@@ -27,7 +27,7 @@ PROMPT_VERSION = "cninfo_corporate_action_resolution_prompt.v4"
 SEMANTIC_VERIFICATION_PROMPT_VERSION = (
     "cninfo_corporate_action_semantic_verification_prompt.v1"
 )
-PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v7"
+PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v8"
 MAX_EVENT_PAGES = 24
 MAX_EVENT_CHARACTERS = 60000
 MAX_EVENT_PROMPT_CHARACTERS = 75000
@@ -1229,17 +1229,22 @@ def _basis_matches_unit(unit: str, basis_text: Any, unit_text: str) -> bool:
 
 def _unit_text_matches(unit: str, unit_text: Any, basis_text: Any) -> bool:
     compact = re.sub(r"\s+", "", _semantic_span(unit_text))
+    currency_unit = re.sub(
+        r"[（(](?:含税|不含税|税前|税后)[）)]$",
+        "",
+        compact,
+    )
     if unit == "10k_CNY":
-        return compact in {"万元", "人民币万元"}
+        return currency_unit in {"万元", "人民币万元"}
     if unit == "CNY":
-        return compact in {"元", "人民币元"}
+        return currency_unit in {"元", "人民币元"}
     if unit == "10k_shares":
         return compact == "万股"
     if unit == "shares":
         return compact == "股"
     if unit in {"CNY_per_share", "CNY_per_10_shares"}:
-        return compact in {"元", "人民币元", "元/股", "人民币元/股"} and (
-            _basis_matches_unit(unit, basis_text, compact)
+        return currency_unit in {"元", "人民币元", "元/股", "人民币元/股"} and (
+            _basis_matches_unit(unit, basis_text, currency_unit)
         )
     if unit in {"per_share", "per_10_shares"}:
         return compact in {"股", "股/股"} and _basis_matches_unit(

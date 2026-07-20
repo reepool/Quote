@@ -671,6 +671,64 @@ def test_v3_share_reform_cash_derivation_does_not_require_action_keywords():
     )
 
 
+def test_v3_currency_unit_accepts_bounded_tax_qualifier_only():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日为2006年6月14日，复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "并派现金1,768.1397万元（含税）。"
+    )
+    result = _share_reform_v3_result(page, include_verification=False)
+
+    def attach_semantic_verification():
+        verification = _semantic_verification(result)
+        result["semantic_event_verification"] = {
+            key: verification[key]
+            for key in (
+                "schema_version", "instrument_id", "source_event_key",
+                "event_claim_hash", "event_match_supported",
+                "event_type_supported", "event_stage_supported",
+                "unresolved_language",
+            )
+        }
+        result["semantic_verifications"] = verification["decisions"]
+        result["semantic_verifier_conflicts"] = verification["conflicts"]
+
+    cash_binding = next(
+        primitive["semantic_evidence"][0]
+        for primitive in result["economic_primitives"]
+        if primitive["fact_id"] == "cash-total"
+    )
+    cash_binding["unit_text"] = "万元（含税）"
+    attach_semantic_verification()
+
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+
+    cash_binding["unit_text"] = "万元（折合美元）"
+    page = _page(page.text.replace("万元（含税）", "万元（折合美元）"))
+    result["evidence"][0]["exact_quote"] = page.text
+    attach_semantic_verification()
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+
 def test_v2_unsupported_date_role_cannot_be_selected():
     page = _page(
         "向全体股东每10股派2.36元，除权除息日为2026年6月12日。"
