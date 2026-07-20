@@ -19062,6 +19062,98 @@ class DataManager:
             "ingestion_run_id": run_id,
         }
 
+    async def _maybe_auto_promote_cninfo_analysis(
+        self,
+        *,
+        analysis: Dict[str, Any],
+        pages: List[Any],
+        enabled: bool,
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        """Promote one eligible analysis through the governed review transaction."""
+        from data_sources.cninfo_corporate_action_llm import (
+            AUTO_PROMOTION_POLICY_VERSION,
+            AUTO_PROMOTION_REVIEWER,
+            classify_auto_promotion_eligibility,
+        )
+
+        decision = classify_auto_promotion_eligibility(
+            result=analysis.get("result") or {},
+            gate_results=analysis.get("gate_results") or {},
+            validation_status=str(analysis.get("validation_status") or ""),
+            schema_version=str(analysis.get("schema_version") or ""),
+            parser_version=str(analysis.get("parser_version") or ""),
+            pages=pages,
+        )
+        outcome: Dict[str, Any] = {
+            "policy_version": AUTO_PROMOTION_POLICY_VERSION,
+            "eligible": bool(decision.get("eligible")),
+            "promoted": False,
+            "status": "skipped",
+            "reason": None,
+            "eligibility_reasons": list(decision.get("reasons") or []),
+            "evidence_key": decision.get("evidence_key"),
+            "analysis_id": int(analysis.get("analysis_id") or 0),
+            "source_event_key": analysis.get("source_event_key"),
+        }
+        if not enabled:
+            outcome["reason"] = "auto_promotion_disabled"
+            return outcome
+        if not outcome["eligible"]:
+            outcome["reason"] = (
+                outcome["eligibility_reasons"][0]
+                if outcome["eligibility_reasons"] else "not_eligible"
+            )
+            return outcome
+
+        try:
+            prior_reviews = await self.db_ops.get_corporate_action_resolution_reviews(
+                source_event_key=str(analysis.get("source_event_key") or ""),
+                limit=1,
+                offset=0,
+            )
+        except Exception as exc:
+            outcome.update(
+                status="failed",
+                reason="prior_review_check_failed",
+                error=str(exc),
+            )
+            return outcome
+        if prior_reviews.get("items"):
+            outcome["reason"] = "prior_event_review_exists"
+            return outcome
+        if dry_run:
+            outcome["status"] = "eligible_dry_run"
+            outcome["reason"] = "dry_run_no_write"
+            return outcome
+        if outcome["analysis_id"] <= 0:
+            outcome.update(status="failed", reason="analysis_id_missing")
+            return outcome
+
+        try:
+            review = await self.review_cninfo_corporate_action_resolution({
+                "instrument_id": analysis.get("instrument_id"),
+                "source_event_key": analysis.get("source_event_key"),
+                "analysis_id": outcome["analysis_id"],
+                "evidence_key": decision.get("evidence_key"),
+                "decision": "resolved",
+                "reviewer": AUTO_PROMOTION_REVIEWER,
+                "_require_unreviewed_event": True,
+                "notes": (
+                    "Automatically promoted after all current-version official "
+                    "evidence, semantic, and deterministic gates passed."
+                ),
+            })
+        except Exception as exc:
+            outcome.update(
+                status="failed",
+                reason="governed_review_failed",
+                error=str(exc),
+            )
+            return outcome
+        outcome.update(status="promoted", promoted=True, review=review.get("review"))
+        return outcome
+
     async def analyze_cninfo_corporate_action_candidates(
         self,
         *,
@@ -19078,16 +19170,13 @@ class DataManager:
         run_ocr: bool = False,
         refresh_documents: bool = False,
         discover_candidates: bool = False,
+        auto_promote_validated: bool = True,
+        exclude_reviewed_events: bool = False,
         sample_limit: int = 20,
         llm_client: Any = None,
         ocr_adapter: Any = None,
     ) -> Dict[str, Any]:
-        """Analyze CNInfo announcement candidates without promoting resolutions.
-
-        Raw observations and effective-date evidence are deliberately read-only here.
-        Write mode persists only document/page and LLM lineage; a human review is
-        required before an effective date can be written as ``resolved``.
-        """
+        """Analyze CNInfo candidates and promote only fully governed results."""
         from tempfile import TemporaryDirectory
         from data_sources.cninfo_corporate_action_documents import (
             CninfoCorporateActionDocumentService,
@@ -19095,6 +19184,7 @@ class DataManager:
             select_relevant_pages,
         )
         from data_sources.cninfo_corporate_action_llm import (
+            AUTO_PROMOTION_POLICY_VERSION,
             CninfoCorporateActionLlmResolver,
             PARSER_VERSION,
             PROMPT_VERSION,
@@ -19125,7 +19215,8 @@ class DataManager:
             "[DataManager] CNInfo LLM resolution preparing: range=%s..%s "
             "exchanges=%s instruments=%s max_events=%s offset=%s profile=%s "
             "resume=%s dry_run=%s download_documents=%s run_ocr=%s "
-            "refresh_documents=%s discover_candidates=%s",
+            "refresh_documents=%s discover_candidates=%s auto_promote_validated=%s "
+            "exclude_reviewed_events=%s",
             normalized_start,
             normalized_end,
             selected_exchanges,
@@ -19139,6 +19230,8 @@ class DataManager:
             run_ocr,
             refresh_documents,
             discover_candidates,
+            auto_promote_validated,
+            exclude_reviewed_events,
         )
         discovery_result = None
         if discover_candidates:
@@ -19175,6 +19268,16 @@ class DataManager:
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution loading candidate evidence"
         )
+        reviewed_filter = ""
+        if exclude_reviewed_events:
+            reviewed_filter = """
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM corporate_action_resolution_reviews r
+                  WHERE r.instrument_id = o.instrument_id
+                    AND r.source_event_key = o.source_event_key
+              )
+            """
         rows = await self.db_ops.execute_read_query(
             f"""
             SELECT o.instrument_id, o.source_event_key, o.source_profile,
@@ -19198,6 +19301,7 @@ class DataManager:
                    OR e.announcement_time >= :start_date AND e.announcement_time < :end_date_exclusive
                    OR o.fiscal_period LIKE :fiscal_year)
               AND ({' OR '.join(suffix_clauses)}) {id_clause}
+              {reviewed_filter}
             ORDER BY o.instrument_id, o.source_event_key, e.announcement_id
             """,
             {
@@ -19260,6 +19364,11 @@ class DataManager:
             "operation": "a_share_cninfo_corporate_action_llm_resolution",
             "dry_run": bool(dry_run),
             "production_isolation": True,
+            "raw_observation_modified": False,
+            "resolved_layer_write_allowed": bool(
+                auto_promote_validated and not dry_run
+            ),
+            "production_factor_modified": False,
             "parameters": {
                 "start_date": normalized_start.isoformat(),
                 "end_date": normalized_end.isoformat(),
@@ -19274,16 +19383,32 @@ class DataManager:
                 "ocr_adapter_configured": ocr_adapter is not None,
                 "refresh_documents": bool(refresh_documents),
                 "discover_candidates": bool(discover_candidates),
+                "auto_promote_validated": bool(auto_promote_validated),
+                "exclude_reviewed_events": bool(exclude_reviewed_events),
             },
             "targets": {"candidate_events": len(all_events), "batch_events": len(batch), "has_more": has_more, "next_target_offset": offset + len(batch) if has_more else None},
             "counts": {"processed": 0, "analyzed": 0, "resumed": 0, "validated_candidates": 0, "manual_required": 0, "llm_disabled": 0, "document_failures": 0, "errors": 0, "persisted_analyses": 0},
             "review_workload": {
                 "tiers": {
+                    "auto_eligible": 0,
+                    "auto_promoted": 0,
                     "machine_rework": 0,
                     "quick_review": 0,
                     "deep_review": 0,
                 },
                 "gate_signatures": {},
+                "remaining_manual_review": 0,
+            },
+            "auto_promotion": {
+                "enabled": bool(auto_promote_validated),
+                "policy_version": AUTO_PROMOTION_POLICY_VERSION,
+                "eligible": 0,
+                "promoted": 0,
+                "dry_run_eligible": 0,
+                "skipped": 0,
+                "failed": 0,
+                "reason_counts": {},
+                "samples": [],
             },
             "llm_metrics": {
                 "input_tokens": 0,
@@ -19298,6 +19423,36 @@ class DataManager:
             "ingestion_run_id": run_id,
         }
         latency_samples: List[int] = []
+
+        def _record_auto_promotion(
+            outcome: Dict[str, Any], *, fallback_tier: str,
+        ) -> None:
+            promotion = result["auto_promotion"]
+            if outcome.get("eligible"):
+                promotion["eligible"] += 1
+            status = str(outcome.get("status") or "skipped")
+            reason = str(outcome.get("reason") or status)
+            if status == "promoted":
+                promotion["promoted"] += 1
+                result["review_workload"]["tiers"]["auto_promoted"] += 1
+            elif status == "eligible_dry_run":
+                promotion["dry_run_eligible"] += 1
+                result["review_workload"]["tiers"]["auto_eligible"] += 1
+            elif status == "failed":
+                promotion["failed"] += 1
+                tier_counts = result["review_workload"]["tiers"]
+                tier_counts[fallback_tier] = int(tier_counts.get(fallback_tier, 0)) + 1
+            else:
+                promotion["skipped"] += 1
+                if reason != "prior_event_review_exists":
+                    tier_counts = result["review_workload"]["tiers"]
+                    tier_counts[fallback_tier] = int(
+                        tier_counts.get(fallback_tier, 0)
+                    ) + 1
+            reason_counts = promotion["reason_counts"]
+            reason_counts[reason] = int(reason_counts.get(reason, 0)) + 1
+            if len(promotion["samples"]) < max(0, int(sample_limit)):
+                promotion["samples"].append(outcome)
         llm_config = self.config.get_llm_config()
         if llm_client is None:
             if not llm_config.enabled or not (llm_config.profiles.get(profile) and llm_config.profiles[profile].enabled):
@@ -19492,19 +19647,51 @@ class DataManager:
                             limit=1000,
                             offset=0,
                         )
-                        if any(
-                            item.get("input_hash") == current_input_hash
+                        matching_analysis = next((
+                            item for item in prior.get("items", [])
+                            if item.get("input_hash") == current_input_hash
+                            and item.get("schema_version") == SCHEMA_VERSION
+                            and item.get("parser_version") == PARSER_VERSION
                             and item.get("validation_status")
                             in {"validated_candidate", "manual_required", "no_matching_evidence"}
-                            for item in prior.get("items", [])
-                        ):
+                        ), None)
+                        if matching_analysis is not None:
+                            classification = (
+                                (matching_analysis.get("result") or {}).get(
+                                    "_review_classification"
+                                ) or {}
+                            )
+                            review_tier = str(
+                                classification.get("review_tier") or "deep_review"
+                            )
+                            gate_signature = str(
+                                classification.get("gate_signature")
+                                or "unclassified"
+                            )
+                            signature_counts = result["review_workload"][
+                                "gate_signatures"
+                            ]
+                            signature_counts[gate_signature] = int(
+                                signature_counts.get(gate_signature, 0)
+                            ) + 1
+                            promotion_outcome = await self._maybe_auto_promote_cninfo_analysis(
+                                analysis=matching_analysis,
+                                pages=pages,
+                                enabled=bool(auto_promote_validated),
+                                dry_run=False,
+                            )
+                            _record_auto_promotion(
+                                promotion_outcome,
+                                fallback_tier=review_tier,
+                            )
                             result["counts"]["resumed"] += 1
                             dm_logger.info(
                                 "[DataManager] CNInfo LLM event resumed from prior analysis: "
-                                "run_id=%s event=%s input_hash=%s",
+                                "run_id=%s event=%s input_hash=%s auto_promotion=%s",
                                 run_id,
                                 event.get("source_event_key"),
                                 current_input_hash[:16],
+                                promotion_outcome.get("status"),
                             )
                             continue
                     analysis = await resolver.analyze(event=event, pages=pages, allowed_start=normalized_start, allowed_end=normalized_end)
@@ -19519,8 +19706,6 @@ class DataManager:
                     review_tier = str(
                         classification.get("review_tier") or "deep_review"
                     )
-                    tier_counts = result["review_workload"]["tiers"]
-                    tier_counts[review_tier] = int(tier_counts.get(review_tier, 0)) + 1
                     gate_signature = str(
                         classification.get("gate_signature") or "unclassified"
                     )
@@ -19565,6 +19750,7 @@ class DataManager:
                         analysis.usage,
                         list(analysis.warnings),
                     )
+                    saved = None
                     if not dry_run:
                         saved = await self.db_ops.save_corporate_action_llm_analysis({
                             "analysis_key": hashlib.sha256(f"{event['source_event_key']}:{analysis.input_hash}:{SCHEMA_VERSION}".encode()).hexdigest(),
@@ -19588,8 +19774,45 @@ class DataManager:
                             event.get("source_event_key"),
                             saved.get("analysis_id") if isinstance(saved, dict) else None,
                         )
+                    promotion_outcome = await self._maybe_auto_promote_cninfo_analysis(
+                        analysis={
+                            "analysis_id": (
+                                saved.get("analysis_id")
+                                if isinstance(saved, dict) else None
+                            ),
+                            "instrument_id": event["instrument_id"],
+                            "source_event_key": event["source_event_key"],
+                            "validation_status": analysis.validation_status,
+                            "schema_version": SCHEMA_VERSION,
+                            "parser_version": PARSER_VERSION,
+                            "result": analysis.result,
+                            "gate_results": analysis.gate_results,
+                        },
+                        pages=pages,
+                        enabled=bool(auto_promote_validated),
+                        dry_run=bool(dry_run),
+                    )
+                    _record_auto_promotion(
+                        promotion_outcome,
+                        fallback_tier=review_tier,
+                    )
+                    dm_logger.info(
+                        "[DataManager] CNInfo LLM auto-promotion evaluated: "
+                        "run_id=%s event=%s eligible=%s status=%s reason=%s",
+                        run_id,
+                        event.get("source_event_key"),
+                        promotion_outcome.get("eligible"),
+                        promotion_outcome.get("status"),
+                        promotion_outcome.get("reason"),
+                    )
                     if len(result["samples"]) < max(0, int(sample_limit)):
-                        result["samples"].append({"source_event_key": event["source_event_key"], "validation_status": analysis.validation_status, "gate_results": analysis.gate_results, "result": analysis.result})
+                        result["samples"].append({
+                            "source_event_key": event["source_event_key"],
+                            "validation_status": analysis.validation_status,
+                            "gate_results": analysis.gate_results,
+                            "result": analysis.result,
+                            "auto_promotion": promotion_outcome,
+                        })
                 except Exception as exc:
                     result["counts"]["errors"] += 1
                     llm_error_code = str(
@@ -19677,14 +19900,28 @@ class DataManager:
                 "p95": _latency_percentile(0.95),
                 "max": ordered_latencies[-1],
             }
-        result["status"] = "partial" if result["errors"] or result["counts"]["document_failures"] or has_more else result["status"]
+        result["status"] = (
+            "partial"
+            if (
+                result["errors"]
+                or result["counts"]["document_failures"]
+                or result["auto_promotion"]["failed"]
+                or has_more
+            )
+            else result["status"]
+        )
+        result["review_workload"]["remaining_manual_review"] = sum(
+            int(result["review_workload"]["tiers"].get(tier, 0))
+            for tier in ("machine_rework", "quick_review", "deep_review")
+        )
         result["checkpoint"] = {"run_id": run_id, "next_target_offset": result["targets"]["next_target_offset"], "input_event_keys": [item["source_event_key"] for item in batch]}
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution finished: run_id=%s status=%s "
             "elapsed_seconds=%.1f processed=%s analyzed=%s validated=%s manual=%s "
             "machine_rework=%s quick_review=%s deep_review=%s input_tokens=%s "
-            "output_tokens=%s budget_overruns=%s resumed=%s document_failures=%s "
-            "errors=%s persisted=%s next_offset=%s",
+            "output_tokens=%s budget_overruns=%s resumed=%s auto_eligible=%s "
+            "auto_promoted=%s auto_skipped=%s auto_failed=%s remaining_review=%s "
+            "document_failures=%s errors=%s persisted=%s next_offset=%s",
             run_id,
             result["status"],
             asyncio.get_running_loop().time() - task_started,
@@ -19699,6 +19936,11 @@ class DataManager:
             result["llm_metrics"]["output_tokens"],
             result["llm_metrics"]["provider_output_budget_overruns"],
             result["counts"]["resumed"],
+            result["auto_promotion"]["eligible"],
+            result["auto_promotion"]["promoted"],
+            result["auto_promotion"]["skipped"],
+            result["auto_promotion"]["failed"],
+            result["review_workload"]["remaining_manual_review"],
             result["counts"]["document_failures"],
             result["counts"]["errors"],
             result["counts"]["persisted_analyses"],
@@ -20147,6 +20389,9 @@ class DataManager:
             terms_row=terms_row,
             evidence_row=evidence_row,
             ingestion_run_id=f"corporate_action_review_{review_key[:16]}",
+            reject_if_prior_event_review=bool(
+                payload.get("_require_unreviewed_event")
+            ),
         )
         return {
             "status": "success",

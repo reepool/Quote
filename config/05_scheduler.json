@@ -289,7 +289,7 @@
       "a_share_cninfo_corporate_action_llm_resolution": {
         "enabled": true,
         "manual_only": true,
-        "description": "A股巨潮公司行动公告正文结构化解析（仅候选，不自动确认有效日期）",
+        "description": "A股巨潮公司行动公告正文结构化解析（高置信结果自动进入受治理 resolved 层）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -309,6 +309,8 @@
           "run_ocr": false,
           "refresh_documents": false,
           "discover_candidates": false,
+          "auto_promote_validated": true,
+          "exclude_reviewed_events": false,
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }
@@ -316,7 +318,7 @@
       "a_share_cninfo_corporate_action_llm_incremental": {
         "enabled": false,
         "manual_only": false,
-        "description": "A股巨潮新增公司行动公告发现与正文解析（默认关闭，仅候选）",
+        "description": "A股巨潮新增公司行动公告发现与正文解析（默认关闭，高置信自动晋级）",
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-fri",
@@ -338,6 +340,8 @@
           "download_documents": true,
           "run_ocr": false,
           "refresh_documents": false,
+          "auto_promote_validated": true,
+          "exclude_reviewed_events": true,
           "sample_limit": 20,
           "max_runtime_seconds": 7200
         }

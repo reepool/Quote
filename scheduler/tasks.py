@@ -432,13 +432,14 @@ def _format_cninfo_special_action_discovery_report(
 
 
 def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
-    """Build a bounded candidate-only report for公告正文解析."""
+    """Build a bounded governed-resolution report for公告正文解析."""
     counts = result.get("counts") or {}
     targets = result.get("targets") or {}
     review_workload = result.get("review_workload") or {}
     tiers = review_workload.get("tiers") or {}
     signatures = review_workload.get("gate_signatures") or {}
     metrics = result.get("llm_metrics") or {}
+    auto_promotion = result.get("auto_promotion") or {}
     latency = metrics.get("latency_ms") or {}
     top_signatures = sorted(
         signatures.items(), key=lambda item: (-int(item[1]), str(item[0]))
@@ -452,8 +453,16 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         f"候选事件: `{targets.get('candidate_events', 0)}`，本批: `{targets.get('batch_events', 0)}`",
         f"处理/分析: `{counts.get('processed', 0)}/{counts.get('analyzed', 0)}`",
         f"通过证据门禁: `{counts.get('validated_candidates', 0)}`",
+        "自动晋级: `"
+        f"enabled={auto_promotion.get('enabled', False)}, "
+        f"eligible={auto_promotion.get('eligible', 0)}, "
+        f"promoted={auto_promotion.get('promoted', 0)}, "
+        f"dry_run_eligible={auto_promotion.get('dry_run_eligible', 0)}, "
+        f"skipped={auto_promotion.get('skipped', 0)}, "
+        f"failed={auto_promotion.get('failed', 0)}`",
         f"机器返工: `{tiers.get('machine_rework', 0)}`",
         f"快速审核: `{tiers.get('quick_review', 0)}`，深度审核: `{tiers.get('deep_review', 0)}`",
+        f"剩余人工审核: `{review_workload.get('remaining_manual_review', 0)}`",
         f"旧口径 manual_required: `{counts.get('manual_required', 0)}`",
         f"Token: `input={metrics.get('input_tokens', 0)}, output={metrics.get('output_tokens', 0)}, total={metrics.get('total_tokens', 0)}`",
         f"输出预算超限: `{metrics.get('provider_output_budget_overruns', 0)}`",
@@ -462,8 +471,20 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         f"文档失败: `{counts.get('document_failures', 0)}`，分析失败: `{counts.get('errors', 0)}`",
         f"下一批 offset: `{targets.get('next_target_offset')}`",
         "",
-        "说明: 解析结果仅保存为候选 lineage，不会自动写入 resolved 有效日期或生产复权因子。",
+        "说明: 高置信结果可写入受治理的 resolved 层；原始 CNInfo 记录和生产复权因子保持隔离。",
     ]
+    reason_counts = auto_promotion.get("reason_counts") or {}
+    top_auto_reasons = sorted(
+        reason_counts.items(), key=lambda item: (-int(item[1]), str(item[0]))
+    )[:5]
+    if top_auto_reasons:
+        lines.extend([
+            "",
+            "自动晋级结果:",
+            "```text",
+            *(f"{reason}: {count}" for reason, count in top_auto_reasons),
+            "```",
+        ])
     if top_signatures:
         lines.extend([
             "",
@@ -4433,10 +4454,12 @@ class ScheduledTasks:
         run_ocr: bool = False,
         refresh_documents: bool = False,
         discover_candidates: bool = False,
+        auto_promote_validated: bool = True,
+        exclude_reviewed_events: bool = False,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Manually analyze official CNInfo candidate documents; candidate-only."""
+        """Analyze CNInfo documents and auto-promote only governed results."""
         task_id = "a_share_cninfo_corporate_action_llm_resolution"
         self._active_tasks.add(task_id)
         try:
@@ -4444,7 +4467,8 @@ class ScheduledTasks:
                 "[Scheduler] Starting CNInfo corporate-action LLM resolution: "
                 "range=%s..%s exchanges=%s instruments=%s max_events=%s "
                 "offset=%s profile=%s resume=%s dry_run=%s download_documents=%s "
-                "run_ocr=%s refresh_documents=%s discover_candidates=%s",
+                "run_ocr=%s refresh_documents=%s discover_candidates=%s "
+                "auto_promote_validated=%s exclude_reviewed_events=%s",
                 start_date,
                 end_date,
                 exchanges,
@@ -4458,6 +4482,8 @@ class ScheduledTasks:
                 run_ocr,
                 refresh_documents,
                 discover_candidates,
+                auto_promote_validated,
+                exclude_reviewed_events,
             )
             result = await data_manager.analyze_cninfo_corporate_action_candidates(
                 start_date=start_date,
@@ -4473,18 +4499,25 @@ class ScheduledTasks:
                 run_ocr=bool(run_ocr),
                 refresh_documents=bool(refresh_documents),
                 discover_candidates=bool(discover_candidates),
+                auto_promote_validated=bool(auto_promote_validated),
+                exclude_reviewed_events=bool(exclude_reviewed_events),
                 sample_limit=int(sample_limit),
             )
             scheduler_logger.info(
                 "[Scheduler] CNInfo corporate-action LLM resolution completed: "
                 "status=%s targets=%s processed=%s analyzed=%s validated=%s "
-                "machine_rework=%s quick_review=%s deep_review=%s "
+                "auto_eligible=%s auto_promoted=%s auto_skipped=%s auto_failed=%s "
+                "machine_rework=%s quick_review=%s deep_review=%s remaining_review=%s "
                 "budget_overruns=%s document_failures=%s errors=%s next_offset=%s",
                 result.get("status"),
                 (result.get("targets") or {}).get("batch_events", 0),
                 (result.get("counts") or {}).get("processed", 0),
                 (result.get("counts") or {}).get("analyzed", 0),
                 (result.get("counts") or {}).get("validated_candidates", 0),
+                (result.get("auto_promotion") or {}).get("eligible", 0),
+                (result.get("auto_promotion") or {}).get("promoted", 0),
+                (result.get("auto_promotion") or {}).get("skipped", 0),
+                (result.get("auto_promotion") or {}).get("failed", 0),
                 ((result.get("review_workload") or {}).get("tiers") or {}).get(
                     "machine_rework", 0
                 ),
@@ -4493,6 +4526,9 @@ class ScheduledTasks:
                 ),
                 ((result.get("review_workload") or {}).get("tiers") or {}).get(
                     "deep_review", 0
+                ),
+                (result.get("review_workload") or {}).get(
+                    "remaining_manual_review", 0
                 ),
                 (result.get("llm_metrics") or {}).get(
                     "provider_output_budget_overruns", 0
@@ -4518,7 +4554,10 @@ class ScheduledTasks:
             scheduler_logger.exception("[Scheduler] CNInfo corporate-action LLM resolution failed: %s", exc)
             return {
                 "status": "failed", "operation": task_id, "dry_run": bool(dry_run),
-                "production_isolation": True, "error": str(exc), "errors": [str(exc)],
+                "production_isolation": True,
+                "raw_observation_modified": False,
+                "production_factor_modified": False,
+                "error": str(exc), "errors": [str(exc)],
             }
         finally:
             self._active_tasks.discard(task_id)
@@ -4534,6 +4573,8 @@ class ScheduledTasks:
         download_documents: bool = True,
         run_ocr: bool = False,
         refresh_documents: bool = False,
+        auto_promote_validated: bool = True,
+        exclude_reviewed_events: bool = True,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4553,6 +4594,8 @@ class ScheduledTasks:
             run_ocr=run_ocr,
             refresh_documents=refresh_documents,
             discover_candidates=True,
+            auto_promote_validated=auto_promote_validated,
+            exclude_reviewed_events=exclude_reviewed_events,
             sample_limit=sample_limit,
             job_config=job_config,
         )

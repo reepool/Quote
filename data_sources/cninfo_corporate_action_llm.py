@@ -28,6 +28,9 @@ SEMANTIC_VERIFICATION_PROMPT_VERSION = (
     "cninfo_corporate_action_semantic_verification_prompt.v1"
 )
 PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v8"
+AUTO_PROMOTION_POLICY_VERSION = "cninfo_corporate_action_auto_promotion.v1"
+AUTO_PROMOTION_REVIEWER = "system:cninfo_auto_promotion.v1"
+AUTO_PROMOTION_MIN_CONFIDENCE = Decimal("0.90")
 MAX_EVENT_PAGES = 24
 MAX_EVENT_CHARACTERS = 60000
 MAX_EVENT_PROMPT_CHARACTERS = 75000
@@ -2009,6 +2012,123 @@ def _derive_review_classification(
         "review_tier": tier,
         "gate_signature": gate_signature,
         "review_reasons": reasons,
+    }
+
+
+def classify_auto_promotion_eligibility(
+    *,
+    result: Mapping[str, Any],
+    gate_results: Mapping[str, Any],
+    validation_status: str,
+    schema_version: str,
+    parser_version: str,
+    pages: Sequence[CorporateActionPageText],
+    minimum_confidence: Decimal = AUTO_PROMOTION_MIN_CONFIDENCE,
+) -> dict[str, Any]:
+    """Return a fail-closed straight-through promotion decision."""
+    reasons: list[str] = []
+    if validation_status != "validated_candidate":
+        reasons.append("validation_status_not_validated")
+    if schema_version != SCHEMA_VERSION:
+        reasons.append("stale_schema_version")
+    if parser_version != PARSER_VERSION:
+        reasons.append("stale_parser_version")
+    if not gate_results or any(value is not True for value in gate_results.values()):
+        reasons.append("not_all_gates_passed")
+
+    classification = result.get("_review_classification")
+    if not isinstance(classification, Mapping):
+        reasons.append("review_classification_missing")
+    else:
+        if classification.get("review_tier") != "quick_review":
+            reasons.append("review_tier_not_quick")
+        if classification.get("gate_signature") != "all_gates_passed":
+            reasons.append("gate_signature_not_clean")
+    if result.get("analysis_status") != "resolved_candidate":
+        reasons.append("analysis_status_not_resolved_candidate")
+    if result.get("event_match") is not True:
+        reasons.append("event_match_not_confirmed")
+    if str(result.get("event_stage") or "").strip() != "implemented":
+        reasons.append("event_stage_not_implemented")
+
+    context = result.get("_input_context")
+    if not isinstance(context, Mapping) or context.get("context_complete") is not True:
+        reasons.append("context_incomplete")
+    verifier = result.get("_semantic_verifier")
+    if (
+        result.get("_semantic_verification_complete") is not True
+        or not isinstance(verifier, Mapping)
+        or verifier.get("status") != "success"
+    ):
+        reasons.append("semantic_verification_incomplete")
+    for field_name in (
+        "conflicts",
+        "_date_fact_conflicts",
+        "semantic_verifier_conflicts",
+        "economic_derivation_conflicts",
+    ):
+        conflicts = result.get(field_name)
+        if isinstance(conflicts, list) and conflicts:
+            reasons.append(f"conflicts_present:{field_name}")
+
+    confidence = _decimal(result.get("confidence"))
+    if confidence is None or confidence < minimum_confidence:
+        reasons.append("confidence_below_threshold")
+    if not pages:
+        reasons.append("official_pages_missing")
+    elif any(
+        page.extraction_method != "native_text"
+        or page.quality_status != "usable"
+        for page in pages
+    ):
+        reasons.append("non_native_or_unusable_page")
+
+    effective_date = str(result.get("effective_date") or "").strip()[:10]
+    effective_date_type = str(result.get("effective_date_type") or "").strip()
+    selected_date_fact = next((
+        item for item in result.get("date_facts", [])
+        if isinstance(item, Mapping)
+        and str(item.get("date") or "")[:10] == effective_date
+        and str(item.get("date_type") or "") == effective_date_type
+    ), None)
+    preferred_evidence_ids = {
+        str(item).strip()
+        for item in (selected_date_fact or {}).get("evidence_ids", [])
+        if str(item).strip()
+    }
+    evidence_candidates = sorted(
+        (
+            item for item in result.get("evidence", [])
+            if isinstance(item, Mapping)
+            and str(item.get("evidence_id") or "") in preferred_evidence_ids
+            and str(item.get("announcement_id") or "").strip()
+            and int(item.get("page_number") or 0) > 0
+            and str(item.get("text_hash") or "").strip()
+            and official_quote_supports_date(
+                effective_date,
+                str(item.get("exact_quote") or ""),
+            )
+        ),
+        key=lambda item: (
+            str(item.get("announcement_id") or ""),
+            int(item.get("page_number") or 0),
+            str(item.get("evidence_id") or ""),
+        ),
+    )
+    evidence_key = (
+        str(evidence_candidates[0].get("announcement_id") or "").strip()
+        if evidence_candidates else None
+    )
+    if not effective_date or not effective_date_type or selected_date_fact is None:
+        reasons.append("effective_date_fact_missing")
+    if not evidence_key:
+        reasons.append("effective_date_evidence_missing")
+    return {
+        "policy_version": AUTO_PROMOTION_POLICY_VERSION,
+        "eligible": not reasons,
+        "reasons": list(dict.fromkeys(reasons)),
+        "evidence_key": evidence_key,
+        "minimum_confidence": str(minimum_confidence),
     }
 
 

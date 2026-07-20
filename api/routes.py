@@ -3518,7 +3518,7 @@ async def get_corporate_action_resolution_reviews(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
 ):
-    """Query explicit human review lineage without changing resolution state."""
+    """Query governed human or system review lineage without changing state."""
     page = await data_manager.db_ops.get_corporate_action_resolution_reviews(
         source_event_key=_normalize_optional_query(source_event_key),
         decision=_normalize_optional_query(decision),

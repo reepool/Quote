@@ -358,6 +358,7 @@ async def test_review_bundle_rolls_back_all_rows_when_terms_write_fails():
             Base.metadata.create_all,
             tables=[
                 InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
                 CorporateActionLlmAnalysisDB.__table__,
                 CorporateActionResolutionReviewDB.__table__,
                 CorporateActionResolvedTermsDB.__table__,
@@ -368,6 +369,14 @@ async def test_review_bundle_rolls_back_all_rows_when_terms_write_fails():
         session.add(InstrumentDB(
             instrument_id="000001.SZ", symbol="000001", name="Test",
             exchange="SZSE", type="stock", currency="CNY", is_active=True,
+        ))
+        session.add(CorporateActionObservationDB(
+            instrument_id="000001.SZ",
+            source="cninfo",
+            source_profile="cninfo_dividend",
+            source_event_key="event-1",
+            action_type="dividend",
+            row_hash="observation-hash",
         ))
         analysis = CorporateActionLlmAnalysisDB(
             analysis_key="analysis-key", instrument_id="000001.SZ",
@@ -458,4 +467,45 @@ async def test_review_bundle_rolls_back_all_rows_when_terms_write_fails():
     assert saved["review"]["review_id"] > 0
     assert saved["terms_write"]["resolved_terms_id"] > 0
     assert saved["evidence_write"]["inserted"] == 1
+    with pytest.raises(
+        ValueError,
+        match="already has a review decision",
+    ):
+        await operations.save_corporate_action_review_bundle(
+            review_row={
+                "review_key": "automatic-review-key",
+                "instrument_id": "000001.SZ",
+                "source_event_key": "event-1",
+                "analysis_id": analysis_id,
+                "evidence_key": "ann-1",
+                "decision": "resolved",
+                "effective_date": "2026-06-13",
+                "date_basis": "automatic_candidate",
+                "reviewer": "system:auto-promotion",
+                "review_payload": {},
+            },
+            terms_row={
+                "cash_dividend_per_share": 9.99,
+                "resolved_fields": ["cash_dividend_per_share"],
+                "is_active": True,
+            },
+            evidence_row={
+                "instrument_id": "000001.SZ",
+                "source_event_key": "event-1",
+                "source_profile": "cninfo_dividend",
+                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_key": "event-1",
+                "resolution_status": "resolved",
+                "effective_date": "2026-06-13",
+                "date_basis": "automatic_candidate",
+            },
+            reject_if_prior_event_review=True,
+        )
+    async with session_factory() as session:
+        terms = await session.scalar(select(CorporateActionResolvedTermsDB))
+        review_count = await session.scalar(
+            select(func.count()).select_from(CorporateActionResolutionReviewDB)
+        )
+    assert terms.cash_dividend_per_share == pytest.approx(0.236)
+    assert review_count == 1
     await engine.dispose()

@@ -5024,6 +5024,7 @@ class DatabaseOperations:
         terms_row: Dict[str, Any],
         evidence_row: Optional[Dict[str, Any]] = None,
         ingestion_run_id: Optional[str] = None,
+        reject_if_prior_event_review: bool = False,
     ) -> Dict[str, Any]:
         """Atomically persist one review, terms overlay, and optional evidence."""
         review_key = str(review_row.get("review_key") or "").strip()
@@ -5180,6 +5181,37 @@ class DatabaseOperations:
 
         async with self.get_async_session() as session:
             async with session.begin():
+                observation_id = await session.scalar(
+                    select(CorporateActionObservationDB.id)
+                    .where(
+                        CorporateActionObservationDB.instrument_id == instrument_id,
+                        CorporateActionObservationDB.source_event_key
+                        == source_event_key,
+                    )
+                    .order_by(
+                        CorporateActionObservationDB.is_current.desc(),
+                        CorporateActionObservationDB.id.desc(),
+                    )
+                    .limit(1)
+                    .with_for_update()
+                )
+                if observation_id is None:
+                    raise ValueError("reviewed corporate-action observation is missing")
+                if reject_if_prior_event_review:
+                    prior_review_id = await session.scalar(
+                        select(CorporateActionResolutionReviewDB.id)
+                        .where(
+                            CorporateActionResolutionReviewDB.instrument_id
+                            == instrument_id,
+                            CorporateActionResolutionReviewDB.source_event_key
+                            == source_event_key,
+                        )
+                        .limit(1)
+                    )
+                    if prior_review_id is not None:
+                        raise ValueError(
+                            "corporate-action event already has a review decision"
+                        )
                 review = await session.scalar(
                     select(CorporateActionResolutionReviewDB).where(
                         CorporateActionResolutionReviewDB.review_key == review_key

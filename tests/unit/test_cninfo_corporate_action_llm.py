@@ -16,6 +16,7 @@ from data_sources.cninfo_corporate_action_documents import (
 )
 from data_sources.cninfo_corporate_action_llm import (
     ANALYSIS_SCHEMA,
+    AUTO_PROMOTION_POLICY_VERSION,
     CninfoCorporateActionLlmResolver,
     FACT_ANALYSIS_SCHEMA,
     FACT_SCHEMA_VERSION,
@@ -26,11 +27,13 @@ from data_sources.cninfo_corporate_action_llm import (
     MAX_ECONOMIC_DERIVATIONS,
     MAX_EVENT_PAGES,
     MAX_EVENT_PROMPT_CHARACTERS,
+    PARSER_VERSION,
     SCHEMA_VERSION,
     SEMANTIC_VERIFICATION_SCHEMA_VERSION,
     _derive_economic_terms,
     _semantic_verification_payload,
     analysis_schema_for_version,
+    classify_auto_promotion_eligibility,
     normalize_analysis_result,
     validate_analysis,
 )
@@ -200,6 +203,100 @@ def test_validated_candidate_requires_exact_official_quote():
     assert status == "validated_candidate"
     assert all(gates.values())
     assert normalized["effective_date"] == "2026-06-12"
+
+
+def _eligible_auto_promotion_case():
+    page = _page()
+    status, gates, normalized = validate_analysis(
+        _v3_result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        allowed_start=date(2026, 1, 1),
+        allowed_end=date(2026, 12, 31),
+        source_profile="cninfo_dividend",
+        action_type="dividend",
+    )
+    normalized["_semantic_verifier"] = {"status": "success"}
+    normalized["_semantic_verification_complete"] = True
+    normalized["_input_context"] = {"context_complete": True}
+    return page, status, gates, normalized
+
+
+def test_current_native_all_gate_candidate_is_auto_promotable():
+    page, status, gates, normalized = _eligible_auto_promotion_case()
+    decision = classify_auto_promotion_eligibility(
+        result=normalized,
+        gate_results=gates,
+        validation_status=status,
+        schema_version=SCHEMA_VERSION,
+        parser_version=PARSER_VERSION,
+        pages=[page],
+    )
+    assert decision == {
+        "policy_version": AUTO_PROMOTION_POLICY_VERSION,
+        "eligible": True,
+        "reasons": [],
+        "evidence_key": "ann-1",
+        "minimum_confidence": "0.90",
+    }
+
+
+@pytest.mark.parametrize(
+    ("case", "reason"),
+    [
+        ("ocr", "non_native_or_unusable_page"),
+        ("conflict", "conflicts_present:conflicts"),
+        ("stale_parser", "stale_parser_version"),
+        ("stale_schema", "stale_schema_version"),
+        ("low_confidence", "confidence_below_threshold"),
+        ("incomplete_context", "context_incomplete"),
+        ("non_final_stage", "event_stage_not_implemented"),
+        ("semantic_incomplete", "semantic_verification_incomplete"),
+        ("failed_gate", "not_all_gates_passed"),
+    ],
+)
+def test_auto_promotion_uncertainty_stays_in_review(case, reason):
+    page, status, gates, normalized = _eligible_auto_promotion_case()
+    schema_version = SCHEMA_VERSION
+    parser_version = PARSER_VERSION
+    pages = [page]
+    if case == "ocr":
+        pages = [CorporateActionPageText(
+            page_number=page.page_number,
+            text=page.text,
+            text_hash=page.text_hash,
+            announcement_id=page.announcement_id,
+            extraction_method="ocr",
+            quality_status="ocr_usable",
+        )]
+    elif case == "conflict":
+        normalized["conflicts"] = ["official statements conflict"]
+    elif case == "stale_parser":
+        parser_version = "cninfo_corporate_action_resolution_validator.v7"
+    elif case == "stale_schema":
+        schema_version = FACT_SCHEMA_VERSION
+    elif case == "low_confidence":
+        normalized["confidence"] = 0.89
+    elif case == "incomplete_context":
+        normalized["_input_context"]["context_complete"] = False
+    elif case == "non_final_stage":
+        normalized["event_stage"] = "approved"
+    elif case == "semantic_incomplete":
+        normalized["_semantic_verification_complete"] = False
+    elif case == "failed_gate":
+        gates["no_conflict"] = False
+
+    decision = classify_auto_promotion_eligibility(
+        result=normalized,
+        gate_results=gates,
+        validation_status=status,
+        schema_version=schema_version,
+        parser_version=parser_version,
+        pages=pages,
+    )
+    assert decision["eligible"] is False
+    assert reason in decision["reasons"]
 
 
 @pytest.mark.parametrize("change", [
@@ -1535,6 +1632,9 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     )
     manager.db_ops.save_corporate_action_document_bundle = AsyncMock()
     manager.db_ops.save_corporate_action_llm_analysis = AsyncMock()
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
     bundle = CorporateActionDocumentBundle(
         "ann-1", "https://example.test/a.pdf", "hash", "application/pdf", 10,
         "ann-1/hash.pdf", (page,), "extracted",
@@ -1566,7 +1666,14 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     )
     assert result["status"] == "dry_run"
     assert result["counts"]["validated_candidates"] == 1
-    assert result["review_workload"]["tiers"]["quick_review"] == 1
+    assert result["auto_promotion"]["eligible"] == 1
+    assert result["auto_promotion"]["dry_run_eligible"] == 1
+    assert result["review_workload"]["tiers"]["auto_eligible"] == 1
+    assert result["review_workload"]["tiers"]["quick_review"] == 0
+    assert result["review_workload"]["remaining_manual_review"] == 0
+    assert result["resolved_layer_write_allowed"] is False
+    assert result["raw_observation_modified"] is False
+    assert result["production_factor_modified"] is False
     assert result["llm_metrics"]["total_tokens"] == 180
     assert result["llm_metrics"]["provider_output_budget_overruns"] == 1
     assert result["llm_metrics"]["latency_ms"]["p95"] == 15
@@ -1625,6 +1732,7 @@ async def test_review_promotes_only_archived_validated_official_evidence():
         "effective_date": "2026-06-12",
         "date_basis": "official_announcement_explicit_statement",
         "reviewer": "unit-reviewer",
+        "_require_unreviewed_event": True,
     })
     bundle_kwargs = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
     saved = bundle_kwargs["evidence_row"]
@@ -1635,6 +1743,7 @@ async def test_review_promotes_only_archived_validated_official_evidence():
     assert terms["cash_dividend_per_share"] == pytest.approx(0.236)
     assert terms["resolved_fields"] == ["cash_dividend_per_share"]
     assert terms["evidence"]["economic_field_evidence"]["cash_dividend"]
+    assert bundle_kwargs["reject_if_prior_event_review"] is True
 
 
 @pytest.mark.asyncio
@@ -2031,6 +2140,7 @@ async def test_refresh_documents_rechecks_existing_announcement(monkeypatch):
         resume=False,
         dry_run=False,
         refresh_documents=True,
+        auto_promote_validated=False,
         llm_client=client,
     )
     assert result["status"] == "success"
@@ -2095,3 +2205,247 @@ async def test_data_manager_reports_specific_llm_error_code(monkeypatch):
     failure_row = manager.db_ops.save_corporate_action_llm_analysis.await_args.args[0]
     assert failure_row["error_code"] == "deadline_exceeded"
     assert failure_row["attempt_count"] == 2
+
+
+def _stored_document_bundle(page):
+    return {
+        "items": [{
+            "artifact_id": 1,
+            "pages": [{
+                "page_number": page.page_number,
+                "text": page.text,
+                "text_hash": page.text_hash,
+                "extraction_method": "native_text",
+                "quality_status": "usable",
+            }],
+        }]
+    }
+
+
+def _candidate_observation_row():
+    return {
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "action_type": "dividend",
+        "announcement_date": date(2026, 6, 1),
+        "record_date": date(2026, 6, 11),
+        "announcement_id": "ann-1",
+        "announcement_title": "权益分派实施公告",
+        "announcement_time": date(2026, 6, 1),
+        "evidence_url": "https://example.test/a.pdf",
+    }
+
+
+@pytest.mark.asyncio
+async def test_new_eligible_analysis_is_promoted_through_governed_review():
+    page = _page()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        return_value=[_candidate_observation_row()]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock(
+        return_value={"analysis_id": 7, "status": "inserted"}
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.review_cninfo_corporate_action_resolution = AsyncMock(return_value={
+        "status": "success",
+        "review": {"review_id": 9, "status": "inserted"},
+        "raw_observation_modified": False,
+        "production_factor_modified": False,
+    })
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=False,
+        dry_run=False,
+        llm_client=client,
+    )
+
+    assert result["status"] == "success"
+    assert result["auto_promotion"]["eligible"] == 1
+    assert result["auto_promotion"]["promoted"] == 1
+    assert result["review_workload"]["tiers"]["auto_promoted"] == 1
+    assert result["review_workload"]["remaining_manual_review"] == 0
+    payload = manager.review_cninfo_corporate_action_resolution.await_args.args[0]
+    assert payload["analysis_id"] == 7
+    assert payload["decision"] == "resolved"
+    assert payload["reviewer"] == "system:cninfo_auto_promotion.v1"
+    assert payload["_require_unreviewed_event"] is True
+
+
+@pytest.mark.asyncio
+async def test_resume_promotes_current_analysis_without_another_llm_call(
+    monkeypatch,
+):
+    page, status, gates, normalized = _eligible_auto_promotion_case()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        return_value=[_candidate_observation_row()]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(return_value={
+        "items": [{
+            "analysis_id": 7,
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "input_hash": "matching-input-hash",
+            "validation_status": status,
+            "schema_version": SCHEMA_VERSION,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+        }]
+    })
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock()
+    manager.review_cninfo_corporate_action_resolution = AsyncMock(return_value={
+        "status": "success",
+        "review": {"review_id": 9, "status": "inserted"},
+    })
+    monkeypatch.setattr(
+        CninfoCorporateActionLlmResolver,
+        "input_hash",
+        lambda self, event, pages: "matching-input-hash",
+    )
+    client = SimpleNamespace(complete=AsyncMock())
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=True,
+        dry_run=False,
+        llm_client=client,
+    )
+
+    assert result["status"] == "success"
+    assert result["counts"]["resumed"] == 1
+    assert result["counts"]["analyzed"] == 0
+    assert result["auto_promotion"]["promoted"] == 1
+    client.complete.assert_not_awaited()
+    manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_prior_review_blocks_auto_promotion():
+    page, status, gates, normalized = _eligible_auto_promotion_case()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": [{"review_id": 1, "decision": "resolved"}]}
+    )
+    manager.review_cninfo_corporate_action_resolution = AsyncMock()
+
+    outcome = await manager._maybe_auto_promote_cninfo_analysis(
+        analysis={
+            "analysis_id": 7,
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "validation_status": status,
+            "schema_version": SCHEMA_VERSION,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+        },
+        pages=[page],
+        enabled=True,
+        dry_run=False,
+    )
+
+    assert outcome["eligible"] is True
+    assert outcome["status"] == "skipped"
+    assert outcome["reason"] == "prior_event_review_exists"
+    manager.review_cninfo_corporate_action_resolution.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_governed_promotion_failure_is_reported_for_manual_review():
+    page = _page()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        return_value=[_candidate_observation_row()]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock(
+        return_value={"analysis_id": 7, "status": "inserted"}
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.review_cninfo_corporate_action_resolution = AsyncMock(
+        side_effect=ValueError("archived official pages are missing")
+    )
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=False,
+        dry_run=False,
+        llm_client=client,
+    )
+
+    assert result["status"] == "partial"
+    assert result["auto_promotion"]["failed"] == 1
+    assert result["auto_promotion"]["reason_counts"] == {
+        "governed_review_failed": 1
+    }
+    assert result["review_workload"]["tiers"]["quick_review"] == 1
+    assert result["review_workload"]["remaining_manual_review"] == 1
+
+
+@pytest.mark.asyncio
+async def test_incremental_candidate_query_can_exclude_reviewed_events():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[])
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exclude_reviewed_events=True,
+        dry_run=True,
+        llm_client=SimpleNamespace(complete=AsyncMock()),
+    )
+
+    query = manager.db_ops.execute_read_query.await_args.args[0]
+    assert "NOT EXISTS" in query
+    assert "corporate_action_resolution_reviews" in query
+    assert result["parameters"]["exclude_reviewed_events"] is True
