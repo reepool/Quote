@@ -110,7 +110,7 @@ candidate 公告元数据
 ```text
 profile=semantic_extraction
 schema_name=cninfo_corporate_action_resolution
-schema_version=cninfo_corporate_action_resolution.v2
+schema_version=cninfo_corporate_action_resolution.v3
 ```
 
 模型初始配置可使用 `grok-4.5`，但业务代码不得判断或写死模型名称。
@@ -131,12 +131,12 @@ section。不能把不同事件合并成一个无边界 prompt。
 
 ## 7. 结构化输出 schema
 
-`cninfo_corporate_action_resolution.v2` 保留 v1 的规范日期和经济字段，并增加证据 ID、
-多角色日期事实和经济原始事实。历史 v1 分析继续按 v1 schema 审核，不要求迁移：
+`cninfo_corporate_action_resolution.v3` 保留 v2 的规范日期、经济字段和公式血缘，并增加
+语义证据片段及独立语义复核结果。历史 v1/v2 分析继续按原 schema 审核，不要求迁移：
 
 ```json
 {
-  "schema_version": "cninfo_corporate_action_resolution.v2",
+  "schema_version": "cninfo_corporate_action_resolution.v3",
   "instrument_id": "600108.SH",
   "source_event_key": "...",
   "event_match": true,
@@ -165,13 +165,13 @@ section。不能把不同事件合并成一个无边界 prompt。
     }
   ],
   "date_facts": [
-    {"date": "2006-06-14", "date_type": "listing_date", "date_basis": "上市日", "evidence_ids": ["ev-1"]},
-    {"date": "2006-06-14", "date_type": "resumption_date", "date_basis": "复牌日", "evidence_ids": ["ev-1"]}
+    {"fact_id": "date-listing", "date": "2006-06-14", "date_type": "listing_date", "date_basis": "上市日", "evidence_ids": ["ev-1"], "semantic_evidence": [{"evidence_id": "ev-1", "role_text": "上市日", "date_text": "2006年6月14日"}]},
+    {"fact_id": "date-resumption", "date": "2006-06-14", "date_type": "resumption_date", "date_basis": "复牌日", "evidence_ids": ["ev-1"], "semantic_evidence": [{"evidence_id": "ev-1", "role_text": "复牌日", "date_text": "2006年6月14日"}]}
   ],
   "economic_primitives": [
-    {"fact_id": "bonus-total", "fact_type": "bonus_share_total", "value": 33574.8504, "unit": "10k_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]},
-    {"fact_id": "bonus-ratio", "fact_type": "bonus_ratio", "value": 6.8, "unit": "per_10_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]},
-    {"fact_id": "cash-total", "fact_type": "cash_total", "value": 1768.1397, "unit": "10k_CNY", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]}
+    {"fact_id": "bonus-total", "fact_type": "bonus_share_total", "value": 33574.8504, "unit": "10k_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"], "semantic_evidence": [{"evidence_id": "ev-1", "subject_text": "流通股股东", "relation_text": "共送股", "value_text": "33,574.8504", "unit_text": "万股", "basis_text": null}]},
+    {"fact_id": "bonus-ratio", "fact_type": "bonus_ratio", "value": 6.8, "unit": "per_10_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"], "semantic_evidence": [{"evidence_id": "ev-1", "subject_text": "流通股股东", "relation_text": "送红股", "value_text": "6.8", "unit_text": "股", "basis_text": "每10股"}]},
+    {"fact_id": "cash-total", "fact_type": "cash_total", "value": 1768.1397, "unit": "10k_CNY", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"], "semantic_evidence": [{"evidence_id": "ev-1", "subject_text": "流通股股东", "relation_text": "并派现金", "value_text": "1,768.1397", "unit_text": "万元", "basis_text": null}]}
   ],
   "alternative_dates": [
     {"date": "2006-06-14", "date_type": "listing_date", "date_basis": "上市日", "reason": "validated official date fact"}
@@ -218,7 +218,7 @@ LLM 返回后必须由程序执行以下校验：
 11. OCR 低质量、页码缺失、正文截断或引用不精确时禁止自动确认；
 12. 模型置信度不能替代上述任何证据门槛。
 
-v2 额外执行以下治理：
+v2 历史分析继续执行以下治理：
 
 - 每条 `date_facts` 必须引用同一语义片段中同时包含日期和对应角色的官方原文，不能把同一
   引文里的登记日与复牌日交叉配对；同一天可同时是上市日、复牌日等不同角色，不视为冲突；
@@ -235,6 +235,12 @@ v2 额外执行以下治理：
   schema 上限或审核阶段无法重放；
 - 模型未填写规范经济条款但存在唯一可复算结果时，解析器可补入候选规范值；模型已填写时，
   必须与程序复算值在容差内一致。
+
+v3 新分析不再通过中文动作、日期角色或股东范围关键词判断语义。模型第一次调用返回
+`role_text/date_text` 或 `subject_text/relation_text/value_text/unit_text/basis_text`；第二次独立
+调用逐条确认事件类型、事件阶段、日期角色、经济事实类型和受益范围。程序只校验这些片段
+确实存在于归档原文、日期和数字可复现、单位及每股/每十股基准相容、片段关联距离有界，并
+继续使用上述 `Decimal` 公式。任一语义复核缺失、否定或冲突均保持 `manual_required`。
 
 校验结果应包含每条 gate 的通过状态和失败原因，便于人工复核。
 
@@ -332,6 +338,34 @@ refresh_documents
 ```text
 /run a_share_cninfo_corporate_action_llm_resolution start_date=1990-12-19 end_date=2026-12-31 exchanges=SSE,SZSE max_events=100 target_offset=0 profile=semantic_extraction resume=true download_documents=true run_ocr=false refresh_documents=false write
 ```
+
+## Two-pass semantic evidence validation
+
+New resolution runs use `cninfo_corporate_action_resolution.v3` and make two
+sequential calls through the common LLM gateway for each event:
+
+1. extraction returns typed date/economic facts plus exact semantic spans copied
+   from archived official quotes;
+2. independent semantic verification checks event type/stage, date roles,
+   economic fact types, and beneficiary scopes without calculating values.
+
+Program code does not approve v3 facts through Chinese action or shareholder
+keyword lists. It verifies exact span existence, date/numeric text, units, bounded
+span association, and deterministic Decimal formulas. Both passes must succeed for
+`validated_candidate`; a verifier error retains the extraction and returns
+`manual_required` with `_semantic_verifier` error lineage.
+
+The verifier echoes a deterministic hash for the event claim and every assertion.
+Validation rejects duplicate fact IDs or any result whose event type, date role,
+economic type, value, scope, or semantic evidence changed after verification.
+Equivalent duplicate facts may be collapsed only together with their redundant
+verification decisions so the persisted candidate remains replayable during review.
+
+The reported token usage, attempts, and latency aggregate both calls. With a slow
+model, one event can therefore take roughly twice the latency of the earlier
+single-pass task. Restart the application after deploying schema or prompt changes,
+then rerun the same bounded command with `resume=false` to replace the analysis for
+that input key while preserving audit lineage.
 
 全量历史处理按报告返回的 `next_target_offset` 分批继续。只有报告中的
 `quick_review` 和 `deep_review` 才进入默认人工队列；`machine_rework` 是格式、单位或兼容映射等

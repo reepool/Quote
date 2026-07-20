@@ -17,6 +17,8 @@ from data_sources.cninfo_corporate_action_documents import (
 from data_sources.cninfo_corporate_action_llm import (
     ANALYSIS_SCHEMA,
     CninfoCorporateActionLlmResolver,
+    FACT_ANALYSIS_SCHEMA,
+    FACT_SCHEMA_VERSION,
     LEGACY_ANALYSIS_SCHEMA,
     LEGACY_SCHEMA_VERSION,
     MAX_ANALYSIS_OUTPUT_TOKENS,
@@ -25,7 +27,9 @@ from data_sources.cninfo_corporate_action_llm import (
     MAX_EVENT_PAGES,
     MAX_EVENT_PROMPT_CHARACTERS,
     SCHEMA_VERSION,
+    SEMANTIC_VERIFICATION_SCHEMA_VERSION,
     _derive_economic_terms,
+    _semantic_verification_payload,
     analysis_schema_for_version,
     normalize_analysis_result,
     validate_analysis,
@@ -82,7 +86,7 @@ def _result(page, **overrides):
 
 def _v2_result(page, **overrides):
     result = _result(page)
-    result["schema_version"] = SCHEMA_VERSION
+    result["schema_version"] = FACT_SCHEMA_VERSION
     result["evidence"][0]["evidence_id"] = "ev-1"
     result["date_facts"] = [{
         "date": "2026-06-12",
@@ -100,6 +104,87 @@ def _v2_result(page, **overrides):
     }]
     result.update(overrides)
     return result
+
+
+def _semantic_verification(result, **overrides):
+    payload = _semantic_verification_payload(result)
+    decisions = [
+        {
+            "assertion_id": item["assertion_id"],
+            "assertion_kind": item["assertion_kind"],
+            "assertion_hash": item["assertion_hash"],
+            "semantic_supported": True,
+            "type_or_role_supported": True,
+            "scope_supported": True,
+            "reason": "official quote supports the assertion",
+        }
+        for item in payload["assertions"]
+    ]
+    verification = {
+        "schema_version": SEMANTIC_VERIFICATION_SCHEMA_VERSION,
+        "instrument_id": result["instrument_id"],
+        "source_event_key": result["source_event_key"],
+        "event_claim_hash": payload["event_claim_hash"],
+        "event_match_supported": True,
+        "event_type_supported": True,
+        "event_stage_supported": True,
+        "unresolved_language": False,
+        "decisions": decisions,
+        "conflicts": [],
+    }
+    verification.update(overrides)
+    return verification
+
+
+def _v3_result(page, *, include_verification=True, **overrides):
+    result = _v2_result(page)
+    result["schema_version"] = SCHEMA_VERSION
+    result["date_facts"][0].update({
+        "fact_id": "date-ex",
+        "semantic_evidence": [{
+            "evidence_id": "ev-1",
+            "role_text": "除权除息日",
+            "date_text": "2026年6月12日",
+        }],
+    })
+    result["economic_primitives"][0]["semantic_evidence"] = [{
+        "evidence_id": "ev-1",
+        "subject_text": "全体股东",
+        "relation_text": "派",
+        "value_text": "2.36",
+        "unit_text": "元",
+        "basis_text": "每10股",
+    }]
+    result.update(overrides)
+    if include_verification:
+        verification = _semantic_verification(result)
+        result["semantic_event_verification"] = {
+            key: verification[key]
+            for key in (
+                "schema_version", "instrument_id", "source_event_key",
+                "event_claim_hash",
+                "event_match_supported", "event_type_supported",
+                "event_stage_supported", "unresolved_language",
+            )
+        }
+        result["semantic_verifications"] = verification["decisions"]
+        result["semantic_verifier_conflicts"] = verification["conflicts"]
+    return result
+
+
+def _gateway_response(
+    data, *, suffix="1", latency_ms=10, usage=None, warnings=(),
+):
+    return SimpleNamespace(
+        data=data,
+        response_hash=f"response-hash-{suffix}",
+        request_id=f"request-{suffix}",
+        model="fake",
+        latency_ms=latency_ms,
+        attempt_count=1,
+        usage=usage,
+        warnings=warnings,
+    )
 
 
 def test_validated_candidate_requires_exact_official_quote():
@@ -173,6 +258,7 @@ def test_analysis_schema_bounds_canonical_fields():
 
 def test_schema_dispatch_preserves_legacy_contract():
     assert analysis_schema_for_version(LEGACY_SCHEMA_VERSION) is LEGACY_ANALYSIS_SCHEMA
+    assert analysis_schema_for_version(FACT_SCHEMA_VERSION) is FACT_ANALYSIS_SCHEMA
     assert analysis_schema_for_version(SCHEMA_VERSION) is ANALYSIS_SCHEMA
     with pytest.raises(ValueError, match="unsupported"):
         analysis_schema_for_version("unknown")
@@ -197,6 +283,191 @@ def test_v2_direct_ratio_and_official_date_fact_validate():
     assert normalized["economic_derivations"][0]["formula_id"] == (
         "direct_cash_ratio_normalization_v1"
     )
+
+
+def test_v3_unseen_wording_uses_semantic_evidence_not_keyword_enumeration():
+    page = _page(
+        "本公司面向全体股东办理本次权益安排：每10股兑现2.36元；"
+        "权益处理基准日期为2026年6月12日。"
+    )
+    result = _v3_result(page, include_verification=False)
+    result["date_facts"][0]["semantic_evidence"][0].update({
+        "role_text": "权益处理基准日期",
+        "date_text": "2026年6月12日",
+    })
+    result["economic_primitives"][0]["semantic_evidence"][0].update({
+        "subject_text": "全体股东",
+        "relation_text": "兑现",
+    })
+    verification = _semantic_verification(result)
+    result["semantic_event_verification"] = {
+        key: verification[key]
+        for key in (
+            "schema_version", "instrument_id", "source_event_key",
+            "event_claim_hash", "event_match_supported", "event_type_supported",
+            "event_stage_supported", "unresolved_language",
+        )
+    }
+    result["semantic_verifications"] = verification["decisions"]
+    result["semantic_verifier_conflicts"] = verification["conflicts"]
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="dividend",
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["economic_terms"]["cash_dividend"]["value"] == 2.36
+
+
+@pytest.mark.parametrize("decision_field", [
+    "semantic_supported", "type_or_role_supported", "scope_supported",
+])
+def test_v3_rejected_semantic_decision_fails_closed(decision_field):
+    page = _page()
+    result = _v3_result(page)
+    economic_decision = next(
+        item for item in result["semantic_verifications"]
+        if item["assertion_kind"] == "economic_primitive"
+    )
+    economic_decision[decision_field] = False
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+
+@pytest.mark.parametrize(("field", "value"), [
+    ("value_text", "2.35"),
+    ("unit_text", "万元"),
+    ("basis_text", "每股"),
+])
+def test_v3_altered_numeric_unit_or_basis_span_fails_closed(field, value):
+    page = _page()
+    result = _v3_result(page)
+    result["economic_primitives"][0]["semantic_evidence"][0][field] = value
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+
+def test_v3_altered_date_span_fails_closed():
+    page = _page()
+    result = _v3_result(page)
+    result["date_facts"][0]["semantic_evidence"][0]["date_text"] = (
+        "2026年6月13日"
+    )
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["date_facts_in_evidence"] is False
+
+
+def test_v3_rejects_fact_id_collision_across_assertion_kinds():
+    page = _page()
+    result = _v3_result(page, include_verification=False)
+    result["date_facts"][0]["fact_id"] = "cash-ratio"
+    verification = _semantic_verification(result)
+    result["semantic_event_verification"] = {
+        key: verification[key]
+        for key in (
+            "schema_version", "instrument_id", "source_event_key",
+            "event_claim_hash", "event_match_supported", "event_type_supported",
+            "event_stage_supported", "unresolved_language",
+        )
+    }
+    result["semantic_verifications"] = verification["decisions"]
+    result["semantic_verifier_conflicts"] = verification["conflicts"]
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["assertion_ids_unique"] is False
+    assert gates["semantic_verification_complete"] is False
+
+
+def test_v3_rejects_stale_semantic_verification_after_claim_change():
+    page = _page()
+    event_changed = _v3_result(page)
+    event_changed["event_type"] = "mixed"
+    status, gates, _ = validate_analysis(
+        event_changed,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["semantic_verification_complete"] is False
+
+    assertion_changed = _v3_result(page)
+    assertion_changed["economic_primitives"][0]["beneficiary_scope"] = (
+        "circulating_shareholders"
+    )
+    status, gates, _ = validate_analysis(
+        assertion_changed,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["semantic_verification_complete"] is False
+
+
+def test_v3_deduplicated_facts_remain_replayable():
+    page = _page()
+    result = _v3_result(page, include_verification=False)
+    duplicate = deepcopy(result["economic_primitives"][0])
+    duplicate["fact_id"] = "cash-ratio-duplicate"
+    result["economic_primitives"].append(duplicate)
+    verification = _semantic_verification(result)
+    result["semantic_event_verification"] = {
+        key: verification[key]
+        for key in (
+            "schema_version", "instrument_id", "source_event_key",
+            "event_claim_hash", "event_match_supported", "event_type_supported",
+            "event_stage_supported", "unresolved_language",
+        )
+    }
+    result["semantic_verifications"] = verification["decisions"]
+    result["semantic_verifier_conflicts"] = verification["conflicts"]
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert len(normalized["economic_primitives"]) == 1
+    assert len(normalized["semantic_verifications"]) == 2
+
+    replay_status, replay_gates, _ = validate_analysis(
+        normalized,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert replay_status == "validated_candidate"
+    assert all(replay_gates.values())
 
 
 def _share_reform_v2_result(page):
@@ -279,12 +550,70 @@ def _share_reform_v2_result(page):
     return result
 
 
+def _share_reform_v3_result(page, *, include_verification=True):
+    result = _share_reform_v2_result(page)
+    result["schema_version"] = SCHEMA_VERSION
+    date_bindings = {
+        "record_date": ("股权登记日", "2006年6月12日"),
+        "listing_date": ("上市日", "2006年6月14日"),
+        "resumption_date": ("复牌日", "2006年6月14日"),
+    }
+    for index, fact in enumerate(result["date_facts"], start=1):
+        role_text, date_text = date_bindings[fact["date_type"]]
+        fact.update({
+            "fact_id": f"date-{index}",
+            "semantic_evidence": [{
+                "evidence_id": "ev-1",
+                "role_text": role_text,
+                "date_text": date_text,
+            }],
+        })
+    economic_bindings = {
+        "bonus-total": {
+            "relation_text": "送股总数", "value_text": "33,574.8504",
+            "unit_text": "万股", "basis_text": None,
+        },
+        "bonus-ratio": {
+            "relation_text": "送", "value_text": "6.8",
+            "unit_text": "股", "basis_text": "每10股",
+        },
+        "capitalization-ratio": {
+            "relation_text": "转增", "value_text": "3.4",
+            "unit_text": "股", "basis_text": "每10股",
+        },
+        "cash-total": {
+            "relation_text": "并派现金", "value_text": "1,768.1397",
+            "unit_text": "万元", "basis_text": None,
+        },
+    }
+    for primitive in result["economic_primitives"]:
+        primitive["semantic_evidence"] = [{
+            "evidence_id": "ev-1",
+            "subject_text": "流通股股东",
+            **economic_bindings[primitive["fact_id"]],
+        }]
+    if include_verification:
+        verification = _semantic_verification(result)
+        result["semantic_event_verification"] = {
+            key: verification[key]
+            for key in (
+                "schema_version", "instrument_id", "source_event_key",
+                "event_claim_hash",
+                "event_match_supported", "event_type_supported",
+                "event_stage_supported", "unresolved_language",
+            )
+        }
+        result["semantic_verifications"] = verification["decisions"]
+        result["semantic_verifier_conflicts"] = verification["conflicts"]
+    return result
+
+
 def test_v2_same_day_roles_and_chained_cash_derivation():
     page = _page(
         "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
         "对价股份上市日为2006年6月14日，复牌日为2006年6月14日。"
         "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
-        "现金对价总额1,768.1397万元。"
+        "并派现金1,768.1397万元（含税）。"
     )
     status, gates, normalized = validate_analysis(
         _share_reform_v2_result(page),
@@ -308,6 +637,38 @@ def test_v2_same_day_roles_and_chained_cash_derivation():
     )
     assert cash_derivation["formula_id"] == "cash_total_over_derived_base_v1"
     assert float(cash_derivation["output_value"]) == pytest.approx(0.03581058)
+
+
+def test_v3_share_reform_cash_derivation_does_not_require_action_keywords():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日为2006年6月14日，复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "并派现金1,768.1397万元（含税）。"
+    )
+    status, gates, normalized = validate_analysis(
+        _share_reform_v3_result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["effective_date"] == "2006-06-14"
+    assert normalized["economic_terms"]["cash_dividend"] == {
+        "value": pytest.approx(0.3581058),
+        "unit": "per_10_shares",
+        "currency": "CNY",
+    }
+    cash_derivation = next(
+        item for item in normalized["economic_derivations"]
+        if item["output_field"] == "cash_dividend"
+    )
+    assert float(cash_derivation["output_value"]) == pytest.approx(
+        0.03581058386488
+    )
 
 
 def test_v2_unsupported_date_role_cannot_be_selected():
@@ -1016,11 +1377,13 @@ async def test_truncated_event_context_cannot_be_validated():
         )
         for index in range(2, MAX_EVENT_PAGES + 3)
     ]
-    client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_v2_result(first_page), response_hash="response-hash",
-        request_id="request-1", model="fake", latency_ms=10,
-        attempt_count=1, usage=None,
-    )))
+    extraction = _v3_result(first_page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
     analysis = await CninfoCorporateActionLlmResolver(client).analyze(
         event={"instrument_id": "000001.SZ", "source_event_key": "event-1"},
         pages=pages,
@@ -1033,20 +1396,50 @@ async def test_truncated_event_context_cannot_be_validated():
 @pytest.mark.asyncio
 async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
     page = _page()
-    response = SimpleNamespace(
-        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
-        model="fake", latency_ms=10, attempt_count=1, usage=None,
-    )
-    client = SimpleNamespace(complete=AsyncMock(return_value=response))
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
     analysis = await CninfoCorporateActionLlmResolver(client).analyze(
         event={"instrument_id": "000001.SZ", "source_event_key": "event-1"},
         pages=[page],
     )
-    request = client.complete.await_args.args[0]
-    assert request.content_is_untrusted is True
-    assert request.schema_version == SCHEMA_VERSION
-    assert request.max_output_tokens == MAX_ANALYSIS_OUTPUT_TOKENS
+    extraction_request = client.complete.await_args_list[0].args[0]
+    verification_request = client.complete.await_args_list[1].args[0]
+    assert extraction_request.content_is_untrusted is True
+    assert extraction_request.schema_version == SCHEMA_VERSION
+    assert extraction_request.max_output_tokens == MAX_ANALYSIS_OUTPUT_TOKENS
+    assert verification_request.content_is_untrusted is True
+    assert verification_request.schema_version == SEMANTIC_VERIFICATION_SCHEMA_VERSION
     assert analysis.validation_status == "validated_candidate"
+    assert analysis.latency_ms == 15
+    assert analysis.attempt_count == 2
+
+
+@pytest.mark.asyncio
+async def test_semantic_verifier_failure_retains_extraction_for_manual_review():
+    page = _page()
+    extraction = _v3_result(page, include_verification=False)
+    error = LlmDeadlineExceededError().with_context(
+        request_id="verify-request", attempt_count=2,
+    )
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        error,
+    ]))
+    analysis = await CninfoCorporateActionLlmResolver(client).analyze(
+        event={"instrument_id": "000001.SZ", "source_event_key": "event-1"},
+        pages=[page],
+    )
+    assert analysis.validation_status == "manual_required"
+    assert analysis.gate_results["semantic_verification_complete"] is False
+    assert analysis.result["_semantic_verifier"]["error_code"] == "deadline_exceeded"
+    assert analysis.result["economic_primitives"][0]["fact_id"] == "cash-ratio"
+    assert "semantic_verifier_deadline_exceeded" in analysis.warnings
+    assert analysis.attempt_count == 3
 
 
 def test_document_service_rejects_non_pdf_and_page_selection_is_bounded(tmp_path):
@@ -1089,12 +1482,25 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
         "ann-1/hash.pdf", (page,), "extracted",
     )
     monkeypatch.setattr(CninfoCorporateActionDocumentService, "ingest", lambda self, **kwargs: bundle)
-    client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
-        model="fake", latency_ms=10, attempt_count=1,
-        usage=SimpleNamespace(input_tokens=100, output_tokens=50, total_tokens=150),
-        warnings=("provider_output_budget_exceeded",),
-    )))
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(
+            extraction,
+            suffix="extract",
+            usage=SimpleNamespace(
+                input_tokens=100, output_tokens=50, total_tokens=150,
+            ),
+            warnings=("provider_output_budget_exceeded",),
+        ),
+        _gateway_response(
+            _semantic_verification(extraction),
+            suffix="verify",
+            latency_ms=5,
+            usage=SimpleNamespace(
+                input_tokens=20, output_tokens=10, total_tokens=30,
+            ),
+        ),
+    ]))
     result = await manager.analyze_cninfo_corporate_action_candidates(
         start_date="2026-01-01", end_date="2026-12-31",
         exchanges=["SZSE"], instrument_ids=["000001.SZ"], max_events=1,
@@ -1103,9 +1509,9 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     assert result["status"] == "dry_run"
     assert result["counts"]["validated_candidates"] == 1
     assert result["review_workload"]["tiers"]["quick_review"] == 1
-    assert result["llm_metrics"]["total_tokens"] == 150
+    assert result["llm_metrics"]["total_tokens"] == 180
     assert result["llm_metrics"]["provider_output_budget_overruns"] == 1
-    assert result["llm_metrics"]["latency_ms"]["p95"] == 10
+    assert result["llm_metrics"]["latency_ms"]["p95"] == 15
     manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
 
@@ -1551,10 +1957,13 @@ async def test_refresh_documents_rechecks_existing_announcement(monkeypatch):
     )
     ingest = Mock(return_value=bundle)
     monkeypatch.setattr(CninfoCorporateActionDocumentService, "ingest", ingest)
-    client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
-        model="fake", latency_ms=10, attempt_count=1, usage=None,
-    )))
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
     result = await manager.analyze_cninfo_corporate_action_candidates(
         start_date="2026-01-01",
         end_date="2026-12-31",
