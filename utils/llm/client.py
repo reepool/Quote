@@ -87,6 +87,7 @@ class LlmClient:
                     profile.temperature if request.temperature is None else request.temperature
                 ),
                 max_output_tokens=request.max_output_tokens,
+                max_output_tokens_field=profile.max_output_tokens_field,
             )
             request_hash = stable_hash(
                 {
@@ -100,6 +101,7 @@ class LlmClient:
                     "mode": mode,
                     "temperature": payload.get("temperature"),
                     "max_output_tokens": request.max_output_tokens,
+                    "max_output_tokens_field": profile.max_output_tokens_field,
                 }
             )
             headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
@@ -115,23 +117,66 @@ class LlmClient:
             last_error: Optional[LlmError] = None
             max_attempts = profile.max_retries + 1
             current_payload = payload
+            llm_logger.info(
+                "LLM request prepared profile=%s request_id=%s request_hash=%s "
+                "model=%s mode=%s attempts_max=%s deadline_seconds=%.1f "
+                "attempt_timeout_seconds=%.1f payload_bytes=%s max_output_tokens=%s",
+                profile.name,
+                request_id,
+                request_hash,
+                model,
+                mode,
+                max_attempts,
+                timeout_seconds,
+                profile.attempt_timeout_seconds,
+                len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
+                request.max_output_tokens,
+            )
             for attempt_count in range(1, max_attempts + 1):
                 response: Optional[TransportResponse] = None
                 raw_content: Optional[str] = None
+                attempt_started = time.monotonic()
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise LlmDeadlineExceededError()
                 try:
                     async with limiter.slot(deadline):
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise LlmDeadlineExceededError()
+                        attempt_timeout = min(
+                            profile.attempt_timeout_seconds,
+                            remaining,
+                        )
+                        llm_logger.info(
+                            "LLM attempt started profile=%s request_id=%s "
+                            "attempt=%s/%s timeout_seconds=%.1f remaining_seconds=%.1f",
+                            profile.name,
+                            request_id,
+                            attempt_count,
+                            max_attempts,
+                            attempt_timeout,
+                            remaining,
+                        )
                         response = await asyncio.wait_for(
                             self.transport.send(
                                 url,
                                 headers,
                                 current_payload,
-                                min(profile.timeout_seconds, remaining),
+                                attempt_timeout,
                             ),
-                            timeout=remaining,
+                            timeout=attempt_timeout,
                         )
+                    llm_logger.info(
+                        "LLM attempt response profile=%s request_id=%s attempt=%s/%s "
+                        "status_code=%s elapsed_ms=%s",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        response.status_code,
+                        max(0, round((time.monotonic() - attempt_started) * 1000)),
+                    )
                     if response.status_code < 200 or response.status_code >= 300:
                         raise safe_provider_error(response.status_code)
                     raw_content, finish_reason = extract_message_content(response)
@@ -141,18 +186,39 @@ class LlmClient:
                         finish_reason,
                     )
                     usage = LlmUsage.from_mapping((response.data or {}).get("usage"))
+                    if (
+                        request.max_output_tokens is not None
+                        and usage is not None
+                        and usage.output_tokens is not None
+                        and usage.output_tokens > request.max_output_tokens
+                    ):
+                        warnings.append("provider_output_budget_exceeded")
+                        llm_logger.warning(
+                            "LLM provider output budget exceeded profile=%s "
+                            "request_id=%s request_hash=%s field=%s requested=%s observed=%s",
+                            profile.name,
+                            request_id,
+                            request_hash,
+                            profile.max_output_tokens_field,
+                            request.max_output_tokens,
+                            usage.output_tokens,
+                        )
                     provider_request_id = response.provider_request_id or _optional_text(
                         (response.data or {}).get("id")
                     )
                     latency_ms = max(0, round((time.monotonic() - started) * 1000))
                     llm_logger.info(
                         "LLM request completed profile=%s request_id=%s "
-                        "request_hash=%s attempts=%s latency_ms=%s",
+                        "request_hash=%s attempts=%s latency_ms=%s "
+                        "input_tokens=%s output_tokens=%s total_tokens=%s",
                         profile.name,
                         request_id,
                         request_hash,
                         attempt_count,
                         latency_ms,
+                        usage.input_tokens if usage else None,
+                        usage.output_tokens if usage else None,
+                        usage.total_tokens if usage else None,
                     )
                     return LlmResponse(
                         status="success",
@@ -181,10 +247,31 @@ class LlmClient:
                         if time.monotonic() >= deadline
                         else safe_provider_error(408)
                     )
+                    llm_logger.warning(
+                        "LLM attempt timed out profile=%s request_id=%s attempt=%s/%s "
+                        "code=%s elapsed_ms=%s remaining_seconds=%.1f",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        last_error.code,
+                        max(0, round((time.monotonic() - attempt_started) * 1000)),
+                        max(0.0, deadline - time.monotonic()),
+                    )
                     if isinstance(last_error, LlmDeadlineExceededError):
                         raise last_error from exc
                 except (LlmResponseParseError, LlmSchemaValidationError) as exc:
                     last_error = exc
+                    llm_logger.warning(
+                        "LLM response validation failed profile=%s request_id=%s "
+                        "attempt=%s/%s code=%s repair_used=%s",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        exc.code,
+                        repair_used,
+                    )
                     if (
                         repair_used < profile.max_schema_repair_attempts
                         and attempt_count < max_attempts
@@ -197,6 +284,19 @@ class LlmClient:
                         raise exc
                 except LlmError as exc:
                     last_error = exc
+                    llm_logger.warning(
+                        "LLM attempt failed profile=%s request_id=%s attempt=%s/%s "
+                        "code=%s retryable=%s detail=%s elapsed_ms=%s remaining_seconds=%.1f",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        exc.code,
+                        exc.retryable,
+                        exc.message,
+                        max(0, round((time.monotonic() - attempt_started) * 1000)),
+                        max(0.0, deadline - time.monotonic()),
+                    )
                     if not exc.retryable:
                         raise
 
@@ -204,6 +304,16 @@ class LlmClient:
                     if last_error is not None:
                         raise last_error
                     raise LlmError("provider_error", "LLM request failed")
+                llm_logger.info(
+                    "LLM retry pending profile=%s request_id=%s next_attempt=%s/%s "
+                    "last_code=%s remaining_seconds=%.1f",
+                    profile.name,
+                    request_id,
+                    attempt_count + 1,
+                    max_attempts,
+                    last_error.code if last_error else "unknown",
+                    max(0.0, deadline - time.monotonic()),
+                )
                 await self._backoff(
                     profile, attempt_count, response=locals().get("response"), deadline=deadline
                 )
@@ -289,6 +399,7 @@ class LlmClient:
         mode: str,
         temperature: float,
         max_output_tokens: Optional[int],
+        max_output_tokens_field: str,
     ) -> dict[str, Any]:
         provider_messages = list(messages)
         payload: dict[str, Any] = {
@@ -297,7 +408,7 @@ class LlmClient:
             "temperature": float(temperature),
         }
         if max_output_tokens is not None:
-            payload["max_tokens"] = int(max_output_tokens)
+            payload[max_output_tokens_field] = int(max_output_tokens)
         if schema is not None and mode == "json_schema":
             payload["response_format"] = {
                 "type": "json_schema",

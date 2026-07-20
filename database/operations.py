@@ -8,11 +8,12 @@ import hashlib
 import json
 import math
 import re
+from collections import defaultdict
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
-from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all, delete
+from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all, delete, case
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
@@ -3861,6 +3862,7 @@ class DatabaseOperations:
         self,
         *,
         instrument_id: Optional[str] = None,
+        source_event_key: Optional[str] = None,
         source: Optional[str] = None,
         source_profile: Optional[str] = None,
         action_type: Optional[str] = None,
@@ -3876,6 +3878,10 @@ class DatabaseOperations:
             filters = []
             if instrument_id:
                 filters.append(CorporateActionObservationDB.instrument_id == instrument_id)
+            if source_event_key:
+                filters.append(
+                    CorporateActionObservationDB.source_event_key == source_event_key
+                )
             if source:
                 filters.append(CorporateActionObservationDB.source == source.lower())
             if source_profile:
@@ -4407,8 +4413,8 @@ class DatabaseOperations:
                 session.add(existing)
                 status = "inserted"
             elif (
-                existing.validation_status == "validated_candidate"
-                and values["validation_status"] == "failed"
+                values["validation_status"] == "failed"
+                and existing.validation_status != "failed"
             ):
                 status = "unchanged"
             else:
@@ -4480,6 +4486,362 @@ class DatabaseOperations:
                 "updated_at": row.updated_at,
             } for row in rows]
             total_value = int(total or 0)
+            return {
+                "total": total_value,
+                "limit": normalized_limit,
+                "offset": normalized_offset,
+                "returned": len(items),
+                "has_more": normalized_offset + len(items) < total_value,
+                "items": items,
+            }
+
+    async def get_corporate_action_review_queue(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        validation_status: Optional[str] = None,
+        review_tier: Optional[str] = None,
+        failed_gate: Optional[str] = None,
+        gate_signature: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        action_type: Optional[str] = None,
+        event_type: Optional[str] = None,
+        reviewed_state: Optional[str] = None,
+        include_machine_rework: bool = False,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return latest-analysis review cards with compact official lineage."""
+        normalized_limit = max(1, min(int(limit), 1000))
+        normalized_offset = max(0, int(offset))
+        normalized_reviewed_state = str(reviewed_state or "").strip().lower()
+        if normalized_reviewed_state not in {"", "reviewed", "unreviewed"}:
+            raise ValueError("reviewed_state must be reviewed or unreviewed")
+        normalized_failed_gate = str(failed_gate or "").strip()
+        if normalized_failed_gate and not re.fullmatch(
+            r"[A-Za-z][A-Za-z0-9_]*", normalized_failed_gate
+        ):
+            raise ValueError("failed_gate contains unsupported characters")
+
+        latest_analysis = select(
+            func.max(CorporateActionLlmAnalysisDB.id).label("analysis_id")
+        ).group_by(
+            CorporateActionLlmAnalysisDB.instrument_id,
+            CorporateActionLlmAnalysisDB.source_event_key,
+        ).subquery()
+        reviewed_exists = select(CorporateActionResolutionReviewDB.id).where(
+            CorporateActionResolutionReviewDB.analysis_id
+            == CorporateActionLlmAnalysisDB.id
+        ).exists()
+        review_tier_expression = case(
+            (
+                CorporateActionLlmAnalysisDB.validation_status == "failed",
+                literal("machine_rework"),
+            ),
+            else_=func.coalesce(
+                func.json_extract(
+                    CorporateActionLlmAnalysisDB.result_json,
+                    "$._review_classification.review_tier",
+                ),
+                literal("deep_review"),
+            ),
+        )
+        gate_signature_expression = case(
+            (
+                CorporateActionLlmAnalysisDB.validation_status == "failed",
+                func.coalesce(
+                    CorporateActionLlmAnalysisDB.error_code,
+                    literal("analysis_failed"),
+                ),
+            ),
+            else_=func.coalesce(
+                func.json_extract(
+                    CorporateActionLlmAnalysisDB.result_json,
+                    "$._review_classification.gate_signature",
+                ),
+                literal(""),
+            ),
+        )
+        filters = [
+            CorporateActionLlmAnalysisDB.id == latest_analysis.c.analysis_id,
+            CorporateActionObservationDB.instrument_id
+            == CorporateActionLlmAnalysisDB.instrument_id,
+            CorporateActionObservationDB.source_event_key
+            == CorporateActionLlmAnalysisDB.source_event_key,
+            CorporateActionObservationDB.source == "cninfo",
+            CorporateActionObservationDB.is_current.is_(True),
+        ]
+        if instrument_id:
+            filters.append(
+                CorporateActionLlmAnalysisDB.instrument_id == instrument_id
+            )
+        if validation_status:
+            filters.append(
+                CorporateActionLlmAnalysisDB.validation_status == validation_status
+            )
+        if source_profile:
+            filters.append(
+                CorporateActionObservationDB.source_profile == source_profile
+            )
+        if action_type:
+            filters.append(CorporateActionObservationDB.action_type == action_type)
+        if not include_machine_rework:
+            filters.append(review_tier_expression != "machine_rework")
+        if review_tier:
+            filters.append(review_tier_expression == review_tier)
+        if normalized_failed_gate:
+            filters.append(
+                func.json_extract(
+                    CorporateActionLlmAnalysisDB.gate_results_json,
+                    f'$."{normalized_failed_gate}"',
+                ) == 0
+            )
+        if gate_signature:
+            filters.append(gate_signature_expression == gate_signature)
+        if event_type:
+            filters.append(
+                func.json_extract(
+                    CorporateActionLlmAnalysisDB.result_json,
+                    "$.event_type",
+                ) == event_type
+            )
+        if normalized_reviewed_state == "reviewed":
+            filters.append(reviewed_exists)
+        elif normalized_reviewed_state == "unreviewed":
+            filters.append(~reviewed_exists)
+
+        async with self.get_async_session() as session:
+            base_query = select(CorporateActionLlmAnalysisDB.id).select_from(
+                CorporateActionLlmAnalysisDB
+            ).join(
+                latest_analysis,
+                CorporateActionLlmAnalysisDB.id == latest_analysis.c.analysis_id,
+            ).join(
+                CorporateActionObservationDB,
+                CorporateActionObservationDB.source_event_key
+                == CorporateActionLlmAnalysisDB.source_event_key,
+            ).where(*filters)
+            total_value = int(await session.scalar(
+                select(func.count()).select_from(base_query.subquery())
+            ) or 0)
+            tier_order_expression = case(
+                (review_tier_expression == "quick_review", 0),
+                (review_tier_expression == "deep_review", 1),
+                (review_tier_expression == "machine_rework", 2),
+                else_=3,
+            )
+            rows = (await session.execute(
+                select(
+                    CorporateActionLlmAnalysisDB,
+                    CorporateActionObservationDB,
+                    reviewed_exists.label("is_reviewed"),
+                    review_tier_expression.label("review_tier"),
+                    gate_signature_expression.label("gate_signature"),
+                ).select_from(CorporateActionLlmAnalysisDB).join(
+                    latest_analysis,
+                    CorporateActionLlmAnalysisDB.id
+                    == latest_analysis.c.analysis_id,
+                ).join(
+                    CorporateActionObservationDB,
+                    CorporateActionObservationDB.source_event_key
+                    == CorporateActionLlmAnalysisDB.source_event_key,
+                ).where(*filters).order_by(
+                    tier_order_expression,
+                    CorporateActionLlmAnalysisDB.created_at,
+                    CorporateActionLlmAnalysisDB.id,
+                ).offset(normalized_offset).limit(normalized_limit)
+            )).all()
+
+            candidates: list[dict[str, Any]] = []
+            for analysis, observation, is_reviewed, item_tier, item_signature in rows:
+                result = json.loads(analysis.result_json or "{}")
+                gates = json.loads(analysis.gate_results_json or "{}")
+                classification = result.get("_review_classification") or {}
+                if analysis.validation_status == "failed":
+                    item_tier = str(item_tier or "machine_rework")
+                    item_signature = str(item_signature or "analysis_failed")
+                    review_reasons = [f"analysis_error:{item_signature}"]
+                else:
+                    item_tier = str(item_tier or "deep_review")
+                    item_signature = str(item_signature or "")
+                    review_reasons = list(
+                        classification.get("review_reasons") or []
+                    )
+                failed_gates = sorted(
+                    name for name, passed in gates.items() if not bool(passed)
+                )
+                candidates.append({
+                    "analysis": analysis,
+                    "observation": observation,
+                    "is_reviewed": bool(is_reviewed),
+                    "result": result,
+                    "gates": gates,
+                    "review_tier": item_tier,
+                    "gate_signature": item_signature,
+                    "review_reasons": review_reasons,
+                    "failed_gates": failed_gates,
+                })
+            selected = candidates
+            analysis_ids = [item["analysis"].id for item in selected]
+            event_keys = [item["analysis"].source_event_key for item in selected]
+            artifact_ids = sorted({
+                int(artifact_id)
+                for item in selected
+                for artifact_id in json.loads(
+                    item["analysis"].artifact_ids_json or "[]"
+                )
+                if str(artifact_id).isdigit()
+            })
+
+            reviews_by_analysis: dict[int, list[dict[str, Any]]] = defaultdict(list)
+            if analysis_ids:
+                review_rows = (await session.execute(
+                    select(CorporateActionResolutionReviewDB).where(
+                        CorporateActionResolutionReviewDB.analysis_id.in_(analysis_ids)
+                    ).order_by(
+                        CorporateActionResolutionReviewDB.created_at,
+                        CorporateActionResolutionReviewDB.id,
+                    )
+                )).scalars().all()
+                for review in review_rows:
+                    reviews_by_analysis[int(review.analysis_id)].append({
+                        "review_id": review.id,
+                        "decision": review.decision,
+                        "reviewer": review.reviewer,
+                        "effective_date": review.effective_date,
+                        "date_basis": review.date_basis,
+                        "notes": review.notes,
+                        "created_at": review.created_at,
+                    })
+
+            announcements_by_event: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            if event_keys:
+                announcement_rows = (await session.execute(
+                    select(CorporateActionEffectiveDateEvidenceDB).where(
+                        CorporateActionEffectiveDateEvidenceDB.source_event_key.in_(
+                            event_keys
+                        ),
+                        CorporateActionEffectiveDateEvidenceDB.evidence_source
+                        == "cninfo_announcement_metadata",
+                    ).order_by(
+                        CorporateActionEffectiveDateEvidenceDB.announcement_time,
+                        CorporateActionEffectiveDateEvidenceDB.id,
+                    )
+                )).scalars().all()
+                for evidence in announcement_rows:
+                    announcements_by_event[evidence.source_event_key].append({
+                        "evidence_key": evidence.evidence_key,
+                        "announcement_id": evidence.announcement_id,
+                        "announcement_title": evidence.announcement_title,
+                        "announcement_time": evidence.announcement_time,
+                        "evidence_url": evidence.evidence_url,
+                        "resolution_status": evidence.resolution_status,
+                    })
+
+            artifacts_by_id: dict[int, dict[str, Any]] = {}
+            if artifact_ids:
+                artifact_rows = (await session.execute(
+                    select(CorporateActionDocumentArtifactDB).where(
+                        CorporateActionDocumentArtifactDB.id.in_(artifact_ids)
+                    )
+                )).scalars().all()
+                page_rows = (await session.execute(
+                    select(CorporateActionDocumentPageDB).where(
+                        CorporateActionDocumentPageDB.artifact_id.in_(artifact_ids)
+                    )
+                )).scalars().all()
+                page_metadata: dict[int, list[dict[str, Any]]] = defaultdict(list)
+                for page in page_rows:
+                    page_metadata[page.artifact_id].append({
+                        "page_number": page.page_number,
+                        "quality_status": page.quality_status,
+                        "text_hash": page.text_hash,
+                        "extraction_method": page.extraction_method,
+                    })
+                for artifact in artifact_rows:
+                    artifacts_by_id[artifact.id] = {
+                        "artifact_id": artifact.id,
+                        "announcement_id": artifact.announcement_id,
+                        "announcement_title": artifact.announcement_title,
+                        "announcement_time": artifact.announcement_time,
+                        "source_url": artifact.source_url,
+                        "content_hash": artifact.content_hash,
+                        "pages": sorted(
+                            page_metadata.get(artifact.id, []),
+                            key=lambda page: page["page_number"],
+                        ),
+                    }
+
+            items = []
+            for candidate in selected:
+                analysis = candidate["analysis"]
+                observation = candidate["observation"]
+                result = candidate["result"]
+                ids = json.loads(analysis.artifact_ids_json or "[]")
+                items.append({
+                    "analysis_id": analysis.id,
+                    "instrument_id": analysis.instrument_id,
+                    "source_event_key": analysis.source_event_key,
+                    "validation_status": analysis.validation_status,
+                    "review_tier": candidate["review_tier"],
+                    "gate_signature": candidate["gate_signature"],
+                    "review_reasons": candidate["review_reasons"],
+                    "failed_gates": candidate["failed_gates"],
+                    "reviewed": candidate["is_reviewed"],
+                    "source": {
+                        "source_profile": observation.source_profile,
+                        "action_type": observation.action_type,
+                        "fiscal_period": observation.fiscal_period,
+                        "announcement_date": observation.announcement_date,
+                        "record_date": observation.record_date,
+                        "ex_date": observation.ex_date,
+                        "pay_date": observation.pay_date,
+                        "share_arrival_date": observation.share_arrival_date,
+                        "cash_dividend_per_share": observation.cash_dividend_per_share,
+                        "bonus_shares_per_share": observation.bonus_shares_per_share,
+                        "capitalization_shares_per_share": (
+                            observation.capitalization_shares_per_share
+                        ),
+                        "rights_shares_per_share": observation.rights_shares_per_share,
+                        "rights_price": observation.rights_price,
+                        "currency": observation.currency,
+                        "description": str(observation.description or "")[:1000] or None,
+                    },
+                    "proposed": {
+                        key: result.get(key)
+                        for key in (
+                            "event_type", "event_stage", "effective_date",
+                            "effective_date_type", "date_basis",
+                            "economic_terms", "alternative_dates", "conflicts",
+                            "confidence", "reason",
+                        )
+                    },
+                    "evidence": list(result.get("evidence") or []),
+                    "announcements": announcements_by_event.get(
+                        analysis.source_event_key, []
+                    ),
+                    "artifacts": [
+                        artifacts_by_id[int(artifact_id)]
+                        for artifact_id in ids
+                        if str(artifact_id).isdigit()
+                        and int(artifact_id) in artifacts_by_id
+                    ],
+                    "usage": json.loads(analysis.usage_json or "{}"),
+                    "latency_ms": analysis.latency_ms,
+                    "attempt_count": analysis.attempt_count,
+                    "lineage": {
+                        "profile": analysis.profile,
+                        "model": analysis.model,
+                        "schema_version": analysis.schema_version,
+                        "prompt_version": analysis.prompt_version,
+                        "parser_version": analysis.parser_version,
+                        "input_hash": analysis.input_hash,
+                        "response_hash": analysis.response_hash,
+                        "request_id": analysis.request_id,
+                        "created_at": analysis.created_at,
+                    },
+                    "prior_reviews": reviews_by_analysis.get(analysis.id, []),
+                })
             return {
                 "total": total_value,
                 "limit": normalized_limit,
@@ -4651,6 +5013,258 @@ class DatabaseOperations:
                 status = "updated"
             await session.commit()
             return {"resolved_terms_id": existing.id, "status": status}
+
+    async def save_corporate_action_review_bundle(
+        self,
+        *,
+        review_row: Dict[str, Any],
+        terms_row: Dict[str, Any],
+        evidence_row: Optional[Dict[str, Any]] = None,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Atomically persist one review, terms overlay, and optional evidence."""
+        review_key = str(review_row.get("review_key") or "").strip()
+        instrument_id = str(review_row.get("instrument_id") or "").strip()
+        source_event_key = str(review_row.get("source_event_key") or "").strip()
+        reviewer = str(review_row.get("reviewer") or "").strip()
+        decision = str(review_row.get("decision") or "").strip().lower()
+        analysis_id = int(review_row.get("analysis_id") or 0)
+        if not all((review_key, instrument_id, source_event_key, reviewer, analysis_id)):
+            raise ValueError("review identity is required")
+        if decision not in {"resolved", "rejected", "conflict", "manual_required"}:
+            raise ValueError("unsupported corporate-action review decision")
+        effective_date = self._coerce_datetime(review_row.get("effective_date"))
+        if decision == "resolved" and effective_date is None:
+            raise ValueError("resolved review requires effective_date")
+        if decision == "resolved" and not str(
+            review_row.get("date_basis") or ""
+        ).strip():
+            raise ValueError("resolved review requires date_basis")
+        review_values = {
+            "review_key": review_key,
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "analysis_id": analysis_id,
+            "evidence_key": review_row.get("evidence_key"),
+            "decision": decision,
+            "effective_date": effective_date,
+            "date_basis": review_row.get("date_basis"),
+            "reviewer": reviewer,
+            "notes": review_row.get("notes"),
+            "review_payload_json": json.dumps(
+                review_row.get("review_payload") or {},
+                ensure_ascii=True,
+                sort_keys=True,
+                default=str,
+            ),
+            "supersedes_review_id": review_row.get("supersedes_review_id"),
+        }
+        terms_values = {
+            "analysis_id": analysis_id,
+            "cash_dividend_per_share": terms_row.get("cash_dividend_per_share"),
+            "bonus_shares_per_share": terms_row.get("bonus_shares_per_share"),
+            "capitalization_shares_per_share": terms_row.get(
+                "capitalization_shares_per_share"
+            ),
+            "rights_shares_per_share": terms_row.get("rights_shares_per_share"),
+            "rights_price": terms_row.get("rights_price"),
+            "currency": terms_row.get("currency"),
+            "is_active": bool(terms_row.get("is_active", True)),
+            "resolved_fields_json": json.dumps(
+                sorted({
+                    str(item)
+                    for item in terms_row.get("resolved_fields", [])
+                    if str(item)
+                }),
+                ensure_ascii=True,
+            ),
+            "evidence_json": json.dumps(
+                terms_row.get("evidence") or {},
+                ensure_ascii=True,
+                sort_keys=True,
+                default=str,
+            ),
+        }
+        if bool(terms_values["is_active"]) != (decision == "resolved"):
+            raise ValueError("resolved-term activation must match review decision")
+        if decision == "resolved" and evidence_row is None:
+            raise ValueError("resolved review requires effective-date evidence")
+
+        prepared_evidence: Optional[Dict[str, Any]] = None
+        if evidence_row is not None:
+            evidence_instrument = str(
+                evidence_row.get("instrument_id") or ""
+            ).strip()
+            evidence_event = str(
+                evidence_row.get("source_event_key") or ""
+            ).strip()
+            evidence_source = str(
+                evidence_row.get("evidence_source") or ""
+            ).strip()
+            evidence_key = str(evidence_row.get("evidence_key") or "").strip()
+            source_profile = str(
+                evidence_row.get("source_profile") or ""
+            ).strip()
+            if (
+                evidence_instrument != instrument_id
+                or evidence_event != source_event_key
+                or not all((evidence_source, evidence_key, source_profile))
+            ):
+                raise ValueError("review evidence identity is invalid")
+            resolution_status = str(
+                evidence_row.get("resolution_status") or ""
+            ).strip().lower()
+            if resolution_status not in {"resolved", "rejected"}:
+                raise ValueError("review evidence must be resolved or rejected")
+            expected_resolution = (
+                "resolved" if decision == "resolved" else "rejected"
+            )
+            if resolution_status != expected_resolution:
+                raise ValueError("review evidence status must match review decision")
+            evidence_effective_date = self._coerce_datetime(
+                evidence_row.get("effective_date")
+            )
+            if resolution_status == "resolved" and evidence_effective_date is None:
+                raise ValueError("resolved evidence requires effective_date")
+            if resolution_status == "resolved" and not str(
+                evidence_row.get("date_basis") or ""
+            ).strip():
+                raise ValueError("resolved evidence requires date_basis")
+            if resolution_status != "resolved":
+                evidence_effective_date = None
+            evidence_values = {
+                "observation_source": str(
+                    evidence_row.get("observation_source") or "cninfo"
+                ).lower(),
+                "source_profile": source_profile,
+                "resolution_status": resolution_status,
+                "effective_date": evidence_effective_date,
+                "date_basis": evidence_row.get("date_basis"),
+                "announcement_id": evidence_row.get("announcement_id"),
+                "announcement_title": evidence_row.get("announcement_title"),
+                "announcement_time": self._coerce_datetime(
+                    evidence_row.get("announcement_time")
+                ),
+                "evidence_url": evidence_row.get("evidence_url"),
+                "confidence": evidence_row.get("confidence"),
+                "ingestion_run_id": ingestion_run_id,
+                "raw_payload_json": json.dumps(
+                    evidence_row.get("raw_payload") or {},
+                    ensure_ascii=True,
+                    default=str,
+                    sort_keys=True,
+                ),
+            }
+            evidence_values["row_hash"] = hashlib.sha256(
+                json.dumps(
+                    {
+                        key: value
+                        for key, value in evidence_values.items()
+                        if key != "ingestion_run_id"
+                    },
+                    ensure_ascii=True,
+                    default=str,
+                    sort_keys=True,
+                ).encode("utf-8")
+            ).hexdigest()
+            prepared_evidence = {
+                "instrument_id": evidence_instrument,
+                "source_event_key": evidence_event,
+                "evidence_source": evidence_source,
+                "evidence_key": evidence_key,
+                "values": evidence_values,
+            }
+
+        async with self.get_async_session() as session:
+            async with session.begin():
+                review = await session.scalar(
+                    select(CorporateActionResolutionReviewDB).where(
+                        CorporateActionResolutionReviewDB.review_key == review_key
+                    )
+                )
+                if review is None:
+                    review = CorporateActionResolutionReviewDB(**review_values)
+                    session.add(review)
+                    review_status = "inserted"
+                else:
+                    for key, value in review_values.items():
+                        setattr(review, key, value)
+                    review.updated_at = get_shanghai_time()
+                    review_status = "updated"
+                await session.flush()
+
+                terms_values["review_id"] = review.id
+                terms = await session.scalar(
+                    select(CorporateActionResolvedTermsDB).where(
+                        CorporateActionResolvedTermsDB.instrument_id == instrument_id,
+                        CorporateActionResolvedTermsDB.source_event_key
+                        == source_event_key,
+                    )
+                )
+                if terms is None:
+                    terms = CorporateActionResolvedTermsDB(
+                        instrument_id=instrument_id,
+                        source_event_key=source_event_key,
+                        **terms_values,
+                    )
+                    session.add(terms)
+                    terms_status = "inserted"
+                else:
+                    for key, value in terms_values.items():
+                        setattr(terms, key, value)
+                    terms.updated_at = get_shanghai_time()
+                    terms_status = "updated"
+                await session.flush()
+
+                evidence_write = None
+                if prepared_evidence is not None:
+                    evidence = await session.scalar(
+                        select(CorporateActionEffectiveDateEvidenceDB).where(
+                            CorporateActionEffectiveDateEvidenceDB.instrument_id
+                            == prepared_evidence["instrument_id"],
+                            CorporateActionEffectiveDateEvidenceDB.source_event_key
+                            == prepared_evidence["source_event_key"],
+                            CorporateActionEffectiveDateEvidenceDB.evidence_source
+                            == prepared_evidence["evidence_source"],
+                            CorporateActionEffectiveDateEvidenceDB.evidence_key
+                            == prepared_evidence["evidence_key"],
+                        )
+                    )
+                    evidence_values = prepared_evidence["values"]
+                    evidence_write = {
+                        "inserted": 0,
+                        "changed": 0,
+                        "unchanged": 0,
+                        "failed": 0,
+                    }
+                    if evidence is None:
+                        evidence = CorporateActionEffectiveDateEvidenceDB(
+                            instrument_id=prepared_evidence["instrument_id"],
+                            source_event_key=prepared_evidence["source_event_key"],
+                            evidence_source=prepared_evidence["evidence_source"],
+                            evidence_key=prepared_evidence["evidence_key"],
+                            **evidence_values,
+                        )
+                        session.add(evidence)
+                        evidence_write["inserted"] = 1
+                    elif evidence.row_hash == evidence_values["row_hash"]:
+                        evidence.ingestion_run_id = ingestion_run_id
+                        evidence.updated_at = get_shanghai_time()
+                        evidence_write["unchanged"] = 1
+                    else:
+                        for key, value in evidence_values.items():
+                            setattr(evidence, key, value)
+                        evidence.updated_at = get_shanghai_time()
+                        evidence_write["changed"] = 1
+
+            return {
+                "review": {"review_id": review.id, "status": review_status},
+                "terms_write": {
+                    "resolved_terms_id": terms.id,
+                    "status": terms_status,
+                },
+                "evidence_write": evidence_write,
+            }
 
     async def get_corporate_action_resolved_terms(
         self,

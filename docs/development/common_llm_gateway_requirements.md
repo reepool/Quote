@@ -78,8 +78,10 @@ utils/llm/
         "api_key_env": "QUOTE_LLM_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
-        "timeout_seconds": 90,
-        "max_retries": 2,
+        "timeout_seconds": 620,
+        "attempt_timeout_seconds": 300,
+        "max_output_tokens_field": "max_completion_tokens",
+        "max_retries": 1,
         "max_concurrency": 1,
         "requests_per_minute": 20,
         "temperature": 0.0
@@ -95,6 +97,9 @@ utils/llm/
 - Base URL 允许包含或不包含 `/v1`，实现必须规范化并避免重复路径；
 - API Key 环境变量缺失时明确失败，不允许匿名降级；
 - profile 中的模型是默认值，调用方可在明确允许时覆盖；
+- `timeout_seconds` 是一次 `complete()` 的总 deadline，包含排队、退避和所有重试；
+- `attempt_timeout_seconds` 是单次 HTTP 尝试上限，默认继承总 deadline，并始终受剩余总 deadline 约束；
+- `max_output_tokens_field` 显式选择 `max_tokens` 或 `max_completion_tokens`，不得同时发送两个字段；
 - 不假设所有 OpenAI-compatible 服务都支持同一种 structured output；
 - 配置必须支持 `json_schema`、`json_object`、`prompt_only` 和 `auto`；
 - `auto` 应基于显式能力配置或可缓存的能力探测选择模式，不得每次请求盲目试错。
@@ -206,6 +211,7 @@ cancelled
 - 原生 JSON Schema、`json_object` 和 `prompt_only` 三种模式；
 - object、array、嵌套结构和可选字段 schema；
 - 429/5xx/timeout 重试和 401/403 不重试；
+- 单次尝试超时后，在总 deadline 尚有预算时能够继续重试；
 - schema 失败、repair 成功和 repair 失败；
 - 并发上限、速率限制、取消和 deadline；
 - request/response hash 稳定性；

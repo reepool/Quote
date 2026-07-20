@@ -3444,6 +3444,70 @@ async def get_corporate_action_llm_analyses(
 
 
 @router.get(
+    "/corporate-actions/resolution-review-queue",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_resolution_review_queue(
+    instrument_id: Optional[str] = Query(None),
+    validation_status: Optional[str] = Query(None),
+    review_tier: Optional[str] = Query(None),
+    failed_gate: Optional[str] = Query(None),
+    gate_signature: Optional[str] = Query(None),
+    source_profile: Optional[str] = Query(None),
+    action_type: Optional[str] = Query(None),
+    event_type: Optional[str] = Query(None),
+    reviewed_state: Optional[str] = Query(None),
+    include_machine_rework: bool = Query(False),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Return compact latest-analysis cards for evidence-bound review."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    normalized_tier = _normalize_optional_query(review_tier)
+    include_machine = bool(_query_default(include_machine_rework, False)) or (
+        normalized_tier == "machine_rework"
+    )
+    try:
+        page = await data_manager.db_ops.get_corporate_action_review_queue(
+            instrument_id=normalized_id,
+            validation_status=_normalize_optional_query(validation_status),
+            review_tier=normalized_tier,
+            failed_gate=_normalize_optional_query(failed_gate),
+            gate_signature=_normalize_optional_query(gate_signature),
+            source_profile=_normalize_optional_query(source_profile),
+            action_type=_normalize_optional_query(action_type),
+            event_type=_normalize_optional_query(event_type),
+            reviewed_state=_normalize_optional_query(reviewed_state),
+            include_machine_rework=include_machine,
+            limit=int(_query_default(limit, 100)),
+            offset=int(_query_default(offset, 0)),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_resolution_review_queue",
+        filters={
+            "instrument_id": normalized_id,
+            "validation_status": _normalize_optional_query(validation_status),
+            "review_tier": normalized_tier,
+            "failed_gate": _normalize_optional_query(failed_gate),
+            "gate_signature": _normalize_optional_query(gate_signature),
+            "source_profile": _normalize_optional_query(source_profile),
+            "action_type": _normalize_optional_query(action_type),
+            "event_type": _normalize_optional_query(event_type),
+            "reviewed_state": _normalize_optional_query(reviewed_state),
+            "include_machine_rework": include_machine,
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
     "/corporate-actions/resolution-reviews",
     response_model=AdjustmentFactorPageResponse,
     tags=["Corporate Actions"],
@@ -3516,6 +3580,22 @@ async def review_corporate_action_resolution(payload: Dict[str, Any] = Body(...)
     """Explicitly review one validated candidate; never edits the raw CNInfo row."""
     try:
         return await data_manager.review_cninfo_corporate_action_resolution(dict(payload))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post(
+    "/corporate-actions/resolution-reviews/batch",
+    tags=["Corporate Actions"],
+)
+async def review_corporate_action_resolutions_batch(
+    payload: Dict[str, Any] = Body(...),
+):
+    """Review up to 100 quick-review candidates with per-item results."""
+    try:
+        return await data_manager.review_cninfo_corporate_action_resolutions_batch(
+            dict(payload)
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

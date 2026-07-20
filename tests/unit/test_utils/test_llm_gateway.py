@@ -104,6 +104,8 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
         {"enabled": True, "profiles": {"test": {"enabled": True}}}
     ).profiles["test"]
     assert profile.api_key_env == "QUOTE_LLM_API_KEY"
+    assert profile.max_output_tokens_field == "max_tokens"
+    assert profile.attempt_timeout_seconds == profile.timeout_seconds
     assert profile.max_retries == 2
     assert profile.max_schema_repair_attempts == 1
     assert profile.requests_per_minute == 20
@@ -124,6 +126,71 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
     assert disabled_limits.max_retries == 0
     assert disabled_limits.max_schema_repair_attempts == 0
     assert disabled_limits.requests_per_minute == 0
+
+    with pytest.raises(ValueError, match="unsupported max_output_tokens_field"):
+        LlmConfig.from_mapping({
+            "enabled": True,
+            "profiles": {"test": {
+                "enabled": True,
+                "max_output_tokens_field": "provider_magic_tokens",
+            }},
+        })
+
+
+@pytest.mark.asyncio
+async def test_profile_selects_max_completion_tokens_and_warns_on_usage_overrun():
+    transport = ScriptedTransport([_response(
+        {"label": "ok", "score": 1},
+        usage={
+            "prompt_tokens": 100,
+            "completion_tokens": 5000,
+            "total_tokens": 5100,
+        },
+    )])
+    client = LlmClient(
+        _config(max_output_tokens_field="max_completion_tokens"),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    response = await client.complete(_request(max_output_tokens=4096))
+    payload = transport.calls[0]["payload"]
+    assert payload["max_completion_tokens"] == 4096
+    assert "max_tokens" not in payload
+    assert "provider_output_budget_exceeded" in response.warnings
+
+
+@pytest.mark.asyncio
+async def test_attempt_timeout_retries_within_total_deadline(monkeypatch):
+    calls = []
+    info_messages = []
+    monkeypatch.setattr(
+        "utils.llm.client.llm_logger.info",
+        lambda message, *args: info_messages.append(message),
+    )
+
+    async def slow_once(url, headers, payload, timeout):
+        calls.append(timeout)
+        if len(calls) == 1:
+            await asyncio.sleep(0.03)
+        return _response({"label": "ok", "score": 1})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(
+            timeout_seconds=0.2,
+            attempt_timeout_seconds=0.01,
+            max_retries=1,
+        ),
+        transport=CallableTransport(slow_once),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    response = await client.complete(_unstructured_request())
+    assert response.attempt_count == 2
+    assert len(calls) == 2
+    assert calls[0] == pytest.approx(0.01)
+    assert any("LLM attempt started" in message for message in info_messages)
+    assert any("LLM retry pending" in message for message in info_messages)
 
 
 @pytest.mark.asyncio

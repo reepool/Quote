@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import re
+from copy import deepcopy
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
@@ -16,11 +17,74 @@ from .cninfo_corporate_action_documents import CorporateActionPageText, normaliz
 
 SCHEMA_VERSION = "cninfo_corporate_action_resolution.v1"
 PROMPT_VERSION = "cninfo_corporate_action_resolution_prompt.v1"
-PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v2"
+PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v3"
 MAX_EVENT_PAGES = 24
 MAX_EVENT_CHARACTERS = 60000
 MAX_EVENT_PROMPT_CHARACTERS = 75000
 MAX_EVENT_CANDIDATES = 25
+MAX_ANALYSIS_OUTPUT_TOKENS = 4096
+MAX_EVIDENCE_ITEMS = 12
+MAX_ALTERNATIVE_DATES = 12
+MAX_CONFLICTS = 12
+
+_DATE_TYPES = (
+    "ex_date",
+    "ex_dividend_date",
+    "implementation_date",
+    "record_date",
+    "payment_date",
+    "share_arrival_date",
+    "listing_date",
+    "resumption_date",
+    "consideration_payment_date",
+    "unknown",
+)
+_SUPPORT_FIELDS = (
+    "effective_date",
+    "effective_date_type",
+    "date_basis",
+    "event_type",
+    "event_stage",
+    "cash_dividend",
+    "bonus_shares",
+    "capitalization_shares",
+    "rights_shares",
+    "rights_price",
+)
+_SHARE_UNIT_ALIASES = {
+    "per_share": "per_share",
+    "per share": "per_share",
+    "每股": "per_share",
+    "每1股": "per_share",
+    "每一股": "per_share",
+    "per_10_shares": "per_10_shares",
+    "per 10 shares": "per_10_shares",
+    "per10shares": "per_10_shares",
+    "每10股": "per_10_shares",
+    "每十股": "per_10_shares",
+}
+_RIGHTS_PRICE_UNIT_ALIASES = {
+    "currency_per_share": "currency_per_share",
+    "currency per share": "currency_per_share",
+    "元/股": "currency_per_share",
+    "元每股": "currency_per_share",
+    "每股元": "currency_per_share",
+    "每股": "currency_per_share",
+}
+_CURRENCY_ALIASES = {
+    "CNY": "CNY",
+    "RMB": "CNY",
+    "人民币": "CNY",
+    "人民币元": "CNY",
+    "元": "CNY",
+}
+_EVENT_TYPE_ALIASES = {
+    "cash_dividend": "dividend",
+    "bonus_shares": "bonus_issue",
+    "capitalization_issue": "capitalization",
+    "rights": "rights_issue",
+    "mixed_distribution": "mixed",
+}
 
 _ECONOMIC_TERM_FIELDS = (
     "cash_dividend",
@@ -68,9 +132,9 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
         "alternative_dates", "conflicts", "confidence", "reason",
     ],
     "properties": {
-        "schema_version": {"type": "string"},
-        "instrument_id": {"type": "string"},
-        "source_event_key": {"type": "string"},
+        "schema_version": {"type": "string", "enum": [SCHEMA_VERSION]},
+        "instrument_id": {"type": "string", "minLength": 1, "maxLength": 32},
+        "source_event_key": {"type": "string", "minLength": 1, "maxLength": 64},
         "event_match": {"type": "boolean"},
         "analysis_status": {"type": "string", "enum": [
             "resolved_candidate", "manual_required", "no_matching_evidence", "rejected_candidate",
@@ -83,13 +147,15 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
             "proposal", "approved", "expected", "implemented", "completed",
             "cancelled", "corrected", "ambiguous",
         ]},
-        "effective_date": {"type": ["string", "null"]},
-        "effective_date_type": {"type": "string", "enum": [
-            "ex_date", "ex_dividend_date", "implementation_date", "record_date",
-            "share_arrival_date", "listing_date", "resumption_date",
-            "consideration_payment_date", "unknown",
-        ]},
-        "date_basis": {"type": ["string", "null"]},
+        "effective_date": {
+            "type": ["string", "null"],
+            "pattern": r"^\d{4}-\d{2}-\d{2}$",
+        },
+        "effective_date_type": {"type": "string", "enum": list(_DATE_TYPES)},
+        "date_basis": {
+            "type": ["string", "null"],
+            "maxLength": 160,
+        },
         "economic_terms": {
             "type": "object",
             "required": [
@@ -102,11 +168,25 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
                         {"type": "null"},
                         {
                             "type": "object",
-                            "required": ["value", "unit"],
+                            "required": ["value", "unit", "currency"],
                             "properties": {
-                                "value": {"type": "number", "minimum": 0},
-                                "unit": {"type": "string"},
-                                "currency": {"type": ["string", "null"]},
+                                "value": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1000000,
+                                },
+                                "unit": {
+                                    "type": "string",
+                                    "enum": (
+                                        ["currency_per_share"]
+                                        if name == "rights_price"
+                                        else ["per_share", "per_10_shares"]
+                                    ),
+                                },
+                                "currency": {
+                                    "type": ["string", "null"],
+                                    "enum": ["CNY", None],
+                                },
                             },
                             "additionalProperties": False,
                         },
@@ -121,6 +201,7 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
         },
         "evidence": {
             "type": "array",
+            "maxItems": MAX_EVIDENCE_ITEMS,
             "items": {
                 "type": "object",
                 "required": [
@@ -128,20 +209,55 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
                     "exact_quote", "supports_fields",
                 ],
                 "properties": {
-                    "announcement_id": {"type": "string"},
-                    "section_id": {"type": "string"},
+                    "announcement_id": {
+                        "type": "string", "minLength": 1, "maxLength": 128,
+                    },
+                    "section_id": {
+                        "type": "string", "minLength": 1, "maxLength": 180,
+                    },
                     "page_number": {"type": "integer", "minimum": 1},
-                    "text_hash": {"type": "string"},
-                    "exact_quote": {"type": "string"},
-                    "supports_fields": {"type": "array", "items": {"type": "string"}},
+                    "text_hash": {
+                        "type": "string", "minLength": 32, "maxLength": 128,
+                    },
+                    "exact_quote": {
+                        "type": "string", "minLength": 1, "maxLength": 1600,
+                    },
+                    "supports_fields": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": len(_SUPPORT_FIELDS),
+                        "uniqueItems": True,
+                        "items": {"type": "string", "enum": list(_SUPPORT_FIELDS)},
+                    },
                 },
                 "additionalProperties": False,
             },
         },
-        "alternative_dates": {"type": "array", "items": {"type": "object"}},
-        "conflicts": {"type": "array", "items": {"type": "string"}},
+        "alternative_dates": {
+            "type": "array",
+            "maxItems": MAX_ALTERNATIVE_DATES,
+            "items": {
+                "type": "object",
+                "required": ["date", "date_type", "date_basis", "reason"],
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "pattern": r"^\d{4}-\d{2}-\d{2}$",
+                    },
+                    "date_type": {"type": "string", "enum": list(_DATE_TYPES)},
+                    "date_basis": {"type": ["string", "null"], "maxLength": 160},
+                    "reason": {"type": "string", "maxLength": 500},
+                },
+                "additionalProperties": False,
+            },
+        },
+        "conflicts": {
+            "type": "array",
+            "maxItems": MAX_CONFLICTS,
+            "items": {"type": "string", "minLength": 1, "maxLength": 500},
+        },
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-        "reason": {"type": "string"},
+        "reason": {"type": "string", "maxLength": 1000},
     },
     "additionalProperties": False,
 }
@@ -159,6 +275,7 @@ class CorporateActionAnalysis:
     latency_ms: Optional[int]
     attempt_count: int
     usage: Optional[dict[str, Any]]
+    warnings: tuple[str, ...] = ()
 
 
 def _date_in_text(value: Optional[str], text: str) -> bool:
@@ -214,9 +331,64 @@ def _economic_terms_valid(value: Any) -> bool:
             normalized_currency = (
                 str(currency).strip().upper() if currency is not None else None
             )
-            if normalized_currency not in {None, "CNY", "RMB", "人民币", "元"}:
+            if normalized_currency not in {None, "CNY"}:
                 return False
     return True
+
+
+def normalize_analysis_result(result: Mapping[str, Any]) -> dict[str, Any]:
+    """Normalize representation aliases without creating business facts."""
+    normalized = deepcopy(dict(result))
+    event_type = normalized.get("event_type")
+    if isinstance(event_type, str):
+        alias = _EVENT_TYPE_ALIASES.get(event_type.strip().lower())
+        if alias:
+            normalized["event_type"] = alias
+
+    economic_terms = normalized.get("economic_terms")
+    if isinstance(economic_terms, Mapping):
+        normalized_terms = dict(economic_terms)
+        for name in _ECONOMIC_TERM_FIELDS:
+            term = normalized_terms.get(name)
+            if not isinstance(term, Mapping):
+                continue
+            normalized_term = dict(term)
+            unit = normalized_term.get("unit")
+            if isinstance(unit, str):
+                stripped_unit = re.sub(r"\s+", " ", unit.strip())
+                aliases = (
+                    _RIGHTS_PRICE_UNIT_ALIASES
+                    if name == "rights_price"
+                    else _SHARE_UNIT_ALIASES
+                )
+                canonical_unit = aliases.get(stripped_unit)
+                if canonical_unit is None:
+                    canonical_unit = aliases.get(stripped_unit.lower())
+                if canonical_unit:
+                    normalized_term["unit"] = canonical_unit
+            currency = normalized_term.get("currency")
+            if isinstance(currency, str):
+                canonical_currency = _CURRENCY_ALIASES.get(currency.strip())
+                if canonical_currency is None:
+                    canonical_currency = _CURRENCY_ALIASES.get(currency.strip().upper())
+                if canonical_currency:
+                    normalized_term["currency"] = canonical_currency
+            normalized_terms[name] = normalized_term
+        normalized["economic_terms"] = normalized_terms
+
+    alternative_dates = normalized.get("alternative_dates")
+    if isinstance(alternative_dates, list):
+        normalized_dates = []
+        for item in alternative_dates:
+            if not isinstance(item, Mapping):
+                normalized_dates.append(item)
+                continue
+            normalized_item = dict(item)
+            if "date_type" not in normalized_item and "type" in normalized_item:
+                normalized_item["date_type"] = normalized_item.pop("type")
+            normalized_dates.append(normalized_item)
+        normalized["alternative_dates"] = normalized_dates
+    return normalized
 
 
 def canonical_supported_economic_fields(value: Any) -> set[str]:
@@ -271,6 +443,8 @@ def _event_type_compatible(
     *,
     source_profile: Optional[str],
     action_type: Optional[str],
+    official_text: str = "",
+    candidate_titles: Sequence[str] = (),
 ) -> bool:
     normalized_event = str(event_type or "").strip()
     normalized_profile = str(source_profile or "").strip()
@@ -279,6 +453,15 @@ def _event_type_compatible(
         return False
     if normalized_profile == "cninfo_allotment" or normalized_action == "rights":
         return normalized_event in {"rights_issue", "mixed"}
+    if normalized_action == "mixed_distribution" and normalized_event == "share_reform":
+        official_context = " ".join([official_text, *candidate_titles])
+        identifies_share_reform = bool(re.search(
+            r"(?:股权分置改革|股改).{0,40}(?:实施|对价|复牌)|"
+            r"(?:实施|对价|复牌).{0,40}(?:股权分置改革|股改)",
+            official_context,
+        ))
+        if identifies_share_reform:
+            return True
     allowed_by_action = {
         "dividend": {"dividend", "mixed"},
         "bonus": {"bonus_issue", "mixed"},
@@ -324,6 +507,94 @@ def _effective_date_type_compatible(
             "resumption_date",
         }
     return normalized_date_type in {"ex_date", "ex_dividend_date"}
+
+
+def _date_semantic_role(value: Any) -> str:
+    normalized = str(value or "").strip()
+    if normalized in {"ex_date", "ex_dividend_date"}:
+        return "ex_date"
+    return normalized
+
+
+def _has_same_role_date_conflict(
+    effective_date: Any,
+    effective_date_type: Any,
+    alternative_dates: Any,
+) -> bool:
+    if not isinstance(alternative_dates, list):
+        return False
+    dates_by_role: dict[str, set[str]] = defaultdict(set)
+    primary_role = _date_semantic_role(effective_date_type)
+    primary_date = str(effective_date or "").strip()
+    if primary_role and primary_date:
+        dates_by_role[primary_role].add(primary_date)
+    for item in alternative_dates:
+        if not isinstance(item, Mapping):
+            return True
+        role = _date_semantic_role(item.get("date_type"))
+        related_date = str(item.get("date") or "").strip()
+        if not role or not related_date:
+            return True
+        dates_by_role[role].add(related_date)
+    return any(len(values) > 1 for values in dates_by_role.values())
+
+
+def _derive_review_classification(
+    *,
+    status: str,
+    gates: Mapping[str, Any],
+    event_stage: Any,
+) -> dict[str, Any]:
+    failed = sorted(name for name, passed in gates.items() if not bool(passed))
+    gate_signature = "|".join(failed) if failed else "all_gates_passed"
+    machine_gates = {
+        "schema_version",
+        "instrument_identity",
+        "event_identity",
+        "economic_term_units",
+        "event_type_compatible",
+        "effective_date_type_compatible",
+        "analysis_status_compatible",
+    }
+    deep_gates = {
+        "evidence_page",
+        "evidence_section",
+        "exact_quote",
+        "evidence_quality",
+        "date_in_evidence",
+        "date_range",
+        "no_unresolved_language",
+        "no_conflict",
+        "economic_terms_in_evidence",
+        "context_complete",
+        "resolved_fields",
+    }
+    stage = str(event_stage or "").strip()
+    if status == "validated_candidate":
+        tier = "quick_review"
+        reasons = ["validated_candidate_requires_explicit_review"]
+    elif failed and set(failed).issubset(machine_gates):
+        tier = "machine_rework"
+        reasons = [f"representation_gate:{name}" for name in failed]
+    elif status == "no_matching_evidence" or set(failed) & deep_gates or stage in {
+        "approved", "cancelled", "corrected", "ambiguous", "expected", "proposal",
+    }:
+        tier = "deep_review"
+        reasons = [f"hard_gate:{name}" for name in failed]
+        if stage in {
+            "approved", "cancelled", "corrected", "ambiguous", "expected", "proposal",
+        }:
+            reasons.append(f"event_stage:{stage}")
+    else:
+        tier = "quick_review"
+        reasons = [f"review_gate:{name}" for name in failed] or [
+            "explicit_reviewer_confirmation_required"
+        ]
+    return {
+        "review_tier": tier,
+        "gate_signature": gate_signature,
+        "review_reasons": reasons,
+    }
 
 
 def _bound_event_pages(
@@ -440,10 +711,11 @@ def validate_analysis(
     allowed_end: Optional[date] = None,
     source_profile: Optional[str] = None,
     action_type: Optional[str] = None,
+    candidate_titles: Sequence[str] = (),
     context_complete: bool = True,
 ) -> tuple[str, dict[str, Any], dict[str, Any]]:
     """Return candidate-only status, gate details, and normalized result."""
-    normalized = dict(result)
+    normalized = normalize_analysis_result(result)
     page_map = {(page.announcement_id, page.page_number): page for page in pages}
     gates: dict[str, Any] = {
         "schema_version": normalized.get("schema_version") == SCHEMA_VERSION,
@@ -513,7 +785,11 @@ def validate_analysis(
             date_ok = False
     gates["date_range"] = date_ok
     gates["no_unresolved_language"] = not _contains_uncertain_language(cited_text)
-    gates["no_conflict"] = not normalized.get("conflicts") and not normalized.get("alternative_dates")
+    gates["no_conflict"] = not normalized.get("conflicts") and not _has_same_role_date_conflict(
+        normalized.get("effective_date"),
+        normalized.get("effective_date_type"),
+        normalized.get("alternative_dates"),
+    )
     economic_terms = normalized.get("economic_terms")
     gates["economic_term_units"] = _economic_terms_valid(economic_terms)
     economic_evidence_valid = gates["economic_term_units"]
@@ -534,6 +810,8 @@ def validate_analysis(
         normalized.get("event_type"),
         source_profile=source_profile,
         action_type=action_type,
+        official_text=cited_text,
+        candidate_titles=candidate_titles,
     )
     gates["effective_date_type_compatible"] = _effective_date_type_compatible(
         normalized.get("event_type"),
@@ -558,9 +836,11 @@ def validate_analysis(
     else:
         status = "validated_candidate"
     normalized["analysis_status"] = "resolved_candidate" if status == "validated_candidate" else status
-    if status != "validated_candidate":
-        normalized["effective_date"] = None
-        normalized["date_basis"] = None
+    normalized["_review_classification"] = _derive_review_classification(
+        status=status,
+        gates=gates,
+        event_stage=normalized.get("event_stage"),
+    )
     return status, gates, normalized
 
 
@@ -702,6 +982,7 @@ class CninfoCorporateActionLlmResolver:
             response_schema=ANALYSIS_SCHEMA,
             schema_name="cninfo_corporate_action_resolution",
             schema_version=SCHEMA_VERSION,
+            max_output_tokens=MAX_ANALYSIS_OUTPUT_TOKENS,
             idempotency_key=input_hash,
             content_is_untrusted=True,
         ))
@@ -714,8 +995,15 @@ class CninfoCorporateActionLlmResolver:
             allowed_end=allowed_end,
             source_profile=str(event.get("source_profile") or "") or None,
             action_type=str(event.get("action_type") or "") or None,
+            candidate_titles=tuple(
+                str(item.get("announcement_title") or "")
+                for item in (event.get("candidates") or [])
+                if isinstance(item, Mapping)
+            ),
             context_complete=bool(context.get("context_complete")),
         )
+        context["allowed_start"] = allowed_start.isoformat() if allowed_start else None
+        context["allowed_end"] = allowed_end.isoformat() if allowed_end else None
         normalized["_input_context"] = context
         usage = None if response.usage is None else {
             "input_tokens": response.usage.input_tokens,
@@ -733,4 +1021,5 @@ class CninfoCorporateActionLlmResolver:
             latency_ms=response.latency_ms,
             attempt_count=response.attempt_count,
             usage=usage,
+            warnings=tuple(getattr(response, "warnings", ()) or ()),
         )

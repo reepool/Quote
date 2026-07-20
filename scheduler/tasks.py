@@ -435,6 +435,14 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     """Build a bounded candidate-only report for公告正文解析."""
     counts = result.get("counts") or {}
     targets = result.get("targets") or {}
+    review_workload = result.get("review_workload") or {}
+    tiers = review_workload.get("tiers") or {}
+    signatures = review_workload.get("gate_signatures") or {}
+    metrics = result.get("llm_metrics") or {}
+    latency = metrics.get("latency_ms") or {}
+    top_signatures = sorted(
+        signatures.items(), key=lambda item: (-int(item[1]), str(item[0]))
+    )[:5]
     lines = [
         "ℹ️ *A 股巨潮公司行动公告正文解析*",
         "",
@@ -444,18 +452,33 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         f"候选事件: `{targets.get('candidate_events', 0)}`，本批: `{targets.get('batch_events', 0)}`",
         f"处理/分析: `{counts.get('processed', 0)}/{counts.get('analyzed', 0)}`",
         f"通过证据门禁: `{counts.get('validated_candidates', 0)}`",
-        f"需人工复核: `{counts.get('manual_required', 0)}`",
+        f"机器返工: `{tiers.get('machine_rework', 0)}`",
+        f"快速审核: `{tiers.get('quick_review', 0)}`，深度审核: `{tiers.get('deep_review', 0)}`",
+        f"旧口径 manual_required: `{counts.get('manual_required', 0)}`",
+        f"Token: `input={metrics.get('input_tokens', 0)}, output={metrics.get('output_tokens', 0)}, total={metrics.get('total_tokens', 0)}`",
+        f"输出预算超限: `{metrics.get('provider_output_budget_overruns', 0)}`",
+        f"延迟 ms: `p50={latency.get('p50')}, p95={latency.get('p95')}, max={latency.get('max')}`",
         f"LLM 未启用: `{counts.get('llm_disabled', 0)}`",
         f"文档失败: `{counts.get('document_failures', 0)}`，分析失败: `{counts.get('errors', 0)}`",
         f"下一批 offset: `{targets.get('next_target_offset')}`",
         "",
         "说明: 解析结果仅保存为候选 lineage，不会自动写入 resolved 有效日期或生产复权因子。",
     ]
+    if top_signatures:
+        lines.extend([
+            "",
+            "主要 gate 签名:",
+            "```text",
+            *(f"{signature}: {count}" for signature, count in top_signatures),
+            "```",
+        ])
     errors = result.get("errors") or []
     if errors:
         lines.extend(["", "异常样本:", "```text"])
         lines.extend(
-            f"{item.get('source_event_key', 'unknown')}: {item.get('code', item.get('error', 'unknown'))}"
+            f"{item.get('source_event_key', 'unknown')}: "
+            f"{item.get('code', 'unknown')} attempts={item.get('attempt_count')} "
+            f"{item.get('error', '')}"
             for item in errors[:10] if isinstance(item, dict)
         )
         lines.append("```")
@@ -4417,6 +4440,25 @@ class ScheduledTasks:
         task_id = "a_share_cninfo_corporate_action_llm_resolution"
         self._active_tasks.add(task_id)
         try:
+            scheduler_logger.info(
+                "[Scheduler] Starting CNInfo corporate-action LLM resolution: "
+                "range=%s..%s exchanges=%s instruments=%s max_events=%s "
+                "offset=%s profile=%s resume=%s dry_run=%s download_documents=%s "
+                "run_ocr=%s refresh_documents=%s discover_candidates=%s",
+                start_date,
+                end_date,
+                exchanges,
+                instrument_ids,
+                max_events,
+                target_offset,
+                profile,
+                resume,
+                dry_run,
+                download_documents,
+                run_ocr,
+                refresh_documents,
+                discover_candidates,
+            )
             result = await data_manager.analyze_cninfo_corporate_action_candidates(
                 start_date=start_date,
                 end_date=end_date,
@@ -4432,6 +4474,32 @@ class ScheduledTasks:
                 refresh_documents=bool(refresh_documents),
                 discover_candidates=bool(discover_candidates),
                 sample_limit=int(sample_limit),
+            )
+            scheduler_logger.info(
+                "[Scheduler] CNInfo corporate-action LLM resolution completed: "
+                "status=%s targets=%s processed=%s analyzed=%s validated=%s "
+                "machine_rework=%s quick_review=%s deep_review=%s "
+                "budget_overruns=%s document_failures=%s errors=%s next_offset=%s",
+                result.get("status"),
+                (result.get("targets") or {}).get("batch_events", 0),
+                (result.get("counts") or {}).get("processed", 0),
+                (result.get("counts") or {}).get("analyzed", 0),
+                (result.get("counts") or {}).get("validated_candidates", 0),
+                ((result.get("review_workload") or {}).get("tiers") or {}).get(
+                    "machine_rework", 0
+                ),
+                ((result.get("review_workload") or {}).get("tiers") or {}).get(
+                    "quick_review", 0
+                ),
+                ((result.get("review_workload") or {}).get("tiers") or {}).get(
+                    "deep_review", 0
+                ),
+                (result.get("llm_metrics") or {}).get(
+                    "provider_output_budget_overruns", 0
+                ),
+                (result.get("counts") or {}).get("document_failures", 0),
+                (result.get("counts") or {}).get("errors", 0),
+                (result.get("targets") or {}).get("next_target_offset"),
             )
             if self.telegram_enabled:
                 await self._send_task_report(

@@ -79,8 +79,9 @@ def test_logging_manager_routes_system_task_and_access_logs(tmp_path):
 
     logging.getLogger("API").info("system lifecycle marker")
     logging.getLogger("DataManager").info("task execution marker")
+    logging.getLogger("LLM").info("llm attempt marker")
     logging.getLogger("API.Access").info("access request marker")
-    _flush_handlers("", "API", "DataManager", "API.Access")
+    _flush_handlers("", "API", "DataManager", "LLM", "API.Access")
 
     sys_log = (tmp_path / "sys.log").read_text(encoding="utf-8")
     task_log = (tmp_path / "task.log").read_text(encoding="utf-8")
@@ -88,8 +89,10 @@ def test_logging_manager_routes_system_task_and_access_logs(tmp_path):
 
     assert "system lifecycle marker" in sys_log
     assert "task execution marker" in task_log
+    assert "llm attempt marker" in task_log
     assert "access request marker" in access_log
     assert "task execution marker" not in sys_log
+    assert "llm attempt marker" not in sys_log
     assert "access request marker" not in sys_log
     assert "access request marker" not in task_log
     assert logging.getLogger("API.Access").propagate is False

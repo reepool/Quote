@@ -8,6 +8,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 
 ALLOWED_OUTPUT_MODES = {"json_schema", "json_object", "prompt_only", "auto"}
+ALLOWED_MAX_OUTPUT_TOKEN_FIELDS = {"max_tokens", "max_completion_tokens"}
 ALLOWED_ROLES = {"system", "developer", "user", "assistant", "tool"}
 
 
@@ -90,11 +91,13 @@ class LlmProfile:
     supported_structured_output_modes: tuple[str, ...] = ("json_schema", "json_object")
     allow_prompt_only: bool = False
     timeout_seconds: float = 90.0
+    attempt_timeout_seconds: float = 90.0
     max_retries: int = 2
     max_schema_repair_attempts: int = 1
     max_concurrency: int = 1
     requests_per_minute: int = 20
     temperature: float = 0.0
+    max_output_tokens_field: str = "max_tokens"
     max_retry_after_seconds: float = 30.0
     retry_backoff_seconds: float = 0.5
     idempotency_header: str = "Idempotency-Key"
@@ -114,6 +117,26 @@ class LlmProfile:
                 f"unsupported structured output capabilities for {name}: "
                 f"{sorted(unsupported_modes)}"
             )
+        max_output_tokens_field = str(
+            _configured(value, "max_output_tokens_field", "max_tokens")
+        ).strip()
+        if max_output_tokens_field not in ALLOWED_MAX_OUTPUT_TOKEN_FIELDS:
+            raise ValueError(
+                f"unsupported max_output_tokens_field for {name}: "
+                f"{max_output_tokens_field}"
+            )
+        timeout_seconds = max(
+            0.01,
+            float(_configured(value, "timeout_seconds", 90.0)),
+        )
+        attempt_timeout_seconds = max(
+            0.01,
+            float(_configured(
+                value,
+                "attempt_timeout_seconds",
+                timeout_seconds,
+            )),
+        )
         return cls(
             name=str(name).strip(),
             enabled=value.get("enabled") is True,
@@ -125,7 +148,8 @@ class LlmProfile:
             structured_output_mode=mode,
             supported_structured_output_modes=modes or ("json_schema", "json_object"),
             allow_prompt_only=value.get("allow_prompt_only") is True,
-            timeout_seconds=max(0.01, float(_configured(value, "timeout_seconds", 90.0))),
+            timeout_seconds=timeout_seconds,
+            attempt_timeout_seconds=attempt_timeout_seconds,
             max_retries=max(0, int(_configured(value, "max_retries", 2))),
             max_schema_repair_attempts=max(
                 0, int(_configured(value, "max_schema_repair_attempts", 1))
@@ -133,6 +157,7 @@ class LlmProfile:
             max_concurrency=max(1, int(_configured(value, "max_concurrency", 1))),
             requests_per_minute=max(0, int(_configured(value, "requests_per_minute", 20))),
             temperature=float(_configured(value, "temperature", 0.0)),
+            max_output_tokens_field=max_output_tokens_field,
             max_retry_after_seconds=max(
                 0.0, float(_configured(value, "max_retry_after_seconds", 30.0))
             ),
@@ -157,11 +182,13 @@ class LlmProfile:
             "supported_structured_output_modes": list(self.supported_structured_output_modes),
             "allow_prompt_only": self.allow_prompt_only,
             "timeout_seconds": self.timeout_seconds,
+            "attempt_timeout_seconds": self.attempt_timeout_seconds,
             "max_retries": self.max_retries,
             "max_schema_repair_attempts": self.max_schema_repair_attempts,
             "max_concurrency": self.max_concurrency,
             "requests_per_minute": self.requests_per_minute,
             "temperature": self.temperature,
+            "max_output_tokens_field": self.max_output_tokens_field,
         }
 
 

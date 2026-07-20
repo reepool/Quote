@@ -69,8 +69,10 @@ flowchart LR
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
-        "timeout_seconds": 90,
-        "max_retries": 2,
+        "timeout_seconds": 620,
+        "attempt_timeout_seconds": 300,
+        "max_output_tokens_field": "max_completion_tokens",
+        "max_retries": 1,
         "max_schema_repair_attempts": 1,
         "max_concurrency": 1,
         "requests_per_minute": 20,
@@ -93,6 +95,8 @@ flowchart LR
 | `structured_output_mode` | `json_schema`、`json_object`、`prompt_only` 或 `auto` |
 | `supported_structured_output_modes` | provider 已验证的能力集合；`auto` 只在集合中选择 |
 | `timeout_seconds` | 单次调用的总业务 deadline |
+| `attempt_timeout_seconds` | 每次 HTTP 尝试的最长时间；默认等于总 deadline，且不会超过当时剩余总预算 |
+| `max_output_tokens_field` | provider 使用的输出预算字段：`max_tokens` 或 `max_completion_tokens`；默认前者 |
 | `max_retries` | provider/transport 重试次数，不含首次请求 |
 | `max_schema_repair_attempts` | schema/JSON 失败后的 repair 次数，建议不超过 1 |
 | `max_concurrency` / `requests_per_minute` | profile 级共享并发和速率上限；RPM 为 0 表示不启用 RPM 限制 |
@@ -223,7 +227,7 @@ JSON 解析失败或 schema 校验失败时，网关最多执行配置允许的�
 | `deadline_exceeded` | 全请求 deadline 用尽 | 否 |
 | `cancelled` | 调用方取消任务 | 否 |
 
-一次 `complete()` 的 timeout 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。显式 `requests_per_minute=0` 表示关闭 RPM 限制，不能被默认值覆盖。
+一次 `complete()` 的 `timeout_seconds` 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，拿到 limiter 槽位后会依据剩余总预算重新收紧；这样一次长尾请求不会独占全部调用预算，只要总 deadline 尚未用尽，后续重试仍可执行。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。显式 `requests_per_minute=0` 表示关闭 RPM 限制，不能被默认值覆盖。
 
 ## 8. business-profile 调用
 

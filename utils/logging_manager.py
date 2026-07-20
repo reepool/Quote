@@ -82,6 +82,7 @@ class LoggingManager:
                 'tg_task_manager',
                 'TelegramBot',
                 'DataManager',
+                'LLM',
                 'DataSource',
                 'Database',
                 'DataOperation',
