@@ -1100,6 +1100,60 @@ def test_valuation_service_dcf_cyclical_uses_futures_cycle_for_margin_normalizat
     assert "cyclical_high_cycle_margin_normalized_with_futures_data" in result["warnings"]
 
 
+def test_valuation_service_dcf_cyclical_accepts_company_special_commodity_context():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600001.SH",
+            "symbol": "600001",
+            "exchange": "SSE",
+            "industry_name": "基础化工",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 160.0,
+            "capital_expenditure": 80.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "commodity_price_assumption": 1200.0,
+            "cycle_index_level": 0.40,
+            "commodity_cycle_context": {
+                "selected_series_id": (
+                    "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+                ),
+                "mapping_scope": "approved_company_business_profile",
+                "mapping_scope_id": "600001.SH",
+                "diagnostic": {
+                    "percentile": 0.90,
+                    "mean_price": 1000.0,
+                    "mean_deviation_pct": 0.20,
+                    "cycle_state": "high",
+                },
+                "source_policy": "local_commodity_db_only",
+            },
+        },
+    )
+
+    diagnostics = result["cyclical_model_diagnostics"]
+    assert result["status"] == "success"
+    assert diagnostics["commodity_cycle_percentile"] == 0.40
+    assert diagnostics["commodity_cycle_selected_series_id"] == (
+        "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+    )
+    assert diagnostics["commodity_cycle_mapping_scope_id"] == "600001.SH"
+    assert diagnostics["commodity_market_data"]["source_policy"] == (
+        "local_commodity_db_only"
+    )
+    assert diagnostics["cycle_inputs"]["commodity_price_assumption"] == 1200.0
+    assert diagnostics["cycle_inputs"]["cycle_index_level"] == 0.40
+
+
 def test_valuation_service_dcf_cyclical_explicit_midcycle_margin_overrides_cycle_context():
     service = ResearchValuationService()
 

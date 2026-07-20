@@ -1474,6 +1474,8 @@ class ProfessionalDcfEngine:
                 "cycle_inputs": cycle_inputs,
                 "missing_cycle_inputs": missing_cycle_inputs,
                 "futures_market_data": overrides.get("futures_cycle_context"),
+                "commodity_market_data": overrides.get("commodity_cycle_context")
+                or overrides.get("futures_cycle_context"),
                 "capex_to_sales": capex_to_sales,
                 "depreciation_to_sales": da_to_sales,
                 "working_capital_to_sales": nwc_to_sales,
@@ -2843,26 +2845,32 @@ class ProfessionalDcfEngine:
                 self.parameters.get("cyclical_midcycle_margin_cap", 0.18),
             )
         )
-        futures_cycle_context = overrides.get("futures_cycle_context")
-        if not isinstance(futures_cycle_context, dict):
-            futures_cycle_context = {}
-        diagnostic = futures_cycle_context.get("diagnostic")
+        cycle_context = overrides.get("commodity_cycle_context")
+        if not isinstance(cycle_context, dict):
+            cycle_context = overrides.get("futures_cycle_context")
+        if not isinstance(cycle_context, dict):
+            cycle_context = {}
+        diagnostic = cycle_context.get("diagnostic")
         if not isinstance(diagnostic, dict):
             diagnostic = {}
-        cycle_percentile = self._normalize_cycle_percentile(
-            diagnostic.get("percentile")
-            or futures_cycle_context.get("price_percentile")
-            or facts.get("cycle_index_level")
-            or overrides.get("cycle_index_level")
-        )
+        explicit_cycle_level = overrides.get("cycle_index_level")
+        fact_cycle_level = facts.get("cycle_index_level")
+        cycle_level_input = explicit_cycle_level
+        if cycle_level_input is None:
+            cycle_level_input = fact_cycle_level
+        if cycle_level_input is None:
+            cycle_level_input = diagnostic.get("percentile")
+        if cycle_level_input is None:
+            cycle_level_input = cycle_context.get("price_percentile")
+        cycle_percentile = self._normalize_cycle_percentile(cycle_level_input)
         cycle_state = str(
             diagnostic.get("cycle_state")
-            or futures_cycle_context.get("cycle_state")
+            or cycle_context.get("cycle_state")
             or ""
         ).strip()
         mean_deviation_pct = self._safe_float(
             diagnostic.get("mean_deviation_pct")
-            or futures_cycle_context.get("mean_deviation_pct")
+            or cycle_context.get("mean_deviation_pct")
         )
         explicit_margin = self._safe_float(
             overrides.get("midcycle_operating_margin") or facts.get("midcycle_operating_margin")
@@ -2924,9 +2932,20 @@ class ProfessionalDcfEngine:
             "futures_cycle_percentile": cycle_percentile,
             "futures_cycle_state": cycle_state or None,
             "futures_cycle_mean_deviation_pct": mean_deviation_pct,
-            "futures_cycle_selected_series_id": futures_cycle_context.get("selected_series_id"),
-            "futures_cycle_mapping_scope": futures_cycle_context.get("mapping_scope"),
-            "futures_cycle_mapping_scope_id": futures_cycle_context.get("mapping_scope_id"),
+            "futures_cycle_selected_series_id": cycle_context.get("selected_series_id"),
+            "futures_cycle_mapping_scope": cycle_context.get("mapping_scope"),
+            "futures_cycle_mapping_scope_id": cycle_context.get("mapping_scope_id"),
+            "commodity_cycle_percentile": cycle_percentile,
+            "commodity_cycle_state": cycle_state or None,
+            "commodity_cycle_mean_deviation_pct": mean_deviation_pct,
+            "commodity_cycle_selected_series_id": cycle_context.get(
+                "selected_series_id"
+            ),
+            "commodity_cycle_mapping_scope": cycle_context.get("mapping_scope"),
+            "commodity_cycle_mapping_scope_id": cycle_context.get(
+                "mapping_scope_id"
+            ),
+            "commodity_cycle_source_policy": cycle_context.get("source_policy"),
             "warnings": warnings,
         }
 

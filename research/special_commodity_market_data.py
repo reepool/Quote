@@ -1930,6 +1930,18 @@ class SpecialCommodityStorageManager:
             result[str(record["series_id"])] = record
         return result
 
+    def get_series(self, series_id: str) -> Optional[Dict[str, Any]]:
+        """Return one local special-commodity price series by stable id."""
+        normalized = str(series_id or "").strip()
+        if not normalized:
+            return None
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM commodity_price_series WHERE series_id = ?",
+                (normalized,),
+            ).fetchone()
+        return _row_to_dict(row) if row is not None else None
+
     def read_dictionary(self) -> Dict[str, Any]:
         with self.get_connection() as conn:
             instruments = [_row_to_dict(row) for row in conn.execute("SELECT * FROM commodity_price_instruments ORDER BY commodity_id")]

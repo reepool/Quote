@@ -373,6 +373,15 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
   路径、URL 或数据库返回顺序；promotion 会重新计算快照 hash，并逐项核对来源行
   身份、标签和问题类型，避免跨环境编号漂移或人工替换 lineage。该流程不自动选择
   产品、不自动修改目录或审核状态；
+- approved 公司商品暴露的行情序列解析已同时支持期货连续序列和特殊商品序列。
+  特殊商品 DCF 上下文只读取当前公司 approved mapping 指定的序列，按估值日截断
+  观测并保留暴露角色和 lineage，不再把全库最新值附加为公司诊断。单一收入端序列
+  可生成受控周期输入；原材料或能源成本单腿只能返回诊断，缺少 approved spread
+  时以 `cost_only_special_commodity_requires_approved_spread` 阻塞；即使已有定义，
+  在跨期货/特殊商品 spread resolver 完成前仍不得进入周期模型，避免反向调整利润率。
+  当前本地特殊商品基线为 44 个商品、47 条序列、102,053 条观测，但 approved 公司
+  暴露、spread definition 和 exposure mapping 仍为 0，因此该接线不代表成本端数据
+  证据或公司价差 DCF 已投入生产；
 - structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
   candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
   候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；

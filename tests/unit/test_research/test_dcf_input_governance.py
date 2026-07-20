@@ -215,3 +215,187 @@ async def test_data_manager_enriches_point_in_time_shares_and_local_risk_free_ra
     assert rate["database"] == "interests.db"
     assert rate["as_of_date"] == "2026-07-14"
     assert rate["lineage_hash"]
+
+
+@pytest.mark.asyncio
+async def test_special_commodity_dcf_context_is_company_and_valuation_date_bound(
+    monkeypatch,
+):
+    async def sync_to_thread(function, /, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("data_manager.asyncio.to_thread", sync_to_thread)
+
+    class Storage:
+        def get_series(self, series_id):
+            assert series_id == "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+            return {
+                "series_id": series_id,
+                "commodity_id": "CN.CHEMICAL.SODA_ASH.SPOT",
+                "currency": "CNY",
+                "unit": "CNY/ton",
+                "active": True,
+            }
+
+        def read_observations(self, *, series_id, end_date=None, start_date=None):
+            assert series_id == "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+            assert end_date == "2025-12-31"
+            assert start_date == "2023-01-01"
+            return [
+                {
+                    "series_id": series_id,
+                    "observation_date": "2025-06-30",
+                    "value": 1000.0,
+                    "currency": "CNY",
+                    "unit": "CNY/ton",
+                    "source_profile": "100ppi",
+                },
+                {
+                    "series_id": series_id,
+                    "observation_date": "2025-12-31",
+                    "value": 1200.0,
+                    "currency": "CNY",
+                    "unit": "CNY/ton",
+                    "source_profile": "100ppi",
+                },
+                {
+                    "series_id": series_id,
+                    "observation_date": "2026-01-02",
+                    "value": 3000.0,
+                    "currency": "CNY",
+                    "unit": "CNY/ton",
+                    "source_profile": "100ppi",
+                },
+            ]
+
+    manager = object.__new__(DataManager)
+    manager.research_config = type(
+        "Config",
+        (),
+        {
+            "modules": {
+                "commodity_market_data": {
+                    "special_commodity_market_data": {"enabled": True}
+                }
+            }
+        },
+    )()
+    manager._require_special_commodity_storage = lambda: Storage()
+    context = await manager._get_dcf_special_commodity_context(
+        valuation_date="2025-12-31",
+        target_currency="CNY",
+        business_profile_context={
+            "instrument_id": "600001.SH",
+            "executable_exposure_mappings": [
+                {
+                    "mapping_id": "business-profile:exposure-soda-ash-cost",
+                    "source": "approved_company_business_profile",
+                    "market_data_family": "special_commodity",
+                    "exposure_role": "revenue",
+                    "direction": "positive",
+                    "revenue_series_id": (
+                        "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+                    ),
+                    "cost_series_ids": [],
+                }
+            ],
+        },
+    )
+
+    assert context["status"] == "ready"
+    assert context["mapping_scope_id"] == "600001.SH"
+    assert context["selected_mapping"]["exposure_role"] == "revenue"
+    assert context["latest_observation"]["observation_date"] == "2025-12-31"
+    assert context["commodity_price_assumption"] == 1200.0
+    assert context["diagnostic"]["observation_count"] == 2
+    assert context["diagnostic"]["percentile"] == 1.0
+    assert context["lineage_hash"]
+
+
+@pytest.mark.asyncio
+async def test_special_commodity_dcf_context_ignores_global_series_without_approval():
+    manager = object.__new__(DataManager)
+    manager.research_config = type(
+        "Config",
+        (),
+        {
+            "modules": {
+                "commodity_market_data": {
+                    "special_commodity_market_data": {"enabled": True}
+                }
+            }
+        },
+    )()
+
+    context = await manager._get_dcf_special_commodity_context(
+        valuation_date="2025-12-31",
+        target_currency="CNY",
+        business_profile_context={"executable_exposure_mappings": []},
+    )
+
+    assert context is None
+
+
+@pytest.mark.asyncio
+async def test_special_commodity_cost_leg_requires_approved_spread(monkeypatch):
+    async def sync_to_thread(function, /, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("data_manager.asyncio.to_thread", sync_to_thread)
+
+    class Storage:
+        def get_series(self, series_id):
+            return {"series_id": series_id, "active": True}
+
+        def read_observations(self, **kwargs):
+            return [
+                {
+                    "series_id": kwargs["series_id"],
+                    "observation_date": "2025-12-31",
+                    "value": 1200.0,
+                    "currency": "CNY",
+                    "source_profile": "100ppi",
+                }
+            ]
+
+    manager = object.__new__(DataManager)
+    manager.research_config = type(
+        "Config",
+        (),
+        {
+            "modules": {
+                "commodity_market_data": {
+                    "special_commodity_market_data": {"enabled": True}
+                }
+            }
+        },
+    )()
+    manager._require_special_commodity_storage = lambda: Storage()
+
+    context = await manager._get_dcf_special_commodity_context(
+        valuation_date="2025-12-31",
+        target_currency="CNY",
+        business_profile_context={
+            "instrument_id": "600001.SH",
+            "executable_exposure_mappings": [
+                {
+                    "source": "approved_company_business_profile",
+                    "market_data_family": "special_commodity",
+                    "exposure_role": "feedstock_cost",
+                    "direction": "negative",
+                    "revenue_series_id": None,
+                    "cost_series_ids": [
+                        "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+                    ],
+                    "spread_ids": [],
+                }
+            ],
+        },
+    )
+
+    assert context["status"] == "blocked"
+    assert context["commodity_price_assumption"] is None
+    assert context["cycle_index_level"] is None
+    assert "cost_only_special_commodity_requires_approved_spread" in context[
+        "blockers"
+    ]

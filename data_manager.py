@@ -20,6 +20,7 @@ from copy import deepcopy
 import hashlib
 import inspect
 import json
+import math
 import os
 import re
 import sqlite3
@@ -7558,6 +7559,10 @@ class DataManager:
                         "as_of_date": beta_result.get("as_of_date"),
                     }
 
+        explicit_commodity_price_assumption = (
+            "commodity_price_assumption" in overrides
+        )
+        explicit_cycle_index_level = "cycle_index_level" in overrides
         futures_cycle_context = await self._get_dcf_futures_cycle_context(
             normalized_id,
             valuation_date=target_valuation_date,
@@ -7578,9 +7583,22 @@ class DataManager:
         special_commodity_context = await self._get_dcf_special_commodity_context(
             valuation_date=overrides.get("valuation_date"),
             target_currency="CNY",
+            business_profile_context=business_profile_context,
         )
         if special_commodity_context:
             overrides["special_commodity_market_data_context"] = special_commodity_context
+            if special_commodity_context.get("status") == "ready":
+                overrides["commodity_cycle_context"] = special_commodity_context
+                if not explicit_commodity_price_assumption:
+                    overrides["commodity_price_assumption"] = (
+                        special_commodity_context.get("commodity_price_assumption")
+                    )
+                if not explicit_cycle_index_level:
+                    overrides["cycle_index_level"] = special_commodity_context.get(
+                        "cycle_index_level"
+                    )
+        elif futures_cycle_context:
+            overrides["commodity_cycle_context"] = futures_cycle_context
 
         fx_context = await self._get_dcf_fx_context(
             valuation_date=overrides.get("valuation_date"),
@@ -7703,9 +7721,15 @@ class DataManager:
             futures_storage = self._require_futures_storage()
         except RuntimeError:
             pass
+        special_commodity_storage = None
+        try:
+            special_commodity_storage = self._require_special_commodity_storage()
+        except RuntimeError:
+            pass
         resolver = BusinessProfileResolver(
             BusinessProfileRepository(storage),
             futures_storage=futures_storage,
+            special_commodity_storage=special_commodity_storage,
         )
         try:
             return await asyncio.to_thread(
@@ -7928,48 +7952,318 @@ class DataManager:
         *,
         valuation_date: Optional[str],
         target_currency: Optional[str] = None,
+        business_profile_context: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
-        """Return local special-commodity diagnostics for DCF without remote fetches."""
+        """Return company-bound, point-in-time special-commodity DCF inputs."""
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
         special_cfg = (module_cfg or {}).get("special_commodity_market_data", {})
         if not special_cfg or not special_cfg.get("enabled", False):
             return None
-        try:
-            diagnostics = await self.get_special_commodity_diagnostics(
-                target_currency=target_currency,
-                max_fx_lag_days=None,
+        company_mappings = [
+            item
+            for item in (
+                business_profile_context.get("executable_exposure_mappings")
+                if isinstance(business_profile_context, dict)
+                else []
             )
+            if isinstance(item, dict)
+            and item.get("source") == "approved_company_business_profile"
+        ]
+        mappings = [
+            item
+            for item in company_mappings
+            if item.get("market_data_family") == "special_commodity"
+        ]
+        if not mappings:
+            return None
+        target_date = str(
+            valuation_date or get_shanghai_time().date().isoformat()
+        )[:10]
+        selected_series_ids = sorted(
+            {
+                str(series_id)
+                for mapping in mappings
+                for series_id in [
+                    mapping.get("revenue_series_id"),
+                    *(mapping.get("cost_series_ids") or []),
+                ]
+                if series_id
+            }
+        )
+        blockers: List[str] = []
+        warnings: List[str] = ["availability_quality_observation_date_only"]
+        if len(selected_series_ids) != 1:
+            blockers.append("multiple_company_special_commodity_series_require_spread")
+        if len(mappings) != 1:
+            blockers.append("multiple_company_special_commodity_mappings_require_review")
+        if any(
+            item.get("market_data_family") != "special_commodity"
+            for item in company_mappings
+        ):
+            blockers.append("multiple_company_market_families_require_spread")
+        selected_mapping = mappings[0] if len(mappings) == 1 else None
+        if (
+            isinstance(selected_mapping, dict)
+            and selected_mapping.get("exposure_role")
+            in {"feedstock_cost", "energy_cost"}
+        ):
+            blockers.append(
+                "special_commodity_cost_leg_requires_cross_market_spread_resolver"
+                if selected_mapping.get("spread_ids")
+                else "cost_only_special_commodity_requires_approved_spread"
+            )
+        try:
+            storage = self._require_special_commodity_storage()
         except Exception as exc:
             return {
                 "status": "blocked",
                 "source_policy": "local_commodity_db_only",
                 "blockers": ["special_commodity_market_data_unavailable"],
                 "warnings": [str(exc)],
-                "valuation_date": str(valuation_date or get_shanghai_time().date().isoformat())[:10],
+                "valuation_date": target_date,
+                "exposure_mappings": mappings,
             }
-        blockers: List[str] = []
-        warnings: List[str] = []
-        if diagnostics.get("missing_observation_series"):
-            warnings.append("special_commodity_series_missing_local_observation")
-        if diagnostics.get("fx_dependency_gaps"):
-            blockers.append("requires_fx_conversion")
-        return {
-            "status": "ready" if not blockers else "blocked",
-            "valuation_date": str(valuation_date or get_shanghai_time().date().isoformat())[:10],
+
+        def _load_series_diagnostics() -> tuple[Dict[str, Any], List[str]]:
+            output: Dict[str, Any] = {}
+            local_blockers: List[str] = []
+            diagnostic_cfg = (module_cfg or {}).get("diagnostics", {})
+            configured_lookbacks = diagnostic_cfg.get("lookback_years") or [3]
+            lookback_years = min(int(item) for item in configured_lookbacks)
+            min_observation_ratio = float(
+                diagnostic_cfg.get("min_observation_ratio", 0.7)
+            )
+            start_date = (
+                date.fromisoformat(target_date)
+                - timedelta(days=int(365.25 * lookback_years))
+            ).isoformat()
+            for series_id in selected_series_ids:
+                series = storage.get_series(series_id)
+                if not series or not series.get("active"):
+                    local_blockers.append(f"inactive_or_missing_series:{series_id}")
+                    continue
+                observations = storage.read_observations(
+                    series_id=series_id,
+                    start_date=start_date,
+                    end_date=target_date,
+                )
+                numeric: List[Dict[str, Any]] = []
+                for item in observations:
+                    try:
+                        value = float(item.get("value"))
+                    except (TypeError, ValueError):
+                        continue
+                    if (
+                        not math.isfinite(value)
+                        or str(item.get("observation_date") or "")[:10]
+                        > target_date
+                    ):
+                        continue
+                    numeric.append(item)
+                if not numeric:
+                    local_blockers.append(f"as_of_observation_missing:{series_id}")
+                    continue
+                latest = max(
+                    numeric,
+                    key=lambda item: (
+                        str(item.get("observation_date") or ""),
+                        str(item.get("source_profile") or ""),
+                    ),
+                )
+                values = sorted(float(item["value"]) for item in numeric)
+                latest_value = float(latest["value"])
+                count = len(values)
+                observations_per_year = {
+                    "daily": 252,
+                    "weekly": 52,
+                    "ten_day": 36,
+                    "monthly": 12,
+                    "quarterly": 4,
+                    "annual": 1,
+                }.get(str(series.get("frequency") or "").lower())
+                expected_count = (
+                    observations_per_year * lookback_years
+                    if observations_per_year
+                    else count
+                )
+                min_required = max(
+                    2,
+                    int(expected_count * min_observation_ratio),
+                )
+                if count < min_required:
+                    local_blockers.append(
+                        "insufficient_cycle_observations:"
+                        f"{series_id}:{count}/{min_required}"
+                    )
+                midpoint = count // 2
+                median = (
+                    values[midpoint]
+                    if count % 2
+                    else (values[midpoint - 1] + values[midpoint]) / 2.0
+                )
+                mean = sum(values) / count
+                percentile = sum(value <= latest_value for value in values) / count
+                latest_identity = {
+                    key: latest.get(key)
+                    for key in (
+                        "series_id",
+                        "observation_date",
+                        "source_profile",
+                        "value",
+                        "currency",
+                        "unit",
+                        "quality_flag",
+                        "raw_payload_hash",
+                        "row_version",
+                    )
+                }
+                output[series_id] = {
+                    "series": series,
+                    "latest_observation": latest_identity,
+                    "diagnostic": {
+                        "series_id": series_id,
+                        "as_of_date": latest.get("observation_date"),
+                        "latest_price": latest_value,
+                        "mean_price": mean,
+                        "median_price": median,
+                        "percentile": percentile,
+                        "mean_deviation_pct": (
+                            (latest_value - mean) / mean if mean else None
+                        ),
+                        "cycle_state": (
+                            "high"
+                            if percentile >= 0.75
+                            else "low" if percentile <= 0.25 else "normal"
+                        ),
+                        "lookback_years": lookback_years,
+                        "observation_count": count,
+                        "min_required_observations": min_required,
+                        "history_coverage_ratio": min(
+                            1.0,
+                            count / expected_count if expected_count else 0.0,
+                        ),
+                        "availability_quality": "observation_date_only",
+                    },
+                }
+            return output, local_blockers
+
+        diagnostics_by_series, series_blockers = await asyncio.to_thread(
+            _load_series_diagnostics
+        )
+        blockers.extend(series_blockers)
+        selected_series_id = (
+            selected_series_ids[0] if len(selected_series_ids) == 1 else None
+        )
+        selected_payload = diagnostics_by_series.get(selected_series_id or "")
+        selected_diagnostic = (
+            selected_payload.get("diagnostic")
+            if isinstance(selected_payload, dict)
+            else None
+        )
+        selected_observation = (
+            selected_payload.get("latest_observation")
+            if isinstance(selected_payload, dict)
+            else None
+        )
+        commodity_price_assumption = (
+            selected_diagnostic.get("latest_price")
+            if isinstance(selected_diagnostic, dict)
+            else None
+        )
+        fx_checks: List[Dict[str, Any]] = []
+        target = str(target_currency or "").upper() or None
+        observation_currency = str(
+            (selected_observation or {}).get("currency") or ""
+        ).upper()
+        if (
+            commodity_price_assumption is not None
+            and target
+            and observation_currency
+            and observation_currency != target
+        ):
+            try:
+                fx_storage = self._require_fx_storage()
+                fx_cfg = self.research_config.modules.get("fx_market_data", {})
+                from research.fx_market_data import FxReadService
+
+                converted = await asyncio.to_thread(
+                    FxReadService(fx_storage, fx_cfg).convert,
+                    from_currency=observation_currency,
+                    to_currency=target,
+                    amount=float(commodity_price_assumption),
+                    observation_date=str(
+                        (selected_observation or {}).get("observation_date") or ""
+                    ),
+                    max_lag_days=None,
+                )
+            except Exception as exc:
+                converted = {
+                    "success": False,
+                    "status": "blocked",
+                    "reason": "fx_conversion_check_failed",
+                    "blockers": [str(exc)],
+                }
+            fx_checks.append(
+                {
+                    "series_id": selected_series_id,
+                    "observation_date": (selected_observation or {}).get(
+                        "observation_date"
+                    ),
+                    "from_currency": observation_currency,
+                    "to_currency": target,
+                    "fx_conversion": converted,
+                }
+            )
+            if converted.get("success"):
+                commodity_price_assumption = converted.get("converted_amount")
+            else:
+                blockers.append("requires_fx_conversion")
+                commodity_price_assumption = None
+        model_eligible = not blockers
+        context = {
+            "status": "ready" if model_eligible else "blocked",
+            "valuation_date": target_date,
             "source_policy": "local_commodity_db_only",
-            "target_currency": target_currency,
-            "series_count": diagnostics.get("series_count", 0),
-            "latest_observations": diagnostics.get("latest_observations", []),
-            "missing_observation_series": diagnostics.get(
-                "missing_observation_series", []
+            "mapping_scope": "approved_company_business_profile",
+            "mapping_scope_id": (
+                business_profile_context.get("instrument_id")
+                if isinstance(business_profile_context, dict)
+                else None
             ),
-            "currencies": diagnostics.get("currencies", []),
-            "units": diagnostics.get("units", []),
-            "fx_checks": diagnostics.get("fx_checks", []),
-            "fx_dependency_gaps": diagnostics.get("fx_dependency_gaps", []),
-            "blockers": blockers,
-            "warnings": warnings,
+            "target_currency": target,
+            "selected_series_id": selected_series_id,
+            "selected_mapping": selected_mapping,
+            "exposure_mappings": mappings,
+            "diagnostics_by_series": {
+                series_id: payload["diagnostic"]
+                for series_id, payload in diagnostics_by_series.items()
+            },
+            "diagnostic": selected_diagnostic,
+            "commodity_price_assumption": (
+                commodity_price_assumption if model_eligible else None
+            ),
+            "cycle_index_level": (
+                selected_diagnostic.get("percentile")
+                if model_eligible and isinstance(selected_diagnostic, dict)
+                else None
+            ),
+            "price_percentile": (
+                selected_diagnostic.get("percentile")
+                if isinstance(selected_diagnostic, dict)
+                else None
+            ),
+            "cycle_state": (
+                selected_diagnostic.get("cycle_state")
+                if isinstance(selected_diagnostic, dict)
+                else None
+            ),
+            "latest_observation": selected_observation,
+            "fx_checks": fx_checks,
+            "blockers": sorted(set(blockers)),
+            "warnings": sorted(set(warnings)),
         }
+        context["lineage_hash"] = self._stable_hash(context)
+        return context
 
     async def _get_dcf_fx_context(
         self,

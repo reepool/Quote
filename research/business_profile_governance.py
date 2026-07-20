@@ -380,9 +380,15 @@ class BusinessProfileRepository:
 class BusinessProfileResolver:
     """Build an auditable point-in-time business profile without remote access."""
 
-    def __init__(self, repository: BusinessProfileRepository, futures_storage: Any = None):
+    def __init__(
+        self,
+        repository: BusinessProfileRepository,
+        futures_storage: Any = None,
+        special_commodity_storage: Any = None,
+    ):
         self.repository = repository
         self.futures_storage = futures_storage
+        self.special_commodity_storage = special_commodity_storage
 
     def resolve(
         self,
@@ -721,11 +727,13 @@ class BusinessProfileResolver:
         for exposure in exposures:
             series_id = str(exposure.get("price_series_id") or "").strip() or None
             spread_id = str(exposure.get("spread_definition_id") or "").strip() or None
-            if series_id and self.futures_storage is not None:
-                series = self.futures_storage.get_series(series_id)
+            market_data_family = None
+            if series_id:
+                series, market_data_family = self._resolve_market_series(series_id)
                 if not series or not series.get("active", False):
                     gaps.append(f"inactive_or_missing_series:{series_id}")
                     series_id = None
+                    market_data_family = None
             if not series_id and not spread_id:
                 gaps.append(f"exposure_market_series_missing:{exposure.get('exposure_id')}")
                 continue
@@ -747,12 +755,27 @@ class BusinessProfileResolver:
                     "lag_days": int(exposure.get("lag_days") or 0),
                     "confidence": exposure.get("confidence"),
                     "source": "approved_company_business_profile",
+                    "market_data_family": market_data_family,
                     "valid_from": exposure.get("effective_from"),
                     "valid_to": exposure.get("effective_to"),
                     "lineage_hash": exposure.get("lineage_hash"),
                 }
             )
         return mappings, gaps
+
+    def _resolve_market_series(
+        self,
+        series_id: str,
+    ) -> tuple[Optional[Dict[str, Any]], Optional[str]]:
+        if self.futures_storage is not None:
+            series = self.futures_storage.get_series(series_id)
+            if series is not None:
+                return series, "futures"
+        if self.special_commodity_storage is not None:
+            series = self.special_commodity_storage.get_series(series_id)
+            if series is not None:
+                return series, "special_commodity"
+        return None, None
 
     @staticmethod
     def _merge_mappings(

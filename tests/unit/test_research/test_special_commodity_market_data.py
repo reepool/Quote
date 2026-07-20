@@ -133,6 +133,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     assert result["series"] >= 45
 
     dictionary = storage.read_dictionary()
+    assert storage.get_series(dictionary["series"][0]["series_id"])["active"] == 1
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
         "OIL.WTI.SPOT",
         "OIL.BRENT.SPOT",

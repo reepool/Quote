@@ -41,6 +41,17 @@ class _FuturesStorage:
         return None
 
 
+class _SpecialCommodityStorage:
+    def get_series(self, series_id):
+        if series_id == "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY":
+            return {
+                "series_id": series_id,
+                "commodity_id": "CN.CHEMICAL.SODA_ASH.SPOT",
+                "active": True,
+            }
+        return None
+
+
 def _storage(tmp_path):
     research_db = tmp_path / "research.db"
     config = ResearchConfig(
@@ -510,6 +521,50 @@ def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
     assert len(context["executable_exposure_mappings"]) == 1
     assert context["readiness"]["approved_company_exposure_count"] == 1
     assert context["model_scores"]["score_version"] == "business_profile_model_score.v1"
+
+
+def test_approved_special_commodity_series_is_executable(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    repository.upsert(
+        "exposures",
+        {
+            "exposure_id": "exposure-soda-ash-cost",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "scope_type": "company",
+            "scope_id": "601088.SH",
+            "commodity_id": "chemical.soda_ash",
+            "exposure_role": "feedstock_cost",
+            "direction": "negative",
+            "materiality": "high",
+            "mapping_basis": "official_cost_composition_review",
+            "price_series_id": "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2026-03-28",
+            "confidence": 0.95,
+            "review_status": "approved",
+            "effective_from": "2026-03-28",
+        },
+    )
+
+    context = BusinessProfileResolver(
+        repository,
+        futures_storage=_FuturesStorage(),
+        special_commodity_storage=_SpecialCommodityStorage(),
+    ).resolve(
+        "601088.SH",
+        as_of_date="2026-04-30",
+    )
+
+    mapping = context["executable_exposure_mappings"][0]
+    assert mapping["market_data_family"] == "special_commodity"
+    assert mapping["revenue_series_id"] is None
+    assert mapping["cost_series_ids"] == [
+        "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
+    ]
+    assert context["readiness"]["executable_mapping_count"] == 1
 
 
 def test_approved_fact_with_unapproved_evidence_is_not_valuation_eligible(tmp_path):
