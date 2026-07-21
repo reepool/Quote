@@ -230,6 +230,7 @@ class DataManager:
         symbol: str,
         ingestion_run_id: int,
         business_run_id: str,
+        selection_metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, int]:
         """Persist generic scan lineage for a corporate-action announcement query."""
         scan_result = getattr(route_result, "scan_result", None)
@@ -252,6 +253,7 @@ class DataManager:
                 ),
                 "business_domain": "corporate_action",
                 "business_run_id": business_run_id,
+                "selection_metadata": selection_metadata or {},
             },
         )
         audited = 0
@@ -19134,7 +19136,17 @@ class DataManager:
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = True,
         retry_evidence_unavailable: bool = False,
+        window_before_days: int = 30,
+        window_after_days: int = 30,
+        max_window_days: int = 180,
+        max_anchor_gap_days: int = 60,
+        page_size: int = 30,
+        max_pages: int = 5,
         request_interval_seconds: float = 0.5,
+        per_event_timeout_sec: int = 60,
+        classify_titles_with_llm: bool = True,
+        title_classification_profile: str = "semantic_extraction",
+        title_max_titles_per_request: int = 80,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
         """Govern unresolved CNInfo events through bounded reusable stages."""
@@ -19176,6 +19188,15 @@ class DataManager:
                 "offset": offset,
                 "retry_evidence_unavailable": bool(
                     retry_evidence_unavailable
+                ),
+                "window_before_days": int(window_before_days),
+                "window_after_days": int(window_after_days),
+                "max_window_days": int(max_window_days),
+                "max_anchor_gap_days": int(max_anchor_gap_days),
+                "classify_titles_with_llm": bool(classify_titles_with_llm),
+                "title_classification_profile": title_classification_profile,
+                "title_max_titles_per_request": int(
+                    title_max_titles_per_request
                 ),
             }, sort_keys=True).encode("utf-8")
         ).hexdigest()[:16]
@@ -19248,7 +19269,19 @@ class DataManager:
                     dry_run=bool(dry_run),
                     max_events=len(discovery_keys),
                     target_offset=0,
+                    window_before_days=int(window_before_days),
+                    window_after_days=int(window_after_days),
+                    max_window_days=int(max_window_days),
+                    max_anchor_gap_days=int(max_anchor_gap_days),
+                    page_size=int(page_size),
+                    max_pages=int(max_pages),
                     request_interval_seconds=request_interval_seconds,
+                    per_event_timeout_sec=int(per_event_timeout_sec),
+                    classify_titles_with_llm=bool(classify_titles_with_llm),
+                    title_classification_profile=title_classification_profile,
+                    title_max_titles_per_request=int(
+                        title_max_titles_per_request
+                    ),
                     sample_limit=max(len(discovery_keys), int(sample_limit)),
                 )
                 stage_results["discovery"] = discovery_result
@@ -19390,6 +19423,19 @@ class DataManager:
                 "max_events": limit,
                 "target_offset": offset,
                 "retry_evidence_unavailable": bool(retry_evidence_unavailable),
+                "window_before_days": int(window_before_days),
+                "window_after_days": int(window_after_days),
+                "max_window_days": int(max_window_days),
+                "max_anchor_gap_days": int(max_anchor_gap_days),
+                "page_size": int(page_size),
+                "max_pages": int(max_pages),
+                "request_interval_seconds": float(request_interval_seconds),
+                "per_event_timeout_sec": int(per_event_timeout_sec),
+                "classify_titles_with_llm": bool(classify_titles_with_llm),
+                "title_classification_profile": title_classification_profile,
+                "title_max_titles_per_request": int(
+                    title_max_titles_per_request
+                ),
             },
             "inventory": {
                 "total_events": len(final_inventory),
@@ -19445,13 +19491,18 @@ class DataManager:
         dry_run: bool = True,
         max_events: int = 500,
         target_offset: int = 0,
-        window_before_days: int = 10,
+        window_before_days: int = 30,
         window_after_days: int = 30,
         max_window_days: int = 180,
+        max_anchor_gap_days: int = 60,
         page_size: int = 30,
         max_pages: int = 5,
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
+        classify_titles_with_llm: bool = False,
+        title_classification_profile: str = "semantic_extraction",
+        title_max_titles_per_request: int = 80,
+        title_llm_client: Optional[Any] = None,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
         """Discover candidate official documents for unresolved special actions."""
@@ -19459,13 +19510,18 @@ class DataManager:
         from data_sources.cninfo_special_action_resolution import (
             announcement_match_reasons,
             build_candidate_evidence,
-            build_search_target,
+            build_classified_announcement_evidence,
+            build_search_targets,
             parse_date,
+        )
+        from data_sources.cninfo_announcement_title_llm import (
+            CninfoAnnouncementTitleClassifier,
         )
         from research.announcements import (
             AnnouncementQuery,
             AnnouncementScope,
         )
+        from utils.llm import LlmClient
         from utils.a_share_historical_backfill import (
             coerce_date,
             normalize_string_list,
@@ -19595,7 +19651,32 @@ class DataManager:
                     if instrument_id and parsed is not None:
                         event_dates_by_instrument[instrument_id].append(parsed)
 
-        targets = []
+        all_anchor_dates = [
+            parsed
+            for row in rows
+            for field_name in (
+                "announcement_date", "record_date", "share_arrival_date", "ex_date"
+            )
+            if (parsed := parse_date(row.get(field_name))) is not None
+        ]
+        calendar_start = (
+            min(all_anchor_dates) - timedelta(days=10)
+            if all_anchor_dates else normalized_start
+        )
+        calendar_end = (
+            max(all_anchor_dates) + timedelta(days=10)
+            if all_anchor_dates else normalized_end
+        )
+        trading_days_by_exchange: Dict[str, List[date]] = {}
+        for exchange in scan_exchanges:
+            trading_days_by_exchange[exchange] = await self.db_ops.get_trading_days(
+                exchange=exchange,
+                start_date=calendar_start,
+                end_date=calendar_end,
+                is_trading_day=True,
+            )
+
+        target_groups: List[Dict[str, Any]] = []
         skipped_outside_range = 0
         skipped_without_bounded_anchor = 0
         skipped_target_results: List[Dict[str, Any]] = []
@@ -19628,14 +19709,17 @@ class DataManager:
                     following = [value for value in dates if value > pivot]
                     if previous and following:
                         adjacent_dates = [previous[-1], following[0]]
-            target = build_search_target(
+            exchange = "SSE" if instrument_id.endswith(".SH") else "SZSE"
+            row_targets = build_search_targets(
                 row,
                 adjacent_dates=adjacent_dates,
+                trading_days=trading_days_by_exchange.get(exchange, []),
                 window_before_days=window_before_days,
                 window_after_days=window_after_days,
                 max_window_days=max_window_days,
+                max_anchor_gap_days=max_anchor_gap_days,
             )
-            if target is None:
+            if not row_targets:
                 skipped_without_bounded_anchor += 1
                 skipped_target_results.append({
                     "instrument_id": instrument_id,
@@ -19643,10 +19727,15 @@ class DataManager:
                     "reason": "unbounded_anchor",
                 })
                 continue
-            if not requested_event_keys and (
-                target.end_date < normalized_start
-                or target.start_date > normalized_end
-            ):
+            if not requested_event_keys:
+                row_targets = [
+                    target for target in row_targets
+                    if not (
+                        target.end_date < normalized_start
+                        or target.start_date > normalized_end
+                    )
+                ]
+            if not row_targets:
                 skipped_outside_range += 1
                 skipped_target_results.append({
                     "instrument_id": instrument_id,
@@ -19654,16 +19743,18 @@ class DataManager:
                     "reason": "outside_requested_range",
                 })
                 continue
-            targets.append(target)
+            target_groups.append({"row": row, "targets": row_targets})
 
-        total_searchable_events = len(targets)
+        total_searchable_events = len(target_groups)
         target_limit = min(5000, max(1, int(max_events)))
         normalized_target_offset = max(0, int(target_offset))
         batch_end_offset = min(
             total_searchable_events,
             normalized_target_offset + target_limit,
         )
-        targets = targets[normalized_target_offset:batch_end_offset]
+        target_groups = target_groups[
+            normalized_target_offset:batch_end_offset
+        ]
         has_more_targets = batch_end_offset < total_searchable_events
         identity = hashlib.sha256(json.dumps({
             "start_date": normalized_start.isoformat(),
@@ -19672,7 +19763,9 @@ class DataManager:
             "instrument_ids": requested_ids,
             "source_event_keys": requested_event_keys,
             "target_offset": normalized_target_offset,
-            "target_keys": [target.source_event_key for target in targets],
+            "target_keys": [
+                group["targets"][0].source_event_key for group in target_groups
+            ],
         }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
         run_id = f"a_share_cninfo_special_action_{identity}"
         bounded_request_timeout = max(
@@ -19693,7 +19786,7 @@ class DataManager:
             "audits_persisted": 0,
             "errors": 0,
         }
-        if not dry_run and targets:
+        if not dry_run and target_groups:
             try:
                 storage = self._require_research_storage()
                 announcement_governance["ingestion_run_id"] = (
@@ -19706,7 +19799,7 @@ class DataManager:
                         mode="announcement_governance",
                         metadata={
                             "business_run_id": run_id,
-                            "target_count": len(targets),
+                            "target_count": len(target_groups),
                             "target_offset": normalized_target_offset,
                         },
                     )
@@ -19716,7 +19809,7 @@ class DataManager:
                     "started: business_run_id=%s ingestion_run_id=%s targets=%d",
                     run_id,
                     announcement_governance["ingestion_run_id"],
-                    len(targets),
+                    len(target_groups),
                 )
             except Exception as exc:
                 announcement_governance["errors"] += 1
@@ -19734,52 +19827,358 @@ class DataManager:
                         f"{exc}"
                     ),
                 })
-        for index, target in enumerate(targets, start=1):
-            symbol = target.instrument_id.split(".")[0].zfill(6)
-            exchange = "SSE" if target.instrument_id.endswith(".SH") else "SZSE"
-            try:
-                route_result = await asyncio.to_thread(
-                    announcement_service.acquire,
-                    AnnouncementQuery(
-                        purpose_key="a_share_cninfo_special_action_discovery",
-                        scope=AnnouncementScope(
-                            exchange=exchange,
-                            market=exchange,
-                            instrument_id=target.instrument_id,
-                            symbol=symbol,
-                            start_date=target.start_date.isoformat(),
-                            end_date=target.end_date.isoformat(),
-                            page_size=min(50, max(1, int(page_size))),
-                            max_pages=min(20, max(1, int(max_pages))),
+        scan_items: List[Dict[str, Any]] = []
+        for index, group in enumerate(target_groups, start=1):
+            row = group["row"]
+            row_targets = group["targets"]
+            primary_target = row_targets[0]
+            symbol = primary_target.instrument_id.split(".")[0].zfill(6)
+            exchange = (
+                "SSE" if primary_target.instrument_id.endswith(".SH") else "SZSE"
+            )
+            records_by_id: Dict[str, Any] = {}
+            route_results = []
+            window_results = []
+            event_errors = []
+            for window_index, target in enumerate(row_targets, start=1):
+                try:
+                    route_result = await asyncio.to_thread(
+                        announcement_service.acquire,
+                        AnnouncementQuery(
+                            purpose_key="a_share_cninfo_special_action_discovery",
+                            scope=AnnouncementScope(
+                                exchange=exchange,
+                                market=exchange,
+                                instrument_id=target.instrument_id,
+                                symbol=symbol,
+                                start_date=target.start_date.isoformat(),
+                                end_date=target.end_date.isoformat(),
+                                page_size=min(50, max(1, int(page_size))),
+                                max_pages=min(20, max(1, int(max_pages))),
+                            ),
                         ),
-                    ),
-                    selectors=[
-                        lambda record, current=target: announcement_match_reasons(
-                            current, record.title
+                        selectors=(
+                            None
+                            if classify_titles_with_llm
+                            else [
+                                lambda record, current=target: (
+                                    announcement_match_reasons(
+                                        current, record.title
+                                    )
+                                )
+                            ]
+                        ),
+                    )
+                    scan_result = route_result.scan_result
+                    if scan_result is None:
+                        raise RuntimeError("announcement_route_returned_no_result")
+                    route_results.append((target, route_result))
+                    for record in scan_result.records:
+                        records_by_id.setdefault(
+                            str(record.source_announcement_id), record
                         )
-                    ],
+                    window_results.append({
+                        "search_start_date": target.start_date.isoformat(),
+                        "search_end_date": target.end_date.isoformat(),
+                        "search_basis": target.search_basis,
+                        "anchor_roles": list(target.anchor_roles),
+                        "source_anchor_dates": [
+                            value.isoformat()
+                            for value in target.source_anchor_dates
+                        ],
+                        "announcements_seen": scan_result.announcements_seen,
+                        "status": scan_result.status,
+                        "stop_reason": scan_result.stop_reason,
+                    })
+                    if not scan_result.cursor_commit_allowed:
+                        event_errors.append(
+                            "announcement_scan_incomplete: "
+                            f"status={scan_result.status} "
+                            f"stop_reason={scan_result.stop_reason}"
+                        )
+                    event_errors.extend(scan_result.errors)
+                except Exception as exc:
+                    event_errors.append(str(exc))
+                if window_index < len(row_targets):
+                    await asyncio.sleep(effective_request_interval)
+            scan_items.append({
+                "row": row,
+                "primary_target": primary_target,
+                "targets": row_targets,
+                "symbol": symbol,
+                "records": list(records_by_id.values()),
+                "route_results": route_results,
+                "search_windows": window_results,
+                "errors": event_errors,
+            })
+            for error in event_errors:
+                errors.append({
+                    "instrument_id": primary_target.instrument_id,
+                    "source_event_key": primary_target.source_event_key,
+                    "error": error,
+                })
+            if index == 1 or index % 10 == 0 or index == len(target_groups):
+                dm_logger.info(
+                    "[DataManager] CNInfo special-action scan progress: %d/%d "
+                    "windows=%d announcements=%d errors=%d",
+                    index,
+                    len(target_groups),
+                    sum(len(item["targets"]) for item in scan_items),
+                    sum(len(item["records"]) for item in scan_items),
+                    len(errors),
                 )
-                scan_result = route_result.scan_result
-                if scan_result is None:
-                    raise RuntimeError("announcement_route_returned_no_result")
-                candidates = build_candidate_evidence(
-                    target, scan_result.selected_records
-                )
-                evidence_rows.extend(candidates)
+            if index < len(target_groups):
+                await asyncio.sleep(effective_request_interval)
+
+        title_batch = None
+        title_classification_error: Optional[str] = None
+        classification_items = [
+            item for item in scan_items if item["records"]
+        ]
+        if classify_titles_with_llm and classification_items:
+            llm_config = self.config.get_llm_config()
+            configured_profile = llm_config.profiles.get(
+                title_classification_profile
+            )
+            if title_llm_client is None:
                 if (
-                    not dry_run
-                    and announcement_governance["ingestion_run_id"] is not None
+                    not llm_config.enabled
+                    or configured_profile is None
+                    or not configured_profile.enabled
                 ):
+                    title_classification_error = "title_classification_llm_disabled"
+                else:
+                    title_llm_client = LlmClient(llm_config)
+            if title_classification_error is None:
+                title_classifier = CninfoAnnouncementTitleClassifier(
+                    title_llm_client,
+                    profile=title_classification_profile,
+                    model_identity=(
+                        configured_profile.model if configured_profile else None
+                    ),
+                    max_titles_per_request=title_max_titles_per_request,
+                )
+                classification_events = []
+                for item in classification_items:
+                    row = item["row"]
+                    target = item["primary_target"]
+                    classification_events.append({
+                        "instrument_id": target.instrument_id,
+                        "source_event_key": target.source_event_key,
+                        "source_profile": target.source_profile,
+                        "action_type": row.get("action_type"),
+                        "fiscal_period": row.get("fiscal_period"),
+                        "announcement_date": row.get("announcement_date"),
+                        "record_date": row.get("record_date"),
+                        "share_arrival_date": row.get("share_arrival_date"),
+                        "description": row.get("description"),
+                        "economic_terms": {
+                            field_name: row.get(field_name)
+                            for field_name in (
+                                "cash_dividend_per_share",
+                                "bonus_shares_per_share",
+                                "capitalization_shares_per_share",
+                                "rights_shares_per_share",
+                                "rights_price",
+                            )
+                        },
+                        "candidate_effective_dates": [
+                            value.isoformat()
+                            for value in target.candidate_effective_dates
+                        ],
+                        "search_windows": item["search_windows"],
+                        "announcements": [
+                            {
+                                "announcement_id": record.source_announcement_id,
+                                "published_at": record.published_at,
+                                "title": record.title,
+                            }
+                            for record in item["records"]
+                        ],
+                    })
+                dm_logger.info(
+                    "[DataManager] CNInfo title classification started: "
+                    "events=%d titles=%d profile=%s",
+                    len(classification_events),
+                    sum(
+                        len(item["announcements"])
+                        for item in classification_events
+                    ),
+                    title_classification_profile,
+                )
+                try:
+                    title_batch = await title_classifier.classify(
+                        classification_events,
+                        tolerate_event_errors=True,
+                    )
+                    dm_logger.info(
+                        "[DataManager] CNInfo title classification completed: "
+                        "events=%d titles=%d requests=%d event_errors=%d",
+                        title_batch.input_event_count,
+                        title_batch.input_title_count,
+                        title_batch.request_count,
+                        len(title_batch.errors_by_event),
+                    )
+                except Exception as exc:
+                    title_classification_error = (
+                        "title_classification_failed: " + str(exc)
+                    )
+                    dm_logger.exception(
+                        "[DataManager] CNInfo title classification failed: %s",
+                        exc,
+                    )
+
+        candidate_evidence_count = 0
+        rejected_evidence_count = 0
+        for index, item in enumerate(scan_items, start=1):
+            target = item["primary_target"]
+            event_key = target.source_event_key
+            event_evidence: List[Dict[str, Any]] = []
+            applicability: Dict[str, Any] = {}
+            lineage: List[Dict[str, Any]] = []
+            decisions: Dict[str, Dict[str, Any]] = {}
+            if classify_titles_with_llm:
+                if not item["records"]:
+                    pass
+                elif title_batch is None:
+                    errors.append({
+                        "instrument_id": target.instrument_id,
+                        "source_event_key": event_key,
+                        "error": title_classification_error or (
+                            "title_classification_unavailable"
+                        ),
+                    })
+                elif event_key in title_batch.errors_by_event:
+                    errors.append({
+                        "instrument_id": target.instrument_id,
+                        "source_event_key": event_key,
+                        "error": (
+                            "title_classification_failed: "
+                            + title_batch.errors_by_event[event_key]
+                        ),
+                    })
+                    lineage = title_batch.lineage_by_event.get(event_key, [])
+                else:
+                    decisions = title_batch.decisions_by_event.get(event_key, {})
+                    applicability = title_batch.applicability_by_event.get(
+                        event_key, {}
+                    )
+                    lineage = title_batch.lineage_by_event.get(event_key, [])
+                    event_evidence = build_classified_announcement_evidence(
+                        target,
+                        item["records"],
+                        decisions=decisions,
+                        applicability=applicability,
+                        lineage=lineage,
+                        search_windows=item["search_windows"],
+                    )
+            else:
+                evidence_by_key = {}
+                for window_target, route_result in item["route_results"]:
+                    scan_result = route_result.scan_result
+                    for evidence in build_candidate_evidence(
+                        window_target,
+                        scan_result.selected_records if scan_result else (),
+                    ):
+                        evidence_by_key[evidence["evidence_key"]] = evidence
+                event_evidence = list(evidence_by_key.values())
+            evidence_rows.extend(event_evidence)
+            event_candidates = [
+                row for row in event_evidence
+                if row["resolution_status"] == "candidate"
+            ]
+            event_rejected = [
+                row for row in event_evidence
+                if row["resolution_status"] == "rejected"
+            ]
+            candidate_evidence_count += len(event_candidates)
+            rejected_evidence_count += len(event_rejected)
+            if not classify_titles_with_llm:
+                event_title_status = "lexical_fallback"
+            elif not item["records"]:
+                event_title_status = "not_required"
+            elif (
+                title_batch is None
+                or event_key in title_batch.errors_by_event
+            ):
+                event_title_status = "failed"
+            else:
+                event_title_status = "success"
+
+            selected_ids = {
+                announcement_id
+                for announcement_id, decision in decisions.items()
+                if decision.get("relevance") in {
+                    "relevant", "possibly_relevant"
+                }
+            }
+            if (
+                not dry_run
+                and announcement_governance["ingestion_run_id"] is not None
+            ):
+                for window_target, route_result in item["route_results"]:
                     try:
+                        governed_route_result = route_result
+                        if classify_titles_with_llm and route_result.scan_result:
+                            selected_records = []
+                            for record in route_result.scan_result.records:
+                                announcement_id = str(record.source_announcement_id)
+                                if announcement_id not in selected_ids:
+                                    continue
+                                decision = decisions[announcement_id]
+                                selected_records.append(
+                                    record.with_selection_reasons((
+                                        "llm_relevance:" + str(
+                                            decision.get("relevance")
+                                        ),
+                                        "llm_role:" + str(
+                                            decision.get("announcement_role")
+                                        ),
+                                    ))
+                                )
+                            governed_scan = route_result.scan_result.with_selected_records(
+                                selected_records
+                            )
+                            attempts = list(route_result.attempts)
+                            if attempts:
+                                attempts[-1] = replace(
+                                    attempts[-1],
+                                    selected_count=len(selected_records),
+                                )
+                            governed_route_result = replace(
+                                route_result,
+                                scan_result=governed_scan,
+                                attempts=tuple(attempts),
+                            )
                         persisted = await asyncio.to_thread(
                             self._persist_corporate_action_announcement_governance,
-                            route_result=route_result,
+                            route_result=governed_route_result,
                             instrument_id=target.instrument_id,
-                            symbol=symbol,
+                            symbol=item["symbol"],
                             ingestion_run_id=int(
                                 announcement_governance["ingestion_run_id"]
                             ),
                             business_run_id=run_id,
+                            selection_metadata={
+                                "source_event_key": event_key,
+                                "title_classification_enabled": bool(
+                                    classify_titles_with_llm
+                                ),
+                                "event_applicability": applicability,
+                                "classifications": [
+                                    decision for announcement_id, decision
+                                    in decisions.items()
+                                    if any(
+                                        str(record.source_announcement_id)
+                                        == announcement_id
+                                        for record in (
+                                            route_result.scan_result.records
+                                            if route_result.scan_result else ()
+                                        )
+                                    )
+                                ],
+                                "llm_lineage": lineage,
+                            },
                         )
                         announcement_governance[
                             "scan_states_persisted"
@@ -19794,63 +20193,45 @@ class DataManager:
                             "governance persistence failed: instrument_id=%s "
                             "source_event_key=%s error=%s",
                             target.instrument_id,
-                            target.source_event_key,
+                            event_key,
                             exc,
                         )
                         errors.append({
                             "instrument_id": target.instrument_id,
-                            "source_event_key": target.source_event_key,
+                            "source_event_key": event_key,
                             "error": (
                                 "announcement_governance_persistence_failed: "
                                 f"{exc}"
                             ),
                         })
-                target_results.append({
-                    "instrument_id": target.instrument_id,
-                    "source_event_key": target.source_event_key,
-                    "event_class": target.event_class,
-                    "search_start_date": target.start_date.isoformat(),
-                    "search_end_date": target.end_date.isoformat(),
-                    "search_basis": target.search_basis,
-                    "announcements_seen": scan_result.announcements_seen,
-                    "candidate_count": len(candidates),
-                    "errors": list(scan_result.errors),
-                })
-                if not scan_result.cursor_commit_allowed:
-                    errors.append({
-                        "instrument_id": target.instrument_id,
-                        "source_event_key": target.source_event_key,
-                        "error": (
-                            "announcement_scan_incomplete: "
-                            f"status={scan_result.status} "
-                            f"stop_reason={scan_result.stop_reason}"
-                        ),
-                    })
-                for error in scan_result.errors:
-                    errors.append({
-                        "instrument_id": target.instrument_id,
-                        "source_event_key": target.source_event_key,
-                        "error": error,
-                    })
-            except Exception as exc:
-                errors.append({
-                    "instrument_id": target.instrument_id,
-                    "source_event_key": target.source_event_key,
-                    "error": str(exc),
-                })
-            if index == 1 or index % 10 == 0 or index == len(targets):
+            target_results.append({
+                "instrument_id": target.instrument_id,
+                "source_event_key": event_key,
+                "event_class": target.event_class,
+                "search_windows": item["search_windows"],
+                "candidate_effective_dates": [
+                    value.isoformat() for value in target.candidate_effective_dates
+                ],
+                "announcements_seen": len(item["records"]),
+                "candidate_count": len(event_candidates),
+                "rejected_count": len(event_rejected),
+                "title_classification_status": event_title_status,
+                "event_applicability": applicability,
+                "classification_samples": list(decisions.values())[:10],
+                "errors": list(item["errors"]),
+            })
+            if index == 1 or index % 10 == 0 or index == len(scan_items):
                 dm_logger.info(
-                    "[DataManager] CNInfo special-action discovery: %d/%d "
-                    "candidates=%d governed_scans=%d audited=%d errors=%d",
+                    "[DataManager] CNInfo special-action selection progress: %d/%d "
+                    "candidates=%d rejected=%d governed_scans=%d audited=%d errors=%d",
                     index,
-                    len(targets),
-                    len(evidence_rows),
+                    len(scan_items),
+                    candidate_evidence_count,
+                    rejected_evidence_count,
                     announcement_governance["scan_states_persisted"],
                     announcement_governance["audits_persisted"],
                     len(errors),
                 )
-            if index < len(targets):
-                await asyncio.sleep(effective_request_interval)
 
         write_result = {
             "inserted": 0,
@@ -19968,13 +20349,22 @@ class DataManager:
                 "window_before_days": int(window_before_days),
                 "window_after_days": int(window_after_days),
                 "max_window_days": int(max_window_days),
+                "max_anchor_gap_days": int(max_anchor_gap_days),
+                "classify_titles_with_llm": bool(classify_titles_with_llm),
+                "title_classification_profile": title_classification_profile,
+                "title_max_titles_per_request": int(
+                    title_max_titles_per_request
+                ),
                 "request_interval_seconds": effective_request_interval,
                 "request_timeout_seconds": bounded_request_timeout,
             },
             "targets": {
                 "candidate_rows_loaded": len(rows),
                 "searchable_events": total_searchable_events,
-                "batch_events": len(targets),
+                "batch_events": len(target_groups),
+                "search_windows": sum(
+                    len(item["targets"]) for item in scan_items
+                ),
                 "target_offset": normalized_target_offset,
                 "batch_end_offset": batch_end_offset,
                 "has_more": has_more_targets,
@@ -19996,9 +20386,41 @@ class DataManager:
                 ),
             },
             "evidence": {
-                "candidate_count": len(evidence_rows),
+                "candidate_count": candidate_evidence_count,
+                "rejected_count": rejected_evidence_count,
+                "classified_count": (
+                    candidate_evidence_count + rejected_evidence_count
+                ),
                 "resolved_count": 0,
                 "write_result": write_result,
+            },
+            "title_classification": {
+                "enabled": bool(classify_titles_with_llm),
+                "status": (
+                    "not_required"
+                    if classify_titles_with_llm and not classification_items
+                    else "failed" if (
+                        classify_titles_with_llm and title_batch is None
+                    )
+                    else "partial" if (
+                        title_batch is not None and title_batch.errors_by_event
+                    )
+                    else "success" if title_batch is not None
+                    else "disabled"
+                ),
+                "error": title_classification_error,
+                "event_errors": (
+                    len(title_batch.errors_by_event) if title_batch else 0
+                ),
+                "request_count": (
+                    title_batch.request_count if title_batch else 0
+                ),
+                "input_event_count": (
+                    title_batch.input_event_count if title_batch else 0
+                ),
+                "input_title_count": (
+                    title_batch.input_title_count if title_batch else 0
+                ),
             },
             "announcement_governance": announcement_governance,
             "target_samples": target_results[:max(0, int(sample_limit))],
@@ -20198,6 +20620,9 @@ class DataManager:
                 dry_run=bool(dry_run),
                 max_events=max_events,
                 target_offset=target_offset,
+                classify_titles_with_llm=True,
+                title_classification_profile=profile,
+                title_llm_client=llm_client,
             )
             dm_logger.info(
                 "[DataManager] CNInfo LLM resolution candidate discovery completed: status=%s",

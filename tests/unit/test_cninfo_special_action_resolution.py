@@ -4,6 +4,7 @@ from data_sources.cninfo_special_action_resolution import (
     announcement_match_reasons,
     build_candidate_evidence,
     build_search_target,
+    build_search_targets,
     classify_special_action,
 )
 from research.announcements import (
@@ -38,7 +39,49 @@ def test_special_action_target_uses_structured_bounded_window():
     assert target is not None
     assert target.start_date == date(2006, 5, 30)
     assert target.end_date == date(2006, 7, 12)
-    assert target.search_basis == "structured_announcement_or_record_date"
+    assert target.search_basis == "role_cluster:announcement_date+record_date"
+
+
+def test_outlier_announcement_date_creates_separate_role_windows():
+    row = {
+        **_share_reform_row(),
+        "instrument_id": "000007.SZ",
+        "announcement_date": date(1993, 5, 16),
+        "record_date": date(1992, 11, 7),
+        "share_arrival_date": date(1992, 11, 10),
+        "description": "10送2股派0.5元",
+        "raw_payload": {"分红类型": "年度分红"},
+    }
+    trading_days = [
+        date(1992, 11, 6),
+        date(1992, 11, 9),
+        date(1992, 11, 10),
+    ]
+
+    targets = build_search_targets(row, trading_days=trading_days)
+
+    assert len(targets) == 2
+    assert targets[0].search_basis == (
+        "role_cluster:record_date+share_arrival_date"
+    )
+    assert targets[0].candidate_effective_dates == (date(1992, 11, 9),)
+    assert targets[1].search_basis == "role_cluster:announcement_date"
+
+
+def test_record_date_candidate_cannot_fall_after_share_arrival():
+    row = {
+        **_share_reform_row(),
+        "record_date": date(2006, 6, 12),
+        "share_arrival_date": date(2006, 6, 12),
+    }
+
+    target = build_search_target(
+        row,
+        trading_days=[date(2006, 6, 12), date(2006, 6, 13)],
+    )
+
+    assert target is not None
+    assert target.candidate_effective_dates == ()
 
 
 def test_announcement_metadata_creates_candidate_without_effective_date():

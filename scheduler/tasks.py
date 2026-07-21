@@ -394,6 +394,7 @@ def _format_cninfo_special_action_discovery_report(
     parameters = result.get("parameters") or {}
     targets = result.get("targets") or {}
     evidence = result.get("evidence") or {}
+    title_classification = result.get("title_classification") or {}
     governance = result.get("announcement_governance") or {}
     lines = [
         f"{icon} *A 股巨潮特殊公司行动公告发现*",
@@ -415,7 +416,15 @@ def _format_cninfo_special_action_discovery_report(
         f"without_candidates={targets.get('events_without_candidates', 0)}, "
         f"unbounded_skipped={targets.get('skipped_without_bounded_anchor', 0)}"
         "`",
-        f"公告候选证据: `{evidence.get('candidate_count', 0)}`",
+        "标题语义分类: `"
+        f"enabled={title_classification.get('enabled', False)}, "
+        f"status={title_classification.get('status')}, "
+        f"titles={title_classification.get('input_title_count', 0)}, "
+        f"requests={title_classification.get('request_count', 0)}, "
+        f"event_errors={title_classification.get('event_errors', 0)}`",
+        "公告证据: `"
+        f"candidate={evidence.get('candidate_count', 0)}, "
+        f"rejected={evidence.get('rejected_count', 0)}`",
         "公告治理: `"
         f"run_id={governance.get('ingestion_run_id')}, "
         f"scans={governance.get('scan_states_persisted', 0)}, "
@@ -427,14 +436,90 @@ def _format_cninfo_special_action_discovery_report(
     ]
     errors = result.get("errors") or []
     if errors:
-        lines.extend(["", "异常样本:", "```text"])
-        lines.extend(
-            f"{item.get('instrument_id')} {item.get('source_event_key')}: "
-            f"{item.get('error')}"
-            for item in errors[:10]
-        )
-        lines.append("```")
+        lines.append(f"异常明细: `{len(errors)} 条，另行分消息发送`")
     return "\n".join(lines)
+
+
+def _format_cninfo_problem_detail_messages(
+    result: Dict[str, Any],
+    *,
+    title: str,
+    items_per_message: int = 12,
+) -> List[str]:
+    """Build bounded Telegram messages only for actionable task problems."""
+    problem_lines: List[str] = []
+    seen = set()
+
+    def add_problem(stage: str, item: Any) -> None:
+        if isinstance(item, dict):
+            instrument_id = str(item.get("instrument_id") or "-")
+            event_key = str(item.get("source_event_key") or "-")[:12]
+            code = str(item.get("code") or "")
+            error = str(
+                item.get("error") or item.get("reason") or "unknown_error"
+            )
+        else:
+            instrument_id = "-"
+            event_key = "-"
+            code = ""
+            error = str(item)
+        identity = (stage, instrument_id, event_key, code, error)
+        if identity in seen:
+            return
+        seen.add(identity)
+        prefix = f"{stage} {instrument_id} {event_key}"
+        if code:
+            prefix += f" {code}"
+        problem_lines.append(f"{prefix}: {error}"[:260])
+
+    for item in result.get("errors") or []:
+        add_problem("task", item)
+    for stage_name, stage_result in (result.get("stages") or {}).items():
+        if not isinstance(stage_result, dict):
+            continue
+        for item in stage_result.get("errors") or []:
+            add_problem(str(stage_name), item)
+        for sample in stage_result.get("target_samples") or []:
+            if not isinstance(sample, dict):
+                continue
+            if sample.get("title_classification_status") == "failed":
+                add_problem(
+                    str(stage_name),
+                    {
+                        **sample,
+                        "error": "title_classification_failed",
+                    },
+                )
+            for error in sample.get("errors") or []:
+                add_problem(
+                    str(stage_name),
+                    {**sample, "error": error},
+                )
+    for sample in result.get("target_samples") or []:
+        if not isinstance(sample, dict):
+            continue
+        if sample.get("title_classification_status") == "failed":
+            add_problem(
+                "discovery",
+                {**sample, "error": "title_classification_failed"},
+            )
+        for error in sample.get("errors") or []:
+            add_problem("discovery", {**sample, "error": error})
+
+    chunk_size = max(1, int(items_per_message))
+    chunks = [
+        problem_lines[offset: offset + chunk_size]
+        for offset in range(0, len(problem_lines), chunk_size)
+    ]
+    return [
+        "\n".join([
+            f"*{title} ({index}/{len(chunks)})*",
+            "```text",
+            *chunk,
+            "```",
+        ])
+        for index, chunk in enumerate(chunks, start=1)
+    ]
 
 
 def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
@@ -517,6 +602,8 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
     inventory = result.get("inventory") or {}
     targets = result.get("targets") or {}
     parameters = result.get("parameters") or {}
+    discovery = (result.get("stages") or {}).get("discovery") or {}
+    title_classification = discovery.get("title_classification") or {}
     state_counts = inventory.get("state_counts") or {}
     next_actions = inventory.get("next_action_counts") or {}
     lines = [
@@ -542,6 +629,11 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         f"next_offset={targets.get('next_target_offset')}`",
         f"状态写入: `{result.get('state_write') or {}}`",
         f"阶段异常: `{','.join(result.get('stage_failures') or []) or '无'}`",
+        "标题语义分类: `"
+        f"enabled={parameters.get('classify_titles_with_llm', False)}, "
+        f"status={title_classification.get('status', '未运行')}, "
+        f"titles={title_classification.get('input_title_count', 0)}, "
+        f"event_errors={title_classification.get('event_errors', 0)}`",
         "说明: 原始 CNInfo 事件不修改；北交所不进入 CNInfo 公告解析。",
     ]
     if state_counts:
@@ -559,6 +651,13 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
             *(f"{key}: {value}" for key, value in sorted(next_actions.items())),
             "```",
         ])
+    problem_count = len(_format_cninfo_problem_detail_messages(
+        result,
+        title="CNInfo 公司行动异常明细",
+        items_per_message=1,
+    ))
+    if problem_count:
+        lines.append(f"异常明细: `{problem_count} 条，另行分消息发送`")
     return "\n".join(lines)
 
 
@@ -3039,7 +3138,7 @@ class ScheduledTasks:
             )
 
             # Notification delivery must not block task lifecycle completion.
-            await asyncio.wait_for(
+            summary_sent = await asyncio.wait_for(
                 self.bot.send_report_notification({
                     'report_type': report_type,
                     'task_name': task_name,
@@ -3048,8 +3147,40 @@ class ScheduledTasks:
                 timeout=report_timeout_seconds,
             )
 
-            scheduler_logger.info(f"[Scheduler] Task {task_name} report sent successfully")
-            return True
+            detail_failures = 0
+            detail_messages = [
+                str(item)
+                for item in (report_data.get("detail_messages") or [])[:20]
+                if str(item).strip()
+            ]
+            for index, detail_message in enumerate(detail_messages, start=1):
+                try:
+                    await asyncio.wait_for(
+                        self.bot.send_data_notification(
+                            detail_message,
+                            level="warning",
+                        ),
+                        timeout=report_timeout_seconds,
+                    )
+                except Exception as exc:
+                    detail_failures += 1
+                    scheduler_logger.warning(
+                        "[Scheduler] Task %s detail report %s/%s failed: %s",
+                        task_name,
+                        index,
+                        len(detail_messages),
+                        exc,
+                    )
+
+            scheduler_logger.info(
+                "[Scheduler] Task %s report sent: summary=%s details=%s "
+                "detail_failures=%s",
+                task_name,
+                bool(summary_sent),
+                len(detail_messages),
+                detail_failures,
+            )
+            return bool(summary_sent)
 
         except asyncio.TimeoutError:
             scheduler_logger.warning(
@@ -4441,13 +4572,17 @@ class ScheduledTasks:
         dry_run: bool = True,
         max_events: int = 500,
         target_offset: int = 0,
-        window_before_days: int = 10,
+        window_before_days: int = 30,
         window_after_days: int = 30,
         max_window_days: int = 180,
+        max_anchor_gap_days: int = 60,
         page_size: int = 30,
         max_pages: int = 5,
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
+        classify_titles_with_llm: bool = True,
+        title_classification_profile: str = "semantic_extraction",
+        title_max_titles_per_request: int = 80,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4466,10 +4601,16 @@ class ScheduledTasks:
                 window_before_days=int(window_before_days),
                 window_after_days=int(window_after_days),
                 max_window_days=int(max_window_days),
+                max_anchor_gap_days=int(max_anchor_gap_days),
                 page_size=int(page_size),
                 max_pages=int(max_pages),
                 request_interval_seconds=float(request_interval_seconds),
                 per_event_timeout_sec=int(per_event_timeout_sec),
+                classify_titles_with_llm=bool(classify_titles_with_llm),
+                title_classification_profile=title_classification_profile,
+                title_max_titles_per_request=int(
+                    title_max_titles_per_request
+                ),
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:
@@ -4479,6 +4620,10 @@ class ScheduledTasks:
                         "status": result.get("status"),
                         "content": _format_cninfo_special_action_discovery_report(
                             result
+                        ),
+                        "detail_messages": _format_cninfo_problem_detail_messages(
+                            result,
+                            title="CNInfo 特殊公司行动异常明细",
                         ),
                         "result": result,
                     },
@@ -4638,6 +4783,17 @@ class ScheduledTasks:
         refresh_documents: bool = False,
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = True,
+        window_before_days: int = 30,
+        window_after_days: int = 30,
+        max_window_days: int = 180,
+        max_anchor_gap_days: int = 60,
+        page_size: int = 30,
+        max_pages: int = 5,
+        request_interval_seconds: float = 0.5,
+        per_event_timeout_sec: int = 60,
+        classify_titles_with_llm: bool = True,
+        title_classification_profile: str = "semantic_extraction",
+        title_max_titles_per_request: int = 80,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4659,6 +4815,17 @@ class ScheduledTasks:
             refresh_documents=refresh_documents,
             auto_promote_validated=auto_promote_validated,
             exclude_reviewed_events=exclude_reviewed_events,
+            window_before_days=window_before_days,
+            window_after_days=window_after_days,
+            max_window_days=max_window_days,
+            max_anchor_gap_days=max_anchor_gap_days,
+            page_size=page_size,
+            max_pages=max_pages,
+            request_interval_seconds=request_interval_seconds,
+            per_event_timeout_sec=per_event_timeout_sec,
+            classify_titles_with_llm=classify_titles_with_llm,
+            title_classification_profile=title_classification_profile,
+            title_max_titles_per_request=title_max_titles_per_request,
             sample_limit=sample_limit,
             job_config=job_config,
         )
@@ -4681,7 +4848,17 @@ class ScheduledTasks:
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = True,
         retry_evidence_unavailable: bool = False,
+        window_before_days: int = 30,
+        window_after_days: int = 30,
+        max_window_days: int = 180,
+        max_anchor_gap_days: int = 60,
+        page_size: int = 30,
+        max_pages: int = 5,
         request_interval_seconds: float = 0.5,
+        per_event_timeout_sec: int = 60,
+        classify_titles_with_llm: bool = True,
+        title_classification_profile: str = "semantic_extraction",
+        title_max_titles_per_request: int = 80,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4706,7 +4883,19 @@ class ScheduledTasks:
                 auto_promote_validated=bool(auto_promote_validated),
                 exclude_reviewed_events=bool(exclude_reviewed_events),
                 retry_evidence_unavailable=bool(retry_evidence_unavailable),
+                window_before_days=int(window_before_days),
+                window_after_days=int(window_after_days),
+                max_window_days=int(max_window_days),
+                max_anchor_gap_days=int(max_anchor_gap_days),
+                page_size=int(page_size),
+                max_pages=int(max_pages),
                 request_interval_seconds=float(request_interval_seconds),
+                per_event_timeout_sec=int(per_event_timeout_sec),
+                classify_titles_with_llm=bool(classify_titles_with_llm),
+                title_classification_profile=title_classification_profile,
+                title_max_titles_per_request=int(
+                    title_max_titles_per_request
+                ),
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:
@@ -4715,6 +4904,10 @@ class ScheduledTasks:
                         "name": "A 股 CNInfo 公司行动日期闭环治理",
                         "status": result.get("status"),
                         "content": _format_cninfo_resolution_governance_report(result),
+                        "detail_messages": _format_cninfo_problem_detail_messages(
+                            result,
+                            title="CNInfo 公司行动治理异常明细",
+                        ),
                         "result": result,
                     },
                     report_type="maintenance_report",

@@ -6,6 +6,7 @@ import html
 import json
 import math
 import re
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
@@ -55,6 +56,8 @@ class SpecialActionSearchTarget:
     search_basis: str
     source_anchor_dates: List[date]
     row: Mapping[str, Any]
+    candidate_effective_dates: tuple[date, ...] = ()
+    anchor_roles: tuple[str, ...] = ()
 
 
 def parse_date(value: Any) -> Optional[date]:
@@ -140,62 +143,159 @@ def classify_special_action(row: Mapping[str, Any]) -> Optional[str]:
     return None
 
 
-def build_search_target(
+def _candidate_effective_dates(
+    row: Mapping[str, Any],
+    trading_days: Sequence[date],
+) -> tuple[date, ...]:
+    ordered = sorted({value for value in trading_days if value is not None})
+    if not ordered:
+        return ()
+    record_date = parse_date(row.get("record_date"))
+    arrival_date = parse_date(row.get("share_arrival_date"))
+    candidates = []
+    if record_date is not None:
+        index = bisect_right(ordered, record_date)
+        if index < len(ordered):
+            next_trading_day = ordered[index]
+            if arrival_date is None or next_trading_day <= arrival_date:
+                candidates.append(next_trading_day)
+    elif arrival_date is not None:
+        arrival_index = bisect_left(ordered, arrival_date)
+        if arrival_index < len(ordered) and ordered[arrival_index] == arrival_date:
+            candidates.append(arrival_date)
+        if arrival_index > 0:
+            candidates.append(ordered[arrival_index - 1])
+    return tuple(sorted(set(candidates)))
+
+
+def _cluster_role_dates(
+    row: Mapping[str, Any],
+    *,
+    max_anchor_gap_days: int,
+) -> list[list[tuple[str, date]]]:
+    role_dates = sorted(
+        (
+            (field_name, parsed)
+            for field_name in (
+                "record_date", "share_arrival_date", "announcement_date", "ex_date"
+            )
+            if (parsed := parse_date(row.get(field_name))) is not None
+        ),
+        key=lambda item: (item[1], item[0]),
+    )
+    clusters: list[list[tuple[str, date]]] = []
+    for role_date in role_dates:
+        if (
+            not clusters
+            or (role_date[1] - clusters[-1][-1][1]).days
+            > max(1, int(max_anchor_gap_days))
+        ):
+            clusters.append([role_date])
+        else:
+            clusters[-1].append(role_date)
+    role_weights = {
+        "ex_date": 100,
+        "record_date": 20,
+        "share_arrival_date": 15,
+        "announcement_date": 5,
+    }
+    return sorted(
+        clusters,
+        key=lambda cluster: (
+            -sum(role_weights[role] for role, _ in cluster),
+            min(value for _, value in cluster),
+        ),
+    )
+
+
+def build_search_targets(
     row: Mapping[str, Any],
     *,
     adjacent_dates: Sequence[date] = (),
+    trading_days: Sequence[date] = (),
     window_before_days: int = 10,
     window_after_days: int = 30,
     max_window_days: int = 180,
-) -> Optional[SpecialActionSearchTarget]:
-    """Build a conservative window from structured anchors or nearby events."""
+    max_anchor_gap_days: int = 60,
+) -> List[SpecialActionSearchTarget]:
+    """Build independent bounded windows from nearby date-role clusters."""
     event_class = classify_special_action(row)
     instrument_id = str(row.get("instrument_id") or "").strip()
     source_event_key = str(row.get("source_event_key") or "").strip()
     source_profile = str(row.get("source_profile") or "").strip()
     if not event_class or not all((instrument_id, source_event_key, source_profile)):
-        return None
-
-    anchors = sorted({
-        parsed
-        for field_name in ("announcement_date", "record_date", "ex_date")
-        if (parsed := parse_date(row.get(field_name))) is not None
-    })
-    if anchors:
+        return []
+    candidate_dates = _candidate_effective_dates(row, trading_days)
+    targets: List[SpecialActionSearchTarget] = []
+    for cluster in _cluster_role_dates(
+        row, max_anchor_gap_days=max_anchor_gap_days
+    ):
+        anchors = sorted({value for _, value in cluster})
+        roles = tuple(sorted({role for role, _ in cluster}))
         start = anchors[0] - timedelta(days=max(0, int(window_before_days)))
         end = anchors[-1] + timedelta(days=max(0, int(window_after_days)))
-        basis = "structured_announcement_or_record_date"
-    else:
-        secondary_anchor = parse_date(row.get("share_arrival_date"))
-        if secondary_anchor is not None:
-            anchors = [secondary_anchor]
-            start = secondary_anchor - timedelta(days=max(0, int(window_before_days)))
-            end = secondary_anchor + timedelta(days=max(0, int(window_after_days)))
-            basis = "structured_share_arrival_date"
-        else:
-            nearby = sorted({value for value in adjacent_dates if value is not None})
-            previous = nearby[0] if len(nearby) >= 2 else None
-            following = nearby[-1] if nearby else None
-            if previous is None or following is None or following <= previous:
-                return None
-            start = previous + timedelta(days=1)
-            end = following - timedelta(days=1)
-            basis = "adjacent_corporate_action_dates"
-            anchors = [previous, following]
-
+        if end < start or (end - start).days > max(1, int(max_window_days)):
+            continue
+        targets.append(SpecialActionSearchTarget(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            source_profile=source_profile,
+            event_class=event_class,
+            start_date=start,
+            end_date=end,
+            search_basis="role_cluster:" + "+".join(roles),
+            source_anchor_dates=anchors,
+            row=row,
+            candidate_effective_dates=candidate_dates,
+            anchor_roles=roles,
+        ))
+    if targets:
+        return targets
+    nearby = sorted({value for value in adjacent_dates if value is not None})
+    previous = nearby[0] if len(nearby) >= 2 else None
+    following = nearby[-1] if nearby else None
+    if previous is None or following is None or following <= previous:
+        return []
+    start = previous + timedelta(days=1)
+    end = following - timedelta(days=1)
     if end < start or (end - start).days > max(1, int(max_window_days)):
-        return None
-    return SpecialActionSearchTarget(
+        return []
+    return [SpecialActionSearchTarget(
         instrument_id=instrument_id,
         source_event_key=source_event_key,
         source_profile=source_profile,
         event_class=event_class,
         start_date=start,
         end_date=end,
-        search_basis=basis,
-        source_anchor_dates=anchors,
+        search_basis="adjacent_corporate_action_dates",
+        source_anchor_dates=[previous, following],
         row=row,
+        candidate_effective_dates=candidate_dates,
+        anchor_roles=("adjacent_event",),
+    )]
+
+
+def build_search_target(
+    row: Mapping[str, Any],
+    *,
+    adjacent_dates: Sequence[date] = (),
+    trading_days: Sequence[date] = (),
+    window_before_days: int = 10,
+    window_after_days: int = 30,
+    max_window_days: int = 180,
+    max_anchor_gap_days: int = 60,
+) -> Optional[SpecialActionSearchTarget]:
+    """Return the highest-priority search window for compatibility callers."""
+    targets = build_search_targets(
+        row,
+        adjacent_dates=adjacent_dates,
+        trading_days=trading_days,
+        window_before_days=window_before_days,
+        window_after_days=window_after_days,
+        max_window_days=max_window_days,
+        max_anchor_gap_days=max_anchor_gap_days,
     )
+    return targets[0] if targets else None
 
 
 def announcement_match_reasons(
@@ -281,3 +381,71 @@ def build_candidate_evidence(
             },
         }
     return sorted(candidates.values(), key=lambda item: item["evidence_key"])
+
+
+def build_classified_announcement_evidence(
+    target: SpecialActionSearchTarget,
+    records: Iterable[Any],
+    *,
+    decisions: Mapping[str, Mapping[str, Any]],
+    applicability: Mapping[str, Any],
+    lineage: Sequence[Mapping[str, Any]],
+    search_windows: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Persist every LLM title decision as candidate or rejected evidence."""
+    rows = []
+    for record in records:
+        announcement_id = str(
+            getattr(record, "source_announcement_id", "")
+            or getattr(record, "announcement_id", "")
+            or ""
+        ).strip()
+        title = str(getattr(record, "title", "") or "").strip()
+        decision = decisions.get(announcement_id)
+        if not announcement_id or not title or not decision:
+            continue
+        relevance = str(decision.get("relevance") or "")
+        resolution_status = (
+            "candidate"
+            if relevance in {"relevant", "possibly_relevant"}
+            else "rejected"
+        )
+        attachments = tuple(getattr(record, "attachments", ()) or ())
+        attachment = attachments[0] if attachments else None
+        evidence_url = (
+            None
+            if attachment is None
+            else attachment.resolved_url or attachment.source_url
+        )
+        raw_payload = getattr(record, "raw_payload", {}) or {}
+        rows.append({
+            "instrument_id": target.instrument_id,
+            "source_event_key": target.source_event_key,
+            "observation_source": "cninfo",
+            "source_profile": target.source_profile,
+            "evidence_source": "cninfo_announcement_metadata",
+            "evidence_key": announcement_id,
+            "resolution_status": resolution_status,
+            "effective_date": None,
+            "date_basis": None,
+            "announcement_id": announcement_id,
+            "announcement_title": html.unescape(
+                _TITLE_TAG_RE.sub("", title)
+            ).strip(),
+            "announcement_time": getattr(record, "published_at", None),
+            "evidence_url": evidence_url,
+            "confidence": decision.get("confidence"),
+            "raw_payload": {
+                "event_class": target.event_class,
+                "candidate_effective_dates": [
+                    value.isoformat() for value in target.candidate_effective_dates
+                ],
+                "search_windows": list(search_windows),
+                "title_classification": dict(decision),
+                "event_applicability": dict(applicability),
+                "llm_lineage": [dict(item) for item in lineage],
+                "lexical_diagnostics": announcement_match_reasons(target, title),
+                "announcement": dict(raw_payload),
+            },
+        })
+    return sorted(rows, key=lambda item: item["evidence_key"])

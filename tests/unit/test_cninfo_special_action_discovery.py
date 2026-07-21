@@ -5,9 +5,13 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
+from data_sources.cninfo_announcement_title_llm import (
+    TITLE_CLASSIFICATION_SCHEMA_VERSION,
+)
 from research.announcements import (
     AnnouncementAttachment,
     AnnouncementRecord,
+    AnnouncementRouteResult,
     AnnouncementScanResult,
     build_announcement_key,
 )
@@ -21,18 +25,20 @@ class _FakeAnnouncementService:
         is_complete=True,
         errors=(),
         stop_reason=None,
+        title="股权分置改革方案实施公告",
     ):
         self.status = status
         self.is_complete = is_complete
         self.errors = tuple(errors)
         self.stop_reason = stop_reason
+        self.title = title
 
     def acquire(self, query, *, selectors=None):
         record = AnnouncementRecord(
             source="cninfo",
             source_announcement_id="120220001",
             announcement_key=build_announcement_key("cninfo", "120220001"),
-            title="股权分置改革方案实施公告",
+            title=self.title,
             published_at="2006-06-09T08:00:00+08:00",
             market=query.scope.market,
             exchange=query.scope.exchange,
@@ -65,7 +71,10 @@ class _FakeAnnouncementService:
             stop_reason=self.stop_reason,
             errors=self.errors,
         )
-        return SimpleNamespace(
+        return AnnouncementRouteResult(
+            query=query,
+            status=self.status,
+            selected_source="cninfo",
             scan_result=scan_result,
             attempts=(),
             fallback_used=False,
@@ -115,6 +124,14 @@ def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
         return normalized_adjacent_rows
 
     manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.get_trading_days = AsyncMock(
+        return_value=[
+            date(2006, 6, 9),
+            date(2006, 6, 12),
+            date(2006, 6, 13),
+            date(2006, 6, 14),
+        ]
+    )
     manager.db_ops.save_corporate_action_effective_date_evidence = AsyncMock(
         return_value={
             "inserted": 1,
@@ -134,6 +151,37 @@ def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
     manager._require_research_storage = Mock(return_value=storage)
     manager._announcement_test_storage = storage
     return manager
+
+
+def _title_llm_response(*, announcement_id="120220001", relevance="relevant"):
+    role = (
+        "compensation_share_distribution"
+        if relevance != "unrelated"
+        else "periodic_report"
+    )
+    return SimpleNamespace(
+        data={
+            "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
+            "events": [{
+                "source_event_key": "event-1",
+                "event_applicability": "effectful",
+                "applicability_reason": "The structured event has share effects",
+                "classifications": [{
+                    "announcement_id": announcement_id,
+                    "relevance": relevance,
+                    "announcement_role": role,
+                    "confidence": 0.97,
+                    "reason": "Semantic title decision",
+                }],
+            }],
+        },
+        model="fake-model",
+        request_hash="request-hash",
+        response_hash="response-hash",
+        request_id="request-id",
+        latency_ms=10,
+        attempt_count=1,
+    )
 
 
 @pytest.mark.asyncio
@@ -421,3 +469,89 @@ async def test_discovery_reports_event_key_for_unbounded_anchor():
         "source_event_key": "event-1",
         "reason": "unbounded_anchor",
     }]
+
+
+@pytest.mark.asyncio
+async def test_llm_title_discovery_accepts_compensation_share_without_keywords():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(
+            title="重大资产重组业绩承诺补偿股份赠与实施完成公告"
+        )
+    )
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response())
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=True,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["status"] == "dry_run"
+    assert result["evidence"]["candidate_count"] == 1
+    assert result["title_classification"]["status"] == "success"
+    assert result["target_samples"][0]["classification_samples"][0][
+        "announcement_role"
+    ] == "compensation_share_distribution"
+    manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_llm_title_discovery_persists_unrelated_as_rejected_evidence():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(title="年度报告摘要")
+    )
+    client = SimpleNamespace(
+        complete=AsyncMock(
+            return_value=_title_llm_response(relevance="unrelated")
+        )
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["status"] == "success"
+    assert result["evidence"]["candidate_count"] == 0
+    assert result["evidence"]["rejected_count"] == 1
+    rows = manager.db_ops.save_corporate_action_effective_date_evidence.await_args.args[0]
+    assert rows[0]["resolution_status"] == "rejected"
+    assert rows[0]["raw_payload"]["title_classification"]["relevance"] == (
+        "unrelated"
+    )
+    manager._announcement_test_storage.store_announcement_audit.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_llm_title_coverage_error_is_retryable_and_writes_no_evidence():
+    manager = _manager()
+    client = SimpleNamespace(
+        complete=AsyncMock(
+            return_value=_title_llm_response(announcement_id="invented")
+        )
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=True,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["status"] == "partial"
+    assert result["evidence"]["classified_count"] == 0
+    assert result["title_classification"]["status"] == "partial"
+    assert result["title_classification"]["event_errors"] == 1
+    assert "title_classification_failed" in result["errors"][0]["error"]
+    manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()

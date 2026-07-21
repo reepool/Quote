@@ -7,6 +7,7 @@ import pytest
 from scheduler.tasks import (
     ScheduledTasks,
     _format_a_share_cninfo_corporate_action_report,
+    _format_cninfo_problem_detail_messages,
     _format_cninfo_special_action_discovery_report,
     data_manager,
 )
@@ -131,19 +132,71 @@ def test_cninfo_special_action_discovery_is_manual_and_candidate_only():
             "excluded_exchanges": ["BSE"],
         },
         "targets": {"searchable_events": 2, "events_with_candidates": 1},
-        "evidence": {"candidate_count": 3},
+        "evidence": {"candidate_count": 3, "rejected_count": 4},
+        "title_classification": {
+            "enabled": True,
+            "status": "success",
+            "input_title_count": 7,
+            "request_count": 1,
+            "event_errors": 0,
+        },
         "announcement_governance": {
             "ingestion_run_id": None,
             "scan_states_persisted": 0,
             "audits_persisted": 0,
             "errors": 0,
         },
+        "target_samples": [{
+            "instrument_id": "000409.SZ",
+            "source_event_key": "event-1",
+            "search_windows": [{}, {}],
+            "announcements_seen": 31,
+            "candidate_count": 2,
+            "rejected_count": 29,
+            "title_classification_status": "success",
+        }],
     })
 
-    assert "公告候选证据: `3`" in report
+    assert "titles=7, requests=1, event_errors=0" in report
+    assert "candidate=3, rejected=4" in report
+    assert "000409.SZ" not in report
     assert "run_id=None, scans=0, audits=0, errors=0" in report
     assert "不从标题推断日期" in report
     assert "生产因子影响: `无`" in report
+
+    assert _format_cninfo_problem_detail_messages(
+        {
+            "target_samples": [{
+                "instrument_id": "000409.SZ",
+                "source_event_key": "event-1",
+                "title_classification_status": "success",
+                "errors": [],
+            }],
+        },
+        title="异常明细",
+    ) == []
+
+
+def test_cninfo_problem_details_are_split_and_only_include_failures():
+    messages = _format_cninfo_problem_detail_messages(
+        {
+            "errors": [
+                {
+                    "instrument_id": f"000{index:03d}.SZ",
+                    "source_event_key": f"event-{index}",
+                    "error": "classification_failed",
+                }
+                for index in range(13)
+            ],
+        },
+        title="异常明细",
+        items_per_message=12,
+    )
+
+    assert len(messages) == 2
+    assert "(1/2)" in messages[0]
+    assert "(2/2)" in messages[1]
+    assert "classification_failed" in messages[0]
 
 
 @pytest.mark.asyncio
@@ -171,6 +224,8 @@ async def test_scheduler_special_action_discovery_delegates_parameters(monkeypat
     assert discovery.await_args.kwargs["instrument_ids"] == ["600108.SH"]
     assert discovery.await_args.kwargs["max_events"] == 10
     assert discovery.await_args.kwargs["target_offset"] == 20
+    assert discovery.await_args.kwargs["classify_titles_with_llm"] is True
+    assert discovery.await_args.kwargs["max_anchor_gap_days"] == 60
     assert "a_share_cninfo_special_action_discovery" not in task._active_tasks
 
 

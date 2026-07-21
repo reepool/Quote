@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
@@ -30,6 +31,9 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
         "inventory", "discovery", "resolution"
     ]
     assert governance["parameters"]["retry_evidence_unavailable"] is False
+    assert governance["parameters"]["classify_titles_with_llm"] is True
+    assert governance["parameters"]["window_before_days"] == 30
+    assert governance["parameters"]["max_anchor_gap_days"] == 60
     incremental = config["scheduler_config"]["jobs"][
         "a_share_cninfo_corporate_action_llm_incremental"
     ]
@@ -38,6 +42,7 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert incremental["parameters"]["refresh_documents"] is False
     assert incremental["parameters"]["auto_promote_validated"] is True
     assert incremental["parameters"]["exclude_reviewed_events"] is True
+    assert incremental["parameters"]["classify_titles_with_llm"] is True
     assert "高置信结果可写入受治理的 resolved 层" in _format_cninfo_corporate_action_llm_report({
         "status": "dry_run", "dry_run": True, "counts": {}, "targets": {},
     })
@@ -108,9 +113,23 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
             "next_action_counts": {"discover_official_announcements": 115},
         },
         "targets": {"eligible_events": 380, "batch_events": 100},
+        "stages": {
+            "discovery": {
+                "target_samples": [{
+                    "instrument_id": "000409.SZ",
+                    "source_event_key": "event-1",
+                    "search_windows": [{}, {}],
+                    "announcements_seen": 31,
+                    "candidate_count": 2,
+                    "rejected_count": 29,
+                    "title_classification_status": "success",
+                }],
+            },
+        },
     })
     assert "factor_blocking=380" in governance_report
     assert "discovery_pending: 115" in governance_report
+    assert "000409.SZ" not in governance_report
 
 
 @pytest.mark.asyncio
@@ -149,6 +168,7 @@ async def test_incremental_resolution_excludes_reviewed_events(monkeypatch):
     ]
     assert delegated.await_args.kwargs["target_offset"] == 0
     assert delegated.await_args.kwargs["exclude_reviewed_events"] is True
+    assert delegated.await_args.kwargs["classify_titles_with_llm"] is True
 
 
 @pytest.mark.asyncio
@@ -174,7 +194,33 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
     assert result["status"] == "dry_run"
     assert operation.await_args.kwargs["max_events"] == 50
     assert operation.await_args.kwargs["scopes"] == ["inventory", "discovery"]
+    assert operation.await_args.kwargs["classify_titles_with_llm"] is True
+    assert operation.await_args.kwargs["max_anchor_gap_days"] == 60
     assert (
         "a_share_cninfo_corporate_action_resolution_governance"
         not in task._active_tasks
     )
+
+
+@pytest.mark.asyncio
+async def test_task_report_sends_problem_details_as_separate_messages():
+    task = ScheduledTasks()
+    task.telegram_enabled = True
+    task.bot = SimpleNamespace(
+        send_report_notification=AsyncMock(return_value=True),
+        send_data_notification=AsyncMock(return_value=True),
+    )
+
+    sent = await task._send_task_report(
+        {
+            "content": "summary only",
+            "detail_messages": ["problem batch 1", "problem batch 2"],
+        },
+        "maintenance_report",
+        "cninfo-test",
+        SimpleNamespace(report=True),
+    )
+
+    assert sent is True
+    task.bot.send_report_notification.assert_awaited_once()
+    assert task.bot.send_data_notification.await_count == 2
