@@ -17792,6 +17792,7 @@ class DataManager:
             build_quote_evidence_keys,
             derive_cninfo_factor_path,
             derive_tdx_factor_path,
+            evaluate_coverage_intervals,
             reconcile_cninfo_tdx_events,
         )
         from utils.a_share_historical_backfill import (
@@ -17909,8 +17910,8 @@ class DataManager:
                 FROM corporate_action_instrument_status
                 WHERE instrument_id IN ({placeholders})
                   AND source = 'cninfo'
-                  AND date(requested_start_date) <= :start_date
-                  AND date(requested_end_date) >= :end_date
+                  AND date(requested_end_date) >= :start_date
+                  AND date(requested_start_date) <= :end_date
                 ORDER BY instrument_id, source_profile, last_attempt_at DESC
                 """,
                 params,
@@ -17924,8 +17925,8 @@ class DataManager:
                 WHERE instrument_id IN ({placeholders})
                   AND source = 'tdx'
                   AND source_profile = 'tdx_xdxr'
-                  AND date(requested_start_date) <= :start_date
-                  AND date(requested_end_date) >= :end_date
+                  AND date(requested_end_date) >= :start_date
+                  AND date(requested_start_date) <= :end_date
                 ORDER BY instrument_id, last_attempt_at DESC
                 """,
                 params,
@@ -18138,14 +18139,15 @@ class DataManager:
             ),
         }
 
-        endpoint_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-        seen_endpoint_keys = set()
+        endpoint_rows_by_profile: Dict[
+            Tuple[str, str], List[Dict[str, Any]]
+        ] = defaultdict(list)
         for row in endpoint_status_rows:
-            key = (row.get("instrument_id"), row.get("source_profile"))
-            if key in seen_endpoint_keys:
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            source_profile = str(row.get("source_profile") or "").strip()
+            if not instrument_id or not source_profile:
                 continue
-            seen_endpoint_keys.add(key)
-            endpoint_by_instrument[str(row.get("instrument_id"))].append(row)
+            endpoint_rows_by_profile[(instrument_id, source_profile)].append(row)
         unresolved_ids = {
             str(item.get("instrument_id"))
             for item in [
@@ -18166,29 +18168,46 @@ class DataManager:
             if item.get("instrument_id")
         }
         for instrument_id in target_ids:
-            rows = endpoint_by_instrument.get(instrument_id, [])
-            profiles = {str(row.get("source_profile") or "") for row in rows}
-            missing_profiles = sorted(required_profiles - profiles)
-            has_indeterminate = any(
-                str(row.get("coverage_status")) == "indeterminate"
-                for row in rows
-            )
-            has_partial = any(
-                str(row.get("coverage_status")) == "partial_missing_fields"
-                for row in rows
-            )
-            if (
-                missing_profiles
-                or has_indeterminate
-                or (has_partial and instrument_id in cninfo_pending_ids)
-            ):
+            incomplete_profiles = []
+            for source_profile in sorted(required_profiles):
+                rows = endpoint_rows_by_profile.get(
+                    (instrument_id, source_profile), []
+                )
+                accepted_statuses = {
+                    "complete_with_events",
+                    "complete_no_events",
+                }
+                if instrument_id not in cninfo_pending_ids:
+                    accepted_statuses.add("partial_missing_fields")
+                coverage = evaluate_coverage_intervals(
+                    rows,
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                    accepted_statuses=accepted_statuses,
+                )
+                if coverage["covered"]:
+                    continue
+                incomplete_profiles.append(source_profile)
+                if len(missing_profile_samples) < sample_limit:
+                    missing_profile_samples.append({
+                        "instrument_id": instrument_id,
+                        "source_profile": source_profile,
+                        "reason": (
+                            "missing_cninfo_endpoint_status"
+                            if not rows
+                            else "incomplete_cninfo_endpoint_coverage"
+                        ),
+                        "status_rows": len(rows),
+                        "coverage_gaps": [
+                            {
+                                "start_date": item["start_date"].isoformat(),
+                                "end_date": item["end_date"].isoformat(),
+                            }
+                            for item in coverage["gaps"]
+                        ],
+                    })
+            if incomplete_profiles:
                 endpoint_incomplete_ids.add(instrument_id)
-            if missing_profiles and len(missing_profile_samples) < sample_limit:
-                missing_profile_samples.append({
-                    "instrument_id": instrument_id,
-                    "reason": "missing_cninfo_endpoint_status",
-                    "missing_profiles": missing_profiles,
-                })
         overall_incomplete_ids = sorted(unresolved_ids | endpoint_incomplete_ids)
         overall_completeness = {
             "status": "partial" if overall_incomplete_ids else "success",
@@ -18212,18 +18231,37 @@ class DataManager:
         baseline_covered_ids = sorted(
             set(target_ids) - endpoint_incomplete_ids - pending_factor_ids
         )
-        tdx_covered_ids = set()
-        seen_tdx_status_ids = set()
+        tdx_rows_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
         for row in tdx_endpoint_status_rows:
             instrument_id = str(row.get("instrument_id") or "").strip()
-            if not instrument_id or instrument_id in seen_tdx_status_ids:
+            if not instrument_id:
                 continue
-            seen_tdx_status_ids.add(instrument_id)
-            if str(row.get("coverage_status") or "") in {
-                "complete_with_events",
-                "complete_no_events",
-            }:
+            tdx_rows_by_instrument[instrument_id].append(row)
+        tdx_covered_ids = set()
+        tdx_coverage_gap_samples: List[Dict[str, Any]] = []
+        for instrument_id in target_ids:
+            coverage = evaluate_coverage_intervals(
+                tdx_rows_by_instrument.get(instrument_id, []),
+                start_date=normalized_start,
+                end_date=normalized_end,
+                accepted_statuses={
+                    "complete_with_events",
+                    "complete_no_events",
+                },
+            )
+            if coverage["covered"]:
                 tdx_covered_ids.add(instrument_id)
+            elif len(tdx_coverage_gap_samples) < sample_limit:
+                tdx_coverage_gap_samples.append({
+                    "instrument_id": instrument_id,
+                    "coverage_gaps": [
+                        {
+                            "start_date": item["start_date"].isoformat(),
+                            "end_date": item["end_date"].isoformat(),
+                        }
+                        for item in coverage["gaps"]
+                    ],
+                })
         benchmark = build_factor_source_benchmark(
             cninfo_comparison_rows,
             {
@@ -18247,6 +18285,7 @@ class DataManager:
             ),
             "endpoint_incomplete_instruments": len(endpoint_incomplete_ids),
             "tdx_coverage_status_rows": len(tdx_endpoint_status_rows),
+            "tdx_coverage_gap_samples": tdx_coverage_gap_samples,
         })
         quality_gates = {
             "full_market_scope": full_market_scope,

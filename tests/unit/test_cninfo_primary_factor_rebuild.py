@@ -6,7 +6,11 @@ import pytest
 from data_manager import DataManager
 
 
-def _manager_with_factor_evidence(*, tdx_validation_result="computed_unvalidated"):
+def _manager_with_factor_evidence(
+    *,
+    tdx_validation_result="computed_unvalidated",
+    segmented_coverage=False,
+):
     manager = DataManager()
     manager.db_ops = Mock()
     manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
@@ -53,26 +57,66 @@ def _manager_with_factor_evidence(*, tdx_validation_result="computed_unvalidated
             }]
         if "FROM corporate_action_instrument_status" in query:
             if "source = 'tdx'" in query:
-                return [{
+                rows = [{
                     "instrument_id": "000001.SZ",
                     "source_profile": "tdx_xdxr",
                     "coverage_status": "complete_with_events",
                     "event_count": 1,
+                    "requested_start_date": datetime(1990, 12, 19),
+                    "requested_end_date": datetime(2026, 7, 17),
                 }]
-            return [
+                if segmented_coverage:
+                    rows = [
+                        {
+                            **rows[0],
+                            "requested_end_date": datetime(2026, 7, 14),
+                        },
+                        {
+                            **rows[0],
+                            "coverage_status": "complete_no_events",
+                            "requested_start_date": datetime(2026, 7, 10),
+                        },
+                    ]
+                return rows
+            rows = [
                 {
                     "instrument_id": "000001.SZ",
                     "source_profile": "cninfo_dividend",
                     "coverage_status": "complete_with_events",
                     "event_count": 1,
+                    "requested_start_date": datetime(1990, 12, 19),
+                    "requested_end_date": datetime(2026, 7, 17),
                 },
                 {
                     "instrument_id": "000001.SZ",
                     "source_profile": "cninfo_allotment",
                     "coverage_status": "complete_no_events",
                     "event_count": 0,
+                    "requested_start_date": datetime(1990, 12, 19),
+                    "requested_end_date": datetime(2026, 7, 17),
                 },
             ]
+            if segmented_coverage:
+                rows = [
+                    {
+                        **rows[0],
+                        "coverage_status": "partial_missing_fields",
+                        "requested_end_date": datetime(2026, 7, 14),
+                    },
+                    {
+                        **rows[0],
+                        "requested_start_date": datetime(2026, 7, 10),
+                    },
+                    {
+                        **rows[1],
+                        "requested_end_date": datetime(2026, 7, 14),
+                    },
+                    {
+                        **rows[1],
+                        "requested_start_date": datetime(2026, 7, 10),
+                    },
+                ]
+            return rows
         return []
 
     manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
@@ -137,6 +181,30 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
     assert result["candidate"]["candidate_built"] is False
     manager.db_ops.save_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_cninfo_factor_rebuild_merges_segmented_endpoint_coverage():
+    manager = _manager_with_factor_evidence(segmented_coverage=True)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert result["overall_completeness"]["status"] == "success"
+    assert result["overall_completeness"]["endpoint_status_rows"] == 4
+    assert result["overall_completeness"][
+        "missing_endpoint_profile_samples"
+    ] == []
+    assert result["benchmark"]["tdx_coverage_status_rows"] == 2
+    assert result["benchmark"]["tdx_coverage_gap_samples"] == []
+    assert result["benchmark"]["reference_sources"][
+        "tdx_event_derived_v1"
+    ]["coverage_ratio"] == pytest.approx(1.0)
 
 
 @pytest.mark.asyncio

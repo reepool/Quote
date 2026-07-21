@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from bisect import bisect_right
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
@@ -541,6 +541,76 @@ def _session_distance(left: date, right: date, sessions: Sequence[date]) -> Opti
     if right > left:
         return bisect_right(sessions, right) - bisect_right(sessions, left)
     return -(bisect_right(sessions, left) - bisect_right(sessions, right))
+
+
+def evaluate_coverage_intervals(
+    rows: Iterable[Mapping[str, Any]],
+    *,
+    start_date: date,
+    end_date: date,
+    accepted_statuses: Iterable[str],
+) -> Dict[str, Any]:
+    """Merge accepted inclusive status intervals and report uncovered gaps."""
+    if end_date < start_date:
+        raise ValueError("end_date must not be earlier than start_date")
+    accepted = {
+        str(status or "").strip().lower()
+        for status in accepted_statuses
+        if str(status or "").strip()
+    }
+    intervals: List[Tuple[date, date]] = []
+    for row in rows:
+        status = str(row.get("coverage_status") or "").strip().lower()
+        interval_start = _date(row.get("requested_start_date"))
+        interval_end = _date(row.get("requested_end_date"))
+        if (
+            status not in accepted
+            or interval_start is None
+            or interval_end is None
+            or interval_end < interval_start
+            or interval_end < start_date
+            or interval_start > end_date
+        ):
+            continue
+        intervals.append((
+            max(start_date, interval_start),
+            min(end_date, interval_end),
+        ))
+
+    merged: List[List[date]] = []
+    for interval_start, interval_end in sorted(intervals):
+        if (
+            not merged
+            or interval_start > merged[-1][1] + timedelta(days=1)
+        ):
+            merged.append([interval_start, interval_end])
+        elif interval_end > merged[-1][1]:
+            merged[-1][1] = interval_end
+
+    gaps: List[Dict[str, date]] = []
+    cursor = start_date
+    for interval_start, interval_end in merged:
+        if interval_start > cursor:
+            gaps.append({
+                "start_date": cursor,
+                "end_date": interval_start - timedelta(days=1),
+            })
+        if interval_end >= end_date:
+            cursor = end_date + timedelta(days=1)
+            break
+        cursor = max(cursor, interval_end + timedelta(days=1))
+    if cursor <= end_date:
+        gaps.append({"start_date": cursor, "end_date": end_date})
+
+    return {
+        "covered": not gaps,
+        "accepted_interval_count": len(intervals),
+        "merged_intervals": [
+            {"start_date": item[0], "end_date": item[1]}
+            for item in merged
+        ],
+        "gaps": gaps,
+    }
 
 
 def _economic_differences(

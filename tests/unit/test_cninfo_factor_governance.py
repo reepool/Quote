@@ -8,8 +8,67 @@ from data_sources.cninfo_factor_governance import (
     build_cninfo_primary_candidate,
     derive_cninfo_factor_path,
     derive_tdx_factor_path,
+    evaluate_coverage_intervals,
     reconcile_cninfo_tdx_events,
 )
+
+
+def test_segmented_coverage_intervals_merge_across_historical_and_rolling_rows():
+    result = evaluate_coverage_intervals(
+        [
+            {
+                "coverage_status": "complete_with_events",
+                "requested_start_date": date(1990, 12, 19),
+                "requested_end_date": date(2026, 7, 18),
+            },
+            {
+                "coverage_status": "complete_no_events",
+                "requested_start_date": date(2026, 7, 14),
+                "requested_end_date": date(2026, 7, 21),
+            },
+        ],
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 21),
+        accepted_statuses={"complete_with_events", "complete_no_events"},
+    )
+
+    assert result["covered"] is True
+    assert result["gaps"] == []
+    assert result["merged_intervals"] == [{
+        "start_date": date(1990, 12, 19),
+        "end_date": date(2026, 7, 21),
+    }]
+
+
+def test_coverage_intervals_preserve_real_gaps_and_ignore_failed_retries():
+    result = evaluate_coverage_intervals(
+        [
+            {
+                "coverage_status": "complete_with_events",
+                "requested_start_date": date(2020, 1, 1),
+                "requested_end_date": date(2020, 6, 30),
+            },
+            {
+                "coverage_status": "indeterminate",
+                "requested_start_date": date(2020, 1, 1),
+                "requested_end_date": date(2020, 12, 31),
+            },
+            {
+                "coverage_status": "complete_no_events",
+                "requested_start_date": date(2020, 7, 2),
+                "requested_end_date": date(2020, 12, 31),
+            },
+        ],
+        start_date=date(2020, 1, 1),
+        end_date=date(2020, 12, 31),
+        accepted_statuses={"complete_with_events", "complete_no_events"},
+    )
+
+    assert result["covered"] is False
+    assert result["gaps"] == [{
+        "start_date": date(2020, 7, 1),
+        "end_date": date(2020, 7, 1),
+    }]
 
 
 def test_cninfo_factor_derivation_aggregates_same_day_economics():
