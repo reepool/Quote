@@ -1,34 +1,37 @@
-# 公司业务画像本地 LLM 基准与启用要求
+# 公司业务画像 LLM 基准与启用要求
 
 ## 1. 目的和当前边界
 
-本文件只定义未来本地模型的评估合同，不启用任何模型。
+本文件定义任意公共网关 provider/model 组合的评估合同，不因公共 profile 已可调用而
+自动启用公司画像抽取。
 
-当前 `research/business_profile_llm.py` 仅提供默认关闭的 OpenAI-compatible
-selected-section 协议和 fail-closed 校验器。它没有 scheduler、数据库 writer
-或 DCF 接入。免费结构化来源和人工复核仍是公司画像主路径。
+当前 `research/business_profile_llm.py` 已通过 `utils/llm/` 公共网关提供默认关闭的
+selected-section 协议和 fail-closed 校验器。它没有 selected-section 编排、数据库
+writer、生产 scheduler 或 DCF 接入。免费结构化来源和人工复核仍是公司画像主路径。
 
-本地模型只有在本文件规定的冻结基准上通过后，才允许另开 OpenSpec change：
+具体 provider/model/prompt/schema/selector 组合只有在本文件规定的冻结基准上通过后，
+才允许进入 OpenSpec change 的 candidate promotion 阶段：
 
 ```text
-promote-business-profile-local-llm-extraction
+integrate-llm-business-profile-supply-chain
 ```
 
-该 change 只能申请启用 candidate writer 和受控试点，不能直接生成 approved
-事实、公司商品暴露或 DCF 输入。
+该 change 只能在对应字段族基准通过后启用 candidate writer 和受控试点，不能直接
+生成 approved 事实、公司商品暴露或 DCF 输入。详细生产合同见
+`llm_assisted_business_profile_and_supply_chain_requirements.md`。
 
 ## 2. 评估对象
 
-每次评估必须锁定以下身份，任一变化均视为新模型：
+每次评估必须锁定以下身份，任一变化均视为新的评估对象：
 
-- 模型名称、权重来源和权重文件 SHA-256；
-- 参数规模、量化方法和量化产物 SHA-256；
-- 推理框架、版本、关键启动参数和 OpenAI-compatible server 版本；
+- provider profile、供应商、请求模型和服务端实际模型；
+- 远程模型不可获得权重 hash 时，保存供应商版本标识和评估时间窗；
+- 本地模型另保存权重来源、权重/量化产物 SHA-256、推理框架和启动参数；
 - prompt、response schema、业务事实目录和单位目录版本；
 - temperature、seed、上下文长度和最大输出长度；
-- CPU、GPU、显存、内存和操作系统基线。
+- 远程服务的 endpoint capability；本地模型另保存 CPU、GPU、显存、内存和操作系统基线。
 
-不得用“同系列模型”替代已评估的具体权重和运行配置。
+不得用“同系列模型”或相同请求别名替代已评估的服务端实际模型和运行配置。
 
 ## 3. 基准语料
 
@@ -39,9 +42,10 @@ promote-business-profile-local-llm-extraction
 
 - `case_id`、`split`、行业组和难度标签；
 - `instrument_id`、报告期、公告 ID、正式 PDF hash；
+- 通用公告 source-qualified identity、purpose route/audit lineage 和画像 manifest identity；
 - section id、页码、标题、规范文本和 text hash；
 - 适用的 fact catalog 和 unit catalog 版本；
-- 人工金标准 `business_profile_llm_report.v1`；
+- 人工金标准 `business_profile_llm_report.v2`，包含逐条 quote、offset、page 和 hash；
 - 标注人、复核人、裁决人、裁决时间和裁决说明；
 - 是否包含表格、跨页、否定、未披露、歧义、更正稿或多业务 regime。
 
@@ -79,7 +83,7 @@ PDF 本地路径不是语料身份。公告 ID、内容 hash、section hash 和�
 | field-level precision | >= 98% |
 | field-level recall | >= 92% |
 | 数值、符号、单位、期间和范围 exact match | >= 99% |
-| evidence section exact citation | >= 99% |
+| evidence quote、offset、page 和 hash exact match | 100% |
 | explicit relationship precision | >= 99% |
 | explicit relationship recall | >= 90% |
 | unsupported fact/relationship rate | 0% |
@@ -97,11 +101,11 @@ PDF 本地路径不是语料身份。公告 ID、内容 hash、section hash 和�
 - 输入/输出 token 或本地 tokenizer 等价计数；
 - 单 case 平均、P50、P95 时延和失败率；
 - 每小时可处理 case 数和完整首轮批次预计耗时；
-- 峰值 CPU、GPU、显存和内存；
+- 远程调用的 provider 限流与服务失败分布；本地模型另报告峰值 CPU、GPU、显存和内存；
 - 超时、重试、断点恢复和服务重启后的幂等结果。
 
-promotion change 必须根据实测硬件设定明确的批次时间预算。不能只以单个短样本
-时延推算全市场效率。
+promotion change 必须根据远程调用或本地硬件实测设定明确的费用、token 和批次时间
+预算。不能只以单个短样本时延推算全市场效率。
 
 ## 6. 评估产物
 
@@ -118,11 +122,11 @@ promotion change 必须根据实测硬件设定明确的批次时间预算。不
 
 ## 7. 后续 promotion change 的必备内容
 
-`promote-business-profile-local-llm-extraction` 至少应包含：
+`integrate-llm-business-profile-supply-chain` 的 promotion 阶段至少应包含：
 
 1. 冻结 benchmark manifest 和独立复核结果；
-2. 配置、模型和硬件的明确身份；
-3. 仅写 candidate 的 writer，以及 evidence/section/model lineage；
+2. profile、provider、实际模型和运行环境的明确身份；
+3. 仅写 candidate 的 writer，以及 exact quote/offset/section/model lineage；
 4. instrument、行业、数量、字符数、时长和并发硬上限；
 5. dry-run、显式 operator 开关、checkpoint、resume 和 kill switch；
 6. 模型失败、JSON 失败、证据失败和目录失败的 fail-closed 行为；

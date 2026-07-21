@@ -1,8 +1,9 @@
 # A 股公司业务画像数据采集实施方案
 
-> 更新日期：2026-07-18
+> 更新日期：2026-07-21
 > 对应需求：`company_business_profile_and_commodity_exposure_requirements.md`
-> OpenSpec：`build-a-share-business-profile-evidence-pipeline`
+> OpenSpec：`build-a-share-business-profile-evidence-pipeline`、
+> `integrate-llm-business-profile-supply-chain`
 
 ## 1. 当前工程目标
 
@@ -33,7 +34,9 @@
 | `research/business_profile_structured_sync.py` | bounded sync、checkpoint、raw cache 和运行报告 | 已实现，生产开关关闭 |
 | `research/business_profile_catalog_governance.py` | 标签审计和受控精确别名升级 | 已实现 |
 | `research/business_profile_governance.py` | 审批事实的时点解析和 DCF context | 已实现 |
-| 公告发现、archive、PDF artifacts | 正式证据与未来关键 section | 已实现基础 |
+| `research/announcements/` | source-neutral 公告模型、provider 路由、保守 cursor/audit 和统一附件取回 | 已实现并完成业务迁移 |
+| `research/business_profile_discovery.py` | 提交画像 purpose query、执行业务标题分类并转换为画像候选 | 已接入通用公告模块 |
+| `research/business_profile_archive.py`、PDF artifacts | 画像不可变归档、manifest、更正 lineage 和关键 section artifact | 已实现，保持业务域所有权 |
 | scheduler | 自动批量维护 | 待 30 家 pilot gate 通过 |
 | 审核 CLI | candidate 审批、驳回、supersede | 待实现 |
 | 生产回补 | A 股数据填充 | 未开始 |
@@ -258,15 +261,27 @@ normalize(label) == normalize(alias)
 
 ## 7. 官方文档链路的保留用途
 
-继续保留：
+通用公告模块负责：
 
-- CNInfo/交易所公告发现和分页水位；
-- 正式附件下载；
+- source-neutral `AnnouncementQuery/AnnouncementScope/AnnouncementRecord`；
+- provider 能力校验和 `routing.official_announcements` 的 purpose/exchange 路由；
+- CNInfo、SSE、SZSE、BSE 请求参数、身份解析和返回结构规范化；
+- `purpose_key + source + scope_key` 的保守 cursor 和 selected-only audit；
+- 附件 host 信任、URL 解析、有界下载、媒体/PDF signature 和 SHA-256 诊断。
+
+画像业务继续负责：
+
+- `purpose_key=business_profile_evidence:<instrument_id>` 和业务标题 selector；
 - 按年/市场配置化不可变归档；
 - 公告 ID、内容 hash、更正和 supersession；
 - PDF 签名、原生文本、页码和 heading index；
 - 低文本页和 OCR-required 诊断；
 - 业务 regime 变化提示。
+
+画像业务不得直接读取 provider endpoint 配置、构造 CNInfo `orgId/column/plate` 或交易所
+参数、实现来源 fallback、复用某一来源 cursor 到另一来源，或保留第二套附件下载
+transport。当前 SSE/SZSE 画像路由由配置决定为 CNInfo 主尝试和对应交易所 fallback，
+BSE 暂只路由 CNInfo；这些是可变运维路由，不应硬编码为画像算法。
 
 停止推进：
 
@@ -280,23 +295,21 @@ normalize(label) == normalize(alias)
 1. 结构化源冲突复核；
 2. 高材料性候选审批；
 3. 产销量、单位成本、储量、套保等专项字段；
-4. 未来 LLM 关键 section 输入；
+4. 受控 LLM 关键 section 输入；
 5. 公司重大业务变化证据。
 
 ## 8. LLM 接口实施边界
 
-当前配置：
+公共连接配置位于 `config/11_llm.json`，画像业务只引用公共 profile，不再重复维护
+provider、base URL、model、key、重试或流式设置。画像业务配置保留如下边界字段：
 
 ```json
 {
   "enabled": false,
-  "provider": "openai_compatible",
-  "base_url": "",
-  "model": "",
-  "api_key_env": "",
-  "endpoint": "/v1/chat/completions",
+  "profile": "semantic_extraction",
   "max_input_characters": 30000,
-  "candidate_only": true
+  "candidate_only": true,
+  "candidate_write_enabled": false
 }
 ```
 
@@ -304,21 +317,26 @@ normalize(label) == normalize(alias)
 
 - 只接受带 page、heading、text hash 的 selected sections；
 - section id 必须唯一，页码必须为正，发送前重新计算规范文本 hash；
-- 默认关闭时在发出 HTTP 前失败；
-- key 只从环境变量读取；
+- 公共 profile 和画像业务任一关闭时均不得发出画像 LLM 请求；
+- key 只由公共网关从环境变量读取；
 - response 必须为 JSON object；
 - instrument、报告期、schema 和事实目录版本必须与请求一致；
 - `field_id` 必须存在于版本化业务事实目录，candidate 必须具备符合字段类型的原值，数值字段必须带原单位；
 - 每条事实和关系必须引用输入 section；
 - 关系必须标记为原文明示；
 - 输出必须为 candidate；
-- 保存 request/response hash、model、base URL、prompt/schema version 和 fact catalog version。
+- 保存公共网关 request/response、provider/实际 model、usage、时延和尝试次数，以及
+  画像 prompt/schema/selector/fact catalog 和 selected-section lineage；
+- v2 candidate 必须包含可在输入 section 中精确复核的 quote、offset、page 和 hash；
+- 具名客户/供应商进入独立供应链关系候选，不能塞入价值链角色或自动解析模糊实体。
 
-当前没有 scheduler、数据库 writer 或 DCF 接入。冻结语料、人工金标准、精度/
-证据/幻觉门槛、硬件和吞吐要求见
-`docs/development/business_profile_llm_benchmark_requirements.md`。后续本地模型评估
-通过后必须另开 `promote-business-profile-local-llm-extraction`，且只能先申请
-candidate writer 和 bounded 人工复核试点。
+当前公共网关和画像业务适配器已完成，但没有 selected-section 生产编排、LLM run
+审计、数据库 candidate writer 或 DCF 接入。完整实施要求见
+`docs/development/llm_assisted_business_profile_and_supply_chain_requirements.md`，冻结
+语料、人工金标准、精度、证据、幻觉、费用和吞吐要求见
+`docs/development/business_profile_llm_benchmark_requirements.md`。OpenSpec
+`integrate-llm-business-profile-supply-chain` 只能先交付 candidate writer 和 bounded
+人工复核试点，不能自动批准或进入 DCF。
 
 ## 9. 验证计划
 
@@ -337,7 +355,8 @@ candidate writer 和 bounded 人工复核试点。
 - 标签审计最新版本、截断 fail-closed 和 promotion 双文件回滚；
 - 未匹配产品保留；
 - 不写价值链角色和商品暴露；
-- LLM disabled、输入上限、JSON/schema、事实目录、section hash、证据引用和 candidate gate。
+- LLM 双重 disabled、输入上限、v2 JSON/schema、事实目录、quote/offset/section hash、
+  供应链关系和 candidate/DCF 隔离 gate。
 
 ### 9.2 Live probe
 
@@ -387,9 +406,9 @@ live probe 只读上游并写 `/tmp` 证据，不写生产库。记录成功率�
 4. 审批首批高材料性产品到商品映射；
 5. 将 approved 产品/成本事实接入周期 DCF 情景。
 
-后续评估：
+并行专项：
 
 1. 免费来源中原材料、产销量、产能、储量和套保结构化字段；
-2. 本地 LLM 模型、硬件、token、吞吐和质量；
-3. selected-section LLM candidate writer；
+2. 公共网关 provider/实际 model、prompt/schema/selector 的冻结质量、token、费用和吞吐；
+3. selected-section、run audit、严格证据和供应链 candidate writer；
 4. 港股来源和数据模型差异。

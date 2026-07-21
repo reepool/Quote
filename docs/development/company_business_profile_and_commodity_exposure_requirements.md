@@ -1,12 +1,15 @@
 # 公司业务画像与商品暴露需求说明
 
 > 状态：A 股第一阶段实施基线
-> 更新日期：2026-07-18
+> 更新日期：2026-07-21
 > 关联：`professional_dcf_requirements.md`
 
 ## 1. 决策结论
 
-公司业务画像采用“免费结构化数据优先、官方披露留作证据与补充、人工治理兜底、LLM 延后评估”的路线。
+公司业务画像采用“免费结构化数据优先、官方披露作为权威证据、人工治理兜底、LLM
+仅辅助抽取有原文依据的候选”的路线。公共 LLM 网关已完成，但画像候选写入仍须按
+`llm_assisted_business_profile_and_supply_chain_requirements.md` 的独立 promotion
+门槛实施。
 
 本版本明确废止以下旧目标：
 
@@ -53,7 +56,7 @@
 |---|---|---|---|---|
 | P0 | 东方财富主营构成 | AkShare `stock_zygc_em` | 报告期、分类类型、主营构成、收入/成本/利润、对应占比、毛利率 | 第一阶段结构化主源 |
 | P1 | 同花顺主营介绍 | AkShare `stock_zyjs_ths` | 当前主营业务、产品类型、产品名称、经营范围 | 当前画像复核上下文 |
-| P2 | CNInfo/交易所正式披露 | 既有公告与归档链 | 正式 PDF、公告时间、修订关系、页级证据 | 人工复核、补充字段、未来 LLM 输入 |
+| P2 | CNInfo/交易所正式披露 | `research.announcements` purpose 路由 + 画像归档链 | 正式 PDF、公告时间、来源尝试、修订关系、页级证据 | 人工复核、补充字段、LLM 选段输入 |
 | P3 | 发行人官网及专项公告 | 按需采集 | 经营数据、资源、合同、套保等 | 特定字段补充 |
 
 东方财富和同花顺是免费聚合源，不是法律意义上的正式披露权威。其结构化字段可以生成 candidate，但不能自动 approved。正式财报和公告仍是争议解决、重大事实审批和专项字段的证据源。
@@ -198,17 +201,22 @@ python scripts/research_business_profile_catalog_governance.py promote-alias \
 
 最后一类不能进入公司事实。没有免费、稳定、结构化来源时，允许字段长期为空。
 
-## 6. LLM 延后接口
+## 6. LLM 辅助抽取接口
 
 ### 6.1 当前状态
 
-LLM 抽取默认关闭，不进入 scheduler，不调用远程服务，不写 DCF 输入。配置位于：
+公共 LLM 网关已由 `utils/llm/` 提供，画像适配器通过
+`LlmClient.complete(LlmRequest)` 调用 `config/11_llm.json` 中的公共 profile。
+公共 profile 即使因其他业务启用，也不代表画像业务自动启用。画像抽取、candidate
+writer 和 scheduler 仍分别默认关闭，不写 DCF 输入。画像业务边界配置位于：
 
 ```text
 research_config.modules.business_profile_evidence.llm_extraction
 ```
 
-接口采用 OpenAI-compatible `POST /v1/chat/completions`，但 `base_url`、`model` 和 API key 环境变量均为空。当前只实现协议和校验器。
+provider、base URL、model、重试和 API key 环境变量属于公共 profile，画像模块不得
+重复配置或直接调用 HTTP。当前已实现公共网关调用和 v1 业务校验器；selected-section
+编排、v2 精确原文证据、run audit、candidate writer 和供应链关系表尚待新 change 实现。
 
 ### 6.2 输入
 
@@ -237,9 +245,10 @@ version、request hash 和 response hash。模型不能直接 approved，不能�
 
 ### 6.4 启用门槛
 
-详细冻结语料、金标准、指标和 promotion 流程见
-`docs/development/business_profile_llm_benchmark_requirements.md`。后续评估本地
-模型时至少验证：
+详细架构、供应链数据模型、冻结语料、金标准、指标和 promotion 流程见
+`docs/development/llm_assisted_business_profile_and_supply_chain_requirements.md` 和
+`docs/development/business_profile_llm_benchmark_requirements.md`。评估具体
+provider/model/prompt/schema 组合时至少验证：
 
 - 产品/分部字段 precision；
 - 数值、单位、期间和实体范围 exact match；
@@ -250,8 +259,8 @@ version、request hash 和 response hash。模型不能直接 approved，不能�
 - 模型、prompt、量化版本和硬件可复现性。
 
 未通过独立 holdout 评估前，不得启用批处理。
-通过后仍必须另开 `promote-business-profile-local-llm-extraction`，且第一阶段
-只能启用 candidate writer 和 bounded 人工复核试点，不能自动批准或进入 DCF。
+通过后仍只能启用 candidate writer 和 bounded 人工复核试点，不能自动批准或进入
+DCF。对应工程 change 为 `integrate-llm-business-profile-supply-chain`。
 
 ## 7. 公司画像长期性
 
@@ -329,9 +338,9 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 验证批准事实对周期 DCF 的增量价值；
 - 未满足公司级条件时继续使用行业默认并显示缺口。
 
-### Phase D：可选 LLM
+### Phase D：受控 LLM 辅助抽取
 
-- 选择可复现的本地模型；
+- 锁定可复现的 provider、实际 model、prompt、schema 和 selector 版本；
 - 只对关键 section 运行；
 - 完成 holdout、成本和吞吐评估；
 - 通过后仅开启 candidate writer；
@@ -339,7 +348,7 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 
 ## 11. 当前实现状态
 
-截至 2026-07-20：
+截至 2026-07-21：
 
 - 已实现 `AkshareStructuredBusinessProfileProvider`，按 AkShare 字段语义通过项目受控 HTTP session 读取东方财富主营构成和同花顺主营介绍；timeout、限速、重试和退避实际生效，并允许单源失败降级；
 - 已实现来源字段规范化、payload hash、200 行疑似上限诊断和原始字段保留；
@@ -348,6 +357,9 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 已删除尚未进入生产的 `value_chain_rule_catalog` 及词法推断代码；
 - 已为单位目录增加事实目录版本锁；
 - 已实现默认禁用的 OpenAI-compatible 选段抽取协议、输入上限、section hash、事实目录版本、证据引用和值类型/candidate-only 校验；
+- 公共 LLM 网关现已实现，画像适配器已改由 `LlmClient.complete(LlmRequest)` 调用；
+  画像侧仍缺少官方 artifact 选段编排、v2 原文 quote/offset 门禁、run audit、candidate
+  writer 和独立供应链关系治理，因此尚未启用画像 LLM 批处理；
 - 已实现配置驱动的结构化业务画像 bounded sync：按申万时点行业和上市生命周期
   选择 A 股范围，支持来源/行业/公司、数量和时长边界，按公司和来源 checkpoint
   续跑；候选写入强制使用内容寻址 raw cache/manifest，生产开关仍关闭；
@@ -421,6 +433,13 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 公告发现、PDF 归档和页级 artifact 继续保留；已新增材料性 precision 候选
   驱动的官方报告编排 service/CLI，默认只读发现，显式 operator switch 后才允许
   按公司和报告期归档，且候选表运行前后差值必须为 0；
+- `2026-07-21` 公告发现和附件下载已迁移到项目通用 `research.announcements`：画像
+  adapter 只提交 source-neutral query 和业务标题 selector，来源能力、purpose/exchange
+  路由、fallback、保守 cursor、`announcement_scan_state/announcement_audit` 以及受信任
+  host/大小限制/SHA-256 下载由通用层负责；画像仍独立负责报告分类、归档布局、manifest、
+  更正 supersession、PDF artifact 和审批。当前 SSE/SZSE 的画像路由为 CNInfo 后按显式
+  `success_empty/failed/degraded/identity_not_found/indeterminate` 条件回退对应交易所，BSE
+  暂只使用 CNInfo，不能在画像模块中自行补第二套路由；
 - 官方报告编排已增加显式 `catalog_issues` 目标范围：只选择最新版、candidate、
   达到材料性阈值且产品目录诊断为 `alias_not_found` 或
   `ambiguous_product_alias` 的结构化产品行，用于先取得目录 promotion 所需

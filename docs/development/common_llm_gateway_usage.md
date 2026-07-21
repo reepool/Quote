@@ -7,7 +7,9 @@
 
 ## 配置与密钥
 
-项目配置 `config/11_llm.json` 只包含非敏感 profile，并默认关闭：
+项目配置 `config/11_llm.json` 只包含非敏感 profile。当前仓库已因受控 LLM 业务显式
+开启全局和 `semantic_extraction` profile；是否能够调用仍取决于运行环境 key，且各业务
+必须使用自己的独立 enable/write gate，公共 profile 开启不代表画像等业务自动开启：
 
 - profile：`semantic_extraction`
 - provider：`openai_compatible`

@@ -16,7 +16,10 @@
 | profile 级并发/RPM 限制 | 业务审计落库和报告生成 |
 | request/response hash、usage、latency、错误分类 | 是否保存 raw prompt/response |
 
-网关默认关闭。即使配置文件存在 profile，也必须同时满足顶层 `llm.enabled=true`、profile `enabled=true`、合法 URL、合法模型名和可用 API key 才会发出请求。网关不在 import 阶段加载密钥、探测模型或发起网络请求。
+网关数据模型和缺省配置为关闭；当前仓库的 `semantic_extraction` 运维 profile 已由受控
+业务显式开启。无论仓库配置如何，只有同时满足顶层 `llm.enabled=true`、profile
+`enabled=true`、合法 URL、合法模型名和可用 API key 才会发出请求，各业务还必须执行
+自己的独立 enable/write gate。网关不在 import 阶段加载密钥、探测模型或发起网络请求。
 
 ## 2. 模块架构
 
@@ -53,7 +56,8 @@ flowchart LR
 
 ## 3. 配置与密钥
 
-非敏感模板位于 `config/11_llm.json`。当前 profile 示例：
+非敏感配置位于 `config/11_llm.json`。以下保守示例使用关闭状态；当前仓库运维值可因
+已批准业务显式开启，不应把 profile 开启解释为任何业务 candidate writer 已开启：
 
 ```json
 {
