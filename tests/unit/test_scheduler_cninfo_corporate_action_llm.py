@@ -7,6 +7,7 @@ import pytest
 from scheduler.tasks import (
     ScheduledTasks,
     _format_cninfo_corporate_action_llm_report,
+    _format_cninfo_resolution_governance_report,
     data_manager,
 )
 
@@ -20,6 +21,15 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert job["parameters"]["refresh_documents"] is False
     assert job["parameters"]["auto_promote_validated"] is True
     assert job["parameters"]["exclude_reviewed_events"] is False
+    governance = config["scheduler_config"]["jobs"][
+        "a_share_cninfo_corporate_action_resolution_governance"
+    ]
+    assert governance["manual_only"] is True
+    assert governance["parameters"]["dry_run"] is True
+    assert governance["parameters"]["scopes"] == [
+        "inventory", "discovery", "resolution"
+    ]
+    assert governance["parameters"]["retry_evidence_unavailable"] is False
     incremental = config["scheduler_config"]["jobs"][
         "a_share_cninfo_corporate_action_llm_incremental"
     ]
@@ -79,6 +89,28 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     })
     assert "attempts=2" in failure_report
     assert "LLM provider request timed out" in failure_report
+    governance_report = _format_cninfo_resolution_governance_report({
+        "status": "dry_run",
+        "dry_run": True,
+        "parameters": {
+            "start_date": "1990-12-19",
+            "end_date": "2026-07-21",
+            "exchanges": ["SSE", "SZSE"],
+            "scopes": ["inventory"],
+        },
+        "inventory": {
+            "total_events": 381,
+            "actionable_events": 380,
+            "terminal_events": 1,
+            "factor_blocking_events": 380,
+            "source_unsupported_events": 0,
+            "state_counts": {"discovery_pending": 115},
+            "next_action_counts": {"discover_official_announcements": 115},
+        },
+        "targets": {"eligible_events": 380, "batch_events": 100},
+    })
+    assert "factor_blocking=380" in governance_report
+    assert "discovery_pending: 115" in governance_report
 
 
 @pytest.mark.asyncio
@@ -105,13 +137,44 @@ async def test_incremental_resolution_excludes_reviewed_events(monkeypatch):
     delegated = AsyncMock(return_value={"status": "dry_run"})
     monkeypatch.setattr(
         task,
-        "a_share_cninfo_corporate_action_llm_resolution",
+        "a_share_cninfo_corporate_action_resolution_governance",
         delegated,
     )
 
     result = await task.a_share_cninfo_corporate_action_llm_incremental()
 
     assert result["status"] == "dry_run"
-    assert delegated.await_args.kwargs["discover_candidates"] is True
+    assert delegated.await_args.kwargs["scopes"] == [
+        "inventory", "discovery", "resolution"
+    ]
     assert delegated.await_args.kwargs["target_offset"] == 0
     assert delegated.await_args.kwargs["exclude_reviewed_events"] is True
+
+
+@pytest.mark.asyncio
+async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    operation = AsyncMock(return_value={"status": "dry_run", "dry_run": True})
+    monkeypatch.setattr(
+        data_manager,
+        "govern_cninfo_corporate_action_resolutions",
+        operation,
+    )
+
+    result = await task.a_share_cninfo_corporate_action_resolution_governance(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE", "SZSE"],
+        scopes=["inventory", "discovery"],
+        max_events=50,
+        dry_run=True,
+    )
+
+    assert result["status"] == "dry_run"
+    assert operation.await_args.kwargs["max_events"] == 50
+    assert operation.await_args.kwargs["scopes"] == ["inventory", "discovery"]
+    assert (
+        "a_share_cninfo_corporate_action_resolution_governance"
+        not in task._active_tasks
+    )

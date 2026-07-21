@@ -315,10 +315,41 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_cninfo_corporate_action_resolution_governance": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股CNInfo公司行动缺失生效日期的全市场库存、公告发现、LLM解析及可选因子重建闭环治理",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE"],
+          "instrument_ids": [],
+          "scopes": ["inventory", "discovery", "resolution"],
+          "max_events": 100,
+          "target_offset": 0,
+          "profile": "semantic_extraction",
+          "resume": true,
+          "dry_run": true,
+          "download_documents": true,
+          "run_ocr": false,
+          "refresh_documents": false,
+          "auto_promote_validated": true,
+          "exclude_reviewed_events": true,
+          "retry_evidence_unavailable": false,
+          "request_interval_seconds": 0.5,
+          "sample_limit": 20,
+          "max_runtime_seconds": 86400
+        }
+      },
       "a_share_cninfo_corporate_action_llm_incremental": {
         "enabled": false,
         "manual_only": false,
-        "description": "A股巨潮新增公司行动公告发现与正文解析（默认关闭，高置信自动晋级）",
+        "description": "A股巨潮新增公司行动缺失日期闭环治理（默认关闭，高置信自动晋级）",
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-fri",

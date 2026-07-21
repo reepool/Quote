@@ -512,6 +512,56 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
+    """Build a bounded full-market unresolved-event governance report."""
+    inventory = result.get("inventory") or {}
+    targets = result.get("targets") or {}
+    parameters = result.get("parameters") or {}
+    state_counts = inventory.get("state_counts") or {}
+    next_actions = inventory.get("next_action_counts") or {}
+    lines = [
+        "ℹ️ *A 股 CNInfo 公司行动日期闭环治理*",
+        "",
+        f"结论: *{'预演完成' if result.get('dry_run') else '部分完成' if result.get('status') == 'partial' else '完成'}*",
+        f"状态: `{result.get('status')}`",
+        f"dry_run: `{result.get('dry_run')}`",
+        f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"scopes: `{','.join(parameters.get('scopes') or [])}`",
+        "库存: `"
+        f"total={inventory.get('total_events', 0)}, "
+        f"actionable={inventory.get('actionable_events', 0)}, "
+        f"terminal={inventory.get('terminal_events', 0)}, "
+        f"factor_blocking={inventory.get('factor_blocking_events', 0)}, "
+        f"source_unsupported={inventory.get('source_unsupported_events', 0)}`",
+        "本批: `"
+        f"eligible={targets.get('eligible_events', 0)}, "
+        f"processable={targets.get('processable_events', 0)}, "
+        f"batch={targets.get('batch_events', 0)}, "
+        f"has_more={targets.get('has_more', False)}, "
+        f"next_offset={targets.get('next_target_offset')}`",
+        f"状态写入: `{result.get('state_write') or {}}`",
+        f"阶段异常: `{','.join(result.get('stage_failures') or []) or '无'}`",
+        "说明: 原始 CNInfo 事件不修改；北交所不进入 CNInfo 公告解析。",
+    ]
+    if state_counts:
+        lines.extend([
+            "",
+            "状态分布:",
+            "```text",
+            *(f"{key}: {value}" for key, value in sorted(state_counts.items())),
+            "```",
+        ])
+    if next_actions:
+        lines.extend([
+            "下一步分布:",
+            "```text",
+            *(f"{key}: {value}" for key, value in sorted(next_actions.items())),
+            "```",
+        ])
+    return "\n".join(lines)
+
+
 def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     """Build a bounded adjustment-factor governance report."""
     icon, label = _format_scheduler_status(result.get("status"))
@@ -4591,13 +4641,14 @@ class ScheduledTasks:
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Default-disabled daily candidate discovery and analysis entry point."""
+        """Default-disabled daily unresolved-event governance entry point."""
         end = get_shanghai_time().date()
         start = end - timedelta(days=max(1, int(lookback_days)))
-        return await self.a_share_cninfo_corporate_action_llm_resolution(
+        return await self.a_share_cninfo_corporate_action_resolution_governance(
             start_date=start,
             end_date=end,
             exchanges=exchanges or ["SSE", "SZSE"],
+            scopes=["inventory", "discovery", "resolution"],
             max_events=max_events,
             target_offset=0,
             profile=profile,
@@ -4606,12 +4657,85 @@ class ScheduledTasks:
             download_documents=download_documents,
             run_ocr=run_ocr,
             refresh_documents=refresh_documents,
-            discover_candidates=True,
             auto_promote_validated=auto_promote_validated,
             exclude_reviewed_events=exclude_reviewed_events,
             sample_limit=sample_limit,
             job_config=job_config,
         )
+
+    async def a_share_cninfo_corporate_action_resolution_governance(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        scopes: Optional[List[str]] = None,
+        max_events: int = 100,
+        target_offset: int = 0,
+        profile: str = "semantic_extraction",
+        resume: bool = True,
+        dry_run: bool = True,
+        download_documents: bool = True,
+        run_ocr: bool = False,
+        refresh_documents: bool = False,
+        auto_promote_validated: bool = True,
+        exclude_reviewed_events: bool = True,
+        retry_evidence_unavailable: bool = False,
+        request_interval_seconds: float = 0.5,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run bounded full-market CNInfo unresolved-date governance."""
+        task_id = "a_share_cninfo_corporate_action_resolution_governance"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.govern_cninfo_corporate_action_resolutions(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                scopes=scopes,
+                max_events=int(max_events),
+                target_offset=int(target_offset),
+                profile=profile,
+                resume=bool(resume),
+                dry_run=bool(dry_run),
+                download_documents=bool(download_documents),
+                run_ocr=bool(run_ocr),
+                refresh_documents=bool(refresh_documents),
+                auto_promote_validated=bool(auto_promote_validated),
+                exclude_reviewed_events=bool(exclude_reviewed_events),
+                retry_evidence_unavailable=bool(retry_evidence_unavailable),
+                request_interval_seconds=float(request_interval_seconds),
+                sample_limit=int(sample_limit),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股 CNInfo 公司行动日期闭环治理",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_resolution_governance_report(result),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] CNInfo resolution governance failed: %s", exc
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
 
     async def a_share_cninfo_adjustment_factor_rebuild(
         self,

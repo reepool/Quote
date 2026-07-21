@@ -57,6 +57,20 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
                 }],
             }
         ),
+        get_corporate_action_resolution_states=AsyncMock(
+            return_value={
+                "total": 1,
+                "limit": 10,
+                "offset": 0,
+                "returned": 1,
+                "has_more": False,
+                "items": [{
+                    "instrument_id": "000001.SZ",
+                    "source_event_key": "event-1",
+                    "resolution_state": "candidate_pending_analysis",
+                }],
+            }
+        ),
     )
     monkeypatch.setattr(routes, "data_manager", SimpleNamespace(db_ops=db_ops))
 
@@ -88,10 +102,22 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
         limit=10,
         offset=0,
     )
+    states = await routes.get_corporate_action_resolution_states(
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        resolution_state="candidate_pending_analysis",
+        is_terminal=False,
+        factor_blocking=True,
+        next_action="semantic_resolution",
+        current_only=True,
+        limit=10,
+        offset=0,
+    )
 
     assert observations.dataset == "corporate_action_observations"
     assert coverage.dataset == "corporate_action_instrument_status"
     assert evidence.dataset == "corporate_action_effective_date_evidence"
+    assert states.dataset == "corporate_action_resolution_states"
     assert db_ops.get_corporate_action_observations.await_args.kwargs[
         "start_date"
     ] == date(2026, 1, 1)
@@ -108,3 +134,9 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
     assert db_ops.get_corporate_action_effective_date_evidence.await_args.kwargs[
         "resolution_status"
     ] == "candidate"
+    assert db_ops.get_corporate_action_resolution_states.await_args.kwargs[
+        "factor_blocking"
+    ] is True
+    assert db_ops.get_corporate_action_resolution_states.await_args.kwargs[
+        "current_only"
+    ] is True

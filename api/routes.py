@@ -3376,6 +3376,56 @@ async def get_corporate_action_effective_date_evidence(
 
 
 @router.get(
+    "/corporate-actions/resolution-states",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_resolution_states(
+    instrument_id: Optional[str] = Query(None),
+    source_event_key: Optional[str] = Query(None),
+    resolution_state: Optional[str] = Query(None),
+    is_terminal: Optional[bool] = Query(None),
+    factor_blocking: Optional[bool] = Query(None),
+    next_action: Optional[str] = Query(None),
+    current_only: bool = Query(True),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query current event-level CNInfo resolution governance state."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    normalized_state = _normalize_optional_query(resolution_state)
+    normalized_action = _normalize_optional_query(next_action)
+    page = await data_manager.db_ops.get_corporate_action_resolution_states(
+        instrument_id=normalized_id,
+        source_event_key=_normalize_optional_query(source_event_key),
+        resolution_state=normalized_state,
+        is_terminal=is_terminal,
+        factor_blocking=factor_blocking,
+        next_action=normalized_action,
+        current_only=bool(_query_default(current_only, True)),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_resolution_states",
+        filters={
+            "instrument_id": normalized_id,
+            "source_event_key": _normalize_optional_query(source_event_key),
+            "resolution_state": normalized_state,
+            "is_terminal": is_terminal,
+            "factor_blocking": factor_blocking,
+            "next_action": normalized_action,
+            "current_only": bool(_query_default(current_only, True)),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
     "/corporate-actions/document-artifacts",
     response_model=AdjustmentFactorPageResponse,
     tags=["Corporate Actions"],

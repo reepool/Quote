@@ -99,11 +99,15 @@ def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
     manager = DataManager()
     manager.db_ops = Mock()
     normalized_event_rows = list(event_rows or [_event_row()])
-    normalized_adjacent_rows = list(adjacent_rows or [{
-        "instrument_id": "600108.SH",
-        "announcement_date": date(2006, 6, 9),
-        "record_date": date(2006, 6, 12),
-    }])
+    normalized_adjacent_rows = list(
+        adjacent_rows
+        if adjacent_rows is not None
+        else [{
+            "instrument_id": "600108.SH",
+            "announcement_date": date(2006, 6, 9),
+            "record_date": date(2006, 6, 12),
+        }]
+    )
 
     async def execute_read_query(query, _params):
         if "quality_status = 'partial_missing_ex_date'" in query:
@@ -155,6 +159,24 @@ async def test_discovery_dry_run_scans_candidates_but_does_not_write():
     manager._announcement_test_storage.store_announcement_audit.assert_not_called()
     manager._announcement_test_storage.start_ingestion_run.assert_not_called()
     manager._announcement_test_storage.finish_ingestion_run.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_discovery_filters_exact_source_event_keys():
+    manager = _manager()
+
+    await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        source_event_keys=["event-1"],
+        dry_run=True,
+        max_events=10,
+    )
+
+    query, params = manager.db_ops.execute_read_query.await_args_list[0].args
+    assert "source_event_key IN" in query
+    assert params["source_event_key_0"] == "event-1"
 
 
 @pytest.mark.asyncio
@@ -358,3 +380,44 @@ async def test_discovery_excludes_unanchored_window_outside_requested_range(
     assert result["targets"]["searchable_events"] == 0
     assert result["targets"]["skipped_outside_range"] == 1
     assert result["evidence"]["candidate_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_exact_event_key_can_resolve_a_late_observation_outside_range():
+    manager = _manager()
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="2026-07-07",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        source_event_keys=["event-1"],
+        dry_run=True,
+        max_events=1,
+    )
+
+    assert result["targets"]["searchable_events"] == 1
+    assert result["targets"]["skipped_outside_range"] == 0
+
+
+@pytest.mark.asyncio
+async def test_discovery_reports_event_key_for_unbounded_anchor():
+    row = {
+        **_event_row(announcement_date=None, record_date=None),
+        "fiscal_period": None,
+        "share_arrival_date": None,
+    }
+    manager = _manager(event_rows=[row], adjacent_rows=[])
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=True,
+    )
+
+    assert result["targets"]["skipped_without_bounded_anchor"] == 1
+    assert result["skipped_samples"] == [{
+        "instrument_id": "600108.SH",
+        "source_event_key": "event-1",
+        "reason": "unbounded_anchor",
+    }]

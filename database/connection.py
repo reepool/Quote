@@ -169,6 +169,7 @@ class DatabaseManager:
             CorporateActionLlmAnalysisDB,
             CorporateActionResolutionReviewDB,
             CorporateActionResolvedTermsDB,
+            CorporateActionResolutionStateDB,
         )
 
         tables = (
@@ -180,6 +181,7 @@ class DatabaseManager:
             CorporateActionLlmAnalysisDB.__table__,
             CorporateActionResolutionReviewDB.__table__,
             CorporateActionResolvedTermsDB.__table__,
+            CorporateActionResolutionStateDB.__table__,
         )
         with self.sync_engine.begin() as connection:
             for table in tables:

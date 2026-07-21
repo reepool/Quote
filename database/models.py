@@ -714,6 +714,54 @@ class CorporateActionResolvedTermsDB(Base):
     )
 
 
+class CorporateActionResolutionStateDB(Base):
+    """Current operational state for one governed CNInfo source event."""
+    __tablename__ = 'corporate_action_resolution_states'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source_event_key = Column(String(64), nullable=False, index=True)
+    source_profile = Column(String(64), nullable=False, index=True)
+    action_type = Column(String(32), nullable=True, index=True)
+    exchange = Column(String(16), nullable=False, index=True)
+    policy_version = Column(String(64), nullable=False)
+    state_version = Column(String(64), nullable=False)
+    resolution_state = Column(String(32), nullable=False, index=True)
+    is_terminal = Column(Boolean, nullable=False, default=False, index=True)
+    factor_blocking = Column(Boolean, nullable=False, default=True, index=True)
+    state_reason = Column(String(128), nullable=False)
+    next_action = Column(String(64), nullable=False, index=True)
+    candidate_count = Column(Integer, nullable=False, default=0)
+    latest_analysis_id = Column(
+        Integer, ForeignKey('corporate_action_llm_analyses.id'), nullable=True, index=True
+    )
+    latest_review_id = Column(
+        Integer, ForeignKey('corporate_action_resolution_reviews.id'), nullable=True,
+        index=True,
+    )
+    resolved_effective_date = Column(DateTime, nullable=True, index=True)
+    last_attempt_at = Column(DateTime, nullable=True, index=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    diagnostics_json = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'source_event_key',
+            name='uq_corporate_action_resolution_state_event',
+        ),
+        Index(
+            'idx_corporate_action_resolution_state_queue',
+            'resolution_state', 'is_terminal', 'next_action',
+        ),
+    )
+
+
 class DataChangeLogDB(Base):
     """Append-only local-observed change records for incremental sync."""
     __tablename__ = 'data_change_log'

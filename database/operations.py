@@ -31,8 +31,15 @@ from .models import (
     CorporateActionEffectiveDateEvidenceDB,
     CorporateActionDocumentArtifactDB, CorporateActionDocumentPageDB,
     CorporateActionLlmAnalysisDB, CorporateActionResolutionReviewDB,
-    CorporateActionResolvedTermsDB,
+    CorporateActionResolvedTermsDB, CorporateActionResolutionStateDB,
     DataChangeLogDB,
+)
+
+
+GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES = (
+    "cninfo_reviewed_official_document",
+    "cninfo_announcement_review",
+    "cninfo_announcement",
 )
 
 
@@ -5398,6 +5405,193 @@ class DatabaseOperations:
                 "items": items,
             }
 
+    async def upsert_corporate_action_resolution_states(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Persist current event-level governance projections idempotently."""
+        allowed_states = {
+            "resolved_source", "resolved_evidence", "not_applicable",
+            "source_not_supported", "candidate_pending_analysis",
+            "validated_candidate", "machine_rework", "manual_required",
+            "conflict", "non_effective", "superseded",
+            "evidence_unavailable", "discovery_pending", "retryable_error",
+        }
+        counters = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
+        if not rows:
+            return counters
+        async with self.get_async_session() as session:
+            async with session.begin():
+                for row in rows:
+                    instrument_id = str(row.get("instrument_id") or "").strip()
+                    source_event_key = str(row.get("source_event_key") or "").strip()
+                    source_profile = str(row.get("source_profile") or "").strip()
+                    exchange = str(row.get("exchange") or "").strip().upper()
+                    state = str(row.get("resolution_state") or "").strip().lower()
+                    if not all((instrument_id, source_event_key, source_profile, exchange)):
+                        counters["failed"] += 1
+                        continue
+                    if state not in allowed_states:
+                        raise ValueError(f"unsupported corporate-action resolution state: {state}")
+                    values = {
+                        "source_profile": source_profile,
+                        "action_type": row.get("action_type"),
+                        "exchange": exchange,
+                        "policy_version": str(row.get("policy_version") or ""),
+                        "state_version": str(row.get("state_version") or ""),
+                        "resolution_state": state,
+                        "is_terminal": bool(row.get("is_terminal")),
+                        "factor_blocking": bool(row.get("factor_blocking")),
+                        "state_reason": str(row.get("state_reason") or "unknown")[:128],
+                        "next_action": str(row.get("next_action") or "unknown")[:64],
+                        "candidate_count": max(0, int(row.get("candidate_count") or 0)),
+                        "latest_analysis_id": row.get("latest_analysis_id"),
+                        "latest_review_id": row.get("latest_review_id"),
+                        "resolved_effective_date": self._coerce_datetime(
+                            row.get("resolved_effective_date")
+                        ),
+                        "last_attempt_at": self._coerce_datetime(
+                            row.get("last_attempt_at")
+                        ),
+                        "ingestion_run_id": ingestion_run_id,
+                        "diagnostics_json": json.dumps(
+                            row.get("diagnostics") or {},
+                            ensure_ascii=True,
+                            sort_keys=True,
+                            default=str,
+                        ),
+                    }
+                    if not values["policy_version"] or not values["state_version"]:
+                        raise ValueError("resolution state versions are required")
+                    existing = await session.scalar(
+                        select(CorporateActionResolutionStateDB).where(
+                            CorporateActionResolutionStateDB.instrument_id
+                            == instrument_id,
+                            CorporateActionResolutionStateDB.source_event_key
+                            == source_event_key,
+                        )
+                    )
+                    if existing is None:
+                        session.add(CorporateActionResolutionStateDB(
+                            instrument_id=instrument_id,
+                            source_event_key=source_event_key,
+                            **values,
+                        ))
+                        counters["inserted"] += 1
+                        continue
+                    if values["last_attempt_at"] is None:
+                        values["last_attempt_at"] = existing.last_attempt_at
+                    changed = any(getattr(existing, key) != value for key, value in values.items())
+                    if changed:
+                        for key, value in values.items():
+                            setattr(existing, key, value)
+                        existing.updated_at = get_shanghai_time()
+                        counters["changed"] += 1
+                    else:
+                        counters["unchanged"] += 1
+        return counters
+
+    async def get_corporate_action_resolution_states(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        source_event_key: Optional[str] = None,
+        resolution_state: Optional[str] = None,
+        is_terminal: Optional[bool] = None,
+        factor_blocking: Optional[bool] = None,
+        next_action: Optional[str] = None,
+        current_only: bool = True,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return paginated current corporate-action governance states."""
+        normalized_limit = max(1, min(int(limit), 1000))
+        normalized_offset = max(0, int(offset))
+        filters = []
+        if instrument_id:
+            filters.append(CorporateActionResolutionStateDB.instrument_id == instrument_id)
+        if source_event_key:
+            filters.append(
+                CorporateActionResolutionStateDB.source_event_key == source_event_key
+            )
+        if resolution_state:
+            filters.append(
+                CorporateActionResolutionStateDB.resolution_state == resolution_state
+            )
+        if is_terminal is not None:
+            filters.append(
+                CorporateActionResolutionStateDB.is_terminal.is_(bool(is_terminal))
+            )
+        if factor_blocking is not None:
+            filters.append(
+                CorporateActionResolutionStateDB.factor_blocking.is_(
+                    bool(factor_blocking)
+                )
+            )
+        if next_action:
+            filters.append(CorporateActionResolutionStateDB.next_action == next_action)
+        if current_only:
+            filters.append(
+                CorporateActionResolutionStateDB.source_event_key.in_(
+                    select(CorporateActionObservationDB.source_event_key).where(
+                        CorporateActionObservationDB.source == "cninfo",
+                        CorporateActionObservationDB.is_current.is_(True),
+                    )
+                )
+            )
+        async with self.get_async_session() as session:
+            total = await session.scalar(
+                select(func.count())
+                .select_from(CorporateActionResolutionStateDB)
+                .where(*filters)
+            )
+            rows = (await session.execute(
+                select(CorporateActionResolutionStateDB)
+                .where(*filters)
+                .order_by(
+                    CorporateActionResolutionStateDB.is_terminal,
+                    CorporateActionResolutionStateDB.instrument_id,
+                    CorporateActionResolutionStateDB.source_event_key,
+                )
+                .offset(normalized_offset)
+                .limit(normalized_limit)
+            )).scalars().all()
+            items = [{
+                "state_id": row.id,
+                "instrument_id": row.instrument_id,
+                "source_event_key": row.source_event_key,
+                "source_profile": row.source_profile,
+                "action_type": row.action_type,
+                "exchange": row.exchange,
+                "policy_version": row.policy_version,
+                "state_version": row.state_version,
+                "resolution_state": row.resolution_state,
+                "is_terminal": bool(row.is_terminal),
+                "factor_blocking": bool(row.factor_blocking),
+                "state_reason": row.state_reason,
+                "next_action": row.next_action,
+                "candidate_count": row.candidate_count,
+                "latest_analysis_id": row.latest_analysis_id,
+                "latest_review_id": row.latest_review_id,
+                "resolved_effective_date": row.resolved_effective_date,
+                "last_attempt_at": row.last_attempt_at,
+                "ingestion_run_id": row.ingestion_run_id,
+                "diagnostics": json.loads(row.diagnostics_json or "{}"),
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            } for row in rows]
+            total_value = int(total or 0)
+            return {
+                "total": total_value,
+                "limit": normalized_limit,
+                "offset": normalized_offset,
+                "returned": len(items),
+                "has_more": normalized_offset + len(items) < total_value,
+                "items": items,
+            }
+
     async def get_corporate_action_effective_date_evidence(
         self,
         *,
@@ -5509,11 +5703,7 @@ class DatabaseOperations:
                         CorporateActionEffectiveDateEvidenceDB.observation_source
                         == "cninfo",
                         CorporateActionEffectiveDateEvidenceDB.evidence_source.in_(
-                            (
-                                "cninfo_reviewed_official_document",
-                                "cninfo_announcement_review",
-                                "cninfo_announcement",
-                            )
+                            GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
                         ),
                         CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(
                             None

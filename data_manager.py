@@ -35,7 +35,10 @@ import pandas as pd
 from utils import dm_logger, config_manager, log_execution, LogContext, TelegramBot
 # 直接导入代码转换工具，避免依赖问题
 from utils.code_utils import convert_to_database_format
-from database.operations import DatabaseOperations
+from database.operations import (
+    DatabaseOperations,
+    GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES,
+)
 from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateInfo, GapSkipDB
 # Note: get_data_source_factory will be imported dynamically to avoid circular import
 from utils.date_utils import DateUtils, get_shanghai_time
@@ -18779,6 +18782,658 @@ class DataManager:
             'errors': errors,
         }
 
+    async def _load_cninfo_resolution_governance_inventory(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        exchanges: List[str],
+        instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
+        scan_status_by_event: Optional[Dict[str, str]] = None,
+        error_by_event: Optional[Dict[str, str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Load authoritative layers and derive current unresolved event states."""
+        from data_sources.cninfo_resolution_governance import (
+            APPLICABILITY_POLICY_VERSION,
+            derive_resolution_state,
+        )
+
+        suffixes = {"SSE": ".SH", "SZSE": ".SZ", "BSE": ".BJ"}
+        params: Dict[str, Any] = {
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+            "start_year": start_date.year,
+            "end_year": end_date.year,
+        }
+        governed_source_params: Dict[str, str] = {}
+        governed_source_placeholders = []
+        for index, evidence_source in enumerate(
+            GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+        ):
+            key = f"governed_evidence_source_{index}"
+            governed_source_params[key] = evidence_source
+            governed_source_placeholders.append(f":{key}")
+        exchange_filters = []
+        for index, exchange in enumerate(exchanges):
+            key = f"governance_suffix_{index}"
+            params[key] = f"%{suffixes[exchange]}"
+            exchange_filters.append(f"instrument_id LIKE :{key}")
+        if not exchange_filters:
+            return []
+        instrument_filter = ""
+        normalized_ids = sorted({
+            str(item).strip() for item in (instrument_ids or []) if str(item).strip()
+        })
+        if normalized_ids:
+            placeholders = []
+            for index, instrument_id in enumerate(normalized_ids):
+                key = f"governance_instrument_{index}"
+                params[key] = instrument_id
+                placeholders.append(f":{key}")
+            instrument_filter = f" AND instrument_id IN ({', '.join(placeholders)})"
+        event_filter = ""
+        normalized_event_keys = sorted({
+            str(item).strip()
+            for item in (source_event_keys or [])
+            if str(item).strip()
+        })
+        if normalized_event_keys:
+            placeholders = []
+            for index, source_event_key in enumerate(normalized_event_keys):
+                key = f"governance_event_{index}"
+                params[key] = source_event_key
+                placeholders.append(f":{key}")
+            event_filter = f" AND source_event_key IN ({', '.join(placeholders)})"
+        rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT instrument_id, source_profile, source_event_key, action_type,
+                   fiscal_period, announcement_date, record_date, ex_date,
+                   pay_date, share_arrival_date, cash_dividend_per_share,
+                   bonus_shares_per_share, capitalization_shares_per_share,
+                   rights_shares_per_share, rights_price, event_status,
+                   quality_status, description
+            FROM corporate_action_observations
+            WHERE source = 'cninfo'
+              AND is_current = 1
+              AND source_profile IN ('cninfo_dividend', 'cninfo_allotment')
+              AND (
+                    ex_date IS NULL
+                    OR EXISTS (
+                        SELECT 1
+                        FROM corporate_action_resolution_states state
+                        WHERE state.instrument_id =
+                              corporate_action_observations.instrument_id
+                          AND state.source_event_key =
+                              corporate_action_observations.source_event_key
+                    )
+                  )
+              AND ({' OR '.join(exchange_filters)})
+              {instrument_filter}
+              {event_filter}
+              AND (
+                    date(announcement_date) BETWEEN :start_date AND :end_date
+                    OR date(record_date) BETWEEN :start_date AND :end_date
+                    OR date(share_arrival_date) BETWEEN :start_date AND :end_date
+                    OR CAST(substr(fiscal_period, 1, 4) AS INTEGER)
+                       BETWEEN :start_year AND :end_year
+                    OR date(created_at) BETWEEN :start_date AND :end_date
+                    OR date(updated_at) BETWEEN :start_date AND :end_date
+                    OR (
+                        announcement_date IS NULL
+                        AND record_date IS NULL
+                        AND share_arrival_date IS NULL
+                        AND (
+                            fiscal_period IS NULL
+                            OR trim(fiscal_period) = ''
+                        )
+                    )
+                  )
+            ORDER BY instrument_id, source_event_key
+            """,
+            params,
+        )
+        event_keys = [
+            str(row.get("source_event_key") or "").strip()
+            for row in rows
+            if row.get("source_event_key")
+        ]
+        candidate_counts: Dict[str, int] = {}
+        resolved_by_event: Dict[str, Dict[str, Any]] = {}
+        resolved_dates_by_event: Dict[str, Set[date]] = defaultdict(set)
+        analysis_by_event: Dict[str, Dict[str, Any]] = {}
+        review_by_event: Dict[str, Dict[str, Any]] = {}
+        prior_state_by_event: Dict[str, Dict[str, Any]] = {}
+        for offset in range(0, len(event_keys), 400):
+            chunk = event_keys[offset: offset + 400]
+            chunk_params = dict(governed_source_params)
+            chunk_params.update({
+                f"event_{index}": value for index, value in enumerate(chunk)
+            })
+            placeholders = ", ".join(
+                f":event_{index}" for index in range(len(chunk))
+            )
+            candidate_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT source_event_key, COUNT(*) AS candidate_count
+                FROM corporate_action_effective_date_evidence
+                WHERE source_event_key IN ({placeholders})
+                  AND observation_source = 'cninfo'
+                  AND evidence_source = 'cninfo_announcement_metadata'
+                  AND resolution_status = 'candidate'
+                GROUP BY source_event_key
+                """,
+                chunk_params,
+            )
+            candidate_counts.update({
+                str(item["source_event_key"]): int(item.get("candidate_count") or 0)
+                for item in candidate_rows
+            })
+            resolved_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT id, source_event_key, effective_date, date_basis,
+                       evidence_source, evidence_key
+                FROM corporate_action_effective_date_evidence
+                WHERE source_event_key IN ({placeholders})
+                  AND observation_source = 'cninfo'
+                  AND resolution_status = 'resolved'
+                  AND evidence_source IN (
+                      {', '.join(governed_source_placeholders)}
+                  )
+                  AND effective_date IS NOT NULL
+                ORDER BY source_event_key, updated_at DESC, id DESC
+                """,
+                chunk_params,
+            )
+            for item in resolved_rows:
+                event_key = str(item["source_event_key"])
+                resolved_by_event.setdefault(event_key, item)
+                parsed_date = self._date_from_any(item.get("effective_date"))
+                if parsed_date is not None:
+                    resolved_dates_by_event[event_key].add(parsed_date)
+            analysis_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT id AS analysis_id, source_event_key, validation_status,
+                       result_json, error_code, updated_at
+                FROM corporate_action_llm_analyses
+                WHERE source_event_key IN ({placeholders})
+                ORDER BY source_event_key, updated_at DESC, id DESC
+                """,
+                chunk_params,
+            )
+            for item in analysis_rows:
+                key = str(item["source_event_key"])
+                if key in analysis_by_event:
+                    continue
+                payload = item.get("result_json")
+                if isinstance(payload, str):
+                    try:
+                        payload = json.loads(payload or "{}")
+                    except json.JSONDecodeError:
+                        payload = {}
+                analysis_by_event[key] = {**item, "result": payload or {}}
+            review_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT id AS review_id, source_event_key, decision,
+                       effective_date, date_basis, notes, review_payload_json,
+                       updated_at
+                FROM corporate_action_resolution_reviews
+                WHERE source_event_key IN ({placeholders})
+                ORDER BY source_event_key, updated_at DESC, id DESC
+                """,
+                chunk_params,
+            )
+            for item in review_rows:
+                key = str(item["source_event_key"])
+                if key in review_by_event:
+                    continue
+                payload = item.get("review_payload_json")
+                if isinstance(payload, str):
+                    try:
+                        payload = json.loads(payload or "{}")
+                    except json.JSONDecodeError:
+                        payload = {}
+                review_by_event[key] = {**item, "review_payload": payload or {}}
+            prior_state_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT source_event_key, resolution_state, state_reason,
+                       next_action, last_attempt_at
+                FROM corporate_action_resolution_states
+                WHERE source_event_key IN ({placeholders})
+                """,
+                chunk_params,
+            )
+            prior_state_by_event.update({
+                str(item["source_event_key"]): item for item in prior_state_rows
+            })
+
+        scan_status_by_event = scan_status_by_event or {}
+        error_by_event = error_by_event or {}
+        inventory = []
+        now = get_shanghai_time().replace(tzinfo=None)
+        for row in rows:
+            event_key = str(row.get("source_event_key") or "")
+            resolved = resolved_by_event.get(event_key)
+            analysis = analysis_by_event.get(event_key)
+            review = review_by_event.get(event_key)
+            prior_state = prior_state_by_event.get(event_key) or {}
+            scan_status = scan_status_by_event.get(event_key)
+            if scan_status is None:
+                if prior_state.get("resolution_state") == "evidence_unavailable":
+                    scan_status = "success"
+                elif (
+                    prior_state.get("resolution_state") == "manual_required"
+                    and prior_state.get("state_reason")
+                    == "no_bounded_announcement_search_anchor"
+                ):
+                    scan_status = "unbounded_anchor"
+            event_error = error_by_event.get(event_key)
+            if (
+                event_error is None
+                and prior_state.get("resolution_state") == "retryable_error"
+                and scan_status is None
+                and candidate_counts.get(event_key, 0) == 0
+                and analysis is None
+            ):
+                event_error = str(prior_state.get("state_reason") or "retryable_error")
+            projection = derive_resolution_state(
+                row,
+                candidate_count=candidate_counts.get(event_key, 0),
+                resolved_evidence=resolved,
+                resolved_evidence_conflict=(
+                    len(resolved_dates_by_event.get(event_key, set())) > 1
+                ),
+                latest_analysis=analysis,
+                latest_review=review,
+                scan_status=scan_status,
+                error_code=(
+                    event_error
+                    or (analysis or {}).get("error_code")
+                ),
+            )
+            applicability = projection["applicability"]
+            conflicting_dates = sorted(
+                value.isoformat()
+                for value in resolved_dates_by_event.get(event_key, set())
+            )
+            attempt_times = [
+                self._parse_master_updated_at(prior_state.get("last_attempt_at")),
+                self._parse_master_updated_at((analysis or {}).get("updated_at")),
+            ]
+            last_attempt_at = max(
+                (value for value in attempt_times if value is not None),
+                default=None,
+            )
+            if event_key in scan_status_by_event or event_key in error_by_event:
+                last_attempt_at = now
+            inventory.append({
+                "instrument_id": row.get("instrument_id"),
+                "source_event_key": event_key,
+                "source_profile": row.get("source_profile"),
+                "action_type": row.get("action_type"),
+                "exchange": applicability["exchange"],
+                "policy_version": APPLICABILITY_POLICY_VERSION,
+                "state_version": projection["state_version"],
+                "resolution_state": projection["resolution_state"],
+                "is_terminal": projection["is_terminal"],
+                "factor_blocking": projection["factor_blocking"],
+                "state_reason": projection["state_reason"],
+                "next_action": projection["next_action"],
+                "candidate_count": candidate_counts.get(event_key, 0),
+                "latest_analysis_id": (analysis or {}).get("analysis_id"),
+                "latest_review_id": (review or {}).get("review_id"),
+                "resolved_effective_date": (
+                    None
+                    if projection["resolution_state"] == "conflict"
+                    else (
+                        (resolved or {}).get("effective_date")
+                        or (review or {}).get("effective_date")
+                    )
+                ),
+                "last_attempt_at": last_attempt_at,
+                "diagnostics": {
+                    "required_date_roles": applicability["required_date_roles"],
+                    "supporting_date_roles": applicability["supporting_date_roles"],
+                    "missing_required_date_roles": applicability[
+                        "missing_required_date_roles"
+                    ],
+                    "event_status": row.get("event_status"),
+                    "quality_status": row.get("quality_status"),
+                    "scan_status": scan_status,
+                    "prior_resolution_state": prior_state.get("resolution_state"),
+                    "latest_validation_status": (
+                        (analysis or {}).get("validation_status")
+                    ),
+                    "latest_review_decision": (review or {}).get("decision"),
+                    "resolved_effective_date_count": len(
+                        resolved_dates_by_event.get(event_key, set())
+                    ),
+                    "conflicting_resolved_effective_dates": (
+                        conflicting_dates if len(conflicting_dates) > 1 else []
+                    ),
+                },
+            })
+        return inventory
+
+    async def govern_cninfo_corporate_action_resolutions(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        scopes: Optional[List[str]] = None,
+        max_events: int = 100,
+        target_offset: int = 0,
+        profile: str = "semantic_extraction",
+        resume: bool = True,
+        dry_run: bool = True,
+        download_documents: bool = True,
+        run_ocr: bool = False,
+        refresh_documents: bool = False,
+        auto_promote_validated: bool = True,
+        exclude_reviewed_events: bool = True,
+        retry_evidence_unavailable: bool = False,
+        request_interval_seconds: float = 0.5,
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Govern unresolved CNInfo events through bounded reusable stages."""
+        from utils.a_share_historical_backfill import (
+            coerce_date,
+            normalize_string_list,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        normalized_exchanges = [
+            item.upper() for item in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE"]
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE", "BSE"})
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        normalized_ids = normalize_string_list(instrument_ids)
+        normalized_scopes = [
+            item.lower() for item in normalize_string_list(scopes)
+        ] or ["inventory", "discovery", "resolution"]
+        allowed_scopes = {"inventory", "discovery", "resolution", "factors"}
+        invalid_scopes = sorted(set(normalized_scopes) - allowed_scopes)
+        if invalid_scopes:
+            raise ValueError(f"unsupported governance scopes: {invalid_scopes}")
+        if "inventory" not in normalized_scopes:
+            normalized_scopes.insert(0, "inventory")
+        limit = max(1, min(int(max_events), 400))
+        offset = max(0, int(target_offset))
+        run_id = "a_share_cninfo_resolution_governance_" + hashlib.sha256(
+            json.dumps({
+                "start": normalized_start.isoformat(),
+                "end": normalized_end.isoformat(),
+                "exchanges": normalized_exchanges,
+                "instrument_ids": sorted(normalized_ids),
+                "scopes": normalized_scopes,
+                "max_events": limit,
+                "offset": offset,
+                "retry_evidence_unavailable": bool(
+                    retry_evidence_unavailable
+                ),
+            }, sort_keys=True).encode("utf-8")
+        ).hexdigest()[:16]
+        dm_logger.info(
+            "[DataManager] CNInfo resolution governance started: run_id=%s "
+            "range=%s..%s exchanges=%s scopes=%s max_events=%s offset=%s dry_run=%s",
+            run_id, normalized_start, normalized_end, normalized_exchanges,
+            normalized_scopes, limit, offset, dry_run,
+        )
+        inventory = await self._load_cninfo_resolution_governance_inventory(
+            start_date=normalized_start,
+            end_date=normalized_end,
+            exchanges=normalized_exchanges,
+            instrument_ids=normalized_ids or None,
+        )
+        actionable = [
+            item for item in inventory
+            if not item["is_terminal"] and item["exchange"] in {"SSE", "SZSE"}
+        ]
+        processable_next_actions = set()
+        if "discovery" in normalized_scopes:
+            processable_next_actions.update({
+                "discover_official_announcements",
+                "write_discovery_candidates",
+                "retry_failed_stage",
+            })
+            if retry_evidence_unavailable:
+                processable_next_actions.add("retry_discovery")
+        if "resolution" in normalized_scopes:
+            processable_next_actions.update({
+                "semantic_resolution",
+                "retry_or_review",
+                "retry_failed_stage",
+                "auto_promote_or_review",
+            })
+        processable = [
+            item for item in actionable
+            if item["next_action"] in processable_next_actions
+        ]
+        batch = processable[offset: offset + limit]
+        batch_keys = [item["source_event_key"] for item in batch]
+        batch_key_set = set(batch_keys)
+        batch_instruments = sorted({str(item["instrument_id"]) for item in batch})
+        has_more = offset + len(batch) < len(processable)
+        stage_results: Dict[str, Any] = {"inventory": {"status": "success"}}
+        error_by_event: Dict[str, str] = {}
+        scan_status_by_event: Dict[str, str] = {}
+
+        if "discovery" in normalized_scopes:
+            discovery_keys = [
+                item["source_event_key"]
+                for item in batch
+                if item["next_action"] in {
+                    "discover_official_announcements", "retry_discovery",
+                    "retry_failed_stage", "manual_anchor_or_external_evidence",
+                }
+                and item["candidate_count"] == 0
+            ]
+            if discovery_keys:
+                dm_logger.info(
+                    "[DataManager] CNInfo resolution governance discovery: "
+                    "run_id=%s events=%s", run_id, len(discovery_keys),
+                )
+                discovery_result = await self.discover_cninfo_special_action_effective_dates(
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                    exchanges=normalized_exchanges,
+                    instrument_ids=batch_instruments or None,
+                    source_event_keys=discovery_keys,
+                    dry_run=bool(dry_run),
+                    max_events=len(discovery_keys),
+                    target_offset=0,
+                    request_interval_seconds=request_interval_seconds,
+                    sample_limit=max(len(discovery_keys), int(sample_limit)),
+                )
+                stage_results["discovery"] = discovery_result
+                for item in discovery_result.get("target_samples") or []:
+                    event_key = str(item.get("source_event_key") or "")
+                    scan_status_by_event[event_key] = (
+                        "candidates_unpersisted"
+                        if dry_run and int(item.get("candidate_count") or 0) > 0
+                        else "success" if int(item.get("candidate_count") or 0) > 0
+                        else "partial_no_candidates"
+                    )
+                for item in discovery_result.get("skipped_samples") or []:
+                    event_key = str(item.get("source_event_key") or "")
+                    if event_key and item.get("reason") == "unbounded_anchor":
+                        scan_status_by_event[event_key] = "unbounded_anchor"
+                for item in discovery_result.get("errors") or []:
+                    event_key = str(item.get("source_event_key") or "")
+                    if event_key:
+                        error_by_event[event_key] = str(
+                            item.get("error") or "announcement_discovery_failed"
+                        )
+            else:
+                stage_results["discovery"] = {
+                    "status": "skipped", "reason": "no_discovery_targets"
+                }
+
+        if not dry_run and "discovery" in normalized_scopes:
+            inventory = await self._load_cninfo_resolution_governance_inventory(
+                start_date=normalized_start,
+                end_date=normalized_end,
+                exchanges=normalized_exchanges,
+                instrument_ids=normalized_ids or None,
+                scan_status_by_event=scan_status_by_event,
+                error_by_event=error_by_event,
+            )
+
+        if "resolution" in normalized_scopes:
+            resolution_keys = [
+                item["source_event_key"]
+                for item in inventory
+                if item["source_event_key"] in batch_key_set
+                and item["candidate_count"] > 0
+                and not item["is_terminal"]
+            ]
+            if resolution_keys:
+                dm_logger.info(
+                    "[DataManager] CNInfo resolution governance semantic stage: "
+                    "run_id=%s events=%s", run_id, len(resolution_keys),
+                )
+                resolution_result = await self.analyze_cninfo_corporate_action_candidates(
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                    exchanges=normalized_exchanges,
+                    instrument_ids=batch_instruments or None,
+                    source_event_keys=resolution_keys,
+                    max_events=len(resolution_keys),
+                    target_offset=0,
+                    profile=profile,
+                    resume=bool(resume),
+                    dry_run=bool(dry_run),
+                    download_documents=bool(download_documents),
+                    run_ocr=bool(run_ocr),
+                    refresh_documents=bool(refresh_documents),
+                    discover_candidates=False,
+                    auto_promote_validated=bool(auto_promote_validated),
+                    exclude_reviewed_events=bool(exclude_reviewed_events),
+                    sample_limit=int(sample_limit),
+                )
+                stage_results["resolution"] = resolution_result
+                for item in resolution_result.get("errors") or []:
+                    event_key = str(item.get("source_event_key") or "")
+                    if event_key:
+                        error_by_event[event_key] = str(
+                            item.get("code") or item.get("error") or "resolution_failed"
+                        )
+            else:
+                stage_results["resolution"] = {
+                    "status": "skipped", "reason": "no_candidate_targets"
+                }
+
+        final_inventory = await self._load_cninfo_resolution_governance_inventory(
+            start_date=normalized_start,
+            end_date=normalized_end,
+            exchanges=normalized_exchanges,
+            instrument_ids=normalized_ids or None,
+            scan_status_by_event=scan_status_by_event,
+            error_by_event=error_by_event,
+        )
+        state_write = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
+        if not dry_run:
+            state_write = await self.db_ops.upsert_corporate_action_resolution_states(
+                final_inventory,
+                ingestion_run_id=run_id,
+            )
+
+        factor_result = None
+        factor_exchanges = [
+            exchange for exchange in normalized_exchanges
+            if exchange in {"SSE", "SZSE"}
+        ]
+        if "factors" in normalized_scopes and factor_exchanges:
+            factor_result = await self.rebuild_cninfo_primary_adjustment_factors(
+                start_date=normalized_start,
+                end_date=normalized_end,
+                exchanges=factor_exchanges,
+                instrument_ids=normalized_ids or None,
+                dry_run=bool(dry_run),
+            )
+            stage_results["factors"] = factor_result
+
+        state_counts = Counter(
+            str(item["resolution_state"]) for item in final_inventory
+        )
+        next_action_counts = Counter(
+            str(item["next_action"])
+            for item in final_inventory if not item["is_terminal"]
+        )
+        factor_blockers = [item for item in final_inventory if item["factor_blocking"]]
+        stage_failures = [
+            name for name, value in stage_results.items()
+            if str((value or {}).get("status")) in {"failed", "partial"}
+        ]
+        status = "dry_run" if dry_run else (
+            "partial" if factor_blockers or stage_failures or has_more else "success"
+        )
+        result = {
+            "status": status,
+            "operation": "a_share_cninfo_corporate_action_resolution_governance",
+            "dry_run": bool(dry_run),
+            "production_isolation": True,
+            "raw_observation_modified": False,
+            "production_factor_modified": False,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "exchanges": normalized_exchanges,
+                "instrument_ids": normalized_ids,
+                "scopes": normalized_scopes,
+                "max_events": limit,
+                "target_offset": offset,
+                "retry_evidence_unavailable": bool(retry_evidence_unavailable),
+            },
+            "inventory": {
+                "total_events": len(final_inventory),
+                "actionable_events": sum(
+                    1 for item in final_inventory if not item["is_terminal"]
+                ),
+                "terminal_events": sum(
+                    1 for item in final_inventory if item["is_terminal"]
+                ),
+                "factor_blocking_events": len(factor_blockers),
+                "source_unsupported_events": state_counts.get(
+                    "source_not_supported", 0
+                ),
+                "state_counts": dict(sorted(state_counts.items())),
+                "next_action_counts": dict(sorted(next_action_counts.items())),
+            },
+            "targets": {
+                "eligible_events": len(actionable),
+                "processable_events": len(processable),
+                "batch_events": len(batch),
+                "batch_event_keys": batch_keys,
+                "target_offset": offset,
+                "has_more": has_more,
+                "next_target_offset": (
+                    offset + len(batch) if dry_run and has_more else 0 if has_more else None
+                ),
+            },
+            "stages": stage_results,
+            "state_write": state_write,
+            "factor_rebuild": factor_result,
+            "stage_failures": stage_failures,
+            "samples": factor_blockers[:max(0, int(sample_limit))],
+            "ingestion_run_id": run_id,
+        }
+        dm_logger.info(
+            "[DataManager] CNInfo resolution governance finished: run_id=%s "
+            "status=%s total=%s actionable=%s terminal=%s blockers=%s states=%s "
+            "stage_failures=%s next_offset=%s",
+            run_id, status, len(final_inventory), result["inventory"]["actionable_events"],
+            result["inventory"]["terminal_events"], len(factor_blockers),
+            dict(state_counts), stage_failures, result["targets"]["next_target_offset"],
+        )
+        return result
+
     async def discover_cninfo_special_action_effective_dates(
         self,
         *,
@@ -18786,6 +19441,7 @@ class DataManager:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
         dry_run: bool = True,
         max_events: int = 500,
         target_offset: int = 0,
@@ -18838,6 +19494,7 @@ class DataManager:
             if value not in CNINFO_SUPPORTED_EXCHANGES
         ]
         requested_ids = sorted(set(normalize_string_list(instrument_ids)))
+        requested_event_keys = sorted(set(normalize_string_list(source_event_keys)))
         suffixes = {
             "SSE": ".SH",
             "SZSE": ".SZ",
@@ -18861,6 +19518,17 @@ class DataManager:
                 instrument_filter = (
                     f" AND instrument_id IN ({', '.join(placeholders)})"
                 )
+            event_filter = ""
+            if requested_event_keys:
+                event_placeholders = []
+                for index, source_event_key in enumerate(requested_event_keys):
+                    key = f"source_event_key_{index}"
+                    params[key] = source_event_key
+                    event_placeholders.append(f":{key}")
+                event_filter = (
+                    " AND source_event_key IN "
+                    f"({', '.join(event_placeholders)})"
+                )
             rows = await self.db_ops.execute_read_query(
                 f"""
                 SELECT instrument_id, source_profile, source_event_key,
@@ -18882,6 +19550,7 @@ class DataManager:
                   )
                   AND ({' OR '.join(exchange_filters)})
                   {instrument_filter}
+                  {event_filter}
                 ORDER BY instrument_id, announcement_date, record_date,
                          source_event_key
                 """,
@@ -18929,6 +19598,7 @@ class DataManager:
         targets = []
         skipped_outside_range = 0
         skipped_without_bounded_anchor = 0
+        skipped_target_results: List[Dict[str, Any]] = []
         for row in rows:
             instrument_id = str(row.get("instrument_id") or "").strip()
             structured_anchors = [
@@ -18940,7 +19610,7 @@ class DataManager:
                 )
                 if (parsed := parse_date(row.get(field_name))) is not None
             ]
-            if structured_anchors and (
+            if not requested_event_keys and structured_anchors and (
                 max(structured_anchors) < normalized_start
                 or min(structured_anchors) > normalized_end
             ):
@@ -18967,12 +19637,22 @@ class DataManager:
             )
             if target is None:
                 skipped_without_bounded_anchor += 1
+                skipped_target_results.append({
+                    "instrument_id": instrument_id,
+                    "source_event_key": row.get("source_event_key"),
+                    "reason": "unbounded_anchor",
+                })
                 continue
-            if (
+            if not requested_event_keys and (
                 target.end_date < normalized_start
                 or target.start_date > normalized_end
             ):
                 skipped_outside_range += 1
+                skipped_target_results.append({
+                    "instrument_id": instrument_id,
+                    "source_event_key": row.get("source_event_key"),
+                    "reason": "outside_requested_range",
+                })
                 continue
             targets.append(target)
 
@@ -18990,6 +19670,7 @@ class DataManager:
             "end_date": normalized_end.isoformat(),
             "exchanges": scan_exchanges,
             "instrument_ids": requested_ids,
+            "source_event_keys": requested_event_keys,
             "target_offset": normalized_target_offset,
             "target_keys": [target.source_event_key for target in targets],
         }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
@@ -19281,6 +19962,7 @@ class DataManager:
                     "source_not_supported" if excluded_exchanges else None
                 ),
                 "instrument_ids": requested_ids,
+                "source_event_keys": requested_event_keys,
                 "max_events": target_limit,
                 "target_offset": normalized_target_offset,
                 "window_before_days": int(window_before_days),
@@ -19320,6 +20002,7 @@ class DataManager:
             },
             "announcement_governance": announcement_governance,
             "target_samples": target_results[:max(0, int(sample_limit))],
+            "skipped_samples": skipped_target_results[:max(0, int(sample_limit))],
             "errors": errors[:max(0, int(sample_limit))],
             "ingestion_run_id": run_id,
         }
@@ -19423,6 +20106,7 @@ class DataManager:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
         max_events: int = 100,
         target_offset: int = 0,
         profile: str = "semantic_extraction",
@@ -19473,6 +20157,11 @@ class DataManager:
         if unsupported:
             raise ValueError(f"unsupported A-share exchanges: {unsupported}")
         selected_ids = sorted({str(item).strip() for item in (instrument_ids or []) if str(item).strip()})
+        selected_event_keys = sorted({
+            str(item).strip()
+            for item in (source_event_keys or [])
+            if str(item).strip()
+        })
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution preparing: range=%s..%s "
             "exchanges=%s instruments=%s max_events=%s offset=%s profile=%s "
@@ -19505,6 +20194,7 @@ class DataManager:
                 end_date=normalized_end,
                 exchanges=selected_exchanges,
                 instrument_ids=selected_ids or None,
+                source_event_keys=selected_event_keys or None,
                 dry_run=bool(dry_run),
                 max_events=max_events,
                 target_offset=target_offset,
@@ -19527,6 +20217,14 @@ class DataManager:
                 params[key] = item
                 keys.append(f":{key}")
             id_clause = f" AND o.instrument_id IN ({', '.join(keys)})"
+        event_clause = ""
+        if selected_event_keys:
+            keys = []
+            for index, item in enumerate(selected_event_keys):
+                key = f"source_event_key_{index}"
+                params[key] = item
+                keys.append(f":{key}")
+            event_clause = f" AND o.source_event_key IN ({', '.join(keys)})"
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution loading candidate evidence"
         )
@@ -19563,6 +20261,7 @@ class DataManager:
                    OR e.announcement_time >= :start_date AND e.announcement_time < :end_date_exclusive
                    OR o.fiscal_period LIKE :fiscal_year)
               AND ({' OR '.join(suffix_clauses)}) {id_clause}
+              {event_clause}
               {reviewed_filter}
             ORDER BY o.instrument_id, o.source_event_key, e.announcement_id
             """,
@@ -19610,7 +20309,7 @@ class DataManager:
         batch = all_events[offset: offset + limit]
         has_more = offset + len(batch) < len(all_events)
         run_id = "a_share_cninfo_corporate_action_llm_" + hashlib.sha256(
-            json.dumps({"start": normalized_start.isoformat(), "end": normalized_end.isoformat(), "ids": selected_ids, "offset": offset}, sort_keys=True).encode()
+            json.dumps({"start": normalized_start.isoformat(), "end": normalized_end.isoformat(), "ids": selected_ids, "event_keys": selected_event_keys, "offset": offset}, sort_keys=True).encode()
         ).hexdigest()[:16]
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution candidates loaded: run_id=%s "
@@ -19636,6 +20335,7 @@ class DataManager:
                 "end_date": normalized_end.isoformat(),
                 "exchanges": selected_exchanges,
                 "instrument_ids": selected_ids,
+                "source_event_keys": selected_event_keys,
                 "max_events": limit,
                 "target_offset": offset,
                 "profile": profile,
@@ -20491,6 +21191,15 @@ class DataManager:
                 raise ValueError("selected evidence is not a stored CNInfo announcement candidate")
         elif decision not in {"rejected", "conflict", "manual_required"}:
             raise ValueError("unsupported corporate-action review decision")
+        terminal_reason = str(payload.get("terminal_reason") or "").strip().lower()
+        if terminal_reason and (
+            decision != "rejected"
+            or terminal_reason not in {"non_effective", "superseded"}
+        ):
+            raise ValueError(
+                "terminal_reason is supported only for rejected "
+                "non_effective or superseded reviews"
+            )
         review_key = hashlib.sha256(json.dumps({
             "instrument_id": instrument_id,
             "source_event_key": source_event_key,
@@ -20502,6 +21211,7 @@ class DataManager:
             "reviewer": reviewer,
             "notes": str(payload.get("notes") or ""),
             "corrected_result": corrected_result or {},
+            "terminal_reason": terminal_reason,
         }, sort_keys=True).encode()).hexdigest()
         review_row = {
             "review_key": review_key,
@@ -20522,6 +21232,7 @@ class DataManager:
                 "post_validation_status": post_validation_status,
                 "pre_gate_results": analysis.get("gate_results") or {},
                 "post_gate_results": post_gate_results,
+                "terminal_reason": terminal_reason or None,
                 "selected_evidence": selected_evidence,
                 "analysis_versions": {
                     "schema_version": analysis.get("schema_version"),

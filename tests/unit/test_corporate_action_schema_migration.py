@@ -78,6 +78,10 @@ def test_corporate_action_status_migration_adds_range_unique_key(tmp_path):
             .mappings()
             .one()
         )
+        resolution_state_table = connection.execute(text(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name='corporate_action_resolution_states'"
+        )).scalar_one_or_none()
 
     assert (
         "instrument_id",
@@ -89,4 +93,5 @@ def test_corporate_action_status_migration_adds_range_unique_key(tmp_path):
     assert migrated["coverage_status"] == "complete_with_events"
     assert str(migrated["requested_start_date"]).startswith("1990-01-01")
     assert str(migrated["requested_end_date"]).startswith("2026-12-31")
+    assert resolution_state_table == "corporate_action_resolution_states"
     manager.sync_engine.dispose()
