@@ -2,16 +2,26 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 import json
 from typing import Any, Dict, Mapping, Optional, Sequence
 
-from utils.llm import LlmClientProtocol, LlmMessage, LlmRequest, stable_hash
+from utils.llm import (
+    LlmClientProtocol,
+    LlmMessage,
+    LlmRequest,
+    LlmResponse,
+    stable_hash,
+)
 
 
 TITLE_CLASSIFICATION_SCHEMA_VERSION = "cninfo_announcement_title_classification.v1"
 TITLE_CLASSIFICATION_PROMPT_VERSION = "cninfo_announcement_title_prompt.v1"
 DEFAULT_MAX_TITLES_PER_REQUEST = 80
+DEFAULT_MAX_CONCURRENCY = 50
+MAX_CONCURRENCY = 60
+DEFAULT_PROFILE = "corporate_action_title_classification"
 MAX_TITLE_CLASSIFICATION_OUTPUT_TOKENS = 16384
 
 RELEVANCE_VALUES = {"relevant", "possibly_relevant", "unrelated"}
@@ -106,6 +116,23 @@ class TitleClassificationBatch:
     request_count: int
     input_event_count: int
     input_title_count: int
+    max_concurrency: int
+    peak_concurrency: int
+
+
+@dataclass(frozen=True)
+class _ChunkWork:
+    chunk_index: int
+    events: list[Dict[str, Any]]
+    payload: Dict[str, Any]
+    input_hash: str
+
+
+@dataclass(frozen=True)
+class _ChunkOutcome:
+    work: _ChunkWork
+    response: Optional[LlmResponse] = None
+    error: Optional[Exception] = None
 
 
 def _clean_event(event: Mapping[str, Any]) -> Dict[str, Any]:
@@ -189,14 +216,18 @@ class CninfoAnnouncementTitleClassifier:
         self,
         client: LlmClientProtocol,
         *,
-        profile: str = "semantic_extraction",
+        profile: str = DEFAULT_PROFILE,
         model_identity: Optional[str] = None,
         max_titles_per_request: int = DEFAULT_MAX_TITLES_PER_REQUEST,
+        max_concurrency: int = DEFAULT_MAX_CONCURRENCY,
     ) -> None:
         self.client = client
         self.profile = profile
         self.model_identity = model_identity
         self.max_titles_per_request = max(1, int(max_titles_per_request))
+        self.max_concurrency = max(
+            1, min(int(max_concurrency), MAX_CONCURRENCY)
+        )
 
     async def classify(
         self,
@@ -220,6 +251,7 @@ class CninfoAnnouncementTitleClassifier:
             normalized_events,
             max_titles_per_request=self.max_titles_per_request,
         )
+        work_items: list[_ChunkWork] = []
         for chunk_index, chunk in enumerate(chunks, start=1):
             payload = {
                 "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
@@ -232,6 +264,20 @@ class CninfoAnnouncementTitleClassifier:
                 "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
                 "prompt_version": TITLE_CLASSIFICATION_PROMPT_VERSION,
             })
+            work_items.append(_ChunkWork(
+                chunk_index=chunk_index,
+                events=chunk,
+                payload=payload,
+                input_hash=input_hash,
+            ))
+
+        active_requests = 0
+        peak_concurrency = 0
+
+        async def execute(work: _ChunkWork) -> _ChunkOutcome:
+            nonlocal active_requests, peak_concurrency
+            active_requests += 1
+            peak_concurrency = max(peak_concurrency, active_requests)
             try:
                 response = await self.client.complete(LlmRequest(
                     profile=self.profile,
@@ -256,17 +302,79 @@ class CninfoAnnouncementTitleClassifier:
                         LlmMessage(
                             role="user",
                             content=json.dumps(
-                                payload, ensure_ascii=False, sort_keys=True, default=str
+                                work.payload,
+                                ensure_ascii=False,
+                                sort_keys=True,
+                                default=str,
                             ),
                         ),
                     ),
                     response_schema=TITLE_CLASSIFICATION_SCHEMA,
-                    schema_name="cninfo_corporate_action_announcement_title_classification",
+                    schema_name=(
+                        "cninfo_corporate_action_announcement_title_classification"
+                    ),
                     schema_version=TITLE_CLASSIFICATION_SCHEMA_VERSION,
                     max_output_tokens=MAX_TITLE_CLASSIFICATION_OUTPUT_TOKENS,
-                    idempotency_key=input_hash,
+                    idempotency_key=work.input_hash,
                     content_is_untrusted=True,
                 ))
+                return _ChunkOutcome(work=work, response=response)
+            except Exception as exc:
+                return _ChunkOutcome(work=work, error=exc)
+            finally:
+                active_requests -= 1
+
+        work_queue: asyncio.Queue[_ChunkWork] = asyncio.Queue()
+        for work in work_items:
+            work_queue.put_nowait(work)
+
+        async def worker() -> list[_ChunkOutcome]:
+            worker_outcomes = []
+            while True:
+                try:
+                    work = work_queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    return worker_outcomes
+                try:
+                    worker_outcomes.append(await execute(work))
+                finally:
+                    work_queue.task_done()
+
+        worker_count = min(self.max_concurrency, len(work_items))
+        grouped_outcomes = await asyncio.gather(*(
+            worker() for _ in range(worker_count)
+        ))
+        outcomes = [
+            outcome
+            for worker_outcomes in grouped_outcomes
+            for outcome in worker_outcomes
+        ]
+        for outcome in sorted(
+            outcomes, key=lambda item: item.work.chunk_index
+        ):
+            chunk_index = outcome.work.chunk_index
+            chunk = outcome.work.events
+            if outcome.error is not None:
+                if not tolerate_event_errors:
+                    raise outcome.error
+                error = (
+                    "title classification request failed: "
+                    f"{outcome.error}"
+                )
+                for event in chunk:
+                    errors[event["source_event_key"]] = error
+                continue
+            response = outcome.response
+            if response is None:
+                exc = RuntimeError(
+                    "title classification request completed without a response"
+                )
+                if not tolerate_event_errors:
+                    raise exc
+                for event in chunk:
+                    errors[event["source_event_key"]] = str(exc)
+                continue
+            try:
                 chunk_errors = self._merge_response(
                     chunk,
                     response.data,
@@ -325,6 +433,8 @@ class CninfoAnnouncementTitleClassifier:
             input_title_count=sum(
                 len(event["announcements"]) for event in normalized_events
             ),
+            max_concurrency=self.max_concurrency,
+            peak_concurrency=peak_concurrency,
         )
 
     @staticmethod

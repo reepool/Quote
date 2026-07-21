@@ -202,6 +202,7 @@ async def test_governance_routes_exact_event_keys_across_write_stages():
         exchanges=["SSE"],
         scopes=["inventory", "discovery", "resolution"],
         max_events=2,
+        title_max_concurrency=99,
         dry_run=False,
     )
 
@@ -209,6 +210,10 @@ async def test_governance_routes_exact_event_keys_across_write_stages():
     assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
         "source_event_keys"
     ] == ["event-discovery"]
+    assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
+        "title_max_concurrency"
+    ] == 60
+    assert result["parameters"]["title_max_concurrency"] == 60
     assert manager.analyze_cninfo_corporate_action_candidates.await_args.kwargs[
         "source_event_keys"
     ] == ["event-discovery", "event-candidate"]

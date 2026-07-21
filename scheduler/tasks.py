@@ -421,6 +421,8 @@ def _format_cninfo_special_action_discovery_report(
         f"status={title_classification.get('status')}, "
         f"titles={title_classification.get('input_title_count', 0)}, "
         f"requests={title_classification.get('request_count', 0)}, "
+        f"concurrency={title_classification.get('peak_concurrency', 0)}/"
+        f"{title_classification.get('max_concurrency', 0)}, "
         f"event_errors={title_classification.get('event_errors', 0)}`",
         "公告证据: `"
         f"candidate={evidence.get('candidate_count', 0)}, "
@@ -633,6 +635,9 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         f"enabled={parameters.get('classify_titles_with_llm', False)}, "
         f"status={title_classification.get('status', '未运行')}, "
         f"titles={title_classification.get('input_title_count', 0)}, "
+        f"requests={title_classification.get('request_count', 0)}, "
+        f"concurrency={title_classification.get('peak_concurrency', 0)}/"
+        f"{title_classification.get('max_concurrency', 0)}, "
         f"event_errors={title_classification.get('event_errors', 0)}`",
         "说明: 原始 CNInfo 事件不修改；北交所不进入 CNInfo 公告解析。",
     ]
@@ -4581,8 +4586,9 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
         classify_titles_with_llm: bool = True,
-        title_classification_profile: str = "semantic_extraction",
+        title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
+        title_max_concurrency: int = 50,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4611,6 +4617,7 @@ class ScheduledTasks:
                 title_max_titles_per_request=int(
                     title_max_titles_per_request
                 ),
+                title_max_concurrency=int(title_max_concurrency),
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:
@@ -4792,8 +4799,9 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
         classify_titles_with_llm: bool = True,
-        title_classification_profile: str = "semantic_extraction",
+        title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
+        title_max_concurrency: int = 50,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4826,6 +4834,7 @@ class ScheduledTasks:
             classify_titles_with_llm=classify_titles_with_llm,
             title_classification_profile=title_classification_profile,
             title_max_titles_per_request=title_max_titles_per_request,
+            title_max_concurrency=title_max_concurrency,
             sample_limit=sample_limit,
             job_config=job_config,
         )
@@ -4857,8 +4866,9 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
         classify_titles_with_llm: bool = True,
-        title_classification_profile: str = "semantic_extraction",
+        title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
+        title_max_concurrency: int = 50,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4896,6 +4906,7 @@ class ScheduledTasks:
                 title_max_titles_per_request=int(
                     title_max_titles_per_request
                 ),
+                title_max_concurrency=int(title_max_concurrency),
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:

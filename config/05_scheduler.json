@@ -284,8 +284,9 @@
           "request_interval_seconds": 0.5,
           "per_event_timeout_sec": 60,
           "classify_titles_with_llm": true,
-          "title_classification_profile": "semantic_extraction",
+          "title_classification_profile": "corporate_action_title_classification",
           "title_max_titles_per_request": 80,
+          "title_max_concurrency": 50,
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }
@@ -354,8 +355,9 @@
           "request_interval_seconds": 0.5,
           "per_event_timeout_sec": 60,
           "classify_titles_with_llm": true,
-          "title_classification_profile": "semantic_extraction",
+          "title_classification_profile": "corporate_action_title_classification",
           "title_max_titles_per_request": 80,
+          "title_max_concurrency": 50,
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }
@@ -396,8 +398,9 @@
           "request_interval_seconds": 0.5,
           "per_event_timeout_sec": 60,
           "classify_titles_with_llm": true,
-          "title_classification_profile": "semantic_extraction",
+          "title_classification_profile": "corporate_action_title_classification",
           "title_max_titles_per_request": 80,
+          "title_max_concurrency": 50,
           "sample_limit": 20,
           "max_runtime_seconds": 7200
         }

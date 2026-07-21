@@ -1,5 +1,10 @@
 # 公共 LLM 网关架构、接口与调用指南
 
+> 状态说明（2026-07-22）：本文描述单次请求网关和稳定调用接口。provider/account 全局
+> 并发、公平调度、有界队列、独立资源池和批处理生命周期见
+> `docs/development/common_llm_work_orchestration_requirements.md`。本文中的 profile 级限制
+> 将作为全局 provider/account 限制之下的第二层限制继续保留。
+
 本文描述 Quote 项目公共大语言模型网关的架构边界、稳定接口、调用方式、错误语义和运维约束。网关用于为公告解析、财务文本分析、研究报告分类等业务流程提供统一的语义分析能力。
 
 ## 1. 设计边界

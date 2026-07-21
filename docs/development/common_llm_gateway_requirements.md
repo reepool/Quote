@@ -1,5 +1,10 @@
 # 公共语言模型网关需求说明
 
+> 状态说明（2026-07-22）：本文继续定义单次 LLM 请求、结构化输出和网关安全契约。
+> 多 profile/多业务的 provider 全局并发、异步队列、资源池、生命周期和批处理调度由
+> `docs/development/common_llm_work_orchestration_requirements.md` 补充定义；如并发治理表述
+> 不一致，以新文档为准。
+
 ## 1. 文档定位
 
 本文定义 Quote 项目公共语言模型输入输出模块的需求和稳定接口。该模块服务公司公告解析、
@@ -7,6 +12,12 @@
 
 本模块由独立会话实现。CNInfo 公司行动公告解析只依赖本文定义的公共契约，不应直接调用
 OpenAI SDK、`requests` 或供应商专用接口。
+
+批量工作协调依赖：
+
+```text
+docs/development/common_llm_work_orchestration_requirements.md
+```
 
 ## 2. 可行性结论
 

@@ -19145,8 +19145,9 @@ class DataManager:
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
         classify_titles_with_llm: bool = True,
-        title_classification_profile: str = "semantic_extraction",
+        title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
+        title_max_concurrency: int = 50,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
         """Govern unresolved CNInfo events through bounded reusable stages."""
@@ -19177,6 +19178,9 @@ class DataManager:
             normalized_scopes.insert(0, "inventory")
         limit = max(1, min(int(max_events), 400))
         offset = max(0, int(target_offset))
+        effective_title_max_concurrency = max(
+            1, min(int(title_max_concurrency), 60)
+        )
         run_id = "a_share_cninfo_resolution_governance_" + hashlib.sha256(
             json.dumps({
                 "start": normalized_start.isoformat(),
@@ -19198,6 +19202,7 @@ class DataManager:
                 "title_max_titles_per_request": int(
                     title_max_titles_per_request
                 ),
+                "title_max_concurrency": effective_title_max_concurrency,
             }, sort_keys=True).encode("utf-8")
         ).hexdigest()[:16]
         dm_logger.info(
@@ -19282,6 +19287,7 @@ class DataManager:
                     title_max_titles_per_request=int(
                         title_max_titles_per_request
                     ),
+                    title_max_concurrency=effective_title_max_concurrency,
                     sample_limit=max(len(discovery_keys), int(sample_limit)),
                 )
                 stage_results["discovery"] = discovery_result
@@ -19436,6 +19442,7 @@ class DataManager:
                 "title_max_titles_per_request": int(
                     title_max_titles_per_request
                 ),
+                "title_max_concurrency": effective_title_max_concurrency,
             },
             "inventory": {
                 "total_events": len(final_inventory),
@@ -19500,8 +19507,9 @@ class DataManager:
         request_interval_seconds: float = 0.5,
         per_event_timeout_sec: int = 60,
         classify_titles_with_llm: bool = False,
-        title_classification_profile: str = "semantic_extraction",
+        title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
+        title_max_concurrency: int = 50,
         title_llm_client: Optional[Any] = None,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
@@ -19551,6 +19559,9 @@ class DataManager:
         ]
         requested_ids = sorted(set(normalize_string_list(instrument_ids)))
         requested_event_keys = sorted(set(normalize_string_list(source_event_keys)))
+        effective_title_max_concurrency = max(
+            1, min(int(title_max_concurrency), 60)
+        )
         suffixes = {
             "SSE": ".SH",
             "SZSE": ".SZ",
@@ -19957,6 +19968,7 @@ class DataManager:
                         configured_profile.model if configured_profile else None
                     ),
                     max_titles_per_request=title_max_titles_per_request,
+                    max_concurrency=effective_title_max_concurrency,
                 )
                 classification_events = []
                 for item in classification_items:
@@ -19998,13 +20010,14 @@ class DataManager:
                     })
                 dm_logger.info(
                     "[DataManager] CNInfo title classification started: "
-                    "events=%d titles=%d profile=%s",
+                    "events=%d titles=%d profile=%s max_concurrency=%d",
                     len(classification_events),
                     sum(
                         len(item["announcements"])
                         for item in classification_events
                     ),
                     title_classification_profile,
+                    title_classifier.max_concurrency,
                 )
                 try:
                     title_batch = await title_classifier.classify(
@@ -20013,10 +20026,13 @@ class DataManager:
                     )
                     dm_logger.info(
                         "[DataManager] CNInfo title classification completed: "
-                        "events=%d titles=%d requests=%d event_errors=%d",
+                        "events=%d titles=%d requests=%d max_concurrency=%d "
+                        "peak_concurrency=%d event_errors=%d",
                         title_batch.input_event_count,
                         title_batch.input_title_count,
                         title_batch.request_count,
+                        title_batch.max_concurrency,
+                        title_batch.peak_concurrency,
                         len(title_batch.errors_by_event),
                     )
                 except Exception as exc:
@@ -20355,6 +20371,7 @@ class DataManager:
                 "title_max_titles_per_request": int(
                     title_max_titles_per_request
                 ),
+                "title_max_concurrency": effective_title_max_concurrency,
                 "request_interval_seconds": effective_request_interval,
                 "request_timeout_seconds": bounded_request_timeout,
             },
@@ -20414,6 +20431,13 @@ class DataManager:
                 ),
                 "request_count": (
                     title_batch.request_count if title_batch else 0
+                ),
+                "max_concurrency": (
+                    title_batch.max_concurrency
+                    if title_batch else effective_title_max_concurrency
+                ),
+                "peak_concurrency": (
+                    title_batch.peak_concurrency if title_batch else 0
                 ),
                 "input_event_count": (
                     title_batch.input_event_count if title_batch else 0
@@ -20621,7 +20645,10 @@ class DataManager:
                 max_events=max_events,
                 target_offset=target_offset,
                 classify_titles_with_llm=True,
-                title_classification_profile=profile,
+                title_classification_profile=(
+                    "corporate_action_title_classification"
+                ),
+                title_max_concurrency=50,
                 title_llm_client=llm_client,
             )
             dm_logger.info(

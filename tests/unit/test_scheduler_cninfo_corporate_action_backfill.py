@@ -138,6 +138,8 @@ def test_cninfo_special_action_discovery_is_manual_and_candidate_only():
             "status": "success",
             "input_title_count": 7,
             "request_count": 1,
+            "max_concurrency": 5,
+            "peak_concurrency": 1,
             "event_errors": 0,
         },
         "announcement_governance": {
@@ -157,7 +159,7 @@ def test_cninfo_special_action_discovery_is_manual_and_candidate_only():
         }],
     })
 
-    assert "titles=7, requests=1, event_errors=0" in report
+    assert "titles=7, requests=1, concurrency=1/5, event_errors=0" in report
     assert "candidate=3, rejected=4" in report
     assert "000409.SZ" not in report
     assert "run_id=None, scans=0, audits=0, errors=0" in report
@@ -225,6 +227,7 @@ async def test_scheduler_special_action_discovery_delegates_parameters(monkeypat
     assert discovery.await_args.kwargs["max_events"] == 10
     assert discovery.await_args.kwargs["target_offset"] == 20
     assert discovery.await_args.kwargs["classify_titles_with_llm"] is True
+    assert discovery.await_args.kwargs["title_max_concurrency"] == 50
     assert discovery.await_args.kwargs["max_anchor_gap_days"] == 60
     assert "a_share_cninfo_special_action_discovery" not in task._active_tasks
 

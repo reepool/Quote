@@ -32,6 +32,10 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     ]
     assert governance["parameters"]["retry_evidence_unavailable"] is False
     assert governance["parameters"]["classify_titles_with_llm"] is True
+    assert governance["parameters"]["title_classification_profile"] == (
+        "corporate_action_title_classification"
+    )
+    assert governance["parameters"]["title_max_concurrency"] == 50
     assert governance["parameters"]["window_before_days"] == 30
     assert governance["parameters"]["max_anchor_gap_days"] == 60
     incremental = config["scheduler_config"]["jobs"][
@@ -43,6 +47,15 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert incremental["parameters"]["auto_promote_validated"] is True
     assert incremental["parameters"]["exclude_reviewed_events"] is True
     assert incremental["parameters"]["classify_titles_with_llm"] is True
+    llm_config = json.loads(Path("config/11_llm.json").read_text(encoding="utf-8"))
+    title_profile = llm_config["llm"]["profiles"][
+        "corporate_action_title_classification"
+    ]
+    assert title_profile["max_concurrency"] == 50
+    assert title_profile["requests_per_minute"] == 60
+    assert llm_config["llm"]["profiles"]["semantic_extraction"][
+        "max_concurrency"
+    ] == 1
     assert "高置信结果可写入受治理的 resolved 层" in _format_cninfo_corporate_action_llm_report({
         "status": "dry_run", "dry_run": True, "counts": {}, "targets": {},
     })
@@ -115,6 +128,14 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
         "targets": {"eligible_events": 380, "batch_events": 100},
         "stages": {
             "discovery": {
+                "title_classification": {
+                    "status": "success",
+                    "input_title_count": 125,
+                    "request_count": 5,
+                    "max_concurrency": 5,
+                    "peak_concurrency": 4,
+                    "event_errors": 0,
+                },
                 "target_samples": [{
                     "instrument_id": "000409.SZ",
                     "source_event_key": "event-1",
@@ -129,6 +150,7 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     })
     assert "factor_blocking=380" in governance_report
     assert "discovery_pending: 115" in governance_report
+    assert "concurrency=4/5" in governance_report
     assert "000409.SZ" not in governance_report
 
 
@@ -169,6 +191,7 @@ async def test_incremental_resolution_excludes_reviewed_events(monkeypatch):
     assert delegated.await_args.kwargs["target_offset"] == 0
     assert delegated.await_args.kwargs["exclude_reviewed_events"] is True
     assert delegated.await_args.kwargs["classify_titles_with_llm"] is True
+    assert delegated.await_args.kwargs["title_max_concurrency"] == 50
 
 
 @pytest.mark.asyncio
@@ -195,6 +218,7 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
     assert operation.await_args.kwargs["max_events"] == 50
     assert operation.await_args.kwargs["scopes"] == ["inventory", "discovery"]
     assert operation.await_args.kwargs["classify_titles_with_llm"] is True
+    assert operation.await_args.kwargs["title_max_concurrency"] == 50
     assert operation.await_args.kwargs["max_anchor_gap_days"] == 60
     assert (
         "a_share_cninfo_corporate_action_resolution_governance"

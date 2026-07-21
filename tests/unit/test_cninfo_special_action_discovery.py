@@ -195,11 +195,14 @@ async def test_discovery_dry_run_scans_candidates_but_does_not_write():
         instrument_ids=["600108.SH"],
         dry_run=True,
         max_events=10,
+        title_max_concurrency=99,
     )
 
     assert result["status"] == "dry_run"
     assert result["parameters"]["scanned_exchanges"] == ["SSE"]
     assert result["parameters"]["excluded_exchanges"] == ["BSE"]
+    assert result["parameters"]["title_max_concurrency"] == 60
+    assert result["title_classification"]["max_concurrency"] == 60
     assert result["evidence"]["candidate_count"] == 1
     assert result["evidence"]["resolved_count"] == 0
     manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()
@@ -494,6 +497,8 @@ async def test_llm_title_discovery_accepts_compensation_share_without_keywords()
     assert result["status"] == "dry_run"
     assert result["evidence"]["candidate_count"] == 1
     assert result["title_classification"]["status"] == "success"
+    assert result["title_classification"]["max_concurrency"] == 50
+    assert result["title_classification"]["peak_concurrency"] == 1
     assert result["target_samples"][0]["classification_samples"][0][
         "announcement_role"
     ] == "compensation_share_distribution"

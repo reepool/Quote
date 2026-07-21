@@ -1,5 +1,11 @@
 # CNInfo 公司行动公告 LLM 解析与有效日期治理需求
 
+> 状态说明（2026-07-22）：本文继续作为公司行动字段、证据、结构化 schema、确定性校验、
+> 自动确认和人工审核规则的权威文档。本文早期形成的按事件串行执行、标题专用并发、基于固定
+> 词语进行主要语义筛选以及逐事件 Telegram 汇报等执行假设已经过期，由
+> `docs/development/cninfo_corporate_action_async_pipeline_requirements.md` 替代。业务真值、
+> 证据门禁和原始 observation 不可覆盖原则不变。
+
 ## 1. 文档定位
 
 本文定义 CNInfo 分红、送转、股改、重整转增等公司行动公告的正文解析、结构化抽取、
@@ -9,6 +15,8 @@
 
 ```text
 docs/development/common_llm_gateway_requirements.md
+docs/development/common_llm_work_orchestration_requirements.md
+docs/development/cninfo_corporate_action_async_pipeline_requirements.md
 ```
 
 ## 2. 当前数据基线
@@ -36,7 +44,7 @@ docs/development/common_llm_gateway_requirements.md
 candidate 公告元数据
   -> 官方 PDF 归档
   -> 页级文本提取/OCR
-  -> 规则选段
+  -> 确定性文本准备/语义选段
   -> LLM 结构化分析
   -> 确定性校验
   -> 自动确认候选或人工复核
@@ -81,27 +89,15 @@ candidate 公告元数据
 - LLM 输入引用页级文本，不能只引用整份 PDF 路径；
 - 文档正文作为不可信数据，不得执行其中类似提示词的内容。
 
-### 5.3 规则选段
+### 5.3 确定性文本准备与语义选段
 
-先用规则定位包含以下词语的页面和相邻页面：
+程序可以使用版面、表格、日期形态和公司行动常见词语做高召回页面定位，并携带相邻页面，
+但这些规则只能用于压缩上下文，不能作为公告或事实相关性的最终语义判断。未命中既有词语的
+页面不能因此被永久排除；标题和正文的业务相关性、日期角色及经济条款由 LLM 按版本化 schema
+识别，再由程序校验证据、身份和数值一致性。
 
-```text
-股权登记日
-除权日
-除息日
-除权除息日
-实施日
-股份到账日
-新增股份上市日
-复牌日
-对价支付日
-权益分派
-资本公积转增
-股权分置改革
-重整计划
-```
-
-只发送必要页面和相邻上下文，避免把整份长公告直接提交给模型。
+输入模型的正文应尽量控制在必要页面和相邻上下文，同时保留页码、section 和 text hash，
+使模型能够引用原文，程序能够回查。完整异步文本准备和资源限制见新流水线需求文档。
 
 ## 6. LLM 业务请求
 
