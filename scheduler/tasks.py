@@ -394,6 +394,7 @@ def _format_cninfo_special_action_discovery_report(
     parameters = result.get("parameters") or {}
     targets = result.get("targets") or {}
     evidence = result.get("evidence") or {}
+    governance = result.get("announcement_governance") or {}
     lines = [
         f"{icon} *A 股巨潮特殊公司行动公告发现*",
         "",
@@ -415,6 +416,11 @@ def _format_cninfo_special_action_discovery_report(
         f"unbounded_skipped={targets.get('skipped_without_bounded_anchor', 0)}"
         "`",
         f"公告候选证据: `{evidence.get('candidate_count', 0)}`",
+        "公告治理: `"
+        f"run_id={governance.get('ingestion_run_id')}, "
+        f"scans={governance.get('scan_states_persisted', 0)}, "
+        f"audits={governance.get('audits_persisted', 0)}, "
+        f"errors={governance.get('errors', 0)}`",
         f"下一批 offset: `{targets.get('next_target_offset')}`",
         "已确认有效日期: `0（本任务不从标题推断日期）`",
         f"生产因子影响: `{'无' if result.get('production_isolation', True) else '有'}`",
@@ -617,6 +623,8 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     parameters = result.get("parameters") or {}
     reconciliation = result.get("reconciliation") or {}
     totals = reconciliation.get("totals") or {}
+    matching_policy = reconciliation.get("matching_policy") or {}
+    rounded_policy = matching_policy.get("rounded_precision_policy") or {}
     candidate = result.get("candidate") or {}
     benchmark = result.get("benchmark") or {}
     reference_sources = benchmark.get("reference_sources") or {}
@@ -636,11 +644,16 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         + ", ".join(
             f"{key}={totals.get(key, 0)}"
             for key in (
-                "exact_matches", "shifted_matches", "conflicts",
+                "exact_matches", "rounded_matches", "shifted_matches", "conflicts",
                 "cninfo_only", "tdx_only",
             )
         )
         + "`",
+        "舍入匹配: `"
+        f"policy={rounded_policy.get('version', 'N/A')}, "
+        "factor_relative_tolerance="
+        f"{float(matching_policy.get('factor_relative_tolerance', 0.0)) * 100:.6f}%"
+        "`",
         f"基准版本: `{benchmark.get('benchmark_series_version', 'N/A')}`",
         f"主源选择: `{benchmark.get('source_selection_status', 'deferred')}`",
         "来源覆盖: `"
@@ -4610,6 +4623,7 @@ class ScheduledTasks:
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.0001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
@@ -4627,6 +4641,7 @@ class ScheduledTasks:
                 build_canonical=bool(build_canonical),
                 series_version=series_version,
                 field_tolerance=float(field_tolerance),
+                factor_relative_tolerance=float(factor_relative_tolerance),
                 max_session_shift=int(max_session_shift),
                 sample_limit=int(sample_limit),
             )

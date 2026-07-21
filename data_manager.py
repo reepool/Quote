@@ -219,6 +219,50 @@ class DataManager:
             config=acquisition_config,
         )
 
+    def _persist_corporate_action_announcement_governance(
+        self,
+        *,
+        route_result: Any,
+        instrument_id: str,
+        symbol: str,
+        ingestion_run_id: int,
+        business_run_id: str,
+    ) -> Dict[str, int]:
+        """Persist generic scan lineage for a corporate-action announcement query."""
+        scan_result = getattr(route_result, "scan_result", None)
+        if scan_result is None:
+            raise ValueError("announcement route result has no scan result")
+        storage = self._require_research_storage()
+        attempts = [
+            asdict(item)
+            for item in tuple(getattr(route_result, "attempts", ()) or ())
+        ]
+        storage.upsert_announcement_scan_state(
+            scan_result=scan_result,
+            attempts=attempts,
+            metadata={
+                "fallback_used": bool(
+                    getattr(route_result, "fallback_used", False)
+                ),
+                "fallback_reason": getattr(
+                    route_result, "fallback_reason", None
+                ),
+                "business_domain": "corporate_action",
+                "business_run_id": business_run_id,
+            },
+        )
+        audited = 0
+        for record in scan_result.selected_records:
+            storage.store_announcement_audit(
+                purpose_key=scan_result.query.purpose_key,
+                record=record,
+                instrument_id=instrument_id,
+                symbol=symbol,
+                ingestion_run_id=ingestion_run_id,
+            )
+            audited += 1
+        return {"scan_states_persisted": 1, "audits_persisted": audited}
+
     async def get_cached_adjustment_factors(
         self, instrument_id: str
     ) -> List[Dict[str, Any]]:
@@ -17734,6 +17778,7 @@ class DataManager:
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.0001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
@@ -17998,6 +18043,9 @@ class DataManager:
             tdx_path["events"],
             sessions_by_exchange=sessions_by_exchange,
             field_tolerance=max(0.0, float(field_tolerance)),
+            factor_relative_tolerance=max(
+                0.0, float(factor_relative_tolerance)
+            ),
             max_session_shift=max(0, int(max_session_shift)),
             sample_limit=max(0, int(sample_limit)),
         )
@@ -18353,6 +18401,10 @@ class DataManager:
                 "instrument_ids": sorted(requested_ids),
                 "build_canonical": bool(build_canonical),
                 "series_version": normalized_series_version,
+                "field_tolerance": max(0.0, float(field_tolerance)),
+                "factor_relative_tolerance": max(
+                    0.0, float(factor_relative_tolerance)
+                ),
             },
             "universe": {"instrument_count": len(target_ids)},
             "source_events": {
@@ -18894,6 +18946,15 @@ class DataManager:
         )
         targets = targets[normalized_target_offset:batch_end_offset]
         has_more_targets = batch_end_offset < total_searchable_events
+        identity = hashlib.sha256(json.dumps({
+            "start_date": normalized_start.isoformat(),
+            "end_date": normalized_end.isoformat(),
+            "exchanges": scan_exchanges,
+            "instrument_ids": requested_ids,
+            "target_offset": normalized_target_offset,
+            "target_keys": [target.source_event_key for target in targets],
+        }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+        run_id = f"a_share_cninfo_special_action_{identity}"
         bounded_request_timeout = max(
             1.0,
             min(20.0, float(per_event_timeout_sec) / 3.0),
@@ -18906,6 +18967,53 @@ class DataManager:
         evidence_rows: List[Dict[str, Any]] = []
         target_results: List[Dict[str, Any]] = []
         errors: List[Dict[str, str]] = []
+        announcement_governance = {
+            "ingestion_run_id": None,
+            "scan_states_persisted": 0,
+            "audits_persisted": 0,
+            "errors": 0,
+        }
+        if not dry_run and targets:
+            try:
+                storage = self._require_research_storage()
+                announcement_governance["ingestion_run_id"] = (
+                    await asyncio.to_thread(
+                        storage.start_ingestion_run,
+                        domain="corporate_actions",
+                        job_name="a_share_cninfo_special_action_discovery",
+                        market=",".join(scan_exchanges),
+                        source="cninfo",
+                        mode="announcement_governance",
+                        metadata={
+                            "business_run_id": run_id,
+                            "target_count": len(targets),
+                            "target_offset": normalized_target_offset,
+                        },
+                    )
+                )
+                dm_logger.info(
+                    "[DataManager] CNInfo special-action announcement governance "
+                    "started: business_run_id=%s ingestion_run_id=%s targets=%d",
+                    run_id,
+                    announcement_governance["ingestion_run_id"],
+                    len(targets),
+                )
+            except Exception as exc:
+                announcement_governance["errors"] += 1
+                dm_logger.warning(
+                    "[DataManager] CNInfo special-action announcement governance "
+                    "start failed: business_run_id=%s error=%s",
+                    run_id,
+                    exc,
+                )
+                errors.append({
+                    "instrument_id": "",
+                    "source_event_key": "",
+                    "error": (
+                        "announcement_governance_run_start_failed: "
+                        f"{exc}"
+                    ),
+                })
         for index, target in enumerate(targets, start=1):
             symbol = target.instrument_id.split(".")[0].zfill(6)
             exchange = "SSE" if target.instrument_id.endswith(".SH") else "SZSE"
@@ -18938,6 +19046,45 @@ class DataManager:
                     target, scan_result.selected_records
                 )
                 evidence_rows.extend(candidates)
+                if (
+                    not dry_run
+                    and announcement_governance["ingestion_run_id"] is not None
+                ):
+                    try:
+                        persisted = await asyncio.to_thread(
+                            self._persist_corporate_action_announcement_governance,
+                            route_result=route_result,
+                            instrument_id=target.instrument_id,
+                            symbol=symbol,
+                            ingestion_run_id=int(
+                                announcement_governance["ingestion_run_id"]
+                            ),
+                            business_run_id=run_id,
+                        )
+                        announcement_governance[
+                            "scan_states_persisted"
+                        ] += int(persisted["scan_states_persisted"])
+                        announcement_governance["audits_persisted"] += int(
+                            persisted["audits_persisted"]
+                        )
+                    except Exception as exc:
+                        announcement_governance["errors"] += 1
+                        dm_logger.warning(
+                            "[DataManager] CNInfo special-action announcement "
+                            "governance persistence failed: instrument_id=%s "
+                            "source_event_key=%s error=%s",
+                            target.instrument_id,
+                            target.source_event_key,
+                            exc,
+                        )
+                        errors.append({
+                            "instrument_id": target.instrument_id,
+                            "source_event_key": target.source_event_key,
+                            "error": (
+                                "announcement_governance_persistence_failed: "
+                                f"{exc}"
+                            ),
+                        })
                 target_results.append({
                     "instrument_id": target.instrument_id,
                     "source_event_key": target.source_event_key,
@@ -18949,6 +19096,16 @@ class DataManager:
                     "candidate_count": len(candidates),
                     "errors": list(scan_result.errors),
                 })
+                if not scan_result.cursor_commit_allowed:
+                    errors.append({
+                        "instrument_id": target.instrument_id,
+                        "source_event_key": target.source_event_key,
+                        "error": (
+                            "announcement_scan_incomplete: "
+                            f"status={scan_result.status} "
+                            f"stop_reason={scan_result.stop_reason}"
+                        ),
+                    })
                 for error in scan_result.errors:
                     errors.append({
                         "instrument_id": target.instrument_id,
@@ -18964,39 +19121,44 @@ class DataManager:
             if index == 1 or index % 10 == 0 or index == len(targets):
                 dm_logger.info(
                     "[DataManager] CNInfo special-action discovery: %d/%d "
-                    "candidates=%d errors=%d",
+                    "candidates=%d governed_scans=%d audited=%d errors=%d",
                     index,
                     len(targets),
                     len(evidence_rows),
+                    announcement_governance["scan_states_persisted"],
+                    announcement_governance["audits_persisted"],
                     len(errors),
                 )
             if index < len(targets):
                 await asyncio.sleep(effective_request_interval)
 
-        identity = hashlib.sha256(json.dumps({
-            "start_date": normalized_start.isoformat(),
-            "end_date": normalized_end.isoformat(),
-            "exchanges": scan_exchanges,
-            "instrument_ids": requested_ids,
-            "target_offset": normalized_target_offset,
-            "target_keys": [target.source_event_key for target in targets],
-        }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
-        run_id = f"a_share_cninfo_special_action_{identity}"
         write_result = {
             "inserted": 0,
             "changed": 0,
             "unchanged": 0,
             "failed": 0,
         }
+        write_exception: Optional[Exception] = None
         if not dry_run:
-            write_result = (
-                await self.db_ops.save_corporate_action_effective_date_evidence(
-                    evidence_rows,
-                    ingestion_run_id=run_id,
+            try:
+                write_result = (
+                    await self.db_ops.save_corporate_action_effective_date_evidence(
+                        evidence_rows,
+                        ingestion_run_id=run_id,
+                    )
                 )
-            )
+            except Exception as exc:
+                write_exception = exc
+                write_result["failed"] = max(1, len(evidence_rows))
+                errors.append({
+                    "instrument_id": "",
+                    "source_event_key": "",
+                    "error": f"corporate_action_evidence_write_failed: {exc}",
+                })
         status = (
-            "partial"
+            "failed"
+            if write_exception is not None
+            else "partial"
             if (
                 errors
                 or int(write_result.get("failed", 0) or 0) > 0
@@ -19004,9 +19166,67 @@ class DataManager:
             )
             else "dry_run" if dry_run else "success"
         )
+        if announcement_governance["ingestion_run_id"] is not None:
+            try:
+                storage = self._require_research_storage()
+                await asyncio.to_thread(
+                    storage.finish_ingestion_run,
+                    int(announcement_governance["ingestion_run_id"]),
+                    status=status,
+                    rows_written=int(
+                        announcement_governance["audits_persisted"]
+                    ),
+                    error_message=(
+                        "; ".join(item["error"] for item in errors[:3])
+                        if status in {"partial", "failed"}
+                        else None
+                    ),
+                    metadata={
+                        "business_run_id": run_id,
+                        "scan_states_persisted": announcement_governance[
+                            "scan_states_persisted"
+                        ],
+                        "audits_persisted": announcement_governance[
+                            "audits_persisted"
+                        ],
+                        "governance_errors": announcement_governance["errors"],
+                    },
+                )
+                dm_logger.info(
+                    "[DataManager] CNInfo special-action announcement governance "
+                    "finished: business_run_id=%s ingestion_run_id=%s "
+                    "status=%s scans=%d audits=%d errors=%d",
+                    run_id,
+                    announcement_governance["ingestion_run_id"],
+                    status,
+                    announcement_governance["scan_states_persisted"],
+                    announcement_governance["audits_persisted"],
+                    announcement_governance["errors"],
+                )
+            except Exception as exc:
+                announcement_governance["errors"] += 1
+                dm_logger.warning(
+                    "[DataManager] CNInfo special-action announcement governance "
+                    "finish failed: business_run_id=%s ingestion_run_id=%s "
+                    "error=%s",
+                    run_id,
+                    announcement_governance["ingestion_run_id"],
+                    exc,
+                )
+                errors.append({
+                    "instrument_id": "",
+                    "source_event_key": "",
+                    "error": (
+                        "announcement_governance_run_finish_failed: "
+                        f"{exc}"
+                    ),
+                })
+                status = "partial"
         batch_failed = bool(
             errors or int(write_result.get("failed", 0) or 0) > 0
         )
+        if write_exception is not None:
+            raise write_exception
         return {
             "status": status,
             "operation": "a_share_cninfo_special_action_discovery",
@@ -19059,6 +19279,7 @@ class DataManager:
                 "resolved_count": 0,
                 "write_result": write_result,
             },
+            "announcement_governance": announcement_governance,
             "target_samples": target_results[:max(0, int(sample_limit))],
             "errors": errors[:max(0, int(sample_limit))],
             "ingestion_run_id": run_id,

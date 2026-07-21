@@ -112,7 +112,15 @@ def test_cninfo_primary_factor_report_keeps_production_isolation_visible():
         "source_events": {"cninfo_rows": 10, "tdx_rows": 12},
         "cninfo_path": {"derived_events": 8},
         "tdx_path": {"derived_events": 9},
-        "reconciliation": {"totals": {"conflicts": 1, "tdx_only": 2}},
+        "reconciliation": {
+            "totals": {"rounded_matches": 3, "conflicts": 1, "tdx_only": 2},
+            "matching_policy": {
+                "factor_relative_tolerance": 0.0001,
+                "rounded_precision_policy": {
+                    "version": "tdx_xdxr_observed_precision_v2"
+                },
+            },
+        },
         "benchmark": {
             "benchmark_series_version": "benchmark",
             "source_selection_status": "deferred",
@@ -128,6 +136,9 @@ def test_cninfo_primary_factor_report_keeps_production_isolation_visible():
 
     assert "生产表影响: `无`" in report
     assert "conflicts=1" in report
+    assert "rounded_matches=3" in report
+    assert "policy=tdx_xdxr_observed_precision_v2" in report
+    assert "factor_relative_tolerance=0.010000%" in report
     assert "主源选择: `deferred`" in report
     assert "候选构造: `未执行" in report
 
@@ -150,10 +161,12 @@ async def test_scheduler_cninfo_primary_rebuild_delegates_manual_parameters(monk
         instrument_ids=["000001.SZ"],
         dry_run=True,
         field_tolerance=0.001,
+        factor_relative_tolerance=0.0002,
     )
 
     assert result["status"] == "dry_run"
     assert rebuild.await_args.kwargs["instrument_ids"] == ["000001.SZ"]
     assert rebuild.await_args.kwargs["field_tolerance"] == 0.001
+    assert rebuild.await_args.kwargs["factor_relative_tolerance"] == 0.0002
     assert rebuild.await_args.kwargs["build_canonical"] is False
     assert "a_share_cninfo_adjustment_factor_rebuild" not in task._active_tasks

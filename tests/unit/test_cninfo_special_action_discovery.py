@@ -14,6 +14,19 @@ from research.announcements import (
 
 
 class _FakeAnnouncementService:
+    def __init__(
+        self,
+        *,
+        status="success",
+        is_complete=True,
+        errors=(),
+        stop_reason=None,
+    ):
+        self.status = status
+        self.is_complete = is_complete
+        self.errors = tuple(errors)
+        self.stop_reason = stop_reason
+
     def acquire(self, query, *, selectors=None):
         record = AnnouncementRecord(
             source="cninfo",
@@ -24,6 +37,7 @@ class _FakeAnnouncementService:
             market=query.scope.market,
             exchange=query.scope.exchange,
             symbols=(query.scope.symbol or "600108",),
+            raw_payload={"announcementId": "120220001"},
             attachments=(
                 AnnouncementAttachment(
                     source_url="finalpage/2006-06-09/120220001.PDF",
@@ -41,15 +55,22 @@ class _FakeAnnouncementService:
         scan_result = AnnouncementScanResult(
             source="cninfo",
             query=query.for_source("cninfo"),
-            status="success",
+            status=self.status,
             records=(record,),
             selected_records=selected,
             announcements_seen=1,
             pages_scanned=1,
             requests_made=1,
-            is_complete=True,
+            is_complete=self.is_complete,
+            stop_reason=self.stop_reason,
+            errors=self.errors,
         )
-        return SimpleNamespace(scan_result=scan_result)
+        return SimpleNamespace(
+            scan_result=scan_result,
+            attempts=(),
+            fallback_used=False,
+            fallback_reason=None,
+        )
 
 
 def _event_row(
@@ -74,7 +95,7 @@ def _event_row(
     }
 
 
-def _manager(event_rows=None, adjacent_rows=None):
+def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
     manager = DataManager()
     manager.db_ops = Mock()
     normalized_event_rows = list(event_rows or [_event_row()])
@@ -99,8 +120,15 @@ def _manager(event_rows=None, adjacent_rows=None):
         }
     )
     manager._build_official_announcement_acquisition_service = Mock(
-        return_value=_FakeAnnouncementService()
+        return_value=announcement_service or _FakeAnnouncementService()
     )
+    storage = Mock()
+    storage.start_ingestion_run = Mock(return_value=42)
+    storage.finish_ingestion_run = Mock()
+    storage.upsert_announcement_scan_state = Mock(return_value={"status": "success"})
+    storage.store_announcement_audit = Mock()
+    manager._require_research_storage = Mock(return_value=storage)
+    manager._announcement_test_storage = storage
     return manager
 
 
@@ -123,6 +151,10 @@ async def test_discovery_dry_run_scans_candidates_but_does_not_write():
     assert result["evidence"]["candidate_count"] == 1
     assert result["evidence"]["resolved_count"] == 0
     manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()
+    manager._announcement_test_storage.upsert_announcement_scan_state.assert_not_called()
+    manager._announcement_test_storage.store_announcement_audit.assert_not_called()
+    manager._announcement_test_storage.start_ingestion_run.assert_not_called()
+    manager._announcement_test_storage.finish_ingestion_run.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -142,6 +174,119 @@ async def test_discovery_write_persists_candidate_only():
     rows = manager.db_ops.save_corporate_action_effective_date_evidence.await_args.args[0]
     assert rows[0]["resolution_status"] == "candidate"
     assert rows[0]["effective_date"] is None
+    storage = manager._announcement_test_storage
+    storage.upsert_announcement_scan_state.assert_called_once()
+    state_kwargs = storage.upsert_announcement_scan_state.call_args.kwargs
+    assert state_kwargs["scan_result"].query.purpose_key == (
+        "a_share_cninfo_special_action_discovery"
+    )
+    assert state_kwargs["metadata"]["business_domain"] == "corporate_action"
+    assert state_kwargs["metadata"]["business_run_id"] == result[
+        "ingestion_run_id"
+    ]
+    storage.store_announcement_audit.assert_called_once()
+    audit_kwargs = storage.store_announcement_audit.call_args.kwargs
+    assert audit_kwargs["purpose_key"] == "a_share_cninfo_special_action_discovery"
+    assert audit_kwargs["instrument_id"] == "600108.SH"
+    assert audit_kwargs["symbol"] == "600108"
+    assert audit_kwargs["ingestion_run_id"] == 42
+    assert audit_kwargs["record"].announcement_key == "cninfo:120220001"
+    assert audit_kwargs["record"].raw_payload == {
+        "announcementId": "120220001"
+    }
+    assert "event_class:share_reform" in audit_kwargs[
+        "record"
+    ].selection_reasons
+    assert result["announcement_governance"] == {
+        "ingestion_run_id": 42,
+        "scan_states_persisted": 1,
+        "audits_persisted": 1,
+        "errors": 0,
+    }
+    storage.finish_ingestion_run.assert_called_once()
+    assert storage.finish_ingestion_run.call_args.kwargs["status"] == "success"
+
+
+@pytest.mark.asyncio
+async def test_discovery_governance_failure_is_partial_but_keeps_domain_write():
+    manager = _manager()
+    manager._announcement_test_storage.upsert_announcement_scan_state.side_effect = (
+        RuntimeError("research storage unavailable")
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        instrument_ids=["600108.SH"],
+        dry_run=False,
+        max_events=10,
+    )
+
+    assert result["status"] == "partial"
+    assert result["announcement_governance"]["errors"] == 1
+    assert result["evidence"]["candidate_count"] == 1
+    manager.db_ops.save_corporate_action_effective_date_evidence.assert_awaited_once()
+    assert any(
+        "announcement_governance_persistence_failed" in item["error"]
+        for item in result["errors"]
+    )
+
+
+@pytest.mark.asyncio
+async def test_discovery_incomplete_scan_persists_diagnostics_and_is_partial():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(
+            status="degraded",
+            is_complete=False,
+            stop_reason="max_pages_reached",
+        )
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        instrument_ids=["600108.SH"],
+        dry_run=False,
+        max_events=10,
+    )
+
+    assert result["status"] == "partial"
+    state_result = manager._announcement_test_storage.upsert_announcement_scan_state.call_args.kwargs[
+        "scan_result"
+    ]
+    assert state_result.status == "degraded"
+    assert state_result.cursor_commit_allowed is False
+    assert any(
+        "announcement_scan_incomplete" in item["error"]
+        for item in result["errors"]
+    )
+
+
+@pytest.mark.asyncio
+async def test_discovery_domain_write_failure_closes_governance_run():
+    manager = _manager()
+    manager.db_ops.save_corporate_action_effective_date_evidence.side_effect = (
+        RuntimeError("domain database unavailable")
+    )
+
+    with pytest.raises(RuntimeError, match="domain database unavailable"):
+        await manager.discover_cninfo_special_action_effective_dates(
+            start_date="1990-12-19",
+            end_date="2026-07-18",
+            exchanges=["SSE"],
+            instrument_ids=["600108.SH"],
+            dry_run=False,
+            max_events=10,
+        )
+
+    finish = manager._announcement_test_storage.finish_ingestion_run
+    finish.assert_called_once()
+    assert finish.call_args.kwargs["status"] == "failed"
+    assert "corporate_action_evidence_write_failed" in finish.call_args.kwargs[
+        "error_message"
+    ]
 
 
 @pytest.mark.asyncio

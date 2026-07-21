@@ -6,12 +6,26 @@ import math
 from bisect import bisect_right
 from collections import defaultdict
 from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
 CNINFO_FACTOR_PROFILE = "cninfo_event_derived_v1"
 TDX_FACTOR_PROFILE = "tdx_event_derived_v1"
 FACTOR_NORMALIZATION_VERSION = "official_event_formula_v1"
+RECONCILIATION_PRECISION_POLICY_VERSION = "tdx_xdxr_observed_precision_v2"
+
+# TDX exposes float32 values without a decimal scale. Stable significant-digit
+# normalization removes binary noise; field caps prevent integer-looking
+# values from implying an unreasonably coarse rounding allowance.
+DEFAULT_ROUNDED_FIELD_TOLERANCE_CAPS = {
+    "cash_per_share": 0.0005,
+    "bonus_per_share": 0.005,
+    "rights_per_share": 0.005,
+    "rights_price": 0.005,
+}
+TDX_FLOAT_SIGNIFICANT_DIGITS = 7
+DEFAULT_FACTOR_RELATIVE_TOLERANCE = 0.0001
 
 
 def _date(value: Any) -> Optional[date]:
@@ -353,6 +367,11 @@ def derive_cninfo_factor_path(
             "rights_proceeds_per_share": round(
                 aggregate["rights_proceeds_per_share"], 10
             ),
+            "rights_price": round(
+                aggregate["rights_proceeds_per_share"]
+                / aggregate["rights_per_share"],
+                10,
+            ) if aggregate["rights_per_share"] > 0 else 0.0,
             "pre_close": pre_close,
             "factor": factor,
             "cumulative_factor": cumulative_by_instrument[instrument_id],
@@ -432,14 +451,18 @@ def derive_tdx_factor_path(
             "bonus_per_share": 0.0,
             "rights_per_share": 0.0,
             "rights_price": 0.0,
+            "rights_proceeds_per_share": 0.0,
         })
         aggregate["source_ex_dates"].append(source_date)
         aggregate["factor"] *= factor
         aggregate["cash_per_share"] += _number(row.get("fenhong")) / 10.0
         aggregate["bonus_per_share"] += _number(row.get("songzhuangu")) / 10.0
-        aggregate["rights_per_share"] += _number(row.get("peigu")) / 10.0
-        if _number(row.get("peigu")) > 0:
-            aggregate["rights_price"] = _number(row.get("peigujia"))
+        rights_per_share = _number(row.get("peigu")) / 10.0
+        rights_price = _number(row.get("peigujia"))
+        aggregate["rights_per_share"] += rights_per_share
+        aggregate["rights_proceeds_per_share"] += (
+            rights_per_share * rights_price
+        )
 
     events: List[Dict[str, Any]] = []
     observations_out: List[Dict[str, Any]] = []
@@ -471,6 +494,12 @@ def derive_tdx_factor_path(
             })
             continue
         factor = round(aggregate["factor"], 12)
+        aggregate["rights_price"] = (
+            aggregate["rights_proceeds_per_share"]
+            / aggregate["rights_per_share"]
+            if aggregate["rights_per_share"] > 0
+            else 0.0
+        )
         cumulative_by_instrument[instrument_id] = round(
             cumulative_by_instrument[instrument_id] * factor,
             12,
@@ -518,6 +547,23 @@ def _economic_differences(
     cninfo_event: Mapping[str, Any],
     tdx_event: Mapping[str, Any],
 ) -> Dict[str, float]:
+    def rights_price(event: Mapping[str, Any]) -> float:
+        rights = _number(event.get("rights_per_share"))
+        if rights <= 0:
+            return 0.0
+        if event.get("rights_price") is not None:
+            return _number(event.get("rights_price"))
+        proceeds = _number(event.get("rights_proceeds_per_share"))
+        return proceeds / rights
+
+    def rights_proceeds(event: Mapping[str, Any]) -> float:
+        if event.get("rights_proceeds_per_share") is not None:
+            return _number(event.get("rights_proceeds_per_share"))
+        return (
+            _number(event.get("rights_per_share"))
+            * rights_price(event)
+        )
+
     return {
         "cash_per_share": abs(
             _number(cninfo_event.get("cash_per_share"))
@@ -532,13 +578,94 @@ def _economic_differences(
             - _number(tdx_event.get("rights_per_share"))
         ),
         "rights_price": abs(
-            _number(cninfo_event.get("rights_proceeds_per_share"))
-            - (
-                _number(tdx_event.get("rights_per_share"))
-                * _number(tdx_event.get("rights_price"))
-            )
+            rights_price(cninfo_event) - rights_price(tdx_event)
+        ),
+        "rights_proceeds_per_share": abs(
+            rights_proceeds(cninfo_event) - rights_proceeds(tdx_event)
         ),
     }
+
+
+def _factor_relative_difference(
+    left: Any,
+    right: Any,
+) -> Tuple[Optional[float], Optional[float]]:
+    """Return absolute and relative factor difference for audit output."""
+    left_value = _positive(left)
+    right_value = _positive(right)
+    if left_value is None or right_value is None:
+        return None, None
+    absolute = abs(left_value - right_value)
+    denominator = max(abs(left_value), abs(right_value), 1e-12)
+    return absolute, absolute / denominator
+
+
+def _rounded_match_policy(
+    field_tolerances: Optional[Mapping[str, float]],
+) -> Dict[str, Any]:
+    overrides: Dict[str, float] = {}
+    for field_name, value in (field_tolerances or {}).items():
+        if field_name not in DEFAULT_ROUNDED_FIELD_TOLERANCE_CAPS:
+            continue
+        try:
+            normalized = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(normalized) and normalized >= 0:
+            overrides[field_name] = normalized
+    return {
+        "version": RECONCILIATION_PRECISION_POLICY_VERSION,
+        "significant_digits": TDX_FLOAT_SIGNIFICANT_DIGITS,
+        "field_tolerance_caps": dict(DEFAULT_ROUNDED_FIELD_TOLERANCE_CAPS),
+        "field_tolerance_overrides": overrides,
+    }
+
+
+def _observed_precision_tolerance(value: Any) -> float:
+    """Infer half of the stable decimal quantum from one TDX float32 value."""
+    number = abs(_number(value))
+    if number <= 0:
+        return 0.0
+    try:
+        stable = Decimal(format(number, f".{TDX_FLOAT_SIGNIFICANT_DIGITS}g"))
+    except (InvalidOperation, ValueError):
+        return 0.0
+    exponent = stable.normalize().as_tuple().exponent
+    quantum = Decimal(1).scaleb(exponent)
+    return float(abs(quantum) / 2)
+
+
+def _rounded_field_tolerances(
+    tdx_event: Mapping[str, Any],
+    policy: Mapping[str, Any],
+) -> Dict[str, float]:
+    """Expand source-field precision into normalized economic allowances."""
+    caps = dict(policy.get("field_tolerance_caps") or {})
+    overrides = dict(policy.get("field_tolerance_overrides") or {})
+    source_values = {
+        "cash_per_share": tdx_event.get("cash_per_share"),
+        "bonus_per_share": tdx_event.get("bonus_per_share"),
+        "rights_per_share": tdx_event.get("rights_per_share"),
+        "rights_price": tdx_event.get("rights_price"),
+    }
+    base: Dict[str, float] = {}
+    for field_name, source_value in source_values.items():
+        if field_name in overrides:
+            base[field_name] = float(overrides[field_name])
+            continue
+        inferred = _observed_precision_tolerance(source_value)
+        cap = float(caps.get(field_name, 0.0) or 0.0)
+        base[field_name] = min(inferred, cap) if inferred > 0 else 0.0
+    rights_tolerance = float(base.get("rights_per_share", 0.0) or 0.0)
+    price_tolerance = float(base.get("rights_price", 0.0) or 0.0)
+    rights_per_share = abs(_number(tdx_event.get("rights_per_share")))
+    rights_price = abs(_number(tdx_event.get("rights_price")))
+    base["rights_proceeds_per_share"] = (
+        rights_price * rights_tolerance
+        + rights_per_share * price_tolerance
+        + rights_tolerance * price_tolerance
+    )
+    return base
 
 
 def reconcile_cninfo_tdx_events(
@@ -547,6 +674,8 @@ def reconcile_cninfo_tdx_events(
     *,
     sessions_by_exchange: Optional[Mapping[str, Sequence[date]]] = None,
     field_tolerance: float = 0.0001,
+    rounded_field_tolerances: Optional[Mapping[str, float]] = None,
+    factor_relative_tolerance: float = DEFAULT_FACTOR_RELATIVE_TOLERANCE,
     max_session_shift: int = 3,
     sample_limit: int = 20,
 ) -> Dict[str, Any]:
@@ -558,12 +687,26 @@ def reconcile_cninfo_tdx_events(
     used_tdx: set[int] = set()
     exact: List[Dict[str, Any]] = []
     shifted: List[Dict[str, Any]] = []
+    rounded: List[Dict[str, Any]] = []
     conflicts: List[Dict[str, Any]] = []
+    rounded_policy = _rounded_match_policy(rounded_field_tolerances)
+    try:
+        normalized_factor_tolerance = float(factor_relative_tolerance)
+    except (TypeError, ValueError):
+        normalized_factor_tolerance = DEFAULT_FACTOR_RELATIVE_TOLERANCE
+    if (
+        not math.isfinite(normalized_factor_tolerance)
+        or normalized_factor_tolerance < 0
+    ):
+        normalized_factor_tolerance = DEFAULT_FACTOR_RELATIVE_TOLERANCE
 
     def detail(c_idx: int, t_idx: int, distance: int) -> Dict[str, Any]:
         left = cninfo[c_idx]
         right = tdx[t_idx]
         differences = _economic_differences(left, right)
+        factor_difference, factor_relative_difference = _factor_relative_difference(
+            left.get("factor"), right.get("factor")
+        )
         return {
             "instrument_id": left["instrument_id"],
             "cninfo_source_date": _date(left.get("source_ex_date")),
@@ -572,6 +715,8 @@ def reconcile_cninfo_tdx_events(
             "tdx_effective_date": _date(right.get("effective_date")),
             "trading_session_distance": distance,
             "differences": differences,
+            "factor_absolute_difference": factor_difference,
+            "factor_relative_difference": factor_relative_difference,
             "cninfo_factor": left.get("factor"),
             "tdx_factor": right.get("factor"),
             "cninfo_index": c_idx,
@@ -591,8 +736,26 @@ def reconcile_cninfo_tdx_events(
                 item["reason"] = "exact_event_match"
                 exact.append(item)
             else:
-                item["reason"] = "same_date_economic_conflict"
-                conflicts.append(item)
+                rounded_allowances = _rounded_field_tolerances(
+                    right, rounded_policy
+                )
+                item["rounded_field_tolerances"] = rounded_allowances
+                item["factor_relative_tolerance"] = normalized_factor_tolerance
+                if (
+                    all(
+                        item["differences"].get(field_name, 0.0)
+                        <= tolerance + max(1e-12, tolerance * 1e-9)
+                        for field_name, tolerance in rounded_allowances.items()
+                    )
+                    and item["factor_relative_difference"] is not None
+                    and item["factor_relative_difference"]
+                    <= normalized_factor_tolerance
+                ):
+                    item["reason"] = "same_date_source_precision_match"
+                    rounded.append(item)
+                else:
+                    item["reason"] = "same_date_economic_conflict"
+                    conflicts.append(item)
             break
 
     candidates = []
@@ -645,6 +808,7 @@ def reconcile_cninfo_tdx_events(
         "cninfo_events": len(cninfo),
         "tdx_events": len(tdx),
         "exact_matches": len(exact),
+        "rounded_matches": len(rounded),
         "shifted_matches": len(shifted),
         "conflicts": len(conflicts),
         "cninfo_only": len(cninfo_only),
@@ -654,12 +818,20 @@ def reconcile_cninfo_tdx_events(
         "status": (
             "partial" if conflicts or cninfo_only or tdx_only else "success"
         ),
+        "matching_policy": {
+            "exact_field_tolerance": field_tolerance,
+            "rounded_precision_policy": rounded_policy,
+            "factor_relative_tolerance": normalized_factor_tolerance,
+            "rounded_match_requires_same_source_date": True,
+        },
         "totals": totals,
         "exact_matches": exact,
+        "rounded_matches": rounded,
         "shifted_matches": shifted,
         "conflicts": conflicts,
         "cninfo_only": cninfo_only,
         "tdx_only": tdx_only,
+        "rounded_match_samples": rounded[:sample_limit],
         "samples": [*conflicts, *cninfo_only, *tdx_only, *shifted][:sample_limit],
     }
 

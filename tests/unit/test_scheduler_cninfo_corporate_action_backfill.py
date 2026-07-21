@@ -132,9 +132,16 @@ def test_cninfo_special_action_discovery_is_manual_and_candidate_only():
         },
         "targets": {"searchable_events": 2, "events_with_candidates": 1},
         "evidence": {"candidate_count": 3},
+        "announcement_governance": {
+            "ingestion_run_id": None,
+            "scan_states_persisted": 0,
+            "audits_persisted": 0,
+            "errors": 0,
+        },
     })
 
     assert "公告候选证据: `3`" in report
+    assert "run_id=None, scans=0, audits=0, errors=0" in report
     assert "不从标题推断日期" in report
     assert "生产因子影响: `无`" in report
 

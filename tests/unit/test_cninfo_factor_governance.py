@@ -51,6 +51,7 @@ def test_cninfo_factor_derivation_aggregates_same_day_economics():
     assert event["bonus_per_share"] == 0.85
     assert event["rights_per_share"] == 0.1
     assert event["rights_proceeds_per_share"] == 1.6
+    assert event["rights_price"] == 16.0
     assert event["factor"] == pytest.approx(20 * 1.95 / 21.3)
     assert result["observations"][0]["source_profile"] == CNINFO_FACTOR_PROFILE
 
@@ -336,15 +337,210 @@ def test_reconciliation_and_candidate_keep_tdx_only_as_unverified_fallback():
         "cninfo_events": 1,
         "tdx_events": 2,
         "exact_matches": 1,
+        "rounded_matches": 0,
         "shifted_matches": 0,
         "conflicts": 0,
         "cninfo_only": 0,
         "tdx_only": 1,
     }
+    exact_match = reconciliation["exact_matches"][0]
+    assert "rounded_field_tolerances" not in exact_match
+    assert "precision_policy" not in exact_match
     assert len(candidate) == 2
     assert candidate[0]["quality_status"] == "tdx_fallback_unverified"
     assert candidate[1]["selected_source"] == "cninfo"
     assert summary["promotion_eligible"] is False
+
+
+def test_same_date_tdx_source_rounding_is_reported_separately():
+    cninfo_events = [{
+        "instrument_id": "600108.SH",
+        "source_ex_date": date(2006, 6, 14),
+        "effective_date": date(2006, 6, 14),
+        "cash_per_share": 0.03581058386488,
+        "bonus_per_share": 1.02,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "rights_price": 0.0,
+        "factor": 2.042366463463,
+    }]
+    tdx_events = [{
+        "instrument_id": "600108.SH",
+        "source_ex_date": date(2006, 6, 14),
+        "effective_date": date(2006, 6, 14),
+        "cash_per_share": 0.0360000014305115,
+        "bonus_per_share": 1.01999998092651,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "rights_price": 0.0,
+        "factor": 2.042486,
+    }]
+
+    result = reconcile_cninfo_tdx_events(cninfo_events, tdx_events)
+
+    assert result["status"] == "success"
+    assert result["totals"]["exact_matches"] == 0
+    assert result["totals"]["rounded_matches"] == 1
+    assert result["totals"]["conflicts"] == 0
+    match = result["rounded_matches"][0]
+    assert match["reason"] == "same_date_source_precision_match"
+    assert match["differences"]["cash_per_share"] == pytest.approx(
+        0.0001894175656315
+    )
+    assert match["factor_relative_difference"] == pytest.approx(0.00005855, rel=1e-3)
+    policy = result["matching_policy"]["rounded_precision_policy"]
+    assert policy["version"] == "tdx_xdxr_observed_precision_v2"
+    assert match["rounded_field_tolerances"]["cash_per_share"] == 0.0005
+
+
+def test_tdx_rights_ratio_and_price_use_separate_precision_allowances():
+    cninfo_rights = 0.12345
+    cninfo_price = 8.1234
+    tdx_rights = 0.1234
+    tdx_price = 8.12
+    cninfo_events = [{
+        "instrument_id": "000001.SZ",
+        "source_ex_date": date(1993, 5, 24),
+        "effective_date": date(1993, 5, 24),
+        "cash_per_share": 0.0,
+        "bonus_per_share": 0.0,
+        "rights_per_share": cninfo_rights,
+        "rights_proceeds_per_share": cninfo_rights * cninfo_price,
+        "rights_price": cninfo_price,
+        "factor": 1.1,
+    }]
+    tdx_events = [{
+        "instrument_id": "000001.SZ",
+        "source_ex_date": date(1993, 5, 24),
+        "effective_date": date(1993, 5, 24),
+        "cash_per_share": 0.0,
+        "bonus_per_share": 0.0,
+        "rights_per_share": tdx_rights,
+        "rights_proceeds_per_share": tdx_rights * tdx_price,
+        "rights_price": tdx_price,
+        "factor": 1.1,
+    }]
+
+    result = reconcile_cninfo_tdx_events(cninfo_events, tdx_events)
+
+    assert result["totals"]["rounded_matches"] == 1
+    match = result["rounded_matches"][0]
+    assert match["differences"]["rights_price"] == pytest.approx(0.0034)
+    assert match["rounded_field_tolerances"]["rights_price"] == 0.005
+    assert (
+        match["differences"]["rights_proceeds_per_share"]
+        <= match["rounded_field_tolerances"]["rights_proceeds_per_share"]
+    )
+
+
+def test_tdx_observed_decimal_precision_tightens_cash_allowance():
+    cninfo_events = [{
+        "instrument_id": "000001.SZ",
+        "source_ex_date": date(2020, 5, 28),
+        "effective_date": date(2020, 5, 28),
+        "cash_per_share": 0.0336,
+        "bonus_per_share": 0.0,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "factor": 1.00001,
+    }]
+    tdx_events = [{
+        **cninfo_events[0],
+        "cash_per_share": 0.0335,
+        "factor": 1.00001,
+    }]
+
+    result = reconcile_cninfo_tdx_events(
+        cninfo_events,
+        tdx_events,
+        field_tolerance=0.00001,
+    )
+
+    assert result["totals"]["rounded_matches"] == 0
+    assert result["totals"]["conflicts"] == 1
+    assert result["conflicts"][0]["rounded_field_tolerances"][
+        "cash_per_share"
+    ] == pytest.approx(0.00005)
+
+
+def test_unused_rights_price_does_not_create_a_false_conflict():
+    base_event = {
+        "instrument_id": "000001.SZ",
+        "source_ex_date": date(2020, 5, 28),
+        "effective_date": date(2020, 5, 28),
+        "cash_per_share": 0.218,
+        "bonus_per_share": 0.0,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "factor": 1.01,
+    }
+
+    result = reconcile_cninfo_tdx_events(
+        [{**base_event, "rights_price": 0.0}],
+        [{**base_event, "rights_price": 10.0}],
+    )
+
+    assert result["totals"]["exact_matches"] == 1
+    assert result["totals"]["conflicts"] == 0
+
+
+def test_rounded_fields_with_material_factor_difference_remain_conflict():
+    cninfo_events = [{
+        "instrument_id": "600108.SH",
+        "source_ex_date": date(2006, 6, 14),
+        "effective_date": date(2006, 6, 14),
+        "cash_per_share": 0.03581,
+        "bonus_per_share": 1.02,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "rights_price": 0.0,
+        "factor": 2.042366,
+    }]
+    tdx_events = [{
+        **cninfo_events[0],
+        "cash_per_share": 0.036,
+        "factor": 2.05,
+    }]
+
+    result = reconcile_cninfo_tdx_events(cninfo_events, tdx_events)
+
+    assert result["status"] == "partial"
+    assert result["totals"]["rounded_matches"] == 0
+    assert result["totals"]["conflicts"] == 1
+    assert result["conflicts"][0]["factor_relative_difference"] > 0.0001
+
+
+def test_shifted_date_difference_is_not_accepted_as_rounding():
+    cninfo_events = [{
+        "instrument_id": "000001.SZ",
+        "source_ex_date": date(2020, 5, 28),
+        "effective_date": date(2020, 5, 28),
+        "cash_per_share": 0.2183,
+        "bonus_per_share": 0.0,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "rights_price": 0.0,
+        "factor": 1.01,
+    }]
+    tdx_events = [{
+        **cninfo_events[0],
+        "source_ex_date": date(2020, 5, 29),
+        "effective_date": date(2020, 5, 29),
+        "cash_per_share": 0.218,
+    }]
+
+    result = reconcile_cninfo_tdx_events(
+        cninfo_events,
+        tdx_events,
+        sessions_by_exchange={
+            "SZSE": [date(2020, 5, 28), date(2020, 5, 29)]
+        },
+    )
+
+    assert result["totals"]["rounded_matches"] == 0
+    assert result["totals"]["shifted_matches"] == 0
+    assert result["totals"]["conflicts"] == 1
+    assert result["conflicts"][0]["reason"] == "shifted_economic_conflict"
 
 
 def test_candidate_keeps_cninfo_primary_when_tdx_only_shares_effective_date():
