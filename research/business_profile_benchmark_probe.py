@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Seque
 from research.business_profile_archive import download_business_profile_candidate
 from research.business_profile_discovery import (
     BusinessProfileDocumentCandidate,
-    CninfoBusinessProfileDiscoveryAdapter,
+    BusinessProfileAnnouncementDiscoveryAdapter,
 )
 from research.business_profile_pdf_artifacts import BusinessProfilePdfArtifactExtractor
 
@@ -93,7 +93,7 @@ def select_probe_issuers(
 def probe_benchmark_documents(
     benchmark: Mapping[str, Any],
     *,
-    adapter: Optional[CninfoBusinessProfileDiscoveryAdapter] = None,
+    adapter: Optional[BusinessProfileAnnouncementDiscoveryAdapter] = None,
     downloader: Optional[Callable[[BusinessProfileDocumentCandidate], bytes]] = None,
     extractor: Optional[BusinessProfilePdfArtifactExtractor] = None,
     industry_groups: Iterable[str] = (),
@@ -128,7 +128,7 @@ def probe_benchmark_documents(
         instrument_ids=instrument_ids,
         max_issuers=max_issuers,
     )
-    discovery = adapter or CninfoBusinessProfileDiscoveryAdapter()
+    discovery = adapter or BusinessProfileAnnouncementDiscoveryAdapter()
     fetch = downloader or download_business_profile_candidate
     pdf_extractor = extractor or BusinessProfilePdfArtifactExtractor()
 
@@ -189,7 +189,7 @@ def probe_benchmark_documents(
 def _probe_issuer(
     issuer: Mapping[str, Any],
     *,
-    adapter: CninfoBusinessProfileDiscoveryAdapter,
+    adapter: BusinessProfileAnnouncementDiscoveryAdapter,
     downloader: Callable[[BusinessProfileDocumentCandidate], bytes],
     extractor: BusinessProfilePdfArtifactExtractor,
     start_date: Optional[str],

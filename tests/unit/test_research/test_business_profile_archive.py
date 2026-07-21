@@ -168,25 +168,23 @@ def test_exchange_backup_archive_preserves_source_lineage(tmp_path):
     assert manifest["metadata"]["discovery_source"] == "sse"
 
 
-def test_exchange_backup_download_uses_source_tls_and_referer(monkeypatch):
+def test_exchange_backup_download_uses_common_retrieval_service():
     captured = {}
 
-    class _Response:
-        content = b"%PDF-1.7\nsse"
-
-        @staticmethod
-        def raise_for_status():
-            return None
-
-    def _request_get(url, **kwargs):
-        captured["url"] = url
-        captured.update(kwargs)
-        return _Response()
-
-    monkeypatch.setattr(
-        "research.business_profile_archive.request_get",
-        _request_get,
-    )
+    class _Retriever:
+        def retrieve(self, source, attachment, *, require_pdf):
+            captured.update(
+                {
+                    "source": source,
+                    "attachment": attachment,
+                    "require_pdf": require_pdf,
+                }
+            )
+            return type(
+                "Result",
+                (),
+                {"status": "success", "content": b"%PDF-1.7\nsse", "errors": ()},
+            )()
     candidate = _candidate(
         "sse-annual",
         "万华化学2025年年度报告",
@@ -200,12 +198,12 @@ def test_exchange_backup_download_uses_source_tls_and_referer(monkeypatch):
         }
     )
 
-    content = download_business_profile_candidate(candidate)
+    content = download_business_profile_candidate(candidate, retriever=_Retriever())
 
     assert content.startswith(b"%PDF-")
-    assert captured["tls_config"].source_name == "sse"
-    assert captured["headers"]["Referer"].startswith("https://www.sse.com.cn/")
-    assert "Mozilla/5.0" in captured["headers"]["User-Agent"]
+    assert captured["source"] == "sse"
+    assert captured["attachment"].resolved_url == candidate.adjunct_url
+    assert captured["require_pdf"] is True
 
 
 def test_exchange_correction_can_supersede_cninfo_original(tmp_path):

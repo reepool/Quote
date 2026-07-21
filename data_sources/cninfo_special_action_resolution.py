@@ -229,20 +229,24 @@ def build_candidate_evidence(
     """Normalize matching announcement metadata into candidate-only evidence."""
     candidates: Dict[str, Dict[str, Any]] = {}
     for record in records:
-        announcement_id = str(getattr(record, "announcement_id", "") or "").strip()
+        announcement_id = str(
+            getattr(record, "source_announcement_id", "")
+            or getattr(record, "announcement_id", "")
+            or ""
+        ).strip()
         title = str(getattr(record, "title", "") or "").strip()
         reasons = announcement_match_reasons(target, title)
         if not announcement_id or not reasons:
             continue
-        adjunct_url = getattr(record, "adjunct_url", None)
-        evidence_url = None
-        if adjunct_url:
-            text = str(adjunct_url).strip()
-            evidence_url = (
-                text
-                if text.startswith(("http://", "https://"))
-                else f"https://static.cninfo.com.cn/{text.lstrip('/')}"
-            )
+        attachments = tuple(getattr(record, "attachments", ()) or ())
+        attachment = attachments[0] if attachments else None
+        evidence_url = (
+            None
+            if attachment is None
+            else attachment.resolved_url or attachment.source_url
+        )
+        if evidence_url is None:
+            evidence_url = getattr(record, "adjunct_url", None)
         raw_payload = getattr(record, "raw_payload", {}) or {}
         candidates[announcement_id] = {
             "instrument_id": target.instrument_id,
@@ -258,7 +262,10 @@ def build_candidate_evidence(
             "announcement_title": html.unescape(
                 _TITLE_TAG_RE.sub("", title)
             ).strip(),
-            "announcement_time": getattr(record, "announcement_time", None),
+            "announcement_time": (
+                getattr(record, "published_at", None)
+                or getattr(record, "announcement_time", None)
+            ),
             "evidence_url": evidence_url,
             "confidence": None,
             "raw_payload": {

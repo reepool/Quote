@@ -3,28 +3,36 @@ from datetime import date
 from data_sources.corporate_action_validation import (
     compare_cumulative_factor_paths,
     match_official_announcement_evidence,
-    normalize_cninfo_implementation_announcements,
+    normalize_official_implementation_announcements,
     normalize_eastmoney_events,
     normalize_tdx_events,
     reconcile_event_fields,
 )
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanner,
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    build_announcement_key,
 )
 
 
-class _Response:
-    def raise_for_status(self):
-        return None
-
-    def json(self):
-        return [{"code": "600000", "orgId": "gssh0600000", "category": "A股"}]
-
-
-class _Session:
-    def post(self, url, data=None, headers=None, timeout=None):
-        return _Response()
+def _announcement_record(
+    announcement_id, title, *, attachment_url=None
+):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at="2025-07-04T16:00:00+00:00",
+        exchange="SSE",
+        market="SSE",
+        symbols=("600000",),
+        attachments=(
+            (AnnouncementAttachment(source_url=attachment_url),)
+            if attachment_url
+            else ()
+        ),
+    )
 
 
 def test_eastmoney_normalization_keeps_implemented_rows_and_source_identity():
@@ -195,24 +203,16 @@ def test_cumulative_comparison_is_partial_when_one_requested_source_is_missing()
 
 
 def test_cninfo_metadata_is_existence_evidence_not_amount_validation():
-    announcements = normalize_cninfo_implementation_announcements(
+    announcements = normalize_official_implementation_announcements(
         [
-            CninfoAnnouncementRecord(
-                announcement_id="a1",
-                title="浦发银行2024年年度普通股<em>权益</em><em>分派</em><em>实施</em><em>公告</em>",
-                announcement_time="2025-07-04T16:00:00+00:00",
-                market="SSE",
-                column="sse",
-                symbols=["600000"],
-                adjunct_url="finalpage/a1.pdf",
+            _announcement_record(
+                "a1",
+                "浦发银行2024年年度普通股<em>权益</em><em>分派</em><em>实施</em><em>公告</em>",
+                attachment_url="finalpage/a1.pdf",
             ),
-            CninfoAnnouncementRecord(
-                announcement_id="a2",
-                title="关于实施权益分派时可转债停止转股的提示性公告",
-                announcement_time="2025-07-03T16:00:00+00:00",
-                market="SSE",
-                column="sse",
-                symbols=["600000"],
+            _announcement_record(
+                "a2",
+                "关于实施权益分派时可转债停止转股的提示性公告",
             ),
         ],
         symbol_to_instrument={"600000": "600000.SH"},
@@ -226,15 +226,3 @@ def test_cninfo_metadata_is_existence_evidence_not_amount_validation():
     assert result["status"] == "success"
     assert result["evidence_scope"] == "announcement_existence_only"
     assert result["totals"]["official_announcement_evidence_found"] == 1
-
-
-def test_cninfo_scanner_resolves_stock_identity_for_targeted_scans():
-    scanner = CninfoAnnouncementScanner(session=_Session(), retry_attempts=0)
-
-    result = scanner.resolve_stock_identity("600000")
-
-    assert result == {
-        "symbol": "600000",
-        "org_id": "gssh0600000",
-        "stock": "600000,gssh0600000",
-    }

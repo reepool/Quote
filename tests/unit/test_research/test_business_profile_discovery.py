@@ -1,183 +1,202 @@
 from research.business_profile_discovery import (
-    CninfoBusinessProfileDiscoveryAdapter,
+    BusinessProfileAnnouncementDiscoveryAdapter,
 )
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanResult,
+from research.business_profile_exchange_discovery import (
+    BusinessProfileDiscoveryCoordinator,
 )
+from research.announcements import (
+    AnnouncementAcquisitionConfig,
+    AnnouncementAcquisitionService,
+    AnnouncementAttachment,
+    AnnouncementProviderCapabilities,
+    AnnouncementProviderRegistry,
+    AnnouncementRecord,
+    AnnouncementRouteConfig,
+    AnnouncementScanResult,
+    build_announcement_key,
+)
+class _CommonProvider:
+    capabilities = AnnouncementProviderCapabilities(
+        exchanges=frozenset({"SSE"}),
+        supports_market_scope=False,
+        supports_instrument_scope=True,
+        supports_date_filter=True,
+        supports_keyword_filter=True,
+        supports_category_filter=True,
+        cursor_kind="published_at",
+        max_page_size=30,
+    )
 
+    def __init__(self, source_name, records, status="success"):
+        self.source_name = source_name
+        self.records = tuple(records)
+        self.status = status
+        self.queries = []
 
-class _Scanner:
-    def __init__(self, records, *, identity=True, errors=None):
-        self.records = records
-        self.identity = identity
-        self.errors = list(errors or [])
-        self.config = None
-
-    def resolve_stock_identity(self, symbol):
-        if not self.identity:
-            return None
-        return {"symbol": symbol, "org_id": "org-1", "stock": f"{symbol},org-1"}
-
-    def scan(self, config, *, filters):
-        self.config = config
-        selected = []
-        for record in self.records:
-            reasons = []
-            for predicate in filters:
-                reasons.extend(predicate(record))
-            if reasons:
-                selected.append(
-                    CninfoAnnouncementRecord(
-                        **{
-                            **record.__dict__,
-                            "selection_reasons": reasons,
-                        }
-                    )
-                )
-        return CninfoAnnouncementScanResult(
-            config=config,
+    def discover(self, query):
+        self.queries.append(query)
+        return AnnouncementScanResult(
+            source=self.source_name,
+            query=query,
+            status=self.status,
             records=self.records,
-            selected_records=selected,
             pages_scanned=1,
+            requests_made=1,
             announcements_seen=len(self.records),
-            max_announcement_time="2026-04-21T00:00:00+00:00",
-            stopped_at_watermark=False,
-            errors=self.errors,
+            max_published_at=max(
+                (record.published_at for record in self.records),
+                default=None,
+            ),
+            is_complete=True,
+            stop_reason="last_page",
         )
 
 
-class _Storage:
-    def __init__(self):
-        self.state = {
-            "last_watermark": "2026-01-01T00:00:00+00:00",
-        }
-        self.state_writes = []
+class _CommonStorage:
+    def __init__(self, states=None):
+        self.source_states = dict(states or {})
+        self.state_reads = []
+        self.states = []
         self.audits = []
 
-    def get_cninfo_announcement_scan_state(self, **kwargs):
-        return self.state
+    def get_announcement_scan_state(self, **kwargs):
+        self.state_reads.append(kwargs)
+        return self.source_states.get(kwargs["source"])
 
-    def upsert_cninfo_announcement_scan_state(self, **kwargs):
-        self.state_writes.append(kwargs)
+    def upsert_announcement_scan_state(self, **kwargs):
+        self.states.append(kwargs)
 
-    def store_cninfo_announcement_audit(self, **kwargs):
+    def store_announcement_audit(self, **kwargs):
         self.audits.append(kwargs)
 
 
-def _record(announcement_id, title):
-    return CninfoAnnouncementRecord(
-        announcement_id=announcement_id,
+def _common_record(source, source_id, title):
+    return AnnouncementRecord(
+        source=source,
+        source_announcement_id=source_id,
+        announcement_key=build_announcement_key(source, source_id),
         title=title,
-        announcement_time="2026-04-21T00:00:00+00:00",
+        published_at="2026-04-21T00:00:00+00:00",
+        published_at_raw="2026-04-21 08:00:00",
+        exchange="SSE",
         market="SSE",
-        column="sse",
-        symbols=["600309"],
-        sec_names=["万华化学"],
-        org_ids=["org-1"],
-        adjunct_url="finalpage/report.PDF",
-        adjunct_type="PDF",
-        raw_payload={"source": "fixture"},
+        symbols=("600309",),
+        attachments=(
+            AnnouncementAttachment(
+                source_url="report.pdf",
+                resolved_url=f"https://{source}.example/report.pdf",
+                file_extension="PDF",
+            ),
+        ),
+        raw_payload={"source": "common_fixture"},
     )
 
 
-def test_instrument_discovery_selects_full_report_and_uses_watermark():
-    scanner = _Scanner(
+def _common_service(providers, *, fallback_on=frozenset()):
+    return AnnouncementAcquisitionService(
+        registry=AnnouncementProviderRegistry(providers),
+        config=AnnouncementAcquisitionConfig(
+            provider_configs={provider.source_name: {} for provider in providers},
+            default_route=AnnouncementRouteConfig(
+                sources=tuple(provider.source_name for provider in providers),
+                fallback_on=fallback_on,
+            ),
+        ),
+    )
+
+
+def test_default_business_profile_path_uses_common_acquisition_and_generic_storage():
+    provider = _CommonProvider(
+        "cninfo",
         [
-            _record("full", "万华化学2025年年度报告"),
-            _record("summary", "万华化学2025年年度报告摘要"),
-        ]
+            _common_record("cninfo", "full", "万华化学2025年年度报告"),
+            _common_record("cninfo", "summary", "万华化学2025年年度报告摘要"),
+        ],
     )
-    storage = _Storage()
-    adapter = CninfoBusinessProfileDiscoveryAdapter(
+    storage = _CommonStorage()
+    adapter = BusinessProfileAnnouncementDiscoveryAdapter(
         storage=storage,
-        scanner=scanner,
+        acquisition_service=_common_service([provider]),
     )
 
     result = adapter.discover_instrument(
         {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"},
-        start_date="2026-01-01",
-        end_date="2026-07-16",
-        search_key="年度报告",
-        category="category_ndbg_szsh",
         dry_run=False,
         ingestion_run_id=7,
     )
 
     assert [item.announcement_id for item in result.candidates] == ["full"]
     assert result.candidates[0].classification.document_type == "annual_report"
-    assert scanner.config.stock == "600309,org-1"
-    assert scanner.config.search_key == "年度报告"
-    assert scanner.config.category == "category_ndbg_szsh"
-    assert scanner.config.stop_at_watermark == "2026-01-01T00:00:00+00:00"
-    assert storage.state_writes[0]["selected_announcements"] == 1
+    assert storage.states[0]["selected_announcements"] == 1
+    assert storage.audits[0]["record"].raw_payload[
+        "business_profile_classification"
+    ]["document_type"] == "annual_report"
     assert storage.audits[0]["ingestion_run_id"] == 7
-    assert (
-        storage.audits[0]["raw_payload"]["business_profile_classification"][
-            "document_type"
-        ]
-        == "annual_report"
+
+
+def test_business_profile_coordinator_exposes_common_route_attempts_and_fallback():
+    primary = _CommonProvider("cninfo", [], status="success_empty")
+    backup = _CommonProvider(
+        "sse",
+        [_common_record("sse", "annual", "万华化学2025年年度报告")],
+    )
+    adapter = BusinessProfileAnnouncementDiscoveryAdapter(
+        acquisition_service=_common_service(
+            [primary, backup],
+            fallback_on=frozenset({"success_empty"}),
+        )
+    )
+    coordinator = BusinessProfileDiscoveryCoordinator(
+        primary_adapter=adapter,
     )
 
-
-def test_discovery_keeps_restructuring_as_candidate_hint():
-    scanner = _Scanner([_record("event", "重大资产置换及发行股份购买资产公告")])
-    adapter = CninfoBusinessProfileDiscoveryAdapter(scanner=scanner)
-
-    result = adapter.discover_instrument(
-        {"instrument_id": "600001.SH", "symbol": "600001", "exchange": "SSE"}
+    result = coordinator.discover_instrument(
+        {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"}
     )
 
-    candidate = result.candidates[0]
-    assert candidate.classification.document_type == "profile_change_event"
-    assert candidate.classification.profile_event_hints == [
-        "reverse_merger",
-        "major_asset_restructuring",
-    ]
+    assert result.selected_source == "sse"
+    assert result.fallback_used is True
+    assert result.fallback_reason == "primary_empty"
+    assert [attempt.source for attempt in result.attempts] == ["cninfo", "sse"]
+    assert result.candidates[0].announcement_id == "sse:annual"
 
 
-def test_discovery_keeps_correction_notice_out_of_full_report_class():
-    scanner = _Scanner([_record("notice", "关于《2023年年度报告》的补充更正公告")])
-    adapter = CninfoBusinessProfileDiscoveryAdapter(scanner=scanner)
-
-    result = adapter.discover_instrument(
-        {"instrument_id": "600001.SH", "symbol": "600001", "exchange": "SSE"}
+def test_business_profile_fallback_loads_cursor_for_each_source_independently():
+    primary = _CommonProvider("cninfo", [], status="success_empty")
+    backup = _CommonProvider(
+        "sse",
+        [_common_record("sse", "annual", "万华化学2025年年度报告")],
     )
-
-    candidate = result.candidates[0]
-    assert candidate.classification.document_type == ("annual_report_correction_notice")
-    assert candidate.classification.is_full_report is False
-
-
-def test_discovery_reports_missing_cninfo_identity_without_scan():
-    scanner = _Scanner([], identity=False)
-    adapter = CninfoBusinessProfileDiscoveryAdapter(scanner=scanner)
-
-    result = adapter.discover_instrument(
-        {"instrument_id": "920001.BJ", "symbol": "920001", "exchange": "BSE"}
+    storage = _CommonStorage(
+        states={
+            "cninfo": {
+                "committed_cursor": {
+                    "kind": "published_at",
+                    "value": "2026-07-20T00:00:00+00:00",
+                }
+            },
+            "sse": {
+                "committed_cursor": {
+                    "kind": "published_at",
+                    "value": "2026-07-19T00:00:00+00:00",
+                }
+            },
+        }
     )
-
-    assert result.status == "not_found"
-    assert result.errors == ["cninfo_stock_identity_not_found"]
-    assert scanner.config is None
-
-
-def test_degraded_scan_keeps_prior_watermark():
-    scanner = _Scanner(
-        [_record("full", "万华化学2025年年度报告")],
-        errors=["page 2 failed"],
-    )
-    storage = _Storage()
-    adapter = CninfoBusinessProfileDiscoveryAdapter(
+    adapter = BusinessProfileAnnouncementDiscoveryAdapter(
         storage=storage,
-        scanner=scanner,
+        acquisition_service=_common_service(
+            [primary, backup],
+            fallback_on=frozenset({"success_empty"}),
+        ),
     )
 
     result = adapter.discover_instrument(
         {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"},
-        dry_run=False,
+        dry_run=True,
     )
 
-    assert result.status == "degraded"
-    assert storage.state_writes[0]["last_watermark"] == ("2026-01-01T00:00:00+00:00")
-    assert storage.state_writes[0]["metadata"]["watermark_advanced"] is False
+    assert result.source == "sse"
+    assert [item["source"] for item in storage.state_reads] == ["cninfo", "sse"]
+    assert primary.queries[0].scope.cursor.value == "2026-07-20T00:00:00+00:00"
+    assert backup.queries[0].scope.cursor.value == "2026-07-19T00:00:00+00:00"

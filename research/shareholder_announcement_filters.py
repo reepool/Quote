@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional
 
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import AnnouncementRecord
 
 
 PERIODIC_REPORT_KEYWORDS = (
@@ -44,11 +44,11 @@ class ShareholderAnnouncementCandidate:
     reasons: List[str] = field(default_factory=list)
     announcement_ids: List[str] = field(default_factory=list)
     latest_announcement_time: Optional[str] = None
-    announcements: List[CninfoAnnouncementRecord] = field(default_factory=list)
+    announcements: List[AnnouncementRecord] = field(default_factory=list)
 
 
 def shareholder_announcement_filter(
-    record: CninfoAnnouncementRecord,
+    record: AnnouncementRecord,
 ) -> List[str]:
     """Return shareholder refresh reasons for one announcement."""
     title = record.title or ""
@@ -84,7 +84,7 @@ def build_shareholder_symbol_index(
 
 
 def build_shareholder_announcement_candidates(
-    records: Iterable[CninfoAnnouncementRecord],
+    records: Iterable[AnnouncementRecord],
     symbol_index: Dict[str, Dict[str, Any]],
 ) -> Dict[str, ShareholderAnnouncementCandidate]:
     """Map selected announcements to shareholder candidate instruments."""
@@ -113,17 +113,25 @@ def build_shareholder_announcement_candidates(
             for reason in reasons:
                 if reason not in candidate.reasons:
                     candidate.reasons.append(reason)
-            if record.announcement_id not in candidate.announcement_ids:
-                candidate.announcement_ids.append(record.announcement_id)
+            announcement_id = str(
+                getattr(record, "source_announcement_id", "")
+                or getattr(record, "announcement_id", "")
+            )
+            if announcement_id not in candidate.announcement_ids:
+                candidate.announcement_ids.append(announcement_id)
                 candidate.announcements.append(record)
+            announcement_time = (
+                getattr(record, "published_at", None)
+                or getattr(record, "announcement_time", None)
+            )
             if (
-                record.announcement_time
+                announcement_time
                 and (
                     candidate.latest_announcement_time is None
-                    or record.announcement_time > candidate.latest_announcement_time
+                    or announcement_time > candidate.latest_announcement_time
                 )
             ):
-                candidate.latest_announcement_time = record.announcement_time
+                candidate.latest_announcement_time = announcement_time
     return candidates
 
 

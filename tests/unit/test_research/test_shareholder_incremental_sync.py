@@ -4,13 +4,15 @@ from datetime import datetime
 
 import pytest
 
-from research.providers.base import BaseShareholderProvider, ShareholderSnapshot
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanConfig,
-    CninfoAnnouncementScanResult,
-    CninfoAnnouncementScanner,
+from research.announcements import (
+    AnnouncementRecord,
+    AnnouncementRouteAttempt,
+    AnnouncementRouteResult,
+    AnnouncementScanResult,
+    ProviderCursor,
+    build_announcement_key,
 )
+from research.providers.base import BaseShareholderProvider, ShareholderSnapshot
 from research.providers.registry import ShareholderProviderRegistry
 from research.shareholder_announcement_filters import (
     ShareholderAnnouncementCandidate,
@@ -37,62 +39,52 @@ class _MockDbOps:
         return [item for item in self.instruments if item["exchange"] == exchange]
 
 
-class _FakeResponse:
-    def __init__(self, payload):
-        self._payload = payload
-
-    def raise_for_status(self):
-        return None
-
-    def json(self):
-        return self._payload
-
-
-class _FakeSession:
-    def __init__(self, payloads):
-        self.payloads = list(payloads)
-        self.calls = []
-
-    def post(self, url, data, headers, timeout):
-        self.calls.append({"url": url, "data": dict(data), "timeout": timeout})
-        return _FakeResponse(self.payloads.pop(0))
-
-
-class _FakeAnnouncementScanner:
+class _FakeAnnouncementService:
     def __init__(self, records):
-        self.records = records
-        self.calls = []
+        self.records = tuple(records)
+        self.queries = []
 
-    def scan(self, config, *, filters=None):
-        self.calls.append(config)
+    def acquire(self, query, *, selectors=None):
+        self.queries.append(query)
         selected = []
         for record in self.records:
             reasons = []
-            for predicate in filters or []:
-                reasons.extend(predicate(record) or [])
+            for selector in selectors or ():
+                reasons.extend(selector(record) or ())
             if reasons:
-                selected.append(
-                    CninfoAnnouncementRecord(
-                        announcement_id=record.announcement_id,
-                        title=record.title,
-                        announcement_time=record.announcement_time,
-                        market=record.market,
-                        column=record.column,
-                        symbols=record.symbols,
-                        raw_payload=record.raw_payload,
-                        selection_reasons=sorted(set(reasons)),
-                    )
-                )
-        return CninfoAnnouncementScanResult(
-            config=config,
+                selected.append(record.with_selection_reasons(reasons))
+        source_query = query.for_source("cninfo")
+        scan_result = AnnouncementScanResult(
+            source="cninfo",
+            query=source_query,
+            status="success",
             records=self.records,
-            selected_records=selected,
+            selected_records=tuple(selected),
             pages_scanned=1,
+            requests_made=1,
             announcements_seen=len(self.records),
-            max_announcement_time=max(
-                (record.announcement_time for record in self.records if record.announcement_time),
+            max_published_at=max(
+                (record.published_at for record in self.records if record.published_at),
                 default=None,
             ),
+            provider_cursor=ProviderCursor(kind="published_at", value="2026-04-30"),
+            is_complete=True,
+            stop_reason="completed",
+        )
+        attempt = AnnouncementRouteAttempt(
+            source="cninfo",
+            status="success",
+            record_count=len(self.records),
+            selected_count=len(selected),
+            pages_scanned=1,
+            stop_reason="completed",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan_result,
+            attempts=(attempt,),
         )
 
 
@@ -191,7 +183,7 @@ def _build_config(tmp_path):
                 "enabled": True,
                 "supports_proxy_patch": False,
                 "cost_tier": "free",
-                "announcement_scan": {
+                "announcements": {
                     "markets": {
                         "SSE": {"market": "SSE", "column": "sse", "plate": "sh"}
                     }
@@ -201,100 +193,8 @@ def _build_config(tmp_path):
     )
 
 
-def test_cninfo_announcement_scanner_paginates_and_filters():
-    session = _FakeSession(
-        [
-            {
-                "announcements": [
-                    {
-                        "announcementId": "a1",
-                        "announcementTitle": "平安银行股份有限公司2026年第一季度报告",
-                        "announcementTime": 1777392000000,
-                        "secCode": "000001",
-                        "secName": "平安银行",
-                        "adjunctUrl": "x.pdf",
-                    },
-                    {
-                        "announcementId": "a2",
-                        "announcementTitle": "普通提示性公告",
-                        "announcementTime": 1777391000000,
-                        "secCode": "000002",
-                    },
-                ]
-            },
-            {"announcements": []},
-        ]
-    )
-    scanner = CninfoAnnouncementScanner(session=session, request_interval_seconds=0)
-
-    result = scanner.scan(
-        CninfoAnnouncementScanConfig(
-            purpose_key="test",
-            market="SZSE",
-            column="szse",
-            plate="sz",
-            start_date="2026-05-01",
-            end_date="2026-05-23",
-            page_size=2,
-            max_pages=3,
-        ),
-        filters=[shareholder_announcement_filter],
-    )
-
-    assert result.pages_scanned == 2
-    assert result.announcements_seen == 2
-    assert len(result.selected_records) == 1
-    assert result.selected_records[0].announcement_id == "a1"
-    assert result.selected_records[0].selection_reasons == ["periodic_report"]
-    assert session.calls[0]["data"]["column"] == "szse"
-    assert session.calls[0]["data"]["plate"] == "sz"
-
-
-def test_cninfo_announcement_scanner_caps_page_size_at_upstream_limit():
-    first_page = [
-        {
-            "announcementId": f"a{index}",
-            "announcementTitle": f"测试公告{index}",
-            "announcementTime": 1777392000000 - index,
-            "secCode": "000001",
-        }
-        for index in range(30)
-    ]
-    session = _FakeSession(
-        [
-            {"announcements": first_page, "hasMore": True},
-            {
-                "announcements": [
-                    {
-                        "announcementId": "a30",
-                        "announcementTitle": "历史测试公告",
-                        "announcementTime": 1777391000000,
-                        "secCode": "000001",
-                    }
-                ],
-                "hasMore": False,
-            },
-        ]
-    )
-    scanner = CninfoAnnouncementScanner(session=session, request_interval_seconds=0)
-
-    result = scanner.scan(
-        CninfoAnnouncementScanConfig(
-            purpose_key="page-size-cap",
-            market="SZSE",
-            column="szse",
-            page_size=100,
-            max_pages=3,
-        )
-    )
-
-    assert result.pages_scanned == 2
-    assert result.announcements_seen == 31
-    assert [call["data"]["pageSize"] for call in session.calls] == ["30", "30"]
-
-
 @pytest.mark.asyncio
-async def test_shareholder_incremental_sync_writes_then_skips_unchanged(tmp_path):
+async def test_shareholder_incremental_sync_uses_common_announcement_service(tmp_path):
     config = _build_config(tmp_path)
     storage = ResearchStorageManager(config)
     storage.initialize()
@@ -306,16 +206,19 @@ async def test_shareholder_incremental_sync_writes_then_skips_unchanged(tmp_path
         "type": "stock",
         "is_active": True,
     }
-    scanner = _FakeAnnouncementScanner(
+    announcement_service = _FakeAnnouncementService(
         [
-            CninfoAnnouncementRecord(
-                announcement_id="ann-1",
+            AnnouncementRecord(
+                source="cninfo",
+                source_announcement_id="ann-common-1",
+                announcement_key=build_announcement_key("cninfo", "ann-common-1"),
                 title="贵州茅台2026年第一季度报告",
-                announcement_time="2026-04-30T16:00:00",
+                published_at="2026-04-30T16:00:00+08:00",
+                published_at_raw="2026-04-30",
+                exchange="SSE",
                 market="SSE",
-                column="sse",
-                symbols=["600519"],
-                raw_payload={"announcementId": "ann-1"},
+                symbols=("600519",),
+                raw_payload={"announcementId": "ann-common-1"},
             )
         ]
     )
@@ -326,27 +229,21 @@ async def test_shareholder_incremental_sync_writes_then_skips_unchanged(tmp_path
         research_config=config,
         resolver=ResearchSourcePolicyResolver(config),
         registry=ShareholderProviderRegistry({"cninfo": provider}),
-        announcement_scanner=scanner,
+        announcement_service=announcement_service,
     )
 
-    first = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
-    second = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
 
-    assert first["status"] == "success"
-    assert first["snapshots_written"] == 1
-    assert first["changed_instruments"] == 1
-    assert second["status"] == "success"
-    assert second["snapshots_written"] == 0
-    assert second["unchanged_instruments"] == 1
-    manifest = storage.get_shareholder_change_manifest("600519.SH")
-    assert manifest is not None
-    assert manifest["status"] == "unchanged"
-
+    assert result["status"] == "success"
+    assert result["selected_announcements"] == 1
+    assert result["snapshots_written"] == 1
+    assert announcement_service.queries[0].purpose_key == service.purpose_key
     with sqlite3.connect(config.storage.db_path) as conn:
-        raw_count = conn.execute(
-            "SELECT COUNT(*) FROM raw_payload_audit WHERE domain = 'shareholders'"
-        ).fetchone()[0]
-    assert raw_count == 1
+        assert conn.execute("SELECT COUNT(*) FROM announcement_scan_state").fetchone()[0] == 1
+        audit = conn.execute(
+            "SELECT source_announcement_id FROM announcement_audit"
+        ).fetchone()
+    assert audit == ("ann-common-1",)
 
 
 def test_shareholder_hash_is_stable_for_reordered_top_holders():

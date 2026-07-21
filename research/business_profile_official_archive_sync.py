@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from research.business_profile_archive import BusinessProfileDocumentArchiveService
 from research.business_profile_discovery import (
     BusinessProfileDocumentCandidate,
-    CninfoBusinessProfileDiscoveryAdapter,
+    BusinessProfileAnnouncementDiscoveryAdapter,
 )
 from research.business_profile_documents import (
     business_profile_document_family,
@@ -66,7 +66,7 @@ class BusinessProfileOfficialArchiveSyncService:
         self.coordinator = coordinator or (
             BusinessProfileDiscoveryCoordinator.from_research_config(
                 research_config,
-                primary_adapter=CninfoBusinessProfileDiscoveryAdapter(),
+                primary_adapter=BusinessProfileAnnouncementDiscoveryAdapter(),
             )
         )
         self.archive_service = archive_service or (
@@ -319,7 +319,7 @@ class BusinessProfileOfficialArchiveSyncService:
                 max_pages=max_pages,
                 dry_run=True,
             )
-            matched_family_periods = _merge_discovery_resolution(
+            _merge_discovery_resolution(
                 resolution,
                 family=family,
                 periods=periods,
@@ -327,84 +327,6 @@ class BusinessProfileOfficialArchiveSyncService:
                 attempts=attempts,
                 discovery_errors=discovery_errors,
             )
-            missing_family_periods = sorted(set(periods) - matched_family_periods)
-            primary_discovery = getattr(
-                self.coordinator,
-                "discover_primary_instrument",
-                None,
-            )
-            if (
-                missing_family_periods
-                and _primary_discovery_succeeded(resolution)
-                and callable(primary_discovery)
-            ):
-                for missing_period in list(missing_family_periods):
-                    retry_window = _period_disclosure_window(
-                        missing_period,
-                        as_of_date=as_of_date,
-                        start_date=start_date,
-                        end_date=end_date,
-                    )
-                    if retry_window is None:
-                        continue
-                    primary_resolution = primary_discovery(
-                        instrument,
-                        start_date=retry_window[0],
-                        end_date=retry_window[1],
-                        search_key=f"{missing_period[:4]}年",
-                        page_size=page_size,
-                        max_pages=max_pages,
-                        dry_run=True,
-                    )
-                    _merge_discovery_resolution(
-                        primary_resolution,
-                        family=family,
-                        periods=[missing_period],
-                        candidates=candidates,
-                        attempts=attempts,
-                        discovery_errors=discovery_errors,
-                    )
-                matched_family_periods = {
-                    period
-                    for period, _announcement_id in candidates
-                    if period in periods
-                }
-                missing_family_periods = sorted(
-                    set(periods) - matched_family_periods
-                )
-            backup_discovery = getattr(
-                self.coordinator,
-                "discover_backup_instrument",
-                None,
-            )
-            if missing_family_periods and callable(backup_discovery):
-                for missing_period in missing_family_periods:
-                    retry_window = _period_disclosure_window(
-                        missing_period,
-                        as_of_date=as_of_date,
-                        start_date=start_date,
-                        end_date=end_date,
-                    )
-                    if retry_window is None:
-                        continue
-                    backup_resolution = backup_discovery(
-                        instrument,
-                        start_date=retry_window[0],
-                        end_date=retry_window[1],
-                        search_key=FAMILY_SEARCH_KEYS[family],
-                        page_size=page_size,
-                        max_pages=max_pages,
-                        dry_run=True,
-                    )
-                    _merge_discovery_resolution(
-                        backup_resolution,
-                        family=family,
-                        periods=[missing_period],
-                        candidates=candidates,
-                        attempts=attempts,
-                        discovery_errors=discovery_errors,
-                    )
-
         selected = _select_active_candidates(candidates.values())
         matched_periods = sorted(
             {
@@ -604,44 +526,6 @@ def _query_window(
         return start_date, end_date
     earliest = min(date.fromisoformat(period) for period in periods)
     return earliest.isoformat(), as_of_date
-
-
-def _period_disclosure_window(
-    period: str,
-    *,
-    as_of_date: str,
-    start_date: Optional[str],
-    end_date: Optional[str],
-) -> Optional[tuple[str, str]]:
-    """Bound a retry to the normal publication window for one periodic report."""
-    report_date = date.fromisoformat(period)
-    if period.endswith("-12-31"):
-        default_end = date(report_date.year + 1, 6, 30)
-    elif period.endswith("-06-30"):
-        default_end = date(report_date.year, 12, 31)
-    else:
-        return None
-    lower = max(
-        report_date,
-        date.fromisoformat(start_date) if start_date else report_date,
-    )
-    upper = min(
-        default_end,
-        date.fromisoformat(end_date) if end_date else date.fromisoformat(as_of_date),
-        date.fromisoformat(as_of_date),
-    )
-    if lower > upper:
-        return None
-    return lower.isoformat(), upper.isoformat()
-
-
-def _primary_discovery_succeeded(
-    resolution: BusinessProfileDiscoveryResolution,
-) -> bool:
-    return any(
-        attempt.source == "cninfo" and attempt.status == "success"
-        for attempt in resolution.attempts
-    )
 
 
 def _select_active_candidates(

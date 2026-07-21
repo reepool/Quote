@@ -1371,7 +1371,7 @@
                     "retry_backoff_seconds": 0.5,
                     "note": "Uses AkShare CNInfo wrappers: stock_hold_change_cninfo(symbol='\u5168\u90e8') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
                 },
-                "announcement_scan": {
+                "announcements": {
                     "request_timeout_seconds": 20.0,
                     "request_interval_seconds": 0.2,
                     "retry_attempts": 2,
@@ -1396,7 +1396,7 @@
                             "tab_name": "fulltext"
                         }
                     },
-                    "note": "Reusable CNInfo announcement metadata scanner. Domain workflows provide their own filter rules and purpose-specific watermarks."
+                    "note": "CNInfo provider configuration for source-neutral official announcement acquisition."
                 },
                 "financial_statements": {
                     "enabled": false,

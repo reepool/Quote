@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from data_manager import DataManager
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import AnnouncementRecord, build_announcement_key
 from scheduler.tasks import (
     ScheduledTasks,
     _format_a_share_corporate_action_validation_report,
@@ -98,16 +98,18 @@ async def test_data_manager_combines_event_official_and_cumulative_evidence(monk
         "empty_periods": [],
         "failed_periods": [],
     })
-    manager._scan_cninfo_corporate_action_announcements = AsyncMock(return_value={
+    manager._scan_official_corporate_action_announcements = AsyncMock(return_value={
         "status": "success",
         "source": "cninfo_announcement_metadata",
-        "records": [CninfoAnnouncementRecord(
-            announcement_id="a1",
+        "records": [AnnouncementRecord(
+            source="cninfo",
+            source_announcement_id="a1",
+            announcement_key=build_announcement_key("cninfo", "a1"),
             title="浦发银行2024年年度普通股权益分派实施公告",
-            announcement_time="2025-07-04T16:00:00+00:00",
+            published_at="2025-07-04T16:00:00+00:00",
             market="SSE",
-            column="sse",
-            symbols=["600000"],
+            exchange="SSE",
+            symbols=("600000",),
         )],
         "instruments_requested": 1,
         "instruments_scanned": 1,

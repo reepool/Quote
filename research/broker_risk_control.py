@@ -8,28 +8,34 @@ import hashlib
 import io
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
 
+from research.announcements import (
+    AnnouncementAcquisitionService,
+    AnnouncementAttachment,
+    AnnouncementAttachmentRetriever,
+    AnnouncementQuery,
+    AnnouncementRecord,
+    AnnouncementScope,
+    ProviderCursor,
+    load_announcement_acquisition_config,
+)
 from research.financial_fact_aliases import describe_financial_numeric_fact_name
 from research.providers.base import (
     FinancialFilingPayload,
     FinancialNumericFactSnapshot,
     FinancialSourceFileManifest,
 )
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanConfig,
-    CninfoAnnouncementScanner,
-)
+from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.listed_broker_dealer_scope import (
     enrich_instrument_with_broker_scope,
     is_confirmed_listed_broker_dealer,
     resolve_listed_broker_dealer_scope,
 )
 from utils.date_utils import get_shanghai_time
-from utils.http_transport import HttpTlsConfig, request_get
+from utils.config_manager import ResearchConfig, config_manager
 
 
 BROKER_RISK_CONTROL_SOURCE_PROFILE = "broker_risk_control_report"
@@ -40,6 +46,46 @@ BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = "broker_annual_or_semiannual_r
 BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
 BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
 LOGGER = logging.getLogger(__name__)
+
+
+def _announcement_id(record: AnnouncementRecord) -> str:
+    return record.source_announcement_id
+
+
+def _announcement_published_at(record: AnnouncementRecord) -> Optional[str]:
+    return record.published_at
+
+
+def _announcement_source(record: AnnouncementRecord) -> str:
+    return record.source
+
+
+def _announcement_attachment(record: AnnouncementRecord) -> Optional[AnnouncementAttachment]:
+    attachments = record.attachments
+    if attachments:
+        return next(
+            (
+                item
+                for item in attachments
+                if "pdf" in str(item.media_type or item.file_extension or "").lower()
+            ),
+            attachments[0],
+        )
+    return None
+
+
+def _announcement_attachment_type(record: AnnouncementRecord) -> Optional[str]:
+    attachment = _announcement_attachment(record)
+    if attachment is None:
+        return None
+    return attachment.media_type or attachment.file_extension
+
+
+def _announcement_source_url(record: AnnouncementRecord) -> Optional[str]:
+    attachment = _announcement_attachment(record)
+    if attachment is None:
+        return None
+    return attachment.resolved_url or attachment.source_url
 
 
 BROKER_RISK_CONTROL_REQUIRED_FACTS = ("net_capital",)
@@ -290,7 +336,7 @@ def is_formal_broker_annual_or_semiannual_report_title(title: str) -> bool:
     return True
 
 
-def infer_broker_annual_report_period(record: CninfoAnnouncementRecord) -> str:
+def infer_broker_annual_report_period(record: AnnouncementRecord) -> str:
     """Infer report period from a formal annual/semiannual report title."""
     title = _normalize_announcement_title(record.title)
     year_match = re.search(r"(20\d{2}|19\d{2})", title)
@@ -299,13 +345,14 @@ def infer_broker_annual_report_period(record: CninfoAnnouncementRecord) -> str:
         if "半年度报告" in title:
             return f"{year}-06-30"
         return f"{year}-12-31"
-    if record.announcement_time and re.match(r"^\d{4}", record.announcement_time):
-        year = int(record.announcement_time[:4]) - 1
+    published_at = _announcement_published_at(record)
+    if published_at and re.match(r"^\d{4}", published_at):
+        year = int(published_at[:4]) - 1
         return f"{year}-12-31"
     return ""
 
 
-def infer_broker_risk_control_report_period(record: CninfoAnnouncementRecord) -> str:
+def infer_broker_risk_control_report_period(record: AnnouncementRecord) -> str:
     """Infer report period from a broker risk-control announcement title."""
     title = re.sub(r"<[^>]+>", "", str(record.title or ""))
     title = title.replace("&nbsp;", "").replace("&amp;", "&")
@@ -320,8 +367,9 @@ def infer_broker_risk_control_report_period(record: CninfoAnnouncementRecord) ->
         if any(token in title for token in ("第三季度", "三季度", "3季度")):
             return f"{year}-09-30"
         return f"{year}-12-31"
-    if record.announcement_time and re.match(r"^\d{4}", record.announcement_time):
-        year = int(record.announcement_time[:4]) - 1
+    published_at = _announcement_published_at(record)
+    if published_at and re.match(r"^\d{4}", published_at):
+        year = int(published_at[:4]) - 1
         return f"{year}-12-31"
     return ""
 
@@ -1185,7 +1233,7 @@ class BrokerRiskControlSyncResult:
         }
 
 
-PayloadFetcher = Callable[[CninfoAnnouncementRecord], Optional[bytes | str]]
+PayloadFetcher = Callable[[AnnouncementRecord], Optional[bytes | str]]
 
 
 class BrokerRiskControlReportSyncService:
@@ -1195,7 +1243,9 @@ class BrokerRiskControlReportSyncService:
         self,
         *,
         storage: Any,
-        scanner: Optional[CninfoAnnouncementScanner] = None,
+        announcement_service: Optional[AnnouncementAcquisitionService] = None,
+        attachment_retriever: Optional[AnnouncementAttachmentRetriever] = None,
+        research_config: Optional[ResearchConfig] = None,
         parser: Optional[BrokerRiskControlPdfFactParser] = None,
         payload_fetcher: Optional[PayloadFetcher] = None,
         title_patterns: Optional[Sequence[str]] = None,
@@ -1206,7 +1256,21 @@ class BrokerRiskControlReportSyncService:
         replace_existing_facts: bool = False,
     ) -> None:
         self.storage = storage
-        self.scanner = scanner or CninfoAnnouncementScanner()
+        self.research_config = research_config or config_manager.get_research_config()
+        acquisition_config = load_announcement_acquisition_config(self.research_config)
+        self.announcement_service = announcement_service or AnnouncementAcquisitionService(
+            registry=OfficialAnnouncementProviderRegistry(
+                research_config=self.research_config
+            ),
+            config=acquisition_config,
+        )
+        self.attachment_retriever = attachment_retriever or (
+            None
+            if payload_fetcher is not None
+            else AnnouncementAttachmentRetriever.from_provider_configs(
+                acquisition_config.provider_configs
+            )
+        )
         if parser is None and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             parser = BrokerRiskControlPdfFactParser(
                 parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
@@ -1225,7 +1289,7 @@ class BrokerRiskControlReportSyncService:
         *,
         instruments: Sequence[Dict[str, Any]],
         report_periods: Sequence[str],
-        announcement_records: Optional[Iterable[CninfoAnnouncementRecord]] = None,
+        announcement_records: Optional[Iterable[AnnouncementRecord]] = None,
         ingestion_run_id: Optional[int] = None,
         tier: str = "history",
         dry_run: bool = False,
@@ -1279,34 +1343,52 @@ class BrokerRiskControlReportSyncService:
         dry_run: bool = False,
     ) -> Dict[str, Any]:
         purpose_key = self.source_profile
-        state = self.storage.get_cninfo_announcement_scan_state(
-            purpose_key=purpose_key,
+        exchange = self._exchange_from_market_column(market, column)
+        scope = AnnouncementScope(
+            exchange=exchange,
             market=market,
-            column=column,
-        )
-        scan_result = self.scanner.scan(
-            CninfoAnnouncementScanConfig(
-                purpose_key=purpose_key,
-                market=market,
-                column=column,
-                search_key="年度报告"
+            keyword=(
+                "年度报告"
                 if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-                else "风险控制指标",
-                start_date=start_date,
-                end_date=end_date,
-                page_size=page_size,
-                max_pages=max_pages,
-                stop_at_watermark=None if state is None else state.get("last_watermark"),
+                else "风险控制指标"
             ),
-            filters=[self._record_filter],
+            start_date=start_date,
+            end_date=end_date,
+            page_size=page_size,
+            max_pages=max_pages,
         )
+        state = self.storage.get_announcement_scan_state(
+            purpose_key=purpose_key,
+            source="cninfo",
+            scope_key=scope.scope_key,
+        )
+        if state and state.get("committed_cursor"):
+            cursor = state["committed_cursor"]
+            scope = AnnouncementScope(
+                **{
+                    **scope.__dict__,
+                    "cursor": ProviderCursor(
+                        kind=str(cursor["kind"]),
+                        value=str(cursor["value"]),
+                    ),
+                }
+            )
+        route_result = self.announcement_service.acquire(
+            AnnouncementQuery(purpose_key=purpose_key, scope=scope),
+            selectors=[self._record_filter],
+        )
+        scan_result = route_result.scan_result
+        if scan_result is None:
+            raise RuntimeError("announcement route returned no scan result")
         result = BrokerRiskControlSyncResult(
             status="success",
             mode="incremental_update",
             target_instruments=len(instruments),
             announcements_scanned=scan_result.announcements_seen,
             matching_announcements=0,
-            filtered_announcements=scan_result.announcements_seen - len(scan_result.selected_records),
+            filtered_announcements=(
+                scan_result.announcements_seen - len(scan_result.selected_records)
+            ),
             errors=list(scan_result.errors),
         )
         instrument_by_symbol = {
@@ -1314,8 +1396,10 @@ class BrokerRiskControlReportSyncService:
             for item in instruments
             if item.get("symbol")
         }
+        selected_records: List[tuple[AnnouncementRecord, Optional[Dict[str, Any]]]] = []
         for record in scan_result.selected_records:
             instrument = self._resolve_record_instrument(record, instrument_by_symbol)
+            selected_records.append((record, instrument))
             if instrument is None or not self._instrument_in_scope(instrument):
                 result.filtered_announcements += 1
                 continue
@@ -1330,33 +1414,41 @@ class BrokerRiskControlReportSyncService:
         if result.parse_failures or result.retryable_pending_reports or result.errors:
             result.status = "partial"
         if not dry_run:
-            self.storage.upsert_cninfo_announcement_scan_state(
-                purpose_key=purpose_key,
-                market=market,
-                column=column,
-                last_watermark=scan_result.max_announcement_time,
-                last_scan_started_at=get_shanghai_time().isoformat(),
-                last_scan_completed_at=get_shanghai_time().isoformat(),
-                pages_scanned=scan_result.pages_scanned,
-                announcements_seen=scan_result.announcements_seen,
+            self.storage.upsert_announcement_scan_state(
+                scan_result=scan_result,
                 selected_announcements=len(scan_result.selected_records),
-                status=result.status,
+                attempts=[asdict(item) for item in route_result.attempts],
                 metadata={
                     "source_profile": self.source_profile,
                     "retryable_pending_reports": result.retryable_pending_reports,
-                    "stopped_at_watermark": scan_result.stopped_at_watermark,
                 },
             )
+            for record, instrument in selected_records:
+                self.storage.store_announcement_audit(
+                    purpose_key=purpose_key,
+                    record=record,
+                    instrument_id=(
+                        None
+                        if instrument is None
+                        else str(instrument.get("instrument_id") or "")
+                    ),
+                    symbol=(
+                        None
+                        if instrument is None
+                        else str(instrument.get("symbol") or "")
+                    ),
+                    ingestion_run_id=ingestion_run_id,
+                )
         return result.to_dict()
 
-    def _record_filter(self, record: CninfoAnnouncementRecord) -> List[str]:
+    def _record_filter(self, record: AnnouncementRecord) -> List[str]:
         if not self._record_matches(record):
             return []
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return ["formal_annual_or_semiannual_report"]
         return ["broker_risk_control_title"]
 
-    def _record_matches(self, record: CninfoAnnouncementRecord) -> bool:
+    def _record_matches(self, record: AnnouncementRecord) -> bool:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return is_formal_broker_annual_or_semiannual_report_title(record.title)
         return is_broker_risk_control_title(record.title, title_patterns=self.title_patterns)
@@ -1369,7 +1461,7 @@ class BrokerRiskControlReportSyncService:
 
     def _process_record(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument: Dict[str, Any],
         result: BrokerRiskControlSyncResult,
         *,
@@ -1385,7 +1477,7 @@ class BrokerRiskControlReportSyncService:
             instrument.get("symbol"),
             instrument.get("exchange"),
             report_period,
-            record.announcement_id,
+            _announcement_id(record),
             record.title,
             dry_run,
         )
@@ -1399,7 +1491,7 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
                 exc,
             )
             return
@@ -1410,7 +1502,7 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
             )
             return
         hash_payload = payload.encode("utf-8") if isinstance(payload, str) else payload
@@ -1420,7 +1512,7 @@ class BrokerRiskControlReportSyncService:
             instrument.get("instrument_id"),
             instrument.get("symbol"),
             report_period,
-            record.announcement_id,
+            _announcement_id(record),
             len(hash_payload),
         )
         archive_path = None if dry_run else self._archive_payload(record, instrument, report_period, hash_payload)
@@ -1439,12 +1531,12 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
                 content_hash[:12],
             )
             return
         source_file_id = (
-            f"dryrun:{record.announcement_id}:{content_hash[:12]}"
+            f"dryrun:{_announcement_id(record)}:{content_hash[:12]}"
             if dry_run
             else self.storage.upsert_financial_source_file_manifest(
                 manifest,
@@ -1465,7 +1557,7 @@ class BrokerRiskControlReportSyncService:
                 exchange=str(instrument.get("exchange") or ""),
                 report_period=report_period,
                 report_type=self._record_report_type(record),
-                source="cninfo",
+                source=_announcement_source(record),
                 source_mode="direct",
                 source_profile=self.source_profile,
                 artifact_kind=self._artifact_kind(),
@@ -1489,7 +1581,7 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
                 exc,
             )
             return
@@ -1508,7 +1600,7 @@ class BrokerRiskControlReportSyncService:
             instrument.get("instrument_id"),
             instrument.get("symbol"),
             report_period,
-            record.announcement_id,
+            _announcement_id(record),
             len(parsed.numeric_facts),
             ",".join(sorted(parsed.diagnostics.keys())) if parsed.diagnostics else "",
         )
@@ -1529,7 +1621,7 @@ class BrokerRiskControlReportSyncService:
                     instrument.get("instrument_id"),
                     instrument.get("symbol"),
                     report_period,
-                    record.announcement_id,
+                    _announcement_id(record),
                 )
             return
         parsed_manifest = FinancialSourceFileManifest(
@@ -1562,7 +1654,7 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
                 replace_result.get("deleted"),
                 replace_result.get("inserted"),
                 tier,
@@ -1578,7 +1670,7 @@ class BrokerRiskControlReportSyncService:
             instrument.get("instrument_id"),
             instrument.get("symbol"),
             report_period,
-            record.announcement_id,
+            _announcement_id(record),
             len(parsed.numeric_facts),
             tier,
         )
@@ -1598,12 +1690,12 @@ class BrokerRiskControlReportSyncService:
                 instrument.get("instrument_id"),
                 instrument.get("symbol"),
                 report_period,
-                record.announcement_id,
+                _announcement_id(record),
             )
 
     def _parse_failure_detail(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument: Dict[str, Any],
         report_period: str,
         *,
@@ -1617,17 +1709,17 @@ class BrokerRiskControlReportSyncService:
             "instrument_id": instrument.get("instrument_id"),
             "symbol": instrument.get("symbol"),
             "exchange": instrument.get("exchange"),
-            "announcement_id": record.announcement_id,
+            "announcement_id": _announcement_id(record),
             "title": record.title,
             "report_period": report_period,
-            "announcement_time": record.announcement_time,
-            "adjunct_url": record.adjunct_url,
+            "announcement_time": _announcement_published_at(record),
+            "adjunct_url": _announcement_source_url(record),
             "diagnostics": diagnostics or {},
         }
 
     def _parsed_report_summary(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument: Dict[str, Any],
         report_period: str,
         parsed: BrokerRiskControlParseResult,
@@ -1642,7 +1734,7 @@ class BrokerRiskControlReportSyncService:
             "symbol": instrument.get("symbol"),
             "exchange": instrument.get("exchange"),
             "report_period": report_period,
-            "announcement_id": record.announcement_id,
+            "announcement_id": _announcement_id(record),
             "title": record.title,
             "fact_count": len(parsed.numeric_facts),
             "parse_status": parsed.diagnostics.get("parse_status"),
@@ -1663,7 +1755,7 @@ class BrokerRiskControlReportSyncService:
 
     def _build_manifest(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument: Dict[str, Any],
         report_period: str,
         payload: bytes | str,
@@ -1673,19 +1765,19 @@ class BrokerRiskControlReportSyncService:
         classification = self._classify_record(record)
         scope_resolution = resolve_listed_broker_dealer_scope(instrument)
         return FinancialSourceFileManifest(
-            source="cninfo",
+            source=_announcement_source(record),
             source_mode="direct",
             instrument_id=str(instrument.get("instrument_id") or ""),
             symbol=str(instrument.get("symbol") or ""),
             exchange=str(instrument.get("exchange") or ""),
             report_period=report_period,
             report_type=self._record_report_type(record),
-            filing_id=record.announcement_id,
-            source_url=record.adjunct_url,
+            filing_id=_announcement_id(record),
+            source_url=_announcement_source_url(record),
             archive_path=archive_path,
             content_hash=content_hash,
             content_length=len(payload),
-            published_at=record.announcement_time,
+            published_at=_announcement_published_at(record),
             downloaded_at=get_shanghai_time().isoformat(),
             parser_version=self.parser.parser_version,
             status="downloaded",
@@ -1695,8 +1787,8 @@ class BrokerRiskControlReportSyncService:
                 "source_profile": self.source_profile,
                 "listed_broker_dealer_scope": scope_resolution.to_dict(),
                 "announcement_record": {
+                    "source": _announcement_source(record),
                     "market": record.market,
-                    "column": record.column,
                     "symbols": record.symbols,
                     "selection_reasons": record.selection_reasons,
                 },
@@ -1705,7 +1797,7 @@ class BrokerRiskControlReportSyncService:
 
     def _archive_payload(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument: Dict[str, Any],
         report_period: str,
         payload: bytes,
@@ -1714,7 +1806,7 @@ class BrokerRiskControlReportSyncService:
             return None
         exchange = str(instrument.get("exchange") or "UNKNOWN")
         symbol = str(instrument.get("symbol") or (record.symbols[0] if record.symbols else "UNKNOWN"))
-        filename = f"{symbol}_{report_period}_{record.announcement_id}.pdf"
+        filename = f"{symbol}_{report_period}_{_announcement_id(record)}.pdf"
         safe_filename = re.sub(r"[^0-9A-Za-z_.-]+", "_", filename)
         path = self.archive_root / exchange / symbol / safe_filename
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -1738,12 +1830,12 @@ class BrokerRiskControlReportSyncService:
             for row in rows
         )
 
-    def _record_period(self, record: CninfoAnnouncementRecord) -> str:
+    def _record_period(self, record: AnnouncementRecord) -> str:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return infer_broker_annual_report_period(record)
         return infer_broker_risk_control_report_period(record)
 
-    def _record_report_type(self, record: CninfoAnnouncementRecord) -> str:
+    def _record_report_type(self, record: AnnouncementRecord) -> str:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             title = _normalize_announcement_title(record.title)
             return "semiannual" if "半年度报告" in title else "annual"
@@ -1759,15 +1851,15 @@ class BrokerRiskControlReportSyncService:
             return BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND
         return BROKER_RISK_CONTROL_ARTIFACT_KIND
 
-    def _classify_record(self, record: CninfoAnnouncementRecord) -> Dict[str, Any]:
+    def _classify_record(self, record: AnnouncementRecord) -> Dict[str, Any]:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return classify_broker_annual_report_risk_control_artifact(
                 record.title,
-                adjunct_type=record.adjunct_type,
+                adjunct_type=_announcement_attachment_type(record),
             ) or {}
         payload = classify_broker_risk_control_artifact(
             record.title,
-            adjunct_type=record.adjunct_type,
+            adjunct_type=_announcement_attachment_type(record),
         ) or {}
         if payload:
             payload["source_priority"] = "supplementary"
@@ -1775,7 +1867,7 @@ class BrokerRiskControlReportSyncService:
 
     def _resolve_record_instrument(
         self,
-        record: CninfoAnnouncementRecord,
+        record: AnnouncementRecord,
         instrument_by_symbol: Dict[str, Dict[str, Any]],
     ) -> Optional[Dict[str, Any]]:
         for symbol in record.symbols:
@@ -1784,16 +1876,36 @@ class BrokerRiskControlReportSyncService:
                 return instrument_by_symbol[clean]
         return None
 
-    def _download_payload(self, record: CninfoAnnouncementRecord) -> Optional[bytes]:
-        if not record.adjunct_url:
+    @staticmethod
+    def _exchange_from_market_column(market: str, column: str) -> str:
+        normalized = str(column or "").strip().lower()
+        if normalized in {"sse", "sh"}:
+            return "SSE"
+        if normalized in {"szse", "sz"}:
+            return "SZSE"
+        if normalized in {"bse", "bj"}:
+            return "BSE"
+        market_text = str(market or "").strip().upper()
+        return {
+            "沪市": "SSE",
+            "深市": "SZSE",
+            "北交所": "BSE",
+        }.get(market_text, market_text)
+
+    def _download_payload(self, record: AnnouncementRecord) -> Optional[bytes]:
+        attachment = _announcement_attachment(record)
+        if attachment is None:
             return None
-        url = record.adjunct_url
-        if not url.startswith(("http://", "https://")):
-            url = f"https://static.cninfo.com.cn/{url.lstrip('/')}"
-        response = request_get(
-            url,
-            tls_config=HttpTlsConfig(source_name="cninfo"),
-            timeout=20,
+        if self.attachment_retriever is None:
+            raise RuntimeError("announcement attachment retriever is not configured")
+        result = self.attachment_retriever.retrieve(
+            _announcement_source(record),
+            attachment,
+            require_pdf=True,
         )
-        response.raise_for_status()
-        return response.content
+        if result.status != "success":
+            raise RuntimeError(
+                "broker risk-control attachment retrieval failed: "
+                + "; ".join(result.errors)
+            )
+        return result.content

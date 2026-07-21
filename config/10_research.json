@@ -7,7 +7,7 @@
       "BSE"
     ],
     "modules": {
-      "change_watermark": {
+        "change_watermark": {
         "enabled": true,
         "domains": {
           "shareholder": true,
@@ -29,10 +29,18 @@
           "risk_snapshots": true,
           "technical_indicator_latest": true,
           "valuation_inputs": true,
-          "valuation_history": true
-        }
-      },
-      "company_profile": {
+            "valuation_history": true
+          }
+        },
+        "official_announcement_acquisition": {
+          "enabled": true,
+          "operational_audit_api": {
+            "enabled": false,
+            "status": "internal_repository_only",
+            "reason": "Announcement audit rows contain raw provider payloads and are exposed through bounded maintenance repository reads until a stable consumer-facing API contract is approved."
+          }
+        },
+        "company_profile": {
         "enabled": true,
         "optional_empty_exchanges": [
           "BSE"
@@ -40,56 +48,6 @@
       },
       "business_profile_evidence": {
         "enabled": false,
-        "discovery": {
-          "primary_source": "cninfo",
-          "fallback_on_empty": true,
-          "official_exchange_backups": {
-            "SSE": {
-              "source": "sse",
-              "enabled": true,
-              "method": "GET",
-              "endpoint_url": "https://query.sse.com.cn/security/stock/queryCompanyBulletin.do",
-              "referer": "https://www.sse.com.cn/disclosure/listedinfo/regular/",
-              "artifact_base_url": "https://www.sse.com.cn/",
-              "request_timeout_seconds": 20.0,
-              "request_interval_seconds": 0.2,
-              "retry_attempts": 2,
-              "retry_backoff_seconds": 0.5
-            },
-            "SZSE": {
-              "source": "szse",
-              "enabled": true,
-              "method": "POST",
-              "endpoint_url": "https://www.szse.cn/api/disc/announcement/annList",
-              "referer": "https://www.szse.cn/disclosure/listed/fixed/index.html",
-              "artifact_base_url": "https://disc.static.szse.cn/",
-              "request_timeout_seconds": 20.0,
-              "request_interval_seconds": 0.2,
-              "retry_attempts": 2,
-              "retry_backoff_seconds": 0.5,
-              "options": {
-                "channel_code": "fixed_disc"
-              }
-            },
-            "BSE": {
-              "source": "bse",
-              "enabled": false,
-              "method": "POST",
-              "endpoint_url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
-              "referer": "https://www.bse.cn/disclosure/announcement.html",
-              "artifact_base_url": "https://www.bse.cn/",
-              "request_timeout_seconds": 20.0,
-              "request_interval_seconds": 0.2,
-              "retry_attempts": 2,
-              "retry_backoff_seconds": 0.5,
-              "options": {
-                "is_new_three": "1",
-                "xxfcbj": "1"
-              },
-              "note": "Adapter is implemented but disabled because the official endpoint currently enters a redirect loop from the production network. CNInfo remains the active BSE official primary source."
-            }
-          }
-        },
         "archive": {
           "archive_root": "data/filings/business_profile",
           "checkpoint_root": "data/checkpoints/business_profile_official_archive",
@@ -1464,6 +1422,23 @@
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
         "role": "official_sse_structured_financial_filings",
+        "announcements": {
+          "enabled": true,
+          "source": "sse",
+          "exchange": "SSE",
+          "method": "GET",
+          "endpoint_url": "https://query.sse.com.cn/security/stock/queryCompanyBulletin.do",
+          "referer": "https://www.sse.com.cn/disclosure/listedinfo/regular/",
+          "artifact_base_url": "https://www.sse.com.cn/",
+          "approved_attachment_hosts": [
+            "www.sse.com.cn"
+          ],
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "max_page_size": 100
+        },
         "financial_statements": {
           "enabled": false,
           "exchanges": [
@@ -1679,11 +1654,19 @@
           "retry_backoff_seconds": 0.5,
           "note": "Uses AkShare CNInfo wrappers: stock_hold_change_cninfo(symbol='全部') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
         },
-        "announcement_scan": {
+        "announcements": {
+          "enabled": true,
+          "endpoint_url": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+          "identity_url": "https://www.cninfo.com.cn/new/information/topSearch/query",
+          "artifact_base_url": "https://static.cninfo.com.cn/",
+          "approved_attachment_hosts": [
+            "static.cninfo.com.cn"
+          ],
           "request_timeout_seconds": 20.0,
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
+          "max_attachment_bytes": 52428800,
           "markets": {
             "SSE": {
               "market": "SSE",
@@ -1704,7 +1687,7 @@
               "tab_name": "fulltext"
             }
           },
-          "note": "Reusable CNInfo announcement metadata scanner. Domain workflows provide their own filter rules and purpose-specific watermarks."
+          "note": "Source implementation for the source-neutral official announcement acquisition service. Domain workflows own selection and semantic parsing."
         },
         "financial_statements": {
           "enabled": false,
@@ -1951,6 +1934,34 @@
           "note": "CNInfo data20 official structured financial JSON is configured for SZSE and BSE 920-code instruments and remains disabled until bounded parser/backfill validation passes. Announcement metadata is still retained as PDF-only evidence and does not satisfy readiness by itself."
         }
       },
+      "szse": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "official_szse_announcement_source",
+        "announcements": {
+          "enabled": true,
+          "source": "szse",
+          "exchange": "SZSE",
+          "method": "POST",
+          "endpoint_url": "https://www.szse.cn/api/disc/announcement/annList",
+          "referer": "https://www.szse.cn/disclosure/listed/fixed/index.html",
+          "artifact_base_url": "https://disc.static.szse.cn/",
+          "approved_attachment_hosts": [
+            "disc.static.szse.cn"
+          ],
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "max_page_size": 100,
+          "options": {
+            "channel_code": "fixed_disc"
+          }
+        }
+      },
       "bse": {
         "enabled": false,
         "transport": "direct",
@@ -1958,6 +1969,28 @@
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
         "role": "official_bse_structured_financial_filings",
+        "announcements": {
+          "enabled": false,
+          "source": "bse",
+          "exchange": "BSE",
+          "method": "POST",
+          "endpoint_url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
+          "referer": "https://www.bse.cn/disclosure/announcement.html",
+          "artifact_base_url": "https://www.bse.cn/",
+          "approved_attachment_hosts": [
+            "www.bse.cn"
+          ],
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "max_page_size": 100,
+          "options": {
+            "is_new_three": "1",
+            "xxfcbj": "1"
+          },
+          "note": "Provider supports the observed null([{listInfo:...}]) JSONP array wrapper but remains disabled because 2026-07-21 bounded probes did not establish stable DNS/endpoint availability. CNInfo remains the BSE primary until a repeated live gate passes."
+        },
         "financial_statements": {
           "enabled": false,
           "exchanges": [
@@ -2031,6 +2064,60 @@
       }
     },
     "routing": {
+      "official_announcements": {
+        "default": {
+          "sources": [
+            "cninfo"
+          ],
+          "fallback_on": [
+            "failed",
+            "degraded",
+            "identity_not_found",
+            "indeterminate"
+          ]
+        },
+        "purposes": {
+          "business_profile_evidence": {
+            "SSE": {
+              "sources": [
+                "cninfo",
+                "sse"
+              ],
+              "fallback_on": [
+                "failed",
+                "degraded",
+                "identity_not_found",
+                "indeterminate",
+                "success_empty"
+              ]
+            },
+            "SZSE": {
+              "sources": [
+                "cninfo",
+                "szse"
+              ],
+              "fallback_on": [
+                "failed",
+                "degraded",
+                "identity_not_found",
+                "indeterminate",
+                "success_empty"
+              ]
+            },
+            "BSE": {
+              "sources": [
+                "cninfo"
+              ],
+              "fallback_on": [
+                "failed",
+                "degraded",
+                "identity_not_found",
+                "indeterminate"
+              ]
+            }
+          }
+        }
+      },
       "company_profile": {
         "free_chain": [
           {

@@ -44,7 +44,7 @@ from utils.cache import cache_manager
 from data_sources.corporate_action_validation import (
     compare_cumulative_factor_paths,
     match_official_announcement_evidence,
-    normalize_cninfo_implementation_announcements,
+    normalize_official_implementation_announcements,
     normalize_eastmoney_events,
     normalize_tdx_events,
     reconcile_event_fields,
@@ -176,6 +176,47 @@ class DataManager:
         self.progress_file = os.path.join(
             self.data_config.get('data_dir', 'data'),
             'download_progress.json',
+        )
+
+    def _build_official_announcement_acquisition_service(
+        self,
+        *,
+        request_timeout_seconds: Optional[float] = None,
+        request_interval_seconds: Optional[float] = None,
+    ):
+        """Build the source-neutral announcement service for bounded workflows."""
+        from research.announcements import (
+            AnnouncementAcquisitionService,
+            load_announcement_acquisition_config,
+        )
+        from research.providers.registry import OfficialAnnouncementProviderRegistry
+
+        acquisition_config = load_announcement_acquisition_config(
+            self.research_config
+        )
+        if request_timeout_seconds is None and request_interval_seconds is None:
+            registry = OfficialAnnouncementProviderRegistry(
+                research_config=self.research_config
+            )
+        else:
+            cninfo_config = dict(
+                acquisition_config.provider_configs.get("cninfo") or {}
+            )
+            if request_timeout_seconds is not None:
+                cninfo_config["request_timeout_seconds"] = max(
+                    1.0, float(request_timeout_seconds)
+                )
+            if request_interval_seconds is not None:
+                cninfo_config["request_interval_seconds"] = max(
+                    0.0, float(request_interval_seconds)
+                )
+            registry = OfficialAnnouncementProviderRegistry(
+                research_config=self.research_config,
+                provider_config_overrides={"cninfo": cninfo_config},
+            )
+        return AnnouncementAcquisitionService(
+            registry=registry,
+            config=acquisition_config,
         )
 
     async def get_cached_adjustment_factors(
@@ -13663,7 +13704,7 @@ class DataManager:
         return "irrelevant"
 
     @staticmethod
-    def _cninfo_announcement_local_date(value: Optional[str]) -> Optional[date]:
+    def _announcement_local_date(value: Optional[str]) -> Optional[date]:
         if not value:
             return None
         try:
@@ -13682,69 +13723,46 @@ class DataManager:
         max_pages: int,
     ) -> List[Any]:
         """Scan CNInfo BSE delisting-related metadata without per-stock requests."""
-        from research.providers.cninfo_announcements import (
-            CninfoAnnouncementScanConfig,
-            CninfoAnnouncementScanner,
+        from research.announcements import (
+            AnnouncementQuery,
+            AnnouncementScope,
         )
 
-        scanner = CninfoAnnouncementScanner(
+        service = self._build_official_announcement_acquisition_service(
             request_timeout_seconds=20.0,
             request_interval_seconds=0.2,
-            retry_attempts=2,
         )
-        configs = [
-            CninfoAnnouncementScanConfig(
-                purpose_key="instrument_master_bse_delisting",
-                market="BSE",
-                column="neeq",
-                plate="bj",
-                category="category_tbclts_szsh",
-                start_date=start_date,
-                end_date=end_date,
-                page_size=30,
-                max_pages=max_pages,
-            ),
-            CninfoAnnouncementScanConfig(
-                purpose_key="instrument_master_bse_delisting",
-                market="BSE",
-                column="neeq",
-                plate="bj",
-                category="category_tszlq_szsh",
-                start_date=start_date,
-                end_date=end_date,
-                page_size=30,
-                max_pages=max_pages,
-            ),
-            CninfoAnnouncementScanConfig(
-                purpose_key="instrument_master_bse_delisting",
-                market="BSE",
-                column="neeq",
-                plate="bj",
-                search_key="终止上市",
-                start_date=start_date,
-                end_date=end_date,
-                page_size=30,
-                max_pages=max_pages,
-            ),
-            CninfoAnnouncementScanConfig(
-                purpose_key="instrument_master_bse_delisting",
-                market="BSE",
-                column="neeq",
-                plate="bj",
-                search_key="摘牌",
-                start_date=start_date,
-                end_date=end_date,
-                page_size=30,
-                max_pages=max_pages,
-            ),
+        filters = [
+            {"category": "category_tbclts_szsh"},
+            {"category": "category_tszlq_szsh"},
+            {"keyword": "终止上市"},
+            {"keyword": "摘牌"},
         ]
 
         records_by_id: Dict[str, Any] = {}
-        for config in configs:
-            result = scanner.scan(config)
+        for query_filter in filters:
+            route_result = await asyncio.to_thread(
+                service.acquire,
+                AnnouncementQuery(
+                    purpose_key="instrument_master_bse_delisting",
+                    scope=AnnouncementScope(
+                        exchange="BSE",
+                        market="BSE",
+                        category=query_filter.get("category"),
+                        keyword=query_filter.get("keyword"),
+                        start_date=start_date,
+                        end_date=end_date,
+                        page_size=30,
+                        max_pages=max_pages,
+                    ),
+                ),
+            )
+            result = route_result.scan_result
+            if result is None:
+                continue
             for record in result.records:
-                if record.announcement_id:
-                    records_by_id[record.announcement_id] = record
+                if record.source_announcement_id:
+                    records_by_id[record.source_announcement_id] = record
         return list(records_by_id.values())
 
     async def _sync_bse_delisting_status(
@@ -13816,7 +13834,10 @@ class DataManager:
                     result["risk_only_count"] += 1
                     continue
 
-                delisted_on = self._cninfo_announcement_local_date(record.announcement_time)
+                delisted_on = self._announcement_local_date(
+                    getattr(record, "published_at", None)
+                    or getattr(record, "announcement_time", None)
+                )
                 if delisted_on is None:
                     result["errors"].append(f"{instrument_id}: confirmed announcement has no parseable date")
                     continue
@@ -18589,7 +18610,7 @@ class DataManager:
             'failed_periods': failed_periods,
         }
 
-    async def _scan_cninfo_corporate_action_announcements(
+    async def _scan_official_corporate_action_announcements(
         self,
         *,
         instrument_ids: List[str],
@@ -18598,20 +18619,21 @@ class DataManager:
         per_instrument_timeout_sec: int,
     ) -> Dict[str, Any]:
         """Scan bounded official implementation-announcement metadata."""
-        from research.providers.cninfo_announcements import (
-            CninfoAnnouncementScanConfig,
-            CninfoAnnouncementScanner,
+        from research.announcements import (
+            AnnouncementQuery,
+            AnnouncementScope,
         )
 
-        scanner = CninfoAnnouncementScanner()
+        bounded_request_timeout = max(
+            1.0,
+            min(20.0, float(per_instrument_timeout_sec) / 3.0),
+        )
+        service = self._build_official_announcement_acquisition_service(
+            request_timeout_seconds=bounded_request_timeout,
+        )
         records: List[Any] = []
         errors: List[Dict[str, str]] = []
         scanned = 0
-        exchange_config = {
-            'SSE': {'column': 'sse', 'plate': 'sh'},
-            'SZSE': {'column': 'szse', 'plate': 'sz'},
-            'BSE': {'column': 'neeq', 'plate': 'bj'},
-        }
         for index, instrument_id in enumerate(instrument_ids, start=1):
             symbol = str(instrument_id).split('.')[0].zfill(6)
             exchange = (
@@ -18619,37 +18641,27 @@ class DataManager:
                 if str(instrument_id).endswith('.SH')
                 else ('SZSE' if str(instrument_id).endswith('.SZ') else 'BSE')
             )
-            config = exchange_config[exchange]
             try:
-                identity = await asyncio.wait_for(
-                    asyncio.to_thread(scanner.resolve_stock_identity, symbol),
-                    timeout=max(1, int(per_instrument_timeout_sec)),
-                )
-                if not identity:
-                    errors.append({
-                        'instrument_id': instrument_id,
-                        'error': 'cninfo_stock_identity_unavailable',
-                    })
-                    continue
-                scan_result = await asyncio.wait_for(
-                    asyncio.to_thread(
-                        scanner.scan,
-                        CninfoAnnouncementScanConfig(
-                            purpose_key='a_share_corporate_action_validation',
+                route_result = await asyncio.to_thread(
+                    service.acquire,
+                    AnnouncementQuery(
+                        purpose_key='a_share_corporate_action_validation',
+                        scope=AnnouncementScope(
+                            exchange=exchange,
                             market=exchange,
-                            column=config['column'],
-                            plate=config['plate'],
-                            search_key='权益分派实施公告',
-                            stock=identity['stock'],
-                            org_id=identity['org_id'],
+                            instrument_id=str(instrument_id),
+                            symbol=symbol,
+                            keyword='权益分派实施公告',
                             start_date=start_date.isoformat(),
                             end_date=end_date.isoformat(),
                             page_size=30,
                             max_pages=20,
                         ),
                     ),
-                    timeout=max(1, int(per_instrument_timeout_sec)),
                 )
+                scan_result = route_result.scan_result
+                if scan_result is None:
+                    raise RuntimeError('announcement_route_returned_no_result')
                 scanned += 1
                 records.extend(scan_result.records)
                 errors.extend({
@@ -18660,7 +18672,7 @@ class DataManager:
                 errors.append({'instrument_id': instrument_id, 'error': str(exc)})
             if index == 1 or index % 10 == 0 or index == len(instrument_ids):
                 dm_logger.info(
-                    "[DataManager] corporate-action CNInfo progress: %d/%d "
+                    "[DataManager] corporate-action official-announcement progress: %d/%d "
                     "records=%d errors=%d",
                     index,
                     len(instrument_ids),
@@ -18703,9 +18715,9 @@ class DataManager:
             build_search_target,
             parse_date,
         )
-        from research.providers.cninfo_announcements import (
-            CninfoAnnouncementScanConfig,
-            CninfoAnnouncementScanner,
+        from research.announcements import (
+            AnnouncementQuery,
+            AnnouncementScope,
         )
         from utils.a_share_historical_backfill import (
             coerce_date,
@@ -18887,51 +18899,41 @@ class DataManager:
             min(20.0, float(per_event_timeout_sec) / 3.0),
         )
         effective_request_interval = max(0.2, float(request_interval_seconds))
-        scanner = CninfoAnnouncementScanner(
+        announcement_service = self._build_official_announcement_acquisition_service(
             request_timeout_seconds=bounded_request_timeout,
             request_interval_seconds=effective_request_interval,
         )
-        exchange_config = {
-            "SSE": {"column": "sse", "plate": "sh"},
-            "SZSE": {"column": "szse", "plate": "sz"},
-        }
-        identity_cache: Dict[str, Optional[Dict[str, str]]] = {}
         evidence_rows: List[Dict[str, Any]] = []
         target_results: List[Dict[str, Any]] = []
         errors: List[Dict[str, str]] = []
         for index, target in enumerate(targets, start=1):
             symbol = target.instrument_id.split(".")[0].zfill(6)
             exchange = "SSE" if target.instrument_id.endswith(".SH") else "SZSE"
-            config = exchange_config[exchange]
             try:
-                if symbol not in identity_cache:
-                    identity_cache[symbol] = await asyncio.to_thread(
-                        scanner.resolve_stock_identity,
-                        symbol,
-                    )
-                identity = identity_cache[symbol]
-                if not identity:
-                    raise RuntimeError("cninfo_stock_identity_unavailable")
-                scan_result = await asyncio.to_thread(
-                    scanner.scan,
-                    CninfoAnnouncementScanConfig(
+                route_result = await asyncio.to_thread(
+                    announcement_service.acquire,
+                    AnnouncementQuery(
                         purpose_key="a_share_cninfo_special_action_discovery",
-                        market=exchange,
-                        column=config["column"],
-                        plate=config["plate"],
-                        stock=identity["stock"],
-                        org_id=identity["org_id"],
-                        start_date=target.start_date.isoformat(),
-                        end_date=target.end_date.isoformat(),
-                        page_size=min(50, max(1, int(page_size))),
-                        max_pages=min(20, max(1, int(max_pages))),
+                        scope=AnnouncementScope(
+                            exchange=exchange,
+                            market=exchange,
+                            instrument_id=target.instrument_id,
+                            symbol=symbol,
+                            start_date=target.start_date.isoformat(),
+                            end_date=target.end_date.isoformat(),
+                            page_size=min(50, max(1, int(page_size))),
+                            max_pages=min(20, max(1, int(max_pages))),
+                        ),
                     ),
-                    filters=[
+                    selectors=[
                         lambda record, current=target: announcement_match_reasons(
                             current, record.title
                         )
                     ],
                 )
+                scan_result = route_result.scan_result
+                if scan_result is None:
+                    raise RuntimeError("announcement_route_returned_no_result")
                 candidates = build_candidate_evidence(
                     target, scan_result.selected_records
                 )
@@ -20671,13 +20673,13 @@ class DataManager:
                 key=lambda item: (item['instrument_id'], item['ex_date']),
             )
             if official_targets:
-                official_scan = await self._scan_cninfo_corporate_action_announcements(
+                official_scan = await self._scan_official_corporate_action_announcements(
                     instrument_ids=official_targets,
                     start_date=official_start - timedelta(days=180),
                     end_date=end_date,
                     per_instrument_timeout_sec=per_source_timeout_sec,
                 )
-                announcements = normalize_cninfo_implementation_announcements(
+                announcements = normalize_official_implementation_announcements(
                     official_scan.get('records') or [],
                     symbol_to_instrument=symbol_to_instrument,
                 )

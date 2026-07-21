@@ -22,9 +22,9 @@ from research.financial_disclosure_events import (  # noqa: E402
     build_financial_symbol_index,
     financial_disclosure_event_filter,
 )
-from research.providers.cninfo_announcements import (  # noqa: E402
-    CninfoAnnouncementScanConfig,
-    CninfoAnnouncementScanner,
+from research.announcements import (  # noqa: E402
+    AnnouncementQuery,
+    AnnouncementScope,
 )
 from scripts.dev_validation.prepare_sina_ths_local_core_import_manifest import (  # noqa: E402
     DEFAULT_EXCHANGES,
@@ -35,13 +35,6 @@ from scripts.research_cli_support import (  # noqa: E402
     json_ready,
     parse_exchanges,
 )
-
-
-CNINFO_MARKET_CONFIG = {
-    "SSE": {"market": "SSE", "column": "sse", "plate": "sh"},
-    "SZSE": {"market": "SZSE", "column": "szse", "plate": "sz"},
-    "BSE": {"market": "BSE", "column": "neeq", "plate": "bj"},
-}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -72,6 +65,12 @@ async def async_main(argv: Optional[Sequence[str]] = None) -> int:
             data_manager.db_ops,
             exchanges=exchanges,
         )
+        announcement_service = (
+            data_manager._build_official_announcement_acquisition_service(
+                request_timeout_seconds=args.request_timeout_seconds,
+                request_interval_seconds=args.request_interval_seconds,
+            )
+        )
     finally:
         close = getattr(data_manager, "close", None)
         if close is not None:
@@ -82,28 +81,29 @@ async def async_main(argv: Optional[Sequence[str]] = None) -> int:
         for instruments in instruments_by_exchange.values()
         for instrument in instruments
     )
-    scanner = CninfoAnnouncementScanner(
-        request_timeout_seconds=args.request_timeout_seconds,
-        request_interval_seconds=args.request_interval_seconds,
-    )
     scan_results: List[Dict[str, Any]] = []
     all_selected = []
     for exchange in exchanges:
-        config_values = CNINFO_MARKET_CONFIG.get(exchange)
-        if not config_values:
+        if exchange not in {"SSE", "SZSE", "BSE"}:
             continue
-        config = CninfoAnnouncementScanConfig(
-            purpose_key="financial_disclosure_events",
-            market=config_values["market"],
-            column=config_values["column"],
-            plate=config_values["plate"],
-            start_date=args.start_date,
-            end_date=args.end_date,
-            page_size=args.page_size,
-            max_pages=args.max_pages,
-            search_key=args.search_key or None,
+        route_result = announcement_service.acquire(
+            AnnouncementQuery(
+                purpose_key="financial_disclosure_events",
+                scope=AnnouncementScope(
+                    exchange=exchange,
+                    market=exchange,
+                    start_date=args.start_date,
+                    end_date=args.end_date,
+                    page_size=args.page_size,
+                    max_pages=args.max_pages,
+                    keyword=args.search_key or None,
+                ),
+            ),
+            selectors=[financial_disclosure_event_filter],
         )
-        result = scanner.scan(config, filters=[financial_disclosure_event_filter])
+        result = route_result.scan_result
+        if result is None:
+            continue
         all_selected.extend(result.selected_records)
         scan_results.append(
             {
@@ -111,8 +111,8 @@ async def async_main(argv: Optional[Sequence[str]] = None) -> int:
                 "pages_scanned": result.pages_scanned,
                 "announcements_seen": result.announcements_seen,
                 "selected_count": len(result.selected_records),
-                "max_announcement_time": result.max_announcement_time,
-                "errors": result.errors,
+                "max_announcement_time": result.max_published_at,
+                "errors": list(result.errors),
             }
         )
 
@@ -126,15 +126,15 @@ async def async_main(argv: Optional[Sequence[str]] = None) -> int:
         "scan_results": scan_results,
         "selected_announcements": [
             {
-                "announcement_id": record.announcement_id,
-                "announcement_time": record.announcement_time,
+                "announcement_id": record.source_announcement_id,
+                "announcement_time": record.published_at,
                 "market": record.market,
-                "column": record.column,
+                "source": record.source,
                 "symbols": list(record.symbols),
                 "title": record.title,
                 "selection_reasons": list(record.selection_reasons),
                 "mapped_event": any(
-                    event.announcement_id == record.announcement_id
+                    event.announcement_id == record.source_announcement_id
                     for event in events
                 ),
             }

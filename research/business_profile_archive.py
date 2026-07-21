@@ -13,6 +13,11 @@ from pathlib import Path
 from string import Formatter
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementAttachmentRetriever,
+    load_announcement_acquisition_config,
+)
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import (
     business_profile_document_family,
@@ -20,7 +25,7 @@ from research.business_profile_documents import (
 )
 from research.providers.base import FinancialSourceFileManifest
 from utils.date_utils import get_shanghai_time
-from utils.http_transport import HttpTlsConfig, request_get
+from utils.config_manager import config_manager
 
 
 BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION = "business_profile_source_file_manifest.v1"
@@ -33,23 +38,6 @@ DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE = (
 )
 LOGGER = logging.getLogger(__name__)
 _SAFE_PATH_RE = re.compile(r"[^0-9A-Za-z_.-]+")
-_BUSINESS_PROFILE_SOURCE_BASE_URLS = {
-    "cninfo": "https://static.cninfo.com.cn/",
-    "sse": "https://www.sse.com.cn/",
-    "szse": "https://disc.static.szse.cn/",
-    "bse": "https://www.bse.cn/",
-}
-_BUSINESS_PROFILE_SOURCE_REFERERS = {
-    "cninfo": "https://www.cninfo.com.cn/",
-    "sse": "https://www.sse.com.cn/disclosure/listedinfo/regular/",
-    "szse": "https://www.szse.cn/disclosure/listed/fixed/index.html",
-    "bse": "https://www.bse.cn/disclosure/announcement.html",
-}
-_BUSINESS_PROFILE_USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/124.0 Safari/537.36"
-)
 _ARCHIVE_TEMPLATE_FIELDS = {
     "announcement_id",
     "content_hash",
@@ -63,50 +51,71 @@ _ARCHIVE_TEMPLATE_FIELDS = {
 }
 
 
-def business_profile_candidate_url(
-    url: Optional[str],
-    *,
-    source: str = "cninfo",
-) -> Optional[str]:
-    """Resolve one official attachment URL without performing network access."""
-    if not url:
-        return None
-    if url.startswith(("http://", "https://")):
-        return url
-    source_name = str(source or "").strip().lower()
-    base_url = _BUSINESS_PROFILE_SOURCE_BASE_URLS.get(source_name)
-    if not base_url:
-        raise ValueError(f"unsupported business-profile document source: {source}")
-    return f"{base_url.rstrip('/')}/{url.lstrip('/')}"
-
-
 def download_business_profile_candidate(
     candidate: BusinessProfileDocumentCandidate,
+    *,
+    retriever: Optional[AnnouncementAttachmentRetriever] = None,
 ) -> bytes:
-    """Download one official attachment through source-aware governed transport."""
+    """Download one attachment through the common governed retrieval service."""
     source = str(candidate.source or "cninfo").strip().lower()
-    if source not in _BUSINESS_PROFILE_SOURCE_REFERERS:
-        raise ValueError(
-            f"unsupported business-profile document source: {candidate.source}"
-        )
-    url = business_profile_candidate_url(
-        candidate.adjunct_url,
-        source=source,
-    )
-    if not url:
+    if not candidate.adjunct_url:
         raise ValueError("candidate attachment URL is missing")
-    response = request_get(
-        url,
-        tls_config=HttpTlsConfig(source_name=source),
-        headers={
-            "Accept": "application/pdf,application/octet-stream,*/*",
-            "Referer": _BUSINESS_PROFILE_SOURCE_REFERERS[source],
-            "User-Agent": _BUSINESS_PROFILE_USER_AGENT,
-        },
-        timeout=20,
+    if retriever is None:
+        acquisition_config = load_announcement_acquisition_config(
+            config_manager.get_research_config()
+        )
+        retriever = AnnouncementAttachmentRetriever.from_provider_configs(
+            acquisition_config.provider_configs
+        )
+    result = retriever.retrieve(
+        source,
+        AnnouncementAttachment(
+            source_url=candidate.adjunct_url,
+            resolved_url=(
+                candidate.adjunct_url
+                if candidate.adjunct_url.startswith(("http://", "https://"))
+                else None
+            ),
+            file_extension=candidate.adjunct_type,
+        ),
+        require_pdf=True,
     )
-    response.raise_for_status()
-    return bytes(response.content or b"")
+    if result.status != "success":
+        raise RuntimeError(
+            "business-profile attachment retrieval failed: "
+            + "; ".join(result.errors)
+        )
+    return result.content
+
+
+def _resolved_business_profile_source_url(
+    candidate: BusinessProfileDocumentCandidate,
+) -> str:
+    """Resolve manifest lineage through the same governed source policy."""
+    if not candidate.adjunct_url:
+        raise ValueError("candidate attachment URL is missing")
+    source = str(candidate.source or "cninfo").strip().lower()
+    acquisition_config = load_announcement_acquisition_config(
+        config_manager.get_research_config()
+    )
+    retriever = AnnouncementAttachmentRetriever.from_provider_configs(
+        acquisition_config.provider_configs
+    )
+    attachment = retriever.resolve_attachment(
+        source,
+        AnnouncementAttachment(
+            source_url=candidate.adjunct_url,
+            resolved_url=(
+                candidate.adjunct_url
+                if candidate.adjunct_url.startswith(("http://", "https://"))
+                else None
+            ),
+            file_extension=candidate.adjunct_type,
+        ),
+    )
+    if not attachment.resolved_url:
+        raise ValueError("candidate attachment URL could not be resolved")
+    return attachment.resolved_url
 
 
 @dataclass(frozen=True)
@@ -334,10 +343,8 @@ class BusinessProfileDocumentArchiveService:
         document_family = business_profile_document_family(document_type)
         source = str(candidate.source or "cninfo").strip().lower()
         source_tier = str(candidate.source_tier or BUSINESS_PROFILE_SOURCE_TIER).strip()
-        if source not in _BUSINESS_PROFILE_SOURCE_BASE_URLS:
-            raise ValueError(
-                f"unsupported business-profile document source: {candidate.source}"
-            )
+        if not source:
+            raise ValueError("business-profile document source is required")
         if source_tier not in {"official_primary", "official_backup"}:
             raise ValueError(
                 f"unsupported business-profile source tier: {candidate.source_tier}"
@@ -413,10 +420,7 @@ class BusinessProfileDocumentArchiveService:
             report_period=report_period,
             report_type=document_type,
             filing_id=candidate.announcement_id,
-            source_url=business_profile_candidate_url(
-                candidate.adjunct_url,
-                source=source,
-            ),
+            source_url=_resolved_business_profile_source_url(candidate),
             archive_path=str(archive_path),
             content_hash=content_hash,
             content_length=len(content),
@@ -793,7 +797,3 @@ class BusinessProfileDocumentArchiveService:
     def _remove_checkpoint(checkpoint_path: Optional[str | Path]) -> None:
         if checkpoint_path is not None:
             Path(checkpoint_path).unlink(missing_ok=True)
-
-    @staticmethod
-    def _absolute_cninfo_url(url: Optional[str]) -> Optional[str]:
-        return business_profile_candidate_url(url, source="cninfo")

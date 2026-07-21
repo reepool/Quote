@@ -6,7 +6,11 @@ from data_sources.cninfo_special_action_resolution import (
     build_search_target,
     classify_special_action,
 )
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    build_announcement_key,
+)
 
 
 def _share_reform_row():
@@ -39,14 +43,24 @@ def test_special_action_target_uses_structured_bounded_window():
 
 def test_announcement_metadata_creates_candidate_without_effective_date():
     target = build_search_target(_share_reform_row())
-    record = CninfoAnnouncementRecord(
-        announcement_id="120220001",
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="120220001",
+        announcement_key=build_announcement_key("cninfo", "120220001"),
         title="<em>股权分置改革</em>方案实施公告",
-        announcement_time="2006-06-09T08:00:00+08:00",
+        published_at="2006-06-09T08:00:00+08:00",
         market="SSE",
-        column="sse",
-        symbols=["600108"],
-        adjunct_url="finalpage/2006-06-09/120220001.PDF",
+        exchange="SSE",
+        symbols=("600108",),
+        attachments=(
+            AnnouncementAttachment(
+                source_url="finalpage/2006-06-09/120220001.PDF",
+                resolved_url=(
+                    "https://static.cninfo.com.cn/"
+                    "finalpage/2006-06-09/120220001.PDF"
+                ),
+            ),
+        ),
         raw_payload={"announcementId": "120220001"},
     )
 

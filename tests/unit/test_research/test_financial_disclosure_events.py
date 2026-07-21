@@ -6,11 +6,26 @@ from research.financial_disclosure_events import (
     infer_report_periods_from_title,
     is_non_primary_financial_announcement_title,
 )
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import AnnouncementRecord, build_announcement_key
+
+
+def _record(
+    *, announcement_id, title, announcement_time, market, symbols, **_kwargs
+):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at=announcement_time,
+        exchange=market,
+        market=market,
+        symbols=tuple(symbols),
+    )
 
 
 def test_financial_disclosure_filter_detects_delayed_periodic_report():
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="a1",
         title="关于无法按期披露2025年年度报告暨股票停牌的公告",
         announcement_time="2026-05-06",
@@ -27,7 +42,7 @@ def test_financial_disclosure_filter_detects_delayed_periodic_report():
 
 
 def test_financial_disclosure_filter_detects_regular_periodic_report():
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="a2",
         title="2026年第一季度报告",
         announcement_time="2026-04-30",
@@ -40,7 +55,7 @@ def test_financial_disclosure_filter_detects_regular_periodic_report():
 
 
 def test_financial_disclosure_filter_detects_formal_correction_and_revision():
-    correction = CninfoAnnouncementRecord(
+    correction = _record(
         announcement_id="a3",
         title="关于2025年年度报告的更正公告",
         announcement_time="2026-05-10",
@@ -48,7 +63,7 @@ def test_financial_disclosure_filter_detects_formal_correction_and_revision():
         column="sse",
         symbols=["600000"],
     )
-    revision = CninfoAnnouncementRecord(
+    revision = _record(
         announcement_id="a4",
         title="2025年年度报告修订公告",
         announcement_time="2026-05-11",
@@ -76,7 +91,7 @@ def test_financial_disclosure_filter_excludes_non_primary_report_related_titles(
         "2025年年度报告摘要",
     ]
     for index, title in enumerate(excluded_titles, start=1):
-        record = CninfoAnnouncementRecord(
+        record = _record(
             announcement_id=f"excluded-{index}",
             title=title,
             announcement_time="2026-05-20",
@@ -89,7 +104,7 @@ def test_financial_disclosure_filter_excludes_non_primary_report_related_titles(
 
 
 def test_financial_disclosure_filter_keeps_delayed_notice_even_if_title_mentions_inquiry():
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="delay-1",
         title="关于问询函事项导致无法按期披露2025年年度报告的公告",
         announcement_time="2026-05-20",
@@ -123,7 +138,7 @@ def test_infer_report_periods_does_not_use_activity_year_for_annual_meeting_noti
 
 
 def test_build_financial_disclosure_events_maps_symbols_to_instruments():
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="a1",
         title="关于无法按期披露2025年年度报告暨股票停牌的公告",
         announcement_time="2026-05-06",
@@ -144,7 +159,7 @@ def test_build_financial_disclosure_events_maps_symbols_to_instruments():
 
 
 def test_build_financial_disclosure_events_excludes_noisy_selected_records():
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="briefing-1",
         title="2025年年度报告业绩说明会预告公告",
         announcement_time="2026-05-10",

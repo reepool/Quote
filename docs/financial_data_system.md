@@ -455,14 +455,14 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 周度对账会把 `outside_approved_local_core / mapping_catalog_empty` 归为 `mapping_policy_gap`，这类问题表示字段标准或准入配置不一致，不再反复调用 CNInfo/THS/Sina 补数。只有 `missing_local_core_fact` 等源数据缺口才进入补数源路由。
 - 增量任务和周度对账在构造本地缺口候选时都会前置股票主数据生命周期判断：报告期结束日早于上市日的 `pre_listing_period`、退市后或无披露窗口的 `post_delisting_or_no_disclosure` 直接记录为 `accepted_disclosure_gap`，不再调用 CNInfo/THS/Sina，也不计入 degraded blockers。历史 `pending_recheck` 在后续运行中如果因主数据补齐上市日而可判定为上市前报告期，也会转为 `accepted_disclosure_gap/pre_listing_period`，不会继续延长 pending 窗口。
 - 周度对账会复用已经落库的 `accepted_disclosure_gap` 状态；已由公告解释的缺报不会在下一轮对账中重新退回 `local_core_gap` blocker。
-- 周度对账会复用 `cninfo_announcement_audit` 中已经扫描到的停牌、无法披露定期报告、退市风险公告。若公告标题未写明具体报告期，则只允许解释公告日前 180 天内的近端报告期，避免把更早历史缺口误标为正常。
+- 周度对账会复用通用 `announcement_audit` 中 `source=cninfo` 等官方来源已经扫描到的停牌、无法披露定期报告、退市风险公告。若公告标题未写明具体报告期，则只允许解释公告日前 180 天内的近端报告期，避免把更早历史缺口误标为正常。
 - 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps、mapping policy gaps、source missing 和 blockers。
 
 | 任务 | 触发方式 | 是否自动定时 | 主要用途 |
 |---|---|---:|---|
 | `financial_l1_full_import` | `/run financial_l1_full_import` | 否 | 手工执行全量初始化、灾后修复或大范围补处理；封装 `scripts/research_financial_l1_full_import.py` |
-| `financial_disclosure_incremental_sync` | 每日 `21:45` 或 `/run` | 是 | 基于 CNInfo 定期报告公告发现候选标的和报告期，只对候选做财务补处理 |
-| `financial_disclosure_reconciliation_sync` | 周日 `09:30` 或 `/run` | 是 | 兜底公告漏识别、CNInfo 静默更新和历史缺口；可全量扫描 active 股票池但只补缺失或变化项 |
+| `financial_disclosure_incremental_sync` | 每日 `21:45` 或 `/run` | 是 | 通过通用官方公告路由发现定期报告候选标的和报告期，当前 CNInfo 为默认主源；只对候选做财务补处理 |
+| `financial_disclosure_reconciliation_sync` | 周日 `09:30` 或 `/run` | 是 | 兜底公告漏识别、官方来源静默更新和历史缺口；可全量扫描 active 股票池但只补缺失或变化项 |
 
 增量维护规则：
 
@@ -479,7 +479,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 状态表：
 
 - `financial_disclosure_event_state`：按 `instrument_id + report_period + announcement_id` 记录候选、pending recheck、待退市风险、缺失字段、首次 pending 时间、重试截止时间和处理结果。
-- `cninfo_announcement_scan_state / cninfo_announcement_audit`：财务任务使用独立 purpose key 记录扫描水位和入选公告证据。
+- `announcement_scan_state / announcement_audit`：财务任务按 `purpose_key + source + scope_key` 记录扫描水位和入选公告证据。旧 CNInfo 专用表在验证备份、迁移行数/游标/理由/lineage/raw payload 后删除，不再由运行时创建或读取。
 
 只生成计划，不下载、不写库：
 

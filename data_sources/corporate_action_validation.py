@@ -584,7 +584,7 @@ def compare_cumulative_factor_paths(
     }
 
 
-def normalize_cninfo_implementation_announcements(
+def normalize_official_implementation_announcements(
     records: Iterable[Any],
     *,
     symbol_to_instrument: Mapping[str, str],
@@ -598,7 +598,11 @@ def normalize_cninfo_implementation_announcements(
             continue
         if any(marker in title for marker in _OFFICIAL_TITLE_EXCLUDES):
             continue
-        announcement_id = str(_value(record, "announcement_id", "") or "").strip()
+        announcement_id = str(
+            _value(record, "source_announcement_id", "")
+            or _value(record, "announcement_id", "")
+            or ""
+        ).strip()
         symbols = _value(record, "symbols", []) or []
         for raw_symbol in symbols:
             symbol = str(raw_symbol or "").strip().zfill(6)
@@ -610,10 +614,11 @@ def normalize_cninfo_implementation_announcements(
                 "symbol": symbol,
                 "announcement_id": announcement_id,
                 "announcement_date": _cninfo_local_date(
-                    _value(record, "announcement_time")
+                    _value(record, "published_at")
+                    or _value(record, "announcement_time")
                 ),
                 "title": title,
-                "adjunct_url": _value(record, "adjunct_url"),
+                "adjunct_url": _official_attachment_url(record),
                 "source": "cninfo_announcement_metadata",
                 "evidence_scope": "implementation_announcement_exists",
             }
@@ -622,6 +627,16 @@ def normalize_cninfo_implementation_announcements(
         normalized.values(),
         key=lambda item: (item["instrument_id"], item["announcement_date"] or date.min),
     )
+
+
+def _official_attachment_url(record: Any) -> Optional[str]:
+    attachments = _value(record, "attachments", ()) or ()
+    if attachments:
+        attachment = attachments[0]
+        return _value(attachment, "resolved_url") or _value(
+            attachment, "source_url"
+        )
+    return _value(record, "adjunct_url")
 
 
 def match_official_announcement_evidence(

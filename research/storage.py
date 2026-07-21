@@ -20,12 +20,21 @@ from datetime import timedelta
 from typing import Any, Dict, Generator, List, Optional
 
 from research.change_watermarks import append_change_record, ensure_change_log_schema
+from research.announcements.models import (
+    AnnouncementRecord,
+    AnnouncementScanResult,
+    ProviderCursor,
+)
 from research.financial_fact_aliases import (
     describe_core_financial_fact_alias,
     get_core_financial_fact_derivation_rules,
 )
 from research.financial_source_field_mapping import FinancialSourceFieldMapping
 from research.official_shenwan_mapping import OfficialShenwanCodeMapping
+from research.migrations.announcement_legacy_cleanup import (
+    create_verified_backup_if_needed,
+    migrate_reconcile_and_drop,
+)
 from utils import db_logger
 from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
@@ -366,10 +375,16 @@ class ResearchStorageManager:
     def initialize(self) -> None:
         """Ensure database file, pragmas, and base tables exist."""
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        announcement_backup = create_verified_backup_if_needed(self.db_path)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             self._create_tables(conn)
             self._migrate_tables(conn)
+            cleanup_result = migrate_reconcile_and_drop(
+                conn,
+                backup=announcement_backup,
+                now=get_shanghai_time().isoformat(),
+            )
             ensure_change_log_schema(conn)
             if self._uses_separate_financial_database():
                 self._drop_financial_tables_from_research_database(conn)
@@ -382,14 +397,30 @@ class ResearchStorageManager:
                 self._attach_quotes_db(conn)
 
             conn.commit()
+        if cleanup_result is not None:
+            db_logger.info(
+                "[ResearchStorage] Legacy announcement cleanup completed: db=%s state_rows=%s audit_rows=%s backup=%s",
+                self.db_path,
+                cleanup_result["legacy_state_rows"],
+                cleanup_result["legacy_audit_rows"],
+                cleanup_result["backup"]["path"],
+            )
         db_logger.info(f"[ResearchStorage] Initialized research database at {self.db_path}")
         if self.financials_db_path and self.financials_db_path != self.db_path:
             os.makedirs(os.path.dirname(self.financials_db_path), exist_ok=True)
+            financial_announcement_backup = create_verified_backup_if_needed(
+                self.financials_db_path
+            )
             with self.financial_database_scope():
                 with self.get_connection() as conn:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    migrate_reconcile_and_drop(
+                        conn,
+                        backup=financial_announcement_backup,
+                        now=get_shanghai_time().isoformat(),
+                    )
                     ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
@@ -398,11 +429,19 @@ class ResearchStorageManager:
             )
         if self.valuation_db_path and self.valuation_db_path != self.db_path:
             os.makedirs(os.path.dirname(self.valuation_db_path), exist_ok=True)
+            valuation_announcement_backup = create_verified_backup_if_needed(
+                self.valuation_db_path
+            )
             with self.valuation_database_scope():
                 with self.get_connection() as conn:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    migrate_reconcile_and_drop(
+                        conn,
+                        backup=valuation_announcement_backup,
+                        now=get_shanghai_time().isoformat(),
+                    )
                     ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
@@ -411,11 +450,19 @@ class ResearchStorageManager:
             )
         if self.interests_db_path and self.interests_db_path != self.db_path:
             os.makedirs(os.path.dirname(self.interests_db_path), exist_ok=True)
+            interests_announcement_backup = create_verified_backup_if_needed(
+                self.interests_db_path
+            )
             with self.interests_database_scope():
                 with self.get_connection() as conn:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    migrate_reconcile_and_drop(
+                        conn,
+                        backup=interests_announcement_backup,
+                        now=get_shanghai_time().isoformat(),
+                    )
                     ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
@@ -7171,163 +7218,243 @@ class ResearchStorageManager:
                     result[str(data["instrument_id"])] = data
         return result
 
-    def get_cninfo_announcement_scan_state(
+    def get_announcement_scan_state(
         self,
         *,
         purpose_key: str,
-        market: str,
-        column: str,
+        source: str,
+        scope_key: str,
     ) -> Optional[Dict[str, Any]]:
-        """Return the latest reusable CNInfo announcement scan state."""
+        """Return one source-neutral announcement checkpoint."""
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             row = conn.execute(
                 """
                 SELECT *
-                FROM cninfo_announcement_scan_state
-                WHERE purpose_key = ? AND market = ? AND column_name = ?
+                FROM announcement_scan_state
+                WHERE purpose_key = ? AND source = ? AND scope_key = ?
                 LIMIT 1
                 """,
-                (purpose_key, market, column),
+                (
+                    str(purpose_key).strip(),
+                    str(source).strip().lower(),
+                    str(scope_key).strip(),
+                ),
             ).fetchone()
         if row is None:
             return None
         item = dict(row)
+        item["scope"] = self._deserialize_json(item.pop("scope_json", None)) or {}
+        item["attempts"] = self._deserialize_json(item.pop("attempts_json", None)) or []
         item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+        item["is_complete"] = bool(item.get("is_complete"))
+        if item.get("committed_cursor_kind") and item.get("committed_cursor_value"):
+            item["committed_cursor"] = {
+                "kind": item["committed_cursor_kind"],
+                "value": item["committed_cursor_value"],
+            }
+        else:
+            item["committed_cursor"] = None
         return item
 
-    def upsert_cninfo_announcement_scan_state(
+    def upsert_announcement_scan_state(
         self,
         *,
-        purpose_key: str,
-        market: str,
-        column: str,
-        last_watermark: Optional[str],
+        scan_result: AnnouncementScanResult,
+        normalized_scope: Optional[Dict[str, Any]] = None,
+        selected_announcements: Optional[int] = None,
         last_scan_started_at: Optional[str] = None,
         last_scan_completed_at: Optional[str] = None,
-        pages_scanned: int = 0,
-        announcements_seen: int = 0,
-        selected_announcements: int = 0,
-        status: str = "success",
+        attempts: Optional[List[Dict[str, Any]]] = None,
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """Upsert reusable CNInfo announcement scan checkpoint state."""
+    ) -> Dict[str, Any]:
+        """Atomically persist diagnostics and conservatively commit provider cursor."""
+        query = scan_result.query
+        scope_key = query.scope.scope_key
+        scope = normalized_scope or query.scope.stable_scope_payload()
+        source = scan_result.source
+        purpose_key = query.purpose_key
         now = get_shanghai_time().isoformat()
-        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            prior = conn.execute(
+                """
+                SELECT committed_cursor_kind, committed_cursor_value, max_published_at,
+                       created_at
+                FROM announcement_scan_state
+                WHERE purpose_key = ? AND source = ? AND scope_key = ?
+                """,
+                (purpose_key, source, scope_key),
+            ).fetchone()
+            prior_cursor = (
+                ProviderCursor(
+                    kind=str(prior["committed_cursor_kind"]),
+                    value=str(prior["committed_cursor_value"]),
+                )
+                if prior is not None
+                and prior["committed_cursor_kind"]
+                and prior["committed_cursor_value"]
+                else None
+            )
+            committed_cursor = (
+                scan_result.provider_cursor
+                if scan_result.cursor_commit_allowed
+                and scan_result.provider_cursor is not None
+                else prior_cursor
+            )
+            committed_max_published_at = (
+                scan_result.max_published_at
+                if scan_result.cursor_commit_allowed
+                and scan_result.max_published_at is not None
+                else (None if prior is None else prior["max_published_at"])
+            )
+            merged_metadata = {
+                **(metadata or {}),
+                "cursor_commit_allowed": scan_result.cursor_commit_allowed,
+                "observed_max_published_at": scan_result.max_published_at,
+            }
             conn.execute(
                 """
-                INSERT INTO cninfo_announcement_scan_state (
-                    purpose_key,
-                    market,
-                    column_name,
-                    last_watermark,
-                    last_scan_started_at,
-                    last_scan_completed_at,
-                    pages_scanned,
-                    announcements_seen,
-                    selected_announcements,
-                    status,
-                    metadata_json,
-                    created_at,
-                    updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(purpose_key, market, column_name)
-                DO UPDATE SET
-                    last_watermark = excluded.last_watermark,
+                INSERT INTO announcement_scan_state (
+                    purpose_key, source, scope_key, scope_json,
+                    committed_cursor_kind, committed_cursor_value,
+                    max_published_at, last_scan_started_at,
+                    last_scan_completed_at, pages_scanned, requests_made,
+                    announcements_seen, selected_announcements, status,
+                    is_complete, stop_reason, attempts_json, metadata_json,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(purpose_key, source, scope_key) DO UPDATE SET
+                    scope_json = excluded.scope_json,
+                    committed_cursor_kind = excluded.committed_cursor_kind,
+                    committed_cursor_value = excluded.committed_cursor_value,
+                    max_published_at = excluded.max_published_at,
                     last_scan_started_at = excluded.last_scan_started_at,
                     last_scan_completed_at = excluded.last_scan_completed_at,
                     pages_scanned = excluded.pages_scanned,
+                    requests_made = excluded.requests_made,
                     announcements_seen = excluded.announcements_seen,
                     selected_announcements = excluded.selected_announcements,
                     status = excluded.status,
+                    is_complete = excluded.is_complete,
+                    stop_reason = excluded.stop_reason,
+                    attempts_json = excluded.attempts_json,
                     metadata_json = excluded.metadata_json,
                     updated_at = excluded.updated_at
                 """,
                 (
                     purpose_key,
-                    market,
-                    column,
-                    last_watermark,
+                    source,
+                    scope_key,
+                    json.dumps(scope, ensure_ascii=False, sort_keys=True, default=str),
+                    None if committed_cursor is None else committed_cursor.kind,
+                    None if committed_cursor is None else committed_cursor.value,
+                    committed_max_published_at,
                     last_scan_started_at,
-                    last_scan_completed_at,
-                    int(pages_scanned or 0),
-                    int(announcements_seen or 0),
-                    int(selected_announcements or 0),
-                    status,
-                    metadata_json,
-                    now,
+                    last_scan_completed_at or now,
+                    scan_result.pages_scanned,
+                    scan_result.requests_made,
+                    scan_result.announcements_seen,
+                    len(scan_result.selected_records)
+                    if selected_announcements is None
+                    else int(selected_announcements),
+                    scan_result.status,
+                    int(scan_result.is_complete),
+                    scan_result.stop_reason,
+                    json.dumps(attempts or [], ensure_ascii=False, sort_keys=True, default=str),
+                    json.dumps(merged_metadata, ensure_ascii=False, sort_keys=True, default=str),
+                    now if prior is None else prior["created_at"],
                     now,
                 ),
             )
             conn.commit()
+        db_logger.info(
+            "[ResearchStorage] Announcement cursor decision: purpose=%s source=%s scope_key=%s status=%s complete=%s commit_allowed=%s committed_cursor=%s stop_reason=%s pages=%s records=%s selected=%s",
+            purpose_key,
+            source,
+            scope_key,
+            scan_result.status,
+            scan_result.is_complete,
+            scan_result.cursor_commit_allowed,
+            None if committed_cursor is None else committed_cursor.value,
+            scan_result.stop_reason,
+            scan_result.pages_scanned,
+            scan_result.announcements_seen,
+            len(scan_result.selected_records)
+            if selected_announcements is None
+            else int(selected_announcements),
+        )
+        state = self.get_announcement_scan_state(
+            purpose_key=purpose_key,
+            source=source,
+            scope_key=scope_key,
+        )
+        if state is None:
+            raise RuntimeError("announcement scan state write did not persist")
+        return state
 
-    def store_cninfo_announcement_audit(
+    def store_announcement_audit(
         self,
         *,
         purpose_key: str,
-        announcement_id: str,
-        instrument_id: Optional[str],
-        symbol: Optional[str],
-        market: str,
-        column: str,
-        announcement_time: Optional[str],
-        title: str,
-        adjunct_url: Optional[str],
-        selection_reasons: List[str],
-        raw_payload: Dict[str, Any],
+        record: AnnouncementRecord,
+        instrument_id: Optional[str] = None,
+        symbol: Optional[str] = None,
         ingestion_run_id: Optional[int] = None,
     ) -> None:
-        """Store selected CNInfo announcement metadata for audit."""
+        """Idempotently store one purpose-specific normalized announcement."""
         now = get_shanghai_time().isoformat()
-        reasons_json = json.dumps(selection_reasons or [], ensure_ascii=False, sort_keys=True)
-        raw_json = json.dumps(raw_payload or {}, ensure_ascii=False, sort_keys=True, default=str)
+        effective_symbol = symbol or (record.symbols[0] if record.symbols else None)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             conn.execute(
                 """
-                INSERT INTO cninfo_announcement_audit (
-                    purpose_key,
-                    announcement_id,
-                    instrument_id,
-                    symbol,
-                    market,
-                    column_name,
-                    announcement_time,
-                    title,
-                    adjunct_url,
-                    selection_reasons_json,
-                    raw_payload_json,
-                    ingestion_run_id,
-                    created_at,
-                    updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(purpose_key, announcement_id, instrument_id)
+                INSERT INTO announcement_audit (
+                    purpose_key, source, announcement_key,
+                    source_announcement_id, instrument_id, symbol,
+                    exchange, market, published_at, published_at_raw,
+                    title, attachments_json, selection_reasons_json,
+                    diagnostics_json, raw_payload_json, ingestion_run_id,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(purpose_key, announcement_key, instrument_id)
                 DO UPDATE SET
                     symbol = excluded.symbol,
+                    exchange = excluded.exchange,
                     market = excluded.market,
-                    column_name = excluded.column_name,
-                    announcement_time = excluded.announcement_time,
+                    published_at = excluded.published_at,
+                    published_at_raw = excluded.published_at_raw,
                     title = excluded.title,
-                    adjunct_url = excluded.adjunct_url,
+                    attachments_json = excluded.attachments_json,
                     selection_reasons_json = excluded.selection_reasons_json,
+                    diagnostics_json = excluded.diagnostics_json,
                     raw_payload_json = excluded.raw_payload_json,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
                 (
-                    purpose_key,
-                    announcement_id,
+                    str(purpose_key).strip(),
+                    record.source,
+                    record.announcement_key,
+                    record.source_announcement_id,
                     instrument_id or "",
-                    symbol,
-                    market,
-                    column,
-                    announcement_time,
-                    title,
-                    adjunct_url,
-                    reasons_json,
-                    raw_json,
+                    effective_symbol,
+                    record.exchange,
+                    record.market,
+                    record.published_at,
+                    None
+                    if record.published_at_raw is None
+                    else str(record.published_at_raw),
+                    record.title,
+                    json.dumps(
+                        [asdict(item) for item in record.attachments],
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        default=str,
+                    ),
+                    json.dumps(record.selection_reasons, ensure_ascii=False, sort_keys=True),
+                    json.dumps(record.diagnostics, ensure_ascii=False, sort_keys=True),
+                    json.dumps(record.raw_payload, ensure_ascii=False, sort_keys=True, default=str),
                     ingestion_run_id,
                     now,
                     now,
@@ -7335,50 +7462,55 @@ class ResearchStorageManager:
             )
             conn.commit()
 
-    def list_cninfo_announcement_audit(
+    def list_announcement_audit(
         self,
         *,
         purpose_key: str,
+        source: Optional[str] = None,
         instrument_ids: Optional[List[str]] = None,
-        limit: Optional[int] = None,
+        limit: int = 100,
     ) -> List[Dict[str, Any]]:
-        """Return selected CNInfo announcement audit rows for maintenance reuse."""
-        params: List[Any] = [purpose_key]
+        """Return bounded source-neutral operational audit rows."""
+        bounded_limit = min(1000, max(1, int(limit)))
+        params: List[Any] = [str(purpose_key).strip()]
         where = ["purpose_key = ?"]
-        if instrument_ids:
-            ids = [str(item) for item in instrument_ids if str(item)]
-            if ids:
-                where.append(
-                    f"instrument_id IN ({','.join('?' for _ in ids)})"
-                )
-                params.extend(ids)
-        limit_clause = ""
-        if limit is not None:
-            limit_clause = "LIMIT ?"
-            params.append(int(limit))
+        if source:
+            where.append("source = ?")
+            params.append(str(source).strip().lower())
+        ids = [str(item) for item in (instrument_ids or []) if str(item)]
+        if ids:
+            where.append(f"instrument_id IN ({','.join('?' for _ in ids)})")
+            params.extend(ids)
+        params.append(bounded_limit)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             rows = conn.execute(
                 f"""
                 SELECT *
-                FROM cninfo_announcement_audit
+                FROM announcement_audit
                 WHERE {' AND '.join(where)}
-                ORDER BY announcement_time DESC, updated_at DESC
-                {limit_clause}
+                ORDER BY published_at DESC, updated_at DESC
+                LIMIT ?
                 """,
                 params,
             ).fetchall()
-        result: List[Dict[str, Any]] = []
+        output: List[Dict[str, Any]] = []
         for row in rows:
             item = dict(row)
+            item["attachments"] = self._deserialize_json(
+                item.pop("attachments_json", None)
+            ) or []
             item["selection_reasons"] = self._deserialize_json(
                 item.pop("selection_reasons_json", None)
+            ) or []
+            item["diagnostics"] = self._deserialize_json(
+                item.pop("diagnostics_json", None)
             ) or []
             item["raw_payload"] = self._deserialize_json(
                 item.pop("raw_payload_json", None)
             ) or {}
-            result.append(item)
-        return result
+            output.append(item)
+        return output
 
     def upsert_financial_disclosure_event_state(
         self,
@@ -11751,48 +11883,61 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_shareholder_snapshots_exchange_source
             ON shareholder_snapshots(exchange, source, updated_at);
 
-            CREATE TABLE IF NOT EXISTS cninfo_announcement_scan_state (
+            CREATE TABLE IF NOT EXISTS announcement_scan_state (
                 purpose_key TEXT NOT NULL,
-                market TEXT NOT NULL,
-                column_name TEXT NOT NULL,
-                last_watermark TEXT,
+                source TEXT NOT NULL,
+                scope_key TEXT NOT NULL,
+                scope_json TEXT NOT NULL,
+                committed_cursor_kind TEXT,
+                committed_cursor_value TEXT,
+                max_published_at TEXT,
                 last_scan_started_at TEXT,
                 last_scan_completed_at TEXT,
                 pages_scanned INTEGER NOT NULL DEFAULT 0,
+                requests_made INTEGER NOT NULL DEFAULT 0,
                 announcements_seen INTEGER NOT NULL DEFAULT 0,
                 selected_announcements INTEGER NOT NULL DEFAULT 0,
-                status TEXT NOT NULL DEFAULT 'success',
+                status TEXT NOT NULL,
+                is_complete INTEGER NOT NULL DEFAULT 0,
+                stop_reason TEXT,
+                attempts_json TEXT NOT NULL DEFAULT '[]',
                 metadata_json TEXT NOT NULL DEFAULT '{}',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
-                PRIMARY KEY (purpose_key, market, column_name)
+                PRIMARY KEY (purpose_key, source, scope_key)
             );
 
-            CREATE INDEX IF NOT EXISTS idx_cninfo_announcement_scan_state_updated
-            ON cninfo_announcement_scan_state(purpose_key, updated_at);
+            CREATE INDEX IF NOT EXISTS idx_announcement_scan_state_updated
+            ON announcement_scan_state(purpose_key, source, updated_at);
 
-            CREATE TABLE IF NOT EXISTS cninfo_announcement_audit (
+            CREATE TABLE IF NOT EXISTS announcement_audit (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 purpose_key TEXT NOT NULL,
-                announcement_id TEXT NOT NULL,
+                source TEXT NOT NULL,
+                announcement_key TEXT NOT NULL,
+                source_announcement_id TEXT NOT NULL,
                 instrument_id TEXT NOT NULL DEFAULT '',
                 symbol TEXT,
-                market TEXT NOT NULL,
-                column_name TEXT NOT NULL,
-                announcement_time TEXT,
+                exchange TEXT,
+                market TEXT,
+                published_at TEXT,
+                published_at_raw TEXT,
                 title TEXT NOT NULL,
-                adjunct_url TEXT,
+                attachments_json TEXT NOT NULL DEFAULT '[]',
                 selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                diagnostics_json TEXT NOT NULL DEFAULT '[]',
                 raw_payload_json TEXT NOT NULL DEFAULT '{}',
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id),
-                UNIQUE(purpose_key, announcement_id, instrument_id)
+                UNIQUE(purpose_key, announcement_key, instrument_id)
             );
 
-            CREATE INDEX IF NOT EXISTS idx_cninfo_announcement_audit_lookup
-            ON cninfo_announcement_audit(purpose_key, announcement_time, instrument_id);
+            CREATE INDEX IF NOT EXISTS idx_announcement_audit_lookup
+            ON announcement_audit(
+                purpose_key, source, published_at, instrument_id
+            );
 
             CREATE TABLE IF NOT EXISTS financial_disclosure_event_state (
                 instrument_id TEXT NOT NULL,

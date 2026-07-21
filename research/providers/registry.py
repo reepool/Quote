@@ -4,8 +4,13 @@ Provider registry for research ingestion.
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Any, Dict, Mapping, Optional
 
+from research.announcements import (
+    AnnouncementProvider,
+    AnnouncementProviderRegistry,
+    load_announcement_acquisition_config,
+)
 from .akshare_financial_statements import AkshareFinancialStatementsProvider
 from .akshare_analyst_forecasts import AkshareAnalystForecastProvider
 from .akshare_research_reports import AkshareResearchReportProvider
@@ -19,10 +24,15 @@ from .baostock_company_profile import BaostockCompanyProfileProvider
 from .baostock_financial_summary import BaostockFinancialSummaryProvider
 from .baostock_industry import BaostockIndustryProvider
 from .cninfo_shareholders import CninfoShareholdersProvider
+from .cninfo_announcements import CninfoAnnouncementProvider
 from .efinance_shareholders import EfinanceShareholdersProvider
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
 from .official_financial_filings import ConfiguredOfficialFinancialFilingProvider
+from .official_exchange_announcements import (
+    OfficialExchangeAnnouncementProvider,
+    OfficialExchangeAnnouncementSourceConfig,
+)
 from .sina_industry_supplement import SinaIndustryNameSupplementProvider
 from .swsresearch_index_analysis import SWSResearchIndexAnalysisProvider
 from .swsresearch_shenwan_classification import SWSResearchShenwanClassificationProvider
@@ -46,6 +56,53 @@ from .pytdx_company_profile import PytdxCompanyProfileProvider
 from .pytdx_financial_summary import PytdxFinancialSummaryProvider
 from .pytdx_industry import PytdxIndustryProvider
 from utils.config_manager import ResearchConfig, config_manager
+
+
+class OfficialAnnouncementProviderRegistry(AnnouncementProviderRegistry):
+    """Build registered official announcement providers from research config."""
+
+    def __init__(
+        self,
+        providers: Optional[Dict[str, AnnouncementProvider]] = None,
+        research_config: Optional[ResearchConfig] = None,
+        provider_config_overrides: Optional[
+            Mapping[str, Mapping[str, Any]]
+        ] = None,
+    ) -> None:
+        if providers is not None:
+            super().__init__(providers.values())
+            return
+        research_config = research_config or config_manager.get_research_config()
+        acquisition_config = load_announcement_acquisition_config(research_config)
+        configured = {
+            source: dict(source_config)
+            for source, source_config in acquisition_config.provider_configs.items()
+        }
+        for source, override in (provider_config_overrides or {}).items():
+            normalized_source = str(source).strip().lower()
+            configured[normalized_source] = {
+                **configured.get(normalized_source, {}),
+                **dict(override),
+            }
+        built = []
+        cninfo_config = configured.get("cninfo")
+        if cninfo_config and bool(cninfo_config.get("enabled", True)):
+            built.append(
+                CninfoAnnouncementProvider(source_config=cninfo_config)
+            )
+        for exchange, source in (("SSE", "sse"), ("SZSE", "szse"), ("BSE", "bse")):
+            source_config = configured.get(source)
+            if not source_config or not bool(source_config.get("enabled", True)):
+                continue
+            built.append(
+                OfficialExchangeAnnouncementProvider(
+                    OfficialExchangeAnnouncementSourceConfig.from_mapping(
+                        exchange,
+                        source_config,
+                    )
+                )
+            )
+        super().__init__(built)
 
 
 class CompanyProfileProviderRegistry:

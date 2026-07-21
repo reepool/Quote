@@ -11,12 +11,16 @@ from dataclasses import asdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Set
 
+from research.announcements import (
+    AnnouncementAcquisitionService,
+    AnnouncementQuery,
+    AnnouncementScope,
+    ProviderCursor,
+    load_announcement_acquisition_config,
+)
 from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementScanConfig,
-    CninfoAnnouncementScanner,
-)
+from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.shareholder_announcement_filters import (
     ShareholderAnnouncementCandidate,
     build_shareholder_announcement_candidates,
@@ -45,7 +49,7 @@ class ShareholderIncrementalSyncService:
         research_config: Optional[ResearchConfig] = None,
         resolver: Optional[ResearchSourcePolicyResolver] = None,
         registry: Optional[ShareholderProviderRegistry] = None,
-        announcement_scanner: Optional[CninfoAnnouncementScanner] = None,
+        announcement_service: Optional[AnnouncementAcquisitionService] = None,
     ) -> None:
         self.db_ops = db_ops
         self.storage = storage
@@ -54,7 +58,9 @@ class ShareholderIncrementalSyncService:
         self.registry = registry or ShareholderProviderRegistry(
             research_config=self.research_config,
         )
-        self.announcement_scanner = announcement_scanner or self._build_scanner()
+        self.announcement_service = (
+            announcement_service or self._build_announcement_service()
+        )
         self.shadow_helper = ShareholderShadowSyncService(
             db_ops=db_ops,
             storage=storage,
@@ -274,32 +280,12 @@ class ShareholderIncrementalSyncService:
                 )
             raise
 
-    def _build_scanner(self) -> CninfoAnnouncementScanner:
-        cninfo_cfg = self.research_config.sources.get("cninfo", {})
-        scan_cfg = cninfo_cfg.get("announcement_scan", {})
-        shareholder_cfg = cninfo_cfg.get("shareholders", {})
-        return CninfoAnnouncementScanner(
-            request_timeout_seconds=float(
-                scan_cfg.get(
-                    "request_timeout_seconds",
-                    shareholder_cfg.get("request_timeout_seconds", 20.0),
-                )
+    def _build_announcement_service(self) -> AnnouncementAcquisitionService:
+        return AnnouncementAcquisitionService(
+            registry=OfficialAnnouncementProviderRegistry(
+                research_config=self.research_config
             ),
-            request_interval_seconds=float(
-                scan_cfg.get(
-                    "request_interval_seconds",
-                    shareholder_cfg.get("request_interval_seconds", 0.2),
-                )
-            ),
-            retry_attempts=int(
-                scan_cfg.get("retry_attempts", shareholder_cfg.get("retry_attempts", 2))
-            ),
-            retry_backoff_seconds=float(
-                scan_cfg.get(
-                    "retry_backoff_seconds",
-                    shareholder_cfg.get("retry_backoff_seconds", 0.5),
-                )
-            ),
+            config=load_announcement_acquisition_config(self.research_config),
         )
 
     async def _load_active_instruments(
@@ -329,95 +315,83 @@ class ShareholderIncrementalSyncService:
         dry_run: bool,
     ) -> Dict[str, Any]:
         now = get_shanghai_time()
-        start_date = (now - timedelta(days=lookback_days)).date().isoformat()
         end_date = now.date().isoformat()
+        start_date = (now - timedelta(days=lookback_days)).date().isoformat()
         symbol_index = build_shareholder_symbol_index(all_instruments)
-        market_configs = self._announcement_market_configs()
         all_selected = []
         pages_scanned = 0
         announcements_scanned = 0
         selected_announcements = 0
         errors: List[str] = []
+        if self.announcement_service is None:
+            raise RuntimeError("announcement acquisition service is not configured")
 
         for exchange in exchanges:
-            cfg = market_configs.get(exchange, {})
-            column = str(cfg.get("column") or exchange.lower()).strip()
-            market = str(cfg.get("market") or exchange).strip()
-            state = self.storage.get_cninfo_announcement_scan_state(
-                purpose_key=self.purpose_key,
-                market=market,
-                column=column,
-            )
-            watermark = None if state is None else state.get("last_watermark")
-            config = CninfoAnnouncementScanConfig(
-                purpose_key=self.purpose_key,
-                market=market,
-                column=column,
-                plate=cfg.get("plate"),
-                tab_name=str(cfg.get("tab_name") or "fulltext"),
-                category=cfg.get("category"),
-                search_key=cfg.get("search_key"),
+            scope = AnnouncementScope(
+                exchange=exchange,
+                market=exchange,
                 start_date=(
                     now - timedelta(days=max(lookback_days, overlap_days))
                 ).date().isoformat(),
                 end_date=end_date,
                 page_size=page_size,
                 max_pages=max_pages_per_market,
-                stop_at_watermark=watermark,
+                overlap_days=overlap_days,
             )
-            scan_started_at = get_shanghai_time().isoformat()
-            result = self.announcement_scanner.scan(
-                config,
-                filters=[shareholder_announcement_filter],
+            state = self.storage.get_announcement_scan_state(
+                purpose_key=self.purpose_key,
+                source="cninfo",
+                scope_key=scope.scope_key,
             )
-            scan_completed_at = get_shanghai_time().isoformat()
+            if state and state.get("committed_cursor"):
+                cursor = state["committed_cursor"]
+                scope = AnnouncementScope(
+                    **{
+                        **scope.__dict__,
+                        "cursor": ProviderCursor(
+                            kind=str(cursor["kind"]),
+                            value=str(cursor["value"]),
+                        ),
+                    }
+                )
+            route_result = self.announcement_service.acquire(
+                AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
+                selectors=[shareholder_announcement_filter],
+            )
+            result = route_result.scan_result
+            if result is None:
+                errors.append(f"{exchange}:announcement_route_returned_no_result")
+                continue
             pages_scanned += result.pages_scanned
             announcements_scanned += result.announcements_seen
             selected_announcements += len(result.selected_records)
             all_selected.extend(result.selected_records)
             errors.extend(result.errors)
             if not dry_run:
-                new_watermark = result.max_announcement_time or watermark
-                self.storage.upsert_cninfo_announcement_scan_state(
-                    purpose_key=self.purpose_key,
-                    market=market,
-                    column=column,
-                    last_watermark=new_watermark,
-                    last_scan_started_at=scan_started_at,
-                    last_scan_completed_at=scan_completed_at,
-                    pages_scanned=result.pages_scanned,
-                    announcements_seen=result.announcements_seen,
+                self.storage.upsert_announcement_scan_state(
+                    scan_result=result,
                     selected_announcements=len(result.selected_records),
-                    status="success" if not result.errors else "degraded",
+                    attempts=[asdict(item) for item in route_result.attempts],
                     metadata={
                         "start_date": start_date,
                         "end_date": end_date,
-                        "stopped_at_watermark": result.stopped_at_watermark,
-                        "errors": result.errors[:5],
+                        "overlap_days": overlap_days,
                     },
                 )
                 for record in result.selected_records:
-                    for symbol in record.symbols or [""]:
+                    for symbol in record.symbols or ("",):
                         instrument = symbol_index.get(symbol)
-                        self.storage.store_cninfo_announcement_audit(
+                        self.storage.store_announcement_audit(
                             purpose_key=self.purpose_key,
-                            announcement_id=record.announcement_id,
+                            record=record,
                             instrument_id=(
                                 None
                                 if instrument is None
                                 else str(instrument.get("instrument_id") or "")
                             ),
                             symbol=symbol or None,
-                            market=record.market,
-                            column=record.column,
-                            announcement_time=record.announcement_time,
-                            title=record.title,
-                            adjunct_url=record.adjunct_url,
-                            selection_reasons=record.selection_reasons,
-                            raw_payload=record.raw_payload,
                             ingestion_run_id=run_id,
                         )
-
         candidates = build_shareholder_announcement_candidates(
             all_selected,
             symbol_index,
@@ -429,20 +403,6 @@ class ShareholderIncrementalSyncService:
             "selected_announcements": selected_announcements,
             "errors": errors,
         }
-
-    def _announcement_market_configs(self) -> Dict[str, Dict[str, Any]]:
-        cninfo_cfg = self.research_config.sources.get("cninfo", {})
-        scan_cfg = cninfo_cfg.get("announcement_scan", {})
-        configured = scan_cfg.get("markets") or {}
-        defaults = {
-            "SSE": {"market": "SSE", "column": "sse", "plate": "sh"},
-            "SZSE": {"market": "SZSE", "column": "szse", "plate": "sz"},
-            "BSE": {"market": "BSE", "column": "neeq", "plate": "bj"},
-        }
-        for exchange, value in configured.items():
-            if isinstance(value, dict):
-                defaults[str(exchange)] = {**defaults.get(str(exchange), {}), **value}
-        return defaults
 
     def _add_missing_and_pending_candidates(
         self,

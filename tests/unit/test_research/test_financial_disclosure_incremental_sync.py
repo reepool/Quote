@@ -1,6 +1,14 @@
 from contextlib import contextmanager
 import asyncio
 
+from research.announcements import (
+    AnnouncementRecord,
+    AnnouncementRouteAttempt,
+    AnnouncementRouteResult,
+    AnnouncementScanResult,
+    ProviderCursor,
+    build_announcement_key,
+)
 from research.financial_disclosure_incremental_sync import (
     FinancialDisclosureMaintenanceCandidate,
     FinancialDisclosureIncrementalSyncService,
@@ -8,10 +16,6 @@ from research.financial_disclosure_incremental_sync import (
 from research.financial_statement_maintenance_repair import (
     FinancialMaintenanceRepairRouter,
     FinancialMaintenanceRepairTarget,
-)
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanResult,
 )
 from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
 
@@ -96,18 +100,26 @@ class _FakeStorage:
         self.audit_rows = list(audit_rows or [])
         self.industry_memberships = dict(industry_memberships or {})
         self.company_profiles = dict(company_profiles or {})
+        self.generic_scan_states = []
+        self.generic_audits = []
 
     @contextmanager
     def financial_database_scope(self):
         yield
 
-    def get_cninfo_announcement_scan_state(self, **kwargs):
-        return None
-
     def list_financial_disclosure_event_states(self, **kwargs):
         return list(self.pending_states)
 
-    def list_cninfo_announcement_audit(self, **kwargs):
+    def get_announcement_scan_state(self, **kwargs):
+        return None
+
+    def upsert_announcement_scan_state(self, **kwargs):
+        self.generic_scan_states.append(kwargs)
+
+    def store_announcement_audit(self, **kwargs):
+        self.generic_audits.append(kwargs)
+
+    def list_announcement_audit(self, **kwargs):
         ids = set(kwargs.get("instrument_ids") or [])
         return [
             row for row in self.audit_rows
@@ -126,12 +138,6 @@ class _FakeStorage:
     def finish_ingestion_run(self, *args, **kwargs):
         self.finished_run = {"args": args, "kwargs": kwargs}
 
-    def upsert_cninfo_announcement_scan_state(self, **kwargs):
-        self.scan_state = kwargs
-
-    def store_cninfo_announcement_audit(self, **kwargs):
-        self.audit = kwargs
-
     def upsert_financial_disclosure_event_state(self, **kwargs):
         self.states.append(kwargs)
 
@@ -140,35 +146,73 @@ class _FakeStorage:
         return 1
 
 
-class _FakeScanner:
-    def __init__(self, records):
-        self.records = records
+def _record(
+    *,
+    announcement_id,
+    title,
+    announcement_time,
+    market,
+    symbols,
+    **_kwargs,
+):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at=announcement_time,
+        exchange=market,
+        market=market,
+        symbols=tuple(symbols),
+    )
 
-    def scan(self, config, *, filters=None):
+
+class _FakeAnnouncementService:
+    def __init__(self, records):
+        self.records = tuple(records)
+        self.queries = []
+
+    def acquire(self, query, *, selectors=None):
+        self.queries.append(query)
         selected = []
         for record in self.records:
             reasons = []
-            for filter_func in filters or []:
-                reasons.extend(filter_func(record))
+            for selector in selectors or ():
+                reasons.extend(selector(record) or ())
             if reasons:
-                selected.append(
-                    CninfoAnnouncementRecord(
-                        announcement_id=record.announcement_id,
-                        title=record.title,
-                        announcement_time=record.announcement_time,
-                        market=record.market,
-                        column=record.column,
-                        symbols=record.symbols,
-                        selection_reasons=reasons,
-                    )
-                )
-        return CninfoAnnouncementScanResult(
-            config=config,
+                selected.append(record.with_selection_reasons(reasons))
+        source_query = query.for_source("cninfo")
+        scan_result = AnnouncementScanResult(
+            source="cninfo",
+            query=source_query,
+            status="success",
             records=self.records,
-            selected_records=selected,
+            selected_records=tuple(selected),
             pages_scanned=1,
+            requests_made=1,
             announcements_seen=len(self.records),
-            max_announcement_time="2026-05-06",
+            max_published_at=max(
+                (record.published_at for record in self.records if record.published_at),
+                default=None,
+            ),
+            provider_cursor=ProviderCursor(kind="published_at", value="2026-05-06"),
+            is_complete=True,
+            stop_reason="completed",
+        )
+        attempt = AnnouncementRouteAttempt(
+            source="cninfo",
+            status="success",
+            record_count=len(self.records),
+            selected_count=len(selected),
+            pages_scanned=1,
+            stop_reason="completed",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan_result,
+            attempts=(attempt,),
         )
 
 
@@ -201,7 +245,7 @@ def _run(coro):
 
 
 def test_incremental_sync_classifies_pending_delisting_risk(tmp_path):
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="ann-1",
         title="关于无法按期披露2025年年度报告暨股票停牌的公告",
         announcement_time="2026-05-06",
@@ -213,7 +257,7 @@ def test_incremental_sync_classifies_pending_delisting_risk(tmp_path):
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=False),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([record]),
+        announcement_service=_FakeAnnouncementService([record]),
     )
 
     result = _run(
@@ -231,8 +275,46 @@ def test_incremental_sync_classifies_pending_delisting_risk(tmp_path):
     assert result["blocking_gap_count"] == 0
 
 
+def test_incremental_sync_uses_common_announcement_service_and_generic_audit(tmp_path):
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="ann-common-risk",
+        announcement_key=build_announcement_key("cninfo", "ann-common-risk"),
+        title="关于无法按期披露2025年年度报告暨股票停牌的公告",
+        published_at="2026-05-06T09:00:00+08:00",
+        published_at_raw="2026-05-06",
+        exchange="SZSE",
+        market="SZSE",
+        symbols=("002731",),
+        raw_payload={"announcementId": "ann-common-risk"},
+    )
+    storage = _FakeStorage(ready=False)
+    announcement_service = _FakeAnnouncementService([record])
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=announcement_service,
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["pending_delisting_risk_count"] == 1
+    assert result["selected_announcements"] == 1
+    assert storage.generic_scan_states[0]["scan_result"].source == "cninfo"
+    assert storage.generic_audits[0]["record"].source_announcement_id == "ann-common-risk"
+    assert announcement_service.queries[0].purpose_key == service.purpose_key
+
+
 def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="ann-delay",
         title="收到《关于公司2025年年度报告预计无法在法定期限内披露的监管工作函》的公告",
         announcement_time="2026-05-06",
@@ -244,7 +326,7 @@ def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=False),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([record]),
+        announcement_service=_FakeAnnouncementService([record]),
     )
 
     result = _run(
@@ -264,7 +346,7 @@ def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):
 
 
 def test_incremental_sync_skips_ready_regular_report_candidate(tmp_path):
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="ann-2",
         title="2026年第一季度报告",
         announcement_time="2026-04-30",
@@ -276,7 +358,7 @@ def test_incremental_sync_skips_ready_regular_report_candidate(tmp_path):
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=True),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([record]),
+        announcement_service=_FakeAnnouncementService([record]),
     )
 
     result = _run(
@@ -295,7 +377,7 @@ def test_incremental_sync_skips_ready_regular_report_candidate(tmp_path):
 
 
 def test_incremental_sync_records_source_failure(tmp_path):
-    record = CninfoAnnouncementRecord(
+    record = _record(
         announcement_id="ann-3",
         title="2026年第一季度报告",
         announcement_time="2026-04-30",
@@ -308,7 +390,7 @@ def test_incremental_sync_records_source_failure(tmp_path):
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([record]),
+        announcement_service=_FakeAnnouncementService([record]),
     )
 
     async def _fail_import(**kwargs):
@@ -331,7 +413,7 @@ def test_incremental_sync_records_source_failure(tmp_path):
 
 def test_incremental_sync_target_filter_limits_candidates(tmp_path):
     records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="ann-1",
             title="关于无法按期披露2025年年度报告暨股票停牌的公告",
             announcement_time="2026-05-06",
@@ -339,7 +421,7 @@ def test_incremental_sync_target_filter_limits_candidates(tmp_path):
             column="szse",
             symbols=["002731"],
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="ann-2",
             title="关于无法按期披露2025年年度报告暨股票停牌的公告",
             announcement_time="2026-05-06",
@@ -352,7 +434,7 @@ def test_incremental_sync_target_filter_limits_candidates(tmp_path):
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=False),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner(records),
+        announcement_service=_FakeAnnouncementService(records),
     )
 
     result = _run(
@@ -371,7 +453,7 @@ def test_incremental_sync_target_filter_limits_candidates(tmp_path):
 
 def test_incremental_sync_reports_filtered_financial_like_announcements(tmp_path):
     records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="ann-noisy",
             title="2025年年度报告业绩说明会预告公告",
             announcement_time="2026-05-06",
@@ -379,7 +461,7 @@ def test_incremental_sync_reports_filtered_financial_like_announcements(tmp_path
             column="szse",
             symbols=["002731"],
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="ann-formal",
             title="2026年第一季度报告",
             announcement_time="2026-05-06",
@@ -392,7 +474,7 @@ def test_incremental_sync_reports_filtered_financial_like_announcements(tmp_path
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=True),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner(records),
+        announcement_service=_FakeAnnouncementService(records),
     )
 
     result = _run(
@@ -430,7 +512,7 @@ def test_incremental_sync_skips_stale_pending_noise_from_old_filter(tmp_path):
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     result = _run(
@@ -467,7 +549,7 @@ def test_incremental_sync_marks_stale_pending_noise_when_not_dry_run(tmp_path):
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     result = _run(
@@ -507,7 +589,7 @@ def test_incremental_sync_keeps_pending_delisting_risk_without_explicit_period(t
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     result = _run(
@@ -538,7 +620,7 @@ def test_readiness_accepts_cninfo_data20_official_fact_for_missing_core(tmp_path
             ],
         ),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
     candidate = service._candidate_for_period(
         {
@@ -578,7 +660,7 @@ def test_targeted_import_uses_cninfo_before_fallback(tmp_path):
             ],
         ),
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
     candidate = service._candidate_for_period(
         {
@@ -675,7 +757,7 @@ def test_candidate_profile_uses_storage_industry_membership(tmp_path):
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     candidate = service._candidate_for_period(
@@ -698,7 +780,7 @@ def test_apply_candidates_uses_fresh_readiness_for_final_status(tmp_path, monkey
         db_ops=_FakeDbOps(),
         storage=current_storage,
         research_config=config,
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
     candidate = FinancialDisclosureMaintenanceCandidate(
         instrument_id="601187.SH",
@@ -752,7 +834,7 @@ def test_reconciliation_mapping_policy_gap_does_not_retry_sources(tmp_path):
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     async def _unexpected_import(**kwargs):
@@ -784,7 +866,7 @@ def test_reconciliation_accepts_pre_listing_period_without_source_retry(tmp_path
         db_ops=_FakeLifecycleDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     async def _unexpected_import(**kwargs):
@@ -832,7 +914,7 @@ def test_reconciliation_converts_pre_listing_pending_state_without_source_retry(
         db_ops=_FakeLifecycleDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     async def _unexpected_import(**kwargs):
@@ -887,7 +969,7 @@ def test_reconciliation_reuses_accepted_disclosure_state_without_source_retry(tm
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     async def _unexpected_import(**kwargs):
@@ -923,8 +1005,8 @@ def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(t
                 "instrument_id": "002731.SZ",
                 "symbol": "002731",
                 "market": "SZSE",
-                "announcement_id": "risk-generic",
-                "announcement_time": "2026-05-05T16:00:00+00:00",
+                "source_announcement_id": "risk-generic",
+                "published_at": "2026-05-05T16:00:00+00:00",
                 "title": "关于无法在法定期限内披露定期报告暨股票停牌的公告",
                 "selection_reasons": ["pending_delisting_risk"],
             }
@@ -934,7 +1016,7 @@ def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(t
         db_ops=_FakeDbOps(),
         storage=storage,
         research_config=_research_config(tmp_path),
-        announcement_scanner=_FakeScanner([]),
+        announcement_service=_FakeAnnouncementService([]),
     )
 
     async def _unexpected_import(**kwargs):

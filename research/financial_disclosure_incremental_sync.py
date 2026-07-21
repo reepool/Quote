@@ -5,11 +5,20 @@ Financial statement maintenance driven by CNInfo disclosure announcements.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from research.announcements import (
+    AnnouncementAcquisitionService,
+    AnnouncementQuery,
+    AnnouncementRecord,
+    AnnouncementScope,
+    ProviderCursor,
+    build_announcement_key,
+    load_announcement_acquisition_config,
+)
 from research.financial_disclosure_events import (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
     FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION,
@@ -29,11 +38,7 @@ from research.financial_statement_maintenance_repair import (
 )
 from research.financial_statement_profile import resolve_financial_statement_profile
 from research.financial_statements_sync import build_financial_report_periods
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanConfig,
-    CninfoAnnouncementScanner,
-)
+from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.storage import ResearchStorageManager
 from scripts.dev_validation.audit_financial_numeric_fact_coverage import (
     DEFAULT_REQUIRED_CANONICAL_FACTS,
@@ -101,13 +106,15 @@ class FinancialDisclosureIncrementalSyncService:
         db_ops: Any,
         storage: ResearchStorageManager,
         research_config: Optional[ResearchConfig] = None,
-        announcement_scanner: Optional[CninfoAnnouncementScanner] = None,
+        announcement_service: Optional[AnnouncementAcquisitionService] = None,
         repair_router: Optional[FinancialMaintenanceRepairRouter] = None,
     ) -> None:
         self.db_ops = db_ops
         self.storage = storage
         self.research_config = research_config or config_manager.get_research_config()
-        self.announcement_scanner = announcement_scanner or self._build_scanner()
+        self.announcement_service = (
+            announcement_service or self._build_announcement_service()
+        )
         self.repair_router = repair_router or FinancialMaintenanceRepairRouter(
             storage=storage,
             research_config=self.research_config,
@@ -338,14 +345,12 @@ class FinancialDisclosureIncrementalSyncService:
                     )
             raise
 
-    def _build_scanner(self) -> CninfoAnnouncementScanner:
-        cninfo_cfg = self.research_config.sources.get("cninfo", {})
-        scan_cfg = cninfo_cfg.get("announcement_scan", {})
-        return CninfoAnnouncementScanner(
-            request_timeout_seconds=float(scan_cfg.get("request_timeout_seconds", 20.0)),
-            request_interval_seconds=float(scan_cfg.get("request_interval_seconds", 0.2)),
-            retry_attempts=int(scan_cfg.get("retry_attempts", 2)),
-            retry_backoff_seconds=float(scan_cfg.get("retry_backoff_seconds", 0.5)),
+    def _build_announcement_service(self) -> AnnouncementAcquisitionService:
+        return AnnouncementAcquisitionService(
+            registry=OfficialAnnouncementProviderRegistry(
+                research_config=self.research_config
+            ),
+            config=load_announcement_acquisition_config(self.research_config),
         )
 
     async def _load_active_instruments(
@@ -392,125 +397,109 @@ class FinancialDisclosureIncrementalSyncService:
         run_id: Optional[int],
         dry_run: bool,
     ) -> Dict[str, Any]:
+        if self.announcement_service is None:
+            raise RuntimeError("announcement acquisition service is not configured")
         now = get_shanghai_time()
         end_date = now.date().isoformat()
         symbol_index = build_financial_symbol_index(instruments)
-        market_configs = self._announcement_market_configs()
         all_selected = []
         pages_scanned = 0
         announcements_scanned = 0
         selected_announcements = 0
         financial_like_announcements = 0
         errors: List[str] = []
+
         for exchange in exchanges:
-            cfg = market_configs.get(exchange, {})
-            column = str(cfg.get("column") or exchange.lower()).strip()
-            market = str(cfg.get("market") or exchange).strip()
-            with self.storage.financial_database_scope():
-                state = self.storage.get_cninfo_announcement_scan_state(
-                    purpose_key=self.purpose_key,
-                    market=market,
-                    column=column,
-                )
-            watermark = None if state is None else state.get("last_watermark")
-            config = CninfoAnnouncementScanConfig(
-                purpose_key=self.purpose_key,
-                market=market,
-                column=column,
-                plate=cfg.get("plate"),
-                tab_name=str(cfg.get("tab_name") or "fulltext"),
-                category=cfg.get("category"),
-                search_key=search_key or cfg.get("search_key"),
-                start_date=(now - timedelta(days=max(lookback_days, overlap_days))).date().isoformat(),
+            scope = AnnouncementScope(
+                exchange=exchange,
+                market=exchange,
+                keyword=search_key,
+                start_date=(
+                    now - timedelta(days=max(lookback_days, overlap_days))
+                ).date().isoformat(),
                 end_date=end_date,
                 page_size=page_size,
                 max_pages=max_pages_per_market,
-                stop_at_watermark=watermark,
+                overlap_days=overlap_days,
             )
-            scan_started_at = get_shanghai_time().isoformat()
-            result = self.announcement_scanner.scan(
-                config,
-                filters=[financial_disclosure_event_filter],
+            with self.storage.financial_database_scope():
+                state = self.storage.get_announcement_scan_state(
+                    purpose_key=self.purpose_key,
+                    source="cninfo",
+                    scope_key=scope.scope_key,
+                )
+            if state and state.get("committed_cursor"):
+                cursor = state["committed_cursor"]
+                scope = AnnouncementScope(
+                    **{
+                        **scope.__dict__,
+                        "cursor": ProviderCursor(
+                            kind=str(cursor["kind"]),
+                            value=str(cursor["value"]),
+                        ),
+                    }
+                )
+            route_result = self.announcement_service.acquire(
+                AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
+                selectors=[financial_disclosure_event_filter],
             )
-            scan_completed_at = get_shanghai_time().isoformat()
+            result = route_result.scan_result
+            if result is None:
+                errors.append(f"{exchange}:announcement_route_returned_no_result")
+                continue
             pages_scanned += result.pages_scanned
             announcements_scanned += result.announcements_seen
             selected_announcements += len(result.selected_records)
-            financial_like_announcements += sum(
-                1 for record in result.records if is_financial_disclosure_like_title(record.title)
+            exchange_financial_like = sum(
+                1
+                for record in result.records
+                if is_financial_disclosure_like_title(record.title)
             )
+            financial_like_announcements += exchange_financial_like
             all_selected.extend(result.selected_records)
             errors.extend(result.errors)
             if not dry_run:
                 with self.storage.financial_database_scope():
-                    noisy_filtered = max(
-                        0,
-                        sum(
-                            1
-                            for record in result.records
-                            if is_financial_disclosure_like_title(record.title)
-                        )
-                        - len(result.selected_records),
-                    )
-                    self.storage.upsert_cninfo_announcement_scan_state(
-                        purpose_key=self.purpose_key,
-                        market=market,
-                        column=column,
-                        last_watermark=result.max_announcement_time or watermark,
-                        last_scan_started_at=scan_started_at,
-                        last_scan_completed_at=scan_completed_at,
-                        pages_scanned=result.pages_scanned,
-                        announcements_seen=result.announcements_seen,
+                    self.storage.upsert_announcement_scan_state(
+                        scan_result=result,
                         selected_announcements=len(result.selected_records),
-                        status="success" if not result.errors else "degraded",
+                        attempts=[asdict(item) for item in route_result.attempts],
                         metadata={
-                            "errors": result.errors[:5],
-                            "financial_like_announcements": sum(
-                                1
-                                for record in result.records
-                                if is_financial_disclosure_like_title(record.title)
+                            "financial_like_announcements": exchange_financial_like,
+                            "filtered_financial_like_announcements": max(
+                                0,
+                                exchange_financial_like
+                                - len(result.selected_records),
                             ),
-                            "filtered_financial_like_announcements": noisy_filtered,
+                            "overlap_days": overlap_days,
                         },
                     )
                     for record in result.selected_records:
-                        for symbol in record.symbols or [""]:
+                        for symbol in record.symbols or ("",):
                             instrument = symbol_index.get(symbol)
-                            self.storage.store_cninfo_announcement_audit(
+                            self.storage.store_announcement_audit(
                                 purpose_key=self.purpose_key,
-                                announcement_id=record.announcement_id,
+                                record=record,
                                 instrument_id=(
                                     None
                                     if instrument is None
                                     else str(instrument.get("instrument_id") or "")
                                 ),
                                 symbol=symbol or None,
-                                market=record.market,
-                                column=record.column,
-                                announcement_time=record.announcement_time,
-                                title=record.title,
-                                adjunct_url=record.adjunct_url,
-                                selection_reasons=record.selection_reasons,
-                                raw_payload=record.raw_payload,
                                 ingestion_run_id=run_id,
                             )
+
         events = build_financial_disclosure_events(all_selected, symbol_index)
         selected_event_ids = {
             str(event.announcement_id)
             for event in events
             if event.announcement_id
         }
-        selected_without_event = max(
-            0,
-            len(
-                {
-                    str(record.announcement_id)
-                    for record in all_selected
-                    if record.announcement_id
-                }
-            )
-            - len(selected_event_ids),
-        )
+        selected_ids = {
+            str(record.source_announcement_id)
+            for record in all_selected
+            if record.source_announcement_id
+        }
         return {
             "events": events,
             "pages_scanned": pages_scanned,
@@ -518,41 +507,29 @@ class FinancialDisclosureIncrementalSyncService:
             "selected_announcements": selected_announcements,
             "financial_like_announcements": financial_like_announcements,
             "filtered_financial_like_announcements": max(
-                0, financial_like_announcements - selected_announcements
+                0,
+                financial_like_announcements - selected_announcements,
             ),
-            "selected_without_event_count": selected_without_event,
+            "selected_without_event_count": max(
+                0,
+                len(selected_ids - selected_event_ids),
+            ),
             "selected_announcements_preview": [
                 {
-                    "announcement_id": record.announcement_id,
-                    "announcement_time": record.announcement_time,
+                    "announcement_id": record.source_announcement_id,
+                    "announcement_time": record.published_at,
                     "market": record.market,
                     "symbols": list(record.symbols),
                     "title": record.title,
                     "selection_reasons": list(record.selection_reasons),
-                    "mapped_event": any(
-                        event.announcement_id == record.announcement_id
-                        for event in events
-                    ),
+                    "mapped_event": record.source_announcement_id
+                    in selected_event_ids,
                 }
                 for record in all_selected[:20]
             ],
             "event_count": len(events),
             "errors": errors,
         }
-
-    def _announcement_market_configs(self) -> Dict[str, Dict[str, Any]]:
-        cninfo_cfg = self.research_config.sources.get("cninfo", {})
-        scan_cfg = cninfo_cfg.get("announcement_scan", {})
-        configured = scan_cfg.get("markets") or {}
-        defaults = {
-            "SSE": {"market": "SSE", "column": "sse", "plate": "sh"},
-            "SZSE": {"market": "SZSE", "column": "szse", "plate": "sz"},
-            "BSE": {"market": "BSE", "column": "neeq", "plate": "bj"},
-        }
-        for exchange, value in configured.items():
-            if isinstance(value, dict):
-                defaults[str(exchange)] = {**defaults.get(str(exchange), {}), **value}
-        return defaults
 
     def _build_candidates(
         self,
@@ -737,13 +714,20 @@ class FinancialDisclosureIncrementalSyncService:
         if not title:
             return False
         current_reasons = financial_disclosure_event_filter(
-            CninfoAnnouncementRecord(
-                announcement_id=str(state.get("announcement_id") or "pending"),
+            AnnouncementRecord(
+                source="local_pending_state",
+                source_announcement_id=str(
+                    state.get("announcement_id") or "pending"
+                ),
+                announcement_key=build_announcement_key(
+                    "local_pending_state",
+                    str(state.get("announcement_id") or "pending"),
+                ),
                 title=title,
-                announcement_time=state.get("announcement_time"),
+                published_at=state.get("announcement_time"),
                 market=str(state.get("exchange") or ""),
-                column=str(state.get("exchange") or "").lower(),
-                symbols=[str(state.get("symbol") or "")],
+                exchange=str(state.get("exchange") or ""),
+                symbols=(str(state.get("symbol") or ""),),
             )
         )
         if not current_reasons:
@@ -885,7 +869,7 @@ class FinancialDisclosureIncrementalSyncService:
         self,
         instrument_ids: Sequence[str],
     ) -> Dict[str, List[Mapping[str, Any]]]:
-        loader = getattr(self.storage, "list_cninfo_announcement_audit", None)
+        loader = getattr(self.storage, "list_announcement_audit", None)
         if loader is None:
             return {}
         with self.storage.financial_database_scope():
@@ -914,7 +898,9 @@ class FinancialDisclosureIncrementalSyncService:
         if period_end is None:
             return None
         for audit in audits:
-            announcement_time = self._parse_date_text(audit.get("announcement_time"))
+            announcement_time = self._parse_date_text(
+                audit.get("published_at") or audit.get("announcement_time")
+            )
             if announcement_time is None:
                 continue
             days_after_period = (announcement_time.date() - period_end.date()).days
@@ -931,8 +917,14 @@ class FinancialDisclosureIncrementalSyncService:
                 report_period=candidate.report_period,
                 classification=classification,
                 reasons=reasons,
-                announcement_id=str(audit.get("announcement_id") or "audit-risk"),
-                announcement_time=audit.get("announcement_time"),
+                announcement_id=str(
+                    audit.get("source_announcement_id")
+                    or audit.get("announcement_id")
+                    or "audit-risk"
+                ),
+                announcement_time=(
+                    audit.get("published_at") or audit.get("announcement_time")
+                ),
                 title=audit.get("title"),
             )
         return None

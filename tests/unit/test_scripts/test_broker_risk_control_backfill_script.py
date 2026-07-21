@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
-from research.providers.cninfo_announcements import (
-    CninfoAnnouncementRecord,
-    CninfoAnnouncementScanResult,
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    AnnouncementRouteResult,
+    AnnouncementScanResult,
+    build_announcement_key,
 )
 from scripts.dev_validation.backfill_broker_risk_control_reports import (
     build_candidate_report_periods,
@@ -21,16 +24,48 @@ class _FakeDbOps:
         return list(self.rows_by_exchange.get(exchange, []))
 
 
-class _FakeScanner:
+def _record(
+    announcement_id,
+    *,
+    title,
+    announcement_time,
+    market,
+    symbols,
+    adjunct_url=None,
+    adjunct_type=None,
+    raw_payload=None,
+):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at=announcement_time,
+        market=market,
+        exchange=market,
+        symbols=tuple(symbols),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=adjunct_url,
+                file_extension=adjunct_type,
+            ),
+        )
+        if adjunct_url
+        else (),
+        raw_payload=dict(raw_payload or {}),
+    )
+
+
+class _FakeAnnouncementService:
     def __init__(self, records):
         self.records = records
         self.configs = []
 
-    def scan(self, config, *, filters=None):
-        self.configs.append(config)
+    def acquire(self, query, *, selectors=None):
+        self.configs.append(query)
         records = list(self.records)
-        if getattr(config, "stock", None):
-            stock_code = str(config.stock).split(",", 1)[0]
+        if query.scope.symbol:
+            stock_code = query.scope.symbol
             records = [record for record in records if stock_code in record.symbols]
         else:
             records = [
@@ -41,32 +76,26 @@ class _FakeScanner:
         selected = []
         for record in records:
             reasons = []
-            for predicate in filters or []:
+            for predicate in selectors or []:
                 reasons.extend(predicate(record) or [])
             if reasons:
-                selected.append(
-                    CninfoAnnouncementRecord(
-                        announcement_id=record.announcement_id,
-                        title=record.title,
-                        announcement_time=record.announcement_time,
-                        market=record.market,
-                        column=record.column,
-                        symbols=record.symbols,
-                        sec_names=record.sec_names,
-                        org_ids=record.org_ids,
-                        adjunct_url=record.adjunct_url,
-                        adjunct_type=record.adjunct_type,
-                        raw_payload=record.raw_payload,
-                        selection_reasons=reasons,
-                    )
-                )
-        return CninfoAnnouncementScanResult(
-            config=config,
-            records=records,
-            selected_records=selected,
+                selected.append(record.with_selection_reasons(reasons))
+        scan_result = AnnouncementScanResult(
+            source="cninfo",
+            query=query.for_source("cninfo"),
+            status="success",
+            records=tuple(records),
+            selected_records=tuple(selected),
             pages_scanned=1,
             announcements_seen=len(records),
-            max_announcement_time="2026-03-30",
+            max_published_at="2026-03-30",
+            is_complete=True,
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan_result,
         )
 
 
@@ -183,24 +212,22 @@ def test_select_broker_instruments_defaults_to_five():
 
 def test_backfill_script_dry_run_parses_without_writes():
     storage = _FakeStorage()
-    scanner = _FakeScanner(
+    announcement_service = _FakeAnnouncementService(
         [
-            CninfoAnnouncementRecord(
+            _record(
                 announcement_id="annual-2025",
                 title="2025年年度报告",
                 announcement_time="2026-03-30",
                 market="SSE",
-                column="sse",
                 symbols=["600030"],
                 adjunct_url="/annual.pdf",
                 adjunct_type="PDF",
             ),
-            CninfoAnnouncementRecord(
+            _record(
                 announcement_id="risk-2025",
                 title="2025年度风险控制指标相关情况报告",
                 announcement_time="2026-03-30",
                 market="SSE",
-                column="sse",
                 symbols=["600030"],
             ),
         ]
@@ -224,7 +251,7 @@ def test_backfill_script_dry_run_parses_without_writes():
         exchanges=["SSE"],
         as_of_date="2026-06-06",
         limit_instruments=5,
-        scanner=scanner,
+        announcement_service=announcement_service,
         payload_fetcher=lambda record: _risk_control_text(),
         write=False,
     )
@@ -240,24 +267,22 @@ def test_backfill_script_dry_run_parses_without_writes():
 
 def test_backfill_script_per_instrument_scan_keeps_full_broker_universe():
     storage = _FakeStorage()
-    scanner = _FakeScanner(
+    announcement_service = _FakeAnnouncementService(
         [
-            CninfoAnnouncementRecord(
+            _record(
                 announcement_id="annual-600030-2025",
                 title="2025年年度报告",
                 announcement_time="2026-03-30",
                 market="SSE",
-                column="sse",
                 symbols=["600030"],
                 adjunct_url="/annual-600030.pdf",
                 adjunct_type="PDF",
             ),
-            CninfoAnnouncementRecord(
+            _record(
                 announcement_id="annual-600109-2025",
                 title="2025年年度报告",
                 announcement_time="2026-03-30",
                 market="SSE",
-                column="sse",
                 symbols=["600109"],
                 adjunct_url="/annual-600109.pdf",
                 adjunct_type="PDF",
@@ -298,7 +323,7 @@ def test_backfill_script_per_instrument_scan_keeps_full_broker_universe():
         exchanges=["SSE"],
         as_of_date="2026-06-06",
         limit_instruments=0,
-        scanner=scanner,
+        announcement_service=announcement_service,
         payload_fetcher=lambda record: _risk_control_text(),
         write=False,
     )
@@ -330,14 +355,13 @@ def test_backfill_script_scan_only_skips_payload_fetch():
         storage=_FakeStorage(),
         exchanges=["SSE"],
         as_of_date="2026-06-06",
-        scanner=_FakeScanner(
+        announcement_service=_FakeAnnouncementService(
             [
-                CninfoAnnouncementRecord(
+                _record(
                     announcement_id="risk-2025",
                     title="2025年年度报告",
                     announcement_time="2026-03-30",
                     market="SSE",
-                    column="sse",
                     symbols=["600030"],
                 )
             ]
@@ -354,22 +378,20 @@ def test_backfill_script_scan_only_skips_payload_fetch():
 def test_standalone_supplement_only_parses_primary_net_capital_gaps():
     storage = _FakeStorage()
     records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="annual-2025",
             title="2025年年度报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
             adjunct_url="/annual.pdf",
             adjunct_type="PDF",
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="risk-2025",
             title="2025年度风险控制指标相关情况报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
             adjunct_url="/risk.pdf",
             adjunct_type="PDF",
@@ -377,7 +399,7 @@ def test_standalone_supplement_only_parses_primary_net_capital_gaps():
     ]
 
     def _payload(record):
-        if record.announcement_id == "annual-2025":
+        if record.source_announcement_id == "annual-2025":
             return _annual_without_net_capital_text()
         return _risk_control_text()
 
@@ -398,7 +420,7 @@ def test_standalone_supplement_only_parses_primary_net_capital_gaps():
         storage=storage,
         exchanges=["SSE"],
         as_of_date="2026-06-06",
-        scanner=_FakeScanner(records),
+        announcement_service=_FakeAnnouncementService(records),
         payload_fetcher=_payload,
         write=False,
         include_standalone_supplement=True,
@@ -417,22 +439,20 @@ def test_standalone_supplement_only_parses_primary_net_capital_gaps():
 def test_standalone_supplement_skips_primary_net_capital_covered_periods():
     storage = _FakeStorage()
     records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="annual-2025",
             title="2025年年度报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
             adjunct_url="/annual.pdf",
             adjunct_type="PDF",
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="risk-2025",
             title="2025年度风险控制指标相关情况报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
             adjunct_url="/risk.pdf",
             adjunct_type="PDF",
@@ -456,7 +476,7 @@ def test_standalone_supplement_skips_primary_net_capital_covered_periods():
         storage=storage,
         exchanges=["SSE"],
         as_of_date="2026-06-06",
-        scanner=_FakeScanner(records),
+        announcement_service=_FakeAnnouncementService(records),
         payload_fetcher=lambda record: _risk_control_text(),
         write=False,
         include_standalone_supplement=True,
@@ -478,38 +498,34 @@ def test_standalone_gap_filter_uses_existing_facts_for_unchanged_primary_reports
         }
     ]
     primary_records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="annual-2025",
             title="2025年年度报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="semi-2025",
             title="2025年半年度报告",
             announcement_time="2025-08-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
         ),
     ]
     standalone_records = [
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="risk-annual-2025",
             title="2025年度风险控制指标相关情况报告",
             announcement_time="2026-03-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
         ),
-        CninfoAnnouncementRecord(
+        _record(
             announcement_id="risk-semi-2025",
             title="2025年半年度风险控制指标相关情况报告",
             announcement_time="2025-08-30",
             market="SSE",
-            column="sse",
             symbols=["600030"],
         ),
     ]
@@ -537,6 +553,6 @@ def test_standalone_gap_filter_uses_existing_facts_for_unchanged_primary_reports
     assert result["missing_primary_pairs"] == [
         {"instrument_id": "600030.SH", "report_period": "2025-06-30"}
     ]
-    assert [record.announcement_id for record in result["selected_records"]] == [
+    assert [record.source_announcement_id for record in result["selected_records"]] == [
         "risk-semi-2025"
     ]

@@ -1,6 +1,17 @@
 import sqlite3
 from dataclasses import replace
 
+import pytest
+
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementQuery,
+    AnnouncementRecord,
+    AnnouncementScanResult,
+    AnnouncementScope,
+    ProviderCursor,
+    build_announcement_key,
+)
 from research.financial_source_field_mapping import (
     MAPPING_VERSION,
     get_financial_source_field_mappings,
@@ -89,8 +100,10 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "company_profiles" in tables
     assert "financial_summaries" in tables
     assert "shareholder_snapshots" in tables
-    assert "cninfo_announcement_scan_state" in tables
-    assert "cninfo_announcement_audit" in tables
+    assert "announcement_scan_state" in tables
+    assert "announcement_audit" in tables
+    assert "cninfo_announcement_scan_state" not in tables
+    assert "cninfo_announcement_audit" not in tables
     assert "financial_disclosure_event_state" in tables
     assert "shareholder_change_manifest" in tables
     assert "financial_statements_raw" in tables
@@ -127,6 +140,523 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
         }
     assert "valuation_inputs" in valuation_tables
     assert "valuation_history" in valuation_tables
+
+
+def _announcement_query(cursor=None):
+    return AnnouncementQuery(
+        purpose_key="storage_test",
+        source="cninfo",
+        scope=AnnouncementScope(
+            exchange="SSE",
+            market="SSE",
+            keyword="年度报告",
+            cursor=cursor,
+        ),
+    )
+
+
+def test_announcement_scan_state_commits_only_complete_success(tmp_path, monkeypatch):
+    log_calls = []
+    monkeypatch.setattr(
+        "research.storage.db_logger.info",
+        lambda *args, **kwargs: log_calls.append((args, kwargs)),
+    )
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    query = _announcement_query()
+    first = AnnouncementScanResult(
+        source="cninfo",
+        query=query,
+        status="success",
+        pages_scanned=1,
+        requests_made=1,
+        announcements_seen=2,
+        max_published_at="2026-07-20T01:00:00+00:00",
+        provider_cursor=ProviderCursor(
+            kind="published_at",
+            value="2026-07-20T01:00:00+00:00",
+        ),
+        is_complete=True,
+        stop_reason="last_page",
+    )
+    committed = storage.upsert_announcement_scan_state(scan_result=first)
+    assert committed["committed_cursor_value"] == "2026-07-20T01:00:00+00:00"
+    assert committed["metadata"]["cursor_commit_allowed"] is True
+
+    partial = AnnouncementScanResult(
+        source="cninfo",
+        query=query,
+        status="degraded",
+        pages_scanned=2,
+        requests_made=2,
+        announcements_seen=5,
+        max_published_at="2026-07-21T01:00:00+00:00",
+        provider_cursor=ProviderCursor(
+            kind="published_at",
+            value="2026-07-21T01:00:00+00:00",
+        ),
+        is_complete=False,
+        stop_reason="request_failed",
+        errors=("page 3 failed",),
+    )
+    retained = storage.upsert_announcement_scan_state(scan_result=partial)
+    assert retained["committed_cursor_value"] == "2026-07-20T01:00:00+00:00"
+    assert retained["max_published_at"] == "2026-07-20T01:00:00+00:00"
+    assert retained["metadata"]["observed_max_published_at"] == (
+        "2026-07-21T01:00:00+00:00"
+    )
+    assert retained["metadata"]["cursor_commit_allowed"] is False
+    cursor_logs = [
+        args
+        for args, _kwargs in log_calls
+        if args and "Announcement cursor decision" in str(args[0])
+    ]
+    assert len(cursor_logs) == 2
+    assert cursor_logs[0][6] is True
+    assert cursor_logs[1][6] is False
+
+
+def test_successful_empty_announcement_scan_retains_existing_cursor(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    query = _announcement_query()
+    baseline_cursor = "2026-07-20T01:00:00+00:00"
+    storage.upsert_announcement_scan_state(
+        scan_result=AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success",
+            max_published_at=baseline_cursor,
+            provider_cursor=ProviderCursor(
+                kind="published_at",
+                value=baseline_cursor,
+            ),
+            is_complete=True,
+            stop_reason="last_page",
+        )
+    )
+
+    retained = storage.upsert_announcement_scan_state(
+        scan_result=AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success_empty",
+            pages_scanned=1,
+            requests_made=1,
+            is_complete=True,
+            stop_reason="empty_page",
+        )
+    )
+
+    assert retained["committed_cursor"] == {
+        "kind": "published_at",
+        "value": baseline_cursor,
+    }
+    assert retained["max_published_at"] == baseline_cursor
+    assert retained["metadata"]["cursor_commit_allowed"] is True
+    assert retained["metadata"]["observed_max_published_at"] is None
+
+
+@pytest.mark.parametrize(
+    ("status", "stop_reason", "errors"),
+    [
+        ("degraded", "request_failed", ("later page failed",)),
+        ("failed", "malformed_payload", ("payload malformed",)),
+        ("indeterminate", "max_pages_exhausted", ()),
+        ("identity_not_found", "identity_not_found", ("identity missing",)),
+    ],
+)
+def test_announcement_failure_outcomes_never_advance_cursor(
+    tmp_path,
+    status,
+    stop_reason,
+    errors,
+):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    query = _announcement_query()
+    baseline_cursor = "2026-07-20T01:00:00+00:00"
+    storage.upsert_announcement_scan_state(
+        scan_result=AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success",
+            pages_scanned=1,
+            requests_made=1,
+            announcements_seen=1,
+            max_published_at=baseline_cursor,
+            provider_cursor=ProviderCursor(
+                kind="published_at",
+                value=baseline_cursor,
+            ),
+            is_complete=True,
+            stop_reason="last_page",
+        )
+    )
+
+    observed_cursor = "2026-07-21T01:00:00+00:00"
+    state = storage.upsert_announcement_scan_state(
+        scan_result=AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status=status,
+            pages_scanned=2,
+            requests_made=2,
+            announcements_seen=3,
+            max_published_at=observed_cursor,
+            provider_cursor=ProviderCursor(
+                kind="published_at",
+                value=observed_cursor,
+            ),
+            is_complete=False,
+            stop_reason=stop_reason,
+            errors=errors,
+        )
+    )
+
+    assert state["status"] == status
+    assert state["status"] != "success_empty"
+    assert state["committed_cursor_value"] == baseline_cursor
+    assert state["max_published_at"] == baseline_cursor
+    assert state["metadata"]["observed_max_published_at"] == observed_cursor
+    assert state["metadata"]["cursor_commit_allowed"] is False
+
+
+def test_announcement_audit_is_source_neutral_idempotent_and_bounded(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="ann-1",
+        announcement_key=build_announcement_key("cninfo", "ann-1"),
+        title="测试年度报告",
+        published_at="2026-07-20T01:00:00+00:00",
+        published_at_raw="2026-07-20 09:00:00",
+        exchange="SSE",
+        market="SSE",
+        symbols=("600000",),
+        attachments=(
+            AnnouncementAttachment(
+                source_url="finalpage/a.pdf",
+                resolved_url="https://static.cninfo.com.cn/finalpage/a.pdf",
+                media_type="application/pdf",
+            ),
+        ),
+        selection_reasons=("annual_report",),
+        raw_payload={"announcementId": "ann-1"},
+    )
+    storage.store_announcement_audit(
+        purpose_key="storage_test",
+        record=record,
+        instrument_id="600000.SH",
+    )
+    storage.store_announcement_audit(
+        purpose_key="storage_test",
+        record=record,
+        instrument_id="600000.SH",
+    )
+
+    rows = storage.list_announcement_audit(
+        purpose_key="storage_test",
+        source="cninfo",
+        limit=10000,
+    )
+    assert len(rows) == 1
+    assert rows[0]["announcement_key"] == "cninfo:ann-1"
+    assert rows[0]["selection_reasons"] == ["annual_report"]
+    assert rows[0]["attachments"][0]["resolved_url"].startswith("https://")
+
+
+def test_legacy_announcement_storage_methods_are_not_exposed(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+
+    for method_name in (
+        "get_cninfo_announcement_scan_state",
+        "upsert_cninfo_announcement_scan_state",
+        "store_cninfo_announcement_audit",
+        "list_cninfo_announcement_audit",
+    ):
+        assert not hasattr(storage, method_name)
+
+
+def test_initialize_backfills_legacy_announcement_evidence_idempotently(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    with sqlite3.connect(research_db_path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE cninfo_announcement_scan_state (
+                purpose_key TEXT NOT NULL,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                last_watermark TEXT,
+                last_scan_started_at TEXT,
+                last_scan_completed_at TEXT,
+                pages_scanned INTEGER NOT NULL DEFAULT 0,
+                announcements_seen INTEGER NOT NULL DEFAULT 0,
+                selected_announcements INTEGER NOT NULL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'success',
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (purpose_key, market, column_name)
+            );
+            CREATE TABLE cninfo_announcement_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                purpose_key TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL DEFAULT '',
+                symbol TEXT,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                announcement_time TEXT,
+                title TEXT NOT NULL,
+                adjunct_url TEXT,
+                selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                raw_payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(purpose_key, announcement_id, instrument_id)
+            );
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO cninfo_announcement_scan_state (
+                purpose_key, market, column_name, last_watermark,
+                pages_scanned, announcements_seen, selected_announcements,
+                status, metadata_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "migrate_test",
+                "SSE",
+                "sse",
+                "2026-07-20T01:00:00+00:00",
+                2,
+                10,
+                3,
+                "success",
+                '{"fixture": true}',
+                "2026-07-20T09:00:00+08:00",
+                "2026-07-20T09:00:00+08:00",
+            ),
+        )
+        conn.execute(
+            """
+            INSERT INTO cninfo_announcement_audit (
+                purpose_key, announcement_id, instrument_id, symbol,
+                market, column_name, announcement_time, title, adjunct_url,
+                selection_reasons_json, raw_payload_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "migrate_test",
+                "ann-legacy",
+                "600000.SH",
+                "600000",
+                "SSE",
+                "sse",
+                "2026-07-20T01:00:00+00:00",
+                "历史公告",
+                "finalpage/legacy.pdf",
+                '["legacy_reason"]',
+                '{"announcementId": "ann-legacy"}',
+                "2026-07-20T09:00:00+08:00",
+                "2026-07-20T09:00:00+08:00",
+            ),
+        )
+        conn.commit()
+
+    storage.initialize()
+    storage.initialize()
+    scope = AnnouncementScope(
+        exchange="SSE",
+        market="SSE",
+        source_options={"column": "sse"},
+    )
+    state = storage.get_announcement_scan_state(
+        purpose_key="migrate_test",
+        source="cninfo",
+        scope_key=scope.scope_key,
+    )
+    rows = storage.list_announcement_audit(
+        purpose_key="migrate_test",
+        source="cninfo",
+    )
+    assert state["committed_cursor"] == {
+        "kind": "published_at",
+        "value": "2026-07-20T01:00:00+00:00",
+    }
+    assert state["metadata"]["migrated_from"] == (
+        "cninfo_announcement_scan_state"
+    )
+    assert len(rows) == 1
+    assert rows[0]["announcement_key"] == "cninfo:ann-legacy"
+    assert rows[0]["selection_reasons"] == ["legacy_reason"]
+    with sqlite3.connect(research_db_path) as conn:
+        tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+        }
+    assert "cninfo_announcement_scan_state" not in tables
+    assert "cninfo_announcement_audit" not in tables
+    backups = list(
+        tmp_path.glob("research.db.pre_announcement_legacy_cleanup.*.bak")
+    )
+    assert len(backups) == 1
+    with sqlite3.connect(backups[0]) as conn:
+        assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+        assert conn.execute(
+            "SELECT COUNT(*) FROM cninfo_announcement_scan_state"
+        ).fetchone()[0] == 1
+        assert conn.execute(
+            "SELECT COUNT(*) FROM cninfo_announcement_audit"
+        ).fetchone()[0] == 1
+    restored_path = tmp_path / "restored_pre_cleanup.db"
+    with sqlite3.connect(backups[0]) as source, sqlite3.connect(restored_path) as target:
+        source.backup(target)
+    with sqlite3.connect(restored_path) as conn:
+        assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+        assert conn.execute(
+            "SELECT last_watermark FROM cninfo_announcement_scan_state"
+        ).fetchone()[0] == "2026-07-20T01:00:00+00:00"
+        assert conn.execute(
+            "SELECT announcement_id FROM cninfo_announcement_audit"
+        ).fetchone()[0] == "ann-legacy"
+
+
+def test_legacy_announcement_cleanup_fails_closed_on_payload_mismatch(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    generic_record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="ann-conflict",
+        announcement_key=build_announcement_key("cninfo", "ann-conflict"),
+        title="冲突公告",
+        published_at="2026-07-20T01:00:00+00:00",
+        exchange="SSE",
+        market="SSE",
+        symbols=("600000",),
+        selection_reasons=("legacy_reason",),
+        raw_payload={"value": "generic"},
+    )
+    storage.store_announcement_audit(
+        purpose_key="migrate_conflict",
+        record=generic_record,
+        instrument_id="600000.SH",
+    )
+    with sqlite3.connect(research_db_path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE cninfo_announcement_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                purpose_key TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL DEFAULT '',
+                symbol TEXT,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                announcement_time TEXT,
+                title TEXT NOT NULL,
+                adjunct_url TEXT,
+                selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                raw_payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(purpose_key, announcement_id, instrument_id)
+            );
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO cninfo_announcement_audit (
+                purpose_key, announcement_id, instrument_id, symbol,
+                market, column_name, announcement_time, title,
+                selection_reasons_json, raw_payload_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "migrate_conflict",
+                "ann-conflict",
+                "600000.SH",
+                "600000",
+                "SSE",
+                "sse",
+                "2026-07-20T01:00:00+00:00",
+                "冲突公告",
+                '["legacy_reason"]',
+                '{"value":"legacy"}',
+                "2026-07-20T09:00:00+08:00",
+                "2026-07-20T09:00:00+08:00",
+            ),
+        )
+        conn.commit()
+
+    with pytest.raises(RuntimeError, match="audit_payload_mismatch"):
+        storage.initialize()
+
+    with sqlite3.connect(research_db_path) as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM cninfo_announcement_audit"
+        ).fetchone()[0] == 1
+        raw_payload = conn.execute(
+            """
+            SELECT raw_payload_json FROM announcement_audit
+            WHERE purpose_key = 'migrate_conflict'
+            """
+        ).fetchone()[0]
+    assert raw_payload == '{"value": "generic"}'
+
+
+def test_legacy_announcement_cleanup_rejects_malformed_json(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    with sqlite3.connect(research_db_path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE cninfo_announcement_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                purpose_key TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL DEFAULT '',
+                symbol TEXT,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                announcement_time TEXT,
+                title TEXT NOT NULL,
+                adjunct_url TEXT,
+                selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                raw_payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(purpose_key, announcement_id, instrument_id)
+            );
+            INSERT INTO cninfo_announcement_audit (
+                purpose_key, announcement_id, instrument_id, market,
+                column_name, title, raw_payload_json, created_at, updated_at
+            ) VALUES (
+                'malformed', 'ann-malformed', '', 'SSE', 'sse',
+                '损坏公告', '{broken-json',
+                '2026-07-20T09:00:00+08:00',
+                '2026-07-20T09:00:00+08:00'
+            );
+            """
+        )
+        conn.commit()
+
+    with pytest.raises(RuntimeError, match="invalid JSON"):
+        storage.initialize()
+
+    with sqlite3.connect(research_db_path) as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM cninfo_announcement_audit"
+        ).fetchone()[0] == 1
 
 
 def test_financial_disclosure_pending_deadline_is_not_extended(tmp_path):

@@ -37,6 +37,7 @@ from data_sources.cninfo_corporate_action_llm import (
     normalize_analysis_result,
     validate_analysis,
 )
+from research.announcements import AnnouncementRetrievalResult
 from utils.llm import LlmDeadlineExceededError
 
 
@@ -1613,6 +1614,45 @@ def test_document_service_rejects_non_pdf_and_page_selection_is_bounded(tmp_path
         for index in range(1, 8)
     ]
     assert [item.page_number for item in select_relevant_pages(pages, max_pages=3)] == [2, 3, 4]
+
+
+def test_document_service_uses_common_attachment_retriever(tmp_path, monkeypatch):
+    class _Retriever:
+        def __init__(self):
+            self.calls = []
+
+        def retrieve(self, source, attachment, *, require_pdf=False):
+            self.calls.append((source, attachment, require_pdf))
+            return AnnouncementRetrievalResult(
+                source=source,
+                attachment=attachment,
+                status="success",
+                content=b"%PDF-common",
+                content_hash="retrieval-hash",
+                content_length=11,
+                final_url="https://static.cninfo.com.cn/finalpage/ann-1.pdf",
+                response_media_type="application/pdf",
+            )
+
+    retriever = _Retriever()
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_action_documents.extract_pdf_pages",
+        lambda _content, **_kwargs: (_page(),),
+    )
+    service = CninfoCorporateActionDocumentService(
+        archive_root=tmp_path,
+        retriever=retriever,
+    )
+
+    bundle = service.ingest(
+        announcement_id="ann-1",
+        source_url="finalpage/ann-1.pdf",
+    )
+
+    assert bundle.source == "cninfo"
+    assert bundle.source_url == "https://static.cninfo.com.cn/finalpage/ann-1.pdf"
+    assert retriever.calls[0][0] == "cninfo"
+    assert retriever.calls[0][2] is True
 
 
 @pytest.mark.asyncio

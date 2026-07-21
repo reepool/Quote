@@ -5,37 +5,51 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    AnnouncementScanResult,
+    build_announcement_key,
+)
 
 
-class _FakeAnnouncementScanner:
-    def __init__(self, **_kwargs):
-        pass
-
-    def resolve_stock_identity(self, symbol):
-        return {"stock": f"{symbol},gssh0600108", "org_id": "gssh0600108"}
-
-    def scan(self, config, *, filters=None):
-        record = CninfoAnnouncementRecord(
-            announcement_id="120220001",
+class _FakeAnnouncementService:
+    def acquire(self, query, *, selectors=None):
+        record = AnnouncementRecord(
+            source="cninfo",
+            source_announcement_id="120220001",
+            announcement_key=build_announcement_key("cninfo", "120220001"),
             title="股权分置改革方案实施公告",
-            announcement_time="2006-06-09T08:00:00+08:00",
-            market=config.market,
-            column=config.column,
-            symbols=["600108"],
-            adjunct_url="finalpage/2006-06-09/120220001.PDF",
+            published_at="2006-06-09T08:00:00+08:00",
+            market=query.scope.market,
+            exchange=query.scope.exchange,
+            symbols=(query.scope.symbol or "600108",),
+            attachments=(
+                AnnouncementAttachment(
+                    source_url="finalpage/2006-06-09/120220001.PDF",
+                    resolved_url=(
+                        "https://static.cninfo.com.cn/"
+                        "finalpage/2006-06-09/120220001.PDF"
+                    ),
+                ),
+            ),
         )
-        selected = [
-            record
-            for predicate in (filters or [])
-            if predicate(record)
-        ]
-        return SimpleNamespace(
-            records=[record],
+        reasons = []
+        for selector in selectors or ():
+            reasons.extend(selector(record) or ())
+        selected = (record.with_selection_reasons(reasons),) if reasons else ()
+        scan_result = AnnouncementScanResult(
+            source="cninfo",
+            query=query.for_source("cninfo"),
+            status="success",
+            records=(record,),
             selected_records=selected,
             announcements_seen=1,
-            errors=[],
+            pages_scanned=1,
+            requests_made=1,
+            is_complete=True,
         )
+        return SimpleNamespace(scan_result=scan_result)
 
 
 def _event_row(
@@ -84,15 +98,14 @@ def _manager(event_rows=None, adjacent_rows=None):
             "failed": 0,
         }
     )
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=_FakeAnnouncementService()
+    )
     return manager
 
 
 @pytest.mark.asyncio
-async def test_discovery_dry_run_scans_candidates_but_does_not_write(monkeypatch):
-    monkeypatch.setattr(
-        "research.providers.cninfo_announcements.CninfoAnnouncementScanner",
-        _FakeAnnouncementScanner,
-    )
+async def test_discovery_dry_run_scans_candidates_but_does_not_write():
     manager = _manager()
 
     result = await manager.discover_cninfo_special_action_effective_dates(
@@ -113,11 +126,7 @@ async def test_discovery_dry_run_scans_candidates_but_does_not_write(monkeypatch
 
 
 @pytest.mark.asyncio
-async def test_discovery_write_persists_candidate_only(monkeypatch):
-    monkeypatch.setattr(
-        "research.providers.cninfo_announcements.CninfoAnnouncementScanner",
-        _FakeAnnouncementScanner,
-    )
+async def test_discovery_write_persists_candidate_only():
     manager = _manager()
 
     result = await manager.discover_cninfo_special_action_effective_dates(
@@ -136,11 +145,7 @@ async def test_discovery_write_persists_candidate_only(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_discovery_exposes_deterministic_continuation_offset(monkeypatch):
-    monkeypatch.setattr(
-        "research.providers.cninfo_announcements.CninfoAnnouncementScanner",
-        _FakeAnnouncementScanner,
-    )
+async def test_discovery_exposes_deterministic_continuation_offset():
     event_rows = [
         _event_row(),
         _event_row(
@@ -185,12 +190,7 @@ async def test_discovery_exposes_deterministic_continuation_offset(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_discovery_excludes_unanchored_window_outside_requested_range(
-    monkeypatch,
 ):
-    monkeypatch.setattr(
-        "research.providers.cninfo_announcements.CninfoAnnouncementScanner",
-        _FakeAnnouncementScanner,
-    )
     row = {
         **_event_row(announcement_date=None, record_date=None),
         "fiscal_period": "1995年度",

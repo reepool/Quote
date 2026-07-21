@@ -9,7 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
+from research.announcements import AnnouncementRecord
 
 
 FINANCIAL_PERIODIC_REPORT_KEYWORDS = (
@@ -117,7 +117,7 @@ class FinancialDisclosureEvent:
         }
 
 
-def financial_disclosure_event_filter(record: CninfoAnnouncementRecord) -> List[str]:
+def financial_disclosure_event_filter(record: AnnouncementRecord) -> List[str]:
     """Return financial disclosure event reasons for one announcement."""
     title = record.title or ""
     reasons: List[str] = []
@@ -182,7 +182,7 @@ def infer_report_periods_from_title(title: str) -> List[str]:
 
 
 def build_financial_disclosure_events(
-    records: Iterable[CninfoAnnouncementRecord],
+    records: Iterable[AnnouncementRecord],
     symbol_index: Mapping[str, Mapping[str, Any]],
 ) -> List[FinancialDisclosureEvent]:
     """Map selected CNInfo announcements to financial disclosure events."""
@@ -204,7 +204,15 @@ def build_financial_disclosure_events(
             if not instrument_id:
                 continue
             for report_period in report_periods:
-                key = (instrument_id, report_period, record.announcement_id)
+                announcement_id = str(
+                    getattr(record, "source_announcement_id", "")
+                    or getattr(record, "announcement_id", "")
+                )
+                announcement_time = (
+                    getattr(record, "published_at", None)
+                    or getattr(record, "announcement_time", None)
+                )
+                key = (instrument_id, report_period, announcement_id)
                 event = events_by_key.get(key)
                 if event is None:
                     classification = (
@@ -222,8 +230,8 @@ def build_financial_disclosure_events(
                         report_period=report_period,
                         classification=classification,
                         reasons=[],
-                        announcement_id=record.announcement_id,
-                        announcement_time=record.announcement_time,
+                        announcement_id=announcement_id,
+                        announcement_time=announcement_time,
                         title=record.title,
                     )
                     events_by_key[key] = event

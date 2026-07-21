@@ -4,6 +4,16 @@ import sqlite3
 import pytest
 
 from data_manager import DataManager
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    AnnouncementRetrievalResult,
+    AnnouncementRouteAttempt,
+    AnnouncementRouteResult,
+    AnnouncementScanResult,
+    ProviderCursor,
+    build_announcement_key,
+)
 from research.broker_risk_control import (
     BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
     BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
@@ -20,8 +30,6 @@ from research.broker_risk_control import (
 )
 from research.listed_broker_dealer_scope import resolve_listed_broker_dealer_scope
 from research.providers.base import FinancialSourceFileManifest
-from research.providers.cninfo_announcements import CninfoAnnouncementRecord
-from research.providers.cninfo_announcements import CninfoAnnouncementScanResult
 from research.storage import ResearchStorageManager
 from research.valuation_service import ResearchValuationService
 from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
@@ -507,7 +515,8 @@ class _FakeSyncStorage:
     def __init__(self):
         self.manifests = []
         self.facts = []
-        self.state = None
+        self.generic_state = None
+        self.generic_audits = []
 
     def get_financial_source_file_manifests(self, **kwargs):
         return self.manifests
@@ -521,16 +530,50 @@ class _FakeSyncStorage:
         self.facts.extend(facts)
         return len(facts)
 
-    def get_cninfo_announcement_scan_state(self, **kwargs):
-        return self.state
+    def get_announcement_scan_state(self, **kwargs):
+        return self.generic_state
 
-    def upsert_cninfo_announcement_scan_state(self, **kwargs):
-        self.state = kwargs
+    def upsert_announcement_scan_state(self, **kwargs):
+        self.generic_state = kwargs
+
+    def store_announcement_audit(self, **kwargs):
+        self.generic_audits.append(kwargs)
+
+
+def _announcement_record(
+    *,
+    announcement_id,
+    title,
+    announcement_time,
+    market,
+    symbols,
+    adjunct_url=None,
+    adjunct_type=None,
+    **_kwargs,
+):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at=announcement_time,
+        market=market,
+        exchange="SSE",
+        symbols=tuple(symbols),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=adjunct_url,
+                file_extension=adjunct_type,
+            ),
+        )
+        if adjunct_url
+        else (),
+    )
 
 
 def test_broker_risk_control_backfill_filters_and_reports_counters():
     storage = _FakeSyncStorage()
-    record = CninfoAnnouncementRecord(
+    record = _announcement_record(
         announcement_id="risk-2025",
         title="2025年度风险控制指标相关情况报告",
         announcement_time="2026-03-30",
@@ -540,7 +583,7 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
         adjunct_url="/risk.pdf",
         adjunct_type="PDF",
     )
-    ignored = CninfoAnnouncementRecord(
+    ignored = _announcement_record(
         announcement_id="annual-2025",
         title="2025年年度报告",
         announcement_time="2026-03-30",
@@ -575,36 +618,75 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     assert deduped["facts_written"] == 0
 
 
-class _FakeScanner:
-    def __init__(self, selected_records):
-        self.selected_records = selected_records
+class _FakeAnnouncementService:
+    def __init__(self, records):
+        self.records = tuple(records)
 
-    def scan(self, config, *, filters=None):
-        return CninfoAnnouncementScanResult(
-            config=config,
-            records=list(self.selected_records),
-            selected_records=list(self.selected_records),
+    def acquire(self, query, *, selectors=None):
+        selected = []
+        for record in self.records:
+            reasons = []
+            for selector in selectors or ():
+                reasons.extend(selector(record) or ())
+            if reasons:
+                selected.append(record.with_selection_reasons(reasons))
+        source_query = query.for_source("cninfo")
+        scan_result = AnnouncementScanResult(
+            source="cninfo",
+            query=source_query,
+            status="success",
+            records=self.records,
+            selected_records=tuple(selected),
             pages_scanned=1,
-            announcements_seen=len(self.selected_records),
-            max_announcement_time="2026-03-30",
+            requests_made=1,
+            announcements_seen=len(self.records),
+            max_published_at="2026-03-30T00:00:00+08:00",
+            provider_cursor=ProviderCursor(
+                kind="published_at",
+                value="2026-03-30T00:00:00+08:00",
+            ),
+            is_complete=True,
+            stop_reason="completed",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan_result,
+            attempts=(
+                AnnouncementRouteAttempt(
+                    source="cninfo",
+                    status="success",
+                    record_count=len(self.records),
+                    selected_count=len(selected),
+                    pages_scanned=1,
+                    stop_reason="completed",
+                ),
+            ),
         )
 
 
-def test_broker_risk_control_incremental_reports_pending_and_watermark():
+def test_broker_risk_control_incremental_uses_common_announcement_storage():
     storage = _FakeSyncStorage()
-    record = CninfoAnnouncementRecord(
-        announcement_id="risk-2025",
+    attachment = AnnouncementAttachment(
+        source_url="/risk.pdf",
+        file_extension="PDF",
+    )
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="risk-common-2025",
+        announcement_key=build_announcement_key("cninfo", "risk-common-2025"),
         title="2025年度风险控制指标相关情况报告",
-        announcement_time="2026-03-30",
+        published_at="2026-03-30T00:00:00+08:00",
+        published_at_raw="2026-03-30",
+        exchange="SSE",
         market="沪市",
-        column="sse",
-        symbols=["600030"],
-        adjunct_url="/risk.pdf",
-        adjunct_type="PDF",
+        symbols=("600030",),
+        attachments=(attachment,),
     )
     service = BrokerRiskControlReportSyncService(
         storage=storage,
-        scanner=_FakeScanner([record]),
+        announcement_service=_FakeAnnouncementService([record]),
         payload_fetcher=lambda record: None,
         source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
     )
@@ -612,14 +694,58 @@ def test_broker_risk_control_incremental_reports_pending_and_watermark():
     result = service.incremental_update(
         market="沪市",
         column="sse",
-        instruments=[{"instrument_id": "600030.SH", "symbol": "600030", "exchange": "SSE", "industry_name": "证券"}],
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+                "industry_name": "证券",
+            }
+        ],
     )
 
     assert result["status"] == "partial"
-    assert result["announcements_scanned"] == 1
     assert result["matching_announcements"] == 1
     assert result["retryable_pending_reports"] == 1
-    assert storage.state["last_watermark"] == "2026-03-30"
+    assert storage.generic_state["scan_result"].source == "cninfo"
+    assert storage.generic_audits[0]["record"].source_announcement_id == "risk-common-2025"
+
+
+def test_broker_risk_control_payload_uses_common_attachment_retriever():
+    class _Retriever:
+        def __init__(self):
+            self.calls = []
+
+        def retrieve(self, source, attachment, *, require_pdf=False):
+            self.calls.append((source, attachment, require_pdf))
+            return AnnouncementRetrievalResult(
+                source=source,
+                attachment=attachment,
+                status="success",
+                content=b"%PDF-test",
+                content_hash="hash",
+                content_length=9,
+            )
+
+    retriever = _Retriever()
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="risk-download",
+        announcement_key=build_announcement_key("cninfo", "risk-download"),
+        title="2025年度风险控制指标相关情况报告",
+        published_at="2026-03-30T00:00:00+08:00",
+        attachments=(AnnouncementAttachment(source_url="/risk.pdf"),),
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        announcement_service=_FakeAnnouncementService([]),
+        attachment_retriever=retriever,
+        source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    assert service._download_payload(record) == b"%PDF-test"
+    assert retriever.calls[0][0] == "cninfo"
+    assert retriever.calls[0][2] is True
 
 
 def test_broker_risk_control_artifact_classification_is_title_scoped():
@@ -636,7 +762,7 @@ def test_broker_risk_control_artifact_classification_is_title_scoped():
 
 
 def test_formal_annual_report_title_selection_excludes_non_reports():
-    record = CninfoAnnouncementRecord(
+    record = _announcement_record(
         announcement_id="annual-2025",
         title="2025年年度报告",
         announcement_time="2026-03-30",

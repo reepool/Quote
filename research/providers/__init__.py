@@ -51,6 +51,11 @@ from .base import (
 )
 from .efinance_shareholders import EfinanceShareholdersProvider
 from .cninfo_shareholders import CninfoShareholdersProvider
+from .cninfo_announcements import CninfoAnnouncementProvider
+from .official_exchange_announcements import (
+    OfficialExchangeAnnouncementProvider,
+    OfficialExchangeAnnouncementSourceConfig,
+)
 from .baostock_company_profile import BaostockCompanyProfileProvider
 from .baostock_financial_summary import BaostockFinancialSummaryProvider
 from .baostock_industry import BaostockIndustryProvider
@@ -88,6 +93,7 @@ from .registry import (
     IndustryStandardProviderRegistry,
     OfficialIndustryHistoryProviderRegistry,
     OfficialFinancialFilingProviderRegistry,
+    OfficialAnnouncementProviderRegistry,
     ResearchReportProviderRegistry,
     ShareholderProviderRegistry,
     SentimentEventProviderRegistry,
@@ -158,6 +164,9 @@ __all__ = [
     "BaostockFinancialSummaryProvider",
     "BaostockIndustryProvider",
     "CninfoShareholdersProvider",
+    "CninfoAnnouncementProvider",
+    "OfficialExchangeAnnouncementProvider",
+    "OfficialExchangeAnnouncementSourceConfig",
     "EfinanceShareholdersProvider",
     "PytdxCompanyProfileProvider",
     "PytdxFinancialSummaryProvider",
@@ -172,6 +181,7 @@ __all__ = [
     "IndustryStandardProviderRegistry",
     "OfficialIndustryHistoryProviderRegistry",
     "OfficialFinancialFilingProviderRegistry",
+    "OfficialAnnouncementProviderRegistry",
     "ResearchReportProviderRegistry",
     "ShareholderProviderRegistry",
     "SentimentEventProviderRegistry",

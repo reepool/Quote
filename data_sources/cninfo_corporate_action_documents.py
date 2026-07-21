@@ -10,7 +10,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, Protocol
 
-from utils.http_transport import urlopen_bytes
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementAttachmentRetriever,
+    load_announcement_acquisition_config,
+)
+from utils.config_manager import ResearchConfig, config_manager
 
 
 DOCUMENT_PARSER_VERSION = "cninfo_corporate_action_pypdf.v1"
@@ -55,11 +60,12 @@ class CorporateActionDocumentBundle:
     pages: tuple[CorporateActionPageText, ...]
     extraction_status: str
     error_message: Optional[str] = None
+    source: str = "cninfo"
 
     def artifact_row(self, *, title: Optional[str] = None, announcement_time: Any = None) -> dict[str, Any]:
         return {
             "announcement_id": self.announcement_id,
-            "source": "cninfo",
+            "source": self.source,
             "source_url": self.source_url,
             "announcement_title": title,
             "announcement_time": announcement_time,
@@ -162,17 +168,20 @@ class CninfoCorporateActionDocumentService:
         *,
         archive_root: str | Path = DEFAULT_ARCHIVE_ROOT,
         fetcher: Optional[Callable[[str], bytes]] = None,
+        retriever: Optional[AnnouncementAttachmentRetriever] = None,
+        research_config: Optional[ResearchConfig] = None,
         ocr_adapter: Optional[CorporateActionOcrAdapter] = None,
-        timeout_seconds: float = 30.0,
     ) -> None:
         self.archive_root = Path(archive_root)
-        self.fetcher = fetcher or (
-            lambda url: urlopen_bytes(
-                url,
-                timeout_sec=float(timeout_seconds),
-                user_agent="QuoteResearch/1.0 CNInfo corporate-action archive",
+        self.fetcher = fetcher
+        if retriever is None and fetcher is None:
+            acquisition_config = load_announcement_acquisition_config(
+                research_config or config_manager.get_research_config()
             )
-        )
+            retriever = AnnouncementAttachmentRetriever.from_provider_configs(
+                acquisition_config.provider_configs
+            )
+        self.retriever = retriever
         self.ocr_adapter = ocr_adapter
 
     def ingest(
@@ -180,6 +189,7 @@ class CninfoCorporateActionDocumentService:
         *,
         announcement_id: str,
         source_url: str,
+        source: str = "cninfo",
         title: Optional[str] = None,
         announcement_time: Any = None,
     ) -> CorporateActionDocumentBundle:
@@ -187,7 +197,36 @@ class CninfoCorporateActionDocumentService:
         source_url = str(source_url or "").strip()
         if not announcement_id or not source_url:
             raise ValueError("announcement_id and source_url are required")
-        content = self.fetcher(source_url)
+        source = str(source or "").strip().lower()
+        if not source:
+            raise ValueError("source is required")
+        final_url = source_url
+        content_type = "application/pdf"
+        if self.fetcher is not None:
+            content = self.fetcher(source_url)
+        else:
+            if self.retriever is None:
+                raise RuntimeError("announcement attachment retriever is not configured")
+            retrieval = self.retriever.retrieve(
+                source,
+                AnnouncementAttachment(
+                    source_url=source_url,
+                    resolved_url=(
+                        source_url
+                        if source_url.startswith(("http://", "https://"))
+                        else None
+                    ),
+                ),
+                require_pdf=True,
+            )
+            if retrieval.status != "success":
+                raise RuntimeError(
+                    "corporate-action attachment retrieval failed: "
+                    + "; ".join(retrieval.errors)
+                )
+            content = retrieval.content
+            final_url = retrieval.final_url or source_url
+            content_type = retrieval.response_media_type or content_type
         if not isinstance(content, (bytes, bytearray)) or not content:
             raise ValueError("document_empty")
         content = bytes(content)
@@ -229,11 +268,12 @@ class CninfoCorporateActionDocumentService:
         )
         return CorporateActionDocumentBundle(
             announcement_id=announcement_id,
-            source_url=source_url,
+            source_url=final_url,
             content_hash=digest,
-            content_type="application/pdf",
+            content_type=content_type,
             content_length=len(content),
             archive_path=relative.as_posix(),
             pages=pages,
             extraction_status="extracted",
+            source=source,
         )
