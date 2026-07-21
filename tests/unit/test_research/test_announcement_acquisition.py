@@ -472,6 +472,48 @@ def test_cninfo_provider_reports_successful_empty_only_for_complete_scan():
     ).discover(_query())
     assert result.status == "success_empty"
     assert result.cursor_commit_allowed is True
+
+
+def test_cninfo_provider_accepts_explicit_zero_result_with_null_containers():
+    result = _cninfo_provider(
+        _Session(
+            payloads=[
+                {
+                    "classifiedAnnouncements": None,
+                    "totalSecurities": 0,
+                    "totalAnnouncement": 0,
+                    "totalRecordNum": 0,
+                    "announcements": None,
+                    "categoryList": None,
+                    "hasMore": False,
+                    "totalpages": 0,
+                }
+            ]
+        )
+    ).discover(_query(keyword="权益分派实施公告"))
+
+    assert result.status == "success_empty"
+    assert result.is_complete is True
+    assert result.stop_reason == "empty_page"
+    assert result.cursor_commit_allowed is True
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"announcements": None},
+        {"announcements": None, "totalAnnouncement": 1, "hasMore": False},
+        {"announcements": None, "totalAnnouncement": "unknown", "hasMore": False},
+    ],
+)
+def test_cninfo_provider_rejects_unconfirmed_null_container(payload):
+    result = _cninfo_provider(_Session(payloads=[payload])).discover(_query())
+
+    assert result.status == "failed"
+    assert result.stop_reason == "malformed_payload"
+    assert result.cursor_commit_allowed is False
+
+
 class _ExchangeResponse:
     def __init__(self, payload, *, jsonp=False):
         self.payload = payload

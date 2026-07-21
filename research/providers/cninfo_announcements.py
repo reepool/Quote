@@ -368,6 +368,8 @@ class _CninfoTransport:
             if key not in payload:
                 continue
             candidate = payload[key]
+            if candidate is None and cls._confirms_empty_result(payload):
+                return []
             if not isinstance(candidate, list):
                 raise ValueError(
                     f"CNInfo announcement container {key} is not a list"
@@ -418,6 +420,29 @@ class _CninfoTransport:
             return flattened
 
         raise ValueError("CNInfo announcement response has no supported record container")
+
+    @staticmethod
+    def _confirms_empty_result(payload: Mapping[str, Any]) -> bool:
+        """Recognize CNInfo's explicit zero-result response with null containers."""
+        count_keys = ("totalAnnouncement", "totalRecordNum", "totalpages")
+        counts: List[int] = []
+        for key in count_keys:
+            if key not in payload:
+                continue
+            value = payload[key]
+            if isinstance(value, bool):
+                return False
+            try:
+                count = int(str(value).strip())
+            except (TypeError, ValueError):
+                return False
+            if count < 0:
+                return False
+            counts.append(count)
+        if not counts or any(count != 0 for count in counts):
+            return False
+        has_more = payload.get("hasMore")
+        return has_more in (None, False, 0, "0", "false", "False")
 
     @staticmethod
     def _dict_records(value: List[Any], *, container: str) -> List[Dict[str, Any]]:
