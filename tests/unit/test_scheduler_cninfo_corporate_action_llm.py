@@ -22,6 +22,18 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert job["parameters"]["refresh_documents"] is False
     assert job["parameters"]["auto_promote_validated"] is True
     assert job["parameters"]["exclude_reviewed_events"] is False
+    assert job["parameters"]["pipeline"] == {
+        "mode": "serial",
+        "stage_queue_size": 200,
+        "title_max_titles_per_request": 80,
+        "download_concurrency": 8,
+        "document_parse_concurrency": 8,
+        "llm_concurrency": 50,
+        "writer_batch_size": 10,
+        "writer_concurrency": 1,
+        "progress_interval_seconds": 30,
+        "verification_policy": "always",
+    }
     governance = config["scheduler_config"]["jobs"][
         "a_share_cninfo_corporate_action_resolution_governance"
     ]
@@ -52,10 +64,10 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
         "corporate_action_title_classification"
     ]
     assert title_profile["max_concurrency"] == 50
-    assert title_profile["requests_per_minute"] == 60
+    assert title_profile["requests_per_minute"] == 0
     assert llm_config["llm"]["profiles"]["semantic_extraction"][
         "max_concurrency"
-    ] == 1
+    ] == 50
     assert "高置信结果可写入受治理的 resolved 层" in _format_cninfo_corporate_action_llm_report({
         "status": "dry_run", "dry_run": True, "counts": {}, "targets": {},
     })
@@ -164,11 +176,19 @@ async def test_scheduler_delegates_bounded_llm_resolution(monkeypatch):
         start_date="2026-01-01", end_date="2026-12-31",
         exchanges=["SZSE"], instrument_ids=["000001.SZ"], max_events=1,
         dry_run=True, auto_promote_validated=True,
+        pipeline={"stage_queue_size": 25},
+        pipeline_mode="async",
+        pipeline_llm_concurrency=10,
     )
     assert result["status"] == "dry_run"
     assert operation.await_args.kwargs["max_events"] == 1
     assert operation.await_args.kwargs["refresh_documents"] is False
     assert operation.await_args.kwargs["auto_promote_validated"] is True
+    assert operation.await_args.kwargs["pipeline"] == {
+        "stage_queue_size": 25,
+        "mode": "async",
+        "llm_concurrency": 10,
+    }
     assert "a_share_cninfo_corporate_action_llm_resolution" not in task._active_tasks
 
 

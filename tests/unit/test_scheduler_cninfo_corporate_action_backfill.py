@@ -241,6 +241,10 @@ def test_cninfo_primary_daily_job_is_bounded_and_single_instance():
     assert job["manual_only"] is False
     assert job["max_instances"] == 1
     assert job["parameters"]["rolling_days"] <= 14
+    assert job["parameters"]["announcement_overlap_days"] >= 1
+    assert job["parameters"]["announcement_max_pages"] >= 20
+    assert job["parameters"]["candidate_limit"] <= 1000
+    assert job["parameters"]["safety_sweep_size"] < 5205
     assert job["parameters"]["build_canonical"] is False
 
 
@@ -264,5 +268,7 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
     assert result["status"] == "success"
     assert maintenance.await_args.kwargs["exchanges"] == ["SZSE"]
     assert maintenance.await_args.kwargs["rolling_days"] == 7
+    assert maintenance.await_args.kwargs["candidate_limit"] == 1000
+    assert maintenance.await_args.kwargs["safety_sweep_size"] == 100
     assert maintenance.await_args.kwargs["build_canonical"] is False
     assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks

@@ -299,7 +299,7 @@ def test_title_classifier_bounds_business_concurrency():
 
     assert CninfoAnnouncementTitleClassifier(
         client, max_concurrency=99
-    ).max_concurrency == 60
+    ).max_concurrency == 50
     assert CninfoAnnouncementTitleClassifier(
         client, max_concurrency=0
     ).max_concurrency == 1
@@ -360,3 +360,49 @@ async def test_title_classifier_isolates_one_invalid_event_in_shared_request():
         "relevance"
     ] == "relevant"
     assert client.complete.await_count == 1
+
+
+@pytest.mark.asyncio
+async def test_title_classifier_publishes_each_event_as_soon_as_it_completes():
+    callback_order = []
+
+    class OutOfOrderClient:
+        async def complete(self, request):
+            payload = json.loads(request.messages[1].content)
+            event = payload["events"][0]
+            if event["source_event_key"] == "event-1":
+                await asyncio.sleep(0.03)
+            announcement = event["announcements"][0]
+            return _response([{
+                "source_event_key": event["source_event_key"],
+                "event_applicability": "effectful",
+                "applicability_reason": "Distribution",
+                "classifications": [{
+                    "announcement_id": announcement["announcement_id"],
+                    "relevance": "relevant",
+                    "announcement_role": "implementation",
+                    "confidence": 0.99,
+                    "reason": "Implementation notice",
+                }],
+            }])
+
+    second_event = {
+        **_event([{"announcement_id": "announcement-2", "title": "公告二"}]),
+        "instrument_id": "000410.SZ",
+        "source_event_key": "event-2",
+    }
+    classifier = CninfoAnnouncementTitleClassifier(
+        OutOfOrderClient(), max_titles_per_request=1, max_concurrency=2
+    )
+
+    await classifier.classify(
+        [
+            _event([{"announcement_id": "announcement-1", "title": "公告一"}]),
+            second_event,
+        ],
+        on_event_complete=lambda outcome: callback_order.append(
+            outcome.source_event_key
+        ),
+    )
+
+    assert callback_order == ["event-2", "event-1"]

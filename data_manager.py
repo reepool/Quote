@@ -26,7 +26,7 @@ import re
 import sqlite3
 from calendar import monthrange
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple, Union, Set
+from typing import Callable, List, Dict, Any, Iterable, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta, timezone
 from dataclasses import asdict, dataclass, field, replace
 
@@ -163,6 +163,7 @@ class DataManager:
         self.futures_storage = None
         self.fx_storage = None
         self.special_commodity_storage = None
+        self._llm_client = None
 
         # 复权因子内存缓存: {dataset/version/instrument: (timestamp, bundle)}
         # TTL = 1 小时, 适用于 API 高频查询场景
@@ -180,6 +181,14 @@ class DataManager:
             self.data_config.get('data_dir', 'data'),
             'download_progress.json',
         )
+
+    def _get_or_create_llm_client(self):
+        """Return the application-owned common LLM client."""
+        if self._llm_client is None:
+            from utils.llm import LlmClient
+
+            self._llm_client = LlmClient(self.config.get_llm_config())
+        return self._llm_client
 
     def _build_official_announcement_acquisition_service(
         self,
@@ -9748,6 +9757,15 @@ class DataManager:
 
     async def close(self) -> None:
         """安全关闭所有数据源连接，防止协程退出时 ResourceWarning"""
+        if self._llm_client is not None:
+            try:
+                await self._llm_client.close()
+                dm_logger.info("[DataManager] Common LLM client closed safely.")
+            except Exception as e:
+                dm_logger.error(f"[DataManager] Error closing LLM client: {e}")
+            finally:
+                self._llm_client = None
+
         if hasattr(self, 'source_factory') and self.source_factory:
             try:
                 await self.source_factory.close_all()
@@ -17596,6 +17614,11 @@ class DataManager:
             "missing_ex_date_events": 0,
             "ignored_placeholders": 0,
         })
+        observed_instrument_ids: Set[str] = set()
+        inserted_instrument_ids: Set[str] = set()
+        changed_instrument_ids: Set[str] = set()
+        reactivated_instrument_ids: Set[str] = set()
+        retired_instrument_ids: Set[str] = set()
         endpoint_specs = []
         if "dividends" in normalized_scopes:
             endpoint_specs.append((DIVIDEND_PROFILE, provider.fetch_dividends))
@@ -17630,10 +17653,18 @@ class DataManager:
                     )
 
                 observations = endpoint_result.observations
+                if observations:
+                    observed_instrument_ids.add(instrument_id)
                 write_stats = await self.db_ops.save_corporate_action_observations(
                     observations,
                     ingestion_run_id=resolved_checkpoint_id,
                 )
+                if int(write_stats.get("inserted", 0)) > 0:
+                    inserted_instrument_ids.add(instrument_id)
+                if int(write_stats.get("changed", 0)) > 0:
+                    changed_instrument_ids.add(instrument_id)
+                if int(write_stats.get("reactivated", 0)) > 0:
+                    reactivated_instrument_ids.add(instrument_id)
                 if int(write_stats.get("failed", 0)) > 0:
                     endpoint_result = CninfoEndpointResult(
                         source_profile=source_profile,
@@ -17658,6 +17689,8 @@ class DataManager:
                             ingestion_run_id=resolved_checkpoint_id,
                         )
                         counters["observations_retired"] += int(retired)
+                        if int(retired) > 0:
+                            retired_instrument_ids.add(instrument_id)
                     except Exception as exc:
                         endpoint_result = CninfoEndpointResult(
                             source_profile=source_profile,
@@ -17768,6 +17801,18 @@ class DataManager:
                 len(stage.get("partial_instruments") or [])
                 + int(counters["indeterminate"])
             ),
+            "observed_instrument_ids": sorted(observed_instrument_ids),
+            "inserted_instrument_ids": sorted(inserted_instrument_ids),
+            "changed_instrument_ids": sorted(changed_instrument_ids),
+            "reactivated_instrument_ids": sorted(reactivated_instrument_ids),
+            "retired_instrument_ids": sorted(retired_instrument_ids),
+            "affected_instrument_ids": sorted(
+                observed_instrument_ids
+                | inserted_instrument_ids
+                | changed_instrument_ids
+                | reactivated_instrument_ids
+                | retired_instrument_ids
+            ),
         })
         checkpoint_store.save(checkpoint)
         return result
@@ -17800,6 +17845,7 @@ class DataManager:
             evaluate_coverage_intervals,
             reconcile_cninfo_tdx_events,
         )
+        from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from utils.a_share_historical_backfill import (
             coerce_date,
             normalize_string_list,
@@ -17837,6 +17883,9 @@ class DataManager:
                 })
         universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
         target_ids = [item["instrument_id"] for item in universe]
+        exchange_by_instrument = {
+            item["instrument_id"]: item["exchange"] for item in universe
+        }
         missing_ids = sorted(requested_ids - set(target_ids))
         if missing_ids:
             raise ValueError(
@@ -18173,6 +18222,11 @@ class DataManager:
             if item.get("instrument_id")
         }
         for instrument_id in target_ids:
+            if (
+                exchange_by_instrument.get(instrument_id)
+                not in CNINFO_SUPPORTED_EXCHANGES
+            ):
+                continue
             incomplete_profiles = []
             for source_profile in sorted(required_profiles):
                 rows = endpoint_rows_by_profile.get(
@@ -18488,6 +18542,426 @@ class DataManager:
             "write_result": write_result,
         }
 
+    async def _load_cninfo_daily_retry_instrument_ids(
+        self,
+        instrument_ids: List[str],
+    ) -> List[str]:
+        """Return active instruments whose latest CNInfo endpoint attempt failed."""
+        retry_ids: Set[str] = set()
+        for offset in range(0, len(instrument_ids), 400):
+            chunk = instrument_ids[offset: offset + 400]
+            if not chunk:
+                continue
+            placeholders = ", ".join(
+                f":retry_instrument_{index}" for index in range(len(chunk))
+            )
+            params = {
+                f"retry_instrument_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_profile, coverage_status
+                FROM (
+                    SELECT instrument_id, source_profile, coverage_status,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY instrument_id, source_profile
+                               ORDER BY last_attempt_at DESC
+                           ) AS attempt_rank
+                    FROM corporate_action_instrument_status
+                    WHERE source = 'cninfo'
+                      AND instrument_id IN ({placeholders})
+                )
+                WHERE attempt_rank = 1
+                  AND coverage_status = 'indeterminate'
+                """,
+                params,
+            )
+            retry_ids.update(
+                str(row.get("instrument_id") or "").strip()
+                for row in rows
+                if row.get("instrument_id")
+            )
+        return sorted(retry_ids)
+
+    async def _load_cninfo_daily_event_instrument_ids(
+        self,
+        instrument_ids: List[str],
+        *,
+        start_date: date,
+        end_date: date,
+    ) -> List[str]:
+        """Return active instruments with stored action dates near this run."""
+        event_ids: Set[str] = set()
+        for offset in range(0, len(instrument_ids), 400):
+            chunk = instrument_ids[offset: offset + 400]
+            if not chunk:
+                continue
+            placeholders = ", ".join(
+                f":event_instrument_{index}" for index in range(len(chunk))
+            )
+            params: Dict[str, Any] = {
+                f"event_instrument_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                "event_start_date": start_date.isoformat(),
+                "event_end_date": end_date.isoformat(),
+            })
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT DISTINCT instrument_id
+                FROM corporate_action_observations
+                WHERE source = 'cninfo'
+                  AND is_current = 1
+                  AND instrument_id IN ({placeholders})
+                  AND (
+                        date(announcement_date) BETWEEN :event_start_date AND :event_end_date
+                     OR date(record_date) BETWEEN :event_start_date AND :event_end_date
+                     OR date(ex_date) BETWEEN :event_start_date AND :event_end_date
+                     OR date(pay_date) BETWEEN :event_start_date AND :event_end_date
+                     OR date(share_arrival_date) BETWEEN :event_start_date AND :event_end_date
+                  )
+                """,
+                params,
+            )
+            event_ids.update(
+                str(row.get("instrument_id") or "").strip()
+                for row in rows
+                if row.get("instrument_id")
+            )
+        return sorted(event_ids)
+
+    async def _scan_cninfo_daily_announcement_activity(
+        self,
+        *,
+        active_instruments: Dict[str, Dict[str, str]],
+        exchanges: List[str],
+        start_date: date,
+        end_date: date,
+        overlap_days: int,
+        page_size: int,
+        max_pages: int,
+        request_interval_seconds: float,
+    ) -> Dict[str, Any]:
+        """Scan market-wide announcement activity without semantic blocking."""
+        from data_sources.cninfo_corporate_action_incremental import build_symbol_index
+        from research.announcements import (
+            AnnouncementQuery,
+            AnnouncementScope,
+            ProviderCursor,
+        )
+
+        if self.research_storage is None:
+            self._initialize_research_storage()
+        storage = self._require_research_storage()
+        service = self._build_official_announcement_acquisition_service(
+            request_interval_seconds=request_interval_seconds,
+        )
+        symbol_index = build_symbol_index(active_instruments)
+        announcement_ids: Set[str] = set()
+        deferred_announcement_ids: Set[str] = set()
+        matched_records_by_exchange: Dict[str, List[Any]] = defaultdict(list)
+        matched_instruments_by_record: Dict[str, Set[str]] = defaultdict(set)
+        route_results: Dict[str, Any] = {}
+        errors: List[str] = []
+        pages_scanned = 0
+        announcements_seen = 0
+
+        for exchange in exchanges:
+            scope = AnnouncementScope(
+                exchange=exchange,
+                market=exchange,
+                start_date=(
+                    start_date - timedelta(days=max(0, int(overlap_days)))
+                ).isoformat(),
+                end_date=end_date.isoformat(),
+                page_size=max(1, int(page_size)),
+                max_pages=max(1, int(max_pages)),
+                overlap_days=max(0, int(overlap_days)),
+            )
+            state = storage.get_announcement_scan_state(
+                purpose_key="a_share_cninfo_corporate_action_daily_sync",
+                source="cninfo",
+                scope_key=scope.scope_key,
+            )
+            if state and state.get("committed_cursor"):
+                cursor = state["committed_cursor"]
+                scope = replace(
+                    scope,
+                    cursor=ProviderCursor(
+                        kind=str(cursor["kind"]),
+                        value=str(cursor["value"]),
+                    ),
+                )
+            if state:
+                deferred_announcement_ids.update(
+                    str(item).strip()
+                    for item in (
+                        (state.get("metadata") or {}).get(
+                            "pending_candidate_ids", []
+                        )
+                    )
+                    if str(item).strip() in active_instruments
+                )
+            route_result = await asyncio.to_thread(
+                service.acquire,
+                AnnouncementQuery(
+                    purpose_key="a_share_cninfo_corporate_action_daily_sync",
+                    scope=scope,
+                ),
+            )
+            route_results[exchange] = route_result
+            scan_result = route_result.scan_result
+            if scan_result is None:
+                errors.append(f"{exchange}:announcement_route_returned_no_result")
+                continue
+            pages_scanned += int(scan_result.pages_scanned)
+            announcements_seen += int(scan_result.announcements_seen)
+            errors.extend(f"{exchange}:{error}" for error in scan_result.errors)
+            if scan_result.status not in {"success", "success_empty"}:
+                errors.append(
+                    f"{exchange}:announcement_scan_{scan_result.status}"
+                )
+            for record in scan_result.records:
+                matched_ids = {
+                    symbol_index[symbol]
+                    for symbol in tuple(record.symbols or ())
+                    if symbol in symbol_index
+                }
+                if not matched_ids:
+                    continue
+                announcement_ids.update(matched_ids)
+                matched_record = record.with_selection_reasons(
+                    ["instrument_activity_trigger"]
+                )
+                matched_records_by_exchange[exchange].append(matched_record)
+                matched_instruments_by_record[
+                    matched_record.announcement_key
+                ].update(matched_ids)
+
+        return {
+            "status": "partial" if errors else "success",
+            "announcement_instrument_ids": sorted(announcement_ids),
+            "deferred_announcement_instrument_ids": sorted(
+                deferred_announcement_ids
+            ),
+            "pages_scanned": pages_scanned,
+            "announcements_seen": announcements_seen,
+            "matched_announcements": sum(
+                len(records) for records in matched_records_by_exchange.values()
+            ),
+            "errors": errors[:50],
+            "route_results": route_results,
+            "matched_records_by_exchange": matched_records_by_exchange,
+            "matched_instruments_by_record": matched_instruments_by_record,
+        }
+
+    def _persist_cninfo_daily_announcement_activity(
+        self,
+        discovery: Dict[str, Any],
+        *,
+        pending_candidate_ids: List[str],
+        active_instruments: Dict[str, Dict[str, str]],
+    ) -> Dict[str, int]:
+        """Persist shared announcement state and deferred candidate queues."""
+        storage = self._require_research_storage()
+        scan_states = 0
+        audits = 0
+        route_results = discovery.get("route_results") or {}
+        matched_records_by_exchange = (
+            discovery.get("matched_records_by_exchange") or {}
+        )
+        matched_instruments_by_record = (
+            discovery.get("matched_instruments_by_record") or {}
+        )
+        pending_by_exchange: Dict[str, List[str]] = defaultdict(list)
+        for instrument_id in pending_candidate_ids:
+            exchange = str(
+                (active_instruments.get(instrument_id) or {}).get("exchange") or ""
+            )
+            if exchange:
+                pending_by_exchange[exchange].append(instrument_id)
+        for exchange, route_result in route_results.items():
+            scan_result = getattr(route_result, "scan_result", None)
+            if scan_result is None:
+                continue
+            selected_records = tuple(matched_records_by_exchange.get(exchange) or ())
+            governed_result = scan_result.with_selected_records(selected_records)
+            storage.upsert_announcement_scan_state(
+                scan_result=governed_result,
+                selected_announcements=len(selected_records),
+                attempts=[
+                    asdict(item)
+                    for item in tuple(getattr(route_result, "attempts", ()) or ())
+                ],
+                metadata={
+                    "business_domain": "corporate_action",
+                    "selection_mode": "instrument_activity_trigger",
+                    "pending_candidate_ids": sorted(
+                        set(pending_by_exchange.get(exchange) or [])
+                    ),
+                },
+            )
+            scan_states += 1
+            for record in selected_records:
+                for instrument_id in sorted(
+                    matched_instruments_by_record.get(record.announcement_key) or ()
+                ):
+                    storage.store_announcement_audit(
+                        purpose_key=governed_result.query.purpose_key,
+                        record=record,
+                        instrument_id=instrument_id,
+                        symbol=instrument_id.split(".")[0],
+                        ingestion_run_id=None,
+                    )
+                    audits += 1
+        return {
+            "scan_states_persisted": scan_states,
+            "audits_persisted": audits,
+        }
+
+    async def discover_a_share_cninfo_daily_candidates(
+        self,
+        *,
+        active_instruments: List[Dict[str, Any]],
+        exchanges: List[str],
+        start_date: date,
+        end_date: date,
+        explicit_instrument_ids: Optional[List[str]] = None,
+        announcement_overlap_days: int = 3,
+        announcement_page_size: int = 30,
+        announcement_max_pages: int = 60,
+        event_lookahead_days: int = 14,
+        candidate_limit: int = 1000,
+        safety_sweep_size: int = 100,
+        request_interval_seconds: float = 0.5,
+    ) -> Dict[str, Any]:
+        """Build a bounded, auditable CNInfo daily refresh universe."""
+        from data_sources.cninfo_corporate_action_incremental import (
+            build_incremental_refresh_candidates,
+            normalize_active_instruments,
+            select_rotating_safety_instruments,
+        )
+
+        active_index = normalize_active_instruments(active_instruments)
+        active_ids = sorted(active_index)
+        explicit_ids = sorted({
+            str(item).strip()
+            for item in (explicit_instrument_ids or [])
+            if str(item).strip()
+        })
+        if explicit_ids:
+            selection = build_incremental_refresh_candidates(
+                active_instruments=active_index,
+                explicit_ids=explicit_ids,
+                max_candidates=candidate_limit,
+            )
+            return {
+                "status": "success",
+                "selection_mode": "explicit",
+                **selection,
+                "announcement_scan": {"status": "skipped", "reason": "explicit_scope"},
+                "retry_instrument_count": 0,
+                "recent_event_instrument_count": 0,
+                "safety_sweep_instrument_count": 0,
+                "governance": {},
+            }
+
+        dm_logger.info(
+            "[DataManager] CNInfo daily candidate discovery started: "
+            "active=%d exchanges=%s range=%s..%s lookahead_days=%d safety=%d cap=%d",
+            len(active_ids),
+            exchanges,
+            start_date,
+            end_date,
+            int(event_lookahead_days),
+            int(safety_sweep_size),
+            int(candidate_limit),
+        )
+
+        retry_ids, recent_event_ids = await asyncio.gather(
+            self._load_cninfo_daily_retry_instrument_ids(active_ids),
+            self._load_cninfo_daily_event_instrument_ids(
+                active_ids,
+                start_date=start_date,
+                end_date=end_date + timedelta(days=max(0, int(event_lookahead_days))),
+            ),
+        )
+        announcement_scan = await self._scan_cninfo_daily_announcement_activity(
+            active_instruments=active_index,
+            exchanges=exchanges,
+            start_date=start_date,
+            end_date=end_date,
+            overlap_days=announcement_overlap_days,
+            page_size=announcement_page_size,
+            max_pages=announcement_max_pages,
+            request_interval_seconds=request_interval_seconds,
+        )
+        safety_ids = select_rotating_safety_instruments(
+            active_ids,
+            as_of_date=end_date,
+            sample_size=safety_sweep_size,
+        )
+        selection = build_incremental_refresh_candidates(
+            active_instruments=active_index,
+            retry_ids=retry_ids,
+            deferred_announcement_ids=announcement_scan.get(
+                "deferred_announcement_instrument_ids"
+            ) or [],
+            recent_event_ids=recent_event_ids,
+            announcement_ids=announcement_scan.get("announcement_instrument_ids") or [],
+            safety_ids=safety_ids,
+            max_candidates=candidate_limit,
+        )
+        deferred_by_reason = selection.get("deferred_by_reason") or {}
+        deferred_announcement_ids = sorted(set(
+            list(deferred_by_reason.get("deferred_announcement") or [])
+            + list(deferred_by_reason.get("announcement_activity") or [])
+        ))
+        discovery_status = (
+            "partial"
+            if announcement_scan.get("status") != "success"
+            or deferred_announcement_ids
+            else "success"
+        )
+        dm_logger.info(
+            "[DataManager] CNInfo daily candidate discovery finished: "
+            "status=%s selected=%d deferred=%d retry=%d recent_events=%d "
+            "announcement_instruments=%d safety=%d announcements_seen=%d",
+            discovery_status,
+            int(selection.get("candidate_count", 0)),
+            int(selection.get("deferred_count", 0)),
+            len(retry_ids),
+            len(recent_event_ids),
+            len(announcement_scan.get("announcement_instrument_ids") or []),
+            len(safety_ids),
+            int(announcement_scan.get("announcements_seen", 0)),
+        )
+        return {
+            "status": discovery_status,
+            "selection_mode": "incremental",
+            **selection,
+            "announcement_scan": {
+                key: value
+                for key, value in announcement_scan.items()
+                if key not in {
+                    "route_results",
+                    "matched_records_by_exchange",
+                    "matched_instruments_by_record",
+                }
+            },
+            "retry_instrument_count": len(retry_ids),
+            "recent_event_instrument_count": len(recent_event_ids),
+            "safety_sweep_instrument_count": len(safety_ids),
+            "governance": {"status": "pending_source_refresh"},
+            "_announcement_governance_context": {
+                "announcement_scan": announcement_scan,
+                "pending_candidate_ids": deferred_announcement_ids,
+                "active_instruments": active_index,
+            },
+        }
+
     async def maintain_a_share_cninfo_primary_factors(
         self,
         *,
@@ -18496,19 +18970,18 @@ class DataManager:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         rolling_days: int = 7,
+        announcement_overlap_days: int = 3,
+        announcement_page_size: int = 30,
+        announcement_max_pages: int = 60,
+        event_lookahead_days: int = 14,
+        candidate_limit: int = 1000,
+        safety_sweep_size: int = 100,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
     ) -> Dict[str, Any]:
-        """Refresh recent CNInfo/TDX events and rebuild isolated factor paths.
-
-        Source refresh is bounded to a rolling window. Factor derivation reads
-        stored full history so cumulative paths do not reset at that boundary.
-        The operation never modifies or promotes the production factor table.
-        Canonical staging is opt-in; the default persists independent paths and
-        source-neutral benchmark evidence only.
-        """
+        """Incrementally refresh events and rebuild only affected factor paths."""
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
 
@@ -18521,17 +18994,34 @@ class DataManager:
             item.upper() for item in normalize_string_list(exchanges)
         ] or ["SSE", "SZSE", "BSE"]
         requested_ids = set(normalize_string_list(instrument_ids))
-        active_ids_by_exchange: Dict[str, List[str]] = {}
+        active_rows_by_exchange: Dict[str, List[Dict[str, Any]]] = {}
         for exchange in normalized_exchanges:
             rows = await self.db_ops.get_active_instruments(
                 exchange, instrument_types=["stock"], tradable_only=False
             )
-            active_ids_by_exchange[exchange] = sorted({
-                str(row.get("instrument_id") or "").strip()
-                for row in rows
-                if row.get("instrument_id")
-                and (not requested_ids or row.get("instrument_id") in requested_ids)
-            })
+            normalized_rows = []
+            for row in rows:
+                instrument_id = str(row.get("instrument_id") or "").strip()
+                if not instrument_id or (
+                    requested_ids and instrument_id not in requested_ids
+                ):
+                    continue
+                normalized_rows.append({
+                    **dict(row),
+                    "instrument_id": instrument_id,
+                    "symbol": str(
+                        row.get("symbol") or instrument_id.split(".")[0]
+                    ).strip(),
+                    "exchange": exchange,
+                })
+            active_rows_by_exchange[exchange] = sorted(
+                normalized_rows,
+                key=lambda item: item["instrument_id"],
+            )
+        active_ids_by_exchange = {
+            exchange: [row["instrument_id"] for row in rows]
+            for exchange, rows in active_rows_by_exchange.items()
+        }
         active_ids = sorted({
             instrument_id
             for values in active_ids_by_exchange.values()
@@ -18570,12 +19060,61 @@ class DataManager:
             for exchange in cninfo_exchanges
             for instrument_id in active_ids_by_exchange.get(exchange, [])
         })
+        cninfo_active_rows = [
+            row
+            for exchange in cninfo_exchanges
+            for row in active_rows_by_exchange.get(exchange, [])
+        ]
+        dm_logger.info(
+            "[DataManager] A-share corporate-action incremental maintenance started: "
+            "range=%s..%s active=%d cninfo_active=%d exchanges=%s",
+            normalized_start,
+            normalized_end,
+            len(active_ids),
+            len(cninfo_active_ids),
+            normalized_exchanges,
+        )
         if cninfo_active_ids:
+            discovery_result = await self.discover_a_share_cninfo_daily_candidates(
+                active_instruments=cninfo_active_rows,
+                exchanges=cninfo_exchanges,
+                start_date=normalized_start,
+                end_date=normalized_end,
+                explicit_instrument_ids=sorted(requested_ids),
+                announcement_overlap_days=announcement_overlap_days,
+                announcement_page_size=announcement_page_size,
+                announcement_max_pages=announcement_max_pages,
+                event_lookahead_days=event_lookahead_days,
+                candidate_limit=candidate_limit,
+                safety_sweep_size=safety_sweep_size,
+                request_interval_seconds=request_interval_seconds,
+            )
+            cninfo_candidate_ids = list(
+                discovery_result.get("candidate_ids") or []
+            )
+            announcement_governance_context = discovery_result.pop(
+                "_announcement_governance_context", None
+            )
+        else:
+            discovery_result = {
+                "status": "skipped",
+                "selection_mode": "none",
+                "candidate_ids": [],
+                "candidate_count": 0,
+                "reason": "no_instruments_in_supported_exchanges",
+            }
+            cninfo_candidate_ids = []
+            announcement_governance_context = None
+        if cninfo_candidate_ids:
+            dm_logger.info(
+                "[DataManager] CNInfo incremental refresh started: candidates=%d",
+                len(cninfo_candidate_ids),
+            )
             cninfo_result = await self.backfill_a_share_cninfo_corporate_actions(
                 start_date=normalized_start,
                 end_date=normalized_end,
                 exchanges=cninfo_exchanges,
-                instrument_ids=cninfo_active_ids,
+                instrument_ids=cninfo_candidate_ids,
                 dry_run=False,
                 resume=False,
                 chunk_size=50,
@@ -18588,7 +19127,12 @@ class DataManager:
                 "status": "skipped",
                 "operation": "a_share_cninfo_corporate_action_backfill",
                 "production_isolation": True,
-                "reason": "no_instruments_in_supported_exchanges",
+                "reason": (
+                    "no_instruments_in_supported_exchanges"
+                    if not cninfo_active_ids
+                    else "no_incremental_candidates"
+                ),
+                "affected_instrument_ids": [],
             }
         cninfo_result["source_coverage"] = {
             "supported_exchanges": sorted(CNINFO_SUPPORTED_EXCHANGES),
@@ -18599,6 +19143,49 @@ class DataManager:
                 "source_not_supported" if cninfo_excluded_exchanges else None
             ),
         }
+        if announcement_governance_context:
+            failed_ids = {
+                str(item.get("instrument_id") or "").strip()
+                for item in (cninfo_result.get("errors") or [])
+                if item.get("instrument_id")
+            }
+            selected_announcement_ids = {
+                str(item.get("instrument_id") or "").strip()
+                for item in (discovery_result.get("candidates") or [])
+                if {
+                    str(reason)
+                    for reason in (item.get("reasons") or [])
+                } & {"deferred_announcement", "announcement_activity"}
+            }
+            pending_candidate_ids = sorted(
+                set(
+                    announcement_governance_context.get(
+                        "pending_candidate_ids", []
+                    )
+                )
+                | (failed_ids & selected_announcement_ids)
+            )
+            try:
+                discovery_result["governance"] = (
+                    self._persist_cninfo_daily_announcement_activity(
+                        announcement_governance_context["announcement_scan"],
+                        pending_candidate_ids=pending_candidate_ids,
+                        active_instruments=announcement_governance_context[
+                            "active_instruments"
+                        ],
+                    )
+                )
+            except Exception as exc:
+                dm_logger.exception(
+                    "[DataManager] CNInfo daily announcement governance "
+                    "persistence failed: %s",
+                    exc,
+                )
+                discovery_result["status"] = "partial"
+                discovery_result["governance"] = {
+                    "status": "failed",
+                    "error": str(exc),
+                }
         tdx_result = await self.backfill_tdx_xdxr_history(
             exchanges=normalized_exchanges,
             start_date=normalized_start,
@@ -18609,22 +19196,87 @@ class DataManager:
             per_instrument_timeout_sec=per_instrument_timeout_sec,
             dry_run=False,
         )
-        rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
-            start_date=date(1990, 12, 19),
-            end_date=normalized_end,
-            exchanges=normalized_exchanges,
-            instrument_ids=active_ids,
-            dry_run=False,
-            build_canonical=build_canonical,
-            series_version=series_version,
+        cninfo_affected_ids = set(
+            cninfo_result.get("affected_instrument_ids") or []
         )
-        statuses = {
+        tdx_affected_ids = set(tdx_result.get("event_instrument_ids") or [])
+        affected_ids = sorted(cninfo_affected_ids | tdx_affected_ids)
+        dm_logger.info(
+            "[DataManager] Corporate-action affected instruments resolved: "
+            "total=%d cninfo=%d tdx=%d",
+            len(affected_ids),
+            len(cninfo_affected_ids),
+            len(tdx_affected_ids),
+        )
+        if affected_ids:
+            dm_logger.info(
+                "[DataManager] Targeted corporate-action factor rebuild started: "
+                "instruments=%d",
+                len(affected_ids),
+            )
+            rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
+                start_date=date(1990, 12, 19),
+                end_date=normalized_end,
+                exchanges=normalized_exchanges,
+                instrument_ids=affected_ids,
+                dry_run=False,
+                build_canonical=build_canonical,
+                series_version=series_version,
+            )
+        else:
+            dm_logger.info(
+                "[DataManager] Targeted corporate-action factor rebuild skipped: "
+                "no affected instruments"
+            )
+            rebuild_result = {
+                "status": "skipped",
+                "operation": "a_share_cninfo_adjustment_factor_rebuild",
+                "production_isolation": True,
+                "reason": "no_affected_instruments",
+                "parameters": {
+                    "start_date": date(1990, 12, 19).isoformat(),
+                    "end_date": normalized_end.isoformat(),
+                    "instrument_ids": [],
+                    "build_canonical": bool(build_canonical),
+                    "series_version": series_version,
+                },
+            }
+        operational_statuses = {
+            str(discovery_result.get("status")),
             str(cninfo_result.get("status")),
             str(tdx_result.get("status")),
-            str(rebuild_result.get("status")),
         }
+        operational_status = (
+            "partial"
+            if operational_statuses & {"partial", "failed"}
+            or rebuild_result.get("status") == "failed"
+            else "success"
+        )
+        reconciliation = rebuild_result.get("reconciliation") or {}
+        overall_completeness = rebuild_result.get("overall_completeness") or {}
+        pending_factor_events = (
+            int((rebuild_result.get("cninfo_path") or {}).get("pending_count", 0))
+            + int((rebuild_result.get("tdx_path") or {}).get("pending_count", 0))
+        )
+        data_readiness_status = (
+            "not_evaluated"
+            if rebuild_result.get("status") == "skipped"
+            else "success"
+            if rebuild_result.get("status") == "success"
+            else "partial"
+        )
+        dm_logger.info(
+            "[DataManager] A-share corporate-action incremental maintenance finished: "
+            "operational_status=%s readiness=%s cninfo_candidates=%d "
+            "affected=%d pending_factors=%d",
+            operational_status,
+            data_readiness_status,
+            len(cninfo_candidate_ids),
+            len(affected_ids),
+            pending_factor_events,
+        )
         return {
-            "status": "partial" if statuses & {"partial", "failed"} else "success",
+            "status": operational_status,
             "operation": "a_share_cninfo_primary_daily_maintenance",
             "production_isolation": True,
             "parameters": {
@@ -18634,12 +19286,38 @@ class DataManager:
                 "cninfo_exchanges": cninfo_exchanges,
                 "cninfo_excluded_exchanges": cninfo_excluded_exchanges,
                 "tdx_exchanges": normalized_exchanges,
-                "instrument_ids": active_ids,
+                "requested_instrument_ids": sorted(requested_ids),
+                "active_instrument_count": len(active_ids),
+                "cninfo_candidate_count": len(cninfo_candidate_ids),
                 "rolling_days": int(rolling_days),
+                "announcement_overlap_days": int(announcement_overlap_days),
+                "announcement_page_size": int(announcement_page_size),
+                "announcement_max_pages": int(announcement_max_pages),
+                "event_lookahead_days": int(event_lookahead_days),
+                "candidate_limit": int(candidate_limit),
+                "safety_sweep_size": int(safety_sweep_size),
             },
+            "candidate_discovery": discovery_result,
             "cninfo_refresh": cninfo_result,
             "tdx_refresh": tdx_result,
+            "affected_instruments": {
+                "count": len(affected_ids),
+                "cninfo_count": len(cninfo_affected_ids),
+                "tdx_count": len(tdx_affected_ids),
+                "instrument_ids": affected_ids[:100],
+            },
             "factor_rebuild": rebuild_result,
+            "data_readiness": {
+                "status": data_readiness_status,
+                "pending_factor_events": pending_factor_events,
+                "reconciliation_status": reconciliation.get("status"),
+                "reconciliation_totals": reconciliation.get("totals") or {},
+                "overall_completeness_status": overall_completeness.get("status"),
+                "overall_incomplete_instruments": int(
+                    overall_completeness.get("overall_incomplete_instruments", 0)
+                    or 0
+                ),
+            },
         }
 
     async def _fetch_eastmoney_corporate_action_rows(
@@ -19148,12 +19826,16 @@ class DataManager:
         title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
         title_max_concurrency: int = 50,
+        pipeline: Optional[Dict[str, Any]] = None,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
         """Govern unresolved CNInfo events through bounded reusable stages."""
         from utils.a_share_historical_backfill import (
             coerce_date,
             normalize_string_list,
+        )
+        from data_sources.cninfo_corporate_action_pipeline import (
+            CninfoCorporateActionPipelineConfig,
         )
 
         normalized_start = coerce_date(start_date, field_name="start_date")
@@ -19179,7 +19861,10 @@ class DataManager:
         limit = max(1, min(int(max_events), 400))
         offset = max(0, int(target_offset))
         effective_title_max_concurrency = max(
-            1, min(int(title_max_concurrency), 60)
+            1, min(int(title_max_concurrency), 50)
+        )
+        pipeline_config = CninfoCorporateActionPipelineConfig.from_mapping(
+            pipeline
         )
         run_id = "a_share_cninfo_resolution_governance_" + hashlib.sha256(
             json.dumps({
@@ -19203,6 +19888,7 @@ class DataManager:
                     title_max_titles_per_request
                 ),
                 "title_max_concurrency": effective_title_max_concurrency,
+                "pipeline": pipeline_config.to_dict(),
             }, sort_keys=True).encode("utf-8")
         ).hexdigest()[:16]
         dm_logger.info(
@@ -19249,6 +19935,111 @@ class DataManager:
         stage_results: Dict[str, Any] = {"inventory": {"status": "success"}}
         error_by_event: Dict[str, str] = {}
         scan_status_by_event: Dict[str, str] = {}
+        overlapped_resolution_results: List[Dict[str, Any]] = []
+        overlapped_resolution_keys: Set[str] = set()
+        resolution_ready_queue: Optional[asyncio.Queue[Any]] = None
+        resolution_consumer: Optional[asyncio.Task[None]] = None
+        resolution_sentinel = object()
+
+        if (
+            pipeline_config.mode == "async"
+            and not dry_run
+            and "discovery" in normalized_scopes
+            and "resolution" in normalized_scopes
+            and classify_titles_with_llm
+        ):
+            resolution_ready_queue = asyncio.Queue(
+                maxsize=pipeline_config.stage_queue_size
+            )
+
+            async def consume_ready_resolutions() -> None:
+                stop_after_batch = False
+                batch_size = max(1, pipeline_config.llm_concurrency)
+                while True:
+                    first = await resolution_ready_queue.get()
+                    if first is resolution_sentinel:
+                        resolution_ready_queue.task_done()
+                        return
+                    event_keys = [str(first)]
+                    resolution_ready_queue.task_done()
+                    coalesce_deadline = (
+                        asyncio.get_running_loop().time() + 0.5
+                    )
+                    while len(event_keys) < batch_size:
+                        remaining = (
+                            coalesce_deadline
+                            - asyncio.get_running_loop().time()
+                        )
+                        if remaining <= 0:
+                            break
+                        try:
+                            queued = await asyncio.wait_for(
+                                resolution_ready_queue.get(),
+                                timeout=remaining,
+                            )
+                        except asyncio.TimeoutError:
+                            break
+                        resolution_ready_queue.task_done()
+                        if queued is resolution_sentinel:
+                            stop_after_batch = True
+                            break
+                        event_keys.append(str(queued))
+                    try:
+                        resolution_result = (
+                            await self.analyze_cninfo_corporate_action_candidates(
+                                start_date=normalized_start,
+                                end_date=normalized_end,
+                                exchanges=normalized_exchanges,
+                                instrument_ids=batch_instruments or None,
+                                source_event_keys=event_keys,
+                                max_events=len(event_keys),
+                                target_offset=0,
+                                profile=profile,
+                                resume=bool(resume),
+                                dry_run=False,
+                                download_documents=bool(download_documents),
+                                run_ocr=bool(run_ocr),
+                                refresh_documents=bool(refresh_documents),
+                                discover_candidates=False,
+                                auto_promote_validated=bool(
+                                    auto_promote_validated
+                                ),
+                                exclude_reviewed_events=bool(
+                                    exclude_reviewed_events
+                                ),
+                                pipeline=pipeline_config.to_dict(),
+                                sample_limit=int(sample_limit),
+                            )
+                        )
+                    except Exception as exc:
+                        resolution_result = {
+                            "status": "failed",
+                            "errors": [
+                                {
+                                    "source_event_key": event_key,
+                                    "code": "overlapped_resolution_failed",
+                                    "error": str(exc),
+                                }
+                                for event_key in event_keys
+                            ],
+                        }
+                    overlapped_resolution_results.append(resolution_result)
+                    if stop_after_batch:
+                        return
+
+            async def enqueue_ready_resolution(payload: Dict[str, Any]) -> None:
+                event_key = str(payload.get("source_event_key") or "").strip()
+                if not event_key or event_key in overlapped_resolution_keys:
+                    return
+                overlapped_resolution_keys.add(event_key)
+                await resolution_ready_queue.put(event_key)
+
+            resolution_consumer = asyncio.create_task(
+                consume_ready_resolutions(),
+                name="cninfo-resolution-ready-consumer",
+            )
+        else:
+            enqueue_ready_resolution = None
 
         if "discovery" in normalized_scopes:
             discovery_keys = [
@@ -19265,31 +20056,38 @@ class DataManager:
                     "[DataManager] CNInfo resolution governance discovery: "
                     "run_id=%s events=%s", run_id, len(discovery_keys),
                 )
-                discovery_result = await self.discover_cninfo_special_action_effective_dates(
-                    start_date=normalized_start,
-                    end_date=normalized_end,
-                    exchanges=normalized_exchanges,
-                    instrument_ids=batch_instruments or None,
-                    source_event_keys=discovery_keys,
-                    dry_run=bool(dry_run),
-                    max_events=len(discovery_keys),
-                    target_offset=0,
-                    window_before_days=int(window_before_days),
-                    window_after_days=int(window_after_days),
-                    max_window_days=int(max_window_days),
-                    max_anchor_gap_days=int(max_anchor_gap_days),
-                    page_size=int(page_size),
-                    max_pages=int(max_pages),
-                    request_interval_seconds=request_interval_seconds,
-                    per_event_timeout_sec=int(per_event_timeout_sec),
-                    classify_titles_with_llm=bool(classify_titles_with_llm),
-                    title_classification_profile=title_classification_profile,
-                    title_max_titles_per_request=int(
-                        title_max_titles_per_request
-                    ),
-                    title_max_concurrency=effective_title_max_concurrency,
-                    sample_limit=max(len(discovery_keys), int(sample_limit)),
-                )
+                try:
+                    discovery_result = await self.discover_cninfo_special_action_effective_dates(
+                        start_date=normalized_start,
+                        end_date=normalized_end,
+                        exchanges=normalized_exchanges,
+                        instrument_ids=batch_instruments or None,
+                        source_event_keys=discovery_keys,
+                        dry_run=bool(dry_run),
+                        max_events=len(discovery_keys),
+                        target_offset=0,
+                        window_before_days=int(window_before_days),
+                        window_after_days=int(window_after_days),
+                        max_window_days=int(max_window_days),
+                        max_anchor_gap_days=int(max_anchor_gap_days),
+                        page_size=int(page_size),
+                        max_pages=int(max_pages),
+                        request_interval_seconds=request_interval_seconds,
+                        per_event_timeout_sec=int(per_event_timeout_sec),
+                        classify_titles_with_llm=bool(classify_titles_with_llm),
+                        title_classification_profile=title_classification_profile,
+                        title_max_titles_per_request=int(
+                            title_max_titles_per_request
+                        ),
+                        title_max_concurrency=effective_title_max_concurrency,
+                        on_event_ready=enqueue_ready_resolution,
+                        sample_limit=max(len(discovery_keys), int(sample_limit)),
+                    )
+                finally:
+                    if resolution_ready_queue is not None:
+                        await resolution_ready_queue.put(resolution_sentinel)
+                    if resolution_consumer is not None:
+                        await resolution_consumer
                 stage_results["discovery"] = discovery_result
                 for item in discovery_result.get("target_samples") or []:
                     event_key = str(item.get("source_event_key") or "")
@@ -19313,6 +20111,10 @@ class DataManager:
                 stage_results["discovery"] = {
                     "status": "skipped", "reason": "no_discovery_targets"
                 }
+                if resolution_ready_queue is not None:
+                    await resolution_ready_queue.put(resolution_sentinel)
+                if resolution_consumer is not None:
+                    await resolution_consumer
 
         if not dry_run and "discovery" in normalized_scopes:
             inventory = await self._load_cninfo_resolution_governance_inventory(
@@ -19329,9 +20131,11 @@ class DataManager:
                 item["source_event_key"]
                 for item in inventory
                 if item["source_event_key"] in batch_key_set
+                and item["source_event_key"] not in overlapped_resolution_keys
                 and item["candidate_count"] > 0
                 and not item["is_terminal"]
             ]
+            resolution_runs = list(overlapped_resolution_results)
             if resolution_keys:
                 dm_logger.info(
                     "[DataManager] CNInfo resolution governance semantic stage: "
@@ -19354,10 +20158,69 @@ class DataManager:
                     discover_candidates=False,
                     auto_promote_validated=bool(auto_promote_validated),
                     exclude_reviewed_events=bool(exclude_reviewed_events),
+                    pipeline=pipeline_config.to_dict(),
                     sample_limit=int(sample_limit),
                 )
-                stage_results["resolution"] = resolution_result
-                for item in resolution_result.get("errors") or []:
+                resolution_runs.append(resolution_result)
+            if resolution_runs:
+                if len(resolution_runs) == 1:
+                    merged_resolution = dict(resolution_runs[0])
+                else:
+                    merged_resolution = deepcopy(resolution_runs[0])
+                    merged_counts = Counter()
+                    merged_errors: List[Dict[str, Any]] = []
+                    for resolution_run in resolution_runs:
+                        merged_counts.update({
+                            key: int(value or 0)
+                            for key, value in (
+                                resolution_run.get("counts") or {}
+                            ).items()
+                            if isinstance(value, (int, float))
+                        })
+                        merged_errors.extend(
+                            resolution_run.get("errors") or []
+                        )
+                    merged_resolution["status"] = (
+                        "partial"
+                        if any(
+                            str(item.get("status")) in {"partial", "failed"}
+                            for item in resolution_runs
+                        )
+                        else "success"
+                    )
+                    merged_resolution["counts"] = dict(merged_counts)
+                    merged_resolution["errors"] = merged_errors
+                    merged_targets = dict(
+                        merged_resolution.get("targets") or {}
+                    )
+                    merged_targets["batch_events"] = sum(
+                        int(
+                            (item.get("targets") or {}).get(
+                                "batch_events", 0
+                            )
+                            or 0
+                        )
+                        for item in resolution_runs
+                    )
+                    merged_resolution["targets"] = merged_targets
+                    merged_resolution["pipeline_runs"] = [
+                        {
+                            "status": item.get("status"),
+                            "batch_events": int(
+                                (item.get("targets") or {}).get(
+                                    "batch_events", 0
+                                ) or 0
+                            ),
+                        }
+                        for item in resolution_runs
+                    ]
+                merged_resolution["title_overlap"] = {
+                    "enabled": bool(overlapped_resolution_keys),
+                    "event_count": len(overlapped_resolution_keys),
+                    "run_count": len(overlapped_resolution_results),
+                }
+                stage_results["resolution"] = merged_resolution
+                for item in merged_resolution.get("errors") or []:
                     event_key = str(item.get("source_event_key") or "")
                     if event_key:
                         error_by_event[event_key] = str(
@@ -19378,10 +20241,63 @@ class DataManager:
         )
         state_write = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
         if not dry_run:
+            current_identities: Set[Tuple[str, str]] = set()
+            for identity_offset in range(0, len(final_inventory), 400):
+                identity_chunk = final_inventory[
+                    identity_offset: identity_offset + 400
+                ]
+                identity_params: Dict[str, Any] = {}
+                identity_clauses = []
+                for identity_index, item in enumerate(identity_chunk):
+                    instrument_key = f"current_instrument_{identity_index}"
+                    event_key = f"current_event_{identity_index}"
+                    identity_params[instrument_key] = item["instrument_id"]
+                    identity_params[event_key] = item["source_event_key"]
+                    identity_clauses.append(
+                        f"(instrument_id = :{instrument_key} "
+                        f"AND source_event_key = :{event_key})"
+                    )
+                if not identity_clauses:
+                    continue
+                current_rows = await self.db_ops.execute_read_query(
+                    f"""
+                    SELECT instrument_id, source_event_key
+                    FROM corporate_action_observations
+                    WHERE source = 'cninfo'
+                      AND is_current = 1
+                      AND ({' OR '.join(identity_clauses)})
+                    """,
+                    identity_params,
+                )
+                current_identities.update({
+                    (
+                        str(item.get("instrument_id") or ""),
+                        str(item.get("source_event_key") or ""),
+                    )
+                    for item in current_rows
+                })
+            current_inventory = [
+                item for item in final_inventory
+                if (
+                    str(item.get("instrument_id") or ""),
+                    str(item.get("source_event_key") or ""),
+                ) in current_identities
+            ]
+            stale_state_count = len(final_inventory) - len(current_inventory)
             state_write = await self.db_ops.upsert_corporate_action_resolution_states(
-                final_inventory,
+                current_inventory,
                 ingestion_run_id=run_id,
             )
+            state_write["failed"] = int(state_write.get("failed") or 0) + (
+                stale_state_count
+            )
+            if stale_state_count:
+                dm_logger.warning(
+                    "[DataManager] CNInfo governance skipped stale state commits: "
+                    "run_id=%s stale_events=%s",
+                    run_id,
+                    stale_state_count,
+                )
 
         factor_result = None
         factor_exchanges = [
@@ -19443,6 +20359,7 @@ class DataManager:
                     title_max_titles_per_request
                 ),
                 "title_max_concurrency": effective_title_max_concurrency,
+                "pipeline": pipeline_config.to_dict(),
             },
             "inventory": {
                 "total_events": len(final_inventory),
@@ -19511,6 +20428,7 @@ class DataManager:
         title_max_titles_per_request: int = 80,
         title_max_concurrency: int = 50,
         title_llm_client: Optional[Any] = None,
+        on_event_ready: Optional[Callable[[Dict[str, Any]], Any]] = None,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
         """Discover candidate official documents for unresolved special actions."""
@@ -19524,12 +20442,12 @@ class DataManager:
         )
         from data_sources.cninfo_announcement_title_llm import (
             CninfoAnnouncementTitleClassifier,
+            TitleClassificationEventOutcome,
         )
         from research.announcements import (
             AnnouncementQuery,
             AnnouncementScope,
         )
-        from utils.llm import LlmClient
         from utils.a_share_historical_backfill import (
             coerce_date,
             normalize_string_list,
@@ -19560,7 +20478,7 @@ class DataManager:
         requested_ids = sorted(set(normalize_string_list(instrument_ids)))
         requested_event_keys = sorted(set(normalize_string_list(source_event_keys)))
         effective_title_max_concurrency = max(
-            1, min(int(title_max_concurrency), 60)
+            1, min(int(title_max_concurrency), 50)
         )
         suffixes = {
             "SSE": ".SH",
@@ -19946,6 +20864,89 @@ class DataManager:
         classification_items = [
             item for item in scan_items if item["records"]
         ]
+        classified_event_state: Dict[str, Dict[str, Any]] = {}
+        prepersisted_evidence_keys: Set[str] = set()
+        early_write_result = Counter({
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+        })
+        scan_item_by_event = {
+            item["primary_target"].source_event_key: item
+            for item in classification_items
+        }
+
+        async def publish_classified_event(
+            outcome: TitleClassificationEventOutcome,
+        ) -> None:
+            item = scan_item_by_event.get(outcome.source_event_key)
+            if item is None:
+                return
+            target = item["primary_target"]
+            decisions = dict(outcome.decisions)
+            applicability = dict(outcome.applicability or {})
+            lineage = list(outcome.lineage)
+            event_evidence = (
+                []
+                if outcome.error
+                else build_classified_announcement_evidence(
+                    target,
+                    item["records"],
+                    decisions=decisions,
+                    applicability=applicability,
+                    lineage=lineage,
+                    search_windows=item["search_windows"],
+                )
+            )
+            classified_event_state[outcome.source_event_key] = {
+                "decisions": decisions,
+                "applicability": applicability,
+                "lineage": lineage,
+                "event_evidence": event_evidence,
+                "error": outcome.error,
+            }
+            if dry_run or outcome.error or not event_evidence:
+                return
+            try:
+                saved = await self.db_ops.save_corporate_action_effective_date_evidence(
+                    event_evidence,
+                    ingestion_run_id=run_id,
+                )
+            except Exception as exc:
+                classified_event_state[outcome.source_event_key][
+                    "early_persistence_error"
+                ] = str(exc)
+                dm_logger.warning(
+                    "[DataManager] CNInfo early event evidence persistence "
+                    "failed; deferring to final batch: event=%s error=%s",
+                    target.source_event_key,
+                    exc,
+                )
+                return
+            if int(saved.get("failed", 0) or 0) > 0:
+                return
+            for key in early_write_result:
+                early_write_result[key] += int(saved.get(key, 0) or 0)
+            prepersisted_evidence_keys.update(
+                str(row.get("evidence_key") or "")
+                for row in event_evidence
+                if row.get("evidence_key")
+            )
+            candidate_count = sum(
+                row.get("resolution_status") == "candidate"
+                for row in event_evidence
+            )
+            if candidate_count <= 0 or on_event_ready is None:
+                return
+            callback_result = on_event_ready({
+                "instrument_id": target.instrument_id,
+                "source_event_key": target.source_event_key,
+                "candidate_count": candidate_count,
+            })
+            if inspect.isawaitable(callback_result):
+                await callback_result
+
         if classify_titles_with_llm and classification_items:
             llm_config = self.config.get_llm_config()
             configured_profile = llm_config.profiles.get(
@@ -19959,7 +20960,7 @@ class DataManager:
                 ):
                     title_classification_error = "title_classification_llm_disabled"
                 else:
-                    title_llm_client = LlmClient(llm_config)
+                    title_llm_client = self._get_or_create_llm_client()
             if title_classification_error is None:
                 title_classifier = CninfoAnnouncementTitleClassifier(
                     title_llm_client,
@@ -20023,6 +21024,11 @@ class DataManager:
                     title_batch = await title_classifier.classify(
                         classification_events,
                         tolerate_event_errors=True,
+                        on_event_complete=(
+                            publish_classified_event
+                            if on_event_ready is not None and not dry_run
+                            else None
+                        ),
                     )
                     dm_logger.info(
                         "[DataManager] CNInfo title classification completed: "
@@ -20075,18 +21081,25 @@ class DataManager:
                     })
                     lineage = title_batch.lineage_by_event.get(event_key, [])
                 else:
-                    decisions = title_batch.decisions_by_event.get(event_key, {})
-                    applicability = title_batch.applicability_by_event.get(
-                        event_key, {}
+                    classified = classified_event_state.get(event_key) or {}
+                    decisions = classified.get("decisions") or (
+                        title_batch.decisions_by_event.get(event_key, {})
                     )
-                    lineage = title_batch.lineage_by_event.get(event_key, [])
-                    event_evidence = build_classified_announcement_evidence(
-                        target,
-                        item["records"],
-                        decisions=decisions,
-                        applicability=applicability,
-                        lineage=lineage,
-                        search_windows=item["search_windows"],
+                    applicability = classified.get("applicability") or (
+                        title_batch.applicability_by_event.get(event_key, {})
+                    )
+                    lineage = classified.get("lineage") or (
+                        title_batch.lineage_by_event.get(event_key, [])
+                    )
+                    event_evidence = classified.get("event_evidence") or (
+                        build_classified_announcement_evidence(
+                            target,
+                            item["records"],
+                            decisions=decisions,
+                            applicability=applicability,
+                            lineage=lineage,
+                            search_windows=item["search_windows"],
+                        )
                     )
             else:
                 evidence_by_key = {}
@@ -20249,24 +21262,27 @@ class DataManager:
                     len(errors),
                 )
 
-        write_result = {
-            "inserted": 0,
-            "changed": 0,
-            "unchanged": 0,
-            "failed": 0,
-        }
+        write_result = dict(early_write_result)
         write_exception: Optional[Exception] = None
         if not dry_run:
+            remaining_evidence_rows = [
+                row for row in evidence_rows
+                if str(row.get("evidence_key") or "")
+                not in prepersisted_evidence_keys
+            ]
             try:
-                write_result = (
-                    await self.db_ops.save_corporate_action_effective_date_evidence(
-                        evidence_rows,
-                        ingestion_run_id=run_id,
+                if remaining_evidence_rows:
+                    saved = (
+                        await self.db_ops.save_corporate_action_effective_date_evidence(
+                            remaining_evidence_rows,
+                            ingestion_run_id=run_id,
+                        )
                     )
-                )
+                    for key in write_result:
+                        write_result[key] += int(saved.get(key, 0) or 0)
             except Exception as exc:
                 write_exception = exc
-                write_result["failed"] = max(1, len(evidence_rows))
+                write_result["failed"] += max(1, len(remaining_evidence_rows))
                 errors.append({
                     "instrument_id": "",
                     "source_event_key": "",
@@ -20453,6 +21469,98 @@ class DataManager:
             "ingestion_run_id": run_id,
         }
 
+    async def _assert_current_cninfo_corporate_action_identity(
+        self,
+        *,
+        instrument_id: str,
+        source_event_key: str,
+        announcement_ids: Optional[Iterable[str]] = None,
+    ) -> None:
+        """Reject stale or cross-linked company-action work before a write."""
+        normalized_instrument = convert_to_database_format(
+            str(instrument_id or "").strip()
+        )
+        normalized_event_key = str(source_event_key or "").strip()
+        if not normalized_instrument or not normalized_event_key:
+            raise ValueError("CNInfo company-action identity is incomplete")
+        execute_read_query = getattr(self.db_ops, "execute_read_query", None)
+        if inspect.iscoroutinefunction(execute_read_query):
+            rows = await execute_read_query(
+                """
+                SELECT instrument_id, source_profile
+                FROM corporate_action_observations
+                WHERE source = 'cninfo'
+                  AND is_current = 1
+                  AND instrument_id = :instrument_id
+                  AND source_event_key = :source_event_key
+                """,
+                {
+                    "instrument_id": normalized_instrument,
+                    "source_event_key": normalized_event_key,
+                },
+            )
+        else:
+            observations = await self.db_ops.get_corporate_action_observations(
+                instrument_id=normalized_instrument,
+                source_event_key=normalized_event_key,
+                source="cninfo",
+                is_current=True,
+                limit=2,
+                offset=0,
+            )
+            rows = observations.get("items") or []
+        if len(rows) != 1:
+            raise ValueError(
+                "CNInfo company-action source event is stale or superseded"
+            )
+        expected_ids = sorted({
+            str(value or "").strip()
+            for value in (announcement_ids or [])
+            if str(value or "").strip()
+        })
+        if not expected_ids:
+            return
+        params: Dict[str, Any] = {"source_event_key": normalized_event_key}
+        placeholders = []
+        for index, announcement_id in enumerate(expected_ids):
+            key = f"announcement_{index}"
+            params[key] = announcement_id
+            placeholders.append(f":{key}")
+        if inspect.iscoroutinefunction(execute_read_query):
+            evidence_rows = await execute_read_query(
+                f"""
+                SELECT DISTINCT announcement_id
+                FROM corporate_action_effective_date_evidence
+                WHERE source_event_key = :source_event_key
+                  AND observation_source = 'cninfo'
+                  AND evidence_source = 'cninfo_announcement_metadata'
+                  AND announcement_id IN ({', '.join(placeholders)})
+                """,
+                params,
+            )
+        else:
+            evidence = await self.db_ops.get_corporate_action_effective_date_evidence(
+                source_event_key=normalized_event_key,
+                evidence_source="cninfo_announcement_metadata",
+                limit=1000,
+                offset=0,
+            )
+            evidence_rows = [
+                item for item in (evidence.get("items") or [])
+                if str(item.get("announcement_id") or "").strip()
+                in set(expected_ids)
+            ]
+        current_ids = {
+            str(item.get("announcement_id") or "").strip()
+            for item in evidence_rows
+        }
+        missing = sorted(set(expected_ids) - current_ids)
+        if missing:
+            raise ValueError(
+                "CNInfo company-action announcement identity is stale: "
+                + ",".join(missing)
+            )
+
     async def _maybe_auto_promote_cninfo_analysis(
         self,
         *,
@@ -20522,6 +21630,17 @@ class DataManager:
             return outcome
 
         try:
+            announcement_ids = {
+                str(item.get("announcement_id") or "").strip()
+                for item in (analysis.get("result") or {}).get("evidence", [])
+                if isinstance(item, dict)
+                and str(item.get("announcement_id") or "").strip()
+            }
+            await self._assert_current_cninfo_corporate_action_identity(
+                instrument_id=str(analysis.get("instrument_id") or ""),
+                source_event_key=str(analysis.get("source_event_key") or ""),
+                announcement_ids=announcement_ids,
+            )
             review = await self.review_cninfo_corporate_action_resolution({
                 "instrument_id": analysis.get("instrument_id"),
                 "source_event_key": analysis.get("source_event_key"),
@@ -20545,6 +21664,500 @@ class DataManager:
         outcome.update(status="promoted", promoted=True, review=review.get("review"))
         return outcome
 
+    async def _run_cninfo_candidate_resolution_pipeline(
+        self,
+        *,
+        batch: List[Dict[str, Any]],
+        run_id: str,
+        resolver: Any,
+        pipeline_config: Any,
+        normalized_start: date,
+        normalized_end: date,
+        profile: str,
+        configured_profile: Any,
+        resume: bool,
+        dry_run: bool,
+        download_documents: bool,
+        run_ocr: bool,
+        refresh_documents: bool,
+        auto_promote_validated: bool,
+        ocr_adapter: Any,
+    ) -> Dict[str, Any]:
+        """Run candidate events through bounded document, LLM, and write stages."""
+        from tempfile import TemporaryDirectory
+        from data_sources.cninfo_corporate_action_documents import (
+            CninfoCorporateActionDocumentService,
+            CorporateActionPageText,
+            select_relevant_pages,
+        )
+        from data_sources.cninfo_corporate_action_llm import (
+            PARSER_VERSION,
+            PROMPT_VERSION,
+            SCHEMA_VERSION,
+        )
+        from data_sources.cninfo_corporate_action_pipeline import (
+            CninfoCorporateActionResolutionPipeline,
+            CninfoDocumentPreparationStage,
+            CorporateActionPipelineStage,
+            InventoryPayload,
+            PipelineIdentity,
+            ResolutionStagePayload,
+        )
+
+        payload_store: Dict[str, Dict[str, Any]] = {}
+
+        def event_ref(source_event_key: str) -> str:
+            return f"event:{source_event_key}"
+
+        with TemporaryDirectory(prefix="cninfo_ca_llm_") as temporary_root:
+            archive_root = (
+                temporary_root
+                if dry_run else self.data_config.get("data_dir", "data")
+            )
+            service = CninfoCorporateActionDocumentService(
+                archive_root=Path(archive_root) / "filings" / "corporate_actions",
+                ocr_adapter=ocr_adapter if run_ocr else None,
+            )
+            document_stage = CninfoDocumentPreparationStage(
+                service=service,
+                download_concurrency=pipeline_config.download_concurrency,
+                document_parse_concurrency=(
+                    pipeline_config.document_parse_concurrency
+                ),
+            )
+
+            async def prepare_event(
+                item: Any,
+            ) -> Any:
+                event = dict(item.observation)
+                source_event_key = item.identity.source_event_key
+                dm_logger.info(
+                    "[DataManager] CNInfo async document stage started: "
+                    "run_id=%s instrument=%s event=%s candidates=%s",
+                    run_id,
+                    item.identity.instrument_id,
+                    source_event_key,
+                    len(event.get("candidates") or []),
+                )
+                pages: List[CorporateActionPageText] = []
+                existing_artifact_ids: List[int] = []
+                pending_bundles: List[Tuple[Any, Dict[str, Any]]] = []
+                errors: List[Dict[str, Any]] = []
+                for candidate in event.get("candidates") or []:
+                    announcement_id = str(
+                        candidate.get("announcement_id") or ""
+                    ).strip()
+                    source_url = str(candidate.get("evidence_url") or "").strip()
+                    if not announcement_id or not source_url:
+                        errors.append({
+                            "source_event_key": source_event_key,
+                            "announcement_id": announcement_id,
+                            "code": "document_url_missing",
+                        })
+                        continue
+                    try:
+                        existing = (
+                            await self.db_ops.get_corporate_action_document_bundle(
+                                announcement_id=announcement_id,
+                                limit=1000,
+                                offset=0,
+                            )
+                        )
+                        should_download = bool(download_documents) and (
+                            refresh_documents or not existing.get("items")
+                        )
+                        if should_download:
+                            bundle = await document_stage.prepare_bundle(
+                                announcement_id=announcement_id,
+                                source_url=source_url,
+                                title=candidate.get("announcement_title"),
+                                announcement_time=candidate.get(
+                                    "announcement_time"
+                                ),
+                            )
+                            pages.extend(select_relevant_pages(bundle.pages))
+                            pending_bundles.append((bundle, dict(candidate)))
+                        elif existing.get("items"):
+                            stored = existing["items"][-1]
+                            stored_pages = [
+                                CorporateActionPageText(
+                                    page_number=int(page["page_number"]),
+                                    text=str(page["text"]),
+                                    text_hash=str(page["text_hash"]),
+                                    announcement_id=announcement_id,
+                                    extraction_method=str(
+                                        page.get("extraction_method")
+                                        or "native_text"
+                                    ),
+                                    quality_status=str(
+                                        page.get("quality_status") or "usable"
+                                    ),
+                                )
+                                for page in stored.get("pages") or []
+                            ]
+                            pages.extend(select_relevant_pages(stored_pages))
+                            existing_artifact_ids.append(int(stored["artifact_id"]))
+                        else:
+                            errors.append({
+                                "source_event_key": source_event_key,
+                                "announcement_id": announcement_id,
+                                "code": "document_download_disabled",
+                            })
+                    except Exception as exc:
+                        error_code = str(exc)
+                        if (
+                            run_ocr
+                            and ocr_adapter is None
+                            and error_code == "ocr_unavailable"
+                        ):
+                            error_code = "ocr_adapter_unconfigured"
+                        errors.append({
+                            "source_event_key": source_event_key,
+                            "announcement_id": announcement_id,
+                            "code": error_code,
+                        })
+                if not pages and not errors:
+                    errors.append({
+                        "source_event_key": source_event_key,
+                        "code": "document_has_no_usable_pages",
+                    })
+                reference = f"prepared:{source_event_key}"
+                payload_store[reference] = {
+                    "event": event,
+                    "pages": pages,
+                    "existing_artifact_ids": existing_artifact_ids,
+                    "pending_bundles": pending_bundles,
+                    "document_errors": errors,
+                }
+                dm_logger.info(
+                    "[DataManager] CNInfo async document stage completed: "
+                    "run_id=%s event=%s pages=%s pending_artifacts=%s "
+                    "existing_artifacts=%s errors=%s",
+                    run_id,
+                    source_event_key,
+                    len(pages),
+                    len(pending_bundles),
+                    len(existing_artifact_ids),
+                    len(errors),
+                )
+                return ResolutionStagePayload(
+                    identity=item.identity.advance(
+                        CorporateActionPipelineStage.DOCUMENT_PARSE
+                    ),
+                    payload_ref=reference,
+                    metadata={
+                        "page_count": len(pages),
+                        "document_failures": len(errors),
+                    },
+                )
+
+            async def analyze_event(prepared: Any) -> Any:
+                data = payload_store[prepared.payload_ref]
+                event = data["event"]
+                pages = data["pages"]
+                source_event_key = prepared.identity.source_event_key
+                if not pages:
+                    current_input_hash = hashlib.sha256(
+                        f"{source_event_key}:no_usable_pages".encode("utf-8")
+                    ).hexdigest()
+                    data.update({
+                        "analysis": None,
+                        "matching_analysis": None,
+                        "analysis_error": None,
+                        "input_hash": current_input_hash,
+                    })
+                else:
+                    current_input_hash = resolver.input_hash(event, pages)
+                    matching_analysis = None
+                    if resume and not dry_run:
+                        prior = await self.db_ops.get_corporate_action_llm_analyses(
+                            instrument_id=event["instrument_id"],
+                            source_event_key=source_event_key,
+                            limit=1000,
+                            offset=0,
+                        )
+                        matching_analysis = next((
+                            row for row in prior.get("items", [])
+                            if row.get("input_hash") == current_input_hash
+                            and row.get("schema_version") == SCHEMA_VERSION
+                            and row.get("parser_version") == PARSER_VERSION
+                            and row.get("validation_status") in {
+                                "validated_candidate",
+                                "manual_required",
+                                "no_matching_evidence",
+                            }
+                        ), None)
+                    analysis = None
+                    analysis_error = None
+                    if matching_analysis is None:
+                        dm_logger.info(
+                            "[DataManager] CNInfo async semantic stage started: "
+                            "run_id=%s instrument=%s event=%s pages=%s input_hash=%s",
+                            run_id,
+                            prepared.identity.instrument_id,
+                            source_event_key,
+                            len(pages),
+                            current_input_hash[:16],
+                        )
+                        try:
+                            analysis = await resolver.analyze(
+                                event=event,
+                                pages=pages,
+                                allowed_start=normalized_start,
+                                allowed_end=normalized_end,
+                            )
+                        except Exception as exc:
+                            analysis_error = exc
+                    data.update({
+                        "analysis": analysis,
+                        "matching_analysis": matching_analysis,
+                        "analysis_error": analysis_error,
+                        "input_hash": current_input_hash,
+                    })
+                reference = f"analyzed:{source_event_key}:{current_input_hash}"
+                payload_store[reference] = data
+                payload_store.pop(prepared.payload_ref, None)
+                return ResolutionStagePayload(
+                    identity=prepared.identity.advance(
+                        CorporateActionPipelineStage.DETERMINISTIC_VALIDATION,
+                        input_hash=current_input_hash,
+                        prompt_version=PROMPT_VERSION,
+                        schema_version=SCHEMA_VERSION,
+                        idempotency_key=hashlib.sha256(
+                            f"{source_event_key}:{current_input_hash}:{SCHEMA_VERSION}".encode(
+                                "utf-8"
+                            )
+                        ).hexdigest(),
+                    ),
+                    payload_ref=reference,
+                )
+
+            async def persist_event(analyzed: Any) -> Dict[str, Any]:
+                data = payload_store[analyzed.payload_ref]
+                event = data["event"]
+                pages = data["pages"]
+                source_event_key = analyzed.identity.source_event_key
+                artifact_ids = list(data["existing_artifact_ids"])
+                expected_announcement_ids = [
+                    candidate.get("announcement_id")
+                    for candidate in event.get("candidates") or []
+                ]
+                if not dry_run:
+                    await self._assert_current_cninfo_corporate_action_identity(
+                        instrument_id=analyzed.identity.instrument_id,
+                        source_event_key=source_event_key,
+                        announcement_ids=expected_announcement_ids,
+                    )
+                    for bundle, candidate in data["pending_bundles"]:
+                        saved_bundle = (
+                            await self.db_ops.save_corporate_action_document_bundle(
+                                bundle.artifact_row(
+                                    title=candidate.get("announcement_title"),
+                                    announcement_time=candidate.get(
+                                        "announcement_time"
+                                    ),
+                                ),
+                                [page.to_row() for page in bundle.pages],
+                            )
+                        )
+                        artifact_ids.append(int(saved_bundle["artifact_id"]))
+                summary: Dict[str, Any] = {
+                    "instrument_id": analyzed.identity.instrument_id,
+                    "source_event_key": source_event_key,
+                    "document_errors": list(data["document_errors"]),
+                    "artifact_ids": artifact_ids,
+                    "resumed": False,
+                    "analysis": None,
+                    "analysis_error": None,
+                    "persisted_analysis": False,
+                    "promotion": None,
+                }
+                matching_analysis = data.get("matching_analysis")
+                if matching_analysis is not None:
+                    summary["resumed"] = True
+                    summary["analysis"] = matching_analysis
+                    summary["promotion"] = (
+                        await self._maybe_auto_promote_cninfo_analysis(
+                            analysis=matching_analysis,
+                            pages=pages,
+                            enabled=bool(auto_promote_validated),
+                            dry_run=False,
+                        )
+                    )
+                    payload_store.pop(analyzed.payload_ref, None)
+                    return summary
+                analysis_error = data.get("analysis_error")
+                if analysis_error is not None:
+                    error_code = str(
+                        getattr(analysis_error, "code", None) or "llm_failed"
+                    )
+                    summary["analysis_error"] = {
+                        "source_event_key": source_event_key,
+                        "code": error_code,
+                        "error": str(analysis_error),
+                        "attempt_count": getattr(
+                            analysis_error, "attempt_count", None
+                        ),
+                    }
+                    if not dry_run:
+                        await self._assert_current_cninfo_corporate_action_identity(
+                            instrument_id=analyzed.identity.instrument_id,
+                            source_event_key=source_event_key,
+                            announcement_ids=expected_announcement_ids,
+                        )
+                        await self.db_ops.save_corporate_action_llm_analysis({
+                            "analysis_key": analyzed.identity.idempotency_key,
+                            "instrument_id": analyzed.identity.instrument_id,
+                            "source_event_key": source_event_key,
+                            "analysis_status": "manual_required",
+                            "validation_status": "failed",
+                            "profile": profile,
+                            "model": (
+                                configured_profile.model
+                                if configured_profile else None
+                            ),
+                            "schema_version": SCHEMA_VERSION,
+                            "prompt_version": PROMPT_VERSION,
+                            "parser_version": PARSER_VERSION,
+                            "input_hash": analyzed.identity.input_hash,
+                            "artifact_ids": artifact_ids,
+                            "result": {},
+                            "gate_results": {},
+                            "attempt_count": int(
+                                getattr(analysis_error, "attempt_count", 0) or 0
+                            ),
+                            "error_code": error_code,
+                            "error_message": str(analysis_error),
+                            "ingestion_run_id": run_id,
+                        })
+                    payload_store.pop(analyzed.payload_ref, None)
+                    return summary
+                analysis = data.get("analysis")
+                if analysis is None:
+                    payload_store.pop(analyzed.payload_ref, None)
+                    return summary
+                saved = None
+                if not dry_run:
+                    await self._assert_current_cninfo_corporate_action_identity(
+                        instrument_id=analyzed.identity.instrument_id,
+                        source_event_key=source_event_key,
+                        announcement_ids=expected_announcement_ids,
+                    )
+                    saved = await self.db_ops.save_corporate_action_llm_analysis({
+                        "analysis_key": analyzed.identity.idempotency_key,
+                        "instrument_id": analyzed.identity.instrument_id,
+                        "source_event_key": source_event_key,
+                        "analysis_status": analysis.result.get("analysis_status"),
+                        "validation_status": analysis.validation_status,
+                        "profile": profile,
+                        "model": analysis.model,
+                        "schema_version": SCHEMA_VERSION,
+                        "prompt_version": PROMPT_VERSION,
+                        "parser_version": PARSER_VERSION,
+                        "input_hash": analysis.input_hash,
+                        "response_hash": analysis.response_hash,
+                        "request_id": analysis.request_id,
+                        "artifact_ids": artifact_ids,
+                        "result": analysis.result,
+                        "gate_results": analysis.gate_results,
+                        "usage": {
+                            **(analysis.usage or {}),
+                            "warnings": list(analysis.warnings),
+                        },
+                        "latency_ms": analysis.latency_ms,
+                        "attempt_count": analysis.attempt_count,
+                        "ingestion_run_id": run_id,
+                    })
+                    summary["persisted_analysis"] = bool(saved)
+                summary["analysis"] = {
+                    "analysis_id": (
+                        saved.get("analysis_id")
+                        if isinstance(saved, dict) else None
+                    ),
+                    "instrument_id": analyzed.identity.instrument_id,
+                    "source_event_key": source_event_key,
+                    "validation_status": analysis.validation_status,
+                    "schema_version": SCHEMA_VERSION,
+                    "parser_version": PARSER_VERSION,
+                    "result": analysis.result,
+                    "gate_results": analysis.gate_results,
+                    "usage": analysis.usage,
+                    "warnings": list(analysis.warnings),
+                    "latency_ms": analysis.latency_ms,
+                    "attempt_count": analysis.attempt_count,
+                }
+                summary["promotion"] = (
+                    await self._maybe_auto_promote_cninfo_analysis(
+                        analysis=summary["analysis"],
+                        pages=pages,
+                        enabled=bool(auto_promote_validated),
+                        dry_run=bool(dry_run),
+                    )
+                )
+                payload_store.pop(analyzed.payload_ref, None)
+                return summary
+
+            def snapshot_extra() -> Dict[str, Any]:
+                resources: Dict[str, Any] = {
+                    "documents": document_stage.snapshot(),
+                    "payload_store_entries": len(payload_store),
+                }
+                registry = getattr(
+                    getattr(resolver, "client", None),
+                    "provider_coordinator_registry",
+                    None,
+                )
+                if registry is not None:
+                    resources["providers"] = [
+                        value.__dict__ for value in registry.snapshots()
+                    ]
+                return resources
+
+            pipeline = CninfoCorporateActionResolutionPipeline(
+                config=pipeline_config,
+                prepare=prepare_event,
+                analyze=analyze_event,
+                persist=persist_event,
+                logger=dm_logger,
+                snapshot_extra=snapshot_extra,
+            )
+            inventory = [
+                InventoryPayload(
+                    identity=PipelineIdentity(
+                        instrument_id=str(event.get("instrument_id") or ""),
+                        source_event_key=str(
+                            event.get("source_event_key") or ""
+                        ),
+                        run_id=run_id,
+                        stage=CorporateActionPipelineStage.INVENTORY,
+                        stage_sequence=0,
+                        source_profile=str(event.get("source_profile") or ""),
+                    ),
+                    observation=event,
+                )
+                for event in batch
+            ]
+            pipeline_run = await pipeline.run(inventory)
+        return {
+            "pipeline_run": pipeline_run,
+            "event_summaries": [
+                outcome.output
+                for outcome in pipeline_run.terminal_outcomes
+                if outcome.status.value == "success"
+                and isinstance(outcome.output, dict)
+            ],
+            "pipeline_failures": [
+                {
+                    "source_event_key": outcome.item.business_item_key,
+                    "code": outcome.error_code or "pipeline_stage_failed",
+                    "error": outcome.error_message or "pipeline stage failed",
+                    "stage": outcome.item.stage,
+                }
+                for outcome in pipeline_run.terminal_outcomes
+                if outcome.status.value != "success"
+            ],
+        }
+
     async def analyze_cninfo_corporate_action_candidates(
         self,
         *,
@@ -20564,6 +22177,7 @@ class DataManager:
         discover_candidates: bool = False,
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = False,
+        pipeline: Optional[Dict[str, Any]] = None,
         sample_limit: int = 20,
         llm_client: Any = None,
         ocr_adapter: Any = None,
@@ -20582,8 +22196,10 @@ class DataManager:
             PROMPT_VERSION,
             SCHEMA_VERSION,
         )
-        from utils.llm import LlmClient
-
+        from data_sources.cninfo_corporate_action_pipeline import (
+            CninfoCorporateActionPipelineConfig,
+            normalize_cninfo_pipeline_exchanges,
+        )
         task_started = asyncio.get_running_loop().time()
         normalized_start = date.fromisoformat(str(start_date or "1990-12-19")[:10])
         normalized_end = date.fromisoformat(
@@ -20595,19 +22211,77 @@ class DataManager:
             raise ValueError(
                 "refresh_documents requires download_documents=true"
             )
-        exchange_suffixes = {
-            "SSE": ".SH", "SZSE": ".SZ", "BSE": ".BJ",
-        }
-        selected_exchanges = [str(item).upper() for item in (exchanges or ["SSE", "SZSE"])]
-        unsupported = sorted(set(selected_exchanges) - set(exchange_suffixes))
-        if unsupported:
-            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        exchange_suffixes = {"SSE": ".SH", "SZSE": ".SZ"}
+        selected_exchanges_tuple, excluded_exchanges_tuple = (
+            normalize_cninfo_pipeline_exchanges(exchanges)
+        )
+        selected_exchanges = list(selected_exchanges_tuple)
+        excluded_exchanges = list(excluded_exchanges_tuple)
+        pipeline_config = CninfoCorporateActionPipelineConfig.from_mapping(
+            pipeline
+        )
         selected_ids = sorted({str(item).strip() for item in (instrument_ids or []) if str(item).strip()})
         selected_event_keys = sorted({
             str(item).strip()
             for item in (source_event_keys or [])
             if str(item).strip()
         })
+        if not selected_exchanges:
+            return {
+                "status": "dry_run" if dry_run else "success",
+                "operation": "a_share_cninfo_corporate_action_llm_resolution",
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "raw_observation_modified": False,
+                "resolved_layer_write_allowed": False,
+                "production_factor_modified": False,
+                "parameters": {
+                    "start_date": normalized_start.isoformat(),
+                    "end_date": normalized_end.isoformat(),
+                    "exchanges": [],
+                    "excluded_exchanges": excluded_exchanges,
+                    "instrument_ids": selected_ids,
+                    "source_event_keys": selected_event_keys,
+                    "pipeline": pipeline_config.to_dict(),
+                },
+                "targets": {
+                    "candidate_events": 0,
+                    "batch_events": 0,
+                    "has_more": False,
+                    "next_target_offset": None,
+                },
+                "counts": {
+                    "processed": 0,
+                    "analyzed": 0,
+                    "resumed": 0,
+                    "validated_candidates": 0,
+                    "manual_required": 0,
+                    "llm_disabled": 0,
+                    "document_failures": 0,
+                    "errors": 0,
+                    "persisted_analyses": 0,
+                },
+                "review_workload": {
+                    "tiers": {},
+                    "gate_signatures": {},
+                    "remaining_manual_review": 0,
+                },
+                "auto_promotion": {
+                    "enabled": bool(auto_promote_validated),
+                    "eligible": 0,
+                    "promoted": 0,
+                    "dry_run_eligible": 0,
+                    "skipped": 0,
+                    "failed": 0,
+                    "reason_counts": {"source_not_supported": 1},
+                    "samples": [],
+                },
+                "llm_metrics": {},
+                "errors": [],
+                "samples": [],
+                "discovery": None,
+                "skip_reason": "cninfo_bse_not_supported",
+            }
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution preparing: range=%s..%s "
             "exchanges=%s instruments=%s max_events=%s offset=%s profile=%s "
@@ -20799,6 +22473,8 @@ class DataManager:
                 "discover_candidates": bool(discover_candidates),
                 "auto_promote_validated": bool(auto_promote_validated),
                 "exclude_reviewed_events": bool(exclude_reviewed_events),
+                "excluded_exchanges": excluded_exchanges,
+                "pipeline": pipeline_config.to_dict(),
             },
             "targets": {"candidate_events": len(all_events), "batch_events": len(batch), "has_more": has_more, "next_target_offset": offset + len(batch) if has_more else None},
             "counts": {"processed": 0, "analyzed": 0, "resumed": 0, "validated_candidates": 0, "manual_required": 0, "llm_disabled": 0, "document_failures": 0, "errors": 0, "persisted_analyses": 0},
@@ -20880,7 +22556,7 @@ class DataManager:
                 result["counts"]["llm_disabled"] = len(batch)
                 result["status"] = "partial" if batch else result["status"]
                 return result
-            llm_client = LlmClient(llm_config)
+            llm_client = self._get_or_create_llm_client()
         configured_profile = llm_config.profiles.get(profile)
         dm_logger.info(
             "[DataManager] CNInfo LLM profile ready: run_id=%s profile=%s model=%s "
@@ -20897,6 +22573,177 @@ class DataManager:
             profile=profile,
             model_identity=configured_profile.model if configured_profile else None,
         )
+
+        if pipeline_config.mode == "async":
+            runtime = await self._run_cninfo_candidate_resolution_pipeline(
+                batch=batch,
+                run_id=run_id,
+                resolver=resolver,
+                pipeline_config=pipeline_config,
+                normalized_start=normalized_start,
+                normalized_end=normalized_end,
+                profile=profile,
+                configured_profile=configured_profile,
+                resume=bool(resume),
+                dry_run=bool(dry_run),
+                download_documents=bool(download_documents),
+                run_ocr=bool(run_ocr),
+                refresh_documents=bool(refresh_documents),
+                auto_promote_validated=bool(auto_promote_validated),
+                ocr_adapter=ocr_adapter,
+            )
+            pipeline_run = runtime["pipeline_run"]
+            result["counts"]["processed"] = pipeline_run.submitted
+            result["pipeline_runtime"] = {
+                "mode": "async",
+                "submitted": pipeline_run.submitted,
+                "duplicate_submissions": pipeline_run.duplicate_submissions,
+                "elapsed_ms": pipeline_run.elapsed_ms,
+                "stage_snapshots": [
+                    value.__dict__ for value in pipeline_run.stage_snapshots
+                ],
+            }
+            for failure in runtime["pipeline_failures"]:
+                result["counts"]["errors"] += 1
+                result["review_workload"]["tiers"]["machine_rework"] += 1
+                signature = "pipeline_error:" + str(failure["code"])
+                signatures = result["review_workload"]["gate_signatures"]
+                signatures[signature] = int(signatures.get(signature, 0)) + 1
+                result["errors"].append(failure)
+            for summary in runtime["event_summaries"]:
+                document_errors = summary.get("document_errors") or []
+                result["counts"]["document_failures"] += len(document_errors)
+                result["errors"].extend(document_errors)
+                analysis_error = summary.get("analysis_error")
+                if analysis_error:
+                    result["counts"]["errors"] += 1
+                    result["review_workload"]["tiers"]["machine_rework"] += 1
+                    signature = (
+                        "analysis_error:" + str(analysis_error.get("code"))
+                    )
+                    signatures = result["review_workload"]["gate_signatures"]
+                    signatures[signature] = int(signatures.get(signature, 0)) + 1
+                    result["errors"].append(analysis_error)
+                analysis = summary.get("analysis")
+                if summary.get("resumed"):
+                    result["counts"]["resumed"] += 1
+                elif analysis:
+                    result["counts"]["analyzed"] += 1
+                    validation_status = str(
+                        analysis.get("validation_status") or ""
+                    )
+                    if validation_status == "validated_candidate":
+                        result["counts"]["validated_candidates"] += 1
+                    else:
+                        result["counts"]["manual_required"] += 1
+                    classification = (
+                        (analysis.get("result") or {}).get(
+                            "_review_classification"
+                        ) or {}
+                    )
+                    review_tier = str(
+                        classification.get("review_tier") or "deep_review"
+                    )
+                    gate_signature = str(
+                        classification.get("gate_signature") or "unclassified"
+                    )
+                    signatures = result["review_workload"]["gate_signatures"]
+                    signatures[gate_signature] = int(
+                        signatures.get(gate_signature, 0)
+                    ) + 1
+                    usage = analysis.get("usage") or {}
+                    for token_name in (
+                        "input_tokens", "output_tokens", "total_tokens"
+                    ):
+                        result["llm_metrics"][token_name] += int(
+                            usage.get(token_name) or 0
+                        )
+                    warnings = analysis.get("warnings") or []
+                    if "provider_output_budget_exceeded" in warnings:
+                        result["llm_metrics"][
+                            "provider_output_budget_overruns"
+                        ] += 1
+                    if analysis.get("latency_ms") is not None:
+                        latency_samples.append(int(analysis["latency_ms"]))
+                    if len(result["samples"]) < max(0, int(sample_limit)):
+                        result["samples"].append({
+                            "source_event_key": summary["source_event_key"],
+                            "validation_status": validation_status,
+                            "gate_results": analysis.get("gate_results") or {},
+                            "result": analysis.get("result") or {},
+                            "auto_promotion": summary.get("promotion"),
+                        })
+                    if summary.get("persisted_analysis"):
+                        result["counts"]["persisted_analyses"] += 1
+                promotion_outcome = summary.get("promotion")
+                if promotion_outcome:
+                    fallback_tier = "deep_review"
+                    if analysis:
+                        fallback_tier = str(
+                            ((analysis.get("result") or {}).get(
+                                "_review_classification"
+                            ) or {}).get("review_tier") or "deep_review"
+                        )
+                    _record_auto_promotion(
+                        promotion_outcome,
+                        fallback_tier=fallback_tier,
+                    )
+            if latency_samples:
+                ordered_latencies = sorted(latency_samples)
+
+                def _latency_percentile(percentile: float) -> int:
+                    index = round((len(ordered_latencies) - 1) * percentile)
+                    return ordered_latencies[
+                        max(0, min(index, len(ordered_latencies) - 1))
+                    ]
+
+                result["llm_metrics"]["latency_ms"] = {
+                    "count": len(ordered_latencies),
+                    "min": ordered_latencies[0],
+                    "p50": _latency_percentile(0.50),
+                    "p95": _latency_percentile(0.95),
+                    "max": ordered_latencies[-1],
+                }
+            result["review_workload"]["remaining_manual_review"] = sum(
+                int(result["review_workload"]["tiers"].get(tier, 0))
+                for tier in ("machine_rework", "quick_review", "deep_review")
+            )
+            result["status"] = (
+                "partial"
+                if (
+                    result["errors"]
+                    or result["counts"]["document_failures"]
+                    or result["auto_promotion"]["failed"]
+                    or result["review_workload"]["remaining_manual_review"]
+                    or has_more
+                )
+                else result["status"]
+            )
+            result["checkpoint"] = {
+                "run_id": run_id,
+                "next_target_offset": result["targets"]["next_target_offset"],
+                "input_event_keys": [
+                    item["source_event_key"] for item in batch
+                ],
+            }
+            dm_logger.info(
+                "[DataManager] CNInfo async LLM resolution finished: run_id=%s "
+                "status=%s elapsed_seconds=%.1f processed=%s analyzed=%s "
+                "resumed=%s promoted=%s manual_remaining=%s document_failures=%s "
+                "errors=%s persisted=%s",
+                run_id,
+                result["status"],
+                asyncio.get_running_loop().time() - task_started,
+                result["counts"]["processed"],
+                result["counts"]["analyzed"],
+                result["counts"]["resumed"],
+                result["auto_promotion"]["promoted"],
+                result["review_workload"]["remaining_manual_review"],
+                result["counts"]["document_failures"],
+                result["counts"]["errors"],
+                result["counts"]["persisted_analyses"],
+            )
+            return result
 
         with TemporaryDirectory(prefix="cninfo_ca_llm_") as temporary_root:
             archive_root = temporary_root if dry_run else self.data_config.get("data_dir", "data")
@@ -21314,19 +23161,20 @@ class DataManager:
                 "p95": _latency_percentile(0.95),
                 "max": ordered_latencies[-1],
             }
+        result["review_workload"]["remaining_manual_review"] = sum(
+            int(result["review_workload"]["tiers"].get(tier, 0))
+            for tier in ("machine_rework", "quick_review", "deep_review")
+        )
         result["status"] = (
             "partial"
             if (
                 result["errors"]
                 or result["counts"]["document_failures"]
                 or result["auto_promotion"]["failed"]
+                or result["review_workload"]["remaining_manual_review"]
                 or has_more
             )
             else result["status"]
-        )
-        result["review_workload"]["remaining_manual_review"] = sum(
-            int(result["review_workload"]["tiers"].get(tier, 0))
-            for tier in ("machine_rework", "quick_review", "deep_review")
         )
         result["checkpoint"] = {"run_id": run_id, "next_target_offset": result["targets"]["next_target_offset"], "input_event_keys": [item["source_event_key"] for item in batch]}
         dm_logger.info(
@@ -21392,6 +23240,11 @@ class DataManager:
             raise ValueError("reviewer exceeds 128 characters")
         if len(str(payload.get("notes") or "")) > 4000:
             raise ValueError("notes exceeds 4000 characters")
+        await self._assert_current_cninfo_corporate_action_identity(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            announcement_ids=(evidence_key,) if evidence_key else (),
+        )
         analyses = await self.db_ops.get_corporate_action_llm_analyses(
             instrument_id=instrument_id,
             source_event_key=source_event_key,
@@ -22805,7 +24658,11 @@ class DataManager:
             'warnings': [],
             'errors': [],
             'samples': [],
+            'event_instrument_ids': [],
+            'pending_factor_instrument_ids': [],
         }
+        event_instrument_ids: Set[str] = set()
+        pending_factor_instrument_ids: Set[str] = set()
 
         for exchange in exchanges:
             raw_instruments = await self.db_ops.get_repair_universe_instruments(
@@ -22909,6 +24766,8 @@ class DataManager:
                         )
                         if row is not None
                     ]
+                    if raw_rows:
+                        event_instrument_ids.add(instrument_id)
                     event_dates = {
                         self._date_from_any(row.get('ex_date'))
                         for row in raw_rows
@@ -22977,9 +24836,10 @@ class DataManager:
                                     factors
                                 )
 
-                    stats['pending_factors'] += len(
-                        event_dates - computed_dates - derived_dates
-                    )
+                    pending_event_dates = event_dates - computed_dates - derived_dates
+                    stats['pending_factors'] += len(pending_event_dates)
+                    if pending_event_dates:
+                        pending_factor_instrument_ids.add(instrument_id)
                     if not dry_run:
                         valid_event_dates = sorted(
                             event_date
@@ -23043,6 +24903,10 @@ class DataManager:
 
         result['samples'] = result['samples'][:20]
         result['errors'] = result['errors'][:50]
+        result['event_instrument_ids'] = sorted(event_instrument_ids)
+        result['pending_factor_instrument_ids'] = sorted(
+            pending_factor_instrument_ids
+        )
         if result['totals']['errors'] or result['totals']['timeouts']:
             result['status'] = 'partial'
         return result

@@ -1,3 +1,4 @@
+import asyncio
 from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
 
@@ -195,6 +196,16 @@ async def test_governance_routes_exact_event_keys_across_write_stages():
     manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
         return_value={"inserted": 2, "changed": 0, "unchanged": 0, "failed": 0}
     )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-discovery",
+        },
+        {
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-candidate",
+        },
+    ])
 
     result = await manager.govern_cninfo_corporate_action_resolutions(
         start_date="1990-12-19",
@@ -212,12 +223,170 @@ async def test_governance_routes_exact_event_keys_across_write_stages():
     ] == ["event-discovery"]
     assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
         "title_max_concurrency"
-    ] == 60
-    assert result["parameters"]["title_max_concurrency"] == 60
+    ] == 50
+    assert result["parameters"]["title_max_concurrency"] == 50
     assert manager.analyze_cninfo_corporate_action_candidates.await_args.kwargs[
         "source_event_keys"
     ] == ["event-discovery", "event-candidate"]
     manager.db_ops.upsert_corporate_action_resolution_states.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_async_governance_starts_resolution_before_discovery_returns():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    initial = [_state("event-discovery", "discovery_pending")]
+    terminal = [
+        _state("event-discovery", "resolved_evidence", terminal=True)
+    ]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[initial, terminal, terminal]
+    )
+    analysis_started = asyncio.Event()
+    ordering = []
+
+    async def discover(**kwargs):
+        await kwargs["on_event_ready"]({
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-discovery",
+            "candidate_count": 1,
+        })
+        await analysis_started.wait()
+        ordering.append("discovery_returned")
+        return {
+            "status": "success",
+            "target_samples": [{
+                "source_event_key": "event-discovery",
+                "candidate_count": 1,
+            }],
+            "errors": [],
+        }
+
+    async def analyze(**kwargs):
+        ordering.append("analysis_started")
+        analysis_started.set()
+        return {
+            "status": "success",
+            "counts": {"processed": 1, "analyzed": 1},
+            "targets": {"batch_events": 1},
+            "errors": [],
+        }
+
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock(
+        side_effect=discover
+    )
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock(
+        side_effect=analyze
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={"inserted": 1, "changed": 0, "unchanged": 0, "failed": 0}
+    )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[{
+        "instrument_id": "600108.SH",
+        "source_event_key": "event-discovery",
+    }])
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "discovery", "resolution"],
+        max_events=1,
+        title_max_concurrency=2,
+        pipeline={"mode": "async", "llm_concurrency": 2},
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert ordering == ["analysis_started", "discovery_returned"]
+    assert result["stages"]["resolution"]["title_overlap"] == {
+        "enabled": True,
+        "event_count": 1,
+        "run_count": 1,
+    }
+    assert manager.analyze_cninfo_corporate_action_candidates.await_args.kwargs[
+        "source_event_keys"
+    ] == ["event-discovery"]
+
+
+@pytest.mark.asyncio
+async def test_async_governance_merges_overlapped_resolution_targets():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    initial = [
+        _state(f"event-{index}", "discovery_pending")
+        for index in range(1, 4)
+    ]
+    terminal = [
+        _state(f"event-{index}", "resolved_evidence", terminal=True)
+        for index in range(1, 4)
+    ]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[initial, terminal, terminal]
+    )
+
+    async def discover(**kwargs):
+        for index in range(1, 4):
+            await kwargs["on_event_ready"]({
+                "instrument_id": "600108.SH",
+                "source_event_key": f"event-{index}",
+                "candidate_count": 1,
+            })
+        return {
+            "status": "success",
+            "target_samples": [
+                {
+                    "source_event_key": f"event-{index}",
+                    "candidate_count": 1,
+                }
+                for index in range(1, 4)
+            ],
+            "errors": [],
+        }
+
+    async def analyze(**kwargs):
+        event_keys = kwargs["source_event_keys"]
+        return {
+            "status": "success",
+            "counts": {"processed": len(event_keys)},
+            "targets": {"batch_events": len(event_keys)},
+            "errors": [],
+        }
+
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock(
+        side_effect=discover
+    )
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock(
+        side_effect=analyze
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={"inserted": 3, "changed": 0, "unchanged": 0, "failed": 0}
+    )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[])
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "discovery", "resolution"],
+        max_events=3,
+        title_max_concurrency=2,
+        pipeline={"mode": "async", "llm_concurrency": 2},
+        dry_run=False,
+    )
+
+    resolution = result["stages"]["resolution"]
+    assert result["status"] == "success"
+    assert resolution["targets"]["batch_events"] == 3
+    assert resolution["counts"]["processed"] == 3
+    assert resolution["title_overlap"] == {
+        "enabled": True,
+        "event_count": 3,
+        "run_count": 2,
+    }
+    assert [
+        run["batch_events"] for run in resolution["pipeline_runs"]
+    ] == [2, 1]
 
 
 @pytest.mark.asyncio
@@ -574,6 +743,12 @@ async def test_governance_preserves_partial_stage_failure_as_retryable_state():
     manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
         return_value={"inserted": 1, "changed": 0, "unchanged": 0, "failed": 0}
     )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-1",
+        }
+    ])
 
     result = await manager.govern_cninfo_corporate_action_resolutions(
         start_date="1990-12-19",

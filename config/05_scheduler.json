@@ -63,7 +63,7 @@
       "a_share_cninfo_corporate_action_daily_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "A股CNInfo（仅沪深）与TDX（沪深北）公司行动滚动日更、独立因子路径及多源基准（不选择或切换生产主源）",
+        "description": "A股公司行动增量日更：公告/近期事件驱动CNInfo定向刷新、TDX快速全市场刷新及受影响标的因子重建（不切换生产主源）",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -82,11 +82,17 @@
           "exchanges": ["SSE", "SZSE", "BSE"],
           "instrument_ids": [],
           "rolling_days": 7,
+          "announcement_overlap_days": 3,
+          "announcement_page_size": 30,
+          "announcement_max_pages": 60,
+          "event_lookahead_days": 14,
+          "candidate_limit": 1000,
+          "safety_sweep_size": 100,
           "request_interval_seconds": 0.5,
           "per_instrument_timeout_sec": 60,
           "build_canonical": false,
           "series_version": "a_share_cninfo_primary_v1",
-          "max_runtime_seconds": 86400
+          "max_runtime_seconds": 21600
         }
       },
       "hk_daily_data_update": {
@@ -316,6 +322,18 @@
           "discover_candidates": false,
           "auto_promote_validated": true,
           "exclude_reviewed_events": false,
+          "pipeline": {
+            "mode": "serial",
+            "stage_queue_size": 200,
+            "title_max_titles_per_request": 80,
+            "download_concurrency": 8,
+            "document_parse_concurrency": 8,
+            "llm_concurrency": 50,
+            "writer_batch_size": 10,
+            "writer_concurrency": 1,
+            "progress_interval_seconds": 30,
+            "verification_policy": "always"
+          },
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }
@@ -358,6 +376,18 @@
           "title_classification_profile": "corporate_action_title_classification",
           "title_max_titles_per_request": 80,
           "title_max_concurrency": 50,
+          "pipeline": {
+            "mode": "serial",
+            "stage_queue_size": 200,
+            "title_max_titles_per_request": 80,
+            "download_concurrency": 8,
+            "document_parse_concurrency": 8,
+            "llm_concurrency": 50,
+            "writer_batch_size": 10,
+            "writer_concurrency": 1,
+            "progress_interval_seconds": 30,
+            "verification_policy": "always"
+          },
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }
@@ -401,6 +431,18 @@
           "title_classification_profile": "corporate_action_title_classification",
           "title_max_titles_per_request": 80,
           "title_max_concurrency": 50,
+          "pipeline": {
+            "mode": "serial",
+            "stage_queue_size": 200,
+            "title_max_titles_per_request": 80,
+            "download_concurrency": 8,
+            "document_parse_concurrency": 8,
+            "llm_concurrency": 50,
+            "writer_batch_size": 10,
+            "writer_concurrency": 1,
+            "progress_interval_seconds": 30,
+            "verification_policy": "always"
+          },
           "sample_limit": 20,
           "max_runtime_seconds": 7200
         }

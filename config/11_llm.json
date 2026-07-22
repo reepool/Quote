@@ -1,33 +1,38 @@
 {
   "llm": {
     "enabled": true,
+    "provider_resources": {
+      "openai_compatible:QUOTE_LLM_API_KEY": {
+        "provider": "openai_compatible",
+        "hard_max_concurrency": 60,
+        "default_bulk_concurrency": 50,
+        "reserved_concurrency": 10,
+        "http_max_connections": 70,
+        "http_max_keepalive_connections": 60,
+        "workload_weights": {
+          "corporate_action_title_classification": 1,
+          "corporate_action_semantic_extraction": 1,
+          "corporate_action_semantic_verification": 1,
+          "business_profile_extraction": 1,
+          "direct": 1
+        }
+      }
+    },
+    "orchestration": {
+      "enabled": true,
+      "default_queue_size": 200,
+      "progress_interval_seconds": 30,
+      "resource_limits": {
+        "document_download": 8,
+        "document_parse": 8,
+        "sqlite_writer": 1
+      }
+    },
     "profiles": {
       "semantic_extraction": {
         "provider": "openai_compatible",
-        "enabled": true,
-        "base_url": "https://pipio.io/v1",
-        "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_API_KEY",
-        "model": "grok-4.5",
-        "structured_output_mode": "auto",
-        "supported_structured_output_modes": ["json_object"],
-        "allow_prompt_only": false,
-        "timeout_seconds": 620,
-        "attempt_timeout_seconds": 300,
-        "max_retries": 1,
-        "max_schema_repair_attempts": 1,
-        "max_concurrency": 1,
-        "requests_per_minute": 20,
-        "temperature": 0.0,
-        "max_output_tokens_field": "max_completion_tokens",
-        "stream": true,
-        "stream_include_usage": true,
-        "max_retry_after_seconds": 30,
-        "retry_backoff_seconds": 0.5,
-        "idempotency_header": "Idempotency-Key"
-      },
-      "corporate_action_title_classification": {
-        "provider": "openai_compatible",
+        "provider_resource": "openai_compatible:QUOTE_LLM_API_KEY",
+        "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
@@ -41,13 +46,41 @@
         "max_retries": 1,
         "max_schema_repair_attempts": 1,
         "max_concurrency": 50,
-        "requests_per_minute": 60,
+        "requests_per_minute": 0,
         "temperature": 0.0,
         "max_output_tokens_field": "max_completion_tokens",
         "stream": true,
         "stream_include_usage": true,
         "max_retry_after_seconds": 30,
         "retry_backoff_seconds": 0.5,
+        "retry_jitter_ratio": 0.2,
+        "idempotency_header": "Idempotency-Key"
+      },
+      "corporate_action_title_classification": {
+        "provider": "openai_compatible",
+        "provider_resource": "openai_compatible:QUOTE_LLM_API_KEY",
+        "default_workload": "corporate_action_title_classification",
+        "enabled": true,
+        "base_url": "https://pipio.io/v1",
+        "endpoint": "/v1/chat/completions",
+        "api_key_env": "QUOTE_LLM_API_KEY",
+        "model": "grok-4.5",
+        "structured_output_mode": "auto",
+        "supported_structured_output_modes": ["json_object"],
+        "allow_prompt_only": false,
+        "timeout_seconds": 620,
+        "attempt_timeout_seconds": 300,
+        "max_retries": 1,
+        "max_schema_repair_attempts": 1,
+        "max_concurrency": 50,
+        "requests_per_minute": 0,
+        "temperature": 0.0,
+        "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
+        "max_retry_after_seconds": 30,
+        "retry_backoff_seconds": 0.5,
+        "retry_jitter_ratio": 0.2,
         "idempotency_header": "Idempotency-Key"
       }
     }

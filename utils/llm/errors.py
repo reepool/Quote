@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 
 ERROR_CODES = {
@@ -49,18 +49,29 @@ class LlmError(RuntimeError):
     retryable: bool = False
     status_code: Optional[int] = None
     request_id: Optional[str] = None
+    request_hash: Optional[str] = None
     attempt_count: int = 0
+    lineage: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self) -> None:
         if self.code not in ERROR_CODES:
             raise ValueError(f"unsupported LLM error code: {self.code}")
         RuntimeError.__init__(self, self.message)
 
-    def with_context(self, *, request_id: str, attempt_count: int) -> "LlmError":
+    def with_context(
+        self,
+        *,
+        request_id: str,
+        attempt_count: int,
+        request_hash: Optional[str] = None,
+        lineage: Optional[Mapping[str, Any]] = None,
+    ) -> "LlmError":
         # Preserve the concrete subclass so callers can handle authentication,
         # schema, and deadline failures without inspecting only the string code.
         self.request_id = request_id
+        self.request_hash = request_hash
         self.attempt_count = attempt_count
+        self.lineage = dict(lineage or {})
         return self
 
     def to_dict(self) -> dict[str, Any]:
@@ -70,7 +81,9 @@ class LlmError(RuntimeError):
             "retryable": self.retryable,
             "status_code": self.status_code,
             "request_id": self.request_id,
+            "request_hash": self.request_hash,
             "attempt_count": self.attempt_count,
+            "lineage": dict(self.lineage or {}),
         }
 
 

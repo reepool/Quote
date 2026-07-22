@@ -81,9 +81,39 @@ class CorporateActionDocumentBundle:
         }
 
 
+@dataclass(frozen=True)
+class CorporateActionDocumentArtifact:
+    announcement_id: str
+    source_url: str
+    content_hash: str
+    content_type: str
+    content_length: int
+    archive_path: str
+    source: str = "cninfo"
+
+
 def normalize_page_text(value: str) -> str:
     """Normalize whitespace only; preserve wording for exact-quote validation."""
     return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def page_text_cache_key(
+    artifact_hash: str,
+    page: CorporateActionPageText,
+    *,
+    parser_version: str = DOCUMENT_PARSER_VERSION,
+) -> str:
+    """Return the immutable reuse key for one parsed artifact page."""
+    identity = "|".join((
+        str(artifact_hash or "").strip(),
+        str(parser_version or "").strip(),
+        str(page.page_number),
+        str(page.extraction_method or "").strip(),
+        str(page.text_hash or "").strip(),
+    ))
+    if not all(identity.split("|")):
+        raise ValueError("page text cache identity is incomplete")
+    return hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
 
 def _safe_component(value: str) -> str:
@@ -193,6 +223,25 @@ class CninfoCorporateActionDocumentService:
         title: Optional[str] = None,
         announcement_time: Any = None,
     ) -> CorporateActionDocumentBundle:
+        artifact = self.retrieve_and_archive(
+            announcement_id=announcement_id,
+            source_url=source_url,
+            source=source,
+            title=title,
+            announcement_time=announcement_time,
+        )
+        return self.parse_artifact(artifact)
+
+    def retrieve_and_archive(
+        self,
+        *,
+        announcement_id: str,
+        source_url: str,
+        source: str = "cninfo",
+        title: Optional[str] = None,
+        announcement_time: Any = None,
+    ) -> CorporateActionDocumentArtifact:
+        """Retrieve and archive an official PDF without retaining bytes in a queue."""
         announcement_id = str(announcement_id or "").strip()
         source_url = str(source_url or "").strip()
         if not announcement_id or not source_url:
@@ -255,25 +304,46 @@ class CninfoCorporateActionDocumentService:
                 os.replace(temporary_path, target)
             finally:
                 temporary_path.unlink(missing_ok=True)
-        pages = tuple(
-            CorporateActionPageText(
-                page_number=page.page_number,
-                text=page.text,
-                text_hash=page.text_hash,
-                announcement_id=announcement_id,
-                extraction_method=page.extraction_method,
-                quality_status=page.quality_status,
-            )
-            for page in extract_pdf_pages(content, ocr_adapter=self.ocr_adapter)
-        )
-        return CorporateActionDocumentBundle(
+        return CorporateActionDocumentArtifact(
             announcement_id=announcement_id,
             source_url=final_url,
             content_hash=digest,
             content_type=content_type,
             content_length=len(content),
             archive_path=relative.as_posix(),
+            source=source,
+        )
+
+    def parse_artifact(
+        self,
+        artifact: CorporateActionDocumentArtifact,
+    ) -> CorporateActionDocumentBundle:
+        """Parse one immutable artifact under a caller-owned CPU resource lease."""
+        target = self.archive_root / artifact.archive_path
+        if not target.is_file():
+            raise FileNotFoundError(f"document artifact is missing: {artifact.archive_path}")
+        content = target.read_bytes()
+        if hashlib.sha256(content).hexdigest() != artifact.content_hash:
+            raise ValueError("archive_hash_mismatch")
+        pages = tuple(
+            CorporateActionPageText(
+                page_number=page.page_number,
+                text=page.text,
+                text_hash=page.text_hash,
+                announcement_id=artifact.announcement_id,
+                extraction_method=page.extraction_method,
+                quality_status=page.quality_status,
+            )
+            for page in extract_pdf_pages(content, ocr_adapter=self.ocr_adapter)
+        )
+        return CorporateActionDocumentBundle(
+            announcement_id=artifact.announcement_id,
+            source_url=artifact.source_url,
+            content_hash=artifact.content_hash,
+            content_type=artifact.content_type,
+            content_length=artifact.content_length,
+            archive_path=artifact.archive_path,
             pages=pages,
             extraction_status="extracted",
-            source=source,
+            source=artifact.source,
         )

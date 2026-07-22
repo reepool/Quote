@@ -7,9 +7,10 @@ import hashlib
 import json
 import logging
 import os
+import random
 import time
 import uuid
-from typing import Any, Mapping, Optional, Protocol
+from typing import Any, Callable, Mapping, Optional, Protocol
 from urllib.parse import urlsplit, urlunsplit
 
 from .errors import (
@@ -23,6 +24,7 @@ from .errors import (
     safe_provider_error,
 )
 from .models import LlmConfig, LlmMessage, LlmProfile, LlmRequest, LlmResponse, LlmUsage
+from .orchestration import ProviderCoordinatorRegistry
 from .rate_limit import ProfileLimiterRegistry
 from .schema import compact_schema_instruction, normalize_schema, validate_data
 from .transport import AsyncTransport, HttpxOpenAICompatibleTransport, TransportResponse
@@ -30,6 +32,15 @@ from .transport import AsyncTransport, HttpxOpenAICompatibleTransport, Transport
 
 llm_logger = logging.getLogger("LLM")
 _GLOBAL_LIMITERS = ProfileLimiterRegistry()
+_GLOBAL_PROVIDER_COORDINATORS = ProviderCoordinatorRegistry()
+_LINEAGE_METADATA_KEYS = {
+    "workload",
+    "run_id",
+    "stage",
+    "stage_sequence",
+    "business_item_key",
+    "input_hash",
+}
 
 
 class LlmClientProtocol(Protocol):
@@ -46,19 +57,63 @@ class LlmClient:
         transport: Optional[AsyncTransport] = None,
         environment: Optional[Mapping[str, str]] = None,
         limiter_registry: Optional[ProfileLimiterRegistry] = None,
+        provider_coordinator_registry: Optional[
+            ProviderCoordinatorRegistry
+        ] = None,
+        owns_transport: Optional[bool] = None,
+        random_source: Callable[[], float] = random.random,
     ) -> None:
         self.config = config if isinstance(config, LlmConfig) else LlmConfig.from_mapping(config)
-        self.transport = transport or HttpxOpenAICompatibleTransport()
+        if transport is None:
+            max_connections = max(
+                (
+                    resource.http_max_connections
+                    for resource in self.config.provider_resources.values()
+                ),
+                default=100,
+            )
+            max_keepalive_connections = max(
+                (
+                    resource.http_max_keepalive_connections
+                    for resource in self.config.provider_resources.values()
+                ),
+                default=20,
+            )
+            self.transport = HttpxOpenAICompatibleTransport(
+                max_connections=max_connections,
+                max_keepalive_connections=max_keepalive_connections,
+            )
+        else:
+            self.transport = transport
         self.environment = environment if environment is not None else os.environ
         self.limiter_registry = limiter_registry or _GLOBAL_LIMITERS
+        self.provider_coordinator_registry = (
+            provider_coordinator_registry or _GLOBAL_PROVIDER_COORDINATORS
+        )
+        self._owns_transport = transport is None or bool(owns_transport)
+        self._random_source = random_source
+        self._closed = False
 
     async def complete(self, request: LlmRequest) -> LlmResponse:
+        if self._closed:
+            raise LlmConfigurationError("LLM client is closed")
         request_id = uuid.uuid4().hex
         started = time.monotonic()
         attempt_count = 0
         request_hash: Optional[str] = None
+        lineage = self._lineage_metadata(request.metadata)
         try:
             profile = self._resolve_profile(request.profile)
+            provider_resource = self.config.resource_for_profile(profile)
+            provider_coordinator = (
+                self.provider_coordinator_registry.get(provider_resource)
+                if self.config.orchestration.enabled
+                else None
+            )
+            workload = str(
+                request.metadata.get("workload") or profile.default_workload
+            ).strip() or profile.default_workload
+            bulk = request.metadata.get("bulk") is True
             messages = tuple(LlmMessage.from_value(item) for item in request.messages)
             if not messages:
                 raise LlmConfigurationError("LLM request must contain at least one message")
@@ -147,37 +202,56 @@ class LlmClient:
                     raise LlmDeadlineExceededError()
                 try:
                     async with limiter.slot(deadline):
-                        remaining = deadline - time.monotonic()
-                        if remaining <= 0:
-                            raise LlmDeadlineExceededError()
-                        attempt_timeout = min(
-                            profile.attempt_timeout_seconds,
-                            remaining,
-                        )
-                        llm_logger.info(
-                            "LLM attempt started profile=%s request_id=%s "
-                            "attempt=%s/%s timeout_seconds=%.1f remaining_seconds=%.1f",
-                            profile.name,
-                            request_id,
-                            attempt_count,
-                            max_attempts,
-                            attempt_timeout,
-                            remaining,
-                        )
-                        response = await asyncio.wait_for(
-                            self.transport.send(
-                                url,
-                                self._attempt_headers(
-                                    headers,
+                        if provider_coordinator is None:
+                            response = await self._send_attempt(
+                                url=url,
+                                headers=headers,
+                                profile=profile,
+                                idempotency_key=request.idempotency_key,
+                                payload=current_payload,
+                                deadline=deadline,
+                                request_id=request_id,
+                                attempt_count=attempt_count,
+                                max_attempts=max_attempts,
+                            )
+                        else:
+                            await provider_coordinator.acquire(
+                                workload=workload,
+                                deadline=deadline,
+                                bulk=bulk,
+                            )
+                            try:
+                                response = await self._send_attempt(
+                                    url=url,
+                                    headers=headers,
                                     profile=profile,
                                     idempotency_key=request.idempotency_key,
                                     payload=current_payload,
-                                ),
-                                current_payload,
-                                attempt_timeout,
-                            ),
-                            timeout=attempt_timeout,
-                        )
+                                    deadline=deadline,
+                                    request_id=request_id,
+                                    attempt_count=attempt_count,
+                                    max_attempts=max_attempts,
+                                )
+                                if (
+                                    response.status_code < 200
+                                    or response.status_code >= 300
+                                ):
+                                    provider_error = safe_provider_error(
+                                        response.status_code
+                                    )
+                                    if provider_error.retryable:
+                                        await provider_coordinator.set_cooldown(
+                                            self._base_retry_delay(
+                                                profile,
+                                                attempt_count,
+                                                response=response,
+                                            )
+                                        )
+                            finally:
+                                await provider_coordinator.release(
+                                    workload=workload,
+                                    bulk=bulk,
+                                )
                     llm_logger.info(
                         "LLM attempt response profile=%s request_id=%s attempt=%s/%s "
                         "status_code=%s elapsed_ms=%s",
@@ -189,7 +263,8 @@ class LlmClient:
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
                     )
                     if response.status_code < 200 or response.status_code >= 300:
-                        raise safe_provider_error(response.status_code)
+                        provider_error = safe_provider_error(response.status_code)
+                        raise provider_error
                     raw_content, finish_reason = extract_message_content(response)
                     data = self._parse_and_validate(raw_content, schema)
                     warnings = response_warnings(
@@ -249,6 +324,7 @@ class LlmClient:
                         latency_ms=latency_ms,
                         attempt_count=attempt_count,
                         warnings=tuple(warnings),
+                        lineage=lineage,
                     )
                 except asyncio.CancelledError as exc:
                     raise LlmCancelledError() from exc
@@ -326,15 +402,29 @@ class LlmClient:
                     max(0.0, deadline - time.monotonic()),
                 )
                 await self._backoff(
-                    profile, attempt_count, response=locals().get("response"), deadline=deadline
+                    profile,
+                    attempt_count,
+                    response=locals().get("response"),
+                    deadline=deadline,
+                    random_source=self._random_source,
                 )
 
             raise last_error or LlmError("provider_error", "LLM request failed")
         except asyncio.CancelledError as exc:
             error: LlmError = LlmCancelledError()
-            raise error.with_context(request_id=request_id, attempt_count=attempt_count) from exc
+            raise error.with_context(
+                request_id=request_id,
+                attempt_count=attempt_count,
+                request_hash=request_hash,
+                lineage=lineage,
+            ) from exc
         except LlmError as exc:
-            contextual = exc.with_context(request_id=request_id, attempt_count=attempt_count)
+            contextual = exc.with_context(
+                request_id=request_id,
+                attempt_count=attempt_count,
+                request_hash=request_hash,
+                lineage=lineage,
+            )
             llm_logger.warning(
                 "LLM request failed request_id=%s request_hash=%s code=%s attempts=%s",
                 request_id,
@@ -343,6 +433,48 @@ class LlmClient:
                 attempt_count,
             )
             raise contextual from exc
+
+    async def _send_attempt(
+        self,
+        *,
+        url: str,
+        headers: Mapping[str, str],
+        profile: LlmProfile,
+        idempotency_key: Optional[str],
+        payload: Mapping[str, Any],
+        deadline: float,
+        request_id: str,
+        attempt_count: int,
+        max_attempts: int,
+    ) -> TransportResponse:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise LlmDeadlineExceededError()
+        attempt_timeout = min(profile.attempt_timeout_seconds, remaining)
+        llm_logger.info(
+            "LLM attempt started profile=%s request_id=%s attempt=%s/%s "
+            "timeout_seconds=%.1f remaining_seconds=%.1f",
+            profile.name,
+            request_id,
+            attempt_count,
+            max_attempts,
+            attempt_timeout,
+            remaining,
+        )
+        return await asyncio.wait_for(
+            self.transport.send(
+                url,
+                self._attempt_headers(
+                    headers,
+                    profile=profile,
+                    idempotency_key=idempotency_key,
+                    payload=payload,
+                ),
+                payload,
+                attempt_timeout,
+            ),
+            timeout=attempt_timeout,
+        )
 
     def _resolve_profile(self, name: str) -> LlmProfile:
         profile_name = str(name or "").strip()
@@ -500,12 +632,19 @@ class LlmClient:
         *,
         response: Any,
         deadline: float,
+        random_source: Callable[[], float] = random.random,
     ) -> None:
-        delay = profile.retry_backoff_seconds * (2 ** max(0, attempt_count - 1))
-        if isinstance(response, TransportResponse) and response.status_code == 429:
-            retry_after = _parse_retry_after(response.headers.get("retry-after"))
-            if retry_after is not None:
-                delay = min(retry_after, profile.max_retry_after_seconds)
+        delay = LlmClient._base_retry_delay(
+            profile, attempt_count, response=response
+        )
+        if not (
+            isinstance(response, TransportResponse)
+            and response.status_code == 429
+            and _parse_retry_after(response.headers.get("retry-after")) is not None
+        ):
+            jitter = profile.retry_jitter_ratio
+            multiplier = 1.0 + ((random_source() * 2.0) - 1.0) * jitter
+            delay = max(0.0, delay * multiplier)
         delay = min(delay, max(0.0, deadline - time.monotonic()))
         if delay <= 0:
             if time.monotonic() >= deadline:
@@ -518,8 +657,36 @@ class LlmClient:
         except asyncio.TimeoutError as exc:
             raise LlmDeadlineExceededError() from exc
 
+    @staticmethod
+    def _base_retry_delay(
+        profile: LlmProfile,
+        attempt_count: int,
+        *,
+        response: Any,
+    ) -> float:
+        delay = profile.retry_backoff_seconds * (
+            2 ** max(0, attempt_count - 1)
+        )
+        if isinstance(response, TransportResponse) and response.status_code == 429:
+            retry_after = _parse_retry_after(response.headers.get("retry-after"))
+            if retry_after is not None:
+                delay = min(retry_after, profile.max_retry_after_seconds)
+        return max(0.0, delay)
+
+    @staticmethod
+    def _lineage_metadata(metadata: Mapping[str, Any]) -> dict[str, Any]:
+        return {
+            key: metadata[key]
+            for key in _LINEAGE_METADATA_KEYS
+            if key in metadata and metadata[key] is not None
+        }
+
     async def close(self) -> None:
-        await self.transport.close()
+        if self._closed:
+            return
+        self._closed = True
+        if self._owns_transport:
+            await self.transport.close()
 
     async def __aenter__(self) -> "LlmClient":
         return self

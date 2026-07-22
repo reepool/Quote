@@ -3120,6 +3120,14 @@ class CninfoCorporateActionLlmResolver:
             schema_version=SCHEMA_VERSION,
             max_output_tokens=MAX_ANALYSIS_OUTPUT_TOKENS,
             idempotency_key=input_hash,
+            metadata={
+                "workload": "corporate_action_semantic_extraction",
+                "stage": "semantic_extraction",
+                "stage_sequence": 1,
+                "business_item_key": source_event_key,
+                "input_hash": input_hash,
+                "bulk": True,
+            },
             content_is_untrusted=True,
         ))
         raw_result = deepcopy(response.data)
@@ -3175,6 +3183,14 @@ class CninfoCorporateActionLlmResolver:
                 schema_version=SEMANTIC_VERIFICATION_SCHEMA_VERSION,
                 max_output_tokens=MAX_SEMANTIC_VERIFICATION_OUTPUT_TOKENS,
                 idempotency_key=verification_input_hash,
+                metadata={
+                    "workload": "corporate_action_semantic_verification",
+                    "stage": "semantic_verification",
+                    "stage_sequence": 2,
+                    "business_item_key": source_event_key,
+                    "input_hash": verification_input_hash,
+                    "bulk": True,
+                },
                 content_is_untrusted=True,
             ))
             _merge_semantic_verification(raw_result, verification_response.data)

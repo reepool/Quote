@@ -272,6 +272,71 @@ async def test_incomplete_rebuild_still_persists_benchmark_without_candidate():
 
 
 @pytest.mark.asyncio
+async def test_bse_factor_rebuild_does_not_require_cninfo_endpoint_coverage():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "920000.BJ",
+        "symbol": "920000",
+    }])
+
+    async def execute_read_query(query, _params):
+        if "FROM corporate_action_observations" in query:
+            return []
+        if "FROM adjustment_factors_tdx" in query:
+            return [{
+                "instrument_id": "920000.BJ",
+                "ex_date": datetime(2026, 7, 20),
+                "factor": 1.01,
+                "cumulative_factor": 1.01,
+                "validation_result": "computed_unvalidated",
+                "pre_close": 10.0,
+                "fenhong": 0.1,
+                "songzhuangu": 0.0,
+                "peigu": 0.0,
+                "peigujia": 0.0,
+            }]
+        if "FROM adjustment_factors\n" in query:
+            return []
+        if "FROM corporate_action_instrument_status" in query:
+            if "source = 'tdx'" in query:
+                return [{
+                    "instrument_id": "920000.BJ",
+                    "source_profile": "tdx_xdxr",
+                    "coverage_status": "complete_with_events",
+                    "event_count": 1,
+                    "requested_start_date": datetime(1990, 12, 19),
+                    "requested_end_date": datetime(2026, 7, 22),
+                }]
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(return_value=[{
+        "instrument_id": "920000.BJ",
+        "source_date": date(2026, 7, 20),
+        "effective_date": date(2026, 7, 20),
+        "pre_close": 10.0,
+        "close": 9.9,
+    }])
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(return_value=[])
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-22",
+        exchanges=["BSE"],
+        instrument_ids=["920000.BJ"],
+        dry_run=True,
+    )
+
+    assert result["overall_completeness"][
+        "endpoint_incomplete_instruments"
+    ] == 0
+    assert result["overall_completeness"][
+        "missing_endpoint_profile_samples"
+    ] == []
+
+
+@pytest.mark.asyncio
 async def test_reviewed_overlay_replaces_zero_effect_placeholder_only(monkeypatch):
     import data_sources.cninfo_factor_governance as factor_governance
 

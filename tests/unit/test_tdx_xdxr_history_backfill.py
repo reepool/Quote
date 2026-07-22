@@ -173,6 +173,8 @@ async def test_xdxr_history_keeps_inactive_event_pending_without_pre_close():
     assert result["totals"]["eligible_instruments"] == 1
     assert result["totals"]["saved_events"] == 1
     assert result["totals"]["pending_factors"] == 1
+    assert result["event_instrument_ids"] == ["600000.SH"]
+    assert result["pending_factor_instrument_ids"] == ["600000.SH"]
     raw_rows, preserve = manager.db_ops.saved_calls[0]
     assert preserve is True
     assert raw_rows[0]["fenhong"] == 2.0
@@ -205,6 +207,8 @@ async def test_xdxr_history_derivation_updates_pending_event():
 
     assert result["totals"]["derived_factors"] == 1
     assert result["totals"]["pending_factors"] == 0
+    assert result["event_instrument_ids"] == ["600000.SH"]
+    assert result["pending_factor_instrument_ids"] == []
     assert manager.db_ops.saved_calls[1][1] is False
     assert manager.db_ops.saved_calls[1][0][0]["validation_result"] == "computed_unvalidated"
     assert source.factor_kwargs["pre_close_overrides"] == {date(2020, 6, 1): 10.0}
@@ -238,6 +242,7 @@ async def test_xdxr_history_dry_run_counts_events_and_factors_without_saving():
     assert result["totals"]["saved_events"] == 0
     assert result["totals"]["derived_factors"] == 1
     assert result["totals"]["pending_factors"] == 0
+    assert result["event_instrument_ids"] == ["600000.SH"]
     assert manager.db_ops.saved_calls == []
     assert manager.db_ops.coverage_statuses == []
 
@@ -255,6 +260,7 @@ async def test_xdxr_history_persists_confirmed_no_event_coverage():
 
     assert result["status"] == "success"
     assert result["totals"]["empty_instruments"] == 1
+    assert result["event_instrument_ids"] == []
     assert manager.db_ops.coverage_statuses == [{
         "instrument_id": "600000.SH",
         "source": "tdx",

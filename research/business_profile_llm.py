@@ -314,6 +314,13 @@ class OpenAICompatibleBusinessProfileExtractor:
                 schema_version=LLM_REPORT_SCHEMA_VERSION,
                 temperature=self.config.temperature,
                 timeout_seconds=self.config.timeout_seconds,
+                metadata={
+                    "workload": "business_profile_extraction",
+                    "stage": "semantic_extraction",
+                    "stage_sequence": 1,
+                    "business_item_key": f"{instrument}:{period}",
+                    "bulk": True,
+                },
                 content_is_untrusted=True,
             )
         )

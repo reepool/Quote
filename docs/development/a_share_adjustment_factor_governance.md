@@ -39,16 +39,17 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
   Sina 和 BaoStock 路径的覆盖率、P50/P95、最大误差和阈值超限比例；
 - 默认重建不创建 `adjustment_factors_canonical`。只有显式传入 `build_canonical=true`
   才创建隔离 staging 候选，且仍不影响生产读取；
-- `a_share_cninfo_corporate_action_daily_sync` 在每日行情更新后按最近 7 天滚动刷新活跃股票的
-  两个原始来源，再利用本地全历史重建累计因子；CNInfo 只请求沪深，TDX 仍请求沪深北，
-  任务单实例运行且不会晋级生产；
+- `a_share_cninfo_corporate_action_daily_sync` 在每日行情更新后按公告水位、近期事件、失败重试
+  和小规模轮转抽查定向刷新 CNInfo 候选股票；TDX 仍快速扫描沪深北活跃股票，再只对本轮受影响
+  标的利用本地全历史重建累计因子。任务单实例运行且不会晋级生产；
 - `a_share_cninfo_corporate_action_backfill` 和
   `a_share_cninfo_adjustment_factor_rebuild` 仍是手工任务，分别负责官方事件全量回补和
   全历史因子重建/对账。
 
-自动日更只刷新源数据的近期窗口，因子重建不能只从这个窗口起算，否则累计因子会错误地从
-1 重新开始。CNInfo 是事件来源候选，不代表其自研累计因子已被选为生产主源；主源选择必须
-等待全市场 benchmark 完成并人工评审。
+自动日更只刷新源数据的近期窗口，且只对受影响标的读取完整历史路径，不能只从这个窗口起算，
+否则累计因子会错误地从 1 重新开始。历史全市场回补、全市场 benchmark 和完整性治理不属于
+每日任务。CNInfo 是事件来源候选，不代表其自研累计因子已被选为生产主源；主源选择必须等待
+全市场 benchmark 完成并人工评审。
 
 ### 1. 全市场 CNInfo 官方事件回补
 

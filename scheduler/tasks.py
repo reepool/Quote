@@ -533,6 +533,7 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     signatures = review_workload.get("gate_signatures") or {}
     metrics = result.get("llm_metrics") or {}
     auto_promotion = result.get("auto_promotion") or {}
+    pipeline = (result.get("parameters") or {}).get("pipeline") or {}
     latency = metrics.get("latency_ms") or {}
     top_signatures = sorted(
         signatures.items(), key=lambda item: (-int(item[1]), str(item[0]))
@@ -543,6 +544,12 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         f"结论: *{'部分完成' if result.get('status') == 'partial' else '预演完成' if result.get('dry_run') else '完成'}*",
         f"状态: `{result.get('status')}`",
         f"dry_run: `{result.get('dry_run')}`",
+        "pipeline: `"
+        f"mode={pipeline.get('mode', 'serial')}, "
+        f"llm={pipeline.get('llm_concurrency', 0)}, "
+        f"download={pipeline.get('download_concurrency', 0)}, "
+        f"parse={pipeline.get('document_parse_concurrency', 0)}, "
+        f"writer={pipeline.get('writer_concurrency', 0)}`",
         f"候选事件: `{targets.get('candidate_events', 0)}`，本批: `{targets.get('batch_events', 0)}`",
         f"处理/分析: `{counts.get('processed', 0)}/{counts.get('analyzed', 0)}`",
         f"通过证据门禁: `{counts.get('validated_candidates', 0)}`",
@@ -604,6 +611,7 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
     inventory = result.get("inventory") or {}
     targets = result.get("targets") or {}
     parameters = result.get("parameters") or {}
+    pipeline = parameters.get("pipeline") or {}
     discovery = (result.get("stages") or {}).get("discovery") or {}
     title_classification = discovery.get("title_classification") or {}
     state_counts = inventory.get("state_counts") or {}
@@ -617,6 +625,11 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`",
         f"市场: `{','.join(parameters.get('exchanges') or [])}`",
         f"scopes: `{','.join(parameters.get('scopes') or [])}`",
+        "pipeline: `"
+        f"mode={pipeline.get('mode', 'serial')}, "
+        f"llm={pipeline.get('llm_concurrency', 0)}, "
+        f"parse={pipeline.get('document_parse_concurrency', 0)}, "
+        f"writer={pipeline.get('writer_concurrency', 0)}`",
         "库存: `"
         f"total={inventory.get('total_events', 0)}, "
         f"actionable={inventory.get('actionable_events', 0)}, "
@@ -774,14 +787,23 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     label = {"success": "完成", "partial": "部分完成", "dry_run": "预演完成"}.get(
         status, status
     )
+    is_daily = result.get("operation") == "a_share_cninfo_primary_daily_maintenance"
     parameters = result.get("parameters") or {}
-    reconciliation = result.get("reconciliation") or {}
+    factor_result = (result.get("factor_rebuild") or {}) if is_daily else result
+    reconciliation = factor_result.get("reconciliation") or {}
     totals = reconciliation.get("totals") or {}
     matching_policy = reconciliation.get("matching_policy") or {}
     rounded_policy = matching_policy.get("rounded_precision_policy") or {}
-    candidate = result.get("candidate") or {}
-    benchmark = result.get("benchmark") or {}
+    candidate = factor_result.get("candidate") or {}
+    benchmark = factor_result.get("benchmark") or {}
     reference_sources = benchmark.get("reference_sources") or {}
+    discovery = result.get("candidate_discovery") or {}
+    cninfo_refresh = result.get("cninfo_refresh") or {}
+    cninfo_counters = cninfo_refresh.get("counters") or {}
+    tdx_refresh = result.get("tdx_refresh") or {}
+    tdx_totals = tdx_refresh.get("totals") or {}
+    affected = result.get("affected_instruments") or {}
+    readiness = result.get("data_readiness") or {}
     lines = [
         "ℹ️ *A 股公司行动与复权因子多源基准*",
         "",
@@ -790,10 +812,10 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         f"生产表影响: `无`",
         f"范围: `{parameters.get('start_date', 'N/A')}` 至 `{parameters.get('end_date', 'N/A')}`",
         f"市场: `{','.join(parameters.get('exchanges') or [])}`",
-        f"CNInfo事件: `{(result.get('source_events') or {}).get('cninfo_rows', 0)}`",
-        f"TDX事件: `{(result.get('source_events') or {}).get('tdx_rows', 0)}`",
-        f"CNInfo因子: `{(result.get('cninfo_path') or {}).get('derived_events', 0)}`",
-        f"TDX因子: `{(result.get('tdx_path') or {}).get('derived_events', 0)}`",
+        f"CNInfo事件: `{(factor_result.get('source_events') or {}).get('cninfo_rows', 0)}`",
+        f"TDX事件: `{(factor_result.get('source_events') or {}).get('tdx_rows', 0)}`",
+        f"CNInfo因子: `{(factor_result.get('cninfo_path') or {}).get('derived_events', 0)}`",
+        f"TDX因子: `{(factor_result.get('tdx_path') or {}).get('derived_events', 0)}`",
         "事件对账: `"
         + ", ".join(
             f"{key}={totals.get(key, 0)}"
@@ -824,9 +846,14 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"可晋级生产: `{candidate.get('promotion_eligible', False)}`",
         ])
     else:
-        lines.append("候选构造: `未执行（需 build_canonical=true）`")
-    if result.get("operation") == "a_share_cninfo_primary_daily_maintenance":
-        lines.insert(1, "模式: `滚动源刷新 + 全历史本地因子重建`")
+        lines.append(
+            "生产因子候选: `未构造（build_canonical=false）`"
+            if is_daily
+            else "候选构造: `未执行（需 build_canonical=true）`"
+        )
+    if is_daily:
+        lines[0] = "ℹ️ *A 股公司行动增量日更*"
+        lines.insert(1, "模式: `公告/事件候选刷新 + 受影响标的因子重建`")
         lines.insert(
             7,
             "CNInfo市场: `"
@@ -835,6 +862,41 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             + ",".join(parameters.get("cninfo_excluded_exchanges") or [])
             + "` (`source_not_supported`)",
         )
+        incremental_lines = [
+            "候选发现: `"
+            f"status={discovery.get('status', 'N/A')}, "
+            f"selected={discovery.get('candidate_count', 0)}, "
+            f"deferred={discovery.get('deferred_count', 0)}, "
+            f"announcements={(discovery.get('announcement_scan') or {}).get('announcements_seen', 0)}"
+            "`",
+            "CNInfo刷新: `"
+            f"requested={cninfo_counters.get('requested_instruments', 0)}, "
+            f"inserted={cninfo_counters.get('observations_inserted', 0)}, "
+            f"changed={cninfo_counters.get('observations_changed', 0)}, "
+            f"unchanged={cninfo_counters.get('observations_unchanged', 0)}, "
+            f"retired={cninfo_counters.get('observations_retired', 0)}, "
+            f"errors={len(cninfo_refresh.get('errors') or [])}"
+            "`",
+            "TDX刷新: `"
+            f"processed={tdx_totals.get('processed_instruments', 0)}, "
+            f"events={tdx_totals.get('raw_events', 0)}, "
+            f"errors={tdx_totals.get('errors', 0)}, "
+            f"timeouts={tdx_totals.get('timeouts', 0)}"
+            "`",
+            "受影响标的: `"
+            f"total={affected.get('count', 0)}, "
+            f"cninfo={affected.get('cninfo_count', 0)}, "
+            f"tdx={affected.get('tdx_count', 0)}"
+            "`",
+            "历史就绪度: `"
+            f"status={readiness.get('status', 'not_evaluated')}, "
+            f"pending_factors={readiness.get('pending_factor_events', 0)}, "
+            f"incomplete_instruments={readiness.get('overall_incomplete_instruments', 0)}"
+            "`",
+        ]
+        if factor_result.get("status") == "skipped":
+            incremental_lines.append("因子重建: `无需执行（本轮无受影响标的）`")
+        lines[8:8] = incremental_lines
     return "\n".join(lines)
 
 
@@ -4671,6 +4733,12 @@ class ScheduledTasks:
         discover_candidates: bool = False,
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = False,
+        pipeline: Optional[Dict[str, Any]] = None,
+        pipeline_mode: Optional[str] = None,
+        pipeline_download_concurrency: Optional[int] = None,
+        pipeline_document_parse_concurrency: Optional[int] = None,
+        pipeline_llm_concurrency: Optional[int] = None,
+        pipeline_progress_interval_seconds: Optional[float] = None,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4683,7 +4751,8 @@ class ScheduledTasks:
                 "range=%s..%s exchanges=%s instruments=%s max_events=%s "
                 "offset=%s profile=%s resume=%s dry_run=%s download_documents=%s "
                 "run_ocr=%s refresh_documents=%s discover_candidates=%s "
-                "auto_promote_validated=%s exclude_reviewed_events=%s",
+                "auto_promote_validated=%s exclude_reviewed_events=%s "
+                "pipeline_mode=%s pipeline_llm_concurrency=%s",
                 start_date,
                 end_date,
                 exchanges,
@@ -4699,7 +4768,25 @@ class ScheduledTasks:
                 discover_candidates,
                 auto_promote_validated,
                 exclude_reviewed_events,
+                pipeline_mode,
+                pipeline_llm_concurrency,
             )
+            effective_pipeline = dict(pipeline or {})
+            pipeline_overrides = {
+                "mode": pipeline_mode,
+                "download_concurrency": pipeline_download_concurrency,
+                "document_parse_concurrency": (
+                    pipeline_document_parse_concurrency
+                ),
+                "llm_concurrency": pipeline_llm_concurrency,
+                "progress_interval_seconds": (
+                    pipeline_progress_interval_seconds
+                ),
+            }
+            effective_pipeline.update({
+                key: value for key, value in pipeline_overrides.items()
+                if value is not None
+            })
             result = await data_manager.analyze_cninfo_corporate_action_candidates(
                 start_date=start_date,
                 end_date=end_date,
@@ -4716,6 +4803,7 @@ class ScheduledTasks:
                 discover_candidates=bool(discover_candidates),
                 auto_promote_validated=bool(auto_promote_validated),
                 exclude_reviewed_events=bool(exclude_reviewed_events),
+                pipeline=effective_pipeline,
                 sample_limit=int(sample_limit),
             )
             scheduler_logger.info(
@@ -4802,6 +4890,7 @@ class ScheduledTasks:
         title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
         title_max_concurrency: int = 50,
+        pipeline: Optional[Dict[str, Any]] = None,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4835,6 +4924,7 @@ class ScheduledTasks:
             title_classification_profile=title_classification_profile,
             title_max_titles_per_request=title_max_titles_per_request,
             title_max_concurrency=title_max_concurrency,
+            pipeline=pipeline,
             sample_limit=sample_limit,
             job_config=job_config,
         )
@@ -4869,6 +4959,7 @@ class ScheduledTasks:
         title_classification_profile: str = "corporate_action_title_classification",
         title_max_titles_per_request: int = 80,
         title_max_concurrency: int = 50,
+        pipeline: Optional[Dict[str, Any]] = None,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4907,6 +4998,7 @@ class ScheduledTasks:
                     title_max_titles_per_request
                 ),
                 title_max_concurrency=int(title_max_concurrency),
+                pipeline=pipeline,
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:
@@ -5008,13 +5100,19 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         rolling_days: int = 7,
+        announcement_overlap_days: int = 3,
+        announcement_page_size: int = 30,
+        announcement_max_pages: int = 60,
+        event_lookahead_days: int = 14,
+        candidate_limit: int = 1000,
+        safety_sweep_size: int = 100,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Refresh active CNInfo/TDX events and rebuild isolated paths."""
+        """Refresh incremental CNInfo candidates and affected factor paths."""
         task_id = "a_share_cninfo_corporate_action_daily_sync"
         self._active_tasks.add(task_id)
         try:
@@ -5024,6 +5122,12 @@ class ScheduledTasks:
                 exchanges=exchanges,
                 instrument_ids=instrument_ids,
                 rolling_days=int(rolling_days),
+                announcement_overlap_days=int(announcement_overlap_days),
+                announcement_page_size=int(announcement_page_size),
+                announcement_max_pages=int(announcement_max_pages),
+                event_lookahead_days=int(event_lookahead_days),
+                candidate_limit=int(candidate_limit),
+                safety_sweep_size=int(safety_sweep_size),
                 request_interval_seconds=float(request_interval_seconds),
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 build_canonical=bool(build_canonical),

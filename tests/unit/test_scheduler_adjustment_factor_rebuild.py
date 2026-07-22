@@ -143,6 +143,71 @@ def test_cninfo_primary_factor_report_keeps_production_isolation_visible():
     assert "候选构造: `未执行" in report
 
 
+def test_cninfo_daily_report_reads_nested_incremental_results():
+    report = _format_cninfo_primary_factor_report({
+        "status": "success",
+        "operation": "a_share_cninfo_primary_daily_maintenance",
+        "parameters": {
+            "start_date": "2026-07-15",
+            "end_date": "2026-07-22",
+            "exchanges": ["SSE", "SZSE", "BSE"],
+            "cninfo_exchanges": ["SSE", "SZSE"],
+            "cninfo_excluded_exchanges": ["BSE"],
+        },
+        "candidate_discovery": {
+            "status": "success",
+            "candidate_count": 12,
+            "deferred_count": 0,
+            "announcement_scan": {"announcements_seen": 88},
+        },
+        "cninfo_refresh": {
+            "counters": {
+                "requested_instruments": 12,
+                "observations_inserted": 2,
+                "observations_changed": 3,
+                "observations_unchanged": 7,
+                "observations_retired": 1,
+            },
+            "errors": [],
+        },
+        "tdx_refresh": {
+            "totals": {
+                "processed_instruments": 5533,
+                "raw_events": 4,
+                "errors": 0,
+                "timeouts": 0,
+            }
+        },
+        "affected_instruments": {
+            "count": 5,
+            "cninfo_count": 4,
+            "tdx_count": 2,
+        },
+        "factor_rebuild": {
+            "status": "partial",
+            "source_events": {"cninfo_rows": 40, "tdx_rows": 45},
+            "cninfo_path": {"derived_events": 38},
+            "tdx_path": {"derived_events": 44},
+            "reconciliation": {"totals": {"exact_matches": 35}},
+            "candidate": {"candidate_built": False},
+        },
+        "data_readiness": {
+            "status": "partial",
+            "pending_factor_events": 2,
+            "overall_incomplete_instruments": 1,
+        },
+    })
+
+    assert "A 股公司行动增量日更" in report
+    assert "selected=12" in report
+    assert "requested=12" in report
+    assert "processed=5533" in report
+    assert "total=5" in report
+    assert "CNInfo事件: `40`" in report
+    assert "TDX因子: `44`" in report
+    assert "pending_factors=2" in report
+
+
 @pytest.mark.asyncio
 async def test_scheduler_cninfo_primary_rebuild_delegates_manual_parameters(monkeypatch):
     task = ScheduledTasks()

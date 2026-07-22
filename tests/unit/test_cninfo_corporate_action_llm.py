@@ -12,6 +12,7 @@ from data_sources.cninfo_corporate_action_documents import (
     CorporateActionDocumentBundle,
     CorporateActionPageText,
     CninfoCorporateActionDocumentService,
+    page_text_cache_key,
     select_relevant_pages,
 )
 from data_sources.cninfo_corporate_action_llm import (
@@ -1614,6 +1615,9 @@ def test_document_service_rejects_non_pdf_and_page_selection_is_bounded(tmp_path
         for index in range(1, 8)
     ]
     assert [item.page_number for item in select_relevant_pages(pages, max_pages=3)] == [2, 3, 4]
+    assert page_text_cache_key("artifact-hash", pages[0]) == page_text_cache_key(
+        "artifact-hash", pages[0]
+    )
 
 
 def test_document_service_uses_common_attachment_retriever(tmp_path, monkeypatch):
@@ -1644,11 +1648,14 @@ def test_document_service_uses_common_attachment_retriever(tmp_path, monkeypatch
         retriever=retriever,
     )
 
-    bundle = service.ingest(
+    artifact = service.retrieve_and_archive(
         announcement_id="ann-1",
         source_url="finalpage/ann-1.pdf",
     )
+    bundle = service.parse_artifact(artifact)
 
+    assert not hasattr(artifact, "content")
+    assert artifact.content_hash == bundle.content_hash
     assert bundle.source == "cninfo"
     assert bundle.source_url == "https://static.cninfo.com.cn/finalpage/ann-1.pdf"
     assert retriever.calls[0][0] == "cninfo"
@@ -1718,6 +1725,189 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     assert result["llm_metrics"]["provider_output_budget_overruns"] == 1
     assert result["llm_metrics"]["latency_ms"]["p95"] == 15
     manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
+    manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_data_manager_async_pipeline_preserves_dry_run_business_result():
+    page = _page()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "action_type": "dividend",
+        "announcement_date": date(2026, 6, 1),
+        "record_date": date(2026, 6, 11),
+        "announcement_id": "ann-1",
+        "announcement_title": "权益分派实施公告",
+        "announcement_time": date(2026, 6, 1),
+        "evidence_url": "https://example.test/a.pdf",
+    }])
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.save_corporate_action_document_bundle = AsyncMock()
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock()
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        dry_run=True,
+        download_documents=False,
+        llm_client=client,
+        pipeline={
+            "mode": "async",
+            "download_concurrency": 2,
+            "document_parse_concurrency": 2,
+            "llm_concurrency": 2,
+            "progress_interval_seconds": 60,
+        },
+    )
+
+    assert result["status"] == "dry_run"
+    assert result["counts"]["analyzed"] == 1
+    assert result["counts"]["validated_candidates"] == 1
+    assert result["auto_promotion"]["dry_run_eligible"] == 1
+    assert result["pipeline_runtime"]["mode"] == "async"
+    assert result["pipeline_runtime"]["submitted"] == 1
+    assert {
+        item["stage"] for item in result["pipeline_runtime"]["stage_snapshots"]
+    } == {
+        "cninfo_document_preparation",
+        "cninfo_semantic_resolution",
+        "cninfo_serial_persistence",
+    }
+    manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
+    manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_data_manager_async_pipeline_serializes_current_analysis_write():
+    page = _page()
+    candidate_row = {
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "action_type": "dividend",
+        "announcement_date": date(2026, 6, 1),
+        "record_date": date(2026, 6, 11),
+        "announcement_id": "ann-1",
+        "announcement_title": "权益分派实施公告",
+        "announcement_time": date(2026, 6, 1),
+        "evidence_url": "https://example.test/a.pdf",
+    }
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[candidate_row])
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock(
+        return_value={"analysis_id": 7, "status": "inserted"}
+    )
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=False,
+        dry_run=False,
+        download_documents=False,
+        auto_promote_validated=False,
+        llm_client=client,
+        pipeline={
+            "mode": "async",
+            "download_concurrency": 2,
+            "document_parse_concurrency": 2,
+            "llm_concurrency": 2,
+            "progress_interval_seconds": 60,
+        },
+    )
+
+    assert result["counts"]["persisted_analyses"] == 1
+    assert result["pipeline_runtime"]["stage_snapshots"][-1]["active"] == 0
+    manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_data_manager_async_pipeline_rejects_superseded_event_before_write():
+    page = _page()
+    candidate_row = {
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "action_type": "dividend",
+        "announcement_date": date(2026, 6, 1),
+        "record_date": date(2026, 6, 11),
+        "announcement_id": "ann-1",
+        "announcement_title": "权益分派实施公告",
+        "announcement_time": date(2026, 6, 1),
+        "evidence_url": "https://example.test/a.pdf",
+    }
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=[[candidate_row], []]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock()
+    extraction = _v3_result(page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=False,
+        dry_run=False,
+        download_documents=False,
+        auto_promote_validated=False,
+        llm_client=client,
+        pipeline={
+            "mode": "async",
+            "download_concurrency": 2,
+            "document_parse_concurrency": 2,
+            "llm_concurrency": 2,
+            "progress_interval_seconds": 60,
+        },
+    )
+
+    assert result["status"] == "partial"
+    assert result["counts"]["errors"] == 1
+    assert "stale or superseded" in result["errors"][0]["error"]
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
 
 
@@ -2183,7 +2373,8 @@ async def test_refresh_documents_rechecks_existing_announcement(monkeypatch):
         auto_promote_validated=False,
         llm_client=client,
     )
-    assert result["status"] == "success"
+    assert result["status"] == "partial"
+    assert result["review_workload"]["remaining_manual_review"] == 1
     assert ingest.call_count == 1
     manager.db_ops.save_corporate_action_document_bundle.assert_awaited_once()
 

@@ -279,6 +279,10 @@ StageRunner 负责：
 1. 应用所有：应用启动时建立，关闭时统一 `close()`；
 2. 任务所有：任务通过 async context manager 建立，任务结束后关闭。
 
+构造 `LlmClient` 时由调用方注入的 transport 默认仍由注入方所有；只有明确传入
+`owns_transport=true` 时，client 才在关闭时一并关闭该 transport。client 自行创建的 HTTP
+transport 始终由 client 所有。
+
 要求：
 
 - `close()` 幂等；
@@ -403,6 +407,12 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
 
 每级记录：成功率、429/5xx、超时、首字和总耗时、内存、文件描述符、连接数、身份正确性、
 关闭耗时。上一级不通过，不进入下一级。
+
+离线基准记录见：
+
+```text
+docs/development/common_llm_work_orchestration_benchmark.md
+```
 
 ## 16. 实施顺序
 

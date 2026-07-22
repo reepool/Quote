@@ -10,6 +10,7 @@ from typing import Any, Mapping, Optional, Sequence
 ALLOWED_OUTPUT_MODES = {"json_schema", "json_object", "prompt_only", "auto"}
 ALLOWED_MAX_OUTPUT_TOKEN_FIELDS = {"max_tokens", "max_completion_tokens"}
 ALLOWED_ROLES = {"system", "developer", "user", "assistant", "tool"}
+MAX_PROVIDER_CONCURRENCY = 60
 
 
 def _configured(value: Mapping[str, Any], name: str, default: Any) -> Any:
@@ -102,7 +103,10 @@ class LlmProfile:
     stream_include_usage: bool = True
     max_retry_after_seconds: float = 30.0
     retry_backoff_seconds: float = 0.5
+    retry_jitter_ratio: float = 0.2
     idempotency_header: str = "Idempotency-Key"
+    provider_resource: str = ""
+    default_workload: str = "direct"
 
     @classmethod
     def from_mapping(cls, name: str, value: Mapping[str, Any]) -> "LlmProfile":
@@ -168,9 +172,17 @@ class LlmProfile:
             retry_backoff_seconds=max(
                 0.0, float(_configured(value, "retry_backoff_seconds", 0.5))
             ),
+            retry_jitter_ratio=min(
+                1.0,
+                max(0.0, float(_configured(value, "retry_jitter_ratio", 0.2))),
+            ),
             idempotency_header=str(
                 _configured(value, "idempotency_header", "Idempotency-Key")
             ).strip(),
+            provider_resource=str(value.get("provider_resource") or "").strip(),
+            default_workload=str(
+                _configured(value, "default_workload", name)
+            ).strip() or str(name).strip(),
         )
 
     def safe_dict(self) -> dict[str, Any]:
@@ -195,13 +207,153 @@ class LlmProfile:
             "max_output_tokens_field": self.max_output_tokens_field,
             "stream": self.stream,
             "stream_include_usage": self.stream_include_usage,
+            "retry_jitter_ratio": self.retry_jitter_ratio,
+            "provider_resource": self.provider_resource,
+            "default_workload": self.default_workload,
         }
+
+
+@dataclass(frozen=True)
+class ProviderResourceConfig:
+    name: str
+    provider: str = "openai_compatible"
+    hard_max_concurrency: int = MAX_PROVIDER_CONCURRENCY
+    default_bulk_concurrency: int = 50
+    reserved_concurrency: int = 10
+    http_max_connections: int = 70
+    http_max_keepalive_connections: int = 60
+    workload_weights: Mapping[str, int] = field(default_factory=dict)
+
+    @classmethod
+    def from_mapping(
+        cls, name: str, value: Mapping[str, Any]
+    ) -> "ProviderResourceConfig":
+        hard_max = int(_configured(
+            value, "hard_max_concurrency", MAX_PROVIDER_CONCURRENCY
+        ))
+        if hard_max < 1 or hard_max > MAX_PROVIDER_CONCURRENCY:
+            raise ValueError(
+                f"provider resource {name} hard_max_concurrency must be between "
+                f"1 and {MAX_PROVIDER_CONCURRENCY}"
+            )
+        bulk_max = int(_configured(
+            value, "default_bulk_concurrency", min(50, hard_max)
+        ))
+        if bulk_max < 1 or bulk_max > hard_max:
+            raise ValueError(
+                f"provider resource {name} default_bulk_concurrency must be "
+                "positive and no greater than hard_max_concurrency"
+            )
+        reserved = int(_configured(
+            value, "reserved_concurrency", max(0, hard_max - bulk_max)
+        ))
+        if reserved < 0 or bulk_max + reserved > hard_max:
+            raise ValueError(
+                f"provider resource {name} reserved_concurrency is inconsistent "
+                "with the bulk and hard concurrency limits"
+            )
+        http_max = int(_configured(
+            value, "http_max_connections", max(hard_max, hard_max + 10)
+        ))
+        http_keepalive = int(_configured(
+            value, "http_max_keepalive_connections", hard_max
+        ))
+        if http_max < hard_max:
+            raise ValueError(
+                f"provider resource {name} http_max_connections must be at least "
+                "hard_max_concurrency"
+            )
+        if http_keepalive < 1 or http_keepalive > http_max:
+            raise ValueError(
+                f"provider resource {name} http_max_keepalive_connections must be "
+                "between 1 and http_max_connections"
+            )
+        raw_weights = value.get("workload_weights", {})
+        weights: dict[str, int] = {}
+        if isinstance(raw_weights, Mapping):
+            for workload, raw_weight in raw_weights.items():
+                weight = int(raw_weight)
+                if weight < 1:
+                    raise ValueError(
+                        f"provider resource {name} workload weight must be positive: "
+                        f"{workload}"
+                    )
+                weights[str(workload).strip()] = weight
+        return cls(
+            name=str(name).strip(),
+            provider=str(value.get("provider") or "openai_compatible").strip(),
+            hard_max_concurrency=hard_max,
+            default_bulk_concurrency=bulk_max,
+            reserved_concurrency=reserved,
+            http_max_connections=http_max,
+            http_max_keepalive_connections=http_keepalive,
+            workload_weights=weights,
+        )
+
+
+@dataclass(frozen=True)
+class OrchestrationConfig:
+    enabled: bool = True
+    default_queue_size: int = 200
+    progress_interval_seconds: float = 30.0
+    resource_limits: Mapping[str, int] = field(default_factory=lambda: {
+        "document_download": 8,
+        "document_parse": 8,
+        "sqlite_writer": 1,
+    })
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any] | None) -> "OrchestrationConfig":
+        raw = value if isinstance(value, Mapping) else {}
+        queue_size = int(_configured(raw, "default_queue_size", 200))
+        if queue_size < 1:
+            raise ValueError("LLM orchestration default_queue_size must be positive")
+        progress_interval = float(_configured(
+            raw, "progress_interval_seconds", 30.0
+        ))
+        if progress_interval <= 0:
+            raise ValueError(
+                "LLM orchestration progress_interval_seconds must be positive"
+            )
+        defaults = {
+            "document_download": 8,
+            "document_parse": 8,
+            "sqlite_writer": 1,
+        }
+        raw_limits = raw.get("resource_limits", {})
+        if isinstance(raw_limits, Mapping):
+            for resource_name, raw_limit in raw_limits.items():
+                limit = int(raw_limit)
+                if limit < 1:
+                    raise ValueError(
+                        f"LLM orchestration resource limit must be positive: "
+                        f"{resource_name}"
+                    )
+                defaults[str(resource_name).strip()] = limit
+        if defaults.get("document_parse", 1) > 8:
+            raise ValueError(
+                "LLM orchestration document_parse resource limit must not exceed 8"
+            )
+        if defaults.get("sqlite_writer", 1) != 1:
+            raise ValueError(
+                "LLM orchestration sqlite_writer resource limit must be 1 for SQLite"
+            )
+        return cls(
+            enabled=raw.get("enabled", True) is True,
+            default_queue_size=queue_size,
+            progress_interval_seconds=progress_interval,
+            resource_limits=defaults,
+        )
 
 
 @dataclass(frozen=True)
 class LlmConfig:
     enabled: bool = False
     profiles: Mapping[str, LlmProfile] = field(default_factory=dict)
+    provider_resources: Mapping[str, ProviderResourceConfig] = field(
+        default_factory=dict
+    )
+    orchestration: OrchestrationConfig = field(default_factory=OrchestrationConfig)
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any] | None) -> "LlmConfig":
@@ -212,7 +364,55 @@ class LlmConfig:
             for name, profile in profiles_raw.items():
                 if isinstance(profile, Mapping):
                     profiles[str(name)] = LlmProfile.from_mapping(str(name), profile)
-        return cls(enabled=raw.get("enabled") is True, profiles=profiles)
+        resources_raw = raw.get("provider_resources", {})
+        resources: dict[str, ProviderResourceConfig] = {}
+        if isinstance(resources_raw, Mapping):
+            for name, resource in resources_raw.items():
+                if isinstance(resource, Mapping):
+                    resources[str(name)] = ProviderResourceConfig.from_mapping(
+                        str(name), resource
+                    )
+        for profile in profiles.values():
+            resource_name = profile.provider_resource or cls.default_resource_name(
+                profile
+            )
+            if resource_name not in resources:
+                resources[resource_name] = ProviderResourceConfig(
+                    name=resource_name,
+                    provider=profile.provider,
+                )
+            resource = resources[resource_name]
+            if resource.provider != profile.provider:
+                raise ValueError(
+                    f"LLM profile {profile.name} provider does not match resource "
+                    f"{resource_name}"
+                )
+            if profile.max_concurrency > resource.hard_max_concurrency:
+                raise ValueError(
+                    f"LLM profile {profile.name} max_concurrency exceeds provider "
+                    f"resource {resource_name} hard limit"
+                )
+        return cls(
+            enabled=raw.get("enabled") is True,
+            profiles=profiles,
+            provider_resources=resources,
+            orchestration=OrchestrationConfig.from_mapping(
+                raw.get("orchestration")
+            ),
+        )
+
+    @staticmethod
+    def default_resource_name(profile: LlmProfile) -> str:
+        return f"{profile.provider}:{profile.api_key_env}"
+
+    def resource_for_profile(self, profile: LlmProfile) -> ProviderResourceConfig:
+        name = profile.provider_resource or self.default_resource_name(profile)
+        try:
+            return self.provider_resources[name]
+        except KeyError as exc:
+            raise ValueError(
+                f"LLM profile {profile.name} references unknown provider resource: {name}"
+            ) from exc
 
 
 @dataclass(frozen=True)
@@ -250,6 +450,7 @@ class LlmResponse:
     latency_ms: int
     attempt_count: int
     warnings: tuple[str, ...] = ()
+    lineage: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

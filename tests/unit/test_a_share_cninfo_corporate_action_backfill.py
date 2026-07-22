@@ -130,6 +130,9 @@ async def test_cninfo_corporate_action_write_resumes_without_second_fetch(
 
     assert first["status"] == "success"
     assert first["counters"]["observations_inserted"] == 1
+    assert first["observed_instrument_ids"] == ["000001.SZ"]
+    assert first["inserted_instrument_ids"] == ["000001.SZ"]
+    assert first["affected_instrument_ids"] == ["000001.SZ"]
     assert second["universe"]["pending_count"] == 0
     assert provider.fetch_dividends.call_count == 1
     assert provider.fetch_allotments.call_count == 1
@@ -190,4 +193,5 @@ async def test_cninfo_indeterminate_response_remains_pending(tmp_path, monkeypat
     assert result["universe"]["pending_count"] == 1
     assert result["counters"]["indeterminate"] == 1
     assert result["errors"][0]["source_profile"] == "cninfo_dividend"
+    assert result["affected_instrument_ids"] == []
     manager.db_ops.reconcile_corporate_action_observation_snapshot.assert_not_awaited()

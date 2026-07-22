@@ -201,8 +201,8 @@ async def test_discovery_dry_run_scans_candidates_but_does_not_write():
     assert result["status"] == "dry_run"
     assert result["parameters"]["scanned_exchanges"] == ["SSE"]
     assert result["parameters"]["excluded_exchanges"] == ["BSE"]
-    assert result["parameters"]["title_max_concurrency"] == 60
-    assert result["title_classification"]["max_concurrency"] == 60
+    assert result["parameters"]["title_max_concurrency"] == 50
+    assert result["title_classification"]["max_concurrency"] == 50
     assert result["evidence"]["candidate_count"] == 1
     assert result["evidence"]["resolved_count"] == 0
     manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()
@@ -503,6 +503,44 @@ async def test_llm_title_discovery_accepts_compensation_share_without_keywords()
         "announcement_role"
     ] == "compensation_share_distribution"
     manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_llm_title_discovery_persists_before_publishing_ready_event():
+    manager = _manager()
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response())
+    )
+    order = []
+
+    async def save_evidence(rows, *, ingestion_run_id):
+        order.append(("saved", rows[0]["source_event_key"]))
+        return {
+            "inserted": 1,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+        }
+
+    async def on_event_ready(payload):
+        order.append(("ready", payload["source_event_key"]))
+
+    manager.db_ops.save_corporate_action_effective_date_evidence = AsyncMock(
+        side_effect=save_evidence
+    )
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+        on_event_ready=on_event_ready,
+    )
+
+    assert result["status"] == "success"
+    assert order == [("saved", "event-1"), ("ready", "event-1")]
+    assert manager.db_ops.save_corporate_action_effective_date_evidence.await_count == 1
 
 
 @pytest.mark.asyncio

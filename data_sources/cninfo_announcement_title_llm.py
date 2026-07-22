@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+import inspect
 import json
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any, Awaitable, Callable, Dict, Mapping, Optional, Sequence
 
 from utils.llm import (
     LlmClientProtocol,
@@ -20,7 +21,7 @@ TITLE_CLASSIFICATION_SCHEMA_VERSION = "cninfo_announcement_title_classification.
 TITLE_CLASSIFICATION_PROMPT_VERSION = "cninfo_announcement_title_prompt.v1"
 DEFAULT_MAX_TITLES_PER_REQUEST = 80
 DEFAULT_MAX_CONCURRENCY = 50
-MAX_CONCURRENCY = 60
+MAX_CONCURRENCY = 50
 DEFAULT_PROFILE = "corporate_action_title_classification"
 MAX_TITLE_CLASSIFICATION_OUTPUT_TOKENS = 16384
 
@@ -118,6 +119,21 @@ class TitleClassificationBatch:
     input_title_count: int
     max_concurrency: int
     peak_concurrency: int
+
+
+@dataclass(frozen=True)
+class TitleClassificationEventOutcome:
+    source_event_key: str
+    decisions: Dict[str, Dict[str, Any]]
+    applicability: Optional[Dict[str, str]]
+    lineage: tuple[Dict[str, Any], ...]
+    error: Optional[str] = None
+
+
+TitleEventCallback = Callable[
+    [TitleClassificationEventOutcome],
+    Any | Awaitable[Any],
+]
 
 
 @dataclass(frozen=True)
@@ -234,6 +250,7 @@ class CninfoAnnouncementTitleClassifier:
         events: Sequence[Mapping[str, Any]],
         *,
         tolerate_event_errors: bool = False,
+        on_event_complete: Optional[TitleEventCallback] = None,
     ) -> TitleClassificationBatch:
         normalized_events = [_clean_event(event) for event in events]
         event_keys = [event["source_event_key"] for event in normalized_events]
@@ -316,6 +333,14 @@ class CninfoAnnouncementTitleClassifier:
                     schema_version=TITLE_CLASSIFICATION_SCHEMA_VERSION,
                     max_output_tokens=MAX_TITLE_CLASSIFICATION_OUTPUT_TOKENS,
                     idempotency_key=work.input_hash,
+                    metadata={
+                        "workload": "corporate_action_title_classification",
+                        "stage": "title_classification",
+                        "stage_sequence": 1,
+                        "business_item_key": work.input_hash,
+                        "input_hash": work.input_hash,
+                        "bulk": True,
+                    },
                     content_is_untrusted=True,
                 ))
                 return _ChunkOutcome(work=work, response=response)
@@ -324,85 +349,29 @@ class CninfoAnnouncementTitleClassifier:
             finally:
                 active_requests -= 1
 
-        work_queue: asyncio.Queue[_ChunkWork] = asyncio.Queue()
-        for work in work_items:
-            work_queue.put_nowait(work)
+        work_queue: asyncio.Queue[_ChunkWork] = asyncio.Queue(
+            maxsize=max(1, self.max_concurrency * 2)
+        )
+        outcome_queue: asyncio.Queue[_ChunkOutcome] = asyncio.Queue(
+            maxsize=max(1, self.max_concurrency * 2)
+        )
 
-        async def worker() -> list[_ChunkOutcome]:
-            worker_outcomes = []
+        async def produce() -> None:
+            for work in work_items:
+                await work_queue.put(work)
+
+        async def worker() -> None:
             while True:
+                work = await work_queue.get()
                 try:
-                    work = work_queue.get_nowait()
-                except asyncio.QueueEmpty:
-                    return worker_outcomes
-                try:
-                    worker_outcomes.append(await execute(work))
+                    await outcome_queue.put(await execute(work))
                 finally:
                     work_queue.task_done()
 
-        worker_count = min(self.max_concurrency, len(work_items))
-        grouped_outcomes = await asyncio.gather(*(
-            worker() for _ in range(worker_count)
-        ))
-        outcomes = [
-            outcome
-            for worker_outcomes in grouped_outcomes
-            for outcome in worker_outcomes
-        ]
-        for outcome in sorted(
-            outcomes, key=lambda item: item.work.chunk_index
-        ):
-            chunk_index = outcome.work.chunk_index
-            chunk = outcome.work.events
-            if outcome.error is not None:
-                if not tolerate_event_errors:
-                    raise outcome.error
-                error = (
-                    "title classification request failed: "
-                    f"{outcome.error}"
-                )
-                for event in chunk:
-                    errors[event["source_event_key"]] = error
-                continue
-            response = outcome.response
-            if response is None:
-                exc = RuntimeError(
-                    "title classification request completed without a response"
-                )
-                if not tolerate_event_errors:
-                    raise exc
-                for event in chunk:
-                    errors[event["source_event_key"]] = str(exc)
-                continue
-            try:
-                chunk_errors = self._merge_response(
-                    chunk,
-                    response.data,
-                    decisions=decisions,
-                    applicability=applicability,
-                )
-                errors.update(chunk_errors)
-            except Exception as exc:
-                if not tolerate_event_errors:
-                    raise
-                error = f"title classification request failed: {exc}"
-                for event in chunk:
-                    errors[event["source_event_key"]] = error
-                continue
-            response_lineage = {
-                "chunk_index": chunk_index,
-                "profile": self.profile,
-                "model": response.model,
-                "prompt_version": TITLE_CLASSIFICATION_PROMPT_VERSION,
-                "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
-                "request_hash": response.request_hash,
-                "response_hash": response.response_hash,
-                "request_id": response.request_id,
-                "latency_ms": response.latency_ms,
-                "attempt_count": response.attempt_count,
-            }
-            for event in chunk:
-                lineage[event["source_event_key"]].append(response_lineage)
+        event_chunk_counts = {event_key: 0 for event_key in event_keys}
+        for work in work_items:
+            for event in work.events:
+                event_chunk_counts[event["source_event_key"]] += 1
 
         expected_by_event = {
             event["source_event_key"]: {
@@ -410,7 +379,14 @@ class CninfoAnnouncementTitleClassifier:
             }
             for event in normalized_events
         }
-        for event_key, expected_ids in expected_by_event.items():
+        completed_events: set[str] = set()
+        strict_error: Optional[Exception] = None
+
+        async def publish_event(event_key: str) -> None:
+            if event_key in completed_events:
+                return
+            completed_events.add(event_key)
+            expected_ids = expected_by_event[event_key]
             if event_key not in errors and set(decisions[event_key]) != expected_ids:
                 errors[event_key] = (
                     f"title classification coverage mismatch for {event_key}"
@@ -420,6 +396,105 @@ class CninfoAnnouncementTitleClassifier:
             if event_key in errors:
                 decisions[event_key] = {}
                 applicability.pop(event_key, None)
+            if on_event_complete is None:
+                return
+            callback_result = on_event_complete(TitleClassificationEventOutcome(
+                source_event_key=event_key,
+                decisions=dict(decisions[event_key]),
+                applicability=(
+                    dict(applicability[event_key])
+                    if event_key in applicability else None
+                ),
+                lineage=tuple(lineage[event_key]),
+                error=errors.get(event_key),
+            ))
+            if inspect.isawaitable(callback_result):
+                await callback_result
+
+        worker_count = min(self.max_concurrency, len(work_items))
+        if worker_count:
+            producer = asyncio.create_task(produce())
+            workers = [asyncio.create_task(worker()) for _ in range(worker_count)]
+            try:
+                for _ in range(len(work_items)):
+                    outcome = await outcome_queue.get()
+                    try:
+                        chunk_index = outcome.work.chunk_index
+                        chunk = outcome.work.events
+                        if outcome.error is not None:
+                            if not tolerate_event_errors:
+                                strict_error = strict_error or outcome.error
+                            error = (
+                                "title classification request failed: "
+                                f"{outcome.error}"
+                            )
+                            for event in chunk:
+                                errors[event["source_event_key"]] = error
+                        else:
+                            response = outcome.response
+                            if response is None:
+                                exc = RuntimeError(
+                                    "title classification request completed without a response"
+                                )
+                                if not tolerate_event_errors:
+                                    strict_error = strict_error or exc
+                                for event in chunk:
+                                    errors[event["source_event_key"]] = str(exc)
+                            else:
+                                try:
+                                    chunk_errors = self._merge_response(
+                                        chunk,
+                                        response.data,
+                                        decisions=decisions,
+                                        applicability=applicability,
+                                    )
+                                    errors.update(chunk_errors)
+                                except Exception as exc:
+                                    if not tolerate_event_errors:
+                                        strict_error = strict_error or exc
+                                    error = (
+                                        "title classification request failed: "
+                                        f"{exc}"
+                                    )
+                                    for event in chunk:
+                                        errors[event["source_event_key"]] = error
+                                else:
+                                    response_lineage = {
+                                        "chunk_index": chunk_index,
+                                        "profile": self.profile,
+                                        "model": response.model,
+                                        "prompt_version": TITLE_CLASSIFICATION_PROMPT_VERSION,
+                                        "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
+                                        "request_hash": response.request_hash,
+                                        "response_hash": response.response_hash,
+                                        "request_id": response.request_id,
+                                        "latency_ms": response.latency_ms,
+                                        "attempt_count": response.attempt_count,
+                                    }
+                                    for event in chunk:
+                                        lineage[event["source_event_key"]].append(
+                                            response_lineage
+                                        )
+                        for event in chunk:
+                            event_key = event["source_event_key"]
+                            event_chunk_counts[event_key] -= 1
+                            if event_chunk_counts[event_key] == 0:
+                                lineage[event_key].sort(
+                                    key=lambda item: int(item["chunk_index"])
+                                )
+                                await publish_event(event_key)
+                    finally:
+                        outcome_queue.task_done()
+                await producer
+            finally:
+                for task in workers:
+                    task.cancel()
+                await asyncio.gather(*workers, return_exceptions=True)
+                if not producer.done():
+                    producer.cancel()
+                    await asyncio.gather(producer, return_exceptions=True)
+        if strict_error is not None:
+            raise strict_error
         if errors and not tolerate_event_errors:
             first_event = next(iter(errors))
             raise ValueError(errors[first_event])

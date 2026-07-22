@@ -31,6 +31,12 @@ docs/development/cninfo_corporate_action_llm_resolution_requirements.md
 openspec/changes/migrate-cninfo-corporate-actions-to-async-pipeline/
 ```
 
+串行回归基线：
+
+```text
+docs/development/cninfo_corporate_action_async_baseline.md
+```
+
 ## 2. 与旧文档的关系
 
 旧文档中的以下内容继续有效：

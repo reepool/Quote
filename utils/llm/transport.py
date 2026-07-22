@@ -39,15 +39,41 @@ class AsyncTransport(Protocol):
 class HttpxOpenAICompatibleTransport:
     """Minimal provider-neutral transport using httpx only."""
 
-    def __init__(self, *, client: Any = None) -> None:
+    def __init__(
+        self,
+        *,
+        client: Any = None,
+        max_connections: int = 100,
+        max_keepalive_connections: int = 20,
+    ) -> None:
+        if int(max_connections) < 1:
+            raise ValueError("HTTP max_connections must be positive")
+        if (
+            int(max_keepalive_connections) < 1
+            or int(max_keepalive_connections) > int(max_connections)
+        ):
+            raise ValueError(
+                "HTTP max_keepalive_connections must be positive and no greater "
+                "than max_connections"
+            )
         self._client = client
         self._owns_client = client is None
+        self._max_connections = int(max_connections)
+        self._max_keepalive_connections = int(max_keepalive_connections)
+        self._closed = False
 
     async def _get_client(self) -> Any:
+        if self._closed:
+            raise RuntimeError("LLM HTTP transport is closed")
         if self._client is None:
             import httpx
 
-            self._client = httpx.AsyncClient()
+            self._client = httpx.AsyncClient(
+                limits=httpx.Limits(
+                    max_connections=self._max_connections,
+                    max_keepalive_connections=self._max_keepalive_connections,
+                )
+            )
         return self._client
 
     async def send(
@@ -165,6 +191,9 @@ class HttpxOpenAICompatibleTransport:
             raise LlmTransientTransportError("LLM provider transport failed") from exc
 
     async def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
         if self._client is not None and self._owns_client:
             client = self._client
             self._client = None
