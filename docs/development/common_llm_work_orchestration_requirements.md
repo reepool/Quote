@@ -113,7 +113,7 @@ research/announcements/
 | 资源 | 默认值 | 硬约束/说明 |
 |---|---:|---|
 | provider/account LLM 并发 | 60 | 已确认的账号最高并发，不得配置更高 |
-| 批量 LLM 目标并发 | 50 | 预留 10 路给短任务、健康检查和运维 |
+| 批量 LLM 配置上限 | 50 | 预留 10 路给短任务、健康检查和运维；业务默认值可更低 |
 | PDF/OCR 解析 | 8 | CPU、内存独立约束 |
 | SQLite writer | 1 | SQLite 单写者，允许有界批量提交 |
 | 文档下载 | 独立配置 | 必须服从来源限速，不跟随 LLM 并发 |
@@ -360,7 +360,12 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
         "default_bulk_concurrency": 50,
         "reserved_concurrency": 10,
         "http_max_connections": 70,
-        "http_max_keepalive_connections": 60
+        "http_max_keepalive_connections": 60,
+        "adaptive_concurrency_enabled": true,
+        "adaptive_min_bulk_concurrency": 5,
+        "adaptive_recovery_successes": 10,
+        "rate_limit_cooldown_seconds": 10.0,
+        "transient_cooldown_seconds": 2.0
       }
     },
     "orchestration": {
@@ -380,6 +385,7 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
 - bulk 不超过 hard max；
 - reserved 与 bulk 关系合理；
 - HTTP pool 能容纳实际 client 并发；
+- 429、503、52x 和传输失败必须触发 provider 级冷却和并发降档，连续成功后只能渐进恢复；
 - 队列和 worker 均为有界正整数；
 - profile 必须映射到已声明的 provider resource。
 

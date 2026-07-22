@@ -29,6 +29,7 @@ from data_sources.cninfo_corporate_action_documents import (
 
 CNINFO_PIPELINE_SUPPORTED_EXCHANGES = frozenset({"SSE", "SZSE"})
 CNINFO_PIPELINE_MAX_LLM_CONCURRENCY = 50
+CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY = 15
 CNINFO_PIPELINE_MAX_PARSE_CONCURRENCY = 8
 
 
@@ -63,7 +64,7 @@ class CninfoCorporateActionPipelineConfig:
     title_max_titles_per_request: int = 80
     download_concurrency: int = 8
     document_parse_concurrency: int = 8
-    llm_concurrency: int = 50
+    llm_concurrency: int = CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY
     writer_batch_size: int = 10
     writer_concurrency: int = 1
     progress_interval_seconds: float = 30.0
@@ -88,7 +89,9 @@ class CninfoCorporateActionPipelineConfig:
             document_parse_concurrency=int(
                 raw.get("document_parse_concurrency", 8)
             ),
-            llm_concurrency=int(raw.get("llm_concurrency", 50)),
+            llm_concurrency=int(raw.get(
+                "llm_concurrency", CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY
+            )),
             writer_batch_size=int(raw.get("writer_batch_size", 10)),
             writer_concurrency=int(raw.get("writer_concurrency", 1)),
             progress_interval_seconds=float(

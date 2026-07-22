@@ -21675,6 +21675,131 @@ class DataManager:
         outcome.update(status="promoted", promoted=True, review=review.get("review"))
         return outcome
 
+    def _revalidate_resumable_cninfo_analysis(
+        self,
+        *,
+        analysis: Optional[Dict[str, Any]],
+        event: Dict[str, Any],
+        pages: List[Any],
+        allowed_start: date,
+        allowed_end: date,
+    ) -> Optional[Dict[str, Any]]:
+        """Reuse only analyses whose completed semantic output passes current gates."""
+        if not analysis:
+            return None
+        result = deepcopy(analysis.get("result") or {})
+        verifier = result.get("_semantic_verifier")
+        verifier_status = (
+            str(verifier.get("status") or "").strip().lower()
+            if isinstance(verifier, dict)
+            else ""
+        )
+        if analysis.get("validation_status") == "validated_candidate":
+            return analysis
+        if verifier_status != "success":
+            dm_logger.info(
+                "[DataManager] CNInfo resume requires LLM retry: event=%s "
+                "prior_validation=%s verifier_status=%s",
+                event.get("source_event_key"),
+                analysis.get("validation_status"),
+                verifier_status or "missing",
+            )
+            return None
+        from data_sources.cninfo_corporate_action_llm import (
+            PARSER_VERSION,
+            validate_analysis,
+        )
+
+        result["analysis_status"] = "resolved_candidate"
+        try:
+            status, gates, normalized = validate_analysis(
+                result,
+                instrument_id=str(event.get("instrument_id") or ""),
+                source_event_key=str(event.get("source_event_key") or ""),
+                pages=pages,
+                allowed_start=allowed_start,
+                allowed_end=allowed_end,
+                source_profile=event.get("source_profile"),
+                action_type=event.get("action_type"),
+                candidate_titles=[
+                    str(item.get("announcement_title") or "")
+                    for item in event.get("candidates") or []
+                    if isinstance(item, dict)
+                ],
+            )
+        except Exception as exc:
+            dm_logger.warning(
+                "[DataManager] CNInfo resume revalidation failed: event=%s detail=%s",
+                event.get("source_event_key"),
+                str(exc),
+            )
+            return None
+        if not gates.get("semantic_verification_complete"):
+            dm_logger.info(
+                "[DataManager] CNInfo resume requires semantic repair: event=%s",
+                event.get("source_event_key"),
+            )
+            return None
+        for key, value in result.items():
+            if str(key).startswith("_") and key not in normalized:
+                normalized[key] = value
+        revalidated = dict(analysis)
+        revalidated.update({
+            "analysis_status": normalized.get("analysis_status"),
+            "validation_status": status,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+            "error_code": None,
+            "error_message": None,
+            "_resume_revalidated": True,
+        })
+        dm_logger.info(
+            "[DataManager] CNInfo prior analysis revalidated: event=%s status=%s "
+            "failed_gates=%s",
+            event.get("source_event_key"),
+            status,
+            sorted(key for key, value in gates.items() if not bool(value)),
+        )
+        return revalidated
+
+    async def _persist_revalidated_cninfo_analysis(
+        self,
+        *,
+        analysis: Dict[str, Any],
+        artifact_ids: List[int],
+        run_id: str,
+        fallback_profile: str,
+    ) -> tuple[Dict[str, Any], bool]:
+        if not analysis.get("_resume_revalidated"):
+            return analysis, False
+        saved = await self.db_ops.save_corporate_action_llm_analysis({
+            "analysis_key": analysis.get("analysis_key"),
+            "instrument_id": analysis.get("instrument_id"),
+            "source_event_key": analysis.get("source_event_key"),
+            "analysis_status": analysis.get("analysis_status"),
+            "validation_status": analysis.get("validation_status"),
+            "profile": analysis.get("profile") or fallback_profile,
+            "model": analysis.get("model"),
+            "schema_version": analysis.get("schema_version"),
+            "prompt_version": analysis.get("prompt_version"),
+            "parser_version": analysis.get("parser_version"),
+            "input_hash": analysis.get("input_hash"),
+            "response_hash": analysis.get("response_hash"),
+            "request_id": analysis.get("request_id"),
+            "artifact_ids": artifact_ids,
+            "result": analysis.get("result") or {},
+            "gate_results": analysis.get("gate_results") or {},
+            "usage": analysis.get("usage") or {},
+            "latency_ms": analysis.get("latency_ms"),
+            "attempt_count": analysis.get("attempt_count"),
+            "ingestion_run_id": run_id,
+        })
+        updated = dict(analysis)
+        if isinstance(saved, dict) and saved.get("analysis_id"):
+            updated["analysis_id"] = saved["analysis_id"]
+        return updated, bool(saved)
+
     async def _run_cninfo_candidate_resolution_pipeline(
         self,
         *,
@@ -21898,6 +22023,13 @@ class DataManager:
                                 "no_matching_evidence",
                             }
                         ), None)
+                        matching_analysis = self._revalidate_resumable_cninfo_analysis(
+                            analysis=matching_analysis,
+                            event=event,
+                            pages=pages,
+                            allowed_start=normalized_start,
+                            allowed_end=normalized_end,
+                        )
                     analysis = None
                     analysis_error = None
                     if matching_analysis is None:
@@ -21985,6 +22117,16 @@ class DataManager:
                 }
                 matching_analysis = data.get("matching_analysis")
                 if matching_analysis is not None:
+                    if not dry_run:
+                        matching_analysis, persisted = (
+                            await self._persist_revalidated_cninfo_analysis(
+                                analysis=matching_analysis,
+                                artifact_ids=artifact_ids,
+                                run_id=run_id,
+                                fallback_profile=profile,
+                            )
+                        )
+                        summary["persisted_analysis"] = persisted
                     summary["resumed"] = True
                     summary["analysis"] = matching_analysis
                     summary["promotion"] = (
@@ -22661,6 +22803,8 @@ class DataManager:
                     signatures[signature] = int(signatures.get(signature, 0)) + 1
                     result["errors"].append(analysis_error)
                 analysis = summary.get("analysis")
+                if summary.get("persisted_analysis"):
+                    result["counts"]["persisted_analyses"] += 1
                 if summary.get("resumed"):
                     result["counts"]["resumed"] += 1
                 elif analysis:
@@ -22709,8 +22853,6 @@ class DataManager:
                             "result": analysis.get("result") or {},
                             "auto_promotion": summary.get("promotion"),
                         })
-                    if summary.get("persisted_analysis"):
-                        result["counts"]["persisted_analyses"] += 1
                 promotion_outcome = summary.get("promotion")
                 if promotion_outcome:
                     fallback_tier = "deep_review"
@@ -22952,7 +23094,38 @@ class DataManager:
                             and item.get("validation_status")
                             in {"validated_candidate", "manual_required", "no_matching_evidence"}
                         ), None)
+                        matching_analysis = self._revalidate_resumable_cninfo_analysis(
+                            analysis=matching_analysis,
+                            event=event,
+                            pages=pages,
+                            allowed_start=normalized_start,
+                            allowed_end=normalized_end,
+                        )
                         if matching_analysis is not None:
+                            try:
+                                matching_analysis, persisted = (
+                                    await self._persist_revalidated_cninfo_analysis(
+                                        analysis=matching_analysis,
+                                        artifact_ids=artifact_ids,
+                                        run_id=run_id,
+                                        fallback_profile=profile,
+                                    )
+                                )
+                            except Exception as exc:
+                                result["counts"]["errors"] += 1
+                                result["errors"].append({
+                                    "source_event_key": event["source_event_key"],
+                                    "code": "revalidated_analysis_persistence_failed",
+                                    "error": str(exc),
+                                })
+                                dm_logger.exception(
+                                    "[DataManager] CNInfo revalidated analysis persistence failed; "
+                                    "prior analysis retained: run_id=%s event=%s",
+                                    run_id,
+                                    event.get("source_event_key"),
+                                )
+                                continue
+                            result["counts"]["persisted_analyses"] += int(persisted)
                             classification = (
                                 (matching_analysis.get("result") or {}).get(
                                     "_review_classification"

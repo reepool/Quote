@@ -222,6 +222,11 @@ class ProviderResourceConfig:
     reserved_concurrency: int = 10
     http_max_connections: int = 70
     http_max_keepalive_connections: int = 60
+    adaptive_concurrency_enabled: bool = True
+    adaptive_min_bulk_concurrency: int = 5
+    adaptive_recovery_successes: int = 10
+    rate_limit_cooldown_seconds: float = 0.0
+    transient_cooldown_seconds: float = 0.0
     workload_weights: Mapping[str, int] = field(default_factory=dict)
 
     @classmethod
@@ -268,6 +273,36 @@ class ProviderResourceConfig:
                 f"provider resource {name} http_max_keepalive_connections must be "
                 "between 1 and http_max_connections"
             )
+        adaptive_enabled = bool(_configured(
+            value, "adaptive_concurrency_enabled", True
+        ))
+        adaptive_min = int(_configured(
+            value,
+            "adaptive_min_bulk_concurrency",
+            min(5, bulk_max),
+        ))
+        if adaptive_min < 1 or adaptive_min > bulk_max:
+            raise ValueError(
+                f"provider resource {name} adaptive_min_bulk_concurrency must "
+                "be positive and no greater than default_bulk_concurrency"
+            )
+        recovery_successes = int(_configured(
+            value, "adaptive_recovery_successes", 10
+        ))
+        if recovery_successes < 1:
+            raise ValueError(
+                f"provider resource {name} adaptive_recovery_successes must be positive"
+            )
+        rate_limit_cooldown = float(_configured(
+            value, "rate_limit_cooldown_seconds", 0.0
+        ))
+        transient_cooldown = float(_configured(
+            value, "transient_cooldown_seconds", 0.0
+        ))
+        if rate_limit_cooldown < 0 or transient_cooldown < 0:
+            raise ValueError(
+                f"provider resource {name} adaptive cooldowns must not be negative"
+            )
         raw_weights = value.get("workload_weights", {})
         weights: dict[str, int] = {}
         if isinstance(raw_weights, Mapping):
@@ -287,6 +322,11 @@ class ProviderResourceConfig:
             reserved_concurrency=reserved,
             http_max_connections=http_max,
             http_max_keepalive_connections=http_keepalive,
+            adaptive_concurrency_enabled=adaptive_enabled,
+            adaptive_min_bulk_concurrency=adaptive_min,
+            adaptive_recovery_successes=recovery_successes,
+            rate_limit_cooldown_seconds=rate_limit_cooldown,
+            transient_cooldown_seconds=transient_cooldown,
             workload_weights=weights,
         )
 

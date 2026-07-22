@@ -93,6 +93,10 @@ class ProviderSnapshot:
     cancelled: int
     deadline_exceeded: int
     cooldown_remaining_seconds: float
+    configured_bulk_concurrency: int
+    effective_bulk_concurrency: int
+    adaptive_retryable_failures: int
+    adaptive_success_streak: int
     total_admission_wait_ms: int
 
 

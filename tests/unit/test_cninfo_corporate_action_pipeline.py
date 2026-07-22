@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 from data_sources.cninfo_corporate_action_pipeline import (
     ArtifactPayload,
+    CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY,
     CNINFO_PIPELINE_MAX_LLM_CONCURRENCY,
     CninfoCorporateActionResolutionPipeline,
     CninfoCorporateActionPipelineConfig,
@@ -43,7 +44,7 @@ def _identity(stage=CorporateActionPipelineStage.INVENTORY, sequence=0):
 def test_pipeline_config_bounds_resources_and_keeps_serial_rollback():
     config = CninfoCorporateActionPipelineConfig.from_mapping({})
     assert config.mode == "serial"
-    assert config.llm_concurrency == CNINFO_PIPELINE_MAX_LLM_CONCURRENCY
+    assert config.llm_concurrency == CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY == 15
     assert config.document_parse_concurrency == 8
     assert config.writer_concurrency == 1
     assert config.verification_policy == "always"

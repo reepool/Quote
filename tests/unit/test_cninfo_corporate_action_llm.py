@@ -12,6 +12,7 @@ from data_sources.cninfo_corporate_action_documents import (
     CorporateActionDocumentBundle,
     CorporateActionPageText,
     CninfoCorporateActionDocumentService,
+    extract_html_pages,
     page_text_cache_key,
     select_relevant_pages,
 )
@@ -32,6 +33,7 @@ from data_sources.cninfo_corporate_action_llm import (
     SCHEMA_VERSION,
     SEMANTIC_VERIFICATION_SCHEMA_VERSION,
     _derive_economic_terms,
+    _economic_semantic_binding_supported,
     _semantic_verification_payload,
     analysis_schema_for_version,
     classify_auto_promotion_eligibility,
@@ -223,6 +225,93 @@ def _eligible_auto_promotion_case():
     normalized["_semantic_verification_complete"] = True
     normalized["_input_context"] = {"context_complete": True}
     return page, status, gates, normalized
+
+
+def test_economic_binding_accepts_descriptive_unit_and_post_value_relation():
+    ratio_quote = "流通股股东每持有 10 股流通股股份将获得转增的 8.85 股股份。"
+    ratio = {
+        "fact_type": "capitalization_ratio",
+        "value": 8.85,
+        "unit": "per_10_shares",
+        "beneficiary_scope": "circulating_shareholders",
+    }
+    ratio_binding = {
+        "evidence_id": "ratio",
+        "subject_text": "流通股股东每持有 10 股流通股股份",
+        "relation_text": "将获得转增的",
+        "value_text": "8.85",
+        "unit_text": "股股份",
+        "basis_text": "每持有 10 股流通股股份",
+    }
+    assert _economic_semantic_binding_supported(
+        ratio, ratio_binding, {"ratio": ratio_quote}
+    )
+
+    base_quote = "以现有流通股股本 160,800,000 股为基数实施本次方案。"
+    base = {
+        "fact_type": "base_share_count",
+        "value": 160800000,
+        "unit": "shares",
+        "beneficiary_scope": "circulating_shareholders",
+    }
+    base_binding = {
+        "evidence_id": "base",
+        "subject_text": "现有流通股股本",
+        "relation_text": "为基数",
+        "value_text": "160,800,000",
+        "unit_text": "股",
+        "basis_text": None,
+    }
+    assert _economic_semantic_binding_supported(
+        base, base_binding, {"base": base_quote}
+    )
+
+
+def test_resume_revalidates_successful_semantics_and_retries_failed_verifier():
+    page = _page()
+    result = _v3_result(page)
+    result.update({
+        "analysis_status": "manual_required",
+        "_semantic_verifier": {"status": "success"},
+    })
+    analysis = {
+        "analysis_id": 1,
+        "analysis_key": "analysis-key",
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "validation_status": "manual_required",
+        "result": result,
+    }
+    event = {
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "action_type": "dividend",
+        "candidates": [{"announcement_title": "权益分派实施公告"}],
+    }
+    reused = DataManager()._revalidate_resumable_cninfo_analysis(
+        analysis=analysis,
+        event=event,
+        pages=[page],
+        allowed_start=date(2026, 1, 1),
+        allowed_end=date(2026, 12, 31),
+    )
+    assert reused is not None
+    assert reused["validation_status"] == "validated_candidate"
+    assert reused["_resume_revalidated"] is True
+
+    failed = deepcopy(analysis)
+    failed["result"]["_semantic_verifier"] = {
+        "status": "error",
+        "error_code": "transient_transport_error",
+    }
+    assert DataManager()._revalidate_resumable_cninfo_analysis(
+        analysis=failed,
+        event=event,
+        pages=[page],
+        allowed_start=date(2026, 1, 1),
+        allowed_end=date(2026, 12, 31),
+    ) is None
 
 
 def test_current_native_all_gate_candidate_is_auto_promotable():
@@ -1604,7 +1693,7 @@ def test_document_service_rejects_non_pdf_and_page_selection_is_bounded(tmp_path
         archive_root=tmp_path,
         fetcher=lambda _url: b"not a pdf",
     )
-    with pytest.raises(ValueError, match="invalid_pdf_signature"):
+    with pytest.raises(ValueError, match="unsupported_document_signature"):
         service.ingest(announcement_id="ann-1", source_url="https://example.test/a.pdf")
     pages = [
         CorporateActionPageText(
@@ -1618,6 +1707,30 @@ def test_document_service_rejects_non_pdf_and_page_selection_is_bounded(tmp_path
     assert page_text_cache_key("artifact-hash", pages[0]) == page_text_cache_key(
         "artifact-hash", pages[0]
     )
+
+
+def test_document_service_archives_and_extracts_historical_html(tmp_path):
+    html = """
+    <html><head><style>hidden</style></head><body>
+    <h1>1992年度分红派息公告</h1>
+    <p>股权登记日为1993年5月20日，除权除息日为1993年5月21日。</p>
+    <script>ignored()</script>
+    </body></html>
+    """.encode("gb18030")
+    service = CninfoCorporateActionDocumentService(
+        archive_root=tmp_path,
+        fetcher=lambda _url: html,
+    )
+    bundle = service.ingest(
+        announcement_id="12598339",
+        source_url="https://static.cninfo.com.cn/finalpage/1993-05-15/12598339.html",
+    )
+    assert bundle.content_type == "text/html"
+    assert bundle.archive_path.endswith(".html")
+    assert bundle.pages[0].extraction_method == "html_text"
+    assert "除权除息日为1993年5月21日" in bundle.pages[0].text
+    assert "ignored" not in bundle.pages[0].text
+    assert extract_html_pages(html)[0].text_hash == bundle.pages[0].text_hash
 
 
 def test_document_service_uses_common_attachment_retriever(tmp_path, monkeypatch):
@@ -1659,7 +1772,7 @@ def test_document_service_uses_common_attachment_retriever(tmp_path, monkeypatch
     assert bundle.source == "cninfo"
     assert bundle.source_url == "https://static.cninfo.com.cn/finalpage/ann-1.pdf"
     assert retriever.calls[0][0] == "cninfo"
-    assert retriever.calls[0][2] is True
+    assert retriever.calls[0][2] is False
 
 
 @pytest.mark.asyncio
@@ -1854,6 +1967,71 @@ async def test_data_manager_async_pipeline_serializes_current_analysis_write():
 
     assert result["counts"]["persisted_analyses"] == 1
     assert result["pipeline_runtime"]["stage_snapshots"][-1]["active"] == 0
+    manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_async_resume_counts_revalidated_analysis_persistence(monkeypatch):
+    page, _, gates, normalized = _eligible_auto_promotion_case()
+    candidate_row = _candidate_observation_row()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=[
+            [candidate_row],
+            [candidate_row],
+            [{"announcement_id": "ann-1"}],
+        ]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(return_value={
+        "items": [{
+            "analysis_id": 7,
+            "analysis_key": "existing-analysis-key",
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "input_hash": "matching-input-hash",
+            "validation_status": "manual_required",
+            "schema_version": SCHEMA_VERSION,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+        }]
+    })
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock(
+        return_value={"analysis_id": 8, "status": "updated"}
+    )
+    monkeypatch.setattr(
+        CninfoCorporateActionLlmResolver,
+        "input_hash",
+        lambda self, event, pages: "matching-input-hash",
+    )
+    client = SimpleNamespace(complete=AsyncMock())
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=True,
+        dry_run=False,
+        auto_promote_validated=False,
+        llm_client=client,
+        pipeline={
+            "mode": "async",
+            "download_concurrency": 2,
+            "document_parse_concurrency": 2,
+            "llm_concurrency": 2,
+            "progress_interval_seconds": 60,
+        },
+    )
+
+    assert result["counts"]["resumed"] == 1
+    assert result["counts"]["persisted_analyses"] == 1
+    client.complete.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
 
 
@@ -2584,6 +2762,68 @@ async def test_resume_promotes_current_analysis_without_another_llm_call(
     assert result["auto_promotion"]["promoted"] == 1
     client.complete.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_resume_persistence_failure_does_not_overwrite_prior_analysis(
+    monkeypatch,
+):
+    page, _, gates, normalized = _eligible_auto_promotion_case()
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        return_value=[_candidate_observation_row()]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value=_stored_document_bundle(page)
+    )
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(return_value={
+        "items": [{
+            "analysis_id": 7,
+            "analysis_key": "existing-analysis-key",
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "input_hash": "matching-input-hash",
+            "validation_status": "manual_required",
+            "schema_version": SCHEMA_VERSION,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+        }]
+    })
+    manager.db_ops.save_corporate_action_llm_analysis = AsyncMock(
+        side_effect=RuntimeError("database temporarily unavailable")
+    )
+    monkeypatch.setattr(
+        CninfoCorporateActionLlmResolver,
+        "input_hash",
+        lambda self, event, pages: "matching-input-hash",
+    )
+    client = SimpleNamespace(complete=AsyncMock())
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=True,
+        dry_run=False,
+        auto_promote_validated=False,
+        llm_client=client,
+    )
+
+    assert result["status"] == "partial"
+    assert result["counts"]["errors"] == 1
+    assert result["errors"][0]["code"] == (
+        "revalidated_analysis_persistence_failed"
+    )
+    client.complete.assert_not_awaited()
+    manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
+    saved_payload = manager.db_ops.save_corporate_action_llm_analysis.await_args.args[0]
+    assert saved_payload["analysis_key"] == "existing-analysis-key"
+    assert saved_payload["validation_status"] == "validated_candidate"
+    assert saved_payload["result"]
 
 
 @pytest.mark.asyncio

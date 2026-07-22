@@ -7,12 +7,17 @@ from collections import deque
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
+import logging
+import math
 import time
 from typing import AsyncIterator, Callable, Deque, Optional
 
 from ..errors import LlmDeadlineExceededError
 from ..models import ProviderResourceConfig
 from .models import ProviderSnapshot, ResourceLeaseError, ResourceSnapshot
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -45,6 +50,16 @@ class ProviderCoordinator:
         self._active_by_workload: dict[str, int] = {}
         self._cooldown_until = 0.0
         self._cooldown_handle: Optional[asyncio.TimerHandle] = None
+        self._effective_bulk_concurrency = config.default_bulk_concurrency
+        self._adaptive_min_bulk_concurrency = max(
+            1,
+            min(
+                config.adaptive_min_bulk_concurrency,
+                config.default_bulk_concurrency,
+            ),
+        )
+        self._adaptive_retryable_failures = 0
+        self._adaptive_success_streak = 0
         self._admitted = 0
         self._admitted_by_workload: dict[str, int] = {}
         self._completed = 0
@@ -161,6 +176,84 @@ class ProviderCoordinator:
             )
             self._schedule_cooldown_wake_locked()
 
+    async def report_retryable_failure(
+        self,
+        *,
+        error_code: str = "",
+        status_code: Optional[int] = None,
+        retry_after_seconds: Optional[float] = None,
+    ) -> None:
+        """Apply provider-wide congestion control after a retryable failure."""
+        normalized_code = str(error_code or "").strip().lower()
+        is_rate_limit = status_code == 429 or normalized_code == "rate_limit_error"
+        configured_cooldown = (
+            self.config.rate_limit_cooldown_seconds
+            if is_rate_limit
+            else self.config.transient_cooldown_seconds
+        )
+        cooldown = max(
+            configured_cooldown,
+            max(0.0, float(retry_after_seconds or 0.0)),
+        )
+        async with self._lock:
+            prior_limit = self._effective_bulk_concurrency
+            self._adaptive_retryable_failures += 1
+            self._adaptive_success_streak = 0
+            if self.config.adaptive_concurrency_enabled:
+                factor = 0.5 if is_rate_limit else 0.75
+                reduced = math.floor(prior_limit * factor)
+                if prior_limit > self._adaptive_min_bulk_concurrency:
+                    reduced = min(reduced, prior_limit - 1)
+                self._effective_bulk_concurrency = max(
+                    self._adaptive_min_bulk_concurrency,
+                    reduced,
+                )
+            if cooldown > 0:
+                self._cooldown_until = max(
+                    self._cooldown_until, self._clock() + cooldown
+                )
+                self._schedule_cooldown_wake_locked()
+            if self._effective_bulk_concurrency != prior_limit or cooldown > 0:
+                LOGGER.warning(
+                    "LLM provider congestion resource=%s code=%s status=%s "
+                    "bulk_limit=%s->%s cooldown_seconds=%.1f failures=%s",
+                    self.config.name,
+                    normalized_code or "retryable_provider_error",
+                    status_code,
+                    prior_limit,
+                    self._effective_bulk_concurrency,
+                    cooldown,
+                    self._adaptive_retryable_failures,
+                )
+
+    async def report_success(self) -> None:
+        """Gradually restore provider concurrency after sustained success."""
+        if not self.config.adaptive_concurrency_enabled:
+            return
+        async with self._lock:
+            if self._effective_bulk_concurrency >= self.config.default_bulk_concurrency:
+                self._adaptive_success_streak = 0
+                return
+            self._adaptive_success_streak += 1
+            if (
+                self._adaptive_success_streak
+                < self.config.adaptive_recovery_successes
+            ):
+                return
+            prior_limit = self._effective_bulk_concurrency
+            self._effective_bulk_concurrency = min(
+                self.config.default_bulk_concurrency,
+                prior_limit + 1,
+            )
+            self._adaptive_success_streak = 0
+            LOGGER.info(
+                "LLM provider concurrency recovering resource=%s bulk_limit=%s->%s",
+                self.config.name,
+                prior_limit,
+                self._effective_bulk_concurrency,
+            )
+            self._dispatch_locked()
+
     def _schedule_cooldown_wake_locked(self) -> None:
         remaining = self._cooldown_until - self._clock()
         if remaining <= 0:
@@ -218,7 +311,7 @@ class ProviderCoordinator:
             waiter = queue[0]
             if (
                 waiter.bulk
-                and self._active_bulk >= self.config.default_bulk_concurrency
+                and self._active_bulk >= self._effective_bulk_concurrency
             ):
                 continue
             queue.popleft()
@@ -261,6 +354,10 @@ class ProviderCoordinator:
             cooldown_remaining_seconds=max(
                 0.0, self._cooldown_until - self._clock()
             ),
+            configured_bulk_concurrency=self.config.default_bulk_concurrency,
+            effective_bulk_concurrency=self._effective_bulk_concurrency,
+            adaptive_retryable_failures=self._adaptive_retryable_failures,
+            adaptive_success_streak=self._adaptive_success_streak,
             total_admission_wait_ms=self._total_admission_wait_ms,
         )
 

@@ -196,6 +196,7 @@ class LlmClient:
             for attempt_count in range(1, max_attempts + 1):
                 response: Optional[TransportResponse] = None
                 raw_content: Optional[str] = None
+                provider_failure_reported = False
                 attempt_started = time.monotonic()
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
@@ -240,13 +241,33 @@ class LlmClient:
                                         response.status_code
                                     )
                                     if provider_error.retryable:
-                                        await provider_coordinator.set_cooldown(
-                                            self._base_retry_delay(
+                                        await provider_coordinator.report_retryable_failure(
+                                            error_code=provider_error.code,
+                                            status_code=response.status_code,
+                                            retry_after_seconds=self._base_retry_delay(
                                                 profile,
                                                 attempt_count,
                                                 response=response,
-                                            )
+                                            ),
                                         )
+                                        provider_failure_reported = True
+                                else:
+                                    await provider_coordinator.report_success()
+                            except asyncio.TimeoutError:
+                                await provider_coordinator.report_retryable_failure(
+                                    error_code="transient_transport_error",
+                                    status_code=408,
+                                )
+                                provider_failure_reported = True
+                                raise
+                            except LlmError as exc:
+                                if exc.code == "transient_transport_error":
+                                    await provider_coordinator.report_retryable_failure(
+                                        error_code=exc.code,
+                                        status_code=exc.status_code,
+                                    )
+                                    provider_failure_reported = True
+                                raise
                             finally:
                                 await provider_coordinator.release(
                                     workload=workload,
@@ -347,6 +368,15 @@ class LlmClient:
                     )
                     if isinstance(last_error, LlmDeadlineExceededError):
                         raise last_error from exc
+                    if (
+                        provider_coordinator is not None
+                        and not provider_failure_reported
+                    ):
+                        await provider_coordinator.report_retryable_failure(
+                            error_code=last_error.code,
+                            status_code=last_error.status_code,
+                        )
+                        provider_failure_reported = True
                 except (LlmResponseParseError, LlmSchemaValidationError) as exc:
                     last_error = exc
                     llm_logger.warning(
@@ -371,6 +401,16 @@ class LlmClient:
                         raise exc
                 except LlmError as exc:
                     last_error = exc
+                    if (
+                        provider_coordinator is not None
+                        and exc.retryable
+                        and not provider_failure_reported
+                    ):
+                        await provider_coordinator.report_retryable_failure(
+                            error_code=exc.code,
+                            status_code=exc.status_code,
+                        )
+                        provider_failure_reported = True
                     llm_logger.warning(
                         "LLM attempt failed profile=%s request_id=%s attempt=%s/%s "
                         "code=%s retryable=%s detail=%s elapsed_ms=%s remaining_seconds=%.1f",

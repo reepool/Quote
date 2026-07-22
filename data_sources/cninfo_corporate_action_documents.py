@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+from html import unescape
+from html.parser import HTMLParser
 import os
 import re
 import tempfile
@@ -18,9 +20,48 @@ from research.announcements import (
 from utils.config_manager import ResearchConfig, config_manager
 
 
-DOCUMENT_PARSER_VERSION = "cninfo_corporate_action_pypdf.v1"
+DOCUMENT_PARSER_VERSION = "cninfo_corporate_action_document.v2"
 DEFAULT_ARCHIVE_ROOT = Path("data/filings/corporate_actions")
 _SAFE_NAME = re.compile(r"[^0-9A-Za-z_.-]+")
+_HTML_CHARSET = re.compile(
+    br"charset\s*=\s*[\"']?\s*([A-Za-z0-9._-]+)", re.IGNORECASE
+)
+_HTML_BLOCK_TAGS = frozenset({
+    "address", "article", "aside", "blockquote", "br", "div", "footer",
+    "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main",
+    "nav", "ol", "p", "pre", "section", "table", "td", "th", "tr", "ul",
+})
+_HTML_IGNORED_TAGS = frozenset({"script", "style", "noscript", "svg"})
+_HTML_ERROR_MARKERS = (
+    "404 not found", "page not found", "access denied", "forbidden",
+    "页面不存在", "访问受限", "请输入验证码", "安全验证",
+)
+
+
+class _VisibleHtmlTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._ignored_depth = 0
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
+        del attrs
+        normalized = str(tag or "").lower()
+        if normalized in _HTML_IGNORED_TAGS:
+            self._ignored_depth += 1
+        elif self._ignored_depth == 0 and normalized in _HTML_BLOCK_TAGS:
+            self.parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        normalized = str(tag or "").lower()
+        if normalized in _HTML_IGNORED_TAGS and self._ignored_depth > 0:
+            self._ignored_depth -= 1
+        elif self._ignored_depth == 0 and normalized in _HTML_BLOCK_TAGS:
+            self.parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._ignored_depth == 0 and str(data or "").strip():
+            self.parts.append(data)
 
 
 @dataclass(frozen=True)
@@ -164,6 +205,47 @@ def extract_pdf_pages(
     return tuple(pages)
 
 
+def extract_html_pages(html_bytes: bytes) -> tuple[CorporateActionPageText, ...]:
+    """Extract one immutable visible-text page from a historical HTML notice."""
+    if not html_bytes:
+        raise ValueError("document_empty")
+    declared = _HTML_CHARSET.search(html_bytes[:4096])
+    encodings = []
+    if declared:
+        encodings.append(declared.group(1).decode("ascii", errors="ignore"))
+    encodings.extend(["utf-8-sig", "gb18030"])
+    decoded: Optional[str] = None
+    for encoding in dict.fromkeys(encodings):
+        try:
+            decoded = html_bytes.decode(encoding)
+            break
+        except (LookupError, UnicodeDecodeError):
+            continue
+    if decoded is None:
+        decoded = html_bytes.decode("utf-8", errors="replace")
+    parser = _VisibleHtmlTextParser()
+    try:
+        parser.feed(decoded)
+        parser.close()
+    except Exception as exc:
+        raise ValueError(f"html_parse_failed:{type(exc).__name__}") from exc
+    text = normalize_page_text(unescape(" ".join(parser.parts)))
+    lowered = text.lower()
+    if len(text) < 40:
+        raise ValueError("html_text_insufficient")
+    if len(text) < 1200 and any(marker in lowered for marker in _HTML_ERROR_MARKERS):
+        raise ValueError("html_error_page")
+    return (
+        CorporateActionPageText(
+            page_number=1,
+            text=text,
+            text_hash=hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            extraction_method="html_text",
+            quality_status="usable",
+        ),
+    )
+
+
 def select_relevant_pages(
     pages: Iterable[CorporateActionPageText],
     *,
@@ -241,7 +323,7 @@ class CninfoCorporateActionDocumentService:
         title: Optional[str] = None,
         announcement_time: Any = None,
     ) -> CorporateActionDocumentArtifact:
-        """Retrieve and archive an official PDF without retaining bytes in a queue."""
+        """Retrieve and archive an official PDF or historical HTML document."""
         announcement_id = str(announcement_id or "").strip()
         source_url = str(source_url or "").strip()
         if not announcement_id or not source_url:
@@ -250,7 +332,7 @@ class CninfoCorporateActionDocumentService:
         if not source:
             raise ValueError("source is required")
         final_url = source_url
-        content_type = "application/pdf"
+        content_type = "application/octet-stream"
         if self.fetcher is not None:
             content = self.fetcher(source_url)
         else:
@@ -266,7 +348,7 @@ class CninfoCorporateActionDocumentService:
                         else None
                     ),
                 ),
-                require_pdf=True,
+                require_pdf=False,
             )
             if retrieval.status != "success":
                 raise RuntimeError(
@@ -279,10 +361,22 @@ class CninfoCorporateActionDocumentService:
         if not isinstance(content, (bytes, bytearray)) or not content:
             raise ValueError("document_empty")
         content = bytes(content)
-        if not content.startswith(b"%PDF-"):
-            raise ValueError("invalid_pdf_signature")
+        if content.startswith(b"%PDF-"):
+            extension = ".pdf"
+            content_type = "application/pdf"
+        else:
+            prefix = content[:2048].lstrip().lower()
+            is_html = (
+                "html" in str(content_type or "").lower()
+                or prefix.startswith((b"<!doctype html", b"<html", b"<head", b"<body"))
+            )
+            if not is_html:
+                raise ValueError("unsupported_document_signature")
+            extract_html_pages(content)
+            extension = ".html"
+            content_type = "text/html"
         digest = hashlib.sha256(content).hexdigest()
-        relative = Path(_safe_component(announcement_id)) / f"{digest}.pdf"
+        relative = Path(_safe_component(announcement_id)) / f"{digest}{extension}"
         target = self.archive_root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         if target.exists():
@@ -325,6 +419,12 @@ class CninfoCorporateActionDocumentService:
         content = target.read_bytes()
         if hashlib.sha256(content).hexdigest() != artifact.content_hash:
             raise ValueError("archive_hash_mismatch")
+        if content.startswith(b"%PDF-"):
+            extracted_pages = extract_pdf_pages(
+                content, ocr_adapter=self.ocr_adapter
+            )
+        else:
+            extracted_pages = extract_html_pages(content)
         pages = tuple(
             CorporateActionPageText(
                 page_number=page.page_number,
@@ -334,7 +434,7 @@ class CninfoCorporateActionDocumentService:
                 extraction_method=page.extraction_method,
                 quality_status=page.quality_status,
             )
-            for page in extract_pdf_pages(content, ocr_adapter=self.ocr_adapter)
+            for page in extracted_pages
         )
         return CorporateActionDocumentBundle(
             announcement_id=artifact.announcement_id,

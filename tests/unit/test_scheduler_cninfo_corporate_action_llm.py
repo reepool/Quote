@@ -28,7 +28,7 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
         "title_max_titles_per_request": 80,
         "download_concurrency": 8,
         "document_parse_concurrency": 8,
-        "llm_concurrency": 50,
+        "llm_concurrency": 15,
         "writer_batch_size": 10,
         "writer_concurrency": 1,
         "progress_interval_seconds": 30,

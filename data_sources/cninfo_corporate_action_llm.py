@@ -1221,7 +1221,7 @@ def _basis_matches_unit(unit: str, basis_text: Any, unit_text: str) -> bool:
     basis = re.sub(r"\s+", "", _semantic_span(basis_text))
     compact_unit = re.sub(r"\s+", "", unit_text)
     if unit in {"per_10_shares", "CNY_per_10_shares"}:
-        return bool(re.fullmatch(r"每(?:10|十)股", basis))
+        return bool(re.fullmatch(r"每(?:持有)?(?:10|十)股.{0,16}", basis))
     if unit in {"per_share", "CNY_per_share"}:
         return bool(
             re.fullmatch(r"每(?:(?:1|一))?股", basis)
@@ -1250,9 +1250,11 @@ def _unit_text_matches(unit: str, unit_text: Any, basis_text: Any) -> bool:
             _basis_matches_unit(unit, basis_text, currency_unit)
         )
     if unit in {"per_share", "per_10_shares"}:
-        return compact in {"股", "股/股"} and _basis_matches_unit(
-            unit, basis_text, compact
+        share_unit = bool(
+            compact == "股/股"
+            or re.fullmatch(r"股[^0-9０-９元]{0,10}", compact)
         )
+        return share_unit and _basis_matches_unit(unit, basis_text, compact)
     return False
 
 
@@ -1310,7 +1312,13 @@ def _economic_semantic_binding_supported(
         return False
     for relation_start, relation_end in positions[relation_text]:
         for value_start, value_end in positions[value_text]:
-            if relation_end > value_start or value_start - relation_end > 160:
+            if relation_end <= value_start:
+                relation_gap = value_start - relation_end
+            elif value_end <= relation_start:
+                relation_gap = relation_start - value_end
+            else:
+                continue
+            if relation_gap > 160:
                 continue
             for unit_start, unit_end in positions[unit_text]:
                 if value_end > unit_start or unit_start - value_end > 24:

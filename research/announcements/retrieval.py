@@ -21,6 +21,22 @@ REDIRECT_STATUSES = frozenset({301, 302, 303, 307, 308})
 LOGGER = logging.getLogger(__name__)
 
 
+def _content_signature_status(
+    content: bytes,
+    response_media_type: Optional[str],
+) -> str:
+    if content.startswith(b"%PDF-"):
+        return "valid_pdf"
+    media_type = str(response_media_type or "").strip().lower()
+    prefix = content[:2048].lstrip().lower()
+    if (
+        media_type in {"text/html", "application/xhtml+xml"}
+        or prefix.startswith((b"<!doctype html", b"<html", b"<head", b"<body"))
+    ):
+        return "valid_html"
+    return "unknown_binary"
+
+
 @dataclass(frozen=True)
 class AttachmentRetrievalPolicy:
     """Source-specific URL trust and bounded transport settings."""
@@ -62,7 +78,9 @@ class AttachmentRetrievalPolicy:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
         )
-        headers.setdefault("Accept", "application/pdf,application/octet-stream,*/*")
+        headers.setdefault(
+            "Accept", "application/pdf,text/html,application/octet-stream,*/*"
+        )
         return cls(
             source=source_name,
             artifact_base_url=base_url,
@@ -181,8 +199,8 @@ class AnnouncementAttachmentRetriever:
                     policy,
                     resolved_attachment.resolved_url or resolved_attachment.source_url,
                 )
-                signature_status = (
-                    "valid_pdf" if content.startswith(b"%PDF-") else "not_pdf"
+                signature_status = _content_signature_status(
+                    content, response_media_type
                 )
                 if require_pdf and signature_status != "valid_pdf":
                     raise ValueError("invalid_pdf_signature")
@@ -217,6 +235,19 @@ class AnnouncementAttachmentRetriever:
                         ),
                     },
                 )
+            except requests.HTTPError as exc:
+                status_code = getattr(getattr(exc, "response", None), "status_code", None)
+                last_error = (
+                    f"attachment_http_{status_code}"
+                    if status_code is not None
+                    else f"{type(exc).__name__}:{exc}"
+                )
+                if status_code in {404, 410}:
+                    break
+                if attempt >= policy.retry_attempts:
+                    break
+                if policy.retry_backoff_seconds > 0:
+                    time.sleep(policy.retry_backoff_seconds * (attempt + 1))
             except Exception as exc:
                 last_error = f"{type(exc).__name__}:{exc}"
                 if attempt >= policy.retry_attempts:

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import json
 
 import pytest
+import requests
 
 from research.announcements import (
     AnnouncementAcquisitionConfig,
@@ -868,7 +869,9 @@ class _AttachmentResponse:
 
     def raise_for_status(self):
         if self.status_code >= 400:
-            raise RuntimeError(f"HTTP {self.status_code}")
+            error = requests.HTTPError(f"HTTP {self.status_code}")
+            error.response = self
+            raise error
 
     def iter_content(self, chunk_size):
         midpoint = max(1, len(self.content) // 2)
@@ -1013,6 +1016,38 @@ def test_attachment_retrieval_rejects_oversize_empty_and_invalid_pdf():
     )
     assert invalid.status == "failed"
     assert "invalid_pdf_signature" in invalid.errors[0]
+
+
+def test_attachment_retrieval_accepts_trusted_historical_html():
+    content = "<html><body>历史权益分派实施公告</body></html>".encode("utf-8")
+    session = _AttachmentSession([
+        _AttachmentResponse(
+            content,
+            headers={"Content-Type": "text/html; charset=utf-8"},
+        )
+    ])
+    result = _retriever(session).retrieve(
+        "cninfo",
+        AnnouncementAttachment(source_url="finalpage/report.html"),
+        require_pdf=False,
+    )
+    assert result.status == "success"
+    assert result.signature_status == "valid_html"
+    assert result.response_media_type == "text/html"
+
+
+def test_attachment_retrieval_classifies_terminal_missing_document_without_retry():
+    session = _AttachmentSession([
+        _AttachmentResponse(b"missing", status_code=404),
+        _AttachmentResponse(b"%PDF-should-not-be-used"),
+    ])
+    result = _retriever(session, retries=2).retrieve(
+        "cninfo",
+        AnnouncementAttachment(source_url="finalpage/missing.html"),
+    )
+    assert result.status == "failed"
+    assert result.errors == ("attachment_http_404",)
+    assert len(session.calls) == 1
 
 
 def test_attachment_retrieval_retries_transport_failure_without_partial_success():

@@ -13,6 +13,7 @@ from utils.llm import (
     LlmDeadlineExceededError,
     LlmMessage,
     LlmRequest,
+    LlmTransientTransportError,
     OutcomeLedger,
     OutcomeStatus,
     OrchestrationError,
@@ -249,6 +250,37 @@ async def test_provider_cooldown_and_deadline_are_enforced():
 
 
 @pytest.mark.asyncio
+async def test_provider_adaptive_concurrency_downshifts_and_recovers_gradually():
+    coordinator = ProviderCoordinator(ProviderResourceConfig(
+        name="adaptive",
+        hard_max_concurrency=10,
+        default_bulk_concurrency=8,
+        reserved_concurrency=2,
+        http_max_connections=12,
+        http_max_keepalive_connections=10,
+        adaptive_min_bulk_concurrency=2,
+        adaptive_recovery_successes=2,
+    ))
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    assert coordinator.snapshot().effective_bulk_concurrency == 6
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error", status_code=429
+    )
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 3
+    assert snapshot.adaptive_retryable_failures == 2
+
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 3
+    await coordinator.report_success()
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 4
+    assert snapshot.adaptive_success_streak == 0
+
+
+@pytest.mark.asyncio
 async def test_retryable_response_sets_cooldown_before_next_admission():
     first_started = asyncio.Event()
     release_first = asyncio.Event()
@@ -288,6 +320,81 @@ async def test_retryable_response_sets_cooldown_before_next_admission():
     assert results[1].data == {"label": "second"}
     assert throttled_at is not None
     assert call_times[1] - throttled_at >= 0.04
+    snapshot = client.provider_coordinator_registry.snapshots()[0]
+    assert snapshot.effective_bulk_concurrency == 1
+
+
+@pytest.mark.asyncio
+async def test_transport_failure_sets_cooldown_before_releasing_provider_slot():
+    first_started = asyncio.Event()
+    release_first = asyncio.Event()
+    call_times = []
+    failed_at = None
+
+    async def transport(url, headers, payload, timeout):
+        nonlocal failed_at
+        call_times.append(time.monotonic())
+        if len(call_times) == 1:
+            first_started.set()
+            await release_first.wait()
+            failed_at = time.monotonic()
+            raise LlmTransientTransportError("temporary transport failure")
+        return _provider_response("second")
+
+    config = _multi_profile_config(hard=1, bulk=1)
+    object.__setattr__(
+        config.provider_resources["shared"],
+        "transient_cooldown_seconds",
+        0.05,
+    )
+    client = LlmClient(
+        config,
+        transport=CallableTransport(transport),
+        environment={"TEST_LLM_KEY": "secret"},
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+    )
+    first = asyncio.create_task(client.complete(_request("one", "first", bulk=True)))
+    await first_started.wait()
+    second = asyncio.create_task(client.complete(_request("one", "second", bulk=True)))
+    await asyncio.sleep(0)
+    release_first.set()
+    results = await asyncio.gather(first, second, return_exceptions=True)
+
+    assert isinstance(results[0], LlmTransientTransportError)
+    assert results[1].data == {"label": "second"}
+    assert failed_at is not None
+    assert call_times[1] - failed_at >= 0.04
+
+
+@pytest.mark.asyncio
+async def test_attempt_timeout_reports_one_provider_failure():
+    async def slow_transport(url, headers, payload, timeout):
+        await asyncio.sleep(0.05)
+
+    config = _multi_profile_config(hard=10, bulk=8)
+    profile = config.profiles["one"]
+    object.__setattr__(profile, "max_retries", 0)
+    object.__setattr__(profile, "timeout_seconds", 1.0)
+    object.__setattr__(profile, "attempt_timeout_seconds", 0.01)
+    object.__setattr__(
+        config.provider_resources["shared"],
+        "transient_cooldown_seconds",
+        0.0,
+    )
+    registry = ProviderCoordinatorRegistry()
+    client = LlmClient(
+        config,
+        transport=CallableTransport(slow_transport),
+        environment={"TEST_LLM_KEY": "secret"},
+        provider_coordinator_registry=registry,
+    )
+
+    with pytest.raises(LlmTransientTransportError):
+        await client.complete(_request("one", "timeout", bulk=True))
+
+    snapshot = registry.snapshots()[0]
+    assert snapshot.adaptive_retryable_failures == 1
+    assert snapshot.effective_bulk_concurrency == 6
 
 
 @pytest.mark.asyncio

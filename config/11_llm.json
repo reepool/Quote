@@ -9,6 +9,11 @@
         "reserved_concurrency": 10,
         "http_max_connections": 70,
         "http_max_keepalive_connections": 60,
+        "adaptive_concurrency_enabled": true,
+        "adaptive_min_bulk_concurrency": 5,
+        "adaptive_recovery_successes": 10,
+        "rate_limit_cooldown_seconds": 10.0,
+        "transient_cooldown_seconds": 2.0,
         "workload_weights": {
           "corporate_action_title_classification": 1,
           "corporate_action_semantic_extraction": 1,
