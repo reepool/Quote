@@ -97,6 +97,16 @@ class ProviderSnapshot:
     effective_bulk_concurrency: int
     adaptive_retryable_failures: int
     adaptive_success_streak: int
+    adaptive_congestion_events: int
+    adaptive_coalesced_failures: int
+    adaptive_recovery_probes: int
+    adaptive_window_requests: int
+    adaptive_window_soft_failures: int
+    adaptive_window_failure_rate: float
+    adaptive_last_failure_class: Optional[str]
+    adaptive_state: str
+    adaptive_episode_remaining_seconds: float
+    adaptive_recovery_quiet_remaining_seconds: float
     total_admission_wait_ms: int
 
 

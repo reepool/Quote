@@ -35,7 +35,8 @@ flowchart LR
     C --> CFG[LlmConfig/LlmProfile\n配置与能力声明]
     C --> SCH[Schema normalizer\nJSON Schema/Pydantic]
     C --> LIM[ProfileLimiterRegistry\n并发 + RPM]
-    C --> T[AsyncTransport]
+    C --> PC[ProviderCoordinator\n智能拥塞控制]
+    PC --> T[AsyncTransport]
     T --> P[OpenAI-compatible provider]
     P --> T
     T --> C
@@ -54,6 +55,7 @@ flowchart LR
 | `utils/llm/schema.py` | JSON Schema/Pydantic 规范化、Draft 2020-12 校验、脱敏诊断 |
 | `utils/llm/errors.py` | 稳定错误 code、retryable 判定和安全异常 envelope |
 | `utils/llm/rate_limit.py` | profile 共享 semaphore、RPM 滑动窗口和 deadline 感知等待 |
+| `utils/llm/orchestration/coordinator.py` | provider/account 公平准入、故障合并、分类降档和恢复探测 |
 | `utils/llm/config.py` | 显式项目 `.env` 加载和配置入口 |
 | `utils/llm/testing.py` | 不联网的脚本化 transport |
 
@@ -68,6 +70,23 @@ flowchart LR
 {
   "llm": {
     "enabled": false,
+    "provider_resources": {
+      "primary_account": {
+        "hard_max_concurrency": 60,
+        "default_bulk_concurrency": 50,
+        "adaptive_min_bulk_concurrency": 5,
+        "adaptive_failure_coalescing_seconds": 10.0,
+        "adaptive_outcome_window_size": 30,
+        "adaptive_soft_failure_min_count": 2,
+        "adaptive_soft_failure_rate_threshold": 0.08,
+        "adaptive_soft_decrease_ratio": 0.8,
+        "adaptive_hard_decrease_ratio": 0.5,
+        "adaptive_recovery_successes": 6,
+        "adaptive_recovery_quiet_seconds": 30.0,
+        "adaptive_recovery_probe_interval_seconds": 30.0,
+        "adaptive_recovery_growth_factor": 1.3333333333333333
+      }
+    },
     "profiles": {
       "semantic_extraction": {
         "provider": "openai_compatible",
@@ -238,6 +257,19 @@ JSON 解析失败或 schema 校验失败时，网关最多执行配置允许的�
 
 一次 `complete()` 的 `timeout_seconds` 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，拿到 limiter 槽位后会依据剩余总预算重新收紧；这样一次长尾请求不会独占全部调用预算，只要总 deadline 尚未用尽，后续重试仍可执行。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。显式 `requests_per_minute=0` 表示关闭 RPM 限制，不能被默认值覆盖。
 
+### 7.1 智能控流状态
+
+provider 协调器使用有界结果窗口和故障事件窗口。多个同时失败的请求仍分别保留错误记录，
+但只允许一个请求代表本次拥塞事件改变并发。429 直接使用硬降档；普通传输错误必须达到
+数量和错误率阈值后使用软降档。软故障事件中随后出现的 429 会将同一事件升级到硬目标，
+不会再次对已经降低的档位叠乘。全局 cooldown 使用原始 `Retry-After`，单请求退避仍受其
+profile 的等待上限和总 deadline 约束。恢复在静默期后按比例探测，不按每十个成功只增加一路。
+
+快照中的 `configured_bulk_concurrency` 是账号配置上限，`effective_bulk_concurrency` 是当前
+准入档位。`adaptive_state` 区分 `steady`、`cooldown`、`congestion_episode`、
+`recovery_hold` 和 `recovery_probe`。同时查看 raw failure、coalesced failure、窗口错误率和
+recovery probe，才能判断任务为什么低于业务 worker 数。
+
 ## 8. business-profile 调用
 
 `research/business_profile_llm.py` 保留业务职责：section/page/text hash、事实目录、提示词、`business_profile_llm_report.v1` 和 candidate-only 校验。
@@ -285,7 +317,7 @@ transport = ScriptedTransport([
 client = LlmClient(config, transport=transport, environment={"TEST_LLM_KEY": "unit"})
 ```
 
-测试至少应覆盖：默认关闭和缺 key、URL 规范化、HTTP 400/401/403/404、429/5xx/timeout 重试、JSON/schema repair、四种输出模式、并发/RPM、取消/deadline、hash 稳定性、日志脱敏和上游缺 usage/request ID 的兼容处理。真实模型请求只能放在显式 live validation，不得成为 pytest 单元测试依赖。
+测试至少应覆盖：默认关闭和缺 key、URL 规范化、HTTP 400/401/403/404、429/5xx/timeout 重试、JSON/schema repair、四种输出模式、并发/RPM、故障窗口合并、分类降档、比例恢复、取消/deadline、hash 稳定性、日志脱敏和上游缺 usage/request ID 的兼容处理。真实模型请求只能放在显式 live validation，不得成为 pytest 单元测试依赖。
 
 ## 10. 启用与发布检查
 

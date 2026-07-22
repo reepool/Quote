@@ -12,6 +12,7 @@ from utils.llm import (
     LlmConfig,
     LlmDeadlineExceededError,
     LlmMessage,
+    LlmRateLimitError,
     LlmRequest,
     LlmTransientTransportError,
     OutcomeLedger,
@@ -93,6 +94,17 @@ def _request(profile, item, *, bulk=False):
     )
 
 
+class _FakeClock:
+    def __init__(self) -> None:
+        self.value = 0.0
+
+    def __call__(self) -> float:
+        return self.value
+
+    def advance(self, seconds: float) -> None:
+        self.value += float(seconds)
+
+
 def test_orchestration_configuration_validates_global_and_local_limits():
     with pytest.raises(ValueError, match="hard_max_concurrency"):
         ProviderResourceConfig.from_mapping("bad", {
@@ -114,6 +126,10 @@ def test_orchestration_configuration_validates_global_and_local_limits():
                     "max_concurrency": 3,
                 }
             },
+        })
+    with pytest.raises(ValueError, match="soft_failure_rate_threshold"):
+        ProviderResourceConfig.from_mapping("bad-adaptive", {
+            "adaptive_soft_failure_rate_threshold": 0,
         })
 
 
@@ -250,34 +266,229 @@ async def test_provider_cooldown_and_deadline_are_enforced():
 
 
 @pytest.mark.asyncio
-async def test_provider_adaptive_concurrency_downshifts_and_recovers_gradually():
+async def test_provider_adaptive_concurrency_coalesces_correlated_soft_failures():
+    clock = _FakeClock()
     coordinator = ProviderCoordinator(ProviderResourceConfig(
         name="adaptive",
-        hard_max_concurrency=10,
-        default_bulk_concurrency=8,
-        reserved_concurrency=2,
-        http_max_connections=12,
-        http_max_keepalive_connections=10,
-        adaptive_min_bulk_concurrency=2,
-        adaptive_recovery_successes=2,
-    ))
+        hard_max_concurrency=20,
+        default_bulk_concurrency=15,
+        reserved_concurrency=5,
+        http_max_connections=20,
+        http_max_keepalive_connections=20,
+        adaptive_min_bulk_concurrency=5,
+        adaptive_failure_coalescing_seconds=10,
+        adaptive_outcome_window_size=30,
+        adaptive_soft_failure_min_count=2,
+        adaptive_soft_failure_rate_threshold=0.05,
+        adaptive_soft_decrease_ratio=0.8,
+        transient_cooldown_seconds=0,
+    ), clock=clock)
+
     await coordinator.report_retryable_failure(
         error_code="transient_transport_error", status_code=503
     )
-    assert coordinator.snapshot().effective_bulk_concurrency == 6
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=502
+    )
+
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 12
+    assert snapshot.adaptive_retryable_failures == 3
+    assert snapshot.adaptive_congestion_events == 1
+    assert snapshot.adaptive_coalesced_failures == 2
+    assert snapshot.adaptive_last_failure_class == "soft_transient"
+    assert snapshot.adaptive_state == "congestion_episode"
+
+    clock.advance(11)
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    assert coordinator.snapshot().effective_bulk_concurrency == 12
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 9
+    assert snapshot.adaptive_congestion_events == 2
+
+
+@pytest.mark.asyncio
+async def test_provider_adaptive_hard_throttle_is_immediate_and_coalesced():
+    clock = _FakeClock()
+    coordinator = ProviderCoordinator(ProviderResourceConfig(
+        name="hard-throttle",
+        hard_max_concurrency=20,
+        default_bulk_concurrency=16,
+        reserved_concurrency=4,
+        http_max_connections=20,
+        http_max_keepalive_connections=20,
+        adaptive_min_bulk_concurrency=4,
+        adaptive_failure_coalescing_seconds=10,
+        adaptive_hard_decrease_ratio=0.5,
+        rate_limit_cooldown_seconds=5,
+    ), clock=clock)
+
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error",
+        status_code=429,
+        retry_after_seconds=7,
+    )
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error",
+        status_code=429,
+        retry_after_seconds=3,
+    )
+
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 8
+    assert snapshot.adaptive_retryable_failures == 2
+    assert snapshot.adaptive_congestion_events == 1
+    assert snapshot.adaptive_coalesced_failures == 1
+    assert snapshot.cooldown_remaining_seconds == pytest.approx(7)
+    assert snapshot.adaptive_state == "cooldown"
+    await coordinator.close()
+
+
+@pytest.mark.asyncio
+async def test_provider_adaptive_hard_throttle_upgrades_soft_episode_once():
+    clock = _FakeClock()
+    coordinator = ProviderCoordinator(ProviderResourceConfig(
+        name="hard-upgrade",
+        hard_max_concurrency=20,
+        default_bulk_concurrency=20,
+        reserved_concurrency=0,
+        http_max_connections=20,
+        http_max_keepalive_connections=20,
+        adaptive_min_bulk_concurrency=4,
+        adaptive_failure_coalescing_seconds=10,
+        adaptive_soft_failure_min_count=2,
+        adaptive_soft_decrease_ratio=0.8,
+        adaptive_hard_decrease_ratio=0.5,
+        rate_limit_cooldown_seconds=0,
+        transient_cooldown_seconds=0,
+    ), clock=clock)
+
+    await coordinator.report_retryable_failure(status_code=503)
+    await coordinator.report_retryable_failure(status_code=503)
+    assert coordinator.snapshot().effective_bulk_concurrency == 16
+
     await coordinator.report_retryable_failure(
         error_code="rate_limit_error", status_code=429
     )
     snapshot = coordinator.snapshot()
-    assert snapshot.effective_bulk_concurrency == 3
-    assert snapshot.adaptive_retryable_failures == 2
+    assert snapshot.effective_bulk_concurrency == 10
+    assert snapshot.adaptive_congestion_events == 1
+    assert snapshot.adaptive_coalesced_failures == 1
+    assert snapshot.adaptive_last_failure_class == "hard_rate_limit"
+
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error", status_code=429
+    )
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 10
+    assert snapshot.adaptive_congestion_events == 1
+    assert snapshot.adaptive_coalesced_failures == 2
+
+
+@pytest.mark.asyncio
+async def test_provider_adaptive_recovers_proportionally_from_six_to_fifteen():
+    clock = _FakeClock()
+    coordinator = ProviderCoordinator(ProviderResourceConfig(
+        name="recovery",
+        hard_max_concurrency=20,
+        default_bulk_concurrency=15,
+        reserved_concurrency=5,
+        http_max_connections=20,
+        http_max_keepalive_connections=20,
+        adaptive_min_bulk_concurrency=5,
+        adaptive_failure_coalescing_seconds=1,
+        adaptive_hard_decrease_ratio=0.4,
+        adaptive_recovery_successes=2,
+        adaptive_recovery_quiet_seconds=10,
+        adaptive_recovery_probe_interval_seconds=5,
+        adaptive_recovery_growth_factor=4 / 3,
+        rate_limit_cooldown_seconds=0,
+    ), clock=clock)
+
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error", status_code=429
+    )
+    assert coordinator.snapshot().effective_bulk_concurrency == 6
+
+    clock.advance(10)
+    await coordinator.report_success()
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 8
 
     await coordinator.report_success()
-    assert coordinator.snapshot().effective_bulk_concurrency == 3
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 8
+    clock.advance(5)
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 11
+
+    clock.advance(5)
+    await coordinator.report_success()
     await coordinator.report_success()
     snapshot = coordinator.snapshot()
-    assert snapshot.effective_bulk_concurrency == 4
+    assert snapshot.effective_bulk_concurrency == 15
+    assert snapshot.adaptive_recovery_probes == 3
+    assert snapshot.adaptive_state == "steady"
+
+
+@pytest.mark.asyncio
+async def test_provider_adaptive_failure_interrupts_recovery_probe():
+    clock = _FakeClock()
+    coordinator = ProviderCoordinator(ProviderResourceConfig(
+        name="recovery-interruption",
+        hard_max_concurrency=20,
+        default_bulk_concurrency=15,
+        reserved_concurrency=5,
+        http_max_connections=20,
+        http_max_keepalive_connections=20,
+        adaptive_min_bulk_concurrency=5,
+        adaptive_failure_coalescing_seconds=1,
+        adaptive_soft_failure_min_count=2,
+        adaptive_soft_failure_rate_threshold=0.05,
+        adaptive_soft_decrease_ratio=0.8,
+        adaptive_hard_decrease_ratio=0.4,
+        adaptive_recovery_successes=2,
+        adaptive_recovery_quiet_seconds=5,
+        adaptive_recovery_probe_interval_seconds=5,
+        adaptive_recovery_growth_factor=4 / 3,
+        rate_limit_cooldown_seconds=0,
+        transient_cooldown_seconds=0,
+    ), clock=clock)
+
+    await coordinator.report_retryable_failure(
+        error_code="rate_limit_error", status_code=429
+    )
+    clock.advance(5)
+    await coordinator.report_success()
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 8
+
+    clock.advance(2)
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    await coordinator.report_retryable_failure(
+        error_code="transient_transport_error", status_code=503
+    )
+    snapshot = coordinator.snapshot()
+    assert snapshot.effective_bulk_concurrency == 6
+    assert snapshot.adaptive_congestion_events == 2
     assert snapshot.adaptive_success_streak == 0
+    assert snapshot.adaptive_state == "congestion_episode"
+
+    clock.advance(2)
+    await coordinator.report_success()
+    await coordinator.report_success()
+    assert coordinator.snapshot().effective_bulk_concurrency == 6
+
 
 
 @pytest.mark.asyncio
@@ -322,6 +533,34 @@ async def test_retryable_response_sets_cooldown_before_next_admission():
     assert call_times[1] - throttled_at >= 0.04
     snapshot = client.provider_coordinator_registry.snapshots()[0]
     assert snapshot.effective_bulk_concurrency == 1
+
+
+@pytest.mark.asyncio
+async def test_provider_cooldown_uses_uncapped_retry_after():
+    async def transport(url, headers, payload, timeout):
+        return {
+            "status_code": 429,
+            "headers": {"retry-after": "120"},
+            "data": {},
+        }
+
+    config = _multi_profile_config(hard=1, bulk=1)
+    assert config.profiles["one"].max_retry_after_seconds == 30
+    registry = ProviderCoordinatorRegistry()
+    client = LlmClient(
+        config,
+        transport=CallableTransport(transport),
+        environment={"TEST_LLM_KEY": "secret"},
+        provider_coordinator_registry=registry,
+    )
+
+    with pytest.raises(LlmRateLimitError):
+        await client.complete(_request("one", "long-retry-after", bulk=True))
+
+    snapshot = registry.snapshots()[0]
+    assert snapshot.cooldown_remaining_seconds >= 119
+    coordinator = registry.get(config.provider_resources["shared"])
+    await coordinator.close()
 
 
 @pytest.mark.asyncio
@@ -394,7 +633,8 @@ async def test_attempt_timeout_reports_one_provider_failure():
 
     snapshot = registry.snapshots()[0]
     assert snapshot.adaptive_retryable_failures == 1
-    assert snapshot.effective_bulk_concurrency == 6
+    assert snapshot.adaptive_congestion_events == 0
+    assert snapshot.effective_bulk_concurrency == 8
 
 
 @pytest.mark.asyncio

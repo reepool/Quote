@@ -224,7 +224,16 @@ class ProviderResourceConfig:
     http_max_keepalive_connections: int = 60
     adaptive_concurrency_enabled: bool = True
     adaptive_min_bulk_concurrency: int = 5
-    adaptive_recovery_successes: int = 10
+    adaptive_recovery_successes: int = 6
+    adaptive_failure_coalescing_seconds: float = 10.0
+    adaptive_outcome_window_size: int = 30
+    adaptive_soft_failure_min_count: int = 2
+    adaptive_soft_failure_rate_threshold: float = 0.08
+    adaptive_soft_decrease_ratio: float = 0.80
+    adaptive_hard_decrease_ratio: float = 0.50
+    adaptive_recovery_quiet_seconds: float = 30.0
+    adaptive_recovery_probe_interval_seconds: float = 30.0
+    adaptive_recovery_growth_factor: float = 4.0 / 3.0
     rate_limit_cooldown_seconds: float = 0.0
     transient_cooldown_seconds: float = 0.0
     workload_weights: Mapping[str, int] = field(default_factory=dict)
@@ -287,11 +296,81 @@ class ProviderResourceConfig:
                 "be positive and no greater than default_bulk_concurrency"
             )
         recovery_successes = int(_configured(
-            value, "adaptive_recovery_successes", 10
+            value, "adaptive_recovery_successes", 6
         ))
         if recovery_successes < 1:
             raise ValueError(
                 f"provider resource {name} adaptive_recovery_successes must be positive"
+            )
+        coalescing_seconds = float(_configured(
+            value, "adaptive_failure_coalescing_seconds", 10.0
+        ))
+        outcome_window_size = int(_configured(
+            value, "adaptive_outcome_window_size", 30
+        ))
+        soft_failure_min_count = int(_configured(
+            value, "adaptive_soft_failure_min_count", 2
+        ))
+        soft_failure_rate_threshold = float(_configured(
+            value, "adaptive_soft_failure_rate_threshold", 0.08
+        ))
+        soft_decrease_ratio = float(_configured(
+            value, "adaptive_soft_decrease_ratio", 0.80
+        ))
+        hard_decrease_ratio = float(_configured(
+            value, "adaptive_hard_decrease_ratio", 0.50
+        ))
+        recovery_quiet_seconds = float(_configured(
+            value, "adaptive_recovery_quiet_seconds", 30.0
+        ))
+        recovery_probe_interval_seconds = float(_configured(
+            value, "adaptive_recovery_probe_interval_seconds", 30.0
+        ))
+        recovery_growth_factor = float(_configured(
+            value, "adaptive_recovery_growth_factor", 4.0 / 3.0
+        ))
+        if coalescing_seconds < 0:
+            raise ValueError(
+                f"provider resource {name} adaptive_failure_coalescing_seconds "
+                "must not be negative"
+            )
+        if outcome_window_size < 2:
+            raise ValueError(
+                f"provider resource {name} adaptive_outcome_window_size must be "
+                "at least 2"
+            )
+        if (
+            soft_failure_min_count < 1
+            or soft_failure_min_count > outcome_window_size
+        ):
+            raise ValueError(
+                f"provider resource {name} adaptive_soft_failure_min_count must "
+                "be positive and no greater than adaptive_outcome_window_size"
+            )
+        if not 0.0 < soft_failure_rate_threshold <= 1.0:
+            raise ValueError(
+                f"provider resource {name} adaptive_soft_failure_rate_threshold "
+                "must be in (0, 1]"
+            )
+        if not 0.0 < soft_decrease_ratio < 1.0:
+            raise ValueError(
+                f"provider resource {name} adaptive_soft_decrease_ratio must be "
+                "in (0, 1)"
+            )
+        if not 0.0 < hard_decrease_ratio < 1.0:
+            raise ValueError(
+                f"provider resource {name} adaptive_hard_decrease_ratio must be "
+                "in (0, 1)"
+            )
+        if recovery_quiet_seconds < 0 or recovery_probe_interval_seconds < 0:
+            raise ValueError(
+                f"provider resource {name} adaptive recovery intervals must not "
+                "be negative"
+            )
+        if recovery_growth_factor <= 1.0:
+            raise ValueError(
+                f"provider resource {name} adaptive_recovery_growth_factor must "
+                "be greater than 1"
             )
         rate_limit_cooldown = float(_configured(
             value, "rate_limit_cooldown_seconds", 0.0
@@ -325,6 +404,17 @@ class ProviderResourceConfig:
             adaptive_concurrency_enabled=adaptive_enabled,
             adaptive_min_bulk_concurrency=adaptive_min,
             adaptive_recovery_successes=recovery_successes,
+            adaptive_failure_coalescing_seconds=coalescing_seconds,
+            adaptive_outcome_window_size=outcome_window_size,
+            adaptive_soft_failure_min_count=soft_failure_min_count,
+            adaptive_soft_failure_rate_threshold=soft_failure_rate_threshold,
+            adaptive_soft_decrease_ratio=soft_decrease_ratio,
+            adaptive_hard_decrease_ratio=hard_decrease_ratio,
+            adaptive_recovery_quiet_seconds=recovery_quiet_seconds,
+            adaptive_recovery_probe_interval_seconds=(
+                recovery_probe_interval_seconds
+            ),
+            adaptive_recovery_growth_factor=recovery_growth_factor,
             rate_limit_cooldown_seconds=rate_limit_cooldown,
             transient_cooldown_seconds=transient_cooldown,
             workload_weights=weights,

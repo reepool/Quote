@@ -43,6 +43,7 @@ docs/development/common_llm_work_orchestration_requirements.md
 - 请求、响应、模型、耗时、token usage 和错误分类的标准 envelope；
 - 请求及响应 hash、调用追踪 ID、幂等键和脱敏日志；
 - 异步调用、取消、deadline 和有界并发；
+- provider/account 共享的智能拥塞控制和可观测恢复探测；
 - 使用 fake transport 的离线单元测试能力。
 
 ### 3.2 公共层不负责
@@ -204,6 +205,23 @@ cancelled
 
 限流必须按 profile 共享，不能由各业务分别创建互不知情的并发连接。
 
+### 9.1 Provider 智能控流
+
+所有映射到同一 provider/account 资源键的 profile 和业务必须共享一个智能控流协调器。
+每次 provider attempt 的 retryable 结果最多上报一次，业务层不得再包装独立的全局并发算法。
+
+智能控流必须区分：
+
+- `rate_limit_error`/HTTP 429：立即硬降档并使用原始 `Retry-After` 约束全局 cooldown；
+- HTTP 408、可重试 5xx、timeout、DNS 和 transport error：进入软故障滑动窗口；
+- `response_parse_error` 和 `schema_validation_error`：允许有界 repair，但不报告 provider 拥塞。
+
+同一故障窗口内的相关失败最多触发一次降档。软故障必须同时达到最少失败数和窗口错误率
+阈值。若软故障事件内随后出现 429，协调器必须把同一事件升级到基于事件初始并发计算的
+硬目标，但不得对当前档位重复叠乘。恢复必须等待静默期、成功数和探测间隔，并按配置比例增长，例如
+`6 -> 8 -> 11 -> 15`。快照必须同时展示配置上限、当前有效并发、原始失败、合并失败、
+拥塞事件、恢复探测和窗口错误率，避免把临时低档误解为服务端永久容量。
+
 ## 10. 安全与审计
 
 - 不记录 Authorization、API Key、Cookie 或完整敏感请求头；
@@ -217,6 +235,11 @@ cancelled
 ## 11. 测试和验收
 
 必须使用 fake transport 覆盖：
+
+- 同一 attempt 穿过多层异常处理时只报告一次 provider 失败；
+- 三个同秒 transport failure 只触发一次降档；
+- 单个软故障不降档，429 立即降档；
+- 稳定成功按比例恢复，恢复中故障会重新进入静默期；
 
 - disabled、缺失 key、错误 Base URL 和 endpoint；
 - 原生 JSON Schema、`json_object` 和 `prompt_only` 三种模式；

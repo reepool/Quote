@@ -29,6 +29,12 @@ class _Waiter:
     admitted: bool = False
 
 
+@dataclass(frozen=True)
+class _ProviderOutcome:
+    timestamp: float
+    outcome: str
+
+
 class ProviderCoordinator:
     """Fair in-process admission for one provider account resource."""
 
@@ -60,6 +66,19 @@ class ProviderCoordinator:
         )
         self._adaptive_retryable_failures = 0
         self._adaptive_success_streak = 0
+        self._adaptive_congestion_events = 0
+        self._adaptive_coalesced_failures = 0
+        self._adaptive_recovery_probes = 0
+        self._adaptive_last_failure_class: Optional[str] = None
+        self._adaptive_last_failure_at: Optional[float] = None
+        self._adaptive_last_recovery_probe_at: Optional[float] = None
+        self._adaptive_episode_until = 0.0
+        self._adaptive_episode_failure_class: Optional[str] = None
+        self._adaptive_episode_base_limit: Optional[int] = None
+        self._adaptive_soft_evidence_after = 0.0
+        self._adaptive_outcomes: Deque[_ProviderOutcome] = deque(
+            maxlen=config.adaptive_outcome_window_size
+        )
         self._admitted = 0
         self._admitted_by_workload: dict[str, int] = {}
         self._completed = 0
@@ -183,9 +202,10 @@ class ProviderCoordinator:
         status_code: Optional[int] = None,
         retry_after_seconds: Optional[float] = None,
     ) -> None:
-        """Apply provider-wide congestion control after a retryable failure."""
+        """Record one retryable outcome and adapt provider-wide admission."""
         normalized_code = str(error_code or "").strip().lower()
         is_rate_limit = status_code == 429 or normalized_code == "rate_limit_error"
+        failure_class = "hard_rate_limit" if is_rate_limit else "soft_transient"
         configured_cooldown = (
             self.config.rate_limit_cooldown_seconds
             if is_rate_limit
@@ -196,41 +216,180 @@ class ProviderCoordinator:
             max(0.0, float(retry_after_seconds or 0.0)),
         )
         async with self._lock:
+            now = self._clock()
             prior_limit = self._effective_bulk_concurrency
             self._adaptive_retryable_failures += 1
             self._adaptive_success_streak = 0
-            if self.config.adaptive_concurrency_enabled:
-                factor = 0.5 if is_rate_limit else 0.75
-                reduced = math.floor(prior_limit * factor)
-                if prior_limit > self._adaptive_min_bulk_concurrency:
-                    reduced = min(reduced, prior_limit - 1)
-                self._effective_bulk_concurrency = max(
-                    self._adaptive_min_bulk_concurrency,
-                    reduced,
-                )
+            self._adaptive_last_failure_class = failure_class
+            self._adaptive_last_failure_at = now
+            self._adaptive_last_recovery_probe_at = None
+            self._adaptive_outcomes.append(_ProviderOutcome(
+                timestamp=now,
+                outcome=failure_class,
+            ))
             if cooldown > 0:
                 self._cooldown_until = max(
-                    self._cooldown_until, self._clock() + cooldown
+                    self._cooldown_until, now + cooldown
                 )
                 self._schedule_cooldown_wake_locked()
-            if self._effective_bulk_concurrency != prior_limit or cooldown > 0:
-                LOGGER.warning(
-                    "LLM provider congestion resource=%s code=%s status=%s "
-                    "bulk_limit=%s->%s cooldown_seconds=%.1f failures=%s",
+            if not self.config.adaptive_concurrency_enabled:
+                return
+
+            if now < self._adaptive_episode_until:
+                if (
+                    is_rate_limit
+                    and self._adaptive_episode_failure_class
+                    != "hard_rate_limit"
+                ):
+                    episode_base_limit = (
+                        self._adaptive_episode_base_limit or prior_limit
+                    )
+                    reduced = math.floor(
+                        episode_base_limit
+                        * self.config.adaptive_hard_decrease_ratio
+                    )
+                    if episode_base_limit > self._adaptive_min_bulk_concurrency:
+                        reduced = min(reduced, episode_base_limit - 1)
+                    hard_limit = max(
+                        self._adaptive_min_bulk_concurrency,
+                        reduced,
+                    )
+                    self._effective_bulk_concurrency = min(
+                        prior_limit,
+                        hard_limit,
+                    )
+                    self._adaptive_episode_failure_class = "hard_rate_limit"
+                    episode_seconds = (
+                        self.config.adaptive_failure_coalescing_seconds
+                    )
+                    self._adaptive_episode_until = max(
+                        self._adaptive_episode_until,
+                        now + episode_seconds,
+                    )
+                    self._adaptive_soft_evidence_after = max(
+                        self._adaptive_soft_evidence_after,
+                        self._adaptive_episode_until,
+                    )
+                    LOGGER.warning(
+                        "LLM provider congestion episode escalated resource=%s "
+                        "class=%s code=%s status=%s base_limit=%s "
+                        "bulk_limit=%s->%s ratio=%.3f cooldown_seconds=%.1f "
+                        "episode_seconds=%.1f events=%s raw_failures=%s",
+                        self.config.name,
+                        failure_class,
+                        normalized_code or "rate_limit_error",
+                        status_code,
+                        episode_base_limit,
+                        prior_limit,
+                        self._effective_bulk_concurrency,
+                        self.config.adaptive_hard_decrease_ratio,
+                        cooldown,
+                        episode_seconds,
+                        self._adaptive_congestion_events,
+                        self._adaptive_retryable_failures,
+                    )
+                    return
+                self._adaptive_coalesced_failures += 1
+                LOGGER.info(
+                    "LLM provider congestion failure coalesced resource=%s "
+                    "class=%s code=%s status=%s episode_remaining_seconds=%.1f "
+                    "raw_failures=%s coalesced=%s",
+                    self.config.name,
+                    failure_class,
+                    normalized_code or "retryable_provider_error",
+                    status_code,
+                    self._adaptive_episode_until - now,
+                    self._adaptive_retryable_failures,
+                    self._adaptive_coalesced_failures,
+                )
+                return
+
+            window_requests, soft_failures, soft_failure_rate = (
+                self._adaptive_window_stats_locked()
+            )
+            should_decrease = is_rate_limit or (
+                soft_failures >= self.config.adaptive_soft_failure_min_count
+                and soft_failure_rate
+                >= self.config.adaptive_soft_failure_rate_threshold
+            )
+            if not should_decrease:
+                LOGGER.info(
+                    "LLM provider transient failure observed resource=%s code=%s "
+                    "status=%s window_requests=%s soft_failures=%s "
+                    "failure_rate=%.3f threshold_count=%s threshold_rate=%.3f",
                     self.config.name,
                     normalized_code or "retryable_provider_error",
                     status_code,
-                    prior_limit,
-                    self._effective_bulk_concurrency,
-                    cooldown,
-                    self._adaptive_retryable_failures,
+                    window_requests,
+                    soft_failures,
+                    soft_failure_rate,
+                    self.config.adaptive_soft_failure_min_count,
+                    self.config.adaptive_soft_failure_rate_threshold,
                 )
+                return
+
+            ratio = (
+                self.config.adaptive_hard_decrease_ratio
+                if is_rate_limit
+                else self.config.adaptive_soft_decrease_ratio
+            )
+            reduced = math.floor(prior_limit * ratio)
+            if prior_limit > self._adaptive_min_bulk_concurrency:
+                reduced = min(reduced, prior_limit - 1)
+            self._effective_bulk_concurrency = max(
+                self._adaptive_min_bulk_concurrency,
+                reduced,
+            )
+            episode_seconds = self.config.adaptive_failure_coalescing_seconds
+            self._adaptive_episode_until = now + episode_seconds
+            self._adaptive_episode_failure_class = failure_class
+            self._adaptive_episode_base_limit = prior_limit
+            self._adaptive_soft_evidence_after = self._adaptive_episode_until
+            self._adaptive_congestion_events += 1
+            if not is_rate_limit:
+                episode_start = now - episode_seconds
+                episode_failures = sum(
+                    1
+                    for outcome in self._adaptive_outcomes
+                    if outcome.outcome == "soft_transient"
+                    and outcome.timestamp >= episode_start
+                )
+                self._adaptive_coalesced_failures += max(
+                    0, episode_failures - 1
+                )
+            LOGGER.warning(
+                "LLM provider congestion episode resource=%s class=%s "
+                "code=%s status=%s bulk_limit=%s->%s ratio=%.3f "
+                "cooldown_seconds=%.1f episode_seconds=%.1f "
+                "window_requests=%s soft_failures=%s failure_rate=%.3f "
+                "events=%s raw_failures=%s coalesced=%s",
+                self.config.name,
+                failure_class,
+                normalized_code or "retryable_provider_error",
+                status_code,
+                prior_limit,
+                self._effective_bulk_concurrency,
+                ratio,
+                cooldown,
+                episode_seconds,
+                window_requests,
+                soft_failures,
+                soft_failure_rate,
+                self._adaptive_congestion_events,
+                self._adaptive_retryable_failures,
+                self._adaptive_coalesced_failures,
+            )
 
     async def report_success(self) -> None:
-        """Gradually restore provider concurrency after sustained success."""
+        """Probe higher concurrency after quiet, sustained provider success."""
         if not self.config.adaptive_concurrency_enabled:
             return
         async with self._lock:
+            now = self._clock()
+            self._adaptive_outcomes.append(_ProviderOutcome(
+                timestamp=now,
+                outcome="success",
+            ))
             if self._effective_bulk_concurrency >= self.config.default_bulk_concurrency:
                 self._adaptive_success_streak = 0
                 return
@@ -240,19 +399,64 @@ class ProviderCoordinator:
                 < self.config.adaptive_recovery_successes
             ):
                 return
+            recovery_ready_at = self._adaptive_recovery_ready_at_locked()
+            if now < recovery_ready_at:
+                return
             prior_limit = self._effective_bulk_concurrency
             self._effective_bulk_concurrency = min(
                 self.config.default_bulk_concurrency,
-                prior_limit + 1,
+                max(
+                    prior_limit + 1,
+                    math.ceil(
+                        prior_limit
+                        * self.config.adaptive_recovery_growth_factor
+                    ),
+                ),
             )
             self._adaptive_success_streak = 0
+            self._adaptive_recovery_probes += 1
+            self._adaptive_last_recovery_probe_at = now
             LOGGER.info(
-                "LLM provider concurrency recovering resource=%s bulk_limit=%s->%s",
+                "LLM provider recovery probe resource=%s bulk_limit=%s->%s "
+                "growth_factor=%.3f probes=%s",
                 self.config.name,
                 prior_limit,
                 self._effective_bulk_concurrency,
+                self.config.adaptive_recovery_growth_factor,
+                self._adaptive_recovery_probes,
             )
             self._dispatch_locked()
+
+    def _adaptive_window_stats_locked(self) -> tuple[int, int, float]:
+        eligible = [
+            outcome
+            for outcome in self._adaptive_outcomes
+            if outcome.timestamp >= self._adaptive_soft_evidence_after
+        ]
+        request_count = len(eligible)
+        soft_failures = sum(
+            1 for outcome in eligible if outcome.outcome == "soft_transient"
+        )
+        failure_rate = (
+            soft_failures / request_count if request_count else 0.0
+        )
+        return request_count, soft_failures, failure_rate
+
+    def _adaptive_recovery_ready_at_locked(self) -> float:
+        ready_at = max(self._cooldown_until, self._adaptive_episode_until)
+        if self._adaptive_last_failure_at is not None:
+            ready_at = max(
+                ready_at,
+                self._adaptive_last_failure_at
+                + self.config.adaptive_recovery_quiet_seconds,
+            )
+        if self._adaptive_last_recovery_probe_at is not None:
+            ready_at = max(
+                ready_at,
+                self._adaptive_last_recovery_probe_at
+                + self.config.adaptive_recovery_probe_interval_seconds,
+            )
+        return ready_at
 
     def _schedule_cooldown_wake_locked(self) -> None:
         remaining = self._cooldown_until - self._clock()
@@ -333,11 +537,26 @@ class ProviderCoordinator:
             self._schedule_cursor %= len(self._schedule)
 
     def snapshot(self) -> ProviderSnapshot:
+        now = self._clock()
         waiting_by_workload = {
             workload: len(queue)
             for workload, queue in self._queues.items()
             if queue
         }
+        window_requests, soft_failures, soft_failure_rate = (
+            self._adaptive_window_stats_locked()
+        )
+        recovery_ready_at = self._adaptive_recovery_ready_at_locked()
+        if now < self._cooldown_until:
+            adaptive_state = "cooldown"
+        elif now < self._adaptive_episode_until:
+            adaptive_state = "congestion_episode"
+        elif self._effective_bulk_concurrency < self.config.default_bulk_concurrency:
+            adaptive_state = (
+                "recovery_hold" if now < recovery_ready_at else "recovery_probe"
+            )
+        else:
+            adaptive_state = "steady"
         return ProviderSnapshot(
             resource_name=self.config.name,
             active=self._active,
@@ -358,6 +577,20 @@ class ProviderCoordinator:
             effective_bulk_concurrency=self._effective_bulk_concurrency,
             adaptive_retryable_failures=self._adaptive_retryable_failures,
             adaptive_success_streak=self._adaptive_success_streak,
+            adaptive_congestion_events=self._adaptive_congestion_events,
+            adaptive_coalesced_failures=self._adaptive_coalesced_failures,
+            adaptive_recovery_probes=self._adaptive_recovery_probes,
+            adaptive_window_requests=window_requests,
+            adaptive_window_soft_failures=soft_failures,
+            adaptive_window_failure_rate=soft_failure_rate,
+            adaptive_last_failure_class=self._adaptive_last_failure_class,
+            adaptive_state=adaptive_state,
+            adaptive_episode_remaining_seconds=max(
+                0.0, self._adaptive_episode_until - now
+            ),
+            adaptive_recovery_quiet_remaining_seconds=max(
+                0.0, recovery_ready_at - now
+            ),
             total_admission_wait_ms=self._total_admission_wait_ms,
         )
 
@@ -407,12 +640,26 @@ class ProviderCoordinatorRegistry:
     @staticmethod
     def _coordination_limits(
         config: ProviderResourceConfig,
-    ) -> tuple[str, int, int, int]:
+    ) -> tuple[object, ...]:
         return (
             config.provider,
             config.hard_max_concurrency,
             config.default_bulk_concurrency,
             config.reserved_concurrency,
+            config.adaptive_concurrency_enabled,
+            config.adaptive_min_bulk_concurrency,
+            config.adaptive_recovery_successes,
+            config.adaptive_failure_coalescing_seconds,
+            config.adaptive_outcome_window_size,
+            config.adaptive_soft_failure_min_count,
+            config.adaptive_soft_failure_rate_threshold,
+            config.adaptive_soft_decrease_ratio,
+            config.adaptive_hard_decrease_ratio,
+            config.adaptive_recovery_quiet_seconds,
+            config.adaptive_recovery_probe_interval_seconds,
+            config.adaptive_recovery_growth_factor,
+            config.rate_limit_cooldown_seconds,
+            config.transient_cooldown_seconds,
         )
 
     def snapshots(self) -> tuple[ProviderSnapshot, ...]:

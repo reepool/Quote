@@ -169,6 +169,28 @@ flowchart LR
 未来如果必须多进程部署，应另行设计 Redis、数据库租约或外部限流服务，不能假设当前内存
 协调器自动生效。
 
+### 6.3 智能拥塞控制
+
+provider/account 的有效批量并发不是固定值。公共协调器必须依据真实 provider 结果动态调整，
+但不得把同一波相关故障当成多次独立容量结论。
+
+控制规则：
+
+- 429 是硬限流信号，立即按硬降档比例处理并服从 `Retry-After`；
+- 408、502/503/其他可重试 5xx、DNS、timeout 和 transport error 是软信号；
+- 单个软故障只进入有界滑动窗口，不立即降低全局并发；
+- 软故障数量和错误率同时达到阈值后，才触发一次温和降档；
+- 同一故障合并窗口内的其他失败只累计 raw/coalesced 指标，不重复降档；
+- 软故障事件内出现 429 时升级为硬事件，硬目标按事件开始前的并发计算，不重复叠乘；
+- provider 全局 cooldown 使用原始 `Retry-After`，单请求退避仍受 profile 上限和 deadline 约束；
+- JSON 解析和 schema repair 失败不属于 provider 容量故障，不得改变全局并发；
+- 降档后必须等待 cooldown、无故障静默期和足够成功请求，再进行恢复探测；
+- 恢复按比例增长并设置探测间隔，例如 `6 -> 8 -> 11 -> 15`，不得长期每次只恢复一路；
+- 新的拥塞事件会中断恢复并重新计算静默期。
+
+账号宣称的 60 并发是硬上限，不等于任意 token 负载都能稳定维持 60。有效并发表示协调器
+当前的准入状态，不得解释为 provider 已测得的永久容量。
+
 ## 7. 公平调度和背压
 
 ### 7.1 Workload 公平性
@@ -338,6 +360,8 @@ prompt 或 artifact 变化时必须重新处理。
 - 准入等待、请求执行、重试和总耗时；
 - 429、5xx、timeout、schema failure、cancel；
 - cooldown 状态和剩余时间；
+- 配置并发、有效并发、拥塞事件和恢复探测；
+- 原始可重试失败、合并失败、滑动窗口错误率和最后失败类型；
 - 下载、解析、writer 活动数和积压；
 - 成功、失败、跳过、恢复和剩余数量。
 
@@ -363,7 +387,16 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
         "http_max_keepalive_connections": 60,
         "adaptive_concurrency_enabled": true,
         "adaptive_min_bulk_concurrency": 5,
-        "adaptive_recovery_successes": 10,
+        "adaptive_recovery_successes": 6,
+        "adaptive_failure_coalescing_seconds": 10.0,
+        "adaptive_outcome_window_size": 30,
+        "adaptive_soft_failure_min_count": 2,
+        "adaptive_soft_failure_rate_threshold": 0.08,
+        "adaptive_soft_decrease_ratio": 0.8,
+        "adaptive_hard_decrease_ratio": 0.5,
+        "adaptive_recovery_quiet_seconds": 30.0,
+        "adaptive_recovery_probe_interval_seconds": 30.0,
+        "adaptive_recovery_growth_factor": 1.3333333333333333,
         "rate_limit_cooldown_seconds": 10.0,
         "transient_cooldown_seconds": 2.0
       }
@@ -385,7 +418,8 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
 - bulk 不超过 hard max；
 - reserved 与 bulk 关系合理；
 - HTTP pool 能容纳实际 client 并发；
-- 429、503、52x 和传输失败必须触发 provider 级冷却和并发降档，连续成功后只能渐进恢复；
+- 429 必须立即触发硬降档；软传输失败必须经过滑动窗口阈值和故障窗口合并；
+- 恢复增长因子必须大于 1，降档比例必须在 0 和 1 之间；
 - 队列和 worker 均为有界正整数；
 - profile 必须映射到已声明的 provider resource。
 
@@ -397,6 +431,10 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
 - 大任务和短任务都能推进；
 - 取消、deadline 和异常不泄漏租约；
 - 429 共享 cooldown；
+- 同一秒的多个软故障只形成一个拥塞事件；
+- 单个软故障不降低全局并发；
+- 软故障达到数量和错误率阈值后只温和降档一次；
+- 稳定成功后按 `6 -> 8 -> 11 -> 15` 比例恢复，故障可中断恢复；
 - jitter 不导致不可测试，使用 fake clock/random；
 - 队列满时背压生效；
 - 乱序返回不串 item；

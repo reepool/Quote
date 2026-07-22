@@ -244,10 +244,18 @@ class LlmClient:
                                         await provider_coordinator.report_retryable_failure(
                                             error_code=provider_error.code,
                                             status_code=response.status_code,
-                                            retry_after_seconds=self._base_retry_delay(
-                                                profile,
-                                                attempt_count,
-                                                response=response,
+                                            retry_after_seconds=(
+                                                _parse_retry_after(
+                                                    response.headers.get(
+                                                        "retry-after"
+                                                    )
+                                                )
+                                                if response.status_code == 429
+                                                else self._base_retry_delay(
+                                                    profile,
+                                                    attempt_count,
+                                                    response=response,
+                                                )
                                             ),
                                         )
                                         provider_failure_reported = True
