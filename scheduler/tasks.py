@@ -424,6 +424,9 @@ def _format_cninfo_special_action_discovery_report(
         f"concurrency={title_classification.get('peak_concurrency', 0)}/"
         f"{title_classification.get('max_concurrency', 0)}, "
         f"event_errors={title_classification.get('event_errors', 0)}`",
+        "标题失败批次拆分重试: "
+        f"requests={title_classification.get('isolated_retry_request_count', 0)}, "
+        f"events={title_classification.get('isolated_retry_event_count', 0)}",
         "公告证据: `"
         f"candidate={evidence.get('candidate_count', 0)}, "
         f"rejected={evidence.get('rejected_count', 0)}`",
@@ -652,6 +655,9 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         f"concurrency={title_classification.get('peak_concurrency', 0)}/"
         f"{title_classification.get('max_concurrency', 0)}, "
         f"event_errors={title_classification.get('event_errors', 0)}`",
+        "标题失败批次拆分重试: "
+        f"requests={title_classification.get('isolated_retry_request_count', 0)}, "
+        f"events={title_classification.get('isolated_retry_event_count', 0)}",
         "说明: 原始 CNInfo 事件不修改；北交所不进入 CNInfo 公告解析。",
     ]
     if state_counts:

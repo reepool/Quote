@@ -21033,13 +21033,16 @@ class DataManager:
                     dm_logger.info(
                         "[DataManager] CNInfo title classification completed: "
                         "events=%d titles=%d requests=%d max_concurrency=%d "
-                        "peak_concurrency=%d event_errors=%d",
+                        "peak_concurrency=%d event_errors=%d "
+                        "isolated_retries=%d/%d",
                         title_batch.input_event_count,
                         title_batch.input_title_count,
                         title_batch.request_count,
                         title_batch.max_concurrency,
                         title_batch.peak_concurrency,
                         len(title_batch.errors_by_event),
+                        title_batch.isolated_retry_request_count,
+                        title_batch.isolated_retry_event_count,
                     )
                 except Exception as exc:
                     title_classification_error = (
@@ -21454,6 +21457,14 @@ class DataManager:
                 ),
                 "peak_concurrency": (
                     title_batch.peak_concurrency if title_batch else 0
+                ),
+                "isolated_retry_request_count": (
+                    title_batch.isolated_retry_request_count
+                    if title_batch else 0
+                ),
+                "isolated_retry_event_count": (
+                    title_batch.isolated_retry_event_count
+                    if title_batch else 0
                 ),
                 "input_event_count": (
                     title_batch.input_event_count if title_batch else 0

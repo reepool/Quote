@@ -65,6 +65,9 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     ]
     assert title_profile["max_concurrency"] == 50
     assert title_profile["requests_per_minute"] == 0
+    assert title_profile["max_retries"] == 2
+    assert title_profile["retry_backoff_seconds"] == 2.0
+    assert title_profile["retry_jitter_ratio"] == 0.5
     assert llm_config["llm"]["profiles"]["semantic_extraction"][
         "max_concurrency"
     ] == 50

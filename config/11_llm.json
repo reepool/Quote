@@ -70,7 +70,7 @@
         "allow_prompt_only": false,
         "timeout_seconds": 620,
         "attempt_timeout_seconds": 300,
-        "max_retries": 1,
+        "max_retries": 2,
         "max_schema_repair_attempts": 1,
         "max_concurrency": 50,
         "requests_per_minute": 0,
@@ -79,8 +79,8 @@
         "stream": true,
         "stream_include_usage": true,
         "max_retry_after_seconds": 30,
-        "retry_backoff_seconds": 0.5,
-        "retry_jitter_ratio": 0.2,
+        "retry_backoff_seconds": 2.0,
+        "retry_jitter_ratio": 0.5,
         "idempotency_header": "Idempotency-Key"
       }
     }

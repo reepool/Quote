@@ -40,7 +40,7 @@ def _state(event_key, state, *, candidate_count=0, terminal=False, next_action=N
         "action_type": "dividend",
         "exchange": "SSE",
         "policy_version": APPLICABILITY_POLICY_VERSION,
-        "state_version": "cninfo_resolution_state_v1",
+        "state_version": "cninfo_resolution_state_v2",
         "resolution_state": state,
         "is_terminal": terminal,
         "factor_blocking": not terminal,
@@ -63,6 +63,38 @@ def test_cash_dividend_optional_dates_do_not_create_extra_blockers():
     assert result["missing_required_date_roles"] == ["effective_date"]
     assert "pay_date" in result["supporting_date_roles"]
     assert "share_arrival_date" not in result["supporting_date_roles"]
+
+
+def test_explicit_no_distribution_is_not_factor_blocking():
+    result = derive_resolution_state(
+        _row(
+            action_type="distribution",
+            cash_dividend_per_share=0.0,
+            description="不派发股利",
+        ),
+        scan_status="success",
+    )
+
+    assert result["applicability"]["explicit_non_effective"] is True
+    assert result["resolution_state"] == "non_effective"
+    assert result["is_terminal"] is True
+    assert result["factor_blocking"] is False
+
+
+def test_compound_distribution_description_is_not_terminalized_from_substring():
+    result = derive_resolution_state(
+        _row(
+            action_type="distribution",
+            cash_dividend_per_share=0.0,
+            capitalization_shares_per_share=0.0,
+            description="不进行利润分配，但以资本公积每10股转增10股",
+        ),
+        scan_status="success",
+    )
+
+    assert result["applicability"]["explicit_non_effective"] is False
+    assert result["resolution_state"] == "evidence_unavailable"
+    assert result["factor_blocking"] is True
 
 
 def test_bse_is_source_unsupported_and_not_factor_blocking():

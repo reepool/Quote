@@ -249,6 +249,113 @@ async def test_title_classifier_isolates_failed_concurrent_chunk():
 
 
 @pytest.mark.asyncio
+async def test_title_classifier_falls_back_to_event_requests_after_shared_failure():
+    class SharedChunkFailureClient:
+        def __init__(self):
+            self.calls = []
+
+        async def complete(self, request):
+            payload = json.loads(request.messages[1].content)
+            self.calls.append(payload)
+            if len(payload["events"]) > 1:
+                raise RuntimeError("provider unavailable")
+            event = payload["events"][0]
+            announcement = event["announcements"][0]
+            return _response([{
+                "source_event_key": event["source_event_key"],
+                "event_applicability": "effectful",
+                "applicability_reason": "Distribution",
+                "classifications": [{
+                    "announcement_id": announcement["announcement_id"],
+                    "relevance": "relevant",
+                    "announcement_role": "implementation",
+                    "confidence": 0.99,
+                    "reason": "Implementation notice",
+                }],
+            }])
+
+    client = SharedChunkFailureClient()
+    second_event = {
+        **_event([{
+            "announcement_id": "announcement-2",
+            "title": "公告二",
+        }]),
+        "instrument_id": "000410.SZ",
+        "source_event_key": "event-2",
+    }
+    classifier = CninfoAnnouncementTitleClassifier(
+        client, max_titles_per_request=10, max_concurrency=2
+    )
+
+    result = await classifier.classify([
+        _event([{"announcement_id": "announcement-1", "title": "公告一"}]),
+        second_event,
+    ])
+
+    assert len(client.calls) == 3
+    assert result.request_count == 3
+    assert result.isolated_retry_request_count == 2
+    assert result.isolated_retry_event_count == 2
+    assert not result.errors_by_event
+    assert set(result.decisions_by_event["event-1"]) == {"announcement-1"}
+    assert set(result.decisions_by_event["event-2"]) == {"announcement-2"}
+
+
+@pytest.mark.asyncio
+async def test_title_classifier_does_not_treat_holder_group_as_share_class_mismatch():
+    client = SimpleNamespace(complete=AsyncMock(return_value=_response([{
+        "source_event_key": "event-1",
+        "event_applicability": "scope_mismatch",
+        "applicability_reason": "Old shareholders are another share class",
+        "classifications": [{
+            "announcement_id": "announcement-1",
+            "relevance": "possibly_relevant",
+            "announcement_role": "implementation",
+            "confidence": 0.8,
+            "reason": "May describe the distribution implementation",
+        }],
+    }])))
+    classifier = CninfoAnnouncementTitleClassifier(client)
+    event = {
+        **_event([{"announcement_id": "announcement-1", "title": "公告一"}]),
+        "description": "老股东10派4.10元(含税)",
+    }
+
+    result = await classifier.classify([event])
+
+    assert result.applicability_by_event["event-1"]["event_applicability"] == (
+        "uncertain"
+    )
+
+
+@pytest.mark.asyncio
+async def test_title_classifier_preserves_legal_person_share_scope_mismatch():
+    client = SimpleNamespace(complete=AsyncMock(return_value=_response([{
+        "source_event_key": "event-1",
+        "event_applicability": "scope_mismatch",
+        "applicability_reason": "Distribution is limited to legal-person shares",
+        "classifications": [{
+            "announcement_id": "announcement-1",
+            "relevance": "possibly_relevant",
+            "announcement_role": "implementation",
+            "confidence": 0.8,
+            "reason": "May document the limited distribution",
+        }],
+    }])))
+    classifier = CninfoAnnouncementTitleClassifier(client)
+    event = {
+        **_event([{"announcement_id": "announcement-1", "title": "公告一"}]),
+        "description": "向法人股、职工股10派2元",
+    }
+
+    result = await classifier.classify([event])
+
+    assert result.applicability_by_event["event-1"]["event_applicability"] == (
+        "scope_mismatch"
+    )
+
+
+@pytest.mark.asyncio
 async def test_title_classifier_strict_failure_waits_for_in_flight_requests():
     class StrictFailingClient:
         def __init__(self):
@@ -367,11 +474,15 @@ async def test_title_classifier_publishes_each_event_as_soon_as_it_completes():
     callback_order = []
 
     class OutOfOrderClient:
+        def __init__(self):
+            self.slow_completed = False
+
         async def complete(self, request):
             payload = json.loads(request.messages[1].content)
             event = payload["events"][0]
             if event["source_event_key"] == "event-1":
                 await asyncio.sleep(0.03)
+                self.slow_completed = True
             announcement = event["announcements"][0]
             return _response([{
                 "source_event_key": event["source_event_key"],
@@ -391,8 +502,9 @@ async def test_title_classifier_publishes_each_event_as_soon_as_it_completes():
         "instrument_id": "000410.SZ",
         "source_event_key": "event-2",
     }
+    client = OutOfOrderClient()
     classifier = CninfoAnnouncementTitleClassifier(
-        OutOfOrderClient(), max_titles_per_request=1, max_concurrency=2
+        client, max_titles_per_request=1, max_concurrency=2
     )
 
     await classifier.classify(
@@ -400,9 +512,10 @@ async def test_title_classifier_publishes_each_event_as_soon_as_it_completes():
             _event([{"announcement_id": "announcement-1", "title": "公告一"}]),
             second_event,
         ],
-        on_event_complete=lambda outcome: callback_order.append(
-            outcome.source_event_key
-        ),
+        on_event_complete=lambda outcome: callback_order.append((
+            outcome.source_event_key,
+            client.slow_completed,
+        )),
     )
 
-    assert callback_order == ["event-2", "event-1"]
+    assert callback_order == [("event-2", False), ("event-1", True)]

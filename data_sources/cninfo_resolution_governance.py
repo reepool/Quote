@@ -6,8 +6,8 @@ from datetime import date, datetime
 from typing import Any, Mapping, Optional
 
 
-APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v1"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v1"
+APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v2"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v2"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 
 _EFFECTFUL_ACTIONS = {
@@ -17,6 +17,17 @@ _EFFECTFUL_ACTIONS = {
     "capitalization",
     "mixed_distribution",
     "rights",
+}
+
+_EXPLICIT_NON_EFFECTIVE_DESCRIPTIONS = {
+    "\u4e0d\u6d3e\u53d1\u80a1\u5229",  # no dividend distribution
+    "\u4e0d\u5206\u914d\u4e0d\u8f6c\u589e",  # no distribution or capitalization
+    "\u4e0d\u8fdb\u884c\u5229\u6da6\u5206\u914d",  # no profit distribution
+    "\u4ee5\u76c8\u4f59\u516c\u79ef\u5f25\u8865\u4e8f\u635f",  # offset losses
+    "\u7ed3\u8f6c\u4e0b\u5e74\u5ea6\u7531\u65b0\u8001\u80a1\u4e1c\u5171\u4eab",
+    "\u7ed3\u8f6c\u4e0b\u5e74\u5ea6\u4e00\u5e76\u5206\u914d",
+    "\u672a\u5206\u914d\u5229\u6da6\u7ed3\u8f6c\u4e0b\u5e74\u5ea6\u4e00\u5e76\u5206\u914d",
+    "\u7ed3\u8f6c\u4e0b\u4e00\u5e74\u5ea6\u5206\u914d(\u65b0\u8001\u80a1\u4e1c\u5171\u4eab)",
 }
 
 
@@ -40,6 +51,26 @@ def _positive(value: Any) -> bool:
         return False
 
 
+def _explicit_non_effective(row: Mapping[str, Any]) -> bool:
+    """Recognize only explicit no-action text without overriding positive terms."""
+    if any(
+        _positive(row.get(field))
+        for field in (
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+            "rights_shares_per_share",
+        )
+    ):
+        return False
+    description = str(row.get("description") or "").strip()
+    normalized = "".join(
+        char for char in description
+        if not char.isspace() and char not in {",", "\uff0c", "\u3001", "\u3002"}
+    ).replace("\uff08", "(").replace("\uff09", ")")
+    return normalized in _EXPLICIT_NON_EFFECTIVE_DESCRIPTIONS
+
+
 def _exchange(instrument_id: Any) -> str:
     value = str(instrument_id or "").strip().upper()
     if value.endswith(".SH"):
@@ -57,7 +88,10 @@ def classify_date_applicability(row: Mapping[str, Any]) -> dict[str, Any]:
     source_profile = str(row.get("source_profile") or "").strip().lower()
     event_status = str(row.get("event_status") or "").strip().lower()
     exchange = _exchange(row.get("instrument_id"))
+    explicit_non_effective = _explicit_non_effective(row)
     effectful = (
+        not explicit_non_effective
+        and (
         action_type in _EFFECTFUL_ACTIONS
         or any(
             _positive(row.get(field))
@@ -67,6 +101,7 @@ def classify_date_applicability(row: Mapping[str, Any]) -> dict[str, Any]:
                 "capitalization_shares_per_share",
                 "rights_shares_per_share",
             )
+        )
         )
     )
     required = []
@@ -104,6 +139,7 @@ def classify_date_applicability(row: Mapping[str, Any]) -> dict[str, Any]:
         "action_type": action_type,
         "event_status": event_status,
         "effectful": effectful,
+        "explicit_non_effective": explicit_non_effective,
         "required_date_roles": required,
         "supporting_date_roles": supporting,
         "inapplicable_date_roles": inapplicable,
@@ -151,6 +187,13 @@ def derive_resolution_state(
         state, reason, next_action, terminal = (
             "resolved_source",
             "raw_cninfo_effective_date_present",
+            "none",
+            True,
+        )
+    elif applicability["explicit_non_effective"]:
+        state, reason, next_action, terminal = (
+            "non_effective",
+            "raw_cninfo_explicit_non_effective_event",
             "none",
             True,
         )
