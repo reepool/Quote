@@ -17,7 +17,7 @@
             }
         },
         "task_async_pool": {
-            "pool_size": 2,
+            "pool_size": 8,
             "max_overflow": 0,
             "pool_timeout_seconds": 30
         },

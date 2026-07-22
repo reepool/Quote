@@ -14,7 +14,7 @@ from contextvars import ContextVar
 from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.pool import StaticPool, QueuePool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, StaticPool
 
 
 _db_workload: ContextVar[str] = ContextVar("quote_db_workload", default="task")
@@ -91,7 +91,7 @@ class DatabaseManager:
             self.task_async_engine = self._create_async_engine(
                 "task",
                 task_async_pool_config,
-                default_pool_size=2,
+                default_pool_size=8,
                 default_max_overflow=0,
                 default_pool_timeout=30,
                 pragma_listener=set_sqlite_pragma,
@@ -312,7 +312,10 @@ class DatabaseManager:
 
         engine = create_async_engine(
             f"sqlite+aiosqlite:///{self.db_path}",
-            poolclass=QueuePool,
+            # QueuePool waits synchronously for a connection.  Under an
+            # asyncio workload that can block the event loop before the
+            # coroutine holding a connection gets a chance to release it.
+            poolclass=AsyncAdaptedQueuePool,
             pool_size=pool_size,
             max_overflow=max_overflow,
             pool_timeout=pool_timeout,

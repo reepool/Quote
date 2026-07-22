@@ -3,6 +3,7 @@ Tests for async DB workload routing between API and task pools.
 """
 
 import pytest
+from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from database.connection import (
     DatabaseManager,
@@ -20,6 +21,17 @@ async def test_database_manager_routes_api_and_task_sessions(tmp_path):
 
     try:
         assert manager.TaskAsyncSessionLocal is not manager.ApiAsyncSessionLocal
+        assert isinstance(
+            manager.task_async_engine.sync_engine.pool,
+            AsyncAdaptedQueuePool,
+        )
+        assert isinstance(
+            manager.api_async_engine.sync_engine.pool,
+            AsyncAdaptedQueuePool,
+        )
+        assert manager.task_async_engine.sync_engine.pool.size() == 8
+        assert manager.api_async_engine.sync_engine.pool.size() == 2
+
         assert get_current_db_workload() == "task"
 
         task_session = manager.get_async_session()

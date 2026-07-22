@@ -858,7 +858,7 @@ PYTHONPATH=/home/python/Quote LD_LIBRARY_PATH=/home/python/miniconda3/envs/Quote
 
 | 项目 | 建议值 | 说明 |
 |---|---:|---|
-| 任务 async pool 容量 | 2 条 | `task_async_pool.pool_size=2`、`max_overflow=0`，调度和数据任务专用 |
+| 任务 async pool 容量 | 8 条 | `task_async_pool.pool_size=8`、`max_overflow=0`，调度和数据任务专用 |
 | API async pool 容量 | 约 8 条 | 例如 `api_async_pool.pool_size=2`、`max_overflow=6`，外部访问专用 |
 | 全 API 活跃查询并发 | 6 个左右 | API 访问独立分池后可适度放宽，默认通过 `/` 规则覆盖所有接口 |
 | 全 API 等待队列 | 80-120 个 | 超出后才拒绝，避免无限堆积 |

@@ -22366,6 +22366,21 @@ class DataManager:
             "[DataManager] CNInfo LLM resolution loading candidate evidence"
         )
         reviewed_filter = ""
+        terminal_filter = """
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM corporate_action_resolution_states s
+                  WHERE s.instrument_id = o.instrument_id
+                    AND s.source_event_key = o.source_event_key
+                    AND s.resolution_state IN (
+                        'non_effective',
+                        'not_applicable',
+                        'resolved_source',
+                        'source_not_supported',
+                        'superseded'
+                    )
+              )
+        """
         if exclude_reviewed_events:
             reviewed_filter = """
               AND NOT EXISTS (
@@ -22373,6 +22388,15 @@ class DataManager:
                   FROM corporate_action_resolution_reviews r
                   WHERE r.instrument_id = o.instrument_id
                     AND r.source_event_key = o.source_event_key
+              )
+            """
+            terminal_filter = """
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM corporate_action_resolution_states s
+                  WHERE s.instrument_id = o.instrument_id
+                    AND s.source_event_key = o.source_event_key
+                    AND s.is_terminal = 1
               )
             """
         rows = await self.db_ops.execute_read_query(
@@ -22393,6 +22417,7 @@ class DataManager:
              AND e.evidence_source = 'cninfo_announcement_metadata'
             WHERE o.source = 'cninfo' AND o.is_current = 1
               AND o.source_profile IN ('cninfo_dividend', 'cninfo_allotment')
+              {terminal_filter}
               AND (o.announcement_date >= :start_date AND o.announcement_date < :end_date_exclusive
                    OR o.record_date >= :start_date AND o.record_date < :end_date_exclusive
                    OR e.announcement_time >= :start_date AND e.announcement_time < :end_date_exclusive

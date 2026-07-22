@@ -1724,6 +1724,10 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     assert result["llm_metrics"]["total_tokens"] == 180
     assert result["llm_metrics"]["provider_output_budget_overruns"] == 1
     assert result["llm_metrics"]["latency_ms"]["p95"] == 15
+    candidate_query = manager.db_ops.execute_read_query.await_args.args[0]
+    assert "corporate_action_resolution_states" in candidate_query
+    assert "s.resolution_state IN" in candidate_query
+    assert "s.is_terminal = 1" not in candidate_query
     manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
 
@@ -2679,4 +2683,5 @@ async def test_incremental_candidate_query_can_exclude_reviewed_events():
     query = manager.db_ops.execute_read_query.await_args.args[0]
     assert "NOT EXISTS" in query
     assert "corporate_action_resolution_reviews" in query
+    assert "s.is_terminal = 1" in query
     assert result["parameters"]["exclude_reviewed_events"] is True

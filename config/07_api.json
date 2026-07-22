@@ -13,7 +13,7 @@
     },
     "resource_protection": {
       "enabled": true,
-      "reserved_task_connections": 2,
+      "reserved_task_connections": 8,
       "protected_paths": {
         "/": {
           "active_limit": 6,

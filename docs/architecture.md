@@ -333,13 +333,15 @@ REPORT_TYPES = {
 
 **API/任务数据库资源隔离**:
 - `database.connection.DatabaseManager` 为 `quotes.db` 创建两套异步连接池：
-  - `task_async_pool`: 调度器、数据维护、历史回补、Telegram 任务收尾等后台任务默认使用，当前生产建议容量为 2 条。
-  - `api_async_pool`: FastAPI 外部请求使用，当前生产建议容量为 `pool_size=2, max_overflow=6`。
+  - `task_async_pool`: 调度器、数据维护、历史回补、Telegram 任务收尾等后台任务默认使用，当前生产配置为 `pool_size=8, max_overflow=0`。
+  - `api_async_pool`: FastAPI 外部请求使用，当前生产配置为 `pool_size=2, max_overflow=6`。
+  - 两套池均使用 SQLAlchemy `AsyncAdaptedQueuePool`；禁止在 `create_async_engine()` 中使用同步 `QueuePool`，否则连接等待会阻塞事件循环。
 - `api.middleware.RateLimitMiddleware` 在请求进入后端路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 根据当前上下文选择 API pool 或 task pool。
 - 未经过 API middleware 的执行路径默认使用 `task` workload，因此调度器、手工任务和 CLI 任务不会排在 API 连接池之后。
 - 管理 API 触发的数据生产任务（例如日更、历史下载、缺口修复、期货官方交易日历回填）通过路由层 helper 显式切换为 `task` workload；普通外部查询仍保持 `api` workload。
 - `AsyncSessionLocal` 与 `async_engine` 保留为 task pool 的兼容别名；新增代码应优先通过 `DatabaseOperations.get_async_session()` 或 `DatabaseManager.get_async_session()` 获取会话。
 - 该隔离解决的是 async DB 连接池饥饿问题。SQLite 仍然只有一个文件级写者；任务写入和 API 读取在 WAL 模式下一般不会死锁，但写事务过长时读写仍可能互相等待，写密集任务仍应保持任务级串行和短事务。
+- 研究、财务、估值、期货、外汇和利率专用库目前仍由同步 storage manager 通过 `sqlite3` 访问，并在异步 API 中使用 `asyncio.to_thread()` 隔离阻塞 I/O；它们不随 `quotes.db` 异步池改造而自动异步化。
 
 ### 8. 智能时间工具 (`utils/date_utils.py`) ⭐ v2.3.0
 

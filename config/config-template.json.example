@@ -162,6 +162,16 @@
         "daily_quotes": true,
         "adjustment_factors": true
       }
+    },
+    "task_async_pool": {
+      "pool_size": 8,
+      "max_overflow": 0,
+      "pool_timeout_seconds": 30
+    },
+    "api_async_pool": {
+      "pool_size": 2,
+      "max_overflow": 6,
+      "pool_timeout_seconds": 30
     }
   },
   "data_config": {

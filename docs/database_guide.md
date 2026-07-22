@@ -1,6 +1,6 @@
 # SQLite 底层架构与调优指南
 
-本文档全面记录了本项目当前使用的数据库架构、表结构设计理念，以及针对海量（量化行情级别）数据的 SQLite 性能并发调优机制。本技术说明与当前项目代码严格同步（截止 **2026年4月最新重构版**）。
+本文档全面记录了本项目当前使用的数据库架构、表结构设计理念，以及针对海量（量化行情级别）数据的 SQLite 性能并发调优机制。本技术说明与当前项目代码严格同步（截止 **2026年7月22日**）。
 
 ---
 
@@ -17,8 +17,9 @@
      `data/QuoteBak`，不要把 NAS 内容复制进本地数据卷。
 2. **连接池设计**：
     - **同步操作引擎**: 使用 `StaticPool` 单开连接防冲突，主要用于少量初始化建库和少量同步读写兼容路径。
-    - **任务异步引擎**: `task_async_pool` 使用 `aiosqlite + SQLAlchemy QueuePool`，专供调度器、数据维护、历史回补、Telegram 任务收尾等后台任务使用。当前生产建议为 `pool_size=2, max_overflow=0`，形成 2 条任务侧专用异步 DB 通道。
-    - **API 异步引擎**: `api_async_pool` 使用独立的 `aiosqlite + SQLAlchemy QueuePool`，专供 FastAPI 外部请求使用。当前生产建议为 `pool_size=2, max_overflow=6`，由 API admission control 控制进入后端的并发请求。
+    - **任务异步引擎**: `task_async_pool` 使用 `aiosqlite + SQLAlchemy AsyncAdaptedQueuePool`，专供调度器、数据维护、历史回补、Telegram 任务收尾等后台任务使用。当前生产配置为 `pool_size=8, max_overflow=0`，形成 8 条任务侧专用异步 DB 通道。
+    - **API 异步引擎**: `api_async_pool` 使用独立的 `aiosqlite + SQLAlchemy AsyncAdaptedQueuePool`，专供 FastAPI 外部请求使用。当前生产配置为 `pool_size=2, max_overflow=6`，由 API admission control 控制进入后端的并发请求。
+    - **异步池实现要求**: 异步 SQLAlchemy 引擎不得使用同步 `QueuePool`。同步池在连接不足时会阻塞事件循环，导致持有连接的协程无法运行并释放连接，最终形成连接池自锁。
     - **路由机制**: `api.middleware.RateLimitMiddleware` 在已准入请求进入路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 通过 `DatabaseManager.get_async_session()` 根据上下文选择 API pool 或 task pool。非 API 执行路径默认使用 `task` pool；管理 API 触发的数据生产任务通过路由层 helper 显式切回 `task` pool。
 3. **高并发 WAL 机制（ Write-Ahead Logging ）**：
     - 在每一次发起的读/写 Engine 会话启动生命周期（`event.listen` "connect"）时，系统自动挂载以下 PRAGMA 配置：
@@ -33,6 +34,21 @@
     - WAL 模式支持一个写者与多个读者并发；API 主要读、任务主要写时，正常短事务不会形成数据库死锁。
     - 长写事务、`VACUUM`、`ANALYZE`、大批量 DDL/索引维护仍可能造成文件级锁等待，因此写密集维护任务必须继续通过调度器 `max_instances`、任务级互斥和批量提交粒度控制。
     - 外部 API 请求必须经过 admission control 有界排队；即便 API pool 被占满，task pool 仍保留给后台任务完成状态写入、报告收尾和数据维护。
+
+5. **其他数据库的访问模式**：`data/research.db`、`data/financials.db`、`data/valuation.db`、`data/futures.db`、`data/fx.db` 和 `data/interests.db` 当前通过 `ResearchStorageManager`、`FuturesStorageManager`、`FxStorageManager` 等 storage 层使用同步 `sqlite3`，业务层通过 `asyncio.to_thread()` 将阻塞 I/O 移出事件循环。它们目前没有与 `quotes.db` 相同的高并发 ORM 异步会话需求，因此暂不统一改造为异步连接池。只有在出现可量化的线程池耗尽、读写等待或 API 延迟问题时，才针对具体库评估异步化，避免一次性引入多套连接生命周期和事务语义。
+
+### 其他数据库异步化评估
+
+| 数据库 | 当前访问模式 | 当前判断 |
+|---|---|---|
+| `research.db` | 同步 `sqlite3` + `asyncio.to_thread()` | API 查询较多，但 storage 方法短连接、边界清晰；先监测线程池排队和慢查询，不立即迁移。 |
+| `financials.db` | 同步 `sqlite3` + `asyncio.to_thread()` | 体积大、查询和批量写入偏重；异步驱动不能降低 SQL 执行和磁盘扫描成本，优先索引、hot/cold 分层和缩短事务。 |
+| `valuation.db` | 同步 `sqlite3` + `asyncio.to_thread()` | 以批量重建和查询为主，写入任务已有调度约束；暂无独立异步池收益证据。 |
+| `futures.db` | 同步 `sqlite3` storage manager | 生产任务以分阶段串行为主，API 读取通过线程卸载；保持同步更易维护事务一致性。 |
+| `fx.db` | 同步 `sqlite3` storage manager | 数据量小、请求频率低，无异步化必要。 |
+| `interests.db` | 同步 `sqlite3` storage manager | 数据量小、主要为周期写入和只读消费，无异步化必要。 |
+
+单库异步化应至少满足一项可观测条件：同步 storage 调用持续占满线程池、API p95 明显受数据库等待影响、同库存在稳定的多读少写并发需求，或任务和 API 已无法通过短事务及调度隔离解决。即使满足条件，也应先为该库建立独立 adapter 和压力基线，不复用 `quotes.db` 参数直接推广。
 
 ---
 
