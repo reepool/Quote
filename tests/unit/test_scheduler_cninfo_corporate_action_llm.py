@@ -51,6 +51,14 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert governance["parameters"]["title_max_concurrency"] == 50
     assert governance["parameters"]["window_before_days"] == 30
     assert governance["parameters"]["max_anchor_gap_days"] == 60
+    reset = config["scheduler_config"]["jobs"][
+        "a_share_cninfo_corporate_action_resolution_reset"
+    ]
+    assert reset["manual_only"] is True
+    assert reset["parameters"]["dry_run"] is True
+    assert reset["parameters"]["confirm_reset"] is False
+    assert reset["parameters"]["include_unanchored"] is False
+    assert reset["parameters"]["exchanges"] == ["SSE", "SZSE"]
     incremental = config["scheduler_config"]["jobs"][
         "a_share_cninfo_corporate_action_llm_incremental"
     ]
@@ -259,6 +267,36 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
     assert operation.await_args.kwargs["max_anchor_gap_days"] == 60
     assert (
         "a_share_cninfo_corporate_action_resolution_governance"
+        not in task._active_tasks
+    )
+
+
+@pytest.mark.asyncio
+async def test_scheduler_delegates_confirmed_resolution_reset(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    operation = AsyncMock(return_value={"status": "success", "dry_run": False})
+    monkeypatch.setattr(
+        data_manager,
+        "reset_cninfo_corporate_action_resolution_governance",
+        operation,
+    )
+
+    result = await task.a_share_cninfo_corporate_action_resolution_reset(
+        start_date="1990-12-19",
+        end_date="2026-07-23",
+        exchanges=["SSE", "SZSE"],
+        include_unanchored=True,
+        dry_run=False,
+        confirm_reset=True,
+    )
+
+    assert result["status"] == "success"
+    assert operation.await_args.kwargs["confirm_reset"] is True
+    assert operation.await_args.kwargs["include_unanchored"] is True
+    assert operation.await_args.kwargs["dry_run"] is False
+    assert (
+        "a_share_cninfo_corporate_action_resolution_reset"
         not in task._active_tasks
     )
 

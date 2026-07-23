@@ -295,6 +295,12 @@ class DataManager:
                 instrument_id=instrument_id,
                 symbol=symbol,
                 ingestion_run_id=ingestion_run_id,
+                scope_key=scan_result.query.scope.scope_key,
+                context_metadata={
+                    **scan_result.query.scope.source_options,
+                    "selection_metadata": selection_metadata or {},
+                    "selection_reasons": list(record.selection_reasons),
+                },
             )
             audited += 1
         return {"scan_states_persisted": 1, "audits_persisted": audited}
@@ -19484,6 +19490,130 @@ class DataManager:
             'errors': errors,
         }
 
+    async def reset_cninfo_corporate_action_resolution_governance(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
+        include_unanchored: bool = False,
+        dry_run: bool = True,
+        confirm_reset: bool = False,
+    ) -> Dict[str, Any]:
+        """Reset non-resolved CNInfo governance artifacts before an LLM rebuild."""
+        from utils.a_share_historical_backfill import (
+            coerce_date,
+            normalize_string_list,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        normalized_exchanges = [
+            item.upper() for item in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE"]
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE"})
+        if unsupported:
+            raise ValueError(
+                "CNInfo resolution reset supports SSE/SZSE only: "
+                f"{unsupported}"
+            )
+        if not dry_run and not confirm_reset:
+            raise ValueError(
+                "write reset requires confirm_reset=true; run dry_run first"
+            )
+        dm_logger.info(
+            "[DataManager] CNInfo resolution reset started: range=%s..%s "
+            "exchanges=%s instruments=%s events=%s include_unanchored=%s dry_run=%s",
+            normalized_start,
+            normalized_end,
+            normalized_exchanges,
+            len(instrument_ids or []),
+            len(source_event_keys or []),
+            include_unanchored,
+            dry_run,
+        )
+        quote_result = await self.db_ops.reset_cninfo_corporate_action_resolution_data(
+            start_date=normalized_start,
+            end_date=normalized_end,
+            exchanges=normalized_exchanges,
+            instrument_ids=normalize_string_list(instrument_ids) or None,
+            source_event_keys=normalize_string_list(source_event_keys) or None,
+            include_unanchored=bool(include_unanchored),
+            dry_run=bool(dry_run),
+        )
+        research_result = {
+            "scan_states": 0,
+            "announcement_audit_contexts": 0,
+            "announcement_audits": 0,
+        }
+        research_error = None
+        try:
+            storage = self._require_research_storage()
+            research_result = await asyncio.to_thread(
+                storage.reset_corporate_action_announcement_governance,
+                purpose_key="a_share_cninfo_special_action_discovery",
+                instrument_ids=quote_result.get("reset_instrument_ids") or [],
+                source_event_keys=quote_result.get("reset_source_event_keys") or [],
+                preserve_instrument_ids=(
+                    quote_result.get("protected_instrument_ids") or []
+                ),
+                preserve_announcement_ids=(
+                    quote_result.get("protected_announcement_ids") or []
+                ),
+                dry_run=bool(dry_run),
+            )
+        except Exception as exc:
+            research_error = str(exc)
+            dm_logger.exception(
+                "[DataManager] CNInfo resolution research governance reset failed: %s",
+                exc,
+            )
+        deleted = {
+            **(quote_result.get("deleted") or {}),
+            **research_result,
+        }
+        status = "dry_run" if dry_run else (
+            "partial" if research_error else "success"
+        )
+        result = {
+            "status": status,
+            "operation": "a_share_cninfo_corporate_action_resolution_reset",
+            "dry_run": bool(dry_run),
+            "confirmed": bool(confirm_reset),
+            "production_isolation": True,
+            "raw_observation_modified": False,
+            "tdx_modified": False,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "exchanges": normalized_exchanges,
+                "instrument_ids": normalize_string_list(instrument_ids),
+                "source_event_keys": normalize_string_list(source_event_keys),
+                "include_unanchored": bool(include_unanchored),
+            },
+            "events": {
+                "selected": int(quote_result.get("selected_events") or 0),
+                "protected_resolved": int(
+                    quote_result.get("protected_resolved_events") or 0
+                ),
+                "reset": int(quote_result.get("reset_events") or 0),
+            },
+            "deleted": deleted,
+            "errors": [] if research_error is None else [research_error],
+        }
+        dm_logger.info(
+            "[DataManager] CNInfo resolution reset completed: status=%s "
+            "selected=%d protected=%d reset=%d rows=%s",
+            status,
+            result["events"]["selected"],
+            result["events"]["protected_resolved"],
+            result["events"]["reset"],
+            deleted,
+        )
+        return result
+
     async def _load_cninfo_resolution_governance_inventory(
         self,
         *,
@@ -19499,6 +19629,10 @@ class DataManager:
         from data_sources.cninfo_resolution_governance import (
             APPLICABILITY_POLICY_VERSION,
             derive_resolution_state,
+        )
+        from data_sources.cninfo_special_action_resolution import (
+            best_structured_anchor,
+            is_implementation_grade_decision,
         )
 
         suffixes = {"SSE": ".SH", "SZSE": ".SZ", "BSE": ".BJ"}
@@ -19606,6 +19740,8 @@ class DataManager:
         analysis_by_event: Dict[str, Dict[str, Any]] = {}
         review_by_event: Dict[str, Dict[str, Any]] = {}
         prior_state_by_event: Dict[str, Dict[str, Any]] = {}
+        title_applicability_by_event: Dict[str, Dict[str, Any]] = {}
+        title_applicability_values_by_event: Dict[str, Set[str]] = defaultdict(set)
         for offset in range(0, len(event_keys), 400):
             chunk = event_keys[offset: offset + 400]
             chunk_params = dict(governed_source_params)
@@ -19615,22 +19751,50 @@ class DataManager:
             placeholders = ", ".join(
                 f":event_{index}" for index in range(len(chunk))
             )
-            candidate_rows = await self.db_ops.execute_read_query(
+            classified_evidence_rows = await self.db_ops.execute_read_query(
                 f"""
-                SELECT source_event_key, COUNT(*) AS candidate_count
+                SELECT id, source_event_key, resolution_status, raw_payload_json
                 FROM corporate_action_effective_date_evidence
                 WHERE source_event_key IN ({placeholders})
                   AND observation_source = 'cninfo'
                   AND evidence_source = 'cninfo_announcement_metadata'
-                  AND resolution_status = 'candidate'
-                GROUP BY source_event_key
+                ORDER BY source_event_key, updated_at DESC, id DESC
                 """,
                 chunk_params,
             )
-            candidate_counts.update({
-                str(item["source_event_key"]): int(item.get("candidate_count") or 0)
-                for item in candidate_rows
-            })
+            for item in classified_evidence_rows:
+                event_key = str(item.get("source_event_key") or "")
+                payload = item.get("raw_payload_json")
+                if isinstance(payload, str):
+                    try:
+                        payload = json.loads(payload or "{}")
+                    except json.JSONDecodeError:
+                        payload = {}
+                payload = payload if isinstance(payload, dict) else {}
+                decision = payload.get("title_classification")
+                lineage = payload.get("llm_lineage")
+                if not isinstance(decision, dict) or not lineage:
+                    continue
+                title_applicability = payload.get("event_applicability") or {}
+                if isinstance(title_applicability, dict):
+                    title_applicability_by_event.setdefault(
+                        event_key,
+                        title_applicability,
+                    )
+                    applicability_value = str(
+                        title_applicability.get("event_applicability") or ""
+                    ).strip()
+                    if applicability_value:
+                        title_applicability_values_by_event[event_key].add(
+                            applicability_value
+                        )
+                if (
+                    str(item.get("resolution_status") or "") == "candidate"
+                    and is_implementation_grade_decision(decision)
+                ):
+                    candidate_counts[event_key] = (
+                        candidate_counts.get(event_key, 0) + 1
+                    )
             resolved_rows = await self.db_ops.execute_read_query(
                 f"""
                 SELECT id, source_event_key, effective_date, date_basis,
@@ -19709,6 +19873,12 @@ class DataManager:
                 str(item["source_event_key"]): item for item in prior_state_rows
             })
 
+        consistent_title_applicability = {
+            event_key: title_applicability_by_event[event_key]
+            for event_key, values in title_applicability_values_by_event.items()
+            if len(values) == 1
+            and next(iter(values)) in {"non_effective", "scope_mismatch"}
+        }
         scan_status_by_event = scan_status_by_event or {}
         error_by_event = error_by_event or {}
         inventory = []
@@ -19721,8 +19891,15 @@ class DataManager:
             prior_state = prior_state_by_event.get(event_key) or {}
             scan_status = scan_status_by_event.get(event_key)
             if scan_status is None:
-                if prior_state.get("resolution_state") == "evidence_unavailable":
-                    scan_status = "success"
+                if prior_state.get("resolution_state") in {
+                    "evidence_unavailable", "official_archive_unavailable"
+                }:
+                    scan_status = (
+                        "complete_no_candidates"
+                        if prior_state.get("resolution_state")
+                        == "official_archive_unavailable"
+                        else "success"
+                    )
                 elif (
                     prior_state.get("resolution_state") == "manual_required"
                     and prior_state.get("state_reason")
@@ -19747,6 +19924,7 @@ class DataManager:
                 ),
                 latest_analysis=analysis,
                 latest_review=review,
+                title_applicability=consistent_title_applicability.get(event_key),
                 scan_status=scan_status,
                 error_code=(
                     event_error
@@ -19807,6 +19985,17 @@ class DataManager:
                         (analysis or {}).get("validation_status")
                     ),
                     "latest_review_decision": (review or {}).get("decision"),
+                    "title_event_applicability": (
+                        title_applicability_by_event.get(event_key) or {}
+                    ),
+                    "title_event_applicability_values": sorted(
+                        title_applicability_values_by_event.get(event_key, set())
+                    ),
+                    "best_anchor_date": (
+                        None
+                        if best_structured_anchor(row) is None
+                        else best_structured_anchor(row).isoformat()
+                    ),
                     "resolved_effective_date_count": len(
                         resolved_dates_by_event.get(event_key, set())
                     ),
@@ -20125,6 +20314,8 @@ class DataManager:
                         "candidates_unpersisted"
                         if dry_run and int(item.get("candidate_count") or 0) > 0
                         else "success" if int(item.get("candidate_count") or 0) > 0
+                        else "complete_no_candidates"
+                        if bool(item.get("scan_complete"))
                         else "partial_no_candidates"
                     )
                 for item in discovery_result.get("skipped_samples") or []:
@@ -20465,9 +20656,11 @@ class DataManager:
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from data_sources.cninfo_special_action_resolution import (
             announcement_match_reasons,
+            best_structured_anchor,
             build_candidate_evidence,
             build_classified_announcement_evidence,
             build_search_targets,
+            is_implementation_grade_decision,
             parse_date,
         )
         from data_sources.cninfo_announcement_title_llm import (
@@ -20814,6 +21007,13 @@ class DataManager:
                                 end_date=target.end_date.isoformat(),
                                 page_size=min(50, max(1, int(page_size))),
                                 max_pages=min(20, max(1, int(max_pages))),
+                                source_options={
+                                    "source_event_key": target.source_event_key,
+                                    "window_index": window_index,
+                                    "search_basis": target.search_basis,
+                                    "search_start_date": target.start_date.isoformat(),
+                                    "search_end_date": target.end_date.isoformat(),
+                                },
                             ),
                         ),
                         selectors=(
@@ -20967,7 +21167,14 @@ class DataManager:
                 row.get("resolution_status") == "candidate"
                 for row in event_evidence
             )
-            if candidate_count <= 0 or on_event_ready is None:
+            event_applicability = str(
+                applicability.get("event_applicability") or ""
+            ).strip()
+            if (
+                candidate_count <= 0
+                or on_event_ready is None
+                or event_applicability in {"non_effective", "scope_mismatch"}
+            ):
                 return
             callback_result = on_event_ready({
                 "instrument_id": target.instrument_id,
@@ -21170,9 +21377,7 @@ class DataManager:
             selected_ids = {
                 announcement_id
                 for announcement_id, decision in decisions.items()
-                if decision.get("relevance") in {
-                    "relevant", "possibly_relevant"
-                }
+                if is_implementation_grade_decision(decision)
             }
             if (
                 not dry_run
@@ -21279,6 +21484,21 @@ class DataManager:
                 "rejected_count": len(event_rejected),
                 "title_classification_status": event_title_status,
                 "event_applicability": applicability,
+                "best_anchor_date": (
+                    None
+                    if best_structured_anchor(item["row"]) is None
+                    else best_structured_anchor(item["row"]).isoformat()
+                ),
+                "scan_complete": bool(
+                    item["search_windows"]
+                    and not item["errors"]
+                    and event_title_status in {"success", "not_required"}
+                    and all(
+                        str(window.get("status") or "").lower()
+                        in {"success", "success_empty"}
+                        for window in item["search_windows"]
+                    )
+                ),
                 "classification_samples": list(decisions.values())[:10],
                 "errors": list(item["errors"]),
             })
@@ -22546,10 +22766,12 @@ class DataManager:
                     AND s.source_event_key = o.source_event_key
                     AND s.resolution_state IN (
                         'non_effective',
+                        'scope_mismatch',
                         'not_applicable',
                         'resolved_source',
                         'source_not_supported',
-                        'superseded'
+                        'superseded',
+                        'official_archive_unavailable'
                     )
               )
         """
@@ -22587,6 +22809,20 @@ class DataManager:
              AND e.source_event_key = o.source_event_key
              AND e.resolution_status = 'candidate'
              AND e.evidence_source = 'cninfo_announcement_metadata'
+             AND json_valid(e.raw_payload_json) = 1
+             AND json_array_length(e.raw_payload_json, '$.llm_lineage') > 0
+             AND json_extract(
+                    e.raw_payload_json,
+                    '$.title_classification.announcement_role'
+                 ) IN (
+                    'implementation',
+                    'implementation_completion',
+                    'record_date_notice',
+                    'share_arrival_notice',
+                    'rights_issue',
+                    'share_reform',
+                    'compensation_share_distribution'
+                 )
             WHERE o.source = 'cninfo' AND o.is_current = 1
               AND o.source_profile IN ('cninfo_dividend', 'cninfo_allotment')
               {terminal_filter}

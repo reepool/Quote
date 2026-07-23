@@ -146,6 +146,65 @@ def test_reviewed_non_effective_is_terminal_but_empty_scan_is_retryable():
     assert unavailable["factor_blocking"] is True
 
 
+def test_explicit_a_share_scope_mismatch_is_terminal_non_blocking():
+    row = _row(
+        description="本次现金股利仅向老股东派发",
+        cash_dividend_per_share=0.1,
+    )
+    result = derive_resolution_state(row)
+    assert result["resolution_state"] == "scope_mismatch"
+    assert result["is_terminal"] is True
+    assert result["factor_blocking"] is False
+
+
+def test_title_applicability_projects_terminal_states():
+    non_effective = derive_resolution_state(
+        _row(),
+        title_applicability={"event_applicability": "non_effective"},
+    )
+    scope_mismatch = derive_resolution_state(
+        _row(),
+        title_applicability={"event_applicability": "scope_mismatch"},
+    )
+    assert non_effective["resolution_state"] == "non_effective"
+    assert scope_mismatch["resolution_state"] == "scope_mismatch"
+    assert non_effective["factor_blocking"] is False
+    assert scope_mismatch["factor_blocking"] is False
+
+
+def test_complete_empty_scan_uses_pre_2002_archive_cutoff():
+    historical = derive_resolution_state(
+        _row(announcement_date="2001-06-01"),
+        scan_status="complete_no_candidates",
+    )
+    modern = derive_resolution_state(
+        _row(announcement_date="2002-01-01"),
+        scan_status="complete_no_candidates",
+    )
+    cross_cutoff = derive_resolution_state(
+        _row(
+            announcement_date="2001-12-20",
+            record_date="2002-01-10",
+        ),
+        scan_status="complete_no_candidates",
+    )
+    arrival_after_cutoff = derive_resolution_state(
+        _row(
+            record_date="2001-12-28",
+            share_arrival_date="2002-01-02",
+        ),
+        scan_status="complete_no_candidates",
+    )
+    assert historical["resolution_state"] == "official_archive_unavailable"
+    assert historical["is_terminal"] is True
+    assert historical["factor_blocking"] is False
+    assert modern["resolution_state"] == "evidence_unavailable"
+    assert modern["is_terminal"] is False
+    assert modern["factor_blocking"] is True
+    assert cross_cutoff["resolution_state"] == "evidence_unavailable"
+    assert arrival_after_cutoff["resolution_state"] == "evidence_unavailable"
+
+
 def test_multiple_resolved_dates_remain_a_blocking_conflict():
     result = derive_resolution_state(
         _row(),
@@ -719,6 +778,8 @@ async def test_llm_candidate_loader_filters_exact_source_event_keys():
     query, params = manager.db_ops.execute_read_query.await_args_list[0].args
     assert result["targets"]["candidate_events"] == 0
     assert "o.source_event_key IN" in query
+    assert "json_array_length" in query
+    assert "implementation_completion" in query
     assert params["source_event_key_0"] == "event-1"
 
 

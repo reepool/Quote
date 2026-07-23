@@ -394,6 +394,27 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_cninfo_corporate_action_resolution_reset": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股CNInfo公司行动非resolved开发派生数据重置（默认仅预演，写入需显式确认）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE"],
+          "instrument_ids": [],
+          "source_event_keys": [],
+          "include_unanchored": false,
+          "dry_run": true,
+          "confirm_reset": false,
+          "max_runtime_seconds": 3600
+        }
+      },
       "a_share_cninfo_corporate_action_llm_incremental": {
         "enabled": false,
         "manual_only": false,

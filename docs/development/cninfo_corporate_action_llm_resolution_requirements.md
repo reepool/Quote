@@ -1,6 +1,6 @@
 # CNInfo 公司行动公告 LLM 解析与有效日期治理需求
 
-> 状态说明（2026-07-22）：本文继续作为公司行动字段、证据、结构化 schema、确定性校验、
+> 状态说明（2026-07-23）：本文继续作为公司行动字段、证据、结构化 schema、确定性校验、
 > 自动确认和人工审核规则的权威文档。本文早期形成的按事件串行执行、标题专用并发、基于固定
 > 词语进行主要语义筛选以及逐事件 Telegram 汇报等执行假设已经过期，由
 > `docs/development/cninfo_corporate_action_async_pipeline_requirements.md` 替代。业务真值、
@@ -19,7 +19,7 @@ docs/development/common_llm_work_orchestration_requirements.md
 docs/development/cninfo_corporate_action_async_pipeline_requirements.md
 ```
 
-## 2. 当前数据基线
+## 2. 当前数据基线与重建政策
 
 截至 2026-07-19：
 
@@ -32,6 +32,13 @@ docs/development/cninfo_corporate_action_async_pipeline_requirements.md
 - 105 个事件在当前窗口和规则下没有候选公告；
 - 10 个事件缺少有界日期锚点，尚未搜索；
 - 当前 `resolved` 有效日期为 0。
+
+上述旧候选中包含开发期词法筛选结果，不再作为新流程的有效输入。重建时：
+
+- 保留拥有受治理 `resolved` 有效日期证据的整个事件血缘；
+- 删除其余选定事件的 candidate/rejected 证据、LLM 分析、审核、派生条款、状态和无引用文档；
+- 重建后每条候选必须先通过当前 LLM 标题分类，旧词法 candidate 不得直接进入正文解析；
+- 标题相关不等于可解析；只有实施、实施完成、登记日通知、到账/上市通知、配股、股改和对价分配等实施级公告进入语义抽取。
 
 公告发现任务只保存标题、公告时间、公告 ID、PDF URL 和匹配理由，没有下载并解析
 全部 PDF 正文，也没有修改 `corporate_action_observations.ex_date`。
@@ -64,6 +71,32 @@ candidate 公告元数据
 - `candidate`、`manual_required`、`conflict` 和 `rejected` 不得进入因子计算；
 - TDX、BaoStock、Sina 等只能作为校验信号，不能替代官方公告证据；
 - 本流程不改变现有生产复权因子读取路径，promotion 必须另行审批。
+- CNInfo 和 TDX 继续独立建表、独立维护；CNInfo 公告不可获得时不得把 TDX 日期或条款回填到 CNInfo 证据。
+
+### 4.1 历史档案分界
+
+- 对所有有界 CNInfo 时间窗口已完整查询、但没有实施级公告的事件，使用结构化公告日、登记日、股份到账日、报告期年末作为最佳锚点。
+- 最佳锚点早于 `2002-01-01` 时，状态记为终态 `official_archive_unavailable`，不生成推断日期，不阻塞 CNInfo 治理流程。
+- `2002-01-01` 及之后完整查询仍无候选时，保持 `evidence_unavailable` 且可重试/复查。
+- 扫描状态按 `source_event_key + 窗口序号 + 起止日期 + 搜索依据` 独立存储，同一股票多个历史事件不再互相覆盖。
+
+### 4.2 开发数据重置与重建命令
+
+先运行只读预览：
+
+```text
+/run a_share_cninfo_corporate_action_resolution_reset start_date=1990-12-19 end_date=2026-07-23 exchanges=SSE,SZSE include_unanchored=true dry_run=true
+```
+
+核对 `protected_resolved`、`reset` 及各表待删行数后，才显式执行：
+
+```text
+/run a_share_cninfo_corporate_action_resolution_reset start_date=1990-12-19 end_date=2026-07-23 exchanges=SSE,SZSE include_unanchored=true dry_run=false confirm_reset=true
+```
+
+然后通过 `a_share_cninfo_corporate_action_resolution_governance` 重新运行 `inventory,discovery,resolution`，且必须保持 `classify_titles_with_llm=true`。重置任务不修改原始 observation、TDX 表或已 resolved 事件。
+
+`include_unanchored` 默认为 `false`，只有全历史开发数据清理时才在预演和正式命令中显式启用；普通日期分段重置不应纳入无锚点事件。
 
 ## 5. 公告归档和文本提取
 

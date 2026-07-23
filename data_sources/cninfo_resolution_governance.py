@@ -6,9 +6,10 @@ from datetime import date, datetime
 from typing import Any, Mapping, Optional
 
 
-APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v2"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v2"
+APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v3"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
+OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 
 _EFFECTFUL_ACTIONS = {
     "dividend",
@@ -29,6 +30,21 @@ _EXPLICIT_NON_EFFECTIVE_DESCRIPTIONS = {
     "\u672a\u5206\u914d\u5229\u6da6\u7ed3\u8f6c\u4e0b\u5e74\u5ea6\u4e00\u5e76\u5206\u914d",
     "\u7ed3\u8f6c\u4e0b\u4e00\u5e74\u5ea6\u5206\u914d(\u65b0\u8001\u80a1\u4e1c\u5171\u4eab)",
 }
+
+_EXPLICIT_SCOPE_MISMATCH_MARKERS = (
+    "仅向老股东",
+    "只向老股东",
+    "限老股东",
+    "仅向原股东",
+    "只向原股东",
+    "限原股东",
+    "仅向法人股股东",
+    "仅向内部职工股股东",
+    "仅向b股股东",
+    "仅向h股股东",
+    "仅向优先股股东",
+    "仅向境外上市外资股股东",
+)
 
 
 def _as_date(value: Any) -> Optional[date]:
@@ -71,6 +87,19 @@ def _explicit_non_effective(row: Mapping[str, Any]) -> bool:
     return normalized in _EXPLICIT_NON_EFFECTIVE_DESCRIPTIONS
 
 
+def _normalized_description(row: Mapping[str, Any]) -> str:
+    return "".join(
+        char for char in str(row.get("description") or "").lower()
+        if not char.isspace() and char not in {",", "，", "、", "。", "；", ";"}
+    )
+
+
+def _explicit_scope_mismatch(row: Mapping[str, Any]) -> bool:
+    """Recognize distributions explicitly limited outside listed A shares."""
+    description = _normalized_description(row)
+    return any(marker in description for marker in _EXPLICIT_SCOPE_MISMATCH_MARKERS)
+
+
 def _exchange(instrument_id: Any) -> str:
     value = str(instrument_id or "").strip().upper()
     if value.endswith(".SH"):
@@ -89,8 +118,10 @@ def classify_date_applicability(row: Mapping[str, Any]) -> dict[str, Any]:
     event_status = str(row.get("event_status") or "").strip().lower()
     exchange = _exchange(row.get("instrument_id"))
     explicit_non_effective = _explicit_non_effective(row)
+    explicit_scope_mismatch = _explicit_scope_mismatch(row)
     effectful = (
         not explicit_non_effective
+        and not explicit_scope_mismatch
         and (
         action_type in _EFFECTFUL_ACTIONS
         or any(
@@ -140,6 +171,7 @@ def classify_date_applicability(row: Mapping[str, Any]) -> dict[str, Any]:
         "event_status": event_status,
         "effectful": effectful,
         "explicit_non_effective": explicit_non_effective,
+        "explicit_scope_mismatch": explicit_scope_mismatch,
         "required_date_roles": required,
         "supporting_date_roles": supporting,
         "inapplicable_date_roles": inapplicable,
@@ -166,6 +198,7 @@ def derive_resolution_state(
     resolved_evidence_conflict: bool = False,
     latest_analysis: Optional[Mapping[str, Any]] = None,
     latest_review: Optional[Mapping[str, Any]] = None,
+    title_applicability: Optional[Mapping[str, Any]] = None,
     scan_status: Optional[str] = None,
     error_code: Optional[str] = None,
 ) -> dict[str, Any]:
@@ -194,6 +227,13 @@ def derive_resolution_state(
         state, reason, next_action, terminal = (
             "non_effective",
             "raw_cninfo_explicit_non_effective_event",
+            "none",
+            True,
+        )
+    elif applicability["explicit_scope_mismatch"]:
+        state, reason, next_action, terminal = (
+            "scope_mismatch",
+            "raw_cninfo_explicit_a_share_scope_mismatch",
             "none",
             True,
         )
@@ -247,6 +287,23 @@ def derive_resolution_state(
                 "none",
                 True,
             )
+        elif decision == "rejected" and terminal_reason == "scope_mismatch":
+            state, reason, next_action, terminal = (
+                "scope_mismatch",
+                "review_confirmed_a_share_scope_mismatch",
+                "none",
+                True,
+            )
+        elif str((title_applicability or {}).get("event_applicability") or "") in {
+            "non_effective", "scope_mismatch"
+        }:
+            title_state = str(title_applicability["event_applicability"])
+            state, reason, next_action, terminal = (
+                title_state,
+                f"llm_title_applicability:{title_state}",
+                "none",
+                True,
+            )
         elif error_code:
             state, reason, next_action = (
                 "retryable_error",
@@ -293,12 +350,31 @@ def derive_resolution_state(
                 "dry_run_candidates_require_write_discovery",
                 "write_discovery_candidates",
             )
-        elif str(scan_status or "").lower() in {"complete", "success", "partial_no_candidates"}:
-            state, reason, next_action = (
-                "evidence_unavailable",
-                "completed_scan_selected_no_matching_announcement",
-                "retry_discovery",
+        elif str(scan_status or "").lower() in {
+            "complete", "success", "complete_no_candidates", "partial_no_candidates"
+        }:
+            from data_sources.cninfo_special_action_resolution import (
+                best_structured_anchor,
             )
+
+            anchor = best_structured_anchor(row)
+            if (
+                str(scan_status or "").lower() == "complete_no_candidates"
+                and anchor is not None
+                and anchor < OFFICIAL_ARCHIVE_CUTOFF
+            ):
+                state, reason, next_action, terminal = (
+                    "official_archive_unavailable",
+                    "complete_pre_2002_cninfo_archive_scan_has_no_evidence",
+                    "none",
+                    True,
+                )
+            else:
+                state, reason, next_action = (
+                    "evidence_unavailable",
+                    "completed_scan_selected_no_matching_announcement",
+                    "retry_discovery",
+                )
         elif str(scan_status or "").lower() == "unbounded_anchor":
             state, reason, next_action = (
                 "manual_required",

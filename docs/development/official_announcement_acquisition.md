@@ -46,6 +46,8 @@ provider 参数位于 `config/10_research.json` 的 `research_config.sources.<so
 ## 4. 游标与失败语义
 
 状态按 `purpose_key + source + scope_key` 存储在 `announcement_scan_state`。
+对同一标的存在多个业务事件或多个有界窗口的流程，业务层必须将事件键、窗口序号、起止日期和搜索依据写入 `AnnouncementScope.source_options`，使 `scope_key` 能区分各次扫描，不得只以标的代码覆盖历史诊断。
+`announcement_audit` 仍保持公告本体幂等；同一公告被多个事件/窗口选中时，通过 `announcement_audit_context` 保存独立 `scope_key`、事件键、窗口和搜索依据，不复制公告本体或附件。
 
 只有完整且状态为 `success` 或 `success_empty` 的扫描允许推进游标。以下结果必须保留先前 committed cursor：
 

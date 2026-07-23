@@ -5417,6 +5417,7 @@ class DatabaseOperations:
             "source_not_supported", "candidate_pending_analysis",
             "validated_candidate", "machine_rework", "manual_required",
             "conflict", "non_effective", "superseded",
+            "scope_mismatch", "official_archive_unavailable",
             "evidence_unavailable", "discovery_pending", "retryable_error",
         }
         counters = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
@@ -5740,6 +5741,269 @@ class DatabaseOperations:
                 "evidence_key": row.evidence_key,
             }
         return resolved
+
+    async def reset_cninfo_corporate_action_resolution_data(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        exchanges: List[str],
+        instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
+        include_unanchored: bool = False,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        """Preview or remove non-resolved CNInfo resolution development data."""
+        normalized_start = self._coerce_datetime(start_date).date()
+        normalized_end = self._coerce_datetime(end_date).date()
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        suffixes = {"SSE": ".SH", "SZSE": ".SZ"}
+        normalized_exchanges = sorted({
+            str(item).strip().upper() for item in exchanges
+            if str(item).strip().upper() in suffixes
+        })
+        if not normalized_exchanges:
+            raise ValueError("reset requires SSE and/or SZSE")
+        selected_ids = {
+            str(item).strip() for item in (instrument_ids or []) if str(item).strip()
+        }
+        selected_event_keys = {
+            str(item).strip() for item in (source_event_keys or []) if str(item).strip()
+        }
+
+        def observation_anchors(row: CorporateActionObservationDB) -> List[date]:
+            anchors = [
+                value.date() if isinstance(value, datetime) else value
+                for value in (
+                    row.announcement_date, row.record_date, row.share_arrival_date
+                )
+                if value is not None
+            ]
+            match = re.search(r"(19|20)\d{2}", str(row.fiscal_period or ""))
+            if not anchors and match:
+                anchors.append(date(int(match.group(0)), 12, 31))
+            return anchors
+
+        async with self.get_async_session() as session:
+            filters = [
+                CorporateActionObservationDB.source == "cninfo",
+                CorporateActionObservationDB.source_profile.in_((
+                    "cninfo_dividend", "cninfo_allotment"
+                )),
+            ]
+            if selected_ids:
+                filters.append(CorporateActionObservationDB.instrument_id.in_(selected_ids))
+            if selected_event_keys:
+                filters.append(
+                    CorporateActionObservationDB.source_event_key.in_(selected_event_keys)
+                )
+            observations = (await session.execute(
+                select(CorporateActionObservationDB).where(*filters)
+            )).scalars().all()
+            allowed_suffixes = tuple(suffixes[item] for item in normalized_exchanges)
+            selected_identities = set()
+            for row in observations:
+                if not row.instrument_id.endswith(allowed_suffixes):
+                    continue
+                anchors = observation_anchors(row)
+                if (
+                    bool(selected_event_keys)
+                    or any(
+                        normalized_start <= anchor <= normalized_end
+                        for anchor in anchors
+                    )
+                    or (
+                        not anchors
+                        and include_unanchored
+                    )
+                ):
+                    selected_identities.add(
+                        (row.instrument_id, row.source_event_key)
+                    )
+            empty_result = {
+                "dry_run": bool(dry_run),
+                "selected_events": len(selected_identities),
+                "protected_resolved_events": 0,
+                "reset_events": 0,
+                "deleted": {},
+                "selected_instrument_ids": sorted({item[0] for item in selected_identities}),
+                "selected_source_event_keys": sorted({item[1] for item in selected_identities}),
+                "reset_instrument_ids": [],
+                "reset_source_event_keys": [],
+                "protected_instrument_ids": [],
+                "protected_announcement_ids": [],
+            }
+            if not selected_identities:
+                return empty_result
+
+            evidence_identity = tuple_(
+                CorporateActionEffectiveDateEvidenceDB.instrument_id,
+                CorporateActionEffectiveDateEvidenceDB.source_event_key,
+            )
+            protected_rows = (await session.execute(
+                select(
+                    CorporateActionEffectiveDateEvidenceDB.instrument_id,
+                    CorporateActionEffectiveDateEvidenceDB.source_event_key,
+                    CorporateActionEffectiveDateEvidenceDB.announcement_id,
+                ).where(
+                    evidence_identity.in_(selected_identities),
+                    CorporateActionEffectiveDateEvidenceDB.observation_source == "cninfo",
+                    CorporateActionEffectiveDateEvidenceDB.resolution_status == "resolved",
+                    CorporateActionEffectiveDateEvidenceDB.evidence_source.in_(
+                        GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+                    ),
+                    CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(None),
+                )
+            )).all()
+            protected_identities = {
+                (row.instrument_id, row.source_event_key) for row in protected_rows
+            }
+            reset_identities = selected_identities - protected_identities
+            empty_result.update({
+                "protected_resolved_events": len(protected_identities),
+                "reset_events": len(reset_identities),
+                "reset_instrument_ids": sorted({item[0] for item in reset_identities}),
+                "reset_source_event_keys": sorted({item[1] for item in reset_identities}),
+                "protected_instrument_ids": sorted({
+                    item[0] for item in protected_identities
+                }),
+                "protected_announcement_ids": sorted({
+                    str(row.announcement_id) for row in protected_rows if row.announcement_id
+                }),
+            })
+            if not reset_identities:
+                return empty_result
+
+            analysis_identity = tuple_(
+                CorporateActionLlmAnalysisDB.instrument_id,
+                CorporateActionLlmAnalysisDB.source_event_key,
+            )
+            review_identity = tuple_(
+                CorporateActionResolutionReviewDB.instrument_id,
+                CorporateActionResolutionReviewDB.source_event_key,
+            )
+            terms_identity = tuple_(
+                CorporateActionResolvedTermsDB.instrument_id,
+                CorporateActionResolvedTermsDB.source_event_key,
+            )
+            state_identity = tuple_(
+                CorporateActionResolutionStateDB.instrument_id,
+                CorporateActionResolutionStateDB.source_event_key,
+            )
+            evidence_filter = evidence_identity.in_(reset_identities)
+            analysis_filter = analysis_identity.in_(reset_identities)
+            review_filter = review_identity.in_(reset_identities)
+            terms_filter = terms_identity.in_(reset_identities)
+            state_filter = state_identity.in_(reset_identities)
+
+            announcement_ids = set((await session.execute(
+                select(CorporateActionEffectiveDateEvidenceDB.announcement_id).where(
+                    evidence_filter,
+                    CorporateActionEffectiveDateEvidenceDB.announcement_id.is_not(None),
+                )
+            )).scalars().all())
+            artifact_rows = []
+            if announcement_ids:
+                artifact_rows = (await session.execute(
+                    select(CorporateActionDocumentArtifactDB).where(
+                        CorporateActionDocumentArtifactDB.announcement_id.in_(announcement_ids)
+                    )
+                )).scalars().all()
+            remaining_evidence_announcements = set()
+            if announcement_ids:
+                remaining_evidence_announcements = set((await session.execute(
+                    select(CorporateActionEffectiveDateEvidenceDB.announcement_id).where(
+                        CorporateActionEffectiveDateEvidenceDB.announcement_id.in_(
+                            announcement_ids
+                        ),
+                        ~evidence_filter,
+                    )
+                )).scalars().all())
+            candidate_artifact_ids = {int(row.id) for row in artifact_rows}
+            remaining_analysis_artifact_ids = set()
+            if candidate_artifact_ids:
+                remaining_analysis_rows = (await session.execute(
+                    select(CorporateActionLlmAnalysisDB.artifact_ids_json).where(
+                        ~analysis_filter
+                    )
+                )).scalars().all()
+                for raw_ids in remaining_analysis_rows:
+                    try:
+                        parsed_ids = json.loads(raw_ids or "[]")
+                    except (TypeError, json.JSONDecodeError):
+                        continue
+                    remaining_analysis_artifact_ids.update(
+                        int(item) for item in parsed_ids if str(item).isdigit()
+                    )
+            unreferenced_artifact_ids = {
+                int(row.id) for row in artifact_rows
+                if row.announcement_id not in remaining_evidence_announcements
+                and int(row.id) not in remaining_analysis_artifact_ids
+            }
+
+            async def row_count(model: Any, clause: Any) -> int:
+                return int(await session.scalar(
+                    select(func.count()).select_from(model).where(clause)
+                ) or 0)
+
+            counts = {
+                "resolution_states": await row_count(
+                    CorporateActionResolutionStateDB, state_filter
+                ),
+                "resolved_terms": await row_count(
+                    CorporateActionResolvedTermsDB, terms_filter
+                ),
+                "reviews": await row_count(
+                    CorporateActionResolutionReviewDB, review_filter
+                ),
+                "llm_analyses": await row_count(
+                    CorporateActionLlmAnalysisDB, analysis_filter
+                ),
+                "effective_date_evidence": await row_count(
+                    CorporateActionEffectiveDateEvidenceDB, evidence_filter
+                ),
+                "document_pages": 0,
+                "document_artifacts": len(unreferenced_artifact_ids),
+            }
+            if unreferenced_artifact_ids:
+                counts["document_pages"] = await row_count(
+                    CorporateActionDocumentPageDB,
+                    CorporateActionDocumentPageDB.artifact_id.in_(
+                        unreferenced_artifact_ids
+                    ),
+                )
+
+            if not dry_run:
+                await session.execute(delete(CorporateActionResolutionStateDB).where(
+                    state_filter
+                ))
+                await session.execute(delete(CorporateActionResolvedTermsDB).where(
+                    terms_filter
+                ))
+                await session.execute(delete(CorporateActionResolutionReviewDB).where(
+                    review_filter
+                ))
+                await session.execute(delete(CorporateActionLlmAnalysisDB).where(
+                    analysis_filter
+                ))
+                await session.execute(delete(
+                    CorporateActionEffectiveDateEvidenceDB
+                ).where(evidence_filter))
+                if unreferenced_artifact_ids:
+                    await session.execute(delete(CorporateActionDocumentPageDB).where(
+                        CorporateActionDocumentPageDB.artifact_id.in_(
+                            unreferenced_artifact_ids
+                        )
+                    ))
+                    await session.execute(delete(CorporateActionDocumentArtifactDB).where(
+                        CorporateActionDocumentArtifactDB.id.in_(
+                            unreferenced_artifact_ids
+                        )
+                    ))
+                await session.commit()
+
+            return {**empty_result, "deleted": counts}
 
     async def get_adjustment_factor_observations(
         self,

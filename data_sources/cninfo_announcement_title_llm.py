@@ -30,6 +30,14 @@ _HOLDER_GROUP_MARKERS = (
     "\u539f\u80a1\u4e1c",       # original shareholders
     "\u65b0\u8001\u80a1\u4e1c", # new and old shareholders
 )
+_EXCLUSIVE_HOLDER_GROUP_MARKERS = (
+    "仅向老股东",
+    "只向老股东",
+    "限老股东",
+    "仅向原股东",
+    "只向原股东",
+    "限原股东",
+)
 _OTHER_SHARE_CLASS_MARKERS = (
     "B\u80a1",
     "H\u80a1",
@@ -223,10 +231,17 @@ def _normalize_event_applicability(
         return normalized
     description = str(event.get("description") or "")
     has_holder_group = any(marker in description for marker in _HOLDER_GROUP_MARKERS)
+    has_exclusive_holder_group = any(
+        marker in description for marker in _EXCLUSIVE_HOLDER_GROUP_MARKERS
+    )
     has_explicit_share_class = any(
         marker in description for marker in _OTHER_SHARE_CLASS_MARKERS
     )
-    if has_holder_group and not has_explicit_share_class:
+    if (
+        has_holder_group
+        and not has_exclusive_holder_group
+        and not has_explicit_share_class
+    ):
         normalized.update({
             "event_applicability": "uncertain",
             "applicability_reason": (

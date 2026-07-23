@@ -42,6 +42,16 @@ _GENERIC_ACTION_MARKERS = (
 )
 _TITLE_EXCLUDES = ("取消", "终止", "不予实施", "不实施")
 
+IMPLEMENTATION_GRADE_ANNOUNCEMENT_ROLES = frozenset({
+    "implementation",
+    "implementation_completion",
+    "record_date_notice",
+    "share_arrival_notice",
+    "rights_issue",
+    "share_reform",
+    "compensation_share_distribution",
+})
+
 
 @dataclass(frozen=True)
 class SpecialActionSearchTarget:
@@ -77,6 +87,33 @@ def parse_date(value: Any) -> Optional[date]:
         return datetime.fromisoformat(str(value)[:10]).date()
     except ValueError:
         return None
+
+
+def best_structured_anchor(row: Mapping[str, Any]) -> Optional[date]:
+    """Return the best date for archive-availability policy decisions."""
+    implementation_dates = [
+        parsed
+        for field_name in ("record_date", "share_arrival_date")
+        if (parsed := parse_date(row.get(field_name))) is not None
+    ]
+    if implementation_dates:
+        return max(implementation_dates)
+    announcement_date = parse_date(row.get("announcement_date"))
+    if announcement_date is not None:
+        return announcement_date
+    fiscal_period = str(row.get("fiscal_period") or "")
+    match = re.search(r"(19|20)\d{2}", fiscal_period)
+    return date(int(match.group(0)), 12, 31) if match else None
+
+
+def is_implementation_grade_decision(decision: Mapping[str, Any]) -> bool:
+    """Return whether a title decision may proceed to semantic extraction."""
+    return (
+        str(decision.get("relevance") or "")
+        in {"relevant", "possibly_relevant"}
+        and str(decision.get("announcement_role") or "")
+        in IMPLEMENTATION_GRADE_ANNOUNCEMENT_ROLES
+    )
 
 
 def _number(value: Any) -> float:
@@ -404,10 +441,9 @@ def build_classified_announcement_evidence(
         decision = decisions.get(announcement_id)
         if not announcement_id or not title or not decision:
             continue
-        relevance = str(decision.get("relevance") or "")
         resolution_status = (
             "candidate"
-            if relevance in {"relevant", "possibly_relevant"}
+            if is_implementation_grade_decision(decision)
             else "rejected"
         )
         attachments = tuple(getattr(record, "attachments", ()) or ())

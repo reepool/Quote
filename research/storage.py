@@ -7401,6 +7401,8 @@ class ResearchStorageManager:
         instrument_id: Optional[str] = None,
         symbol: Optional[str] = None,
         ingestion_run_id: Optional[int] = None,
+        scope_key: Optional[str] = None,
+        context_metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Idempotently store one purpose-specific normalized announcement."""
         now = get_shanghai_time().isoformat()
@@ -7460,6 +7462,51 @@ class ResearchStorageManager:
                     now,
                 ),
             )
+            normalized_scope_key = str(scope_key or "").strip()
+            if normalized_scope_key:
+                context = dict(context_metadata or {})
+                conn.execute(
+                    """
+                    INSERT INTO announcement_audit_context (
+                        purpose_key, source, announcement_key, instrument_id,
+                        scope_key, source_event_key, window_index,
+                        search_start_date, search_end_date, search_basis,
+                        context_json, ingestion_run_id, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(
+                        purpose_key, announcement_key, instrument_id, scope_key
+                    ) DO UPDATE SET
+                        source_event_key = excluded.source_event_key,
+                        window_index = excluded.window_index,
+                        search_start_date = excluded.search_start_date,
+                        search_end_date = excluded.search_end_date,
+                        search_basis = excluded.search_basis,
+                        context_json = excluded.context_json,
+                        ingestion_run_id = excluded.ingestion_run_id,
+                        updated_at = excluded.updated_at
+                    """,
+                    (
+                        str(purpose_key).strip(),
+                        record.source,
+                        record.announcement_key,
+                        instrument_id or "",
+                        normalized_scope_key,
+                        str(context.get("source_event_key") or ""),
+                        context.get("window_index"),
+                        context.get("search_start_date"),
+                        context.get("search_end_date"),
+                        context.get("search_basis"),
+                        json.dumps(
+                            context,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            default=str,
+                        ),
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
             conn.commit()
 
     def list_announcement_audit(
@@ -7511,6 +7558,165 @@ class ResearchStorageManager:
             ) or {}
             output.append(item)
         return output
+
+    def reset_corporate_action_announcement_governance(
+        self,
+        *,
+        purpose_key: str,
+        instrument_ids: List[str],
+        source_event_keys: List[str],
+        preserve_instrument_ids: Optional[List[str]] = None,
+        preserve_announcement_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+    ) -> Dict[str, int]:
+        """Remove selected corporate-action scan lineage for a clean rebuild."""
+        normalized_instruments = {
+            str(item).strip() for item in instrument_ids if str(item).strip()
+        }
+        normalized_events = {
+            str(item).strip() for item in source_event_keys if str(item).strip()
+        }
+        protected_instruments = {
+            str(item).strip() for item in (preserve_instrument_ids or [])
+            if str(item).strip()
+        }
+        preserved = {
+            str(item).strip() for item in (preserve_announcement_ids or [])
+            if str(item).strip()
+        }
+        if not normalized_instruments and not normalized_events:
+            return {
+                "scan_states": 0,
+                "announcement_audit_contexts": 0,
+                "announcement_audits": 0,
+            }
+
+        def matches_scope(row: sqlite3.Row) -> bool:
+            scope = self._deserialize_json(row["scope_json"]) or {}
+            metadata = self._deserialize_json(row["metadata_json"]) or {}
+            options = scope.get("source_options") or {}
+            selection = metadata.get("selection_metadata") or {}
+            event_key = str(
+                options.get("source_event_key")
+                or selection.get("source_event_key")
+                or ""
+            ).strip()
+            instrument_id = str(scope.get("instrument_id") or "").strip()
+            if event_key:
+                return event_key in normalized_events
+            return bool(
+                instrument_id
+                and instrument_id in normalized_instruments
+                and instrument_id not in protected_instruments
+            )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            scan_rows = conn.execute(
+                """
+                SELECT purpose_key, source, scope_key, scope_json, metadata_json
+                FROM announcement_scan_state
+                WHERE purpose_key = ? AND source = 'cninfo'
+                """,
+                (str(purpose_key).strip(),),
+            ).fetchall()
+            scan_keys = [
+                (row["purpose_key"], row["source"], row["scope_key"])
+                for row in scan_rows if matches_scope(row)
+            ]
+            audit_rows = []
+            context_rows = []
+            if normalized_instruments:
+                placeholders = ",".join("?" for _ in normalized_instruments)
+                audit_rows = conn.execute(
+                    f"""
+                    SELECT purpose_key, announcement_key, instrument_id,
+                           source_announcement_id
+                    FROM announcement_audit
+                    WHERE purpose_key = ? AND source = 'cninfo'
+                      AND instrument_id IN ({placeholders})
+                    """,
+                    [str(purpose_key).strip(), *sorted(normalized_instruments)],
+                ).fetchall()
+                context_rows = conn.execute(
+                    f"""
+                    SELECT purpose_key, announcement_key, instrument_id,
+                           scope_key, source_event_key
+                    FROM announcement_audit_context
+                    WHERE purpose_key = ? AND source = 'cninfo'
+                      AND instrument_id IN ({placeholders})
+                    """,
+                    [str(purpose_key).strip(), *sorted(normalized_instruments)],
+                ).fetchall()
+            deleted_scope_keys = {item[2] for item in scan_keys}
+            context_keys = [
+                (
+                    row["purpose_key"],
+                    row["announcement_key"],
+                    row["instrument_id"],
+                    row["scope_key"],
+                )
+                for row in context_rows
+                if (
+                    str(row["source_event_key"] or "") in normalized_events
+                    or str(row["scope_key"] or "") in deleted_scope_keys
+                )
+            ]
+            deleted_context_keys = set(context_keys)
+            announcements_with_remaining_context = {
+                (
+                    row["purpose_key"],
+                    row["announcement_key"],
+                    row["instrument_id"],
+                )
+                for row in context_rows
+                if (
+                    row["purpose_key"],
+                    row["announcement_key"],
+                    row["instrument_id"],
+                    row["scope_key"],
+                ) not in deleted_context_keys
+            }
+            audit_keys = [
+                (row["purpose_key"], row["announcement_key"], row["instrument_id"])
+                for row in audit_rows
+                if str(row["source_announcement_id"] or "") not in preserved
+                and (
+                    row["purpose_key"],
+                    row["announcement_key"],
+                    row["instrument_id"],
+                ) not in announcements_with_remaining_context
+            ]
+            if not dry_run:
+                conn.executemany(
+                    """
+                    DELETE FROM announcement_scan_state
+                    WHERE purpose_key = ? AND source = ? AND scope_key = ?
+                    """,
+                    scan_keys,
+                )
+                conn.executemany(
+                    """
+                    DELETE FROM announcement_audit_context
+                    WHERE purpose_key = ? AND announcement_key = ?
+                      AND instrument_id = ? AND scope_key = ?
+                    """,
+                    context_keys,
+                )
+                conn.executemany(
+                    """
+                    DELETE FROM announcement_audit
+                    WHERE purpose_key = ? AND announcement_key = ?
+                      AND instrument_id = ?
+                    """,
+                    audit_keys,
+                )
+                conn.commit()
+        return {
+            "scan_states": len(scan_keys),
+            "announcement_audit_contexts": len(context_keys),
+            "announcement_audits": len(audit_keys),
+        }
 
     def upsert_financial_disclosure_event_state(
         self,
@@ -11937,6 +12143,32 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_announcement_audit_lookup
             ON announcement_audit(
                 purpose_key, source, published_at, instrument_id
+            );
+
+            CREATE TABLE IF NOT EXISTS announcement_audit_context (
+                purpose_key TEXT NOT NULL,
+                source TEXT NOT NULL,
+                announcement_key TEXT NOT NULL,
+                instrument_id TEXT NOT NULL DEFAULT '',
+                scope_key TEXT NOT NULL,
+                source_event_key TEXT NOT NULL DEFAULT '',
+                window_index INTEGER,
+                search_start_date TEXT,
+                search_end_date TEXT,
+                search_basis TEXT,
+                context_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (
+                    purpose_key, announcement_key, instrument_id, scope_key
+                ),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_announcement_audit_context_event
+            ON announcement_audit_context(
+                purpose_key, source_event_key, instrument_id, scope_key
             );
 
             CREATE TABLE IF NOT EXISTS financial_disclosure_event_state (

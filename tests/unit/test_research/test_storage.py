@@ -102,6 +102,7 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "shareholder_snapshots" in tables
     assert "announcement_scan_state" in tables
     assert "announcement_audit" in tables
+    assert "announcement_audit_context" in tables
     assert "cninfo_announcement_scan_state" not in tables
     assert "cninfo_announcement_audit" not in tables
     assert "financial_disclosure_event_state" in tables
@@ -365,6 +366,116 @@ def test_announcement_audit_is_source_neutral_idempotent_and_bounded(tmp_path):
     assert rows[0]["announcement_key"] == "cninfo:ann-1"
     assert rows[0]["selection_reasons"] == ["annual_report"]
     assert rows[0]["attachments"][0]["resolved_url"].startswith("https://")
+
+
+def test_corporate_action_announcement_governance_reset_is_dry_run_first(
+    tmp_path,
+):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    purpose = "a_share_cninfo_special_action_discovery"
+    for index in (1, 2):
+        query = AnnouncementQuery(
+            purpose_key=purpose,
+            scope=AnnouncementScope(
+                exchange="SZSE",
+                instrument_id="000001.SZ",
+                symbol="000001",
+                start_date=f"200{index}-01-01",
+                end_date=f"200{index}-01-31",
+                source_options={
+                    "source_event_key": f"event-{index}",
+                    "window_index": 1,
+                },
+            ),
+        )
+        storage.upsert_announcement_scan_state(
+            scan_result=AnnouncementScanResult(
+                source="cninfo",
+                query=query,
+                status="success",
+                is_complete=True,
+                stop_reason="last_page",
+            )
+        )
+        storage.store_announcement_audit(
+            purpose_key=purpose,
+            record=AnnouncementRecord(
+                source="cninfo",
+                source_announcement_id=f"ann-{index}",
+                announcement_key=build_announcement_key("cninfo", f"ann-{index}"),
+                title=f"announcement {index}",
+                published_at=f"200{index}-01-15T00:00:00+00:00",
+            ),
+            instrument_id="000001.SZ",
+            symbol="000001",
+            scope_key=query.scope.scope_key,
+            context_metadata=query.scope.source_options,
+        )
+    legacy_query = AnnouncementQuery(
+        purpose_key=purpose,
+        scope=AnnouncementScope(
+            exchange="SZSE",
+            instrument_id="000001.SZ",
+            symbol="000001",
+            start_date="2000-01-01",
+            end_date="2000-01-31",
+        ),
+    )
+    storage.upsert_announcement_scan_state(
+        scan_result=AnnouncementScanResult(
+            source="cninfo",
+            query=legacy_query,
+            status="success",
+            is_complete=True,
+            stop_reason="last_page",
+        )
+    )
+
+    preview = storage.reset_corporate_action_announcement_governance(
+        purpose_key=purpose,
+        instrument_ids=["000001.SZ"],
+        source_event_keys=["event-2"],
+        preserve_instrument_ids=["000001.SZ"],
+        preserve_announcement_ids=["ann-1"],
+        dry_run=True,
+    )
+    assert preview == {
+        "scan_states": 1,
+        "announcement_audit_contexts": 1,
+        "announcement_audits": 1,
+    }
+    with sqlite3.connect(research_db_path) as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM announcement_scan_state"
+        ).fetchone()[0] == 3
+        assert conn.execute(
+            "SELECT COUNT(*) FROM announcement_audit"
+        ).fetchone()[0] == 2
+        assert conn.execute(
+            "SELECT COUNT(*) FROM announcement_audit_context"
+        ).fetchone()[0] == 2
+
+    written = storage.reset_corporate_action_announcement_governance(
+        purpose_key=purpose,
+        instrument_ids=["000001.SZ"],
+        source_event_keys=["event-2"],
+        preserve_instrument_ids=["000001.SZ"],
+        preserve_announcement_ids=["ann-1"],
+        dry_run=False,
+    )
+    assert written == preview
+    with sqlite3.connect(research_db_path) as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM announcement_scan_state"
+        ).fetchone()[0] == 2
+        assert conn.execute(
+            "SELECT COUNT(*) FROM announcement_audit_context"
+        ).fetchone()[0] == 1
+        remaining = conn.execute(
+            "SELECT source_announcement_id FROM announcement_audit"
+        ).fetchall()
+    assert remaining == [("ann-1",)]
 
 
 def test_legacy_announcement_storage_methods_are_not_exposed(tmp_path):

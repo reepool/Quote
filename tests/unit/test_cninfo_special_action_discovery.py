@@ -153,8 +153,14 @@ def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
     return manager
 
 
-def _title_llm_response(*, announcement_id="120220001", relevance="relevant"):
-    role = (
+def _title_llm_response(
+    *,
+    announcement_id="120220001",
+    relevance="relevant",
+    role=None,
+    event_applicability="effectful",
+):
+    role = role or (
         "compensation_share_distribution"
         if relevance != "unrelated"
         else "periodic_report"
@@ -164,7 +170,7 @@ def _title_llm_response(*, announcement_id="120220001", relevance="relevant"):
             "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
             "events": [{
                 "source_event_key": "event-1",
-                "event_applicability": "effectful",
+                "event_applicability": event_applicability,
                 "applicability_reason": "The structured event has share effects",
                 "classifications": [{
                     "announcement_id": announcement_id,
@@ -544,6 +550,34 @@ async def test_llm_title_discovery_persists_before_publishing_ready_event():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("event_applicability", ["non_effective", "scope_mismatch"])
+async def test_terminal_title_applicability_is_not_published_for_resolution(
+    event_applicability,
+):
+    manager = _manager()
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response(
+            event_applicability=event_applicability,
+        ))
+    )
+    on_event_ready = AsyncMock()
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+        on_event_ready=on_event_ready,
+    )
+
+    assert result["status"] == "success"
+    assert result["evidence"]["candidate_count"] == 1
+    on_event_ready.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_llm_title_discovery_persists_unrelated_as_rejected_evidence():
     manager = _manager(
         announcement_service=_FakeAnnouncementService(title="年度报告摘要")
@@ -575,6 +609,64 @@ async def test_llm_title_discovery_persists_unrelated_as_rejected_evidence():
 
 
 @pytest.mark.asyncio
+async def test_relevant_context_title_is_rejected_from_semantic_candidates():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(title="年度利润分配预案")
+    )
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response(
+            relevance="relevant",
+            role="dividend_plan",
+        ))
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["evidence"]["candidate_count"] == 0
+    assert result["evidence"]["rejected_count"] == 1
+    rows = manager.db_ops.save_corporate_action_effective_date_evidence.await_args.args[0]
+    assert rows[0]["resolution_status"] == "rejected"
+    assert result["target_samples"][0]["scan_complete"] is True
+
+
+@pytest.mark.asyncio
+async def test_announcement_scan_scope_is_unique_per_event_window():
+    manager = _manager()
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response())
+    )
+
+    await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    call = manager._announcement_test_storage.upsert_announcement_scan_state.call_args
+    scope = call.kwargs["scan_result"].query.scope
+    assert scope.source_options["source_event_key"] == "event-1"
+    assert scope.source_options["window_index"] == 1
+    assert scope.source_options["search_start_date"]
+    assert scope.source_options["search_end_date"]
+    audit_call = (
+        manager._announcement_test_storage.store_announcement_audit.call_args
+    )
+    assert audit_call.kwargs["scope_key"] == scope.scope_key
+    assert audit_call.kwargs["context_metadata"]["source_event_key"] == "event-1"
+    assert audit_call.kwargs["context_metadata"]["selection_reasons"]
+
+
+@pytest.mark.asyncio
 async def test_llm_title_coverage_error_is_retryable_and_writes_no_evidence():
     manager = _manager()
     client = SimpleNamespace(
@@ -597,4 +689,5 @@ async def test_llm_title_coverage_error_is_retryable_and_writes_no_evidence():
     assert result["title_classification"]["status"] == "partial"
     assert result["title_classification"]["event_errors"] == 1
     assert "title_classification_failed" in result["errors"][0]["error"]
+    assert result["target_samples"][0]["scan_complete"] is False
     manager.db_ops.save_corporate_action_effective_date_evidence.assert_not_awaited()

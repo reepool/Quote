@@ -329,6 +329,33 @@ async def test_title_classifier_does_not_treat_holder_group_as_share_class_misma
 
 
 @pytest.mark.asyncio
+async def test_title_classifier_preserves_explicit_old_shareholder_limitation():
+    client = SimpleNamespace(complete=AsyncMock(return_value=_response([{
+        "source_event_key": "event-1",
+        "event_applicability": "scope_mismatch",
+        "applicability_reason": "Distribution is explicitly limited to old shareholders",
+        "classifications": [{
+            "announcement_id": "announcement-1",
+            "relevance": "possibly_relevant",
+            "announcement_role": "implementation",
+            "confidence": 0.9,
+            "reason": "Implementation notice for the limited distribution",
+        }],
+    }])))
+    classifier = CninfoAnnouncementTitleClassifier(client)
+    event = {
+        **_event([{"announcement_id": "announcement-1", "title": "公告一"}]),
+        "description": "本次现金股利仅向老股东派发",
+    }
+
+    result = await classifier.classify([event])
+
+    assert result.applicability_by_event["event-1"]["event_applicability"] == (
+        "scope_mismatch"
+    )
+
+
+@pytest.mark.asyncio
 async def test_title_classifier_preserves_legal_person_share_scope_mismatch():
     client = SimpleNamespace(complete=AsyncMock(return_value=_response([{
         "source_event_key": "event-1",

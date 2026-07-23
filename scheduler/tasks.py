@@ -701,6 +701,30 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_cninfo_resolution_reset_report(result: Dict[str, Any]) -> str:
+    """Build a compact report for the destructive-development reset task."""
+    parameters = result.get("parameters") or {}
+    events = result.get("events") or {}
+    deleted = result.get("deleted") or {}
+    return "\n".join([
+        "ℹ️ *A 股 CNInfo 公司行动治理数据重置*",
+        "",
+        f"结论: *{'预演完成' if result.get('dry_run') else '完成' if result.get('status') == 'success' else '部分完成'}*",
+        f"状态: `{result.get('status')}`",
+        f"dry_run: `{result.get('dry_run')}`",
+        f"confirm_reset: `{result.get('confirmed')}`",
+        f"include_unanchored: `{parameters.get('include_unanchored', False)}`",
+        f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        "事件: `"
+        f"selected={events.get('selected', 0)}, "
+        f"protected_resolved={events.get('protected_resolved', 0)}, "
+        f"reset={events.get('reset', 0)}`",
+        f"派生数据: `{deleted}`",
+        "说明: 原始 CNInfo 事件、TDX 数据及已 resolved 事件血缘不修改。",
+    ])
+
+
 def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     """Build a bounded adjustment-factor governance report."""
     icon, label = _format_scheduler_status(result.get("status"))
@@ -5052,6 +5076,61 @@ class ScheduledTasks:
                 "status": "failed",
                 "operation": task_id,
                 "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_corporate_action_resolution_reset(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
+        include_unanchored: bool = False,
+        dry_run: bool = True,
+        confirm_reset: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Preview or execute the bounded non-resolved governance reset."""
+        task_id = "a_share_cninfo_corporate_action_resolution_reset"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.reset_cninfo_corporate_action_resolution_governance(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                source_event_keys=source_event_keys,
+                include_unanchored=bool(include_unanchored),
+                dry_run=bool(dry_run),
+                confirm_reset=bool(confirm_reset),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股 CNInfo 公司行动治理数据重置",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_resolution_reset_report(result),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] CNInfo resolution reset failed: %s", exc
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "confirmed": bool(confirm_reset),
                 "production_isolation": True,
                 "error": str(exc),
                 "errors": [str(exc)],
