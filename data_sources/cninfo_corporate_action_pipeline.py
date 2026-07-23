@@ -53,6 +53,22 @@ def _required_text(value: Any, name: str) -> str:
     return text
 
 
+def _exact_int(value: Any, *, name: str, default: int) -> int:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be an integer")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        sign = text[:1]
+        digits = text[1:] if sign in {"+", "-"} else text
+        if digits and digits.isdigit():
+            return int(text)
+    raise ValueError(f"{name} must be an integer")
+
+
 def _frozen_mapping(value: Mapping[str, Any] | None) -> Mapping[str, Any]:
     return MappingProxyType(dict(value or {}))
 
@@ -65,6 +81,7 @@ class CninfoCorporateActionPipelineConfig:
     download_concurrency: int = 8
     document_parse_concurrency: int = 8
     llm_concurrency: int = CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY
+    llm_requests_per_minute: int = 0
     writer_batch_size: int = 10
     writer_concurrency: int = 1
     progress_interval_seconds: float = 30.0
@@ -92,6 +109,11 @@ class CninfoCorporateActionPipelineConfig:
             llm_concurrency=int(raw.get(
                 "llm_concurrency", CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY
             )),
+            llm_requests_per_minute=_exact_int(
+                raw.get("llm_requests_per_minute"),
+                name="CNInfo company-action llm_requests_per_minute",
+                default=0,
+            ),
             writer_batch_size=int(raw.get("writer_batch_size", 10)),
             writer_concurrency=int(raw.get("writer_concurrency", 1)),
             progress_interval_seconds=float(
@@ -124,6 +146,10 @@ class CninfoCorporateActionPipelineConfig:
             raise ValueError(
                 "CNInfo company-action llm_concurrency must not exceed 50"
             )
+        if self.llm_requests_per_minute < 0:
+            raise ValueError(
+                "CNInfo company-action llm_requests_per_minute must not be negative"
+            )
         if self.writer_concurrency != 1:
             raise ValueError(
                 "CNInfo company-action writer_concurrency must be 1 for SQLite"
@@ -145,6 +171,7 @@ class CninfoCorporateActionPipelineConfig:
             "download_concurrency": self.download_concurrency,
             "document_parse_concurrency": self.document_parse_concurrency,
             "llm_concurrency": self.llm_concurrency,
+            "llm_requests_per_minute": self.llm_requests_per_minute,
             "writer_batch_size": self.writer_batch_size,
             "writer_concurrency": self.writer_concurrency,
             "progress_interval_seconds": self.progress_interval_seconds,

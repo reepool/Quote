@@ -527,6 +527,20 @@ def _format_cninfo_problem_detail_messages(
     ]
 
 
+def _format_llm_rpm(pipeline: Dict[str, Any]) -> str:
+    configured = pipeline.get("llm_requests_per_minute")
+    effective = pipeline.get("effective_llm_requests_per_minute")
+    if effective is not None:
+        if effective == 0:
+            return "unlimited"
+        if configured in (None, 0, "0"):
+            return f"{effective} (inherited)"
+        return str(effective)
+    if configured in (None, 0, "0"):
+        return "inherit(provider)"
+    return str(configured)
+
+
 def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     """Build a bounded governed-resolution report for公告正文解析."""
     counts = result.get("counts") or {}
@@ -550,6 +564,7 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         "pipeline: `"
         f"mode={pipeline.get('mode', 'serial')}, "
         f"llm={pipeline.get('llm_concurrency', 0)}, "
+        f"llm_rpm={_format_llm_rpm(pipeline)}, "
         f"download={pipeline.get('download_concurrency', 0)}, "
         f"parse={pipeline.get('document_parse_concurrency', 0)}, "
         f"writer={pipeline.get('writer_concurrency', 0)}`",
@@ -631,6 +646,7 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         "pipeline: `"
         f"mode={pipeline.get('mode', 'serial')}, "
         f"llm={pipeline.get('llm_concurrency', 0)}, "
+        f"llm_rpm={_format_llm_rpm(pipeline)}, "
         f"parse={pipeline.get('document_parse_concurrency', 0)}, "
         f"writer={pipeline.get('writer_concurrency', 0)}`",
         "库存: `"
@@ -4744,6 +4760,7 @@ class ScheduledTasks:
         pipeline_download_concurrency: Optional[int] = None,
         pipeline_document_parse_concurrency: Optional[int] = None,
         pipeline_llm_concurrency: Optional[int] = None,
+        pipeline_llm_requests_per_minute: Optional[int] = None,
         pipeline_progress_interval_seconds: Optional[float] = None,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
@@ -4758,7 +4775,8 @@ class ScheduledTasks:
                 "offset=%s profile=%s resume=%s dry_run=%s download_documents=%s "
                 "run_ocr=%s refresh_documents=%s discover_candidates=%s "
                 "auto_promote_validated=%s exclude_reviewed_events=%s "
-                "pipeline_mode=%s pipeline_llm_concurrency=%s",
+                "pipeline_mode=%s pipeline_llm_concurrency=%s "
+                "pipeline_llm_requests_per_minute=%s",
                 start_date,
                 end_date,
                 exchanges,
@@ -4776,6 +4794,7 @@ class ScheduledTasks:
                 exclude_reviewed_events,
                 pipeline_mode,
                 pipeline_llm_concurrency,
+                pipeline_llm_requests_per_minute,
             )
             effective_pipeline = dict(pipeline or {})
             pipeline_overrides = {
@@ -4785,6 +4804,7 @@ class ScheduledTasks:
                     pipeline_document_parse_concurrency
                 ),
                 "llm_concurrency": pipeline_llm_concurrency,
+                "llm_requests_per_minute": pipeline_llm_requests_per_minute,
                 "progress_interval_seconds": (
                     pipeline_progress_interval_seconds
                 ),

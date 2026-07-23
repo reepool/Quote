@@ -5,6 +5,7 @@ import os
 import pytest
 
 from utils.llm import (
+    DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
     LlmAuthenticationError,
     LlmCancelledError,
     LlmClient,
@@ -18,7 +19,7 @@ from utils.llm import (
     normalize_openai_url,
 )
 from utils.llm.errors import LlmProviderError
-from utils.llm.rate_limit import ProfileLimiter
+from utils.llm.rate_limit import ProfileLimiter, ProfileLimiterRegistry
 from utils.llm.transport import HttpxOpenAICompatibleTransport
 from utils.llm import load_project_environment
 from utils.llm.testing import ScriptedTransport
@@ -52,7 +53,15 @@ def _config(**profile_overrides):
         "retry_backoff_seconds": 0,
     }
     profile.update(profile_overrides)
-    return LlmConfig.from_mapping({"enabled": True, "profiles": {"test": profile}})
+    return LlmConfig.from_mapping({
+        "enabled": True,
+        "provider_resources": {
+            "openai_compatible:TEST_LLM_KEY": {
+                "requests_per_minute": 0,
+            }
+        },
+        "profiles": {"test": profile},
+    })
 
 
 def _request(**kwargs):
@@ -108,7 +117,11 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
     assert profile.attempt_timeout_seconds == profile.timeout_seconds
     assert profile.max_retries == 2
     assert profile.max_schema_repair_attempts == 1
-    assert profile.requests_per_minute == 20
+    assert profile.requests_per_minute == 0
+    resource = LlmConfig.from_mapping(
+        {"enabled": True, "profiles": {"test": {"enabled": True}}}
+    ).resource_for_profile(profile)
+    assert resource.requests_per_minute == DEFAULT_PROVIDER_REQUESTS_PER_MINUTE == 58
     assert profile.stream is False
     assert profile.stream_include_usage is True
 
@@ -128,6 +141,39 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
     assert disabled_limits.max_retries == 0
     assert disabled_limits.max_schema_repair_attempts == 0
     assert disabled_limits.requests_per_minute == 0
+
+    unlimited_resource = LlmConfig.from_mapping(
+        {
+            "enabled": True,
+            "provider_resources": {
+                "unlimited": {"requests_per_minute": 0},
+            },
+            "profiles": {
+                "test": {
+                    "enabled": True,
+                    "provider_resource": "unlimited",
+                }
+            },
+        }
+    ).provider_resources["unlimited"]
+    assert unlimited_resource.requests_per_minute == 0
+
+    with pytest.raises(ValueError, match="requests_per_minute exceeds provider"):
+        LlmConfig.from_mapping(
+            {
+                "enabled": True,
+                "provider_resources": {
+                    "limited": {"requests_per_minute": 58},
+                },
+                "profiles": {
+                    "test": {
+                        "enabled": True,
+                        "provider_resource": "limited",
+                        "requests_per_minute": 59,
+                    }
+                },
+            }
+        )
 
     with pytest.raises(ValueError, match="unsupported max_output_tokens_field"):
         LlmConfig.from_mapping({
@@ -669,3 +715,80 @@ async def test_profile_rate_limiter_uses_injected_clock():
     await limiter.acquire(deadline=120)
     limiter.release()
     assert now[0] == 60
+
+
+@pytest.mark.asyncio
+async def test_business_rpm_override_can_only_tighten_parent_limits():
+    transport = ScriptedTransport([_response({"label": "ok", "score": 1})])
+    client = LlmClient(
+        _config(requests_per_minute=20),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+
+    response = await client.complete(_request(requests_per_minute=10))
+    assert response.status == "success"
+    assert "requests_per_minute" not in transport.calls[0]["payload"]
+
+    with pytest.raises(
+        LlmConfigurationError,
+        match="requests_per_minute override exceeds inherited",
+    ):
+        await client.complete(_request(requests_per_minute=21))
+    assert len(transport.calls) == 1
+
+    with pytest.raises(
+        LlmConfigurationError,
+        match="requests_per_minute override must not be negative",
+    ):
+        await client.complete(_request(requests_per_minute=-1))
+    assert len(transport.calls) == 1
+
+    with pytest.raises(
+        LlmConfigurationError,
+        match="requests_per_minute override must be an integer",
+    ):
+        await client.complete(_request(requests_per_minute=0.5))
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_business_rate_limit_scope_is_shared_across_workloads():
+    registry = ProfileLimiterRegistry()
+    transport = ScriptedTransport([
+        _response({"label": "one", "score": 1}),
+        _response({"label": "two", "score": 1}),
+    ])
+    client = LlmClient(
+        _config(),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+        limiter_registry=registry,
+    )
+
+    await client.complete(_request(
+        requests_per_minute=10,
+        rate_limit_scope="shared-business",
+        metadata={"workload": "extract"},
+    ))
+    await client.complete(_request(
+        requests_per_minute=10,
+        rate_limit_scope="shared-business",
+        metadata={"workload": "verify"},
+    ))
+
+    scope = "business:openai_compatible:TEST_LLM_KEY:shared-business"
+    assert list(registry._shared_limiters) == [scope]
+    concurrency, rpm, _ = registry._shared_limiters[scope]
+    assert (concurrency, rpm) == (1_000_000, 10)
+
+    with pytest.raises(
+        LlmConfigurationError,
+        match="conflicting shared limiter configuration",
+    ):
+        await client.complete(_request(
+            requests_per_minute=11,
+            rate_limit_scope="shared-business",
+            metadata={"workload": "verify"},
+        ))
+    assert len(transport.calls) == 2

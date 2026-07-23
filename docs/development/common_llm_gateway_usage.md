@@ -16,6 +16,7 @@
 - base URL：`https://pipio.io/v1`
 - model：`grok-4.5`
 - key 环境变量：`QUOTE_LLM_API_KEY`
+- provider quota bucket：默认 `58 RPM`，由该资源下所有 profile、业务和重试共享
 
 本地开发时，将真实值放在项目根目录 `.env`，该文件已被 gitignore 忽略。应用入口显式调用 `load_project_environment()`，且 `override=False`，所以进程已经注入的变量优先。`.env` 不应被提交、写入日志或复制到报告中。
 
@@ -48,10 +49,18 @@ response = await client.complete(
         },
         schema_name="semantic_label",
         schema_version="v1",
+        requests_per_minute=20,  # 可选业务级收紧；0/None 继承公共 58
+        rate_limit_scope="example_semantic_business",
         content_is_untrusted=True,
     )
 )
 ```
+
+并发和 RPM 是两套独立阈值。公共 provider resource 默认 `58 RPM`；profile 可配置更低的局部 RPM，业务请求还可通过 `LlmRequest.requests_per_minute` 继续收紧。业务的多个阶段应传入相同 `rate_limit_scope`，例如正文提取和语义复核共同使用一个桶。业务 override 不能高于 profile/provider 父级，否则在网络请求前返回 `configuration_error`。因此默认配置统一，公告解析、画像、供应链等业务又能按自身成本和优先级设置更保守的速率。
+
+同一 `rate_limit_scope` 的所有请求必须使用相同的正 RPM；配置冲突会 fail closed，防止一个业务被拆成多个限流桶。RPM 只接受整数或整数字符串，小数和布尔值均视为配置错误。任务报告中的 `effective` RPM 表示继承和业务 override 共同作用后的实际限制。
+
+provider resource 应按真实 quota bucket 建模，而不是机械地按 API key 建模。当前 Grok 4.5 profile 共用一个 58 RPM 资源；其他模型若有不同额度，应配置另一个 provider resource。当前限流器为单进程共享，多 worker/多主机部署需要额外的分布式协调。
 
 `response.data` 只表示通过 JSON Schema 的候选结构，不能绕过业务证据、可得日、字段目录或 candidate gate。`raw_content` 只用于受控审计，公共日志默认只记录 request/response hash、request ID、usage、耗时和错误分类。
 

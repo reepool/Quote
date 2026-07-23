@@ -1649,7 +1649,10 @@ async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
             _semantic_verification(extraction), suffix="verify", latency_ms=5,
         ),
     ]))
-    analysis = await CninfoCorporateActionLlmResolver(client).analyze(
+    analysis = await CninfoCorporateActionLlmResolver(
+        client,
+        requests_per_minute=12,
+    ).analyze(
         event={"instrument_id": "000001.SZ", "source_event_key": "event-1"},
         pages=[page],
     )
@@ -1658,8 +1661,12 @@ async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
     assert extraction_request.content_is_untrusted is True
     assert extraction_request.schema_version == SCHEMA_VERSION
     assert extraction_request.max_output_tokens == MAX_ANALYSIS_OUTPUT_TOKENS
+    assert extraction_request.requests_per_minute == 12
+    assert extraction_request.rate_limit_scope == "cninfo_corporate_action_resolution"
     assert verification_request.content_is_untrusted is True
     assert verification_request.schema_version == SEMANTIC_VERIFICATION_SCHEMA_VERSION
+    assert verification_request.requests_per_minute == 12
+    assert verification_request.rate_limit_scope == "cninfo_corporate_action_resolution"
     assert analysis.validation_status == "validated_candidate"
     assert analysis.latency_ms == 15
     assert analysis.attempt_count == 2

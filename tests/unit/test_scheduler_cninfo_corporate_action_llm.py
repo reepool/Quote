@@ -29,6 +29,7 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
         "download_concurrency": 8,
         "document_parse_concurrency": 8,
         "llm_concurrency": 15,
+        "llm_requests_per_minute": 0,
         "writer_batch_size": 10,
         "writer_concurrency": 1,
         "progress_interval_seconds": 30,
@@ -65,6 +66,10 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     ]
     assert title_profile["max_concurrency"] == 50
     assert title_profile["requests_per_minute"] == 0
+    resource = llm_config["llm"]["provider_resources"][
+        "openai_compatible:QUOTE_LLM_API_KEY"
+    ]
+    assert resource["requests_per_minute"] == 58
     assert title_profile["max_retries"] == 2
     assert title_profile["retry_backoff_seconds"] == 2.0
     assert title_profile["retry_jitter_ratio"] == 0.5
@@ -100,6 +105,12 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
             "provider_output_budget_overruns": 1,
             "latency_ms": {"p50": 1000, "p95": 2000, "max": 2000},
         },
+        "parameters": {
+            "pipeline": {
+                "llm_requests_per_minute": 0,
+                "effective_llm_requests_per_minute": 58,
+            },
+        },
     })
     assert "机器返工: `1`" in workload_report
     assert "快速审核: `1`，深度审核: `1`" in workload_report
@@ -108,6 +119,7 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert "prior_event_review_exists: 1" in workload_report
     assert "输出预算超限: `1`" in workload_report
     assert "date_in_evidence: 1" in workload_report
+    assert "llm_rpm=58 (inherited)" in workload_report
     failure_report = _format_cninfo_corporate_action_llm_report({
         "status": "partial",
         "dry_run": True,
@@ -182,6 +194,7 @@ async def test_scheduler_delegates_bounded_llm_resolution(monkeypatch):
         pipeline={"stage_queue_size": 25},
         pipeline_mode="async",
         pipeline_llm_concurrency=10,
+        pipeline_llm_requests_per_minute=12,
     )
     assert result["status"] == "dry_run"
     assert operation.await_args.kwargs["max_events"] == 1
@@ -191,6 +204,7 @@ async def test_scheduler_delegates_bounded_llm_resolution(monkeypatch):
         "stage_queue_size": 25,
         "mode": "async",
         "llm_concurrency": 10,
+        "llm_requests_per_minute": 12,
     }
     assert "a_share_cninfo_corporate_action_llm_resolution" not in task._active_tasks
 

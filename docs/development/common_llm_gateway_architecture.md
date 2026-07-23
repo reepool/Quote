@@ -54,8 +54,8 @@ flowchart LR
 | `utils/llm/transport.py` | `AsyncTransport` 协议、httpx OpenAI-compatible 实现、测试/legacy transport |
 | `utils/llm/schema.py` | JSON Schema/Pydantic 规范化、Draft 2020-12 校验、脱敏诊断 |
 | `utils/llm/errors.py` | 稳定错误 code、retryable 判定和安全异常 envelope |
-| `utils/llm/rate_limit.py` | profile 共享 semaphore、RPM 滑动窗口和 deadline 感知等待 |
-| `utils/llm/orchestration/coordinator.py` | provider/account 公平准入、故障合并、分类降档和恢复探测 |
+| `utils/llm/rate_limit.py` | profile/业务附加 semaphore、RPM 滑动窗口和 deadline 感知等待 |
+| `utils/llm/orchestration/coordinator.py` | provider quota bucket 共享 RPM、公平准入、故障合并、分类降档和恢复探测 |
 | `utils/llm/config.py` | 显式项目 `.env` 加载和配置入口 |
 | `utils/llm/testing.py` | 不联网的脚本化 transport |
 
@@ -74,6 +74,7 @@ flowchart LR
       "primary_account": {
         "hard_max_concurrency": 60,
         "default_bulk_concurrency": 50,
+        "requests_per_minute": 58,
         "adaptive_min_bulk_concurrency": 5,
         "adaptive_failure_coalescing_seconds": 10.0,
         "adaptive_outcome_window_size": 30,
@@ -103,7 +104,7 @@ flowchart LR
         "max_retries": 1,
         "max_schema_repair_attempts": 1,
         "max_concurrency": 1,
-        "requests_per_minute": 20,
+        "requests_per_minute": 0,
         "temperature": 0.0
       }
     }
@@ -127,7 +128,9 @@ flowchart LR
 | `max_output_tokens_field` | provider 使用的输出预算字段：`max_tokens` 或 `max_completion_tokens`；默认前者 |
 | `max_retries` | provider/transport 重试次数，不含首次请求 |
 | `max_schema_repair_attempts` | schema/JSON 失败后的 repair 次数，建议不超过 1 |
-| `max_concurrency` / `requests_per_minute` | profile 级共享并发和速率上限；RPM 为 0 表示不启用 RPM 限制 |
+| provider resource `requests_per_minute` | 同一 quota bucket 下所有 profile、workload、首次请求、重试和 repair 共享的滚动一分钟硬上限；默认 `58`，显式 `0` 才关闭 provider RPM |
+| profile `max_concurrency` / `requests_per_minute` | profile 级附加上限；profile RPM 为 `0` 表示继承 provider 上限且不增加 profile 局部限额 |
+| request `requests_per_minute` / `rate_limit_scope` | 可选业务级附加上限及共享桶名称；只能低于有效父级，`None` 或 `0` 表示继承。同一业务的多个阶段应使用同一 scope |
 
 本地开发可以在项目根目录 `.env` 中设置：
 
@@ -255,7 +258,17 @@ JSON 解析失败或 schema 校验失败时，网关最多执行配置允许的�
 | `deadline_exceeded` | 全请求 deadline 用尽 | 否 |
 | `cancelled` | 调用方取消任务 | 否 |
 
-一次 `complete()` 的 `timeout_seconds` 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，拿到 limiter 槽位后会依据剩余总预算重新收紧；这样一次长尾请求不会独占全部调用预算，只要总 deadline 尚未用尽，后续重试仍可执行。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。显式 `requests_per_minute=0` 表示关闭 RPM 限制，不能被默认值覆盖。
+一次 `complete()` 的 `timeout_seconds` 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，拿到 limiter 槽位后会依据剩余总预算重新收紧；这样一次长尾请求不会独占全部调用预算，只要总 deadline 尚未用尽，后续重试仍可执行。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。每次 HTTP 重试都重新进入 provider RPM 队列并消耗一次额度。
+
+限额优先级为 provider resource -> profile -> business request。provider resource 是账号、模型或商业计划定义的 quota bucket；当前 Grok 4.5 的两个 profile 映射到同一个资源并共享 `58 RPM`。如果同一 API key 下其他模型拥有不同配额，应建立独立 provider resource 并让相应 profile 显式引用。子级只能收紧，不能把 `58` 提高为更大的值，也不能通过设置 `0` 关闭父级。
+
+同一 provider resource 下相同的业务 `rate_limit_scope` 只允许一个正 RPM 配置。不同阶段如传入冲突值，网关必须在发起网络请求前返回 `configuration_error`，不能拆成多个独立窗口。RPM 配置必须是精确整数，小数和布尔值均拒绝。
+
+provider 快照同时输出 `configured_requests_per_minute`、`rpm_window_requests`、`rpm_waiting`、`rpm_next_admission_seconds` 和 `total_rpm_wait_ms`。这些值与并发指标必须分开理解：高并发允许很多慢请求同时在途，RPM 只控制一分钟内新发出的 HTTP 尝试数量。
+
+业务任务报告必须区分业务 override 和最终有效 RPM。业务值为 `0` 时应显示继承后的 provider/profile 上限，不能把 `0` 报告成实际无限制。
+
+当前共享 RPM 是单进程治理。多个应用 worker 或主机如果共用同一个供应商 quota bucket，需要在扩容前引入 Redis 等分布式限流器，不能把每个进程的 `58 RPM` 简单相加。
 
 ### 7.1 智能控流状态
 

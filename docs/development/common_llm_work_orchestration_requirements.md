@@ -385,6 +385,7 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
         "reserved_concurrency": 10,
         "http_max_connections": 70,
         "http_max_keepalive_connections": 60,
+        "requests_per_minute": 58,
         "adaptive_concurrency_enabled": true,
         "adaptive_min_bulk_concurrency": 5,
         "adaptive_recovery_successes": 6,
@@ -411,6 +412,8 @@ Telegram 只发送批次汇总。大量单条详情必须进入查询接口、�
   }
 }
 ```
+
+`requests_per_minute` 是 provider quota bucket 的滚动一分钟硬上限，与并发上限独立。所有引用该资源的业务 workload、profile、重试和 repair 共享同一计数器。profile 或业务请求可以配置更低值，但不能突破 provider 上限。快照应同时报告窗口已用额度、RPM 等待数量、下一次可准入时间和累计 RPM 等待时间。
 
 字段名称以最终配置模型为准，但必须 fail closed 校验：
 

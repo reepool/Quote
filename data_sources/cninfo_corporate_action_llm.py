@@ -2980,10 +2980,12 @@ class CninfoCorporateActionLlmResolver:
         *,
         profile: str = "semantic_extraction",
         model_identity: Optional[str] = None,
+        requests_per_minute: int = 0,
     ) -> None:
         self.client = client
         self.profile = profile
         self.model_identity = model_identity
+        self.requests_per_minute = max(0, int(requests_per_minute))
 
     def build_payload(
         self,
@@ -3127,6 +3129,8 @@ class CninfoCorporateActionLlmResolver:
             schema_name="cninfo_corporate_action_resolution",
             schema_version=SCHEMA_VERSION,
             max_output_tokens=MAX_ANALYSIS_OUTPUT_TOKENS,
+            requests_per_minute=self.requests_per_minute,
+            rate_limit_scope="cninfo_corporate_action_resolution",
             idempotency_key=input_hash,
             metadata={
                 "workload": "corporate_action_semantic_extraction",
@@ -3190,6 +3194,8 @@ class CninfoCorporateActionLlmResolver:
                 schema_name="cninfo_corporate_action_semantic_verification",
                 schema_version=SEMANTIC_VERIFICATION_SCHEMA_VERSION,
                 max_output_tokens=MAX_SEMANTIC_VERIFICATION_OUTPUT_TOKENS,
+                requests_per_minute=self.requests_per_minute,
+                rate_limit_scope="cninfo_corporate_action_resolution",
                 idempotency_key=verification_input_hash,
                 metadata={
                     "workload": "corporate_action_semantic_verification",

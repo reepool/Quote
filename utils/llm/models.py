@@ -11,6 +11,7 @@ ALLOWED_OUTPUT_MODES = {"json_schema", "json_object", "prompt_only", "auto"}
 ALLOWED_MAX_OUTPUT_TOKEN_FIELDS = {"max_tokens", "max_completion_tokens"}
 ALLOWED_ROLES = {"system", "developer", "user", "assistant", "tool"}
 MAX_PROVIDER_CONCURRENCY = 60
+DEFAULT_PROVIDER_REQUESTS_PER_MINUTE = 58
 
 
 def _configured(value: Mapping[str, Any], name: str, default: Any) -> Any:
@@ -96,7 +97,7 @@ class LlmProfile:
     max_retries: int = 2
     max_schema_repair_attempts: int = 1
     max_concurrency: int = 1
-    requests_per_minute: int = 20
+    requests_per_minute: int = 0
     temperature: float = 0.0
     max_output_tokens_field: str = "max_tokens"
     stream: bool = False
@@ -161,7 +162,7 @@ class LlmProfile:
                 0, int(_configured(value, "max_schema_repair_attempts", 1))
             ),
             max_concurrency=max(1, int(_configured(value, "max_concurrency", 1))),
-            requests_per_minute=max(0, int(_configured(value, "requests_per_minute", 20))),
+            requests_per_minute=max(0, int(_configured(value, "requests_per_minute", 0))),
             temperature=float(_configured(value, "temperature", 0.0)),
             max_output_tokens_field=max_output_tokens_field,
             stream=value.get("stream") is True,
@@ -222,6 +223,7 @@ class ProviderResourceConfig:
     reserved_concurrency: int = 10
     http_max_connections: int = 70
     http_max_keepalive_connections: int = 60
+    requests_per_minute: int = DEFAULT_PROVIDER_REQUESTS_PER_MINUTE
     adaptive_concurrency_enabled: bool = True
     adaptive_min_bulk_concurrency: int = 5
     adaptive_recovery_successes: int = 6
@@ -281,6 +283,15 @@ class ProviderResourceConfig:
             raise ValueError(
                 f"provider resource {name} http_max_keepalive_connections must be "
                 "between 1 and http_max_connections"
+            )
+        requests_per_minute = int(_configured(
+            value,
+            "requests_per_minute",
+            DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
+        ))
+        if requests_per_minute < 0:
+            raise ValueError(
+                f"provider resource {name} requests_per_minute must not be negative"
             )
         adaptive_enabled = bool(_configured(
             value, "adaptive_concurrency_enabled", True
@@ -401,6 +412,7 @@ class ProviderResourceConfig:
             reserved_concurrency=reserved,
             http_max_connections=http_max,
             http_max_keepalive_connections=http_keepalive,
+            requests_per_minute=requests_per_minute,
             adaptive_concurrency_enabled=adaptive_enabled,
             adaptive_min_bulk_concurrency=adaptive_min,
             adaptive_recovery_successes=recovery_successes,
@@ -419,6 +431,41 @@ class ProviderResourceConfig:
             transient_cooldown_seconds=transient_cooldown,
             workload_weights=weights,
         )
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "provider": self.provider,
+            "hard_max_concurrency": self.hard_max_concurrency,
+            "default_bulk_concurrency": self.default_bulk_concurrency,
+            "reserved_concurrency": self.reserved_concurrency,
+            "http_max_connections": self.http_max_connections,
+            "http_max_keepalive_connections": self.http_max_keepalive_connections,
+            "requests_per_minute": self.requests_per_minute,
+            "adaptive_concurrency_enabled": self.adaptive_concurrency_enabled,
+            "adaptive_min_bulk_concurrency": self.adaptive_min_bulk_concurrency,
+            "adaptive_recovery_successes": self.adaptive_recovery_successes,
+            "adaptive_failure_coalescing_seconds": (
+                self.adaptive_failure_coalescing_seconds
+            ),
+            "adaptive_outcome_window_size": self.adaptive_outcome_window_size,
+            "adaptive_soft_failure_min_count": self.adaptive_soft_failure_min_count,
+            "adaptive_soft_failure_rate_threshold": (
+                self.adaptive_soft_failure_rate_threshold
+            ),
+            "adaptive_soft_decrease_ratio": self.adaptive_soft_decrease_ratio,
+            "adaptive_hard_decrease_ratio": self.adaptive_hard_decrease_ratio,
+            "adaptive_recovery_quiet_seconds": (
+                self.adaptive_recovery_quiet_seconds
+            ),
+            "adaptive_recovery_probe_interval_seconds": (
+                self.adaptive_recovery_probe_interval_seconds
+            ),
+            "adaptive_recovery_growth_factor": self.adaptive_recovery_growth_factor,
+            "rate_limit_cooldown_seconds": self.rate_limit_cooldown_seconds,
+            "transient_cooldown_seconds": self.transient_cooldown_seconds,
+            "workload_weights": dict(self.workload_weights),
+        }
 
 
 @dataclass(frozen=True)
@@ -522,6 +569,14 @@ class LlmConfig:
                     f"LLM profile {profile.name} max_concurrency exceeds provider "
                     f"resource {resource_name} hard limit"
                 )
+            if (
+                resource.requests_per_minute > 0
+                and profile.requests_per_minute > resource.requests_per_minute
+            ):
+                raise ValueError(
+                    f"LLM profile {profile.name} requests_per_minute exceeds provider "
+                    f"resource {resource_name} limit"
+                )
         return cls(
             enabled=raw.get("enabled") is True,
             profiles=profiles,
@@ -556,6 +611,8 @@ class LlmRequest:
     temperature: Optional[float] = None
     max_output_tokens: Optional[int] = None
     timeout_seconds: Optional[float] = None
+    requests_per_minute: Optional[int] = None
+    rate_limit_scope: Optional[str] = None
     idempotency_key: Optional[str] = None
     metadata: Mapping[str, Any] = field(default_factory=dict)
     content_is_untrusted: bool = False

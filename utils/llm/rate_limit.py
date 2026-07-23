@@ -8,7 +8,7 @@ from collections import deque
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Callable
 
-from .errors import LlmDeadlineExceededError
+from .errors import LlmConfigurationError, LlmDeadlineExceededError
 
 
 class ProfileLimiter:
@@ -76,15 +76,20 @@ class ProfileLimiter:
 class ProfileLimiterRegistry:
     def __init__(self) -> None:
         self._limiters: dict[tuple[str, int, int], ProfileLimiter] = {}
+        self._shared_limiters: dict[str, tuple[int, int, ProfileLimiter]] = {}
         self._loop_id: int | None = None
+
+    def _ensure_loop(self) -> None:
+        loop_id = id(asyncio.get_running_loop())
+        if self._loop_id != loop_id:
+            self._limiters.clear()
+            self._shared_limiters.clear()
+            self._loop_id = loop_id
 
     def get(
         self, profile_name: str, *, max_concurrency: int, requests_per_minute: int
     ) -> ProfileLimiter:
-        loop_id = id(asyncio.get_running_loop())
-        if self._loop_id != loop_id:
-            self._limiters.clear()
-            self._loop_id = loop_id
+        self._ensure_loop()
         key = (profile_name, max_concurrency, requests_per_minute)
         limiter = self._limiters.get(key)
         if limiter is None:
@@ -95,6 +100,36 @@ class ProfileLimiterRegistry:
             self._limiters[key] = limiter
         return limiter
 
+    def get_shared(
+        self,
+        scope_name: str,
+        *,
+        max_concurrency: int,
+        requests_per_minute: int,
+    ) -> ProfileLimiter:
+        """Return one limiter for a stable scope and reject limit conflicts."""
+        self._ensure_loop()
+        name = str(scope_name).strip()
+        if not name:
+            raise LlmConfigurationError("shared limiter scope must not be empty")
+        concurrency = max(1, int(max_concurrency))
+        rpm = max(0, int(requests_per_minute))
+        existing = self._shared_limiters.get(name)
+        if existing is not None:
+            existing_concurrency, existing_rpm, limiter = existing
+            if (existing_concurrency, existing_rpm) != (concurrency, rpm):
+                raise LlmConfigurationError(
+                    f"conflicting shared limiter configuration: {name}"
+                )
+            return limiter
+        limiter = ProfileLimiter(
+            max_concurrency=concurrency,
+            requests_per_minute=rpm,
+        )
+        self._shared_limiters[name] = (concurrency, rpm, limiter)
+        return limiter
+
     def clear(self) -> None:
         self._limiters.clear()
+        self._shared_limiters.clear()
         self._loop_id = None

@@ -27,6 +27,7 @@ class _Waiter:
     enqueued_at: float
     future: asyncio.Future[None]
     admitted: bool = False
+    rpm_wait_started_at: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,7 @@ class ProviderCoordinator:
         config: ProviderResourceConfig,
         *,
         clock: Callable[[], float] = time.monotonic,
+        rpm_window_seconds: float = 60.0,
     ) -> None:
         self.config = config
         self._clock = clock
@@ -56,6 +58,10 @@ class ProviderCoordinator:
         self._active_by_workload: dict[str, int] = {}
         self._cooldown_until = 0.0
         self._cooldown_handle: Optional[asyncio.TimerHandle] = None
+        self._rpm_window_seconds = max(0.01, float(rpm_window_seconds))
+        self._rpm_timestamps: Deque[float] = deque()
+        self._rpm_wake_handle: Optional[asyncio.TimerHandle] = None
+        self._total_rpm_wait_ms = 0
         self._effective_bulk_concurrency = config.default_bulk_concurrency
         self._adaptive_min_bulk_concurrency = max(
             1,
@@ -135,6 +141,7 @@ class ProviderCoordinator:
                         self._rebuild_schedule_locked()
                 if not waiter.future.done():
                     waiter.future.cancel()
+            self._record_rpm_wait_locked(waiter)
             if deadline_exceeded:
                 self._deadline_exceeded += 1
             else:
@@ -470,20 +477,82 @@ class ProviderCoordinator:
             remaining, lambda: asyncio.create_task(self._cooldown_elapsed())
         )
 
+    def _prune_rpm_locked(self, now: float) -> None:
+        while (
+            self._rpm_timestamps
+            and now - self._rpm_timestamps[0] >= self._rpm_window_seconds
+        ):
+            self._rpm_timestamps.popleft()
+
+    def _rpm_is_exhausted_locked(self, now: float) -> bool:
+        self._prune_rpm_locked(now)
+        return (
+            self.config.requests_per_minute > 0
+            and len(self._rpm_timestamps) >= self.config.requests_per_minute
+        )
+
+    def _mark_rpm_waiters_locked(self, now: float) -> None:
+        for queue in self._queues.values():
+            for waiter in queue:
+                if waiter.rpm_wait_started_at is None:
+                    waiter.rpm_wait_started_at = now
+
+    def _record_rpm_wait_locked(self, waiter: _Waiter) -> None:
+        if waiter.rpm_wait_started_at is None:
+            return
+        self._total_rpm_wait_ms += max(
+            0,
+            round((self._clock() - waiter.rpm_wait_started_at) * 1000),
+        )
+        waiter.rpm_wait_started_at = None
+
+    def _schedule_rpm_wake_locked(self, now: float) -> None:
+        if not self._rpm_timestamps:
+            return
+        remaining = (
+            self._rpm_timestamps[0] + self._rpm_window_seconds - now
+        )
+        if remaining <= 0:
+            self._dispatch_locked()
+            return
+        if self._rpm_wake_handle is not None:
+            self._rpm_wake_handle.cancel()
+        loop = asyncio.get_running_loop()
+        self._rpm_wake_handle = loop.call_later(
+            remaining,
+            lambda: asyncio.create_task(self._rpm_elapsed()),
+        )
+
+    async def _rpm_elapsed(self) -> None:
+        async with self._lock:
+            self._rpm_wake_handle = None
+            self._dispatch_locked()
+
     async def _cooldown_elapsed(self) -> None:
         async with self._lock:
             self._cooldown_handle = None
             self._dispatch_locked()
 
     def _dispatch_locked(self) -> None:
-        if self._clock() < self._cooldown_until:
+        now = self._clock()
+        if now < self._cooldown_until:
             self._schedule_cooldown_wake_locked()
             return
         while self._active < self.config.hard_max_concurrency:
+            if not self._schedule:
+                break
+            now = self._clock()
+            if self._rpm_is_exhausted_locked(now):
+                self._mark_rpm_waiters_locked(now)
+                self._schedule_rpm_wake_locked(now)
+                return
             waiter = self._next_eligible_waiter_locked()
             if waiter is None:
                 break
+            self._record_rpm_wait_locked(waiter)
             waiter.admitted = True
+            if self.config.requests_per_minute > 0:
+                self._rpm_timestamps.append(now)
             self._active += 1
             if waiter.bulk:
                 self._active_bulk += 1
@@ -538,6 +607,7 @@ class ProviderCoordinator:
 
     def snapshot(self) -> ProviderSnapshot:
         now = self._clock()
+        self._prune_rpm_locked(now)
         waiting_by_workload = {
             workload: len(queue)
             for workload, queue in self._queues.items()
@@ -547,6 +617,18 @@ class ProviderCoordinator:
             self._adaptive_window_stats_locked()
         )
         recovery_ready_at = self._adaptive_recovery_ready_at_locked()
+        rpm_exhausted = self._rpm_is_exhausted_locked(now)
+        rpm_next_admission_seconds = (
+            max(
+                0.0,
+                self._rpm_timestamps[0] + self._rpm_window_seconds - now,
+            )
+            if rpm_exhausted and self._rpm_timestamps
+            else 0.0
+        )
+        rpm_waiting = (
+            sum(waiting_by_workload.values()) if rpm_exhausted else 0
+        )
         if now < self._cooldown_until:
             adaptive_state = "cooldown"
         elif now < self._adaptive_episode_until:
@@ -575,6 +657,11 @@ class ProviderCoordinator:
             ),
             configured_bulk_concurrency=self.config.default_bulk_concurrency,
             effective_bulk_concurrency=self._effective_bulk_concurrency,
+            configured_requests_per_minute=self.config.requests_per_minute,
+            rpm_window_requests=len(self._rpm_timestamps),
+            rpm_waiting=rpm_waiting,
+            rpm_next_admission_seconds=rpm_next_admission_seconds,
+            total_rpm_wait_ms=self._total_rpm_wait_ms,
             adaptive_retryable_failures=self._adaptive_retryable_failures,
             adaptive_success_streak=self._adaptive_success_streak,
             adaptive_congestion_events=self._adaptive_congestion_events,
@@ -603,6 +690,9 @@ class ProviderCoordinator:
             if self._cooldown_handle is not None:
                 self._cooldown_handle.cancel()
                 self._cooldown_handle = None
+            if self._rpm_wake_handle is not None:
+                self._rpm_wake_handle.cancel()
+                self._rpm_wake_handle = None
             for queue in self._queues.values():
                 for waiter in queue:
                     if not waiter.future.done():
@@ -646,6 +736,7 @@ class ProviderCoordinatorRegistry:
             config.hard_max_concurrency,
             config.default_bulk_concurrency,
             config.reserved_concurrency,
+            config.requests_per_minute,
             config.adaptive_concurrency_enabled,
             config.adaptive_min_bulk_concurrency,
             config.adaptive_recovery_successes,

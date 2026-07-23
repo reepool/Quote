@@ -82,6 +82,12 @@ utils/llm/
 {
   "llm": {
     "enabled": false,
+    "provider_resources": {
+      "primary_grok_quota": {
+        "provider": "openai_compatible",
+        "requests_per_minute": 58
+      }
+    },
     "profiles": {
       "semantic_extraction": {
         "provider": "openai_compatible",
@@ -95,7 +101,7 @@ utils/llm/
         "max_output_tokens_field": "max_completion_tokens",
         "max_retries": 1,
         "max_concurrency": 1,
-        "requests_per_minute": 20,
+        "requests_per_minute": 0,
         "temperature": 0.0
       }
     }
@@ -109,6 +115,9 @@ utils/llm/
 - Base URL 允许包含或不包含 `/v1`，实现必须规范化并避免重复路径；
 - API Key 环境变量缺失时明确失败，不允许匿名降级；
 - profile 中的模型是默认值，调用方可在明确允许时覆盖；
+- provider resource 默认以滚动窗口共享 `58 RPM`，同一 quota bucket 的所有 profile、业务、重试和 repair 必须合并计数；
+- profile 的 `requests_per_minute=0` 表示继承 provider 上限，正数表示附加的更低上限；业务请求也只能向下 override；
+- RPM 配置必须是精确整数；小数和布尔值必须在发起请求前以 `configuration_error` 拒绝；同一业务 scope 的冲突 RPM 也必须 fail closed；
 - `timeout_seconds` 是一次 `complete()` 的总 deadline，包含排队、退避和所有重试；
 - `attempt_timeout_seconds` 是单次 HTTP 尝试上限，默认继承总 deadline，并始终受剩余总 deadline 约束；
 - `max_output_tokens_field` 显式选择 `max_tokens` 或 `max_completion_tokens`，不得同时发送两个字段；

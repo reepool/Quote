@@ -325,15 +325,17 @@ refresh_documents
 先做小范围预演，确认公告下载、页级文本和模型门禁结果：
 
 ```text
-/run a_share_cninfo_corporate_action_llm_resolution start_date=2020-01-01 end_date=2026-12-31 exchanges=SSE,SZSE instrument_ids=000001.SZ max_events=2 target_offset=0 profile=semantic_extraction resume=false download_documents=true run_ocr=false refresh_documents=false dry_run
+/run a_share_cninfo_corporate_action_llm_resolution start_date=2020-01-01 end_date=2026-12-31 exchanges=SSE,SZSE instrument_ids=000001.SZ max_events=2 target_offset=0 profile=semantic_extraction resume=false download_documents=true run_ocr=false refresh_documents=false pipeline_llm_requests_per_minute=0 dry_run
 ```
 
 预演只读取已发现的 candidate 证据，并且不写 artifact、分析或 resolved 证据。启用网关
 并确认环境后，可使用写入模式保存 PDF、页文本和 LLM 分析 lineage；它仍然不会确认有效日期：
 
 ```text
-/run a_share_cninfo_corporate_action_llm_resolution start_date=1990-12-19 end_date=2026-12-31 exchanges=SSE,SZSE max_events=100 target_offset=0 profile=semantic_extraction resume=true download_documents=true run_ocr=false refresh_documents=false write
+/run a_share_cninfo_corporate_action_llm_resolution start_date=1990-12-19 end_date=2026-12-31 exchanges=SSE,SZSE max_events=100 target_offset=0 profile=semantic_extraction resume=true download_documents=true run_ocr=false refresh_documents=false pipeline_llm_requests_per_minute=0 write
 ```
+
+`pipeline_llm_requests_per_minute=0` 表示继承公共 Grok quota bucket 的 `58 RPM`。如需让公司行动任务为其他业务保留额度，可设置更低值，例如 `40`；该参数不能高于 profile/provider 父级。并发参数只控制同时在途请求数，不替代 RPM 管控。
 
 ## Two-pass semantic evidence validation
 

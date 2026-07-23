@@ -95,6 +95,11 @@ class ProviderSnapshot:
     cooldown_remaining_seconds: float
     configured_bulk_concurrency: int
     effective_bulk_concurrency: int
+    configured_requests_per_minute: int
+    rpm_window_requests: int
+    rpm_waiting: int
+    rpm_next_admission_seconds: float
+    total_rpm_wait_ms: int
     adaptive_retryable_failures: int
     adaptive_success_streak: int
     adaptive_congestion_events: int

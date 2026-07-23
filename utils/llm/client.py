@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import AsyncExitStack
 import hashlib
 import json
 import logging
@@ -114,6 +115,18 @@ class LlmClient:
                 request.metadata.get("workload") or profile.default_workload
             ).strip() or profile.default_workload
             bulk = request.metadata.get("bulk") is True
+            business_requests_per_minute = self._resolve_business_rpm(
+                request=request,
+                profile=profile,
+                provider_requests_per_minute=provider_resource.requests_per_minute,
+            )
+            business_rate_limit_scope = str(
+                request.rate_limit_scope or workload
+            ).strip()
+            if business_requests_per_minute > 0 and not business_rate_limit_scope:
+                raise LlmConfigurationError(
+                    "rate_limit_scope is required for a business RPM override"
+                )
             messages = tuple(LlmMessage.from_value(item) for item in request.messages)
             if not messages:
                 raise LlmConfigurationError("LLM request must contain at least one message")
@@ -169,10 +182,29 @@ class LlmClient:
             if request.idempotency_key and profile.idempotency_header and not profile.stream:
                 headers[profile.idempotency_header] = request.idempotency_key
 
-            limiter = self.limiter_registry.get(
+            profile_limiter = self.limiter_registry.get(
                 profile.name,
                 max_concurrency=profile.max_concurrency,
                 requests_per_minute=profile.requests_per_minute,
+            )
+            business_limiter = (
+                self.limiter_registry.get_shared(
+                    f"business:{provider_resource.name}:{business_rate_limit_scope}",
+                    max_concurrency=1_000_000,
+                    requests_per_minute=business_requests_per_minute,
+                )
+                if business_requests_per_minute > 0
+                else None
+            )
+            provider_fallback_limiter = (
+                self.limiter_registry.get(
+                    f"provider:{provider_resource.name}",
+                    max_concurrency=1_000_000,
+                    requests_per_minute=provider_resource.requests_per_minute,
+                )
+                if provider_coordinator is None
+                and provider_resource.requests_per_minute > 0
+                else None
             )
             repair_used = 0
             last_error: Optional[LlmError] = None
@@ -181,7 +213,9 @@ class LlmClient:
             llm_logger.info(
                 "LLM request prepared profile=%s request_id=%s request_hash=%s "
                 "model=%s mode=%s attempts_max=%s deadline_seconds=%.1f "
-                "attempt_timeout_seconds=%.1f payload_bytes=%s max_output_tokens=%s",
+                "attempt_timeout_seconds=%.1f payload_bytes=%s max_output_tokens=%s "
+                "resource_rpm=%s profile_rpm=%s business_rpm=%s workload=%s "
+                "rate_limit_scope=%s",
                 profile.name,
                 request_id,
                 request_hash,
@@ -192,6 +226,11 @@ class LlmClient:
                 profile.attempt_timeout_seconds,
                 len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
                 request.max_output_tokens,
+                provider_resource.requests_per_minute,
+                profile.requests_per_minute,
+                business_requests_per_minute,
+                workload,
+                business_rate_limit_scope,
             )
             for attempt_count in range(1, max_attempts + 1):
                 response: Optional[TransportResponse] = None
@@ -202,7 +241,18 @@ class LlmClient:
                 if remaining <= 0:
                     raise LlmDeadlineExceededError()
                 try:
-                    async with limiter.slot(deadline):
+                    async with AsyncExitStack() as limiter_stack:
+                        await limiter_stack.enter_async_context(
+                            profile_limiter.slot(deadline)
+                        )
+                        if business_limiter is not None:
+                            await limiter_stack.enter_async_context(
+                                business_limiter.slot(deadline)
+                            )
+                        if provider_fallback_limiter is not None:
+                            await limiter_stack.enter_async_context(
+                                provider_fallback_limiter.slot(deadline)
+                            )
                         if provider_coordinator is None:
                             response = await self._send_attempt(
                                 url=url,
@@ -536,6 +586,55 @@ class LlmClient:
         if profile.provider != "openai_compatible":
             raise LlmConfigurationError(f"unsupported LLM provider: {profile.provider}")
         return profile
+
+    @staticmethod
+    def _resolve_business_rpm(
+        *,
+        request: LlmRequest,
+        profile: LlmProfile,
+        provider_requests_per_minute: int,
+    ) -> int:
+        raw = request.requests_per_minute
+        if raw is None:
+            return 0
+        if isinstance(raw, bool):
+            raise LlmConfigurationError(
+                "requests_per_minute override must be an integer"
+            )
+        if isinstance(raw, int):
+            value = raw
+        elif isinstance(raw, str):
+            text = raw.strip()
+            sign = text[:1]
+            digits = text[1:] if sign in {"+", "-"} else text
+            if not digits or not digits.isdigit():
+                raise LlmConfigurationError(
+                    "requests_per_minute override must be an integer"
+                )
+            value = int(text)
+        else:
+            raise LlmConfigurationError(
+                "requests_per_minute override must be an integer"
+            )
+        if value < 0:
+            raise LlmConfigurationError(
+                "requests_per_minute override must not be negative"
+            )
+        if value == 0:
+            return 0
+        parent_limits = tuple(
+            limit
+            for limit in (
+                provider_requests_per_minute,
+                profile.requests_per_minute,
+            )
+            if limit > 0
+        )
+        if parent_limits and value > min(parent_limits):
+            raise LlmConfigurationError(
+                "requests_per_minute override exceeds inherited LLM limit"
+            )
+        return value
 
     def _resolve_api_key(self, profile: LlmProfile) -> str:
         if not profile.api_key_env:

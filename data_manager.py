@@ -190,6 +190,28 @@ class DataManager:
             self._llm_client = LlmClient(self.config.get_llm_config())
         return self._llm_client
 
+    @staticmethod
+    def _effective_llm_requests_per_minute(
+        llm_config: Any,
+        *,
+        profile_name: str,
+        business_override: int = 0,
+    ) -> Optional[int]:
+        profile = llm_config.profiles.get(profile_name)
+        if profile is None:
+            return None
+        resource = llm_config.resource_for_profile(profile)
+        limits = [
+            value
+            for value in (
+                resource.requests_per_minute,
+                profile.requests_per_minute,
+                business_override,
+            )
+            if value > 0
+        ]
+        return min(limits) if limits else 0
+
     def _build_official_announcement_acquisition_service(
         self,
         *,
@@ -19866,6 +19888,14 @@ class DataManager:
         pipeline_config = CninfoCorporateActionPipelineConfig.from_mapping(
             pipeline
         )
+        pipeline_report = pipeline_config.to_dict()
+        effective_rpm = self._effective_llm_requests_per_minute(
+            self.config.get_llm_config(),
+            profile_name=profile,
+            business_override=pipeline_config.llm_requests_per_minute,
+        )
+        if effective_rpm is not None:
+            pipeline_report["effective_llm_requests_per_minute"] = effective_rpm
         run_id = "a_share_cninfo_resolution_governance_" + hashlib.sha256(
             json.dumps({
                 "start": normalized_start.isoformat(),
@@ -20359,7 +20389,7 @@ class DataManager:
                     title_max_titles_per_request
                 ),
                 "title_max_concurrency": effective_title_max_concurrency,
-                "pipeline": pipeline_config.to_dict(),
+                "pipeline": pipeline_report,
             },
             "inventory": {
                 "total_events": len(final_inventory),
@@ -22736,6 +22766,15 @@ class DataManager:
                 return result
             llm_client = self._get_or_create_llm_client()
         configured_profile = llm_config.profiles.get(profile)
+        effective_rpm = self._effective_llm_requests_per_minute(
+            llm_config,
+            profile_name=profile,
+            business_override=pipeline_config.llm_requests_per_minute,
+        )
+        if effective_rpm is not None:
+            result["parameters"]["pipeline"][
+                "effective_llm_requests_per_minute"
+            ] = effective_rpm
         dm_logger.info(
             "[DataManager] CNInfo LLM profile ready: run_id=%s profile=%s model=%s "
             "deadline_seconds=%s attempt_timeout_seconds=%s max_attempts=%s",
@@ -22750,6 +22789,7 @@ class DataManager:
             llm_client,
             profile=profile,
             model_identity=configured_profile.model if configured_profile else None,
+            requests_per_minute=pipeline_config.llm_requests_per_minute,
         )
 
         if pipeline_config.mode == "async":

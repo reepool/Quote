@@ -45,6 +45,7 @@ def test_pipeline_config_bounds_resources_and_keeps_serial_rollback():
     config = CninfoCorporateActionPipelineConfig.from_mapping({})
     assert config.mode == "serial"
     assert config.llm_concurrency == CNINFO_PIPELINE_DEFAULT_LLM_CONCURRENCY == 15
+    assert config.llm_requests_per_minute == 0
     assert config.document_parse_concurrency == 8
     assert config.writer_concurrency == 1
     assert config.verification_policy == "always"
@@ -56,6 +57,18 @@ def test_pipeline_config_bounds_resources_and_keeps_serial_rollback():
     with pytest.raises(ValueError, match="llm_concurrency"):
         CninfoCorporateActionPipelineConfig.from_mapping({
             "llm_concurrency": 51,
+        })
+    with pytest.raises(ValueError, match="llm_requests_per_minute"):
+        CninfoCorporateActionPipelineConfig.from_mapping({
+            "llm_requests_per_minute": -1,
+        })
+    with pytest.raises(ValueError, match="llm_requests_per_minute"):
+        CninfoCorporateActionPipelineConfig.from_mapping({
+            "llm_requests_per_minute": 0.5,
+        })
+    with pytest.raises(ValueError, match="llm_requests_per_minute"):
+        CninfoCorporateActionPipelineConfig.from_mapping({
+            "llm_requests_per_minute": True,
         })
     with pytest.raises(ValueError, match="writer_concurrency"):
         CninfoCorporateActionPipelineConfig.from_mapping({

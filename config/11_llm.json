@@ -9,6 +9,7 @@
         "reserved_concurrency": 10,
         "http_max_connections": 70,
         "http_max_keepalive_connections": 60,
+        "requests_per_minute": 58,
         "adaptive_concurrency_enabled": true,
         "adaptive_min_bulk_concurrency": 5,
         "adaptive_recovery_successes": 6,

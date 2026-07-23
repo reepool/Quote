@@ -51,6 +51,7 @@ def _multi_profile_config(*, hard=2, bulk=1, orchestration=True):
                 "reserved_concurrency": hard - bulk,
                 "http_max_connections": max(hard, 4),
                 "http_max_keepalive_connections": max(hard, 2),
+                "requests_per_minute": 0,
             }
         },
         "orchestration": {"enabled": orchestration},
@@ -263,6 +264,145 @@ async def test_provider_cooldown_and_deadline_are_enforced():
             deadline=time.monotonic() + 0.005,
             bulk=True,
         )
+
+
+@pytest.mark.asyncio
+async def test_provider_rpm_is_shared_across_workloads_and_observable():
+    coordinator = ProviderCoordinator(
+        ProviderResourceConfig(
+            name="rpm-shared",
+            hard_max_concurrency=3,
+            default_bulk_concurrency=3,
+            reserved_concurrency=0,
+            http_max_connections=3,
+            http_max_keepalive_connections=3,
+            requests_per_minute=2,
+        ),
+        rpm_window_seconds=0.04,
+    )
+    deadline = time.monotonic() + 0.5
+    for workload in ("one", "two"):
+        await coordinator.acquire(
+            workload=workload,
+            deadline=deadline,
+            bulk=True,
+        )
+        await coordinator.release(workload=workload, bulk=True)
+
+    started = time.monotonic()
+    third = asyncio.create_task(
+        coordinator.acquire(
+            workload="three",
+            deadline=deadline,
+            bulk=True,
+        )
+    )
+    await asyncio.sleep(0.005)
+    snapshot = coordinator.snapshot()
+    assert snapshot.configured_requests_per_minute == 2
+    assert snapshot.rpm_window_requests == 2
+    assert snapshot.rpm_waiting == 1
+    assert snapshot.rpm_next_admission_seconds > 0
+    assert not third.done()
+
+    await third
+    assert time.monotonic() - started >= 0.025
+    await coordinator.release(workload="three", bulk=True)
+    snapshot = coordinator.snapshot()
+    assert snapshot.total_rpm_wait_ms >= 25
+    await coordinator.close()
+
+
+@pytest.mark.asyncio
+async def test_provider_rpm_wait_honors_deadline_and_cancellation():
+    coordinator = ProviderCoordinator(
+        ProviderResourceConfig(
+            name="rpm-deadline",
+            hard_max_concurrency=2,
+            default_bulk_concurrency=2,
+            reserved_concurrency=0,
+            http_max_connections=2,
+            http_max_keepalive_connections=2,
+            requests_per_minute=1,
+        ),
+        rpm_window_seconds=0.2,
+    )
+    await coordinator.acquire(
+        workload="first",
+        deadline=time.monotonic() + 1,
+        bulk=True,
+    )
+    await coordinator.release(workload="first", bulk=True)
+
+    with pytest.raises(LlmDeadlineExceededError):
+        await coordinator.acquire(
+            workload="deadline",
+            deadline=time.monotonic() + 0.01,
+            bulk=True,
+        )
+
+    cancelled = asyncio.create_task(
+        coordinator.acquire(
+            workload="cancelled",
+            deadline=time.monotonic() + 1,
+            bulk=True,
+        )
+    )
+    await asyncio.sleep(0)
+    cancelled.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await cancelled
+    snapshot = coordinator.snapshot()
+    assert snapshot.deadline_exceeded == 1
+    assert snapshot.cancelled == 1
+    await coordinator.close()
+
+
+@pytest.mark.asyncio
+async def test_client_retry_reenters_provider_rpm_admission():
+    class ShortWindowRegistry(ProviderCoordinatorRegistry):
+        def get(self, config):
+            loop_id = id(asyncio.get_running_loop())
+            if self._loop_id != loop_id:
+                self._coordinators.clear()
+                self._loop_id = loop_id
+            coordinator = self._coordinators.get(config.name)
+            if coordinator is None:
+                coordinator = ProviderCoordinator(
+                    config,
+                    rpm_window_seconds=0.04,
+                )
+                self._coordinators[config.name] = coordinator
+            return coordinator
+
+    calls = 0
+
+    async def transport(url, headers, payload, timeout):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return {"status_code": 503, "headers": {}, "data": {}}
+        return _provider_response("retried")
+
+    config = _multi_profile_config(hard=2, bulk=2)
+    resource = config.provider_resources["shared"]
+    object.__setattr__(resource, "requests_per_minute", 1)
+    profile = config.profiles["one"]
+    object.__setattr__(profile, "max_retries", 1)
+    object.__setattr__(profile, "retry_backoff_seconds", 0)
+    client = LlmClient(
+        config,
+        transport=CallableTransport(transport),
+        environment={"TEST_LLM_KEY": "secret"},
+        provider_coordinator_registry=ShortWindowRegistry(),
+    )
+
+    started = time.monotonic()
+    response = await client.complete(_request("one", "retry", bulk=True))
+    assert response.status == "success"
+    assert response.attempt_count == 2
+    assert calls == 2
+    assert time.monotonic() - started >= 0.025
 
 
 @pytest.mark.asyncio
