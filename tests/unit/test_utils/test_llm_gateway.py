@@ -1,10 +1,12 @@
 import asyncio
 import json
 import os
+import time
 
 import pytest
 
 from utils.llm import (
+    DEFAULT_QUEUE_TIMEOUT_SECONDS,
     DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
     LlmAuthenticationError,
     LlmCancelledError,
@@ -114,6 +116,7 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
     ).profiles["test"]
     assert profile.api_key_env == "QUOTE_LLM_API_KEY"
     assert profile.max_output_tokens_field == "max_tokens"
+    assert profile.queue_timeout_seconds == DEFAULT_QUEUE_TIMEOUT_SECONDS == 3600
     assert profile.attempt_timeout_seconds == profile.timeout_seconds
     assert profile.max_retries == 2
     assert profile.max_schema_repair_attempts == 1
@@ -184,6 +187,21 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
             }},
         })
 
+    for invalid_queue_timeout in (0, -1, float("inf"), float("nan")):
+        with pytest.raises(
+            ValueError,
+            match="queue_timeout_seconds must be finite and positive",
+        ):
+            LlmConfig.from_mapping({
+                "enabled": True,
+                "profiles": {
+                    "test": {
+                        "enabled": True,
+                        "queue_timeout_seconds": invalid_queue_timeout,
+                    }
+                },
+            })
+
 
 @pytest.mark.asyncio
 async def test_profile_selects_max_completion_tokens_and_warns_on_usage_overrun():
@@ -239,6 +257,223 @@ async def test_attempt_timeout_retries_within_total_deadline(monkeypatch):
     assert calls[0] == pytest.approx(0.01)
     assert any("LLM attempt started" in message for message in info_messages)
     assert any("LLM retry pending" in message for message in info_messages)
+
+
+@pytest.mark.asyncio
+async def test_initial_queue_wait_preserves_full_execution_budget():
+    first_started = asyncio.Event()
+    release_first = asyncio.Event()
+    calls = 0
+    observed_timeouts = []
+
+    async def controlled_transport(url, headers, payload, timeout):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            first_started.set()
+            await release_first.wait()
+        else:
+            observed_timeouts.append(timeout)
+            await asyncio.sleep(0.02)
+        return _response({"label": "ok", "score": calls})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(
+            timeout_seconds=1,
+            queue_timeout_seconds=1,
+            attempt_timeout_seconds=1,
+            max_retries=0,
+            max_concurrency=1,
+        ),
+        transport=CallableTransport(controlled_transport),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+        limiter_registry=ProfileLimiterRegistry(),
+    )
+    first = asyncio.create_task(client.complete(_unstructured_request()))
+    await first_started.wait()
+    second = asyncio.create_task(client.complete(_unstructured_request(
+        timeout_seconds=0.04,
+        queue_timeout_seconds=1,
+    )))
+    await asyncio.sleep(0.06)
+    release_first.set()
+
+    first_response, second_response = await asyncio.gather(first, second)
+    assert first_response.status == "success"
+    assert second_response.status == "success"
+    assert calls == 2
+    assert observed_timeouts[0] == pytest.approx(0.04, abs=0.01)
+
+
+@pytest.mark.asyncio
+async def test_initial_queue_timeout_sends_no_provider_request_and_releases_waiter():
+    first_started = asyncio.Event()
+    release_first = asyncio.Event()
+    calls = 0
+
+    async def controlled_transport(url, headers, payload, timeout):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            first_started.set()
+            await release_first.wait()
+        return _response({"label": "ok", "score": calls})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(
+            timeout_seconds=1,
+            queue_timeout_seconds=1,
+            attempt_timeout_seconds=1,
+            max_retries=0,
+            max_concurrency=1,
+        ),
+        transport=CallableTransport(controlled_transport),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+        limiter_registry=ProfileLimiterRegistry(),
+    )
+    first = asyncio.create_task(client.complete(_unstructured_request()))
+    await first_started.wait()
+    with pytest.raises(LlmDeadlineExceededError):
+        await client.complete(_unstructured_request(
+            timeout_seconds=1,
+            queue_timeout_seconds=0.01,
+        ))
+    assert calls == 1
+
+    release_first.set()
+    await first
+    third = await client.complete(_unstructured_request())
+    assert third.status == "success"
+    assert calls == 2
+
+
+@pytest.mark.asyncio
+async def test_queue_wait_cancellation_does_not_leak_limiter_slot():
+    first_started = asyncio.Event()
+    release_first = asyncio.Event()
+    calls = 0
+
+    async def controlled_transport(url, headers, payload, timeout):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            first_started.set()
+            await release_first.wait()
+        return _response({"label": "ok", "score": calls})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(max_retries=0, max_concurrency=1),
+        transport=CallableTransport(controlled_transport),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+        limiter_registry=ProfileLimiterRegistry(),
+    )
+    first = asyncio.create_task(client.complete(_unstructured_request()))
+    await first_started.wait()
+    queued = asyncio.create_task(client.complete(_unstructured_request()))
+    await asyncio.sleep(0.01)
+    queued.cancel()
+    with pytest.raises(LlmCancelledError):
+        await queued
+
+    release_first.set()
+    await first
+    final = await client.complete(_unstructured_request())
+    assert final.status == "success"
+    assert calls == 2
+
+
+@pytest.mark.asyncio
+async def test_invalid_request_queue_timeout_fails_before_provider_send():
+    transport = ScriptedTransport([_response({"label": "ok", "score": 1})])
+    client = LlmClient(
+        _config(max_retries=0),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+
+    for invalid_queue_timeout in ("invalid", 0, float("inf"), float("nan")):
+        with pytest.raises(
+            LlmConfigurationError,
+            match="queue_timeout_seconds must be finite and positive",
+        ):
+            await client.complete(_unstructured_request(
+                queue_timeout_seconds=invalid_queue_timeout,
+            ))
+    assert transport.calls == []
+
+
+@pytest.mark.asyncio
+async def test_response_parsing_cannot_return_success_after_execution_deadline(
+    monkeypatch,
+):
+    transport = ScriptedTransport([_response({"label": "ok", "score": 1})])
+    client = LlmClient(
+        _config(
+            timeout_seconds=0.01,
+            attempt_timeout_seconds=1,
+            max_retries=0,
+        ),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    original_parse = client._parse_and_validate
+
+    def slow_parse(raw_content, schema):
+        time.sleep(0.03)
+        return original_parse(raw_content, schema)
+
+    monkeypatch.setattr(client, "_parse_and_validate", slow_parse)
+
+    with pytest.raises(LlmDeadlineExceededError):
+        await client.complete(_request())
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "raw_content",
+    (
+        "not-json",
+        json.dumps({"label": "missing-score"}),
+    ),
+)
+async def test_response_parsing_failure_prefers_execution_deadline(
+    monkeypatch,
+    raw_content,
+):
+    transport = ScriptedTransport([{
+        "choices": [{
+            "message": {"content": raw_content},
+            "finish_reason": "stop",
+        }],
+        "id": "provider-1",
+    }])
+    client = LlmClient(
+        _config(
+            timeout_seconds=0.01,
+            attempt_timeout_seconds=1,
+            max_retries=0,
+        ),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    original_parse = client._parse_and_validate
+
+    def slow_parse(content, schema):
+        time.sleep(0.03)
+        return original_parse(content, schema)
+
+    monkeypatch.setattr(client, "_parse_and_validate", slow_parse)
+
+    with pytest.raises(LlmDeadlineExceededError):
+        await client.complete(_request())
+    assert len(transport.calls) == 1
 
 
 @pytest.mark.asyncio

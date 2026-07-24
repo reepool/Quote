@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import math
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
@@ -12,6 +13,7 @@ ALLOWED_MAX_OUTPUT_TOKEN_FIELDS = {"max_tokens", "max_completion_tokens"}
 ALLOWED_ROLES = {"system", "developer", "user", "assistant", "tool"}
 MAX_PROVIDER_CONCURRENCY = 60
 DEFAULT_PROVIDER_REQUESTS_PER_MINUTE = 58
+DEFAULT_QUEUE_TIMEOUT_SECONDS = 3600.0
 
 
 def _configured(value: Mapping[str, Any], name: str, default: Any) -> Any:
@@ -93,6 +95,7 @@ class LlmProfile:
     supported_structured_output_modes: tuple[str, ...] = ("json_schema", "json_object")
     allow_prompt_only: bool = False
     timeout_seconds: float = 90.0
+    queue_timeout_seconds: float = DEFAULT_QUEUE_TIMEOUT_SECONDS
     attempt_timeout_seconds: float = 90.0
     max_retries: int = 2
     max_schema_repair_attempts: int = 1
@@ -136,6 +139,15 @@ class LlmProfile:
             0.01,
             float(_configured(value, "timeout_seconds", 90.0)),
         )
+        queue_timeout_seconds = float(_configured(
+            value,
+            "queue_timeout_seconds",
+            DEFAULT_QUEUE_TIMEOUT_SECONDS,
+        ))
+        if not math.isfinite(queue_timeout_seconds) or queue_timeout_seconds <= 0:
+            raise ValueError(
+                f"LLM profile {name} queue_timeout_seconds must be finite and positive"
+            )
         attempt_timeout_seconds = max(
             0.01,
             float(_configured(
@@ -156,6 +168,7 @@ class LlmProfile:
             supported_structured_output_modes=modes or ("json_schema", "json_object"),
             allow_prompt_only=value.get("allow_prompt_only") is True,
             timeout_seconds=timeout_seconds,
+            queue_timeout_seconds=queue_timeout_seconds,
             attempt_timeout_seconds=attempt_timeout_seconds,
             max_retries=max(0, int(_configured(value, "max_retries", 2))),
             max_schema_repair_attempts=max(
@@ -199,6 +212,7 @@ class LlmProfile:
             "supported_structured_output_modes": list(self.supported_structured_output_modes),
             "allow_prompt_only": self.allow_prompt_only,
             "timeout_seconds": self.timeout_seconds,
+            "queue_timeout_seconds": self.queue_timeout_seconds,
             "attempt_timeout_seconds": self.attempt_timeout_seconds,
             "max_retries": self.max_retries,
             "max_schema_repair_attempts": self.max_schema_repair_attempts,
@@ -611,6 +625,7 @@ class LlmRequest:
     temperature: Optional[float] = None
     max_output_tokens: Optional[int] = None
     timeout_seconds: Optional[float] = None
+    queue_timeout_seconds: Optional[float] = None
     requests_per_minute: Optional[int] = None
     rate_limit_scope: Optional[str] = None
     idempotency_key: Optional[str] = None

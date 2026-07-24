@@ -73,7 +73,7 @@ def _multi_profile_config(*, hard=2, bulk=1, orchestration=True):
     })
 
 
-def _request(profile, item, *, bulk=False):
+def _request(profile, item, *, bulk=False, queue_timeout_seconds=None):
     return LlmRequest(
         profile=profile,
         messages=[LlmMessage(role="user", content=f"item {item}")],
@@ -92,6 +92,7 @@ def _request(profile, item, *, bulk=False):
             "bulk": bulk,
             "secret_not_forwarded": "hidden",
         },
+        queue_timeout_seconds=queue_timeout_seconds,
     )
 
 
@@ -237,6 +238,55 @@ async def test_provider_admission_is_fair_and_cancellation_safe():
     snapshot = coordinator.snapshot()
     assert snapshot.active == 0
     assert snapshot.cancelled == 1
+
+
+@pytest.mark.asyncio
+async def test_client_provider_queue_timeout_releases_partial_profile_lease():
+    first_started = asyncio.Event()
+    release_first = asyncio.Event()
+    calls = 0
+
+    async def transport(url, headers, payload, timeout):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            first_started.set()
+            await release_first.wait()
+        return _provider_response(str(calls))
+
+    client = LlmClient(
+        _multi_profile_config(hard=1, bulk=1),
+        transport=CallableTransport(transport),
+        environment={"TEST_LLM_KEY": "secret"},
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+    )
+    first = asyncio.create_task(client.complete(
+        _request("one", "first", bulk=True)
+    ))
+    await first_started.wait()
+
+    with pytest.raises(LlmDeadlineExceededError):
+        await client.complete(_request(
+            "two",
+            "queued",
+            bulk=True,
+            queue_timeout_seconds=0.01,
+        ))
+    assert calls == 1
+
+    release_first.set()
+    await first
+    recovered = await asyncio.wait_for(
+        client.complete(_request(
+            "two",
+            "recovered",
+            bulk=True,
+            queue_timeout_seconds=0.1,
+        )),
+        timeout=0.2,
+    )
+    assert recovered.status == "success"
+    assert calls == 2
 
 
 @pytest.mark.asyncio

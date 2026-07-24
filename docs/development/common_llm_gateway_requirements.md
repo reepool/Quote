@@ -97,6 +97,7 @@ utils/llm/
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
         "attempt_timeout_seconds": 300,
         "max_output_tokens_field": "max_completion_tokens",
         "max_retries": 1,
@@ -118,8 +119,9 @@ utils/llm/
 - provider resource 默认以滚动窗口共享 `58 RPM`，同一 quota bucket 的所有 profile、业务、重试和 repair 必须合并计数；
 - profile 的 `requests_per_minute=0` 表示继承 provider 上限，正数表示附加的更低上限；业务请求也只能向下 override；
 - RPM 配置必须是精确整数；小数和布尔值必须在发起请求前以 `configuration_error` 拒绝；同一业务 scope 的冲突 RPM 也必须 fail closed；
-- `timeout_seconds` 是一次 `complete()` 的总 deadline，包含排队、退避和所有重试；
-- `attempt_timeout_seconds` 是单次 HTTP 尝试上限，默认继承总 deadline，并始终受剩余总 deadline 约束；
+- `queue_timeout_seconds` 是首次请求获得 profile、业务 RPM 和 provider 资源许可的独立、有限正数排队上限，默认 `3600` 秒；排队时间不消耗执行预算，但仍受取消和队列超时约束；
+- `timeout_seconds` 是首次获得全部发送许可后才启动的执行与重试 deadline，包含 HTTP、解析、退避和后续重试准入；
+- `attempt_timeout_seconds` 是单次 HTTP 尝试上限，默认继承执行 deadline，并始终受剩余执行预算约束；
 - `max_output_tokens_field` 显式选择 `max_tokens` 或 `max_completion_tokens`，不得同时发送两个字段；
 - 不假设所有 OpenAI-compatible 服务都支持同一种 structured output；
 - 配置必须支持 `json_schema`、`json_object`、`prompt_only` 和 `auto`；
@@ -147,7 +149,8 @@ class LlmClient(Protocol):
 | `model` | 可选模型覆盖 |
 | `temperature` | 可选参数覆盖 |
 | `max_output_tokens` | 最大输出 token |
-| `timeout_seconds` | 单次业务 deadline |
+| `queue_timeout_seconds` | 可选首次准入排队上限；业务可覆盖 profile 默认值 |
+| `timeout_seconds` | 首次准入成功后启动的执行与重试 deadline |
 | `idempotency_key` | 调用方生成的幂等键 |
 | `metadata` | 不进入 prompt 的追踪元数据 |
 
@@ -254,7 +257,9 @@ cancelled
 - 原生 JSON Schema、`json_object` 和 `prompt_only` 三种模式；
 - object、array、嵌套结构和可选字段 schema；
 - 429/5xx/timeout 重试和 401/403 不重试；
-- 单次尝试超时后，在总 deadline 尚有预算时能够继续重试；
+- 长时间初始排队后仍保留完整执行预算；
+- 队列超时、单次尝试超时和执行 deadline 分别 fail closed；
+- 单次尝试超时后，在执行 deadline 尚有预算时能够继续重试；
 - schema 失败、repair 成功和 repair 失败；
 - 并发上限、速率限制、取消和 deadline；
 - request/response hash 稳定性；

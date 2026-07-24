@@ -7,6 +7,7 @@ from contextlib import AsyncExitStack
 import hashlib
 import json
 import logging
+import math
 import os
 import random
 import time
@@ -102,6 +103,9 @@ class LlmClient:
         started = time.monotonic()
         attempt_count = 0
         request_hash: Optional[str] = None
+        execution_started: Optional[float] = None
+        execution_deadline: Optional[float] = None
+        total_admission_wait_ms = 0
         lineage = self._lineage_metadata(request.metadata)
         try:
             profile = self._resolve_profile(request.profile)
@@ -142,7 +146,23 @@ class LlmClient:
             timeout_seconds = float(request.timeout_seconds or profile.timeout_seconds)
             if timeout_seconds <= 0:
                 raise LlmConfigurationError("timeout_seconds must be positive")
-            deadline = started + timeout_seconds
+            try:
+                queue_timeout_seconds = float(
+                    profile.queue_timeout_seconds
+                    if request.queue_timeout_seconds is None
+                    else request.queue_timeout_seconds
+                )
+            except (TypeError, ValueError) as exc:
+                raise LlmConfigurationError(
+                    "queue_timeout_seconds must be finite and positive"
+                ) from exc
+            if (
+                not math.isfinite(queue_timeout_seconds)
+                or queue_timeout_seconds <= 0
+            ):
+                raise LlmConfigurationError(
+                    "queue_timeout_seconds must be finite and positive"
+                )
             url = normalize_openai_url(profile.base_url, profile.endpoint)
             provider_messages = [message.to_provider() for message in messages]
             payload = self._build_payload(
@@ -212,7 +232,8 @@ class LlmClient:
             current_payload = payload
             llm_logger.info(
                 "LLM request prepared profile=%s request_id=%s request_hash=%s "
-                "model=%s mode=%s attempts_max=%s deadline_seconds=%.1f "
+                "model=%s mode=%s attempts_max=%s execution_timeout_seconds=%.1f "
+                "queue_timeout_seconds=%.1f "
                 "attempt_timeout_seconds=%.1f payload_bytes=%s max_output_tokens=%s "
                 "resource_rpm=%s profile_rpm=%s business_rpm=%s workload=%s "
                 "rate_limit_scope=%s",
@@ -223,6 +244,7 @@ class LlmClient:
                 mode,
                 max_attempts,
                 timeout_seconds,
+                queue_timeout_seconds,
                 profile.attempt_timeout_seconds,
                 len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
                 request.max_output_tokens,
@@ -237,52 +259,89 @@ class LlmClient:
                 raw_content: Optional[str] = None
                 provider_failure_reported = False
                 attempt_started = time.monotonic()
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
+                admission_started = time.monotonic()
+                admission_deadline = (
+                    admission_started + queue_timeout_seconds
+                    if execution_deadline is None
+                    else execution_deadline
+                )
+                if admission_deadline - time.monotonic() <= 0:
                     raise LlmDeadlineExceededError()
                 try:
                     async with AsyncExitStack() as limiter_stack:
                         await limiter_stack.enter_async_context(
-                            profile_limiter.slot(deadline)
+                            profile_limiter.slot(admission_deadline)
                         )
                         if business_limiter is not None:
                             await limiter_stack.enter_async_context(
-                                business_limiter.slot(deadline)
+                                business_limiter.slot(admission_deadline)
                             )
                         if provider_fallback_limiter is not None:
                             await limiter_stack.enter_async_context(
-                                provider_fallback_limiter.slot(deadline)
+                                provider_fallback_limiter.slot(
+                                    admission_deadline
+                                )
                             )
-                        if provider_coordinator is None:
+                        provider_lease_acquired = False
+                        if provider_coordinator is not None:
+                            await provider_coordinator.acquire(
+                                workload=workload,
+                                deadline=admission_deadline,
+                                bulk=bulk,
+                            )
+                            provider_lease_acquired = True
+                        try:
+                            admitted_at = time.monotonic()
+                            admission_wait_ms = max(
+                                0,
+                                round(
+                                    (admitted_at - admission_started) * 1000
+                                ),
+                            )
+                            total_admission_wait_ms += admission_wait_ms
+                            if execution_deadline is None:
+                                execution_started = admitted_at
+                                execution_deadline = (
+                                    execution_started + timeout_seconds
+                                )
+                                llm_logger.info(
+                                    "LLM request admitted profile=%s request_id=%s "
+                                    "initial_queue_wait_ms=%s "
+                                    "execution_timeout_seconds=%.1f",
+                                    profile.name,
+                                    request_id,
+                                    admission_wait_ms,
+                                    timeout_seconds,
+                                )
+                            else:
+                                llm_logger.info(
+                                    "LLM retry admitted profile=%s request_id=%s "
+                                    "attempt=%s/%s queue_wait_ms=%s "
+                                    "execution_remaining_seconds=%.1f",
+                                    profile.name,
+                                    request_id,
+                                    attempt_count,
+                                    max_attempts,
+                                    admission_wait_ms,
+                                    max(
+                                        0.0,
+                                        execution_deadline - admitted_at,
+                                    ),
+                                )
+                            assert execution_deadline is not None
+                            attempt_started = admitted_at
                             response = await self._send_attempt(
                                 url=url,
                                 headers=headers,
                                 profile=profile,
                                 idempotency_key=request.idempotency_key,
                                 payload=current_payload,
-                                deadline=deadline,
+                                deadline=execution_deadline,
                                 request_id=request_id,
                                 attempt_count=attempt_count,
                                 max_attempts=max_attempts,
                             )
-                        else:
-                            await provider_coordinator.acquire(
-                                workload=workload,
-                                deadline=deadline,
-                                bulk=bulk,
-                            )
-                            try:
-                                response = await self._send_attempt(
-                                    url=url,
-                                    headers=headers,
-                                    profile=profile,
-                                    idempotency_key=request.idempotency_key,
-                                    payload=current_payload,
-                                    deadline=deadline,
-                                    request_id=request_id,
-                                    attempt_count=attempt_count,
-                                    max_attempts=max_attempts,
-                                )
+                            if provider_coordinator is not None:
                                 if (
                                     response.status_code < 200
                                     or response.status_code >= 300
@@ -311,22 +370,30 @@ class LlmClient:
                                         provider_failure_reported = True
                                 else:
                                     await provider_coordinator.report_success()
-                            except asyncio.TimeoutError:
+                        except asyncio.TimeoutError:
+                            if provider_coordinator is not None:
                                 await provider_coordinator.report_retryable_failure(
                                     error_code="transient_transport_error",
                                     status_code=408,
                                 )
                                 provider_failure_reported = True
-                                raise
-                            except LlmError as exc:
-                                if exc.code == "transient_transport_error":
-                                    await provider_coordinator.report_retryable_failure(
-                                        error_code=exc.code,
-                                        status_code=exc.status_code,
-                                    )
-                                    provider_failure_reported = True
-                                raise
-                            finally:
+                            raise
+                        except LlmError as exc:
+                            if (
+                                provider_coordinator is not None
+                                and exc.code == "transient_transport_error"
+                            ):
+                                await provider_coordinator.report_retryable_failure(
+                                    error_code=exc.code,
+                                    status_code=exc.status_code,
+                                )
+                                provider_failure_reported = True
+                            raise
+                        finally:
+                            if (
+                                provider_coordinator is not None
+                                and provider_lease_acquired
+                            ):
                                 await provider_coordinator.release(
                                     workload=workload,
                                     bulk=bulk,
@@ -341,6 +408,9 @@ class LlmClient:
                         response.status_code,
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
                     )
+                    assert execution_deadline is not None
+                    if time.monotonic() >= execution_deadline:
+                        raise LlmDeadlineExceededError()
                     if response.status_code < 200 or response.status_code >= 300:
                         provider_error = safe_provider_error(response.status_code)
                         raise provider_error
@@ -371,16 +441,35 @@ class LlmClient:
                     provider_request_id = response.provider_request_id or _optional_text(
                         (response.data or {}).get("id")
                     )
-                    latency_ms = max(0, round((time.monotonic() - started) * 1000))
+                    completed_at = time.monotonic()
+                    if completed_at >= execution_deadline:
+                        raise LlmDeadlineExceededError()
+                    latency_ms = max(0, round((completed_at - started) * 1000))
+                    execution_elapsed_ms = max(
+                        0,
+                        round(
+                            (
+                                completed_at
+                                - (
+                                    execution_started
+                                    if execution_started is not None
+                                    else completed_at
+                                )
+                            ) * 1000
+                        ),
+                    )
                     llm_logger.info(
                         "LLM request completed profile=%s request_id=%s "
                         "request_hash=%s attempts=%s latency_ms=%s "
+                        "admission_wait_ms=%s execution_elapsed_ms=%s "
                         "input_tokens=%s output_tokens=%s total_tokens=%s",
                         profile.name,
                         request_id,
                         request_hash,
                         attempt_count,
                         latency_ms,
+                        total_admission_wait_ms,
+                        execution_elapsed_ms,
                         usage.input_tokens if usage else None,
                         usage.output_tokens if usage else None,
                         usage.total_tokens if usage else None,
@@ -408,9 +497,10 @@ class LlmClient:
                 except asyncio.CancelledError as exc:
                     raise LlmCancelledError() from exc
                 except asyncio.TimeoutError as exc:
+                    active_deadline = execution_deadline or admission_deadline
                     last_error = (
                         LlmDeadlineExceededError()
-                        if time.monotonic() >= deadline
+                        if time.monotonic() >= active_deadline
                         else safe_provider_error(408)
                     )
                     llm_logger.warning(
@@ -422,7 +512,7 @@ class LlmClient:
                         max_attempts,
                         last_error.code,
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
-                        max(0.0, deadline - time.monotonic()),
+                        max(0.0, active_deadline - time.monotonic()),
                     )
                     if isinstance(last_error, LlmDeadlineExceededError):
                         raise last_error from exc
@@ -436,6 +526,9 @@ class LlmClient:
                         )
                         provider_failure_reported = True
                 except (LlmResponseParseError, LlmSchemaValidationError) as exc:
+                    assert execution_deadline is not None
+                    if time.monotonic() >= execution_deadline:
+                        raise LlmDeadlineExceededError() from exc
                     last_error = exc
                     llm_logger.warning(
                         "LLM response validation failed profile=%s request_id=%s "
@@ -471,7 +564,8 @@ class LlmClient:
                         provider_failure_reported = True
                     llm_logger.warning(
                         "LLM attempt failed profile=%s request_id=%s attempt=%s/%s "
-                        "code=%s retryable=%s detail=%s elapsed_ms=%s remaining_seconds=%.1f",
+                        "code=%s retryable=%s detail=%s elapsed_ms=%s "
+                        "phase=%s remaining_seconds=%.1f",
                         profile.name,
                         request_id,
                         attempt_count,
@@ -480,7 +574,12 @@ class LlmClient:
                         exc.retryable,
                         exc.message,
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
-                        max(0.0, deadline - time.monotonic()),
+                        "queue" if execution_deadline is None else "execution",
+                        max(
+                            0.0,
+                            (execution_deadline or admission_deadline)
+                            - time.monotonic(),
+                        ),
                     )
                     if not exc.retryable:
                         raise
@@ -497,13 +596,19 @@ class LlmClient:
                     attempt_count + 1,
                     max_attempts,
                     last_error.code if last_error else "unknown",
-                    max(0.0, deadline - time.monotonic()),
+                    max(
+                        0.0,
+                        (execution_deadline or admission_deadline)
+                        - time.monotonic(),
+                    ),
                 )
+                if execution_deadline is None:
+                    raise LlmDeadlineExceededError()
                 await self._backoff(
                     profile,
                     attempt_count,
                     response=locals().get("response"),
-                    deadline=deadline,
+                    deadline=execution_deadline,
                     random_source=self._random_source,
                 )
 

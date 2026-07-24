@@ -99,6 +99,7 @@ flowchart LR
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
         "attempt_timeout_seconds": 300,
         "max_output_tokens_field": "max_completion_tokens",
         "max_retries": 1,
@@ -123,8 +124,9 @@ flowchart LR
 | `model` | 默认请求模型；响应 envelope 优先记录服务端实际返回模型 |
 | `structured_output_mode` | `json_schema`、`json_object`、`prompt_only` 或 `auto` |
 | `supported_structured_output_modes` | provider 已验证的能力集合；`auto` 只在集合中选择 |
-| `timeout_seconds` | 单次调用的总业务 deadline |
-| `attempt_timeout_seconds` | 每次 HTTP 尝试的最长时间；默认等于总 deadline，且不会超过当时剩余总预算 |
+| `queue_timeout_seconds` | 首次 profile、业务 RPM 和 provider 准入的排队上限；默认 3600 秒，可由业务请求覆盖 |
+| `timeout_seconds` | 首次获得全部发送许可后启动的执行与重试 deadline |
+| `attempt_timeout_seconds` | 每次 HTTP 尝试的最长时间；默认等于执行 deadline，且不会超过当时剩余执行预算 |
 | `max_output_tokens_field` | provider 使用的输出预算字段：`max_tokens` 或 `max_completion_tokens`；默认前者 |
 | `max_retries` | provider/transport 重试次数，不含首次请求 |
 | `max_schema_repair_attempts` | schema/JSON 失败后的 repair 次数，建议不超过 1 |
@@ -258,7 +260,9 @@ JSON 解析失败或 schema 校验失败时，网关最多执行配置允许的�
 | `deadline_exceeded` | 全请求 deadline 用尽 | 否 |
 | `cancelled` | 调用方取消任务 | 否 |
 
-一次 `complete()` 的 `timeout_seconds` 是总 deadline，不是每个重试的独立预算。limiter 等待、退避和 HTTP I/O 都消耗同一预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，拿到 limiter 槽位后会依据剩余总预算重新收紧；这样一次长尾请求不会独占全部调用预算，只要总 deadline 尚未用尽，后续重试仍可执行。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。每次 HTTP 重试都重新进入 provider RPM 队列并消耗一次额度。
+一次 `complete()` 使用两种相互独立的时钟。首次 profile、业务 RPM 和 provider 准入受 `queue_timeout_seconds` 约束；这段排队不消耗执行预算。全部许可获得后才启动 `timeout_seconds` 执行 deadline，HTTP、解析、退避和后续重试准入都消耗该预算。`attempt_timeout_seconds` 限制单次 HTTP 尝试，并依据剩余执行预算重新收紧。`attempt_count` 包含首次请求；`max_retries=0` 表示只请求一次。每次 HTTP 重试仍重新进入 provider RPM 队列并消耗一次额度，但不能延长执行 deadline。
+
+网关日志分别输出首次 `initial_queue_wait_ms`、累计 `admission_wait_ms`、`execution_elapsed_ms` 和总 `latency_ms`。历史批处理应以队列耗时判断容量压力，以执行耗时判断模型长尾，不能再把两者混为一种 provider latency。scheduler 或业务流水线仍需保留更外层的任务 deadline 和 kill switch。
 
 限额优先级为 provider resource -> profile -> business request。provider resource 是账号、模型或商业计划定义的 quota bucket；当前 Grok 4.5 的两个 profile 映射到同一个资源并共享 `58 RPM`。如果同一 API key 下其他模型拥有不同配额，应建立独立 provider resource 并让相应 profile 显式引用。子级只能收紧，不能把 `58` 提高为更大的值，也不能通过设置 `0` 关闭父级。
 

@@ -16,6 +16,7 @@ from .errors import (
     LlmTransientTransportError,
 )
 from .models import (
+    DEFAULT_QUEUE_TIMEOUT_SECONDS,
     DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
     LlmConfig,
     LlmFailureEnvelope,
@@ -61,6 +62,7 @@ __all__ = [
     "LlmClientProtocol",
     "CallableTransport",
     "DEFAULT_PROVIDER_REQUESTS_PER_MINUTE",
+    "DEFAULT_QUEUE_TIMEOUT_SECONDS",
     "LlmConfig",
     "LlmConfigurationError",
     "LlmDeadlineExceededError",

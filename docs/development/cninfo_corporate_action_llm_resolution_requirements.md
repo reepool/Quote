@@ -407,8 +407,10 @@ that input key while preserving audit lineage.
 每次 LLM 尝试、超时或重试、业务门禁、lineage 落库和最终统计。日志只记录 ID、hash、计数、
 耗时和安全错误分类，不记录 API Key、完整 prompt、完整公告正文或模型原始响应。
 
-当前 `semantic_extraction` 根据供应商实测长尾采用单次 300 秒、总 deadline 620 秒和最多一次
-重试。v2 公司行动结构化输出限制为 8192 tokens，并通过 `max_completion_tokens` 发送给当前
+当前 `semantic_extraction` 根据供应商实测长尾采用首次准入排队上限 3600 秒、准入后单次
+300 秒、执行与重试 deadline 620 秒和最多一次重试。标题分类使用相同的排队/执行时钟分离，
+不会因等待 50 路并发或 58 RPM 许可而提前耗尽执行预算。v2 公司行动结构化输出限制为
+8192 tokens，并通过 `max_completion_tokens` 发送给当前
 OpenAI-compatible 服务。若供应商 usage 仍超过预算，任务报告会增加
 `provider_output_budget_overruns`；出现超限时应停止扩大批次并先确认供应商参数契约。
 如果后续供应商时延分布变化，应根据日志中的 attempt latency 调整，而不是缩短到低于已观测的

@@ -329,8 +329,10 @@ transport 始终由 client 所有。
 - 尊重合法 `Retry-After`；
 - 多次 429/5xx 可触发 provider/account 共享 cooldown；
 - 同账号其他 profile 也必须服从共享 cooldown；
-- cooldown、排队、限流和重试全部计入业务 deadline；
-- deadline 不足时直接失败，不再发起一次注定超时的请求。
+- 首次 cooldown、排队和限流受独立 `queue_timeout_seconds` 约束，不消耗 provider 执行预算；
+- 首次准入后，HTTP、解析、退避和后续重试准入全部计入执行 deadline；
+- 队列或执行 deadline 不足时直接失败，不再发起一次注定超时的请求；
+- scheduler 和业务流水线继续提供更外层的整项任务 deadline，避免排队与执行预算分离后任务无限存活。
 
 业务阶段可以重试自身的下载、解析或写库失败，但不能在外层无限重试 `complete()`。
 
