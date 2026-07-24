@@ -548,6 +548,7 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     review_workload = result.get("review_workload") or {}
     tiers = review_workload.get("tiers") or {}
     signatures = review_workload.get("gate_signatures") or {}
+    reason_codes = review_workload.get("reason_codes") or {}
     metrics = result.get("llm_metrics") or {}
     auto_promotion = result.get("auto_promotion") or {}
     pipeline = (result.get("parameters") or {}).get("pipeline") or {}
@@ -555,6 +556,9 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
     top_signatures = sorted(
         signatures.items(), key=lambda item: (-int(item[1]), str(item[0]))
     )[:5]
+    top_reason_codes = sorted(
+        reason_codes.items(), key=lambda item: (-int(item[1]), str(item[0]))
+    )[:8]
     lines = [
         "ℹ️ *A 股巨潮公司行动公告正文解析*",
         "",
@@ -582,6 +586,9 @@ def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
         f"快速审核: `{tiers.get('quick_review', 0)}`，深度审核: `{tiers.get('deep_review', 0)}`",
         f"剩余人工审核: `{review_workload.get('remaining_manual_review', 0)}`",
         f"旧口径 manual_required: `{counts.get('manual_required', 0)}`",
+        "审核原因码: `"
+        + ", ".join(f"{name}={count}" for name, count in top_reason_codes)
+        + "`",
         f"Token: `input={metrics.get('input_tokens', 0)}, output={metrics.get('output_tokens', 0)}, total={metrics.get('total_tokens', 0)}`",
         f"输出预算超限: `{metrics.get('provider_output_budget_overruns', 0)}`",
         f"延迟 ms: `p50={latency.get('p50')}, p95={latency.get('p95')}, max={latency.get('max')}`",
@@ -4768,6 +4775,7 @@ class ScheduledTasks:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
         max_events: int = 100,
         target_offset: int = 0,
         profile: str = "semantic_extraction",
@@ -4795,7 +4803,7 @@ class ScheduledTasks:
         try:
             scheduler_logger.info(
                 "[Scheduler] Starting CNInfo corporate-action LLM resolution: "
-                "range=%s..%s exchanges=%s instruments=%s max_events=%s "
+                "range=%s..%s exchanges=%s instruments=%s events=%s max_events=%s "
                 "offset=%s profile=%s resume=%s dry_run=%s download_documents=%s "
                 "run_ocr=%s refresh_documents=%s discover_candidates=%s "
                 "auto_promote_validated=%s exclude_reviewed_events=%s "
@@ -4805,6 +4813,7 @@ class ScheduledTasks:
                 end_date,
                 exchanges,
                 instrument_ids,
+                source_event_keys,
                 max_events,
                 target_offset,
                 profile,
@@ -4842,6 +4851,7 @@ class ScheduledTasks:
                 end_date=end_date,
                 exchanges=exchanges,
                 instrument_ids=instrument_ids,
+                source_event_keys=source_event_keys,
                 max_events=int(max_events),
                 target_offset=int(target_offset),
                 profile=profile,
@@ -4985,6 +4995,7 @@ class ScheduledTasks:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
         scopes: Optional[List[str]] = None,
         max_events: int = 100,
         target_offset: int = 0,
@@ -5022,6 +5033,7 @@ class ScheduledTasks:
                 end_date=end_date,
                 exchanges=exchanges,
                 instrument_ids=instrument_ids,
+                source_event_keys=source_event_keys,
                 scopes=scopes,
                 max_events=int(max_events),
                 target_offset=int(target_offset),

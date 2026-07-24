@@ -128,6 +128,21 @@ def test_model_only_cancellation_remains_manual_required():
     assert result["factor_blocking"] is True
 
 
+def test_stale_analysis_without_current_candidate_routes_back_to_discovery():
+    result = derive_resolution_state(
+        _row(),
+        candidate_count=0,
+        latest_analysis={
+            "validation_status": "manual_required",
+            "result": {"event_stage": "implemented"},
+        },
+    )
+
+    assert result["resolution_state"] == "discovery_pending"
+    assert result["state_reason"] == "no_current_implementation_candidate"
+    assert result["next_action"] == "discover_official_announcements"
+
+
 def test_reviewed_non_effective_is_terminal_but_empty_scan_is_retryable():
     reviewed = derive_resolution_state(
         _row(),
@@ -224,7 +239,7 @@ def test_unbounded_search_requires_manual_anchor():
     assert result["next_action"] == "manual_anchor_or_external_evidence"
 
 
-def test_rejected_review_does_not_confirm_model_only_cancellation():
+def test_rejected_model_only_cancellation_without_candidate_returns_to_discovery():
     result = derive_resolution_state(
         _row(),
         latest_analysis={
@@ -240,7 +255,9 @@ def test_rejected_review_does_not_confirm_model_only_cancellation():
         },
     )
 
-    assert result["resolution_state"] == "manual_required"
+    assert result["resolution_state"] == "discovery_pending"
+    assert result["state_reason"] == "no_current_implementation_candidate"
+    assert result["next_action"] == "discover_official_announcements"
     assert result["is_terminal"] is False
 
 
@@ -800,11 +817,17 @@ async def test_factor_scope_can_rebuild_already_resolved_requested_instrument():
         end_date="2026-07-21",
         exchanges=["SSE"],
         instrument_ids=["600108.SH"],
+        source_event_keys=["event-1"],
         scopes=["inventory", "factors"],
         dry_run=True,
     )
 
     assert result["factor_rebuild"]["status"] == "dry_run"
+    assert all(
+        call.kwargs["source_event_keys"] == ["event-1"]
+        for call in manager._load_cninfo_resolution_governance_inventory.await_args_list
+    )
+    assert result["parameters"]["source_event_keys"] == ["event-1"]
     assert manager.rebuild_cninfo_primary_adjustment_factors.await_args.kwargs[
         "instrument_ids"
     ] == ["600108.SH"]

@@ -13,7 +13,9 @@ from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
-from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all, delete, case
+from sqlalchemy import (
+    text, func, desc, asc, tuple_, literal, union_all, delete, case, and_, or_,
+)
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
@@ -4522,6 +4524,10 @@ class DatabaseOperations:
         offset: int = 0,
     ) -> Dict[str, Any]:
         """Return latest-analysis review cards with compact official lineage."""
+        from data_sources.cninfo_special_action_resolution import (
+            deterministic_title_match,
+        )
+
         normalized_limit = max(1, min(int(limit), 1000))
         normalized_offset = max(0, int(offset))
         normalized_reviewed_state = str(reviewed_state or "").strip().lower()
@@ -4542,6 +4548,27 @@ class DatabaseOperations:
         reviewed_exists = select(CorporateActionResolutionReviewDB.id).where(
             CorporateActionResolutionReviewDB.analysis_id
             == CorporateActionLlmAnalysisDB.id
+        ).exists()
+        active_candidate_exists = select(
+            CorporateActionEffectiveDateEvidenceDB.id
+        ).where(
+            CorporateActionEffectiveDateEvidenceDB.instrument_id
+            == CorporateActionLlmAnalysisDB.instrument_id,
+            CorporateActionEffectiveDateEvidenceDB.source_event_key
+            == CorporateActionLlmAnalysisDB.source_event_key,
+            CorporateActionEffectiveDateEvidenceDB.evidence_source
+            == "cninfo_announcement_metadata",
+            CorporateActionEffectiveDateEvidenceDB.resolution_status == "candidate",
+        ).exists()
+        no_current_candidate_state_exists = select(
+            CorporateActionResolutionStateDB.id
+        ).where(
+            CorporateActionResolutionStateDB.instrument_id
+            == CorporateActionLlmAnalysisDB.instrument_id,
+            CorporateActionResolutionStateDB.source_event_key
+            == CorporateActionLlmAnalysisDB.source_event_key,
+            CorporateActionResolutionStateDB.state_reason
+            == "no_current_implementation_candidate",
         ).exists()
         review_tier_expression = case(
             (
@@ -4580,6 +4607,13 @@ class DatabaseOperations:
             == CorporateActionLlmAnalysisDB.source_event_key,
             CorporateActionObservationDB.source == "cninfo",
             CorporateActionObservationDB.is_current.is_(True),
+            or_(
+                CorporateActionLlmAnalysisDB.validation_status == "failed",
+                and_(
+                    active_candidate_exists,
+                    ~no_current_candidate_state_exists,
+                ),
+            ),
         ]
         if instrument_id:
             filters.append(
@@ -4671,11 +4705,28 @@ class DatabaseOperations:
                     item_tier = str(item_tier or "machine_rework")
                     item_signature = str(item_signature or "analysis_failed")
                     review_reasons = [f"analysis_error:{item_signature}"]
+                    reason_codes = [
+                        "provider_retryable"
+                        if any(
+                            marker in item_signature
+                            for marker in ("retry", "transport", "timeout")
+                        )
+                        else "provider_or_pipeline_error"
+                    ]
+                    operator_summary = [
+                        "LLM/传输阶段失败，可重试，不应进入人工事实判断。"
+                        if reason_codes[0] == "provider_retryable"
+                        else "流水线失败，需先修复机器阶段。"
+                    ]
                 else:
                     item_tier = str(item_tier or "deep_review")
                     item_signature = str(item_signature or "")
                     review_reasons = list(
                         classification.get("review_reasons") or []
+                    )
+                    reason_codes = list(classification.get("reason_codes") or [])
+                    operator_summary = list(
+                        classification.get("operator_summary") or []
                     )
                 failed_gates = sorted(
                     name for name, passed in gates.items() if not bool(passed)
@@ -4689,6 +4740,8 @@ class DatabaseOperations:
                     "review_tier": item_tier,
                     "gate_signature": item_signature,
                     "review_reasons": review_reasons,
+                    "reason_codes": reason_codes,
+                    "operator_summary": operator_summary,
                     "failed_gates": failed_gates,
                 })
             selected = candidates
@@ -4725,6 +4778,10 @@ class DatabaseOperations:
                     })
 
             announcements_by_event: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            observations_by_event = {
+                item["analysis"].source_event_key: item["observation"]
+                for item in selected
+            }
             if event_keys:
                 announcement_rows = (await session.execute(
                     select(CorporateActionEffectiveDateEvidenceDB).where(
@@ -4739,6 +4796,39 @@ class DatabaseOperations:
                     )
                 )).scalars().all()
                 for evidence in announcement_rows:
+                    raw_payload = {}
+                    try:
+                        parsed_payload = json.loads(
+                            evidence.raw_payload_json or "{}"
+                        )
+                        if isinstance(parsed_payload, dict):
+                            raw_payload = parsed_payload
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        raw_payload = {}
+                    persisted_deterministic = raw_payload.get(
+                        "deterministic_match"
+                    )
+                    observation = observations_by_event.get(
+                        evidence.source_event_key
+                    )
+                    current_deterministic = deterministic_title_match(
+                        "",
+                        getattr(observation, "fiscal_period", None),
+                        evidence.announcement_title,
+                        getattr(observation, "action_type", None),
+                    )
+                    deterministic = (
+                        current_deterministic
+                        if current_deterministic.get("status") != "accepted"
+                        or not isinstance(persisted_deterministic, dict)
+                        else persisted_deterministic
+                    )
+                    effective_status = evidence.resolution_status
+                    if (
+                        effective_status == "candidate"
+                        and deterministic.get("status") != "accepted"
+                    ):
+                        effective_status = "rejected_by_current_policy"
                     announcements_by_event[evidence.source_event_key].append({
                         "evidence_key": evidence.evidence_key,
                         "announcement_id": evidence.announcement_id,
@@ -4746,6 +4836,17 @@ class DatabaseOperations:
                         "announcement_time": evidence.announcement_time,
                         "evidence_url": evidence.evidence_url,
                         "resolution_status": evidence.resolution_status,
+                        "effective_status": effective_status,
+                        "selection_reasons": raw_payload.get(
+                            "selection_reasons"
+                        ) or [],
+                        "deterministic_match": deterministic,
+                        "title_classification": raw_payload.get(
+                            "title_classification"
+                        ),
+                        "search_windows": raw_payload.get(
+                            "search_windows"
+                        ) or [],
                     })
 
             artifacts_by_id: dict[int, dict[str, Any]] = {}
@@ -4796,6 +4897,8 @@ class DatabaseOperations:
                     "review_tier": candidate["review_tier"],
                     "gate_signature": candidate["gate_signature"],
                     "review_reasons": candidate["review_reasons"],
+                    "reason_codes": candidate["reason_codes"],
+                    "operator_summary": candidate["operator_summary"],
                     "failed_gates": candidate["failed_gates"],
                     "reviewed": candidate["is_reviewed"],
                     "source": {

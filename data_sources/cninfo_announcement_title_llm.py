@@ -374,10 +374,15 @@ class CninfoAnnouncementTitleClassifier:
                                 "exactly once. Use possibly_relevant whenever a title could lead to "
                                 "an implementation, record-date, ex-date, share-arrival, rights, "
                                 "share-reform, or compensation-share document. Do not resolve an "
-                                "effective date or economic term. Classify event applicability from "
-                                "the supplied structured event only; use uncertain unless the text "
-                                "explicitly says no implementation, no distribution, or another "
-                                "share class. Return JSON only."
+                                "effective date or economic term. Match the reporting period "
+                                "strictly: an event marked 半年报/中报/中期 must not use a title "
+                                "marked 年报/年度, and an annual event must not use an interim "
+                                "title; an explicit fiscal year in the title must match the "
+                                "structured fiscal period. Treat such a title as unrelated even "
+                                "when the action words are otherwise similar. Classify event "
+                                "applicability from the supplied structured event only; use "
+                                "uncertain unless the text explicitly says no implementation, "
+                                "no distribution, or another share class. Return JSON only."
                             ),
                         ),
                         LlmMessage(

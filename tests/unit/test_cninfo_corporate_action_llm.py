@@ -247,6 +247,75 @@ def test_economic_binding_accepts_descriptive_unit_and_post_value_relation():
         ratio, ratio_binding, {"ratio": ratio_quote}
     )
 
+    split_span_quote = (
+        "以公司流通股本579,726,850股为基数，"
+        "公积金转增部分流通股股东每10股可获1.379960流通股。"
+    )
+    split_span_ratio = {
+        "fact_type": "capitalization_ratio",
+        "value": 1.379960,
+        "unit": "per_10_shares",
+        "beneficiary_scope": "circulating_shareholders",
+    }
+    split_span_binding = {
+        "evidence_id": "split",
+        "subject_text": "公积金转增部分流通股股东",
+        "relation_text": "每10股可获",
+        "value_text": "1.379960",
+        "unit_text": "流通股",
+        "basis_text": "以公司流通股本579,726,850股为基数",
+    }
+    assert _economic_semantic_binding_supported(
+        split_span_ratio,
+        split_span_binding,
+        {"split": split_span_quote},
+    )
+
+
+def test_v3_optional_invalid_auxiliary_primitive_does_not_veto_valid_terms():
+    page = _page()
+    result = _v3_result(page, include_verification=False)
+    result["economic_primitives"].append({
+        "fact_id": "auxiliary-base",
+        "fact_type": "base_share_count",
+        "value": 100,
+        "unit": "shares",
+        "beneficiary_scope": "all_shareholders",
+        "semantic_evidence": [{
+            "evidence_id": "ev-1",
+            "subject_text": "全体股东",
+            "relation_text": "派",
+            "value_text": "2.36",
+            "unit_text": "元",
+            "basis_text": "每10股",
+        }],
+    })
+    verification = _semantic_verification(result)
+    result["semantic_event_verification"] = {
+        key: verification[key]
+        for key in (
+            "schema_version", "instrument_id", "source_event_key",
+            "event_claim_hash", "event_match_supported", "event_type_supported",
+            "event_stage_supported", "unresolved_language",
+        )
+    }
+    result["semantic_verifications"] = verification["decisions"]
+    result["semantic_verifier_conflicts"] = verification["conflicts"]
+
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="dividend",
+    )
+    assert status == "validated_candidate"
+    assert gates["economic_primitives_in_evidence"] is True
+    assert normalized["economic_primitive_validation_warnings"] == [
+        "unusable_economic_primitive:auxiliary-base"
+    ]
+
     base_quote = "以现有流通股股本 160,800,000 股为基数实施本次方案。"
     base = {
         "fact_type": "base_share_count",
@@ -618,6 +687,31 @@ def test_v3_rejects_stale_semantic_verification_after_claim_change():
     )
     assert status == "manual_required"
     assert gates["semantic_verification_complete"] is False
+
+
+def test_v3_ignores_extra_verifier_decision_not_retained_by_extraction():
+    page = _page()
+    result = _v3_result(page)
+    result["semantic_verifications"].append({
+        "assertion_id": "not-retained-by-extraction",
+        "assertion_kind": "date_fact",
+        "assertion_hash": "unused",
+        "semantic_supported": True,
+        "type_or_role_supported": True,
+        "scope_supported": True,
+        "reason": "extra verifier output",
+    })
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "validated_candidate"
+    assert gates["semantic_verification_complete"] is True
+    assert normalized["_semantic_verifier_warnings"] == [
+        "ignored_extra_semantic_assertion:not-retained-by-extraction"
+    ]
 
 
 def test_v3_deduplicated_facts_remain_replayable():
@@ -1999,10 +2093,10 @@ async def test_async_resume_counts_revalidated_analysis_persistence(monkeypatch)
             "analysis_key": "existing-analysis-key",
             "instrument_id": "000001.SZ",
             "source_event_key": "event-1",
-            "input_hash": "matching-input-hash",
+            "input_hash": "legacy-input-hash",
             "validation_status": "manual_required",
             "schema_version": SCHEMA_VERSION,
-            "parser_version": PARSER_VERSION,
+            "parser_version": "cninfo_corporate_action_resolution_validator.v8",
             "result": normalized,
             "gate_results": gates,
         }]
@@ -2014,6 +2108,16 @@ async def test_async_resume_counts_revalidated_analysis_persistence(monkeypatch)
         CninfoCorporateActionLlmResolver,
         "input_hash",
         lambda self, event, pages: "matching-input-hash",
+    )
+    monkeypatch.setattr(
+        CninfoCorporateActionLlmResolver,
+        "input_hash_for_parser",
+        lambda self, event, pages, *, parser_version: (
+            "legacy-input-hash"
+            if parser_version
+            == "cninfo_corporate_action_resolution_validator.v8"
+            else "matching-input-hash"
+        ),
     )
     client = SimpleNamespace(complete=AsyncMock())
 
@@ -2040,6 +2144,46 @@ async def test_async_resume_counts_revalidated_analysis_persistence(monkeypatch)
     assert result["counts"]["persisted_analyses"] == 1
     client.complete.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
+    saved = manager.db_ops.save_corporate_action_llm_analysis.await_args.args[0]
+    assert saved["analysis_key"] != "existing-analysis-key"
+    assert saved["parser_version"] == PARSER_VERSION
+    assert saved["input_hash"] == "matching-input-hash"
+
+
+@pytest.mark.asyncio
+async def test_direct_resolution_rejects_stale_period_candidate_before_llm():
+    candidate_row = {
+        **_candidate_observation_row(),
+        "instrument_id": "000007.SZ",
+        "source_event_key": "event-interim",
+        "source_profile": "cninfo_dividend",
+        "action_type": "mixed_distribution",
+        "fiscal_period": "1992半年报",
+        "announcement_id": "12598339",
+        "announcement_title": "1992年度分红派息公告",
+    }
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[candidate_row])
+    client = SimpleNamespace(complete=AsyncMock())
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="1990-12-19",
+        end_date="2026-07-24",
+        exchanges=["SZSE"],
+        instrument_ids=["000007.SZ"],
+        max_events=1,
+        dry_run=True,
+        llm_client=client,
+    )
+
+    assert result["targets"]["candidate_events"] == 0
+    assert result["targets"]["batch_events"] == 0
+    assert result["targets"]["candidate_rows_rejected_by_current_policy"] == 1
+    assert result["targets"]["candidate_policy_rejection_samples"][0][
+        "reason"
+    ].startswith("period_mismatch:")
+    client.complete.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -2828,7 +2972,7 @@ async def test_resume_persistence_failure_does_not_overwrite_prior_analysis(
     client.complete.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_awaited_once()
     saved_payload = manager.db_ops.save_corporate_action_llm_analysis.await_args.args[0]
-    assert saved_payload["analysis_key"] == "existing-analysis-key"
+    assert saved_payload["analysis_key"] != "existing-analysis-key"
     assert saved_payload["validation_status"] == "validated_candidate"
     assert saved_payload["result"]
 

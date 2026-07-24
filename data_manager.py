@@ -26,7 +26,7 @@ import re
 import sqlite3
 from calendar import monthrange
 from pathlib import Path
-from typing import Callable, List, Dict, Any, Iterable, Optional, Tuple, Union, Set
+from typing import Callable, List, Dict, Any, Iterable, Mapping, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta, timezone
 from dataclasses import asdict, dataclass, field, replace
 
@@ -19632,6 +19632,8 @@ class DataManager:
         )
         from data_sources.cninfo_special_action_resolution import (
             best_structured_anchor,
+            classify_special_action,
+            deterministic_title_match,
             is_implementation_grade_decision,
         )
 
@@ -19734,6 +19736,11 @@ class DataManager:
             for row in rows
             if row.get("source_event_key")
         ]
+        row_by_event = {
+            str(row.get("source_event_key") or "").strip(): row
+            for row in rows
+            if row.get("source_event_key")
+        }
         candidate_counts: Dict[str, int] = {}
         resolved_by_event: Dict[str, Dict[str, Any]] = {}
         resolved_dates_by_event: Dict[str, Set[date]] = defaultdict(set)
@@ -19753,7 +19760,8 @@ class DataManager:
             )
             classified_evidence_rows = await self.db_ops.execute_read_query(
                 f"""
-                SELECT id, source_event_key, resolution_status, raw_payload_json
+                SELECT id, source_event_key, resolution_status,
+                       announcement_title, raw_payload_json
                 FROM corporate_action_effective_date_evidence
                 WHERE source_event_key IN ({placeholders})
                   AND observation_source = 'cninfo'
@@ -19788,9 +19796,44 @@ class DataManager:
                         title_applicability_values_by_event[event_key].add(
                             applicability_value
                         )
+                event_row = row_by_event.get(event_key) or {}
+                event_class = str(
+                    payload.get("event_class")
+                    or classify_special_action(event_row)
+                    or ""
+                )
+                deterministic = payload.get("deterministic_match")
+                if not isinstance(deterministic, dict):
+                    if item.get("announcement_title"):
+                        deterministic = deterministic_title_match(
+                            event_class,
+                            event_row.get("fiscal_period"),
+                            item.get("announcement_title"),
+                            event_row.get("action_type"),
+                        )
+                    else:
+                        # Older fixtures/rows may not retain the title; keep
+                        # their governed candidate count until discovery
+                        # refreshes the metadata.
+                        deterministic = {"status": "accepted"}
+                elif (
+                    deterministic.get("status") == "accepted"
+                    and item.get("announcement_title")
+                ):
+                    # Re-evaluate current hard gates so old accepted candidates
+                    # cannot keep an invalid period binding alive.
+                    current_deterministic = deterministic_title_match(
+                        event_class,
+                        event_row.get("fiscal_period"),
+                        item.get("announcement_title"),
+                        event_row.get("action_type"),
+                    )
+                    if current_deterministic.get("status") != "accepted":
+                        deterministic = current_deterministic
                 if (
                     str(item.get("resolution_status") or "") == "candidate"
                     and is_implementation_grade_decision(decision)
+                    and str(deterministic.get("status") or "") == "accepted"
                 ):
                     candidate_counts[event_key] = (
                         candidate_counts.get(event_key, 0) + 1
@@ -20013,6 +20056,7 @@ class DataManager:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
         scopes: Optional[List[str]] = None,
         max_events: int = 100,
         target_offset: int = 0,
@@ -20060,6 +20104,7 @@ class DataManager:
         if unsupported:
             raise ValueError(f"unsupported A-share exchanges: {unsupported}")
         normalized_ids = normalize_string_list(instrument_ids)
+        normalized_event_keys = normalize_string_list(source_event_keys)
         normalized_scopes = [
             item.lower() for item in normalize_string_list(scopes)
         ] or ["inventory", "discovery", "resolution"]
@@ -20091,6 +20136,7 @@ class DataManager:
                 "end": normalized_end.isoformat(),
                 "exchanges": normalized_exchanges,
                 "instrument_ids": sorted(normalized_ids),
+                "source_event_keys": sorted(normalized_event_keys),
                 "scopes": normalized_scopes,
                 "max_events": limit,
                 "offset": offset,
@@ -20121,6 +20167,7 @@ class DataManager:
             end_date=normalized_end,
             exchanges=normalized_exchanges,
             instrument_ids=normalized_ids or None,
+            source_event_keys=normalized_event_keys or None,
         )
         actionable = [
             item for item in inventory
@@ -20343,6 +20390,7 @@ class DataManager:
                 end_date=normalized_end,
                 exchanges=normalized_exchanges,
                 instrument_ids=normalized_ids or None,
+                source_event_keys=normalized_event_keys or None,
                 scan_status_by_event=scan_status_by_event,
                 error_by_event=error_by_event,
             )
@@ -20457,6 +20505,7 @@ class DataManager:
             end_date=normalized_end,
             exchanges=normalized_exchanges,
             instrument_ids=normalized_ids or None,
+            source_event_keys=normalized_event_keys or None,
             scan_status_by_event=scan_status_by_event,
             error_by_event=error_by_event,
         )
@@ -20562,6 +20611,7 @@ class DataManager:
                 "end_date": normalized_end.isoformat(),
                 "exchanges": normalized_exchanges,
                 "instrument_ids": normalized_ids,
+                "source_event_keys": normalized_event_keys,
                 "scopes": normalized_scopes,
                 "max_events": limit,
                 "target_offset": offset,
@@ -21937,6 +21987,11 @@ class DataManager:
         """Reuse only analyses whose completed semantic output passes current gates."""
         if not analysis:
             return None
+        from data_sources.cninfo_corporate_action_llm import (
+            PARSER_VERSION,
+            validate_analysis,
+        )
+
         result = deepcopy(analysis.get("result") or {})
         verifier = result.get("_semantic_verifier")
         verifier_status = (
@@ -21944,7 +21999,10 @@ class DataManager:
             if isinstance(verifier, dict)
             else ""
         )
-        if analysis.get("validation_status") == "validated_candidate":
+        if (
+            analysis.get("validation_status") == "validated_candidate"
+            and analysis.get("parser_version") == PARSER_VERSION
+        ):
             return analysis
         if verifier_status != "success":
             dm_logger.info(
@@ -21955,11 +22013,6 @@ class DataManager:
                 verifier_status or "missing",
             )
             return None
-        from data_sources.cninfo_corporate_action_llm import (
-            PARSER_VERSION,
-            validate_analysis,
-        )
-
         result["analysis_status"] = "resolved_candidate"
         try:
             status, gates, normalized = validate_analysis(
@@ -22023,8 +22076,15 @@ class DataManager:
     ) -> tuple[Dict[str, Any], bool]:
         if not analysis.get("_resume_revalidated"):
             return analysis, False
+        current_analysis_key = hashlib.sha256(
+            (
+                f"{analysis.get('source_event_key')}:"
+                f"{analysis.get('input_hash')}:"
+                f"{analysis.get('schema_version')}"
+            ).encode()
+        ).hexdigest()
         saved = await self.db_ops.save_corporate_action_llm_analysis({
-            "analysis_key": analysis.get("analysis_key"),
+            "analysis_key": current_analysis_key,
             "instrument_id": analysis.get("instrument_id"),
             "source_event_key": analysis.get("source_event_key"),
             "analysis_status": analysis.get("analysis_status"),
@@ -22046,6 +22106,7 @@ class DataManager:
             "ingestion_run_id": run_id,
         })
         updated = dict(analysis)
+        updated["analysis_key"] = current_analysis_key
         if isinstance(saved, dict) and saved.get("analysis_id"):
             updated["analysis_id"] = saved["analysis_id"]
         return updated, bool(saved)
@@ -22079,6 +22140,7 @@ class DataManager:
         from data_sources.cninfo_corporate_action_llm import (
             PARSER_VERSION,
             PROMPT_VERSION,
+            REVALIDATABLE_PARSER_VERSIONS,
             SCHEMA_VERSION,
         )
         from data_sources.cninfo_corporate_action_pipeline import (
@@ -22256,6 +22318,18 @@ class DataManager:
                     current_input_hash = resolver.input_hash(event, pages)
                     matching_analysis = None
                     if resume and not dry_run:
+                        resumable_input_hashes = {
+                            PARSER_VERSION: current_input_hash,
+                            **{
+                                parser_version: resolver.input_hash_for_parser(
+                                    event,
+                                    pages,
+                                    parser_version=parser_version,
+                                )
+                                for parser_version in REVALIDATABLE_PARSER_VERSIONS
+                                if parser_version != PARSER_VERSION
+                            },
+                        }
                         prior = await self.db_ops.get_corporate_action_llm_analyses(
                             instrument_id=event["instrument_id"],
                             source_event_key=source_event_key,
@@ -22264,9 +22338,12 @@ class DataManager:
                         )
                         matching_analysis = next((
                             row for row in prior.get("items", [])
-                            if row.get("input_hash") == current_input_hash
-                            and row.get("schema_version") == SCHEMA_VERSION
-                            and row.get("parser_version") == PARSER_VERSION
+                            if row.get("schema_version") == SCHEMA_VERSION
+                            and row.get("parser_version")
+                            in REVALIDATABLE_PARSER_VERSIONS
+                            and row.get("input_hash") == resumable_input_hashes.get(
+                                row.get("parser_version")
+                            )
                             and row.get("validation_status") in {
                                 "validated_candidate",
                                 "manual_required",
@@ -22280,6 +22357,11 @@ class DataManager:
                             allowed_start=normalized_start,
                             allowed_end=normalized_end,
                         )
+                        if (
+                            matching_analysis is not None
+                            and matching_analysis.get("_resume_revalidated")
+                        ):
+                            matching_analysis["input_hash"] = current_input_hash
                     analysis = None
                     analysis_error = None
                     if matching_analysis is None:
@@ -22597,11 +22679,16 @@ class DataManager:
             CninfoCorporateActionLlmResolver,
             PARSER_VERSION,
             PROMPT_VERSION,
+            REVALIDATABLE_PARSER_VERSIONS,
             SCHEMA_VERSION,
         )
         from data_sources.cninfo_corporate_action_pipeline import (
             CninfoCorporateActionPipelineConfig,
             normalize_cninfo_pipeline_exchanges,
+        )
+        from data_sources.cninfo_special_action_resolution import (
+            classify_special_action,
+            deterministic_title_match,
         )
         task_started = asyncio.get_running_loop().time()
         normalized_start = date.fromisoformat(str(start_date or "1990-12-19")[:10])
@@ -22667,6 +22754,7 @@ class DataManager:
                 "review_workload": {
                     "tiers": {},
                     "gate_signatures": {},
+                    "reason_codes": {},
                     "remaining_manual_review": 0,
                 },
                 "auto_promotion": {
@@ -22842,7 +22930,22 @@ class DataManager:
             },
         )
         grouped: Dict[str, Dict[str, Any]] = {}
+        candidate_policy_rejections: List[Dict[str, Any]] = []
         for row in rows:
+            deterministic = deterministic_title_match(
+                classify_special_action(row) or "",
+                row.get("fiscal_period"),
+                row.get("announcement_title"),
+                row.get("action_type"),
+            )
+            if deterministic.get("status") != "accepted":
+                candidate_policy_rejections.append({
+                    "instrument_id": row.get("instrument_id"),
+                    "source_event_key": row.get("source_event_key"),
+                    "announcement_id": row.get("announcement_id"),
+                    "reason": deterministic.get("reason"),
+                })
+                continue
             key = str(row.get("source_event_key") or "").strip()
             if not key:
                 continue
@@ -22883,9 +22986,11 @@ class DataManager:
         ).hexdigest()[:16]
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution candidates loaded: run_id=%s "
-            "evidence_rows=%s candidate_events=%s batch_events=%s has_more=%s",
+            "evidence_rows=%s current_policy_rejections=%s "
+            "candidate_events=%s batch_events=%s has_more=%s",
             run_id,
             len(rows),
+            len(candidate_policy_rejections),
             len(all_events),
             len(batch),
             has_more,
@@ -22920,7 +23025,20 @@ class DataManager:
                 "excluded_exchanges": excluded_exchanges,
                 "pipeline": pipeline_config.to_dict(),
             },
-            "targets": {"candidate_events": len(all_events), "batch_events": len(batch), "has_more": has_more, "next_target_offset": offset + len(batch) if has_more else None},
+            "targets": {
+                "candidate_events": len(all_events),
+                "candidate_rows_rejected_by_current_policy": len(
+                    candidate_policy_rejections
+                ),
+                "candidate_policy_rejection_samples": (
+                    candidate_policy_rejections[: max(0, int(sample_limit))]
+                ),
+                "batch_events": len(batch),
+                "has_more": has_more,
+                "next_target_offset": (
+                    offset + len(batch) if has_more else None
+                ),
+            },
             "counts": {"processed": 0, "analyzed": 0, "resumed": 0, "validated_candidates": 0, "manual_required": 0, "llm_disabled": 0, "document_failures": 0, "errors": 0, "persisted_analyses": 0},
             "review_workload": {
                 "tiers": {
@@ -22931,6 +23049,7 @@ class DataManager:
                     "deep_review": 0,
                 },
                 "gate_signatures": {},
+                "reason_codes": {},
                 "remaining_manual_review": 0,
             },
             "auto_promotion": {
@@ -22987,6 +23106,22 @@ class DataManager:
             reason_counts[reason] = int(reason_counts.get(reason, 0)) + 1
             if len(promotion["samples"]) < max(0, int(sample_limit)):
                 promotion["samples"].append(outcome)
+
+        def _record_reason_codes(
+            classification: Mapping[str, Any] | None,
+            *,
+            fallback: str | None = None,
+        ) -> None:
+            codes = [
+                str(item).strip()
+                for item in ((classification or {}).get("reason_codes") or [])
+                if str(item).strip()
+            ]
+            if not codes and fallback:
+                codes = [fallback]
+            counts = result["review_workload"]["reason_codes"]
+            for code in dict.fromkeys(codes):
+                counts[code] = int(counts.get(code, 0)) + 1
         llm_config = self.config.get_llm_config()
         if llm_client is None:
             if not llm_config.enabled or not (llm_config.profiles.get(profile) and llm_config.profiles[profile].enabled):
@@ -23096,6 +23231,15 @@ class DataManager:
                         (analysis.get("result") or {}).get(
                             "_review_classification"
                         ) or {}
+                    )
+                    _record_reason_codes(
+                        classification,
+                        fallback=(
+                            "validated_candidate_requires_explicit_review"
+                            if analysis.get("validation_status")
+                            == "validated_candidate"
+                            else "semantic_event_ambiguous"
+                        ),
                     )
                     review_tier = str(
                         classification.get("review_tier") or "deep_review"
@@ -23356,6 +23500,18 @@ class DataManager:
                 )
                 try:
                     if resume and not dry_run:
+                        resumable_input_hashes = {
+                            PARSER_VERSION: current_input_hash,
+                            **{
+                                parser_version: resolver.input_hash_for_parser(
+                                    event,
+                                    pages,
+                                    parser_version=parser_version,
+                                )
+                                for parser_version in REVALIDATABLE_PARSER_VERSIONS
+                                if parser_version != PARSER_VERSION
+                            },
+                        }
                         prior = await self.db_ops.get_corporate_action_llm_analyses(
                             instrument_id=event["instrument_id"],
                             source_event_key=event["source_event_key"],
@@ -23364,9 +23520,12 @@ class DataManager:
                         )
                         matching_analysis = next((
                             item for item in prior.get("items", [])
-                            if item.get("input_hash") == current_input_hash
-                            and item.get("schema_version") == SCHEMA_VERSION
-                            and item.get("parser_version") == PARSER_VERSION
+                            if item.get("schema_version") == SCHEMA_VERSION
+                            and item.get("parser_version")
+                            in REVALIDATABLE_PARSER_VERSIONS
+                            and item.get("input_hash") == resumable_input_hashes.get(
+                                item.get("parser_version")
+                            )
                             and item.get("validation_status")
                             in {"validated_candidate", "manual_required", "no_matching_evidence"}
                         ), None)
@@ -23377,6 +23536,11 @@ class DataManager:
                             allowed_start=normalized_start,
                             allowed_end=normalized_end,
                         )
+                        if (
+                            matching_analysis is not None
+                            and matching_analysis.get("_resume_revalidated")
+                        ):
+                            matching_analysis["input_hash"] = current_input_hash
                         if matching_analysis is not None:
                             try:
                                 matching_analysis, persisted = (
@@ -23406,6 +23570,10 @@ class DataManager:
                                 (matching_analysis.get("result") or {}).get(
                                     "_review_classification"
                                 ) or {}
+                            )
+                            _record_reason_codes(
+                                classification,
+                                fallback="semantic_event_ambiguous",
                             )
                             review_tier = str(
                                 classification.get("review_tier") or "deep_review"
@@ -23448,6 +23616,15 @@ class DataManager:
                         result["counts"]["manual_required"] += 1
                     classification = (
                         analysis.result.get("_review_classification") or {}
+                    )
+                    _record_reason_codes(
+                        classification,
+                        fallback=(
+                            "validated_candidate_requires_explicit_review"
+                            if analysis.validation_status
+                            == "validated_candidate"
+                            else "semantic_event_ambiguous"
+                        ),
                     )
                     review_tier = str(
                         classification.get("review_tier") or "deep_review"
@@ -23570,6 +23747,17 @@ class DataManager:
                     signature_counts[error_signature] = int(
                         signature_counts.get(error_signature, 0)
                     ) + 1
+                    _record_reason_codes(
+                        {},
+                        fallback=(
+                            "provider_retryable"
+                            if any(
+                                marker in llm_error_code
+                                for marker in ("retry", "transport", "timeout")
+                            )
+                            else "provider_or_pipeline_error"
+                        ),
+                    )
                     result["errors"].append({
                         "source_event_key": event["source_event_key"],
                         "code": llm_error_code,

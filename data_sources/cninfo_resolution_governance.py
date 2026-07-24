@@ -310,6 +310,16 @@ def derive_resolution_state(
                 str(error_code),
                 "retry_failed_stage",
             )
+        elif latest_analysis and candidate_count <= 0:
+            # A prior semantic analysis may reference a candidate that the
+            # current deterministic title/period policy now rejects.  Force
+            # rediscovery before reusing the stale analysis; otherwise the
+            # event remains trapped in retry_or_review indefinitely.
+            state, reason, next_action = (
+                "discovery_pending",
+                "no_current_implementation_candidate",
+                "discover_official_announcements",
+            )
         elif latest_analysis:
             validation = str(latest_analysis.get("validation_status") or "")
             result = latest_analysis.get("result") or {}

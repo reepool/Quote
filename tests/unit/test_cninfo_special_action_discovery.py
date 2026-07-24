@@ -8,6 +8,12 @@ from data_manager import DataManager
 from data_sources.cninfo_announcement_title_llm import (
     TITLE_CLASSIFICATION_SCHEMA_VERSION,
 )
+from data_sources.cninfo_special_action_resolution import (
+    announcement_match_reasons,
+    build_search_target,
+    deterministic_title_match,
+    period_mismatch_reason,
+)
 from research.announcements import (
     AnnouncementAttachment,
     AnnouncementRecord,
@@ -102,6 +108,111 @@ def _event_row(
         "quality_status": "partial_missing_ex_date",
         "raw_payload_json": '{"分红类型": "股改分红"}',
     }
+
+
+def test_interim_event_does_not_match_annual_notice_title():
+    row = {
+        **_event_row(),
+        "fiscal_period": "1992半年报",
+        "description": "10送2股派0.5元",
+    }
+    target = build_search_target(
+        row,
+        trading_days=[
+            date(1992, 11, 7),
+            date(1992, 11, 10),
+            date(1993, 5, 28),
+            date(1993, 5, 31),
+        ],
+    )
+    assert target is not None
+    assert announcement_match_reasons(
+        target,
+        "深圳市赛格达声股份有限公司1992年度分红派息公告",
+    ) == []
+
+
+def test_annual_event_still_matches_annual_notice_title():
+    row = {
+        **_event_row(),
+        "fiscal_period": "1992年报",
+        "description": "10送2股",
+        "raw_payload_json": "{}",
+    }
+    target = build_search_target(
+        row,
+        trading_days=[
+            date(1993, 5, 28),
+            date(1993, 5, 31),
+        ],
+    )
+    assert target is not None
+    reasons = announcement_match_reasons(
+        target,
+        "深圳市赛格达声股份有限公司1992年度分红派息公告",
+    )
+    assert reasons
+
+
+def test_period_mismatch_reason_is_available_for_stale_audit_rows():
+    assert period_mismatch_reason(
+        "1992半年报",
+        "深圳市赛格达声股份有限公司1992年度分红派息公告",
+    ) == "period_mismatch:interim_event_with_annual_notice"
+
+
+def test_period_mismatch_normalizes_fullwidth_years():
+    assert period_mismatch_reason(
+        "1992年报",
+        "公司１９９３年度权益分派实施公告",
+    ) == "period_mismatch:fiscal_year=1992:title_year=1993"
+
+
+def test_annual_event_rejects_annual_worded_interim_notice():
+    assert period_mismatch_reason(
+        "2006年报",
+        "公司2006年度中期权益分派实施公告",
+    ) == "period_mismatch:annual_event_with_interim_notice"
+
+
+def test_deterministic_title_match_exposes_rejection_reason():
+    decision = deterministic_title_match(
+        "missing_date_distribution",
+        "1992半年报",
+        "达声93年配股说明书重要提示",
+        "mixed_distribution",
+    )
+    assert decision["status"] == "rejected"
+    assert decision["reason"] == (
+        "incompatible_action_term:rights_issue_for_non_rights_event"
+    )
+
+
+def test_llm_title_gate_does_not_treat_exclusion_words_as_authoritative():
+    row = {
+        **_event_row(),
+        "fiscal_period": "2005年报",
+        "description": "10送2股",
+        "raw_payload_json": "{}",
+    }
+    target = build_search_target(
+        row,
+        trading_days=[date(2024, 6, 20), date(2024, 6, 21)],
+    )
+    assert target is not None
+    decision = deterministic_title_match(
+        target.event_class,
+        row["fiscal_period"],
+        "关于取消原方案并实施调整后权益安排的公告",
+        row.get("action_type"),
+    )
+    assert decision["status"] == "accepted"
+    assert decision["lexical_match"] is False
+    assert decision["lexical_exclusion_hits"] == ["取消"]
+    assert announcement_match_reasons(
+        target,
+        "关于取消原方案并实施调整后权益安排的公告",
+    ) == []
 
 
 def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
@@ -634,6 +745,42 @@ async def test_relevant_context_title_is_rejected_from_semantic_candidates():
     rows = manager.db_ops.save_corporate_action_effective_date_evidence.await_args.args[0]
     assert rows[0]["resolution_status"] == "rejected"
     assert result["target_samples"][0]["scan_complete"] is True
+
+
+@pytest.mark.asyncio
+async def test_llm_relevant_but_lexically_unfamiliar_title_is_selected():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(
+            title="关于本公司股东回报事项执行结果的公告"
+        )
+    )
+    client = SimpleNamespace(
+        complete=AsyncMock(return_value=_title_llm_response(
+            relevance="relevant",
+            role="implementation",
+        ))
+    )
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["evidence"]["candidate_count"] == 1
+    assert result["evidence"]["rejected_count"] == 0
+    rows = manager.db_ops.save_corporate_action_effective_date_evidence.await_args.args[0]
+    assert rows[0]["resolution_status"] == "candidate"
+    assert rows[0]["raw_payload"]["deterministic_match"] == {
+        "status": "accepted",
+        "reason": None,
+    }
+    diagnostics = rows[0]["raw_payload"]["lexical_diagnostics"]
+    assert diagnostics[0] == "event_class:share_reform"
+    assert not any(item.startswith("action_term:") for item in diagnostics)
 
 
 @pytest.mark.asyncio

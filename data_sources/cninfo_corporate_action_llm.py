@@ -27,7 +27,11 @@ PROMPT_VERSION = "cninfo_corporate_action_resolution_prompt.v4"
 SEMANTIC_VERIFICATION_PROMPT_VERSION = (
     "cninfo_corporate_action_semantic_verification_prompt.v1"
 )
-PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v8"
+PARSER_VERSION = "cninfo_corporate_action_resolution_validator.v9"
+REVALIDATABLE_PARSER_VERSIONS = frozenset({
+    PARSER_VERSION,
+    "cninfo_corporate_action_resolution_validator.v8",
+})
 AUTO_PROMOTION_POLICY_VERSION = "cninfo_corporate_action_auto_promotion.v1"
 AUTO_PROMOTION_REVIEWER = "system:cninfo_auto_promotion.v1"
 AUTO_PROMOTION_MIN_CONFIDENCE = Decimal("0.90")
@@ -1217,20 +1221,38 @@ def _evidence_decimal(value: Any) -> Optional[Decimal]:
     return _decimal(compact)
 
 
-def _basis_matches_unit(unit: str, basis_text: Any, unit_text: str) -> bool:
+def _basis_matches_unit(
+    unit: str,
+    basis_text: Any,
+    unit_text: str,
+    relation_text: Any = None,
+) -> bool:
     basis = re.sub(r"\s+", "", _semantic_span(basis_text))
+    relation = re.sub(r"\s+", "", _semantic_span(relation_text))
+    unit_contexts = [value for value in (basis, relation) if value]
     compact_unit = re.sub(r"\s+", "", unit_text)
     if unit in {"per_10_shares", "CNY_per_10_shares"}:
-        return bool(re.fullmatch(r"每(?:持有)?(?:10|十)股.{0,16}", basis))
+        return any(
+            re.fullmatch(r"每(?:持有)?(?:10|十)股.{0,16}", value)
+            for value in unit_contexts
+        )
     if unit in {"per_share", "CNY_per_share"}:
         return bool(
-            re.fullmatch(r"每(?:(?:1|一))?股", basis)
+            any(
+                re.fullmatch(r"每(?:(?:1|一))?股", value)
+                for value in unit_contexts
+            )
             or re.search(r"/股$", compact_unit)
         )
     return basis_text in {None, ""}
 
 
-def _unit_text_matches(unit: str, unit_text: Any, basis_text: Any) -> bool:
+def _unit_text_matches(
+    unit: str,
+    unit_text: Any,
+    basis_text: Any,
+    relation_text: Any = None,
+) -> bool:
     compact = re.sub(r"\s+", "", _semantic_span(unit_text))
     currency_unit = re.sub(
         r"[（(](?:含税|不含税|税前|税后)[）)]$",
@@ -1240,21 +1262,32 @@ def _unit_text_matches(unit: str, unit_text: Any, basis_text: Any) -> bool:
     if unit == "10k_CNY":
         return currency_unit in {"万元", "人民币万元"}
     if unit == "CNY":
-        return currency_unit in {"元", "人民币元"}
+        return currency_unit in {"元", "人民币元", "元人民币"}
     if unit == "10k_shares":
-        return compact == "万股"
+        return bool(re.fullmatch(r"(?:[\u4e00-\u9fffA-Za-z]{0,12})万股(?:份)?", compact))
     if unit == "shares":
-        return compact == "股"
+        return bool(re.fullmatch(r"(?:[\u4e00-\u9fffA-Za-z]{0,12})股(?:份)?", compact))
     if unit in {"CNY_per_share", "CNY_per_10_shares"}:
-        return currency_unit in {"元", "人民币元", "元/股", "人民币元/股"} and (
-            _basis_matches_unit(unit, basis_text, currency_unit)
+        return currency_unit in {
+            "元", "人民币元", "元人民币", "元/股", "人民币元/股",
+        } and (
+            _basis_matches_unit(unit, basis_text, currency_unit, relation_text)
         )
     if unit in {"per_share", "per_10_shares"}:
         share_unit = bool(
             compact == "股/股"
-            or re.fullmatch(r"股[^0-9０-９元]{0,10}", compact)
+            or re.fullmatch(
+                r"(?:[\u4e00-\u9fffA-Za-z]{0,12})股(?:份)?"
+                r"(?:/股)?",
+                compact,
+            )
         )
-        return share_unit and _basis_matches_unit(unit, basis_text, compact)
+        return share_unit and _basis_matches_unit(
+            unit,
+            basis_text,
+            compact,
+            relation_text,
+        )
     return False
 
 
@@ -1308,7 +1341,7 @@ def _economic_semantic_binding_supported(
     if value is None or _evidence_decimal(value_text) != value:
         return False
     unit = str(primitive.get("unit") or "").strip()
-    if not _unit_text_matches(unit, unit_text, basis_value):
+    if not _unit_text_matches(unit, unit_text, basis_value, relation_text):
         return False
     for relation_start, relation_end in positions[relation_text]:
         for value_start, value_end in positions[value_text]:
@@ -1372,6 +1405,7 @@ def _semantic_verification_state(
     decisions = result.get("semantic_verifications")
     decisions_by_id: dict[str, dict[str, Any]] = {}
     decisions_valid = isinstance(decisions, list)
+    extra_assertion_ids: list[str] = []
     for item in decisions if isinstance(decisions, list) else []:
         if not isinstance(item, Mapping):
             decisions_valid = False
@@ -1379,6 +1413,12 @@ def _semantic_verification_state(
         decision = dict(item)
         assertion_id = str(decision.get("assertion_id") or "").strip()
         expected = expected_assertions.get(assertion_id)
+        if expected is None and assertion_id:
+            # Older verifier responses occasionally carried a decision for an
+            # assertion that the extraction did not retain. It cannot support
+            # a resolved field, so ignore it while preserving an audit note.
+            extra_assertion_ids.append(assertion_id)
+            continue
         if (
             not assertion_id
             or assertion_id in decisions_by_id
@@ -1389,6 +1429,14 @@ def _semantic_verification_state(
             decisions_valid = False
             continue
         decisions_by_id[assertion_id] = decision
+    if extra_assertion_ids:
+        result["_semantic_verifier_warnings"] = list(dict.fromkeys([
+            *(result.get("_semantic_verifier_warnings") or []),
+            *(
+                f"ignored_extra_semantic_assertion:{assertion_id}"
+                for assertion_id in extra_assertion_ids
+            ),
+        ]))
     decisions_valid = bool(
         decisions_valid
         and set(decisions_by_id) == set(expected_assertions)
@@ -1996,6 +2044,66 @@ def _derive_review_classification(
         "resolved_fields",
     }
     stage = str(event_stage or "").strip()
+    reason_codes: list[str] = []
+    if "no_conflict" in failed:
+        reason_codes.append("source_event_conflict")
+    if any(
+        name in failed
+        for name in (
+            "date_in_evidence",
+            "date_facts_in_evidence",
+            "date_range",
+            "resolved_fields",
+            "effective_date_type_compatible",
+        )
+    ):
+        reason_codes.append("missing_effective_date_evidence")
+    if any(
+        name in failed
+        for name in (
+            "economic_primitives_in_evidence",
+            "economic_terms_in_evidence",
+            "economic_term_units",
+        )
+    ):
+        reason_codes.append("economic_term_reconciliation_failed")
+    if "context_complete" in failed:
+        reason_codes.append("context_incomplete")
+    if stage in {
+        "approved", "proposal", "expected", "cancelled", "corrected", "ambiguous",
+    }:
+        reason_codes.append(
+            "proposal_not_implemented"
+            if stage in {"approved", "proposal", "expected"}
+            else "semantic_event_ambiguous"
+        )
+    if any(
+        name in failed
+        for name in (
+            "event_match_semantically_verified",
+            "event_type_compatible",
+            "event_stage_semantically_verified",
+            "semantic_verification_complete",
+            "semantic_verifier_no_conflict",
+            "no_unresolved_language",
+        )
+    ):
+        reason_codes.append("semantic_event_ambiguous")
+    if status == "no_matching_evidence":
+        reason_codes.append("missing_official_evidence")
+    if not reason_codes and status == "validated_candidate":
+        reason_codes.append("validated_candidate_requires_explicit_review")
+    reason_codes = list(dict.fromkeys(reason_codes))
+    summary_by_code = {
+        "source_event_conflict": "Structured event and selected announcement disagree on dates or economic terms.",
+        "missing_effective_date_evidence": "The official text does not support a usable effective-date role.",
+        "economic_term_reconciliation_failed": "Economic terms are missing, unit-inconsistent, or not bound to official text.",
+        "context_incomplete": "The LLM input omitted or truncated official context.",
+        "proposal_not_implemented": "The notice is a proposal, approval, or expected stage rather than an implemented event.",
+        "semantic_event_ambiguous": "Event identity, type, stage, or semantic verification is unresolved.",
+        "missing_official_evidence": "No matching official announcement evidence was found.",
+        "validated_candidate_requires_explicit_review": "All machine gates passed; an explicit review decision is still required.",
+    }
     if status == "validated_candidate":
         tier = "quick_review"
         reasons = ["validated_candidate_requires_explicit_review"]
@@ -2020,6 +2128,10 @@ def _derive_review_classification(
         "review_tier": tier,
         "gate_signature": gate_signature,
         "review_reasons": reasons,
+        "reason_codes": reason_codes,
+        "operator_summary": [
+            summary_by_code[code] for code in reason_codes if code in summary_by_code
+        ],
     }
 
 
@@ -2729,19 +2841,60 @@ def _validate_analysis_v3(
             date_ok = False
     gates["date_range"] = date_ok
 
-    primitives, all_primitives_valid = _validated_v3_economic_primitives(
+    primitives, _all_primitives_valid = _validated_v3_economic_primitives(
         normalized.get("economic_primitives"), quotes_by_id, decisions_by_id
     )
     economic_terms = normalized.get("economic_terms")
     has_model_terms = isinstance(economic_terms, Mapping) and any(
         economic_terms.get(name) is not None for name in _ECONOMIC_TERM_FIELDS
     )
+    input_primitives = normalized.get("economic_primitives")
+    if isinstance(input_primitives, list):
+        valid_fact_ids: set[str] = set()
+        for primitive in input_primitives:
+            if not isinstance(primitive, Mapping):
+                continue
+            fact_id = str(primitive.get("fact_id") or "").strip()
+            bindings = primitive.get("semantic_evidence")
+            binding_rows = [
+                binding for binding in bindings if isinstance(binding, Mapping)
+            ] if isinstance(bindings, list) else []
+            if (
+                fact_id
+                and _normalize_primitive_value(primitive) is not None
+                and binding_rows
+                and all(
+                    _economic_semantic_binding_supported(
+                        primitive, binding, quotes_by_id
+                    )
+                    for binding in binding_rows
+                )
+                and _semantic_decision_supported(
+                    decisions_by_id.get(fact_id), require_scope=True
+                )
+            ):
+                valid_fact_ids.add(fact_id)
+        invalid_fact_ids = [
+            str(primitive.get("fact_id") or "").strip()
+            for primitive in input_primitives
+            if isinstance(primitive, Mapping)
+            and str(primitive.get("fact_id") or "").strip()
+            and str(primitive.get("fact_id") or "").strip() not in valid_fact_ids
+        ]
+    else:
+        invalid_fact_ids = []
+    # A document often contains redundant base-share and total-share facts.
+    # Keep invalid auxiliary facts auditable, but do not let one malformed
+    # optional span veto a term that has an independent valid derivation.
+    normalized["economic_primitive_validation_warnings"] = [
+        f"unusable_economic_primitive:{fact_id}"
+        for fact_id in dict.fromkeys(invalid_fact_ids)
+    ]
     gates["economic_primitives_in_evidence"] = bool(
         semantic_complete
-        and all_primitives_valid
         and (primitives or not has_model_terms)
     )
-    if all_primitives_valid:
+    if semantic_complete:
         normalized["economic_primitives"] = [
             {
                 key: value for key, value in primitive.items()
@@ -2749,7 +2902,7 @@ def _validate_analysis_v3(
             }
             for primitive in primitives
         ]
-    if semantic_complete and all_date_facts_valid and all_primitives_valid:
+    if semantic_complete and all_date_facts_valid and primitives:
         retained_assertion_ids = [
             str(fact.get("fact_id") or "") for fact in date_facts
         ] + [
@@ -3060,6 +3213,20 @@ class CninfoCorporateActionLlmResolver:
         event: Mapping[str, Any],
         pages: Sequence[CorporateActionPageText],
     ) -> str:
+        return self.input_hash_for_parser(
+            event,
+            pages,
+            parser_version=PARSER_VERSION,
+        )
+
+    def input_hash_for_parser(
+        self,
+        event: Mapping[str, Any],
+        pages: Sequence[CorporateActionPageText],
+        *,
+        parser_version: str,
+    ) -> str:
+        """Return the request identity for a specific deterministic validator."""
         return stable_hash({
             "payload": self.build_payload(event, pages),
             "profile": self.profile,
@@ -3069,7 +3236,7 @@ class CninfoCorporateActionLlmResolver:
             "semantic_verification_prompt_version": (
                 SEMANTIC_VERIFICATION_PROMPT_VERSION
             ),
-            "parser_version": PARSER_VERSION,
+            "parser_version": parser_version,
         })
 
     async def analyze(

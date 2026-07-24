@@ -6,6 +6,7 @@ import html
 import json
 import math
 import re
+import unicodedata
 from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -14,6 +15,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 _TITLE_TAG_RE = re.compile(r"<[^>]+>")
 _SHARE_REFORM_MARKERS = ("股权分置", "股改", "对价")
+_COMPENSATION_MARKERS = ("赠与", "补偿股份", "业绩承诺股份", "股份过户")
 _RESTRUCTURING_MARKERS = ("重整", "重组", "资本公积", "转增股本")
 _EXECUTION_MARKERS = (
     "实施",
@@ -39,8 +41,14 @@ _GENERIC_ACTION_MARKERS = (
     "转增",
     "分红",
     "配股",
+    "赠与",
+    "补偿股份",
+    "业绩承诺股份",
+    "股份过户",
 )
 _TITLE_EXCLUDES = ("取消", "终止", "不予实施", "不实施")
+_ANNUAL_PERIOD_MARKERS = ("年度", "年报")
+_INTERIM_PERIOD_MARKERS = ("半年", "中报", "中期")
 
 IMPLEMENTATION_GRADE_ANNOUNCEMENT_ROLES = frozenset({
     "implementation",
@@ -340,23 +348,139 @@ def announcement_match_reasons(
     title: str,
 ) -> List[str]:
     """Return auditable title-match reasons without resolving an effective date."""
-    normalized = html.unescape(_TITLE_TAG_RE.sub("", str(title or ""))).strip()
-    if not normalized or any(marker in normalized for marker in _TITLE_EXCLUDES):
+    diagnostics = deterministic_title_match(
+        target.event_class,
+        target.row.get("fiscal_period"),
+        title,
+        target.row.get("action_type"),
+    )
+    if diagnostics["status"] != "accepted":
         return []
+    if not diagnostics["lexical_match"]:
+        return []
+    return list(diagnostics["selection_reasons"])
+
+
+def deterministic_title_match(
+    event_class: str,
+    fiscal_period: Any,
+    title: Any,
+    action_type: Any = None,
+) -> Dict[str, Any]:
+    """Apply deterministic title gates and return an auditable decision."""
+    normalized = unicodedata.normalize(
+        "NFKC",
+        html.unescape(_TITLE_TAG_RE.sub("", str(title or ""))),
+    ).strip()
+    if not normalized:
+        return {
+            "status": "rejected",
+            "reason": "empty_title",
+            "selection_reasons": [],
+            "lexical_match": False,
+        }
+    mismatch = period_mismatch_reason(fiscal_period, normalized)
+    if mismatch:
+        return {
+            "status": "rejected",
+            "reason": mismatch,
+            "selection_reasons": [],
+            "lexical_match": False,
+        }
     class_markers = {
-        "share_reform": _SHARE_REFORM_MARKERS,
+        "share_reform": _SHARE_REFORM_MARKERS + _COMPENSATION_MARKERS,
         "restructuring_capitalization": _RESTRUCTURING_MARKERS,
         "missing_date_distribution": _GENERIC_ACTION_MARKERS,
-    }[target.event_class]
+    }.get(str(event_class or "").strip(), _GENERIC_ACTION_MARKERS)
     action_hits = [marker for marker in class_markers if marker in normalized]
     execution_hits = [marker for marker in _EXECUTION_MARKERS if marker in normalized]
-    if not action_hits or not execution_hits:
-        return []
-    return [
-        f"event_class:{target.event_class}",
+    exclusion_hits = [marker for marker in _TITLE_EXCLUDES if marker in normalized]
+    normalized_action_type = str(action_type or "").strip().lower()
+    if (
+        "配股" in action_hits
+        and normalized_action_type != "rights"
+        and not any(marker != "配股" for marker in action_hits)
+    ):
+        return {
+            "status": "rejected",
+            "reason": "incompatible_action_term:rights_issue_for_non_rights_event",
+            "selection_reasons": [],
+            "lexical_match": False,
+        }
+    reasons = [
+        f"event_class:{event_class}",
         *(f"action_term:{marker}" for marker in action_hits),
         *(f"execution_term:{marker}" for marker in execution_hits),
     ]
+    return {
+        "status": "accepted",
+        "reason": None,
+        "selection_reasons": reasons,
+        "lexical_match": bool(
+            action_hits and execution_hits and not exclusion_hits
+        ),
+        "lexical_exclusion_hits": exclusion_hits,
+    }
+
+
+def _period_mismatch_reason(
+    target: SpecialActionSearchTarget,
+    title: str,
+) -> Optional[str]:
+    """Return a deterministic period mismatch for an announcement title.
+
+    CNInfo often returns several historical notices in one search window.  A
+    generic LLM title decision is insufficient to distinguish a half-year
+    observation from an annual notice, so explicit period wording is treated
+    as a hard candidate boundary.
+    """
+    return period_mismatch_reason(
+        target.row.get("fiscal_period"),
+        title,
+    )
+
+
+def period_mismatch_reason(
+    fiscal_period: Any,
+    title: Any,
+) -> Optional[str]:
+    """Return a hard period mismatch between an event and announcement title.
+
+    This helper is intentionally independent of a search target so the
+    operator audit can re-evaluate stale persisted candidates without
+    re-running the network discovery stage.
+    """
+    fiscal_period = unicodedata.normalize(
+        "NFKC",
+        str(fiscal_period or ""),
+    ).strip()
+    if not fiscal_period:
+        return None
+    title_text = unicodedata.normalize("NFKC", str(title or "")).strip()
+    is_interim_event = any(marker in fiscal_period for marker in _INTERIM_PERIOD_MARKERS)
+    is_annual_event = (
+        not is_interim_event
+        and any(marker in fiscal_period for marker in _ANNUAL_PERIOD_MARKERS)
+    )
+    title_is_interim = any(marker in title_text for marker in _INTERIM_PERIOD_MARKERS)
+    title_is_annual = (
+        not title_is_interim
+        and any(marker in title_text for marker in _ANNUAL_PERIOD_MARKERS)
+    )
+    if is_interim_event and title_is_annual:
+        return "period_mismatch:interim_event_with_annual_notice"
+    if is_annual_event and title_is_interim:
+        return "period_mismatch:annual_event_with_interim_notice"
+    fiscal_year = re.search(r"(?:19|20)\d{2}", fiscal_period)
+    title_years = set(re.findall(r"(?:19|20)\d{2}", title_text))
+    if fiscal_year and title_years and fiscal_year.group(0) not in title_years:
+        return (
+            "period_mismatch:fiscal_year="
+            + fiscal_year.group(0)
+            + ":title_year="
+            + ",".join(sorted(title_years))
+        )
+    return None
 
 
 def build_candidate_evidence(
@@ -441,10 +565,28 @@ def build_classified_announcement_evidence(
         decision = decisions.get(announcement_id)
         if not announcement_id or not title or not decision:
             continue
+        normalized_title = unicodedata.normalize(
+            "NFKC",
+            html.unescape(_TITLE_TAG_RE.sub("", title)),
+        ).strip()
+        deterministic = deterministic_title_match(
+            target.event_class,
+            target.row.get("fiscal_period"),
+            normalized_title,
+            target.row.get("action_type"),
+        )
         resolution_status = (
             "candidate"
             if is_implementation_grade_decision(decision)
             else "rejected"
+        )
+        if deterministic["status"] != "accepted":
+            resolution_status = "rejected"
+        lexical_diagnostics = list(deterministic["selection_reasons"])
+        rejection_reason = (
+            deterministic["reason"]
+            if deterministic["status"] != "accepted"
+            else None
         )
         attachments = tuple(getattr(record, "attachments", ()) or ())
         attachment = attachments[0] if attachments else None
@@ -478,9 +620,13 @@ def build_classified_announcement_evidence(
                 ],
                 "search_windows": list(search_windows),
                 "title_classification": dict(decision),
+                "deterministic_match": {
+                    "status": "rejected" if rejection_reason else "accepted",
+                    "reason": rejection_reason,
+                },
                 "event_applicability": dict(applicability),
                 "llm_lineage": [dict(item) for item in lineage],
-                "lexical_diagnostics": announcement_match_reasons(target, title),
+                "lexical_diagnostics": lexical_diagnostics,
                 "announcement": dict(raw_payload),
             },
         })

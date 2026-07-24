@@ -197,7 +197,8 @@ async def test_scheduler_delegates_bounded_llm_resolution(monkeypatch):
     monkeypatch.setattr(data_manager, "analyze_cninfo_corporate_action_candidates", operation)
     result = await task.a_share_cninfo_corporate_action_llm_resolution(
         start_date="2026-01-01", end_date="2026-12-31",
-        exchanges=["SZSE"], instrument_ids=["000001.SZ"], max_events=1,
+        exchanges=["SZSE"], instrument_ids=["000001.SZ"],
+        source_event_keys=["event-1"], max_events=1,
         dry_run=True, auto_promote_validated=True,
         pipeline={"stage_queue_size": 25},
         pipeline_mode="async",
@@ -206,6 +207,7 @@ async def test_scheduler_delegates_bounded_llm_resolution(monkeypatch):
     )
     assert result["status"] == "dry_run"
     assert operation.await_args.kwargs["max_events"] == 1
+    assert operation.await_args.kwargs["source_event_keys"] == ["event-1"]
     assert operation.await_args.kwargs["refresh_documents"] is False
     assert operation.await_args.kwargs["auto_promote_validated"] is True
     assert operation.await_args.kwargs["pipeline"] == {
@@ -254,6 +256,7 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
         start_date="1990-12-19",
         end_date="2026-07-21",
         exchanges=["SSE", "SZSE"],
+        source_event_keys=["event-1"],
         scopes=["inventory", "discovery"],
         max_events=50,
         dry_run=True,
@@ -261,6 +264,7 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
 
     assert result["status"] == "dry_run"
     assert operation.await_args.kwargs["max_events"] == 50
+    assert operation.await_args.kwargs["source_event_keys"] == ["event-1"]
     assert operation.await_args.kwargs["scopes"] == ["inventory", "discovery"]
     assert operation.await_args.kwargs["classify_titles_with_llm"] is True
     assert operation.await_args.kwargs["title_max_concurrency"] == 50

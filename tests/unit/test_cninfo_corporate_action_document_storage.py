@@ -14,6 +14,7 @@ from database.models import (
     CorporateActionLlmAnalysisDB,
     CorporateActionObservationDB,
     CorporateActionResolutionReviewDB,
+    CorporateActionResolutionStateDB,
     CorporateActionResolvedTermsDB,
     InstrumentDB,
 )
@@ -158,6 +159,7 @@ async def test_review_queue_uses_latest_analysis_and_compact_lineage():
                 CorporateActionDocumentPageDB.__table__,
                 CorporateActionLlmAnalysisDB.__table__,
                 CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolutionStateDB.__table__,
             ],
         )
     async with session_factory() as session:
@@ -170,11 +172,20 @@ async def test_review_queue_uses_latest_analysis_and_compact_lineage():
                 instrument_id="000001.SZ", source="cninfo",
                 source_profile="cninfo_dividend", source_event_key=event_key,
                 action_type="dividend", description="每10股派2.36元",
+                fiscal_period="2025年报" if event_key == "event-1" else None,
                 event_status="implemented", quality_status="unvalidated",
                 row_hash=("1" if event_key == "event-1" else "2") * 64,
             )
             for event_key in ("event-1", "event-2")
         ])
+        session.add(CorporateActionObservationDB(
+            instrument_id="000001.SZ", source="cninfo",
+            source_profile="cninfo_dividend", source_event_key="event-stale",
+            action_type="dividend", fiscal_period="1992半年报",
+            description="每10股送2股派0.5元",
+            event_status="implemented", quality_status="unvalidated",
+            row_hash="3" * 64,
+        ))
         artifact = CorporateActionDocumentArtifactDB(
             announcement_id="ann-1", source="cninfo",
             source_url="https://example.test/ann-1.pdf",
@@ -199,6 +210,24 @@ async def test_review_queue_uses_latest_analysis_and_compact_lineage():
             evidence_key="ann-1", resolution_status="candidate",
             announcement_id="ann-1", announcement_title="权益分派实施公告",
             evidence_url="https://example.test/ann-1.pdf", row_hash="c" * 64,
+        ))
+        session.add(CorporateActionEffectiveDateEvidenceDB(
+            instrument_id="000001.SZ", source_event_key="event-1",
+            observation_source="cninfo", source_profile="cninfo_dividend",
+            evidence_source="cninfo_announcement_metadata",
+            evidence_key="ann-old", resolution_status="candidate",
+            announcement_id="ann-old",
+            announcement_title="公司２０２４年度权益分派实施公告",
+            evidence_url="https://example.test/ann-old.pdf", row_hash="8" * 64,
+        ))
+        session.add(CorporateActionEffectiveDateEvidenceDB(
+            instrument_id="000001.SZ", source_event_key="event-stale",
+            observation_source="cninfo", source_profile="cninfo_dividend",
+            evidence_source="cninfo_announcement_metadata",
+            evidence_key="ann-stale", resolution_status="candidate",
+            announcement_id="ann-stale",
+            announcement_title="１９９２年度分红派息公告",
+            evidence_url="https://example.test/ann-stale.pdf", row_hash="9" * 64,
         ))
         old_result = {
             "event_type": "dividend",
@@ -260,9 +289,36 @@ async def test_review_queue_uses_latest_analysis_and_compact_lineage():
                 result_json="{}", gate_results_json="{}", usage_json="{}",
                 attempt_count=1, error_code="schema_validation_failed",
             ),
+            CorporateActionLlmAnalysisDB(
+                analysis_key="stale", instrument_id="000001.SZ",
+                source_event_key="event-stale", analysis_status="manual_required",
+                validation_status="manual_required", profile="semantic_extraction",
+                schema_version="v1", prompt_version="p2", parser_version="p2",
+                input_hash="7" * 64, artifact_ids_json="[]",
+                result_json=json.dumps(old_result),
+                gate_results_json=json.dumps({"date_in_evidence": False}),
+                usage_json="{}", attempt_count=1,
+            ),
         ]
         session.add_all(analyses)
         await session.flush()
+        session.add(CorporateActionResolutionStateDB(
+            instrument_id="000001.SZ",
+            source_event_key="event-stale",
+            source_profile="cninfo_dividend",
+            action_type="dividend",
+            exchange="SZSE",
+            policy_version="policy-v1",
+            state_version="state-v1",
+            resolution_state="discovery_pending",
+            is_terminal=False,
+            factor_blocking=True,
+            state_reason="no_current_implementation_candidate",
+            next_action="discover_official_announcements",
+            candidate_count=0,
+            latest_analysis_id=analyses[3].id,
+            diagnostics_json="{}",
+        ))
         session.add(CorporateActionResolutionReviewDB(
             review_key="review-1", instrument_id="000001.SZ",
             source_event_key="event-1", analysis_id=analyses[1].id,
@@ -290,6 +346,14 @@ async def test_review_queue_uses_latest_analysis_and_compact_lineage():
     assert "text" not in page["items"][0]["artifacts"][0]["pages"][0]
     assert page["items"][0]["usage"]["input_tokens"] == 100
     assert page["items"][0]["prior_reviews"][0]["reviewer"] == "reviewer"
+    effective_statuses = {
+        item["announcement_id"]: item["effective_status"]
+        for item in page["items"][0]["announcements"]
+    }
+    assert effective_statuses == {
+        "ann-old": "rejected_by_current_policy",
+        "ann-1": "candidate",
+    }
     assert machine["total"] == 1
     assert machine["items"][0]["source_event_key"] == "event-2"
     assert machine["items"][0]["gate_signature"] == "schema_validation_failed"

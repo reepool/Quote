@@ -3179,6 +3179,7 @@ class TaskManagerHandlers:
             'scopes',
             'series_ids',
             'series_types',
+            'source_event_keys',
             'source_profiles',
             'venues',
             'commodity_ids',
