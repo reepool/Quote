@@ -143,6 +143,38 @@ def test_stale_analysis_without_current_candidate_routes_back_to_discovery():
     assert result["next_action"] == "discover_official_announcements"
 
 
+def test_complete_historical_empty_scan_supersedes_stale_analysis():
+    stale_analysis = {
+        "validation_status": "manual_required",
+        "result": {"event_stage": "implemented"},
+    }
+    historical = derive_resolution_state(
+        _row(
+            announcement_date="1993-05-16",
+            record_date="1992-11-07",
+        ),
+        candidate_count=0,
+        latest_analysis=stale_analysis,
+        scan_status="complete_no_candidates",
+    )
+    modern = derive_resolution_state(
+        _row(announcement_date="2002-01-01"),
+        candidate_count=0,
+        latest_analysis=stale_analysis,
+        scan_status="complete_no_candidates",
+    )
+
+    assert historical["resolution_state"] == "official_archive_unavailable"
+    assert historical["state_reason"] == (
+        "complete_pre_2002_cninfo_archive_scan_has_no_evidence"
+    )
+    assert historical["next_action"] == "none"
+    assert historical["is_terminal"] is True
+    assert historical["factor_blocking"] is False
+    assert modern["resolution_state"] == "discovery_pending"
+    assert modern["state_reason"] == "no_current_implementation_candidate"
+
+
 def test_reviewed_non_effective_is_terminal_but_empty_scan_is_retryable():
     reviewed = derive_resolution_state(
         _row(),

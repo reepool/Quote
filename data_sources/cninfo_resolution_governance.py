@@ -190,6 +190,20 @@ def _review_terminal_reason(review: Optional[Mapping[str, Any]]) -> str:
     return str(payload.get("terminal_reason") or "").strip().lower()
 
 
+def _complete_pre_2002_archive_scan_has_no_evidence(
+    row: Mapping[str, Any],
+    scan_status: Optional[str],
+) -> bool:
+    if str(scan_status or "").lower() != "complete_no_candidates":
+        return False
+    from data_sources.cninfo_special_action_resolution import (
+        best_structured_anchor,
+    )
+
+    anchor = best_structured_anchor(row)
+    return anchor is not None and anchor < OFFICIAL_ARCHIVE_CUTOFF
+
+
 def derive_resolution_state(
     row: Mapping[str, Any],
     *,
@@ -310,6 +324,16 @@ def derive_resolution_state(
                 str(error_code),
                 "retry_failed_stage",
             )
+        elif _complete_pre_2002_archive_scan_has_no_evidence(
+            row,
+            scan_status,
+        ):
+            state, reason, next_action, terminal = (
+                "official_archive_unavailable",
+                "complete_pre_2002_cninfo_archive_scan_has_no_evidence",
+                "none",
+                True,
+            )
         elif latest_analysis and candidate_count <= 0:
             # A prior semantic analysis may reference a candidate that the
             # current deterministic title/period policy now rejects.  Force
@@ -363,28 +387,11 @@ def derive_resolution_state(
         elif str(scan_status or "").lower() in {
             "complete", "success", "complete_no_candidates", "partial_no_candidates"
         }:
-            from data_sources.cninfo_special_action_resolution import (
-                best_structured_anchor,
+            state, reason, next_action = (
+                "evidence_unavailable",
+                "completed_scan_selected_no_matching_announcement",
+                "retry_discovery",
             )
-
-            anchor = best_structured_anchor(row)
-            if (
-                str(scan_status or "").lower() == "complete_no_candidates"
-                and anchor is not None
-                and anchor < OFFICIAL_ARCHIVE_CUTOFF
-            ):
-                state, reason, next_action, terminal = (
-                    "official_archive_unavailable",
-                    "complete_pre_2002_cninfo_archive_scan_has_no_evidence",
-                    "none",
-                    True,
-                )
-            else:
-                state, reason, next_action = (
-                    "evidence_unavailable",
-                    "completed_scan_selected_no_matching_announcement",
-                    "retry_discovery",
-                )
         elif str(scan_status or "").lower() == "unbounded_anchor":
             state, reason, next_action = (
                 "manual_required",
