@@ -7,7 +7,7 @@ from typing import Any, Mapping, Optional
 
 
 APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v3"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v4"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 
@@ -204,6 +204,161 @@ def _complete_pre_2002_archive_scan_has_no_evidence(
     return anchor is not None and anchor < OFFICIAL_ARCHIVE_CUTOFF
 
 
+def _analysis_reason_codes(
+    latest_analysis: Mapping[str, Any],
+) -> set[str]:
+    result = latest_analysis.get("result") or {}
+    if not isinstance(result, Mapping):
+        return set()
+    classification = result.get("_review_classification") or {}
+    if not isinstance(classification, Mapping):
+        return set()
+    return {
+        str(item).strip()
+        for item in classification.get("reason_codes") or []
+        if str(item).strip()
+    }
+
+
+def _analysis_gate_results(
+    latest_analysis: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    gates = latest_analysis.get("gate_results") or {}
+    return gates if isinstance(gates, Mapping) else {}
+
+
+def _analysis_rework_route(
+    latest_analysis: Mapping[str, Any],
+) -> tuple[str, str, str]:
+    """Map a non-promoted analysis to the repair that can change it."""
+    result = latest_analysis.get("result") or {}
+    result = result if isinstance(result, Mapping) else {}
+    reason_codes = _analysis_reason_codes(latest_analysis)
+    verifier = result.get("_semantic_verifier") or {}
+    verifier = verifier if isinstance(verifier, Mapping) else {}
+    verifier_status = str(verifier.get("status") or "").strip().lower()
+    validation = str(
+        latest_analysis.get("validation_status") or ""
+    ).strip().lower()
+    gates = _analysis_gate_results(latest_analysis)
+    has_reason_codes = bool(reason_codes)
+    if validation == "failed" or verifier_status in {
+        "error", "failed", "incomplete", "retryable_error",
+    }:
+        error_code = str(
+            latest_analysis.get("error_code")
+            or verifier.get("error_code")
+            or "semantic_verification_incomplete"
+        ).strip()
+        return (
+            "retryable_error",
+            f"analysis_retryable:{error_code}",
+            "retry_failed_stage",
+        )
+
+    if (
+        "context_incomplete" in reason_codes
+        or (
+            not has_reason_codes
+            and gates.get("context_complete") is False
+        )
+    ):
+        input_context = result.get("_input_context") or {}
+        repair_context = (
+            input_context.get("document_context_repair") or {}
+            if isinstance(input_context, Mapping)
+            else {}
+        )
+        if (
+            isinstance(repair_context, Mapping)
+            and repair_context.get("attempted") is True
+        ):
+            return (
+                "manual_required",
+                "analysis_context_repair_exhausted",
+                "human_review",
+            )
+        return (
+            "document_rework",
+            "analysis_context_incomplete",
+            "repair_document_context",
+        )
+
+    stage = str(result.get("event_stage") or "").strip().lower()
+    if (
+        stage in {"approved", "expected", "proposal"}
+        or "proposal_not_implemented" in reason_codes
+    ):
+        return (
+            "discovery_pending",
+            "analysis_requires_implementation_discovery",
+            "discover_implementation_evidence",
+        )
+
+    if (
+        "source_event_conflict" in reason_codes
+        or (
+            not has_reason_codes
+            and any(
+                gates.get(name) is False
+                for name in (
+                    "no_conflict",
+                    "semantic_verifier_no_conflict",
+                )
+            )
+        )
+    ):
+        return (
+            "conflict",
+            "analysis_source_event_conflict",
+            "human_review",
+        )
+
+    missing_date = (
+        "missing_effective_date_evidence" in reason_codes
+        or (
+            not has_reason_codes
+            and any(
+                gates.get(name) is False
+                for name in (
+                    "date_in_evidence",
+                    "date_facts_in_evidence",
+                    "date_range",
+                    "resolved_fields",
+                    "effective_date_type_compatible",
+                )
+            )
+        )
+    )
+    missing_terms = (
+        "economic_term_reconciliation_failed" in reason_codes
+        or (
+            not has_reason_codes
+            and any(
+                gates.get(name) is False
+                for name in (
+                    "economic_primitives_in_evidence",
+                    "economic_terms_in_evidence",
+                    "economic_term_units",
+                )
+            )
+        )
+    )
+    if missing_date and missing_terms:
+        detail = "date_and_terms"
+    elif missing_date:
+        detail = "date"
+    elif missing_terms:
+        detail = "economic_terms"
+    else:
+        detail = "semantic_ambiguity"
+    return (
+        "manual_required",
+        f"analysis_evidence_review:{detail}",
+        "human_review",
+    )
+
+
 def derive_resolution_state(
     row: Mapping[str, Any],
     *,
@@ -367,10 +522,8 @@ def derive_resolution_state(
                     "retry_discovery",
                 )
             else:
-                state, reason, next_action = (
-                    "machine_rework",
-                    f"analysis_validation:{validation or 'unknown'}",
-                    "retry_or_review",
+                state, reason, next_action = _analysis_rework_route(
+                    latest_analysis
                 )
         elif candidate_count > 0:
             state, reason, next_action = (

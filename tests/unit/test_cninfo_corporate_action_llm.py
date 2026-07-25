@@ -1705,6 +1705,50 @@ def test_event_prompt_has_one_global_page_budget():
     )
 
 
+def test_document_context_repair_selects_prior_omissions_and_changes_input():
+    resolver = CninfoCorporateActionLlmResolver(
+        SimpleNamespace(complete=AsyncMock())
+    )
+    pages = [
+        CorporateActionPageText(
+            page_number=index,
+            text=f"第{index}页权益分派内容",
+            text_hash=str(index),
+            announcement_id="ann-1",
+        )
+        for index in range(1, MAX_EVENT_PAGES + 3)
+    ]
+    normal_event = {
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+    }
+    normal_hash = resolver.input_hash(normal_event, pages)
+    selected, repair_lineage = (
+        DataManager._select_cninfo_document_context_repair_pages(
+            pages,
+            source_context={
+                "source_analysis_id": 9,
+                "source_input_hash": normal_hash,
+                "omitted_sections": ["ann-1:p25", "ann-1:p26"],
+            },
+            max_pages=MAX_EVENT_PAGES,
+        )
+    )
+    repair_event = {
+        **normal_event,
+        "_document_context_repair": repair_lineage,
+    }
+    payload = resolver.build_payload(repair_event, selected)
+
+    assert [page.page_number for page in selected[:2]] == [25, 26]
+    assert repair_lineage["archive_pages_omitted"] == 2
+    assert payload["context_window"]["document_context_repair"][
+        "attempted"
+    ] is True
+    assert payload["context_window"]["context_complete"] is False
+    assert resolver.input_hash(repair_event, selected) != normal_hash
+
+
 @pytest.mark.asyncio
 async def test_truncated_event_context_cannot_be_validated():
     first_page = _page()
@@ -2012,6 +2056,115 @@ async def test_data_manager_async_pipeline_preserves_dry_run_business_result():
     }
     manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_async_document_context_repair_uses_omitted_archive_pages():
+    evidence_text = _page().text
+    repair_page = CorporateActionPageText(
+        page_number=25,
+        text=evidence_text,
+        text_hash="repair-page-25",
+        announcement_id="ann-1",
+    )
+    archived_pages = [
+        CorporateActionPageText(
+            page_number=index,
+            text=(
+                evidence_text
+                if index == repair_page.page_number
+                else f"第{index}页历史公告附录"
+            ),
+            text_hash=(
+                repair_page.text_hash
+                if index == repair_page.page_number
+                else f"page-{index}"
+            ),
+            announcement_id="ann-1",
+        )
+        for index in range(1, MAX_EVENT_PAGES + 3)
+    ]
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(
+        return_value=[_candidate_observation_row()]
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value={
+            "items": [{
+                "artifact_id": 1,
+                "pages": [
+                    {
+                        "page_number": page.page_number,
+                        "text": page.text,
+                        "text_hash": page.text_hash,
+                        "extraction_method": "native_text",
+                        "quality_status": "usable",
+                    }
+                    for page in archived_pages
+                ],
+            }],
+        }
+    )
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(
+        return_value={
+            "items": [{
+                "analysis_id": 7,
+                "input_hash": "prior-input-hash",
+                "result": {
+                    "_input_context": {
+                        "context_complete": False,
+                        "omitted_sections": [
+                            "ann-1:p25",
+                            "ann-1:p26",
+                        ],
+                    },
+                },
+            }],
+        }
+    )
+    extraction = _v3_result(repair_page, include_verification=False)
+    client = SimpleNamespace(complete=AsyncMock(side_effect=[
+        _gateway_response(extraction, suffix="extract"),
+        _gateway_response(
+            _semantic_verification(extraction),
+            suffix="verify",
+            latency_ms=5,
+        ),
+    ]))
+
+    result = await manager.analyze_cninfo_corporate_action_candidates(
+        start_date="2026-01-01",
+        end_date="2026-12-31",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        max_events=1,
+        resume=False,
+        dry_run=True,
+        download_documents=False,
+        document_context_repair=True,
+        llm_client=client,
+        pipeline={
+            "mode": "async",
+            "download_concurrency": 2,
+            "document_parse_concurrency": 2,
+            "llm_concurrency": 2,
+            "progress_interval_seconds": 60,
+        },
+    )
+
+    context = result["samples"][0]["result"]["_input_context"]
+    repair = context["document_context_repair"]
+    assert repair["attempted"] is True
+    assert repair["source_analysis_id"] == 7
+    assert repair["source_input_hash"] == "prior-input-hash"
+    assert repair["selected_sections"][:2] == [
+        "ann-1:p25",
+        "ann-1:p26",
+    ]
+    assert context["context_complete"] is False
+    assert result["counts"]["analyzed"] == 1
+    assert result["counts"]["manual_required"] == 1
 
 
 @pytest.mark.asyncio
@@ -2435,12 +2588,26 @@ def _manual_review_manager(page, analysis_result, *, validation_status):
         }]
     })
     manager.db_ops.get_corporate_action_document_bundle = AsyncMock(return_value={
-        "items": [{"pages": [{
-            "page_number": 3,
-            "text": page.text,
-            "text_hash": page.text_hash,
-            "quality_status": "usable",
-        }]}]
+        "total": 1,
+        "returned": 1,
+        "has_more": False,
+        "items": [{
+            "artifact_id": 11,
+            "announcement_id": "ann-1",
+            "content_hash": "c" * 64,
+            "download_status": "downloaded",
+            "extraction_status": "extracted",
+            "parser_version": "document-parser.v1",
+            "pages": [{
+                "page_number": 3,
+                "text": page.text,
+                "text_hash": page.text_hash,
+                "parser_version": "document-parser.v1",
+                "extraction_method": "native_text",
+                "quality_status": "usable",
+                "character_count": len(page.text),
+            }],
+        }],
     })
     manager.db_ops.get_corporate_action_effective_date_evidence = AsyncMock(
         return_value={"items": [{
@@ -2703,6 +2870,209 @@ async def test_batch_review_is_item_isolated_and_rejects_deep_resolution():
             "reviewer": "batch-reviewer",
             "items": [{} for _ in range(101)],
         })
+
+
+def _incomplete_quick_review_result(page):
+    result = _result(page)
+    result["_input_context"] = {
+        "context_complete": False,
+        "candidates_available": 1,
+        "candidates_included": 1,
+        "candidate_metadata_omitted": 0,
+    }
+    result["_review_classification"] = {
+        "review_tier": "quick_review",
+        "gate_signature": "context_complete",
+        "review_reasons": ["hard_gate:context_complete"],
+        "reason_codes": ["validated_candidate_requires_explicit_review"],
+    }
+    return result
+
+
+@pytest.mark.asyncio
+async def test_incomplete_context_review_requires_explicit_acknowledgement():
+    page = _page()
+    manager = _manual_review_manager(
+        page,
+        _incomplete_quick_review_result(page),
+        validation_status="validated_candidate",
+    )
+
+    with pytest.raises(ValueError, match="context_complete"):
+        await manager.review_cninfo_corporate_action_resolution({
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": 7,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "reviewer": "unit-reviewer",
+        })
+
+    manager.db_ops.save_corporate_action_review_bundle.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_quick_review_can_acknowledge_fully_reloaded_archived_context():
+    page = _page()
+    manager = _manual_review_manager(
+        page,
+        _incomplete_quick_review_result(page),
+        validation_status="validated_candidate",
+    )
+
+    batch = await manager.review_cninfo_corporate_action_resolutions_batch({
+        "reviewer": "unit-reviewer",
+        "items": [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": 7,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "acknowledge_archived_context": True,
+        }],
+    })
+
+    assert batch["status"] == "success"
+    saved = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    lineage = saved["review_row"]["review_payload"][
+        "archived_context_acknowledgement"
+    ]
+    assert lineage == {
+        "requested": True,
+        "accepted": True,
+        "original_context_complete": False,
+        "review_context_complete": True,
+        "candidates_available": 1,
+        "candidates_included": 1,
+        "candidate_metadata_omitted": 0,
+        "announcement_ids": ["ann-1"],
+        "pages_reloaded": {"ann-1": 1},
+        "context_hash": lineage["context_hash"],
+        "artifacts": [{
+            "artifact_id": 11,
+            "announcement_id": "ann-1",
+            "content_hash": "c" * 64,
+            "parser_version": "document-parser.v1",
+            "download_status": "downloaded",
+            "extraction_status": "extracted",
+            "pages": [{
+                "page_number": 3,
+                "text_hash": page.text_hash,
+                "parser_version": "document-parser.v1",
+                "extraction_method": "native_text",
+                "quality_status": "usable",
+                "character_count": len(page.text),
+            }],
+        }],
+    }
+    assert len(lineage["context_hash"]) == 64
+    assert saved["review_row"]["review_payload"]["original_result"][
+        "_input_context"
+    ]["context_complete"] is False
+
+
+@pytest.mark.asyncio
+async def test_archived_context_acknowledgement_rejects_deep_review():
+    page = _page()
+    result = _incomplete_quick_review_result(page)
+    result["_review_classification"]["review_tier"] = "deep_review"
+    manager = _manual_review_manager(
+        page, result, validation_status="manual_required"
+    )
+
+    with pytest.raises(ValueError, match="requires quick_review tier"):
+        await manager.review_cninfo_corporate_action_resolution({
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": 7,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "reviewer": "unit-reviewer",
+            "acknowledge_archived_context": True,
+        })
+
+
+@pytest.mark.asyncio
+async def test_archived_context_acknowledgement_rejects_omitted_candidates():
+    page = _page()
+    result = _incomplete_quick_review_result(page)
+    result["_input_context"].update({
+        "candidates_available": 2,
+        "candidates_included": 1,
+        "candidate_metadata_omitted": 1,
+    })
+    manager = _manual_review_manager(
+        page, result, validation_status="validated_candidate"
+    )
+
+    with pytest.raises(ValueError, match="complete candidate metadata"):
+        await manager.review_cninfo_corporate_action_resolution({
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": 7,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "reviewer": "unit-reviewer",
+            "acknowledge_archived_context": True,
+        })
+
+    manager.db_ops.get_corporate_action_document_bundle.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_review_key_binds_archived_artifact_and_page_hashes():
+    first_page = _page()
+    first_manager = _manual_review_manager(
+        first_page,
+        _incomplete_quick_review_result(first_page),
+        validation_status="validated_candidate",
+    )
+    await first_manager.review_cninfo_corporate_action_resolution({
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 7,
+        "evidence_key": "ann-1",
+        "decision": "resolved",
+        "reviewer": "unit-reviewer",
+        "acknowledge_archived_context": True,
+    })
+    first_review = (
+        first_manager.db_ops.save_corporate_action_review_bundle
+        .await_args.kwargs["review_row"]
+    )
+
+    second_page = _page(first_page.text + " ")
+    second_manager = _manual_review_manager(
+        second_page,
+        _incomplete_quick_review_result(second_page),
+        validation_status="validated_candidate",
+    )
+    await second_manager.review_cninfo_corporate_action_resolution({
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 7,
+        "evidence_key": "ann-1",
+        "decision": "resolved",
+        "reviewer": "unit-reviewer",
+        "acknowledge_archived_context": True,
+    })
+    second_review = (
+        second_manager.db_ops.save_corporate_action_review_bundle
+        .await_args.kwargs["review_row"]
+    )
+
+    assert first_review["review_key"] != second_review["review_key"]
+    first_lineage = first_review["review_payload"][
+        "archived_context_acknowledgement"
+    ]
+    second_lineage = second_review["review_payload"][
+        "archived_context_acknowledgement"
+    ]
+    assert first_lineage["context_hash"] != second_lineage["context_hash"]
+    assert (
+        first_lineage["artifacts"][0]["pages"][0]["text_hash"]
+        != second_lineage["artifacts"][0]["pages"][0]["text_hash"]
+    )
 
 
 @pytest.mark.asyncio

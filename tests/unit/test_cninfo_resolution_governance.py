@@ -128,6 +128,134 @@ def test_model_only_cancellation_remains_manual_required():
     assert result["factor_blocking"] is True
 
 
+@pytest.mark.parametrize(
+    ("latest_analysis", "expected_state", "expected_action"),
+    [
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "implemented",
+                    "_semantic_verifier": {
+                        "status": "error",
+                        "error_code": "provider_timeout",
+                    },
+                },
+            },
+            "retryable_error",
+            "retry_failed_stage",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "implemented",
+                    "_review_classification": {
+                        "reason_codes": ["context_incomplete"],
+                    },
+                },
+            },
+            "document_rework",
+            "repair_document_context",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "implemented",
+                    "_input_context": {
+                        "context_complete": False,
+                        "document_context_repair": {"attempted": True},
+                    },
+                    "_review_classification": {
+                        "reason_codes": ["context_incomplete"],
+                    },
+                },
+            },
+            "manual_required",
+            "human_review",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "proposal",
+                    "_review_classification": {
+                        "reason_codes": ["proposal_not_implemented"],
+                    },
+                },
+            },
+            "discovery_pending",
+            "discover_implementation_evidence",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "implemented",
+                    "_review_classification": {
+                        "reason_codes": ["source_event_conflict"],
+                    },
+                },
+            },
+            "conflict",
+            "human_review",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "implemented",
+                    "_review_classification": {
+                        "reason_codes": [
+                            "missing_effective_date_evidence",
+                            "economic_term_reconciliation_failed",
+                        ],
+                    },
+                },
+            },
+            "manual_required",
+            "human_review",
+        ),
+    ],
+)
+def test_non_promoted_analysis_routes_by_remediable_cause(
+    latest_analysis,
+    expected_state,
+    expected_action,
+):
+    result = derive_resolution_state(
+        _row(),
+        candidate_count=1,
+        latest_analysis=latest_analysis,
+    )
+
+    assert result["resolution_state"] == expected_state
+    assert result["next_action"] == expected_action
+    assert result["factor_blocking"] is True
+
+
+def test_prompt_page_omission_without_context_reason_is_not_document_rework():
+    result = derive_resolution_state(
+        _row(),
+        candidate_count=1,
+        latest_analysis={
+            "validation_status": "manual_required",
+            "result": {
+                "event_stage": "implemented",
+                "_input_context": {"context_complete": False},
+                "_review_classification": {
+                    "reason_codes": ["missing_effective_date_evidence"],
+                },
+            },
+        },
+    )
+
+    assert result["resolution_state"] == "manual_required"
+    assert result["state_reason"] == "analysis_evidence_review:date"
+    assert result["next_action"] == "human_review"
+
+
 def test_stale_analysis_without_current_candidate_routes_back_to_discovery():
     result = derive_resolution_state(
         _row(),
@@ -649,6 +777,43 @@ async def test_evidence_unavailable_can_be_explicitly_retried():
 
 
 @pytest.mark.asyncio
+async def test_evidence_unavailable_retry_ignores_stale_candidate_count():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    unavailable = [_state(
+        "event-stale-candidates",
+        "evidence_unavailable",
+        candidate_count=3,
+        next_action="retry_discovery",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[unavailable, unavailable]
+    )
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock(
+        return_value={
+            "status": "dry_run",
+            "target_samples": [],
+            "skipped_samples": [],
+            "errors": [],
+        }
+    )
+
+    await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "discovery"],
+        max_events=1,
+        retry_evidence_unavailable=True,
+        dry_run=True,
+    )
+
+    assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
+        "source_event_keys"
+    ] == ["event-stale-candidates"]
+
+
+@pytest.mark.asyncio
 async def test_retryable_discovery_error_reenters_discovery_stage():
     manager = DataManager()
     manager.db_ops = Mock()
@@ -681,6 +846,132 @@ async def test_retryable_discovery_error_reenters_discovery_stage():
     assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
         "source_event_keys"
     ] == ["event-error"]
+
+
+@pytest.mark.asyncio
+async def test_provider_retry_is_selected_only_by_resolution_scope():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    retryable = [_state(
+        "event-provider-error",
+        "retryable_error",
+        candidate_count=1,
+        next_action="retry_failed_stage",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[retryable, retryable]
+    )
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock()
+
+    discovery = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "discovery"],
+        max_events=1,
+        dry_run=True,
+    )
+
+    assert discovery["targets"]["batch_event_keys"] == []
+    manager.discover_cninfo_special_action_effective_dates.assert_not_awaited()
+
+    resolution_manager = DataManager()
+    resolution_manager.db_ops = Mock()
+    resolution_manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[retryable, retryable]
+    )
+    resolution_manager.analyze_cninfo_corporate_action_candidates = AsyncMock(
+        return_value={"status": "dry_run", "errors": []}
+    )
+    await resolution_manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "resolution"],
+        max_events=1,
+        dry_run=True,
+    )
+
+    assert resolution_manager.analyze_cninfo_corporate_action_candidates.await_args.kwargs[
+        "source_event_keys"
+    ] == ["event-provider-error"]
+
+
+@pytest.mark.asyncio
+async def test_document_rework_uses_isolated_non_resumable_repair_path():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    document_rework = [_state(
+        "event-context-repair",
+        "document_rework",
+        candidate_count=1,
+        next_action="repair_document_context",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[document_rework, document_rework]
+    )
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock(
+        return_value={
+            "status": "dry_run",
+            "counts": {"processed": 1},
+            "targets": {"batch_events": 1},
+            "errors": [],
+        }
+    )
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "resolution"],
+        max_events=1,
+        resume=True,
+        dry_run=True,
+    )
+
+    assert result["targets"]["batch_event_keys"] == ["event-context-repair"]
+    repair_call = (
+        manager.analyze_cninfo_corporate_action_candidates.await_args.kwargs
+    )
+    assert repair_call["source_event_keys"] == ["event-context-repair"]
+    assert repair_call["resume"] is False
+    assert repair_call["document_context_repair"] is True
+
+
+@pytest.mark.asyncio
+async def test_proposal_analysis_with_existing_candidate_reenters_discovery():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    proposal = [_state(
+        "event-proposal",
+        "discovery_pending",
+        candidate_count=1,
+        next_action="discover_implementation_evidence",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[proposal, proposal]
+    )
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock(
+        return_value={
+            "status": "dry_run",
+            "target_samples": [],
+            "skipped_samples": [],
+            "errors": [],
+        }
+    )
+
+    await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "discovery"],
+        max_events=1,
+        dry_run=True,
+    )
+
+    assert manager.discover_cninfo_special_action_effective_dates.await_args.kwargs[
+        "source_event_keys"
+    ] == ["event-proposal"]
 
 
 @pytest.mark.asyncio

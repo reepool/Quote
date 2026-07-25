@@ -19863,7 +19863,7 @@ class DataManager:
             analysis_rows = await self.db_ops.execute_read_query(
                 f"""
                 SELECT id AS analysis_id, source_event_key, validation_status,
-                       result_json, error_code, updated_at
+                       result_json, gate_results_json, error_code, updated_at
                 FROM corporate_action_llm_analyses
                 WHERE source_event_key IN ({placeholders})
                 ORDER BY source_event_key, updated_at DESC, id DESC
@@ -19880,7 +19880,17 @@ class DataManager:
                         payload = json.loads(payload or "{}")
                     except json.JSONDecodeError:
                         payload = {}
-                analysis_by_event[key] = {**item, "result": payload or {}}
+                gate_results = item.get("gate_results_json")
+                if isinstance(gate_results, str):
+                    try:
+                        gate_results = json.loads(gate_results or "{}")
+                    except json.JSONDecodeError:
+                        gate_results = {}
+                analysis_by_event[key] = {
+                    **item,
+                    "result": payload or {},
+                    "gate_results": gate_results or {},
+                }
             review_rows = await self.db_ops.execute_read_query(
                 f"""
                 SELECT id AS review_id, source_event_key, decision,
@@ -20177,8 +20187,8 @@ class DataManager:
         if "discovery" in normalized_scopes:
             processable_next_actions.update({
                 "discover_official_announcements",
+                "discover_implementation_evidence",
                 "write_discovery_candidates",
-                "retry_failed_stage",
             })
             if retry_evidence_unavailable:
                 processable_next_actions.add("retry_discovery")
@@ -20186,16 +20196,36 @@ class DataManager:
             processable_next_actions.update({
                 "semantic_resolution",
                 "retry_or_review",
-                "retry_failed_stage",
                 "auto_promote_or_review",
+                "repair_document_context",
             })
         processable = [
             item for item in actionable
-            if item["next_action"] in processable_next_actions
+            if (
+                item["next_action"] in processable_next_actions
+                or (
+                    item["next_action"] == "retry_failed_stage"
+                    and (
+                        (
+                            item["candidate_count"] > 0
+                            and "resolution" in normalized_scopes
+                        )
+                        or (
+                            item["candidate_count"] == 0
+                            and "discovery" in normalized_scopes
+                        )
+                    )
+                )
+            )
         ]
         batch = processable[offset: offset + limit]
         batch_keys = [item["source_event_key"] for item in batch]
         batch_key_set = set(batch_keys)
+        repair_key_set = {
+            item["source_event_key"]
+            for item in batch
+            if item["next_action"] == "repair_document_context"
+        }
         batch_instruments = sorted({str(item["instrument_id"]) for item in batch})
         has_more = offset + len(batch) < len(processable)
         stage_results: Dict[str, Any] = {"inventory": {"status": "success"}}
@@ -20313,9 +20343,16 @@ class DataManager:
                 for item in batch
                 if item["next_action"] in {
                     "discover_official_announcements", "retry_discovery",
-                    "retry_failed_stage", "manual_anchor_or_external_evidence",
+                    "discover_implementation_evidence", "retry_failed_stage",
+                    "manual_anchor_or_external_evidence",
                 }
-                and item["candidate_count"] == 0
+                and (
+                    item["candidate_count"] == 0
+                    or item["next_action"] in {
+                        "discover_implementation_evidence",
+                        "retry_discovery",
+                    }
+                )
             ]
             if discovery_keys:
                 dm_logger.info(
@@ -20405,25 +20442,40 @@ class DataManager:
                 and not item["is_terminal"]
             ]
             resolution_runs = list(overlapped_resolution_results)
-            if resolution_keys:
+            normal_resolution_keys = [
+                key for key in resolution_keys if key not in repair_key_set
+            ]
+            repair_resolution_keys = [
+                key for key in resolution_keys if key in repair_key_set
+            ]
+            for current_keys, repair_context in (
+                (normal_resolution_keys, False),
+                (repair_resolution_keys, True),
+            ):
+                if not current_keys:
+                    continue
                 dm_logger.info(
                     "[DataManager] CNInfo resolution governance semantic stage: "
-                    "run_id=%s events=%s", run_id, len(resolution_keys),
+                    "run_id=%s events=%s document_context_repair=%s",
+                    run_id,
+                    len(current_keys),
+                    repair_context,
                 )
                 resolution_result = await self.analyze_cninfo_corporate_action_candidates(
                     start_date=normalized_start,
                     end_date=normalized_end,
                     exchanges=normalized_exchanges,
                     instrument_ids=batch_instruments or None,
-                    source_event_keys=resolution_keys,
-                    max_events=len(resolution_keys),
+                    source_event_keys=current_keys,
+                    max_events=len(current_keys),
                     target_offset=0,
                     profile=profile,
-                    resume=bool(resume),
+                    resume=False if repair_context else bool(resume),
                     dry_run=bool(dry_run),
                     download_documents=bool(download_documents),
                     run_ocr=bool(run_ocr),
                     refresh_documents=bool(refresh_documents),
+                    document_context_repair=repair_context,
                     discover_candidates=False,
                     auto_promote_validated=bool(auto_promote_validated),
                     exclude_reviewed_events=bool(exclude_reviewed_events),
@@ -22111,6 +22163,118 @@ class DataManager:
             updated["analysis_id"] = saved["analysis_id"]
         return updated, bool(saved)
 
+    async def _load_cninfo_document_context_repair_source(
+        self,
+        *,
+        instrument_id: str,
+        source_event_key: str,
+    ) -> Dict[str, Any]:
+        """Return the latest incomplete prompt context used to plan one repair."""
+        prior = await self.db_ops.get_corporate_action_llm_analyses(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            limit=1000,
+            offset=0,
+        )
+        for analysis in prior.get("items") or []:
+            result = analysis.get("result") or {}
+            if not isinstance(result, Mapping):
+                continue
+            context = result.get("_input_context") or {}
+            if (
+                not isinstance(context, Mapping)
+                or context.get("context_complete") is not False
+            ):
+                continue
+            return {
+                "source_analysis_id": analysis.get("analysis_id"),
+                "source_input_hash": analysis.get("input_hash"),
+                "omitted_sections": list(
+                    context.get("omitted_sections") or []
+                ),
+                "truncated_sections": list(
+                    context.get("truncated_sections") or []
+                ),
+            }
+        return {}
+
+    @staticmethod
+    def _select_cninfo_document_context_repair_pages(
+        pages: Iterable[Any],
+        *,
+        source_context: Mapping[str, Any],
+        max_pages: int,
+    ) -> Tuple[List[Any], Dict[str, Any]]:
+        """Select a distinct archived-page slice led by prior omissions."""
+        normalized_limit = max(1, int(max_pages))
+        unique_pages: List[Any] = []
+        page_by_section: Dict[str, Any] = {}
+        for page in sorted(
+            pages,
+            key=lambda item: (
+                str(getattr(item, "announcement_id", "") or ""),
+                int(getattr(item, "page_number", 0) or 0),
+                str(getattr(item, "text_hash", "") or ""),
+            ),
+        ):
+            section_id = (
+                f"{getattr(page, 'announcement_id', None)}:"
+                f"p{int(getattr(page, 'page_number', 0) or 0)}"
+            )
+            if section_id in page_by_section:
+                continue
+            page_by_section[section_id] = page
+            unique_pages.append(page)
+
+        requested_sections = list(dict.fromkeys([
+            str(value)
+            for value in (
+                list(source_context.get("truncated_sections") or [])
+                + list(source_context.get("omitted_sections") or [])
+            )
+            if str(value)
+        ]))
+        selected: List[Any] = []
+        selected_sections: Set[str] = set()
+
+        def add_page(page: Any) -> None:
+            section_id = (
+                f"{getattr(page, 'announcement_id', None)}:"
+                f"p{int(getattr(page, 'page_number', 0) or 0)}"
+            )
+            if (
+                section_id in selected_sections
+                or len(selected) >= normalized_limit
+            ):
+                return
+            selected.append(page)
+            selected_sections.add(section_id)
+
+        for section_id in requested_sections:
+            page = page_by_section.get(section_id)
+            if page is not None:
+                add_page(page)
+        for page in unique_pages:
+            add_page(page)
+
+        lineage = {
+            "attempted": True,
+            "source_analysis_id": source_context.get("source_analysis_id"),
+            "source_input_hash": source_context.get("source_input_hash"),
+            "archive_pages_available": len(unique_pages),
+            "archive_pages_selected": len(selected),
+            "archive_pages_omitted": max(0, len(unique_pages) - len(selected)),
+            "archive_context_complete": len(selected) == len(unique_pages),
+            "selected_sections": [
+                (
+                    f"{getattr(page, 'announcement_id', None)}:"
+                    f"p{int(getattr(page, 'page_number', 0) or 0)}"
+                )
+                for page in selected
+            ],
+        }
+        return selected, lineage
+
     async def _run_cninfo_candidate_resolution_pipeline(
         self,
         *,
@@ -22127,6 +22291,7 @@ class DataManager:
         download_documents: bool,
         run_ocr: bool,
         refresh_documents: bool,
+        document_context_repair: bool,
         auto_promote_validated: bool,
         ocr_adapter: Any,
     ) -> Dict[str, Any]:
@@ -22138,6 +22303,7 @@ class DataManager:
             select_relevant_pages,
         )
         from data_sources.cninfo_corporate_action_llm import (
+            MAX_EVENT_PAGES,
             PARSER_VERSION,
             PROMPT_VERSION,
             REVALIDATABLE_PARSER_VERSIONS,
@@ -22188,9 +22354,18 @@ class DataManager:
                     len(event.get("candidates") or []),
                 )
                 pages: List[CorporateActionPageText] = []
+                archived_pages: List[CorporateActionPageText] = []
                 existing_artifact_ids: List[int] = []
                 pending_bundles: List[Tuple[Any, Dict[str, Any]]] = []
                 errors: List[Dict[str, Any]] = []
+                repair_source = (
+                    await self._load_cninfo_document_context_repair_source(
+                        instrument_id=item.identity.instrument_id,
+                        source_event_key=source_event_key,
+                    )
+                    if document_context_repair
+                    else {}
+                )
                 for candidate in event.get("candidates") or []:
                     announcement_id = str(
                         candidate.get("announcement_id") or ""
@@ -22223,7 +22398,10 @@ class DataManager:
                                     "announcement_time"
                                 ),
                             )
-                            pages.extend(select_relevant_pages(bundle.pages))
+                            if document_context_repair:
+                                archived_pages.extend(bundle.pages)
+                            else:
+                                pages.extend(select_relevant_pages(bundle.pages))
                             pending_bundles.append((bundle, dict(candidate)))
                         elif existing.get("items"):
                             stored = existing["items"][-1]
@@ -22243,7 +22421,10 @@ class DataManager:
                                 )
                                 for page in stored.get("pages") or []
                             ]
-                            pages.extend(select_relevant_pages(stored_pages))
+                            if document_context_repair:
+                                archived_pages.extend(stored_pages)
+                            else:
+                                pages.extend(select_relevant_pages(stored_pages))
                             existing_artifact_ids.append(int(stored["artifact_id"]))
                         else:
                             errors.append({
@@ -22264,6 +22445,15 @@ class DataManager:
                             "announcement_id": announcement_id,
                             "code": error_code,
                         })
+                if document_context_repair:
+                    pages, repair_lineage = (
+                        self._select_cninfo_document_context_repair_pages(
+                            archived_pages,
+                            source_context=repair_source,
+                            max_pages=MAX_EVENT_PAGES,
+                        )
+                    )
+                    event["_document_context_repair"] = repair_lineage
                 if not pages and not errors:
                     errors.append({
                         "source_event_key": source_event_key,
@@ -22659,6 +22849,7 @@ class DataManager:
         download_documents: bool = True,
         run_ocr: bool = False,
         refresh_documents: bool = False,
+        document_context_repair: bool = False,
         discover_candidates: bool = False,
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = False,
@@ -22677,6 +22868,7 @@ class DataManager:
         from data_sources.cninfo_corporate_action_llm import (
             AUTO_PROMOTION_POLICY_VERSION,
             CninfoCorporateActionLlmResolver,
+            MAX_EVENT_PAGES,
             PARSER_VERSION,
             PROMPT_VERSION,
             REVALIDATABLE_PARSER_VERSIONS,
@@ -22778,7 +22970,7 @@ class DataManager:
             "exchanges=%s instruments=%s max_events=%s offset=%s profile=%s "
             "resume=%s dry_run=%s download_documents=%s run_ocr=%s "
             "refresh_documents=%s discover_candidates=%s auto_promote_validated=%s "
-            "exclude_reviewed_events=%s",
+            "exclude_reviewed_events=%s document_context_repair=%s",
             normalized_start,
             normalized_end,
             selected_exchanges,
@@ -22794,6 +22986,7 @@ class DataManager:
             discover_candidates,
             auto_promote_validated,
             exclude_reviewed_events,
+            document_context_repair,
         )
         discovery_result = None
         if discover_candidates:
@@ -23019,6 +23212,7 @@ class DataManager:
                 "run_ocr": bool(run_ocr),
                 "ocr_adapter_configured": ocr_adapter is not None,
                 "refresh_documents": bool(refresh_documents),
+                "document_context_repair": bool(document_context_repair),
                 "discover_candidates": bool(discover_candidates),
                 "auto_promote_validated": bool(auto_promote_validated),
                 "exclude_reviewed_events": bool(exclude_reviewed_events),
@@ -23178,6 +23372,7 @@ class DataManager:
                 download_documents=bool(download_documents),
                 run_ocr=bool(run_ocr),
                 refresh_documents=bool(refresh_documents),
+                document_context_repair=bool(document_context_repair),
                 auto_promote_validated=bool(auto_promote_validated),
                 ocr_adapter=ocr_adapter,
             )
@@ -23365,7 +23560,18 @@ class DataManager:
                     len(event.get("candidates") or []),
                 )
                 pages: list[CorporateActionPageText] = []
+                archived_pages: list[CorporateActionPageText] = []
                 artifact_ids: list[int] = []
+                repair_source = (
+                    await self._load_cninfo_document_context_repair_source(
+                        instrument_id=str(event.get("instrument_id") or ""),
+                        source_event_key=str(
+                            event.get("source_event_key") or ""
+                        ),
+                    )
+                    if document_context_repair
+                    else {}
+                )
                 for candidate_index, candidate in enumerate(event["candidates"], start=1):
                     announcement_id = str(candidate.get("announcement_id") or "").strip()
                     source_url = str(candidate.get("evidence_url") or "").strip()
@@ -23400,8 +23606,15 @@ class DataManager:
                                 title=candidate.get("announcement_title"),
                                 announcement_time=candidate.get("announcement_time"),
                             )
-                            selected_bundle_pages = select_relevant_pages(bundle.pages)
-                            pages.extend(selected_bundle_pages)
+                            selected_bundle_pages = (
+                                list(bundle.pages)
+                                if document_context_repair
+                                else select_relevant_pages(bundle.pages)
+                            )
+                            if document_context_repair:
+                                archived_pages.extend(selected_bundle_pages)
+                            else:
+                                pages.extend(selected_bundle_pages)
                             dm_logger.info(
                                 "[DataManager] CNInfo document extracted: run_id=%s "
                                 "event=%s announcement_id=%s bytes=%s pages_total=%s "
@@ -23436,8 +23649,15 @@ class DataManager:
                             stored_pages: list[CorporateActionPageText] = []
                             for page in item.get("pages", []):
                                 stored_pages.append(CorporateActionPageText(page_number=int(page["page_number"]), text=str(page["text"]), text_hash=str(page["text_hash"]), announcement_id=announcement_id, extraction_method=str(page.get("extraction_method") or "native_text"), quality_status=str(page.get("quality_status") or "usable")))
-                            selected_stored_pages = select_relevant_pages(stored_pages)
-                            pages.extend(selected_stored_pages)
+                            selected_stored_pages = (
+                                stored_pages
+                                if document_context_repair
+                                else select_relevant_pages(stored_pages)
+                            )
+                            if document_context_repair:
+                                archived_pages.extend(selected_stored_pages)
+                            else:
+                                pages.extend(selected_stored_pages)
                             artifact_ids.append(int(item["artifact_id"]))
                             dm_logger.info(
                                 "[DataManager] CNInfo document reused: run_id=%s event=%s "
@@ -23475,6 +23695,15 @@ class DataManager:
                             announcement_id,
                             error_code,
                         )
+                if document_context_repair:
+                    pages, repair_lineage = (
+                        self._select_cninfo_document_context_repair_pages(
+                            archived_pages,
+                            source_context=repair_source,
+                            max_pages=MAX_EVENT_PAGES,
+                        )
+                    )
+                    event["_document_context_repair"] = repair_lineage
                 if not pages:
                     dm_logger.warning(
                         "[DataManager] CNInfo LLM event skipped without usable pages: "
@@ -23908,6 +24137,14 @@ class DataManager:
         decision = str(payload.get("decision") or "").strip().lower()
         analysis_id = int(payload.get("analysis_id") or 0)
         evidence_key = str(payload.get("evidence_key") or "").strip()
+        archived_context_value = payload.get(
+            "acknowledge_archived_context", False
+        )
+        if not isinstance(archived_context_value, bool):
+            raise ValueError(
+                "acknowledge_archived_context must be a boolean"
+            )
+        acknowledge_archived_context = archived_context_value
         if not all((instrument_id, source_event_key, reviewer, decision, analysis_id)):
             raise ValueError("instrument_id, source_event_key, analysis_id, decision, and reviewer are required")
         if len(reviewer) > 128:
@@ -23933,6 +24170,24 @@ class DataManager:
             raise ValueError("analysis_id does not belong to the requested event")
         original_result = deepcopy(analysis.get("result") or {})
         original_classification = original_result.get("_review_classification") or {}
+        original_input_context = original_result.get("_input_context") or {}
+        if not isinstance(original_input_context, dict):
+            original_input_context = {}
+        original_context_complete = original_input_context.get(
+            "context_complete", True
+        )
+        if acknowledge_archived_context and decision != "resolved":
+            raise ValueError(
+                "archived context acknowledgement is supported only for "
+                "resolved reviews"
+            )
+        if (
+            acknowledge_archived_context
+            and original_classification.get("review_tier") != "quick_review"
+        ):
+            raise ValueError(
+                "archived context acknowledgement requires quick_review tier"
+            )
         if (
             payload.get("_batch_review")
             and decision == "resolved"
@@ -23971,6 +24226,9 @@ class DataManager:
         post_gate_results = None
         post_validation_status = None
         validated_result = original_result
+        archived_pages_reloaded: Dict[str, int] = {}
+        archived_context_lineage: List[Dict[str, Any]] = []
+        archived_context_hash: Optional[str] = None
         if decision == "resolved":
             if analysis.get("validation_status") not in {
                 "validated_candidate", "manual_required",
@@ -24029,6 +24287,31 @@ class DataManager:
                 for item in candidates
                 if str(item.get("announcement_id") or "")
             }
+            if acknowledge_archived_context:
+                if original_context_complete is not False:
+                    raise ValueError(
+                        "archived context acknowledgement requires an "
+                        "incomplete original context"
+                    )
+                candidates_available = original_input_context.get(
+                    "candidates_available"
+                )
+                candidates_included = original_input_context.get(
+                    "candidates_included"
+                )
+                candidate_metadata_omitted = original_input_context.get(
+                    "candidate_metadata_omitted"
+                )
+                if (
+                    candidate_metadata_omitted != 0
+                    or candidates_available is None
+                    or candidates_included is None
+                    or candidates_available != candidates_included
+                ):
+                    raise ValueError(
+                        "archived context acknowledgement requires complete "
+                        "candidate metadata"
+                    )
             pages: list[CorporateActionPageText] = []
             announcement_ids = sorted({
                 str(item.get("announcement_id") or "").strip()
@@ -24050,8 +24333,89 @@ class DataManager:
                     limit=1000,
                     offset=0,
                 )
+                if (
+                    acknowledge_archived_context
+                    and bool(documents.get("has_more"))
+                ):
+                    raise ValueError(
+                        "archived official document list is incomplete: "
+                        + announcement_id
+                    )
+                announcement_page_count = 0
+                complete_artifact_found = False
                 for artifact in documents.get("items", []):
-                    for page in artifact.get("pages", []):
+                    artifact_pages = artifact.get("pages", [])
+                    page_lineage = [
+                        {
+                            "page_number": int(
+                                page.get("page_number") or 0
+                            ),
+                            "text_hash": str(
+                                page.get("text_hash") or ""
+                            ),
+                            "parser_version": str(
+                                page.get("parser_version")
+                                or artifact.get("parser_version")
+                                or ""
+                            ),
+                            "extraction_method": str(
+                                page.get("extraction_method") or ""
+                            ),
+                            "quality_status": str(
+                                page.get("quality_status") or ""
+                            ),
+                            "character_count": int(
+                                page.get("character_count")
+                                or len(str(page.get("text") or ""))
+                            ),
+                        }
+                        for page in sorted(
+                            artifact_pages,
+                            key=lambda value: (
+                                int(value.get("page_number") or 0),
+                                str(value.get("text_hash") or ""),
+                            ),
+                        )
+                    ]
+                    archived_context_lineage.append({
+                        "artifact_id": int(
+                            artifact.get("artifact_id") or 0
+                        ),
+                        "announcement_id": announcement_id,
+                        "content_hash": str(
+                            artifact.get("content_hash") or ""
+                        ),
+                        "parser_version": str(
+                            artifact.get("parser_version") or ""
+                        ),
+                        "download_status": str(
+                            artifact.get("download_status") or ""
+                        ),
+                        "extraction_status": str(
+                            artifact.get("extraction_status") or ""
+                        ),
+                        "pages": page_lineage,
+                    })
+                    if (
+                        acknowledge_archived_context
+                        and str(artifact.get("download_status") or "")
+                        == "downloaded"
+                        and str(artifact.get("extraction_status") or "")
+                        == "extracted"
+                        and isinstance(artifact_pages, list)
+                        and artifact_pages
+                    ):
+                        complete_artifact_found = True
+                    for page in artifact_pages:
+                        if acknowledge_archived_context and (
+                            int(page.get("page_number") or 0) < 1
+                            or not str(page.get("text") or "").strip()
+                            or not str(page.get("text_hash") or "").strip()
+                        ):
+                            raise ValueError(
+                                "archived official page is incomplete: "
+                                + announcement_id
+                            )
                         pages.append(CorporateActionPageText(
                             page_number=int(page.get("page_number") or 0),
                             text=str(page.get("text") or ""),
@@ -24064,11 +24428,33 @@ class DataManager:
                                 page.get("quality_status") or "usable"
                             ),
                         ))
+                        announcement_page_count += 1
+                if (
+                    acknowledge_archived_context
+                    and not complete_artifact_found
+                ):
+                    raise ValueError(
+                        "complete archived official pages are missing: "
+                        + announcement_id
+                    )
+                archived_pages_reloaded[
+                    announcement_id
+                ] = announcement_page_count
             if not pages:
                 raise ValueError("archived official pages are missing")
-            input_context = original_result.get("_input_context") or {}
-            allowed_start_value = input_context.get("allowed_start")
-            allowed_end_value = input_context.get("allowed_end")
+            archived_context_lineage.sort(key=lambda item: (
+                str(item.get("announcement_id") or ""),
+                int(item.get("artifact_id") or 0),
+                str(item.get("content_hash") or ""),
+            ))
+            archived_context_hash = hashlib.sha256(json.dumps(
+                archived_context_lineage,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")).hexdigest()
+            allowed_start_value = original_input_context.get("allowed_start")
+            allowed_end_value = original_input_context.get("allowed_end")
             post_validation_status, post_gate_results, validated_result = validate_analysis(
                 normalized_proposed,
                 instrument_id=instrument_id,
@@ -24088,7 +24474,11 @@ class DataManager:
                     str(item.get("announcement_title") or "")
                     for item in candidates
                 ),
-                context_complete=bool(input_context.get("context_complete", True)),
+                context_complete=(
+                    True
+                    if acknowledge_archived_context
+                    else bool(original_context_complete)
+                ),
             )
             if post_validation_status != "validated_candidate" or not all(
                 bool(value) for value in post_gate_results.values()
@@ -24188,6 +24578,9 @@ class DataManager:
             "notes": str(payload.get("notes") or ""),
             "corrected_result": corrected_result or {},
             "terminal_reason": terminal_reason,
+            "acknowledge_archived_context": acknowledge_archived_context,
+            "original_context_complete": original_context_complete,
+            "archived_context_hash": archived_context_hash,
         }, sort_keys=True).encode()).hexdigest()
         review_row = {
             "review_key": review_key,
@@ -24210,6 +24603,31 @@ class DataManager:
                 "post_gate_results": post_gate_results,
                 "terminal_reason": terminal_reason or None,
                 "selected_evidence": selected_evidence,
+                "archived_context_acknowledgement": {
+                    "requested": acknowledge_archived_context,
+                    "accepted": acknowledge_archived_context,
+                    "original_context_complete": original_context_complete,
+                    "review_context_complete": (
+                        bool(post_gate_results.get("context_complete"))
+                        if isinstance(post_gate_results, dict)
+                        else None
+                    ),
+                    "candidates_available": original_input_context.get(
+                        "candidates_available"
+                    ),
+                    "candidates_included": original_input_context.get(
+                        "candidates_included"
+                    ),
+                    "candidate_metadata_omitted": original_input_context.get(
+                        "candidate_metadata_omitted"
+                    ),
+                    "announcement_ids": sorted(
+                        archived_pages_reloaded
+                    ),
+                    "pages_reloaded": archived_pages_reloaded,
+                    "context_hash": archived_context_hash,
+                    "artifacts": archived_context_lineage,
+                },
                 "analysis_versions": {
                     "schema_version": analysis.get("schema_version"),
                     "prompt_version": analysis.get("prompt_version"),

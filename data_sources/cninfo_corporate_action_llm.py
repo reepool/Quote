@@ -2382,6 +2382,28 @@ def _event_prompt_payload(
             0, len(candidate_rows) - len(bounded_candidates)
         ),
     }
+    repair_context = event.get("_document_context_repair")
+    if isinstance(repair_context, Mapping):
+        context["document_context_repair"] = {
+            "attempted": bool(repair_context.get("attempted")),
+            "source_analysis_id": repair_context.get("source_analysis_id"),
+            "source_input_hash": repair_context.get("source_input_hash"),
+            "archive_pages_available": int(
+                repair_context.get("archive_pages_available") or 0
+            ),
+            "archive_pages_selected": int(
+                repair_context.get("archive_pages_selected") or 0
+            ),
+            "archive_pages_omitted": int(
+                repair_context.get("archive_pages_omitted") or 0
+            ),
+            "archive_context_complete": bool(
+                repair_context.get("archive_context_complete")
+            ),
+            "selected_sections": list(
+                repair_context.get("selected_sections") or []
+            ),
+        }
     return payload, context
 
 
@@ -3211,6 +3233,12 @@ class CninfoCorporateActionLlmResolver:
         context["context_complete"] = bool(
             context.get("context_complete")
             and not context.get("candidate_metadata_omitted")
+            and (
+                not context.get("document_context_repair")
+                or context["document_context_repair"].get(
+                    "archive_context_complete"
+                )
+            )
         )
         context["prompt_characters"] = 0
         payload = {

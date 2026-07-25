@@ -5518,7 +5518,8 @@ class DatabaseOperations:
         allowed_states = {
             "resolved_source", "resolved_evidence", "not_applicable",
             "source_not_supported", "candidate_pending_analysis",
-            "validated_candidate", "machine_rework", "manual_required",
+            "validated_candidate", "machine_rework", "document_rework",
+            "manual_required",
             "conflict", "non_effective", "superseded",
             "scope_mismatch", "official_archive_unavailable",
             "evidence_unavailable", "discovery_pending", "retryable_error",

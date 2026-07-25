@@ -119,4 +119,24 @@ async def test_resolution_state_upsert_is_idempotent_and_filterable():
     assert page["items"][0]["diagnostics"] == {
         "missing_required_date_roles": ["effective_date"]
     }
+    document_rework = await operations.upsert_corporate_action_resolution_states(
+        [{
+            **row,
+            "resolution_state": "document_rework",
+            "state_reason": "analysis_context_incomplete",
+            "next_action": "repair_document_context",
+        }],
+        ingestion_run_id="run-2",
+    )
+    document_page = await operations.get_corporate_action_resolution_states(
+        factor_blocking=True,
+        next_action="repair_document_context",
+        limit=10,
+        offset=0,
+    )
+    assert document_rework == {
+        "inserted": 0, "changed": 1, "unchanged": 0, "failed": 0
+    }
+    assert document_page["total"] == 1
+    assert document_page["items"][0]["resolution_state"] == "document_rework"
     await engine.dispose()
