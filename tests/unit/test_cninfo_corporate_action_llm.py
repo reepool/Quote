@@ -2460,6 +2460,99 @@ def _manual_review_manager(page, analysis_result, *, validation_status):
 
 
 @pytest.mark.asyncio
+async def test_governed_auto_promotion_accepts_derived_validation_diagnostics():
+    page, status, gates, normalized = _eligible_auto_promotion_case()
+    assert "economic_primitive_validation_warnings" in normalized
+    manager = _manual_review_manager(
+        page, normalized, validation_status=status
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+
+    outcome = await manager._maybe_auto_promote_cninfo_analysis(
+        analysis={
+            "analysis_id": 7,
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "validation_status": status,
+            "schema_version": SCHEMA_VERSION,
+            "parser_version": PARSER_VERSION,
+            "result": normalized,
+            "gate_results": gates,
+        },
+        pages=[page],
+        enabled=True,
+        dry_run=False,
+    )
+
+    assert outcome["eligible"] is True
+    assert outcome["status"] == "promoted"
+    assert outcome["promoted"] is True
+    review_payload = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs[
+            "review_row"
+        ]["review_payload"]
+    )
+    assert review_payload["validated_result"][
+        "economic_primitive_validation_warnings"
+    ] == []
+
+
+@pytest.mark.asyncio
+async def test_governed_review_rejects_unknown_public_analysis_field():
+    page, status, _, normalized = _eligible_auto_promotion_case()
+    normalized["unexpected_public_field"] = {"unsafe": True}
+    manager = _manual_review_manager(
+        page, normalized, validation_status=status
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "stored analysis contains unsupported public fields: "
+            "unexpected_public_field"
+        ),
+    ):
+        await manager.review_cninfo_corporate_action_resolution({
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": 7,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "reviewer": "unit-reviewer",
+        })
+
+    manager.db_ops.save_corporate_action_review_bundle.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_governed_rejection_can_quarantine_unknown_public_analysis_field():
+    page, status, _, normalized = _eligible_auto_promotion_case()
+    normalized["unexpected_public_field"] = {"unsafe": True}
+    manager = _manual_review_manager(
+        page, normalized, validation_status=status
+    )
+
+    result = await manager.review_cninfo_corporate_action_resolution({
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 7,
+        "decision": "rejected",
+        "reviewer": "unit-reviewer",
+    })
+
+    assert result["status"] == "success"
+    saved = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    assert saved["review_row"]["decision"] == "rejected"
+    assert saved["review_row"]["review_payload"]["original_result"][
+        "unexpected_public_field"
+    ] == {"unsafe": True}
+    assert saved["review_row"]["review_payload"]["validated_result"] is None
+    assert saved["terms_row"]["is_active"] is False
+
+
+@pytest.mark.asyncio
 async def test_manual_required_correction_reruns_archived_evidence_gates():
     page = _page()
     original = _result(page, effective_date="2026-06-13")

@@ -35,6 +35,9 @@ REVALIDATABLE_PARSER_VERSIONS = frozenset({
 AUTO_PROMOTION_POLICY_VERSION = "cninfo_corporate_action_auto_promotion.v1"
 AUTO_PROMOTION_REVIEWER = "system:cninfo_auto_promotion.v1"
 AUTO_PROMOTION_MIN_CONFIDENCE = Decimal("0.90")
+DETERMINISTIC_ANALYSIS_DIAGNOSTIC_FIELDS = frozenset({
+    "economic_primitive_validation_warnings",
+})
 MAX_EVENT_PAGES = 24
 MAX_EVENT_CHARACTERS = 60000
 MAX_EVENT_PROMPT_CHARACTERS = 75000
@@ -579,6 +582,32 @@ def analysis_schema_for_version(schema_version: Any) -> dict[str, Any]:
     if version == SCHEMA_VERSION:
         return ANALYSIS_SCHEMA
     raise ValueError(f"unsupported corporate-action analysis schema: {version or '<missing>'}")
+
+
+def analysis_result_for_schema_validation(
+    result: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return strict response fields while rejecting unknown public data."""
+    schema = analysis_schema_for_version(result.get("schema_version"))
+    schema_fields = set(schema.get("properties") or {})
+    public_fields = {
+        str(key) for key in result
+        if not str(key).startswith("_")
+    }
+    unsupported_fields = sorted(
+        public_fields
+        - schema_fields
+        - DETERMINISTIC_ANALYSIS_DIAGNOSTIC_FIELDS
+    )
+    if unsupported_fields:
+        raise ValueError(
+            "stored analysis contains unsupported public fields: "
+            + ", ".join(unsupported_fields)
+        )
+    return {
+        key: value for key, value in result.items()
+        if str(key) in schema_fields
+    }
 
 
 @dataclass(frozen=True)

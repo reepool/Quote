@@ -23892,6 +23892,7 @@ class DataManager:
             CorporateActionPageText,
         )
         from data_sources.cninfo_corporate_action_llm import (
+            analysis_result_for_schema_validation,
             analysis_schema_for_version,
             canonical_supported_economic_fields,
             normalize_analysis_result,
@@ -23963,21 +23964,6 @@ class DataManager:
                 "unsupported corrected_result fields: "
                 + ", ".join(unsupported_corrections)
             )
-        proposed_result = {
-            key: value for key, value in original_result.items()
-            if not str(key).startswith("_")
-        }
-        if corrected_result:
-            proposed_result.update(deepcopy(corrected_result))
-        proposed_result.update({
-            "schema_version": original_result.get("schema_version"),
-            "instrument_id": instrument_id,
-            "source_event_key": source_event_key,
-            "event_match": True,
-        })
-        if decision == "resolved":
-            proposed_result["analysis_status"] = "resolved_candidate"
-
         effective_date = payload.get("effective_date")
         date_basis = str(payload.get("date_basis") or "").strip() or None
         selected_evidence = None
@@ -23992,6 +23978,18 @@ class DataManager:
                 raise ValueError(
                     "resolved review requires a candidate analysis"
                 )
+            proposed_result = analysis_result_for_schema_validation(
+                original_result
+            )
+            if corrected_result:
+                proposed_result.update(deepcopy(corrected_result))
+            proposed_result.update({
+                "schema_version": original_result.get("schema_version"),
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "event_match": True,
+                "analysis_status": "resolved_candidate",
+            })
             normalized_proposed = normalize_analysis_result(proposed_result)
             try:
                 validate_data(
