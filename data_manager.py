@@ -20059,6 +20059,528 @@ class DataManager:
             })
         return inventory
 
+    async def _review_cninfo_asymmetric_passthrough_batch(
+        self,
+        *,
+        items: List[Mapping[str, Any]],
+        dry_run: bool,
+        exclude_reviewed_events: bool,
+        ingestion_run_id: str,
+        sample_limit: int,
+    ) -> Dict[str, Any]:
+        """Review eligible asymmetric CNInfo events from persisted data only."""
+        from data_sources.cninfo_corporate_action_llm import (
+            official_quote_supports_date,
+        )
+        from data_sources.cninfo_resolution_governance import (
+            classify_cninfo_asymmetric_passthrough,
+            rank_cninfo_asymmetric_implementation_candidate,
+        )
+
+        event_keys = sorted({
+            str(item.get("source_event_key") or "").strip()
+            for item in items
+            if str(item.get("source_event_key") or "").strip()
+        })
+        report: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "success",
+            "policy_version": "cninfo_asymmetric_passthrough_v1",
+            "network_access": False,
+            "llm_invocations": 0,
+            "scanned": len(event_keys),
+            "eligible": 0,
+            "promoted": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "skipped": 0,
+            "blocked": 0,
+            "failed": 0,
+            "blocked_reason_counts": {},
+            "eligible_samples": [],
+            "skipped_samples": [],
+            "blocked_samples": [],
+            "errors": [],
+        }
+        if not event_keys:
+            return report
+
+        placeholders = ", ".join(
+            f":asymmetric_event_{index}"
+            for index in range(len(event_keys))
+        )
+        params = {
+            f"asymmetric_event_{index}": value
+            for index, value in enumerate(event_keys)
+        }
+        observations = await self.db_ops.execute_read_query(
+            f"""
+            SELECT instrument_id, source_profile, source_event_key, action_type,
+                   cash_dividend_per_share, bonus_shares_per_share,
+                   capitalization_shares_per_share, rights_shares_per_share,
+                   rights_price, currency, description
+            FROM corporate_action_observations
+            WHERE source = 'cninfo'
+              AND is_current = 1
+              AND source_event_key IN ({placeholders})
+            """,
+            params,
+        )
+        observation_by_event = {
+            str(row.get("source_event_key") or ""): row
+            for row in observations
+        }
+        analysis_rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT id AS analysis_id, instrument_id, source_event_key,
+                   validation_status, result_json, updated_at
+            FROM corporate_action_llm_analyses
+            WHERE source_event_key IN ({placeholders})
+            ORDER BY source_event_key, updated_at DESC, id DESC
+            """,
+            params,
+        )
+        analysis_by_event: Dict[str, Dict[str, Any]] = {}
+        for row in analysis_rows:
+            event_key = str(row.get("source_event_key") or "")
+            if event_key in analysis_by_event:
+                continue
+            payload = row.get("result_json")
+            if isinstance(payload, str):
+                try:
+                    payload = json.loads(payload or "{}")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    payload = {}
+            analysis_by_event[event_key] = {
+                **row,
+                "result": payload if isinstance(payload, dict) else {},
+            }
+        candidate_rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT source_event_key, source_profile, evidence_key,
+                   resolution_status, announcement_id, announcement_title,
+                   announcement_time, evidence_url, raw_payload_json
+            FROM corporate_action_effective_date_evidence
+            WHERE source_event_key IN ({placeholders})
+              AND observation_source = 'cninfo'
+              AND evidence_source = 'cninfo_announcement_metadata'
+            ORDER BY source_event_key, updated_at DESC, id DESC
+            """,
+            params,
+        )
+        candidates_by_event: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        for row in candidate_rows:
+            candidate = dict(row)
+            raw_payload = candidate.pop("raw_payload_json", None)
+            if isinstance(raw_payload, str):
+                try:
+                    raw_payload = json.loads(raw_payload or "{}")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    raw_payload = {}
+            raw_payload = (
+                raw_payload if isinstance(raw_payload, Mapping) else {}
+            )
+            title_classification = raw_payload.get("title_classification") or {}
+            candidate["title_classification"] = (
+                title_classification
+                if isinstance(title_classification, Mapping)
+                else {}
+            )
+            candidates_by_event[
+                str(row.get("source_event_key") or "")
+            ].append(candidate)
+        review_rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT source_event_key, decision, review_payload_json
+            FROM corporate_action_resolution_reviews
+            WHERE source_event_key IN ({placeholders})
+            ORDER BY source_event_key, updated_at DESC, id DESC
+            """,
+            params,
+        )
+        reviewed_events = {
+            str(row.get("source_event_key") or "")
+            for row in review_rows
+            if str(row.get("source_event_key") or "")
+        }
+
+        for event_key in event_keys:
+            def block(reason: str, sample: Optional[Dict[str, Any]] = None) -> None:
+                report["blocked"] += 1
+                counts = report["blocked_reason_counts"]
+                counts[reason] = int(counts.get(reason, 0)) + 1
+                if sample is not None and len(report["blocked_samples"]) < sample_limit:
+                    report["blocked_samples"].append(sample)
+
+            observation = observation_by_event.get(event_key)
+            analysis = analysis_by_event.get(event_key)
+            candidates = candidates_by_event.get(event_key, [])
+            if exclude_reviewed_events and event_key in reviewed_events:
+                report["skipped"] += 1
+                if len(report["skipped_samples"]) < sample_limit:
+                    report["skipped_samples"].append({
+                        "source_event_key": event_key,
+                        "reason": "already_reviewed",
+                    })
+                continue
+            if observation is None:
+                block("current_cninfo_observation_missing", {
+                    "source_event_key": event_key,
+                    "reason": "current_cninfo_observation_missing",
+                })
+                continue
+            if analysis is None:
+                block("persisted_llm_analysis_missing", {
+                    "source_event_key": event_key,
+                    "reason": "persisted_llm_analysis_missing",
+                })
+                continue
+            classification = classify_cninfo_asymmetric_passthrough(
+                observation=observation,
+                analysis=analysis,
+                candidates=candidates,
+            )
+            if not classification.get("eligible"):
+                reason = str(
+                    classification.get("reason")
+                    or "asymmetric_eligibility_failed"
+                )
+                block(reason, {
+                    "source_event_key": event_key,
+                    "reason": reason,
+                    "beneficiary_markers": classification.get(
+                        "beneficiary_markers", []
+                    ),
+                    "special_event_markers": classification.get(
+                        "special_event_markers", []
+                    ),
+                    "economic_differences": classification.get(
+                        "economic_differences", {}
+                    ),
+                })
+                continue
+
+            effective_date = classification["effective_date"]
+            result = analysis.get("result") or {}
+            evidence_by_announcement: Dict[
+                str, List[Mapping[str, Any]]
+            ] = defaultdict(list)
+            for item in result.get("evidence", []):
+                if not isinstance(item, Mapping):
+                    continue
+                announcement_id = str(
+                    item.get("announcement_id") or ""
+                ).strip()
+                if announcement_id:
+                    evidence_by_announcement[announcement_id].append(item)
+            candidate_by_announcement = {
+                str(item.get("announcement_id") or ""): item
+                for item in candidates
+                if str(item.get("announcement_id") or "").strip()
+                and str(item.get("resolution_status") or "").lower()
+                == "candidate"
+            }
+            ranked_candidates = []
+            date_supported = False
+            cancellation_markers: Set[str] = set()
+            scoped_failures: List[Dict[str, Any]] = []
+            for candidate_index, candidate_item in enumerate(candidates):
+                announcement_id = str(
+                    candidate_item.get("announcement_id") or ""
+                ).strip()
+                if (
+                    not announcement_id
+                    or announcement_id not in candidate_by_announcement
+                ):
+                    continue
+                announcement_evidence = evidence_by_announcement.get(
+                    announcement_id, []
+                )
+                supporting_evidence = [
+                    item for item in announcement_evidence
+                    if (
+                        str(item.get("exact_quote") or "").strip()
+                        and official_quote_supports_date(
+                            effective_date.isoformat(),
+                            str(item.get("exact_quote") or "").strip(),
+                        )
+                    )
+                ]
+                if not supporting_evidence:
+                    continue
+                date_supported = True
+                priority = rank_cninfo_asymmetric_implementation_candidate(
+                    candidate_item,
+                    announcement_evidence,
+                )
+                if priority is None:
+                    continue
+                ranked_candidates.extend(
+                    (
+                        priority,
+                        candidate_index,
+                        evidence_index,
+                        candidate_item,
+                        evidence,
+                    )
+                    for evidence_index, evidence in enumerate(
+                        supporting_evidence
+                    )
+                )
+
+            selected = None
+            for _, _, _, candidate_item, evidence in sorted(
+                ranked_candidates,
+                key=lambda item: item[:3],
+            ):
+                selected_text = " ".join((
+                    str(candidate_item.get("announcement_title") or ""),
+                    str(evidence.get("exact_quote") or ""),
+                ))
+                selected_block_markers = {
+                    marker for marker in (
+                        "取消", "终止", "不予实施", "不实施", "更正", "修订"
+                    )
+                    if marker in selected_text
+                }
+                if selected_block_markers:
+                    cancellation_markers.update(selected_block_markers)
+                    continue
+                announcement_id = str(
+                    candidate_item.get("announcement_id") or ""
+                ).strip()
+                selected_classification = (
+                    classify_cninfo_asymmetric_passthrough(
+                        observation=observation,
+                        analysis=analysis,
+                        candidates=[candidate_item],
+                        selected_announcement_ids=[announcement_id],
+                    )
+                )
+                if not selected_classification.get("eligible"):
+                    scoped_failures.append(selected_classification)
+                    continue
+                selected = (
+                    candidate_item,
+                    evidence,
+                    selected_classification,
+                )
+                break
+            if selected is None:
+                if cancellation_markers and not scoped_failures:
+                    reason = (
+                        "selected_announcement_cancellation_or_correction"
+                    )
+                    sample = {
+                        "source_event_key": event_key,
+                        "reason": reason,
+                        "markers": sorted(cancellation_markers),
+                    }
+                elif scoped_failures:
+                    scoped_failure = scoped_failures[0]
+                    reason = str(
+                        scoped_failure.get("reason")
+                        or "selected_announcement_scope_not_supported"
+                    )
+                    sample = {
+                        "source_event_key": event_key,
+                        "reason": reason,
+                        "beneficiary_markers": scoped_failure.get(
+                            "beneficiary_markers", []
+                        ),
+                        "special_event_markers": scoped_failure.get(
+                            "special_event_markers", []
+                        ),
+                    }
+                elif date_supported:
+                    reason = "implementation_grade_announcement_missing"
+                    sample = {
+                        "source_event_key": event_key,
+                        "reason": reason,
+                    }
+                else:
+                    reason = "effective_date_not_supported_by_stored_quote"
+                    sample = {
+                        "source_event_key": event_key,
+                        "reason": reason,
+                    }
+                block(reason, sample)
+                continue
+            candidate, selected_evidence, classification = selected
+            if candidate is None:
+                block("implementation_grade_announcement_missing", {
+                    "source_event_key": event_key,
+                    "reason": "implementation_grade_announcement_missing",
+                })
+                continue
+            economic_fields = (
+                "cash_dividend_per_share",
+                "bonus_shares_per_share",
+                "capitalization_shares_per_share",
+                "rights_shares_per_share",
+                "rights_price",
+            )
+            if not any(
+                _value is not None and float(_value or 0) > 0
+                for _value in (
+                    observation.get(field_name)
+                    for field_name in economic_fields
+                )
+            ):
+                block("cninfo_observation_has_no_positive_economic_term", {
+                    "source_event_key": event_key,
+                    "reason": "cninfo_observation_has_no_positive_economic_term",
+                })
+                continue
+
+            report["eligible"] += 1
+            effective_date_value = effective_date.isoformat()
+            date_basis = (
+                str(classification.get("date_basis") or "").strip()
+                or str(result.get("date_basis") or "").strip()
+                or str(result.get("effective_date_type") or "").strip()
+                or str(
+                    classification.get("effective_date_type") or ""
+                ).strip()
+                or "CNInfo已有实施日期"
+            )
+            selected_evidence_id = str(
+                selected_evidence.get("evidence_id") or ""
+            ).strip()
+            selected_candidate_key = str(
+                candidate.get("evidence_key") or ""
+            ).strip()
+            if len(report["eligible_samples"]) < sample_limit:
+                report["eligible_samples"].append({
+                    "source_event_key": event_key,
+                    "instrument_id": observation.get("instrument_id"),
+                    "effective_date": effective_date_value,
+                    "date_basis": date_basis,
+                    "beneficiary_markers": classification.get(
+                        "beneficiary_markers", []
+                    ),
+                    "special_event_markers": classification.get(
+                        "special_event_markers", []
+                    ),
+                    "economic_differences": classification.get(
+                        "economic_differences", {}
+                    ),
+                    "announcement_id": candidate.get("announcement_id"),
+                })
+            if dry_run:
+                continue
+
+            review_key = hashlib.sha256(json.dumps({
+                "policy": "cninfo_asymmetric_passthrough_v1",
+                "instrument_id": observation.get("instrument_id"),
+                "source_event_key": event_key,
+                "analysis_id": analysis.get("analysis_id"),
+                "effective_date": effective_date_value,
+                "evidence_key": selected_candidate_key,
+            }, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+            normalized_terms = {
+                field_name: observation.get(field_name)
+                for field_name in economic_fields
+            }
+            resolved_fields = [
+                field_name for field_name in economic_fields
+                if observation.get(field_name) is not None
+            ]
+            review_payload = {
+                "resolution_policy": "cninfo_asymmetric_passthrough_v1",
+                "beneficiary_markers": classification.get(
+                    "beneficiary_markers", []
+                ),
+                "special_event_markers": classification.get(
+                    "special_event_markers", []
+                ),
+                "economic_differences": classification.get(
+                    "economic_differences", {}
+                ),
+                "analysis_id": analysis.get("analysis_id"),
+                "selected_evidence": selected_evidence,
+                "selected_announcement": candidate,
+                "cninfo_observation_terms": normalized_terms,
+            }
+            try:
+                bundle = await self.db_ops.save_corporate_action_review_bundle(
+                    review_row={
+                        "review_key": review_key,
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "analysis_id": analysis["analysis_id"],
+                        "evidence_key": selected_candidate_key or event_key,
+                        "decision": "resolved",
+                        "effective_date": effective_date_value,
+                        "date_basis": date_basis,
+                        "reviewer": "cninfo_asymmetric_governance",
+                        "notes": (
+                            "CNInfo非对称事项按既有CNInfo记录旁路核准；"
+                            "不套用全体股东送转公式。"
+                        ),
+                        "review_payload": review_payload,
+                    },
+                    terms_row={
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "analysis_id": analysis["analysis_id"],
+                        **normalized_terms,
+                        "currency": observation.get("currency"),
+                        "resolved_fields": resolved_fields,
+                        "evidence": {
+                            "resolution_policy": (
+                                "cninfo_asymmetric_passthrough_v1"
+                            ),
+                            "source": "cninfo_observation",
+                            "selected_evidence_id": selected_evidence_id,
+                        },
+                        "is_active": True,
+                    },
+                    evidence_row={
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "observation_source": "cninfo",
+                        "source_profile": (
+                            candidate.get("source_profile")
+                            or observation.get("source_profile")
+                        ),
+                        "evidence_source": (
+                            "cninfo_reviewed_official_document"
+                        ),
+                        "evidence_key": selected_candidate_key or event_key,
+                        "resolution_status": "resolved",
+                        "effective_date": effective_date_value,
+                        "date_basis": date_basis,
+                        "announcement_id": candidate.get("announcement_id"),
+                        "announcement_title": candidate.get("announcement_title"),
+                        "announcement_time": candidate.get("announcement_time"),
+                        "evidence_url": candidate.get("evidence_url"),
+                        "confidence": result.get("confidence"),
+                        "raw_payload": review_payload,
+                    },
+                    ingestion_run_id=ingestion_run_id,
+                    reject_if_prior_event_review=bool(exclude_reviewed_events),
+                )
+            except Exception as exc:
+                report["failed"] += 1
+                report["errors"].append({
+                    "source_event_key": event_key,
+                    "error": str(exc),
+                })
+                continue
+            review_status = str(
+                (bundle.get("review") or {}).get("status") or ""
+            )
+            if review_status == "inserted":
+                report["promoted"] += 1
+            elif review_status == "updated":
+                report["updated"] += 1
+            else:
+                report["unchanged"] += 1
+
+        if not dry_run and report["failed"]:
+            report["status"] = "partial"
+        return report
+
     async def govern_cninfo_corporate_action_resolutions(
         self,
         *,
@@ -20118,7 +20640,10 @@ class DataManager:
         normalized_scopes = [
             item.lower() for item in normalize_string_list(scopes)
         ] or ["inventory", "discovery", "resolution"]
-        allowed_scopes = {"inventory", "discovery", "resolution", "factors"}
+        allowed_scopes = {
+            "inventory", "discovery", "resolution", "factors",
+            "asymmetric_review",
+        }
         invalid_scopes = sorted(set(normalized_scopes) - allowed_scopes)
         if invalid_scopes:
             raise ValueError(f"unsupported governance scopes: {invalid_scopes}")
@@ -20221,6 +20746,18 @@ class DataManager:
         batch = processable[offset: offset + limit]
         batch_keys = [item["source_event_key"] for item in batch]
         batch_key_set = set(batch_keys)
+        asymmetric_batch = (
+            actionable[offset: offset + limit]
+            if "asymmetric_review" in normalized_scopes
+            else []
+        )
+        asymmetric_has_more = (
+            "asymmetric_review" in normalized_scopes
+            and offset + len(asymmetric_batch) < len(actionable)
+        )
+        asymmetric_batch_keys = [
+            item["source_event_key"] for item in asymmetric_batch
+        ]
         repair_key_set = {
             item["source_event_key"]
             for item in batch
@@ -20236,6 +20773,17 @@ class DataManager:
         resolution_ready_queue: Optional[asyncio.Queue[Any]] = None
         resolution_consumer: Optional[asyncio.Task[None]] = None
         resolution_sentinel = object()
+
+        if "asymmetric_review" in normalized_scopes:
+            stage_results["asymmetric_review"] = (
+                await self._review_cninfo_asymmetric_passthrough_batch(
+                    items=asymmetric_batch,
+                    dry_run=bool(dry_run),
+                    exclude_reviewed_events=bool(exclude_reviewed_events),
+                    ingestion_run_id=run_id,
+                    sample_limit=int(sample_limit),
+                )
+            )
 
         if (
             pipeline_config.mode == "async"
@@ -20644,6 +21192,22 @@ class DataManager:
             for item in final_inventory if not item["is_terminal"]
         )
         factor_blockers = [item for item in final_inventory if item["factor_blocking"]]
+        asymmetric_next_target_offset = None
+        if asymmetric_has_more:
+            if dry_run:
+                asymmetric_next_target_offset = offset + len(asymmetric_batch)
+            else:
+                asymmetric_result = stage_results.get(
+                    "asymmetric_review"
+                ) or {}
+                terminalized_count = sum(
+                    int(asymmetric_result.get(field_name) or 0)
+                    for field_name in ("promoted", "updated", "unchanged")
+                )
+                asymmetric_next_target_offset = max(
+                    0,
+                    offset + len(asymmetric_batch) - terminalized_count,
+                )
         stage_failures = [
             name for name, value in stage_results.items()
             if str((value or {}).get("status")) in {"failed", "partial"}
@@ -20704,6 +21268,12 @@ class DataManager:
                 "processable_events": len(processable),
                 "batch_events": len(batch),
                 "batch_event_keys": batch_keys,
+                "asymmetric_batch_events": len(asymmetric_batch),
+                "asymmetric_batch_event_keys": asymmetric_batch_keys,
+                "asymmetric_has_more": asymmetric_has_more,
+                "asymmetric_next_target_offset": (
+                    asymmetric_next_target_offset
+                ),
                 "target_offset": offset,
                 "has_more": has_more,
                 "next_target_offset": (

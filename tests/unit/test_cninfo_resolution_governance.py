@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
 
@@ -8,7 +9,9 @@ from data_manager import DataManager
 from data_sources.cninfo_resolution_governance import (
     APPLICABILITY_POLICY_VERSION,
     classify_date_applicability,
+    classify_cninfo_asymmetric_passthrough,
     derive_resolution_state,
+    rank_cninfo_asymmetric_implementation_candidate,
 )
 
 
@@ -54,6 +57,385 @@ def _state(event_key, state, *, candidate_count=0, terminal=False, next_action=N
         "resolved_effective_date": None,
         "diagnostics": {},
     }
+
+
+def _asymmetric_analysis(*, extra_bonus=0.0):
+    return {
+        "analysis_id": 11,
+        "validation_status": "manual_required",
+        "result": {
+            "event_type": "share_reform",
+            "event_stage": "implemented",
+            "effective_date": "2006-06-14",
+            "effective_date_type": "resumption_date",
+            "date_basis": "复牌日",
+            "economic_terms": {
+                "cash_dividend": None,
+                "bonus_shares": {
+                    "value": extra_bonus,
+                    "unit": "per_share",
+                    "currency": None,
+                },
+                "capitalization_shares": {
+                    "value": 1.5,
+                    "unit": "per_10_shares",
+                    "currency": None,
+                },
+                "rights_shares": None,
+                "rights_price": None,
+            },
+            "economic_primitives": [{
+                "fact_type": "capitalization_ratio",
+                "value": 1.5,
+                "unit": "per_10_shares",
+                "beneficiary_scope": "circulating_shareholders",
+            }],
+            "evidence": [{
+                "evidence_id": "ev-1",
+                "announcement_id": "announcement-1",
+                "page_number": 1,
+                "text_hash": "hash-1",
+                "exact_quote": (
+                    "股权分置改革方案实施公告，流通股股东复牌日为"
+                    "2006年6月14日，每10股转增1.5股。"
+                ),
+            }],
+            "confidence": 0.98,
+            "reason": "股权分置改革对价实施",
+        },
+    }
+
+
+def test_asymmetric_passthrough_accepts_matching_persisted_cninfo_terms():
+    result = classify_cninfo_asymmetric_passthrough(
+        observation=_row(
+            action_type="capitalization",
+            cash_dividend_per_share=0.0,
+            capitalization_shares_per_share=0.15,
+            description="10转增1.5股（股改对价）",
+        ),
+        analysis=_asymmetric_analysis(),
+        candidates=[{
+            "announcement_id": "announcement-1",
+            "announcement_title": "股权分置改革方案实施公告",
+            "resolution_status": "candidate",
+        }],
+    )
+
+    assert result["eligible"] is True
+    assert result["effective_date"] == date(2006, 6, 14)
+    assert "beneficiary_scope:circulating_shareholders" in result[
+        "beneficiary_markers"
+    ]
+
+
+def test_asymmetric_passthrough_reuses_stored_implementation_date_fact():
+    analysis = _asymmetric_analysis()
+    analysis["result"]["effective_date"] = None
+    analysis["result"]["effective_date_type"] = None
+    analysis["result"]["date_basis"] = None
+    analysis["result"]["date_facts"] = [{
+        "date": "2006-06-14",
+        "date_type": "resumption_date",
+        "date_basis": "公司股票复牌日",
+        "evidence_ids": ["ev-1"],
+    }]
+
+    result = classify_cninfo_asymmetric_passthrough(
+        observation=_row(
+            action_type="capitalization",
+            cash_dividend_per_share=0.0,
+            capitalization_shares_per_share=0.15,
+            description="10转增1.5股（股改对价）",
+        ),
+        analysis=analysis,
+        candidates=[{
+            "announcement_id": "announcement-1",
+            "announcement_title": "股权分置改革方案实施公告",
+            "resolution_status": "candidate",
+        }],
+    )
+
+    assert result["eligible"] is True
+    assert result["effective_date"] == date(2006, 6, 14)
+    assert result["date_basis"] == "公司股票复牌日"
+
+
+def test_asymmetric_passthrough_records_but_does_not_block_llm_term_difference():
+    result = classify_cninfo_asymmetric_passthrough(
+        observation=_row(
+            cash_dividend_per_share=0.757,
+            description="10派7.57元",
+        ),
+        analysis={
+            **_asymmetric_analysis(extra_bonus=0.22),
+            "result": {
+                **_asymmetric_analysis(extra_bonus=0.22)["result"],
+                "economic_terms": {
+                    "cash_dividend": {
+                        "value": 7.57,
+                        "unit": "CNY_per_10_shares",
+                        "currency": "CNY",
+                    },
+                    "bonus_shares": {
+                        "value": 2.2,
+                        "unit": "per_10_shares",
+                        "currency": None,
+                    },
+                    "capitalization_shares": None,
+                    "rights_shares": None,
+                    "rights_price": None,
+                },
+            },
+        },
+        candidates=[{
+            "announcement_id": "announcement-1",
+            "announcement_title": "股权分置改革方案实施公告",
+            "resolution_status": "candidate",
+        }],
+    )
+
+    assert result["eligible"] is True
+    assert result["economic_differences"]["shares"]["cninfo"] == 0.0
+    assert result["economic_differences"]["shares"]["analysis"] == pytest.approx(
+        0.22
+    )
+
+
+def test_asymmetric_passthrough_does_not_borrow_markers_from_other_announcement():
+    analysis = _asymmetric_analysis()
+    analysis["result"]["economic_primitives"] = []
+    analysis["result"]["reason"] = ""
+    analysis["result"]["evidence"] = [
+        {
+            "evidence_id": "date-only",
+            "announcement_id": "announcement-date",
+            "exact_quote": "公司股份于2006年6月14日上市。",
+        },
+        {
+            "evidence_id": "scope-only",
+            "announcement_id": "announcement-scope",
+            "exact_quote": "股权分置改革对价仅向流通股股东实施。",
+        },
+    ]
+    candidates = [
+        {
+            "announcement_id": "announcement-date",
+            "announcement_title": "股份上市公告",
+            "resolution_status": "candidate",
+        },
+        {
+            "announcement_id": "announcement-scope",
+            "announcement_title": "股权分置改革方案实施公告",
+            "resolution_status": "candidate",
+        },
+    ]
+
+    result = classify_cninfo_asymmetric_passthrough(
+        observation=_row(
+            action_type="capitalization",
+            capitalization_shares_per_share=0.15,
+            description="每10股转增1.5股",
+        ),
+        analysis=analysis,
+        candidates=candidates,
+        selected_announcement_ids=["announcement-date"],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "limited_beneficiary_scope_not_explicit"
+
+
+def test_asymmetric_candidate_rank_rejects_proposal_share_reform_role():
+    proposal = {
+        "announcement_title": "关于沟通协商暨调整股权分置改革方案的公告",
+        "title_classification": {"announcement_role": "share_reform"},
+    }
+    implementation = {
+        "announcement_title": "股权分置改革方案实施公告",
+        "title_classification": {"announcement_role": "share_reform"},
+    }
+
+    assert rank_cninfo_asymmetric_implementation_candidate(
+        proposal,
+        [{"exact_quote": "公司股票将于2006年6月14日复牌。"}],
+    ) is None
+    assert rank_cninfo_asymmetric_implementation_candidate(
+        implementation,
+        [{"exact_quote": "方案实施的股份变更登记日为2006年6月14日。"}],
+    ) == 4
+
+
+@pytest.mark.asyncio
+async def test_asymmetric_passthrough_write_uses_cninfo_terms_without_llm_call():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{
+            "instrument_id": "600108.SH",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-1",
+            "action_type": "capitalization",
+            "cash_dividend_per_share": 0.0,
+            "bonus_shares_per_share": 0.0,
+            "capitalization_shares_per_share": 0.15,
+            "rights_shares_per_share": 0.0,
+            "rights_price": 0.0,
+            "currency": "CNY",
+            "description": "10转增1.5股（股改对价）",
+        }],
+        [{
+            "analysis_id": 11,
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-1",
+            "validation_status": "manual_required",
+            "result_json": json.dumps(_asymmetric_analysis()["result"]),
+        }],
+        [{
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "evidence_key": "candidate-1",
+            "resolution_status": "candidate",
+            "announcement_id": "announcement-1",
+            "announcement_title": "股权分置改革方案实施公告",
+            "announcement_time": "2006-06-13",
+            "evidence_url": "https://example.invalid/announcement-1",
+        }],
+        [],
+    ])
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"status": "inserted"},
+            "terms_write": {"status": "inserted"},
+        }
+    )
+
+    result = await manager._review_cninfo_asymmetric_passthrough_batch(
+        items=[{
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-1",
+        }],
+        dry_run=False,
+        exclude_reviewed_events=True,
+        ingestion_run_id="run-1",
+        sample_limit=10,
+    )
+
+    assert result["promoted"] == 1
+    request = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    assert request["terms_row"]["capitalization_shares_per_share"] == 0.15
+    assert request["terms_row"]["bonus_shares_per_share"] == 0.0
+    assert request["review_row"]["review_payload"][
+        "resolution_policy"
+    ] == "cninfo_asymmetric_passthrough_v1"
+
+
+@pytest.mark.asyncio
+async def test_asymmetric_write_uses_implementation_candidate_and_all_quotes():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    analysis = _asymmetric_analysis()
+    analysis["result"]["evidence"] = [
+        {
+            "evidence_id": "proposal-date",
+            "announcement_id": "announcement-proposal",
+            "exact_quote": "公司股票将于2006年6月14日复牌。",
+        },
+        {
+            "evidence_id": "implementation-date",
+            "announcement_id": "announcement-implementation",
+            "exact_quote": "方案实施的股份变更登记日为2006年6月14日。",
+        },
+        {
+            "evidence_id": "implementation-scope",
+            "announcement_id": "announcement-implementation",
+            "exact_quote": "股权分置改革对价仅向流通股股东实施。",
+        },
+    ]
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{
+            "instrument_id": "600108.SH",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-1",
+            "action_type": "capitalization",
+            "cash_dividend_per_share": 0.0,
+            "bonus_shares_per_share": 0.0,
+            "capitalization_shares_per_share": 0.15,
+            "rights_shares_per_share": 0.0,
+            "rights_price": 0.0,
+            "currency": "CNY",
+            "description": "每10股转增1.5股",
+        }],
+        [{
+            "analysis_id": 11,
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-1",
+            "validation_status": "manual_required",
+            "result_json": json.dumps(analysis["result"]),
+        }],
+        [
+            {
+                "source_event_key": "event-1",
+                "source_profile": "cninfo_dividend",
+                "evidence_key": "proposal-key",
+                "resolution_status": "candidate",
+                "announcement_id": "announcement-proposal",
+                "announcement_title": "关于沟通协商暨调整股权分置改革方案的公告",
+                "announcement_time": "2006-06-01",
+                "evidence_url": "https://example.invalid/proposal",
+                "raw_payload_json": json.dumps({
+                    "title_classification": {
+                        "announcement_role": "share_reform",
+                        "relevance": "relevant",
+                    },
+                }),
+            },
+            {
+                "source_event_key": "event-1",
+                "source_profile": "cninfo_dividend",
+                "evidence_key": "implementation-key",
+                "resolution_status": "candidate",
+                "announcement_id": "announcement-implementation",
+                "announcement_title": "股权分置改革方案实施公告",
+                "announcement_time": "2006-06-13",
+                "evidence_url": "https://example.invalid/implementation",
+                "raw_payload_json": json.dumps({
+                    "title_classification": {
+                        "announcement_role": "implementation",
+                        "relevance": "relevant",
+                    },
+                }),
+            },
+        ],
+        [],
+    ])
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"status": "inserted"},
+            "terms_write": {"status": "inserted"},
+        }
+    )
+
+    result = await manager._review_cninfo_asymmetric_passthrough_batch(
+        items=[{
+            "instrument_id": "600108.SH",
+            "source_event_key": "event-1",
+        }],
+        dry_run=False,
+        exclude_reviewed_events=True,
+        ingestion_run_id="run-1",
+        sample_limit=10,
+    )
+
+    assert result["promoted"] == 1
+    request = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    assert request["review_row"]["evidence_key"] == "implementation-key"
+    assert request["evidence_row"]["announcement_id"] == (
+        "announcement-implementation"
+    )
+    assert request["review_row"]["review_payload"]["selected_evidence"][
+        "evidence_id"
+    ] == "implementation-date"
 
 
 def test_cash_dividend_optional_dates_do_not_create_extra_blockers():
@@ -716,6 +1098,104 @@ async def test_governance_dry_run_does_not_persist_state():
 
     assert result["status"] == "dry_run"
     manager.db_ops.upsert_corporate_action_resolution_states.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_asymmetric_review_scope_does_not_run_discovery_or_llm():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    inventory = [_state(
+        "event-1",
+        "manual_required",
+        candidate_count=1,
+        next_action="human_review",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[inventory, inventory]
+    )
+    manager._review_cninfo_asymmetric_passthrough_batch = AsyncMock(
+        return_value={
+            "status": "dry_run",
+            "scanned": 1,
+            "eligible": 1,
+            "network_access": False,
+            "llm_invocations": 0,
+        }
+    )
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock()
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock()
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "asymmetric_review"],
+        max_events=1,
+        dry_run=True,
+    )
+
+    assert result["stages"]["asymmetric_review"]["eligible"] == 1
+    manager.discover_cninfo_special_action_effective_dates.assert_not_awaited()
+    manager.analyze_cninfo_corporate_action_candidates.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_asymmetric_write_pagination_compensates_for_promoted_rows():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    initial = [
+        _state(
+            f"event-{index}",
+            "manual_required",
+            candidate_count=1,
+            next_action="human_review",
+        )
+        for index in range(3)
+    ]
+    final = initial[1:]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[initial, final]
+    )
+    manager._review_cninfo_asymmetric_passthrough_batch = AsyncMock(
+        return_value={
+            "status": "success",
+            "scanned": 2,
+            "eligible": 1,
+            "promoted": 1,
+            "updated": 0,
+            "unchanged": 0,
+            "blocked": 1,
+            "failed": 0,
+        }
+    )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            "instrument_id": item["instrument_id"],
+            "source_event_key": item["source_event_key"],
+        }
+        for item in final
+    ])
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 2,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "asymmetric_review"],
+        max_events=2,
+        target_offset=0,
+        dry_run=False,
+    )
+
+    assert result["targets"]["asymmetric_has_more"] is True
+    assert result["targets"]["asymmetric_next_target_offset"] == 1
 
 
 @pytest.mark.asyncio

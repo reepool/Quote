@@ -3,13 +3,71 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping, Optional, Sequence
 
 
 APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
 RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v5"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
+CNINFO_ASYMMETRIC_POLICY_VERSION = "cninfo_asymmetric_passthrough_v1"
+
+_ASYMMETRIC_BENEFICIARY_MARKERS = (
+    "流通股股东",
+    "流通股东",
+    "非流通股股东不",
+    "非流通股东不",
+    "大股东不",
+    "原非流通股股东不",
+    "仅向流通股",
+    "只向流通股",
+)
+_ASYMMETRIC_SPECIAL_EVENT_MARKERS = (
+    "股权分置",
+    "股改",
+    "对价",
+    "补偿股份",
+    "业绩承诺股份",
+    "债转股",
+    "重组",
+    "定向赠与",
+    "股份赠与",
+)
+_ASYMMETRIC_DATE_CONFLICT_MARKERS = (
+    "ambiguous",
+    "conflict",
+    "conflicts",
+    "inconsistent",
+    "which changes",
+    "不一致",
+    "歧义",
+    "冲突",
+)
+_ASYMMETRIC_DATE_ROLE_MARKERS = (
+    "date",
+    "日期",
+    "登记日",
+    "到账日",
+    "复牌日",
+    "effective",
+)
+_ASYMMETRIC_IMPLEMENTATION_ROLE_PRIORITY = {
+    "implementation_completion": 0,
+    "implementation": 1,
+    "share_arrival_notice": 2,
+    "compensation_share_distribution": 2,
+    "record_date_notice": 3,
+    "rights_issue": 3,
+}
+_ASYMMETRIC_IMPLEMENTATION_TEXT_MARKERS = (
+    "实施公告",
+    "实施完成",
+    "实施完毕",
+    "正式实施完毕",
+    "办理完成",
+    "已办理完成",
+    "已实施",
+)
 
 _EFFECTFUL_ACTIONS = {
     "dividend",
@@ -65,6 +123,332 @@ def _positive(value: Any) -> bool:
         return float(value or 0) > 0
     except (TypeError, ValueError):
         return False
+
+
+def _normalized_analysis_term(
+    result: Mapping[str, Any],
+    name: str,
+) -> float:
+    term = (result.get("economic_terms") or {}).get(name)
+    if not isinstance(term, Mapping) or term.get("value") is None:
+        return 0.0
+    try:
+        value = float(term.get("value") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+    unit = str(term.get("unit") or "")
+    if unit in {"per_10_shares", "CNY_per_10_shares"}:
+        value /= 10.0
+    return value
+
+
+def _analysis_effective_date(
+    result: Mapping[str, Any],
+) -> tuple[Optional[date], str, str]:
+    direct_date = _as_date(result.get("effective_date"))
+    if direct_date is not None:
+        return (
+            direct_date,
+            str(result.get("date_basis") or "").strip(),
+            str(result.get("effective_date_type") or "").strip(),
+        )
+    allowed_types = {
+        "ex_date",
+        "ex_dividend_date",
+        "implementation_date",
+        "share_arrival_date",
+        "listing_date",
+        "resumption_date",
+    }
+    type_priority = {
+        "implementation_date": 0,
+        "resumption_date": 1,
+        "listing_date": 2,
+        "share_arrival_date": 3,
+        "ex_date": 4,
+        "ex_dividend_date": 5,
+    }
+    date_items = []
+    for collection_name in ("date_facts", "alternative_dates"):
+        for item in result.get(collection_name, []):
+            if not isinstance(item, Mapping):
+                continue
+            date_type = str(item.get("date_type") or "").strip().lower()
+            parsed = _as_date(item.get("date"))
+            if parsed is None or date_type not in allowed_types:
+                continue
+            date_items.append((
+                type_priority.get(date_type, 99),
+                parsed,
+                str(item.get("date_basis") or "").strip(),
+                date_type,
+            ))
+    if not date_items:
+        return None, "", ""
+    _, parsed, basis, date_type = sorted(date_items)[0]
+    return parsed, basis, date_type
+
+
+def rank_cninfo_asymmetric_implementation_candidate(
+    candidate: Mapping[str, Any],
+    evidence_items: Sequence[Mapping[str, Any]] = (),
+) -> Optional[int]:
+    """Return a stable priority only for implementation-grade evidence."""
+    classification = candidate.get("title_classification") or {}
+    classification = (
+        classification if isinstance(classification, Mapping) else {}
+    )
+    role = str(
+        classification.get("announcement_role") or ""
+    ).strip().lower()
+    if role in _ASYMMETRIC_IMPLEMENTATION_ROLE_PRIORITY:
+        return _ASYMMETRIC_IMPLEMENTATION_ROLE_PRIORITY[role]
+
+    selected_text = " ".join([
+        str(candidate.get("announcement_title") or ""),
+        *(
+            str(item.get("exact_quote") or "")
+            for item in evidence_items
+            if isinstance(item, Mapping)
+        ),
+    ])
+    explicitly_implemented = any(
+        marker in selected_text
+        for marker in _ASYMMETRIC_IMPLEMENTATION_TEXT_MARKERS
+    )
+    if role == "share_reform":
+        return 4 if explicitly_implemented else None
+    if not role and explicitly_implemented:
+        return 5
+    return None
+
+
+def classify_cninfo_asymmetric_passthrough(
+    *,
+    observation: Mapping[str, Any],
+    analysis: Mapping[str, Any],
+    candidates: Sequence[Mapping[str, Any]] = (),
+    selected_announcement_ids: Optional[Sequence[str]] = None,
+) -> dict[str, Any]:
+    """Classify a persisted CNInfo event for asymmetric passthrough.
+
+    This helper is deliberately local and deterministic. It consumes already
+    persisted observation/analysis/candidate values and never performs I/O.
+    """
+    result = analysis.get("result") or {}
+    result = result if isinstance(result, Mapping) else {}
+    event_stage = str(result.get("event_stage") or "").strip().lower()
+    if event_stage not in {"implemented", "completed"}:
+        return {
+            "eligible": False,
+            "reason": "analysis_stage_not_implemented",
+            "beneficiary_markers": [],
+            "special_event_markers": [],
+        }
+    conflict_text = " ".join(
+        str(item or "") for item in result.get("conflicts", [])
+    ).lower()
+    if (
+        conflict_text
+        and any(
+            marker in conflict_text
+            for marker in _ASYMMETRIC_DATE_CONFLICT_MARKERS
+        )
+        and any(
+            marker in conflict_text
+            for marker in _ASYMMETRIC_DATE_ROLE_MARKERS
+        )
+    ):
+        return {
+            "eligible": False,
+            "reason": "analysis_date_conflict",
+            "beneficiary_markers": [],
+            "special_event_markers": [],
+        }
+    effective_date, date_basis, effective_date_type = _analysis_effective_date(
+        result
+    )
+    if effective_date is None:
+        return {
+            "eligible": False,
+            "reason": "missing_persisted_effective_date",
+            "beneficiary_markers": [],
+            "special_event_markers": [],
+        }
+
+    selected_ids = {
+        str(item or "").strip()
+        for item in (selected_announcement_ids or ())
+        if str(item or "").strip()
+    }
+    candidate_items = [
+        item for item in candidates
+        if (
+            not selected_ids
+            or str(item.get("announcement_id") or "").strip() in selected_ids
+        )
+    ]
+    evidence_items = [
+        item for item in result.get("evidence", [])
+        if isinstance(item, Mapping)
+        and (
+            not selected_ids
+            or str(item.get("announcement_id") or "").strip() in selected_ids
+        )
+    ]
+    candidate_announcement_ids = {
+        str(item.get("announcement_id") or "").strip()
+        for item in candidate_items
+        if str(item.get("announcement_id") or "").strip()
+        and str(item.get("resolution_status") or "candidate").lower()
+        == "candidate"
+    }
+    evidence_announcement_ids = {
+        str(item.get("announcement_id") or "").strip()
+        for item in evidence_items
+        if str(item.get("announcement_id") or "").strip()
+    }
+    if not candidate_announcement_ids.intersection(evidence_announcement_ids):
+        return {
+            "eligible": False,
+            "reason": "stored_announcement_evidence_link_missing",
+            "beneficiary_markers": [],
+            "special_event_markers": [],
+        }
+
+    selected_evidence_ids = {
+        str(item.get("evidence_id") or "").strip()
+        for item in evidence_items
+        if str(item.get("evidence_id") or "").strip()
+    }
+    primitive_items = [
+        item for item in result.get("economic_primitives", [])
+        if isinstance(item, Mapping)
+    ]
+    if selected_ids:
+        primitive_items = [
+            item for item in primitive_items
+            if (
+                not {
+                    str(evidence_id or "").strip()
+                    for evidence_id in (item.get("evidence_ids") or [])
+                    if str(evidence_id or "").strip()
+                }
+                or bool(
+                    selected_evidence_ids.intersection({
+                        str(evidence_id or "").strip()
+                        for evidence_id in (item.get("evidence_ids") or [])
+                        if str(evidence_id or "").strip()
+                    })
+                )
+            )
+        ]
+    primitive_scopes = {
+        str(item.get("beneficiary_scope") or "").strip().lower()
+        for item in primitive_items
+    }
+    texts = [str(observation.get("description") or "")]
+    if not selected_ids:
+        texts.extend((
+            str(result.get("event_type") or ""),
+            str(result.get("reason") or ""),
+        ))
+    for candidate in candidate_items:
+        texts.append(str(candidate.get("announcement_title") or ""))
+    for evidence in evidence_items:
+        texts.append(str(evidence.get("exact_quote") or ""))
+        for semantic in evidence.get("semantic_evidence", []):
+            if isinstance(semantic, Mapping):
+                texts.extend(
+                    str(semantic.get(field_name) or "")
+                    for field_name in (
+                        "subject_text", "relation_text", "basis_text", "role_text"
+                    )
+                )
+    evidence_text = " ".join(texts)
+    normalized_text = "".join(evidence_text.split())
+    beneficiary_markers = [
+        marker for marker in _ASYMMETRIC_BENEFICIARY_MARKERS
+        if marker in normalized_text
+    ]
+    if "circulating_shareholders" in primitive_scopes:
+        beneficiary_markers.append("beneficiary_scope:circulating_shareholders")
+    elif "eligible_shareholders" in primitive_scopes:
+        beneficiary_markers.append("beneficiary_scope:eligible_shareholders")
+    special_markers = [
+        marker for marker in _ASYMMETRIC_SPECIAL_EVENT_MARKERS
+        if marker in normalized_text
+    ]
+    if not beneficiary_markers:
+        return {
+            "eligible": False,
+            "reason": "limited_beneficiary_scope_not_explicit",
+            "beneficiary_markers": [],
+            "special_event_markers": special_markers,
+        }
+    if not special_markers:
+        return {
+            "eligible": False,
+            "reason": "special_event_marker_not_explicit",
+            "beneficiary_markers": beneficiary_markers,
+            "special_event_markers": [],
+        }
+    source_economics = {
+        "cash": float(observation.get("cash_dividend_per_share") or 0),
+        "shares": (
+            float(observation.get("bonus_shares_per_share") or 0)
+            + float(observation.get("capitalization_shares_per_share") or 0)
+        ),
+        "rights": float(observation.get("rights_shares_per_share") or 0),
+        "rights_price": float(observation.get("rights_price") or 0),
+    }
+    analysis_economics = {
+        "cash": _normalized_analysis_term(result, "cash_dividend"),
+        "shares": (
+            _normalized_analysis_term(result, "bonus_shares")
+            + _normalized_analysis_term(result, "capitalization_shares")
+        ),
+        "rights": _normalized_analysis_term(result, "rights_shares"),
+        "rights_price": _normalized_analysis_term(result, "rights_price"),
+    }
+    if not any(value > 0 for value in source_economics.values()):
+        return {
+            "eligible": False,
+            "reason": "cninfo_observation_has_no_positive_economic_term",
+            "beneficiary_markers": beneficiary_markers,
+            "special_event_markers": special_markers,
+        }
+    economic_differences = {
+        field_name: {
+            "cninfo": source_economics[field_name],
+            "analysis": analysis_economics[field_name],
+        }
+        for field_name in source_economics
+        if abs(
+            source_economics[field_name] - analysis_economics[field_name]
+        ) > max(
+            0.0001,
+            max(
+                abs(source_economics[field_name]),
+                abs(analysis_economics[field_name]),
+            ) * 0.001,
+        )
+    }
+    return {
+        "eligible": True,
+        "reason": "asymmetric_cninfo_event_ready",
+        "effective_date": effective_date,
+        "date_basis": date_basis,
+        "effective_date_type": effective_date_type,
+        "beneficiary_markers": sorted(set(beneficiary_markers)),
+        "special_event_markers": sorted(set(special_markers)),
+        "candidate_announcement_ids": sorted(candidate_announcement_ids),
+        "evidence_announcement_ids": sorted(evidence_announcement_ids),
+        "source_economics": source_economics,
+        "analysis_economics": analysis_economics,
+        "economic_differences": economic_differences,
+        "policy_version": CNINFO_ASYMMETRIC_POLICY_VERSION,
+    }
 
 
 def _explicit_non_effective(row: Mapping[str, Any]) -> bool:

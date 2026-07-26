@@ -637,7 +637,9 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
     targets = result.get("targets") or {}
     parameters = result.get("parameters") or {}
     pipeline = parameters.get("pipeline") or {}
-    discovery = (result.get("stages") or {}).get("discovery") or {}
+    stages = result.get("stages") or {}
+    discovery = stages.get("discovery") or {}
+    asymmetric_review = stages.get("asymmetric_review") or {}
     title_classification = discovery.get("title_classification") or {}
     state_counts = inventory.get("state_counts") or {}
     next_actions = inventory.get("next_action_counts") or {}
@@ -683,6 +685,39 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
         f"events={title_classification.get('isolated_retry_event_count', 0)}",
         "说明: 原始 CNInfo 事件不修改；北交所不进入 CNInfo 公告解析。",
     ]
+    if asymmetric_review:
+        lines.extend([
+            "非对称旁路: `"
+            f"scanned={asymmetric_review.get('scanned', 0)}, "
+            f"eligible={asymmetric_review.get('eligible', 0)}, "
+            f"promoted={asymmetric_review.get('promoted', 0)}, "
+            f"updated={asymmetric_review.get('updated', 0)}, "
+            f"unchanged={asymmetric_review.get('unchanged', 0)}, "
+            f"skipped={asymmetric_review.get('skipped', 0)}, "
+            f"blocked={asymmetric_review.get('blocked', 0)}, "
+            f"failed={asymmetric_review.get('failed', 0)}`",
+            "非对称隔离: `"
+            f"network_access={asymmetric_review.get('network_access')}, "
+            f"llm_invocations={asymmetric_review.get('llm_invocations', 0)}`",
+            "非对称分页: `"
+            f"batch={targets.get('asymmetric_batch_events', 0)}, "
+            f"has_more={targets.get('asymmetric_has_more', False)}, "
+            "next_offset="
+            f"{targets.get('asymmetric_next_target_offset')}`",
+        ])
+        blocked_reasons = (
+            asymmetric_review.get("blocked_reason_counts") or {}
+        )
+        if blocked_reasons:
+            lines.extend([
+                "非对称阻塞原因:",
+                "```text",
+                *(
+                    f"{key}: {value}"
+                    for key, value in sorted(blocked_reasons.items())
+                ),
+                "```",
+            ])
     if state_counts:
         lines.extend([
             "",
