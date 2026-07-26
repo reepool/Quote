@@ -137,6 +137,13 @@ MUST remain factor-blocking and MUST NOT all collapse into a generic LLM retry q
 - **THEN** the event returns to implementation discovery even if proposal candidates are
   already stored
 
+#### Scenario: Omitted implementation pages are repaired before rediscovery
+- **WHEN** a proposal-stage analysis has an incomplete prompt context and its archived
+  candidate pages include omitted or truncated sections
+- **THEN** the event enters bounded document-context repair before returning to
+  implementation discovery, while a completed repair that still lacks implementation
+  evidence remains eligible for rediscovery
+
 #### Scenario: Complete insufficient evidence becomes review work
 - **WHEN** semantic verification completed but the official text does not bind a usable
   date or economic term

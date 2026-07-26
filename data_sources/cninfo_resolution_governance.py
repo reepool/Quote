@@ -7,7 +7,7 @@ from typing import Any, Mapping, Optional
 
 
 APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v4"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v5"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 
@@ -256,6 +256,37 @@ def _analysis_rework_route(
             "retry_failed_stage",
         )
 
+    input_context = result.get("_input_context") or {}
+    input_context = input_context if isinstance(input_context, Mapping) else {}
+    repair_context = input_context.get("document_context_repair") or {}
+    repair_context = (
+        repair_context if isinstance(repair_context, Mapping) else {}
+    )
+    omitted_sections = (
+        list(input_context.get("omitted_sections") or [])
+        + list(input_context.get("truncated_sections") or [])
+    )
+    stage = str(result.get("event_stage") or "").strip().lower()
+
+    # An implementation announcement may already be archived but absent from
+    # the bounded prompt. Repair that context before repeating discovery.
+    if (
+        stage in {"approved", "expected", "proposal"}
+        and input_context.get("context_complete") is False
+        and omitted_sections
+    ):
+        if repair_context.get("attempted") is True:
+            return (
+                "manual_required",
+                "analysis_context_repair_exhausted",
+                "human_review",
+            )
+        return (
+            "document_rework",
+            "analysis_context_incomplete",
+            "repair_document_context",
+        )
+
     if (
         "context_incomplete" in reason_codes
         or (
@@ -263,12 +294,6 @@ def _analysis_rework_route(
             and gates.get("context_complete") is False
         )
     ):
-        input_context = result.get("_input_context") or {}
-        repair_context = (
-            input_context.get("document_context_repair") or {}
-            if isinstance(input_context, Mapping)
-            else {}
-        )
         if (
             isinstance(repair_context, Mapping)
             and repair_context.get("attempted") is True
@@ -284,7 +309,6 @@ def _analysis_rework_route(
             "repair_document_context",
         )
 
-    stage = str(result.get("event_stage") or "").strip().lower()
     if (
         stage in {"approved", "expected", "proposal"}
         or "proposal_not_implemented" in reason_codes

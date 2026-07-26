@@ -149,6 +149,27 @@ def test_model_only_cancellation_remains_manual_required():
             {
                 "validation_status": "manual_required",
                 "result": {
+                    "event_stage": "proposal",
+                    "_semantic_verifier": {
+                        "status": "error",
+                        "error_code": "provider_timeout",
+                    },
+                    "_input_context": {
+                        "context_complete": False,
+                        "omitted_sections": ["implementation-announcement:p1"],
+                    },
+                    "_review_classification": {
+                        "reason_codes": ["proposal_not_implemented"],
+                    },
+                },
+            },
+            "retryable_error",
+            "retry_failed_stage",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
                     "event_stage": "implemented",
                     "_review_classification": {
                         "reason_codes": ["context_incomplete"],
@@ -187,6 +208,23 @@ def test_model_only_cancellation_remains_manual_required():
             },
             "discovery_pending",
             "discover_implementation_evidence",
+        ),
+        (
+            {
+                "validation_status": "manual_required",
+                "result": {
+                    "event_stage": "proposal",
+                    "_input_context": {
+                        "context_complete": False,
+                        "omitted_sections": ["implementation-announcement:p1"],
+                    },
+                    "_review_classification": {
+                        "reason_codes": ["proposal_not_implemented"],
+                    },
+                },
+            },
+            "document_rework",
+            "repair_document_context",
         ),
         (
             {
