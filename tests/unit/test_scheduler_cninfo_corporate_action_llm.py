@@ -259,6 +259,13 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
         source_event_keys=["event-1"],
         scopes=["inventory", "discovery"],
         max_events=50,
+        pipeline={"stage_queue_size": 25},
+        pipeline_mode="async",
+        pipeline_download_concurrency=8,
+        pipeline_document_parse_concurrency=8,
+        pipeline_llm_concurrency=50,
+        pipeline_llm_requests_per_minute=58,
+        pipeline_progress_interval_seconds=30,
         dry_run=True,
     )
 
@@ -269,6 +276,15 @@ async def test_scheduler_delegates_full_market_resolution_governance(monkeypatch
     assert operation.await_args.kwargs["classify_titles_with_llm"] is True
     assert operation.await_args.kwargs["title_max_concurrency"] == 50
     assert operation.await_args.kwargs["max_anchor_gap_days"] == 60
+    assert operation.await_args.kwargs["pipeline"] == {
+        "stage_queue_size": 25,
+        "mode": "async",
+        "download_concurrency": 8,
+        "document_parse_concurrency": 8,
+        "llm_concurrency": 50,
+        "llm_requests_per_minute": 58,
+        "progress_interval_seconds": 30,
+    }
     assert (
         "a_share_cninfo_corporate_action_resolution_governance"
         not in task._active_tasks

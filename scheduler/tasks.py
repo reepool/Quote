@@ -5021,6 +5021,12 @@ class ScheduledTasks:
         title_max_titles_per_request: int = 80,
         title_max_concurrency: int = 50,
         pipeline: Optional[Dict[str, Any]] = None,
+        pipeline_mode: Optional[str] = None,
+        pipeline_download_concurrency: Optional[int] = None,
+        pipeline_document_parse_concurrency: Optional[int] = None,
+        pipeline_llm_concurrency: Optional[int] = None,
+        pipeline_llm_requests_per_minute: Optional[int] = None,
+        pipeline_progress_interval_seconds: Optional[float] = None,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -5028,6 +5034,23 @@ class ScheduledTasks:
         task_id = "a_share_cninfo_corporate_action_resolution_governance"
         self._active_tasks.add(task_id)
         try:
+            effective_pipeline = dict(pipeline or {})
+            pipeline_overrides = {
+                "mode": pipeline_mode,
+                "download_concurrency": pipeline_download_concurrency,
+                "document_parse_concurrency": (
+                    pipeline_document_parse_concurrency
+                ),
+                "llm_concurrency": pipeline_llm_concurrency,
+                "llm_requests_per_minute": pipeline_llm_requests_per_minute,
+                "progress_interval_seconds": (
+                    pipeline_progress_interval_seconds
+                ),
+            }
+            effective_pipeline.update({
+                key: value for key, value in pipeline_overrides.items()
+                if value is not None
+            })
             result = await data_manager.govern_cninfo_corporate_action_resolutions(
                 start_date=start_date,
                 end_date=end_date,
@@ -5060,7 +5083,7 @@ class ScheduledTasks:
                     title_max_titles_per_request
                 ),
                 title_max_concurrency=int(title_max_concurrency),
-                pipeline=pipeline,
+                pipeline=effective_pipeline,
                 sample_limit=int(sample_limit),
             )
             if self.telegram_enabled:
