@@ -1,0 +1,110 @@
+## Context
+
+CNInfo raw observations, announcement candidates, archived pages, LLM analyses,
+reviews, and resolved-term overlays already exist. The ordinary review path
+requires document-backed all-shareholder validation, while the existing
+asymmetric passthrough copies the current CNInfo observation unchanged. Neither
+path can express an operator correction to total-share-capital economics,
+beneficiary-only economics, or a recorded event that has no adjustment-factor
+effect.
+
+The remaining backlog should be handled from persisted CNInfo data. Raw
+observations and raw announcement scans are immutable, and this change must not
+introduce another data source, redownload documents, or rerun the LLM for the
+four explicit operator decisions.
+
+## Goals / Non-Goals
+
+**Goals:**
+
+- Persist operator-approved asymmetric corrections with full supersession and
+  source lineage.
+- Keep factor-relevant total-share-capital terms distinct from terms applying
+  only to circulating or otherwise eligible shareholders.
+- Record an implemented corporate action even when it has no adjustment-factor
+  effect.
+- Reduce future discovery cost by excluding clearly irrelevant announcement
+  document types before title LLM and document processing.
+
+**Non-Goals:**
+
+- Do not infer total-share-capital economics for every unresolved asymmetric
+  event.
+- Do not delete or rewrite raw CNInfo observations, announcements, pages, or
+  analyses.
+- Do not automatically approve ordinary dividends or ambiguous special events.
+- Do not change production factor source selection.
+
+## Decisions
+
+1. **Add a separate manual asymmetric review method.** The method accepts only
+   a current CNInfo source event, an existing analysis identity, explicit
+   operator terms, an effective date, and an adjustment-factor effect. It writes
+   through the existing atomic review bundle and supersedes the latest prior
+   review. This is preferable to weakening the ordinary evidence gates.
+
+2. **Store additional semantics in existing JSON lineage.** No schema migration
+   is required. `review_payload_json` records the policy, original observation,
+   total-share-capital terms, beneficiary-only terms, operator instruction, and
+   factor effect. `evidence_json` on resolved terms repeats the factor effect so
+   factor consumers can load it efficiently and audit APIs expose it.
+
+3. **Use `factor_effect=normal` or `factor_effect=none`.** `normal` means the
+   total-share-capital fields contribute to factor derivation. `none` means the
+   corporate action remains resolved and queryable but all of its economic
+   fields are excluded from factor aggregation. Zeroing the stored terms was
+   rejected because it would erase the actual event.
+
+4. **Apply reviewed fields as authoritative overlays.** A manual asymmetric
+   correction can replace an existing non-null raw observation value. This
+   differs intentionally from automatic repair overlays, which only fill
+   missing or placeholder values.
+
+5. **Use conservative title prefilter rules.** Strong non-implementation
+   document types such as legal opinions, voting results, periodic reports,
+  valuation reports, replies, pledges, and transfer-registration notices are
+  excluded by deterministic title rules. Broad role words such as `董事会`,
+  `监事会`, `独立董事`, `股东大会`, and `国资委批准` are excluded unless the title
+  also contains a strong implementation marker.
+
+6. **Preserve filter lineage.** Prefiltered announcements remain visible in
+   discovery results and are persisted as rejected candidate evidence with a
+   deterministic reason. They are omitted only from title LLM input and
+   downstream document resolution.
+
+7. **Do not bulk-approve the remaining backlog solely by category.** A special
+   event marker establishes asymmetric classification, but automatic approval
+   still requires an existing trustworthy total-share-capital term and factor
+   effect. Items lacking either remain manual.
+
+## Risks / Trade-offs
+
+- **[Risk] A broad title word hides an implementation notice.** → Strong
+  implementation markers override the broad-role filters, and tests cover
+  mixed titles.
+- **[Risk] Manual terms are entered in the wrong unit.** → The API accepts only
+  per-share normalized values and records the original operator instruction;
+  tests use the four known decisions.
+- **[Risk] `factor_effect=none` is ignored by an older consumer.** → Extend the
+  resolved-term loader and the current CNInfo factor rebuild together, with
+  regression coverage.
+- **[Risk] Existing reviews are silently overwritten.** → New reviews include
+  `supersedes_review_id`; raw observations and prior review rows remain intact.
+
+## Migration Plan
+
+1. Deploy code and tests without a schema migration.
+2. Persist the four explicit operator decisions from existing CNInfo data.
+3. Query reviews and resolved terms to verify supersession, values, dates, and
+   factor effects.
+4. Run a targeted dry-run factor rebuild for the four instruments and verify
+   `000035.SZ` contributes no event factor.
+5. Enable the deterministic title prefilter for subsequent discovery runs.
+6. Roll back by disabling the new review endpoint/prefilter and superseding any
+   manual review with another governed review; raw data remains unchanged.
+
+## Open Questions
+
+- The unresolved backlog can later support a separate batch policy for events
+  whose total-share-capital economics and factor effect are already explicit.
+  This change intentionally does not guess those values.

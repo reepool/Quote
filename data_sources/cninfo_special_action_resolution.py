@@ -49,6 +49,38 @@ _GENERIC_ACTION_MARKERS = (
 _TITLE_EXCLUDES = ("取消", "终止", "不予实施", "不实施")
 _ANNUAL_PERIOD_MARKERS = ("年度", "年报")
 _INTERIM_PERIOD_MARKERS = ("半年", "中报", "中期")
+_TITLE_PREFILTER_STRONG_EXCLUSIONS = {
+    "法律意见书": "legal_opinion",
+    "表决结果": "voting_result",
+    "补充流动资金": "working_capital",
+    "季度报告": "quarterly_report",
+    "独立意见": "independent_opinion",
+    "回复": "reply",
+    "权益变动报告书": "ownership_change_report",
+    "评估报告": "valuation_report",
+    "年度财务报告": "annual_financial_report",
+    "年度报告": "annual_report",
+    "裁定书": "court_ruling",
+    "质押": "share_pledge",
+}
+_TITLE_PREFILTER_ROLE_MARKERS = {
+    "董事会": "board_material",
+    "监事会": "supervisory_board_material",
+    "独立董事": "independent_director_material",
+    "股东大会": "shareholder_meeting_material",
+}
+_TITLE_PREFILTER_IMPLEMENTATION_PROTECTION = (
+    "实施公告",
+    "实施方案",
+    "实施完成",
+    "实施完毕",
+    "权益分派实施",
+    "除权除息",
+    "股份到账",
+    "派发",
+    "复牌",
+    "上市公告",
+)
 
 IMPLEMENTATION_GRADE_ANNOUNCEMENT_ROLES = frozenset({
     "implementation",
@@ -122,6 +154,62 @@ def is_implementation_grade_decision(decision: Mapping[str, Any]) -> bool:
         and str(decision.get("announcement_role") or "")
         in IMPLEMENTATION_GRADE_ANNOUNCEMENT_ROLES
     )
+
+
+def classify_cninfo_announcement_title_prefilter(
+    title: Any,
+) -> Dict[str, Any]:
+    """Classify clearly non-implementation titles without external work."""
+    normalized_title = unicodedata.normalize(
+        "NFKC",
+        html.unescape(_TITLE_TAG_RE.sub("", str(title or ""))),
+    ).strip()
+    protected = [
+        marker for marker in _TITLE_PREFILTER_IMPLEMENTATION_PROTECTION
+        if marker in normalized_title
+    ]
+    if not protected and "方案实施" in normalized_title:
+        protected = ["方案实施"]
+    for marker, reason in _TITLE_PREFILTER_STRONG_EXCLUSIONS.items():
+        if marker in normalized_title and not protected:
+            return {
+                "excluded": True,
+                "reason": reason,
+                "matched_keywords": [marker],
+                "protected_markers": [],
+            }
+    if "国资委批准" in normalized_title and not protected:
+        return {
+            "excluded": True,
+            "reason": "sasac_approval",
+            "matched_keywords": ["国资委批准"],
+            "protected_markers": [],
+        }
+    if "过户" in normalized_title and not protected:
+        return {
+            "excluded": True,
+            "reason": "transfer_registration",
+            "matched_keywords": ["过户"],
+            "protected_markers": [],
+        }
+    if not protected:
+        role_hits = [
+            marker for marker in _TITLE_PREFILTER_ROLE_MARKERS
+            if marker in normalized_title
+        ]
+        if role_hits:
+            return {
+                "excluded": True,
+                "reason": _TITLE_PREFILTER_ROLE_MARKERS[role_hits[0]],
+                "matched_keywords": role_hits,
+                "protected_markers": [],
+            }
+    return {
+        "excluded": False,
+        "reason": None,
+        "matched_keywords": [],
+        "protected_markers": protected,
+    }
 
 
 def _number(value: Any) -> float:
@@ -542,6 +630,61 @@ def build_candidate_evidence(
             },
         }
     return sorted(candidates.values(), key=lambda item: item["evidence_key"])
+
+
+def build_prefiltered_announcement_evidence(
+    target: SpecialActionSearchTarget,
+    filtered_records: Iterable[tuple[Any, Mapping[str, Any]]],
+    *,
+    search_windows: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Persist deterministic title exclusions as rejected CNInfo evidence."""
+    rows = []
+    for record, filter_decision in filtered_records:
+        announcement_id = str(
+            getattr(record, "source_announcement_id", "")
+            or getattr(record, "announcement_id", "")
+            or ""
+        ).strip()
+        title = str(getattr(record, "title", "") or "").strip()
+        if not announcement_id or not title:
+            continue
+        attachments = tuple(getattr(record, "attachments", ()) or ())
+        attachment = attachments[0] if attachments else None
+        evidence_url = (
+            None
+            if attachment is None
+            else attachment.resolved_url or attachment.source_url
+        )
+        raw_payload = getattr(record, "raw_payload", {}) or {}
+        rows.append({
+            "instrument_id": target.instrument_id,
+            "source_event_key": target.source_event_key,
+            "observation_source": "cninfo",
+            "source_profile": target.source_profile,
+            "evidence_source": "cninfo_announcement_metadata",
+            "evidence_key": announcement_id,
+            "resolution_status": "rejected",
+            "effective_date": None,
+            "date_basis": None,
+            "announcement_id": announcement_id,
+            "announcement_title": html.unescape(
+                _TITLE_TAG_RE.sub("", title)
+            ).strip(),
+            "announcement_time": getattr(record, "published_at", None),
+            "evidence_url": evidence_url,
+            "confidence": 1.0,
+            "raw_payload": {
+                "event_class": target.event_class,
+                "search_windows": list(search_windows),
+                "title_prefilter": {
+                    **dict(filter_decision),
+                    "policy_version": "cninfo_title_prefilter_v1",
+                },
+                "announcement": dict(raw_payload),
+            },
+        })
+    return sorted(rows, key=lambda item: item["evidence_key"])
 
 
 def build_classified_announcement_evidence(

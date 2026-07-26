@@ -3618,6 +3618,118 @@ class DatabaseOperations:
             stats["failed"] = max(stats["failed"], len(observations))
             return stats
 
+    async def replace_adjustment_factor_observations(
+        self,
+        observations: List[Dict[str, Any]],
+        *,
+        instrument_ids: List[str],
+        source: str,
+        source_profile: str,
+        cleanup_source_event_keys: Optional[List[str]] = None,
+        additional_keys: Optional[List[tuple[str, date]]] = None,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Atomically replace emitted identities and explicitly superseded events."""
+        affected = sorted({
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        })
+        normalized_source = str(source or "").strip().lower()
+        normalized_profile = str(source_profile or "").strip()
+        stats = {"deleted": 0, "inserted": 0, "failed": 0}
+        if not affected or not normalized_source or not normalized_profile:
+            return stats
+        replacement_identity = {
+            (str(instrument_id).strip(), self._coerce_datetime(ex_date))
+            for instrument_id, ex_date in (additional_keys or [])
+            if str(instrument_id).strip() in affected
+            and self._coerce_datetime(ex_date) is not None
+        }
+        for item in observations:
+            instrument_id = str(item.get("instrument_id") or "").strip()
+            ex_date = self._coerce_datetime(item.get("ex_date"))
+            if instrument_id in affected and ex_date is not None:
+                replacement_identity.add((instrument_id, ex_date))
+        cleanup_keys = sorted({
+            str(value).strip()
+            for value in (cleanup_source_event_keys or [])
+            if str(value).strip()
+        })
+        scope = and_(
+            AdjustmentFactorObservationDB.instrument_id.in_(affected),
+            AdjustmentFactorObservationDB.source == normalized_source,
+            AdjustmentFactorObservationDB.source_profile == normalized_profile,
+        )
+        cleanup_conditions = []
+        if replacement_identity:
+            cleanup_conditions.append(
+                tuple_(
+                    AdjustmentFactorObservationDB.instrument_id,
+                    AdjustmentFactorObservationDB.ex_date,
+                ).in_(sorted(replacement_identity))
+            )
+        cleanup_conditions.extend(
+            AdjustmentFactorObservationDB.raw_payload_json.like(
+                f'%"{event_key}"%'
+            )
+            for event_key in cleanup_keys
+        )
+        async with self.get_async_session() as session:
+            if cleanup_conditions:
+                result = await session.execute(
+                    delete(AdjustmentFactorObservationDB).where(
+                        scope,
+                        or_(*cleanup_conditions),
+                    )
+                )
+                stats["deleted"] = max(0, int(result.rowcount or 0))
+            for item in observations:
+                instrument_id = str(item.get("instrument_id") or "").strip()
+                ex_date = self._coerce_datetime(item.get("ex_date"))
+                item_source = str(
+                    item.get("source") or normalized_source
+                ).strip().lower()
+                item_profile = str(
+                    item.get("source_profile") or normalized_profile
+                ).strip()
+                if (
+                    instrument_id not in affected
+                    or ex_date is None
+                    or item_source != normalized_source
+                    or item_profile != normalized_profile
+                ):
+                    stats["failed"] += 1
+                    continue
+                session.add(AdjustmentFactorObservationDB(
+                    instrument_id=instrument_id,
+                    ex_date=ex_date,
+                    source=normalized_source,
+                    source_profile=normalized_profile,
+                    provider_factor=item.get("provider_factor"),
+                    provider_cumulative_factor=item.get(
+                        "provider_cumulative_factor"
+                    ),
+                    normalized_factor=item.get("normalized_factor"),
+                    normalization_version=str(
+                        item.get("normalization_version") or "event_ratio_v1"
+                    ),
+                    quality_status=str(
+                        item.get("quality_status") or "unvalidated"
+                    ),
+                    ingestion_run_id=ingestion_run_id
+                    or item.get("ingestion_run_id"),
+                    raw_payload_json=json.dumps(
+                        item.get("raw_payload") or {},
+                        ensure_ascii=True,
+                        default=str,
+                        sort_keys=True,
+                    ),
+                ))
+                stats["inserted"] += 1
+            await session.commit()
+        return stats
+
     @staticmethod
     def _corporate_action_observation_values(
         row: Dict[str, Any],
@@ -5433,18 +5545,32 @@ class DatabaseOperations:
                     )
                 )).scalars().all())
         return {
-            row.source_event_key: {
-                "cash_dividend_per_share": row.cash_dividend_per_share,
-                "bonus_shares_per_share": row.bonus_shares_per_share,
-                "capitalization_shares_per_share": row.capitalization_shares_per_share,
-                "rights_shares_per_share": row.rights_shares_per_share,
-                "rights_price": row.rights_price,
-                "currency": row.currency,
-                "resolved_fields": json.loads(row.resolved_fields_json or "[]"),
-                "analysis_id": row.analysis_id,
-                "review_id": row.review_id,
-            }
+            row.source_event_key: self._resolved_terms_payload(row)
             for row in rows
+        }
+
+    @staticmethod
+    def _resolved_terms_payload(
+        row: CorporateActionResolvedTermsDB,
+    ) -> Dict[str, Any]:
+        evidence = json.loads(row.evidence_json or "{}")
+        return {
+            "cash_dividend_per_share": row.cash_dividend_per_share,
+            "bonus_shares_per_share": row.bonus_shares_per_share,
+            "capitalization_shares_per_share": row.capitalization_shares_per_share,
+            "rights_shares_per_share": row.rights_shares_per_share,
+            "rights_price": row.rights_price,
+            "currency": row.currency,
+            "resolved_fields": json.loads(row.resolved_fields_json or "[]"),
+            "evidence": evidence,
+            "factor_effect": str(
+                evidence.get("factor_effect") or "normal"
+            ).strip().lower(),
+            "authoritative_override": bool(
+                evidence.get("authoritative_override")
+            ),
+            "analysis_id": row.analysis_id,
+            "review_id": row.review_id,
         }
 
     async def get_corporate_action_resolved_terms_page(
@@ -5484,19 +5610,10 @@ class DatabaseOperations:
                 "resolved_terms_id": row.id,
                 "instrument_id": row.instrument_id,
                 "source_event_key": row.source_event_key,
-                "analysis_id": row.analysis_id,
-                "review_id": row.review_id,
-                "cash_dividend_per_share": row.cash_dividend_per_share,
-                "bonus_shares_per_share": row.bonus_shares_per_share,
-                "capitalization_shares_per_share": row.capitalization_shares_per_share,
-                "rights_shares_per_share": row.rights_shares_per_share,
-                "rights_price": row.rights_price,
-                "currency": row.currency,
                 "is_active": bool(row.is_active),
-                "resolved_fields": json.loads(row.resolved_fields_json or "[]"),
-                "evidence": json.loads(row.evidence_json or "{}"),
                 "created_at": row.created_at,
                 "updated_at": row.updated_at,
+                **self._resolved_terms_payload(row),
             } for row in rows]
             total_value = int(total or 0)
             return {
@@ -5795,6 +5912,9 @@ class DatabaseOperations:
         if not normalized_keys:
             return {}
         rows = []
+        current_reviews_by_event: Dict[
+            str, CorporateActionResolutionReviewDB
+        ] = {}
         async with self.get_async_session() as session:
             for offset in range(0, len(normalized_keys), 400):
                 chunk = normalized_keys[offset: offset + 400]
@@ -5818,11 +5938,69 @@ class DatabaseOperations:
                         CorporateActionEffectiveDateEvidenceDB.id.desc(),
                     )
                 )).scalars().all())
+                current_review_rows = (await session.execute(
+                    select(
+                        CorporateActionResolvedTermsDB.source_event_key,
+                        CorporateActionResolutionReviewDB,
+                    )
+                    .join(
+                        CorporateActionResolutionReviewDB,
+                        CorporateActionResolutionReviewDB.id
+                        == CorporateActionResolvedTermsDB.review_id,
+                    )
+                    .where(
+                        CorporateActionResolvedTermsDB.source_event_key.in_(
+                            chunk
+                        ),
+                    )
+                )).all()
+                current_reviews_by_event.update({
+                    source_event_key: review
+                    for source_event_key, review in current_review_rows
+                })
         rows_by_event: Dict[str, List[Any]] = {}
         for row in rows:
             rows_by_event.setdefault(row.source_event_key, []).append(row)
         resolved = {}
         for source_event_key, event_rows in rows_by_event.items():
+            current_review = current_reviews_by_event.get(source_event_key)
+            if current_review is not None:
+                if str(current_review.decision or "").strip() != "resolved":
+                    continue
+                current_review_key = str(
+                    current_review.review_key or ""
+                ).strip()
+                current_evidence_key = str(
+                    current_review.evidence_key or ""
+                ).strip()
+                review_key_rows = []
+                for row in event_rows:
+                    try:
+                        raw_payload = json.loads(row.raw_payload_json or "{}")
+                    except (TypeError, ValueError):
+                        raw_payload = {}
+                    if (
+                        current_review_key
+                        and str(raw_payload.get("review_key") or "").strip()
+                        == current_review_key
+                    ):
+                        review_key_rows.append(row)
+                matching_rows = review_key_rows
+                if not matching_rows and current_evidence_key:
+                    matching_rows = [
+                        row for row in event_rows
+                        if str(row.evidence_key or "").strip()
+                        == current_evidence_key
+                    ]
+                if not matching_rows:
+                    self.db_logger.warning(
+                        "Current corporate-action review has no matching "
+                        "resolved evidence: source_event_key=%s review_id=%s",
+                        source_event_key,
+                        current_review.id,
+                    )
+                    continue
+                event_rows = matching_rows
             dates = {
                 row.effective_date.date()
                 if isinstance(row.effective_date, datetime)

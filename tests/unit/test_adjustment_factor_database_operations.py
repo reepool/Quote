@@ -1,4 +1,5 @@
-from datetime import datetime
+import asyncio
+from datetime import date, datetime
 import sqlite3
 
 import pytest
@@ -8,6 +9,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from database.models import (
     AdjustmentFactorCanonicalDB,
     AdjustmentFactorInstrumentStatusDB,
+    AdjustmentFactorObservationDB,
     AdjustmentFactorSeriesStatusDB,
     Base,
     InstrumentDB,
@@ -38,6 +40,105 @@ def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_pa
         } <= tables
     finally:
         manager.close()
+
+
+def test_replace_adjustment_factor_observations_removes_stale_dates():
+    asyncio.run(_exercise_replace_adjustment_factor_observations())
+
+
+async def _exercise_replace_adjustment_factor_observations():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorObservationDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000035.SZ",
+            symbol="000035",
+            name="Test",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        session.add_all([
+            AdjustmentFactorObservationDB(
+                instrument_id="000035.SZ",
+                ex_date=datetime(2012, 11, 30),
+                source="cninfo",
+                source_profile="cninfo_official_event_product_v1",
+                provider_factor=1.2596,
+                normalized_factor=1.2596,
+                normalization_version="event_ratio_v1",
+                quality_status="valid",
+                raw_payload_json='{"source_event_keys": ["event-none"]}',
+            ),
+            AdjustmentFactorObservationDB(
+                instrument_id="000035.SZ",
+                ex_date=datetime(2011, 1, 1),
+                source="cninfo",
+                source_profile="cninfo_official_event_product_v1",
+                provider_factor=1.1,
+                normalized_factor=1.1,
+                normalization_version="event_ratio_v1",
+                quality_status="valid",
+                raw_payload_json='{"source_event_keys": ["event-keep"]}',
+            ),
+        ])
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    replacement = {
+        "instrument_id": "000035.SZ",
+        "ex_date": datetime(2013, 1, 2),
+        "source": "cninfo",
+        "source_profile": "cninfo_official_event_product_v1",
+        "provider_factor": 1.05,
+        "normalized_factor": 1.05,
+        "normalization_version": "event_ratio_v1",
+        "quality_status": "valid",
+        "raw_payload": {"source_event_keys": ["event-new"]},
+    }
+    result = await operations.replace_adjustment_factor_observations(
+        [replacement],
+        instrument_ids=["000035.SZ"],
+        source="cninfo",
+        source_profile="cninfo_official_event_product_v1",
+        cleanup_source_event_keys=["event-none"],
+        additional_keys=[("000035.SZ", date(2012, 11, 30))],
+        ingestion_run_id="unit",
+    )
+    repeated = await operations.replace_adjustment_factor_observations(
+        [replacement],
+        instrument_ids=["000035.SZ"],
+        source="cninfo",
+        source_profile="cninfo_official_event_product_v1",
+        cleanup_source_event_keys=["event-none"],
+        additional_keys=[("000035.SZ", date(2012, 11, 30))],
+        ingestion_run_id="unit-repeat",
+    )
+
+    async with session_factory() as session:
+        rows = (await session.execute(
+            select(AdjustmentFactorObservationDB).order_by(
+                AdjustmentFactorObservationDB.ex_date
+            )
+        )).scalars().all()
+
+    assert result == {"deleted": 1, "inserted": 1, "failed": 0}
+    assert repeated == {"deleted": 1, "inserted": 1, "failed": 0}
+    assert [row.ex_date.date() for row in rows] == [
+        date(2011, 1, 1),
+        date(2013, 1, 2),
+    ]
+    await engine.dispose()
 
 
 @pytest.mark.asyncio

@@ -11,6 +11,7 @@ from data_sources.cninfo_announcement_title_llm import (
 from data_sources.cninfo_special_action_resolution import (
     announcement_match_reasons,
     build_search_target,
+    classify_cninfo_announcement_title_prefilter,
     deterministic_title_match,
     period_mismatch_reason,
 )
@@ -213,6 +214,64 @@ def test_llm_title_gate_does_not_treat_exclusion_words_as_authoritative():
         target,
         "关于取消原方案并实施调整后权益安排的公告",
     ) == []
+
+
+@pytest.mark.parametrize(
+    ("title", "reason"),
+    [
+        ("公司2025年年度报告", "annual_report"),
+        ("股权分置改革相关股东会议表决结果公告", "voting_result"),
+        ("关于重大资产重组问询函回复的公告", "reply"),
+        ("第五届董事会第三次会议决议公告", "board_material"),
+        ("关于独立董事辞职的公告", "independent_director_material"),
+        ("监事会换届公告", "supervisory_board_material"),
+        ("临时股东大会公告", "shareholder_meeting_material"),
+        ("关于股权分置改革方案获国资委批准的公告", "sasac_approval"),
+    ],
+)
+def test_cninfo_title_prefilter_excludes_non_implementation_documents(
+    title,
+    reason,
+):
+    decision = classify_cninfo_announcement_title_prefilter(title)
+
+    assert decision["excluded"] is True
+    assert decision["reason"] == reason
+
+
+def test_cninfo_title_prefilter_keeps_implementation_notice_with_board_word():
+    decision = classify_cninfo_announcement_title_prefilter(
+        "董事会关于股权分置改革方案实施公告"
+    )
+
+    assert decision["excluded"] is False
+    assert decision["protected_markers"] == ["实施公告"]
+
+
+def test_cninfo_title_prefilter_keeps_generic_scheme_implementation_notice():
+    decision = classify_cninfo_announcement_title_prefilter(
+        "董事会关于股权分置改革方案实施的公告"
+    )
+
+    assert decision["excluded"] is False
+    assert decision["protected_markers"] == ["方案实施"]
+
+
+@pytest.mark.parametrize(
+    ("title", "protected_marker"),
+    [
+        ("股权分置改革表决结果暨实施公告", "实施公告"),
+        ("关于法律意见书及方案实施完成的公告", "实施完成"),
+    ],
+)
+def test_cninfo_title_prefilter_keeps_combined_implementation_notice(
+    title,
+    protected_marker,
+):
+    decision = classify_cninfo_announcement_title_prefilter(title)
+
+    assert decision["excluded"] is False
+    assert decision["protected_markers"] == [protected_marker]
 
 
 def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
@@ -691,7 +750,7 @@ async def test_terminal_title_applicability_is_not_published_for_resolution(
 @pytest.mark.asyncio
 async def test_llm_title_discovery_persists_unrelated_as_rejected_evidence():
     manager = _manager(
-        announcement_service=_FakeAnnouncementService(title="年度报告摘要")
+        announcement_service=_FakeAnnouncementService(title="股票简称变更公告")
     )
     client = SimpleNamespace(
         complete=AsyncMock(
@@ -717,6 +776,38 @@ async def test_llm_title_discovery_persists_unrelated_as_rejected_evidence():
         "unrelated"
     )
     manager._announcement_test_storage.store_announcement_audit.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_title_prefilter_skips_llm_and_persists_rejected_lineage():
+    manager = _manager(
+        announcement_service=_FakeAnnouncementService(
+            title="公司2025年年度报告"
+        )
+    )
+    client = SimpleNamespace(complete=AsyncMock())
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="1990-12-19",
+        end_date="2026-07-18",
+        exchanges=["SSE"],
+        dry_run=False,
+        classify_titles_with_llm=True,
+        title_llm_client=client,
+    )
+
+    assert result["status"] == "success"
+    assert result["title_prefilter"]["excluded_count"] == 1
+    assert result["title_classification"]["status"] == "not_required"
+    client.complete.assert_not_awaited()
+    rows = (
+        manager.db_ops.save_corporate_action_effective_date_evidence
+        .await_args.args[0]
+    )
+    assert rows[0]["resolution_status"] == "rejected"
+    assert rows[0]["raw_payload"]["title_prefilter"]["reason"] == (
+        "annual_report"
+    )
 
 
 @pytest.mark.asyncio

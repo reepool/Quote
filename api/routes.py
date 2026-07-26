@@ -3635,6 +3635,22 @@ async def review_corporate_action_resolution(payload: Dict[str, Any] = Body(...)
 
 
 @router.post(
+    "/corporate-actions/resolution-reviews/asymmetric-override",
+    tags=["Corporate Actions"],
+)
+async def review_corporate_action_asymmetric_override(
+    payload: Dict[str, Any] = Body(...),
+):
+    """Apply an explicit CNInfo asymmetric correction from persisted data."""
+    try:
+        return await data_manager.review_cninfo_asymmetric_manual_override(
+            dict(payload)
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post(
     "/corporate-actions/resolution-reviews/batch",
     tags=["Corporate Actions"],
 )

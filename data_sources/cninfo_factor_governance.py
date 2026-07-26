@@ -129,8 +129,13 @@ def build_quote_evidence_keys(
         if str(row.get("event_status") or "") == "failed":
             continue
         instrument_id = str(row.get("instrument_id") or "").strip()
-        source_date = _date(row.get("ex_date")) or _date(
-            row.get("resolved_effective_date")
+        raw_ex_date = _date(row.get("ex_date"))
+        resolved_effective_date = _date(row.get("resolved_effective_date"))
+        source_date = (
+            resolved_effective_date
+            if bool(row.get("resolved_date_authoritative"))
+            and resolved_effective_date is not None
+            else raw_ex_date or resolved_effective_date
         )
         if instrument_id and source_date:
             keys.add((instrument_id, source_date))
@@ -185,6 +190,7 @@ def derive_cninfo_factor_path(
     """Aggregate current CNInfo events and derive one factor per effective session."""
     quote_lookup = _quote_map(quote_evidence)
     pending: List[Dict[str, Any]] = []
+    excluded_no_effect: List[Dict[str, Any]] = []
     grouped: Dict[Tuple[str, date], Dict[str, Any]] = {}
     pending_source_dates: Dict[str, List[date]] = defaultdict(list)
     unlocated_pending_instruments = set()
@@ -196,9 +202,36 @@ def derive_cninfo_factor_path(
         instrument_id = str(row.get("instrument_id") or "").strip()
         raw_ex_date = _date(row.get("ex_date"))
         resolved_effective_date = _date(row.get("resolved_effective_date"))
-        source_date = raw_ex_date or resolved_effective_date
+        source_date = (
+            resolved_effective_date
+            if bool(row.get("resolved_date_authoritative"))
+            and resolved_effective_date is not None
+            else raw_ex_date or resolved_effective_date
+        )
         event_key = str(row.get("source_event_key") or "")
         if not instrument_id:
+            continue
+        if str(row.get("resolved_factor_effect") or "normal").strip().lower() == "none":
+            suppressed_dates = sorted({
+                value
+                for value in (
+                    raw_ex_date,
+                    resolved_effective_date,
+                    source_date,
+                )
+                if value is not None
+            })
+            excluded_no_effect.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "reason": "resolved_factor_effect_none",
+                "effective_date": (
+                    source_date.isoformat() if source_date is not None else None
+                ),
+                "suppressed_dates": [
+                    value.isoformat() for value in suppressed_dates
+                ],
+            })
             continue
         if source_date is None:
             pending.append({
@@ -268,6 +301,7 @@ def derive_cninfo_factor_path(
             "rights_per_share": 0.0,
             "rights_proceeds_per_share": 0.0,
             "event_keys": [],
+            "authoritative_event_keys": [],
             "date_evidence": [],
             "pre_close": quote.get("pre_close"),
         })
@@ -284,6 +318,8 @@ def derive_cninfo_factor_path(
         aggregate["rights_per_share"] += rights_per_share
         aggregate["rights_proceeds_per_share"] += rights_per_share * rights_price
         aggregate["event_keys"].append(event_key)
+        if bool(row.get("resolved_authoritative_override")):
+            aggregate["authoritative_event_keys"].append(event_key)
         if resolved_missing_date:
             aggregate["date_evidence"].append({
                 "source_event_key": event_key,
@@ -376,6 +412,9 @@ def derive_cninfo_factor_path(
             "factor": factor,
             "cumulative_factor": cumulative_by_instrument[instrument_id],
             "source_event_keys": aggregate["event_keys"],
+            "authoritative_override": bool(aggregate["event_keys"])
+            and len(aggregate["authoritative_event_keys"])
+            == len(aggregate["event_keys"]),
             "resolved_date_evidence": aggregate["date_evidence"],
             "date_shifted": any(value != effective_date for value in source_dates),
         }
@@ -396,6 +435,7 @@ def derive_cninfo_factor_path(
         "observations": observations_out,
         "events": events,
         "pending": pending,
+        "excluded_no_effect": excluded_no_effect,
     }
 
 
@@ -738,10 +778,29 @@ def _rounded_field_tolerances(
     return base
 
 
+def _excluded_cninfo_event_dates(
+    events: Sequence[Mapping[str, Any]],
+) -> set[Tuple[str, date]]:
+    excluded_dates = set()
+    for item in events:
+        instrument_id = str(item.get("instrument_id") or "").strip()
+        if not instrument_id:
+            continue
+        for value in [
+            item.get("effective_date"),
+            *(item.get("suppressed_dates") or []),
+        ]:
+            parsed = _date(value)
+            if parsed is not None:
+                excluded_dates.add((instrument_id, parsed))
+    return excluded_dates
+
+
 def reconcile_cninfo_tdx_events(
     cninfo_events: Sequence[Mapping[str, Any]],
     tdx_events: Sequence[Mapping[str, Any]],
     *,
+    excluded_cninfo_events: Sequence[Mapping[str, Any]] = (),
     sessions_by_exchange: Optional[Mapping[str, Sequence[date]]] = None,
     field_tolerance: float = 0.0001,
     rounded_field_tolerances: Optional[Mapping[str, float]] = None,
@@ -758,7 +817,30 @@ def reconcile_cninfo_tdx_events(
     exact: List[Dict[str, Any]] = []
     shifted: List[Dict[str, Any]] = []
     rounded: List[Dict[str, Any]] = []
+    accepted_overrides: List[Dict[str, Any]] = []
+    suppressed_reference_events: List[Dict[str, Any]] = []
     conflicts: List[Dict[str, Any]] = []
+    excluded_dates = _excluded_cninfo_event_dates(excluded_cninfo_events)
+    for index, item in enumerate(tdx):
+        instrument_id = str(item.get("instrument_id") or "").strip()
+        reference_dates = {
+            parsed
+            for value in (
+                item.get("source_ex_date"),
+                item.get("effective_date"),
+            )
+            if (parsed := _date(value)) is not None
+        }
+        if any(
+            (instrument_id, reference_date) in excluded_dates
+            for reference_date in reference_dates
+        ):
+            used_tdx.add(index)
+            suppressed_reference_events.append({
+                **item,
+                "tdx_index": index,
+                "reason": "resolved_cninfo_factor_effect_none",
+            })
     rounded_policy = _rounded_match_policy(rounded_field_tolerances)
     try:
         normalized_factor_tolerance = float(factor_relative_tolerance)
@@ -823,6 +905,9 @@ def reconcile_cninfo_tdx_events(
                 ):
                     item["reason"] = "same_date_source_precision_match"
                     rounded.append(item)
+                elif bool(left.get("authoritative_override")):
+                    item["reason"] = "authoritative_cninfo_override"
+                    accepted_overrides.append(item)
                 else:
                     item["reason"] = "same_date_economic_conflict"
                     conflicts.append(item)
@@ -860,10 +945,22 @@ def reconcile_cninfo_tdx_events(
         if difference <= field_tolerance:
             item["reason"] = "shifted_event_match"
             shifted.append(item)
+        elif bool(cninfo[c_idx].get("authoritative_override")):
+            item["reason"] = "authoritative_cninfo_override_shifted"
+            accepted_overrides.append(item)
         else:
             item["reason"] = "shifted_economic_conflict"
             conflicts.append(item)
 
+    for index, item in enumerate(cninfo):
+        if index in used_cninfo or not bool(item.get("authoritative_override")):
+            continue
+        accepted_overrides.append({
+            **item,
+            "cninfo_index": index,
+            "reason": "authoritative_cninfo_event_only",
+        })
+        used_cninfo.add(index)
     cninfo_only = [
         {**item, "cninfo_index": index, "reason": "cninfo_event_only"}
         for index, item in enumerate(cninfo)
@@ -880,6 +977,8 @@ def reconcile_cninfo_tdx_events(
         "exact_matches": len(exact),
         "rounded_matches": len(rounded),
         "shifted_matches": len(shifted),
+        "accepted_authoritative_overrides": len(accepted_overrides),
+        "suppressed_reference_events": len(suppressed_reference_events),
         "conflicts": len(conflicts),
         "cninfo_only": len(cninfo_only),
         "tdx_only": len(tdx_only),
@@ -898,11 +997,20 @@ def reconcile_cninfo_tdx_events(
         "exact_matches": exact,
         "rounded_matches": rounded,
         "shifted_matches": shifted,
+        "accepted_authoritative_overrides": accepted_overrides,
+        "suppressed_reference_events": suppressed_reference_events,
         "conflicts": conflicts,
         "cninfo_only": cninfo_only,
         "tdx_only": tdx_only,
         "rounded_match_samples": rounded[:sample_limit],
-        "samples": [*conflicts, *cninfo_only, *tdx_only, *shifted][:sample_limit],
+        "samples": [
+            *conflicts,
+            *cninfo_only,
+            *tdx_only,
+            *accepted_overrides,
+            *suppressed_reference_events,
+            *shifted,
+        ][:sample_limit],
     }
 
 
@@ -913,6 +1021,7 @@ def build_cninfo_primary_candidate(
     *,
     series_version: str,
     promotion_eligible: bool = False,
+    excluded_cninfo_events: Sequence[Mapping[str, Any]] = (),
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """Build a staging candidate with CNInfo first and labelled TDX-only fallback."""
     conflict_indexes = {
@@ -940,7 +1049,8 @@ def build_cninfo_primary_candidate(
         }
         rows.append(row)
         cninfo_dates.add((row["instrument_id"], row["ex_date"]))
-    fallback_dates = set(cninfo_dates)
+    excluded_dates = _excluded_cninfo_event_dates(excluded_cninfo_events)
+    fallback_dates = cninfo_dates | excluded_dates
     for item in reconciliation.get("tdx_only", []):
         index = item.get("tdx_index")
         if index is None or int(index) >= len(tdx_events):
@@ -992,5 +1102,6 @@ def build_cninfo_primary_candidate(
         "tdx_fallback_count": sum(
             row["selected_source"] == "tdx_xdxr" for row in canonical
         ),
+        "cninfo_no_effect_exclusion_count": len(excluded_dates),
         "promotion_eligible": bool(promotion_eligible),
     }

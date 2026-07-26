@@ -9,7 +9,10 @@ from database.models import (
     Base,
     CorporateActionEffectiveDateEvidenceDB,
     CorporateActionInstrumentStatusDB,
+    CorporateActionLlmAnalysisDB,
     CorporateActionObservationDB,
+    CorporateActionResolutionReviewDB,
+    CorporateActionResolvedTermsDB,
     InstrumentDB,
 )
 from database.operations import DatabaseOperations
@@ -272,6 +275,10 @@ def test_effective_date_evidence_is_idempotent_and_queryable():
     asyncio.run(_exercise_effective_date_evidence_is_idempotent_and_queryable())
 
 
+def test_effective_date_uses_active_superseding_review():
+    asyncio.run(_exercise_effective_date_uses_active_superseding_review())
+
+
 async def _exercise_effective_date_evidence_is_idempotent_and_queryable():
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
@@ -280,6 +287,9 @@ async def _exercise_effective_date_evidence_is_idempotent_and_queryable():
             Base.metadata.create_all,
             tables=[
                 InstrumentDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
                 CorporateActionEffectiveDateEvidenceDB.__table__,
             ],
         )
@@ -347,6 +357,156 @@ async def _exercise_effective_date_evidence_is_idempotent_and_queryable():
     assert page["total"] == 1
     assert page["items"][0]["date_basis"] == "official_resumption_date"
     assert resolved_map["event-1"]["effective_date"].date() == date(2006, 8, 14)
+    await engine.dispose()
+
+
+async def _exercise_effective_date_uses_active_superseding_review():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
+                CorporateActionEffectiveDateEvidenceDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="600449.SH",
+            symbol="600449",
+            name="Test",
+            exchange="SSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        analysis = CorporateActionLlmAnalysisDB(
+            analysis_key="analysis-1",
+            instrument_id="600449.SH",
+            source_event_key="event-1",
+            analysis_status="completed",
+            validation_status="manual_required",
+            profile="semantic_extraction",
+            schema_version="v1",
+            prompt_version="v1",
+            parser_version="v1",
+            input_hash="input-1",
+            artifact_ids_json="[]",
+            gate_results_json="{}",
+        )
+        session.add(analysis)
+        await session.flush()
+        old_review = CorporateActionResolutionReviewDB(
+            review_key="review-old",
+            instrument_id="600449.SH",
+            source_event_key="event-1",
+            analysis_id=analysis.id,
+            evidence_key="announcement-old",
+            decision="resolved",
+            effective_date=datetime(2006, 7, 14),
+            date_basis="复牌日",
+            reviewer="operator",
+            review_payload_json="{}",
+        )
+        session.add(old_review)
+        await session.flush()
+        active_review = CorporateActionResolutionReviewDB(
+            review_key="review-new",
+            instrument_id="600449.SH",
+            source_event_key="event-1",
+            analysis_id=analysis.id,
+            evidence_key="announcement-new",
+            decision="resolved",
+            effective_date=datetime(2006, 8, 15),
+            date_basis="股份到账日",
+            reviewer="operator",
+            review_payload_json="{}",
+            supersedes_review_id=old_review.id,
+        )
+        session.add(active_review)
+        await session.flush()
+        session.add(CorporateActionResolvedTermsDB(
+            instrument_id="600449.SH",
+            source_event_key="event-1",
+            analysis_id=analysis.id,
+            review_id=active_review.id,
+            capitalization_shares_per_share=0.172488,
+            currency="CNY",
+            is_active=True,
+            resolved_fields_json='["capitalization_shares_per_share"]',
+            evidence_json="{}",
+        ))
+        for evidence_source, effective_date, review_key in (
+            ("cninfo_announcement_review", datetime(2006, 7, 14), "review-old"),
+            (
+                "cninfo_reviewed_official_document",
+                datetime(2006, 8, 15),
+                "review-new",
+            ),
+        ):
+            session.add(CorporateActionEffectiveDateEvidenceDB(
+                instrument_id="600449.SH",
+                source_event_key="event-1",
+                observation_source="cninfo",
+                source_profile="cninfo_dividend",
+                evidence_source=evidence_source,
+                evidence_key="announcement-new",
+                resolution_status="resolved",
+                effective_date=effective_date,
+                date_basis=(
+                    "股份到账日"
+                    if review_key == "review-new"
+                    else "复牌日"
+                ),
+                raw_payload_json=(
+                    '{"review_key": "' + review_key + '"}'
+                ),
+                row_hash=review_key,
+            ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    resolved_map = await operations.get_resolved_corporate_action_effective_dates(
+        ["event-1"]
+    )
+
+    assert resolved_map["event-1"]["effective_date"].date() == date(2006, 8, 15)
+    assert resolved_map["event-1"]["date_basis"] == "股份到账日"
+    assert resolved_map["event-1"]["evidence_key"] == "announcement-new"
+
+    async with session_factory() as session:
+        terms = await session.scalar(
+            select(CorporateActionResolvedTermsDB).where(
+                CorporateActionResolvedTermsDB.source_event_key == "event-1"
+            )
+        )
+        rejected_review = CorporateActionResolutionReviewDB(
+            review_key="review-rejected",
+            instrument_id="600449.SH",
+            source_event_key="event-1",
+            analysis_id=analysis.id,
+            evidence_key="announcement-new",
+            decision="rejected",
+            reviewer="operator",
+            review_payload_json="{}",
+            supersedes_review_id=active_review.id,
+        )
+        session.add(rejected_review)
+        await session.flush()
+        terms.review_id = rejected_review.id
+        terms.is_active = False
+        await session.commit()
+
+    assert (
+        await operations.get_resolved_corporate_action_effective_dates(
+            ["event-1"]
+        )
+    ) == {}
     await engine.dispose()
 
 

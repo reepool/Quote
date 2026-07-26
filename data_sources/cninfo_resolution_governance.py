@@ -821,6 +821,13 @@ def derive_resolution_state(
             "no_action",
             True,
         )
+    elif str((latest_review or {}).get("decision") or "").lower() == "resolved":
+        state, reason, next_action, terminal = (
+            "resolved_evidence",
+            "review_resolved_effective_date",
+            "rebuild_factor_path",
+            True,
+        )
     elif resolved_evidence_conflict:
         state, reason, next_action = (
             "conflict",

@@ -331,6 +331,212 @@ async def test_asymmetric_passthrough_write_uses_cninfo_terms_without_llm_call()
 
 
 @pytest.mark.asyncio
+async def test_manual_asymmetric_override_supersedes_review_and_records_factor_effect():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(return_value={
+        "items": [{
+            "instrument_id": "000031.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "currency": "CNY",
+            "cash_dividend_per_share": 0.1,
+            "bonus_shares_per_share": 0.17,
+            "capitalization_shares_per_share": None,
+            "rights_shares_per_share": None,
+            "rights_price": None,
+        }]
+    })
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(return_value={
+        "items": [{"analysis_id": 42}]
+    })
+    manager.db_ops.get_corporate_action_effective_date_evidence = AsyncMock(
+        return_value={"items": [{
+            "announcement_id": "ann-1",
+            "announcement_title": "股权分置改革实施公告",
+            "source_profile": "cninfo_dividend",
+        }]}
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": [{"review_id": 7}]}
+    )
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"review_id": 8, "status": "inserted"},
+            "terms_write": {"resolved_terms_id": 9, "status": "updated"},
+            "evidence_write": {"changed": 1},
+        }
+    )
+    refreshed_state = {
+        "instrument_id": "000031.SZ",
+        "source_event_key": "event-1",
+        "resolution_state": "resolved_evidence",
+        "is_terminal": True,
+        "factor_blocking": False,
+    }
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[refreshed_state]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 1,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+
+    payload = {
+        "instrument_id": "000031.SZ",
+        "source_event_key": "event-1",
+        "reviewer": "operator",
+        "effective_date": "2006-02-14",
+        "date_basis": "股份到账日",
+        "announcement_id": "ann-1",
+        "factor_effect": "normal",
+        "beneficiary_scope": "circulating_shareholders",
+        "beneficiary_terms": {"cash_per_10_shares": 2.7},
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.1,
+            "bonus_shares_per_share": 0.0,
+        },
+        "notes": "按总股本每10股派1元。",
+    }
+    missing_factor_effect = dict(payload)
+    missing_factor_effect.pop("factor_effect")
+    with pytest.raises(
+        ValueError,
+        match="factor_effect is required and must be normal or none",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override(
+            missing_factor_effect
+        )
+
+    null_total_term = {
+        **payload,
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": None,
+        },
+    }
+    with pytest.raises(
+        ValueError,
+        match="cash_dividend_per_share must be a finite non-negative number",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override(null_total_term)
+
+    missing_announcement = dict(payload)
+    missing_announcement.pop("announcement_id")
+    with pytest.raises(
+        ValueError,
+        match="date_basis, and announcement_id are required",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override(
+            missing_announcement
+        )
+
+    non_a_share = {**payload, "instrument_id": "000031.HK"}
+    with pytest.raises(
+        ValueError,
+        match="requires an A-share instrument",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override(non_a_share)
+    manager._assert_current_cninfo_corporate_action_identity.assert_not_awaited()
+    manager.db_ops.save_corporate_action_review_bundle.assert_not_awaited()
+
+    result = await manager.review_cninfo_asymmetric_manual_override(payload)
+
+    saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert result["supersedes_review_id"] == 7
+    assert saved["review_row"]["supersedes_review_id"] == 7
+    assert saved["terms_row"]["cash_dividend_per_share"] == pytest.approx(0.1)
+    assert saved["terms_row"]["bonus_shares_per_share"] == pytest.approx(0.0)
+    assert saved["terms_row"]["evidence"]["factor_effect"] == "normal"
+    assert saved["terms_row"]["evidence"]["authoritative_override"] is True
+    assert result["resolution_state"] == refreshed_state
+    manager.db_ops.upsert_corporate_action_resolution_states.assert_awaited_once()
+    assert result["network_access"] is False
+    assert result["llm_invocations"] == 0
+
+    manager.db_ops.get_corporate_action_resolution_reviews.return_value = {
+        "items": [{
+            "review_id": 8,
+            "review_key": saved["review_row"]["review_key"],
+            "supersedes_review_id": 7,
+            "analysis_id": 42,
+            "evidence_key": "ann-1",
+            "effective_date": "2006-02-14",
+            "date_basis": "股份到账日",
+            "reviewer": "operator",
+            "notes": "按总股本每10股派1元。",
+            "review_payload": saved["review_row"]["review_payload"],
+        }]
+    }
+    manager.db_ops.get_corporate_action_effective_date_evidence.return_value = {
+        "items": [{
+            "announcement_id": "ann-1",
+            "announcement_title": "股权分置改革实施公告",
+            "source_profile": "cninfo_dividend",
+            "updated_at": "later-discovery-run",
+        }]
+    }
+    repeated = await manager.review_cninfo_asymmetric_manual_override(payload)
+    repeated_saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert repeated["supersedes_review_id"] == 7
+    assert repeated_saved["review_row"]["review_key"] == (
+        saved["review_row"]["review_key"]
+    )
+    assert repeated_saved["review_row"]["supersedes_review_id"] == 7
+    assert repeated_saved["evidence_row"]["evidence_key"] == "ann-1"
+
+    changed_payload = {
+        **payload,
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.2,
+            "bonus_shares_per_share": 0.0,
+        },
+    }
+    changed = await manager.review_cninfo_asymmetric_manual_override(
+        changed_payload
+    )
+    changed_saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert changed["supersedes_review_id"] == 8
+    assert changed_saved["review_row"]["review_key"] != (
+        saved["review_row"]["review_key"]
+    )
+
+    manager.db_ops.get_corporate_action_resolution_reviews.return_value = {
+        "items": [{
+            "review_id": 9,
+            "review_key": changed_saved["review_row"]["review_key"],
+            "supersedes_review_id": 8,
+            "analysis_id": 42,
+            "evidence_key": "ann-1",
+            "effective_date": "2006-02-14",
+            "date_basis": "股份到账日",
+            "reviewer": "operator",
+            "notes": "按总股本每10股派1元。",
+            "review_payload": changed_saved["review_row"]["review_payload"],
+        }]
+    }
+    reverted = await manager.review_cninfo_asymmetric_manual_override(payload)
+    reverted_saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert reverted["supersedes_review_id"] == 9
+    assert reverted_saved["review_row"]["review_key"] not in {
+        saved["review_row"]["review_key"],
+        changed_saved["review_row"]["review_key"],
+    }
+
+
+@pytest.mark.asyncio
 async def test_asymmetric_write_uses_implementation_candidate_and_all_quotes():
     manager = DataManager()
     manager.db_ops = Mock()
@@ -459,6 +665,23 @@ def test_explicit_no_distribution_is_not_factor_blocking():
 
     assert result["applicability"]["explicit_non_effective"] is True
     assert result["resolution_state"] == "non_effective"
+    assert result["is_terminal"] is True
+    assert result["factor_blocking"] is False
+
+
+def test_resolved_review_overrides_stale_governed_date_conflict():
+    result = derive_resolution_state(
+        _row(),
+        resolved_evidence_conflict=True,
+        latest_review={
+            "decision": "resolved",
+            "effective_date": "2006-08-15",
+            "date_basis": "股份到账日",
+        },
+    )
+
+    assert result["resolution_state"] == "resolved_evidence"
+    assert result["state_reason"] == "review_resolved_effective_date"
     assert result["is_terminal"] is True
     assert result["factor_blocking"] is False
 

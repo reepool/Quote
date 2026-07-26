@@ -17866,6 +17866,7 @@ class DataManager:
             compare_normalized_cumulative_paths,
         )
         from data_sources.cninfo_factor_governance import (
+            CNINFO_FACTOR_PROFILE,
             build_cninfo_primary_candidate,
             build_quote_evidence_keys,
             derive_cninfo_factor_path,
@@ -17957,6 +17958,20 @@ class DataManager:
                   AND (
                         ex_date IS NULL
                         OR date(ex_date) BETWEEN :start_date AND :end_date
+                        OR source_event_key IN (
+                            SELECT terms.source_event_key
+                            FROM corporate_action_resolved_terms AS terms
+                            JOIN corporate_action_resolution_reviews AS review
+                              ON review.id = terms.review_id
+                            WHERE terms.is_active = 1
+                              AND review.decision = 'resolved'
+                              AND json_extract(
+                                    terms.evidence_json,
+                                    '$.authoritative_override'
+                                  ) = 1
+                              AND date(review.effective_date)
+                                  BETWEEN :start_date AND :end_date
+                        )
                   )
                 ORDER BY instrument_id, ex_date, source_profile
                 """,
@@ -18033,6 +18048,8 @@ class DataManager:
             if inspect.isawaitable(terms_result):
                 resolved_term_overlays = await terms_result
         factor_cninfo_rows: List[Dict[str, Any]] = []
+        cninfo_replacement_extra_keys: set[Tuple[str, date]] = set()
+        cninfo_cleanup_source_event_keys: set[str] = set()
         resolved_outside_range = 0
         for row in cninfo_rows:
             event_key = str(row.get("source_event_key") or "")
@@ -18042,13 +18059,6 @@ class DataManager:
                 self._date_from_any(resolved.get("effective_date"))
                 if resolved else None
             )
-            if (
-                row.get("ex_date") is None
-                and resolved_date is not None
-                and not normalized_start <= resolved_date <= normalized_end
-            ):
-                resolved_outside_range += 1
-                continue
             merged_row = dict(row)
             economic_field_names = (
                 "cash_dividend_per_share",
@@ -18069,6 +18079,45 @@ class DataManager:
                 "partial_zero_effect",
             }
             applied_economic_fields = []
+            factor_effect = str(
+                resolved_terms.get("factor_effect") or "normal"
+            ).strip().lower()
+            authoritative_override = bool(
+                resolved_terms.get("authoritative_override")
+            )
+            if authoritative_override or factor_effect == "none":
+                cninfo_cleanup_source_event_keys.add(event_key)
+            authoritative_effective_date = bool(
+                authoritative_override and resolved_date is not None
+            )
+            selected_source_date = (
+                resolved_date
+                if authoritative_effective_date
+                else self._date_from_any(row.get("ex_date")) or resolved_date
+            )
+            raw_source_date = self._date_from_any(row.get("ex_date"))
+            if (
+                authoritative_override
+                and raw_source_date is not None
+                and raw_source_date != selected_source_date
+            ):
+                cninfo_replacement_extra_keys.add(
+                    (str(row.get("instrument_id") or ""), raw_source_date)
+                )
+            if factor_effect == "none":
+                for excluded_date in (raw_source_date, selected_source_date):
+                    if excluded_date is not None:
+                        cninfo_replacement_extra_keys.add(
+                            (str(row.get("instrument_id") or ""), excluded_date)
+                        )
+            if (
+                selected_source_date is not None
+                and not normalized_start
+                <= selected_source_date
+                <= normalized_end
+            ):
+                resolved_outside_range += 1
+                continue
             for field_name in economic_field_names:
                 reviewed_value = resolved_terms.get(field_name)
                 if field_name not in reviewed_fields or reviewed_value is None:
@@ -18082,7 +18131,11 @@ class DataManager:
                         )
                     except (TypeError, ValueError):
                         current_is_placeholder = True
-                if current_value is None or current_is_placeholder:
+                if (
+                    authoritative_override
+                    or current_value is None
+                    or current_is_placeholder
+                ):
                     merged_row[field_name] = reviewed_value
                     applied_economic_fields.append(field_name)
             factor_cninfo_rows.append({
@@ -18099,6 +18152,9 @@ class DataManager:
                 ),
                 "resolved_economic_terms": bool(applied_economic_fields),
                 "resolved_economic_fields": applied_economic_fields,
+                "resolved_factor_effect": factor_effect,
+                "resolved_date_authoritative": authoritative_effective_date,
+                "resolved_authoritative_override": authoritative_override,
             })
 
         quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
@@ -18124,6 +18180,7 @@ class DataManager:
         reconciliation = reconcile_cninfo_tdx_events(
             cninfo_path["events"],
             tdx_path["events"],
+            excluded_cninfo_events=cninfo_path.get("excluded_no_effect") or (),
             sessions_by_exchange=sessions_by_exchange,
             field_tolerance=max(0.0, float(field_tolerance)),
             factor_relative_tolerance=max(
@@ -18160,6 +18217,7 @@ class DataManager:
             "instrument_count": 0,
             "conflict_count": 0,
             "tdx_fallback_count": 0,
+            "cninfo_no_effect_exclusion_count": 0,
             "candidate_built": False,
             "source_selection_status": "deferred",
             "promotion_eligible": False,
@@ -18170,6 +18228,7 @@ class DataManager:
                 tdx_path["events"],
                 reconciliation,
                 series_version=staging_version,
+                excluded_cninfo_events=cninfo_path.get("excluded_no_effect") or (),
             )
             candidate_summary["candidate_built"] = True
             candidate_summary["source_selection_status"] = "deferred"
@@ -18404,8 +18463,15 @@ class DataManager:
         }
         if not dry_run:
             write_result["cninfo_observations"] = (
-                await self.db_ops.save_adjustment_factor_observations(
+                await self.db_ops.replace_adjustment_factor_observations(
                     cninfo_path["observations"],
+                    instrument_ids=target_ids,
+                    source="cninfo",
+                    source_profile=CNINFO_FACTOR_PROFILE,
+                    cleanup_source_event_keys=sorted(
+                        cninfo_cleanup_source_event_keys
+                    ),
+                    additional_keys=sorted(cninfo_replacement_extra_keys),
                     ingestion_run_id=run_id,
                 )
             )
@@ -18543,6 +18609,12 @@ class DataManager:
                 "derived_events": len(cninfo_path["events"]),
                 "pending_count": len(cninfo_path["pending"]),
                 "pending": cninfo_path["pending"][:sample_limit],
+                "excluded_no_effect_count": len(
+                    cninfo_path.get("excluded_no_effect") or []
+                ),
+                "excluded_no_effect": (
+                    cninfo_path.get("excluded_no_effect") or []
+                )[:sample_limit],
             },
             "tdx_path": {
                 "derived_events": len(tdx_path["events"]),
@@ -21331,7 +21403,9 @@ class DataManager:
             best_structured_anchor,
             build_candidate_evidence,
             build_classified_announcement_evidence,
+            build_prefiltered_announcement_evidence,
             build_search_targets,
+            classify_cninfo_announcement_title_prefilter,
             is_implementation_grade_decision,
             parse_date,
         )
@@ -21761,6 +21835,42 @@ class DataManager:
             if index < len(target_groups):
                 await asyncio.sleep(effective_request_interval)
 
+        title_prefilter_reason_counts: Counter[str] = Counter()
+        title_prefilter_samples: List[Dict[str, Any]] = []
+        prefiltered_title_count = 0
+        for item in scan_items:
+            all_records = list(item["records"])
+            eligible_records = []
+            filtered_records = []
+            for record in all_records:
+                decision = classify_cninfo_announcement_title_prefilter(
+                    record.title
+                )
+                if decision["excluded"]:
+                    filtered_records.append((record, decision))
+                    prefiltered_title_count += 1
+                    reason = str(decision.get("reason") or "excluded")
+                    title_prefilter_reason_counts[reason] += 1
+                    if len(title_prefilter_samples) < max(0, int(sample_limit)):
+                        title_prefilter_samples.append({
+                            "instrument_id": item[
+                                "primary_target"
+                            ].instrument_id,
+                            "source_event_key": item[
+                                "primary_target"
+                            ].source_event_key,
+                            "announcement_id": str(
+                                record.source_announcement_id
+                            ),
+                            "title": record.title,
+                            **decision,
+                        })
+                else:
+                    eligible_records.append(record)
+            item["all_records"] = all_records
+            item["records"] = eligible_records
+            item["prefiltered_records"] = filtered_records
+
         title_batch = None
         title_classification_error: Optional[str] = None
         classification_items = [
@@ -21967,7 +22077,13 @@ class DataManager:
         for index, item in enumerate(scan_items, start=1):
             target = item["primary_target"]
             event_key = target.source_event_key
-            event_evidence: List[Dict[str, Any]] = []
+            event_evidence: List[Dict[str, Any]] = (
+                build_prefiltered_announcement_evidence(
+                    target,
+                    item["prefiltered_records"],
+                    search_windows=item["search_windows"],
+                )
+            )
             applicability: Dict[str, Any] = {}
             lineage: List[Dict[str, Any]] = []
             decisions: Dict[str, Dict[str, Any]] = {}
@@ -22003,7 +22119,7 @@ class DataManager:
                     lineage = classified.get("lineage") or (
                         title_batch.lineage_by_event.get(event_key, [])
                     )
-                    event_evidence = classified.get("event_evidence") or (
+                    classified_evidence = classified.get("event_evidence") or (
                         build_classified_announcement_evidence(
                             target,
                             item["records"],
@@ -22013,16 +22129,25 @@ class DataManager:
                             search_windows=item["search_windows"],
                         )
                     )
+                    event_evidence.extend(classified_evidence)
             else:
                 evidence_by_key = {}
+                filtered_ids = {
+                    str(record.source_announcement_id)
+                    for record, _ in item["prefiltered_records"]
+                }
                 for window_target, route_result in item["route_results"]:
                     scan_result = route_result.scan_result
                     for evidence in build_candidate_evidence(
                         window_target,
-                        scan_result.selected_records if scan_result else (),
+                        (
+                            record for record in scan_result.selected_records
+                            if str(record.source_announcement_id)
+                            not in filtered_ids
+                        ) if scan_result else (),
                     ):
                         evidence_by_key[evidence["evidence_key"]] = evidence
-                event_evidence = list(evidence_by_key.values())
+                event_evidence.extend(evidence_by_key.values())
             evidence_rows.extend(event_evidence)
             event_candidates = [
                 row for row in event_evidence
@@ -22117,6 +22242,24 @@ class DataManager:
                                     )
                                 ],
                                 "llm_lineage": lineage,
+                                "title_prefilter": [
+                                    {
+                                        "announcement_id": str(
+                                            record.source_announcement_id
+                                        ),
+                                        **dict(decision),
+                                    }
+                                    for record, decision
+                                    in item["prefiltered_records"]
+                                    if any(
+                                        str(route_record.source_announcement_id)
+                                        == str(record.source_announcement_id)
+                                        for route_record in (
+                                            route_result.scan_result.records
+                                            if route_result.scan_result else ()
+                                        )
+                                    )
+                                ],
                             },
                         )
                         announcement_governance[
@@ -22151,7 +22294,9 @@ class DataManager:
                 "candidate_effective_dates": [
                     value.isoformat() for value in target.candidate_effective_dates
                 ],
-                "announcements_seen": len(item["records"]),
+                "announcements_seen": len(item["all_records"]),
+                "titles_prefiltered": len(item["prefiltered_records"]),
+                "titles_sent_to_classifier": len(item["records"]),
                 "candidate_count": len(event_candidates),
                 "rejected_count": len(event_rejected),
                 "title_classification_status": event_title_status,
@@ -22394,6 +22539,12 @@ class DataManager:
                 "input_title_count": (
                     title_batch.input_title_count if title_batch else 0
                 ),
+            },
+            "title_prefilter": {
+                "policy_version": "cninfo_title_prefilter_v1",
+                "excluded_count": prefiltered_title_count,
+                "reason_counts": dict(title_prefilter_reason_counts),
+                "samples": title_prefilter_samples,
             },
             "announcement_governance": announcement_governance,
             "target_samples": target_results[:max(0, int(sample_limit))],
@@ -24681,6 +24832,395 @@ class DataManager:
             result["targets"]["next_target_offset"],
         )
         return result
+
+    async def review_cninfo_asymmetric_manual_override(
+        self,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Apply an operator-approved asymmetric CNInfo correction locally."""
+        instrument_id = convert_to_database_format(
+            str(payload.get("instrument_id") or "").strip()
+        )
+        source_event_key = str(payload.get("source_event_key") or "").strip()
+        reviewer = str(payload.get("reviewer") or "").strip()
+        effective_date = self._date_from_any(payload.get("effective_date"))
+        date_basis = str(payload.get("date_basis") or "").strip()
+        announcement_id = str(
+            payload.get("announcement_id") or ""
+        ).strip()
+        notes = str(payload.get("notes") or "").strip()
+        factor_effect = str(payload.get("factor_effect") or "").strip().lower()
+        if not all((
+            instrument_id,
+            source_event_key,
+            reviewer,
+            effective_date,
+            date_basis,
+            announcement_id,
+        )):
+            raise ValueError(
+                "instrument_id, source_event_key, reviewer, effective_date, "
+                "date_basis, and announcement_id are required"
+            )
+        if factor_effect not in {"normal", "none"}:
+            raise ValueError("factor_effect is required and must be normal or none")
+        if len(reviewer) > 128:
+            raise ValueError("reviewer exceeds 128 characters")
+        if len(notes) > 4000:
+            raise ValueError("notes exceeds 4000 characters")
+        exchange = {
+            ".SH": "SSE",
+            ".SZ": "SZSE",
+            ".BJ": "BSE",
+        }.get(instrument_id[-3:])
+        if exchange is None:
+            raise ValueError(
+                "manual asymmetric review requires an A-share instrument"
+            )
+
+        allowed_fields = {
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+            "rights_shares_per_share",
+            "rights_price",
+        }
+        supplied_terms = payload.get("total_share_capital_terms")
+        if not isinstance(supplied_terms, Mapping):
+            raise ValueError("total_share_capital_terms must be an object")
+        unexpected_fields = sorted(set(supplied_terms) - allowed_fields)
+        if unexpected_fields:
+            raise ValueError(
+                "unsupported total-share-capital fields: "
+                + ", ".join(unexpected_fields)
+            )
+        normalized_terms: Dict[str, Optional[float]] = {
+            field_name: None for field_name in allowed_fields
+        }
+        resolved_fields = []
+        for field_name, value in supplied_terms.items():
+            if value is None:
+                raise ValueError(
+                    f"{field_name} must be a finite non-negative number"
+                )
+            try:
+                numeric_value = float(value)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"{field_name} must be numeric"
+                ) from exc
+            if not math.isfinite(numeric_value) or numeric_value < 0:
+                raise ValueError(
+                    f"{field_name} must be a finite non-negative number"
+                )
+            normalized_terms[field_name] = numeric_value
+            resolved_fields.append(field_name)
+        if not resolved_fields:
+            raise ValueError("at least one total-share-capital term is required")
+
+        beneficiary_terms = payload.get("beneficiary_terms") or {}
+        if not isinstance(beneficiary_terms, Mapping):
+            raise ValueError("beneficiary_terms must be an object")
+        beneficiary_scope = str(
+            payload.get("beneficiary_scope") or ""
+        ).strip()
+        if not beneficiary_scope:
+            raise ValueError("beneficiary_scope is required")
+
+        await self._assert_current_cninfo_corporate_action_identity(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+        )
+        observations = await self.db_ops.get_corporate_action_observations(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            source="cninfo",
+            include_inactive=False,
+            limit=2,
+            offset=0,
+        )
+        observation_items = observations.get("items") or []
+        if len(observation_items) != 1:
+            raise ValueError("current CNInfo observation is missing or ambiguous")
+        observation = observation_items[0]
+
+        analyses = await self.db_ops.get_corporate_action_llm_analyses(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            limit=1000,
+            offset=0,
+        )
+        requested_analysis_id = int(payload.get("analysis_id") or 0)
+        analysis = next((
+            item for item in analyses.get("items", [])
+            if (
+                requested_analysis_id <= 0
+                or int(item.get("analysis_id") or 0) == requested_analysis_id
+            )
+        ), None)
+        if analysis is None:
+            raise ValueError("persisted CNInfo analysis is required")
+        analysis_id = int(analysis.get("analysis_id") or 0)
+        if analysis_id <= 0:
+            raise ValueError("persisted CNInfo analysis identity is invalid")
+
+        candidate_page = (
+            await self.db_ops.get_corporate_action_effective_date_evidence(
+                source_event_key=source_event_key,
+                evidence_source="cninfo_announcement_metadata",
+                limit=1000,
+                offset=0,
+            )
+        )
+        candidates = candidate_page.get("items") or []
+        selected_candidate = next((
+            item for item in candidates
+            if str(item.get("announcement_id") or "").strip()
+            == announcement_id
+        ), None)
+        if selected_candidate is None:
+            raise ValueError(
+                "announcement_id is not a persisted CNInfo candidate"
+            )
+
+        prior_reviews = await self.db_ops.get_corporate_action_resolution_reviews(
+            source_event_key=source_event_key,
+            limit=1,
+            offset=0,
+        )
+        prior_review = next(iter(prior_reviews.get("items") or []), None)
+        original_terms = {
+            field_name: observation.get(field_name)
+            for field_name in allowed_fields
+        }
+        operator_instruction = str(
+            payload.get("operator_instruction") or notes
+        ).strip()
+        decision_identity = {
+            "policy": "cninfo_asymmetric_manual_override_v1",
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "analysis_id": analysis_id,
+            "effective_date": effective_date.isoformat(),
+            "date_basis": date_basis,
+            "announcement_id": announcement_id,
+            "reviewer": reviewer,
+            "notes": notes,
+            "factor_effect": factor_effect,
+            "beneficiary_scope": beneficiary_scope,
+            "beneficiary_terms": dict(beneficiary_terms),
+            "total_share_capital_terms": normalized_terms,
+            "operator_instruction": operator_instruction,
+        }
+        operator_decision_key = hashlib.sha256(json.dumps(
+            decision_identity,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        ).encode("utf-8")).hexdigest()
+        policy_payload = {
+            "resolution_policy": "cninfo_asymmetric_manual_override_v1",
+            "operator_decision_key": operator_decision_key,
+            "factor_effect": factor_effect,
+            "authoritative_override": True,
+            "beneficiary_scope": beneficiary_scope,
+            "beneficiary_terms": dict(beneficiary_terms),
+            "total_share_capital_terms": normalized_terms,
+            "cninfo_observation_terms": original_terms,
+            "operator_instruction": operator_instruction,
+            "selected_announcement": selected_candidate,
+            "network_access": False,
+            "llm_invocations": 0,
+        }
+        prior_decision_key = None
+        if prior_review:
+            prior_payload = prior_review.get("review_payload") or {}
+            prior_decision_key = str(
+                prior_payload.get("operator_decision_key") or ""
+            ).strip() or None
+            if (
+                prior_decision_key is None
+                and prior_payload.get("resolution_policy")
+                == "cninfo_asymmetric_manual_override_v1"
+            ):
+                prior_effective_date = self._date_from_any(
+                    prior_review.get("effective_date")
+                )
+                prior_selected = (
+                    prior_payload.get("selected_announcement") or {}
+                )
+                prior_identity = {
+                    "policy": "cninfo_asymmetric_manual_override_v1",
+                    "instrument_id": instrument_id,
+                    "source_event_key": source_event_key,
+                    "analysis_id": int(
+                        prior_review.get("analysis_id") or 0
+                    ),
+                    "effective_date": (
+                        prior_effective_date.isoformat()
+                        if prior_effective_date else None
+                    ),
+                    "date_basis": str(
+                        prior_review.get("date_basis") or ""
+                    ).strip(),
+                    "announcement_id": str(
+                        prior_selected.get("announcement_id")
+                        or prior_review.get("evidence_key")
+                        or ""
+                    ).strip(),
+                    "reviewer": str(
+                        prior_review.get("reviewer") or ""
+                    ).strip(),
+                    "notes": str(prior_review.get("notes") or "").strip(),
+                    "factor_effect": str(
+                        prior_payload.get("factor_effect") or "normal"
+                    ).strip().lower(),
+                    "beneficiary_scope": str(
+                        prior_payload.get("beneficiary_scope") or ""
+                    ).strip(),
+                    "beneficiary_terms": dict(
+                        prior_payload.get("beneficiary_terms") or {}
+                    ),
+                    "total_share_capital_terms": dict(
+                        prior_payload.get("total_share_capital_terms") or {}
+                    ),
+                    "operator_instruction": str(
+                        prior_payload.get("operator_instruction")
+                        or prior_review.get("notes")
+                        or ""
+                    ).strip(),
+                }
+                prior_decision_key = hashlib.sha256(json.dumps(
+                    prior_identity,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                ).encode("utf-8")).hexdigest()
+        supersedes_review_id = None
+        if prior_review and prior_decision_key == operator_decision_key:
+            review_key = str(prior_review.get("review_key") or "").strip()
+            supersedes_review_id = prior_review.get("supersedes_review_id")
+        else:
+            if prior_review:
+                supersedes_review_id = prior_review.get("review_id")
+            review_key = hashlib.sha256(json.dumps({
+                "policy": policy_payload["resolution_policy"],
+                "operator_decision_key": operator_decision_key,
+                "supersedes_review_id": supersedes_review_id,
+            }, ensure_ascii=False, sort_keys=True, default=str).encode(
+                "utf-8"
+            )).hexdigest()
+        if not review_key:
+            raise ValueError("manual asymmetric review identity is invalid")
+        evidence_key = announcement_id or source_event_key
+        terms_evidence = {
+            **policy_payload,
+            "selected_date_evidence": {
+                "announcement_id": announcement_id or None,
+                "announcement_title": (
+                    selected_candidate.get("announcement_title")
+                    if selected_candidate else None
+                ),
+                "effective_date": effective_date.isoformat(),
+                "date_basis": date_basis,
+            },
+        }
+        bundle = await self.db_ops.save_corporate_action_review_bundle(
+            review_row={
+                "review_key": review_key,
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "analysis_id": analysis_id,
+                "evidence_key": evidence_key,
+                "decision": "resolved",
+                "effective_date": effective_date.isoformat(),
+                "date_basis": date_basis,
+                "reviewer": reviewer,
+                "notes": notes,
+                "review_payload": policy_payload,
+                "supersedes_review_id": supersedes_review_id,
+            },
+            terms_row={
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "analysis_id": analysis_id,
+                **normalized_terms,
+                "currency": observation.get("currency"),
+                "resolved_fields": sorted(resolved_fields),
+                "evidence": terms_evidence,
+                "is_active": True,
+            },
+            evidence_row={
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "observation_source": "cninfo",
+                "source_profile": observation.get("source_profile"),
+                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_key": evidence_key,
+                "resolution_status": "resolved",
+                "effective_date": effective_date.isoformat(),
+                "date_basis": date_basis,
+                "announcement_id": announcement_id or None,
+                "announcement_title": (
+                    selected_candidate.get("announcement_title")
+                    if selected_candidate else None
+                ),
+                "announcement_time": (
+                    selected_candidate.get("announcement_time")
+                    if selected_candidate else None
+                ),
+                "evidence_url": (
+                    selected_candidate.get("evidence_url")
+                    if selected_candidate else None
+                ),
+                "confidence": 1.0,
+                "raw_payload": {
+                    "review_key": review_key,
+                    **policy_payload,
+                },
+            },
+            ingestion_run_id=(
+                "cninfo_asymmetric_manual_" + review_key[:16]
+            ),
+        )
+        refreshed_inventory = (
+            await self._load_cninfo_resolution_governance_inventory(
+                start_date=date.min,
+                end_date=date.max,
+                exchanges=[exchange],
+                instrument_ids=[instrument_id],
+                source_event_keys=[source_event_key],
+            )
+        )
+        if len(refreshed_inventory) != 1:
+            raise RuntimeError(
+                "manual asymmetric review state refresh did not resolve "
+                "exactly one current CNInfo event"
+            )
+        state_write = await self.db_ops.upsert_corporate_action_resolution_states(
+            refreshed_inventory,
+            ingestion_run_id=(
+                "cninfo_asymmetric_manual_" + review_key[:16]
+            ),
+        )
+        if int(state_write.get("failed", 0) or 0) > 0:
+            raise RuntimeError(
+                "manual asymmetric review state refresh failed"
+            )
+        return {
+            "status": "success",
+            "review": bundle["review"],
+            "terms_write": bundle["terms_write"],
+            "evidence_write": bundle["evidence_write"],
+            "resolution_state": refreshed_inventory[0],
+            "state_write": state_write,
+            "supersedes_review_id": supersedes_review_id,
+            "factor_effect": factor_effect,
+            "raw_observation_modified": False,
+            "production_factor_modified": False,
+            "network_access": False,
+            "llm_invocations": 0,
+        }
 
     async def review_cninfo_corporate_action_resolution(
         self,

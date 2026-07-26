@@ -148,6 +148,9 @@ def _manager_with_factor_evidence(
         "unchanged": 0,
         "failed": 0,
     })
+    manager.db_ops.replace_adjustment_factor_observations = AsyncMock(
+        return_value={"deleted": 0, "inserted": 1, "failed": 0}
+    )
     manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(return_value=1)
     manager.db_ops.replace_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=1
@@ -180,6 +183,7 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
     ]["coverage_ratio"] == pytest.approx(1.0)
     assert result["candidate"]["candidate_built"] is False
     manager.db_ops.save_adjustment_factor_observations.assert_not_awaited()
+    manager.db_ops.replace_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
 
 
@@ -225,7 +229,8 @@ async def test_cninfo_factor_rebuild_writes_paths_and_benchmark_without_candidat
     assert result["candidate"]["promotion_eligible"] is False
     assert result["write_result"]["canonical_saved_rows"] == 0
     assert result["write_result"]["benchmark_status_saved"] is True
-    assert manager.db_ops.save_adjustment_factor_observations.await_count == 2
+    manager.db_ops.replace_adjustment_factor_observations.assert_awaited_once()
+    assert manager.db_ops.save_adjustment_factor_observations.await_count == 1
     manager.db_ops.upsert_adjustment_factor_series_status.assert_awaited_once()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
     manager.invalidate_factor_cache.assert_called_once()
@@ -395,3 +400,98 @@ async def test_reviewed_overlay_replaces_zero_effect_placeholder_only(monkeypatc
     assert captured_rows[0]["resolved_economic_fields"] == [
         "cash_dividend_per_share"
     ]
+
+
+@pytest.mark.asyncio
+async def test_manual_override_replaces_existing_terms_and_can_exclude_factor(
+    monkeypatch,
+):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    captured_rows = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        if "FROM corporate_action_observations" in query:
+            return [{
+                "instrument_id": "000001.SZ",
+                "source_profile": "cninfo_dividend",
+                "source_event_key": "event-1",
+                "action_type": "distribution",
+                "ex_date": datetime(2020, 5, 28),
+                "cash_dividend_per_share": 0.0,
+                "bonus_shares_per_share": 0.17,
+                "capitalization_shares_per_share": 0.0,
+                "rights_shares_per_share": None,
+                "rights_price": None,
+                "event_status": "implemented",
+                "quality_status": "partial_missing_fields",
+                "is_current": 1,
+            }]
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(return_value={
+        "event-1": {
+            "cash_dividend_per_share": 0.1,
+            "bonus_shares_per_share": 0.0,
+            "resolved_fields": [
+                "cash_dividend_per_share",
+                "bonus_shares_per_share",
+            ],
+            "authoritative_override": True,
+            "factor_effect": "none",
+        }
+    })
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2020, 5, 29),
+                "date_basis": "operator_corrected_date",
+                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_key": "announcement-1",
+            }
+        }
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+    )
+
+    assert captured_rows[0]["cash_dividend_per_share"] == pytest.approx(0.1)
+    assert captured_rows[0]["bonus_shares_per_share"] == pytest.approx(0.0)
+    assert result["cninfo_path"]["derived_events"] == 0
+    assert result["cninfo_path"]["pending"] == []
+    assert result["cninfo_path"]["excluded_no_effect"] == [{
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "reason": "resolved_factor_effect_none",
+        "effective_date": "2020-05-29",
+        "suppressed_dates": ["2020-05-28", "2020-05-29"],
+    }]
+    assert captured_rows[0]["resolved_date_authoritative"] is True
+    assert captured_rows[0]["resolved_authoritative_override"] is True
+    assert result["reconciliation"]["status"] == "success"
+    assert result["reconciliation"]["totals"]["tdx_only"] == 0
+    assert result["reconciliation"]["totals"][
+        "suppressed_reference_events"
+    ] == 1
+    assert result["candidate"]["row_count"] == 0
+    assert result["candidate"]["tdx_fallback_count"] == 0

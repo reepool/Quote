@@ -6,6 +6,7 @@ from data_sources.cninfo_factor_governance import (
     CNINFO_FACTOR_PROFILE,
     TDX_FACTOR_PROFILE,
     build_cninfo_primary_candidate,
+    build_quote_evidence_keys,
     derive_cninfo_factor_path,
     derive_tdx_factor_path,
     evaluate_coverage_intervals,
@@ -234,6 +235,40 @@ def test_resolved_date_evidence_allows_missing_ex_date_event_only():
     assert evidence["date_basis"] == "official_resumption_date"
 
 
+def test_authoritative_resolved_date_drives_quote_lookup_and_factor():
+    observations = [{
+        "instrument_id": "600449.SH",
+        "source_event_key": "share-reform",
+        "ex_date": date(2006, 7, 14),
+        "resolved_effective_date": date(2006, 8, 15),
+        "resolved_date_authoritative": True,
+        "resolved_factor_effect": "normal",
+        "event_status": "implemented",
+        "quality_status": "structured_complete",
+        "capitalization_shares_per_share": 0.172488,
+        "is_current": True,
+    }]
+
+    assert build_quote_evidence_keys(observations, []) == [
+        ("600449.SH", date(2006, 8, 15))
+    ]
+
+    result = derive_cninfo_factor_path(
+        observations,
+        [{
+            "instrument_id": "600449.SH",
+            "source_date": date(2006, 8, 15),
+            "effective_date": date(2006, 8, 15),
+            "pre_close": 10.0,
+            "close": 8.5,
+        }],
+    )
+
+    assert result["pending"] == []
+    assert result["events"][0]["effective_date"] == date(2006, 8, 15)
+    assert result["events"][0]["factor"] == pytest.approx(1.172488)
+
+
 def test_candidate_only_metadata_does_not_resolve_missing_ex_date():
     result = derive_cninfo_factor_path(
         [{
@@ -398,6 +433,8 @@ def test_reconciliation_and_candidate_keep_tdx_only_as_unverified_fallback():
         "exact_matches": 1,
         "rounded_matches": 0,
         "shifted_matches": 0,
+        "accepted_authoritative_overrides": 0,
+        "suppressed_reference_events": 0,
         "conflicts": 0,
         "cninfo_only": 0,
         "tdx_only": 1,
@@ -627,3 +664,111 @@ def test_candidate_keeps_cninfo_primary_when_tdx_only_shares_effective_date():
 
     assert len(candidate) == 1
     assert candidate[0]["selected_source"] == "cninfo"
+
+
+def test_candidate_does_not_restore_explicit_cninfo_no_effect_event_from_tdx():
+    tdx_events = [{
+        "instrument_id": "000035.SZ",
+        "source_ex_date": date(2012, 11, 30),
+        "effective_date": date(2012, 11, 30),
+        "factor": 1.2596,
+    }]
+    reconciliation = {
+        "conflicts": [],
+        "tdx_only": [{**tdx_events[0], "tdx_index": 0}],
+    }
+
+    candidate, summary = build_cninfo_primary_candidate(
+        [],
+        tdx_events,
+        reconciliation,
+        series_version="cninfo_primary_test",
+        excluded_cninfo_events=[{
+            "instrument_id": "000035.SZ",
+            "effective_date": "2012-11-30",
+            "suppressed_dates": ["2012-11-29", "2012-11-30"],
+            "reason": "resolved_factor_effect_none",
+        }],
+    )
+
+    assert candidate == []
+    assert summary["tdx_fallback_count"] == 0
+    assert summary["cninfo_no_effect_exclusion_count"] == 2
+
+
+def test_reconciliation_suppresses_reference_for_cninfo_no_effect_event():
+    tdx_events = [{
+        "instrument_id": "000035.SZ",
+        "source_ex_date": date(2012, 11, 30),
+        "effective_date": date(2012, 11, 30),
+        "factor": 1.2596,
+    }]
+
+    result = reconcile_cninfo_tdx_events(
+        [],
+        tdx_events,
+        excluded_cninfo_events=[{
+            "instrument_id": "000035.SZ",
+            "effective_date": "2012-11-30",
+            "suppressed_dates": ["2012-11-30"],
+        }],
+    )
+
+    assert result["status"] == "success"
+    assert result["tdx_only"] == []
+    assert result["totals"]["suppressed_reference_events"] == 1
+
+
+def test_authoritative_cninfo_override_does_not_create_reconciliation_conflict():
+    cninfo_events = [{
+        "instrument_id": "600449.SH",
+        "source_ex_date": date(2006, 8, 15),
+        "effective_date": date(2006, 8, 15),
+        "cash_per_share": 0.0,
+        "bonus_per_share": 0.172488,
+        "rights_per_share": 0.0,
+        "rights_proceeds_per_share": 0.0,
+        "rights_price": 0.0,
+        "factor": 1.172488,
+        "authoritative_override": True,
+    }]
+    tdx_events = [{
+        **cninfo_events[0],
+        "bonus_per_share": 0.442,
+        "factor": 1.442,
+        "authoritative_override": False,
+    }]
+
+    result = reconcile_cninfo_tdx_events(cninfo_events, tdx_events)
+
+    assert result["status"] == "success"
+    assert result["totals"]["conflicts"] == 0
+    assert result["totals"]["accepted_authoritative_overrides"] == 1
+    assert result["accepted_authoritative_overrides"][0][
+        "reason"
+    ] == "authoritative_cninfo_override"
+
+
+def test_authoritative_cninfo_only_event_is_not_unresolved():
+    result = reconcile_cninfo_tdx_events(
+        [{
+            "instrument_id": "000519.SZ",
+            "source_ex_date": date(2016, 5, 11),
+            "effective_date": date(2016, 5, 11),
+            "cash_per_share": 0.0,
+            "bonus_per_share": 0.08189,
+            "rights_per_share": 0.0,
+            "rights_proceeds_per_share": 0.0,
+            "rights_price": 0.0,
+            "factor": 1.08189,
+            "authoritative_override": True,
+        }],
+        [],
+    )
+
+    assert result["status"] == "success"
+    assert result["cninfo_only"] == []
+    assert result["totals"]["accepted_authoritative_overrides"] == 1
+    assert result["accepted_authoritative_overrides"][0][
+        "reason"
+    ] == "authoritative_cninfo_event_only"
