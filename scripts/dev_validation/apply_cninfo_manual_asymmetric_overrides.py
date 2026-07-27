@@ -117,13 +117,49 @@ DECISIONS: tuple[dict[str, Any], ...] = (
             "偿债，公告明确不需除权，复权因子影响为0。"
         ),
     },
+    {
+        "instrument_id": "000623.SZ",
+        "source_event_key": (
+            "84a7d330b9e64e9fcd7ae5359215f559"
+            "d6fd79ac87bbcdeffb76c063219cfe37"
+        ),
+        "announcement_id": "15718433",
+        "reviewer": "operator_cninfo_asymmetric_20260727",
+        "effective_date": "2005-08-04",
+        "date_basis": "股权分置改革实施完成并恢复交易日",
+        "factor_effect": "normal",
+        "beneficiary_scope": (
+            "全体股东法定分红；非流通股东现金转赠流通股东；"
+            "非流通股定向缩股"
+        ),
+        "beneficiary_terms": {
+            "circulating_cash_per_10_shares_approx": 4.0,
+            "nontradable_shares_before_10k": 16255.20,
+            "nontradable_shrink_ratio": 0.6074,
+            "nontradable_shares_after_10k": 9873.4085,
+            "total_shares_before_10k": 35049.69,
+            "total_shares_after_10k": 28667.8985,
+            "nontradable_shrink_price_factor_effect": "not_applied",
+        },
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.214,
+        },
+        "notes": (
+            "按CNInfo口径通过：全体股东每10股派2.14元并于2005-08-04"
+            "完成股改、恢复交易。流通股东约每10股获4元属于股东间补偿"
+            "口径，不写入CNInfo因子；非流通股按1:0.6074缩股仅记录为"
+            "非对称资本结构变化，不构造送转或负向价格复权。"
+        ),
+    },
 )
 
 
-async def _apply() -> list[dict[str, Any]]:
+async def _apply(
+    decisions: tuple[dict[str, Any], ...],
+) -> list[dict[str, Any]]:
     manager = DataManager()
     results = []
-    for payload in DECISIONS:
+    for payload in decisions:
         result = await manager.review_cninfo_asymmetric_manual_override(
             dict(payload)
         )
@@ -140,18 +176,39 @@ def main() -> int:
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Persist the four operator-approved review bundles.",
+        help="Persist the operator-approved review bundles.",
+    )
+    parser.add_argument(
+        "--instrument-id",
+        action="append",
+        help="Limit preview/write to one instrument; may be repeated.",
     )
     args = parser.parse_args()
+    requested = {
+        str(value or "").strip().upper()
+        for value in (args.instrument_id or [])
+        if str(value or "").strip()
+    }
+    decisions = tuple(
+        item for item in DECISIONS
+        if not requested or item["instrument_id"] in requested
+    )
+    missing = sorted(
+        requested - {item["instrument_id"] for item in decisions}
+    )
+    if missing:
+        parser.error(
+            "no operator decision for instrument(s): " + ", ".join(missing)
+        )
     if not args.write:
         print(json.dumps(
-            {"status": "preview", "decisions": DECISIONS},
+            {"status": "preview", "decisions": decisions},
             ensure_ascii=False,
             indent=2,
         ))
         return 0
     print(json.dumps(
-        {"status": "success", "results": asyncio.run(_apply())},
+        {"status": "success", "results": asyncio.run(_apply(decisions))},
         ensure_ascii=False,
         indent=2,
         default=str,

@@ -797,6 +797,126 @@ async def test_manual_asymmetric_override_supersedes_review_and_records_factor_e
 
 
 @pytest.mark.asyncio
+async def test_manual_asymmetric_passthrough_without_analysis_keeps_cninfo_terms():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(return_value={
+        "items": [{
+            "instrument_id": "000623.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "currency": "CNY",
+            "cash_dividend_per_share": 0.214,
+            "bonus_shares_per_share": None,
+            "capitalization_shares_per_share": None,
+            "rights_shares_per_share": None,
+            "rights_price": None,
+        }]
+    })
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.get_corporate_action_effective_date_evidence = AsyncMock(
+        return_value={"items": [{
+            "announcement_id": "ann-1",
+            "announcement_title": "关于股权分置改革实施完成并恢复交易的提示性公告",
+            "source_profile": "cninfo_dividend",
+        }]}
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"review_id": 8, "status": "inserted"},
+            "terms_write": {
+                "resolved_terms_id": None,
+                "status": "absent",
+            },
+            "evidence_write": {"inserted": 1},
+        }
+    )
+    refreshed_state = {
+        "instrument_id": "000623.SZ",
+        "source_event_key": "event-1",
+        "resolution_state": "resolved_evidence",
+        "is_terminal": True,
+        "factor_blocking": False,
+    }
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[refreshed_state]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 1,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+    payload = {
+        "instrument_id": "000623.SZ",
+        "source_event_key": "event-1",
+        "reviewer": "operator",
+        "effective_date": "2005-08-04",
+        "date_basis": "股权分置改革实施完成并恢复交易日",
+        "announcement_id": "ann-1",
+        "factor_effect": "normal",
+        "beneficiary_scope": "非流通股缩股；流通股东获得现金补偿",
+        "beneficiary_terms": {
+            "circulating_cash_per_10_shares_approx": 4.0,
+            "nontradable_shrink_ratio": 0.6074,
+            "nontradable_shrink_price_factor_effect": "not_applied",
+        },
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.214,
+        },
+        "notes": "保留CNInfo每10股派2.14元，缩股不进入价格复权。",
+    }
+
+    result = await manager.review_cninfo_asymmetric_manual_override(payload)
+
+    saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert saved["review_row"]["analysis_id"] is None
+    assert saved["terms_row"] is None
+    assert saved["review_row"]["review_payload"][
+        "resolution_policy"
+    ] == "cninfo_asymmetric_manual_passthrough_v1"
+    assert saved["review_row"]["review_payload"][
+        "approval_classification"
+    ] == "approved_asymmetric"
+    assert saved["review_row"]["review_payload"][
+        "factor_terms_source"
+    ] == "cninfo_observation"
+    assert saved["review_row"]["review_payload"]["tdx_factor_used"] is False
+    assert result["analysis_id"] is None
+    assert result["terms_overlay_written"] is False
+    assert result["source_terms_unchanged"] is True
+
+    with pytest.raises(
+        ValueError,
+        match="cannot change current CNInfo economic terms",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "total_share_capital_terms": {
+                "cash_dividend_per_share": 0.4,
+            },
+        })
+    with pytest.raises(
+        ValueError,
+        match="requires factor_effect=normal",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "factor_effect": "none",
+        })
+
+
+@pytest.mark.asyncio
 async def test_asymmetric_write_uses_implementation_candidate_and_all_quotes():
     manager = DataManager()
     manager.db_ops = Mock()

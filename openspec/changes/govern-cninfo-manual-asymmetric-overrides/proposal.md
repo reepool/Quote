@@ -20,6 +20,12 @@ but has no adjustment-factor effect.
 - Apply the operator decisions for `000519.SZ`, `600449.SH`, `000031.SZ`, and
   `000035.SZ` from existing persisted CNInfo data without redownloading or
   reanalyzing documents.
+- Allow an operator to approve unchanged current CNInfo terms and persisted
+  official-date evidence when no LLM analysis exists, without fabricating an
+  analysis row or creating a redundant resolved-term overlay.
+- Apply the CNInfo-only operator decision for `000623.SZ`: retain the official
+  `10派2.14元` terms, use the reform implementation date, and record the
+  non-tradable-share contraction as non-factor descriptive lineage.
 
 ## Capabilities
 
@@ -46,3 +52,5 @@ but has no adjustment-factor effect.
 - Corporate-action review API payload behavior and focused unit tests.
 - Existing CNInfo review, resolved-term, and effective-date-evidence tables;
   no raw observation mutation and no schema migration are required.
+- TDX remains comparison evidence only; no TDX economic term or factor is
+  written into the CNInfo factor path.

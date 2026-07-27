@@ -77,6 +77,21 @@ four explicit operator decisions.
    still requires an existing trustworthy total-share-capital term and factor
    effect. Items lacking either remain manual.
 
+8. **Allow review-only CNInfo passthrough without an LLM analysis.** When an
+   operator keeps the current CNInfo economic terms unchanged, selects
+   persisted official announcement evidence, and declares
+   `factor_effect=normal`, the system may persist a resolved review and date
+   evidence without a resolved-term overlay. The factor path continues to read
+   the raw CNInfo terms. A missing analysis MUST NOT be replaced with a
+   synthetic LLM row. Term-changing overrides and `factor_effect=none` continue
+   to require the existing resolved-term overlay path.
+
+9. **Keep TDX outside the CNInfo factor path.** TDX comparisons may be retained
+   as audit lineage, but neither TDX economic fields nor TDX day factors may
+   become the authoritative terms of a CNInfo manual decision. Non-tradable-only
+   share contraction is descriptive capital-structure lineage unless an
+   official CNInfo price-adjustment term explicitly represents it.
+
 ## Risks / Trade-offs
 
 - **[Risk] A broad title word hides an implementation notice.** → Strong
@@ -90,6 +105,12 @@ four explicit operator decisions.
   regression coverage.
 - **[Risk] Existing reviews are silently overwritten.** → New reviews include
   `supersedes_review_id`; raw observations and prior review rows remain intact.
+- **[Risk] An analysis-free review accidentally changes economics.** → Permit
+  this path only when every supplied total-share-capital term equals the current
+  CNInfo observation and `factor_effect=normal`; otherwise reject it.
+- **[Risk] An omitted overlay leaves stale prior terms active.** → The atomic
+  review bundle deactivates an existing resolved-term overlay when the new
+  approved state explicitly returns to unchanged raw CNInfo terms.
 
 ## Migration Plan
 
@@ -100,7 +121,10 @@ four explicit operator decisions.
 4. Run a targeted dry-run factor rebuild for the four instruments and verify
    `000035.SZ` contributes no event factor.
 5. Enable the deterministic title prefilter for subsequent discovery runs.
-6. Roll back by disabling the new review endpoint/prefilter and superseding any
+6. Apply and audit the `000623.SZ` CNInfo-only review without downloading or LLM
+   work, then verify that raw CNInfo, TDX audit, and production factor rows are
+   unchanged by the review write.
+7. Roll back by disabling the new review endpoint/prefilter and superseding any
    manual review with another governed review; raw data remains unchanged.
 
 ## Open Questions

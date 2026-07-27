@@ -573,3 +573,154 @@ async def test_review_bundle_rolls_back_all_rows_when_terms_write_fails():
     assert terms.cash_dividend_per_share == pytest.approx(0.236)
     assert review_count == 1
     await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_review_bundle_without_analysis_uses_raw_terms_and_deactivates_overlay():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
+                CorporateActionEffectiveDateEvidenceDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000623.SZ", symbol="000623", name="Test",
+            exchange="SZSE", type="stock", currency="CNY", is_active=True,
+        ))
+        session.add(CorporateActionObservationDB(
+            instrument_id="000623.SZ",
+            source="cninfo",
+            source_profile="cninfo_dividend",
+            source_event_key="event-1",
+            action_type="dividend",
+            cash_dividend_per_share=0.214,
+            row_hash="observation-hash",
+        ))
+        await session.commit()
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    first = await operations.save_corporate_action_review_bundle(
+        review_row={
+            "review_key": "review-key-1",
+            "instrument_id": "000623.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": None,
+            "evidence_key": "ann-1",
+            "decision": "resolved",
+            "effective_date": "2005-08-04",
+            "date_basis": "股权分置改革实施完成并恢复交易日",
+            "reviewer": "operator",
+            "review_payload": {
+                "resolution_policy":
+                    "cninfo_asymmetric_manual_passthrough_v1",
+            },
+        },
+        terms_row=None,
+        evidence_row={
+            "instrument_id": "000623.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "evidence_source": "cninfo_reviewed_official_document",
+            "evidence_key": "ann-1",
+            "resolution_status": "resolved",
+            "effective_date": "2005-08-04",
+            "date_basis": "股权分置改革实施完成并恢复交易日",
+        },
+    )
+    assert first["review"]["review_id"] > 0
+    assert first["terms_write"] == {
+        "resolved_terms_id": None,
+        "status": "absent",
+    }
+    assert first["evidence_write"]["inserted"] == 1
+
+    async with session_factory() as session:
+        analysis = CorporateActionLlmAnalysisDB(
+            analysis_key="analysis-key",
+            instrument_id="000623.SZ",
+            source_event_key="event-1",
+            analysis_status="manual_required",
+            validation_status="manual_required",
+            profile="semantic_extraction",
+            schema_version="v1",
+            prompt_version="p1",
+            parser_version="parser-v1",
+            input_hash="a" * 64,
+            artifact_ids_json="[]",
+            result_json="{}",
+            gate_results_json="{}",
+            usage_json="{}",
+            attempt_count=1,
+        )
+        session.add(analysis)
+        await session.flush()
+        session.add(CorporateActionResolvedTermsDB(
+            instrument_id="000623.SZ",
+            source_event_key="event-1",
+            analysis_id=analysis.id,
+            review_id=first["review"]["review_id"],
+            cash_dividend_per_share=0.4,
+            is_active=True,
+            resolved_fields_json='["cash_dividend_per_share"]',
+            evidence_json="{}",
+        ))
+        await session.commit()
+
+    second = await operations.save_corporate_action_review_bundle(
+        review_row={
+            "review_key": "review-key-2",
+            "instrument_id": "000623.SZ",
+            "source_event_key": "event-1",
+            "analysis_id": None,
+            "evidence_key": "ann-2",
+            "decision": "resolved",
+            "effective_date": "2005-08-04",
+            "date_basis": "股权分置改革实施完成并恢复交易日",
+            "reviewer": "operator",
+            "review_payload": {
+                "resolution_policy":
+                    "cninfo_asymmetric_manual_passthrough_v1",
+            },
+        },
+        terms_row=None,
+        evidence_row={
+            "instrument_id": "000623.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "evidence_source": "cninfo_reviewed_official_document",
+            "evidence_key": "ann-2",
+            "resolution_status": "resolved",
+            "effective_date": "2005-08-04",
+            "date_basis": "股权分置改革实施完成并恢复交易日",
+        },
+    )
+    assert second["terms_write"]["status"] == "deactivated"
+    async with session_factory() as session:
+        reviews = (
+            await session.execute(
+                select(CorporateActionResolutionReviewDB).order_by(
+                    CorporateActionResolutionReviewDB.id
+                )
+            )
+        ).scalars().all()
+        terms = await session.scalar(select(CorporateActionResolvedTermsDB))
+        evidence_count = await session.scalar(
+            select(func.count()).select_from(
+                CorporateActionEffectiveDateEvidenceDB
+            )
+        )
+    assert len(reviews) == 2
+    assert reviews[0].analysis_id is None
+    assert reviews[1].analysis_id is None
+    assert terms.is_active is False
+    assert evidence_count == 2
+    await engine.dispose()

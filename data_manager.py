@@ -25471,10 +25471,15 @@ class DataManager:
                 or int(item.get("analysis_id") or 0) == requested_analysis_id
             )
         ), None)
-        if analysis is None:
-            raise ValueError("persisted CNInfo analysis is required")
-        analysis_id = int(analysis.get("analysis_id") or 0)
-        if analysis_id <= 0:
+        if requested_analysis_id > 0 and analysis is None:
+            raise ValueError(
+                "requested analysis_id does not belong to the CNInfo event"
+            )
+        analysis_id = (
+            int(analysis.get("analysis_id") or 0)
+            if analysis is not None else None
+        )
+        if analysis is not None and not analysis_id:
             raise ValueError("persisted CNInfo analysis identity is invalid")
 
         candidate_page = (
@@ -25506,11 +25511,38 @@ class DataManager:
             field_name: observation.get(field_name)
             for field_name in allowed_fields
         }
+        writes_terms_overlay = analysis_id is not None
+        source_terms_unchanged = all(
+            original_terms.get(field_name) is not None
+            and math.isclose(
+                float(original_terms[field_name]),
+                float(normalized_terms[field_name]),
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            for field_name in resolved_fields
+        )
+        if not writes_terms_overlay:
+            if factor_effect != "normal":
+                raise ValueError(
+                    "analysis-free CNInfo passthrough requires "
+                    "factor_effect=normal"
+                )
+            if not source_terms_unchanged:
+                raise ValueError(
+                    "analysis-free CNInfo passthrough cannot change current "
+                    "CNInfo economic terms"
+                )
+        resolution_policy = (
+            "cninfo_asymmetric_manual_override_v1"
+            if writes_terms_overlay
+            else "cninfo_asymmetric_manual_passthrough_v1"
+        )
         operator_instruction = str(
             payload.get("operator_instruction") or notes
         ).strip()
         decision_identity = {
-            "policy": "cninfo_asymmetric_manual_override_v1",
+            "policy": resolution_policy,
             "instrument_id": instrument_id,
             "source_event_key": source_event_key,
             "analysis_id": analysis_id,
@@ -25532,10 +25564,17 @@ class DataManager:
             default=str,
         ).encode("utf-8")).hexdigest()
         policy_payload = {
-            "resolution_policy": "cninfo_asymmetric_manual_override_v1",
+            "resolution_policy": resolution_policy,
+            "approval_classification": "approved_asymmetric",
             "operator_decision_key": operator_decision_key,
             "factor_effect": factor_effect,
-            "authoritative_override": True,
+            "authoritative_override": writes_terms_overlay,
+            "source_terms_unchanged": source_terms_unchanged,
+            "factor_terms_source": (
+                "cninfo_reviewed_operator_terms"
+                if writes_terms_overlay else "cninfo_observation"
+            ),
+            "tdx_factor_used": False,
             "beneficiary_scope": beneficiary_scope,
             "beneficiary_terms": dict(beneficiary_terms),
             "total_share_capital_terms": normalized_terms,
@@ -25653,16 +25692,19 @@ class DataManager:
                 "review_payload": policy_payload,
                 "supersedes_review_id": supersedes_review_id,
             },
-            terms_row={
-                "instrument_id": instrument_id,
-                "source_event_key": source_event_key,
-                "analysis_id": analysis_id,
-                **normalized_terms,
-                "currency": observation.get("currency"),
-                "resolved_fields": sorted(resolved_fields),
-                "evidence": terms_evidence,
-                "is_active": True,
-            },
+            terms_row=(
+                {
+                    "instrument_id": instrument_id,
+                    "source_event_key": source_event_key,
+                    "analysis_id": analysis_id,
+                    **normalized_terms,
+                    "currency": observation.get("currency"),
+                    "resolved_fields": sorted(resolved_fields),
+                    "evidence": terms_evidence,
+                    "is_active": True,
+                }
+                if writes_terms_overlay else None
+            ),
             evidence_row={
                 "instrument_id": instrument_id,
                 "source_event_key": source_event_key,
@@ -25729,6 +25771,9 @@ class DataManager:
             "state_write": state_write,
             "supersedes_review_id": supersedes_review_id,
             "factor_effect": factor_effect,
+            "analysis_id": analysis_id,
+            "terms_overlay_written": writes_terms_overlay,
+            "source_terms_unchanged": source_terms_unchanged,
             "raw_observation_modified": False,
             "production_factor_modified": False,
             "network_access": False,

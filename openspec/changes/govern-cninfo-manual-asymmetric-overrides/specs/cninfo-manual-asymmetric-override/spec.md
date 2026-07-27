@@ -51,3 +51,32 @@ documents, run OCR, invoke title classification, or invoke semantic extraction.
 - **WHEN** the four approved event payloads are submitted
 - **THEN** the system writes review bundles using existing CNInfo identities and
   reports no network or LLM work
+
+### Requirement: Analysis-free unchanged CNInfo approval
+The system SHALL allow an operator to resolve an asymmetric event without a
+persisted LLM analysis when the supplied factor-relevant terms are unchanged
+from the current CNInfo observation, persisted official announcement evidence
+is selected, and `factor_effect=normal`.
+
+#### Scenario: Approve unchanged CNInfo terms
+- **WHEN** an operator supplies current CNInfo terms, an official effective
+  date, beneficiary-only descriptive lineage, and no analysis exists
+- **THEN** the system writes a resolved review and effective-date evidence,
+  writes no resolved-term overlay, and continues deriving factors from the raw
+  CNInfo observation
+
+#### Scenario: Reject an analysis-free economic change
+- **WHEN** an analysis-free operator payload changes a CNInfo economic term or
+  declares `factor_effect=none`
+- **THEN** the system rejects the payload rather than fabricating an analysis
+  row or silently changing factor behavior
+
+### Requirement: CNInfo factor-source isolation
+Manual asymmetric approvals SHALL NOT copy TDX economic terms or TDX day
+factors into the CNInfo factor path.
+
+#### Scenario: Record a TDX disagreement
+- **WHEN** a persisted TDX comparison uses a different beneficiary perspective
+  from the CNInfo observation
+- **THEN** the disagreement may remain in audit lineage while the approved
+  CNInfo factor path continues to use CNInfo terms only

@@ -5244,20 +5244,27 @@ class DatabaseOperations:
         self,
         *,
         review_row: Dict[str, Any],
-        terms_row: Dict[str, Any],
+        terms_row: Optional[Dict[str, Any]] = None,
         evidence_row: Optional[Dict[str, Any]] = None,
         ingestion_run_id: Optional[str] = None,
         reject_if_prior_event_review: bool = False,
     ) -> Dict[str, Any]:
-        """Atomically persist one review, terms overlay, and optional evidence."""
+        """Atomically persist a review, optional terms overlay, and evidence."""
         review_key = str(review_row.get("review_key") or "").strip()
         instrument_id = str(review_row.get("instrument_id") or "").strip()
         source_event_key = str(review_row.get("source_event_key") or "").strip()
         reviewer = str(review_row.get("reviewer") or "").strip()
         decision = str(review_row.get("decision") or "").strip().lower()
-        analysis_id = int(review_row.get("analysis_id") or 0)
-        if not all((review_key, instrument_id, source_event_key, reviewer, analysis_id)):
+        raw_analysis_id = review_row.get("analysis_id")
+        analysis_id = (
+            int(raw_analysis_id)
+            if raw_analysis_id not in (None, "", 0, "0")
+            else None
+        )
+        if not all((review_key, instrument_id, source_event_key, reviewer)):
             raise ValueError("review identity is required")
+        if terms_row is not None and analysis_id is None:
+            raise ValueError("resolved-term overlay requires analysis_id")
         if decision not in {"resolved", "rejected", "conflict", "manual_required"}:
             raise ValueError("unsupported corporate-action review decision")
         effective_date = self._coerce_datetime(review_row.get("effective_date"))
@@ -5286,33 +5293,44 @@ class DatabaseOperations:
             ),
             "supersedes_review_id": review_row.get("supersedes_review_id"),
         }
-        terms_values = {
-            "analysis_id": analysis_id,
-            "cash_dividend_per_share": terms_row.get("cash_dividend_per_share"),
-            "bonus_shares_per_share": terms_row.get("bonus_shares_per_share"),
-            "capitalization_shares_per_share": terms_row.get(
-                "capitalization_shares_per_share"
-            ),
-            "rights_shares_per_share": terms_row.get("rights_shares_per_share"),
-            "rights_price": terms_row.get("rights_price"),
-            "currency": terms_row.get("currency"),
-            "is_active": bool(terms_row.get("is_active", True)),
-            "resolved_fields_json": json.dumps(
-                sorted({
-                    str(item)
-                    for item in terms_row.get("resolved_fields", [])
-                    if str(item)
-                }),
-                ensure_ascii=True,
-            ),
-            "evidence_json": json.dumps(
-                terms_row.get("evidence") or {},
-                ensure_ascii=True,
-                sort_keys=True,
-                default=str,
-            ),
-        }
-        if bool(terms_values["is_active"]) != (decision == "resolved"):
+        terms_values = None
+        if terms_row is not None:
+            terms_values = {
+                "analysis_id": analysis_id,
+                "cash_dividend_per_share": terms_row.get(
+                    "cash_dividend_per_share"
+                ),
+                "bonus_shares_per_share": terms_row.get(
+                    "bonus_shares_per_share"
+                ),
+                "capitalization_shares_per_share": terms_row.get(
+                    "capitalization_shares_per_share"
+                ),
+                "rights_shares_per_share": terms_row.get(
+                    "rights_shares_per_share"
+                ),
+                "rights_price": terms_row.get("rights_price"),
+                "currency": terms_row.get("currency"),
+                "is_active": bool(terms_row.get("is_active", True)),
+                "resolved_fields_json": json.dumps(
+                    sorted({
+                        str(item)
+                        for item in terms_row.get("resolved_fields", [])
+                        if str(item)
+                    }),
+                    ensure_ascii=True,
+                ),
+                "evidence_json": json.dumps(
+                    terms_row.get("evidence") or {},
+                    ensure_ascii=True,
+                    sort_keys=True,
+                    default=str,
+                ),
+            }
+        if (
+            terms_values is not None
+            and bool(terms_values["is_active"]) != (decision == "resolved")
+        ):
             raise ValueError("resolved-term activation must match review decision")
         if decision == "resolved" and evidence_row is None:
             raise ValueError("resolved review requires effective-date evidence")
@@ -5452,7 +5470,6 @@ class DatabaseOperations:
                 await session.flush()
                 review_id = int(review.id)
 
-                terms_values["review_id"] = review_id
                 terms = await session.scalar(
                     select(CorporateActionResolvedTermsDB).where(
                         CorporateActionResolvedTermsDB.instrument_id == instrument_id,
@@ -5460,21 +5477,42 @@ class DatabaseOperations:
                         == source_event_key,
                     )
                 )
-                if terms is None:
-                    terms = CorporateActionResolvedTermsDB(
-                        instrument_id=instrument_id,
-                        source_event_key=source_event_key,
-                        **terms_values,
-                    )
-                    session.add(terms)
-                    terms_status = "inserted"
+                if terms_values is None:
+                    if terms is None:
+                        terms_write = {
+                            "resolved_terms_id": None,
+                            "status": "absent",
+                        }
+                    else:
+                        terms_status = (
+                            "deactivated" if terms.is_active else "unchanged"
+                        )
+                        terms.is_active = False
+                        terms.updated_at = get_shanghai_time()
+                        terms_write = {
+                            "resolved_terms_id": int(terms.id),
+                            "status": terms_status,
+                        }
                 else:
-                    for key, value in terms_values.items():
-                        setattr(terms, key, value)
-                    terms.updated_at = get_shanghai_time()
-                    terms_status = "updated"
-                await session.flush()
-                resolved_terms_id = int(terms.id)
+                    terms_values["review_id"] = review_id
+                    if terms is None:
+                        terms = CorporateActionResolvedTermsDB(
+                            instrument_id=instrument_id,
+                            source_event_key=source_event_key,
+                            **terms_values,
+                        )
+                        session.add(terms)
+                        terms_status = "inserted"
+                    else:
+                        for key, value in terms_values.items():
+                            setattr(terms, key, value)
+                        terms.updated_at = get_shanghai_time()
+                        terms_status = "updated"
+                    await session.flush()
+                    terms_write = {
+                        "resolved_terms_id": int(terms.id),
+                        "status": terms_status,
+                    }
 
                 evidence_write = None
                 if prepared_evidence is not None:
@@ -5519,10 +5557,7 @@ class DatabaseOperations:
 
             return {
                 "review": {"review_id": review_id, "status": review_status},
-                "terms_write": {
-                    "resolved_terms_id": resolved_terms_id,
-                    "status": terms_status,
-                },
+                "terms_write": terms_write,
                 "evidence_write": evidence_write,
             }
 
