@@ -5603,6 +5603,8 @@ class DatabaseOperations:
             "factor_effect": str(
                 evidence.get("factor_effect") or "normal"
             ).strip().lower(),
+            "factor_override": evidence.get("factor_override"),
+            "factor_reference": evidence.get("factor_reference") or {},
             "authoritative_override": bool(
                 evidence.get("authoritative_override")
             ),

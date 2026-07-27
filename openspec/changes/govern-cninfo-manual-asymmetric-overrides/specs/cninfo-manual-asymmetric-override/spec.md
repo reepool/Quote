@@ -104,3 +104,54 @@ the TDX economic terms or factor.
 - **WHEN** the TDX row ID, instrument, expected date, special-event category, or
   trading-session validation does not match the explicit operator decision
 - **THEN** the system rejects the write without guessing another TDX row
+
+### Requirement: Fixed-list operator backlog approval
+The system SHALL apply a batch operator instruction only to an immutable list
+of explicit CNInfo event identities and SHALL NOT convert that instruction into
+a category-wide automatic approval policy.
+
+#### Scenario: Apply the reviewed workbook decisions
+- **WHEN** the operator approves the fixed 55-event decision list
+- **THEN** each review preserves its frozen event, analysis, announcement,
+  effective-date, CNInfo-term, and factor-effect identities
+
+#### Scenario: Preserve unresolved evidence blockers
+- **WHEN** six events have no usable official candidate or analysis and one
+  event has only proposal-stage evidence, and one announcement contains
+  conflicting record dates without an effective ex-date
+- **THEN** those eight events remain factor-blocking and no synthetic evidence,
+  analysis, or guessed date is created
+
+### Requirement: TDX date-only evidence with CNInfo term overlay
+The system SHALL allow an explicit manual decision to bind its effective date
+to an exact persisted TDX XDXR row while retaining operator-approved CNInfo
+economic terms.
+
+#### Scenario: Economic values disagree but TDX date is approved
+- **WHEN** the operator selects an exact TDX row for the effective date and the
+  TDX economic fields disagree with CNInfo
+- **THEN** the review records the TDX row as date-only evidence, retains CNInfo
+  terms in the resolved overlay, and records that neither TDX economics nor its
+  factor was used
+
+#### Scenario: Reject a stale or non-trading TDX date
+- **WHEN** the selected TDX row does not match the instrument and expected date
+  or its date is not an exchange trading session
+- **THEN** the manual review is rejected before any bundle is written
+
+### Requirement: Official adjusted-reference-price factor
+The CNInfo factor path SHALL support an operator-reviewed special adjustment
+whose official announcement provides both the pre-adjustment reference price
+and adjusted opening reference price.
+
+#### Scenario: Apply a restructuring reference-price adjustment
+- **WHEN** a resolved review declares `factor_effect=official_reference_price`
+  with two positive official prices
+- **THEN** the event factor equals pre-adjustment reference price divided by
+  adjusted opening reference price and the ordinary cash/bonus/rights formula
+  is not applied to that event
+
+#### Scenario: Reject incomplete special-price evidence
+- **WHEN** either official reference price is absent, non-positive, or produces
+  a non-finite factor
+- **THEN** the manual review is rejected without resolving the event

@@ -39,3 +39,20 @@
 - [x] 5.4 Apply all 15 decisions and verify governance resolution plus zero
   mutation of raw CNInfo, TDX audit, and production factor rows.
 - [x] 5.5 Run focused tests, OpenSpec validation, and uncommitted review.
+
+## 6. Fixed blocker-workbook operator decisions
+
+- [x] 6.1 Extend manual review persistence so an exact TDX row can provide
+  date-only evidence while CNInfo terms and factor effect remain authoritative;
+  add official adjusted-reference-price factor lineage for the five applicable
+  restructuring events.
+- [x] 6.2 Add regression tests for TDX identity/session validation, source
+  isolation, factor-effect lineage, official-reference-price factors, and
+  official-evidence fallback.
+- [x] 6.3 Add a fixed-list preview/write script for the 55 approved events and
+  explicitly exclude six no-evidence events, one proposal-stage event, and one
+  unresolved official-date conflict.
+- [x] 6.4 Preview and apply the 55 decisions, verify eight blockers remain, and
+  prove raw CNInfo, TDX audit, and production-factor rows were unchanged.
+- [x] 6.5 Run focused tests, strict OpenSpec validation, database checks, and
+  uncommitted review.

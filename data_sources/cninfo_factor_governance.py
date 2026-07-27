@@ -211,7 +211,10 @@ def derive_cninfo_factor_path(
         event_key = str(row.get("source_event_key") or "")
         if not instrument_id:
             continue
-        if str(row.get("resolved_factor_effect") or "normal").strip().lower() == "none":
+        factor_effect = str(
+            row.get("resolved_factor_effect") or "normal"
+        ).strip().lower()
+        if factor_effect == "none":
             suppressed_dates = sorted({
                 value
                 for value in (
@@ -232,6 +235,21 @@ def derive_cninfo_factor_path(
                     value.isoformat() for value in suppressed_dates
                 ],
             })
+            continue
+        factor_override = _positive(row.get("resolved_factor_override"))
+        if (
+            factor_effect == "official_reference_price"
+            and factor_override is None
+        ):
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "reason": "missing_official_factor_override",
+            })
+            if source_date is not None:
+                pending_source_dates[instrument_id].append(source_date)
+            else:
+                unlocated_pending_instruments.add(instrument_id)
             continue
         if source_date is None:
             pending.append({
@@ -302,6 +320,7 @@ def derive_cninfo_factor_path(
             "rights_proceeds_per_share": 0.0,
             "event_keys": [],
             "authoritative_event_keys": [],
+            "factor_overrides": [],
             "date_evidence": [],
             "pre_close": quote.get("pre_close"),
         })
@@ -318,6 +337,11 @@ def derive_cninfo_factor_path(
         aggregate["rights_per_share"] += rights_per_share
         aggregate["rights_proceeds_per_share"] += rights_per_share * rights_price
         aggregate["event_keys"].append(event_key)
+        if factor_effect == "official_reference_price":
+            aggregate["factor_overrides"].append({
+                "source_event_key": event_key,
+                "factor": factor_override,
+            })
         if bool(row.get("resolved_authoritative_override")):
             aggregate["authoritative_event_keys"].append(event_key)
         if resolved_missing_date:
@@ -361,23 +385,44 @@ def derive_cninfo_factor_path(
                 "reason": "prior_event_pending",
             })
             continue
+        factor_overrides = aggregate["factor_overrides"]
+        if factor_overrides:
+            if (
+                len(factor_overrides) != 1
+                or len(aggregate["event_keys"]) != 1
+            ):
+                pending.append({
+                    "instrument_id": instrument_id,
+                    "effective_date": effective_date.isoformat(),
+                    "source_event_keys": aggregate["event_keys"],
+                    "reason": "ambiguous_official_factor_override",
+                })
+                blocked_instruments.add(instrument_id)
+                continue
+            factor = round(factor_overrides[0]["factor"], 12)
+            factor_basis = "official_reference_price"
+        else:
+            pre_close = _positive(aggregate.get("pre_close"))
+            if pre_close is None:
+                pending.append({
+                    "instrument_id": instrument_id,
+                    "effective_date": effective_date.isoformat(),
+                    "source_event_keys": aggregate["event_keys"],
+                    "reason": "missing_pre_close",
+                })
+                blocked_instruments.add(instrument_id)
+                continue
+            factor = _event_factor(
+                pre_close=pre_close,
+                cash_per_share=aggregate["cash_per_share"],
+                bonus_per_share=aggregate["bonus_per_share"],
+                rights_per_share=aggregate["rights_per_share"],
+                rights_proceeds_per_share=aggregate[
+                    "rights_proceeds_per_share"
+                ],
+            )
+            factor_basis = "ordinary_economic_terms"
         pre_close = _positive(aggregate.get("pre_close"))
-        if pre_close is None:
-            pending.append({
-                "instrument_id": instrument_id,
-                "effective_date": effective_date.isoformat(),
-                "source_event_keys": aggregate["event_keys"],
-                "reason": "missing_pre_close",
-            })
-            blocked_instruments.add(instrument_id)
-            continue
-        factor = _event_factor(
-            pre_close=pre_close,
-            cash_per_share=aggregate["cash_per_share"],
-            bonus_per_share=aggregate["bonus_per_share"],
-            rights_per_share=aggregate["rights_per_share"],
-            rights_proceeds_per_share=aggregate["rights_proceeds_per_share"],
-        )
         if factor is None:
             pending.append({
                 "instrument_id": instrument_id,
@@ -410,6 +455,7 @@ def derive_cninfo_factor_path(
             ) if aggregate["rights_per_share"] > 0 else 0.0,
             "pre_close": pre_close,
             "factor": factor,
+            "factor_basis": factor_basis,
             "cumulative_factor": cumulative_by_instrument[instrument_id],
             "source_event_keys": aggregate["event_keys"],
             "authoritative_override": bool(aggregate["event_keys"])

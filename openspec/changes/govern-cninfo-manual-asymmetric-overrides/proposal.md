@@ -30,6 +30,11 @@ but has no adjustment-factor effect.
   preserve each source's economic values independently, keep CNInfo terms in
   the CNInfo factor path, and use only the exact matched TDX XDXR trading date
   as the CNInfo effective date.
+- Apply the operator-approved fixed 55-event blocker list from the persisted
+  review workbook: keep CNInfo economics, record 19 no-effect decisions, use
+  five official adjusted-reference-price factors, use exact TDX rows as
+  date-only evidence for the two instructed date conflicts, and leave eight
+  evidence/document/date-conflict blockers unresolved.
 
 ## Capabilities
 

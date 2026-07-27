@@ -18082,6 +18082,7 @@ class DataManager:
             factor_effect = str(
                 resolved_terms.get("factor_effect") or "normal"
             ).strip().lower()
+            factor_override = resolved_terms.get("factor_override")
             authoritative_override = bool(
                 resolved_terms.get("authoritative_override")
             )
@@ -18162,6 +18163,7 @@ class DataManager:
                 "resolved_economic_terms": bool(applied_economic_fields),
                 "resolved_economic_fields": applied_economic_fields,
                 "resolved_factor_effect": factor_effect,
+                "resolved_factor_override": factor_override,
                 "resolved_date_authoritative": authoritative_effective_date,
                 "resolved_authoritative_override": authoritative_override,
             })
@@ -25372,6 +25374,89 @@ class DataManager:
         ).strip()
         notes = str(payload.get("notes") or "").strip()
         factor_effect = str(payload.get("factor_effect") or "").strip().lower()
+        factor_reference = payload.get("factor_reference") or {}
+        if not isinstance(factor_reference, Mapping):
+            raise ValueError("factor_reference must be an object")
+        official_factor_override = None
+        normalized_factor_reference: Dict[str, float] = {}
+        if factor_effect == "official_reference_price":
+            for field_name in (
+                "pre_adjustment_reference_price",
+                "adjusted_reference_price",
+            ):
+                try:
+                    value = float(factor_reference.get(field_name))
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{field_name} must be a positive finite number"
+                    ) from exc
+                if not math.isfinite(value) or value <= 0:
+                    raise ValueError(
+                        f"{field_name} must be a positive finite number"
+                    )
+                normalized_factor_reference[field_name] = value
+            official_factor_override = round(
+                normalized_factor_reference[
+                    "pre_adjustment_reference_price"
+                ]
+                / normalized_factor_reference["adjusted_reference_price"],
+                12,
+            )
+            if (
+                not math.isfinite(official_factor_override)
+                or official_factor_override <= 0
+            ):
+                raise ValueError(
+                    "official reference prices produce an invalid factor"
+                )
+        elif factor_reference:
+            raise ValueError(
+                "factor_reference requires "
+                "factor_effect=official_reference_price"
+            )
+        approval_classification = str(
+            payload.get("approval_classification")
+            or "approved_asymmetric"
+        ).strip()
+        if approval_classification not in {
+            "approved_asymmetric",
+            "approved_cninfo_operator",
+        }:
+            raise ValueError(
+                "approval_classification must be approved_asymmetric "
+                "or approved_cninfo_operator"
+            )
+        raw_tdx_record_id = payload.get("tdx_record_id")
+        if raw_tdx_record_id is None:
+            tdx_record_id = None
+        elif isinstance(raw_tdx_record_id, bool):
+            raise ValueError("tdx_record_id must be a positive integer")
+        elif isinstance(raw_tdx_record_id, int):
+            tdx_record_id = raw_tdx_record_id
+        elif (
+            isinstance(raw_tdx_record_id, str)
+            and raw_tdx_record_id.strip().isdigit()
+        ):
+            tdx_record_id = int(raw_tdx_record_id.strip())
+        else:
+            raise ValueError("tdx_record_id must be a positive integer")
+        if tdx_record_id is not None and tdx_record_id <= 0:
+            raise ValueError("tdx_record_id must be a positive integer")
+        expected_tdx_ex_date = self._date_from_any(
+            payload.get("expected_tdx_ex_date")
+        )
+        if (tdx_record_id is None) != (expected_tdx_ex_date is None):
+            raise ValueError(
+                "tdx_record_id and expected_tdx_ex_date must be supplied "
+                "together"
+            )
+        if (
+            expected_tdx_ex_date is not None
+            and expected_tdx_ex_date != effective_date
+        ):
+            raise ValueError(
+                "effective_date must equal expected_tdx_ex_date"
+            )
         if not all((
             instrument_id,
             source_event_key,
@@ -25384,8 +25469,15 @@ class DataManager:
                 "instrument_id, source_event_key, reviewer, effective_date, "
                 "date_basis, and announcement_id are required"
             )
-        if factor_effect not in {"normal", "none"}:
-            raise ValueError("factor_effect is required and must be normal or none")
+        if factor_effect not in {
+            "normal",
+            "none",
+            "official_reference_price",
+        }:
+            raise ValueError(
+                "factor_effect is required and must be normal, none, "
+                "or official_reference_price"
+            )
         if len(reviewer) > 128:
             raise ValueError("reviewer exceeds 128 characters")
         if len(notes) > 4000:
@@ -25509,6 +25601,64 @@ class DataManager:
             raise ValueError(
                 "announcement_id is not a persisted CNInfo candidate"
             )
+        selected_tdx_date_evidence = None
+        if tdx_record_id is not None:
+            tdx_rows = await self.db_ops.execute_read_query(
+                """
+                SELECT id, instrument_id, ex_date, factor,
+                       validation_result, fenhong, songzhuangu,
+                       peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE id = :manual_tdx_record_id
+                  AND instrument_id = :manual_tdx_instrument_id
+                LIMIT 2
+                """,
+                {
+                    "manual_tdx_record_id": tdx_record_id,
+                    "manual_tdx_instrument_id": instrument_id,
+                },
+            )
+            if len(tdx_rows) != 1:
+                raise ValueError(
+                    "exact persisted TDX XDXR row is missing or ambiguous"
+                )
+            persisted_tdx_date = self._date_from_any(
+                tdx_rows[0].get("ex_date")
+            )
+            if persisted_tdx_date != expected_tdx_ex_date:
+                raise ValueError(
+                    "persisted TDX ex-date does not match the "
+                    "operator decision"
+                )
+            calendar_rows = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                expected_tdx_ex_date,
+                expected_tdx_ex_date,
+            )
+            if not any(
+                row.get("is_trading_day")
+                and self._date_from_any(row.get("date"))
+                == expected_tdx_ex_date
+                for row in calendar_rows
+            ):
+                raise ValueError(
+                    "operator-approved TDX ex-date is not an exchange "
+                    "trading session"
+                )
+            selected_tdx_date_evidence = {
+                "tdx_id": tdx_record_id,
+                "tdx_ex_date": expected_tdx_ex_date.isoformat(),
+                "tdx_factor": tdx_rows[0].get("factor"),
+                "tdx_validation_result": tdx_rows[0].get(
+                    "validation_result"
+                ),
+                "tdx_raw_fields": {
+                    "fenhong": tdx_rows[0].get("fenhong"),
+                    "songzhuangu": tdx_rows[0].get("songzhuangu"),
+                    "peigu": tdx_rows[0].get("peigu"),
+                    "peigujia": tdx_rows[0].get("peigujia"),
+                },
+            }
 
         prior_reviews = await self.db_ops.get_corporate_action_resolution_reviews(
             source_event_key=source_event_key,
@@ -25561,29 +25711,64 @@ class DataManager:
             "reviewer": reviewer,
             "notes": notes,
             "factor_effect": factor_effect,
+            "factor_reference": normalized_factor_reference,
+            "factor_override": official_factor_override,
+            "approval_classification": approval_classification,
+            "tdx_record_id": tdx_record_id,
+            "expected_tdx_ex_date": (
+                expected_tdx_ex_date.isoformat()
+                if expected_tdx_ex_date else None
+            ),
             "beneficiary_scope": beneficiary_scope,
             "beneficiary_terms": dict(beneficiary_terms),
             "total_share_capital_terms": normalized_terms,
             "operator_instruction": operator_instruction,
         }
-        operator_decision_key = hashlib.sha256(json.dumps(
-            decision_identity,
-            ensure_ascii=False,
-            sort_keys=True,
-            default=str,
-        ).encode("utf-8")).hexdigest()
+        def _decision_key(identity: Mapping[str, Any]) -> str:
+            return hashlib.sha256(json.dumps(
+                identity,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            ).encode("utf-8")).hexdigest()
+
+        operator_decision_key = _decision_key(decision_identity)
+        legacy_operator_decision_key = None
+        if (
+            not normalized_factor_reference
+            and official_factor_override is None
+            and approval_classification == "approved_asymmetric"
+            and tdx_record_id is None
+            and expected_tdx_ex_date is None
+        ):
+            legacy_operator_decision_key = _decision_key({
+                key: value
+                for key, value in decision_identity.items()
+                if key not in {
+                    "factor_reference",
+                    "factor_override",
+                    "approval_classification",
+                    "tdx_record_id",
+                    "expected_tdx_ex_date",
+                }
+            })
         policy_payload = {
             "resolution_policy": resolution_policy,
-            "approval_classification": "approved_asymmetric",
+            "approval_classification": approval_classification,
             "operator_decision_key": operator_decision_key,
             "factor_effect": factor_effect,
+            "factor_reference": normalized_factor_reference,
+            "factor_override": official_factor_override,
             "authoritative_override": writes_terms_overlay,
             "source_terms_unchanged": source_terms_unchanged,
             "factor_terms_source": (
                 "cninfo_reviewed_operator_terms"
                 if writes_terms_overlay else "cninfo_observation"
             ),
+            "tdx_date_used": selected_tdx_date_evidence is not None,
+            "tdx_economic_terms_used": False,
             "tdx_factor_used": False,
+            "tdx_date_evidence": selected_tdx_date_evidence,
             "beneficiary_scope": beneficiary_scope,
             "beneficiary_terms": dict(beneficiary_terms),
             "total_share_capital_terms": normalized_terms,
@@ -25594,6 +25779,7 @@ class DataManager:
             "llm_invocations": 0,
         }
         prior_decision_key = None
+        prior_payload: Dict[str, Any] = {}
         if prior_review:
             prior_payload = prior_review.get("review_payload") or {}
             prior_decision_key = str(
@@ -25658,7 +25844,15 @@ class DataManager:
                     default=str,
                 ).encode("utf-8")).hexdigest()
         supersedes_review_id = None
-        if prior_review and prior_decision_key == operator_decision_key:
+        prior_matches_decision = (
+            prior_decision_key == operator_decision_key
+            or (
+                legacy_operator_decision_key is not None
+                and prior_decision_key == legacy_operator_decision_key
+                and prior_payload.get("resolution_policy") == resolution_policy
+            )
+        )
+        if prior_review and prior_matches_decision:
             review_key = str(prior_review.get("review_key") or "").strip()
             supersedes_review_id = prior_review.get("supersedes_review_id")
         else:
@@ -25673,15 +25867,26 @@ class DataManager:
             )).hexdigest()
         if not review_key:
             raise ValueError("manual asymmetric review identity is invalid")
-        evidence_key = announcement_id or source_event_key
+        evidence_key = (
+            f"tdx_xdxr:{tdx_record_id}"
+            if selected_tdx_date_evidence is not None
+            else announcement_id or source_event_key
+        )
         terms_evidence = {
             **policy_payload,
             "selected_date_evidence": {
-                "announcement_id": announcement_id or None,
+                "source": (
+                    "tdx_xdxr_operator_date"
+                    if selected_tdx_date_evidence is not None
+                    else "cninfo_official_announcement"
+                ),
+                "announcement_id": (
+                    announcement_id or None
+                ),
                 "announcement_title": (
                     selected_candidate.get("announcement_title")
-                    if selected_candidate else None
                 ),
+                "tdx_record_id": tdx_record_id,
                 "effective_date": effective_date.isoformat(),
                 "date_basis": date_basis,
             },
@@ -25719,23 +25924,26 @@ class DataManager:
                 "source_event_key": source_event_key,
                 "observation_source": "cninfo",
                 "source_profile": observation.get("source_profile"),
-                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_source": (
+                    "cninfo_tdx_xdxr_operator_review"
+                    if selected_tdx_date_evidence is not None
+                    else "cninfo_reviewed_official_document"
+                ),
                 "evidence_key": evidence_key,
                 "resolution_status": "resolved",
                 "effective_date": effective_date.isoformat(),
                 "date_basis": date_basis,
-                "announcement_id": announcement_id or None,
+                "announcement_id": (
+                    announcement_id or None
+                ),
                 "announcement_title": (
                     selected_candidate.get("announcement_title")
-                    if selected_candidate else None
                 ),
                 "announcement_time": (
                     selected_candidate.get("announcement_time")
-                    if selected_candidate else None
                 ),
                 "evidence_url": (
                     selected_candidate.get("evidence_url")
-                    if selected_candidate else None
                 ),
                 "confidence": 1.0,
                 "raw_payload": {
@@ -25780,6 +25988,11 @@ class DataManager:
             "state_write": state_write,
             "supersedes_review_id": supersedes_review_id,
             "factor_effect": factor_effect,
+            "factor_override": official_factor_override,
+            "approval_classification": approval_classification,
+            "tdx_date_used": selected_tdx_date_evidence is not None,
+            "tdx_economic_terms_used": False,
+            "tdx_factor_used": False,
             "analysis_id": analysis_id,
             "terms_overlay_written": writes_terms_overlay,
             "source_terms_unchanged": source_terms_unchanged,

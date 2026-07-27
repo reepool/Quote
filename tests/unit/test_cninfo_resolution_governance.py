@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
@@ -715,7 +716,10 @@ async def test_manual_asymmetric_override_supersedes_review_and_records_factor_e
     missing_factor_effect.pop("factor_effect")
     with pytest.raises(
         ValueError,
-        match="factor_effect is required and must be normal or none",
+        match=(
+            "factor_effect is required and must be normal, none, "
+            "or official_reference_price"
+        ),
     ):
         await manager.review_cninfo_asymmetric_manual_override(
             missing_factor_effect
@@ -767,6 +771,64 @@ async def test_manual_asymmetric_override_supersedes_review_and_records_factor_e
     manager.db_ops.upsert_corporate_action_resolution_states.assert_awaited_once()
     assert result["network_access"] is False
     assert result["llm_invocations"] == 0
+
+    legacy_identity = {
+        "policy": "cninfo_asymmetric_manual_override_v1",
+        "instrument_id": "000031.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 42,
+        "effective_date": "2006-02-14",
+        "date_basis": "股份到账日",
+        "announcement_id": "ann-1",
+        "reviewer": "operator",
+        "notes": "按总股本每10股派1元。",
+        "factor_effect": "normal",
+        "beneficiary_scope": "circulating_shareholders",
+        "beneficiary_terms": {"cash_per_10_shares": 2.7},
+        "total_share_capital_terms": saved["review_row"]["review_payload"][
+            "total_share_capital_terms"
+        ],
+        "operator_instruction": "按总股本每10股派1元。",
+    }
+    legacy_decision_key = hashlib.sha256(json.dumps(
+        legacy_identity,
+        ensure_ascii=False,
+        sort_keys=True,
+        default=str,
+    ).encode("utf-8")).hexdigest()
+    legacy_payload = dict(saved["review_row"]["review_payload"])
+    legacy_payload["operator_decision_key"] = legacy_decision_key
+    for field_name in (
+        "factor_reference",
+        "factor_override",
+        "tdx_date_used",
+        "tdx_economic_terms_used",
+        "tdx_date_evidence",
+    ):
+        legacy_payload.pop(field_name)
+    manager.db_ops.get_corporate_action_resolution_reviews.return_value = {
+        "items": [{
+            "review_id": 8,
+            "review_key": "legacy-review-key",
+            "supersedes_review_id": 7,
+            "analysis_id": 42,
+            "evidence_key": "ann-1",
+            "effective_date": "2006-02-14",
+            "date_basis": "股份到账日",
+            "reviewer": "operator",
+            "notes": "按总股本每10股派1元。",
+            "review_payload": legacy_payload,
+        }]
+    }
+    legacy_repeated = await manager.review_cninfo_asymmetric_manual_override(
+        payload
+    )
+    legacy_saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    assert legacy_repeated["supersedes_review_id"] == 7
+    assert legacy_saved["review_row"]["review_key"] == "legacy-review-key"
+    assert legacy_saved["review_row"]["supersedes_review_id"] == 7
 
     manager.db_ops.get_corporate_action_resolution_reviews.return_value = {
         "items": [{
@@ -842,6 +904,45 @@ async def test_manual_asymmetric_override_supersedes_review_and_records_factor_e
         saved["review_row"]["review_key"],
         changed_saved["review_row"]["review_key"],
     }
+
+    official_reference = {
+        **payload,
+        "factor_effect": "official_reference_price",
+        "factor_reference": {
+            "pre_adjustment_reference_price": 7.9,
+            "adjusted_reference_price": 6.87,
+        },
+    }
+    official_result = (
+        await manager.review_cninfo_asymmetric_manual_override(
+            official_reference
+        )
+    )
+    official_saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    expected_factor = round(7.9 / 6.87, 12)
+    assert official_result["factor_override"] == pytest.approx(expected_factor)
+    assert official_saved["terms_row"]["evidence"]["factor_reference"] == {
+        "pre_adjustment_reference_price": 7.9,
+        "adjusted_reference_price": 6.87,
+    }
+    assert official_saved["terms_row"]["evidence"][
+        "factor_override"
+    ] == pytest.approx(expected_factor)
+
+    for invalid_reference in (
+        {},
+        {
+            "pre_adjustment_reference_price": 7.9,
+            "adjusted_reference_price": 0,
+        },
+    ):
+        with pytest.raises(ValueError, match="positive finite number"):
+            await manager.review_cninfo_asymmetric_manual_override({
+                **official_reference,
+                "factor_reference": invalid_reference,
+            })
 
 
 @pytest.mark.asyncio
@@ -962,6 +1063,131 @@ async def test_manual_asymmetric_passthrough_without_analysis_keeps_cninfo_terms
             **payload,
             "factor_effect": "none",
         })
+
+
+@pytest.mark.asyncio
+async def test_manual_override_uses_exact_tdx_date_with_cninfo_terms():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(return_value={
+        "items": [{
+            "instrument_id": "600280.SH",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "currency": "CNY",
+            "cash_dividend_per_share": 0.414,
+            "bonus_shares_per_share": 0.0,
+            "capitalization_shares_per_share": 0.0,
+            "rights_shares_per_share": 0.0,
+            "rights_price": 0.0,
+        }]
+    })
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(
+        return_value={"items": [{"analysis_id": 42}]}
+    )
+    manager.db_ops.get_corporate_action_effective_date_evidence = AsyncMock(
+        return_value={"items": [{
+            "announcement_id": "ann-1",
+            "announcement_title": "分红派息实施公告",
+            "source_profile": "cninfo_dividend",
+        }]}
+    )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[{
+        "id": 6560,
+        "instrument_id": "600280.SH",
+        "ex_date": "2001-06-26",
+        "factor": 1.002828,
+        "validation_result": "computed_unvalidated",
+        "fenhong": 0.6,
+        "songzhuangu": 0.0,
+        "peigu": 0.0,
+        "peigujia": 0.0,
+    }])
+    manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
+        {"date": "2001-06-26", "is_trading_day": True},
+    ])
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"review_id": 8, "status": "inserted"},
+            "terms_write": {"resolved_terms_id": 9, "status": "inserted"},
+            "evidence_write": {"inserted": 1},
+        }
+    )
+    refreshed_state = {
+        "instrument_id": "600280.SH",
+        "source_event_key": "event-1",
+        "resolution_state": "resolved_evidence",
+        "is_terminal": True,
+        "factor_blocking": False,
+    }
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[refreshed_state]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={"changed": 1, "failed": 0}
+    )
+    payload = {
+        "instrument_id": "600280.SH",
+        "source_event_key": "event-1",
+        "analysis_id": 42,
+        "reviewer": "operator",
+        "effective_date": "2001-06-26",
+        "date_basis": "用户指定TDX XDXR除权交易日",
+        "announcement_id": "ann-1",
+        "tdx_record_id": 6560,
+        "expected_tdx_ex_date": "2001-06-26",
+        "approval_classification": "approved_cninfo_operator",
+        "factor_effect": "normal",
+        "beneficiary_scope": "CNInfo全体股东口径",
+        "beneficiary_terms": {},
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.414,
+        },
+        "notes": "保留CNInfo数字，仅采用TDX日期。",
+    }
+
+    result = await manager.review_cninfo_asymmetric_manual_override(payload)
+
+    saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    review_payload = saved["review_row"]["review_payload"]
+    assert saved["terms_row"]["cash_dividend_per_share"] == pytest.approx(
+        0.414
+    )
+    assert saved["review_row"]["effective_date"] == "2001-06-26"
+    assert saved["review_row"]["evidence_key"] == "tdx_xdxr:6560"
+    assert saved["evidence_row"]["evidence_source"] == (
+        "cninfo_tdx_xdxr_operator_review"
+    )
+    assert saved["evidence_row"]["announcement_id"] == "ann-1"
+    assert saved["evidence_row"]["announcement_title"] == "分红派息实施公告"
+    assert review_payload["approval_classification"] == (
+        "approved_cninfo_operator"
+    )
+    assert review_payload["tdx_date_used"] is True
+    assert review_payload["tdx_economic_terms_used"] is False
+    assert review_payload["tdx_factor_used"] is False
+    assert review_payload["tdx_date_evidence"]["tdx_raw_fields"][
+        "fenhong"
+    ] == pytest.approx(0.6)
+    assert result["tdx_date_used"] is True
+    assert result["tdx_economic_terms_used"] is False
+    assert result["tdx_factor_used"] is False
+
+    manager.db_ops.get_trading_calendar_records.return_value = [{
+        "date": "2001-06-26",
+        "is_trading_day": False,
+    }]
+    with pytest.raises(
+        ValueError,
+        match="is not an exchange trading session",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override(payload)
 
 
 @pytest.mark.asyncio

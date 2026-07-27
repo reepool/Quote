@@ -554,3 +554,70 @@ async def test_manual_override_replaces_existing_terms_and_can_exclude_factor(
     ] == 1
     assert result["candidate"]["row_count"] == 0
     assert result["candidate"]["tdx_fallback_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_primary_rebuild_propagates_official_reference_factor_override(
+    monkeypatch,
+):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    captured_rows = []
+    captured_path = {}
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    def capture_derive(observations, quote_evidence):
+        rows = [dict(item) for item in observations]
+        captured_rows.extend(rows)
+        derived = original_derive(rows, quote_evidence)
+        captured_path.update(derived)
+        return derived
+
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(return_value={
+        "event-1": {
+            "cash_dividend_per_share": 0.218,
+            "resolved_fields": ["cash_dividend_per_share"],
+            "authoritative_override": True,
+            "factor_effect": "official_reference_price",
+            "factor_override": round(7.9 / 6.87, 12),
+        }
+    })
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2020, 5, 28),
+                "date_basis": "official_adjusted_reference_price",
+                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_key": "announcement-1",
+            }
+        }
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    expected = round(7.9 / 6.87, 12)
+    assert captured_rows[0]["resolved_factor_effect"] == (
+        "official_reference_price"
+    )
+    assert captured_rows[0]["resolved_factor_override"] == pytest.approx(
+        expected
+    )
+    assert captured_path["events"][0]["factor"] == pytest.approx(
+        expected
+    )
+    assert captured_path["events"][0]["factor_basis"] == (
+        "official_reference_price"
+    )
+    assert result["cninfo_path"]["derived_events"] == 1

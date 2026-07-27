@@ -269,6 +269,77 @@ def test_authoritative_resolved_date_drives_quote_lookup_and_factor():
     assert result["events"][0]["factor"] == pytest.approx(1.172488)
 
 
+def test_official_reference_price_override_ignores_economic_formula_and_pre_close():
+    result = derive_cninfo_factor_path(
+        [{
+            "instrument_id": "000430.SZ",
+            "source_event_key": "restructuring",
+            "resolved_effective_date": date(2025, 12, 29),
+            "resolved_date_authoritative": True,
+            "resolved_factor_effect": "official_reference_price",
+            "resolved_factor_override": 7.90 / 6.87,
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "capitalization_shares_per_share": 1.0,
+            "is_current": True,
+        }],
+        [{
+            "instrument_id": "000430.SZ",
+            "source_date": date(2025, 12, 29),
+            "effective_date": date(2025, 12, 29),
+            "pre_close": None,
+        }],
+    )
+
+    assert result["pending"] == []
+    assert result["events"][0]["factor"] == pytest.approx(7.90 / 6.87)
+    assert result["events"][0]["factor_basis"] == "official_reference_price"
+    assert result["events"][0]["pre_close"] is None
+
+
+def test_official_reference_price_override_rejects_missing_and_grouped_overrides():
+    base = {
+        "instrument_id": "000430.SZ",
+        "source_event_key": "restructuring",
+        "resolved_effective_date": date(2025, 12, 29),
+        "resolved_date_authoritative": True,
+        "resolved_factor_effect": "official_reference_price",
+        "event_status": "implemented",
+        "quality_status": "structured_complete",
+        "capitalization_shares_per_share": 1.0,
+        "is_current": True,
+    }
+    quote = [{
+        "instrument_id": "000430.SZ",
+        "source_date": date(2025, 12, 29),
+        "effective_date": date(2025, 12, 29),
+        "pre_close": 7.90,
+    }]
+
+    missing = derive_cninfo_factor_path([base], quote)
+    assert missing["events"] == []
+    assert missing["pending"][0]["reason"] == (
+        "missing_official_factor_override"
+    )
+
+    grouped = derive_cninfo_factor_path(
+        [
+            {**base, "resolved_factor_override": 7.90 / 6.87},
+            {
+                **base,
+                "source_event_key": "same-day-cash",
+                "resolved_factor_effect": "normal",
+                "cash_dividend_per_share": 0.1,
+            },
+        ],
+        quote,
+    )
+    assert grouped["events"] == []
+    assert grouped["pending"][0]["reason"] == (
+        "ambiguous_official_factor_override"
+    )
+
+
 def test_candidate_only_metadata_does_not_resolve_missing_ex_date():
     result = derive_cninfo_factor_path(
         [{

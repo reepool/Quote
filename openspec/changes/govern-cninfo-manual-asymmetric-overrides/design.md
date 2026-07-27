@@ -105,6 +105,26 @@ four explicit operator decisions.
     only an explicit CNInfo source-event key and TDX row ID pair, validates the
     current instrument and expected TDX date, and records review supersession.
 
+12. **Treat the 55-event workbook decision as an explicit fixed-list review.**
+    The operator instruction does not create a category-wide auto-approval
+    rule. The write script freezes each event key, analysis, official
+    announcement, effective date, and factor effect. Events outside that list
+    remain subject to the ordinary gates.
+
+13. **Allow TDX date-only lineage on a manual CNInfo terms overlay.** When an
+    explicitly selected TDX row supplies the date for a reviewed economic
+    conflict, validate its instrument, expected date, and exchange session,
+    then persist the TDX evidence identity separately from the selected CNInfo
+    announcement. The resolved terms remain the operator-approved CNInfo terms;
+    `tdx_economic_terms_used` and `tdx_factor_used` remain false.
+
+14. **Represent an official special reference-price adjustment explicitly.**
+    For the five reviewed restructuring events whose announcements publish both
+    the pre-adjustment reference price and adjusted opening reference price,
+    store those prices in review lineage and use their ratio as the event
+    factor. Do not pass the asymmetric capitalization ratio through the normal
+    all-shareholder formula.
+
 ## Risks / Trade-offs
 
 - **[Risk] A broad title word hides an implementation notice.** → Strong
@@ -132,6 +152,14 @@ four explicit operator decisions.
   `tdx_date_used=true`, `tdx_economic_terms_used=false`, and
   `tdx_factor_used=false`; derive all factor terms from the raw CNInfo
   observation and write no economic overlay.
+- **[Risk] A blanket instruction silently resolves unsupported rows.** →
+  Freeze and validate the exact 55-event approved list, while retaining six
+  no-candidate rows, one proposal-stage document row, and one announcement
+  with conflicting record dates as blockers.
+- **[Risk] A special restructuring adjustment uses the ordinary bonus
+  formula.** → Require two positive official reference prices and derive the
+  override factor deterministically as pre-adjustment price divided by adjusted
+  reference price.
 
 ## Migration Plan
 
@@ -150,6 +178,9 @@ four explicit operator decisions.
    production factors remain unchanged.
 8. Roll back by disabling the new review endpoint/prefilter and superseding any
    manual review with another governed review; raw data remains unchanged.
+9. Preview and apply the fixed 55-event workbook decision, then verify eight
+   excluded blockers remain and no raw CNInfo, TDX audit, or production-factor
+   row changed.
 
 ## Open Questions
 
