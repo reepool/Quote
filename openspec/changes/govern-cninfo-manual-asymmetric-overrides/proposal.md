@@ -26,6 +26,10 @@ but has no adjustment-factor effect.
 - Apply the CNInfo-only operator decision for `000623.SZ`: retain the official
   `10派2.14元` terms, use the reform implementation date, and record the
   non-tradable-share contraction as non-factor descriptive lineage.
+- Apply the operator-approved 15-event CNInfo/TDX asymmetric conflict list:
+  preserve each source's economic values independently, keep CNInfo terms in
+  the CNInfo factor path, and use only the exact matched TDX XDXR trading date
+  as the CNInfo effective date.
 
 ## Capabilities
 
@@ -54,3 +58,5 @@ but has no adjustment-factor effect.
   no raw observation mutation and no schema migration are required.
 - TDX remains comparison evidence only; no TDX economic term or factor is
   written into the CNInfo factor path.
+- Exact TDX row identities may supply an operator-approved trading effective
+  date while their economic values and factors remain non-authoritative.

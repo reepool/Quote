@@ -15,7 +15,10 @@ from database.models import (
     CorporateActionResolvedTermsDB,
     InstrumentDB,
 )
-from database.operations import DatabaseOperations
+from database.operations import (
+    DatabaseOperations,
+    GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES,
+)
 
 
 def test_corporate_action_observation_revision_and_partial_coverage():
@@ -277,6 +280,89 @@ def test_effective_date_evidence_is_idempotent_and_queryable():
 
 def test_effective_date_uses_active_superseding_review():
     asyncio.run(_exercise_effective_date_uses_active_superseding_review())
+
+
+def test_operator_tdx_date_evidence_is_loaded_and_reset_protected():
+    asyncio.run(_exercise_operator_tdx_date_evidence_is_governed())
+
+
+async def _exercise_operator_tdx_date_evidence_is_governed():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
+                CorporateActionEffectiveDateEvidenceDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000897.SZ",
+            symbol="000897",
+            name="Test",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        session.add(CorporateActionObservationDB(
+            instrument_id="000897.SZ",
+            source="cninfo",
+            source_profile="cninfo_dividend",
+            source_event_key="event-operator-date",
+            action_type="capitalization",
+            record_date=date(2005, 11, 9),
+            capitalization_shares_per_share=0.21,
+            row_hash="observation-hash",
+        ))
+        session.add(CorporateActionEffectiveDateEvidenceDB(
+            instrument_id="000897.SZ",
+            source_event_key="event-operator-date",
+            observation_source="cninfo",
+            source_profile="cninfo_dividend",
+            evidence_source="cninfo_tdx_xdxr_operator_review",
+            evidence_key="tdx_xdxr:34700",
+            resolution_status="resolved",
+            effective_date=datetime(2005, 11, 11),
+            date_basis="TDX XDXR除权交易日",
+            raw_payload_json="{}",
+            row_hash="evidence-hash",
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    resolved = await operations.get_resolved_corporate_action_effective_dates(
+        ["event-operator-date"]
+    )
+    reset_preview = (
+        await operations.reset_cninfo_corporate_action_resolution_data(
+            start_date=date(2005, 1, 1),
+            end_date=date(2005, 12, 31),
+            exchanges=["SZSE"],
+            source_event_keys=["event-operator-date"],
+            dry_run=True,
+        )
+    )
+
+    assert (
+        "cninfo_tdx_xdxr_operator_review"
+        in GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+    )
+    assert resolved["event-operator-date"]["effective_date"].date() == date(
+        2005, 11, 11
+    )
+    assert resolved["event-operator-date"]["evidence_source"] == (
+        "cninfo_tdx_xdxr_operator_review"
+    )
+    assert reset_preview["protected_resolved_events"] == 1
+    assert reset_preview["reset_events"] == 0
+    await engine.dispose()
 
 
 async def _exercise_effective_date_evidence_is_idempotent_and_queryable():

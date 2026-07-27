@@ -11,6 +11,7 @@ from data_sources.cninfo_resolution_governance import (
     classify_date_applicability,
     classify_cninfo_asymmetric_passthrough,
     classify_cninfo_tdx_asymmetric_match,
+    classify_cninfo_tdx_asymmetric_operator_approval,
     derive_resolution_state,
     rank_cninfo_asymmetric_implementation_candidate,
 )
@@ -253,6 +254,53 @@ def test_tdx_asymmetric_match_rejects_all_zero_economics():
     assert result["eligible"] is False
     assert result["reason"] == (
         "cninfo_observation_has_no_positive_economic_term"
+    )
+
+
+def test_tdx_asymmetric_operator_approval_keeps_conflicting_economics():
+    result = classify_cninfo_tdx_asymmetric_operator_approval(
+        observation=_tdx_match_observation(
+            capitalization_shares_per_share=0.21,
+        ),
+        tdx_events=[_tdx_event(id=34700, songzhuangu=6.7)],
+        selected_tdx_id=34700,
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is True
+    assert result["effective_date"] == "2007-06-01"
+    assert result["tdx_date_used"] is True
+    assert result["tdx_economic_terms_used"] is False
+    assert result["tdx_factor_used"] is False
+    assert result["selected_tdx_event"]["cninfo_terms"][
+        "bonus_per_share"
+    ] == pytest.approx(0.21)
+    assert result["selected_tdx_event"]["tdx_terms"][
+        "bonus_per_share"
+    ] == pytest.approx(0.67)
+
+
+def test_tdx_asymmetric_operator_approval_requires_exact_session_row():
+    wrong_id = classify_cninfo_tdx_asymmetric_operator_approval(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event(id=2)],
+        selected_tdx_id=1,
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+    non_session = classify_cninfo_tdx_asymmetric_operator_approval(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event(ex_date="2007-06-02")],
+        selected_tdx_id=1,
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert wrong_id["eligible"] is False
+    assert wrong_id["reason"] == (
+        "selected_tdx_identity_missing_or_ambiguous"
+    )
+    assert non_session["eligible"] is False
+    assert non_session["reason"] == (
+        "selected_tdx_ex_date_not_trading_session"
     )
 
 
@@ -914,6 +962,179 @@ async def test_manual_asymmetric_passthrough_without_analysis_keeps_cninfo_terms
             **payload,
             "factor_effect": "none",
         })
+
+
+@pytest.mark.asyncio
+async def test_tdx_operator_approval_uses_date_only_and_supersedes_review():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(
+        return_value={"items": [{
+            "instrument_id": "000897.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "action_type": "capitalization",
+            "record_date": "2005-11-09",
+            "pay_date": None,
+            "share_arrival_date": None,
+            "ex_date": None,
+            "currency": "CNY",
+            "cash_dividend_per_share": 0.0,
+            "bonus_shares_per_share": 0.0,
+            "capitalization_shares_per_share": 0.21,
+            "rights_shares_per_share": 0.0,
+            "rights_price": 0.0,
+        }]}
+    )
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{"raw_payload_json": json.dumps({"分红类型": "股改分红"})}],
+        [{
+            "id": 34700,
+            "instrument_id": "000897.SZ",
+            "ex_date": "2005-11-11",
+            "factor": 1.67,
+            "validation_result": "computed_unvalidated",
+            "fenhong": 0.0,
+            "songzhuangu": 6.7,
+            "peigu": 0.0,
+            "peigujia": 0.0,
+        }],
+    ])
+    manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
+        {"date": "2005-11-09", "is_trading_day": True},
+        {"date": "2005-11-10", "is_trading_day": True},
+        {"date": "2005-11-11", "is_trading_day": True},
+    ])
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": [{
+            "review_id": 41,
+            "review_key": "prior-review",
+            "review_payload": {"resolution_policy": "older_policy"},
+        }]}
+    )
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"review_id": 42, "status": "inserted"},
+            "terms_write": {
+                "resolved_terms_id": None,
+                "status": "absent",
+            },
+            "evidence_write": {"inserted": 1},
+        }
+    )
+    refreshed_state = {
+        "instrument_id": "000897.SZ",
+        "source_event_key": "event-1",
+        "resolution_state": "resolved_evidence",
+        "is_terminal": True,
+        "factor_blocking": False,
+    }
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[refreshed_state]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 1,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+
+    result = (
+        await manager.review_cninfo_tdx_asymmetric_operator_approval({
+            "instrument_id": "000897.SZ",
+            "source_event_key": "event-1",
+            "tdx_record_id": 34700,
+            "expected_tdx_ex_date": "2005-11-11",
+            "source_event_category": "股改分红",
+            "reviewer": "operator",
+            "notes": "保留CNInfo数字，仅采用TDX日期。",
+        })
+    )
+
+    saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    payload = saved["review_row"]["review_payload"]
+    assert saved["review_row"]["analysis_id"] is None
+    assert saved["review_row"]["effective_date"] == "2005-11-11"
+    assert saved["review_row"]["supersedes_review_id"] == 41
+    assert saved["terms_row"] is None
+    assert saved["evidence_row"]["evidence_source"] == (
+        "cninfo_tdx_xdxr_operator_review"
+    )
+    assert payload["factor_terms_source"] == "cninfo_observation"
+    assert payload["cninfo_observation_terms"][
+        "capitalization_shares_per_share"
+    ] == pytest.approx(0.21)
+    assert payload["tdx_date_used"] is True
+    assert payload["tdx_economic_terms_used"] is False
+    assert payload["tdx_factor_used"] is False
+    assert result["terms_overlay_written"] is False
+    assert result["tdx_audit_modified"] is False
+    assert result["production_factor_modified"] is False
+    assert result["llm_invocations"] == 0
+
+
+@pytest.mark.asyncio
+async def test_tdx_operator_approval_rejects_changed_expected_date():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(
+        return_value={"items": [{
+            "instrument_id": "000897.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+        }]}
+    )
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{"raw_payload_json": json.dumps({"分红类型": "股改分红"})}],
+        [{
+            "id": 34700,
+            "instrument_id": "000897.SZ",
+            "ex_date": "2005-11-10",
+        }],
+    ])
+
+    with pytest.raises(
+        ValueError,
+        match="does not match the operator decision",
+    ):
+        await manager.review_cninfo_tdx_asymmetric_operator_approval({
+            "instrument_id": "000897.SZ",
+            "source_event_key": "event-1",
+            "tdx_record_id": 34700,
+            "expected_tdx_ex_date": "2005-11-11",
+            "source_event_category": "股改分红",
+            "reviewer": "operator",
+        })
+    manager.db_ops.save_corporate_action_review_bundle.assert_not_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("tdx_record_id", [34700.5, True, "34700.0"])
+async def test_tdx_operator_approval_rejects_non_integer_record_id(
+    tdx_record_id,
+):
+    manager = DataManager()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+
+    with pytest.raises(
+        ValueError,
+        match="tdx_record_id must be a positive integer",
+    ):
+        await manager.review_cninfo_tdx_asymmetric_operator_approval({
+            "instrument_id": "000897.SZ",
+            "source_event_key": "event-1",
+            "tdx_record_id": tdx_record_id,
+            "expected_tdx_ex_date": "2005-11-11",
+            "source_event_category": "股改分红",
+            "reviewer": "operator",
+        })
+    manager._assert_current_cninfo_corporate_action_identity.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -2245,6 +2466,7 @@ async def test_inventory_preserves_prior_evidence_unavailable_state():
         "cninfo_announcement_review",
         "cninfo_announcement",
         "cninfo_tdx_xdxr_review",
+        "cninfo_tdx_xdxr_operator_review",
     }
 
 

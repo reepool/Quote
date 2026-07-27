@@ -12,6 +12,9 @@ SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 CNINFO_ASYMMETRIC_POLICY_VERSION = "cninfo_asymmetric_passthrough_v1"
 CNINFO_TDX_ASYMMETRIC_POLICY_VERSION = "cninfo_tdx_asymmetric_match_v1"
+CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION = (
+    "cninfo_tdx_asymmetric_operator_approval_v1"
+)
 CNINFO_TDX_ASYMMETRIC_SPECIAL_CATEGORIES = {
     "重整转增",
     "股改分红",
@@ -714,6 +717,128 @@ def classify_cninfo_tdx_asymmetric_match(
         "date_basis": "TDX XDXR对照日",
         "selected_tdx_event": selected,
         "field_tolerance": normalized_tolerance,
+        "max_session_shift": max(0, int(max_session_shift)),
+    }
+
+
+def classify_cninfo_tdx_asymmetric_operator_approval(
+    *,
+    observation: Mapping[str, Any],
+    tdx_events: Sequence[Mapping[str, Any]],
+    selected_tdx_id: Any,
+    trading_sessions: Sequence[date] = (),
+    max_session_shift: int = CNINFO_TDX_ASYMMETRIC_MAX_SESSION_SHIFT,
+) -> dict[str, Any]:
+    """Validate an exact operator-approved asymmetric TDX date reference."""
+    source_category = str(
+        observation.get("source_event_category") or ""
+    ).strip()
+    if source_category not in CNINFO_TDX_ASYMMETRIC_SPECIAL_CATEGORIES:
+        return {
+            "eligible": False,
+            "reason": "cninfo_special_category_out_of_scope",
+            "source_event_category": source_category,
+        }
+    if not any(
+        _positive(observation.get(field_name))
+        for field_name in (
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+            "rights_shares_per_share",
+        )
+    ):
+        return {
+            "eligible": False,
+            "reason": "cninfo_observation_has_no_positive_economic_term",
+            "source_event_category": source_category,
+        }
+
+    normalized_tdx_id = str(selected_tdx_id or "").strip()
+    instrument_id = str(observation.get("instrument_id") or "").strip()
+    selected_rows = [
+        row for row in tdx_events
+        if str(row.get("instrument_id") or "").strip() == instrument_id
+        and str(row.get("id") or row.get("tdx_id") or "").strip()
+        == normalized_tdx_id
+    ]
+    if len(selected_rows) != 1:
+        return {
+            "eligible": False,
+            "reason": "selected_tdx_identity_missing_or_ambiguous",
+            "source_event_category": source_category,
+        }
+    selected_row = selected_rows[0]
+    tdx_date = _as_date(selected_row.get("ex_date"))
+    if tdx_date is None:
+        return {
+            "eligible": False,
+            "reason": "selected_tdx_ex_date_missing",
+            "source_event_category": source_category,
+        }
+    session_dates = {
+        parsed
+        for value in trading_sessions
+        if (parsed := _as_date(value)) is not None
+    }
+    if tdx_date not in session_dates:
+        return {
+            "eligible": False,
+            "reason": "selected_tdx_ex_date_not_trading_session",
+            "source_event_category": source_category,
+            "tdx_ex_date": tdx_date.isoformat(),
+        }
+    date_match = _tdx_asymmetric_date_match(
+        observation,
+        tdx_date,
+        sorted(session_dates),
+        max_session_shift=max(0, int(max_session_shift)),
+    )
+    if not date_match.get("compatible"):
+        return {
+            "eligible": False,
+            "reason": str(
+                date_match.get("reason") or "selected_tdx_date_conflict"
+            ),
+            "source_event_category": source_category,
+            "tdx_ex_date": tdx_date.isoformat(),
+            "date_match": date_match,
+        }
+
+    cninfo_terms, tdx_terms, differences = _tdx_asymmetric_economics(
+        observation,
+        selected_row,
+    )
+    selected_tdx_event = {
+        "tdx_id": selected_row.get("id") or selected_row.get("tdx_id"),
+        "tdx_ex_date": tdx_date.isoformat(),
+        "tdx_factor": selected_row.get("factor"),
+        "tdx_validation_result": selected_row.get("validation_result"),
+        "tdx_raw_fields": {
+            "fenhong": selected_row.get("fenhong"),
+            "songzhuangu": selected_row.get("songzhuangu"),
+            "peigu": selected_row.get("peigu"),
+            "peigujia": selected_row.get("peigujia"),
+        },
+        "cninfo_terms": cninfo_terms,
+        "tdx_terms": tdx_terms,
+        "differences": differences,
+        "date_match": date_match,
+    }
+    return {
+        "eligible": True,
+        "reason": "operator_approved_cninfo_tdx_asymmetric_date",
+        "approval_classification": "approved_asymmetric",
+        "policy_version": (
+            CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION
+        ),
+        "source_event_category": source_category,
+        "effective_date": tdx_date.isoformat(),
+        "date_basis": "TDX XDXR除权交易日",
+        "selected_tdx_event": selected_tdx_event,
+        "tdx_date_used": True,
+        "tdx_economic_terms_used": False,
+        "tdx_factor_used": False,
         "max_session_shift": max(0, int(max_session_shift)),
     }
 

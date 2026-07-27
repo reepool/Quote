@@ -188,6 +188,65 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
 
 
 @pytest.mark.asyncio
+async def test_tdx_operator_review_overrides_only_cninfo_factor_date(
+    monkeypatch,
+):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    captured_rows = []
+    captured_path = {}
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        derived = original_derive(captured_rows, quote_evidence)
+        captured_path.update(derived)
+        return derived
+
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2020, 5, 29),
+                "date_basis": "TDX XDXR除权交易日",
+                "evidence_source": "cninfo_tdx_xdxr_operator_review",
+                "evidence_key": "tdx_xdxr:34700",
+            }
+        }
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source_date": date(2020, 5, 29),
+            "effective_date": date(2020, 5, 29),
+            "pre_close": 13.5,
+            "close": 13.0,
+        }]
+    )
+
+    await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert captured_rows[0]["resolved_date_authoritative"] is True
+    assert captured_rows[0]["resolved_authoritative_override"] is False
+    assert captured_rows[0]["resolved_economic_terms"] is False
+    assert captured_rows[0]["cash_dividend_per_share"] == pytest.approx(0.218)
+    assert captured_path["events"][0]["source_ex_date"] == date(
+        2020, 5, 29
+    )
+
+
+@pytest.mark.asyncio
 async def test_cninfo_factor_rebuild_merges_segmented_endpoint_coverage():
     manager = _manager_with_factor_evidence(segmented_coverage=True)
 

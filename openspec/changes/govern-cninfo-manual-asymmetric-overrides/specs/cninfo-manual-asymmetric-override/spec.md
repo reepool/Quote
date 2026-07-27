@@ -80,3 +80,27 @@ factors into the CNInfo factor path.
   from the CNInfo observation
 - **THEN** the disagreement may remain in audit lineage while the approved
   CNInfo factor path continues to use CNInfo terms only
+
+### Requirement: Operator-approved TDX trading-date alignment
+The system SHALL allow an operator-approved asymmetric CNInfo event to use the
+trading effective date from an exact persisted TDX XDXR row without adopting
+the TDX economic terms or factor.
+
+#### Scenario: Align a non-trading CNInfo payment date
+- **WHEN** an exact TDX row belongs to the same instrument, its ex-date is an
+  exchange trading session, and it is compatible with the CNInfo record,
+  payment, or share-arrival timeline
+- **THEN** the resolved CNInfo effective date uses the TDX ex-date while the
+  CNInfo factor economics continue to use the unchanged CNInfo observation
+
+#### Scenario: Preserve source-specific asymmetric values
+- **WHEN** CNInfo reports total-share-capital economics and TDX reports
+  circulating-shareholder economics for the same asymmetric event
+- **THEN** both source records remain unchanged, no CNInfo resolved-term overlay
+  is written, and review lineage states that TDX economics and factor were not
+  used
+
+#### Scenario: Reject an unreviewed nearby TDX row
+- **WHEN** the TDX row ID, instrument, expected date, special-event category, or
+  trading-session validation does not match the explicit operator decision
+- **THEN** the system rejects the write without guessing another TDX row

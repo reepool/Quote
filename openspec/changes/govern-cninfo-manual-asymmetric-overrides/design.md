@@ -92,6 +92,19 @@ four explicit operator decisions.
    share contraction is descriptive capital-structure lineage unless an
    official CNInfo price-adjustment term explicitly represents it.
 
+10. **Allow exact operator-approved TDX date alignment.** For the explicitly
+    reviewed 15-event asymmetric conflict list, an exact persisted TDX row may
+    supply the CNInfo factor effective date after its exchange calendar confirms
+    that the date is a trading session and the date is compatible with the
+    CNInfo record, payment, or share-arrival timeline. CNInfo economic fields
+    remain unchanged and no resolved-term overlay is written. TDX economic
+    fields and factors are retained only as audit comparison lineage.
+
+11. **Require exact event and TDX identities.** Economic disagreement remains a
+    blocking condition for unattended automation. The operator path accepts
+    only an explicit CNInfo source-event key and TDX row ID pair, validates the
+    current instrument and expected TDX date, and records review supersession.
+
 ## Risks / Trade-offs
 
 - **[Risk] A broad title word hides an implementation notice.** → Strong
@@ -111,6 +124,14 @@ four explicit operator decisions.
 - **[Risk] An omitted overlay leaves stale prior terms active.** → The atomic
   review bundle deactivates an existing resolved-term overlay when the new
   approved state explicitly returns to unchanged raw CNInfo terms.
+- **[Risk] A nearby but unrelated TDX row supplies the date.** → Require the
+  exact reviewed TDX row ID, matching instrument, expected date, supported
+  asymmetric category, compatible CNInfo timeline, and an exchange trading
+  session before permitting the operator approval.
+- **[Risk] TDX beneficiary values leak into CNInfo economics.** → Persist
+  `tdx_date_used=true`, `tdx_economic_terms_used=false`, and
+  `tdx_factor_used=false`; derive all factor terms from the raw CNInfo
+  observation and write no economic overlay.
 
 ## Migration Plan
 
@@ -124,7 +145,10 @@ four explicit operator decisions.
 6. Apply and audit the `000623.SZ` CNInfo-only review without downloading or LLM
    work, then verify that raw CNInfo, TDX audit, and production factor rows are
    unchanged by the review write.
-7. Roll back by disabling the new review endpoint/prefilter and superseding any
+7. Preview and apply the exact 15-event operator list, verify all selected TDX
+   dates are exchange sessions, and verify CNInfo/TDX economic tables and
+   production factors remain unchanged.
+8. Roll back by disabling the new review endpoint/prefilter and superseding any
    manual review with another governed review; raw data remains unchanged.
 
 ## Open Questions

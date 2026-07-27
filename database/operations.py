@@ -43,6 +43,7 @@ GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES = (
     "cninfo_announcement_review",
     "cninfo_announcement",
     "cninfo_tdx_xdxr_review",
+    "cninfo_tdx_xdxr_operator_review",
 )
 
 

@@ -25,3 +25,17 @@
   non-tradable-share contraction retained as descriptive non-factor lineage.
 - [x] 4.5 Verify no raw CNInfo, TDX audit, or production-factor rows are changed
   by the review write, then run focused tests and OpenSpec validation.
+
+## 5. Operator-approved CNInfo/TDX date alignment
+
+- [x] 5.1 Add an exact event/TDX-row classifier that accepts operator-approved
+  asymmetric economic differences only when the TDX date is a compatible
+  exchange trading session.
+- [x] 5.2 Persist a review/date-evidence bundle that keeps raw CNInfo economics,
+  records TDX as date-only evidence, and writes no resolved-term overlay.
+- [x] 5.3 Add a local preview/write script for the 15 reviewed conflicts and
+  regression tests for source isolation, identity validation, and review
+  supersession.
+- [x] 5.4 Apply all 15 decisions and verify governance resolution plus zero
+  mutation of raw CNInfo, TDX audit, and production factor rows.
+- [x] 5.5 Run focused tests, OpenSpec validation, and uncommitted review.

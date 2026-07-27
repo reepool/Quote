@@ -18085,11 +18085,20 @@ class DataManager:
             authoritative_override = bool(
                 resolved_terms.get("authoritative_override")
             )
-            if authoritative_override or factor_effect == "none":
-                cninfo_cleanup_source_event_keys.add(event_key)
-            authoritative_effective_date = bool(
-                authoritative_override and resolved_date is not None
+            date_only_operator_override = bool(
+                resolved
+                and resolved.get("evidence_source")
+                == "cninfo_tdx_xdxr_operator_review"
             )
+            authoritative_effective_date = bool(
+                resolved_date is not None
+                and (
+                    authoritative_override
+                    or date_only_operator_override
+                )
+            )
+            if authoritative_effective_date or factor_effect == "none":
+                cninfo_cleanup_source_event_keys.add(event_key)
             selected_source_date = (
                 resolved_date
                 if authoritative_effective_date
@@ -18097,7 +18106,7 @@ class DataManager:
             )
             raw_source_date = self._date_from_any(row.get("ex_date"))
             if (
-                authoritative_override
+                authoritative_effective_date
                 and raw_source_date is not None
                 and raw_source_date != selected_source_date
             ):
@@ -25778,6 +25787,395 @@ class DataManager:
             "production_factor_modified": False,
             "network_access": False,
             "llm_invocations": 0,
+        }
+
+    async def review_cninfo_tdx_asymmetric_operator_approval(
+        self,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Approve an exact asymmetric event with a TDX date only."""
+        from data_sources.cninfo_resolution_governance import (
+            CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION,
+            classify_cninfo_tdx_asymmetric_operator_approval,
+        )
+
+        instrument_id = convert_to_database_format(
+            str(payload.get("instrument_id") or "").strip()
+        )
+        source_event_key = str(
+            payload.get("source_event_key") or ""
+        ).strip()
+        reviewer = str(payload.get("reviewer") or "").strip()
+        notes = str(payload.get("notes") or "").strip()
+        expected_category = str(
+            payload.get("source_event_category") or ""
+        ).strip()
+        expected_tdx_date = self._date_from_any(
+            payload.get("expected_tdx_ex_date")
+        )
+        raw_tdx_record_id = payload.get("tdx_record_id")
+        if isinstance(raw_tdx_record_id, bool):
+            raise ValueError("tdx_record_id must be a positive integer")
+        if isinstance(raw_tdx_record_id, int):
+            tdx_record_id = raw_tdx_record_id
+        elif (
+            isinstance(raw_tdx_record_id, str)
+            and raw_tdx_record_id.strip().isdigit()
+        ):
+            tdx_record_id = int(raw_tdx_record_id.strip())
+        else:
+            raise ValueError("tdx_record_id must be a positive integer")
+        if not all((
+            instrument_id,
+            source_event_key,
+            reviewer,
+            expected_category,
+            expected_tdx_date,
+            tdx_record_id > 0,
+        )):
+            raise ValueError(
+                "instrument_id, source_event_key, tdx_record_id, "
+                "expected_tdx_ex_date, source_event_category, and reviewer "
+                "are required"
+            )
+        if len(reviewer) > 128:
+            raise ValueError("reviewer exceeds 128 characters")
+        if len(notes) > 4000:
+            raise ValueError("notes exceeds 4000 characters")
+        exchange = {
+            ".SH": "SSE",
+            ".SZ": "SZSE",
+            ".BJ": "BSE",
+        }.get(instrument_id[-3:])
+        if exchange not in {"SSE", "SZSE"}:
+            raise ValueError(
+                "operator-approved TDX date requires an SSE/SZSE instrument"
+            )
+
+        await self._assert_current_cninfo_corporate_action_identity(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+        )
+        observations = await self.db_ops.get_corporate_action_observations(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            source="cninfo",
+            include_inactive=False,
+            limit=2,
+            offset=0,
+        )
+        observation_items = observations.get("items") or []
+        if len(observation_items) != 1:
+            raise ValueError("current CNInfo observation is missing or ambiguous")
+        observation = dict(observation_items[0])
+
+        raw_rows = await self.db_ops.execute_read_query(
+            """
+            SELECT raw_payload_json
+            FROM corporate_action_observations
+            WHERE instrument_id = :operator_instrument_id
+              AND source_event_key = :operator_source_event_key
+              AND source = 'cninfo'
+              AND is_current = 1
+            ORDER BY id DESC
+            LIMIT 2
+            """,
+            {
+                "operator_instrument_id": instrument_id,
+                "operator_source_event_key": source_event_key,
+            },
+        )
+        if len(raw_rows) != 1:
+            raise ValueError("current CNInfo raw lineage is missing or ambiguous")
+        raw_payload = raw_rows[0].get("raw_payload_json")
+        if isinstance(raw_payload, str):
+            try:
+                raw_payload = json.loads(raw_payload or "{}")
+            except (TypeError, ValueError, json.JSONDecodeError):
+                raw_payload = {}
+        raw_payload = (
+            raw_payload if isinstance(raw_payload, Mapping) else {}
+        )
+        source_category = str(
+            raw_payload.get("分红类型") or ""
+        ).strip()
+        if source_category != expected_category:
+            raise ValueError(
+                "current CNInfo special-event category does not match "
+                "the operator decision"
+            )
+        observation["source_event_category"] = source_category
+
+        tdx_rows = await self.db_ops.execute_read_query(
+            """
+            SELECT id, instrument_id, ex_date, factor, validation_result,
+                   fenhong, songzhuangu, peigu, peigujia
+            FROM adjustment_factors_tdx
+            WHERE id = :operator_tdx_record_id
+              AND instrument_id = :operator_instrument_id
+            LIMIT 2
+            """,
+            {
+                "operator_tdx_record_id": tdx_record_id,
+                "operator_instrument_id": instrument_id,
+            },
+        )
+        if len(tdx_rows) != 1:
+            raise ValueError(
+                "exact persisted TDX XDXR row is missing or ambiguous"
+            )
+        persisted_tdx_date = self._date_from_any(
+            tdx_rows[0].get("ex_date")
+        )
+        if persisted_tdx_date != expected_tdx_date:
+            raise ValueError(
+                "persisted TDX ex-date does not match the operator decision"
+            )
+        relevant_dates = [
+            parsed
+            for field_name in (
+                "record_date",
+                "pay_date",
+                "share_arrival_date",
+                "ex_date",
+            )
+            if (
+                parsed := self._date_from_any(
+                    observation.get(field_name)
+                )
+            ) is not None
+        ]
+        calendar_start = min([
+            expected_tdx_date,
+            *relevant_dates,
+        ])
+        calendar_end = max([
+            expected_tdx_date,
+            *relevant_dates,
+        ])
+        calendar_rows = await self.db_ops.get_trading_calendar_records(
+            exchange,
+            calendar_start,
+            calendar_end,
+        )
+        trading_sessions = sorted({
+            parsed
+            for row in calendar_rows
+            if row.get("is_trading_day")
+            if (
+                parsed := self._date_from_any(row.get("date"))
+            ) is not None
+        })
+        classification = (
+            classify_cninfo_tdx_asymmetric_operator_approval(
+                observation=observation,
+                tdx_events=tdx_rows,
+                selected_tdx_id=tdx_record_id,
+                trading_sessions=trading_sessions,
+            )
+        )
+        if not classification.get("eligible"):
+            raise ValueError(
+                "operator-approved CNInfo/TDX date validation failed: "
+                + str(classification.get("reason") or "unknown")
+            )
+
+        economic_fields = (
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+            "rights_shares_per_share",
+            "rights_price",
+        )
+        cninfo_terms = {
+            field_name: observation.get(field_name)
+            for field_name in economic_fields
+        }
+        selected_tdx = classification["selected_tdx_event"]
+        prior_reviews = (
+            await self.db_ops.get_corporate_action_resolution_reviews(
+                source_event_key=source_event_key,
+                limit=1,
+                offset=0,
+            )
+        )
+        prior_review = next(
+            iter(prior_reviews.get("items") or []),
+            None,
+        )
+        decision_identity = {
+            "policy": (
+                CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION
+            ),
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "source_event_category": source_category,
+            "tdx_record_id": tdx_record_id,
+            "tdx_ex_date": expected_tdx_date.isoformat(),
+            "cninfo_terms": cninfo_terms,
+            "reviewer": reviewer,
+            "notes": notes,
+        }
+        operator_decision_key = hashlib.sha256(json.dumps(
+            decision_identity,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        ).encode("utf-8")).hexdigest()
+        prior_payload = (
+            prior_review.get("review_payload") or {}
+            if prior_review else {}
+        )
+        prior_decision_key = str(
+            prior_payload.get("operator_decision_key") or ""
+        ).strip() or None
+        if prior_review and prior_decision_key == operator_decision_key:
+            review_key = str(
+                prior_review.get("review_key") or ""
+            ).strip()
+            supersedes_review_id = prior_review.get(
+                "supersedes_review_id"
+            )
+        else:
+            supersedes_review_id = (
+                prior_review.get("review_id")
+                if prior_review else None
+            )
+            review_key = hashlib.sha256(json.dumps({
+                "policy": (
+                    CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION
+                ),
+                "operator_decision_key": operator_decision_key,
+                "supersedes_review_id": supersedes_review_id,
+            }, ensure_ascii=False, sort_keys=True).encode(
+                "utf-8"
+            )).hexdigest()
+
+        review_payload = {
+            "approval_classification": "approved_asymmetric",
+            "resolution_policy": (
+                CNINFO_TDX_ASYMMETRIC_OPERATOR_POLICY_VERSION
+            ),
+            "operator_decision_key": operator_decision_key,
+            "source_event_category": source_category,
+            "factor_effect": "normal",
+            "factor_terms_source": "cninfo_observation",
+            "cninfo_observation_terms": cninfo_terms,
+            "tdx_date_used": True,
+            "tdx_economic_terms_used": False,
+            "tdx_factor_used": False,
+            "tdx_date_evidence": selected_tdx,
+            "date_alignment": {
+                "effective_date": classification["effective_date"],
+                "date_basis": classification["date_basis"],
+                "cninfo_record_date": self._date_text(
+                    observation.get("record_date")
+                ),
+                "cninfo_pay_date": self._date_text(
+                    observation.get("pay_date")
+                ),
+                "cninfo_share_arrival_date": self._date_text(
+                    observation.get("share_arrival_date")
+                ),
+                "date_match": selected_tdx.get("date_match"),
+            },
+            "network_access": False,
+            "llm_invocations": 0,
+        }
+        preview = {
+            "status": "dry_run",
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "tdx_record_id": tdx_record_id,
+            "effective_date": classification["effective_date"],
+            "date_basis": classification["date_basis"],
+            "source_event_category": source_category,
+            "cninfo_terms": cninfo_terms,
+            "tdx_comparison": selected_tdx,
+            "supersedes_review_id": supersedes_review_id,
+            "terms_overlay_written": False,
+            "tdx_date_used": True,
+            "tdx_economic_terms_used": False,
+            "tdx_factor_used": False,
+            "raw_observation_modified": False,
+            "tdx_audit_modified": False,
+            "production_factor_modified": False,
+            "network_access": False,
+            "llm_invocations": 0,
+        }
+        if bool(payload.get("dry_run", False)):
+            return preview
+
+        evidence_key = f"tdx_xdxr:{tdx_record_id}"
+        bundle = await self.db_ops.save_corporate_action_review_bundle(
+            review_row={
+                "review_key": review_key,
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "analysis_id": None,
+                "evidence_key": evidence_key,
+                "decision": "resolved",
+                "effective_date": classification["effective_date"],
+                "date_basis": classification["date_basis"],
+                "reviewer": reviewer,
+                "notes": notes,
+                "review_payload": review_payload,
+                "supersedes_review_id": supersedes_review_id,
+            },
+            terms_row=None,
+            evidence_row={
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "observation_source": "cninfo",
+                "source_profile": observation.get("source_profile"),
+                "evidence_source": (
+                    "cninfo_tdx_xdxr_operator_review"
+                ),
+                "evidence_key": evidence_key,
+                "resolution_status": "resolved",
+                "effective_date": classification["effective_date"],
+                "date_basis": classification["date_basis"],
+                "confidence": 1.0,
+                "raw_payload": review_payload,
+            },
+            ingestion_run_id=(
+                "cninfo_tdx_operator_" + review_key[:16]
+            ),
+        )
+        refreshed_inventory = (
+            await self._load_cninfo_resolution_governance_inventory(
+                start_date=date.min,
+                end_date=date.max,
+                exchanges=[exchange],
+                instrument_ids=[instrument_id],
+                source_event_keys=[source_event_key],
+            )
+        )
+        if len(refreshed_inventory) != 1:
+            raise RuntimeError(
+                "operator-approved CNInfo/TDX state refresh did not resolve "
+                "exactly one current event"
+            )
+        state_write = (
+            await self.db_ops.upsert_corporate_action_resolution_states(
+                refreshed_inventory,
+                ingestion_run_id=(
+                    "cninfo_tdx_operator_" + review_key[:16]
+                ),
+            )
+        )
+        if int(state_write.get("failed", 0) or 0) > 0:
+            raise RuntimeError(
+                "operator-approved CNInfo/TDX state refresh failed"
+            )
+        return {
+            **preview,
+            "status": "success",
+            "review": bundle["review"],
+            "terms_write": bundle["terms_write"],
+            "evidence_write": bundle["evidence_write"],
+            "resolution_state": refreshed_inventory[0],
+            "state_write": state_write,
         }
 
     async def review_cninfo_corporate_action_resolution(
