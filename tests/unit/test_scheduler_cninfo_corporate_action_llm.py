@@ -177,6 +177,21 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
                     "implementation_grade_announcement_missing": 12,
                 },
             },
+            "tdx_asymmetric_review": {
+                "scanned": 92,
+                "special_events": 82,
+                "eligible": 14,
+                "promoted": 14,
+                "skipped": 0,
+                "blocked": 68,
+                "failed": 0,
+                "network_access": False,
+                "llm_invocations": 0,
+                "mismatch_reason_counts": {
+                    "tdx_event_not_found_near_cninfo_dates": 60,
+                    "tdx_economic_conflict": 8,
+                },
+            },
             "discovery": {
                 "title_classification": {
                     "status": "success",
@@ -201,6 +216,9 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert "非对称旁路" in governance_report
     assert "promoted=8" in governance_report
     assert "implementation_grade_announcement_missing: 12" in governance_report
+    assert "TDX非对称对账" in governance_report
+    assert "matched=14" in governance_report
+    assert "tdx_economic_conflict: 8" in governance_report
     assert "factor_blocking=380" in governance_report
     assert "discovery_pending: 115" in governance_report
     assert "concurrency=4/5" in governance_report

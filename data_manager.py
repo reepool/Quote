@@ -20653,6 +20653,466 @@ class DataManager:
             report["status"] = "partial"
         return report
 
+    async def _review_cninfo_tdx_asymmetric_match_batch(
+        self,
+        *,
+        items: List[Mapping[str, Any]],
+        start_date: date,
+        end_date: date,
+        exchanges: List[str],
+        dry_run: bool,
+        exclude_reviewed_events: bool,
+        ingestion_run_id: str,
+        sample_limit: int,
+    ) -> Dict[str, Any]:
+        """Approve only unique persisted CNInfo/TDX special-event matches."""
+        from data_sources.cninfo_resolution_governance import (
+            CNINFO_TDX_ASYMMETRIC_NEARBY_CALENDAR_DAYS,
+            CNINFO_TDX_ASYMMETRIC_POLICY_VERSION,
+            classify_cninfo_tdx_asymmetric_match,
+        )
+
+        event_keys = sorted({
+            str(item.get("source_event_key") or "").strip()
+            for item in items
+            if str(item.get("source_event_key") or "").strip()
+        })
+        report: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "success",
+            "policy_version": CNINFO_TDX_ASYMMETRIC_POLICY_VERSION,
+            "approval_classification": "approved_asymmetric",
+            "network_access": False,
+            "llm_invocations": 0,
+            "scanned": len(event_keys),
+            "special_events": 0,
+            "eligible": 0,
+            "promoted": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "skipped": 0,
+            "blocked": 0,
+            "failed": 0,
+            "mismatch_reason_counts": {},
+            "matches": [],
+            "mismatches": [],
+            "errors": [],
+        }
+        if not event_keys:
+            return report
+
+        placeholders = ", ".join(
+            f":tdx_asymmetric_event_{index}"
+            for index in range(len(event_keys))
+        )
+        params = {
+            f"tdx_asymmetric_event_{index}": value
+            for index, value in enumerate(event_keys)
+        }
+        observation_rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT observation.instrument_id, observation.source_profile,
+                   observation.source_event_key, observation.action_type,
+                   observation.announcement_date, observation.record_date,
+                   observation.ex_date, observation.pay_date,
+                   observation.share_arrival_date,
+                   observation.cash_dividend_per_share,
+                   observation.bonus_shares_per_share,
+                   observation.capitalization_shares_per_share,
+                   observation.rights_shares_per_share,
+                   observation.rights_price, observation.currency,
+                   observation.description, observation.raw_payload_json,
+                   (
+                       SELECT analysis.id
+                       FROM corporate_action_llm_analyses AS analysis
+                       WHERE analysis.instrument_id = observation.instrument_id
+                         AND analysis.source_event_key =
+                             observation.source_event_key
+                       ORDER BY analysis.updated_at DESC, analysis.id DESC
+                       LIMIT 1
+                   ) AS latest_analysis_id
+            FROM corporate_action_observations AS observation
+            WHERE observation.source = 'cninfo'
+              AND observation.is_current = 1
+              AND observation.source_event_key IN ({placeholders})
+            """,
+            params,
+        )
+        observations: List[Dict[str, Any]] = []
+        for raw_row in observation_rows:
+            row = dict(raw_row)
+            raw_payload = row.pop("raw_payload_json", None)
+            if isinstance(raw_payload, str):
+                try:
+                    raw_payload = json.loads(raw_payload or "{}")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    raw_payload = {}
+            raw_payload = (
+                raw_payload if isinstance(raw_payload, Mapping) else {}
+            )
+            row["source_event_category"] = str(
+                raw_payload.get("分红类型") or ""
+            ).strip()
+            observations.append(row)
+        observation_by_event = {
+            str(row.get("source_event_key") or ""): row
+            for row in observations
+        }
+        special_observations = [
+            row for row in observations
+            if row.get("source_event_category") in {
+                "重整转增", "股改分红", "承诺补偿",
+            }
+        ]
+        report["special_events"] = len(special_observations)
+        dm_logger.info(
+            "[DataManager] CNInfo/TDX asymmetric review loaded observations: "
+            "events=%s current_observations=%s special_events=%s",
+            len(event_keys),
+            len(observations),
+            len(special_observations),
+        )
+
+        reviewed_rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT source_event_key
+            FROM corporate_action_resolution_reviews
+            WHERE source_event_key IN ({placeholders})
+            """,
+            params,
+        )
+        reviewed_events = {
+            str(row.get("source_event_key") or "")
+            for row in reviewed_rows
+            if str(row.get("source_event_key") or "")
+        }
+
+        instrument_ids = sorted({
+            str(row.get("instrument_id") or "").strip()
+            for row in special_observations
+            if str(row.get("instrument_id") or "").strip()
+        })
+        tdx_rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(instrument_ids), 400):
+            chunk = instrument_ids[offset: offset + 400]
+            instrument_placeholders = ", ".join(
+                f":tdx_asymmetric_instrument_{index}"
+                for index in range(len(chunk))
+            )
+            tdx_params = {
+                f"tdx_asymmetric_instrument_{index}": value
+                for index, value in enumerate(chunk)
+            }
+            tdx_params.update({
+                "tdx_asymmetric_start": (
+                    start_date
+                    - timedelta(
+                        days=CNINFO_TDX_ASYMMETRIC_NEARBY_CALENDAR_DAYS
+                    )
+                ).isoformat(),
+                "tdx_asymmetric_end": (
+                    end_date
+                    + timedelta(
+                        days=CNINFO_TDX_ASYMMETRIC_NEARBY_CALENDAR_DAYS
+                    )
+                ).isoformat(),
+            })
+            tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT id, instrument_id, ex_date, factor,
+                       validation_result, fenhong, songzhuangu,
+                       peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({instrument_placeholders})
+                  AND date(ex_date) BETWEEN :tdx_asymmetric_start
+                                        AND :tdx_asymmetric_end
+                ORDER BY instrument_id, ex_date, id
+                """,
+                tdx_params,
+            ))
+        tdx_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        for row in tdx_rows:
+            tdx_by_instrument[
+                str(row.get("instrument_id") or "")
+            ].append(dict(row))
+        dm_logger.info(
+            "[DataManager] CNInfo/TDX asymmetric review loaded TDX rows: "
+            "instruments=%s rows=%s",
+            len(instrument_ids),
+            len(tdx_rows),
+        )
+
+        sessions_by_exchange: Dict[str, List[date]] = {}
+        for exchange in sorted({
+            value for value in exchanges if value in {"SSE", "SZSE"}
+        }):
+            calendar_rows = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                start_date - timedelta(days=14),
+                end_date + timedelta(days=14),
+            )
+            sessions_by_exchange[exchange] = sorted({
+                parsed
+                for row in calendar_rows
+                if row.get("is_trading_day")
+                if (parsed := self._date_from_any(row.get("date"))) is not None
+            })
+        dm_logger.info(
+            "[DataManager] CNInfo/TDX asymmetric review loaded calendars: %s",
+            {
+                exchange: len(sessions)
+                for exchange, sessions in sessions_by_exchange.items()
+            },
+        )
+
+        classifications: List[Dict[str, Any]] = []
+        for event_key in event_keys:
+            observation = observation_by_event.get(event_key)
+            if observation is None:
+                classifications.append({
+                    "source_event_key": event_key,
+                    "classification": {
+                        "eligible": False,
+                        "reason": "current_cninfo_observation_missing",
+                    },
+                })
+                continue
+            if observation.get("source_event_category") not in {
+                "重整转增", "股改分红", "承诺补偿",
+            }:
+                continue
+            if exclude_reviewed_events and event_key in reviewed_events:
+                report["skipped"] += 1
+                continue
+            instrument_id = str(observation.get("instrument_id") or "")
+            exchange = (
+                "SSE" if instrument_id.endswith(".SH")
+                else "SZSE" if instrument_id.endswith(".SZ")
+                else ""
+            )
+            classification = classify_cninfo_tdx_asymmetric_match(
+                observation=observation,
+                tdx_events=tdx_by_instrument.get(instrument_id, []),
+                trading_sessions=sessions_by_exchange.get(exchange, []),
+            )
+            classifications.append({
+                "source_event_key": event_key,
+                "observation": observation,
+                "classification": classification,
+            })
+        dm_logger.info(
+            "[DataManager] CNInfo/TDX asymmetric review classified events: "
+            "classifications=%s skipped=%s",
+            len(classifications),
+            report["skipped"],
+        )
+
+        selected_id_counts = Counter(
+            (
+                str(item["observation"].get("instrument_id") or ""),
+                str(
+                    item["classification"].get("selected_tdx_event", {}).get(
+                        "tdx_id"
+                    )
+                    or ""
+                ),
+            )
+            for item in classifications
+            if item["classification"].get("eligible")
+        )
+        for item in classifications:
+            classification = item["classification"]
+            observation = item.get("observation") or {}
+            event_key = item["source_event_key"]
+            if classification.get("eligible"):
+                selected_tdx = classification.get("selected_tdx_event") or {}
+                selected_identity = (
+                    str(observation.get("instrument_id") or ""),
+                    str(selected_tdx.get("tdx_id") or ""),
+                )
+                if selected_id_counts[selected_identity] > 1:
+                    classification = {
+                        **classification,
+                        "eligible": False,
+                        "reason": "tdx_event_matches_multiple_cninfo_events",
+                    }
+                    item["classification"] = classification
+
+            if not classification.get("eligible"):
+                reason = str(
+                    classification.get("reason")
+                    or "tdx_asymmetric_match_failed"
+                )
+                report["blocked"] += 1
+                counts = report["mismatch_reason_counts"]
+                counts[reason] = int(counts.get(reason, 0)) + 1
+                report["mismatches"].append({
+                    "source_event_key": event_key,
+                    "instrument_id": observation.get("instrument_id"),
+                    "source_event_category": observation.get(
+                        "source_event_category"
+                    ),
+                    "reason": reason,
+                    "comparison": classification,
+                })
+                continue
+
+            report["eligible"] += 1
+            match_payload = {
+                "source_event_key": event_key,
+                "instrument_id": observation.get("instrument_id"),
+                "source_event_category": observation.get(
+                    "source_event_category"
+                ),
+                "effective_date": classification.get("effective_date"),
+                "date_basis": classification.get("date_basis"),
+                "selected_tdx_event": classification.get(
+                    "selected_tdx_event"
+                ),
+            }
+            report["matches"].append(match_payload)
+            if dry_run:
+                continue
+
+            analysis_id = int(observation.get("latest_analysis_id") or 0)
+            if analysis_id <= 0:
+                report["failed"] += 1
+                report["errors"].append({
+                    "source_event_key": event_key,
+                    "error": "persisted_llm_analysis_missing",
+                })
+                continue
+            selected_tdx = classification["selected_tdx_event"]
+            tdx_id = str(selected_tdx.get("tdx_id") or "")
+            evidence_key = f"tdx_xdxr:{tdx_id}"
+            economic_fields = (
+                "cash_dividend_per_share",
+                "bonus_shares_per_share",
+                "capitalization_shares_per_share",
+                "rights_shares_per_share",
+                "rights_price",
+            )
+            normalized_terms = {
+                field_name: observation.get(field_name)
+                for field_name in economic_fields
+            }
+            resolved_fields = [
+                field_name for field_name in economic_fields
+                if observation.get(field_name) is not None
+            ]
+            cninfo_lineage = {
+                "announcement_date": self._date_text(
+                    observation.get("announcement_date")
+                ),
+                "record_date": self._date_text(
+                    observation.get("record_date")
+                ),
+                "ex_date": self._date_text(observation.get("ex_date")),
+                "pay_date": self._date_text(observation.get("pay_date")),
+                "share_arrival_date": self._date_text(
+                    observation.get("share_arrival_date")
+                ),
+                "description": observation.get("description"),
+                "terms": normalized_terms,
+            }
+            review_payload = {
+                "approval_classification": "approved_asymmetric",
+                "resolution_policy": CNINFO_TDX_ASYMMETRIC_POLICY_VERSION,
+                "source_event_category": observation.get(
+                    "source_event_category"
+                ),
+                "cninfo_observation": cninfo_lineage,
+                "tdx_match": selected_tdx,
+                "field_tolerance": classification.get("field_tolerance"),
+                "max_session_shift": classification.get("max_session_shift"),
+                "network_access": False,
+                "llm_invocations": 0,
+            }
+            review_key = hashlib.sha256(json.dumps({
+                "policy": CNINFO_TDX_ASYMMETRIC_POLICY_VERSION,
+                "instrument_id": observation.get("instrument_id"),
+                "source_event_key": event_key,
+                "analysis_id": analysis_id,
+                "tdx_id": tdx_id,
+                "effective_date": classification.get("effective_date"),
+            }, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+            try:
+                bundle = await self.db_ops.save_corporate_action_review_bundle(
+                    review_row={
+                        "review_key": review_key,
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "analysis_id": analysis_id,
+                        "evidence_key": evidence_key,
+                        "decision": "resolved",
+                        "effective_date": classification["effective_date"],
+                        "date_basis": classification["date_basis"],
+                        "reviewer": "cninfo_tdx_asymmetric_governance",
+                        "notes": (
+                            "CNInfo特殊事项与TDX XDXR逐字段及日期窗口一致，"
+                            "标记approved_asymmetric。"
+                        ),
+                        "review_payload": review_payload,
+                    },
+                    terms_row={
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "analysis_id": analysis_id,
+                        **normalized_terms,
+                        "currency": observation.get("currency"),
+                        "resolved_fields": resolved_fields,
+                        "evidence": {
+                            "approval_classification": "approved_asymmetric",
+                            "resolution_policy": (
+                                CNINFO_TDX_ASYMMETRIC_POLICY_VERSION
+                            ),
+                            "source": "cninfo_observation",
+                            "factor_effect": "normal",
+                            "tdx_match": selected_tdx,
+                        },
+                        "is_active": True,
+                    },
+                    evidence_row={
+                        "instrument_id": observation["instrument_id"],
+                        "source_event_key": event_key,
+                        "observation_source": "cninfo",
+                        "source_profile": observation["source_profile"],
+                        "evidence_source": "cninfo_tdx_xdxr_review",
+                        "evidence_key": evidence_key,
+                        "resolution_status": "resolved",
+                        "effective_date": classification["effective_date"],
+                        "date_basis": classification["date_basis"],
+                        "confidence": 1.0,
+                        "raw_payload": review_payload,
+                    },
+                    ingestion_run_id=ingestion_run_id,
+                    reject_if_prior_event_review=bool(
+                        exclude_reviewed_events
+                    ),
+                )
+            except Exception as exc:
+                report["failed"] += 1
+                report["errors"].append({
+                    "source_event_key": event_key,
+                    "error": str(exc),
+                })
+                continue
+            review_status = str(
+                (bundle.get("review") or {}).get("status") or ""
+            )
+            if review_status == "inserted":
+                report["promoted"] += 1
+            elif review_status == "updated":
+                report["updated"] += 1
+            else:
+                report["unchanged"] += 1
+
+        if report["failed"]:
+            report["status"] = "partial"
+        bounded_limit = max(0, int(sample_limit))
+        report["match_samples"] = report["matches"][:bounded_limit]
+        report["mismatch_samples"] = report["mismatches"][:bounded_limit]
+        return report
+
     async def govern_cninfo_corporate_action_resolutions(
         self,
         *,
@@ -20714,7 +21174,7 @@ class DataManager:
         ] or ["inventory", "discovery", "resolution"]
         allowed_scopes = {
             "inventory", "discovery", "resolution", "factors",
-            "asymmetric_review",
+            "asymmetric_review", "tdx_asymmetric_review",
         }
         invalid_scopes = sorted(set(normalized_scopes) - allowed_scopes)
         if invalid_scopes:
@@ -20830,6 +21290,18 @@ class DataManager:
         asymmetric_batch_keys = [
             item["source_event_key"] for item in asymmetric_batch
         ]
+        tdx_asymmetric_batch = (
+            actionable[offset: offset + limit]
+            if "tdx_asymmetric_review" in normalized_scopes
+            else []
+        )
+        tdx_asymmetric_has_more = (
+            "tdx_asymmetric_review" in normalized_scopes
+            and offset + len(tdx_asymmetric_batch) < len(actionable)
+        )
+        tdx_asymmetric_batch_keys = [
+            item["source_event_key"] for item in tdx_asymmetric_batch
+        ]
         repair_key_set = {
             item["source_event_key"]
             for item in batch
@@ -20850,6 +21322,19 @@ class DataManager:
             stage_results["asymmetric_review"] = (
                 await self._review_cninfo_asymmetric_passthrough_batch(
                     items=asymmetric_batch,
+                    dry_run=bool(dry_run),
+                    exclude_reviewed_events=bool(exclude_reviewed_events),
+                    ingestion_run_id=run_id,
+                    sample_limit=int(sample_limit),
+                )
+            )
+        if "tdx_asymmetric_review" in normalized_scopes:
+            stage_results["tdx_asymmetric_review"] = (
+                await self._review_cninfo_tdx_asymmetric_match_batch(
+                    items=tdx_asymmetric_batch,
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                    exchanges=normalized_exchanges,
                     dry_run=bool(dry_run),
                     exclude_reviewed_events=bool(exclude_reviewed_events),
                     ingestion_run_id=run_id,
@@ -21280,6 +21765,26 @@ class DataManager:
                     0,
                     offset + len(asymmetric_batch) - terminalized_count,
                 )
+        tdx_asymmetric_next_target_offset = None
+        if tdx_asymmetric_has_more:
+            if dry_run:
+                tdx_asymmetric_next_target_offset = (
+                    offset + len(tdx_asymmetric_batch)
+                )
+            else:
+                tdx_asymmetric_result = stage_results.get(
+                    "tdx_asymmetric_review"
+                ) or {}
+                terminalized_count = sum(
+                    int(tdx_asymmetric_result.get(field_name) or 0)
+                    for field_name in ("promoted", "updated", "unchanged")
+                )
+                tdx_asymmetric_next_target_offset = max(
+                    0,
+                    offset
+                    + len(tdx_asymmetric_batch)
+                    - terminalized_count,
+                )
         stage_failures = [
             name for name, value in stage_results.items()
             if str((value or {}).get("status")) in {"failed", "partial"}
@@ -21345,6 +21850,14 @@ class DataManager:
                 "asymmetric_has_more": asymmetric_has_more,
                 "asymmetric_next_target_offset": (
                     asymmetric_next_target_offset
+                ),
+                "tdx_asymmetric_batch_events": len(tdx_asymmetric_batch),
+                "tdx_asymmetric_batch_event_keys": (
+                    tdx_asymmetric_batch_keys
+                ),
+                "tdx_asymmetric_has_more": tdx_asymmetric_has_more,
+                "tdx_asymmetric_next_target_offset": (
+                    tdx_asymmetric_next_target_offset
                 ),
                 "target_offset": offset,
                 "has_more": has_more,

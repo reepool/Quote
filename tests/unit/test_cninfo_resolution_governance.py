@@ -10,6 +10,7 @@ from data_sources.cninfo_resolution_governance import (
     APPLICABILITY_POLICY_VERSION,
     classify_date_applicability,
     classify_cninfo_asymmetric_passthrough,
+    classify_cninfo_tdx_asymmetric_match,
     derive_resolution_state,
     rank_cninfo_asymmetric_implementation_candidate,
 )
@@ -104,6 +105,265 @@ def _asymmetric_analysis(*, extra_bonus=0.0):
             "reason": "股权分置改革对价实施",
         },
     }
+
+
+def _tdx_match_observation(**overrides):
+    row = _row(
+        instrument_id="000423.SZ",
+        action_type="capitalization",
+        source_event_category="股改分红",
+        record_date="2007-05-31",
+        cash_dividend_per_share=0.0,
+        capitalization_shares_per_share=0.4,
+        rights_price=0.0,
+    )
+    row.update(overrides)
+    return row
+
+
+def _tdx_event(**overrides):
+    row = {
+        "id": 1,
+        "instrument_id": "000423.SZ",
+        "ex_date": "2007-06-01",
+        "fenhong": 0.0,
+        "songzhuangu": 4.0,
+        "peigu": 0.0,
+        "peigujia": 0.0,
+        "validation_result": "computed_unvalidated",
+    }
+    row.update(overrides)
+    return row
+
+
+def test_tdx_asymmetric_match_accepts_unique_next_session_event():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event()],
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is True
+    assert result["approval_classification"] == "approved_asymmetric"
+    assert result["effective_date"] == "2007-06-01"
+    assert result["selected_tdx_event"]["date_match"] == {
+        "compatible": True,
+        "matched_role": "record_date_forward_session",
+        "trading_session_distance": 1,
+    }
+
+
+def test_tdx_asymmetric_match_absorbs_float32_noise_only():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(
+            capitalization_shares_per_share=0.531,
+        ),
+        tdx_events=[_tdx_event(songzhuangu=5.30999994277954)],
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is True
+    assert result["selected_tdx_event"]["differences"][
+        "bonus_per_share"
+    ] < 0.0001
+
+
+def test_tdx_asymmetric_match_blocks_material_economic_difference():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event(songzhuangu=4.2)],
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "tdx_economic_conflict"
+    assert result["candidate_details"][0]["differences"][
+        "bonus_per_share"
+    ] == pytest.approx(0.02)
+
+
+def test_tdx_asymmetric_match_blocks_out_of_window_date():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event(ex_date="2007-06-06")],
+        trading_sessions=[
+            date(2007, 5, 31),
+            date(2007, 6, 1),
+            date(2007, 6, 4),
+            date(2007, 6, 5),
+            date(2007, 6, 6),
+        ],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "tdx_date_conflict"
+
+
+def test_tdx_asymmetric_match_blocks_multiple_valid_rows():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(),
+        tdx_events=[
+            _tdx_event(id=1, ex_date="2007-06-01"),
+            _tdx_event(id=2, ex_date="2007-06-04"),
+        ],
+        trading_sessions=[
+            date(2007, 5, 31),
+            date(2007, 6, 1),
+            date(2007, 6, 4),
+        ],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "ambiguous_tdx_event_match"
+
+
+def test_tdx_asymmetric_match_requires_calendar_for_forward_date():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(),
+        tdx_events=[_tdx_event()],
+        trading_sessions=[],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "trading_calendar_unavailable"
+
+
+def test_tdx_asymmetric_match_rejects_ordinary_dividend():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(
+            source_event_category="年度分红",
+        ),
+        tdx_events=[_tdx_event()],
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == "cninfo_special_category_out_of_scope"
+
+
+def test_tdx_asymmetric_match_rejects_all_zero_economics():
+    result = classify_cninfo_tdx_asymmetric_match(
+        observation=_tdx_match_observation(
+            capitalization_shares_per_share=0.0,
+        ),
+        tdx_events=[_tdx_event(songzhuangu=0.0)],
+        trading_sessions=[date(2007, 5, 31), date(2007, 6, 1)],
+    )
+
+    assert result["eligible"] is False
+    assert result["reason"] == (
+        "cninfo_observation_has_no_positive_economic_term"
+    )
+
+
+@pytest.mark.asyncio
+async def test_tdx_asymmetric_batch_persists_approved_lineage_without_io():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{
+            **_tdx_match_observation(),
+            "source_profile": "cninfo_dividend",
+            "announcement_date": "2007-05-30",
+            "share_arrival_date": None,
+            "pay_date": None,
+            "currency": "CNY",
+            "description": "10转增4股",
+            "raw_payload_json": json.dumps({"分红类型": "股改分红"}),
+            "latest_analysis_id": 831,
+        }],
+        [],
+        [_tdx_event()],
+    ])
+    manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
+        {"date": "2007-05-31", "is_trading_day": True},
+        {"date": "2007-06-01", "is_trading_day": True},
+    ])
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={"review": {"status": "inserted"}}
+    )
+
+    result = await manager._review_cninfo_tdx_asymmetric_match_batch(
+        items=[{
+            "instrument_id": "000423.SZ",
+            "source_event_key": "event-1",
+        }],
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 24),
+        exchanges=["SZSE"],
+        dry_run=False,
+        exclude_reviewed_events=True,
+        ingestion_run_id="run-1",
+        sample_limit=20,
+    )
+
+    assert result["eligible"] == 1
+    assert result["promoted"] == 1
+    assert result["network_access"] is False
+    assert result["llm_invocations"] == 0
+    saved = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    assert saved["review_row"]["decision"] == "resolved"
+    assert saved["review_row"]["effective_date"] == "2007-06-01"
+    assert saved["review_row"]["review_payload"][
+        "approval_classification"
+    ] == "approved_asymmetric"
+    assert saved["terms_row"]["evidence"]["factor_effect"] == "normal"
+    assert saved["evidence_row"]["evidence_source"] == (
+        "cninfo_tdx_xdxr_review"
+    )
+    tdx_query_params = (
+        manager.db_ops.execute_read_query.await_args_list[2].args[1]
+    )
+    assert tdx_query_params["tdx_asymmetric_start"] == "1990-12-05"
+    assert tdx_query_params["tdx_asymmetric_end"] == "2026-08-07"
+
+
+@pytest.mark.asyncio
+async def test_tdx_asymmetric_batch_dry_run_records_mismatch_without_write():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [{
+            **_tdx_match_observation(),
+            "source_profile": "cninfo_dividend",
+            "announcement_date": "2007-05-30",
+            "share_arrival_date": None,
+            "pay_date": None,
+            "currency": "CNY",
+            "description": "10转增4股",
+            "raw_payload_json": json.dumps({"分红类型": "股改分红"}),
+            "latest_analysis_id": 831,
+        }],
+        [],
+        [_tdx_event(songzhuangu=4.2)],
+    ])
+    manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
+        {"date": "2007-05-31", "is_trading_day": True},
+        {"date": "2007-06-01", "is_trading_day": True},
+    ])
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock()
+
+    result = await manager._review_cninfo_tdx_asymmetric_match_batch(
+        items=[{
+            "instrument_id": "000423.SZ",
+            "source_event_key": "event-1",
+        }],
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 24),
+        exchanges=["SZSE"],
+        dry_run=True,
+        exclude_reviewed_events=True,
+        ingestion_run_id="run-1",
+        sample_limit=20,
+    )
+
+    assert result["eligible"] == 0
+    assert result["blocked"] == 1
+    assert result["mismatch_reason_counts"] == {
+        "tdx_economic_conflict": 1
+    }
+    assert len(result["mismatches"]) == 1
+    manager.db_ops.save_corporate_action_review_bundle.assert_not_awaited()
 
 
 def test_asymmetric_passthrough_accepts_matching_persisted_cninfo_terms():
@@ -1363,6 +1623,108 @@ async def test_asymmetric_review_scope_does_not_run_discovery_or_llm():
 
 
 @pytest.mark.asyncio
+async def test_tdx_asymmetric_review_scope_does_not_run_discovery_or_llm():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    inventory = [_state(
+        "event-1",
+        "manual_required",
+        candidate_count=1,
+        next_action="human_review",
+    )]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[inventory, inventory]
+    )
+    manager._review_cninfo_tdx_asymmetric_match_batch = AsyncMock(
+        return_value={
+            "status": "dry_run",
+            "scanned": 1,
+            "special_events": 1,
+            "eligible": 1,
+            "network_access": False,
+            "llm_invocations": 0,
+        }
+    )
+    manager.discover_cninfo_special_action_effective_dates = AsyncMock()
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock()
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "tdx_asymmetric_review"],
+        max_events=1,
+        dry_run=True,
+    )
+
+    stage = result["stages"]["tdx_asymmetric_review"]
+    assert stage["eligible"] == 1
+    assert result["targets"]["tdx_asymmetric_batch_events"] == 1
+    manager.discover_cninfo_special_action_effective_dates.assert_not_awaited()
+    manager.analyze_cninfo_corporate_action_candidates.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_tdx_asymmetric_write_pagination_compensates_for_promoted_rows():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    initial = [
+        _state(
+            f"event-{index}",
+            "manual_required",
+            candidate_count=1,
+            next_action="human_review",
+        )
+        for index in range(3)
+    ]
+    final = initial[1:]
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        side_effect=[initial, final]
+    )
+    manager._review_cninfo_tdx_asymmetric_match_batch = AsyncMock(
+        return_value={
+            "status": "success",
+            "scanned": 2,
+            "special_events": 2,
+            "eligible": 1,
+            "promoted": 1,
+            "updated": 0,
+            "unchanged": 0,
+            "blocked": 1,
+            "failed": 0,
+        }
+    )
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            "instrument_id": item["instrument_id"],
+            "source_event_key": item["source_event_key"],
+        }
+        for item in final
+    ])
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 2,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+
+    result = await manager.govern_cninfo_corporate_action_resolutions(
+        start_date="1990-12-19",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        scopes=["inventory", "tdx_asymmetric_review"],
+        max_events=2,
+        target_offset=0,
+        dry_run=False,
+    )
+
+    assert result["targets"]["tdx_asymmetric_has_more"] is True
+    assert result["targets"]["tdx_asymmetric_next_target_offset"] == 1
+
+
+@pytest.mark.asyncio
 async def test_asymmetric_write_pagination_compensates_for_promoted_rows():
     manager = DataManager()
     manager.db_ops = Mock()
@@ -1762,6 +2124,7 @@ async def test_inventory_preserves_prior_evidence_unavailable_state():
         "cninfo_reviewed_official_document",
         "cninfo_announcement_review",
         "cninfo_announcement",
+        "cninfo_tdx_xdxr_review",
     }
 
 

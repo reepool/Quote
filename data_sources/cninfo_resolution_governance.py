@@ -11,6 +11,15 @@ RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v5"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 CNINFO_ASYMMETRIC_POLICY_VERSION = "cninfo_asymmetric_passthrough_v1"
+CNINFO_TDX_ASYMMETRIC_POLICY_VERSION = "cninfo_tdx_asymmetric_match_v1"
+CNINFO_TDX_ASYMMETRIC_SPECIAL_CATEGORIES = {
+    "重整转增",
+    "股改分红",
+    "承诺补偿",
+}
+CNINFO_TDX_ASYMMETRIC_FIELD_TOLERANCE = 0.0001
+CNINFO_TDX_ASYMMETRIC_MAX_SESSION_SHIFT = 3
+CNINFO_TDX_ASYMMETRIC_NEARBY_CALENDAR_DAYS = 14
 
 _ASYMMETRIC_BENEFICIARY_MARKERS = (
     "流通股股东",
@@ -448,6 +457,264 @@ def classify_cninfo_asymmetric_passthrough(
         "analysis_economics": analysis_economics,
         "economic_differences": economic_differences,
         "policy_version": CNINFO_ASYMMETRIC_POLICY_VERSION,
+    }
+
+
+def _tdx_asymmetric_economics(
+    observation: Mapping[str, Any],
+    tdx_event: Mapping[str, Any],
+) -> tuple[dict[str, float], dict[str, float], dict[str, float]]:
+    cninfo = {
+        "cash_per_share": float(
+            observation.get("cash_dividend_per_share") or 0
+        ),
+        "bonus_per_share": (
+            float(observation.get("bonus_shares_per_share") or 0)
+            + float(observation.get("capitalization_shares_per_share") or 0)
+        ),
+        "rights_per_share": float(
+            observation.get("rights_shares_per_share") or 0
+        ),
+        "rights_price": float(observation.get("rights_price") or 0),
+    }
+    tdx = {
+        "cash_per_share": float(tdx_event.get("fenhong") or 0) / 10.0,
+        "bonus_per_share": float(tdx_event.get("songzhuangu") or 0) / 10.0,
+        "rights_per_share": float(tdx_event.get("peigu") or 0) / 10.0,
+        "rights_price": float(tdx_event.get("peigujia") or 0),
+    }
+    differences = {
+        field_name: abs(cninfo[field_name] - tdx[field_name])
+        for field_name in cninfo
+    }
+    if cninfo["rights_per_share"] <= 0 and tdx["rights_per_share"] <= 0:
+        differences["rights_price"] = 0.0
+    return cninfo, tdx, differences
+
+
+def _tdx_asymmetric_date_match(
+    observation: Mapping[str, Any],
+    tdx_date: date,
+    trading_sessions: Sequence[date],
+    *,
+    max_session_shift: int,
+) -> dict[str, Any]:
+    direct_roles = (
+        ("ex_date", _as_date(observation.get("ex_date"))),
+        (
+            "share_arrival_date",
+            _as_date(observation.get("share_arrival_date")),
+        ),
+        ("pay_date", _as_date(observation.get("pay_date"))),
+    )
+    for role, value in direct_roles:
+        if value is not None and value == tdx_date:
+            return {
+                "compatible": True,
+                "matched_role": role,
+                "trading_session_distance": 0,
+            }
+
+    record_date = _as_date(observation.get("record_date"))
+    if record_date is None:
+        return {
+            "compatible": False,
+            "reason": "cninfo_comparison_date_missing",
+        }
+    if tdx_date == record_date:
+        return {
+            "compatible": True,
+            "matched_role": "record_date",
+            "trading_session_distance": 0,
+        }
+    if tdx_date < record_date:
+        return {
+            "compatible": False,
+            "reason": "tdx_date_precedes_record_date",
+        }
+    if not trading_sessions:
+        return {
+            "compatible": False,
+            "reason": "trading_calendar_unavailable",
+        }
+    distance = sum(
+        record_date < session <= tdx_date
+        for session in trading_sessions
+    )
+    if (
+        distance <= 0
+        or distance > max_session_shift
+        or tdx_date not in trading_sessions
+    ):
+        return {
+            "compatible": False,
+            "reason": "tdx_date_outside_allowed_session_window",
+            "trading_session_distance": distance,
+        }
+    return {
+        "compatible": True,
+        "matched_role": "record_date_forward_session",
+        "trading_session_distance": distance,
+    }
+
+
+def classify_cninfo_tdx_asymmetric_match(
+    *,
+    observation: Mapping[str, Any],
+    tdx_events: Sequence[Mapping[str, Any]],
+    trading_sessions: Sequence[date] = (),
+    field_tolerance: float = CNINFO_TDX_ASYMMETRIC_FIELD_TOLERANCE,
+    max_session_shift: int = CNINFO_TDX_ASYMMETRIC_MAX_SESSION_SHIFT,
+    nearby_calendar_days: int = CNINFO_TDX_ASYMMETRIC_NEARBY_CALENDAR_DAYS,
+) -> dict[str, Any]:
+    """Return a conservative persisted CNInfo/TDX special-event comparison."""
+    source_category = str(
+        observation.get("source_event_category") or ""
+    ).strip()
+    if source_category not in CNINFO_TDX_ASYMMETRIC_SPECIAL_CATEGORIES:
+        return {
+            "eligible": False,
+            "reason": "cninfo_special_category_out_of_scope",
+            "source_event_category": source_category,
+        }
+
+    if not any(
+        float(observation.get(field_name) or 0) > 0
+        for field_name in (
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+            "rights_shares_per_share",
+        )
+    ):
+        return {
+            "eligible": False,
+            "reason": "cninfo_observation_has_no_positive_economic_term",
+            "source_event_category": source_category,
+        }
+
+    relevant_dates = [
+        parsed
+        for field_name in (
+            "ex_date",
+            "record_date",
+            "share_arrival_date",
+            "pay_date",
+        )
+        if (parsed := _as_date(observation.get(field_name))) is not None
+    ]
+    if not relevant_dates:
+        return {
+            "eligible": False,
+            "reason": "cninfo_comparison_date_missing",
+            "source_event_category": source_category,
+        }
+
+    instrument_id = str(observation.get("instrument_id") or "").strip()
+    nearby_events = []
+    for row in tdx_events:
+        if str(row.get("instrument_id") or "").strip() != instrument_id:
+            continue
+        tdx_date = _as_date(row.get("ex_date"))
+        if tdx_date is None:
+            continue
+        if min(abs((tdx_date - value).days) for value in relevant_dates) <= max(
+            0, int(nearby_calendar_days)
+        ):
+            nearby_events.append((row, tdx_date))
+    if not nearby_events:
+        return {
+            "eligible": False,
+            "reason": "tdx_event_not_found_near_cninfo_dates",
+            "source_event_category": source_category,
+            "cninfo_dates": sorted(value.isoformat() for value in relevant_dates),
+        }
+
+    economic_matches = []
+    candidate_details = []
+    normalized_tolerance = max(0.0, float(field_tolerance))
+    for row, tdx_date in nearby_events:
+        cninfo_terms, tdx_terms, differences = _tdx_asymmetric_economics(
+            observation,
+            row,
+        )
+        date_match = _tdx_asymmetric_date_match(
+            observation,
+            tdx_date,
+            trading_sessions,
+            max_session_shift=max(0, int(max_session_shift)),
+        )
+        detail = {
+            "tdx_id": row.get("id"),
+            "tdx_ex_date": tdx_date.isoformat(),
+            "tdx_factor": row.get("factor"),
+            "tdx_validation_result": row.get("validation_result"),
+            "tdx_raw_fields": {
+                "fenhong": row.get("fenhong"),
+                "songzhuangu": row.get("songzhuangu"),
+                "peigu": row.get("peigu"),
+                "peigujia": row.get("peigujia"),
+            },
+            "cninfo_terms": cninfo_terms,
+            "tdx_terms": tdx_terms,
+            "differences": differences,
+            "date_match": date_match,
+        }
+        candidate_details.append(detail)
+        if all(
+            difference <= normalized_tolerance
+            for difference in differences.values()
+        ):
+            economic_matches.append(detail)
+
+    if not economic_matches:
+        return {
+            "eligible": False,
+            "reason": "tdx_economic_conflict",
+            "source_event_category": source_category,
+            "candidate_details": candidate_details,
+        }
+
+    compatible_matches = [
+        item for item in economic_matches
+        if item["date_match"].get("compatible")
+    ]
+    if not compatible_matches:
+        reasons = {
+            str(item["date_match"].get("reason") or "")
+            for item in economic_matches
+        }
+        reason = (
+            "trading_calendar_unavailable"
+            if reasons == {"trading_calendar_unavailable"}
+            else "tdx_date_conflict"
+        )
+        return {
+            "eligible": False,
+            "reason": reason,
+            "source_event_category": source_category,
+            "candidate_details": economic_matches,
+        }
+    if len(compatible_matches) != 1:
+        return {
+            "eligible": False,
+            "reason": "ambiguous_tdx_event_match",
+            "source_event_category": source_category,
+            "candidate_details": compatible_matches,
+        }
+
+    selected = compatible_matches[0]
+    return {
+        "eligible": True,
+        "reason": "cninfo_tdx_asymmetric_event_match",
+        "approval_classification": "approved_asymmetric",
+        "policy_version": CNINFO_TDX_ASYMMETRIC_POLICY_VERSION,
+        "source_event_category": source_category,
+        "effective_date": selected["tdx_ex_date"],
+        "date_basis": "TDX XDXR对照日",
+        "selected_tdx_event": selected,
+        "field_tolerance": normalized_tolerance,
+        "max_session_shift": max(0, int(max_session_shift)),
     }
 
 

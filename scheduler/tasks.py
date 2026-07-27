@@ -640,6 +640,7 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
     stages = result.get("stages") or {}
     discovery = stages.get("discovery") or {}
     asymmetric_review = stages.get("asymmetric_review") or {}
+    tdx_asymmetric_review = stages.get("tdx_asymmetric_review") or {}
     title_classification = discovery.get("title_classification") or {}
     state_counts = inventory.get("state_counts") or {}
     next_actions = inventory.get("next_action_counts") or {}
@@ -715,6 +716,33 @@ def _format_cninfo_resolution_governance_report(result: Dict[str, Any]) -> str:
                 *(
                     f"{key}: {value}"
                     for key, value in sorted(blocked_reasons.items())
+                ),
+                "```",
+            ])
+    if tdx_asymmetric_review:
+        lines.extend([
+            "TDX非对称对账: `"
+            f"scanned={tdx_asymmetric_review.get('scanned', 0)}, "
+            f"special={tdx_asymmetric_review.get('special_events', 0)}, "
+            f"matched={tdx_asymmetric_review.get('eligible', 0)}, "
+            f"promoted={tdx_asymmetric_review.get('promoted', 0)}, "
+            f"skipped={tdx_asymmetric_review.get('skipped', 0)}, "
+            f"blocked={tdx_asymmetric_review.get('blocked', 0)}, "
+            f"failed={tdx_asymmetric_review.get('failed', 0)}`",
+            "TDX非对称隔离: `"
+            f"network_access={tdx_asymmetric_review.get('network_access')}, "
+            f"llm_invocations={tdx_asymmetric_review.get('llm_invocations', 0)}`",
+        ])
+        mismatch_reasons = (
+            tdx_asymmetric_review.get("mismatch_reason_counts") or {}
+        )
+        if mismatch_reasons:
+            lines.extend([
+                "TDX非对称不一致原因:",
+                "```text",
+                *(
+                    f"{key}: {value}"
+                    for key, value in sorted(mismatch_reasons.items())
                 ),
                 "```",
             ])
