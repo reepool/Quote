@@ -44,6 +44,7 @@ GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES = (
     "cninfo_announcement",
     "cninfo_tdx_xdxr_review",
     "cninfo_tdx_xdxr_operator_review",
+    "cninfo_operator_attestation",
 )
 
 
@@ -5566,25 +5567,71 @@ class DatabaseOperations:
         self,
         source_event_keys: List[str],
     ) -> Dict[str, Dict[str, Any]]:
-        """Return reviewed economic overlays keyed by source event."""
+        """Return economic overlays plus explicit review-only no-effect policies."""
         keys = sorted({str(item).strip() for item in source_event_keys if str(item).strip()})
         if not keys:
             return {}
         rows = []
+        review_rows = []
         async with self.get_async_session() as session:
             for offset in range(0, len(keys), 400):
+                chunk = keys[offset: offset + 400]
                 rows.extend((await session.execute(
                     select(CorporateActionResolvedTermsDB).where(
                         CorporateActionResolvedTermsDB.source_event_key.in_(
-                            keys[offset: offset + 400]
+                            chunk
                         ),
                         CorporateActionResolvedTermsDB.is_active.is_(True),
                     )
                 )).scalars().all())
-        return {
+                review_rows.extend((await session.execute(
+                    select(CorporateActionResolutionReviewDB).where(
+                        CorporateActionResolutionReviewDB.source_event_key.in_(
+                            chunk
+                        ),
+                    ).order_by(
+                        CorporateActionResolutionReviewDB.id.desc()
+                    )
+                )).scalars().all())
+        result = {
             row.source_event_key: self._resolved_terms_payload(row)
             for row in rows
         }
+        seen_review_events = set()
+        for review in review_rows:
+            if (
+                review.source_event_key in result
+                or review.source_event_key in seen_review_events
+            ):
+                continue
+            seen_review_events.add(review.source_event_key)
+            if str(review.decision or "").strip() != "resolved":
+                continue
+            payload = json.loads(review.review_payload_json or "{}")
+            if (
+                payload.get("resolution_policy")
+                != "cninfo_operator_attested_passthrough_v1"
+                or str(payload.get("factor_effect") or "").strip().lower()
+                != "none"
+            ):
+                continue
+            result[review.source_event_key] = {
+                "cash_dividend_per_share": None,
+                "bonus_shares_per_share": None,
+                "capitalization_shares_per_share": None,
+                "rights_shares_per_share": None,
+                "rights_price": None,
+                "currency": None,
+                "resolved_fields": [],
+                "evidence": payload,
+                "factor_effect": "none",
+                "factor_override": None,
+                "factor_reference": {},
+                "authoritative_override": False,
+                "analysis_id": None,
+                "review_id": review.id,
+            }
+        return result
 
     @staticmethod
     def _resolved_terms_payload(
@@ -5943,6 +5990,8 @@ class DatabaseOperations:
     async def get_resolved_corporate_action_effective_dates(
         self,
         source_event_keys: List[str],
+        *,
+        _session: Any = None,
     ) -> Dict[str, Dict[str, Any]]:
         """Return one resolved date per source event for factor derivation."""
         normalized_keys = sorted({
@@ -5950,53 +5999,98 @@ class DatabaseOperations:
         })
         if not normalized_keys:
             return {}
+        if _session is None:
+            async with self.get_async_session() as session:
+                return await self.get_resolved_corporate_action_effective_dates(
+                    normalized_keys,
+                    _session=session,
+                )
         rows = []
         current_reviews_by_event: Dict[
             str, CorporateActionResolutionReviewDB
         ] = {}
-        async with self.get_async_session() as session:
-            for offset in range(0, len(normalized_keys), 400):
-                chunk = normalized_keys[offset: offset + 400]
-                rows.extend((await session.execute(
-                    select(CorporateActionEffectiveDateEvidenceDB).where(
-                        CorporateActionEffectiveDateEvidenceDB.source_event_key.in_(
-                            chunk
-                        ),
-                        CorporateActionEffectiveDateEvidenceDB.resolution_status
-                        == "resolved",
-                        CorporateActionEffectiveDateEvidenceDB.observation_source
-                        == "cninfo",
-                        CorporateActionEffectiveDateEvidenceDB.evidence_source.in_(
-                            GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
-                        ),
-                        CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(
-                            None
-                        ),
-                    ).order_by(
-                        CorporateActionEffectiveDateEvidenceDB.updated_at.desc(),
-                        CorporateActionEffectiveDateEvidenceDB.id.desc(),
+        latest_reviews_by_event: Dict[
+            str, CorporateActionResolutionReviewDB
+        ] = {}
+        operator_attestation_events = set()
+        session = _session
+        for offset in range(0, len(normalized_keys), 400):
+            chunk = normalized_keys[offset: offset + 400]
+            rows.extend((await session.execute(
+                select(CorporateActionEffectiveDateEvidenceDB).where(
+                    CorporateActionEffectiveDateEvidenceDB.source_event_key.in_(
+                        chunk
+                    ),
+                    CorporateActionEffectiveDateEvidenceDB.resolution_status
+                    == "resolved",
+                    CorporateActionEffectiveDateEvidenceDB.observation_source
+                    == "cninfo",
+                    CorporateActionEffectiveDateEvidenceDB.evidence_source.in_(
+                        GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+                    ),
+                    CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(
+                        None
+                    ),
+                ).order_by(
+                    CorporateActionEffectiveDateEvidenceDB.updated_at.desc(),
+                    CorporateActionEffectiveDateEvidenceDB.id.desc(),
+                )
+            )).scalars().all())
+            current_review_rows = (await session.execute(
+                select(
+                    CorporateActionResolvedTermsDB.source_event_key,
+                    CorporateActionResolutionReviewDB,
+                )
+                .join(
+                    CorporateActionResolutionReviewDB,
+                    CorporateActionResolutionReviewDB.id
+                    == CorporateActionResolvedTermsDB.review_id,
+                )
+                .where(
+                    CorporateActionResolvedTermsDB.source_event_key.in_(
+                        chunk
+                    ),
+                    CorporateActionResolvedTermsDB.is_active.is_(True),
+                )
+            )).all()
+            current_reviews_by_event.update({
+                source_event_key: review
+                for source_event_key, review in current_review_rows
+            })
+            review_rows = (await session.execute(
+                select(CorporateActionResolutionReviewDB).where(
+                    CorporateActionResolutionReviewDB.source_event_key.in_(
+                        chunk
+                    ),
+                ).order_by(
+                    CorporateActionResolutionReviewDB.id.desc()
+                )
+            )).scalars().all()
+            for review in review_rows:
+                latest_reviews_by_event.setdefault(
+                    review.source_event_key,
+                    review,
+                )
+                try:
+                    review_payload = json.loads(
+                        review.review_payload_json or "{}"
                     )
-                )).scalars().all())
-                current_review_rows = (await session.execute(
-                    select(
-                        CorporateActionResolvedTermsDB.source_event_key,
-                        CorporateActionResolutionReviewDB,
+                except (TypeError, ValueError):
+                    review_payload = {}
+                if (
+                    review_payload.get("resolution_policy")
+                    == "cninfo_operator_attested_passthrough_v1"
+                ):
+                    operator_attestation_events.add(
+                        review.source_event_key
                     )
-                    .join(
-                        CorporateActionResolutionReviewDB,
-                        CorporateActionResolutionReviewDB.id
-                        == CorporateActionResolvedTermsDB.review_id,
-                    )
-                    .where(
-                        CorporateActionResolvedTermsDB.source_event_key.in_(
-                            chunk
-                        ),
-                    )
-                )).all()
-                current_reviews_by_event.update({
-                    source_event_key: review
-                    for source_event_key, review in current_review_rows
-                })
+        for source_event_key in operator_attestation_events:
+            current_review = latest_reviews_by_event.get(source_event_key)
+            if current_review is not None:
+                current_reviews_by_event.setdefault(
+                    source_event_key,
+                    current_review,
+                )
         rows_by_event: Dict[str, List[Any]] = {}
         for row in rows:
             rows_by_event.setdefault(row.source_event_key, []).append(row)
@@ -6167,6 +6261,8 @@ class DatabaseOperations:
                     CorporateActionEffectiveDateEvidenceDB.instrument_id,
                     CorporateActionEffectiveDateEvidenceDB.source_event_key,
                     CorporateActionEffectiveDateEvidenceDB.announcement_id,
+                    CorporateActionEffectiveDateEvidenceDB.evidence_source,
+                    CorporateActionEffectiveDateEvidenceDB.evidence_key,
                 ).where(
                     evidence_identity.in_(selected_identities),
                     CorporateActionEffectiveDateEvidenceDB.observation_source == "cninfo",
@@ -6177,6 +6273,31 @@ class DatabaseOperations:
                     CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(None),
                 )
             )).all()
+            attested_event_keys = {
+                row.source_event_key for row in protected_rows
+                if row.evidence_source == "cninfo_operator_attestation"
+            }
+            if attested_event_keys:
+                current_dates = (
+                    await self.get_resolved_corporate_action_effective_dates(
+                        sorted(attested_event_keys),
+                        _session=session,
+                    )
+                )
+                protected_rows = [
+                    row for row in protected_rows
+                    if (
+                        row.source_event_key not in attested_event_keys
+                        or (
+                            current_dates.get(row.source_event_key, {}).get(
+                                "evidence_source"
+                            ) == row.evidence_source
+                            and current_dates.get(
+                                row.source_event_key, {}
+                            ).get("evidence_key") == row.evidence_key
+                        )
+                    )
+                ]
             protected_identities = {
                 (row.instrument_id, row.source_event_key) for row in protected_rows
             }

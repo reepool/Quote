@@ -1,5 +1,6 @@
 import asyncio
 from datetime import date, datetime
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from sqlalchemy import select
@@ -7,11 +8,14 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.models import (
     Base,
+    CorporateActionDocumentArtifactDB,
+    CorporateActionDocumentPageDB,
     CorporateActionEffectiveDateEvidenceDB,
     CorporateActionInstrumentStatusDB,
     CorporateActionLlmAnalysisDB,
     CorporateActionObservationDB,
     CorporateActionResolutionReviewDB,
+    CorporateActionResolutionStateDB,
     CorporateActionResolvedTermsDB,
     InstrumentDB,
 )
@@ -284,6 +288,278 @@ def test_effective_date_uses_active_superseding_review():
 
 def test_operator_tdx_date_evidence_is_loaded_and_reset_protected():
     asyncio.run(_exercise_operator_tdx_date_evidence_is_governed())
+
+
+def test_operator_attestation_date_is_loaded_and_reset_protected():
+    asyncio.run(_exercise_operator_attestation_date_is_governed())
+
+
+async def _exercise_operator_attestation_date_is_governed():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
+                CorporateActionEffectiveDateEvidenceDB.__table__,
+                CorporateActionResolutionStateDB.__table__,
+                CorporateActionDocumentArtifactDB.__table__,
+                CorporateActionDocumentPageDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="002192.SZ",
+            symbol="002192",
+            name="Test",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        session.add(CorporateActionObservationDB(
+            instrument_id="002192.SZ",
+            source="cninfo",
+            source_profile="cninfo_dividend",
+            source_event_key="event-operator-attestation",
+            action_type="dividend",
+            pay_date=date(2017, 8, 29),
+            cash_dividend_per_share=0.04754,
+            row_hash="observation-attestation",
+        ))
+        old_review = CorporateActionResolutionReviewDB(
+            review_key="review-attestation-old",
+            instrument_id="002192.SZ",
+            source_event_key="event-operator-attestation",
+            evidence_key="operator_attestation:old-decision",
+            decision="resolved",
+            effective_date=datetime(2017, 8, 28),
+            date_basis="旧批示日期",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"normal",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+        )
+        session.add(old_review)
+        await session.flush()
+        current_review = CorporateActionResolutionReviewDB(
+            review_key="review-attestation-current",
+            instrument_id="002192.SZ",
+            source_event_key="event-operator-attestation",
+            evidence_key="operator_attestation:current-decision",
+            decision="resolved",
+            effective_date=datetime(2017, 8, 29),
+            date_basis="用户核准的外部补偿金派发日",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"normal",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+            supersedes_review_id=old_review.id,
+        )
+        session.add(current_review)
+        for review, evidence_key, effective_date, date_basis in (
+            (
+                old_review,
+                "operator_attestation:old-decision",
+                datetime(2017, 8, 28),
+                "旧批示日期",
+            ),
+            (
+                current_review,
+                "operator_attestation:current-decision",
+                datetime(2017, 8, 29),
+                "用户核准的外部补偿金派发日",
+            ),
+        ):
+            session.add(CorporateActionEffectiveDateEvidenceDB(
+                instrument_id="002192.SZ",
+                source_event_key="event-operator-attestation",
+                observation_source="cninfo",
+                source_profile="cninfo_dividend",
+                evidence_source="cninfo_operator_attestation",
+                evidence_key=evidence_key,
+                resolution_status="resolved",
+                effective_date=effective_date,
+                date_basis=date_basis,
+                raw_payload_json=(
+                    '{"review_key":"' + review.review_key + '"}'
+                ),
+                row_hash=evidence_key,
+            ))
+        session.add(CorporateActionEffectiveDateEvidenceDB(
+            instrument_id="002192.SZ",
+            source_event_key="event-operator-attestation",
+            observation_source="cninfo",
+            source_profile="cninfo_dividend",
+            evidence_source="cninfo_reviewed_official_document",
+            evidence_key="announcement-before-attestation",
+            resolution_status="resolved",
+            effective_date=datetime(2017, 8, 27),
+            date_basis="旧公告日期",
+            raw_payload_json='{"review_key":"review-before-attestation"}',
+            row_hash="announcement-before-attestation",
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    session_provider = Mock(side_effect=session_factory)
+    operations.get_async_session = session_provider
+    resolved = await operations.get_resolved_corporate_action_effective_dates(
+        ["event-operator-attestation"]
+    )
+    reset_preview = (
+        await operations.reset_cninfo_corporate_action_resolution_data(
+            start_date=date(2017, 1, 1),
+            end_date=date(2017, 12, 31),
+            exchanges=["SZSE"],
+            source_event_keys=["event-operator-attestation"],
+            dry_run=True,
+        )
+    )
+    assert session_provider.call_count == 2
+
+    assert (
+        "cninfo_operator_attestation"
+        in GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+    )
+    assert resolved["event-operator-attestation"]["effective_date"].date() == (
+        date(2017, 8, 29)
+    )
+    assert resolved["event-operator-attestation"]["evidence_source"] == (
+        "cninfo_operator_attestation"
+    )
+    assert reset_preview["protected_resolved_events"] == 1
+    assert reset_preview["reset_events"] == 0
+
+    async with session_factory() as session:
+        session.add(CorporateActionResolutionReviewDB(
+            review_key="review-attestation-rejected",
+            instrument_id="002192.SZ",
+            source_event_key="event-operator-attestation",
+            evidence_key="operator_attestation:current-decision",
+            decision="rejected",
+            reviewer="operator",
+            review_payload_json="{}",
+            supersedes_review_id=current_review.id,
+        ))
+        await session.commit()
+
+    assert (
+        await operations.get_resolved_corporate_action_effective_dates(
+            ["event-operator-attestation"]
+        )
+    ) == {}
+    revoked_reset_preview = (
+        await operations.reset_cninfo_corporate_action_resolution_data(
+            start_date=date(2017, 1, 1),
+            end_date=date(2017, 12, 31),
+            exchanges=["SZSE"],
+            source_event_keys=["event-operator-attestation"],
+            dry_run=True,
+        )
+    )
+    assert session_provider.call_count == 4
+    assert revoked_reset_preview["protected_resolved_events"] == 0
+    assert revoked_reset_preview["reset_events"] == 1
+    await engine.dispose()
+
+
+def test_operator_attestation_supersedes_inactive_terms_review():
+    asyncio.run(_exercise_attestation_supersedes_inactive_terms_review())
+
+
+async def _exercise_attestation_supersedes_inactive_terms_review():
+    event_key = "event-attestation-after-overlay"
+    old_review = CorporateActionResolutionReviewDB(
+        id=1,
+        review_key="review-attestation-overlay-old",
+        instrument_id="002192.SZ",
+        source_event_key=event_key,
+        evidence_key="announcement-old",
+        decision="resolved",
+        effective_date=datetime(2017, 8, 28),
+        date_basis="旧公告日期",
+        reviewer="operator",
+        review_payload_json='{"factor_effect":"normal"}',
+    )
+    current_review = CorporateActionResolutionReviewDB(
+        id=2,
+        review_key="review-attestation-after-overlay",
+        instrument_id="002192.SZ",
+        source_event_key=event_key,
+        evidence_key="operator_attestation:current",
+        decision="resolved",
+        effective_date=datetime(2017, 8, 29),
+        date_basis="用户核准日期",
+        reviewer="operator",
+        review_payload_json=(
+            '{"factor_effect":"none",'
+            '"resolution_policy":'
+            '"cninfo_operator_attested_passthrough_v1"}'
+        ),
+        supersedes_review_id=1,
+    )
+    old_evidence = CorporateActionEffectiveDateEvidenceDB(
+        source_event_key=event_key,
+        evidence_source="cninfo_reviewed_official_document",
+        evidence_key="announcement-old",
+        effective_date=datetime(2017, 8, 28),
+        date_basis="旧公告日期",
+        raw_payload_json='{"review_key":"review-attestation-overlay-old"}',
+    )
+    current_evidence = CorporateActionEffectiveDateEvidenceDB(
+        source_event_key=event_key,
+        evidence_source="cninfo_operator_attestation",
+        evidence_key="operator_attestation:current",
+        effective_date=datetime(2017, 8, 29),
+        date_basis="用户核准日期",
+        raw_payload_json='{"review_key":"review-attestation-after-overlay"}',
+    )
+    evidence_result = Mock()
+    evidence_result.scalars.return_value.all.return_value = [
+        current_evidence,
+        old_evidence,
+    ]
+    active_terms_result = Mock()
+    active_terms_result.all.return_value = []
+    reviews_result = Mock()
+    reviews_result.scalars.return_value.all.return_value = [
+        current_review,
+        old_review,
+    ]
+    session = Mock()
+    session.execute = AsyncMock(side_effect=[
+        evidence_result,
+        active_terms_result,
+        reviews_result,
+    ])
+    session_context = AsyncMock()
+    session_context.__aenter__.return_value = session
+    session_context.__aexit__.return_value = False
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = Mock(return_value=session_context)
+    resolved = await operations.get_resolved_corporate_action_effective_dates(
+        [event_key]
+    )
+
+    active_terms_query = session.execute.await_args_list[1].args[0]
+    assert "corporate_action_resolved_terms.is_active IS true" in str(
+        active_terms_query
+    )
+    assert resolved[event_key]["effective_date"].date() == date(2017, 8, 29)
+    assert resolved[event_key]["evidence_source"] == (
+        "cninfo_operator_attestation"
+    )
+    assert resolved[event_key]["evidence_key"] == "operator_attestation:current"
 
 
 async def _exercise_operator_tdx_date_evidence_is_governed():
@@ -658,4 +934,171 @@ async def _exercise_coverage_is_versioned_by_requested_range():
         (date(1990, 1, 1), date(2026, 12, 31)),
         (date(2020, 1, 1), date(2020, 12, 31)),
     }
+    await engine.dispose()
+
+
+def test_resolved_terms_loads_latest_operator_attested_no_effect_policy():
+    asyncio.run(_exercise_operator_attested_no_effect_policy_loading())
+
+
+async def _exercise_operator_attested_no_effect_policy_loading():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+                CorporateActionResolvedTermsDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="002192.SZ",
+            symbol="002192",
+            name="Test",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        attested_review = CorporateActionResolutionReviewDB(
+            review_key="review-attested",
+            instrument_id="002192.SZ",
+            source_event_key="event-attested",
+            evidence_key="operator_attestation:key",
+            decision="resolved",
+            effective_date=datetime(2017, 8, 29),
+            date_basis="用户核准的外部补偿金派发日",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"none",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+        )
+        session.add(attested_review)
+        await session.flush()
+        old_attested = CorporateActionResolutionReviewDB(
+            review_key="review-old-attested",
+            instrument_id="002192.SZ",
+            source_event_key="event-latest-normal",
+            evidence_key="operator_attestation:old",
+            decision="resolved",
+            effective_date=datetime(2019, 10, 24),
+            date_basis="旧批示",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"none",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+        )
+        session.add(old_attested)
+        await session.flush()
+        session.add(CorporateActionResolutionReviewDB(
+            review_key="review-latest-normal",
+            instrument_id="002192.SZ",
+            source_event_key="event-latest-normal",
+            evidence_key="announcement-1",
+            decision="resolved",
+            effective_date=datetime(2019, 10, 25),
+            date_basis="官方日期",
+            reviewer="operator",
+            review_payload_json='{"factor_effect":"normal"}',
+        ))
+        revoked_attested = CorporateActionResolutionReviewDB(
+            review_key="review-revoked-attested",
+            instrument_id="002192.SZ",
+            source_event_key="event-revoked",
+            evidence_key="operator_attestation:revoked",
+            decision="resolved",
+            effective_date=datetime(2019, 10, 25),
+            date_basis="旧批示",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"none",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+        )
+        session.add(revoked_attested)
+        await session.flush()
+        session.add(CorporateActionResolutionReviewDB(
+            review_key="review-revocation",
+            instrument_id="002192.SZ",
+            source_event_key="event-revoked",
+            evidence_key="operator_attestation:revoked",
+            decision="rejected",
+            reviewer="operator",
+            review_payload_json="{}",
+            supersedes_review_id=revoked_attested.id,
+        ))
+        analysis = CorporateActionLlmAnalysisDB(
+            analysis_key="analysis-overlay",
+            instrument_id="002192.SZ",
+            source_event_key="event-overlay",
+            analysis_status="completed",
+            validation_status="manual_required",
+            profile="semantic_extraction",
+            schema_version="v1",
+            prompt_version="v1",
+            parser_version="v1",
+            input_hash="input-overlay",
+            artifact_ids_json="[]",
+            gate_results_json="{}",
+        )
+        session.add(analysis)
+        await session.flush()
+        overlay_review = CorporateActionResolutionReviewDB(
+            review_key="review-overlay",
+            instrument_id="002192.SZ",
+            source_event_key="event-overlay",
+            analysis_id=analysis.id,
+            evidence_key="announcement-overlay",
+            decision="resolved",
+            effective_date=datetime(2020, 1, 1),
+            date_basis="官方日期",
+            reviewer="operator",
+            review_payload_json=(
+                '{"factor_effect":"none",'
+                '"resolution_policy":'
+                '"cninfo_operator_attested_passthrough_v1"}'
+            ),
+        )
+        session.add(overlay_review)
+        await session.flush()
+        session.add(CorporateActionResolvedTermsDB(
+            instrument_id="002192.SZ",
+            source_event_key="event-overlay",
+            analysis_id=analysis.id,
+            review_id=overlay_review.id,
+            cash_dividend_per_share=0.2,
+            currency="CNY",
+            is_active=True,
+            resolved_fields_json='["cash_dividend_per_share"]',
+            evidence_json='{"factor_effect":"normal"}',
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    resolved = await operations.get_corporate_action_resolved_terms([
+        "event-attested",
+        "event-latest-normal",
+        "event-revoked",
+        "event-overlay",
+    ])
+
+    assert resolved["event-attested"]["factor_effect"] == "none"
+    assert resolved["event-attested"]["resolved_fields"] == []
+    assert resolved["event-attested"]["authoritative_override"] is False
+    assert "event-latest-normal" not in resolved
+    assert "event-revoked" not in resolved
+    assert resolved["event-overlay"]["factor_effect"] == "normal"
+    assert resolved["event-overlay"]["cash_dividend_per_share"] == pytest.approx(
+        0.2
+    )
     await engine.dispose()

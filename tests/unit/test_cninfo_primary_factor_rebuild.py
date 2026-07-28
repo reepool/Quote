@@ -247,6 +247,154 @@ async def test_tdx_operator_review_overrides_only_cninfo_factor_date(
 
 
 @pytest.mark.asyncio
+async def test_operator_attestation_overrides_cninfo_factor_date(monkeypatch):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    captured_rows = []
+    observation_queries = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    async def capture_query(query, params):
+        if "FROM corporate_action_observations" in query:
+            observation_queries.append(query)
+        return await original_query(query, params)
+
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=capture_query)
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2020, 5, 29),
+                "date_basis": "用户核准的首个复牌交易日",
+                "evidence_source": "cninfo_operator_attestation",
+                "evidence_key": "operator_attestation:decision",
+            }
+        }
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source_date": date(2020, 5, 29),
+            "effective_date": date(2020, 5, 29),
+            "pre_close": 13.5,
+            "close": 13.0,
+        }]
+    )
+
+    await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert len(observation_queries) == 1
+    assert "cninfo_operator_attested_passthrough_v1" in observation_queries[0]
+    assert captured_rows[0]["resolved_date_authoritative"] is True
+    assert captured_rows[0]["resolved_authoritative_override"] is False
+    assert captured_rows[0]["resolved_economic_terms"] is False
+    assert captured_rows[0]["cash_dividend_per_share"] == pytest.approx(0.218)
+    assert captured_rows[0]["resolved_effective_date"] == date(2020, 5, 29)
+
+
+@pytest.mark.asyncio
+async def test_scoped_rebuild_preserves_out_of_range_attested_factor():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def observation_without_source_date(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" not in query:
+            return rows
+        return [{**row, "ex_date": None} for row in rows]
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=observation_without_source_date
+    )
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2013, 2, 8),
+                "date_basis": "用户核准的长期停牌后首个复牌交易日",
+                "evidence_source": "cninfo_operator_attestation",
+                "evidence_key": "operator_attestation:decision",
+            }
+        }
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+    )
+
+    replace_call = (
+        manager.db_ops.replace_adjustment_factor_observations.await_args
+    )
+    assert (
+        result["source_events"]["resolved_effective_dates_outside_range"] == 1
+    )
+    assert replace_call.args[0] == []
+    assert replace_call.kwargs["cleanup_source_event_keys"] == []
+    assert replace_call.kwargs["additional_keys"] == []
+
+
+@pytest.mark.asyncio
+async def test_scoped_rebuild_cleans_in_range_raw_date_moved_outside_range():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={
+            "event-1": {
+                "effective_date": datetime(2013, 2, 8),
+                "date_basis": "用户核准的长期停牌后首个复牌交易日",
+                "evidence_source": "cninfo_operator_attestation",
+                "evidence_key": "operator_attestation:decision",
+            }
+        }
+    )
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(
+        return_value={
+            "event-1": {
+                "factor_effect": "none",
+            }
+        }
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+    )
+
+    replace_call = (
+        manager.db_ops.replace_adjustment_factor_observations.await_args
+    )
+    assert (
+        result["source_events"]["resolved_effective_dates_outside_range"] == 1
+    )
+    assert replace_call.args[0] == []
+    assert replace_call.kwargs["cleanup_source_event_keys"] == []
+    assert replace_call.kwargs["additional_keys"] == [
+        ("000001.SZ", date(2020, 5, 28))
+    ]
+
+
+@pytest.mark.asyncio
 async def test_cninfo_factor_rebuild_merges_segmented_endpoint_coverage():
     manager = _manager_with_factor_evidence(segmented_coverage=True)
 

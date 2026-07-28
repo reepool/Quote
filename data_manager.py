@@ -17972,6 +17972,25 @@ class DataManager:
                               AND date(review.effective_date)
                                   BETWEEN :start_date AND :end_date
                         )
+                        OR source_event_key IN (
+                            SELECT review.source_event_key
+                            FROM corporate_action_resolution_reviews AS review
+                            WHERE review.id = (
+                                      SELECT MAX(latest.id)
+                                      FROM corporate_action_resolution_reviews
+                                           AS latest
+                                      WHERE latest.source_event_key
+                                            = review.source_event_key
+                                  )
+                              AND review.decision = 'resolved'
+                              AND json_extract(
+                                    review.review_payload_json,
+                                    '$.resolution_policy'
+                                  )
+                                  = 'cninfo_operator_attested_passthrough_v1'
+                              AND date(review.effective_date)
+                                  BETWEEN :start_date AND :end_date
+                        )
                   )
                 ORDER BY instrument_id, ex_date, source_profile
                 """,
@@ -18086,20 +18105,20 @@ class DataManager:
             authoritative_override = bool(
                 resolved_terms.get("authoritative_override")
             )
-            date_only_operator_override = bool(
+            operator_date_override = bool(
                 resolved
-                and resolved.get("evidence_source")
-                == "cninfo_tdx_xdxr_operator_review"
+                and resolved.get("evidence_source") in {
+                    "cninfo_tdx_xdxr_operator_review",
+                    "cninfo_operator_attestation",
+                }
             )
             authoritative_effective_date = bool(
                 resolved_date is not None
                 and (
                     authoritative_override
-                    or date_only_operator_override
+                    or operator_date_override
                 )
             )
-            if authoritative_effective_date or factor_effect == "none":
-                cninfo_cleanup_source_event_keys.add(event_key)
             selected_source_date = (
                 resolved_date
                 if authoritative_effective_date
@@ -18110,16 +18129,11 @@ class DataManager:
                 authoritative_effective_date
                 and raw_source_date is not None
                 and raw_source_date != selected_source_date
+                and normalized_start <= raw_source_date <= normalized_end
             ):
                 cninfo_replacement_extra_keys.add(
                     (str(row.get("instrument_id") or ""), raw_source_date)
                 )
-            if factor_effect == "none":
-                for excluded_date in (raw_source_date, selected_source_date):
-                    if excluded_date is not None:
-                        cninfo_replacement_extra_keys.add(
-                            (str(row.get("instrument_id") or ""), excluded_date)
-                        )
             if (
                 selected_source_date is not None
                 and not normalized_start
@@ -18128,6 +18142,14 @@ class DataManager:
             ):
                 resolved_outside_range += 1
                 continue
+            if authoritative_effective_date or factor_effect == "none":
+                cninfo_cleanup_source_event_keys.add(event_key)
+            if factor_effect == "none":
+                for excluded_date in (raw_source_date, selected_source_date):
+                    if excluded_date is not None:
+                        cninfo_replacement_extra_keys.add(
+                            (str(row.get("instrument_id") or ""), excluded_date)
+                        )
             for field_name in economic_field_names:
                 reviewed_value = resolved_terms.get(field_name)
                 if field_name not in reviewed_fields or reviewed_value is None:
@@ -19829,6 +19851,7 @@ class DataManager:
         resolved_dates_by_event: Dict[str, Set[date]] = defaultdict(set)
         analysis_by_event: Dict[str, Dict[str, Any]] = {}
         review_by_event: Dict[str, Dict[str, Any]] = {}
+        operator_attestation_review_events: Set[str] = set()
         prior_state_by_event: Dict[str, Dict[str, Any]] = {}
         title_applicability_by_event: Dict[str, Dict[str, Any]] = {}
         title_applicability_values_by_event: Dict[str, Set[str]] = defaultdict(set)
@@ -19987,14 +20010,20 @@ class DataManager:
             )
             for item in review_rows:
                 key = str(item["source_event_key"])
-                if key in review_by_event:
-                    continue
                 payload = item.get("review_payload_json")
                 if isinstance(payload, str):
                     try:
                         payload = json.loads(payload or "{}")
                     except json.JSONDecodeError:
                         payload = {}
+                payload = payload if isinstance(payload, dict) else {}
+                if (
+                    payload.get("resolution_policy")
+                    == "cninfo_operator_attested_passthrough_v1"
+                ):
+                    operator_attestation_review_events.add(key)
+                if key in review_by_event:
+                    continue
                 review_by_event[key] = {**item, "review_payload": payload or {}}
             prior_state_rows = await self.db_ops.execute_read_query(
                 f"""
@@ -20008,6 +20037,25 @@ class DataManager:
             prior_state_by_event.update({
                 str(item["source_event_key"]): item for item in prior_state_rows
             })
+
+        if operator_attestation_review_events:
+            current_dates = (
+                await self.db_ops.get_resolved_corporate_action_effective_dates(
+                    sorted(operator_attestation_review_events)
+                )
+            )
+            for event_key in operator_attestation_review_events:
+                resolved_by_event.pop(event_key, None)
+                resolved_dates_by_event.pop(event_key, None)
+                current = current_dates.get(event_key)
+                if current is None:
+                    continue
+                resolved_by_event[event_key] = current
+                parsed_date = self._date_from_any(
+                    current.get("effective_date")
+                )
+                if parsed_date is not None:
+                    resolved_dates_by_event[event_key].add(parsed_date)
 
         consistent_title_applicability = {
             event_key: title_applicability_by_event[event_key]
@@ -25373,6 +25421,26 @@ class DataManager:
             payload.get("announcement_id") or ""
         ).strip()
         notes = str(payload.get("notes") or "").strip()
+        operator_attestation = payload.get("operator_attestation") or {}
+        if not isinstance(operator_attestation, Mapping):
+            raise ValueError("operator_attestation must be an object")
+        normalized_operator_attestation: Dict[str, Any] = {}
+        if operator_attestation:
+            attestation_basis = str(
+                operator_attestation.get("basis") or ""
+            ).strip()
+            supporting_facts = operator_attestation.get("supporting_facts")
+            if not attestation_basis:
+                raise ValueError("operator_attestation basis is required")
+            if not isinstance(supporting_facts, Mapping) or not supporting_facts:
+                raise ValueError(
+                    "operator_attestation supporting_facts must be a "
+                    "non-empty object"
+                )
+            normalized_operator_attestation = {
+                "basis": attestation_basis,
+                "supporting_facts": dict(supporting_facts),
+            }
         factor_effect = str(payload.get("factor_effect") or "").strip().lower()
         factor_reference = payload.get("factor_reference") or {}
         if not isinstance(factor_reference, Mapping):
@@ -25426,6 +25494,22 @@ class DataManager:
                 "approval_classification must be approved_asymmetric "
                 "or approved_cninfo_operator"
             )
+        if (
+            normalized_operator_attestation
+            and approval_classification != "approved_cninfo_operator"
+        ):
+            raise ValueError(
+                "operator_attestation requires "
+                "approval_classification=approved_cninfo_operator"
+            )
+        if (
+            normalized_operator_attestation
+            and factor_effect == "official_reference_price"
+        ):
+            raise ValueError(
+                "official_reference_price requires persisted official "
+                "announcement evidence"
+            )
         raw_tdx_record_id = payload.get("tdx_record_id")
         if raw_tdx_record_id is None:
             tdx_record_id = None
@@ -25463,11 +25547,19 @@ class DataManager:
             reviewer,
             effective_date,
             date_basis,
-            announcement_id,
         )):
             raise ValueError(
                 "instrument_id, source_event_key, reviewer, effective_date, "
-                "date_basis, and announcement_id are required"
+                "and date_basis are required"
+            )
+        if not announcement_id and not normalized_operator_attestation:
+            raise ValueError(
+                "announcement_id or operator_attestation is required"
+            )
+        if announcement_id and normalized_operator_attestation:
+            raise ValueError(
+                "announcement_id and operator_attestation are mutually "
+                "exclusive"
             )
         if factor_effect not in {
             "normal",
@@ -25565,13 +25657,22 @@ class DataManager:
             offset=0,
         )
         requested_analysis_id = int(payload.get("analysis_id") or 0)
-        analysis = next((
-            item for item in analyses.get("items", [])
-            if (
-                requested_analysis_id <= 0
-                or int(item.get("analysis_id") or 0) == requested_analysis_id
+        if normalized_operator_attestation and requested_analysis_id > 0:
+            raise ValueError(
+                "operator_attestation cannot be combined with analysis_id"
             )
-        ), None)
+        analysis = (
+            None
+            if normalized_operator_attestation
+            else next((
+                item for item in analyses.get("items", [])
+                if (
+                    requested_analysis_id <= 0
+                    or int(item.get("analysis_id") or 0)
+                    == requested_analysis_id
+                )
+            ), None)
+        )
         if requested_analysis_id > 0 and analysis is None:
             raise ValueError(
                 "requested analysis_id does not belong to the CNInfo event"
@@ -25592,14 +25693,21 @@ class DataManager:
             )
         )
         candidates = candidate_page.get("items") or []
-        selected_candidate = next((
-            item for item in candidates
-            if str(item.get("announcement_id") or "").strip()
-            == announcement_id
-        ), None)
-        if selected_candidate is None:
+        selected_candidate = (
+            next((
+                item for item in candidates
+                if str(item.get("announcement_id") or "").strip()
+                == announcement_id
+            ), None)
+            if announcement_id else None
+        )
+        if announcement_id and selected_candidate is None:
             raise ValueError(
                 "announcement_id is not a persisted CNInfo candidate"
+            )
+        if normalized_operator_attestation and tdx_record_id is not None:
+            raise ValueError(
+                "operator_attestation cannot be combined with TDX date evidence"
             )
         selected_tdx_date_evidence = None
         if tdx_record_id is not None:
@@ -25682,21 +25790,29 @@ class DataManager:
             for field_name in resolved_fields
         )
         if not writes_terms_overlay:
-            if factor_effect != "normal":
+            if (
+                factor_effect != "normal"
+                and not (
+                    factor_effect == "none"
+                    and normalized_operator_attestation
+                )
+            ):
                 raise ValueError(
                     "analysis-free CNInfo passthrough requires "
-                    "factor_effect=normal"
+                    "factor_effect=normal unless an operator attestation "
+                    "explicitly declares factor_effect=none"
                 )
             if not source_terms_unchanged:
                 raise ValueError(
                     "analysis-free CNInfo passthrough cannot change current "
                     "CNInfo economic terms"
                 )
-        resolution_policy = (
-            "cninfo_asymmetric_manual_override_v1"
-            if writes_terms_overlay
-            else "cninfo_asymmetric_manual_passthrough_v1"
-        )
+        if writes_terms_overlay:
+            resolution_policy = "cninfo_asymmetric_manual_override_v1"
+        elif normalized_operator_attestation:
+            resolution_policy = "cninfo_operator_attested_passthrough_v1"
+        else:
+            resolution_policy = "cninfo_asymmetric_manual_passthrough_v1"
         operator_instruction = str(
             payload.get("operator_instruction") or notes
         ).strip()
@@ -25708,6 +25824,7 @@ class DataManager:
             "effective_date": effective_date.isoformat(),
             "date_basis": date_basis,
             "announcement_id": announcement_id,
+            "operator_attestation": normalized_operator_attestation,
             "reviewer": reviewer,
             "notes": notes,
             "factor_effect": factor_effect,
@@ -25748,6 +25865,7 @@ class DataManager:
                     "factor_reference",
                     "factor_override",
                     "approval_classification",
+                    "operator_attestation",
                     "tdx_record_id",
                     "expected_tdx_ex_date",
                 }
@@ -25775,6 +25893,7 @@ class DataManager:
             "cninfo_observation_terms": original_terms,
             "operator_instruction": operator_instruction,
             "selected_announcement": selected_candidate,
+            "operator_attestation": normalized_operator_attestation,
             "network_access": False,
             "llm_invocations": 0,
         }
@@ -25870,21 +25989,30 @@ class DataManager:
         evidence_key = (
             f"tdx_xdxr:{tdx_record_id}"
             if selected_tdx_date_evidence is not None
-            else announcement_id or source_event_key
+            else (
+                announcement_id
+                or f"operator_attestation:{operator_decision_key}"
+            )
+        )
+        date_evidence_source = (
+            "tdx_xdxr_operator_date"
+            if selected_tdx_date_evidence is not None
+            else (
+                "cninfo_official_announcement"
+                if selected_candidate is not None
+                else "cninfo_operator_attestation"
+            )
         )
         terms_evidence = {
             **policy_payload,
             "selected_date_evidence": {
-                "source": (
-                    "tdx_xdxr_operator_date"
-                    if selected_tdx_date_evidence is not None
-                    else "cninfo_official_announcement"
-                ),
+                "source": date_evidence_source,
                 "announcement_id": (
                     announcement_id or None
                 ),
                 "announcement_title": (
                     selected_candidate.get("announcement_title")
+                    if selected_candidate is not None else None
                 ),
                 "tdx_record_id": tdx_record_id,
                 "effective_date": effective_date.isoformat(),
@@ -25927,7 +26055,11 @@ class DataManager:
                 "evidence_source": (
                     "cninfo_tdx_xdxr_operator_review"
                     if selected_tdx_date_evidence is not None
-                    else "cninfo_reviewed_official_document"
+                    else (
+                        "cninfo_reviewed_official_document"
+                        if selected_candidate is not None
+                        else "cninfo_operator_attestation"
+                    )
                 ),
                 "evidence_key": evidence_key,
                 "resolution_status": "resolved",
@@ -25938,12 +26070,15 @@ class DataManager:
                 ),
                 "announcement_title": (
                     selected_candidate.get("announcement_title")
+                    if selected_candidate is not None else None
                 ),
                 "announcement_time": (
                     selected_candidate.get("announcement_time")
+                    if selected_candidate is not None else None
                 ),
                 "evidence_url": (
                     selected_candidate.get("evidence_url")
+                    if selected_candidate is not None else None
                 ),
                 "confidence": 1.0,
                 "raw_payload": {
@@ -25990,6 +26125,9 @@ class DataManager:
             "factor_effect": factor_effect,
             "factor_override": official_factor_override,
             "approval_classification": approval_classification,
+            "operator_attestation_used": bool(
+                normalized_operator_attestation
+            ),
             "tdx_date_used": selected_tdx_date_evidence is not None,
             "tdx_economic_terms_used": False,
             "tdx_factor_used": False,

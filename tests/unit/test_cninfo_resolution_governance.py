@@ -741,7 +741,7 @@ async def test_manual_asymmetric_override_supersedes_review_and_records_factor_e
     missing_announcement.pop("announcement_id")
     with pytest.raises(
         ValueError,
-        match="date_basis, and announcement_id are required",
+        match="announcement_id or operator_attestation is required",
     ):
         await manager.review_cninfo_asymmetric_manual_override(
             missing_announcement
@@ -1062,6 +1062,148 @@ async def test_manual_asymmetric_passthrough_without_analysis_keeps_cninfo_terms
         await manager.review_cninfo_asymmetric_manual_override({
             **payload,
             "factor_effect": "none",
+        })
+
+
+@pytest.mark.asyncio
+async def test_operator_attested_no_effect_requires_unchanged_cninfo_terms():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(return_value={
+        "items": [{
+            "instrument_id": "002192.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "currency": "CNY",
+            "cash_dividend_per_share": 0.04754,
+            "bonus_shares_per_share": None,
+            "capitalization_shares_per_share": None,
+            "rights_shares_per_share": None,
+            "rights_price": None,
+        }]
+    })
+    manager.db_ops.get_corporate_action_llm_analyses = AsyncMock(
+        return_value={"items": [{"analysis_id": 42}]}
+    )
+    manager.db_ops.get_corporate_action_effective_date_evidence = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.get_corporate_action_resolution_reviews = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.save_corporate_action_review_bundle = AsyncMock(
+        return_value={
+            "review": {"review_id": 9, "status": "inserted"},
+            "terms_write": {
+                "resolved_terms_id": None,
+                "status": "absent",
+            },
+            "evidence_write": {"inserted": 1},
+        }
+    )
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[{
+            "instrument_id": "002192.SZ",
+            "source_event_key": "event-1",
+            "resolution_state": "resolved_evidence",
+            "is_terminal": True,
+            "factor_blocking": False,
+        }]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={"changed": 1, "failed": 0}
+    )
+    payload = {
+        "instrument_id": "002192.SZ",
+        "source_event_key": "event-1",
+        "reviewer": "operator",
+        "effective_date": "2017-08-29",
+        "date_basis": "用户核准的外部补偿金派发日",
+        "approval_classification": "approved_cninfo_operator",
+        "factor_effect": "none",
+        "operator_attestation": {
+            "basis": "external_compensation_no_ex_adjustment",
+            "supporting_facts": {
+                "payer": "资产重组方",
+                "listed_company_funded": False,
+                "market_reference_price_adjusted": False,
+            },
+        },
+        "beneficiary_scope": "业绩承诺补偿对象",
+        "beneficiary_terms": {
+            "funding_source": "external_restructuring_counterparty",
+        },
+        "total_share_capital_terms": {
+            "cash_dividend_per_share": 0.04754,
+        },
+        "notes": "保留CNInfo事项，外部补偿不进入复权因子。",
+    }
+
+    result = await manager.review_cninfo_asymmetric_manual_override(payload)
+
+    saved = (
+        manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    )
+    review_payload = saved["review_row"]["review_payload"]
+    assert saved["review_row"]["analysis_id"] is None
+    assert saved["review_row"]["evidence_key"].startswith(
+        "operator_attestation:"
+    )
+    assert saved["terms_row"] is None
+    assert saved["evidence_row"]["evidence_source"] == (
+        "cninfo_operator_attestation"
+    )
+    assert saved["evidence_row"]["announcement_id"] is None
+    assert review_payload["resolution_policy"] == (
+        "cninfo_operator_attested_passthrough_v1"
+    )
+    assert review_payload["factor_effect"] == "none"
+    assert review_payload["operator_attestation"]["basis"] == (
+        "external_compensation_no_ex_adjustment"
+    )
+    assert result["analysis_id"] is None
+    assert result["operator_attestation_used"] is True
+    assert result["terms_overlay_written"] is False
+
+    with pytest.raises(
+        ValueError,
+        match="cannot change current CNInfo economic terms",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "total_share_capital_terms": {
+                "cash_dividend_per_share": 0.1,
+            },
+        })
+
+    with pytest.raises(
+        ValueError,
+        match="announcement_id or operator_attestation is required",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "operator_attestation": {},
+        })
+
+    with pytest.raises(
+        ValueError,
+        match="operator_attestation cannot be combined with analysis_id",
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "analysis_id": 42,
+        })
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "announcement_id and operator_attestation are mutually exclusive"
+        ),
+    ):
+        await manager.review_cninfo_asymmetric_manual_override({
+            **payload,
+            "announcement_id": "ann-1",
         })
 
 
@@ -2693,7 +2835,72 @@ async def test_inventory_preserves_prior_evidence_unavailable_state():
         "cninfo_announcement",
         "cninfo_tdx_xdxr_review",
         "cninfo_tdx_xdxr_operator_review",
+        "cninfo_operator_attestation",
     }
+
+
+@pytest.mark.asyncio
+async def test_inventory_ignores_revoked_operator_attestation_evidence():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[
+        [_row(source_event_key="event-revoked-attestation")],
+        [],
+        [{
+            "id": 1,
+            "source_event_key": "event-revoked-attestation",
+            "effective_date": "2020-01-01",
+            "date_basis": "旧批示",
+            "evidence_source": "cninfo_operator_attestation",
+            "evidence_key": "operator_attestation:old",
+        }],
+        [],
+        [
+            {
+                "review_id": 2,
+                "source_event_key": "event-revoked-attestation",
+                "decision": "rejected",
+                "effective_date": None,
+                "date_basis": None,
+                "notes": "撤销旧批示",
+                "review_payload_json": "{}",
+                "updated_at": "2026-07-28T10:00:00",
+            },
+            {
+                "review_id": 1,
+                "source_event_key": "event-revoked-attestation",
+                "decision": "resolved",
+                "effective_date": "2020-01-01",
+                "date_basis": "旧批示",
+                "notes": None,
+                "review_payload_json": json.dumps({
+                    "factor_effect": "none",
+                    "resolution_policy": (
+                        "cninfo_operator_attested_passthrough_v1"
+                    ),
+                }),
+                "updated_at": "2026-07-27T10:00:00",
+            },
+        ],
+        [],
+    ])
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={}
+    )
+
+    inventory = await manager._load_cninfo_resolution_governance_inventory(
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 28),
+        exchanges=["SSE"],
+    )
+
+    manager.db_ops.get_resolved_corporate_action_effective_dates.assert_awaited_once_with(
+        ["event-revoked-attestation"]
+    )
+    assert inventory[0]["resolved_effective_date"] is None
+    assert (
+        inventory[0]["diagnostics"]["resolved_effective_date_count"] == 0
+    )
 
 
 @pytest.mark.asyncio
