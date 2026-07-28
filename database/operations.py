@@ -6562,18 +6562,24 @@ class DatabaseOperations:
     async def get_quote_evidence_for_event_dates(
         self,
         event_dates: List[tuple[str, date]],
+        *,
+        effective_end_date: Optional[date] = None,
     ) -> List[Dict[str, Any]]:
         """Return bounded unadjusted quote evidence for each source event date.
 
-        A source date may fall on a weekend or holiday, but accepting an
-        arbitrarily distant quote would silently turn a missing historical
-        quote into false factor evidence. Fourteen calendar days covers the
-        normal exchange holiday window while keeping stale matches visible as
-        pending. The factor formula must use the prior trading session's raw
-        close. An ex-date row's ``pre_close`` may already be an exchange or
-        provider adjusted reference price, and suspended placeholder rows are
-        not valid effective sessions.
+        A source date may fall on a weekend, holiday, or suspended session.
+        When ``effective_end_date`` is supplied, the first valid traded quote
+        through that date is accepted so a long suspension becomes effective
+        on its first resumed session. Callers that omit the bound retain the
+        legacy fourteen-day lookup. The factor formula must use the prior
+        trading session's raw close. An ex-date row's ``pre_close`` may already
+        be an exchange or provider adjusted reference price, and suspended
+        placeholder rows are not valid effective sessions.
         """
+        if effective_end_date is not None and not isinstance(
+            effective_end_date, date
+        ):
+            raise ValueError("effective_end_date must be a date")
         normalized = sorted({
             (str(instrument_id).strip(), parsed_date)
             for instrument_id, parsed_date in event_dates
@@ -6591,24 +6597,73 @@ class DatabaseOperations:
                 for index, (instrument_id, source_date) in enumerate(chunk):
                     parameters[f"instrument_{index}"] = instrument_id
                     parameters[f"date_{index}"] = source_date.isoformat()
+                parameters["effective_end_date"] = (
+                    effective_end_date.isoformat()
+                    if effective_end_date is not None else None
+                )
                 result = await session.execute(text(f"""
                     WITH requested(instrument_id, source_date) AS (
                         VALUES {values_sql}
-                    ), evidence AS MATERIALIZED (
+                    ), requested_state AS MATERIALIZED (
                         SELECT requested.instrument_id,
                                requested.source_date,
+                               CASE
+                                   WHEN :effective_end_date IS NULL THEN NULL
+                                   ELSE (
+                                       SELECT q.tradestatus
+                                       FROM daily_quotes q
+                                       WHERE q.instrument_id
+                                             = requested.instrument_id
+                                         AND q.time >= datetime(
+                                             requested.source_date
+                                         )
+                                         AND q.time < datetime(
+                                             :effective_end_date, '+1 day'
+                                         )
+                                         AND q.close > 0
+                                       ORDER BY q.time
+                                       LIMIT 1
+                                   )
+                               END AS first_quote_tradestatus
+                        FROM requested
+                    ), evidence AS MATERIALIZED (
+                        SELECT requested_state.instrument_id,
+                               requested_state.source_date,
                                (
                                    SELECT q.time
                                    FROM daily_quotes q
-                                   WHERE q.instrument_id = requested.instrument_id
-                                     AND q.time >= datetime(requested.source_date)
-                                     AND q.time < datetime(requested.source_date, '+15 day')
+                                   WHERE q.instrument_id
+                                         = requested_state.instrument_id
+                                     AND q.time >= datetime(
+                                         requested_state.source_date
+                                     )
+                                     AND q.time < CASE
+                                         WHEN :effective_end_date IS NULL
+                                         THEN datetime(
+                                             requested_state.source_date,
+                                             '+15 day'
+                                         )
+                                         WHEN requested_state
+                                              .first_quote_tradestatus = 0
+                                         THEN datetime(
+                                             :effective_end_date, '+1 day'
+                                         )
+                                         ELSE min(
+                                             datetime(
+                                                 requested_state.source_date,
+                                                 '+15 day'
+                                             ),
+                                             datetime(
+                                                 :effective_end_date, '+1 day'
+                                             )
+                                         )
+                                     END
                                      AND q.tradestatus = 1
                                      AND q.close > 0
                                    ORDER BY q.time
                                    LIMIT 1
                                ) AS effective_time
-                        FROM requested
+                        FROM requested_state
                     )
                     SELECT evidence.instrument_id,
                            evidence.source_date,

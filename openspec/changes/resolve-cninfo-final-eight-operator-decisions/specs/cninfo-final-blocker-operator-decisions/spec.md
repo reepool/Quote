@@ -88,3 +88,41 @@ or semantic-LLM work and SHALL prove review-write source isolation.
 - **THEN** eight latest resolved reviews exist, zero frozen events remain
   factor-blocking, raw CNInfo observations and TDX rows are unchanged, and
   production factor tables are unchanged by the review write
+
+### Requirement: Suspended implementation-date factor fallback
+The CNInfo factor path SHALL use the first valid traded session on or after the
+implementation date as the effective factor date when an event is implemented
+while the instrument has no valid traded quote.
+
+#### Scenario: Long suspension resumes after implementation
+- **WHEN** an implemented CNInfo event has no `tradestatus=1` quote on its
+  implementation date, the first available quote is explicitly suspended, and
+  the first later valid quote is within the requested rebuild interval
+- **THEN** the implementation date remains `source_ex_date`, the first later
+  valid quote date becomes `effective_date`, and the ordinary factor uses the
+  last valid traded close before that effective date
+
+#### Scenario: Missing quote history is not suspension evidence
+- **WHEN** no suspended quote exists on or after the implementation date and
+  the next valid quote is more than fourteen days later
+- **THEN** the event remains pending rather than treating the quote-history gap
+  as a long suspension
+
+#### Scenario: Compound actions during one suspension
+- **WHEN** multiple CNInfo actions with distinct implementation dates map to
+  the same first resumed trading session
+- **THEN** their same-date terms are aggregated, their distinct-date factors
+  are compounded chronologically, and one combined factor is emitted on the
+  resumed session
+
+#### Scenario: Do not cross the rebuild end date
+- **WHEN** no valid traded quote exists from the implementation date through
+  the requested rebuild `end_date`
+- **THEN** the event remains pending instead of using a later out-of-range
+  quote
+
+#### Scenario: Resolve the two 002076 suspended distributions
+- **WHEN** the full `002076.SZ` CNInfo path is rebuilt
+- **THEN** the `2014-06-13` `10派0.5元` event is effective on `2014-09-11`
+  and the `2017-06-01` `10派0.3元、10转10` event is effective on
+  `2017-10-12`, without downloading or re-analyzing announcements

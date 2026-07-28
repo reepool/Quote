@@ -140,6 +140,138 @@ class TestDatabaseOperations:
         }]
 
     @pytest.mark.asyncio
+    async def test_factor_quote_evidence_uses_first_resumed_session(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'suspended_factor_evidence.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2014-06-10', '002076.SZ', 10.07, 10.07, 1),
+                        ('2014-06-13', '002076.SZ', 10.02, 10.02, 0),
+                        ('2014-09-10', '002076.SZ', 10.02, 10.02, 0),
+                        ('2014-09-11', '002076.SZ', 11.02, 10.02, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates(
+                [("002076.SZ", date(2014, 6, 13))],
+                effective_end_date=date(2014, 12, 31),
+            )
+        finally:
+            await engine.dispose()
+
+        assert evidence == [{
+            "instrument_id": "002076.SZ",
+            "source_date": "2014-06-13",
+            "effective_date": "2014-09-11",
+            "pre_close": 10.07,
+            "close": 11.02,
+        }]
+
+    @pytest.mark.asyncio
+    async def test_factor_quote_evidence_does_not_cross_rebuild_end_date(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'bounded_factor_evidence.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2014-06-10', '002076.SZ', 10.07, 10.07, 1),
+                        ('2014-06-13', '002076.SZ', 10.02, 10.02, 0),
+                        ('2014-09-11', '002076.SZ', 11.02, 10.02, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates(
+                [("002076.SZ", date(2014, 6, 13))],
+                effective_end_date=date(2014, 8, 31),
+            )
+        finally:
+            await engine.dispose()
+
+        assert evidence == [{
+            "instrument_id": "002076.SZ",
+            "source_date": "2014-06-13",
+            "effective_date": None,
+            "pre_close": None,
+            "close": None,
+        }]
+
+    @pytest.mark.asyncio
+    async def test_factor_quote_evidence_does_not_treat_quote_gap_as_suspension(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'quote_gap_factor_evidence.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2010-01-04', '000001.SZ', 10.00, 9.90, 1),
+                        ('2020-01-02', '000001.SZ', 12.00, 11.90, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates(
+                [("000001.SZ", date(2010, 2, 1))],
+                effective_end_date=date(2020, 12, 31),
+            )
+        finally:
+            await engine.dispose()
+
+        assert evidence[0]["effective_date"] is None
+
+    @pytest.mark.asyncio
     async def test_get_daily_data(self, db_operations, sample_quote_data):
         """Test getting daily quote data"""
         # Insert test data

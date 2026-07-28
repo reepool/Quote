@@ -70,6 +70,16 @@ lineage without a schema migration.
    unrounded theoretical price remains audit commentary and is not mixed with
    the exchange-published two-decimal opening reference price.
 
+6. **Shift suspended implementation events to the first resumed session.**
+   The announcement implementation date remains the source event date. When
+   the first available quote on or after that date is explicitly suspended,
+   factor evidence uses the first later `tradestatus=1` quote, up to the rebuild
+   `end_date`. Without that suspension evidence, lookup retains the normal
+   fourteen-day bound. The prior close for the ordinary event formula remains
+   the last valid traded close before that resumed session. Multiple actions
+   implemented during one suspension are compounded in source-date order and
+   share the resumed effective date.
+
 ## Risks / Trade-offs
 
 - **[Risk] Operator attestation becomes an automatic bypass.** → Require an
@@ -87,6 +97,16 @@ lineage without a schema migration.
 - **[Risk] Partial batch writes leave mixed state.** → Keep decisions
   idempotent, report persisted and pending keys, and rerun the same frozen
   command to complete the audit.
+- **[Risk] An unbounded resumption search writes a future factor outside the
+  requested rebuild.** → Require an explicit maximum effective date from the
+  rebuild and leave the event pending when no valid traded quote exists by
+  that date.
+- **[Risk] Missing quote history is mistaken for suspension.** → Extend beyond
+  fourteen days only when the first available row is explicitly marked
+  suspended.
+- **[Risk] Multiple suspended-period actions are added as simultaneous
+  terms.** → Aggregate only same-source-date terms and compound distinct event
+  dates in chronological order before emitting one resumed-session factor.
 
 ## Migration Plan
 
@@ -97,7 +117,10 @@ lineage without a schema migration.
    factor blockers.
 4. Rebuild the CNInfo factor path and verify two normal events, five no-effect
    exclusions, and one official-reference-price event.
-5. Roll back decisions by superseding them through the same governed review
+5. Rebuild `002076.SZ` with bounded resumption lookup and verify the
+   `2014-06-13` and `2017-06-01` implementation events become effective on
+   `2014-09-11` and `2017-10-12`.
+6. Roll back decisions by superseding them through the same governed review
    API; raw observations and prior reviews remain available.
 
 ## Open Questions

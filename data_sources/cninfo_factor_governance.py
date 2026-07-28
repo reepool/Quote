@@ -313,6 +313,7 @@ def derive_cninfo_factor_path(
         aggregate = grouped.setdefault(key, {
             "instrument_id": instrument_id,
             "source_ex_dates": set(),
+            "source_date_terms": {},
             "effective_date": effective_date,
             "cash_per_share": 0.0,
             "bonus_per_share": 0.0,
@@ -326,16 +327,30 @@ def derive_cninfo_factor_path(
         })
         rights_per_share = _number(row.get("rights_shares_per_share"))
         rights_price = _number(row.get("rights_price"))
-        aggregate["source_ex_dates"].add(source_date)
-        aggregate["cash_per_share"] += _number(
-            row.get("cash_dividend_per_share")
-        )
-        aggregate["bonus_per_share"] += (
+        cash_per_share = _number(row.get("cash_dividend_per_share"))
+        bonus_per_share = (
             _number(row.get("bonus_shares_per_share"))
             + _number(row.get("capitalization_shares_per_share"))
         )
+        rights_proceeds_per_share = rights_per_share * rights_price
+        source_terms = aggregate["source_date_terms"].setdefault(source_date, {
+            "source_ex_date": source_date,
+            "cash_per_share": 0.0,
+            "bonus_per_share": 0.0,
+            "rights_per_share": 0.0,
+            "rights_proceeds_per_share": 0.0,
+        })
+        aggregate["source_ex_dates"].add(source_date)
+        aggregate["cash_per_share"] += cash_per_share
+        aggregate["bonus_per_share"] += bonus_per_share
         aggregate["rights_per_share"] += rights_per_share
-        aggregate["rights_proceeds_per_share"] += rights_per_share * rights_price
+        aggregate["rights_proceeds_per_share"] += rights_proceeds_per_share
+        source_terms["cash_per_share"] += cash_per_share
+        source_terms["bonus_per_share"] += bonus_per_share
+        source_terms["rights_per_share"] += rights_per_share
+        source_terms[
+            "rights_proceeds_per_share"
+        ] += rights_proceeds_per_share
         aggregate["event_keys"].append(event_key)
         if factor_effect == "official_reference_price":
             aggregate["factor_overrides"].append({
@@ -412,16 +427,32 @@ def derive_cninfo_factor_path(
                 })
                 blocked_instruments.add(instrument_id)
                 continue
-            factor = _event_factor(
-                pre_close=pre_close,
-                cash_per_share=aggregate["cash_per_share"],
-                bonus_per_share=aggregate["bonus_per_share"],
-                rights_per_share=aggregate["rights_per_share"],
-                rights_proceeds_per_share=aggregate[
-                    "rights_proceeds_per_share"
-                ],
+            factor = 1.0
+            current_reference_price = pre_close
+            source_date_terms = [
+                aggregate["source_date_terms"][source_date]
+                for source_date in sorted(aggregate["source_date_terms"])
+            ]
+            for source_terms in source_date_terms:
+                source_factor = _event_factor(
+                    pre_close=current_reference_price,
+                    cash_per_share=source_terms["cash_per_share"],
+                    bonus_per_share=source_terms["bonus_per_share"],
+                    rights_per_share=source_terms["rights_per_share"],
+                    rights_proceeds_per_share=source_terms[
+                        "rights_proceeds_per_share"
+                    ],
+                )
+                if source_factor is None:
+                    factor = None
+                    break
+                factor = round(factor * source_factor, 12)
+                current_reference_price /= source_factor
+            factor_basis = (
+                "ordinary_economic_terms_compounded"
+                if len(source_date_terms) > 1
+                else "ordinary_economic_terms"
             )
-            factor_basis = "ordinary_economic_terms"
         pre_close = _positive(aggregate.get("pre_close"))
         if factor is None:
             pending.append({
@@ -462,6 +493,16 @@ def derive_cninfo_factor_path(
             and len(aggregate["authoritative_event_keys"])
             == len(aggregate["event_keys"]),
             "resolved_date_evidence": aggregate["date_evidence"],
+            "source_date_terms": [
+                {
+                    **terms,
+                    "source_ex_date": terms["source_ex_date"].isoformat(),
+                }
+                for terms in (
+                    aggregate["source_date_terms"][source_date]
+                    for source_date in sorted(aggregate["source_date_terms"])
+                )
+            ],
             "date_shifted": any(value != effective_date for value in source_dates),
         }
         events.append(event)

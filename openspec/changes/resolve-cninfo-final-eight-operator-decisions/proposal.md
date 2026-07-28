@@ -27,6 +27,10 @@ LLM evidence.
 - Rebuild the CNInfo factor path only after all eight governance blockers are
   resolved and verify the expected normal, excluded-no-effect, and official
   reference-price outcomes.
+- Treat an implemented event that occurs during suspension as effective on the
+  first valid traded session on or after the implementation date, bounded by
+  the requested factor-rebuild end date. Preserve the implementation date as
+  source lineage and do not require another announcement or LLM analysis.
 
 ## Capabilities
 
@@ -44,6 +48,8 @@ None.
 
 - CNInfo manual-review orchestration and review lineage in `data_manager.py`.
 - A fixed-list local preview/write script and focused unit tests.
+- Bounded quote-evidence lookup for long suspensions and focused resumption-date
+  regression tests.
 - Existing corporate-action review, resolved-term, effective-date-evidence,
   and governance-state tables; no schema migration is required.
 - The local `data/quotes.db` receives eight operator review decisions after a

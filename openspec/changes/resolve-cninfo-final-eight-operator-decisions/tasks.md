@@ -20,3 +20,9 @@
     blocked by pre-existing quote-anchor gaps for the `2014-06-13` and
     `2017-06-01` events.
 - [x] 3.3 Commit and push only the implementation, tests, and OpenSpec artifacts created for this change.
+
+## 4. Suspended implementation-date fallback
+
+- [x] 4.1 Extend quote evidence to use the first valid traded session on or after an implementation date, bounded by the factor-rebuild end date.
+- [x] 4.2 Add focused database and factor-rebuild regression tests for long suspension, end-date bounds, and the two `002076.SZ` resumed sessions.
+- [x] 4.3 Run focused tests, strict OpenSpec validation, a real `002076.SZ` dry-run/write verification, and an uncommitted review; fix only confirmed in-scope defects.

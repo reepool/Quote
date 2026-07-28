@@ -18192,7 +18192,8 @@ class DataManager:
 
         quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
         quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
-            quote_keys
+            quote_keys,
+            effective_end_date=normalized_end,
         )
         cninfo_path = derive_cninfo_factor_path(factor_cninfo_rows, quote_evidence)
         tdx_path = derive_tdx_factor_path(tdx_rows, quote_evidence)

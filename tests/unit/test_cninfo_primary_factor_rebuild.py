@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
+from data_sources.cninfo_factor_governance import derive_cninfo_factor_path
 
 
 def _manager_with_factor_evidence(
@@ -158,6 +159,122 @@ def _manager_with_factor_evidence(
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.invalidate_factor_cache = Mock()
     return manager
+
+
+def test_cninfo_suspended_events_apply_on_first_resumed_sessions():
+    observations = [
+        {
+            "instrument_id": "002076.SZ",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-2014",
+            "ex_date": date(2014, 6, 13),
+            "cash_dividend_per_share": 0.05,
+            "bonus_shares_per_share": None,
+            "capitalization_shares_per_share": None,
+            "rights_shares_per_share": None,
+            "rights_price": None,
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "is_current": 1,
+        },
+        {
+            "instrument_id": "002076.SZ",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-2017",
+            "ex_date": date(2017, 6, 1),
+            "cash_dividend_per_share": 0.03,
+            "bonus_shares_per_share": None,
+            "capitalization_shares_per_share": 1.0,
+            "rights_shares_per_share": None,
+            "rights_price": None,
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "is_current": 1,
+        },
+    ]
+    quote_evidence = [
+        {
+            "instrument_id": "002076.SZ",
+            "source_date": date(2014, 6, 13),
+            "effective_date": date(2014, 9, 11),
+            "pre_close": 10.07,
+            "close": 11.02,
+        },
+        {
+            "instrument_id": "002076.SZ",
+            "source_date": date(2017, 6, 1),
+            "effective_date": date(2017, 10, 12),
+            "pre_close": 14.17,
+            "close": 7.78,
+        },
+    ]
+
+    result = derive_cninfo_factor_path(observations, quote_evidence)
+
+    assert result["pending"] == []
+    assert [
+        (row["source_ex_date"], row["effective_date"], row["factor"])
+        for row in result["events"]
+    ] == [
+        (
+            date(2014, 6, 13),
+            date(2014, 9, 11),
+            pytest.approx(10.07 / 10.02),
+        ),
+        (
+            date(2017, 6, 1),
+            date(2017, 10, 12),
+            pytest.approx(14.17 * 2 / 14.14),
+        ),
+    ]
+
+
+def test_cninfo_sequential_suspended_actions_compound_before_resumption():
+    observations = [
+        {
+            "instrument_id": "000001.SZ",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-first",
+            "ex_date": date(2015, 6, 2),
+            "capitalization_shares_per_share": 1.0,
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "is_current": 1,
+        },
+        {
+            "instrument_id": "000001.SZ",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-second",
+            "ex_date": date(2015, 9, 24),
+            "capitalization_shares_per_share": 1.5,
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "is_current": 1,
+        },
+    ]
+    quote_evidence = [
+        {
+            "instrument_id": "000001.SZ",
+            "source_date": row["ex_date"],
+            "effective_date": date(2015, 10, 23),
+            "pre_close": 10.0,
+            "close": 3.0,
+        }
+        for row in observations
+    ]
+
+    result = derive_cninfo_factor_path(observations, quote_evidence)
+
+    assert result["pending"] == []
+    assert len(result["events"]) == 1
+    event = result["events"][0]
+    assert event["effective_date"] == date(2015, 10, 23)
+    assert event["factor"] == pytest.approx(5.0)
+    assert event["factor_basis"] == "ordinary_economic_terms_compounded"
+    assert [row["source_ex_date"] for row in event["source_date_terms"]] == [
+        "2015-06-02",
+        "2015-09-24",
+    ]
 
 
 @pytest.mark.asyncio
