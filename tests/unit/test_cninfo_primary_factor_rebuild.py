@@ -37,6 +37,7 @@ def _manager_with_factor_evidence(
             }]
         if "FROM adjustment_factors_tdx" in query:
             return [{
+                "id": 41,
                 "instrument_id": "000001.SZ",
                 "ex_date": datetime(2020, 5, 28),
                 "factor": 1.01,
@@ -302,6 +303,291 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
     manager.db_ops.save_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.replace_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("resolution_state", "expected_reason"),
+    [
+        ("non_effective", "resolution_state:non_effective"),
+        ("scope_mismatch", "resolution_state:scope_mismatch"),
+        ("superseded", "resolution_state:superseded"),
+    ],
+)
+async def test_primary_rebuild_applies_terminal_no_factor_state(
+    monkeypatch,
+    resolution_state,
+    expected_reason,
+):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+    captured_rows = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    async def governed_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{
+                **rows[0],
+                "ex_date": None,
+                "resolution_state": resolution_state,
+            }]
+        return rows
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=governed_query)
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert captured_rows[0]["resolved_factor_effect"] == "none"
+    assert captured_rows[0]["factor_exclusion_reason"] == expected_reason
+    assert result["cninfo_path"]["pending_count"] == 0
+    assert result["cninfo_path"]["excluded_no_effect_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_primary_rebuild_excludes_explicit_pre_listing_event(monkeypatch):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "listed_date": datetime(2020, 6, 1),
+    }])
+    original_query = manager.db_ops.execute_read_query.side_effect
+    captured_rows = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    async def source_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{**rows[0], "resolution_state": None}]
+        return rows
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=source_query)
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert captured_rows[0]["resolved_factor_effect"] == "none"
+    assert captured_rows[0]["factor_exclusion_reason"] == (
+        "pre_listing_corporate_action"
+    )
+    assert result["cninfo_path"]["pending_count"] == 0
+    assert result["cninfo_path"]["excluded_no_effect"][0]["reason"] == (
+        "pre_listing_corporate_action"
+    )
+
+
+@pytest.mark.asyncio
+async def test_primary_rebuild_uses_unique_tdx_archive_date_only(monkeypatch):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "listed_date": datetime(1991, 4, 3),
+    }])
+    original_query = manager.db_ops.execute_read_query.side_effect
+    captured_rows = []
+    captured_path = {}
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    async def archive_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{
+                **rows[0],
+                "announcement_date": datetime(2020, 5, 27),
+                "ex_date": None,
+                "resolution_state": "official_archive_unavailable",
+            }]
+        return rows
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        derived = original_derive(captured_rows, quote_evidence)
+        captured_path.update(derived)
+        return derived
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=archive_query)
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert captured_rows[0]["resolved_effective_date"] == date(2020, 5, 28)
+    assert captured_rows[0]["resolved_date_authoritative"] is True
+    assert captured_rows[0]["resolved_authoritative_override"] is False
+    assert captured_rows[0]["resolved_evidence_key"] == "tdx_xdxr:41"
+    assert captured_rows[0]["historical_gap_reason"] is None
+    assert captured_path["events"][0]["factor"] == pytest.approx(
+        13.5 / (13.5 - 0.218)
+    )
+    assert captured_path["events"][0]["factor"] != pytest.approx(1.01)
+    assert result["cninfo_path"]["historical_gap_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_scoped_rebuild_loads_historical_tdx_archive_candidates(
+    monkeypatch,
+):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "listed_date": datetime(1991, 4, 3),
+    }])
+    original_query = manager.db_ops.execute_read_query.side_effect
+    archive_query_params = []
+    captured_rows = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    async def scoped_archive_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{
+                **rows[0],
+                "announcement_date": datetime(1992, 11, 1),
+                "record_date": datetime(1992, 11, 7),
+                "ex_date": None,
+                "cash_dividend_per_share": 0.05,
+                "bonus_shares_per_share": 0.2,
+                "resolution_state": "official_archive_unavailable",
+            }]
+        if (
+            "FROM adjustment_factors_tdx" in query
+            and ":archive_instrument_0" in query
+        ):
+            archive_query_params.append(dict(params))
+            return [{
+                "id": 92,
+                "instrument_id": "000001.SZ",
+                "ex_date": datetime(1992, 11, 9),
+                "factor": 99.0,
+                "cumulative_factor": 99.0,
+                "validation_result": "computed_unvalidated",
+                "pre_close": 10.0,
+                "fenhong": 0.5,
+                "songzhuangu": 2.0,
+                "peigu": 0.0,
+                "peigujia": 0.0,
+            }]
+        return rows
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=scoped_archive_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "source_date": date(1992, 11, 9),
+        "effective_date": date(1992, 11, 9),
+        "pre_close": 10.0,
+        "close": 8.0,
+    }])
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert archive_query_params == [{
+        "archive_instrument_0": "000001.SZ",
+        "archive_start_0": "1992-10-07",
+        "archive_end_0": "1994-05-11",
+    }]
+    assert captured_rows == []
+    assert result["cninfo_path"]["historical_gap_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_primary_rebuild_keeps_unmatched_archive_root_incomplete():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def archive_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{
+                **rows[0],
+                "announcement_date": datetime(2020, 5, 27),
+                "ex_date": None,
+                "cash_dividend_per_share": 0.999,
+                "resolution_state": "official_archive_unavailable",
+            }]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=archive_query)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert result["cninfo_path"]["pending_count"] == 0
+    assert result["cninfo_path"]["historical_gap_count"] == 1
+    assert result["candidate"]["quality_gates"][
+        "no_historical_factor_gaps"
+    ] is False
+    assert result["overall_completeness"]["status"] == "partial"
 
 
 @pytest.mark.asyncio

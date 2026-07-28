@@ -26,6 +26,9 @@ DEFAULT_ROUNDED_FIELD_TOLERANCE_CAPS = {
 }
 TDX_FLOAT_SIGNIFICANT_DIGITS = 7
 DEFAULT_FACTOR_RELATIVE_TOLERANCE = 0.0001
+ARCHIVE_TDX_DATE_MATCH_WINDOW_DAYS = 550
+ARCHIVE_TDX_ANNOUNCEMENT_WINDOW_DAYS = 120
+ARCHIVE_TDX_OPERATIONAL_LOOKBACK_DAYS = 31
 
 
 def _date(value: Any) -> Optional[date]:
@@ -128,6 +131,8 @@ def build_quote_evidence_keys(
             continue
         if str(row.get("event_status") or "") == "failed":
             continue
+        if str(row.get("resolved_factor_effect") or "").strip().lower() == "none":
+            continue
         instrument_id = str(row.get("instrument_id") or "").strip()
         raw_ex_date = _date(row.get("ex_date"))
         resolved_effective_date = _date(row.get("resolved_effective_date"))
@@ -191,6 +196,8 @@ def derive_cninfo_factor_path(
     quote_lookup = _quote_map(quote_evidence)
     pending: List[Dict[str, Any]] = []
     excluded_no_effect: List[Dict[str, Any]] = []
+    historical_gaps: List[Dict[str, Any]] = []
+    historical_gap_anchors: Dict[str, List[Optional[date]]] = defaultdict(list)
     grouped: Dict[Tuple[str, date], Dict[str, Any]] = {}
     pending_source_dates: Dict[str, List[date]] = defaultdict(list)
     unlocated_pending_instruments = set()
@@ -227,7 +234,10 @@ def derive_cninfo_factor_path(
             excluded_no_effect.append({
                 "instrument_id": instrument_id,
                 "source_event_key": event_key,
-                "reason": "resolved_factor_effect_none",
+                "reason": (
+                    str(row.get("factor_exclusion_reason") or "").strip()
+                    or "resolved_factor_effect_none"
+                ),
                 "effective_date": (
                     source_date.isoformat() if source_date is not None else None
                 ),
@@ -235,6 +245,33 @@ def derive_cninfo_factor_path(
                     value.isoformat() for value in suppressed_dates
                 ],
             })
+            continue
+        historical_gap_reason = str(
+            row.get("historical_gap_reason") or ""
+        ).strip()
+        if historical_gap_reason and source_date is None:
+            operational_anchors = [
+                parsed
+                for field_name in ("record_date", "pay_date", "share_arrival_date")
+                if (parsed := _date(row.get(field_name))) is not None
+            ]
+            ordering_anchor = (
+                min(operational_anchors)
+                if operational_anchors
+                else _date(row.get("announcement_date"))
+            )
+            historical_gaps.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "reason": historical_gap_reason,
+                "resolution_state": row.get("resolution_state"),
+                "date_match": row.get("historical_date_match"),
+                "ordering_anchor_date": (
+                    ordering_anchor.isoformat()
+                    if ordering_anchor is not None else None
+                ),
+            })
+            historical_gap_anchors[instrument_id].append(ordering_anchor)
             continue
         factor_override = _positive(row.get("resolved_factor_override"))
         if (
@@ -504,6 +541,10 @@ def derive_cninfo_factor_path(
                 )
             ],
             "date_shifted": any(value != effective_date for value in source_dates),
+            "path_has_prior_historical_gap": any(
+                anchor is None or effective_date >= anchor
+                for anchor in historical_gap_anchors.get(instrument_id, ())
+            ),
         }
         events.append(event)
         observations_out.append({
@@ -515,7 +556,11 @@ def derive_cninfo_factor_path(
             "provider_cumulative_factor": cumulative_by_instrument[instrument_id],
             "normalized_factor": factor,
             "normalization_version": FACTOR_NORMALIZATION_VERSION,
-            "quality_status": "valid",
+            "quality_status": (
+                "partial_prior_historical_gap"
+                if event["path_has_prior_historical_gap"]
+                else "valid"
+            ),
             "raw_payload": event,
         })
     return {
@@ -523,6 +568,7 @@ def derive_cninfo_factor_path(
         "events": events,
         "pending": pending,
         "excluded_no_effect": excluded_no_effect,
+        "historical_gaps": historical_gaps,
     }
 
 
@@ -863,6 +909,160 @@ def _rounded_field_tolerances(
         + rights_tolerance * price_tolerance
     )
     return base
+
+
+def match_cninfo_archive_tdx_date(
+    observation: Mapping[str, Any],
+    tdx_rows: Sequence[Mapping[str, Any]],
+    *,
+    field_tolerance: float = 0.0001,
+    anchor_window_days: int = ARCHIVE_TDX_DATE_MATCH_WINDOW_DAYS,
+    announcement_window_days: int = ARCHIVE_TDX_ANNOUNCEMENT_WINDOW_DAYS,
+) -> Dict[str, Any]:
+    """Return one bounded TDX date match without adopting TDX economics."""
+    instrument_id = str(observation.get("instrument_id") or "").strip()
+    cninfo_event = {
+        "cash_per_share": _number(
+            observation.get("cash_dividend_per_share")
+        ),
+        "bonus_per_share": (
+            _number(observation.get("bonus_shares_per_share"))
+            + _number(observation.get("capitalization_shares_per_share"))
+        ),
+        "rights_per_share": _number(
+            observation.get("rights_shares_per_share")
+        ),
+        "rights_price": _number(observation.get("rights_price")),
+    }
+    if not instrument_id:
+        return {"matched": False, "reason": "missing_instrument_id"}
+    if not any(
+        cninfo_event[field_name] > 0
+        for field_name in (
+            "cash_per_share",
+            "bonus_per_share",
+            "rights_per_share",
+        )
+    ):
+        return {
+            "matched": False,
+            "reason": "cninfo_observation_has_no_positive_economic_term",
+        }
+
+    operational_anchors = {
+        field_name: parsed
+        for field_name in ("record_date", "pay_date", "share_arrival_date")
+        if (parsed := _date(observation.get(field_name))) is not None
+    }
+    announcement_date = _date(observation.get("announcement_date"))
+    anchors = (
+        operational_anchors
+        if operational_anchors
+        else (
+            {"announcement_date": announcement_date}
+            if announcement_date is not None
+            else {}
+        )
+    )
+    if not anchors:
+        return {"matched": False, "reason": "cninfo_date_anchor_missing"}
+
+    normalized_tolerance = max(0.0, float(field_tolerance))
+    normalized_window = max(0, int(anchor_window_days))
+    normalized_announcement_window = max(0, int(announcement_window_days))
+    precision_policy = _rounded_match_policy(None)
+    candidates: List[Dict[str, Any]] = []
+    for row in tdx_rows:
+        if str(row.get("instrument_id") or "").strip() != instrument_id:
+            continue
+        validation_result = str(row.get("validation_result") or "")
+        if validation_result.startswith("pending_"):
+            continue
+        tdx_date = _date(row.get("ex_date"))
+        if tdx_date is None:
+            continue
+        matched_anchors: List[Dict[str, Any]] = []
+        for role, anchor in anchors.items():
+            distance_days = (tdx_date - anchor).days
+            if role == "announcement_date":
+                eligible = 0 <= distance_days <= normalized_announcement_window
+            elif role == "record_date":
+                eligible = 0 <= distance_days <= normalized_window
+            else:
+                eligible = (
+                    -ARCHIVE_TDX_OPERATIONAL_LOOKBACK_DAYS
+                    <= distance_days
+                    <= normalized_window
+                )
+            if eligible:
+                matched_anchors.append({
+                    "role": role,
+                    "date": anchor.isoformat(),
+                    "distance_days": distance_days,
+                })
+        if not matched_anchors:
+            continue
+        tdx_event = {
+            "cash_per_share": _number(row.get("fenhong")) / 10.0,
+            "bonus_per_share": _number(row.get("songzhuangu")) / 10.0,
+            "rights_per_share": _number(row.get("peigu")) / 10.0,
+            "rights_price": _number(row.get("peigujia")),
+        }
+        differences = _economic_differences(cninfo_event, tdx_event)
+        rounded_tolerances = _rounded_field_tolerances(
+            tdx_event,
+            precision_policy,
+        )
+        matches = all(
+            difference <= max(
+                normalized_tolerance,
+                rounded_tolerances.get(field_name, 0.0),
+            )
+            for field_name, difference in differences.items()
+        )
+        if not matches:
+            continue
+        candidates.append({
+            "tdx_id": row.get("id"),
+            "tdx_ex_date": tdx_date.isoformat(),
+            "anchor_distance_days": min(
+                abs(item["distance_days"]) for item in matched_anchors
+            ),
+            "matched_anchors": matched_anchors,
+            "differences": differences,
+            "rounded_field_tolerances": rounded_tolerances,
+        })
+
+    anchor_policy = {
+        "anchor_dates": {
+            role: value.isoformat() for role, value in anchors.items()
+        },
+        "operational_forward_window_days": normalized_window,
+        "operational_lookback_days": ARCHIVE_TDX_OPERATIONAL_LOOKBACK_DAYS,
+        "announcement_forward_window_days": normalized_announcement_window,
+    }
+    if not candidates:
+        return {
+            "matched": False,
+            "reason": "tdx_economic_event_not_found_in_anchor_window",
+            **anchor_policy,
+        }
+    if len(candidates) != 1:
+        return {
+            "matched": False,
+            "reason": "ambiguous_tdx_archive_date_match",
+            **anchor_policy,
+            "candidates": candidates,
+        }
+    selected = candidates[0]
+    return {
+        "matched": True,
+        "reason": "unique_tdx_archive_date_match",
+        "effective_date": selected["tdx_ex_date"],
+        "date_basis": "tdx_xdxr_archive_date_reference",
+        "selected_tdx_event": selected,
+        **anchor_policy,
+    }
 
 
 def _excluded_cninfo_event_dates(

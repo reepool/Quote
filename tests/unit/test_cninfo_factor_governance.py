@@ -10,6 +10,7 @@ from data_sources.cninfo_factor_governance import (
     derive_cninfo_factor_path,
     derive_tdx_factor_path,
     evaluate_coverage_intervals,
+    match_cninfo_archive_tdx_date,
     reconcile_cninfo_tdx_events,
 )
 
@@ -181,6 +182,249 @@ def test_unlocated_cninfo_event_blocks_factor_path():
         item["reason"] == "prior_unlocated_event_pending"
         for item in result["pending"]
     )
+
+
+def test_governed_no_factor_event_does_not_block_later_path():
+    result = derive_cninfo_factor_path(
+        [
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "non-effective",
+                "ex_date": None,
+                "resolved_factor_effect": "none",
+                "factor_exclusion_reason": "resolution_state:non_effective",
+                "event_status": "announced_incomplete",
+            },
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "known-date",
+                "ex_date": date(1996, 8, 1),
+                "event_status": "implemented",
+                "cash_dividend_per_share": 0.1,
+            },
+        ],
+        [{
+            "instrument_id": "000004.SZ",
+            "source_date": date(1996, 8, 1),
+            "effective_date": date(1996, 8, 1),
+            "pre_close": 10.0,
+        }],
+    )
+
+    assert result["pending"] == []
+    assert result["historical_gaps"] == []
+    assert result["excluded_no_effect"] == [{
+        "instrument_id": "000004.SZ",
+        "source_event_key": "non-effective",
+        "reason": "resolution_state:non_effective",
+        "effective_date": None,
+        "suppressed_dates": [],
+    }]
+    assert result["events"][0]["source_event_keys"] == ["known-date"]
+
+
+def test_historical_root_gap_is_reported_once_without_later_pending_rows():
+    result = derive_cninfo_factor_path(
+        [
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "archive-gap",
+                "ex_date": None,
+                "record_date": date(1995, 7, 31),
+                "resolution_state": "official_archive_unavailable",
+                "historical_gap_reason": "tdx_economic_event_not_found",
+                "event_status": "announced_incomplete",
+            },
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "known-date",
+                "ex_date": date(1996, 8, 1),
+                "event_status": "implemented",
+                "cash_dividend_per_share": 0.1,
+            },
+        ],
+        [{
+            "instrument_id": "000004.SZ",
+            "source_date": date(1996, 8, 1),
+            "effective_date": date(1996, 8, 1),
+            "pre_close": 10.0,
+        }],
+    )
+
+    assert result["pending"] == []
+    assert result["historical_gaps"] == [{
+        "instrument_id": "000004.SZ",
+        "source_event_key": "archive-gap",
+        "reason": "tdx_economic_event_not_found",
+        "resolution_state": "official_archive_unavailable",
+        "date_match": None,
+        "ordering_anchor_date": "1995-07-31",
+    }]
+    assert result["events"][0]["path_has_prior_historical_gap"] is True
+    assert result["observations"][0]["quality_status"] == (
+        "partial_prior_historical_gap"
+    )
+
+
+def test_historical_gap_marks_only_events_on_or_after_its_anchor():
+    result = derive_cninfo_factor_path(
+        [
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "earlier-event",
+                "ex_date": date(1994, 6, 1),
+                "event_status": "implemented",
+                "cash_dividend_per_share": 0.1,
+            },
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "archive-gap",
+                "ex_date": None,
+                "announcement_date": date(1995, 7, 1),
+                "record_date": date(1995, 7, 31),
+                "resolution_state": "official_archive_unavailable",
+                "historical_gap_reason": "tdx_economic_event_not_found",
+                "event_status": "announced_incomplete",
+            },
+            {
+                "instrument_id": "000004.SZ",
+                "source_event_key": "later-event",
+                "ex_date": date(1996, 8, 1),
+                "event_status": "implemented",
+                "cash_dividend_per_share": 0.1,
+            },
+        ],
+        [
+            {
+                "instrument_id": "000004.SZ",
+                "source_date": date(1994, 6, 1),
+                "effective_date": date(1994, 6, 1),
+                "pre_close": 10.0,
+            },
+            {
+                "instrument_id": "000004.SZ",
+                "source_date": date(1996, 8, 1),
+                "effective_date": date(1996, 8, 1),
+                "pre_close": 10.0,
+            },
+        ],
+    )
+
+    assert result["pending"] == []
+    assert result["historical_gaps"][0]["ordering_anchor_date"] == "1995-07-31"
+    assert [
+        event["path_has_prior_historical_gap"] for event in result["events"]
+    ] == [False, True]
+    assert [
+        row["quality_status"] for row in result["observations"]
+    ] == ["valid", "partial_prior_historical_gap"]
+
+
+def test_archive_date_match_uses_unique_tdx_date_only():
+    observation = {
+        "instrument_id": "000007.SZ",
+        "announcement_date": date(1993, 5, 16),
+        "record_date": date(1992, 11, 7),
+        "cash_dividend_per_share": 0.05,
+        "bonus_shares_per_share": 0.2,
+    }
+    result = match_cninfo_archive_tdx_date(
+        observation,
+        [
+            {
+                "id": 1,
+                "instrument_id": "000007.SZ",
+                "ex_date": date(1992, 11, 9),
+                "validation_result": "computed_unvalidated",
+                "fenhong": 0.5,
+                "songzhuangu": 2.0,
+                "peigu": 0.0,
+                "peigujia": 0.0,
+                "factor": 99.0,
+            },
+            {
+                "id": 2,
+                "instrument_id": "000007.SZ",
+                "ex_date": date(1993, 5, 31),
+                "validation_result": "computed_unvalidated",
+                "fenhong": 0.0,
+                "songzhuangu": 2.0,
+                "peigu": 5.0,
+                "peigujia": 9.0,
+                "factor": 88.0,
+            },
+        ],
+    )
+
+    assert result["matched"] is True
+    assert result["effective_date"] == "1992-11-09"
+    assert result["selected_tdx_event"]["tdx_id"] == 1
+    assert "factor" not in result["selected_tdx_event"]
+
+
+def test_archive_date_match_rejects_ambiguous_and_economic_conflicts():
+    observation = {
+        "instrument_id": "000001.SZ",
+        "announcement_date": date(1996, 6, 1),
+        "cash_dividend_per_share": 0.1,
+    }
+    matching = {
+        "instrument_id": "000001.SZ",
+        "validation_result": "computed_unvalidated",
+        "fenhong": 1.0,
+        "songzhuangu": 0.0,
+        "peigu": 0.0,
+        "peigujia": 0.0,
+    }
+    ambiguous = match_cninfo_archive_tdx_date(
+        observation,
+        [
+            {**matching, "id": 1, "ex_date": date(1996, 6, 5)},
+            {**matching, "id": 2, "ex_date": date(1996, 6, 10)},
+        ],
+    )
+    conflict = match_cninfo_archive_tdx_date(
+        observation,
+        [{
+            **matching,
+            "id": 3,
+            "ex_date": date(1996, 6, 10),
+            "fenhong": 2.0,
+        }],
+    )
+
+    assert ambiguous["matched"] is False
+    assert ambiguous["reason"] == "ambiguous_tdx_archive_date_match"
+    assert conflict["matched"] is False
+    assert conflict["reason"] == (
+        "tdx_economic_event_not_found_in_anchor_window"
+    )
+
+
+def test_archive_date_match_rejects_distant_announcement_only_candidate():
+    result = match_cninfo_archive_tdx_date(
+        {
+            "instrument_id": "000001.SZ",
+            "announcement_date": date(2000, 1, 1),
+            "cash_dividend_per_share": 0.1,
+        },
+        [{
+            "id": 1,
+            "instrument_id": "000001.SZ",
+            "ex_date": date(2001, 6, 30),
+            "validation_result": "computed_unvalidated",
+            "fenhong": 1.0,
+            "songzhuangu": 0.0,
+            "peigu": 0.0,
+            "peigujia": 0.0,
+        }],
+    )
+
+    assert result["matched"] is False
+    assert result["reason"] == (
+        "tdx_economic_event_not_found_in_anchor_window"
+    )
+    assert result["announcement_forward_window_days"] == 120
 
 
 def test_cninfo_partial_economic_fields_are_pending_not_zero_effect():

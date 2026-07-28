@@ -17872,6 +17872,7 @@ class DataManager:
             derive_cninfo_factor_path,
             derive_tdx_factor_path,
             evaluate_coverage_intervals,
+            match_cninfo_archive_tdx_date,
             reconcile_cninfo_tdx_events,
         )
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
@@ -17909,11 +17910,16 @@ class DataManager:
                 universe.append({
                     "instrument_id": instrument_id,
                     "exchange": exchange,
+                    "listed_date": instrument.get("listed_date"),
                 })
         universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
         target_ids = [item["instrument_id"] for item in universe]
         exchange_by_instrument = {
             item["instrument_id"]: item["exchange"] for item in universe
+        }
+        listed_date_by_instrument = {
+            item["instrument_id"]: self._date_from_any(item.get("listed_date"))
+            for item in universe
         }
         missing_ids = sorted(requested_ids - set(target_ids))
         if missing_ids:
@@ -17950,7 +17956,14 @@ class DataManager:
                        cash_dividend_per_share, bonus_shares_per_share,
                        capitalization_shares_per_share,
                        rights_shares_per_share, rights_price,
-                       event_status, quality_status, is_current
+                       event_status, quality_status, is_current,
+                       (
+                           SELECT state.resolution_state
+                           FROM corporate_action_resolution_states AS state
+                           WHERE state.source_event_key
+                                 = corporate_action_observations.source_event_key
+                           LIMIT 1
+                       ) AS resolution_state
                 FROM corporate_action_observations
                 WHERE instrument_id IN ({placeholders})
                   AND source = 'cninfo'
@@ -17998,7 +18011,7 @@ class DataManager:
             ))
             tdx_rows.extend(await self.db_ops.execute_read_query(
                 f"""
-                SELECT instrument_id, ex_date, factor, cumulative_factor,
+                SELECT id, instrument_id, ex_date, factor, cumulative_factor,
                        validation_result, pre_close,
                        fenhong, songzhuangu, peigu, peigujia
                 FROM adjustment_factors_tdx
@@ -18066,7 +18079,85 @@ class DataManager:
             terms_result = terms_loader(source_event_keys)
             if inspect.isawaitable(terms_result):
                 resolved_term_overlays = await terms_result
+        archive_candidate_windows: Dict[str, Tuple[date, date]] = {}
+        for row in cninfo_rows:
+            event_key = str(row.get("source_event_key") or "")
+            resolved = resolved_date_evidence.get(event_key)
+            if (
+                str(row.get("resolution_state") or "").strip().lower()
+                != "official_archive_unavailable"
+                or self._date_from_any(row.get("ex_date")) is not None
+                or (
+                    resolved
+                    and self._date_from_any(resolved.get("effective_date"))
+                    is not None
+                )
+            ):
+                continue
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            operational_anchors = [
+                parsed
+                for field_name in ("record_date", "pay_date", "share_arrival_date")
+                if (parsed := self._date_from_any(row.get(field_name))) is not None
+            ]
+            if operational_anchors:
+                candidate_start = min(operational_anchors) - timedelta(days=31)
+                candidate_end = max(operational_anchors) + timedelta(days=550)
+            else:
+                announcement_date = self._date_from_any(
+                    row.get("announcement_date")
+                )
+                if announcement_date is None:
+                    continue
+                candidate_start = announcement_date
+                candidate_end = announcement_date + timedelta(days=120)
+            existing_window = archive_candidate_windows.get(instrument_id)
+            archive_candidate_windows[instrument_id] = (
+                min(existing_window[0], candidate_start)
+                if existing_window else candidate_start,
+                max(existing_window[1], candidate_end)
+                if existing_window else candidate_end,
+            )
+        archive_tdx_rows: List[Dict[str, Any]] = []
+        archive_candidate_items = sorted(archive_candidate_windows.items())
+        for offset in range(0, len(archive_candidate_items), 150):
+            chunk = archive_candidate_items[offset: offset + 150]
+            clauses = []
+            params: Dict[str, Any] = {}
+            for index, (instrument_id, (candidate_start, candidate_end)) in (
+                enumerate(chunk)
+            ):
+                clauses.append(
+                    "("
+                    f"instrument_id = :archive_instrument_{index} "
+                    f"AND date(ex_date) BETWEEN :archive_start_{index} "
+                    f"AND :archive_end_{index}"
+                    ")"
+                )
+                params.update({
+                    f"archive_instrument_{index}": instrument_id,
+                    f"archive_start_{index}": candidate_start.isoformat(),
+                    f"archive_end_{index}": candidate_end.isoformat(),
+                })
+            archive_tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT id, instrument_id, ex_date, factor, cumulative_factor,
+                       validation_result, pre_close,
+                       fenhong, songzhuangu, peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE {" OR ".join(clauses)}
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
         factor_cninfo_rows: List[Dict[str, Any]] = []
+        archive_tdx_rows_by_instrument: Dict[
+            str, List[Dict[str, Any]]
+        ] = defaultdict(list)
+        for row in archive_tdx_rows:
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            if instrument_id:
+                archive_tdx_rows_by_instrument[instrument_id].append(row)
         cninfo_replacement_extra_keys: set[Tuple[str, date]] = set()
         cninfo_cleanup_source_event_keys: set[str] = set()
         resolved_outside_range = 0
@@ -18079,6 +18170,28 @@ class DataManager:
                 if resolved else None
             )
             merged_row = dict(row)
+            instrument_id = str(row.get("instrument_id") or "")
+            resolution_state = str(
+                row.get("resolution_state") or ""
+            ).strip().lower()
+            raw_source_date = self._date_from_any(row.get("ex_date"))
+            historical_date_match: Dict[str, Any] = {}
+            archive_date_reference = False
+            if (
+                resolution_state == "official_archive_unavailable"
+                and resolved_date is None
+                and raw_source_date is None
+            ):
+                historical_date_match = match_cninfo_archive_tdx_date(
+                    row,
+                    archive_tdx_rows_by_instrument.get(instrument_id, ()),
+                    field_tolerance=max(0.0, float(field_tolerance)),
+                )
+                if historical_date_match.get("matched"):
+                    resolved_date = self._date_from_any(
+                        historical_date_match.get("effective_date")
+                    )
+                    archive_date_reference = resolved_date is not None
             economic_field_names = (
                 "cash_dividend_per_share",
                 "bonus_shares_per_share",
@@ -18101,6 +18214,16 @@ class DataManager:
             factor_effect = str(
                 resolved_terms.get("factor_effect") or "normal"
             ).strip().lower()
+            factor_exclusion_reason: Optional[str] = None
+            if resolution_state in {
+                "non_effective",
+                "scope_mismatch",
+                "superseded",
+            }:
+                factor_effect = "none"
+                factor_exclusion_reason = (
+                    f"resolution_state:{resolution_state}"
+                )
             factor_override = resolved_terms.get("factor_override")
             authoritative_override = bool(
                 resolved_terms.get("authoritative_override")
@@ -18117,6 +18240,7 @@ class DataManager:
                 and (
                     authoritative_override
                     or operator_date_override
+                    or archive_date_reference
                 )
             )
             selected_source_date = (
@@ -18124,7 +18248,23 @@ class DataManager:
                 if authoritative_effective_date
                 else self._date_from_any(row.get("ex_date")) or resolved_date
             )
-            raw_source_date = self._date_from_any(row.get("ex_date"))
+            listed_date = listed_date_by_instrument.get(instrument_id)
+            if (
+                selected_source_date is not None
+                and listed_date is not None
+                and selected_source_date < listed_date
+            ):
+                factor_effect = "none"
+                factor_exclusion_reason = "pre_listing_corporate_action"
+            historical_gap_reason: Optional[str] = None
+            if (
+                resolution_state == "official_archive_unavailable"
+                and selected_source_date is None
+            ):
+                historical_gap_reason = str(
+                    historical_date_match.get("reason")
+                    or "official_archive_unavailable_without_date_match"
+                )
             if (
                 authoritative_effective_date
                 and raw_source_date is not None
@@ -18174,13 +18314,30 @@ class DataManager:
                 **merged_row,
                 "resolved_effective_date": resolved_date,
                 "resolved_date_basis": (
-                    resolved.get("date_basis") if resolved else None
+                    historical_date_match.get("date_basis")
+                    if archive_date_reference
+                    else resolved.get("date_basis") if resolved else None
                 ),
                 "resolved_evidence_source": (
-                    resolved.get("evidence_source") if resolved else None
+                    "tdx_xdxr_archive_date_reference"
+                    if archive_date_reference
+                    else resolved.get("evidence_source") if resolved else None
                 ),
                 "resolved_evidence_key": (
-                    resolved.get("evidence_key") if resolved else None
+                    (
+                        "tdx_xdxr:"
+                        + str(
+                            (
+                                historical_date_match.get(
+                                    "selected_tdx_event"
+                                )
+                                or {}
+                            ).get("tdx_id")
+                            or historical_date_match.get("effective_date")
+                        )
+                    )
+                    if archive_date_reference
+                    else resolved.get("evidence_key") if resolved else None
                 ),
                 "resolved_economic_terms": bool(applied_economic_fields),
                 "resolved_economic_fields": applied_economic_fields,
@@ -18188,6 +18345,13 @@ class DataManager:
                 "resolved_factor_override": factor_override,
                 "resolved_date_authoritative": authoritative_effective_date,
                 "resolved_authoritative_override": authoritative_override,
+                "factor_exclusion_reason": factor_exclusion_reason,
+                "historical_gap_reason": historical_gap_reason,
+                "historical_date_match": (
+                    historical_date_match or None
+                ),
+                "resolution_state": resolution_state or None,
+                "listed_date": listed_date,
             })
 
         quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
@@ -18327,6 +18491,7 @@ class DataManager:
             str(item.get("instrument_id"))
             for item in [
                 *cninfo_path["pending"],
+                *cninfo_path.get("historical_gaps", []),
                 *tdx_path["pending"],
                 *reconciliation.get("conflicts", []),
                 *reconciliation.get("cninfo_only", []),
@@ -18339,7 +18504,10 @@ class DataManager:
         missing_profile_samples: List[Dict[str, Any]] = []
         cninfo_pending_ids = {
             str(item.get("instrument_id"))
-            for item in cninfo_path["pending"]
+            for item in [
+                *cninfo_path["pending"],
+                *cninfo_path.get("historical_gaps", []),
+            ]
             if item.get("instrument_id")
         }
         for instrument_id in target_ids:
@@ -18405,7 +18573,11 @@ class DataManager:
         )
         pending_factor_ids = {
             str(item.get("instrument_id"))
-            for item in [*cninfo_path["pending"], *tdx_path["pending"]]
+            for item in [
+                *cninfo_path["pending"],
+                *cninfo_path.get("historical_gaps", []),
+                *tdx_path["pending"],
+            ]
             if item.get("instrument_id")
         }
         baseline_covered_ids = sorted(
@@ -18463,6 +18635,9 @@ class DataManager:
             "pending_factor_events": (
                 len(cninfo_path["pending"]) + len(tdx_path["pending"])
             ),
+            "historical_factor_gaps": len(
+                cninfo_path.get("historical_gaps", [])
+            ),
             "endpoint_incomplete_instruments": len(endpoint_incomplete_ids),
             "tdx_coverage_status_rows": len(tdx_endpoint_status_rows),
             "tdx_coverage_gap_samples": tdx_coverage_gap_samples,
@@ -18472,6 +18647,9 @@ class DataManager:
             "endpoint_completeness": overall_completeness["status"] == "success",
             "no_pending_factor_events": not (
                 cninfo_path["pending"] or tdx_path["pending"]
+            ),
+            "no_historical_factor_gaps": not cninfo_path.get(
+                "historical_gaps"
             ),
             "event_reconciliation": reconciliation.get("status") == "success",
             "no_unverified_tdx_fallback": (
@@ -18527,6 +18705,7 @@ class DataManager:
                         "benchmarked"
                         if not cninfo_path["pending"]
                         and not tdx_path["pending"]
+                        and not cninfo_path.get("historical_gaps")
                         and not endpoint_incomplete_ids
                         else "partial"
                     ),
@@ -18606,6 +18785,7 @@ class DataManager:
 
         has_operational_issues = bool(
             cninfo_path["pending"]
+            or cninfo_path.get("historical_gaps")
             or tdx_path["pending"]
             or endpoint_incomplete_ids
         )
@@ -18648,6 +18828,12 @@ class DataManager:
                 ),
                 "excluded_no_effect": (
                     cninfo_path.get("excluded_no_effect") or []
+                )[:sample_limit],
+                "historical_gap_count": len(
+                    cninfo_path.get("historical_gaps") or []
+                ),
+                "historical_gaps": (
+                    cninfo_path.get("historical_gaps") or []
                 )[:sample_limit],
             },
             "tdx_path": {
