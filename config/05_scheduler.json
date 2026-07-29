@@ -63,7 +63,7 @@
       "a_share_cninfo_corporate_action_daily_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "A股公司行动增量日更：公告/近期事件驱动CNInfo定向刷新、TDX快速全市场刷新及受影响标的因子重建（不切换生产主源）",
+        "description": "每日 CnInfo 分红配股送转事件更新",
         "report": true,
         "pre_run_notify": true,
         "trigger": {

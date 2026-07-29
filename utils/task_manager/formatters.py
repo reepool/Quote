@@ -346,6 +346,8 @@ class TaskManagerFormatters:
     @staticmethod
     def _task_domain(job_id: str) -> str:
         job_id = job_id.lower()
+        if job_id == "a_share_cninfo_corporate_action_daily_sync":
+            return "A股行情与主数据"
         if any(key in job_id for key in ("futures", "commodity")):
             return "大宗商品市场"
         if job_id.startswith("fx_") or any(

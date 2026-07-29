@@ -72,6 +72,26 @@ def test_status_summary_groups_tasks_by_status_and_domain():
     assert text.index("**股东与披露**") < text.index("`/run shareholder_reconciliation_sync`")
 
 
+def test_status_summary_places_cninfo_daily_sync_in_a_share_market_group():
+    task = {
+        "job_id": "a_share_cninfo_corporate_action_daily_sync",
+        "description": "每日 CnInfo 分红配股送转事件更新",
+        "next_run": "今天 03:30",
+        "status": "running",
+    }
+
+    text = TaskManagerFormatters.format_task_status_summary(
+        [task],
+        [],
+        total_tasks=1,
+    )
+
+    assert "**A股行情与主数据**" in text
+    assert "**其他**" not in text
+    assert "• 每日 CnInfo 分红配股送转事件更新：" in text
+    assert "`/run a_share_cninfo_corporate_action_daily_sync`" in text
+
+
 def test_status_summary_accepts_task_status_enum():
     class _Task:
         job_id = "hkex_instrument_master_sync"
