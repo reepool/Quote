@@ -5728,7 +5728,7 @@ class DatabaseOperations:
             "manual_required",
             "conflict", "non_effective", "superseded",
             "scope_mismatch", "pre_listing",
-            "official_archive_unavailable",
+            "official_archive_unavailable", "archive_gap_ignored",
             "evidence_unavailable", "discovery_pending", "retryable_error",
         }
         counters = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}

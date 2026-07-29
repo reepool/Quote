@@ -7,7 +7,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 
 APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v6"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v7"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 CNINFO_ASYMMETRIC_POLICY_VERSION = "cninfo_asymmetric_passthrough_v1"
@@ -1274,6 +1274,16 @@ def derive_resolution_state(
             state, reason, next_action, terminal = (
                 "scope_mismatch",
                 "review_confirmed_a_share_scope_mismatch",
+                "none",
+                True,
+            )
+        elif (
+            decision == "rejected"
+            and terminal_reason == "archive_gap_ignored"
+        ):
+            state, reason, next_action, terminal = (
+                "archive_gap_ignored",
+                "review_accepted_unrecoverable_historical_archive_gap",
                 "none",
                 True,
             )

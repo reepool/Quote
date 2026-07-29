@@ -55,6 +55,46 @@ remaining post-listing archive gap for manual review using existing local data.
 - **THEN** the review workbook contains exactly the remaining ten full event keys, CNInfo facts, listing dates, nearby TDX evidence, failure reasons, and blank operator-decision fields
 - **AND** no document download, OCR, or LLM invocation occurs
 
+### Requirement: Operator-Accepted Archive Gaps Are Nonblocking
+The system SHALL support a distinct terminal `archive_gap_ignored` disposition
+for a frozen historical CNInfo event whose official implementation evidence is
+irrecoverable and which the operator accepts excluding from factor calculation.
+
+#### Scenario: Irrecoverable historical event is accepted as a gap
+- **WHEN** an operator supplies the full source-event key, current CNInfo row
+  hash, and an attestation that the official archive cannot be recovered
+- **THEN** the review is persisted without a fabricated effective date
+- **AND** the event becomes terminal and nonblocking with state
+  `archive_gap_ignored`
+- **AND** the system does not claim the event was economically non-effective
+
+#### Scenario: Accepted archive gap enters factor assembly
+- **WHEN** a current CNInfo event has state `archive_gap_ignored`
+- **THEN** factor derivation emits an auditable no-factor exclusion instead of
+  a historical root gap or missing-date pending event
+
+### Requirement: B-Share-Only Events Are Outside The A-Share Factor Scope
+The system SHALL permit an operator-confirmed B-share-only distribution to be
+classified as terminal `scope_mismatch` for the A-share factor path.
+
+#### Scenario: Frozen observation explicitly describes a B-share distribution
+- **WHEN** an operator confirms that a frozen CNInfo observation applies only
+  to B shares
+- **THEN** the source observation remains unchanged
+- **AND** the A-share factor path excludes it without requesting an ex-date
+
+### Requirement: Final Ten-Event Decisions Preserve Source And Factor Data
+The fixed final manifest SHALL apply two `scope_mismatch` and eight
+`archive_gap_ignored` decisions using existing local data only.
+
+#### Scenario: Final manifest is written
+- **WHEN** the ten full event keys and current row hashes match the frozen
+  manifest
+- **THEN** only resolution reviews and resolution-state projections change
+- **AND** CNInfo observations, TDX audit rows, and production factor rows remain
+  byte-equivalent by canonical content hash
+- **AND** no document download, OCR, or LLM invocation occurs
+
 ### Requirement: Archive Date Recovery Uses TDX Date Only
 For an `official_archive_unavailable` CNInfo event, the system SHALL use a TDX
 effective date only when one bounded same-instrument candidate uniquely matches

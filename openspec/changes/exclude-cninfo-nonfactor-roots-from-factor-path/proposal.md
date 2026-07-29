@@ -27,6 +27,11 @@ market quote can exist.
   alone remains insufficient for generic automatic classification.
 - Close explanatory zero-economic records as `non_effective` and export the
   remaining post-listing archive gaps for explicit operator review.
+- Allow an operator to close a frozen archive gap as
+  `archive_gap_ignored` when official evidence is irrecoverable, without
+  asserting that the underlying economic event did not occur.
+- Close B-share-only distributions as `scope_mismatch` for the A-share factor
+  path and apply the final frozen ten-event operator manifest locally.
 
 ## Capabilities
 
@@ -52,3 +57,6 @@ None.
   the CNInfo factor path.
 - The fixed terminal-decision run uses only existing local data and performs no
   document downloads, OCR, or LLM invocation.
+- The final ten-event run changes only resolution reviews and projected states;
+  CNInfo source facts, TDX audit rows, and production factor rows are
+  hash-checked as immutable.

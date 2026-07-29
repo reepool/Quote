@@ -139,7 +139,17 @@ def _tdx_event(**overrides):
 
 
 @pytest.mark.asyncio
-async def test_terminal_disposition_persists_review_without_fake_date():
+@pytest.mark.parametrize(
+    "terminal_reason",
+    [
+        "archive_gap_ignored",
+        "pre_listing",
+        "scope_mismatch",
+    ],
+)
+async def test_terminal_disposition_persists_review_without_fake_date(
+    terminal_reason,
+):
     manager = DataManager()
     manager.db_ops = Mock()
     manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
@@ -164,7 +174,7 @@ async def test_terminal_disposition_persists_review_without_fake_date():
         return_value=[{
             **_state(
                 "event-1",
-                "pre_listing",
+                terminal_reason,
                 terminal=True,
                 next_action="none",
             ),
@@ -185,7 +195,7 @@ async def test_terminal_disposition_persists_review_without_fake_date():
             "instrument_id": "000001.SZ",
             "source_event_key": "event-1",
             "reviewer": "unit-reviewer",
-            "terminal_reason": "pre_listing",
+            "terminal_reason": terminal_reason,
             "expected_row_hash": "a" * 64,
             "notes": "operator confirmed",
             "operator_attestation": {
@@ -199,12 +209,12 @@ async def test_terminal_disposition_persists_review_without_fake_date():
         manager.db_ops.save_corporate_action_resolution_review
         .await_args.args[0]
     )
-    assert result["resolution_state"]["resolution_state"] == "pre_listing"
+    assert result["resolution_state"]["resolution_state"] == terminal_reason
     assert saved["analysis_id"] is None
     assert saved["decision"] == "rejected"
     assert saved["effective_date"] is None
     assert saved["date_basis"] is None
-    assert saved["review_payload"]["terminal_reason"] == "pre_listing"
+    assert saved["review_payload"]["terminal_reason"] == terminal_reason
     assert saved["review_payload"][
         "effective_date_intentionally_absent"
     ] is True
@@ -2019,6 +2029,29 @@ def test_reviewed_pre_listing_is_terminal_without_effective_date():
 
     assert reviewed["resolution_state"] == "pre_listing"
     assert reviewed["state_reason"] == "review_confirmed_pre_listing_event"
+    assert reviewed["is_terminal"] is True
+    assert reviewed["factor_blocking"] is False
+
+
+def test_reviewed_archive_gap_ignored_is_terminal_without_denial():
+    reviewed = derive_resolution_state(
+        _row(announcement_date="1998-06-01"),
+        latest_review={
+            "decision": "rejected",
+            "effective_date": None,
+            "review_payload": {
+                "terminal_reason": "archive_gap_ignored",
+                "operator_attestation": {
+                    "economic_event_denied": False,
+                },
+            },
+        },
+    )
+
+    assert reviewed["resolution_state"] == "archive_gap_ignored"
+    assert reviewed["state_reason"] == (
+        "review_accepted_unrecoverable_historical_archive_gap"
+    )
     assert reviewed["is_terminal"] is True
     assert reviewed["factor_blocking"] is False
 

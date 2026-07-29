@@ -18216,6 +18216,7 @@ class DataManager:
             ).strip().lower()
             factor_exclusion_reason: Optional[str] = None
             if resolution_state in {
+                "archive_gap_ignored",
                 "non_effective",
                 "pre_listing",
                 "scope_mismatch",
@@ -24532,6 +24533,7 @@ class DataManager:
                         'non_effective',
                         'pre_listing',
                         'scope_mismatch',
+                        'archive_gap_ignored',
                         'not_applicable',
                         'resolved_source',
                         'source_not_supported',
@@ -26741,8 +26743,10 @@ class DataManager:
         ).strip()
         operator_attestation = payload.get("operator_attestation")
         allowed_terminal_reasons = {
+            "archive_gap_ignored",
             "non_effective",
             "pre_listing",
+            "scope_mismatch",
         }
         if not all((
             instrument_id,

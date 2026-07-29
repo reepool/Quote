@@ -163,4 +163,32 @@ async def test_resolution_state_upsert_is_idempotent_and_filterable():
         "inserted": 0, "changed": 1, "unchanged": 0, "failed": 0
     }
     assert pre_listing_page["total"] == 1
+    archive_gap_ignored = (
+        await operations.upsert_corporate_action_resolution_states(
+            [{
+                **row,
+                "resolution_state": "archive_gap_ignored",
+                "is_terminal": True,
+                "factor_blocking": False,
+                "state_reason": (
+                    "review_accepted_unrecoverable_historical_archive_gap"
+                ),
+                "next_action": "none",
+            }],
+            ingestion_run_id="run-4",
+        )
+    )
+    archive_gap_page = (
+        await operations.get_corporate_action_resolution_states(
+            resolution_state="archive_gap_ignored",
+            is_terminal=True,
+            factor_blocking=False,
+            limit=10,
+            offset=0,
+        )
+    )
+    assert archive_gap_ignored == {
+        "inserted": 0, "changed": 1, "unchanged": 0, "failed": 0
+    }
+    assert archive_gap_page["total"] == 1
     await engine.dispose()

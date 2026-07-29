@@ -1986,6 +1986,7 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     assert "corporate_action_resolution_states" in candidate_query
     assert "s.resolution_state IN" in candidate_query
     assert "s.is_terminal = 1" not in candidate_query
+    assert "'archive_gap_ignored'" in candidate_query
     manager.db_ops.save_corporate_action_document_bundle.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
 

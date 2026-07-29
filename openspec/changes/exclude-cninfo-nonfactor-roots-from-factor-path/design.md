@@ -89,6 +89,20 @@ CNInfo values.
    non-effective decisions are applied, only the remaining post-listing
    archive gaps are exported for manual review.
 
+8. A frozen operator decision may classify an A-share factor candidate as
+   `scope_mismatch` when the CNInfo observation explicitly describes a B-share
+   distribution. A separate `archive_gap_ignored` terminal state records that
+   an otherwise potentially real historical event is excluded because its
+   official implementation evidence cannot be recovered. The latter does not
+   mean `non_effective` and does not rewrite CNInfo economics.
+
+9. The final ten-event manifest is applied from existing local data only. Each
+   item is bound to its full source-event key and current CNInfo row hash.
+   Before and after the write, the script hashes the selected CNInfo source
+   observations, all TDX rows for the affected instruments, and production
+   factor tables. Only resolution reviews and current resolution-state
+   projections may change.
+
 ## Risks / Trade-offs
 
 - [A broad date window could find an unrelated TDX event] -> Use role-specific
@@ -104,6 +118,9 @@ CNInfo values.
 - [Resolved operator evidence could be overridden] -> Apply governed/operator
   resolved dates before archive matching and never run archive matching when a
   resolved date already exists.
+- [Ignoring a historical gap could be mistaken for declaring no event] -> Use
+  the distinct `archive_gap_ignored` state and preserve the operator
+  attestation that the archive is irrecoverable.
 
 ## Migration Plan
 

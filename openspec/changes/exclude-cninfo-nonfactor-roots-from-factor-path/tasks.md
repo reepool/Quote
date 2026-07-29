@@ -28,3 +28,10 @@
 - [x] 5.2 Apply the frozen 42 announcement-only plus 3 operational pre-listing decisions and 17 zero-economic non-effective decisions
 - [x] 5.3 Export the remaining 10 post-listing archive gaps to a clear Excel workbook
 - [x] 5.4 Run focused tests, full dry-run audit, uncommitted review, commit, and push
+
+## 6. Final Archive-Gap Operator Decisions
+
+- [x] 6.1 Add terminal `scope_mismatch` and `archive_gap_ignored` operator dispositions
+- [x] 6.2 Exclude `archive_gap_ignored` from factor and LLM candidate paths
+- [x] 6.3 Apply the frozen two B-share and eight irrecoverable-archive decisions with immutable-data checks
+- [x] 6.4 Run focused tests, full dry-run audit, uncommitted review, commit, and push
