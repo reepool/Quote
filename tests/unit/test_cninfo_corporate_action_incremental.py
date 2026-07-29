@@ -1,13 +1,16 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
+from zoneinfo import ZoneInfo
 
 import pytest
 
 from data_manager import DataManager
 from data_sources.cninfo_corporate_action_incremental import (
     build_incremental_refresh_candidates,
+    classify_daily_corporate_action_title,
     normalize_active_instruments,
+    resolve_daily_announcement_window,
     select_rotating_safety_instruments,
 )
 from research.announcements import (
@@ -30,6 +33,73 @@ def _active(count=6):
         }
         for index in range(1, count + 1)
     ])
+
+
+def test_calendar_daily_announcement_window_includes_previous_day_and_overnight():
+    run_at = datetime(
+        2026, 7, 29, 3, 30,
+        tzinfo=ZoneInfo("Asia/Shanghai"),
+    )
+
+    result = resolve_daily_announcement_window(
+        run_at=run_at,
+        schedule_mode="calendar_daily",
+    )
+
+    assert result["start_date"] == date(2026, 7, 28)
+    assert result["end_date"] == date(2026, 7, 29)
+    assert result["run_at"] == run_at
+
+
+def test_trading_day_announcement_window_spans_long_holiday():
+    result = resolve_daily_announcement_window(
+        run_at=datetime(
+            2026, 10, 9, 3, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        schedule_mode="trading_day",
+        previous_trading_day=date(2026, 9, 30),
+    )
+
+    assert result["start_date"] == date(2026, 9, 30)
+    assert result["end_date"] == date(2026, 10, 9)
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "2025年度权益分派实施公告",
+        "股权分置改革方案实施公告",
+        "重整计划资本公积金转增股本实施公告",
+        "业绩承诺补偿股份赠与完成公告",
+        "关于部分A股限制性股票回购注销实施公告",
+        "关于回购股份完成注销的公告",
+        "关于已回购股份完成注销暨股份变动的公告",
+        "库存股注销完成暨股份变动公告",
+        "关于减少注册资本实施完成的公告",
+    ],
+)
+def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
+    decision = classify_daily_corporate_action_title(title)
+
+    assert decision["selected"] is True
+    assert decision["subject_markers"]
+    assert decision["implementation_markers"]
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "2026年半年度报告",
+        "第五届董事会第三次会议决议公告",
+        "关于控股股东部分股份质押的公告",
+        "关于为全资子公司提供担保的公告",
+        "关于回购公司股份方案的公告",
+        "限制性股票归属结果暨股份上市公告",
+    ],
+)
+def test_daily_title_trigger_rejects_unrelated_disclosures(title):
+    assert classify_daily_corporate_action_title(title)["selected"] is False
 
 
 def test_candidate_priority_and_explicit_ids_bypass_automatic_limit():
@@ -104,7 +174,12 @@ def test_rotating_safety_selection_is_deterministic_and_bounded():
 async def test_market_announcement_scan_maps_activity_and_persists_governance():
     manager = DataManager()
     storage = Mock()
-    storage.get_announcement_scan_state.return_value = None
+    storage.get_announcement_scan_state.return_value = {
+        "metadata": {
+            "pending_candidate_ids": ["600001.SH"],
+            "pending_factor_instrument_ids": ["920000.BJ"],
+        },
+    }
     manager.research_config = Mock(enabled=True)
     manager.research_storage = storage
     active_instruments = {
@@ -123,8 +198,18 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
         source="cninfo",
         source_announcement_id="announcement-1",
         announcement_key=build_announcement_key("cninfo", "announcement-1"),
-        title="测试公告",
+        title="2025年度权益分派实施公告",
         published_at="2026-07-22T01:00:00+00:00",
+        exchange="SSE",
+        market="SSE",
+        symbols=("600000",),
+    )
+    future_record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="announcement-2",
+        announcement_key=build_announcement_key("cninfo", "announcement-2"),
+        title="2026年度权益分派实施公告",
+        published_at="2026-07-22T02:00:00+00:00",
         exchange="SSE",
         market="SSE",
         symbols=("600000",),
@@ -135,13 +220,14 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
             source="cninfo",
             query=query,
             status="success",
-            records=(record,),
+            records=(record, future_record),
             pages_scanned=1,
             requests_made=1,
-            announcements_seen=1,
+            announcements_seen=2,
+            max_published_at="2026-07-22T02:00:00+00:00",
             provider_cursor=ProviderCursor(
                 kind="published_at",
-                value="2026-07-22T01:00:00+00:00",
+                value="2026-07-22T02:00:00+00:00",
             ),
             is_complete=True,
             stop_reason="last_page",
@@ -168,6 +254,10 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
         exchanges=["SSE"],
         start_date=date(2026, 7, 15),
         end_date=date(2026, 7, 22),
+        run_at=datetime(
+            2026, 7, 22, 9, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
         overlap_days=3,
         page_size=30,
         max_pages=60,
@@ -176,21 +266,36 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     persisted = manager._persist_cninfo_daily_announcement_activity(
         discovery,
         pending_candidate_ids=["600001.SH"],
+        pending_factor_instrument_ids=["600000.SH"],
         active_instruments=active_instruments,
     )
 
     assert discovery["announcement_instrument_ids"] == ["600000.SH"]
+    assert discovery["deferred_announcement_instrument_ids"] == ["600001.SH"]
+    assert discovery["deferred_factor_instrument_ids"] == ["920000.BJ"]
     assert discovery["matched_announcements"] == 1
     assert persisted == {"scan_states_persisted": 1, "audits_persisted": 1}
     saved_scan = storage.upsert_announcement_scan_state.call_args.kwargs[
         "scan_result"
     ]
     assert saved_scan.selected_records[0].selection_reasons == (
-        "instrument_activity_trigger",
+        "corporate_action_announcement",
+    )
+    assert saved_scan.provider_cursor == ProviderCursor(
+        kind="published_at",
+        value="2026-07-22T01:30:00+00:00",
+    )
+    assert saved_scan.max_published_at == "2026-07-22T01:30:00+00:00"
+    assert saved_scan.diagnostics["provider_cursor_bounded_by_run_at"] is True
+    assert saved_scan.diagnostics["observed_max_published_at"] == (
+        "2026-07-22T02:00:00+00:00"
     )
     assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
         "pending_candidate_ids"
     ] == ["600001.SH"]
+    assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
+        "pending_factor_instrument_ids"
+    ] == ["600000.SH"]
     storage.store_announcement_audit.assert_called_once()
 
 

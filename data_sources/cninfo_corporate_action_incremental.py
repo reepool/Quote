@@ -4,8 +4,14 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timedelta
+import unicodedata
 from typing import Any, Dict, Iterable, Mapping, Sequence
+from zoneinfo import ZoneInfo
+
+from data_sources.cninfo_special_action_resolution import (
+    classify_cninfo_announcement_title_prefilter,
+)
 
 
 _REASON_PRIORITY = {
@@ -17,6 +23,51 @@ _REASON_PRIORITY = {
     "safety_sweep": 40,
 }
 
+DAILY_TITLE_TRIGGER_POLICY_VERSION = (
+    "cninfo_corporate_action_daily_title_trigger_v1"
+)
+_SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
+_DAILY_ACTION_SUBJECT_MARKERS = (
+    "权益分派",
+    "利润分配",
+    "现金红利",
+    "分红",
+    "派息",
+    "送股",
+    "转增",
+    "配股",
+    "缩股",
+    "股权分置",
+    "股改",
+    "对价",
+    "重整",
+    "补偿股份",
+    "股份补偿",
+    "股份赠与",
+    "债转股",
+    "以股抵债",
+    "股份注销",
+    "回购注销",
+    "库存股注销",
+    "减少注册资本",
+    "减资",
+)
+_DAILY_IMPLEMENTATION_MARKERS = (
+    "实施",
+    "完成",
+    "完毕",
+    "派发",
+    "派息",
+    "股权登记",
+    "到账",
+    "除权",
+    "除息",
+    "复牌",
+    "发行",
+    "上市",
+    "执行",
+)
+
 
 @dataclass(frozen=True)
 class CorporateActionRefreshCandidate:
@@ -27,6 +78,86 @@ class CorporateActionRefreshCandidate:
     exchange: str
     reasons: tuple[str, ...]
     priority: int
+
+
+def resolve_daily_announcement_window(
+    *,
+    run_at: datetime,
+    schedule_mode: str,
+    previous_trading_day: date | datetime | None = None,
+) -> Dict[str, Any]:
+    """Resolve the minimum complete announcement interval for one daily run."""
+    normalized_mode = str(schedule_mode or "").strip().lower()
+    if normalized_mode not in {"calendar_daily", "trading_day"}:
+        raise ValueError(
+            "announcement_schedule_mode must be calendar_daily or trading_day"
+        )
+    normalized_run_at = run_at
+    if normalized_run_at.tzinfo is None:
+        normalized_run_at = normalized_run_at.replace(tzinfo=_SHANGHAI_TZ)
+    else:
+        normalized_run_at = normalized_run_at.astimezone(_SHANGHAI_TZ)
+    run_date = normalized_run_at.date()
+    if normalized_mode == "calendar_daily":
+        start_date = run_date - timedelta(days=1)
+    else:
+        if isinstance(previous_trading_day, datetime):
+            previous_trading_day = previous_trading_day.date()
+        if previous_trading_day is None or previous_trading_day >= run_date:
+            raise ValueError(
+                "trading_day announcement mode requires a prior trading day"
+            )
+        start_date = previous_trading_day
+    return {
+        "schedule_mode": normalized_mode,
+        "start_date": start_date,
+        "end_date": run_date,
+        "run_at": normalized_run_at,
+    }
+
+
+def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
+    """Return whether a title is a useful structured-action refresh trigger."""
+    prefilter = classify_cninfo_announcement_title_prefilter(title)
+    if prefilter.get("excluded"):
+        return {
+            "selected": False,
+            "reason": f"prefilter:{prefilter.get('reason') or 'excluded'}",
+            "subject_markers": [],
+            "implementation_markers": [],
+            "prefilter": prefilter,
+            "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+        }
+    normalized_title = unicodedata.normalize("NFKC", str(title or "")).strip()
+    subject_markers = [
+        marker for marker in _DAILY_ACTION_SUBJECT_MARKERS
+        if marker in normalized_title
+    ]
+    if (
+        not subject_markers
+        and "回购" in normalized_title
+        and "注销" in normalized_title
+    ):
+        subject_markers.append("回购+注销")
+    implementation_markers = [
+        marker for marker in _DAILY_IMPLEMENTATION_MARKERS
+        if marker in normalized_title
+    ]
+    selected = bool(subject_markers and implementation_markers)
+    return {
+        "selected": selected,
+        "reason": (
+            "corporate_action_implementation"
+            if selected
+            else "missing_subject_marker"
+            if not subject_markers
+            else "missing_implementation_marker"
+        ),
+        "subject_markers": subject_markers,
+        "implementation_markers": implementation_markers,
+        "prefilter": prefilter,
+        "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+    }
 
 
 def normalize_active_instruments(

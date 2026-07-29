@@ -46,6 +46,11 @@ GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES = (
     "cninfo_tdx_xdxr_operator_review",
     "cninfo_operator_attestation",
 )
+DAILY_FACTOR_RETRY_SOURCE = "governance"
+DAILY_FACTOR_RETRY_PROFILE = "daily_factor_retry"
+DAILY_FACTOR_RETRY_STATUS = "pending_factor_rebuild"
+DAILY_FACTOR_RETRY_START = datetime(1990, 12, 19)
+DAILY_FACTOR_RETRY_END = datetime(9999, 12, 31)
 
 
 class DatabaseOperations:
@@ -2471,6 +2476,270 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to get latest quote date for {instrument_id}: {e}")
             return None
+
+    async def get_latest_stock_quote_dates_by_exchange(
+        self,
+        exchanges: List[str],
+        *,
+        listed_on_or_before: Optional[date] = None,
+        completed_on_or_before: Optional[date] = None,
+    ) -> Dict[str, date]:
+        """Return the latest date completely covered by tradable stocks."""
+        normalized_exchanges = sorted({
+            str(exchange or "").strip().upper()
+            for exchange in exchanges
+            if str(exchange or "").strip()
+        })
+        if not normalized_exchanges:
+            return {}
+        try:
+            async with self.get_async_session() as session:
+                bounded_quotes = select(
+                    DailyQuoteDB.instrument_id.label("instrument_id"),
+                    DailyQuoteDB.time.label("quote_time"),
+                    DailyQuoteDB.is_complete.label("is_complete"),
+                    DailyQuoteDB.tradestatus.label("tradestatus"),
+                )
+                if completed_on_or_before is not None:
+                    bounded_quotes = bounded_quotes.where(
+                        DailyQuoteDB.time <= datetime.combine(
+                            completed_on_or_before,
+                            datetime.max.time(),
+                        )
+                    )
+                bounded_quotes = bounded_quotes.subquery()
+                latest_observation_dates = (
+                    select(
+                        bounded_quotes.c.instrument_id,
+                        func.max(
+                            bounded_quotes.c.quote_time
+                        ).label("latest_observation_date"),
+                    )
+                    .group_by(bounded_quotes.c.instrument_id)
+                    .subquery()
+                )
+                latest_observation_states = (
+                    select(
+                        bounded_quotes.c.instrument_id,
+                        bounded_quotes.c.tradestatus,
+                    )
+                    .join(
+                        latest_observation_dates,
+                        and_(
+                            latest_observation_dates.c.instrument_id
+                            == bounded_quotes.c.instrument_id,
+                            latest_observation_dates.c.latest_observation_date
+                            == bounded_quotes.c.quote_time,
+                        ),
+                    )
+                    .subquery()
+                )
+                eligible_instrument_filters = [
+                    InstrumentDB.exchange.in_(normalized_exchanges),
+                    InstrumentDB.type == "stock",
+                    InstrumentDB.is_active.is_(True),
+                    InstrumentDB.trading_status == 1,
+                    ~InstrumentDB.name.endswith("退"),
+                ]
+                if listed_on_or_before is not None:
+                    listing_cutoff = datetime.combine(
+                        listed_on_or_before,
+                        datetime.max.time(),
+                    )
+                    eligible_instrument_filters.append(or_(
+                        InstrumentDB.listed_date.is_(None),
+                        InstrumentDB.listed_date <= listing_cutoff,
+                    ))
+                latest_by_instrument = (
+                    select(
+                        InstrumentDB.exchange.label("exchange"),
+                        InstrumentDB.instrument_id.label("instrument_id"),
+                        func.max(
+                            case(
+                                (
+                                    or_(
+                                        bounded_quotes.c.is_complete.is_(True),
+                                        bounded_quotes.c.is_complete.is_(None),
+                                    ),
+                                    bounded_quotes.c.quote_time,
+                                ),
+                                else_=None,
+                            )
+                        ).label("latest_quote_date"),
+                        latest_observation_states.c.tradestatus.label(
+                            "latest_tradestatus"
+                        ),
+                    )
+                    .select_from(InstrumentDB)
+                    .outerjoin(
+                        bounded_quotes,
+                        bounded_quotes.c.instrument_id
+                        == InstrumentDB.instrument_id,
+                    )
+                    .outerjoin(
+                        latest_observation_states,
+                        latest_observation_states.c.instrument_id
+                        == InstrumentDB.instrument_id,
+                    )
+                    .filter(*eligible_instrument_filters)
+                    .group_by(
+                        InstrumentDB.exchange,
+                        InstrumentDB.instrument_id,
+                        latest_observation_states.c.tradestatus,
+                    )
+                    .subquery()
+                )
+                currently_tradable_quotes = (
+                    select(latest_by_instrument)
+                    .where(or_(
+                        latest_by_instrument.c.latest_tradestatus.is_(None),
+                        latest_by_instrument.c.latest_tradestatus == 1,
+                    ))
+                    .subquery()
+                )
+                stmt = (
+                    select(
+                        currently_tradable_quotes.c.exchange,
+                        func.min(
+                            currently_tradable_quotes.c.latest_quote_date
+                        ).label("latest_quote_date"),
+                        func.count().label("expected_instruments"),
+                        func.count(
+                            currently_tradable_quotes.c.latest_quote_date
+                        ).label("covered_instruments"),
+                    )
+                    .group_by(currently_tradable_quotes.c.exchange)
+                )
+                rows = (await session.execute(stmt)).all()
+                return {
+                    str(exchange): (
+                        latest.date()
+                        if isinstance(latest, datetime)
+                        else latest
+                    )
+                    for exchange, latest, expected, covered in rows
+                    if (
+                        exchange
+                        and latest is not None
+                        and int(expected or 0) > 0
+                        and int(covered or 0) == int(expected or 0)
+                    )
+                }
+        except Exception as exc:
+            self.db_logger.error(
+                "Failed to get latest stock quote dates by exchange: %s", exc
+            )
+            return {}
+
+    async def get_corporate_action_daily_factor_retry_instrument_ids(
+        self,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> List[str]:
+        """Return independently persisted daily factor-rebuild retries."""
+        normalized_ids = sorted({
+            str(item).strip()
+            for item in (instrument_ids or [])
+            if str(item).strip()
+        })
+        try:
+            async with self.get_async_session() as session:
+                stmt = select(
+                    CorporateActionInstrumentStatusDB.instrument_id
+                ).where(
+                    CorporateActionInstrumentStatusDB.source
+                    == DAILY_FACTOR_RETRY_SOURCE,
+                    CorporateActionInstrumentStatusDB.source_profile
+                    == DAILY_FACTOR_RETRY_PROFILE,
+                    CorporateActionInstrumentStatusDB.coverage_status
+                    == DAILY_FACTOR_RETRY_STATUS,
+                )
+                if normalized_ids:
+                    stmt = stmt.where(
+                        CorporateActionInstrumentStatusDB.instrument_id.in_(
+                            normalized_ids
+                        )
+                    )
+                rows = (await session.execute(stmt)).scalars().all()
+                return sorted({
+                    str(item).strip() for item in rows if str(item).strip()
+                })
+        except Exception as exc:
+            self.db_logger.error(
+                "Failed to load corporate-action daily factor retries: %s",
+                exc,
+            )
+            raise
+
+    async def replace_corporate_action_daily_factor_retry_instruments(
+        self,
+        pending_instrument_ids: List[str],
+        *,
+        scope_instrument_ids: List[str],
+    ) -> Dict[str, int]:
+        """Replace factor retries only inside the current maintenance scope."""
+        scope_ids = sorted({
+            str(item).strip()
+            for item in scope_instrument_ids
+            if str(item).strip()
+        })
+        scope_id_set = set(scope_ids)
+        pending_ids = {
+            str(item).strip()
+            for item in pending_instrument_ids
+            if str(item).strip() in scope_id_set
+        }
+        if not scope_ids:
+            return {"inserted": 0, "cleared": 0, "pending": 0}
+        async with self.get_async_session() as session:
+            existing_ids = set((await session.execute(
+                select(
+                    CorporateActionInstrumentStatusDB.instrument_id
+                ).where(
+                    CorporateActionInstrumentStatusDB.source
+                    == DAILY_FACTOR_RETRY_SOURCE,
+                    CorporateActionInstrumentStatusDB.source_profile
+                    == DAILY_FACTOR_RETRY_PROFILE,
+                    CorporateActionInstrumentStatusDB.coverage_status
+                    == DAILY_FACTOR_RETRY_STATUS,
+                    CorporateActionInstrumentStatusDB.instrument_id.in_(
+                        scope_ids
+                    ),
+                )
+            )).scalars().all())
+            cleared_ids = existing_ids - pending_ids
+            if cleared_ids:
+                await session.execute(
+                    delete(CorporateActionInstrumentStatusDB).where(
+                        CorporateActionInstrumentStatusDB.source
+                        == DAILY_FACTOR_RETRY_SOURCE,
+                        CorporateActionInstrumentStatusDB.source_profile
+                        == DAILY_FACTOR_RETRY_PROFILE,
+                        CorporateActionInstrumentStatusDB.instrument_id.in_(
+                            sorted(cleared_ids)
+                        ),
+                    )
+                )
+            inserted_ids = pending_ids - existing_ids
+            now = get_shanghai_time()
+            for instrument_id in sorted(inserted_ids):
+                session.add(CorporateActionInstrumentStatusDB(
+                    instrument_id=instrument_id,
+                    source=DAILY_FACTOR_RETRY_SOURCE,
+                    source_profile=DAILY_FACTOR_RETRY_PROFILE,
+                    coverage_status=DAILY_FACTOR_RETRY_STATUS,
+                    event_count=0,
+                    missing_ex_date_count=0,
+                    requested_start_date=DAILY_FACTOR_RETRY_START,
+                    requested_end_date=DAILY_FACTOR_RETRY_END,
+                    ingestion_run_id="a_share_cninfo_corporate_action_daily_sync",
+                    last_attempt_at=now,
+                ))
+            await session.commit()
+        return {
+            "inserted": len(inserted_ids),
+            "cleared": len(cleared_ids),
+            "pending": len(pending_ids),
+        }
 
     # === Trading Calendar Operations ===
 

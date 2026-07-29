@@ -880,9 +880,12 @@ async def test_incomplete_rebuild_still_persists_benchmark_without_candidate():
         exchanges=["SZSE"],
         instrument_ids=["000001.SZ"],
         dry_run=False,
+        sample_limit=0,
     )
 
     assert result["status"] == "partial"
+    assert result["tdx_path"]["pending"] == []
+    assert result["tdx_path"]["pending_instrument_ids"] == ["000001.SZ"]
     assert result["write_result"]["canonical_saved_rows"] == 0
     assert result["write_result"]["benchmark_status_saved"] is True
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
@@ -898,7 +901,16 @@ async def test_bse_factor_rebuild_does_not_require_cninfo_endpoint_coverage():
 
     async def execute_read_query(query, _params):
         if "FROM corporate_action_observations" in query:
-            return []
+            return [{
+                "instrument_id": "920000.BJ",
+                "source_profile": "cninfo_dividend",
+                "source_event_key": "unsupported-bse-cninfo",
+                "action_type": "distribution",
+                "ex_date": None,
+                "event_status": "implemented",
+                "quality_status": "partial_missing_ex_date",
+                "is_current": 1,
+            }]
         if "FROM adjustment_factors_tdx" in query:
             return [{
                 "instrument_id": "920000.BJ",
@@ -951,6 +963,9 @@ async def test_bse_factor_rebuild_does_not_require_cninfo_endpoint_coverage():
     assert result["overall_completeness"][
         "missing_endpoint_profile_samples"
     ] == []
+    assert result["cninfo_path"]["pending_count"] == 0
+    assert result["source_completeness"]["cninfo"]["status"] == "success"
+    assert result["source_completeness"]["tdx_reference"]["status"] == "success"
 
 
 @pytest.mark.asyncio

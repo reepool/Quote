@@ -18061,6 +18061,20 @@ class DataManager:
                 params,
             ))
 
+        cninfo_target_ids = {
+            instrument_id
+            for instrument_id in target_ids
+            if exchange_by_instrument.get(instrument_id)
+            in CNINFO_SUPPORTED_EXCHANGES
+        }
+        cninfo_rows = [
+            row for row in cninfo_rows
+            if str(row.get("instrument_id") or "") in cninfo_target_ids
+        ]
+        endpoint_status_rows = [
+            row for row in endpoint_status_rows
+            if str(row.get("instrument_id") or "") in cninfo_target_ids
+        ]
         source_event_keys = [
             str(row.get("source_event_key") or "")
             for row in cninfo_rows
@@ -18491,12 +18505,9 @@ class DataManager:
             if not instrument_id or not source_profile:
                 continue
             endpoint_rows_by_profile[(instrument_id, source_profile)].append(row)
-        unresolved_ids = {
+        reconciliation_incomplete_ids = {
             str(item.get("instrument_id"))
             for item in [
-                *cninfo_path["pending"],
-                *cninfo_path.get("historical_gaps", []),
-                *tdx_path["pending"],
                 *reconciliation.get("conflicts", []),
                 *reconciliation.get("cninfo_only", []),
                 *reconciliation.get("tdx_only", []),
@@ -18560,7 +18571,48 @@ class DataManager:
                     })
             if incomplete_profiles:
                 endpoint_incomplete_ids.add(instrument_id)
+        cninfo_incomplete_ids = cninfo_pending_ids | endpoint_incomplete_ids
+        tdx_incomplete_ids = {
+            str(item.get("instrument_id"))
+            for item in tdx_path["pending"]
+            if item.get("instrument_id")
+        }
+        unresolved_ids = (
+            cninfo_incomplete_ids
+            | tdx_incomplete_ids
+            | reconciliation_incomplete_ids
+        )
         overall_incomplete_ids = sorted(unresolved_ids | endpoint_incomplete_ids)
+        source_completeness = {
+            "cninfo": {
+                "status": "partial" if cninfo_incomplete_ids else "success",
+                "pending_factor_events": len(cninfo_path["pending"]),
+                "historical_factor_gaps": len(
+                    cninfo_path.get("historical_gaps") or []
+                ),
+                "endpoint_incomplete_instruments": len(
+                    endpoint_incomplete_ids
+                ),
+                "incomplete_instruments": len(cninfo_incomplete_ids),
+                "instrument_ids": sorted(cninfo_incomplete_ids)[:sample_limit],
+            },
+            "tdx_reference": {
+                "status": "partial" if tdx_incomplete_ids else "success",
+                "pending_factor_events": len(tdx_path["pending"]),
+                "incomplete_instruments": len(tdx_incomplete_ids),
+                "instrument_ids": sorted(tdx_incomplete_ids)[:sample_limit],
+            },
+            "reconciliation": {
+                "status": reconciliation.get("status"),
+                "incomplete_instruments": len(
+                    reconciliation_incomplete_ids
+                ),
+                "instrument_ids": sorted(
+                    reconciliation_incomplete_ids
+                )[:sample_limit],
+                "totals": reconciliation.get("totals") or {},
+            },
+        }
         overall_completeness = {
             "status": "partial" if overall_incomplete_ids else "success",
             "endpoint_status_rows": len(endpoint_status_rows),
@@ -18569,6 +18621,7 @@ class DataManager:
             "overall_incomplete_instruments": len(overall_incomplete_ids),
             "instrument_ids": overall_incomplete_ids[:100],
             "missing_endpoint_profile_samples": missing_profile_samples,
+            "source_completeness": source_completeness,
         }
         full_market_scope = (
             not requested_ids
@@ -18826,6 +18879,14 @@ class DataManager:
             "cninfo_path": {
                 "derived_events": len(cninfo_path["events"]),
                 "pending_count": len(cninfo_path["pending"]),
+                "pending_instrument_ids": sorted({
+                    str(item.get("instrument_id") or "").strip()
+                    for item in [
+                        *cninfo_path["pending"],
+                        *cninfo_path.get("historical_gaps", []),
+                    ]
+                    if str(item.get("instrument_id") or "").strip()
+                }),
                 "pending": cninfo_path["pending"][:sample_limit],
                 "excluded_no_effect_count": len(
                     cninfo_path.get("excluded_no_effect") or []
@@ -18843,6 +18904,11 @@ class DataManager:
             "tdx_path": {
                 "derived_events": len(tdx_path["events"]),
                 "pending_count": len(tdx_path["pending"]),
+                "pending_instrument_ids": sorted({
+                    str(item.get("instrument_id") or "").strip()
+                    for item in tdx_path["pending"]
+                    if str(item.get("instrument_id") or "").strip()
+                }),
                 "pending": tdx_path["pending"][:sample_limit],
             },
             "reconciliation": reconciliation,
@@ -18853,6 +18919,7 @@ class DataManager:
                 "selected_primary_source": None,
             },
             "overall_completeness": overall_completeness,
+            "source_completeness": source_completeness,
             "candidate": {
                 **candidate_summary,
                 "staging_series_version": (
@@ -18956,6 +19023,94 @@ class DataManager:
             )
         return sorted(event_ids)
 
+    async def _load_daily_factor_cutoff_deferred_instrument_ids(
+        self,
+        instrument_ids: List[str],
+        *,
+        cutoff_date: date,
+        end_date: date,
+    ) -> List[str]:
+        """Return source events that are newer than the completed quote cutoff."""
+        if cutoff_date >= end_date:
+            return []
+        deferred_ids: Set[str] = set()
+        for offset in range(0, len(instrument_ids), 400):
+            chunk = instrument_ids[offset: offset + 400]
+            if not chunk:
+                continue
+            placeholders = ", ".join(
+                f":cutoff_instrument_{index}" for index in range(len(chunk))
+            )
+            params: Dict[str, Any] = {
+                f"cutoff_instrument_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                "cutoff_date": cutoff_date.isoformat(),
+                "cutoff_end_date": end_date.isoformat(),
+            })
+            evidence_source_placeholders = ", ".join(
+                f":cutoff_evidence_source_{index}"
+                for index, _ in enumerate(
+                    GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+                )
+            )
+            params.update({
+                f"cutoff_evidence_source_{index}": evidence_source
+                for index, evidence_source in enumerate(
+                    GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES
+                )
+            })
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT DISTINCT instrument_id
+                FROM (
+                    SELECT instrument_id
+                    FROM corporate_action_observations
+                    WHERE source = 'cninfo'
+                      AND is_current = 1
+                      AND instrument_id IN ({placeholders})
+                      AND date(ex_date) > :cutoff_date
+                      AND date(ex_date) <= :cutoff_end_date
+                    UNION
+                    SELECT instrument_id
+                    FROM corporate_action_resolution_states
+                    WHERE instrument_id IN ({placeholders})
+                      AND date(resolved_effective_date) > :cutoff_date
+                      AND date(resolved_effective_date) <= :cutoff_end_date
+                    UNION
+                    SELECT evidence.instrument_id
+                    FROM corporate_action_effective_date_evidence AS evidence
+                    JOIN corporate_action_observations AS observation
+                      ON observation.instrument_id = evidence.instrument_id
+                     AND observation.source_event_key = evidence.source_event_key
+                    WHERE observation.source = 'cninfo'
+                      AND observation.is_current = 1
+                      AND evidence.observation_source = 'cninfo'
+                      AND evidence.resolution_status = 'resolved'
+                      AND evidence.evidence_source IN (
+                          {evidence_source_placeholders}
+                      )
+                      AND evidence.instrument_id IN ({placeholders})
+                      AND date(evidence.effective_date) > :cutoff_date
+                      AND date(evidence.effective_date) <= :cutoff_end_date
+                    UNION
+                    SELECT instrument_id
+                    FROM adjustment_factors_tdx
+                    WHERE instrument_id IN ({placeholders})
+                      AND date(ex_date) > :cutoff_date
+                      AND date(ex_date) <= :cutoff_end_date
+                )
+                """,
+                params,
+            )
+            deferred_ids.update(
+                str(row.get("instrument_id") or "").strip()
+                for row in rows
+                if row.get("instrument_id")
+            )
+        return sorted(deferred_ids)
+
     async def _scan_cninfo_daily_announcement_activity(
         self,
         *,
@@ -18963,13 +19118,18 @@ class DataManager:
         exchanges: List[str],
         start_date: date,
         end_date: date,
+        run_at: Optional[datetime] = None,
         overlap_days: int,
         page_size: int,
         max_pages: int,
         request_interval_seconds: float,
     ) -> Dict[str, Any]:
         """Scan market-wide announcement activity without semantic blocking."""
-        from data_sources.cninfo_corporate_action_incremental import build_symbol_index
+        from data_sources.cninfo_corporate_action_incremental import (
+            DAILY_TITLE_TRIGGER_POLICY_VERSION,
+            build_symbol_index,
+            classify_daily_corporate_action_title,
+        )
         from research.announcements import (
             AnnouncementQuery,
             AnnouncementScope,
@@ -18985,12 +19145,21 @@ class DataManager:
         symbol_index = build_symbol_index(active_instruments)
         announcement_ids: Set[str] = set()
         deferred_announcement_ids: Set[str] = set()
+        deferred_factor_ids: Set[str] = set()
         matched_records_by_exchange: Dict[str, List[Any]] = defaultdict(list)
         matched_instruments_by_record: Dict[str, Set[str]] = defaultdict(set)
         route_results: Dict[str, Any] = {}
         errors: List[str] = []
         pages_scanned = 0
         announcements_seen = 0
+        title_records_evaluated = 0
+        title_records_selected = 0
+        title_filter_reasons: Counter[str] = Counter()
+        normalized_run_at = run_at or get_shanghai_time()
+        if normalized_run_at.tzinfo is None:
+            normalized_run_at = normalized_run_at.replace(
+                tzinfo=get_shanghai_time().tzinfo
+            )
 
         for exchange in exchanges:
             scope = AnnouncementScope(
@@ -19019,14 +19188,18 @@ class DataManager:
                     ),
                 )
             if state:
+                state_metadata = state.get("metadata") or {}
                 deferred_announcement_ids.update(
                     str(item).strip()
-                    for item in (
-                        (state.get("metadata") or {}).get(
-                            "pending_candidate_ids", []
-                        )
-                    )
+                    for item in state_metadata.get("pending_candidate_ids", [])
                     if str(item).strip() in active_instruments
+                )
+                deferred_factor_ids.update(
+                    str(item).strip()
+                    for item in state_metadata.get(
+                        "pending_factor_instrument_ids", []
+                    )
+                    if str(item).strip()
                 )
             route_result = await asyncio.to_thread(
                 service.acquire,
@@ -19047,7 +19220,23 @@ class DataManager:
                 errors.append(
                     f"{exchange}:announcement_scan_{scan_result.status}"
                 )
+            records_published_after_run_at = 0
             for record in scan_result.records:
+                published_at = None
+                if record.published_at:
+                    try:
+                        published_at = datetime.fromisoformat(
+                            str(record.published_at).replace("Z", "+00:00")
+                        )
+                    except ValueError:
+                        published_at = None
+                published_after_run_at = (
+                    published_at is not None
+                    and published_at.tzinfo is not None
+                    and published_at > normalized_run_at.astimezone(timezone.utc)
+                )
+                if published_after_run_at:
+                    records_published_after_run_at += 1
                 matched_ids = {
                     symbol_index[symbol]
                     for symbol in tuple(record.symbols or ())
@@ -19055,14 +19244,68 @@ class DataManager:
                 }
                 if not matched_ids:
                     continue
+                title_records_evaluated += 1
+                if published_after_run_at:
+                    title_filter_reasons["published_after_run_at"] += 1
+                    continue
+                title_decision = classify_daily_corporate_action_title(record.title)
+                title_filter_reasons[str(title_decision["reason"])] += 1
+                if not title_decision["selected"]:
+                    continue
+                title_records_selected += 1
                 announcement_ids.update(matched_ids)
                 matched_record = record.with_selection_reasons(
-                    ["instrument_activity_trigger"]
+                    ["corporate_action_announcement"]
                 )
                 matched_records_by_exchange[exchange].append(matched_record)
                 matched_instruments_by_record[
                     matched_record.announcement_key
                 ].update(matched_ids)
+            if (
+                records_published_after_run_at
+                and scan_result.cursor_commit_allowed
+                and scan_result.provider_cursor is not None
+                and scan_result.provider_cursor.kind == "published_at"
+            ):
+                cursor_ceiling = normalized_run_at.astimezone(timezone.utc)
+                committed_cursor = scope.cursor
+                if (
+                    committed_cursor is not None
+                    and committed_cursor.kind == "published_at"
+                ):
+                    try:
+                        committed_cursor_at = datetime.fromisoformat(
+                            committed_cursor.value.replace("Z", "+00:00")
+                        )
+                    except ValueError:
+                        committed_cursor_at = None
+                    if (
+                        committed_cursor_at is not None
+                        and committed_cursor_at.tzinfo is not None
+                        and committed_cursor_at > cursor_ceiling
+                    ):
+                        cursor_ceiling = committed_cursor_at
+                bounded_cursor_value = cursor_ceiling.isoformat()
+                bounded_scan_result = replace(
+                    scan_result,
+                    max_published_at=bounded_cursor_value,
+                    provider_cursor=ProviderCursor(
+                        kind="published_at",
+                        value=bounded_cursor_value,
+                    ),
+                    diagnostics={
+                        **scan_result.diagnostics,
+                        "provider_cursor_bounded_by_run_at": True,
+                        "observed_max_published_at": scan_result.max_published_at,
+                        "records_published_after_run_at": (
+                            records_published_after_run_at
+                        ),
+                    },
+                )
+                route_results[exchange] = replace(
+                    route_result,
+                    scan_result=bounded_scan_result,
+                )
 
         return {
             "status": "partial" if errors else "success",
@@ -19070,11 +19313,21 @@ class DataManager:
             "deferred_announcement_instrument_ids": sorted(
                 deferred_announcement_ids
             ),
+            "deferred_factor_instrument_ids": sorted(deferred_factor_ids),
             "pages_scanned": pages_scanned,
             "announcements_seen": announcements_seen,
             "matched_announcements": sum(
                 len(records) for records in matched_records_by_exchange.values()
             ),
+            "title_filter": {
+                "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+                "evaluated_records": title_records_evaluated,
+                "selected_records": title_records_selected,
+                "excluded_records": (
+                    title_records_evaluated - title_records_selected
+                ),
+                "reason_counts": dict(sorted(title_filter_reasons.items())),
+            },
             "errors": errors[:50],
             "route_results": route_results,
             "matched_records_by_exchange": matched_records_by_exchange,
@@ -19086,6 +19339,7 @@ class DataManager:
         discovery: Dict[str, Any],
         *,
         pending_candidate_ids: List[str],
+        pending_factor_instrument_ids: Optional[List[str]] = None,
         active_instruments: Dict[str, Dict[str, str]],
     ) -> Dict[str, int]:
         """Persist shared announcement state and deferred candidate queues."""
@@ -19122,8 +19376,14 @@ class DataManager:
                 metadata={
                     "business_domain": "corporate_action",
                     "selection_mode": "instrument_activity_trigger",
+                    "selection_policy_version": (
+                        "cninfo_corporate_action_daily_title_trigger_v1"
+                    ),
                     "pending_candidate_ids": sorted(
                         set(pending_by_exchange.get(exchange) or [])
+                    ),
+                    "pending_factor_instrument_ids": sorted(
+                        set(pending_factor_instrument_ids or [])
                     ),
                 },
             )
@@ -19153,6 +19413,8 @@ class DataManager:
         start_date: date,
         end_date: date,
         explicit_instrument_ids: Optional[List[str]] = None,
+        announcement_start_date: Optional[date] = None,
+        announcement_run_at: Optional[datetime] = None,
         announcement_overlap_days: int = 3,
         announcement_page_size: int = 30,
         announcement_max_pages: int = 60,
@@ -19215,8 +19477,13 @@ class DataManager:
         announcement_scan = await self._scan_cninfo_daily_announcement_activity(
             active_instruments=active_index,
             exchanges=exchanges,
-            start_date=start_date,
-            end_date=end_date,
+            start_date=announcement_start_date or start_date,
+            end_date=(
+                announcement_run_at.date()
+                if announcement_run_at is not None
+                else end_date
+            ),
+            run_at=announcement_run_at,
             overlap_days=announcement_overlap_days,
             page_size=announcement_page_size,
             max_pages=announcement_max_pages,
@@ -19294,7 +19561,8 @@ class DataManager:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         rolling_days: int = 7,
-        announcement_overlap_days: int = 3,
+        announcement_schedule_mode: str = "trading_day",
+        announcement_overlap_days: int = 0,
         announcement_page_size: int = 30,
         announcement_max_pages: int = 60,
         event_lookahead_days: int = 14,
@@ -19309,7 +19577,10 @@ class DataManager:
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
 
-        normalized_end = coerce_date(end_date or date.today(), field_name="end_date")
+        normalized_end = coerce_date(
+            end_date or get_shanghai_time().date(),
+            field_name="end_date",
+        )
         normalized_start = coerce_date(
             start_date or normalized_end - timedelta(days=max(1, int(rolling_days))),
             field_name="start_date",
@@ -19318,6 +19589,22 @@ class DataManager:
             item.upper() for item in normalize_string_list(exchanges)
         ] or ["SSE", "SZSE", "BSE"]
         requested_ids = set(normalize_string_list(instrument_ids))
+        normalized_schedule_mode = str(
+            announcement_schedule_mode or ""
+        ).strip().lower()
+        if normalized_schedule_mode not in {"calendar_daily", "trading_day"}:
+            raise ValueError(
+                "announcement_schedule_mode must be calendar_daily or trading_day"
+            )
+        actual_run_at = get_shanghai_time()
+        announcement_run_at = (
+            actual_run_at
+            if normalized_end == actual_run_at.date()
+            else datetime.combine(
+                normalized_end,
+                actual_run_at.timetz(),
+            )
+        )
         active_rows_by_exchange: Dict[str, List[Dict[str, Any]]] = {}
         for exchange in normalized_exchanges:
             rows = await self.db_ops.get_active_instruments(
@@ -19369,6 +19656,123 @@ class DataManager:
                 "error": "active A-share stock universe is empty",
             }
 
+        quote_exchange_ids = [
+            exchange
+            for exchange in normalized_exchanges
+            if active_ids_by_exchange.get(exchange)
+        ]
+        previous_trading_days: Dict[str, date] = {}
+        for exchange in quote_exchange_ids:
+            candidate = await self.db_ops.get_previous_trading_day(
+                exchange,
+                normalized_end,
+            )
+            if (parsed := self._date_from_any(candidate)) is not None:
+                previous_trading_days[exchange] = parsed
+        previous_trading_day = None
+        if (
+            normalized_schedule_mode == "trading_day"
+            and {"SSE", "SZSE"} & set(normalized_exchanges)
+        ):
+            previous_candidates = [
+                previous_trading_days[exchange]
+                for exchange in ("SSE", "SZSE")
+                if exchange in previous_trading_days
+            ]
+            if not previous_candidates:
+                raise ValueError(
+                    "no prior SSE/SZSE trading day is available for "
+                    "announcement discovery"
+                )
+            previous_trading_day = min(previous_candidates)
+        from data_sources.cninfo_corporate_action_incremental import (
+            resolve_daily_announcement_window,
+        )
+        resolved_window_mode = (
+            normalized_schedule_mode
+            if previous_trading_day is not None
+            or normalized_schedule_mode == "calendar_daily"
+            else "calendar_daily"
+        )
+        announcement_window = resolve_daily_announcement_window(
+            run_at=announcement_run_at,
+            schedule_mode=resolved_window_mode,
+            previous_trading_day=previous_trading_day,
+        )
+
+        factor_retry_ids: Set[str] = set()
+        factor_retry_load_error: Optional[str] = None
+        factor_retry_loader = getattr(
+            self.db_ops,
+            "get_corporate_action_daily_factor_retry_instrument_ids",
+            None,
+        )
+        if callable(factor_retry_loader):
+            try:
+                loaded_factor_retry_ids = factor_retry_loader(active_ids)
+                if inspect.isawaitable(loaded_factor_retry_ids):
+                    loaded_factor_retry_ids = await loaded_factor_retry_ids
+                if isinstance(loaded_factor_retry_ids, (list, tuple, set)):
+                    factor_retry_ids.update(
+                        str(item).strip()
+                        for item in loaded_factor_retry_ids
+                        if str(item).strip() in active_ids
+                    )
+            except Exception as exc:
+                dm_logger.exception(
+                    "[DataManager] Corporate-action daily factor retry "
+                    "load failed; the persisted queue will be preserved: %s",
+                    exc,
+                )
+                factor_retry_load_error = str(exc)
+        quote_dates_loader = getattr(
+            self.db_ops,
+            "get_latest_stock_quote_dates_by_exchange",
+            None,
+        )
+        latest_quote_dates: Dict[str, date] = {}
+        quote_cutoff_evaluated = False
+        if callable(quote_dates_loader):
+            quote_dates_result = quote_dates_loader(
+                quote_exchange_ids,
+                listed_on_or_before=(
+                    min(previous_trading_days.values())
+                    if previous_trading_days
+                    else normalized_end - timedelta(days=1)
+                ),
+                completed_on_or_before=(
+                    min(previous_trading_days.values())
+                    if previous_trading_days
+                    else normalized_end - timedelta(days=1)
+                ),
+            )
+            if inspect.isawaitable(quote_dates_result):
+                quote_dates_result = await quote_dates_result
+            if isinstance(quote_dates_result, Mapping):
+                quote_cutoff_evaluated = True
+                latest_quote_dates = {
+                    str(exchange): parsed
+                    for exchange, value in quote_dates_result.items()
+                    if (parsed := self._date_from_any(value)) is not None
+                }
+        missing_quote_exchanges = sorted(
+            set(quote_exchange_ids) - set(latest_quote_dates)
+        )
+        quote_cutoff_status = (
+            "partial"
+            if quote_cutoff_evaluated and missing_quote_exchanges
+            else "success"
+            if quote_cutoff_evaluated
+            else "not_evaluated"
+        )
+        factor_end_date: Optional[date] = (
+            min(normalized_end, min(latest_quote_dates.values()))
+            if quote_cutoff_status == "success"
+            else normalized_end
+            if quote_cutoff_status == "not_evaluated"
+            else None
+        )
+
         cninfo_exchanges = [
             exchange
             for exchange in normalized_exchanges
@@ -19405,6 +19809,8 @@ class DataManager:
                 start_date=normalized_start,
                 end_date=normalized_end,
                 explicit_instrument_ids=sorted(requested_ids),
+                announcement_start_date=announcement_window["start_date"],
+                announcement_run_at=announcement_window["run_at"],
                 announcement_overlap_days=announcement_overlap_days,
                 announcement_page_size=announcement_page_size,
                 announcement_max_pages=announcement_max_pages,
@@ -19467,6 +19873,8 @@ class DataManager:
                 "source_not_supported" if cninfo_excluded_exchanges else None
             ),
         }
+        pending_candidate_ids: List[str] = []
+        carried_factor_ids: Set[str] = set(factor_retry_ids)
         if announcement_governance_context:
             failed_ids = {
                 str(item.get("instrument_id") or "").strip()
@@ -19489,11 +19897,156 @@ class DataManager:
                 )
                 | (failed_ids & selected_announcement_ids)
             )
+            carried_factor_ids.update(
+                str(item).strip()
+                for item in (
+                    announcement_governance_context["announcement_scan"].get(
+                        "deferred_factor_instrument_ids", []
+                    )
+                )
+                if str(item).strip() in active_ids
+            )
+        tdx_result = await self.backfill_tdx_xdxr_history(
+            exchanges=normalized_exchanges,
+            start_date=normalized_start,
+            end_date=normalized_end,
+            instrument_ids=active_ids,
+            derive_factors=True,
+            repair_universe_mode="current_repair",
+            per_instrument_timeout_sec=per_instrument_timeout_sec,
+            dry_run=False,
+        )
+        cninfo_affected_ids = set(
+            cninfo_result.get("affected_instrument_ids") or []
+        )
+        tdx_affected_ids = set(tdx_result.get("event_instrument_ids") or [])
+        affected_ids = sorted(
+            cninfo_affected_ids | tdx_affected_ids | carried_factor_ids
+        )
+        dm_logger.info(
+            "[DataManager] Corporate-action affected instruments resolved: "
+            "total=%d cninfo=%d tdx=%d",
+            len(affected_ids),
+            len(cninfo_affected_ids),
+            len(tdx_affected_ids),
+        )
+        if affected_ids and factor_end_date is not None:
+            dm_logger.info(
+                "[DataManager] Targeted corporate-action factor rebuild started: "
+                "instruments=%d",
+                len(affected_ids),
+            )
+            rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
+                start_date=date(1990, 12, 19),
+                end_date=factor_end_date,
+                exchanges=normalized_exchanges,
+                instrument_ids=affected_ids,
+                dry_run=False,
+                build_canonical=build_canonical,
+                series_version=series_version,
+            )
+        else:
+            dm_logger.info(
+                "[DataManager] Targeted corporate-action factor rebuild skipped: "
+                "no affected instruments"
+            )
+            rebuild_result = {
+                "status": "skipped",
+                "operation": "a_share_cninfo_adjustment_factor_rebuild",
+                "production_isolation": True,
+                "reason": (
+                    "factor_cutoff_unavailable"
+                    if affected_ids
+                    else "no_affected_instruments"
+                ),
+                "parameters": {
+                    "start_date": date(1990, 12, 19).isoformat(),
+                    "end_date": (
+                        factor_end_date.isoformat()
+                        if factor_end_date is not None
+                        else None
+                    ),
+                    "instrument_ids": [],
+                    "build_canonical": bool(build_canonical),
+                    "series_version": series_version,
+                },
+            }
+        pending_factor_ids: Set[str] = set()
+        if factor_end_date is None:
+            pending_factor_ids.update(affected_ids)
+        else:
+            pending_factor_ids.update(
+                await self._load_daily_factor_cutoff_deferred_instrument_ids(
+                    affected_ids,
+                    cutoff_date=factor_end_date,
+                    end_date=normalized_end,
+                )
+            )
+            if rebuild_result.get("status") == "failed":
+                pending_factor_ids.update(affected_ids)
+            else:
+                for path_name in ("cninfo_path", "tdx_path"):
+                    path = rebuild_result.get(path_name) or {}
+                    complete_ids = path.get("pending_instrument_ids")
+                    if complete_ids is not None:
+                        pending_factor_ids.update(
+                            str(item).strip()
+                            for item in complete_ids
+                            if str(item).strip()
+                        )
+                        continue
+                    pending_factor_ids.update(
+                        str(item.get("instrument_id") or "").strip()
+                        for item in path.get("pending", [])
+                        if item.get("instrument_id")
+                    )
+        factor_retry_state: Dict[str, Any] = {"status": "not_supported"}
+        factor_retry_persister = getattr(
+            self.db_ops,
+            "replace_corporate_action_daily_factor_retry_instruments",
+            None,
+        )
+        if factor_retry_load_error is not None:
+            factor_retry_state = {
+                "status": "failed",
+                "reason": "factor_retry_load_failed_queue_preserved",
+                "error": factor_retry_load_error,
+            }
+        elif callable(factor_retry_persister):
+            try:
+                persisted_factor_retry_state = factor_retry_persister(
+                    sorted(pending_factor_ids),
+                    scope_instrument_ids=active_ids,
+                )
+                if inspect.isawaitable(persisted_factor_retry_state):
+                    persisted_factor_retry_state = (
+                        await persisted_factor_retry_state
+                    )
+                factor_retry_state = {
+                    "status": "success",
+                    **(
+                        dict(persisted_factor_retry_state)
+                        if isinstance(persisted_factor_retry_state, Mapping)
+                        else {}
+                    ),
+                }
+            except Exception as exc:
+                dm_logger.exception(
+                    "[DataManager] Corporate-action daily factor retry "
+                    "persistence failed: %s",
+                    exc,
+                )
+                factor_retry_state = {
+                    "status": "failed",
+                    "error": str(exc),
+                }
+        if announcement_governance_context:
             try:
                 discovery_result["governance"] = (
                     self._persist_cninfo_daily_announcement_activity(
                         announcement_governance_context["announcement_scan"],
                         pending_candidate_ids=pending_candidate_ids,
+                        pending_factor_instrument_ids=sorted(pending_factor_ids),
                         active_instruments=announcement_governance_context[
                             "active_instruments"
                         ],
@@ -19510,65 +20063,12 @@ class DataManager:
                     "status": "failed",
                     "error": str(exc),
                 }
-        tdx_result = await self.backfill_tdx_xdxr_history(
-            exchanges=normalized_exchanges,
-            start_date=normalized_start,
-            end_date=normalized_end,
-            instrument_ids=active_ids,
-            derive_factors=True,
-            repair_universe_mode="current_repair",
-            per_instrument_timeout_sec=per_instrument_timeout_sec,
-            dry_run=False,
-        )
-        cninfo_affected_ids = set(
-            cninfo_result.get("affected_instrument_ids") or []
-        )
-        tdx_affected_ids = set(tdx_result.get("event_instrument_ids") or [])
-        affected_ids = sorted(cninfo_affected_ids | tdx_affected_ids)
-        dm_logger.info(
-            "[DataManager] Corporate-action affected instruments resolved: "
-            "total=%d cninfo=%d tdx=%d",
-            len(affected_ids),
-            len(cninfo_affected_ids),
-            len(tdx_affected_ids),
-        )
-        if affected_ids:
-            dm_logger.info(
-                "[DataManager] Targeted corporate-action factor rebuild started: "
-                "instruments=%d",
-                len(affected_ids),
-            )
-            rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
-                start_date=date(1990, 12, 19),
-                end_date=normalized_end,
-                exchanges=normalized_exchanges,
-                instrument_ids=affected_ids,
-                dry_run=False,
-                build_canonical=build_canonical,
-                series_version=series_version,
-            )
-        else:
-            dm_logger.info(
-                "[DataManager] Targeted corporate-action factor rebuild skipped: "
-                "no affected instruments"
-            )
-            rebuild_result = {
-                "status": "skipped",
-                "operation": "a_share_cninfo_adjustment_factor_rebuild",
-                "production_isolation": True,
-                "reason": "no_affected_instruments",
-                "parameters": {
-                    "start_date": date(1990, 12, 19).isoformat(),
-                    "end_date": normalized_end.isoformat(),
-                    "instrument_ids": [],
-                    "build_canonical": bool(build_canonical),
-                    "series_version": series_version,
-                },
-            }
         operational_statuses = {
             str(discovery_result.get("status")),
             str(cninfo_result.get("status")),
             str(tdx_result.get("status")),
+            str(quote_cutoff_status),
+            str(factor_retry_state.get("status")),
         }
         operational_status = (
             "partial"
@@ -19578,16 +20078,25 @@ class DataManager:
         )
         reconciliation = rebuild_result.get("reconciliation") or {}
         overall_completeness = rebuild_result.get("overall_completeness") or {}
+        source_completeness = rebuild_result.get("source_completeness") or {}
+        cninfo_readiness = source_completeness.get("cninfo") or {}
+        tdx_readiness = source_completeness.get("tdx_reference") or {}
+        reconciliation_readiness = (
+            source_completeness.get("reconciliation") or {}
+        )
+        cninfo_pending_factor_events = int(
+            (rebuild_result.get("cninfo_path") or {}).get("pending_count", 0)
+        )
+        tdx_pending_factor_events = int(
+            (rebuild_result.get("tdx_path") or {}).get("pending_count", 0)
+        )
         pending_factor_events = (
-            int((rebuild_result.get("cninfo_path") or {}).get("pending_count", 0))
-            + int((rebuild_result.get("tdx_path") or {}).get("pending_count", 0))
+            cninfo_pending_factor_events + tdx_pending_factor_events
         )
         data_readiness_status = (
             "not_evaluated"
             if rebuild_result.get("status") == "skipped"
-            else "success"
-            if rebuild_result.get("status") == "success"
-            else "partial"
+            else str(cninfo_readiness.get("status") or "partial")
         )
         dm_logger.info(
             "[DataManager] A-share corporate-action incremental maintenance finished: "
@@ -19615,11 +20124,23 @@ class DataManager:
                 "cninfo_candidate_count": len(cninfo_candidate_ids),
                 "rolling_days": int(rolling_days),
                 "announcement_overlap_days": int(announcement_overlap_days),
+                "announcement_schedule_mode": normalized_schedule_mode,
+                "announcement_start_date": (
+                    announcement_window["start_date"].isoformat()
+                ),
+                "announcement_run_at": (
+                    announcement_window["run_at"].isoformat()
+                ),
                 "announcement_page_size": int(announcement_page_size),
                 "announcement_max_pages": int(announcement_max_pages),
                 "event_lookahead_days": int(event_lookahead_days),
                 "candidate_limit": int(candidate_limit),
                 "safety_sweep_size": int(safety_sweep_size),
+                "factor_end_date": (
+                    factor_end_date.isoformat()
+                    if factor_end_date is not None
+                    else None
+                ),
             },
             "candidate_discovery": discovery_result,
             "cninfo_refresh": cninfo_result,
@@ -19631,9 +20152,37 @@ class DataManager:
                 "instrument_ids": affected_ids[:100],
             },
             "factor_rebuild": rebuild_result,
+            "factor_retry_state": factor_retry_state,
+            "factor_cutoff": {
+                "status": quote_cutoff_status,
+                "requested_end_date": normalized_end.isoformat(),
+                "resolved_end_date": (
+                    factor_end_date.isoformat()
+                    if factor_end_date is not None
+                    else None
+                ),
+                "latest_quote_dates": {
+                    exchange: value.isoformat()
+                    for exchange, value in sorted(latest_quote_dates.items())
+                },
+                "missing_exchanges": missing_quote_exchanges,
+            },
             "data_readiness": {
                 "status": data_readiness_status,
                 "pending_factor_events": pending_factor_events,
+                "cninfo": {
+                    **cninfo_readiness,
+                    "pending_factor_events": cninfo_pending_factor_events,
+                },
+                "tdx_reference": {
+                    **tdx_readiness,
+                    "pending_factor_events": tdx_pending_factor_events,
+                },
+                "reconciliation": {
+                    **reconciliation_readiness,
+                    "status": reconciliation.get("status"),
+                    "totals": reconciliation.get("totals") or {},
+                },
                 "reconciliation_status": reconciliation.get("status"),
                 "reconciliation_totals": reconciliation.get("totals") or {},
                 "overall_completeness_status": overall_completeness.get("status"),

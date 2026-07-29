@@ -194,6 +194,20 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
         "data_readiness": {
             "status": "partial",
             "pending_factor_events": 2,
+            "cninfo": {
+                "status": "success",
+                "pending_factor_events": 0,
+                "incomplete_instruments": 0,
+            },
+            "tdx_reference": {
+                "status": "partial",
+                "pending_factor_events": 2,
+                "incomplete_instruments": 1,
+            },
+            "reconciliation": {
+                "status": "partial",
+                "incomplete_instruments": 1,
+            },
             "overall_incomplete_instruments": 1,
         },
     })
@@ -205,7 +219,9 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
     assert "total=5" in report
     assert "CNInfo事件: `40`" in report
     assert "TDX因子: `44`" in report
-    assert "pending_factors=2" in report
+    assert "CNInfo就绪度: `status=success, pending_factors=0" in report
+    assert "TDX参考路径: `status=partial, pending_factors=2" in report
+    assert "跨源对账: `status=partial, incomplete_instruments=1" in report
 
 
 @pytest.mark.asyncio

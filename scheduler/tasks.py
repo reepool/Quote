@@ -983,7 +983,9 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"status={discovery.get('status', 'N/A')}, "
             f"selected={discovery.get('candidate_count', 0)}, "
             f"deferred={discovery.get('deferred_count', 0)}, "
-            f"announcements={(discovery.get('announcement_scan') or {}).get('announcements_seen', 0)}"
+            f"announcements={(discovery.get('announcement_scan') or {}).get('announcements_seen', 0)}, "
+            "relevant="
+            f"{((discovery.get('announcement_scan') or {}).get('title_filter') or {}).get('selected_records', 0)}"
             "`",
             "CNInfo刷新: `"
             f"requested={cninfo_counters.get('requested_instruments', 0)}, "
@@ -1004,10 +1006,24 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"cninfo={affected.get('cninfo_count', 0)}, "
             f"tdx={affected.get('tdx_count', 0)}"
             "`",
-            "历史就绪度: `"
-            f"status={readiness.get('status', 'not_evaluated')}, "
-            f"pending_factors={readiness.get('pending_factor_events', 0)}, "
-            f"incomplete_instruments={readiness.get('overall_incomplete_instruments', 0)}"
+            "CNInfo就绪度: `"
+            f"status={(readiness.get('cninfo') or {}).get('status', readiness.get('status', 'not_evaluated'))}, "
+            f"pending_factors={(readiness.get('cninfo') or {}).get('pending_factor_events', 0)}, "
+            f"incomplete_instruments={(readiness.get('cninfo') or {}).get('incomplete_instruments', 0)}"
+            "`",
+            "TDX参考路径: `"
+            f"status={(readiness.get('tdx_reference') or {}).get('status', 'not_evaluated')}, "
+            f"pending_factors={(readiness.get('tdx_reference') or {}).get('pending_factor_events', 0)}, "
+            f"incomplete_instruments={(readiness.get('tdx_reference') or {}).get('incomplete_instruments', 0)}"
+            "`",
+            "跨源对账: `"
+            f"status={(readiness.get('reconciliation') or {}).get('status', 'not_evaluated')}, "
+            f"incomplete_instruments={(readiness.get('reconciliation') or {}).get('incomplete_instruments', 0)}"
+            "`",
+            "窗口: `"
+            f"announcements={parameters.get('announcement_start_date', 'N/A')}.."
+            f"{parameters.get('announcement_run_at', 'N/A')}, "
+            f"factor_end={(result.get('factor_cutoff') or {}).get('resolved_end_date', parameters.get('end_date', 'N/A'))}"
             "`",
         ]
         if factor_result.get("status") == "skipped":
@@ -5303,9 +5319,10 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         rolling_days: int = 7,
-        announcement_overlap_days: int = 3,
+        announcement_schedule_mode: str = "trading_day",
+        announcement_overlap_days: int = 2,
         announcement_page_size: int = 30,
-        announcement_max_pages: int = 60,
+        announcement_max_pages: int = 240,
         event_lookahead_days: int = 14,
         candidate_limit: int = 1000,
         safety_sweep_size: int = 100,
@@ -5325,6 +5342,7 @@ class ScheduledTasks:
                 exchanges=exchanges,
                 instrument_ids=instrument_ids,
                 rolling_days=int(rolling_days),
+                announcement_schedule_mode=announcement_schedule_mode,
                 announcement_overlap_days=int(announcement_overlap_days),
                 announcement_page_size=int(announcement_page_size),
                 announcement_max_pages=int(announcement_max_pages),

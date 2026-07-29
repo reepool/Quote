@@ -17,12 +17,138 @@ from database.models import (
     CorporateActionResolutionReviewDB,
     CorporateActionResolutionStateDB,
     CorporateActionResolvedTermsDB,
+    DailyQuoteDB,
     InstrumentDB,
 )
 from database.operations import (
     DatabaseOperations,
     GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES,
 )
+
+
+@pytest.mark.asyncio
+async def test_daily_factor_retry_loader_propagates_database_failure():
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = Mock(
+        side_effect=RuntimeError("retry read failed")
+    )
+
+    with pytest.raises(RuntimeError, match="retry read failed"):
+        await operations.get_corporate_action_daily_factor_retry_instrument_ids(
+            ["600000.SH"]
+        )
+
+
+@pytest.mark.asyncio
+async def test_quote_cutoff_excludes_suspended_and_exiting_stocks():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                DailyQuoteDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add_all([
+            InstrumentDB(
+                instrument_id="600000.SH",
+                symbol="600000",
+                name="Live",
+                exchange="SSE",
+                type="stock",
+                currency="CNY",
+                listed_date=datetime(2000, 1, 1),
+                is_active=True,
+                trading_status=1,
+            ),
+            InstrumentDB(
+                instrument_id="600001.SH",
+                symbol="600001",
+                name="Suspended",
+                exchange="SSE",
+                type="stock",
+                currency="CNY",
+                listed_date=datetime(2000, 1, 1),
+                is_active=True,
+                trading_status=1,
+            ),
+            InstrumentDB(
+                instrument_id="600002.SH",
+                symbol="600002",
+                name="Example退",
+                exchange="SSE",
+                type="stock",
+                currency="CNY",
+                listed_date=datetime(2000, 1, 1),
+                is_active=True,
+                trading_status=1,
+            ),
+        ])
+        session.add_all([
+            DailyQuoteDB(
+                instrument_id="600000.SH",
+                time=datetime(2026, 7, 28),
+                open=10,
+                high=10,
+                low=10,
+                close=10,
+                volume=100,
+                amount=1000,
+                tradestatus=1,
+                is_complete=True,
+            ),
+            DailyQuoteDB(
+                instrument_id="600000.SH",
+                time=datetime(2026, 7, 29),
+                open=11,
+                high=11,
+                low=11,
+                close=11,
+                volume=100,
+                amount=1100,
+                tradestatus=1,
+                is_complete=True,
+            ),
+            DailyQuoteDB(
+                instrument_id="600001.SH",
+                time=datetime(2026, 7, 10),
+                open=8,
+                high=8,
+                low=8,
+                close=8,
+                volume=0,
+                amount=0,
+                tradestatus=0,
+                is_complete=True,
+            ),
+            DailyQuoteDB(
+                instrument_id="600002.SH",
+                time=datetime(2026, 7, 9),
+                open=5,
+                high=5,
+                low=5,
+                close=5,
+                volume=100,
+                amount=500,
+                tradestatus=1,
+                is_complete=True,
+            ),
+        ])
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    result = await operations.get_latest_stock_quote_dates_by_exchange(
+        ["SSE"],
+        listed_on_or_before=date(2026, 7, 28),
+        completed_on_or_before=date(2026, 7, 28),
+    )
+
+    assert result == {"SSE": date(2026, 7, 28)}
+    await engine.dispose()
 
 
 def test_corporate_action_observation_revision_and_partial_coverage():
