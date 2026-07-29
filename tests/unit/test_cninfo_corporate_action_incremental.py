@@ -7,10 +7,12 @@ import pytest
 
 from data_manager import DataManager
 from data_sources.cninfo_corporate_action_incremental import (
+    associate_exceptional_announcements,
     build_incremental_refresh_candidates,
     classify_daily_corporate_action_title,
     normalize_active_instruments,
     resolve_daily_announcement_window,
+    select_daily_semantic_anomalies,
     select_rotating_safety_instruments,
 )
 from research.announcements import (
@@ -102,6 +104,274 @@ def test_daily_title_trigger_rejects_unrelated_disclosures(title):
     assert classify_daily_corporate_action_title(title)["selected"] is False
 
 
+def test_exceptional_title_requires_semantic_review():
+    decision = classify_daily_corporate_action_title(
+        "重整计划资本公积金转增股本实施公告"
+    )
+
+    assert decision["selected"] is True
+    assert decision["requires_semantic_review"] is True
+    assert "重整" in decision["exceptional_markers"]
+
+
+def test_ordinary_complete_event_bypasses_semantic_selection():
+    result = select_daily_semantic_anomalies([{
+        "instrument_id": "000001.SZ",
+        "source_event_key": "ordinary",
+        "quality_status": "structured_complete",
+    }])
+
+    assert result["candidate_count"] == 0
+    assert result["source_event_keys"] == []
+
+
+def test_semantic_selector_merges_reasons_and_bounds_work():
+    events = [
+        {
+            "instrument_id": "000001.SZ",
+            "source_event_key": "partial",
+            "quality_status": "partial_missing_ex_date",
+        },
+        {
+            "instrument_id": "000002.SZ",
+            "source_event_key": "special",
+            "quality_status": "structured_complete",
+        },
+        {
+            "instrument_id": "000003.SZ",
+            "source_event_key": "conflict",
+            "quality_status": "structured_complete",
+        },
+    ]
+
+    result = select_daily_semantic_anomalies(
+        events,
+        exceptional_markers_by_event={"special": ["重整"]},
+        conflict_event_keys=["conflict"],
+        changed_event_keys=["conflict"],
+        max_events=2,
+    )
+
+    assert result["source_event_keys"] == ["partial", "special"]
+    assert result["deferred_source_event_keys"] == ["conflict"]
+    assert result["reason_counts"] == {
+        "current_run_tdx_conflict": 1,
+        "exceptional_implementation_title": 1,
+        "incomplete_structured_event": 1,
+    }
+
+
+def test_historical_conflict_is_not_selected_without_current_change():
+    result = select_daily_semantic_anomalies(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "historical",
+            "quality_status": "structured_complete",
+        }],
+        conflict_event_keys=["historical"],
+        changed_event_keys=[],
+    )
+
+    assert result["candidate_count"] == 0
+
+
+def test_deferred_event_keys_are_prioritized_before_new_candidates():
+    result = select_daily_semantic_anomalies(
+        [
+            {
+                "instrument_id": "000001.SZ",
+                "source_event_key": "new-event",
+                "quality_status": "partial_missing_ex_date",
+            },
+            {
+                "instrument_id": "000002.SZ",
+                "source_event_key": "deferred-event",
+                "quality_status": "partial_missing_ex_date",
+            },
+        ],
+        priority_event_keys=["deferred-event"],
+        max_events=1,
+    )
+
+    assert result["source_event_keys"] == ["deferred-event"]
+    assert result["deferred_source_event_keys"] == ["new-event"]
+
+
+def test_deferred_conflict_event_keeps_reason_without_new_source_change():
+    result = select_daily_semantic_anomalies(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "deferred-conflict",
+            "quality_status": "structured_complete",
+        }],
+        conflict_event_keys=["deferred-conflict"],
+        changed_event_keys=[],
+        priority_event_keys=["deferred-conflict"],
+    )
+
+    assert result["source_event_keys"] == ["deferred-conflict"]
+    assert result["candidates"][0]["reason_codes"] == [
+        "current_run_tdx_conflict"
+    ]
+
+
+def test_terminal_event_is_not_reselected_for_semantic_governance():
+    result = select_daily_semantic_anomalies([{
+        "instrument_id": "000001.SZ",
+        "source_event_key": "resolved-event",
+        "quality_status": "partial_missing_ex_date",
+        "resolution_is_terminal": 1,
+    }])
+
+    assert result["candidate_count"] == 0
+
+
+def test_changed_terminal_event_is_reselected_for_semantic_governance():
+    result = select_daily_semantic_anomalies(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "changed-event",
+            "quality_status": "partial_missing_ex_date",
+            "resolution_is_terminal": 1,
+        }],
+        changed_event_keys=["changed-event"],
+    )
+
+    assert result["source_event_keys"] == ["changed-event"]
+    assert result["candidates"][0]["reason_codes"] == [
+        "incomplete_structured_event"
+    ]
+
+
+def test_exceptional_terminal_event_is_reselected_for_semantic_governance():
+    result = select_daily_semantic_anomalies(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "exceptional-terminal",
+            "quality_status": "structured_complete",
+            "resolution_is_terminal": 1,
+        }],
+        exceptional_markers_by_event={
+            "exceptional-terminal": ["重整"],
+        },
+    )
+
+    assert result["source_event_keys"] == ["exceptional-terminal"]
+    assert result["candidates"][0]["reason_codes"] == [
+        "exceptional_implementation_title"
+    ]
+
+
+def test_exceptional_association_reports_unmatched_instrument():
+    result = associate_exceptional_announcements(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "quality_status": "structured_complete",
+            "announcement_date": date(2026, 7, 28),
+        }],
+        exceptional_announcements_by_instrument={
+            "000001.SZ": [{
+                "announcement_key": "announcement-1",
+                "announcement_date": "2026-07-28",
+                "exceptional_markers": ["股改"],
+            }],
+            "000002.SZ": [{
+                "announcement_key": "announcement-2",
+                "announcement_date": "2026-07-28",
+                "exceptional_markers": ["重整"],
+            }],
+        },
+    )
+
+    assert result["exceptional_markers_by_event"] == {
+        "event-1": ["股改"]
+    }
+    assert result["unmatched_instrument_ids"] == ["000002.SZ"]
+
+
+def test_exceptional_association_selects_only_unique_nearby_event():
+    result = associate_exceptional_announcements(
+        [
+            {
+                "instrument_id": "000001.SZ",
+                "source_event_key": "ordinary-old",
+                "announcement_date": date(2026, 6, 1),
+            },
+            {
+                "instrument_id": "000001.SZ",
+                "source_event_key": "special-current",
+                "announcement_date": date(2026, 7, 28),
+            },
+        ],
+        exceptional_announcements_by_instrument={
+            "000001.SZ": [{
+                "announcement_key": "announcement-1",
+                "announcement_date": "2026-07-29",
+                "exceptional_markers": ["重整"],
+            }],
+        },
+    )
+
+    assert result["exceptional_markers_by_event"] == {
+        "special-current": ["重整"]
+    }
+    assert result["announcement_keys_by_event"] == {
+        "special-current": ["announcement-1"]
+    }
+
+
+def test_exceptional_association_uses_implementation_date_after_old_announcement():
+    result = associate_exceptional_announcements(
+        [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "announcement_date": date(2026, 6, 1),
+            "record_date": date(2026, 7, 28),
+            "ex_date": date(2026, 7, 29),
+        }],
+        exceptional_announcements_by_instrument={
+            "000001.SZ": [{
+                "announcement_key": "announcement-1",
+                "announcement_date": "2026-07-29",
+                "exceptional_markers": ["重整"],
+            }],
+        },
+    )
+
+    assert result["exceptional_markers_by_event"] == {
+        "event-1": ["重整"]
+    }
+    assert result["unmatched_announcements"] == []
+
+
+def test_exceptional_association_defers_ambiguous_same_date_events():
+    result = associate_exceptional_announcements(
+        [
+            {
+                "instrument_id": "000001.SZ",
+                "source_event_key": "event-1",
+                "announcement_date": date(2026, 7, 28),
+            },
+            {
+                "instrument_id": "000001.SZ",
+                "source_event_key": "event-2",
+                "announcement_date": date(2026, 7, 28),
+            },
+        ],
+        exceptional_announcements_by_instrument={
+            "000001.SZ": [{
+                "announcement_key": "announcement-1",
+                "announcement_date": "2026-07-28",
+                "exceptional_markers": ["重整"],
+            }],
+        },
+    )
+
+    assert result["exceptional_markers_by_event"] == {}
+    assert result["unmatched_instrument_ids"] == ["000001.SZ"]
+
+
 def test_candidate_priority_and_explicit_ids_bypass_automatic_limit():
     result = build_incremental_refresh_candidates(
         active_instruments=_active(),
@@ -178,6 +448,16 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
         "metadata": {
             "pending_candidate_ids": ["600001.SH"],
             "pending_factor_instrument_ids": ["920000.BJ"],
+            "pending_special_announcements_by_instrument": {
+                "600001.SH": [{
+                    "announcement_key": "special-1",
+                    "announcement_date": "2026-07-21",
+                    "exceptional_markers": ["重整"],
+                }]
+            },
+            "pending_semantic_event_keys_by_instrument": {
+                "600001.SH": ["event-1"]
+            },
         },
     }
     manager.research_config = Mock(enabled=True)
@@ -266,6 +546,16 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     persisted = manager._persist_cninfo_daily_announcement_activity(
         discovery,
         pending_candidate_ids=["600001.SH"],
+        pending_special_announcements_by_instrument={
+            "600001.SH": [{
+                "announcement_key": "special-1",
+                "announcement_date": "2026-07-21",
+                "exceptional_markers": ["重整"],
+            }]
+        },
+        pending_semantic_event_keys_by_instrument={
+            "600001.SH": ["event-1"]
+        },
         pending_factor_instrument_ids=["600000.SH"],
         active_instruments=active_instruments,
     )
@@ -273,6 +563,16 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     assert discovery["announcement_instrument_ids"] == ["600000.SH"]
     assert discovery["deferred_announcement_instrument_ids"] == ["600001.SH"]
     assert discovery["deferred_factor_instrument_ids"] == ["920000.BJ"]
+    assert discovery["deferred_special_announcements_by_instrument"] == {
+        "600001.SH": [{
+            "announcement_key": "special-1",
+            "announcement_date": "2026-07-21",
+            "exceptional_markers": ["重整"],
+        }]
+    }
+    assert discovery["deferred_semantic_event_keys_by_instrument"] == {
+        "600001.SH": ["event-1"]
+    }
     assert discovery["matched_announcements"] == 1
     assert persisted == {"scan_states_persisted": 1, "audits_persisted": 1}
     saved_scan = storage.upsert_announcement_scan_state.call_args.kwargs[
@@ -296,6 +596,18 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
         "pending_factor_instrument_ids"
     ] == ["600000.SH"]
+    assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
+        "pending_special_announcements_by_instrument"
+    ] == {
+        "600001.SH": [{
+            "announcement_key": "special-1",
+            "announcement_date": "2026-07-21",
+            "exceptional_markers": ["重整"],
+        }]
+    }
+    assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
+        "pending_semantic_event_keys_by_instrument"
+    ] == {"600001.SH": ["event-1"]}
     storage.store_announcement_audit.assert_called_once()
 
 

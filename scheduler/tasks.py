@@ -920,6 +920,16 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     tdx_totals = tdx_refresh.get("totals") or {}
     affected = result.get("affected_instruments") or {}
     readiness = result.get("data_readiness") or {}
+    anomaly = result.get("anomaly_governance") or {}
+    anomaly_llm = anomaly.get("llm") or {}
+    anomaly_counts = anomaly_llm.get("counts") or {}
+    anomaly_promotion = anomaly_llm.get("auto_promotion") or {}
+    anomaly_review = anomaly_llm.get("review_workload") or {}
+    anomaly_reason_counts = anomaly.get("reason_counts") or {}
+    anomaly_reason_summary = ",".join(
+        f"{reason}:{count}"
+        for reason, count in sorted(anomaly_reason_counts.items())
+    ) or "none"
     lines = [
         "ℹ️ *A 股公司行动与复权因子多源基准*",
         "",
@@ -1024,6 +1034,24 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"announcements={parameters.get('announcement_start_date', 'N/A')}.."
             f"{parameters.get('announcement_run_at', 'N/A')}, "
             f"factor_end={(result.get('factor_cutoff') or {}).get('resolved_end_date', parameters.get('end_date', 'N/A'))}"
+            "`",
+            "异常语义治理: `"
+            f"execution={anomaly.get('execution_status', 'N/A')}, "
+            f"readiness={anomaly.get('readiness_status', 'N/A')}, "
+            f"candidates={anomaly.get('candidate_event_count', 0)}, "
+            f"selected={anomaly.get('selected_event_count', 0)}, "
+            f"deferred={anomaly.get('deferred_event_count', 0)}, "
+            "unmatched="
+            f"{anomaly.get('unmatched_special_announcement_count', 0)}, "
+            f"reasons={anomaly_reason_summary}"
+            "`",
+            "异常 LLM: `"
+            f"processed={anomaly_counts.get('processed', 0)}, "
+            f"analyzed={anomaly_counts.get('analyzed', 0)}, "
+            f"promoted={anomaly_promotion.get('promoted', 0)}, "
+            f"manual={anomaly_review.get('remaining_manual_review', 0)}, "
+            f"errors={anomaly_counts.get('errors', 0)}, "
+            f"document_failures={anomaly_counts.get('document_failures', 0)}"
             "`",
         ]
         if factor_result.get("status") == "skipped":
@@ -5330,6 +5358,18 @@ class ScheduledTasks:
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
+        anomaly_llm_enabled: bool = True,
+        anomaly_llm_max_events: int = 50,
+        anomaly_llm_profile: str = "semantic_extraction",
+        anomaly_llm_download_documents: bool = True,
+        anomaly_llm_run_ocr: bool = False,
+        anomaly_llm_auto_promote_validated: bool = True,
+        anomaly_llm_title_max_concurrency: int = 50,
+        anomaly_llm_pipeline_mode: str = "async",
+        anomaly_llm_pipeline_llm_concurrency: int = 50,
+        anomaly_llm_pipeline_download_concurrency: int = 8,
+        anomaly_llm_pipeline_document_parse_concurrency: int = 8,
+        anomaly_llm_pipeline_progress_interval_seconds: float = 30.0,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
         """Refresh incremental CNInfo candidates and affected factor paths."""
@@ -5353,6 +5393,32 @@ class ScheduledTasks:
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 build_canonical=bool(build_canonical),
                 series_version=series_version,
+                anomaly_llm_enabled=bool(anomaly_llm_enabled),
+                anomaly_llm_max_events=int(anomaly_llm_max_events),
+                anomaly_llm_profile=anomaly_llm_profile,
+                anomaly_llm_download_documents=bool(
+                    anomaly_llm_download_documents
+                ),
+                anomaly_llm_run_ocr=bool(anomaly_llm_run_ocr),
+                anomaly_llm_auto_promote_validated=bool(
+                    anomaly_llm_auto_promote_validated
+                ),
+                anomaly_llm_title_max_concurrency=int(
+                    anomaly_llm_title_max_concurrency
+                ),
+                anomaly_llm_pipeline_mode=anomaly_llm_pipeline_mode,
+                anomaly_llm_pipeline_llm_concurrency=int(
+                    anomaly_llm_pipeline_llm_concurrency
+                ),
+                anomaly_llm_pipeline_download_concurrency=int(
+                    anomaly_llm_pipeline_download_concurrency
+                ),
+                anomaly_llm_pipeline_document_parse_concurrency=int(
+                    anomaly_llm_pipeline_document_parse_concurrency
+                ),
+                anomaly_llm_pipeline_progress_interval_seconds=float(
+                    anomaly_llm_pipeline_progress_interval_seconds
+                ),
             )
             if self.telegram_enabled:
                 await self._send_task_report(

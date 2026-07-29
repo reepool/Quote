@@ -63,12 +63,17 @@ async def test_cninfo_corporate_action_write_resumes_without_second_fetch(
         ]
     )
 
-    async def save_observations(observations, **_kwargs):
+    async def save_observations(observations, **kwargs):
         return {
             "inserted": len(observations),
             "changed": 0,
             "unchanged": 0,
             "failed": 0,
+            "inserted_event_keys": (
+                [item["source_event_key"] for item in observations]
+                if kwargs.get("include_event_keys")
+                else []
+            ),
         }
 
     manager.db_ops.save_corporate_action_observations = AsyncMock(
@@ -131,11 +136,78 @@ async def test_cninfo_corporate_action_write_resumes_without_second_fetch(
     assert first["status"] == "success"
     assert first["counters"]["observations_inserted"] == 1
     assert first["observed_instrument_ids"] == ["000001.SZ"]
+    assert first["observed_event_keys"] == ["event-1"]
+    assert first["persisted_event_keys"] == ["event-1"]
+    assert first["persisted_event_keys_by_instrument"] == {
+        "000001.SZ": ["event-1"]
+    }
+    assert first["inserted_event_keys"] == ["event-1"]
     assert first["inserted_instrument_ids"] == ["000001.SZ"]
     assert first["affected_instrument_ids"] == ["000001.SZ"]
     assert second["universe"]["pending_count"] == 0
     assert provider.fetch_dividends.call_count == 1
     assert provider.fetch_allotments.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_cninfo_failed_write_does_not_publish_semantic_event_keys(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(asyncio, "to_thread", _inline_to_thread)
+    manager = DataManager()
+    manager.data_config = {"data_dir": str(tmp_path)}
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+    }])
+    manager.db_ops.save_corporate_action_observations = AsyncMock(return_value={
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 1,
+        "inserted_event_keys": [],
+        "changed_event_keys": [],
+        "reactivated_event_keys": [],
+    })
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    observation = {
+        "instrument_id": "000001.SZ",
+        "source": "cninfo",
+        "source_profile": "cninfo_dividend",
+        "source_event_key": "event-not-committed",
+        "action_type": "dividend",
+        "ex_date": date(2026, 6, 12),
+        "quality_status": "structured_complete",
+    }
+    provider = Mock()
+    provider.fetch_dividends = Mock(return_value=CninfoEndpointResult(
+        source_profile="cninfo_dividend",
+        coverage_status="complete_with_events",
+        observations=[observation],
+        rows_received=1,
+    ))
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_actions.CninfoCorporateActionProvider",
+        lambda **_: provider,
+    )
+
+    result = await manager.backfill_a_share_cninfo_corporate_actions(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        scopes=["dividends"],
+        dry_run=False,
+        resume=False,
+        request_interval_seconds=0,
+    )
+
+    assert result["status"] == "partial"
+    assert result["observed_event_keys"] == ["event-not-committed"]
+    assert result["persisted_event_keys"] == []
+    assert result["persisted_event_keys_by_instrument"] == {}
 
 
 @pytest.mark.asyncio

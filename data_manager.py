@@ -26,7 +26,19 @@ import re
 import sqlite3
 from calendar import monthrange
 from pathlib import Path
-from typing import Callable, List, Dict, Any, Iterable, Mapping, Optional, Tuple, Union, Set
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 from datetime import datetime, date, timedelta, timezone
 from dataclasses import asdict, dataclass, field, replace
 
@@ -17643,6 +17655,12 @@ class DataManager:
             "ignored_placeholders": 0,
         })
         observed_instrument_ids: Set[str] = set()
+        observed_event_keys: Set[str] = set()
+        persisted_event_keys: Set[str] = set()
+        persisted_event_keys_by_instrument: Dict[str, Set[str]] = defaultdict(set)
+        inserted_event_keys: Set[str] = set()
+        changed_event_keys: Set[str] = set()
+        reactivated_event_keys: Set[str] = set()
         inserted_instrument_ids: Set[str] = set()
         changed_instrument_ids: Set[str] = set()
         reactivated_instrument_ids: Set[str] = set()
@@ -17683,9 +17701,36 @@ class DataManager:
                 observations = endpoint_result.observations
                 if observations:
                     observed_instrument_ids.add(instrument_id)
+                    observed_event_keys.update(
+                        str(observation.get("source_event_key") or "").strip()
+                        for observation in observations
+                        if str(observation.get("source_event_key") or "").strip()
+                    )
                 write_stats = await self.db_ops.save_corporate_action_observations(
                     observations,
                     ingestion_run_id=resolved_checkpoint_id,
+                    include_event_keys=True,
+                )
+                if int(write_stats.get("failed", 0)) == 0:
+                    endpoint_persisted_event_keys = {
+                        str(observation.get("source_event_key") or "").strip()
+                        for observation in observations
+                        if str(
+                            observation.get("source_event_key") or ""
+                        ).strip()
+                    }
+                    persisted_event_keys.update(endpoint_persisted_event_keys)
+                    persisted_event_keys_by_instrument[instrument_id].update(
+                        endpoint_persisted_event_keys
+                    )
+                inserted_event_keys.update(
+                    write_stats.get("inserted_event_keys") or []
+                )
+                changed_event_keys.update(
+                    write_stats.get("changed_event_keys") or []
+                )
+                reactivated_event_keys.update(
+                    write_stats.get("reactivated_event_keys") or []
                 )
                 if int(write_stats.get("inserted", 0)) > 0:
                     inserted_instrument_ids.add(instrument_id)
@@ -17830,6 +17875,18 @@ class DataManager:
                 + int(counters["indeterminate"])
             ),
             "observed_instrument_ids": sorted(observed_instrument_ids),
+            "observed_event_keys": sorted(observed_event_keys),
+            "persisted_event_keys": sorted(persisted_event_keys),
+            "persisted_event_keys_by_instrument": {
+                instrument_id: sorted(event_keys)
+                for instrument_id, event_keys in sorted(
+                    persisted_event_keys_by_instrument.items()
+                )
+                if event_keys
+            },
+            "inserted_event_keys": sorted(inserted_event_keys),
+            "changed_event_keys": sorted(changed_event_keys),
+            "reactivated_event_keys": sorted(reactivated_event_keys),
             "inserted_instrument_ids": sorted(inserted_instrument_ids),
             "changed_instrument_ids": sorted(changed_instrument_ids),
             "reactivated_instrument_ids": sorted(reactivated_instrument_ids),
@@ -18594,17 +18651,22 @@ class DataManager:
                     endpoint_incomplete_ids
                 ),
                 "incomplete_instruments": len(cninfo_incomplete_ids),
+                "all_instrument_ids": sorted(cninfo_incomplete_ids),
                 "instrument_ids": sorted(cninfo_incomplete_ids)[:sample_limit],
             },
             "tdx_reference": {
                 "status": "partial" if tdx_incomplete_ids else "success",
                 "pending_factor_events": len(tdx_path["pending"]),
                 "incomplete_instruments": len(tdx_incomplete_ids),
+                "all_instrument_ids": sorted(tdx_incomplete_ids),
                 "instrument_ids": sorted(tdx_incomplete_ids)[:sample_limit],
             },
             "reconciliation": {
                 "status": reconciliation.get("status"),
                 "incomplete_instruments": len(
+                    reconciliation_incomplete_ids
+                ),
+                "all_instrument_ids": sorted(
                     reconciliation_incomplete_ids
                 ),
                 "instrument_ids": sorted(
@@ -18619,6 +18681,7 @@ class DataManager:
             "endpoint_incomplete_instruments": len(endpoint_incomplete_ids),
             "reconciliation_incomplete_instruments": len(unresolved_ids),
             "overall_incomplete_instruments": len(overall_incomplete_ids),
+            "all_instrument_ids": overall_incomplete_ids,
             "instrument_ids": overall_incomplete_ids[:100],
             "missing_endpoint_profile_samples": missing_profile_samples,
             "source_completeness": source_completeness,
@@ -19146,6 +19209,12 @@ class DataManager:
         announcement_ids: Set[str] = set()
         deferred_announcement_ids: Set[str] = set()
         deferred_factor_ids: Set[str] = set()
+        deferred_special_announcements_by_instrument: Dict[
+            str, List[Dict[str, Any]]
+        ] = defaultdict(list)
+        deferred_semantic_event_keys_by_instrument: Dict[
+            str, Set[str]
+        ] = defaultdict(set)
         matched_records_by_exchange: Dict[str, List[Any]] = defaultdict(list)
         matched_instruments_by_record: Dict[str, Set[str]] = defaultdict(set)
         route_results: Dict[str, Any] = {}
@@ -19201,6 +19270,36 @@ class DataManager:
                     )
                     if str(item).strip()
                 )
+                for instrument_id, announcements in (
+                    state_metadata.get(
+                        "pending_special_announcements_by_instrument", {}
+                    ) or {}
+                ).items():
+                    normalized_instrument_id = str(instrument_id or "").strip()
+                    if normalized_instrument_id not in active_instruments:
+                        continue
+                    deferred_special_announcements_by_instrument[
+                        normalized_instrument_id
+                    ].extend(
+                        dict(item)
+                        for item in announcements or ()
+                        if isinstance(item, Mapping)
+                    )
+                for instrument_id, event_keys in (
+                    state_metadata.get(
+                        "pending_semantic_event_keys_by_instrument", {}
+                    ) or {}
+                ).items():
+                    normalized_instrument_id = str(instrument_id or "").strip()
+                    if normalized_instrument_id not in active_instruments:
+                        continue
+                    deferred_semantic_event_keys_by_instrument[
+                        normalized_instrument_id
+                    ].update(
+                        str(item).strip()
+                        for item in event_keys or ()
+                        if str(item).strip()
+                    )
             route_result = await asyncio.to_thread(
                 service.acquire,
                 AnnouncementQuery(
@@ -19314,6 +19413,23 @@ class DataManager:
                 deferred_announcement_ids
             ),
             "deferred_factor_instrument_ids": sorted(deferred_factor_ids),
+            "deferred_special_announcements_by_instrument": {
+                instrument_id: list({
+                    str(item.get("announcement_key") or ""): item
+                    for item in announcements
+                    if str(item.get("announcement_key") or "").strip()
+                }.values())
+                for instrument_id, announcements in sorted(
+                    deferred_special_announcements_by_instrument.items()
+                )
+            },
+            "deferred_semantic_event_keys_by_instrument": {
+                instrument_id: sorted(event_keys)
+                for instrument_id, event_keys in sorted(
+                    deferred_semantic_event_keys_by_instrument.items()
+                )
+                if event_keys
+            },
             "pages_scanned": pages_scanned,
             "announcements_seen": announcements_seen,
             "matched_announcements": sum(
@@ -19339,6 +19455,13 @@ class DataManager:
         discovery: Dict[str, Any],
         *,
         pending_candidate_ids: List[str],
+        pending_candidate_reasons: Optional[Mapping[str, str]] = None,
+        pending_special_announcements_by_instrument: Optional[
+            Mapping[str, Sequence[Mapping[str, Any]]]
+        ] = None,
+        pending_semantic_event_keys_by_instrument: Optional[
+            Mapping[str, Sequence[str]]
+        ] = None,
         pending_factor_instrument_ids: Optional[List[str]] = None,
         active_instruments: Dict[str, Dict[str, str]],
     ) -> Dict[str, int]:
@@ -19377,11 +19500,50 @@ class DataManager:
                     "business_domain": "corporate_action",
                     "selection_mode": "instrument_activity_trigger",
                     "selection_policy_version": (
-                        "cninfo_corporate_action_daily_title_trigger_v1"
+                        "cninfo_corporate_action_daily_title_trigger_v2"
                     ),
                     "pending_candidate_ids": sorted(
                         set(pending_by_exchange.get(exchange) or [])
                     ),
+                    "pending_candidate_reasons": {
+                        instrument_id: str(reason)
+                        for instrument_id, reason in sorted(
+                            (pending_candidate_reasons or {}).items()
+                        )
+                        if instrument_id in set(
+                            pending_by_exchange.get(exchange) or []
+                        )
+                    },
+                    "pending_special_announcements_by_instrument": {
+                        instrument_id: [
+                            dict(item) for item in announcements or ()
+                        ]
+                        for instrument_id, announcements in sorted(
+                            (
+                                pending_special_announcements_by_instrument
+                                or {}
+                            ).items()
+                        )
+                        if instrument_id in set(
+                            pending_by_exchange.get(exchange) or []
+                        )
+                    },
+                    "pending_semantic_event_keys_by_instrument": {
+                        instrument_id: sorted({
+                            str(item).strip()
+                            for item in event_keys or ()
+                            if str(item).strip()
+                        })
+                        for instrument_id, event_keys in sorted(
+                            (
+                                pending_semantic_event_keys_by_instrument
+                                or {}
+                            ).items()
+                        )
+                        if instrument_id in set(
+                            pending_by_exchange.get(exchange) or []
+                        )
+                    },
                     "pending_factor_instrument_ids": sorted(
                         set(pending_factor_instrument_ids or [])
                     ),
@@ -19553,6 +19715,662 @@ class DataManager:
             },
         }
 
+    async def _load_cninfo_daily_semantic_events(
+        self,
+        source_event_keys: List[str],
+    ) -> List[Dict[str, Any]]:
+        """Load exact current CNInfo rows selected by the current daily run."""
+        normalized_keys = sorted({
+            str(item).strip() for item in source_event_keys if str(item).strip()
+        })
+        rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(normalized_keys), 300):
+            chunk = normalized_keys[offset: offset + 300]
+            params = {
+                f"event_key_{index}": event_key
+                for index, event_key in enumerate(chunk)
+            }
+            placeholders = ", ".join(
+                f":event_key_{index}" for index in range(len(chunk))
+            )
+            rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_event_key, quality_status,
+                       announcement_date, record_date, ex_date, pay_date,
+                       share_arrival_date, event_status,
+                       EXISTS (
+                           SELECT 1
+                           FROM corporate_action_resolution_states AS state
+                           WHERE state.instrument_id = observation.instrument_id
+                             AND state.source_event_key = observation.source_event_key
+                             AND state.is_terminal = 1
+                       ) AS resolution_is_terminal
+                FROM corporate_action_observations AS observation
+                WHERE observation.source = 'cninfo'
+                  AND observation.is_current = 1
+                  AND observation.source_event_key IN ({placeholders})
+                ORDER BY observation.instrument_id,
+                         observation.source_event_key
+                """,
+                params,
+            ))
+        return rows
+
+    async def _govern_cninfo_daily_anomalies(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        exchanges: List[str],
+        cninfo_result: Mapping[str, Any],
+        announcement_governance_context: Optional[Mapping[str, Any]],
+        rebuild_result: Mapping[str, Any],
+        enabled: bool,
+        max_events: int,
+        profile: str,
+        download_documents: bool,
+        run_ocr: bool,
+        auto_promote_validated: bool,
+        title_max_concurrency: int,
+        pipeline_mode: str,
+        pipeline_llm_concurrency: int,
+        pipeline_download_concurrency: int,
+        pipeline_document_parse_concurrency: int,
+        pipeline_progress_interval_seconds: float,
+    ) -> Dict[str, Any]:
+        """Run bounded semantic governance only for deterministic anomalies."""
+        from data_sources.cninfo_corporate_action_incremental import (
+            associate_exceptional_announcements,
+            classify_daily_corporate_action_title,
+            select_daily_semantic_anomalies,
+        )
+
+        announcement_scan = (
+            announcement_governance_context.get("announcement_scan") or {}
+            if announcement_governance_context
+            else {}
+        )
+        carried_event_keys_by_instrument = {
+            str(instrument_id or "").strip(): sorted({
+                str(item).strip()
+                for item in event_keys or ()
+                if str(item).strip()
+            })
+            for instrument_id, event_keys in (
+                announcement_scan.get(
+                    "deferred_semantic_event_keys_by_instrument"
+                ) or {}
+            ).items()
+            if str(instrument_id or "").strip()
+        }
+        carried_event_keys = {
+            event_key
+            for event_keys in carried_event_keys_by_instrument.values()
+            for event_key in event_keys
+        }
+        persisted_event_key_values = (
+            cninfo_result.get("persisted_event_keys")
+            if "persisted_event_keys" in cninfo_result
+            else cninfo_result.get("observed_event_keys")
+        )
+        observed_event_keys = {
+            str(item).strip()
+            for item in (persisted_event_key_values or [])
+            if str(item).strip()
+        }
+        current_event_keys_by_instrument = {
+            str(instrument_id or "").strip(): {
+                str(item).strip()
+                for item in event_keys or ()
+                if str(item).strip()
+            }
+            for instrument_id, event_keys in (
+                cninfo_result.get("persisted_event_keys_by_instrument") or {}
+            ).items()
+            if str(instrument_id or "").strip()
+        }
+        affected_instrument_ids = {
+            str(item).strip()
+            for item in (
+                cninfo_result.get("affected_instrument_ids") or []
+            )
+            if str(item).strip()
+        }
+        if (
+            not current_event_keys_by_instrument
+            and len(affected_instrument_ids) == 1
+            and observed_event_keys
+        ):
+            current_event_keys_by_instrument[next(iter(
+                affected_instrument_ids
+            ))] = set(observed_event_keys)
+        semantic_event_keys = sorted(observed_event_keys | carried_event_keys)
+        exceptional_announcements_by_instrument: Dict[
+            str, Dict[str, Dict[str, Any]]
+        ] = defaultdict(dict)
+        if announcement_governance_context:
+            for instrument_id, announcements in (
+                announcement_scan.get(
+                    "deferred_special_announcements_by_instrument"
+                ) or {}
+            ).items():
+                normalized_instrument_id = str(instrument_id or "").strip()
+                for item in announcements or ():
+                    announcement_key = str(
+                        item.get("announcement_key") or ""
+                    ).strip()
+                    if normalized_instrument_id and announcement_key:
+                        exceptional_announcements_by_instrument[
+                            normalized_instrument_id
+                        ][announcement_key] = dict(item)
+            matched_instruments_by_record = (
+                announcement_scan.get("matched_instruments_by_record") or {}
+            )
+            for records in (
+                announcement_scan.get("matched_records_by_exchange") or {}
+            ).values():
+                for record in records or ():
+                    decision = classify_daily_corporate_action_title(
+                        getattr(record, "title", "")
+                    )
+                    if not decision.get("requires_semantic_review"):
+                        continue
+                    published_at = None
+                    if getattr(record, "published_at", None):
+                        try:
+                            published_at = datetime.fromisoformat(
+                                str(record.published_at).replace("Z", "+00:00")
+                            )
+                        except ValueError:
+                            published_at = None
+                    if published_at is not None and published_at.tzinfo is not None:
+                        announcement_date = published_at.astimezone(
+                            get_shanghai_time().tzinfo
+                        ).date()
+                    elif published_at is not None:
+                        announcement_date = published_at.date()
+                    else:
+                        announcement_date = None
+                    announcement_key = str(
+                        getattr(record, "announcement_key", "") or ""
+                    ).strip()
+                    for instrument_id in matched_instruments_by_record.get(
+                        getattr(record, "announcement_key", ""), ()
+                    ):
+                        normalized_instrument_id = str(instrument_id or "").strip()
+                        if not normalized_instrument_id or not announcement_key:
+                            continue
+                        exceptional_announcements_by_instrument[
+                            normalized_instrument_id
+                        ][announcement_key] = {
+                            "announcement_key": announcement_key,
+                            "announcement_date": (
+                                announcement_date.isoformat()
+                                if announcement_date is not None
+                                else None
+                            ),
+                            "title": str(getattr(record, "title", "") or ""),
+                            "exceptional_markers": sorted({
+                                str(item).strip()
+                                for item in (
+                                    decision.get("exceptional_markers") or []
+                                )
+                                if str(item).strip()
+                            }),
+                        }
+        try:
+            events = (
+                await self._load_cninfo_daily_semantic_events(
+                    semantic_event_keys
+                )
+                if semantic_event_keys
+                else []
+            )
+        except Exception as exc:
+            dm_logger.exception(
+                "[DataManager] CNInfo daily semantic event load failed: %s",
+                exc,
+            )
+            pending_event_keys_by_instrument: Dict[str, Set[str]] = defaultdict(
+                set
+            )
+            for instrument_id, event_keys in (
+                carried_event_keys_by_instrument.items()
+            ):
+                pending_event_keys_by_instrument[instrument_id].update(
+                    event_keys
+                )
+            for instrument_id, event_keys in (
+                current_event_keys_by_instrument.items()
+            ):
+                pending_event_keys_by_instrument[instrument_id].update(
+                    event_keys
+                )
+            deferred_instrument_ids = sorted({
+                *(
+                    str(item).strip()
+                    for item in (
+                        cninfo_result.get("affected_instrument_ids") or []
+                    )
+                    if str(item).strip()
+                ),
+                *pending_event_keys_by_instrument,
+                *exceptional_announcements_by_instrument,
+            })
+            return {
+                "status": "partial",
+                "execution_status": "partial",
+                "readiness_status": "partial",
+                "candidate_event_count": len(semantic_event_keys),
+                "selected_event_count": 0,
+                "deferred_event_count": len(semantic_event_keys),
+                "unmatched_special_announcement_count": sum(
+                    len(items)
+                    for items in (
+                        exceptional_announcements_by_instrument.values()
+                    )
+                ),
+                "reason_counts": {},
+                "candidates": [],
+                "deferred_candidates": [],
+                "source_event_keys": [],
+                "deferred_source_event_keys": semantic_event_keys,
+                "instrument_ids": [],
+                "deferred_instrument_ids": deferred_instrument_ids,
+                "unmatched_instrument_ids": sorted(
+                    exceptional_announcements_by_instrument
+                ),
+                "deferred_special_announcements_by_instrument": {
+                    instrument_id: list(items.values())
+                    for instrument_id, items in sorted(
+                        exceptional_announcements_by_instrument.items()
+                    )
+                },
+                "deferred_semantic_event_keys_by_instrument": (
+                    {
+                        instrument_id: sorted(event_keys)
+                        for instrument_id, event_keys in sorted(
+                            pending_event_keys_by_instrument.items()
+                        )
+                        if event_keys
+                    }
+                ),
+                "promoted_instrument_ids": [],
+                "llm": {
+                    "status": "failed",
+                    "stage": "load_semantic_events",
+                    "error": str(exc),
+                },
+            }
+        association = associate_exceptional_announcements(
+            events,
+            exceptional_announcements_by_instrument={
+                instrument_id: list(items.values())
+                for instrument_id, items in (
+                    exceptional_announcements_by_instrument.items()
+                )
+            },
+        )
+        conflict_event_keys = {
+            str(event_key).strip()
+            for conflict in (
+                (rebuild_result.get("reconciliation") or {}).get(
+                    "conflicts", []
+                )
+            )
+            for event_key in (conflict.get("source_event_keys") or [])
+            if str(event_key).strip()
+        }
+        changed_event_keys = {
+            str(item).strip()
+            for field_name in (
+                "inserted_event_keys",
+                "changed_event_keys",
+                "reactivated_event_keys",
+            )
+            for item in (cninfo_result.get(field_name) or [])
+            if str(item).strip()
+        }
+        selection = select_daily_semantic_anomalies(
+            events,
+            exceptional_markers_by_event=association[
+                "exceptional_markers_by_event"
+            ],
+            conflict_event_keys=conflict_event_keys,
+            changed_event_keys=changed_event_keys,
+            priority_event_keys=carried_event_keys,
+            max_events=max_events,
+        )
+        selected_candidates = selection["candidates"]
+        candidate_instrument_by_key = {
+            str(item["source_event_key"]): str(item["instrument_id"])
+            for item in [
+                *selection["candidates"],
+                *selection["deferred"],
+            ]
+        }
+
+        def _deferred_semantic_event_keys(
+            event_keys: Iterable[str],
+        ) -> Dict[str, List[str]]:
+            grouped: Dict[str, Set[str]] = defaultdict(set)
+            for event_key in event_keys:
+                normalized_event_key = str(event_key or "").strip()
+                instrument_id = candidate_instrument_by_key.get(
+                    normalized_event_key, ""
+                )
+                if normalized_event_key and instrument_id:
+                    grouped[instrument_id].add(normalized_event_key)
+            return {
+                instrument_id: sorted(keys)
+                for instrument_id, keys in sorted(grouped.items())
+            }
+
+        selected_instruments = sorted({
+            str(item["instrument_id"]) for item in selected_candidates
+        })
+        deferred_instruments = sorted({
+            *association["unmatched_instrument_ids"],
+            *(
+                str(item["instrument_id"])
+                for item in selection["deferred"]
+            ),
+        })
+
+        announcement_lineage_by_key = {
+            announcement_key: {
+                **dict(item),
+                "instrument_id": instrument_id,
+            }
+            for instrument_id, announcements in (
+                exceptional_announcements_by_instrument.items()
+            )
+            for announcement_key, item in announcements.items()
+        }
+
+        def _deferred_special_lineage(
+            event_keys: Iterable[str],
+        ) -> Dict[str, List[Dict[str, Any]]]:
+            pending_announcement_keys = {
+                announcement_key
+                for event_key in event_keys
+                for announcement_key in (
+                    association["announcement_keys_by_event"].get(
+                        str(event_key), ()
+                    )
+                )
+            }
+            pending_items = [
+                *association["unmatched_announcements"],
+                *(
+                    announcement_lineage_by_key[announcement_key]
+                    for announcement_key in sorted(pending_announcement_keys)
+                    if announcement_key in announcement_lineage_by_key
+                ),
+            ]
+            grouped: Dict[str, Dict[str, Dict[str, Any]]] = defaultdict(dict)
+            for item in pending_items:
+                instrument_id = str(
+                    item.get("instrument_id") or ""
+                ).strip()
+                announcement_key = str(
+                    item.get("announcement_key") or ""
+                ).strip()
+                if not instrument_id or not announcement_key:
+                    continue
+                grouped[instrument_id][announcement_key] = {
+                    key: value
+                    for key, value in dict(item).items()
+                    if key != "instrument_id"
+                }
+            return {
+                instrument_id: list(items.values())
+                for instrument_id, items in sorted(grouped.items())
+            }
+
+        deferred_special_lineage = _deferred_special_lineage(
+            selection["deferred_source_event_keys"]
+        )
+        base = {
+            "candidate_event_count": selection["candidate_count"],
+            "selected_event_count": selection["selected_count"],
+            "deferred_event_count": selection["deferred_count"],
+            "unmatched_special_announcement_count": len(
+                association["unmatched_announcements"]
+            ),
+            "reason_counts": selection["reason_counts"],
+            "candidates": selected_candidates,
+            "deferred_candidates": selection["deferred"],
+            "source_event_keys": selection["source_event_keys"],
+            "deferred_source_event_keys": selection[
+                "deferred_source_event_keys"
+            ],
+            "instrument_ids": selected_instruments,
+            "deferred_instrument_ids": deferred_instruments,
+            "unmatched_instrument_ids": association[
+                "unmatched_instrument_ids"
+            ],
+            "deferred_special_announcements_by_instrument": (
+                deferred_special_lineage
+            ),
+            "deferred_semantic_event_keys_by_instrument": (
+                _deferred_semantic_event_keys(
+                    selection["deferred_source_event_keys"]
+                )
+            ),
+            "promoted_instrument_ids": [],
+        }
+        if not enabled:
+            disabled_deferred_instruments = sorted({
+                *deferred_instruments,
+                *selected_instruments,
+            })
+            return {
+                **base,
+                "status": "disabled",
+                "execution_status": "disabled",
+                "readiness_status": (
+                    "partial"
+                    if selection["candidate_count"]
+                    or association["unmatched_instrument_ids"]
+                    else "success"
+                ),
+                "deferred_instrument_ids": disabled_deferred_instruments,
+                "deferred_special_announcements_by_instrument": (
+                    _deferred_special_lineage(
+                        selection["source_event_keys"]
+                        + selection["deferred_source_event_keys"]
+                    )
+                ),
+                "deferred_semantic_event_keys_by_instrument": (
+                    _deferred_semantic_event_keys(
+                        selection["source_event_keys"]
+                        + selection["deferred_source_event_keys"]
+                    )
+                ),
+                "llm": None,
+            }
+        if not selection["source_event_keys"]:
+            return {
+                **base,
+                "status": "skipped",
+                "execution_status": "skipped",
+                "readiness_status": (
+                    "partial"
+                    if selection["deferred_count"]
+                    or association["unmatched_instrument_ids"]
+                    else "success"
+                ),
+                "llm": None,
+            }
+        semantic_anchor_dates = [
+            parsed
+            for event in events
+            if str(event.get("source_event_key") or "").strip()
+            in set(selection["source_event_keys"])
+            for field_name in (
+                "announcement_date",
+                "record_date",
+                "ex_date",
+                "pay_date",
+                "share_arrival_date",
+            )
+            if (parsed := self._date_from_any(event.get(field_name))) is not None
+        ]
+        semantic_start_date = min([start_date, *semantic_anchor_dates])
+        semantic_end_date = max([end_date, *semantic_anchor_dates])
+        try:
+            llm_result = await self.analyze_cninfo_corporate_action_candidates(
+                start_date=semantic_start_date,
+                end_date=semantic_end_date,
+                exchanges=exchanges,
+                instrument_ids=selected_instruments,
+                source_event_keys=selection["source_event_keys"],
+                max_events=len(selection["source_event_keys"]),
+                target_offset=0,
+                profile=profile,
+                resume=True,
+                dry_run=False,
+                download_documents=download_documents,
+                run_ocr=run_ocr,
+                refresh_documents=False,
+                discover_candidates=True,
+                auto_promote_validated=auto_promote_validated,
+                exclude_reviewed_events=False,
+                title_max_concurrency=title_max_concurrency,
+                pipeline={
+                    "mode": pipeline_mode,
+                    "llm_concurrency": pipeline_llm_concurrency,
+                    "download_concurrency": pipeline_download_concurrency,
+                    "document_parse_concurrency": (
+                        pipeline_document_parse_concurrency
+                    ),
+                    "progress_interval_seconds": (
+                        pipeline_progress_interval_seconds
+                    ),
+                    "title_max_titles_per_request": 80,
+                },
+            )
+        except Exception as exc:
+            dm_logger.exception(
+                "[DataManager] CNInfo daily anomaly governance failed: %s",
+                exc,
+            )
+            return {
+                **base,
+                "status": "partial",
+                "execution_status": "partial",
+                "readiness_status": "partial",
+                "deferred_instrument_ids": sorted({
+                    *deferred_instruments,
+                    *selected_instruments,
+                }),
+                "deferred_special_announcements_by_instrument": (
+                    _deferred_special_lineage(
+                        selection["source_event_keys"]
+                        + selection["deferred_source_event_keys"]
+                    )
+                ),
+                "deferred_semantic_event_keys_by_instrument": (
+                    _deferred_semantic_event_keys(
+                        selection["source_event_keys"]
+                        + selection["deferred_source_event_keys"]
+                    )
+                ),
+                "llm": {
+                    "status": "failed",
+                    "error": str(exc),
+                },
+            }
+        counts = llm_result.get("counts") or {}
+        promotion = llm_result.get("auto_promotion") or {}
+        review = llm_result.get("review_workload") or {}
+        targets = llm_result.get("targets") or {}
+        discovery = llm_result.get("discovery") or {}
+        promoted_source_event_keys = {
+            str(item).strip()
+            for item in (
+                promotion.get("promoted_source_event_keys") or []
+            )
+            if str(item).strip()
+        }
+        promoted_source_event_keys.update(
+            str(item.get("source_event_key") or "").strip()
+            for item in (promotion.get("samples") or [])
+            if str(item.get("status") or "") == "promoted"
+            and str(item.get("source_event_key") or "").strip()
+        )
+        promoted_instruments = sorted({
+            candidate_instrument_by_key[event_key]
+            for event_key in promoted_source_event_keys
+            if event_key in candidate_instrument_by_key
+        })
+        promotion_attribution_missing = (
+            int(promotion.get("promoted") or 0)
+            > len({
+                event_key
+                for event_key in promoted_source_event_keys
+                if event_key in candidate_instrument_by_key
+            })
+        )
+        unprocessed_event_count = max(
+            0,
+            len(selection["source_event_keys"])
+            - int(targets.get("candidate_events") or 0),
+        )
+        execution_failed = bool(
+            llm_result.get("errors")
+            or int(counts.get("errors") or 0)
+            or int(counts.get("document_failures") or 0)
+            or int(counts.get("llm_disabled") or 0)
+            or int(promotion.get("failed") or 0)
+            or promotion_attribution_missing
+            or str(discovery.get("status") or "") in {"partial", "failed"}
+        )
+        remaining_review = int(review.get("remaining_manual_review") or 0)
+        has_more = bool(targets.get("has_more"))
+        if execution_failed or unprocessed_event_count:
+            deferred_instruments = sorted({
+                *deferred_instruments,
+                *selected_instruments,
+            })
+            deferred_special_lineage = _deferred_special_lineage(
+                selection["source_event_keys"]
+                + selection["deferred_source_event_keys"]
+            )
+            deferred_semantic_event_keys = _deferred_semantic_event_keys(
+                selection["source_event_keys"]
+                + selection["deferred_source_event_keys"]
+            )
+        else:
+            deferred_semantic_event_keys = _deferred_semantic_event_keys(
+                selection["deferred_source_event_keys"]
+            )
+        return {
+            **base,
+            "status": "partial" if execution_failed else "success",
+            "execution_status": "partial" if execution_failed else "success",
+            "readiness_status": (
+                "partial"
+                if remaining_review
+                or has_more
+                or unprocessed_event_count
+                or selection["deferred_count"]
+                or association["unmatched_instrument_ids"]
+                else "success"
+            ),
+            "unprocessed_event_count": unprocessed_event_count,
+            "deferred_instrument_ids": deferred_instruments,
+            "deferred_special_announcements_by_instrument": (
+                deferred_special_lineage
+            ),
+            "deferred_semantic_event_keys_by_instrument": (
+                deferred_semantic_event_keys
+            ),
+            "promoted_instrument_ids": promoted_instruments,
+            "llm": llm_result,
+        }
+
     async def maintain_a_share_cninfo_primary_factors(
         self,
         *,
@@ -19572,6 +20390,18 @@ class DataManager:
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
+        anomaly_llm_enabled: bool = True,
+        anomaly_llm_max_events: int = 50,
+        anomaly_llm_profile: str = "semantic_extraction",
+        anomaly_llm_download_documents: bool = True,
+        anomaly_llm_run_ocr: bool = False,
+        anomaly_llm_auto_promote_validated: bool = True,
+        anomaly_llm_title_max_concurrency: int = 50,
+        anomaly_llm_pipeline_mode: str = "async",
+        anomaly_llm_pipeline_llm_concurrency: int = 50,
+        anomaly_llm_pipeline_download_concurrency: int = 8,
+        anomaly_llm_pipeline_document_parse_concurrency: int = 8,
+        anomaly_llm_pipeline_progress_interval_seconds: float = 30.0,
     ) -> Dict[str, Any]:
         """Incrementally refresh events and rebuild only affected factor paths."""
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
@@ -19971,35 +20801,116 @@ class DataManager:
                     "series_version": series_version,
                 },
             }
+        anomaly_governance = await self._govern_cninfo_daily_anomalies(
+            start_date=normalized_start,
+            end_date=normalized_end,
+            exchanges=cninfo_exchanges,
+            cninfo_result=cninfo_result,
+            announcement_governance_context=announcement_governance_context,
+            rebuild_result=rebuild_result,
+            enabled=bool(anomaly_llm_enabled),
+            max_events=int(anomaly_llm_max_events),
+            profile=anomaly_llm_profile,
+            download_documents=bool(anomaly_llm_download_documents),
+            run_ocr=bool(anomaly_llm_run_ocr),
+            auto_promote_validated=bool(
+                anomaly_llm_auto_promote_validated
+            ),
+            title_max_concurrency=int(
+                anomaly_llm_title_max_concurrency
+            ),
+            pipeline_mode=anomaly_llm_pipeline_mode,
+            pipeline_llm_concurrency=int(
+                anomaly_llm_pipeline_llm_concurrency
+            ),
+            pipeline_download_concurrency=int(
+                anomaly_llm_pipeline_download_concurrency
+            ),
+            pipeline_document_parse_concurrency=int(
+                anomaly_llm_pipeline_document_parse_concurrency
+            ),
+            pipeline_progress_interval_seconds=float(
+                anomaly_llm_pipeline_progress_interval_seconds
+            ),
+        )
+        pending_candidate_ids = sorted({
+            *pending_candidate_ids,
+            *(anomaly_governance.get("deferred_instrument_ids") or []),
+        })
+        promoted_instrument_ids = set(
+            anomaly_governance.get("promoted_instrument_ids") or []
+        )
+        factor_rebuild_scope_ids = sorted(
+            set(affected_ids) | promoted_instrument_ids
+        )
+        initial_rebuild_result = rebuild_result
+        promotion_rebuild_result: Optional[Dict[str, Any]] = None
+        if promoted_instrument_ids and factor_end_date is not None:
+            final_rebuild_ids = sorted(promoted_instrument_ids)
+            dm_logger.info(
+                "[DataManager] Rebuilding factors after governed anomaly "
+                "promotion: promoted=%d instruments=%d",
+                len(promoted_instrument_ids),
+                len(final_rebuild_ids),
+            )
+            promotion_rebuild_result = (
+                await self.rebuild_cninfo_primary_adjustment_factors(
+                    start_date=date(1990, 12, 19),
+                    end_date=factor_end_date,
+                    exchanges=normalized_exchanges,
+                    instrument_ids=final_rebuild_ids,
+                    dry_run=False,
+                    build_canonical=build_canonical,
+                    series_version=series_version,
+                )
+            )
+            rebuild_result = promotion_rebuild_result
         pending_factor_ids: Set[str] = set()
         if factor_end_date is None:
-            pending_factor_ids.update(affected_ids)
+            pending_factor_ids.update(factor_rebuild_scope_ids)
         else:
             pending_factor_ids.update(
                 await self._load_daily_factor_cutoff_deferred_instrument_ids(
-                    affected_ids,
+                    factor_rebuild_scope_ids,
                     cutoff_date=factor_end_date,
                     end_date=normalized_end,
                 )
             )
-            if rebuild_result.get("status") == "failed":
-                pending_factor_ids.update(affected_ids)
-            else:
+            def _phase_pending_instrument_ids(
+                phase_result: Mapping[str, Any],
+                phase_instrument_ids: Set[str],
+            ) -> Set[str]:
+                if phase_result.get("status") == "failed":
+                    return set(phase_instrument_ids)
+                phase_pending_ids: Set[str] = set()
                 for path_name in ("cninfo_path", "tdx_path"):
-                    path = rebuild_result.get(path_name) or {}
+                    path = phase_result.get(path_name) or {}
                     complete_ids = path.get("pending_instrument_ids")
                     if complete_ids is not None:
-                        pending_factor_ids.update(
+                        phase_pending_ids.update(
                             str(item).strip()
                             for item in complete_ids
                             if str(item).strip()
                         )
                         continue
-                    pending_factor_ids.update(
+                    phase_pending_ids.update(
                         str(item.get("instrument_id") or "").strip()
                         for item in path.get("pending", [])
                         if item.get("instrument_id")
                     )
+                return phase_pending_ids
+
+            initial_pending_ids = _phase_pending_instrument_ids(
+                initial_rebuild_result,
+                set(affected_ids),
+            )
+            if promotion_rebuild_result is not None:
+                initial_pending_ids.difference_update(promoted_instrument_ids)
+                pending_factor_ids.update(_phase_pending_instrument_ids(
+                    promotion_rebuild_result,
+                    promoted_instrument_ids,
+                ))
+            pending_factor_ids.update(initial_pending_ids)
         factor_retry_state: Dict[str, Any] = {"status": "not_supported"}
         factor_retry_persister = getattr(
             self.db_ops,
@@ -20042,10 +20953,33 @@ class DataManager:
                 }
         if announcement_governance_context:
             try:
+                pending_candidate_reasons = {
+                    str(instrument_id): "semantic_anomaly_deferred"
+                    for instrument_id in (
+                        anomaly_governance.get("deferred_instrument_ids") or []
+                    )
+                }
+                pending_candidate_reasons.update({
+                    str(instrument_id): "unmatched_special_announcement"
+                    for instrument_id in (
+                        anomaly_governance.get("unmatched_instrument_ids") or []
+                    )
+                })
                 discovery_result["governance"] = (
                     self._persist_cninfo_daily_announcement_activity(
                         announcement_governance_context["announcement_scan"],
                         pending_candidate_ids=pending_candidate_ids,
+                        pending_candidate_reasons=pending_candidate_reasons,
+                        pending_special_announcements_by_instrument=(
+                            anomaly_governance.get(
+                                "deferred_special_announcements_by_instrument"
+                            ) or {}
+                        ),
+                        pending_semantic_event_keys_by_instrument=(
+                            anomaly_governance.get(
+                                "deferred_semantic_event_keys_by_instrument"
+                            ) or {}
+                        ),
                         pending_factor_instrument_ids=sorted(pending_factor_ids),
                         active_instruments=announcement_governance_context[
                             "active_instruments"
@@ -20069,33 +21003,391 @@ class DataManager:
             str(tdx_result.get("status")),
             str(quote_cutoff_status),
             str(factor_retry_state.get("status")),
+            str(anomaly_governance.get("execution_status")),
         }
         operational_status = (
             "partial"
             if operational_statuses & {"partial", "failed"}
-            or rebuild_result.get("status") == "failed"
+            or initial_rebuild_result.get("status") == "failed"
+            or (
+                promotion_rebuild_result is not None
+                and promotion_rebuild_result.get("status") == "failed"
+            )
             else "success"
         )
-        reconciliation = rebuild_result.get("reconciliation") or {}
-        overall_completeness = rebuild_result.get("overall_completeness") or {}
-        source_completeness = rebuild_result.get("source_completeness") or {}
-        cninfo_readiness = source_completeness.get("cninfo") or {}
-        tdx_readiness = source_completeness.get("tdx_reference") or {}
-        reconciliation_readiness = (
-            source_completeness.get("reconciliation") or {}
+
+        def _readiness_phase_summary(
+            phase_result: Optional[Mapping[str, Any]],
+        ) -> Optional[Dict[str, Any]]:
+            if phase_result is None:
+                return None
+            return {
+                "status": phase_result.get("status"),
+                "cninfo_pending_factor_events": int(
+                    (phase_result.get("cninfo_path") or {}).get(
+                        "pending_count", 0
+                    )
+                    or 0
+                ),
+                "tdx_pending_factor_events": int(
+                    (phase_result.get("tdx_path") or {}).get(
+                        "pending_count", 0
+                    )
+                    or 0
+                ),
+                "reconciliation": (
+                    phase_result.get("reconciliation") or {}
+                ),
+                "overall_completeness": (
+                    phase_result.get("overall_completeness") or {}
+                ),
+                "source_completeness": (
+                    phase_result.get("source_completeness") or {}
+                ),
+            }
+
+        def _remaining_count(
+            section: Mapping[str, Any],
+            *,
+            count_key: str,
+            instrument_ids_key: str,
+            phase_scope: Set[str],
+            superseded_ids: Set[str],
+            count_is_instrument_count: bool = False,
+        ) -> int:
+            count = int(section.get(count_key, 0) or 0)
+            if count <= 0 or not superseded_ids:
+                return count
+            if phase_scope and phase_scope <= superseded_ids:
+                return 0
+            item_ids = {
+                str(item).strip()
+                for item in (section.get(instrument_ids_key) or [])
+                if str(item).strip()
+            }
+            if count_is_instrument_count and instrument_ids_key in section:
+                return max(0, count - len(item_ids & superseded_ids))
+            if item_ids and item_ids <= superseded_ids:
+                return 0
+            return count
+
+        def _remaining_pending_count(
+            phase_result: Mapping[str, Any],
+            path_name: str,
+            phase_scope: Set[str],
+            superseded_ids: Set[str],
+        ) -> int:
+            path = phase_result.get(path_name) or {}
+            count = _remaining_count(
+                path,
+                count_key="pending_count",
+                instrument_ids_key="pending_instrument_ids",
+                phase_scope=phase_scope,
+                superseded_ids=superseded_ids,
+            )
+            pending_rows = path.get("pending") or []
+            original_count = int(path.get("pending_count", 0) or 0)
+            if (
+                superseded_ids
+                and original_count == len(pending_rows)
+                and original_count > 0
+            ):
+                return sum(
+                    1
+                    for item in pending_rows
+                    if str(item.get("instrument_id") or "").strip()
+                    not in superseded_ids
+                )
+            return count
+
+        def _remaining_source_section(
+            phase_result: Mapping[str, Any],
+            source_name: str,
+            phase_scope: Set[str],
+            superseded_ids: Set[str],
+        ) -> Dict[str, Any]:
+            section = (
+                (phase_result.get("source_completeness") or {}).get(source_name)
+                or {}
+            )
+            incomplete_count = _remaining_count(
+                section,
+                count_key="incomplete_instruments",
+                instrument_ids_key="all_instrument_ids",
+                phase_scope=phase_scope,
+                superseded_ids=superseded_ids,
+                count_is_instrument_count=True,
+            )
+            instrument_ids = sorted({
+                str(item).strip()
+                for item in (
+                    section.get("all_instrument_ids")
+                    or section.get("instrument_ids")
+                    or []
+                )
+                if str(item).strip() and str(item).strip() not in superseded_ids
+            })[:100]
+            raw_status = str(section.get("status") or "partial")
+            if phase_scope and phase_scope <= superseded_ids:
+                status = "success"
+            elif incomplete_count > 0:
+                status = "partial"
+            elif "all_instrument_ids" in section:
+                status = "success"
+            elif raw_status in {"partial", "failed"}:
+                status = "partial"
+            else:
+                status = "success"
+            return {
+                "status": status,
+                "incomplete_instruments": incomplete_count,
+                "instrument_ids": instrument_ids,
+            }
+
+        reconciliation_list_keys = {
+            "exact_matches": "exact_matches",
+            "rounded_matches": "rounded_matches",
+            "shifted_matches": "shifted_matches",
+            "accepted_authoritative_overrides": (
+                "accepted_authoritative_overrides"
+            ),
+            "suppressed_reference_events": "suppressed_reference_events",
+            "conflicts": "conflicts",
+            "cninfo_only": "cninfo_only",
+            "tdx_only": "tdx_only",
+        }
+
+        def _remaining_reconciliation_totals(
+            phase_result: Mapping[str, Any],
+            phase_scope: Set[str],
+            superseded_ids: Set[str],
+        ) -> Dict[str, int]:
+            reconciliation = phase_result.get("reconciliation") or {}
+            totals = reconciliation.get("totals") or {}
+            remaining: Dict[str, int] = {}
+            for total_key, list_key in reconciliation_list_keys.items():
+                rows = reconciliation.get(list_key)
+                if rows is not None:
+                    remaining[total_key] = sum(
+                        1
+                        for item in rows
+                        if str(item.get("instrument_id") or "").strip()
+                        not in superseded_ids
+                    )
+                elif phase_scope and phase_scope <= superseded_ids:
+                    remaining[total_key] = 0
+                else:
+                    remaining[total_key] = int(
+                        totals.get(total_key, 0) or 0
+                    )
+            return remaining
+
+        def _remaining_overall_count(
+            phase_result: Mapping[str, Any],
+            phase_scope: Set[str],
+            superseded_ids: Set[str],
+        ) -> int:
+            return _remaining_count(
+                phase_result.get("overall_completeness") or {},
+                count_key="overall_incomplete_instruments",
+                instrument_ids_key="all_instrument_ids",
+                phase_scope=phase_scope,
+                superseded_ids=superseded_ids,
+                count_is_instrument_count=True,
+            )
+
+        initial_scope = set(affected_ids)
+        promotion_scope = set(promoted_instrument_ids)
+        initial_superseded_ids = initial_scope & promotion_scope
+        cninfo_pending_factor_events = _remaining_pending_count(
+            initial_rebuild_result,
+            "cninfo_path",
+            initial_scope,
+            initial_superseded_ids,
         )
-        cninfo_pending_factor_events = int(
-            (rebuild_result.get("cninfo_path") or {}).get("pending_count", 0)
+        tdx_pending_factor_events = _remaining_pending_count(
+            initial_rebuild_result,
+            "tdx_path",
+            initial_scope,
+            initial_superseded_ids,
         )
-        tdx_pending_factor_events = int(
-            (rebuild_result.get("tdx_path") or {}).get("pending_count", 0)
+        initial_cninfo_readiness = _remaining_source_section(
+            initial_rebuild_result,
+            "cninfo",
+            initial_scope,
+            initial_superseded_ids,
         )
+        initial_tdx_readiness = _remaining_source_section(
+            initial_rebuild_result,
+            "tdx_reference",
+            initial_scope,
+            initial_superseded_ids,
+        )
+        reconciliation_totals = _remaining_reconciliation_totals(
+            initial_rebuild_result,
+            initial_scope,
+            initial_superseded_ids,
+        )
+        overall_incomplete_instruments = _remaining_overall_count(
+            initial_rebuild_result,
+            initial_scope,
+            initial_superseded_ids,
+        )
+
+        cninfo_readiness = initial_cninfo_readiness
+        tdx_readiness = initial_tdx_readiness
+        if promotion_rebuild_result is not None:
+            cninfo_pending_factor_events += _remaining_pending_count(
+                promotion_rebuild_result,
+                "cninfo_path",
+                promotion_scope,
+                set(),
+            )
+            tdx_pending_factor_events += _remaining_pending_count(
+                promotion_rebuild_result,
+                "tdx_path",
+                promotion_scope,
+                set(),
+            )
+            promotion_cninfo_readiness = _remaining_source_section(
+                promotion_rebuild_result,
+                "cninfo",
+                promotion_scope,
+                set(),
+            )
+            promotion_tdx_readiness = _remaining_source_section(
+                promotion_rebuild_result,
+                "tdx_reference",
+                promotion_scope,
+                set(),
+            )
+            cninfo_readiness = {
+                "status": (
+                    "partial"
+                    if {
+                        initial_cninfo_readiness["status"],
+                        promotion_cninfo_readiness["status"],
+                    } & {"partial", "failed"}
+                    else "success"
+                ),
+                "incomplete_instruments": (
+                    initial_cninfo_readiness["incomplete_instruments"]
+                    + promotion_cninfo_readiness["incomplete_instruments"]
+                ),
+                "instrument_ids": sorted({
+                    *initial_cninfo_readiness["instrument_ids"],
+                    *promotion_cninfo_readiness["instrument_ids"],
+                }),
+            }
+            tdx_readiness = {
+                "status": (
+                    "partial"
+                    if {
+                        initial_tdx_readiness["status"],
+                        promotion_tdx_readiness["status"],
+                    } & {"partial", "failed"}
+                    else "success"
+                ),
+                "incomplete_instruments": (
+                    initial_tdx_readiness["incomplete_instruments"]
+                    + promotion_tdx_readiness["incomplete_instruments"]
+                ),
+                "instrument_ids": sorted({
+                    *initial_tdx_readiness["instrument_ids"],
+                    *promotion_tdx_readiness["instrument_ids"],
+                }),
+            }
+            promotion_reconciliation_totals = (
+                _remaining_reconciliation_totals(
+                    promotion_rebuild_result,
+                    promotion_scope,
+                    set(),
+                )
+            )
+            reconciliation_totals = {
+                key: reconciliation_totals.get(key, 0)
+                + promotion_reconciliation_totals.get(key, 0)
+                for key in {
+                    *reconciliation_totals,
+                    *promotion_reconciliation_totals,
+                }
+            }
+            overall_incomplete_instruments += _remaining_overall_count(
+                promotion_rebuild_result,
+                promotion_scope,
+                set(),
+            )
+
+        matched_event_count = sum(
+            reconciliation_totals.get(key, 0)
+            for key in (
+                "exact_matches",
+                "rounded_matches",
+                "shifted_matches",
+                "accepted_authoritative_overrides",
+                "conflicts",
+            )
+        )
+        reconciliation_totals["cninfo_events"] = (
+            matched_event_count
+            + reconciliation_totals.get("cninfo_only", 0)
+        )
+        reconciliation_totals["tdx_events"] = (
+            matched_event_count
+            + reconciliation_totals.get("tdx_only", 0)
+            + reconciliation_totals.get("suppressed_reference_events", 0)
+        )
+        reconciliation_status = (
+            "partial"
+            if any(
+                reconciliation_totals.get(key, 0)
+                for key in ("conflicts", "cninfo_only", "tdx_only")
+            )
+            else "success"
+        )
+        reconciliation_readiness = {
+            "status": reconciliation_status,
+            "incomplete_instruments": len({
+                str(item.get("instrument_id") or "").strip()
+                for phase_result, excluded_ids in (
+                    (initial_rebuild_result, initial_superseded_ids),
+                    (promotion_rebuild_result or {}, set()),
+                )
+                for list_key in ("conflicts", "cninfo_only", "tdx_only")
+                for item in (
+                    (phase_result.get("reconciliation") or {}).get(list_key)
+                    or []
+                )
+                if str(item.get("instrument_id") or "").strip()
+                and str(item.get("instrument_id") or "").strip()
+                not in excluded_ids
+            }),
+            "totals": reconciliation_totals,
+        }
+        overall_completeness = {
+            "status": (
+                "partial"
+                if overall_incomplete_instruments > 0
+                or reconciliation_status == "partial"
+                or cninfo_readiness["status"] == "partial"
+                or tdx_readiness["status"] == "partial"
+                else "success"
+            ),
+            "overall_incomplete_instruments": overall_incomplete_instruments,
+        }
+        reconciliation = {
+            "status": reconciliation_status,
+            "totals": reconciliation_totals,
+        }
         pending_factor_events = (
             cninfo_pending_factor_events + tdx_pending_factor_events
         )
         data_readiness_status = (
             "not_evaluated"
-            if rebuild_result.get("status") == "skipped"
+            if (
+                initial_rebuild_result.get("status") == "skipped"
+                and promotion_rebuild_result is None
+            )
             else str(cninfo_readiness.get("status") or "partial")
         )
         dm_logger.info(
@@ -20141,6 +21433,16 @@ class DataManager:
                     if factor_end_date is not None
                     else None
                 ),
+                "anomaly_llm_enabled": bool(anomaly_llm_enabled),
+                "anomaly_llm_max_events": int(anomaly_llm_max_events),
+                "anomaly_llm_profile": anomaly_llm_profile,
+                "anomaly_llm_title_max_concurrency": int(
+                    anomaly_llm_title_max_concurrency
+                ),
+                "anomaly_llm_pipeline_mode": anomaly_llm_pipeline_mode,
+                "anomaly_llm_pipeline_llm_concurrency": int(
+                    anomaly_llm_pipeline_llm_concurrency
+                ),
             },
             "candidate_discovery": discovery_result,
             "cninfo_refresh": cninfo_result,
@@ -20152,6 +21454,24 @@ class DataManager:
                 "instrument_ids": affected_ids[:100],
             },
             "factor_rebuild": rebuild_result,
+            "factor_rebuild_phases": {
+                "initial_status": initial_rebuild_result.get("status"),
+                "initial_readiness": _readiness_phase_summary(
+                    initial_rebuild_result
+                ),
+                "post_promotion_status": (
+                    promotion_rebuild_result.get("status")
+                    if promotion_rebuild_result is not None
+                    else "not_run"
+                ),
+                "post_promotion_readiness": _readiness_phase_summary(
+                    promotion_rebuild_result
+                ),
+                "post_promotion_instrument_ids": sorted(
+                    promoted_instrument_ids
+                ),
+            },
+            "anomaly_governance": anomaly_governance,
             "factor_retry_state": factor_retry_state,
             "factor_cutoff": {
                 "status": quote_cutoff_status,
@@ -22795,6 +24115,13 @@ class DataManager:
                     " AND source_event_key IN "
                     f"({', '.join(event_placeholders)})"
                 )
+            quality_filter = (
+                ""
+                if requested_event_keys
+                else """
+                  AND quality_status LIKE 'partial_%'
+                """
+            )
             rows = await self.db_ops.execute_read_query(
                 f"""
                 SELECT instrument_id, source_profile, source_event_key,
@@ -22808,12 +24135,7 @@ class DataManager:
                 WHERE source = 'cninfo'
                   AND source_profile IN ('cninfo_dividend', 'cninfo_allotment')
                   AND is_current = 1
-                  AND (
-                    quality_status = 'partial_missing_ex_date'
-                    OR quality_status = 'partial_missing_fields'
-                    OR quality_status = 'partial_missing_economic_fields'
-                    OR quality_status = 'partial_zero_effect'
-                  )
+                  {quality_filter}
                   AND ({' OR '.join(exchange_filters)})
                   {instrument_filter}
                   {event_filter}
@@ -22928,6 +24250,7 @@ class DataManager:
                 window_after_days=window_after_days,
                 max_window_days=max_window_days,
                 max_anchor_gap_days=max_anchor_gap_days,
+                allow_complete_event=bool(requested_event_keys),
             )
             if not row_targets:
                 skipped_without_bounded_anchor += 1
@@ -24886,6 +26209,7 @@ class DataManager:
         discover_candidates: bool = False,
         auto_promote_validated: bool = True,
         exclude_reviewed_events: bool = False,
+        title_max_concurrency: int = 50,
         pipeline: Optional[Dict[str, Any]] = None,
         sample_limit: int = 20,
         llm_client: Any = None,
@@ -24989,6 +26313,7 @@ class DataManager:
                     "dry_run_eligible": 0,
                     "skipped": 0,
                     "failed": 0,
+                    "promoted_source_event_keys": [],
                     "reason_counts": {"source_not_supported": 1},
                     "samples": [],
                 },
@@ -25039,7 +26364,9 @@ class DataManager:
                 title_classification_profile=(
                     "corporate_action_title_classification"
                 ),
-                title_max_concurrency=50,
+                title_max_concurrency=max(
+                    1, min(int(title_max_concurrency), 50)
+                ),
                 title_llm_client=llm_client,
             )
             dm_logger.info(
@@ -25068,6 +26395,21 @@ class DataManager:
                 params[key] = item
                 keys.append(f":{key}")
             event_clause = f" AND o.source_event_key IN ({', '.join(keys)})"
+        candidate_date_filter = (
+            ""
+            if selected_event_keys
+            else """
+              AND (
+                   o.announcement_date >= :start_date
+                   AND o.announcement_date < :end_date_exclusive
+                   OR o.record_date >= :start_date
+                   AND o.record_date < :end_date_exclusive
+                   OR e.announcement_time >= :start_date
+                   AND e.announcement_time < :end_date_exclusive
+                   OR o.fiscal_period LIKE :fiscal_year
+              )
+            """
+        )
         dm_logger.info(
             "[DataManager] CNInfo LLM resolution loading candidate evidence"
         )
@@ -25088,9 +26430,11 @@ class DataManager:
                         'source_not_supported',
                         'superseded',
                         'official_archive_unavailable'
-                    )
+                  )
               )
         """
+        if selected_event_keys and not exclude_reviewed_events:
+            terminal_filter = ""
         if exclude_reviewed_events:
             reviewed_filter = """
               AND NOT EXISTS (
@@ -25142,10 +26486,7 @@ class DataManager:
             WHERE o.source = 'cninfo' AND o.is_current = 1
               AND o.source_profile IN ('cninfo_dividend', 'cninfo_allotment')
               {terminal_filter}
-              AND (o.announcement_date >= :start_date AND o.announcement_date < :end_date_exclusive
-                   OR o.record_date >= :start_date AND o.record_date < :end_date_exclusive
-                   OR e.announcement_time >= :start_date AND e.announcement_time < :end_date_exclusive
-                   OR o.fiscal_period LIKE :fiscal_year)
+              {candidate_date_filter}
               AND ({' OR '.join(suffix_clauses)}) {id_clause}
               {event_clause}
               {reviewed_filter}
@@ -25251,6 +26592,9 @@ class DataManager:
                 "discover_candidates": bool(discover_candidates),
                 "auto_promote_validated": bool(auto_promote_validated),
                 "exclude_reviewed_events": bool(exclude_reviewed_events),
+                "title_max_concurrency": max(
+                    1, min(int(title_max_concurrency), 50)
+                ),
                 "excluded_exchanges": excluded_exchanges,
                 "pipeline": pipeline_config.to_dict(),
             },
@@ -25289,6 +26633,7 @@ class DataManager:
                 "dry_run_eligible": 0,
                 "skipped": 0,
                 "failed": 0,
+                "promoted_source_event_keys": [],
                 "reason_counts": {},
                 "samples": [],
             },
@@ -25316,6 +26661,17 @@ class DataManager:
             reason = str(outcome.get("reason") or status)
             if status == "promoted":
                 promotion["promoted"] += 1
+                source_event_key = str(
+                    outcome.get("source_event_key") or ""
+                ).strip()
+                if (
+                    source_event_key
+                    and source_event_key
+                    not in promotion["promoted_source_event_keys"]
+                ):
+                    promotion["promoted_source_event_keys"].append(
+                        source_event_key
+                    )
                 result["review_workload"]["tiers"]["auto_promoted"] += 1
             elif status == "eligible_dry_run":
                 promotion["dry_run_eligible"] += 1

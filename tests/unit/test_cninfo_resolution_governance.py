@@ -3122,6 +3122,8 @@ async def test_llm_candidate_loader_filters_exact_source_event_keys():
     assert "o.source_event_key IN" in query
     assert "json_array_length" in query
     assert "implementation_completion" in query
+    assert "o.announcement_date >= :start_date" not in query
+    assert "corporate_action_resolution_states" not in query
     assert params["source_event_key_0"] == "event-1"
 
 

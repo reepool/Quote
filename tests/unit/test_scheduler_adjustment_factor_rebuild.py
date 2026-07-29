@@ -210,6 +210,28 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
             },
             "overall_incomplete_instruments": 1,
         },
+        "anomaly_governance": {
+            "execution_status": "success",
+            "readiness_status": "partial",
+            "candidate_event_count": 3,
+            "selected_event_count": 2,
+            "deferred_event_count": 1,
+            "unmatched_special_announcement_count": 1,
+            "reason_counts": {
+                "exceptional_implementation_title": 2,
+                "incomplete_structured_event": 1,
+            },
+            "llm": {
+                "counts": {
+                    "processed": 2,
+                    "analyzed": 2,
+                    "errors": 0,
+                    "document_failures": 0,
+                },
+                "auto_promotion": {"promoted": 1},
+                "review_workload": {"remaining_manual_review": 1},
+            },
+        },
     })
 
     assert "A 股公司行动增量日更" in report
@@ -222,6 +244,12 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
     assert "CNInfo就绪度: `status=success, pending_factors=0" in report
     assert "TDX参考路径: `status=partial, pending_factors=2" in report
     assert "跨源对账: `status=partial, incomplete_instruments=1" in report
+    assert "execution=success, readiness=partial, candidates=3" in report
+    assert (
+        "reasons=exceptional_implementation_title:2,"
+        "incomplete_structured_event:1"
+    ) in report
+    assert "processed=2, analyzed=2, promoted=1, manual=1" in report
 
 
 @pytest.mark.asyncio

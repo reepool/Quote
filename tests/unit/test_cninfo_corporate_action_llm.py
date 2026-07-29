@@ -3310,6 +3310,9 @@ async def test_new_eligible_analysis_is_promoted_through_governed_review():
     assert result["status"] == "success"
     assert result["auto_promotion"]["eligible"] == 1
     assert result["auto_promotion"]["promoted"] == 1
+    assert result["auto_promotion"]["promoted_source_event_keys"] == [
+        "event-1"
+    ]
     assert result["review_workload"]["tiers"]["auto_promoted"] == 1
     assert result["review_workload"]["remaining_manual_review"] == 0
     payload = manager.review_cninfo_corporate_action_resolution.await_args.args[0]
@@ -3375,6 +3378,9 @@ async def test_resume_promotes_current_analysis_without_another_llm_call(
     assert result["counts"]["resumed"] == 1
     assert result["counts"]["analyzed"] == 0
     assert result["auto_promotion"]["promoted"] == 1
+    assert result["auto_promotion"]["promoted_source_event_keys"] == [
+        "event-1"
+    ]
     client.complete.assert_not_awaited()
     manager.db_ops.save_corporate_action_llm_analysis.assert_not_awaited()
 

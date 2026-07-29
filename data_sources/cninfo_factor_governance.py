@@ -1148,6 +1148,7 @@ def reconcile_cninfo_tdx_events(
         )
         return {
             "instrument_id": left["instrument_id"],
+            "source_event_keys": list(left.get("source_event_keys") or []),
             "cninfo_source_date": _date(left.get("source_ex_date")),
             "tdx_source_date": _date(right.get("source_ex_date")),
             "cninfo_effective_date": _date(left.get("effective_date")),

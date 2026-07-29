@@ -4053,17 +4053,23 @@ class DatabaseOperations:
         observations: List[Dict[str, Any]],
         *,
         ingestion_run_id: Optional[str] = None,
-    ) -> Dict[str, int]:
+        include_event_keys: bool = False,
+    ) -> Dict[str, Any]:
         """Idempotently persist source-neutral corporate-action evidence."""
-        stats = {
+        stats: Dict[str, Any] = {
             "inserted": 0,
             "changed": 0,
             "unchanged": 0,
             "reactivated": 0,
             "failed": 0,
         }
+        event_keys = {
+            "inserted_event_keys": [],
+            "changed_event_keys": [],
+            "reactivated_event_keys": [],
+        }
         if not observations:
-            return stats
+            return {**stats, **event_keys} if include_event_keys else stats
         try:
             async with self.get_async_session() as session:
                 for row in observations:
@@ -4096,6 +4102,7 @@ class DatabaseOperations:
                             **values,
                         ))
                         stats["inserted"] += 1
+                        event_keys["inserted_event_keys"].append(source_event_key)
                     else:
                         was_current = bool(existing.is_current)
                         if existing.row_hash == values["row_hash"]:
@@ -4106,6 +4113,7 @@ class DatabaseOperations:
                                 setattr(existing, key, value)
                             existing.row_version = int(existing.row_version or 1) + 1
                             stats["changed"] += 1
+                            event_keys["changed_event_keys"].append(source_event_key)
                         existing.is_current = True
                         existing.last_seen_run_id = ingestion_run_id
                         existing.retired_at = None
@@ -4114,17 +4122,28 @@ class DatabaseOperations:
                         existing.updated_at = get_shanghai_time()
                         if not was_current:
                             stats["reactivated"] += 1
+                            event_keys["reactivated_event_keys"].append(
+                                source_event_key
+                            )
                 await session.commit()
-            return stats
+            return {**stats, **event_keys} if include_event_keys else stats
         except Exception as exc:
             self.db_logger.error("Failed to save corporate-action observations: %s", exc)
-            return {
+            failure: Dict[str, Any] = {
                 "inserted": 0,
                 "changed": 0,
                 "unchanged": 0,
                 "reactivated": 0,
                 "failed": len(observations),
             }
+            empty_event_keys = {
+                key: [] for key in event_keys
+            }
+            return (
+                {**failure, **empty_event_keys}
+                if include_event_keys
+                else failure
+            )
 
     @staticmethod
     def _corporate_action_row_in_requested_range(

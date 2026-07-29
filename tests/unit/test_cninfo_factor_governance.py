@@ -847,6 +847,7 @@ def test_tdx_rights_ratio_and_price_use_separate_precision_allowances():
 def test_tdx_observed_decimal_precision_tightens_cash_allowance():
     cninfo_events = [{
         "instrument_id": "000001.SZ",
+        "source_event_keys": ["cninfo-event-1"],
         "source_ex_date": date(2020, 5, 28),
         "effective_date": date(2020, 5, 28),
         "cash_per_share": 0.0336,
@@ -869,6 +870,9 @@ def test_tdx_observed_decimal_precision_tightens_cash_allowance():
 
     assert result["totals"]["rounded_matches"] == 0
     assert result["totals"]["conflicts"] == 1
+    assert result["conflicts"][0]["source_event_keys"] == [
+        "cninfo-event-1"
+    ]
     assert result["conflicts"][0]["rounded_field_tolerances"][
         "cash_per_share"
     ] == pytest.approx(0.00005)

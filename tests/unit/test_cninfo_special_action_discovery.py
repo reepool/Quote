@@ -289,7 +289,10 @@ def _manager(event_rows=None, adjacent_rows=None, announcement_service=None):
     )
 
     async def execute_read_query(query, _params):
-        if "quality_status = 'partial_missing_ex_date'" in query:
+        if (
+            "FROM corporate_action_observations" in query
+            and "source_profile IN" in query
+        ):
             return normalized_event_rows
         return normalized_adjacent_rows
 
@@ -403,7 +406,39 @@ async def test_discovery_filters_exact_source_event_keys():
 
     query, params = manager.db_ops.execute_read_query.await_args_list[0].args
     assert "source_event_key IN" in query
+    assert "quality_status = 'partial_missing_ex_date'" not in query
     assert params["source_event_key_0"] == "event-1"
+
+
+@pytest.mark.asyncio
+async def test_explicit_complete_event_builds_semantic_search_target():
+    row = {
+        **_event_row(),
+        "quality_status": "structured_complete",
+        "ex_date": date(2006, 6, 13),
+    }
+    manager = _manager(event_rows=[row])
+
+    result = await manager.discover_cninfo_special_action_effective_dates(
+        start_date="2026-07-07",
+        end_date="2026-07-21",
+        exchanges=["SSE"],
+        source_event_keys=["event-1"],
+        dry_run=True,
+        max_events=1,
+    )
+
+    assert result["targets"]["searchable_events"] == 1
+    assert result["targets"]["skipped_without_bounded_anchor"] == 0
+
+
+def test_all_partial_quality_states_can_build_search_targets():
+    row = {
+        **_event_row(),
+        "quality_status": "partial_zero_actual_allocation",
+    }
+
+    assert build_search_target(row) is not None
 
 
 @pytest.mark.asyncio

@@ -247,6 +247,10 @@ def test_cninfo_primary_daily_job_is_bounded_and_single_instance():
     assert job["parameters"]["candidate_limit"] <= 1000
     assert job["parameters"]["safety_sweep_size"] < 5205
     assert job["parameters"]["build_canonical"] is False
+    assert job["parameters"]["anomaly_llm_enabled"] is True
+    assert job["parameters"]["anomaly_llm_max_events"] == 50
+    assert job["parameters"]["anomaly_llm_title_max_concurrency"] == 50
+    assert job["parameters"]["anomaly_llm_pipeline_llm_concurrency"] == 50
 
 
 @pytest.mark.asyncio
@@ -275,4 +279,12 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
     assert maintenance.await_args.kwargs["candidate_limit"] == 1000
     assert maintenance.await_args.kwargs["safety_sweep_size"] == 100
     assert maintenance.await_args.kwargs["build_canonical"] is False
+    assert maintenance.await_args.kwargs["anomaly_llm_enabled"] is True
+    assert maintenance.await_args.kwargs["anomaly_llm_max_events"] == 50
+    assert (
+        maintenance.await_args.kwargs[
+            "anomaly_llm_pipeline_llm_concurrency"
+        ]
+        == 50
+    )
     assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks

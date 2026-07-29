@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v1"
+    "cninfo_corporate_action_daily_title_trigger_v2"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -41,11 +41,16 @@ _DAILY_ACTION_SUBJECT_MARKERS = (
     "股改",
     "对价",
     "重整",
+    "补偿",
     "补偿股份",
     "股份补偿",
     "股份赠与",
     "债转股",
     "以股抵债",
+    "偿债",
+    "清偿债务",
+    "非对称",
+    "定向赠送",
     "股份注销",
     "回购注销",
     "库存股注销",
@@ -67,6 +72,25 @@ _DAILY_IMPLEMENTATION_MARKERS = (
     "上市",
     "执行",
 )
+_DAILY_EXCEPTIONAL_ACTION_MARKERS = (
+    "重整",
+    "补偿",
+    "股权分置",
+    "股改",
+    "对价",
+    "债转股",
+    "以股抵债",
+    "缩股",
+    "偿债",
+    "清偿债务",
+    "非对称",
+    "定向赠送",
+)
+_SEMANTIC_REASON_PRIORITY = {
+    "incomplete_structured_event": 0,
+    "exceptional_implementation_title": 10,
+    "current_run_tdx_conflict": 20,
+}
 
 
 @dataclass(frozen=True)
@@ -125,6 +149,8 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
             "reason": f"prefilter:{prefilter.get('reason') or 'excluded'}",
             "subject_markers": [],
             "implementation_markers": [],
+            "exceptional_markers": [],
+            "requires_semantic_review": False,
             "prefilter": prefilter,
             "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
         }
@@ -143,6 +169,10 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
         marker for marker in _DAILY_IMPLEMENTATION_MARKERS
         if marker in normalized_title
     ]
+    exceptional_markers = [
+        marker for marker in _DAILY_EXCEPTIONAL_ACTION_MARKERS
+        if marker in normalized_title
+    ]
     selected = bool(subject_markers and implementation_markers)
     return {
         "selected": selected,
@@ -155,8 +185,236 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
         ),
         "subject_markers": subject_markers,
         "implementation_markers": implementation_markers,
+        "exceptional_markers": exceptional_markers,
+        "requires_semantic_review": bool(selected and exceptional_markers),
         "prefilter": prefilter,
         "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+    }
+
+
+def select_daily_semantic_anomalies(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    exceptional_markers_by_event: Mapping[str, Sequence[str]] | None = None,
+    conflict_event_keys: Iterable[str] = (),
+    changed_event_keys: Iterable[str] = (),
+    priority_event_keys: Iterable[str] = (),
+    max_events: int = 50,
+) -> Dict[str, Any]:
+    """Select a bounded, deterministic set of current-run semantic anomalies."""
+    exceptional_markers_by_event = exceptional_markers_by_event or {}
+    conflict_keys = {
+        str(item).strip() for item in conflict_event_keys if str(item).strip()
+    }
+    changed_keys = {
+        str(item).strip() for item in changed_event_keys if str(item).strip()
+    }
+    priority_keys = {
+        str(item).strip() for item in priority_event_keys if str(item).strip()
+    }
+    candidates: list[Dict[str, Any]] = []
+    reason_counts: Counter[str] = Counter()
+    for event in events:
+        event_key = str(event.get("source_event_key") or "").strip()
+        instrument_id = str(event.get("instrument_id") or "").strip()
+        if not event_key or not instrument_id:
+            continue
+        exceptional_markers = sorted({
+            str(item).strip()
+            for item in exceptional_markers_by_event.get(event_key, ())
+            if str(item).strip()
+        })
+        if (
+            bool(event.get("resolution_is_terminal"))
+            and event_key not in changed_keys
+            and not exceptional_markers
+        ):
+            continue
+        reasons: list[str] = []
+        quality_status = str(event.get("quality_status") or "").strip()
+        if quality_status.startswith("partial_"):
+            reasons.append("incomplete_structured_event")
+        if exceptional_markers:
+            reasons.append("exceptional_implementation_title")
+        if (
+            event_key in conflict_keys
+            and (event_key in changed_keys or event_key in priority_keys)
+        ):
+            reasons.append("current_run_tdx_conflict")
+        if not reasons:
+            continue
+        ordered_reasons = sorted(
+            set(reasons),
+            key=lambda item: (_SEMANTIC_REASON_PRIORITY[item], item),
+        )
+        reason_counts.update(ordered_reasons)
+        candidates.append({
+            "instrument_id": instrument_id,
+            "source_event_key": event_key,
+            "quality_status": quality_status,
+            "reason_codes": ordered_reasons,
+            "exceptional_markers": exceptional_markers,
+            "priority": min(
+                _SEMANTIC_REASON_PRIORITY[item] for item in ordered_reasons
+            ),
+        })
+    candidates.sort(
+        key=lambda item: (
+            0 if str(item["source_event_key"]) in priority_keys else 1,
+            int(item["priority"]),
+            str(item["instrument_id"]),
+            str(item["source_event_key"]),
+        )
+    )
+    limit = max(0, int(max_events))
+    selected = candidates[:limit]
+    deferred = candidates[limit:]
+    return {
+        "candidate_count": len(candidates),
+        "selected_count": len(selected),
+        "deferred_count": len(deferred),
+        "reason_counts": dict(sorted(reason_counts.items())),
+        "candidates": selected,
+        "deferred": deferred,
+        "source_event_keys": [
+            str(item["source_event_key"]) for item in selected
+        ],
+        "deferred_source_event_keys": [
+            str(item["source_event_key"]) for item in deferred
+        ],
+    }
+
+
+def associate_exceptional_announcements(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    exceptional_announcements_by_instrument: Mapping[
+        str, Sequence[Mapping[str, Any]]
+    ],
+    max_date_distance_days: int = 1,
+) -> Dict[str, Any]:
+    """Associate each exceptional announcement with one bounded source event."""
+    events_by_instrument: Dict[str, list[Mapping[str, Any]]] = {}
+    for event in events:
+        instrument_id = str(event.get("instrument_id") or "").strip()
+        event_key = str(event.get("source_event_key") or "").strip()
+        if not instrument_id or not event_key:
+            continue
+        events_by_instrument.setdefault(instrument_id, []).append(event)
+
+    def _coerce_date(value: Any) -> date | None:
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        text = str(value or "").strip()
+        if not text:
+            return None
+        try:
+            return date.fromisoformat(text[:10])
+        except ValueError:
+            return None
+
+    def _match_event(
+        candidates: Sequence[Mapping[str, Any]],
+        announcement_date: date,
+    ) -> Mapping[str, Any] | None:
+        scored: list[tuple[int, int, Mapping[str, Any]]] = []
+        for event in candidates:
+            event_date_scores = [
+                (abs((parsed - announcement_date).days), priority)
+                for priority, field_name in enumerate((
+                    "announcement_date",
+                    "record_date",
+                    "ex_date",
+                    "pay_date",
+                    "share_arrival_date",
+                ))
+                if (parsed := _coerce_date(event.get(field_name))) is not None
+            ]
+            if event_date_scores:
+                distance, priority = min(event_date_scores)
+                scored.append((distance, priority, event))
+        bounded = [
+            item
+            for item in scored
+            if item[0] <= max(0, int(max_date_distance_days))
+        ]
+        if not bounded:
+            return None
+        best_score = min((item[0], item[1]) for item in bounded)
+        best = [
+            item[2]
+            for item in bounded
+            if (item[0], item[1]) == best_score
+        ]
+        return best[0] if len(best) == 1 else None
+
+    event_markers: Dict[str, set[str]] = {}
+    announcement_keys_by_event: Dict[str, set[str]] = {}
+    matched_instruments: set[str] = set()
+    unmatched_announcements: list[Dict[str, Any]] = []
+    for instrument_id, announcements in sorted(
+        exceptional_announcements_by_instrument.items()
+    ):
+        normalized_instrument_id = str(instrument_id or "").strip()
+        for announcement in announcements or ():
+            announcement_date = _coerce_date(
+                announcement.get("announcement_date")
+            )
+            announcement_key = str(
+                announcement.get("announcement_key") or ""
+            ).strip()
+            markers = {
+                str(item).strip()
+                for item in (
+                    announcement.get("exceptional_markers") or ()
+                )
+                if str(item).strip()
+            }
+            matched_event = (
+                _match_event(
+                    events_by_instrument.get(normalized_instrument_id, ()),
+                    announcement_date,
+                )
+                if normalized_instrument_id and announcement_date is not None
+                else None
+            )
+            if matched_event is None:
+                unmatched_announcements.append({
+                    **dict(announcement),
+                    "instrument_id": normalized_instrument_id,
+                })
+                continue
+            event_key = str(
+                matched_event.get("source_event_key") or ""
+            ).strip()
+            if not event_key:
+                continue
+            event_markers.setdefault(event_key, set()).update(markers)
+            if announcement_key:
+                announcement_keys_by_event.setdefault(
+                    event_key, set()
+                ).add(announcement_key)
+            matched_instruments.add(normalized_instrument_id)
+
+    unmatched_instruments = {
+        str(item.get("instrument_id") or "").strip()
+        for item in unmatched_announcements
+        if str(item.get("instrument_id") or "").strip()
+    }
+    return {
+        "exceptional_markers_by_event": {
+            event_key: sorted(markers)
+            for event_key, markers in sorted(event_markers.items())
+        },
+        "announcement_keys_by_event": {
+            event_key: sorted(keys)
+            for event_key, keys in sorted(announcement_keys_by_event.items())
+        },
+        "matched_instrument_ids": sorted(matched_instruments),
+        "unmatched_instrument_ids": sorted(unmatched_instruments),
+        "unmatched_announcements": unmatched_announcements,
     }
 
 

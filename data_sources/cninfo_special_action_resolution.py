@@ -234,15 +234,17 @@ def _raw_payload(row: Mapping[str, Any]) -> Dict[str, Any]:
     return dict(parsed) if isinstance(parsed, Mapping) else {}
 
 
-def classify_special_action(row: Mapping[str, Any]) -> Optional[str]:
+def classify_special_action(
+    row: Mapping[str, Any],
+    *,
+    allow_complete_event: bool = False,
+) -> Optional[str]:
     """Classify partial events that warrant official announcement discovery."""
     quality_status = str(row.get("quality_status") or "")
-    if quality_status not in {
-        "partial_missing_ex_date",
-        "partial_missing_fields",
-        "partial_missing_economic_fields",
-        "partial_zero_effect",
-    }:
+    if (
+        not quality_status.startswith("partial_")
+        and not allow_complete_event
+    ):
         return None
     if (
         quality_status == "partial_missing_ex_date"
@@ -350,9 +352,13 @@ def build_search_targets(
     window_after_days: int = 30,
     max_window_days: int = 180,
     max_anchor_gap_days: int = 60,
+    allow_complete_event: bool = False,
 ) -> List[SpecialActionSearchTarget]:
     """Build independent bounded windows from nearby date-role clusters."""
-    event_class = classify_special_action(row)
+    event_class = classify_special_action(
+        row,
+        allow_complete_event=allow_complete_event,
+    )
     instrument_id = str(row.get("instrument_id") or "").strip()
     source_event_key = str(row.get("source_event_key") or "").strip()
     source_profile = str(row.get("source_profile") or "").strip()
@@ -417,6 +423,7 @@ def build_search_target(
     window_after_days: int = 30,
     max_window_days: int = 180,
     max_anchor_gap_days: int = 60,
+    allow_complete_event: bool = False,
 ) -> Optional[SpecialActionSearchTarget]:
     """Return the highest-priority search window for compatibility callers."""
     targets = build_search_targets(
@@ -427,6 +434,7 @@ def build_search_target(
         window_after_days=window_after_days,
         max_window_days=max_window_days,
         max_anchor_gap_days=max_anchor_gap_days,
+        allow_complete_event=allow_complete_event,
     )
     return targets[0] if targets else None
 

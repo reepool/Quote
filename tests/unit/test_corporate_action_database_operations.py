@@ -208,6 +208,7 @@ async def _exercise_observation_revision_and_partial_coverage():
     changed = await operations.save_corporate_action_observations(
         [{**observation, "cash_dividend_per_share": 0.25}],
         ingestion_run_id="run-3",
+        include_event_keys=True,
     )
     await operations.upsert_corporate_action_instrument_status(
         {
@@ -249,6 +250,9 @@ async def _exercise_observation_revision_and_partial_coverage():
         "unchanged": 0,
         "reactivated": 0,
         "failed": 0,
+        "inserted_event_keys": [],
+        "changed_event_keys": ["event-1"],
+        "reactivated_event_keys": [],
     }
     assert row.cash_dividend_per_share == pytest.approx(0.25)
     assert row.row_version == 2
@@ -257,6 +261,46 @@ async def _exercise_observation_revision_and_partial_coverage():
     assert status.missing_ex_date_count == 1
     assert isinstance(status.last_attempt_at, datetime)
     await engine.dispose()
+
+
+def test_observation_transaction_failure_clears_returned_event_keys():
+    asyncio.run(_exercise_observation_transaction_failure_event_keys())
+
+
+async def _exercise_observation_transaction_failure_event_keys():
+    operations = DatabaseOperations(auto_initialize=False)
+    session = Mock()
+    query_result = Mock()
+    query_result.scalar_one_or_none.return_value = None
+    session.execute = AsyncMock(return_value=query_result)
+    session.commit = AsyncMock(side_effect=RuntimeError("commit failed"))
+    session_context = AsyncMock()
+    session_context.__aenter__.return_value = session
+    operations.get_async_session = Mock(return_value=session_context)
+
+    result = await operations.save_corporate_action_observations(
+        [{
+            "instrument_id": "000001.SZ",
+            "source": "cninfo",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": "event-1",
+            "action_type": "dividend",
+            "announcement_date": date(2026, 6, 1),
+            "record_date": date(2026, 6, 11),
+            "ex_date": date(2026, 6, 12),
+            "cash_dividend_per_share": 0.2,
+            "currency": "CNY",
+            "event_status": "implemented",
+            "quality_status": "structured_complete",
+            "raw_payload": {},
+        }],
+        include_event_keys=True,
+    )
+
+    assert result["failed"] == 1
+    assert result["inserted_event_keys"] == []
+    assert result["changed_event_keys"] == []
+    assert result["reactivated_event_keys"] == []
 
 
 def test_corporate_action_confirmed_empty_status_is_queryable():
