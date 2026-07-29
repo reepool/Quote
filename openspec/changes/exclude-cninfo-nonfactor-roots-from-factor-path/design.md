@@ -78,6 +78,17 @@ CNInfo values.
    propagation behavior. The change only removes propagation caused by an
    explicitly governed non-factor event or separately reported archive gap.
 
+6. Operator-confirmed pre-listing decisions are persisted as rejected reviews
+   with terminal reason `pre_listing`, a frozen source-row hash, and no
+   effective date. This path is reserved for an explicit event-key manifest;
+   it does not relax the prohibition on inferring implementation from an
+   announcement date alone.
+
+7. Explanatory observations with no positive economic term may be persisted as
+   operator-confirmed `non_effective` records. After the frozen pre-listing and
+   non-effective decisions are applied, only the remaining post-listing
+   archive gaps are exported for manual review.
+
 ## Risks / Trade-offs
 
 - [A broad date window could find an unrelated TDX event] -> Use role-specific

@@ -139,4 +139,28 @@ async def test_resolution_state_upsert_is_idempotent_and_filterable():
     }
     assert document_page["total"] == 1
     assert document_page["items"][0]["resolution_state"] == "document_rework"
+    pre_listing = await operations.upsert_corporate_action_resolution_states(
+        [{
+            **row,
+            "resolution_state": "pre_listing",
+            "is_terminal": True,
+            "factor_blocking": False,
+            "state_reason": "review_confirmed_pre_listing_event",
+            "next_action": "none",
+        }],
+        ingestion_run_id="run-3",
+    )
+    pre_listing_page = (
+        await operations.get_corporate_action_resolution_states(
+            resolution_state="pre_listing",
+            is_terminal=True,
+            factor_blocking=False,
+            limit=10,
+            offset=0,
+        )
+    )
+    assert pre_listing == {
+        "inserted": 0, "changed": 1, "unchanged": 0, "failed": 0
+    }
+    assert pre_listing_page["total"] == 1
     await engine.dispose()

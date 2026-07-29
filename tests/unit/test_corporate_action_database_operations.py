@@ -263,6 +263,7 @@ async def _exercise_snapshot_retirement_and_reactivation():
 
     assert retired == 1
     assert current_page["total"] == 1
+    assert len(current_page["items"][0]["row_hash"]) == 64
     assert audit_page["total"] == 2
     retired_row = next(
         row for row in audit_page["items"] if row["source_event_key"] == "event-2"
@@ -280,6 +281,48 @@ def test_corporate_action_coverage_is_versioned_by_requested_range():
 
 def test_effective_date_evidence_is_idempotent_and_queryable():
     asyncio.run(_exercise_effective_date_evidence_is_idempotent_and_queryable())
+
+
+def test_resolution_review_returns_id_with_expiring_session():
+    asyncio.run(_exercise_resolution_review_returns_id_with_expiring_session())
+
+
+async def _exercise_resolution_review_returns_id_with_expiring_session():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=True)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionResolutionReviewDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000001.SZ",
+            symbol="000001",
+            name="Ping An Bank",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    result = await operations.save_corporate_action_resolution_review({
+        "review_key": "review-expiring-session",
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "decision": "rejected",
+        "reviewer": "unit-reviewer",
+        "review_payload": {"terminal_reason": "pre_listing"},
+    })
+
+    assert result == {"review_id": 1, "status": "inserted"}
+    await engine.dispose()
 
 
 def test_effective_date_uses_active_superseding_review():

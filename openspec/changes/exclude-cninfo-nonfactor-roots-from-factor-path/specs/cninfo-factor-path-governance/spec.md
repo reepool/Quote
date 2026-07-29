@@ -29,6 +29,32 @@ governed effective date is strictly earlier than the instrument listing date.
 - **WHEN** a CNInfo event has no source or governed effective date and only its announcement date predates listing
 - **THEN** the system does not classify the event as pre-listing solely from the announcement date
 
+#### Scenario: Operator confirms a frozen announcement-only event set
+- **WHEN** an operator explicitly confirms a fixed source-event-key manifest as pre-listing and the review preserves the source-row hash
+- **THEN** the system persists terminal state `pre_listing` without inventing an effective date and excludes those events from listed-market factor calculation
+
+#### Scenario: Future announcement-only event is not in the fixed manifest
+- **WHEN** a future archive-unavailable event only has a pre-listing announcement anchor and has no explicit operator terminal review
+- **THEN** the event remains an archive gap and is not automatically classified as `pre_listing`
+
+### Requirement: Explanatory Zero-Economic Records Do Not Block Factors
+The CNInfo factor path SHALL allow an operator-confirmed explanatory record
+with no positive cash, bonus, capitalization, or rights term to be terminally
+classified as `non_effective`.
+
+#### Scenario: Historical record only describes retained or old-shareholder profit
+- **WHEN** the frozen source observation has no positive economic term and an operator confirms that it does not describe a current listed-market distribution
+- **THEN** the source observation remains unchanged, the review is auditable, and no factor or missing-date blocker is emitted
+
+### Requirement: Remaining Post-Listing Archive Gaps Are Exported
+After fixed terminal decisions are applied, the system SHALL export every
+remaining post-listing archive gap for manual review using existing local data.
+
+#### Scenario: Ten unresolved post-listing events remain
+- **WHEN** the confirmed pre-listing and zero-economic manifests are applied
+- **THEN** the review workbook contains exactly the remaining ten full event keys, CNInfo facts, listing dates, nearby TDX evidence, failure reasons, and blank operator-decision fields
+- **AND** no document download, OCR, or LLM invocation occurs
+
 ### Requirement: Archive Date Recovery Uses TDX Date Only
 For an `official_archive_unavailable` CNInfo event, the system SHALL use a TDX
 effective date only when one bounded same-instrument candidate uniquely matches

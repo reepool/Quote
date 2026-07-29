@@ -21,3 +21,10 @@
 - [x] 4.2 Run focused CNInfo factor and rebuild tests
 - [x] 4.3 Run the full SSE/SZSE dry-run audit and compare root, pending, and historical-gap counts
 - [x] 4.4 Review all uncommitted changes and resolve confirmed findings
+
+## 5. Fixed Historical Dispositions And Manual Review
+
+- [x] 5.1 Support terminal `pre_listing` operator decisions without a fabricated effective date
+- [x] 5.2 Apply the frozen 42 announcement-only plus 3 operational pre-listing decisions and 17 zero-economic non-effective decisions
+- [x] 5.3 Export the remaining 10 post-listing archive gaps to a clear Excel workbook
+- [x] 5.4 Run focused tests, full dry-run audit, uncommitted review, commit, and push

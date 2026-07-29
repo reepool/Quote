@@ -138,6 +138,80 @@ def _tdx_event(**overrides):
     return row
 
 
+@pytest.mark.asyncio
+async def test_terminal_disposition_persists_review_without_fake_date():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager._assert_current_cninfo_corporate_action_identity = AsyncMock()
+    manager.db_ops.get_corporate_action_observations = AsyncMock(
+        return_value={
+            "items": [{
+                "instrument_id": "000001.SZ",
+                "source_event_key": "event-1",
+                "source": "cninfo",
+                "row_hash": "a" * 64,
+                "is_current": True,
+            }]
+        }
+    )
+    manager.db_ops.save_corporate_action_resolution_review = AsyncMock(
+        return_value={
+            "review_id": 9,
+            "status": "inserted",
+        }
+    )
+    manager._load_cninfo_resolution_governance_inventory = AsyncMock(
+        return_value=[{
+            **_state(
+                "event-1",
+                "pre_listing",
+                terminal=True,
+                next_action="none",
+            ),
+            "factor_blocking": False,
+        }]
+    )
+    manager.db_ops.upsert_corporate_action_resolution_states = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 1,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+
+    result = (
+        await manager.review_cninfo_corporate_action_terminal_disposition({
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "reviewer": "unit-reviewer",
+            "terminal_reason": "pre_listing",
+            "expected_row_hash": "a" * 64,
+            "notes": "operator confirmed",
+            "operator_attestation": {
+                "basis": "fixed_event_manifest",
+                "no_fabricated_effective_date": True,
+            },
+        })
+    )
+
+    saved = (
+        manager.db_ops.save_corporate_action_resolution_review
+        .await_args.args[0]
+    )
+    assert result["resolution_state"]["resolution_state"] == "pre_listing"
+    assert saved["analysis_id"] is None
+    assert saved["decision"] == "rejected"
+    assert saved["effective_date"] is None
+    assert saved["date_basis"] is None
+    assert saved["review_payload"]["terminal_reason"] == "pre_listing"
+    assert saved["review_payload"][
+        "effective_date_intentionally_absent"
+    ] is True
+    assert result["raw_observation_modified"] is False
+    assert result["production_factor_modified"] is False
+
+
 def test_tdx_asymmetric_match_accepts_unique_next_session_event():
     result = classify_cninfo_tdx_asymmetric_match(
         observation=_tdx_match_observation(),
@@ -1931,6 +2005,22 @@ def test_reviewed_non_effective_is_terminal_but_empty_scan_is_retryable():
     assert unavailable["resolution_state"] == "evidence_unavailable"
     assert unavailable["is_terminal"] is False
     assert unavailable["factor_blocking"] is True
+
+
+def test_reviewed_pre_listing_is_terminal_without_effective_date():
+    reviewed = derive_resolution_state(
+        _row(announcement_date="1996-06-01"),
+        latest_review={
+            "decision": "rejected",
+            "effective_date": None,
+            "review_payload": {"terminal_reason": "pre_listing"},
+        },
+    )
+
+    assert reviewed["resolution_state"] == "pre_listing"
+    assert reviewed["state_reason"] == "review_confirmed_pre_listing_event"
+    assert reviewed["is_terminal"] is True
+    assert reviewed["factor_blocking"] is False
 
 
 def test_explicit_a_share_scope_mismatch_is_terminal_non_blocking():

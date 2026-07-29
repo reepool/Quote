@@ -7,7 +7,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 
 APPLICABILITY_POLICY_VERSION = "cninfo_action_date_applicability_v3"
-RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v5"
+RESOLUTION_STATE_VERSION = "cninfo_resolution_state_v6"
 SUPPORTED_EXCHANGES = {"SSE", "SZSE"}
 OFFICIAL_ARCHIVE_CUTOFF = date(2002, 1, 1)
 CNINFO_ASYMMETRIC_POLICY_VERSION = "cninfo_asymmetric_passthrough_v1"
@@ -1260,6 +1260,13 @@ def derive_resolution_state(
             state, reason, next_action, terminal = (
                 "non_effective",
                 "review_confirmed_non_effective_event",
+                "none",
+                True,
+            )
+        elif decision == "rejected" and terminal_reason == "pre_listing":
+            state, reason, next_action, terminal = (
+                "pre_listing",
+                "review_confirmed_pre_listing_event",
                 "none",
                 True,
             )

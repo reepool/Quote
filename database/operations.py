@@ -4070,6 +4070,7 @@ class DatabaseOperations:
                 "event_status": row.event_status,
                 "quality_status": row.quality_status,
                 "ingestion_run_id": row.ingestion_run_id,
+                "row_hash": row.row_hash,
                 "row_version": row.row_version,
                 "is_current": bool(row.is_current),
                 "last_seen_run_id": row.last_seen_run_id,
@@ -5132,8 +5133,10 @@ class DatabaseOperations:
                     setattr(existing, key, value)
                 existing.updated_at = get_shanghai_time()
                 status = "updated"
+            await session.flush()
+            review_id = int(existing.id)
             await session.commit()
-            return {"review_id": existing.id, "status": status}
+            return {"review_id": review_id, "status": status}
 
     async def get_corporate_action_resolution_reviews(
         self,
@@ -5724,7 +5727,8 @@ class DatabaseOperations:
             "validated_candidate", "machine_rework", "document_rework",
             "manual_required",
             "conflict", "non_effective", "superseded",
-            "scope_mismatch", "official_archive_unavailable",
+            "scope_mismatch", "pre_listing",
+            "official_archive_unavailable",
             "evidence_unavailable", "discovery_pending", "retryable_error",
         }
         counters = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}

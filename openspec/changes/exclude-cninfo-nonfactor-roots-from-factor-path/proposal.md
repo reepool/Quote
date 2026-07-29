@@ -22,6 +22,11 @@ market quote can exist.
 - Permit a unique TDX event match to supply only the effective date for an
   archive-unavailable CNInfo event; all economic terms and factor calculations
   remain CNInfo-derived.
+- Permit an operator-confirmed fixed event set to be terminally classified as
+  `pre_listing` without inventing an implementation date. Announcement date
+  alone remains insufficient for generic automatic classification.
+- Close explanatory zero-economic records as `non_effective` and export the
+  remaining post-listing archive gaps for explicit operator review.
 
 ## Capabilities
 
@@ -45,3 +50,5 @@ None.
   analysis.
 - Existing TDX factor values remain audit/reference data and are not copied into
   the CNInfo factor path.
+- The fixed terminal-decision run uses only existing local data and performs no
+  document downloads, OCR, or LLM invocation.

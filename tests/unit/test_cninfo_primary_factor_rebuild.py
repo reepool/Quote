@@ -310,6 +310,7 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
     ("resolution_state", "expected_reason"),
     [
         ("non_effective", "resolution_state:non_effective"),
+        ("pre_listing", "pre_listing_corporate_action"),
         ("scope_mismatch", "resolution_state:scope_mismatch"),
         ("superseded", "resolution_state:superseded"),
     ],

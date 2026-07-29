@@ -18217,12 +18217,15 @@ class DataManager:
             factor_exclusion_reason: Optional[str] = None
             if resolution_state in {
                 "non_effective",
+                "pre_listing",
                 "scope_mismatch",
                 "superseded",
             }:
                 factor_effect = "none"
                 factor_exclusion_reason = (
-                    f"resolution_state:{resolution_state}"
+                    "pre_listing_corporate_action"
+                    if resolution_state == "pre_listing"
+                    else f"resolution_state:{resolution_state}"
                 )
             factor_override = resolved_terms.get("factor_override")
             authoritative_override = bool(
@@ -24527,6 +24530,7 @@ class DataManager:
                     AND s.source_event_key = o.source_event_key
                     AND s.resolution_state IN (
                         'non_effective',
+                        'pre_listing',
                         'scope_mismatch',
                         'not_applicable',
                         'resolved_source',
@@ -26714,6 +26718,173 @@ class DataManager:
             "evidence_write": bundle["evidence_write"],
             "resolution_state": refreshed_inventory[0],
             "state_write": state_write,
+        }
+
+    async def review_cninfo_corporate_action_terminal_disposition(
+        self,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Persist an operator-confirmed no-factor disposition without a date."""
+        instrument_id = convert_to_database_format(
+            str(payload.get("instrument_id") or "").strip()
+        )
+        source_event_key = str(
+            payload.get("source_event_key") or ""
+        ).strip()
+        reviewer = str(payload.get("reviewer") or "").strip()
+        terminal_reason = str(
+            payload.get("terminal_reason") or ""
+        ).strip().lower()
+        notes = str(payload.get("notes") or "").strip()
+        expected_row_hash = str(
+            payload.get("expected_row_hash") or ""
+        ).strip()
+        operator_attestation = payload.get("operator_attestation")
+        allowed_terminal_reasons = {
+            "non_effective",
+            "pre_listing",
+        }
+        if not all((
+            instrument_id,
+            source_event_key,
+            reviewer,
+            terminal_reason,
+            expected_row_hash,
+        )):
+            raise ValueError(
+                "instrument_id, source_event_key, reviewer, terminal_reason, "
+                "and expected_row_hash are required"
+            )
+        if terminal_reason not in allowed_terminal_reasons:
+            raise ValueError(
+                "unsupported terminal corporate-action disposition: "
+                + terminal_reason
+            )
+        if len(reviewer) > 128:
+            raise ValueError("reviewer exceeds 128 characters")
+        if len(notes) > 4000:
+            raise ValueError("notes exceeds 4000 characters")
+        if not isinstance(operator_attestation, dict) or not operator_attestation:
+            raise ValueError(
+                "operator_attestation is required for a terminal disposition"
+            )
+
+        await self._assert_current_cninfo_corporate_action_identity(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+        )
+        observations = await self.db_ops.get_corporate_action_observations(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            source="cninfo",
+            include_inactive=False,
+            limit=10,
+            offset=0,
+        )
+        current_rows = [
+            item
+            for item in observations.get("items", [])
+            if bool(item.get("is_current", True))
+        ]
+        if len(current_rows) != 1:
+            raise RuntimeError(
+                "terminal disposition requires exactly one current CNInfo "
+                "observation"
+            )
+        observation = current_rows[0]
+        actual_row_hash = str(observation.get("row_hash") or "")
+        if actual_row_hash != expected_row_hash:
+            raise RuntimeError(
+                "current CNInfo observation row hash drifted for "
+                + source_event_key
+            )
+
+        review_payload = {
+            "resolution_policy": (
+                "cninfo_operator_terminal_disposition_v1"
+            ),
+            "terminal_reason": terminal_reason,
+            "source_row_hash": actual_row_hash,
+            "operator_attestation": operator_attestation,
+            "effective_date_intentionally_absent": True,
+            "raw_cninfo_observation_modified": False,
+            "production_factor_modified": False,
+        }
+        review_key = hashlib.sha256(json.dumps({
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "decision": "rejected",
+            "reviewer": reviewer,
+            "notes": notes,
+            "review_payload": review_payload,
+        }, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+        ingestion_run_id = (
+            "cninfo_terminal_" + review_key[:16]
+        )
+        review_write = (
+            await self.db_ops.save_corporate_action_resolution_review({
+                "review_key": review_key,
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "analysis_id": None,
+                "evidence_key": None,
+                "decision": "rejected",
+                "effective_date": None,
+                "date_basis": None,
+                "reviewer": reviewer,
+                "notes": notes,
+                "review_payload": review_payload,
+                "supersedes_review_id": payload.get(
+                    "supersedes_review_id"
+                ),
+            })
+        )
+        exchange = (
+            "SZSE" if instrument_id.endswith(".SZ")
+            else "SSE" if instrument_id.endswith(".SH")
+            else ""
+        )
+        if not exchange:
+            raise ValueError(
+                "terminal CNInfo disposition supports SSE/SZSE only"
+            )
+        refreshed_inventory = (
+            await self._load_cninfo_resolution_governance_inventory(
+                start_date=date.min,
+                end_date=date.max,
+                exchanges=[exchange],
+                instrument_ids=[instrument_id],
+                source_event_keys=[source_event_key],
+            )
+        )
+        if len(refreshed_inventory) != 1:
+            raise RuntimeError(
+                "terminal CNInfo disposition state refresh did not return "
+                "exactly one event"
+            )
+        refreshed_state = refreshed_inventory[0]
+        if refreshed_state.get("resolution_state") != terminal_reason:
+            raise RuntimeError(
+                "terminal CNInfo disposition projected an unexpected state: "
+                + str(refreshed_state.get("resolution_state") or "")
+            )
+        state_write = (
+            await self.db_ops.upsert_corporate_action_resolution_states(
+                refreshed_inventory,
+                ingestion_run_id=ingestion_run_id,
+            )
+        )
+        if int(state_write.get("failed", 0) or 0) > 0:
+            raise RuntimeError(
+                "terminal CNInfo disposition state refresh failed"
+            )
+        return {
+            "status": "success",
+            "review": review_write,
+            "resolution_state": refreshed_state,
+            "state_write": state_write,
+            "raw_observation_modified": False,
+            "production_factor_modified": False,
         }
 
     async def review_cninfo_corporate_action_resolution(
