@@ -15,6 +15,11 @@ from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from requests import exceptions as requests_exceptions
 
+from utils.adaptive_throttle import (
+    AdaptiveSourceThrottle,
+    get_adaptive_source_throttle,
+)
+
 
 CNINFO_SOURCE = "cninfo"
 DIVIDEND_PROFILE = "cninfo_dividend"
@@ -30,9 +35,15 @@ cninfo_logger = logging.getLogger(__name__)
 class _RequestsTimeoutProxy:
     """Delegate requests calls while enforcing a bounded POST timeout."""
 
-    def __init__(self, delegate: Any, timeout_seconds: float) -> None:
+    def __init__(
+        self,
+        delegate: Any,
+        timeout_seconds: float,
+        adaptive_throttle: AdaptiveSourceThrottle,
+    ) -> None:
         self._delegate = delegate
         self._timeout_seconds = timeout_seconds
+        self._adaptive_throttle = adaptive_throttle
         self.last_payload: Optional[Mapping[str, Any]] = None
         self.last_status_code: Optional[int] = None
 
@@ -42,13 +53,38 @@ class _RequestsTimeoutProxy:
 
     def post(self, *args: Any, **kwargs: Any) -> Any:
         kwargs.setdefault("timeout", self._timeout_seconds)
-        response = self._delegate.post(*args, **kwargs)
+        self._adaptive_throttle.wait_before_request()
+        try:
+            response = self._delegate.post(*args, **kwargs)
+        except Exception:
+            self._adaptive_throttle.record_failure()
+            raise
         self.last_status_code = getattr(response, "status_code", None)
         try:
             payload = response.json()
         except Exception:
             payload = None
         self.last_payload = payload if isinstance(payload, Mapping) else None
+        status_code = self.last_status_code
+        if status_code in {403, 429}:
+            headers = getattr(response, "headers", None)
+            retry_after = (
+                headers.get("Retry-After")
+                if isinstance(headers, Mapping)
+                else None
+            )
+            self._adaptive_throttle.record_throttle(
+                status_code,
+                retry_after=retry_after,
+            )
+        elif (
+            isinstance(status_code, int)
+            and 200 <= status_code < 400
+            and payload is not None
+        ):
+            self._adaptive_throttle.record_success()
+        else:
+            self._adaptive_throttle.record_failure()
         return response
 
     def __getattr__(self, name: str) -> Any:
@@ -58,6 +94,7 @@ class _RequestsTimeoutProxy:
 def _bind_requests_timeout(
     loader: Callable[..., Any],
     timeout_seconds: float,
+    adaptive_throttle: Optional[AdaptiveSourceThrottle] = None,
 ) -> Callable[..., Any]:
     """Clone an AkShare loader with an isolated timeout-aware requests proxy."""
     loader_globals = getattr(loader, "__globals__", None)
@@ -71,6 +108,7 @@ def _bind_requests_timeout(
     requests_proxy = _RequestsTimeoutProxy(
         requests_client,
         max(1.0, float(timeout_seconds)),
+        adaptive_throttle or get_adaptive_source_throttle(CNINFO_SOURCE),
     )
     bound_globals["requests"] = requests_proxy
     bound = FunctionType(
@@ -518,7 +556,11 @@ class CninfoCorporateActionProvider:
         loader_attempts: int = DEFAULT_LOADER_ATTEMPTS,
         retry_backoff_seconds: float = DEFAULT_RETRY_BACKOFF_SECONDS,
         sleep_func: Callable[[float], None] = time.sleep,
+        adaptive_throttle: Optional[AdaptiveSourceThrottle] = None,
     ) -> None:
+        source_throttle = adaptive_throttle or get_adaptive_source_throttle(
+            CNINFO_SOURCE
+        )
         if dividend_loader is None or allotment_loader is None:
             import akshare as ak
 
@@ -526,11 +568,13 @@ class CninfoCorporateActionProvider:
                 dividend_loader = _bind_requests_timeout(
                     ak.stock_dividend_cninfo,
                     request_timeout_seconds,
+                    source_throttle,
                 )
             if allotment_loader is None:
                 allotment_loader = _bind_requests_timeout(
                     ak.stock_allotment_cninfo,
                     request_timeout_seconds,
+                    source_throttle,
                 )
         self.dividend_loader = dividend_loader
         self.allotment_loader = allotment_loader

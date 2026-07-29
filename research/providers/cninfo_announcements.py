@@ -23,6 +23,10 @@ from research.announcements.models import (
     build_announcement_key,
     normalize_published_at,
 )
+from utils.adaptive_throttle import (
+    AdaptiveSourceThrottle,
+    get_adaptive_source_throttle,
+)
 from utils.http_transport import HttpTlsConfig, create_requests_session
 
 LOGGER = logging.getLogger(__name__)
@@ -110,6 +114,7 @@ class _CninfoTransport:
         retry_attempts: int = 2,
         retry_backoff_seconds: float = 0.5,
         session: Optional[requests.Session] = None,
+        adaptive_throttle: Optional[AdaptiveSourceThrottle] = None,
     ) -> None:
         self.url = url
         self.request_timeout_seconds = request_timeout_seconds
@@ -118,6 +123,35 @@ class _CninfoTransport:
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
         self.tls_config = HttpTlsConfig(source_name="cninfo")
         self.session = session or create_requests_session(tls_config=self.tls_config)
+        self.adaptive_throttle = (
+            adaptive_throttle or get_adaptive_source_throttle("cninfo")
+        )
+
+    def _post(self, url: str, **kwargs: Any) -> requests.Response:
+        """POST through the shared CNInfo admission and feedback state."""
+        self.adaptive_throttle.wait_before_request()
+        try:
+            response = self.session.post(url, **kwargs)
+        except Exception:
+            self.adaptive_throttle.record_failure()
+            raise
+        status_code = getattr(response, "status_code", 200)
+        if status_code in {403, 429}:
+            headers = getattr(response, "headers", None)
+            retry_after = (
+                headers.get("Retry-After")
+                if isinstance(headers, Mapping)
+                else None
+            )
+            self.adaptive_throttle.record_throttle(
+                status_code,
+                retry_after=retry_after,
+            )
+        elif isinstance(status_code, int) and 200 <= status_code < 400:
+            self.adaptive_throttle.record_success()
+        else:
+            self.adaptive_throttle.record_failure()
+        return response
 
     def resolve_stock_identity(self, symbol: str) -> Optional[Dict[str, str]]:
         """Resolve the CNInfo org id required for per-stock announcement scans."""
@@ -127,7 +161,7 @@ class _CninfoTransport:
         last_exc: Optional[Exception] = None
         for attempt in range(self.retry_attempts + 1):
             try:
-                response = self.session.post(
+                response = self._post(
                     _CNINFO_TOP_SEARCH_URL,
                     data={"keyWord": normalized_symbol, "maxNum": "10"},
                     headers={
@@ -338,7 +372,7 @@ class _CninfoTransport:
         last_exc: Optional[Exception] = None
         for attempt in range(self.retry_attempts + 1):
             try:
-                response = self.session.post(
+                response = self._post(
                     self.url,
                     data=body,
                     headers=_CNINFO_ANNOUNCEMENT_HEADERS,
@@ -574,6 +608,7 @@ class CninfoAnnouncementProvider:
         source_config: Optional[Mapping[str, Any]] = None,
         transport: Optional[_CninfoTransport] = None,
         session: Optional[requests.Session] = None,
+        adaptive_throttle: Optional[AdaptiveSourceThrottle] = None,
     ) -> None:
         config = dict(source_config or {})
         self.source_config = config
@@ -595,6 +630,7 @@ class CninfoAnnouncementProvider:
             retry_attempts=int(config.get("retry_attempts", 2)),
             retry_backoff_seconds=float(config.get("retry_backoff_seconds", 0.5)),
             session=session,
+            adaptive_throttle=adaptive_throttle,
         )
 
     def discover(self, query: AnnouncementQuery) -> AnnouncementScanResult:

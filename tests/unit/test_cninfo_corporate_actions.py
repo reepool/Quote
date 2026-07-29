@@ -15,6 +15,26 @@ from data_sources.cninfo_corporate_actions import (
 )
 
 
+class _TrackingThrottle:
+    def __init__(self):
+        self.waits = 0
+        self.successes = 0
+        self.failures = 0
+        self.throttles = []
+
+    def wait_before_request(self):
+        self.waits += 1
+
+    def record_success(self):
+        self.successes += 1
+
+    def record_failure(self):
+        self.failures += 1
+
+    def record_throttle(self, status_code, *, retry_after=None):
+        self.throttles.append((status_code, retry_after))
+
+
 def test_generic_requests_timeout_is_retryable():
     assert _retryable_loader_error(requests.exceptions.Timeout("timeout"))
 
@@ -44,6 +64,71 @@ def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
     assert bounded_loader() == "ok"
     assert calls[0][1]["timeout"] == 7.5
     assert loader.__globals__["requests"] is fake_requests
+
+
+def test_bound_cninfo_loader_reports_throttle_response_and_retry_after(monkeypatch):
+    throttle = _TrackingThrottle()
+
+    class FakeResponse:
+        status_code = 429
+        headers = {"Retry-After": "15"}
+
+        @staticmethod
+        def json():
+            return {"resultcode": 429}
+
+    class FakeRequests:
+        @staticmethod
+        def post(*_args, **_kwargs):
+            return FakeResponse()
+
+    def loader():
+        return requests.post("https://example.invalid")
+
+    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
+    bounded_loader = _bind_requests_timeout(
+        loader,
+        5,
+        adaptive_throttle=throttle,
+    )
+
+    assert bounded_loader().status_code == 429
+    assert throttle.waits == 1
+    assert throttle.throttles == [(429, "15")]
+    assert throttle.successes == 0
+
+
+def test_bound_cninfo_loader_reports_stable_json_response(monkeypatch):
+    throttle = _TrackingThrottle()
+
+    class FakeResponse:
+        status_code = 200
+        headers = {}
+
+        @staticmethod
+        def json():
+            return {"resultcode": 200, "records": []}
+
+    class FakeRequests:
+        @staticmethod
+        def post(*_args, **_kwargs):
+            return FakeResponse()
+
+    def loader():
+        return requests.post("https://example.invalid")
+
+    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
+    bounded_loader = _bind_requests_timeout(
+        loader,
+        5,
+        adaptive_throttle=throttle,
+    )
+
+    bounded_loader()
+
+    assert throttle.waits == 1
+    assert throttle.successes == 1
+    assert throttle.throttles == []
 
 
 def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):

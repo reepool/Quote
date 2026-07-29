@@ -4,6 +4,7 @@ import json
 import pytest
 import requests
 
+from data_sources.cninfo_corporate_actions import _bind_requests_timeout
 from research.announcements import (
     AnnouncementAcquisitionConfig,
     AnnouncementAcquisitionService,
@@ -283,8 +284,10 @@ def test_common_config_rejects_route_to_unconfigured_source():
 
 
 class _Response:
-    def __init__(self, payload):
+    def __init__(self, payload, *, status_code=200, headers=None):
         self.payload = payload
+        self.status_code = status_code
+        self.headers = dict(headers or {})
 
     def raise_for_status(self):
         return None
@@ -303,7 +306,29 @@ class _Session:
         payload = self.payloads.pop(0)
         if isinstance(payload, BaseException):
             raise payload
+        if isinstance(payload, _Response):
+            return payload
         return _Response(payload)
+
+
+class _TrackingThrottle:
+    def __init__(self):
+        self.waits = 0
+        self.successes = 0
+        self.failures = 0
+        self.throttles = []
+
+    def wait_before_request(self):
+        self.waits += 1
+
+    def record_success(self):
+        self.successes += 1
+
+    def record_failure(self):
+        self.failures += 1
+
+    def record_throttle(self, status_code, *, retry_after=None):
+        self.throttles.append((status_code, retry_after))
 
 
 def _cninfo_provider(session):
@@ -314,7 +339,49 @@ def _cninfo_provider(session):
             "retry_backoff_seconds": 0,
         },
         session=session,
+        adaptive_throttle=_TrackingThrottle(),
     )
+
+
+def test_cninfo_transport_reports_retry_after_to_shared_throttle():
+    throttle = _TrackingThrottle()
+    response = _Response(
+        {"error": "too many requests"},
+        status_code=429,
+        headers={"Retry-After": "30"},
+    )
+    provider = CninfoAnnouncementProvider(
+        source_config={"retry_attempts": 0},
+        session=_Session(payloads=[response]),
+        adaptive_throttle=throttle,
+    )
+
+    assert provider.transport._post(
+        "https://example.invalid",
+        data={},
+        headers={},
+        timeout=1,
+    ) is response
+    assert throttle.waits == 1
+    assert throttle.throttles == [(429, "30")]
+    assert throttle.successes == 0
+
+
+def test_cninfo_business_paths_reuse_process_shared_source_throttle(monkeypatch):
+    class FakeRequests:
+        @staticmethod
+        def post(*_args, **_kwargs):
+            raise AssertionError("request is not expected")
+
+    def loader():
+        return requests.post("https://example.invalid")
+
+    monkeypatch.setitem(loader.__globals__, "requests", FakeRequests())
+    bounded_loader = _bind_requests_timeout(loader, 5)
+    provider = CninfoAnnouncementProvider(session=_Session())
+
+    proxy = bounded_loader._cninfo_requests_proxy
+    assert proxy._adaptive_throttle is provider.transport.adaptive_throttle
 
 
 def test_cninfo_provider_resolves_identity_caps_page_size_and_normalizes_attachment():
