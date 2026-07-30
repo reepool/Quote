@@ -7,17 +7,29 @@ import pytest
 from data_manager import DataManager
 from database.operations import DatabaseOperations
 from data_sources.hkex_instrument_master import HKEXProviderSnapshot
+from research.announcements import AnnouncementRecord, build_announcement_key
 
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "hkex_instrument_master"
 
 
-class _CninfoRecord:
-    def __init__(self, *, announcement_id, title, symbols, announcement_time):
-        self.announcement_id = announcement_id
-        self.title = title
-        self.symbols = symbols
-        self.announcement_time = announcement_time
+def _announcement_record(
+    *,
+    announcement_id: str,
+    title: str,
+    symbols: list[str],
+    published_at: str,
+) -> AnnouncementRecord:
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("cninfo", announcement_id),
+        title=title,
+        published_at=published_at,
+        exchange="BSE",
+        market="BSE",
+        symbols=tuple(symbols),
+    )
 
 
 def _build_config_manager() -> Mock:
@@ -950,11 +962,11 @@ async def test_bse_delisting_sync_confirms_current_list_disappearance_with_cninf
     manager.db_ops = Mock()
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
     manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
-        _CninfoRecord(
+        _announcement_record(
             announcement_id="ann-920680",
             title="关于公司股票终止上市暨摘牌的公告",
             symbols=["920680"],
-            announcement_time="2025-12-30T16:00:00+00:00",
+            published_at="2025-12-30T16:00:00+00:00",
         )
     ])
 
@@ -976,6 +988,14 @@ async def test_bse_delisting_sync_confirms_current_list_disappearance_with_cninf
     manager.db_ops.mark_instrument_delisted.assert_awaited_once()
     kwargs = manager.db_ops.mark_instrument_delisted.await_args.kwargs
     assert kwargs["delisted_date"].isoformat() == "2025-12-31"
+    assert result["updated_samples"] == [
+        {
+            "instrument_id": "920680.BJ",
+            "delisted_date": "2025-12-31",
+            "announcement_id": "ann-920680",
+            "title": "关于公司股票终止上市暨摘牌的公告",
+        }
+    ]
 
 
 @pytest.mark.asyncio
@@ -984,11 +1004,11 @@ async def test_bse_delisting_sync_keeps_risk_only_disappearance_unconfirmed():
     manager.db_ops = Mock()
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
     manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
-        _CninfoRecord(
+        _announcement_record(
             announcement_id="ann-920305",
             title="关于公司股票可能被终止上市的风险提示公告",
             symbols=["920305"],
-            announcement_time="2026-04-28T16:00:00+00:00",
+            published_at="2026-04-28T16:00:00+00:00",
         )
     ])
 

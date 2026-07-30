@@ -13962,7 +13962,7 @@ class DataManager:
                             {
                                 "instrument_id": instrument_id,
                                 "delisted_date": delisted_on.isoformat(),
-                                "announcement_id": record.announcement_id,
+                                "announcement_id": record.source_announcement_id,
                                 "title": self._normalize_cninfo_title(record.title),
                             }
                         )
