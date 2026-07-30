@@ -19042,27 +19042,34 @@ class DataManager:
             "tdx_coverage_status_rows": len(tdx_endpoint_status_rows),
             "tdx_coverage_gap_samples": tdx_coverage_gap_samples,
         })
-        quality_gates = {
+        blocking_quality_gates = {
             "full_market_scope": full_market_scope,
-            "endpoint_completeness": overall_completeness["status"] == "success",
-            "no_pending_factor_events": not (
-                cninfo_path["pending"] or tdx_path["pending"]
-            ),
+            "no_cninfo_pending_factor_events": not cninfo_path["pending"],
             "no_historical_factor_gaps": not cninfo_path.get(
                 "historical_gaps"
             ),
-            "event_reconciliation": reconciliation.get("status") == "success",
             "no_unverified_tdx_fallback": (
                 int(candidate_summary.get("tdx_fallback_count", 0) or 0) == 0
             ),
         }
+        audit_checks = {
+            "endpoint_completeness": not endpoint_incomplete_ids,
+            "tdx_reference_completeness": not tdx_path["pending"],
+            "event_reconciliation": reconciliation.get("status") == "success",
+        }
         candidate_summary.update({
-            "quality_gates": quality_gates,
+            # Reference-source coverage and cross-source differences remain
+            # visible for audit, but cannot veto a CNInfo-primary candidate.
+            "quality_gates": blocking_quality_gates,
+            "blocking_quality_gates": blocking_quality_gates,
+            "audit_checks": audit_checks,
             "candidate_promotion_eligible": (
-                bool(build_canonical) and all(quality_gates.values())
+                bool(build_canonical)
+                and all(blocking_quality_gates.values())
             ),
             "promotion_eligible": (
-                bool(build_canonical) and all(quality_gates.values())
+                bool(build_canonical)
+                and all(blocking_quality_gates.values())
             ),
         })
 
@@ -19072,7 +19079,12 @@ class DataManager:
             "tdx_observations": {},
             "canonical_saved_rows": 0,
             "benchmark_status_saved": False,
+            "factor_retry_state": {"status": "not_run"},
+            "write_checks": {},
         }
+        retry_persistence_failed = False
+        factor_path_write_failed = False
+        candidate_write_failed = False
         if not dry_run:
             write_result["cninfo_observations"] = (
                 await self.db_ops.replace_adjustment_factor_observations(
@@ -19093,6 +19105,23 @@ class DataManager:
                     ingestion_run_id=run_id,
                 )
             )
+            write_result["write_checks"] = {
+                "cninfo_observations": (
+                    int(
+                        write_result["cninfo_observations"].get("failed", 0)
+                        or 0
+                    ) == 0
+                ),
+                "tdx_observations": (
+                    int(
+                        write_result["tdx_observations"].get("failed", 0)
+                        or 0
+                    ) == 0
+                ),
+            }
+            factor_path_write_failed = not all(
+                write_result["write_checks"].values()
+            )
             benchmark_errors = [
                 report.get("max_adjusted_price_error_pct")
                 for report in benchmark.get("reference_sources", {}).values()
@@ -19106,7 +19135,7 @@ class DataManager:
                         if not cninfo_path["pending"]
                         and not tdx_path["pending"]
                         and not cninfo_path.get("historical_gaps")
-                        and not endpoint_incomplete_ids
+                        and not factor_path_write_failed
                         else "partial"
                     ),
                     "source_priority": [],
@@ -19164,6 +19193,38 @@ class DataManager:
                         instrument_ids=target_ids,
                     )
                 )
+                write_result["write_checks"].update({
+                    "canonical_rows": (
+                        write_result["canonical_saved_rows"]
+                        == len(candidate_rows)
+                    ),
+                    "instrument_statuses": (
+                        write_result["instrument_statuses"] == len(target_ids)
+                    ),
+                })
+                candidate_write_failed = not all(
+                    write_result["write_checks"].values()
+                )
+                candidate_blocking_gates = {
+                    **candidate_summary["blocking_quality_gates"],
+                    "candidate_write_success": not candidate_write_failed,
+                }
+                candidate_summary.update({
+                    "quality_gates": candidate_blocking_gates,
+                    "blocking_quality_gates": candidate_blocking_gates,
+                    "candidate_promotion_eligible": (
+                        bool(
+                            candidate_summary[
+                                "candidate_promotion_eligible"
+                            ]
+                        )
+                        and not candidate_write_failed
+                    ),
+                    "promotion_eligible": (
+                        bool(candidate_summary["promotion_eligible"])
+                        and not candidate_write_failed
+                    ),
+                })
                 await self.db_ops.upsert_adjustment_factor_series_status(
                     staging_version,
                     {
@@ -19181,13 +19242,70 @@ class DataManager:
                         "overall_completeness": overall_completeness,
                     },
                 )
+            pending_retry_ids = sorted({
+                str(item.get("instrument_id") or "").strip()
+                for item in [
+                    *cninfo_path["pending"],
+                    *cninfo_path.get("historical_gaps", []),
+                    *tdx_path["pending"],
+                ]
+                if str(item.get("instrument_id") or "").strip()
+            })
+            retry_reconciliation_eligible = (
+                normalized_start <= date(1990, 12, 19)
+            )
+            if retry_reconciliation_eligible:
+                try:
+                    retry_ids_to_persist = (
+                        target_ids
+                        if factor_path_write_failed
+                        else pending_retry_ids
+                    )
+                    retry_result = (
+                        await self.db_ops
+                        .replace_corporate_action_daily_factor_retry_instruments(
+                            retry_ids_to_persist,
+                            scope_instrument_ids=target_ids,
+                        )
+                    )
+                    write_result["factor_retry_state"] = {
+                        "status": "success",
+                        **(
+                            {
+                                "reason": (
+                                    "factor_path_write_failed_all_scoped"
+                                ),
+                            }
+                            if factor_path_write_failed
+                            else {}
+                        ),
+                        **dict(retry_result or {}),
+                    }
+                except Exception as exc:
+                    retry_persistence_failed = True
+                    dm_logger.exception(
+                        "[DataManager] Corporate-action factor rebuild could "
+                        "not reconcile the daily retry queue: %s",
+                        exc,
+                    )
+                    write_result["factor_retry_state"] = {
+                        "status": "failed",
+                        "error": str(exc),
+                    }
+            else:
+                write_result["factor_retry_state"] = {
+                    "status": "skipped",
+                    "reason": "partial_history_scope",
+                }
             self.invalidate_factor_cache()
 
         has_operational_issues = bool(
             cninfo_path["pending"]
             or cninfo_path.get("historical_gaps")
             or tdx_path["pending"]
-            or endpoint_incomplete_ids
+            or factor_path_write_failed
+            or candidate_write_failed
+            or retry_persistence_failed
         )
         result_status = (
             "dry_run" if dry_run

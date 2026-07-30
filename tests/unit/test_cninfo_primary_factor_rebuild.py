@@ -159,6 +159,9 @@ def _manager_with_factor_evidence(
     manager.db_ops.replace_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=1
     )
+    manager.db_ops.replace_corporate_action_daily_factor_retry_instruments = (
+        AsyncMock(return_value={"inserted": 0, "cleared": 0, "pending": 0})
+    )
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.invalidate_factor_cache = Mock()
     return manager
@@ -887,9 +890,22 @@ async def test_cninfo_factor_rebuild_writes_paths_and_benchmark_without_candidat
     assert result["candidate"]["promotion_eligible"] is False
     assert result["write_result"]["canonical_saved_rows"] == 0
     assert result["write_result"]["benchmark_status_saved"] is True
+    assert result["write_result"]["factor_retry_state"] == {
+        "status": "success",
+        "inserted": 0,
+        "cleared": 0,
+        "pending": 0,
+    }
     manager.db_ops.replace_adjustment_factor_observations.assert_awaited_once()
     assert manager.db_ops.save_adjustment_factor_observations.await_count == 1
     manager.db_ops.upsert_adjustment_factor_series_status.assert_awaited_once()
+    retry_call = (
+        manager.db_ops
+        .replace_corporate_action_daily_factor_retry_instruments
+        .await_args
+    )
+    assert retry_call.args == ([],)
+    assert retry_call.kwargs["scope_instrument_ids"] == ["000001.SZ"]
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
     manager.invalidate_factor_cache.assert_called_once()
 
@@ -934,7 +950,141 @@ async def test_incomplete_rebuild_still_persists_benchmark_without_candidate():
     assert result["tdx_path"]["pending_instrument_ids"] == ["000001.SZ"]
     assert result["write_result"]["canonical_saved_rows"] == 0
     assert result["write_result"]["benchmark_status_saved"] is True
+    retry_call = (
+        manager.db_ops
+        .replace_corporate_action_daily_factor_retry_instruments
+        .await_args
+    )
+    assert retry_call.args == (["000001.SZ"],)
+    assert retry_call.kwargs["scope_instrument_ids"] == ["000001.SZ"]
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_endpoint_and_reconciliation_gaps_are_candidate_audit_only():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=lambda exchange, **_: (
+            [{
+                "instrument_id": "000001.SZ",
+                "symbol": "000001",
+            }]
+            if exchange == "SZSE"
+            else []
+        )
+    )
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        if "FROM corporate_action_instrument_status" in query:
+            if "source = 'tdx'" in query:
+                return await original_query(query, params)
+            return []
+        if "FROM adjustment_factors_tdx" in query:
+            rows = await original_query(query, params)
+            return [{**rows[0], "fenhong": 4.0}]
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SSE", "SZSE", "BSE"],
+        dry_run=False,
+        build_canonical=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["overall_completeness"]["status"] == "partial"
+    assert result["candidate"]["audit_checks"] == {
+        "endpoint_completeness": False,
+        "tdx_reference_completeness": True,
+        "event_reconciliation": False,
+    }
+    assert "endpoint_completeness" not in result["candidate"][
+        "blocking_quality_gates"
+    ]
+    assert "event_reconciliation" not in result["candidate"][
+        "blocking_quality_gates"
+    ]
+    assert result["candidate"]["candidate_promotion_eligible"] is True
+
+
+@pytest.mark.asyncio
+async def test_partial_history_rebuild_preserves_daily_factor_retry_queue():
+    manager = _manager_with_factor_evidence()
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+    )
+
+    (
+        manager.db_ops
+        .replace_corporate_action_daily_factor_retry_instruments
+        .assert_not_awaited()
+    )
+    assert result["write_result"]["factor_retry_state"] == {
+        "status": "skipped",
+        "reason": "partial_history_scope",
+    }
+
+
+@pytest.mark.asyncio
+async def test_candidate_write_failure_blocks_promotion_and_retry_cleanup():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=lambda exchange, **_: (
+            [{
+                "instrument_id": "000001.SZ",
+                "symbol": "000001",
+            }]
+            if exchange == "SZSE"
+            else []
+        )
+    )
+    manager.db_ops.replace_adjustment_factor_observations = AsyncMock(
+        return_value={"deleted": 0, "inserted": 0, "failed": 1}
+    )
+    manager.db_ops.replace_corporate_action_daily_factor_retry_instruments = (
+        AsyncMock(return_value={"inserted": 1, "cleared": 0, "pending": 1})
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SSE", "SZSE", "BSE"],
+        dry_run=False,
+        build_canonical=True,
+    )
+
+    assert result["status"] == "partial"
+    assert result["candidate"]["blocking_quality_gates"][
+        "candidate_write_success"
+    ] is False
+    assert result["candidate"]["candidate_promotion_eligible"] is False
+    retry_call = (
+        manager.db_ops
+        .replace_corporate_action_daily_factor_retry_instruments
+        .await_args
+    )
+    assert retry_call.args == (["000001.SZ"],)
+    assert retry_call.kwargs["scope_instrument_ids"] == ["000001.SZ"]
+    assert result["write_result"]["factor_retry_state"] == {
+        "status": "success",
+        "reason": "factor_path_write_failed_all_scoped",
+        "inserted": 1,
+        "cleared": 0,
+        "pending": 1,
+    }
+    benchmark_call = (
+        manager.db_ops.upsert_adjustment_factor_series_status.await_args_list[0]
+    )
+    assert benchmark_call.args[1]["status"] == "partial"
 
 
 @pytest.mark.asyncio
