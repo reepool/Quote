@@ -89,6 +89,16 @@ from instrument_master_governance import (
     SUPPORTED_MODES_BY_SCOPE,
 )
 
+AKSHARE_FACTOR_SNAPSHOT_SERIES = "akshare_market_price_ratio_snapshot_v1"
+AKSHARE_PROFILE_BY_STATUS_SOURCE = {
+    "akshare_tencent": "akshare_tencent_price_ratio_v1",
+    "akshare_eastmoney": "akshare_eastmoney_price_ratio_v1",
+}
+AKSHARE_STATUS_SOURCE_BY_PROFILE = {
+    profile: source
+    for source, profile in AKSHARE_PROFILE_BY_STATUS_SOURCE.items()
+}
+
 
 @dataclass
 class DownloadProgress:
@@ -393,6 +403,34 @@ class DataManager:
                         availability_error = (
                             "canonical coverage says events exist but no factor rows were found"
                         )
+                    else:
+                        decisions = (
+                            series_status.get("decisions")
+                            or (
+                                series_status.get("candidate") or {}
+                            ).get("decisions")
+                            or []
+                        )
+                        continuity_segments = [{
+                            "segment_id": item.get("segment_id"),
+                            "start_date": item.get("start_date"),
+                            "end_date": item.get("end_date"),
+                            "reset_at_start": bool(
+                                item.get("reset_at_start")
+                            ),
+                        } for item in decisions
+                        if str(item.get("instrument_id") or "").strip()
+                        == instrument_id]
+                        if continuity_segments:
+                            factors = [
+                                {
+                                    **factor,
+                                    "continuity_segments": (
+                                        continuity_segments
+                                    ),
+                                }
+                                for factor in factors
+                            ]
                 elif coverage_status == "complete_no_events":
                     factors = []
                 else:
@@ -16737,6 +16775,9 @@ class DataManager:
             reconcile_factor_events,
             source_transition_metrics,
         )
+        from data_sources.a_share_factor_adapter import (
+            validate_price_ratio_snapshot_coverage,
+        )
 
         normalized_start = coerce_date(start_date, field_name="start_date")
         normalized_end = coerce_date(end_date, field_name="end_date")
@@ -16768,6 +16809,8 @@ class DataManager:
                     "instrument_id": instrument_id,
                     "symbol": str(instrument.get("symbol") or ""),
                     "exchange": exchange,
+                    "listed_date": instrument.get("listed_date"),
+                    "delisted_date": instrument.get("delisted_date"),
                 })
         universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
         universe_ids = {item["instrument_id"] for item in universe}
@@ -16824,8 +16867,31 @@ class DataManager:
             start_date=normalized_start,
             end_date=normalized_end,
         )
-        existing_observation_instruments = {
-            row["instrument_id"] for row in existing_observations
+        existing_snapshot_statuses = (
+            await self.db_ops.list_adjustment_factor_instrument_statuses(
+                series_version=AKSHARE_FACTOR_SNAPSHOT_SERIES,
+                instrument_ids=target_ids,
+            )
+            if normalized_source == "akshare"
+            else []
+        )
+        valid_snapshot_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in existing_snapshot_statuses
+            if str(row.get("coverage_status") or "").strip()
+            in {"complete_with_events", "complete_no_events"}
+            and (
+                self._date_from_any(row.get("start_date"))
+                is not None
+                and self._date_from_any(row.get("start_date"))
+                <= normalized_start
+            )
+            and (
+                self._date_from_any(row.get("end_date"))
+                is not None
+                and self._date_from_any(row.get("end_date"))
+                >= normalized_end
+            )
         }
         checkpoint_parameters = {
             key: value for key, value in parameters.items() if key != "dry_run"
@@ -16849,6 +16915,9 @@ class DataManager:
                 {"completed_instruments": [], "empty_instruments": [], "errors": []},
             )
             completed = set(stage.get("completed_instruments") or []) if resume else set()
+            if normalized_source == "akshare":
+                completed &= valid_snapshot_ids
+                stage["completed_instruments"] = sorted(completed)
             stage["errors"] = [
                 error for error in (stage.get("errors") or [])
                 if error.get("instrument_id") not in completed
@@ -16907,12 +16976,44 @@ class DataManager:
             ]
             try:
                 counters["requested_instruments"] += 1
-                factors = await source_instance.get_adjustment_factors(
-                    instrument_id,
-                    item["symbol"],
-                    datetime.combine(normalized_start, datetime.min.time()),
-                    datetime.combine(normalized_end, datetime.max.time()),
+                requested_start = datetime.combine(
+                    normalized_start, datetime.min.time()
                 )
+                requested_end = datetime.combine(
+                    normalized_end, datetime.max.time()
+                )
+                provider_profile = ""
+                provider_diagnostics: Dict[str, Any] = {}
+                if (
+                    normalized_source == "akshare"
+                    and hasattr(
+                        source_instance,
+                        "get_a_share_adjustment_factor_path",
+                    )
+                ):
+                    path_result = (
+                        await source_instance
+                        .get_a_share_adjustment_factor_path(
+                            instrument_id,
+                            item["symbol"],
+                            requested_start,
+                            requested_end,
+                        )
+                    )
+                    factors = path_result.events
+                    provider_profile = str(
+                        path_result.source_profile or ""
+                    ).strip()
+                    provider_diagnostics = dict(
+                        path_result.diagnostics or {}
+                    )
+                else:
+                    factors = await source_instance.get_adjustment_factors(
+                        instrument_id,
+                        item["symbol"],
+                        requested_start,
+                        requested_end,
+                    )
                 if factors is None:
                     raise RuntimeError("source returned indeterminate factor response")
                 observations = normalize_source_path(
@@ -16929,17 +17030,97 @@ class DataManager:
                         "source identity mismatch: "
                         f"expected {normalized_source}, got {sorted(observed_sources)}"
                     )
-                if (
-                    not observations
-                    and instrument_id in existing_observation_instruments
-                ):
-                    raise RuntimeError(
-                        "source returned empty history despite existing observations"
+                if normalized_source == "akshare":
+                    if not provider_profile and observations:
+                        provider_profile = str(
+                            observations[0].get("source_profile") or ""
+                        ).strip()
+                    if (
+                        provider_profile
+                        not in AKSHARE_STATUS_SOURCE_BY_PROFILE
+                    ):
+                        raise RuntimeError(
+                            "AkShare provider snapshot profile is unavailable"
+                        )
+                    listed_date = self._date_from_any(
+                        item.get("listed_date")
                     )
-                write_stats = await self.db_ops.save_adjustment_factor_observations(
-                    observations,
-                    ingestion_run_id=resolved_checkpoint_id,
-                )
+                    delisted_date = self._date_from_any(
+                        item.get("delisted_date")
+                    )
+                    coverage_tolerance_days = max(
+                        0,
+                        int(
+                            governance.get(
+                                "akshare_snapshot_coverage_tolerance_days",
+                                10,
+                            )
+                        ),
+                    )
+                    provider_diagnostics.update(
+                        validate_price_ratio_snapshot_coverage(
+                            provider_diagnostics,
+                            requested_start=normalized_start,
+                            requested_end=normalized_end,
+                            listed_date=listed_date,
+                            delisted_date=delisted_date,
+                            tolerance_days=coverage_tolerance_days,
+                        )
+                    )
+                snapshot_payload = {
+                    "instrument_id": instrument_id,
+                    "source_profile": provider_profile,
+                    "start_date": normalized_start.isoformat(),
+                    "end_date": normalized_end.isoformat(),
+                    "events": [{
+                        "ex_date": str(row.get("ex_date") or ""),
+                        "normalized_factor": row.get("normalized_factor"),
+                    } for row in observations],
+                    "diagnostics": provider_diagnostics,
+                }
+                snapshot_digest = hashlib.sha256(
+                    json.dumps(
+                        snapshot_payload,
+                        ensure_ascii=True,
+                        default=str,
+                        sort_keys=True,
+                    ).encode("utf-8")
+                ).hexdigest()[:20]
+                snapshot_run_id = f"factor_snapshot_{snapshot_digest}"
+                if normalized_source == "akshare":
+                    write_stats = (
+                        await self.db_ops
+                        .save_adjustment_factor_provider_snapshot(
+                            observations,
+                            instrument_id=instrument_id,
+                            source=normalized_source,
+                            source_profile=provider_profile,
+                            status_source=(
+                                AKSHARE_STATUS_SOURCE_BY_PROFILE[
+                                    provider_profile
+                                ]
+                            ),
+                            series_version=(
+                                AKSHARE_FACTOR_SNAPSHOT_SERIES
+                            ),
+                            coverage_status=(
+                                "complete_with_events"
+                                if observations
+                                else "complete_no_events"
+                            ),
+                            start_date=normalized_start,
+                            end_date=normalized_end,
+                            ingestion_run_id=snapshot_run_id,
+                        )
+                    )
+                else:
+                    write_stats = (
+                        await self.db_ops
+                        .save_adjustment_factor_observations(
+                            observations,
+                            ingestion_run_id=snapshot_run_id,
+                        )
+                    )
                 processed_observations = sum(
                     int(write_stats.get(key, 0))
                     for key in ("inserted", "changed", "unchanged")
@@ -16951,6 +17132,14 @@ class DataManager:
                     raise RuntimeError(
                         "source observation persistence incomplete: "
                         f"expected={len(observations)} stats={write_stats}"
+                    )
+                if (
+                    normalized_source == "akshare"
+                    and int(write_stats.get("status_saved", 0)) != 1
+                ):
+                    raise RuntimeError(
+                        "AkShare provider snapshot status persistence "
+                        "incomplete"
                     )
                 for key in ("inserted", "changed", "unchanged"):
                     counters[f"observation_{key}"] += int(write_stats.get(key, 0))
@@ -16990,6 +17179,69 @@ class DataManager:
             start_date=normalized_start,
             end_date=normalized_end,
         )
+        provider_profiles = {
+            "akshare_tencent_price_ratio_v1",
+            "akshare_eastmoney_price_ratio_v1",
+        }
+        snapshot_statuses = (
+            await self.db_ops.list_adjustment_factor_instrument_statuses(
+                series_version=AKSHARE_FACTOR_SNAPSHOT_SERIES,
+                instrument_ids=target_ids,
+            )
+            if normalized_source == "akshare"
+            else []
+        )
+        if normalized_source == "akshare":
+            current_snapshot_by_instrument = {
+                str(row.get("instrument_id") or "").strip(): row
+                for row in snapshot_statuses
+                if str(row.get("coverage_status") or "").strip()
+                in {"complete_with_events", "complete_no_events"}
+                and (
+                    self._date_from_any(row.get("start_date"))
+                    is not None
+                    and self._date_from_any(row.get("start_date"))
+                    <= normalized_start
+                )
+                and (
+                    self._date_from_any(row.get("end_date"))
+                    is not None
+                    and self._date_from_any(row.get("end_date"))
+                    >= normalized_end
+                )
+            }
+            observation_rows = [
+                row for row in observation_rows
+                if (
+                    snapshot := current_snapshot_by_instrument.get(
+                        str(row.get("instrument_id") or "").strip()
+                    )
+                ) is not None
+                and str(row.get("ingestion_run_id") or "").strip()
+                == str(snapshot.get("ingestion_run_id") or "").strip()
+                and str(row.get("source_profile") or "").strip()
+                == AKSHARE_PROFILE_BY_STATUS_SOURCE.get(
+                    str(snapshot.get("source") or "").strip()
+                )
+            ]
+        provider_instruments: Dict[str, set[str]] = defaultdict(set)
+        for row in (
+            current_snapshot_by_instrument.values()
+            if normalized_source == "akshare"
+            else snapshot_statuses
+        ):
+            profile = AKSHARE_PROFILE_BY_STATUS_SOURCE.get(
+                str(row.get("source") or "").strip()
+            )
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            if profile in provider_profiles and instrument_id:
+                provider_instruments[profile].add(instrument_id)
+        provider_profile_counts = {
+            profile: len(instrument_ids)
+            for profile, instrument_ids in sorted(
+                provider_instruments.items()
+            )
+        }
         canonical_rows, canonical_summary = build_canonical_series(
             observation_rows,
             series_version=staging_series_version,
@@ -17214,6 +17466,13 @@ class DataManager:
                 )
                 canonical_summary["promoted"] = True
         result["observations"] = counters
+        result["observations"].update({
+            "provider_profile_counts": provider_profile_counts,
+            "provider_fallback_instruments": provider_profile_counts.get(
+                "akshare_eastmoney_price_ratio_v1", 0
+            ),
+            "provider_failure_instruments": counters["errors"],
+        })
         result["canonical"] = canonical_summary
         result["status"] = "success" if promotion_eligible else "partial"
         result["universe"]["completed_count"] = len(completed)
@@ -18116,6 +18375,7 @@ class DataManager:
         dry_run: bool = True,
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
+        source_selection_mode: str = "deferred",
         field_tolerance: float = 0.0001,
         factor_relative_tolerance: float = 0.0001,
         max_session_shift: int = 3,
@@ -18123,8 +18383,12 @@ class DataManager:
     ) -> Dict[str, Any]:
         """Persist independent CNInfo/TDX paths and benchmark all references."""
         from data_sources.adjustment_factor_governance import (
+            build_event_product_path,
             build_factor_source_benchmark,
             compare_normalized_cumulative_paths,
+        )
+        from data_sources.a_share_factor_selection import (
+            build_three_source_canonical_candidate,
         )
         from data_sources.cninfo_factor_governance import (
             CNINFO_FACTOR_PROFILE,
@@ -18157,6 +18421,13 @@ class DataManager:
         normalized_series_version = str(series_version or "").strip()
         if not normalized_series_version or len(normalized_series_version) > 64:
             raise ValueError("series_version must contain 1 to 64 characters")
+        normalized_selection_mode = str(
+            source_selection_mode or "deferred"
+        ).strip().lower()
+        if normalized_selection_mode not in {"deferred", "three_source"}:
+            raise ValueError(
+                "source_selection_mode must be deferred or three_source"
+            )
 
         universe: List[Dict[str, Any]] = []
         for exchange in normalized_exchanges:
@@ -18242,6 +18513,14 @@ class DataManager:
                        capitalization_shares_per_share,
                        rights_shares_per_share, rights_price,
                        event_status, quality_status, is_current,
+                       (
+                           SELECT review.review_payload_json
+                           FROM corporate_action_resolution_reviews AS review
+                           WHERE review.source_event_key
+                                 = corporate_action_observations.source_event_key
+                           ORDER BY review.id DESC
+                           LIMIT 1
+                       ) AS review_payload_json,
                        (
                            SELECT state.resolution_state
                            FROM corporate_action_resolution_states AS state
@@ -18749,6 +19028,7 @@ class DataManager:
             "exchanges": normalized_exchanges,
             "instrument_ids": sorted(requested_ids),
             "series_version": normalized_series_version,
+            "source_selection_mode": normalized_selection_mode,
             "write_run": (
                 get_shanghai_time().strftime("%Y%m%d%H%M%S%f")
                 if not dry_run else "preview"
@@ -18775,17 +19055,109 @@ class DataManager:
             "source_selection_status": "deferred",
             "promotion_eligible": False,
         }
-        if build_canonical:
-            candidate_rows, candidate_summary = build_cninfo_primary_candidate(
-                cninfo_path["events"],
-                tdx_path["events"],
-                reconciliation,
-                series_version=staging_version,
-                excluded_cninfo_events=cninfo_path.get("excluded_no_effect") or (),
+        source_observations = (
+            await self.db_ops.list_adjustment_factor_observations(
+                instrument_ids=target_ids,
+                sources=["akshare"],
+                start_date=normalized_start,
+                end_date=normalized_end,
             )
-            candidate_summary["candidate_built"] = True
-            candidate_summary["source_selection_status"] = "deferred"
-
+        )
+        akshare_snapshot_statuses = (
+            await self.db_ops.list_adjustment_factor_instrument_statuses(
+                series_version=AKSHARE_FACTOR_SNAPSHOT_SERIES,
+                instrument_ids=target_ids,
+            )
+        )
+        akshare_snapshot_by_instrument = {
+            str(row.get("instrument_id") or "").strip(): row
+            for row in akshare_snapshot_statuses
+            if str(row.get("coverage_status") or "").strip()
+            in {"complete_with_events", "complete_no_events"}
+            and (
+                self._date_from_any(row.get("start_date")) is not None
+                and self._date_from_any(row.get("start_date"))
+                <= normalized_start
+            )
+            and (
+                self._date_from_any(row.get("end_date")) is not None
+                and self._date_from_any(row.get("end_date"))
+                >= normalized_end
+            )
+            and str(row.get("ingestion_run_id") or "").strip()
+        }
+        eligible_akshare_profiles = {
+            "akshare_tencent_price_ratio_v1",
+            "akshare_eastmoney_price_ratio_v1",
+        }
+        akshare_selection_rows = [
+            row for row in source_observations
+            if (
+                snapshot := akshare_snapshot_by_instrument.get(
+                    str(row.get("instrument_id") or "").strip()
+                )
+            ) is not None
+            if str(row.get("source_profile") or "")
+            in eligible_akshare_profiles
+            and str(row.get("source_profile") or "").strip()
+            == AKSHARE_PROFILE_BY_STATUS_SOURCE.get(
+                str(snapshot.get("source") or "").strip()
+            )
+            and str(row.get("ingestion_run_id") or "").strip()
+            == str(snapshot.get("ingestion_run_id") or "").strip()
+            and row.get("normalized_factor") is not None
+        ]
+        akshare_complete_ids = sorted(
+            akshare_snapshot_by_instrument
+        )
+        akshare_comparison_rows = build_event_product_path([
+            {
+                "instrument_id": row.get("instrument_id"),
+                "ex_date": row.get("ex_date"),
+                "factor": row.get("normalized_factor"),
+            }
+            for row in akshare_selection_rows
+        ])
+        special_event_dates_by_instrument: Dict[
+            str, List[date]
+        ] = defaultdict(list)
+        for row in factor_cninfo_rows:
+            raw_payload = row.get("review_payload_json")
+            try:
+                review_payload = (
+                    json.loads(raw_payload)
+                    if isinstance(raw_payload, str)
+                    else dict(raw_payload or {})
+                )
+            except (TypeError, ValueError, json.JSONDecodeError):
+                review_payload = {}
+            classification = str(
+                review_payload.get("approval_classification") or ""
+            ).strip().lower()
+            resolution_policy = str(
+                review_payload.get("resolution_policy") or ""
+            ).strip().lower()
+            if (
+                classification != "approved_asymmetric"
+                and not (
+                    classification == "approved_cninfo_operator"
+                    and resolution_policy
+                    == "cninfo_operator_attested_passthrough_v1"
+                )
+                and "asymmetric" not in resolution_policy
+            ):
+                continue
+            effective_date = (
+                self._date_from_any(row.get("resolved_effective_date"))
+                or self._date_from_any(row.get("ex_date"))
+            )
+            instrument_id = str(
+                row.get("instrument_id") or ""
+            ).strip()
+            if instrument_id and effective_date is not None:
+                special_event_dates_by_instrument[instrument_id].append(
+                    effective_date
+                )
         cninfo_comparison_rows = [
             {
                 "instrument_id": row["instrument_id"],
@@ -18802,12 +19174,6 @@ class DataManager:
             }
             for row in tdx_path["events"]
         ]
-        source_observations = await self.db_ops.list_adjustment_factor_observations(
-            instrument_ids=target_ids,
-            sources=["akshare"],
-            start_date=normalized_start,
-            end_date=normalized_end,
-        )
         sina_rows = [
             {
                 "instrument_id": row["instrument_id"],
@@ -18827,6 +19193,11 @@ class DataManager:
             ),
             "sina": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows, sina_rows, sample_limit=sample_limit
+            ),
+            "akshare_market": compare_normalized_cumulative_paths(
+                cninfo_comparison_rows,
+                akshare_comparison_rows,
+                sample_limit=sample_limit,
             ),
             "baostock": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows, baostock_rows, sample_limit=sample_limit
@@ -18954,6 +19325,26 @@ class DataManager:
                 )[:sample_limit],
                 "totals": reconciliation.get("totals") or {},
             },
+            "akshare_market": {
+                "status": (
+                    "success"
+                    if set(akshare_complete_ids) == set(target_ids)
+                    else "partial"
+                ),
+                "available_instruments": len(akshare_complete_ids),
+                "incomplete_instruments": (
+                    len(target_ids) - len(akshare_complete_ids)
+                ),
+                "provider_profiles": sorted({
+                    AKSHARE_PROFILE_BY_STATUS_SOURCE.get(
+                        str(row.get("source") or "").strip()
+                    )
+                    for row in akshare_snapshot_by_instrument.values()
+                    if AKSHARE_PROFILE_BY_STATUS_SOURCE.get(
+                        str(row.get("source") or "").strip()
+                    )
+                }),
+            },
         }
         overall_completeness = {
             "status": "partial" if overall_incomplete_ids else "success",
@@ -18966,9 +19357,14 @@ class DataManager:
             "missing_endpoint_profile_samples": missing_profile_samples,
             "source_completeness": source_completeness,
         }
+        full_market_exchanges = (
+            {"SSE", "SZSE"}
+            if normalized_selection_mode == "three_source"
+            else {"SSE", "SZSE", "BSE"}
+        )
         full_market_scope = (
             not requested_ids
-            and set(normalized_exchanges) == {"SSE", "SZSE", "BSE"}
+            and set(normalized_exchanges) == full_market_exchanges
             and normalized_start <= date(1990, 12, 19)
         )
         pending_factor_ids = {
@@ -19014,10 +19410,89 @@ class DataManager:
                         for item in coverage["gaps"]
                     ],
                 })
+        if build_canonical:
+            if normalized_selection_mode == "three_source":
+                candidate_rows, candidate_summary = (
+                    build_three_source_canonical_candidate(
+                        cninfo_rows=cninfo_path["events"],
+                        tdx_rows=tdx_path["events"],
+                        akshare_rows=akshare_selection_rows,
+                        target_instruments=target_ids,
+                        series_version=staging_version,
+                        start_date=normalized_start,
+                        end_date=normalized_end,
+                        complete_instruments_by_source={
+                            "cninfo": sorted(
+                                set(cninfo_target_ids)
+                                - cninfo_incomplete_ids
+                            ),
+                            "tdx": sorted(
+                                tdx_covered_ids - tdx_incomplete_ids
+                            ),
+                            "akshare": akshare_complete_ids,
+                        },
+                        lineage_by_instrument=lineage_by_instrument,
+                        special_event_dates_by_instrument=(
+                            special_event_dates_by_instrument
+                        ),
+                        sessions_by_exchange=sessions_by_exchange,
+                        factor_relative_tolerance=max(
+                            0.0, float(factor_relative_tolerance)
+                        ),
+                        cumulative_relative_tolerance=max(
+                            0.0, float(factor_relative_tolerance)
+                        ),
+                        max_session_shift=max(0, int(max_session_shift)),
+                        sample_limit=max(0, int(sample_limit)),
+                    )
+                )
+                candidate_summary.update({
+                    "conflict_count": (
+                        int(
+                            candidate_summary.get(
+                                "blocked_segment_count", 0
+                            )
+                        )
+                        + int(
+                            candidate_summary.get(
+                                "low_confidence_segment_count", 0
+                            )
+                        )
+                    ),
+                    "tdx_fallback_count": 0,
+                    "tdx_consensus_selection_count": int(
+                        candidate_summary.get(
+                            "selection_counts", {}
+                        ).get("tdx", 0)
+                    ),
+                    "cninfo_no_effect_exclusion_count": len(
+                        cninfo_path.get("excluded_no_effect") or ()
+                    ),
+                })
+            else:
+                candidate_rows, candidate_summary = (
+                    build_cninfo_primary_candidate(
+                        cninfo_path["events"],
+                        tdx_path["events"],
+                        reconciliation,
+                        series_version=staging_version,
+                        excluded_cninfo_events=(
+                            cninfo_path.get("excluded_no_effect") or ()
+                        ),
+                    )
+                )
+            candidate_summary["candidate_built"] = True
+            if normalized_selection_mode != "three_source":
+                candidate_summary["source_selection_status"] = (
+                    normalized_selection_mode
+                )
         benchmark = build_factor_source_benchmark(
             cninfo_comparison_rows,
             {
                 "tdx_event_derived_v1": tdx_comparison_rows,
+                "akshare_market_price_ratio_v1": (
+                    akshare_comparison_rows
+                ),
                 "sina_hfq_factor": sina_rows,
                 "baostock_legacy": baostock_rows,
             },
@@ -19025,6 +19500,7 @@ class DataManager:
             baseline_covered_instruments=baseline_covered_ids,
             reference_covered_instruments={
                 "tdx_event_derived_v1": sorted(tdx_covered_ids),
+                "akshare_market_price_ratio_v1": akshare_complete_ids,
             },
             full_market_scope=full_market_scope,
             sample_limit=sample_limit,
@@ -19050,6 +19526,11 @@ class DataManager:
             ),
             "no_unverified_tdx_fallback": (
                 int(candidate_summary.get("tdx_fallback_count", 0) or 0) == 0
+            ),
+            "no_blocked_selection_segments": (
+                int(
+                    candidate_summary.get("blocked_segment_count", 0) or 0
+                ) == 0
             ),
         }
         audit_checks = {
@@ -19171,12 +19652,44 @@ class DataManager:
                 event_counts = Counter(
                     row["instrument_id"] for row in candidate_rows
                 )
+                blocked_selection_ids = {
+                    str(item.get("instrument_id") or "").strip()
+                    for item in candidate_summary.get("decisions", [])
+                    if item.get("confidence") == "blocked"
+                    and str(item.get("instrument_id") or "").strip()
+                }
+                selected_sources_by_instrument: Dict[
+                    str, set[str]
+                ] = defaultdict(set)
+                for item in candidate_summary.get("decisions", []):
+                    decision_instrument_id = str(
+                        item.get("instrument_id") or ""
+                    ).strip()
+                    selected_source = str(
+                        item.get("selected_source") or ""
+                    ).strip()
+                    if decision_instrument_id and selected_source:
+                        selected_sources_by_instrument[
+                            decision_instrument_id
+                        ].add(selected_source)
                 status_rows = [{
                     "instrument_id": instrument_id,
-                    "source": "cninfo_primary",
+                    "source": (
+                        next(iter(selected_sources_by_instrument[instrument_id]))
+                        if len(
+                            selected_sources_by_instrument[instrument_id]
+                        ) == 1
+                        else "multisource_selection"
+                        if selected_sources_by_instrument[instrument_id]
+                        else "cninfo_primary"
+                    ),
                     "coverage_status": (
                         "incomplete"
-                        if instrument_id in overall_incomplete_ids
+                        if (
+                            instrument_id in blocked_selection_ids
+                            if normalized_selection_mode == "three_source"
+                            else instrument_id in overall_incomplete_ids
+                        )
                         else "complete_with_events"
                         if event_counts.get(instrument_id, 0) > 0
                         else "complete_no_events"
@@ -19306,6 +19819,14 @@ class DataManager:
             or factor_path_write_failed
             or candidate_write_failed
             or retry_persistence_failed
+            or (
+                build_canonical
+                and int(
+                    candidate_summary.get(
+                        "blocked_segment_count", 0
+                    ) or 0
+                ) > 0
+            )
         )
         result_status = (
             "dry_run" if dry_run
@@ -19325,6 +19846,7 @@ class DataManager:
                 "instrument_ids": sorted(requested_ids),
                 "build_canonical": bool(build_canonical),
                 "series_version": normalized_series_version,
+                "source_selection_mode": normalized_selection_mode,
                 "field_tolerance": max(0.0, float(field_tolerance)),
                 "factor_relative_tolerance": max(
                     0.0, float(factor_relative_tolerance)
@@ -19334,6 +19856,12 @@ class DataManager:
             "source_events": {
                 "cninfo_rows": len(cninfo_rows),
                 "tdx_rows": len(tdx_rows),
+                "akshare_market_factor_rows": len(
+                    akshare_selection_rows
+                ),
+                "akshare_market_instruments": len(
+                    akshare_complete_ids
+                ),
                 "resolved_effective_date_events": len(resolved_date_evidence),
                 "resolved_effective_dates_outside_range": resolved_outside_range,
             },
@@ -19382,8 +19910,25 @@ class DataManager:
             "comparisons": comparisons,
             "benchmark": benchmark,
             "source_selection": {
-                "status": "deferred",
-                "selected_primary_source": None,
+                "status": candidate_summary.get(
+                    "source_selection_status",
+                    normalized_selection_mode,
+                ),
+                "selected_primary_source": (
+                    "per_continuity_segment"
+                    if normalized_selection_mode == "three_source"
+                    and build_canonical
+                    else None
+                ),
+                "selection_counts": candidate_summary.get(
+                    "selection_counts", {}
+                ),
+                "confidence_counts": candidate_summary.get(
+                    "confidence_counts", {}
+                ),
+                "agreement_counts": candidate_summary.get(
+                    "agreement_counts", {}
+                ),
             },
             "overall_completeness": overall_completeness,
             "source_completeness": source_completeness,

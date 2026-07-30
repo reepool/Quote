@@ -4018,6 +4018,157 @@ class DatabaseOperations:
             stats["failed"] = max(stats["failed"], len(observations))
             return stats
 
+    async def save_adjustment_factor_provider_snapshot(
+        self,
+        observations: List[Dict[str, Any]],
+        *,
+        instrument_id: str,
+        source: str,
+        source_profile: str,
+        status_source: str,
+        series_version: str,
+        coverage_status: str,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        ingestion_run_id: str,
+    ) -> Dict[str, int]:
+        """Atomically persist one provider path and its coverage snapshot."""
+
+        normalized_instrument = str(instrument_id or "").strip()
+        normalized_source = str(source or "").strip().lower()
+        normalized_profile = str(source_profile or "").strip()
+        normalized_status_source = str(status_source or "").strip()
+        normalized_series = str(series_version or "").strip()
+        normalized_coverage = str(coverage_status or "").strip()
+        normalized_run_id = str(ingestion_run_id or "").strip()
+        normalized_start = self._coerce_datetime(start_date)
+        normalized_end = self._coerce_datetime(end_date)
+        if not all((
+            normalized_instrument,
+            normalized_source,
+            normalized_profile,
+            normalized_status_source,
+            normalized_series,
+            normalized_coverage,
+            normalized_run_id,
+        )):
+            raise ValueError("provider snapshot identity fields must be non-empty")
+        if normalized_start is None or normalized_end is None:
+            raise ValueError("provider snapshot coverage dates are required")
+        if normalized_end < normalized_start:
+            raise ValueError("provider snapshot end_date precedes start_date")
+
+        prepared: List[Dict[str, Any]] = []
+        for item in observations:
+            row_instrument = str(item.get("instrument_id") or "").strip()
+            row_source = str(item.get("source") or "").strip().lower()
+            row_profile = str(item.get("source_profile") or "").strip()
+            ex_date = self._coerce_datetime(item.get("ex_date"))
+            if (
+                row_instrument != normalized_instrument
+                or row_source != normalized_source
+                or row_profile != normalized_profile
+                or ex_date is None
+            ):
+                raise ValueError(
+                    "provider snapshot observation identity does not match "
+                    f"{normalized_instrument}/{normalized_source}/"
+                    f"{normalized_profile}"
+                )
+            prepared.append({
+                "item": item,
+                "ex_date": ex_date,
+            })
+
+        stats = {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+            "status_saved": 0,
+        }
+        async with self.get_async_session() as session:
+            try:
+                for prepared_row in prepared:
+                    item = prepared_row["item"]
+                    ex_date = prepared_row["ex_date"]
+                    existing = (await session.execute(
+                        select(AdjustmentFactorObservationDB).where(
+                            AdjustmentFactorObservationDB.instrument_id
+                            == normalized_instrument,
+                            AdjustmentFactorObservationDB.ex_date == ex_date,
+                            AdjustmentFactorObservationDB.source
+                            == normalized_source,
+                            AdjustmentFactorObservationDB.source_profile
+                            == normalized_profile,
+                        )
+                    )).scalar_one_or_none()
+                    values = {
+                        "provider_factor": item.get("provider_factor"),
+                        "provider_cumulative_factor": item.get(
+                            "provider_cumulative_factor"
+                        ),
+                        "normalized_factor": item.get("normalized_factor"),
+                        "normalization_version": str(
+                            item.get("normalization_version")
+                            or "event_ratio_v1"
+                        ),
+                        "quality_status": str(
+                            item.get("quality_status") or "unvalidated"
+                        ),
+                        "ingestion_run_id": normalized_run_id,
+                        "raw_payload_json": json.dumps(
+                            item.get("raw_payload") or {},
+                            ensure_ascii=True,
+                            default=str,
+                            sort_keys=True,
+                        ),
+                    }
+                    if existing is None:
+                        session.add(AdjustmentFactorObservationDB(
+                            instrument_id=normalized_instrument,
+                            ex_date=ex_date,
+                            source=normalized_source,
+                            source_profile=normalized_profile,
+                            **values,
+                        ))
+                        stats["inserted"] += 1
+                    elif any(
+                        getattr(existing, key) != value
+                        for key, value in values.items()
+                    ):
+                        for key, value in values.items():
+                            setattr(existing, key, value)
+                        existing.updated_at = get_shanghai_time()
+                        stats["changed"] += 1
+                    else:
+                        stats["unchanged"] += 1
+
+                await session.execute(
+                    delete(AdjustmentFactorInstrumentStatusDB).where(
+                        AdjustmentFactorInstrumentStatusDB.series_version
+                        == normalized_series,
+                        AdjustmentFactorInstrumentStatusDB.instrument_id
+                        == normalized_instrument,
+                    )
+                )
+                session.add(AdjustmentFactorInstrumentStatusDB(
+                    instrument_id=normalized_instrument,
+                    series_version=normalized_series,
+                    source=normalized_status_source,
+                    coverage_status=normalized_coverage,
+                    event_count=len(prepared),
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                    ingestion_run_id=normalized_run_id,
+                ))
+                stats["status_saved"] = 1
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+        return stats
+
     async def replace_adjustment_factor_observations(
         self,
         observations: List[Dict[str, Any]],
@@ -7396,6 +7547,41 @@ class DatabaseOperations:
                 "end_date": row.end_date,
                 "ingestion_run_id": row.ingestion_run_id,
             }
+
+    async def list_adjustment_factor_instrument_statuses(
+        self,
+        *,
+        series_version: str,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return bounded per-instrument coverage states for one series."""
+
+        async with self.get_async_session() as session:
+            stmt = select(AdjustmentFactorInstrumentStatusDB).where(
+                AdjustmentFactorInstrumentStatusDB.series_version
+                == series_version
+            )
+            if instrument_ids:
+                stmt = stmt.where(
+                    AdjustmentFactorInstrumentStatusDB.instrument_id.in_(
+                        instrument_ids
+                    )
+                )
+            rows = (await session.execute(
+                stmt.order_by(
+                    AdjustmentFactorInstrumentStatusDB.instrument_id
+                )
+            )).scalars().all()
+            return [{
+                "instrument_id": row.instrument_id,
+                "series_version": row.series_version,
+                "source": row.source,
+                "coverage_status": row.coverage_status,
+                "event_count": row.event_count,
+                "start_date": row.start_date,
+                "end_date": row.end_date,
+                "ingestion_run_id": row.ingestion_run_id,
+            } for row in rows]
 
     async def promote_canonical_adjustment_factor_series(
         self,

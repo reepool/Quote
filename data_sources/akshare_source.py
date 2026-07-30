@@ -19,6 +19,11 @@ import pandas as pd
 import akshare as ak
 
 from .base_source import BaseDataSource, RateLimitConfig
+from .a_share_factor_adapter import (
+    AkshareAShareFactorAdapter,
+    AkshareFactorPathResult,
+    PriceRatioFactorError,
+)
 from .adjustment_config import AdjustmentConfig
 from utils.exceptions import DataSourceError, NetworkError, ErrorCodes
 from utils import log_execution, data_source_metrics, config_manager, get_shanghai_time, exchange_mapper
@@ -1455,7 +1460,7 @@ class AkShareSource(BaseDataSource):
                                      ) -> Optional[List[Dict[str, Any]]]:
         """获取复权因子数据
 
-        调用 ak.stock_zh_a_daily(adjust="hfq-factor") 获取后复权因子.
+        A 股优先使用腾讯原始/后复权行情反推稳定因子平台，失败后回退东财。
         """
         try:
             # HKEX 分支: 通过不复权/后复权价格反推因子
@@ -1465,95 +1470,69 @@ class AkShareSource(BaseDataSource):
                     instrument_id, symbol, start_date, end_date
                 )
 
-            await self.rate_limiter.acquire()
-
-            # AkShare 需要带市场前缀的代码
-            if 'SH' in instrument_id or 'SSE' in instrument_id:
-                ak_symbol = f"sh{symbol}"
-            elif 'SZ' in instrument_id:
-                ak_symbol = f"sz{symbol}"
-            elif 'BJ' in instrument_id or 'BSE' in instrument_id:
-                ak_symbol = f"bj{symbol}"
-            else:
-                akshare_logger.debug(
-                    f"Unsupported instrument_id for AkShare factor: {instrument_id}"
-                )
-                return []
-
-            try:
-                factor_df = await asyncio.to_thread(
-                    ak.stock_zh_a_daily,
-                    symbol=ak_symbol,
-                    adjust="hfq-factor"
-                )
-            except Exception as fetch_e:
-                akshare_logger.warning(
-                    f"AkShare factor fetch failed for {ak_symbol}: {fetch_e}"
-                )
-                return None
-
-            if factor_df is None or factor_df.empty:
-                akshare_logger.warning(
-                    f"AkShare factor response unavailable for {instrument_id}"
-                )
-                return None
-
-            # ---------- 解析: 仅保留因子发生显著变化的除权事件日 ----------
-            # ak.stock_zh_a_daily(adjust="hfq-factor") 返回每日一条累积因子记录,
-            # 非除权日前后值相同。只记录突变日, 与 BaoStock 保持稀疏存储一致。
-
-            # 识别日期列
-            if 'date' in factor_df.columns:
-                factor_df = factor_df.set_index('date')
-            factor_df.index = pd.to_datetime(factor_df.index)
-
-            # 过滤脏日期 (AkShare 部分 BSE 品种含 1900-01-01 等无效记录)
-            factor_df = factor_df[factor_df.index >= pd.Timestamp('1990-01-01')]
-
-            factor_df = factor_df.sort_index()  # ★ 必须按时间正序排列，否则累积复权算法错乱
-
-            # 识别因子列
-            factor_col = None
-            for col_name in ('hfq_factor', 'factor', factor_df.columns[0]):
-                if col_name in factor_df.columns:
-                    factor_col = col_name
-                    break
-
-            if factor_col is None:
-                akshare_logger.warning(
-                    f"AkShare factor DataFrame has no recognized factor column for {instrument_id}"
-                )
-                return None
-
-            # ★ AkShare 返回的因子列可能是 object/str 类型，必须先转 float
-            factor_df = factor_df.copy()
-            factor_df[factor_col] = pd.to_numeric(factor_df[factor_col], errors='coerce')
-            factor_df = factor_df.dropna(subset=[factor_col])
-
-            if factor_df.empty:
-                akshare_logger.warning(
-                    f"AkShare factor response has no valid numeric rows for {instrument_id}"
-                )
-                return None
-            factors = self._build_sparse_factor_events(
-                instrument_id=instrument_id,
-                cum_factor=factor_df[factor_col],
-                requested_start=start_date.date(),
-                requested_end=end_date.date(),
-                threshold=0.0001,
-                source='akshare',
+            result = await self.get_a_share_adjustment_factor_path(
+                instrument_id,
+                symbol,
+                start_date,
+                end_date,
             )
+            return result.events
 
-            akshare_logger.info(
-                f"Retrieved {len(factors)} adjustment factors from AkShare for {instrument_id}"
+        except PriceRatioFactorError as e:
+            akshare_logger.warning(
+                "AkShare A-share factor path unavailable for %s: %s",
+                instrument_id,
+                e,
             )
-            return factors
-
+            return None
         except Exception as e:
             akshare_logger.error(
                 f"Failed to get adjustment factors from AkShare for {instrument_id}: {e}"
             )
             return None
+
+    async def get_a_share_adjustment_factor_path(
+        self,
+        instrument_id: str,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> AkshareFactorPathResult:
+        """Return A-share events together with the provider snapshot profile."""
+
+        suffix = (
+            instrument_id.split('.')[-1].upper()
+            if '.' in instrument_id else ''
+        )
+        if suffix == 'HK':
+            raise PriceRatioFactorError(
+                "A-share factor path metadata is unavailable for HKEX"
+            )
+        await self.rate_limiter.acquire()
+        factor_config = config_manager.get_nested(
+            "data_sources_config.akshare.a_share_adjustment_factors",
+            {},
+        )
+        if not isinstance(factor_config, dict):
+            factor_config = {}
+        adapter = AkshareAShareFactorAdapter(
+            akshare_module=ak,
+            to_thread=asyncio.to_thread,
+            config=factor_config,
+        )
+        result = await adapter.fetch(
+            instrument_id=instrument_id,
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        akshare_logger.info(
+            "Retrieved %d adjustment factors from %s for %s",
+            len(result.events),
+            result.source_profile,
+            instrument_id,
+        )
+        return result
 
     async def _get_hk_adjustment_factors(
         self, instrument_id: str, symbol: str,

@@ -64,20 +64,45 @@ class AdjustmentEngine:
         if not quotes:
             return []
 
-        # 构建逐日累积因子映射
-        daily_cum = AdjustmentEngine._build_daily_cumulative_map(factors)
-
-        # 获取最新日的累积因子作为基准
-        latest_cum = AdjustmentEngine._get_latest_cum_factor(quotes, daily_cum)
-        if latest_cum == 0:
-            logger.warning("[AdjustmentEngine] 最新累积因子为0, 跳过前复权")
-            return [q.copy() for q in quotes]
+        contexts = AdjustmentEngine._build_continuity_contexts(factors)
+        latest_by_context: Dict[int, float] = {}
+        for index, context in enumerate(contexts):
+            context_quotes = [
+                quote for quote in quotes
+                if AdjustmentEngine._date_in_context(
+                    AdjustmentEngine._extract_date(quote["time"]),
+                    context,
+                )
+            ]
+            latest_by_context[index] = (
+                AdjustmentEngine._get_latest_cum_factor(
+                    context_quotes,
+                    context["daily_cum"],
+                )
+            )
 
         result = []
         for q in quotes:
             adjusted = q.copy()
             q_date = AdjustmentEngine._extract_date(q["time"])
-            cum_factor = AdjustmentEngine._lookup_cumulative_factor(q_date, daily_cum)
+            context_index = AdjustmentEngine._context_index_for_date(
+                q_date, contexts
+            )
+            if context_index is None:
+                cum_factor = 1.0
+                latest_cum = 1.0
+            else:
+                context = contexts[context_index]
+                cum_factor = AdjustmentEngine._lookup_cumulative_factor(
+                    q_date, context["daily_cum"]
+                )
+                latest_cum = latest_by_context[context_index]
+            if latest_cum == 0:
+                logger.warning(
+                    "[AdjustmentEngine] 最新累积因子为0, 跳过当前连续区间"
+                )
+                latest_cum = 1.0
+                cum_factor = 1.0
 
             # 前复权因子 = 累积因子 / 最新累积因子
             forward_factor = round(cum_factor / latest_cum, PRECISION)
@@ -129,13 +154,23 @@ class AdjustmentEngine:
         if not quotes:
             return []
 
-        daily_cum = AdjustmentEngine._build_daily_cumulative_map(factors)
+        contexts = AdjustmentEngine._build_continuity_contexts(factors)
 
         result = []
         for q in quotes:
             adjusted = q.copy()
             q_date = AdjustmentEngine._extract_date(q["time"])
-            cum_factor = AdjustmentEngine._lookup_cumulative_factor(q_date, daily_cum)
+            context_index = AdjustmentEngine._context_index_for_date(
+                q_date, contexts
+            )
+            cum_factor = (
+                AdjustmentEngine._lookup_cumulative_factor(
+                    q_date,
+                    contexts[context_index]["daily_cum"],
+                )
+                if context_index is not None
+                else 1.0
+            )
 
             # 调整价格字段
             for field in price_fields:
@@ -333,6 +368,99 @@ class AdjustmentEngine:
         return cum_map
 
     @staticmethod
+    def _build_continuity_contexts(
+        factors: List[Dict],
+    ) -> List[Dict]:
+        """Build independently anchored factor maps for legal-subject ranges."""
+
+        raw_segments = next(
+            (
+                factor.get("continuity_segments")
+                for factor in factors
+                if factor.get("continuity_segments")
+            ),
+            None,
+        )
+        if not raw_segments:
+            return [{
+                "start_date": None,
+                "end_date": None,
+                "daily_cum": (
+                    AdjustmentEngine._build_daily_cumulative_map(factors)
+                ),
+            }]
+
+        segments: List[Dict] = []
+        seen = set()
+        for raw_segment in raw_segments:
+            if not isinstance(raw_segment, dict):
+                continue
+            try:
+                start = AdjustmentEngine._extract_date(
+                    raw_segment.get("start_date")
+                )
+                end = AdjustmentEngine._extract_date(
+                    raw_segment.get("end_date")
+                )
+            except (TypeError, ValueError):
+                continue
+            if end < start or (start, end) in seen:
+                continue
+            seen.add((start, end))
+            segment_factors = [
+                factor for factor in factors
+                if start
+                <= AdjustmentEngine._extract_date(factor["ex_date"])
+                <= end
+            ]
+            segments.append({
+                "start_date": start,
+                "end_date": end,
+                "daily_cum": (
+                    AdjustmentEngine._build_daily_cumulative_map(
+                        segment_factors
+                    )
+                ),
+            })
+        if not segments:
+            return [{
+                "start_date": None,
+                "end_date": None,
+                "daily_cum": (
+                    AdjustmentEngine._build_daily_cumulative_map(factors)
+                ),
+            }]
+        ordered = sorted(segments, key=lambda item: item["start_date"])
+        # A report's end date is a build horizon, not a legal-subject boundary.
+        # Keep only the latest continuity segment open for later quote reads.
+        ordered[-1]["end_date"] = None
+        return ordered
+
+    @staticmethod
+    def _date_in_context(target_date: date, context: Dict) -> bool:
+        start = context.get("start_date")
+        end = context.get("end_date")
+        return (
+            (start is None or target_date >= start)
+            and (end is None or target_date <= end)
+        )
+
+    @staticmethod
+    def _context_index_for_date(
+        target_date: date,
+        contexts: List[Dict],
+    ) -> Optional[int]:
+        return next(
+            (
+                index for index, context in enumerate(contexts)
+                if AdjustmentEngine._date_in_context(
+                    target_date, context
+                )
+            ),
+            None,
+        )
+
+    @staticmethod
     def _lookup_cumulative_factor(
         target_date: date, daily_cum: Dict[date, float]
     ) -> float:
@@ -527,4 +655,3 @@ def adjust_quotes(
         return AdjustmentEngine.apply_adjustment(
             quotes, factors, adjust_type, price_fields, volume_fields
         )
-

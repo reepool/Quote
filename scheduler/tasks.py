@@ -1100,6 +1100,95 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_a_share_canonical_factor_selection_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a bounded report for the manual three-source selection workflow."""
+    status = str(result.get("status") or "unknown").lower()
+    label = {
+        "success": "完成",
+        "partial": "部分完成",
+        "dry_run": "预演完成",
+        "failed": "失败",
+    }.get(status, status)
+    parameters = result.get("parameters") or {}
+    backfill = result.get("akshare_backfill") or {}
+    selection = result.get("selection") or {}
+    source_events = selection.get("source_events") or {}
+    source_selection = selection.get("source_selection") or {}
+    candidate = selection.get("candidate") or {}
+    observations = backfill.get("observations") or {}
+    provider_counts = observations.get("provider_profile_counts") or {}
+    lines = [
+        "ℹ️ *A 股三源主复权因子候选选择*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{status}`",
+        "生产表影响: `无（仅独立观察层与 versioned staging）`",
+        f"范围: `{parameters.get('start_date', 'N/A')}` 至 "
+        f"`{parameters.get('end_date', 'N/A')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"定向标的: `{len(parameters.get('instrument_ids') or [])}`",
+        f"AkShare回补: `enabled={parameters.get('backfill_akshare', False)}, "
+        f"status={backfill.get('status', 'skipped')}, "
+        f"checkpoint={backfill.get('checkpoint_id', 'N/A')}`",
+        "AkShare提供方: `"
+        + ", ".join(
+            f"{profile}={count}"
+            for profile, count in sorted(provider_counts.items())
+        )
+        + "`",
+        "来源覆盖: `"
+        f"cninfo_events={source_events.get('cninfo_rows', 0)}, "
+        f"tdx_events={source_events.get('tdx_rows', 0)}, "
+        "akshare_events="
+        f"{source_events.get('akshare_market_factor_rows', 0)}, "
+        "akshare_instruments="
+        f"{source_events.get('akshare_market_instruments', 0)}`",
+        "路径选择: `"
+        + ", ".join(
+            f"{source}={count}"
+            for source, count in sorted(
+                (source_selection.get("selection_counts") or {}).items()
+            )
+        )
+        + "`",
+        "置信度: `"
+        + ", ".join(
+            f"{confidence}={count}"
+            for confidence, count in sorted(
+                (source_selection.get("confidence_counts") or {}).items()
+            )
+        )
+        + "`",
+        "一致模式: `"
+        + ", ".join(
+            f"{pattern}={count}"
+            for pattern, count in sorted(
+                (source_selection.get("agreement_counts") or {}).items()
+            )
+        )
+        + "`",
+        f"候选版本: `{candidate.get('staging_series_version', 'N/A')}`",
+        f"候选行数: `{candidate.get('row_count', 0)}`",
+        f"阻塞区间: `{candidate.get('blocked_segment_count', 0)}`",
+        f"低置信区间: `{candidate.get('low_confidence_segment_count', 0)}`",
+        f"可供独立晋级审核: `{candidate.get('promotion_eligible', False)}`",
+        "自动晋级生产: `False`",
+    ]
+    samples = candidate.get("conflict_samples") or []
+    if samples:
+        lines.extend(["", "冲突样本:", "```text"])
+        for item in samples[:20]:
+            lines.append(
+                f"{item.get('instrument_id', 'unknown')} "
+                f"{item.get('start_date', '?')}..{item.get('end_date', '?')}: "
+                f"{item.get('reason', 'conflict')}"
+            )
+        lines.append("```")
+    return "\n".join(lines)
+
+
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
     """Return a compact operator summary for shared instrument master governance."""
     if not isinstance(governance, dict) or not governance:
@@ -5374,6 +5463,186 @@ class ScheduledTasks:
                 "operation": task_id,
                 "dry_run": bool(dry_run),
                 "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_canonical_adjustment_factor_selection(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        backfill_akshare: bool = False,
+        dry_run: bool = True,
+        resume: bool = True,
+        chunk_size: int = 100,
+        request_interval_seconds: float = 1.0,
+        checkpoint_id: Optional[str] = None,
+        build_canonical: bool = True,
+        series_version: str = "a_share_cninfo_primary_v1",
+        field_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.0001,
+        max_session_shift: int = 3,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Backfill optional AkShare evidence and build a three-source staging candidate."""
+        task_id = "a_share_canonical_adjustment_factor_selection"
+        self._active_tasks.add(task_id)
+        parameters = {
+            "start_date": start_date,
+            "end_date": end_date,
+            "exchanges": exchanges or ["SSE", "SZSE"],
+            "instrument_ids": instrument_ids or [],
+            "backfill_akshare": bool(backfill_akshare),
+            "dry_run": bool(dry_run),
+            "resume": bool(resume),
+            "chunk_size": int(chunk_size),
+            "request_interval_seconds": float(request_interval_seconds),
+            "checkpoint_id": checkpoint_id,
+            "build_canonical": bool(build_canonical),
+            "series_version": series_version,
+            "field_tolerance": float(field_tolerance),
+            "factor_relative_tolerance": float(factor_relative_tolerance),
+            "max_session_shift": int(max_session_shift),
+            "sample_limit": int(sample_limit),
+        }
+        try:
+            backfill_result: Dict[str, Any] = {
+                "status": "skipped",
+                "reason": "backfill_akshare_false",
+            }
+            if backfill_akshare:
+                backfill_result = (
+                    await data_manager.rebuild_a_share_adjustment_factor_governance(
+                        start_date=start_date,
+                        end_date=end_date,
+                        exchanges=exchanges,
+                        instrument_ids=instrument_ids,
+                        source="akshare",
+                        dry_run=bool(dry_run),
+                        resume=bool(resume),
+                        chunk_size=int(chunk_size),
+                        request_interval_seconds=float(
+                            request_interval_seconds
+                        ),
+                        checkpoint_id=checkpoint_id,
+                        # The legacy workflow promotes when this is true.
+                        build_canonical=False,
+                    )
+                )
+
+            selection_result = (
+                await data_manager.rebuild_cninfo_primary_adjustment_factors(
+                    start_date=start_date,
+                    end_date=end_date,
+                    exchanges=exchanges,
+                    instrument_ids=instrument_ids,
+                    dry_run=bool(dry_run),
+                    build_canonical=bool(build_canonical),
+                    series_version=series_version,
+                    source_selection_mode="three_source",
+                    field_tolerance=float(field_tolerance),
+                    factor_relative_tolerance=float(
+                        factor_relative_tolerance
+                    ),
+                    max_session_shift=int(max_session_shift),
+                    sample_limit=int(sample_limit),
+                )
+            )
+            raw_backfill_status = str(
+                backfill_result.get("status") or "skipped"
+            ).lower()
+            backfill_observations = (
+                backfill_result.get("observations") or {}
+            )
+            backfill_universe = backfill_result.get("universe") or {}
+            has_acquisition_counters = (
+                "errors" in backfill_observations
+                or "provider_failure_instruments"
+                in backfill_observations
+                or "pending_count" in backfill_universe
+            )
+            if raw_backfill_status == "failed":
+                backfill_stage_status = "failed"
+            elif has_acquisition_counters:
+                backfill_stage_status = (
+                    "partial"
+                    if (
+                        int(backfill_observations.get("errors", 0) or 0) > 0
+                        or int(
+                            backfill_observations.get(
+                                "provider_failure_instruments", 0
+                            ) or 0
+                        ) > 0
+                        or int(
+                            backfill_universe.get("pending_count", 0) or 0
+                        ) > 0
+                    )
+                    else "success"
+                )
+            else:
+                backfill_stage_status = raw_backfill_status
+            stage_statuses = {
+                backfill_stage_status,
+                str(selection_result.get("status") or "failed").lower(),
+            }
+            if dry_run:
+                status = (
+                    "partial"
+                    if "failed" in stage_statuses or "partial" in stage_statuses
+                    else "dry_run"
+                )
+            else:
+                status = (
+                    "failed"
+                    if str(selection_result.get("status")).lower() == "failed"
+                    else "partial"
+                    if stage_statuses & {"failed", "partial"}
+                    else "success"
+                )
+            result = {
+                "status": status,
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "parameters": parameters,
+                "akshare_backfill": backfill_result,
+                "selection": selection_result,
+                "promoted": False,
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股三源主复权因子候选选择",
+                        "status": status,
+                        "content": (
+                            _format_a_share_canonical_factor_selection_report(
+                                result
+                            )
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share canonical factor selection failed: %s",
+                exc,
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "parameters": parameters,
+                "promoted": False,
                 "error": str(exc),
                 "errors": [str(exc)],
             }

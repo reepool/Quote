@@ -427,6 +427,56 @@ async def test_factor_cache_distinguishes_complete_no_events_from_missing_covera
 
 
 @pytest.mark.asyncio
+async def test_factor_cache_attaches_continuity_segments_from_series_report():
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager.data_config = {
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+            "allow_legacy_fallback": False,
+        }
+    }
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factor_series_status = AsyncMock(
+        return_value={
+            "promotion_eligible": True,
+            "decisions": [{
+                "instrument_id": "600018.SH",
+                "segment_id": "600018.SH:1",
+                "start_date": "2001-01-01",
+                "end_date": "2006-10-25",
+                "reset_at_start": False,
+            }, {
+                "instrument_id": "600018.SH",
+                "segment_id": "600018.SH:2",
+                "start_date": "2006-10-26",
+                "end_date": "2026-07-29",
+                "reset_at_start": True,
+            }],
+        }
+    )
+    manager.db_ops.get_adjustment_factor_instrument_status = AsyncMock(
+        return_value={"coverage_status": "complete_with_events"}
+    )
+    manager.db_ops.get_canonical_adjustment_factors = AsyncMock(
+        return_value=[{
+            "ex_date": datetime(2005, 1, 10),
+            "factor": 1.1,
+            "cumulative_factor": 1.1,
+        }]
+    )
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("600018.SH")
+
+    segments = bundle["factors"][0]["continuity_segments"]
+    assert [item["segment_id"] for item in segments] == [
+        "600018.SH:1",
+        "600018.SH:2",
+    ]
+
+
+@pytest.mark.asyncio
 async def test_factor_rebuild_dry_run_does_not_create_checkpoint(tmp_path):
     manager = DataManager()
     manager.data_config = {
@@ -439,6 +489,9 @@ async def test_factor_rebuild_dry_run_does_not_create_checkpoint(tmp_path):
         "symbol": "000001",
     }])
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(return_value=[])
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[]
+    )
     manager.source_factory = Mock()
 
     result = await manager.rebuild_a_share_adjustment_factor_governance(
@@ -469,6 +522,7 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
         },
     }
     stored_observations = []
+    stored_snapshot_statuses = []
     manager.db_ops = Mock()
     manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
         "instrument_id": "000001.SZ",
@@ -479,8 +533,39 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
         return list(stored_observations)
 
     async def save_observations(rows, ingestion_run_id=None):
-        stored_observations[:] = rows
+        stored_observations[:] = [
+            {**row, "ingestion_run_id": ingestion_run_id}
+            for row in rows
+        ]
         return {"inserted": len(rows), "changed": 0, "unchanged": 0, "failed": 0}
+
+    async def list_statuses(**_kwargs):
+        return list(stored_snapshot_statuses)
+
+    async def replace_statuses(rows, *, series_version, instrument_ids):
+        if series_version == "akshare_market_price_ratio_snapshot_v1":
+            stored_snapshot_statuses[:] = rows
+        return len(rows)
+
+    async def save_snapshot(rows, **kwargs):
+        stats = await save_observations(
+            rows,
+            ingestion_run_id=kwargs["ingestion_run_id"],
+        )
+        status_saved = await replace_statuses(
+            [{
+                "instrument_id": kwargs["instrument_id"],
+                "source": kwargs["status_source"],
+                "coverage_status": kwargs["coverage_status"],
+                "event_count": len(rows),
+                "start_date": kwargs["start_date"],
+                "end_date": kwargs["end_date"],
+                "ingestion_run_id": kwargs["ingestion_run_id"],
+            }],
+            series_version=kwargs["series_version"],
+            instrument_ids=[kwargs["instrument_id"]],
+        )
+        return {**stats, "status_saved": status_saved}
 
     async def read_query(sql, _parameters):
         if "adjustment_factors_tdx" in sql:
@@ -502,8 +587,14 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(
         side_effect=list_observations
     )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        side_effect=list_statuses
+    )
     manager.db_ops.save_adjustment_factor_observations = AsyncMock(
         side_effect=save_observations
+    )
+    manager.db_ops.save_adjustment_factor_provider_snapshot = AsyncMock(
+        side_effect=save_snapshot
     )
     manager.db_ops.execute_read_query = AsyncMock(side_effect=read_query)
     manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
@@ -512,18 +603,31 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     manager.db_ops.get_previous_trading_day = AsyncMock(return_value=date.today())
     manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(return_value=1)
     manager.db_ops.replace_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=1
+        side_effect=replace_statuses
     )
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.db_ops.promote_canonical_adjustment_factor_series = AsyncMock()
-    source = SimpleNamespace(get_adjustment_factors=AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "ex_date": datetime(2020, 5, 28),
-        "factor": 1.02,
-        "cumulative_factor": 10.0,
-        "source": "akshare",
-        "source_profile": "sina_hfq_factor",
-    }]))
+    source = SimpleNamespace(
+        get_a_share_adjustment_factor_path=AsyncMock(
+            return_value=SimpleNamespace(
+                events=[{
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2020, 5, 28),
+                    "factor": 1.02,
+                    "cumulative_factor": 10.0,
+                    "source": "akshare",
+                    "source_profile": (
+                        "akshare_tencent_price_ratio_v1"
+                    ),
+                }],
+                source_profile="akshare_tencent_price_ratio_v1",
+                diagnostics={
+                    "first_overlap_date": "2020-05-20",
+                    "last_overlap_date": "2026-07-16",
+                },
+            )
+        )
+    )
     manager.source_factory = Mock()
     manager.source_factory._find_source_by_base_name.return_value = source
 
@@ -544,7 +648,15 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     assert first["canonical"]["promoted"] is False
     assert first["canonical"]["staging_series_version"] != "a_share_event_product_v1"
     assert second["universe"]["pending_count"] == 0
-    assert source.get_adjustment_factors.await_count == 1
+    assert first["observations"]["provider_profile_counts"] == {
+        "akshare_tencent_price_ratio_v1": 1
+    }
+    assert first["observations"]["provider_fallback_instruments"] == 0
+    assert source.get_a_share_adjustment_factor_path.await_count == 1
+    assert (
+        manager.db_ops.save_adjustment_factor_provider_snapshot.await_count
+        == 1
+    )
     assert manager.db_ops.upsert_adjustment_factor_series_status.await_count == 2
     manager.db_ops.promote_canonical_adjustment_factor_series.assert_not_awaited()
 
@@ -562,6 +674,7 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
         "BSE": [{"instrument_id": "920001.BJ", "symbol": "920001"}],
     }
     stored_observations = []
+    stored_snapshot_statuses = []
     manager.db_ops = Mock()
     manager.db_ops.get_instruments_list = AsyncMock(
         side_effect=lambda exchange, type, is_active: instruments_by_exchange[exchange]
@@ -571,8 +684,46 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
         return list(stored_observations)
 
     async def save_observations(rows, ingestion_run_id=None):
-        stored_observations.extend(rows)
+        stored_observations.extend(
+            {**row, "ingestion_run_id": ingestion_run_id}
+            for row in rows
+        )
         return {"inserted": len(rows), "changed": 0, "unchanged": 0, "failed": 0}
+
+    async def list_statuses(**_kwargs):
+        return list(stored_snapshot_statuses)
+
+    async def replace_statuses(rows, *, series_version, instrument_ids):
+        if series_version == "akshare_market_price_ratio_snapshot_v1":
+            existing = {
+                row["instrument_id"]: row
+                for row in stored_snapshot_statuses
+            }
+            existing.update({
+                row["instrument_id"]: row for row in rows
+            })
+            stored_snapshot_statuses[:] = list(existing.values())
+        return len(rows)
+
+    async def save_snapshot(rows, **kwargs):
+        stats = await save_observations(
+            rows,
+            ingestion_run_id=kwargs["ingestion_run_id"],
+        )
+        status_saved = await replace_statuses(
+            [{
+                "instrument_id": kwargs["instrument_id"],
+                "source": kwargs["status_source"],
+                "coverage_status": kwargs["coverage_status"],
+                "event_count": len(rows),
+                "start_date": kwargs["start_date"],
+                "end_date": kwargs["end_date"],
+                "ingestion_run_id": kwargs["ingestion_run_id"],
+            }],
+            series_version=kwargs["series_version"],
+            instrument_ids=[kwargs["instrument_id"]],
+        )
+        return {**stats, "status_saved": status_saved}
 
     async def read_query(sql, parameters):
         rows = []
@@ -592,8 +743,14 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(
         side_effect=list_observations
     )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        side_effect=list_statuses
+    )
     manager.db_ops.save_adjustment_factor_observations = AsyncMock(
         side_effect=save_observations
+    )
+    manager.db_ops.save_adjustment_factor_provider_snapshot = AsyncMock(
+        side_effect=save_snapshot
     )
     manager.db_ops.execute_read_query = AsyncMock(side_effect=read_query)
     manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[
@@ -602,23 +759,35 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
     manager.db_ops.get_previous_trading_day = AsyncMock(return_value=date.today())
     manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(return_value=3)
     manager.db_ops.replace_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=3
+        side_effect=replace_statuses
     )
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.db_ops.promote_canonical_adjustment_factor_series = AsyncMock(
         return_value={"canonical_rows": 3, "instrument_statuses": 3}
     )
 
-    async def get_factors(instrument_id, _symbol, _start, _end):
-        return [{
-            "instrument_id": instrument_id,
-            "ex_date": datetime(2020, 5, 28),
-            "factor": 1.02,
-            "cumulative_factor": 1.02,
-            "source": "akshare",
-        }]
+    async def get_factor_path(instrument_id, _symbol, _start, _end):
+        return SimpleNamespace(
+            events=[{
+                "instrument_id": instrument_id,
+                "ex_date": datetime(2020, 5, 28),
+                "factor": 1.02,
+                "cumulative_factor": 1.02,
+                "source": "akshare",
+                "source_profile": "akshare_tencent_price_ratio_v1",
+            }],
+            source_profile="akshare_tencent_price_ratio_v1",
+            diagnostics={
+                "first_overlap_date": "2020-05-20",
+                "last_overlap_date": date.today().isoformat(),
+            },
+        )
 
-    source = SimpleNamespace(get_adjustment_factors=AsyncMock(side_effect=get_factors))
+    source = SimpleNamespace(
+        get_a_share_adjustment_factor_path=AsyncMock(
+            side_effect=get_factor_path
+        )
+    )
     manager.source_factory = Mock()
     manager.source_factory._find_source_by_base_name.return_value = source
 

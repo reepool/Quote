@@ -507,6 +507,7 @@ def derive_cninfo_factor_path(
         source_dates = sorted(aggregate["source_ex_dates"])
         event = {
             "instrument_id": instrument_id,
+            "source_profile": CNINFO_FACTOR_PROFILE,
             "source_ex_date": source_dates[0],
             "source_ex_dates": source_dates,
             "effective_date": effective_date,
@@ -714,6 +715,7 @@ def derive_tdx_factor_path(
         )
         event = {
             **aggregate,
+            "source_profile": TDX_FACTOR_PROFILE,
             "source_ex_date": min(aggregate["source_ex_dates"]),
             "factor": factor,
             "cumulative_factor": cumulative_by_instrument[instrument_id],

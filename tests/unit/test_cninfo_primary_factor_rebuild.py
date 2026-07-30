@@ -1,3 +1,4 @@
+import json
 from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
 
@@ -146,6 +147,9 @@ def _manager_with_factor_evidence(
         "source_profile": "sina_hfq_factor",
         "provider_cumulative_factor": 1.01,
     }])
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[]
+    )
     manager.db_ops.save_adjustment_factor_observations = AsyncMock(return_value={
         "inserted": 1,
         "changed": 0,
@@ -1085,6 +1089,307 @@ async def test_candidate_write_failure_blocks_promotion_and_retry_cleanup():
         manager.db_ops.upsert_adjustment_factor_series_status.await_args_list[0]
     )
     assert benchmark_call.args[1]["status"] == "partial"
+
+
+@pytest.mark.asyncio
+async def test_three_source_candidate_selects_matching_akshare_path_in_dry_run():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_tencent",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-tencent",
+        }]
+    )
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2020, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_tencent_price_ratio_v1",
+            "normalized_factor": 13.5 / (13.5 - 0.218),
+            "provider_cumulative_factor": 1.0,
+            "ingestion_run_id": "snapshot-tencent",
+        }, {
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2019, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_eastmoney_price_ratio_v1",
+            "normalized_factor": 1.2,
+            "provider_cumulative_factor": 1.0,
+            "ingestion_run_id": "stale-eastmoney",
+        }]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["status"] == "dry_run"
+    assert result["source_selection"]["status"] == "selected"
+    assert result["source_selection"]["selected_primary_source"] == (
+        "per_continuity_segment"
+    )
+    assert result["candidate"]["candidate_built"] is True
+    assert result["candidate"]["selection_counts"] == {"cninfo": 1}
+    assert result["candidate"]["confidence_counts"] == {"high": 1}
+    assert result["source_events"]["akshare_market_factor_rows"] == 1
+    manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_three_source_candidate_persists_staging_without_promotion():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_eastmoney",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-eastmoney",
+        }]
+    )
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2020, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_eastmoney_price_ratio_v1",
+            "normalized_factor": 13.5 / (13.5 - 0.218),
+            "provider_cumulative_factor": 1.0,
+            "ingestion_run_id": "snapshot-eastmoney",
+        }]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["staging_series_version"]
+    assert result["candidate"]["promoted"] is False
+    assert result["write_result"]["canonical_saved_rows"] == 1
+    canonical_call = (
+        manager.db_ops.replace_canonical_adjustment_factors.await_args
+    )
+    assert canonical_call.args[0][0]["selected_source"] == "cninfo"
+    assert canonical_call.args[0][0]["source_profile"] == (
+        "cninfo_event_derived_v1"
+    )
+    manager.db_ops.replace_canonical_adjustment_factors.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_three_source_counts_zero_event_akshare_snapshot_as_complete():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[]
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_tencent",
+            "coverage_status": "complete_no_events",
+            "event_count": 0,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-empty",
+        }]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    coverage = result["source_completeness"]["akshare_market"]
+    assert coverage["status"] == "success"
+    assert coverage["available_instruments"] == 1
+    assert coverage["incomplete_instruments"] == 0
+
+
+@pytest.mark.asyncio
+async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        if (
+            "FROM corporate_action_instrument_status" in query
+            and "source = 'tdx'" in query
+        ):
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[]
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_tencent",
+            "coverage_status": "complete_no_events",
+            "event_count": 0,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-empty",
+        }]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["row_count"] == 1
+    assert result["candidate"]["selection_counts"] == {"cninfo": 1}
+    assert result["candidate"]["confidence_counts"] == {"low": 1}
+    assert result["candidate"]["decisions"][0]["eligible_sources"] == [
+        "akshare",
+        "cninfo",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_three_source_preserves_operator_attested_special_cninfo_path():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM corporate_action_observations" in query:
+            return [{
+                **rows[0],
+                "review_payload_json": json.dumps({
+                    "approval_classification": "approved_cninfo_operator",
+                    "resolution_policy": (
+                        "cninfo_operator_attested_passthrough_v1"
+                    ),
+                    "operator_attestation": {
+                        "basis": "governed_special_action",
+                    },
+                }),
+            }]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2020, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_tencent_price_ratio_v1",
+            "normalized_factor": 1.01,
+            "ingestion_run_id": "snapshot-tencent",
+        }]
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_tencent",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-tencent",
+        }]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["selection_counts"] == {"cninfo": 1}
+    assert result["candidate"]["confidence_counts"] == {
+        "governed_special": 1,
+    }
+    assert result["candidate"]["decisions"][0]["special_action"] is True
+
+
+@pytest.mark.asyncio
+async def test_three_source_candidate_blocks_when_cninfo_path_is_incomplete():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2020, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_tencent_price_ratio_v1",
+            "normalized_factor": 1.2,
+            "ingestion_run_id": "snapshot-tencent",
+        }]
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source": "akshare_tencent",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+            "start_date": datetime(1990, 12, 19),
+            "end_date": datetime(2026, 7, 17),
+            "ingestion_run_id": "snapshot-tencent",
+        }]
+    )
+    manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(
+        return_value=0
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["status"] == "partial"
+    assert result["source_selection"]["status"] == "blocked"
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert result["candidate"]["candidate_promotion_eligible"] is False
+    status_rows = (
+        manager.db_ops
+        .replace_adjustment_factor_instrument_statuses.await_args.args[0]
+    )
+    assert status_rows[0]["coverage_status"] == "incomplete"
 
 
 @pytest.mark.asyncio

@@ -1,9 +1,12 @@
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock
 
 import pytest
 
 from scheduler.tasks import (
     ScheduledTasks,
+    _format_a_share_canonical_factor_selection_report,
     _format_a_share_factor_rebuild_report,
     _format_cninfo_primary_factor_report,
     data_manager,
@@ -74,6 +77,84 @@ def test_factor_rebuild_dry_run_report_shows_planned_universe_without_fake_work(
     assert "标准序列" not in content
 
 
+def test_three_source_selection_job_is_manual_dry_run_first():
+    config = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )
+    job = config["scheduler_config"]["jobs"][
+        "a_share_canonical_adjustment_factor_selection"
+    ]
+
+    assert job["manual_only"] is True
+    assert job["parameters"]["dry_run"] is True
+    assert job["parameters"]["backfill_akshare"] is False
+    assert job["parameters"]["build_canonical"] is True
+    assert job["parameters"]["exchanges"] == ["SSE", "SZSE"]
+    assert job["max_instances"] == 1
+
+
+def test_three_source_selection_report_is_bounded_and_auditable():
+    samples = [
+        {
+            "instrument_id": f"{index:06d}.SZ",
+            "start_date": "1990-12-19",
+            "end_date": "2026-07-29",
+            "reason": "no_eligible_consensus_cninfo_fallback",
+        }
+        for index in range(25)
+    ]
+    content = _format_a_share_canonical_factor_selection_report({
+        "status": "partial",
+        "parameters": {
+            "start_date": "1990-12-19",
+            "end_date": "2026-07-29",
+            "exchanges": ["SSE", "SZSE"],
+            "instrument_ids": ["000001.SZ"],
+            "backfill_akshare": True,
+        },
+        "akshare_backfill": {
+            "status": "success",
+            "checkpoint_id": "unit",
+            "observations": {
+                "provider_profile_counts": {
+                    "akshare_tencent_price_ratio_v1": 10,
+                    "akshare_eastmoney_price_ratio_v1": 2,
+                },
+            },
+        },
+        "selection": {
+            "source_events": {
+                "cninfo_rows": 10,
+                "tdx_rows": 12,
+                "akshare_market_factor_rows": 9,
+                "akshare_market_instruments": 1,
+            },
+            "source_selection": {
+                "selection_counts": {"cninfo": 1},
+                "confidence_counts": {"low": 1},
+                "agreement_counts": {"cninfo__tdx": 1},
+            },
+            "candidate": {
+                "staging_series_version": "candidate",
+                "row_count": 10,
+                "blocked_segment_count": 0,
+                "low_confidence_segment_count": 1,
+                "promotion_eligible": True,
+                "conflict_samples": samples,
+            },
+        },
+    })
+
+    assert "生产表影响: `无" in content
+    assert "akshare_tencent_price_ratio_v1=10" in content
+    assert "cninfo=1" in content
+    assert "low=1" in content
+    assert "cninfo__tdx=1" in content
+    assert "自动晋级生产: `False`" in content
+    assert "000019.SZ" in content
+    assert "000020.SZ" not in content
+
+
 @pytest.mark.asyncio
 async def test_scheduler_factor_rebuild_delegates_manual_parameters(monkeypatch):
     task = ScheduledTasks()
@@ -98,6 +179,137 @@ async def test_scheduler_factor_rebuild_delegates_manual_parameters(monkeypatch)
     assert rebuild.await_args.kwargs["instrument_ids"] == ["000001.SZ"]
     assert rebuild.await_args.kwargs["request_interval_seconds"] == 1.5
     assert "a_share_adjustment_factor_rebuild" not in task._active_tasks
+
+
+@pytest.mark.asyncio
+async def test_scheduler_three_source_selection_coordinates_without_promotion(
+    monkeypatch,
+):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    backfill = AsyncMock(return_value={
+        "status": "success",
+        "observations": {"completed_instruments": 1},
+    })
+    selection = AsyncMock(return_value={
+        "status": "success",
+        "candidate": {"candidate_built": True, "promotion_eligible": True},
+    })
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_a_share_adjustment_factor_governance",
+        backfill,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_cninfo_primary_adjustment_factors",
+        selection,
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_selection(
+        start_date="1990-12-19",
+        end_date="2026-07-29",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        backfill_akshare=True,
+        dry_run=False,
+        resume=True,
+        chunk_size=25,
+        request_interval_seconds=1.5,
+        checkpoint_id="unit",
+        build_canonical=True,
+        factor_relative_tolerance=0.0002,
+    )
+
+    assert result["status"] == "success"
+    assert result["promoted"] is False
+    assert backfill.await_args.kwargs["source"] == "akshare"
+    assert backfill.await_args.kwargs["build_canonical"] is False
+    assert backfill.await_args.kwargs["resume"] is True
+    assert backfill.await_args.kwargs["chunk_size"] == 25
+    assert backfill.await_args.kwargs["checkpoint_id"] == "unit"
+    assert selection.await_args.kwargs["source_selection_mode"] == "three_source"
+    assert selection.await_args.kwargs["build_canonical"] is True
+    assert selection.await_args.kwargs["factor_relative_tolerance"] == 0.0002
+    assert (
+        "a_share_canonical_adjustment_factor_selection"
+        not in task._active_tasks
+    )
+
+
+@pytest.mark.asyncio
+async def test_scheduler_ignores_legacy_promotion_gates_after_clean_backfill(
+    monkeypatch,
+):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    backfill = AsyncMock(return_value={
+        "status": "partial",
+        "observations": {
+            "errors": 0,
+            "provider_failure_instruments": 0,
+        },
+        "universe": {"pending_count": 0},
+        "canonical": {
+            "quality_gates": {"full_market_scope": False},
+        },
+    })
+    selection = AsyncMock(return_value={
+        "status": "success",
+        "candidate": {"candidate_built": True},
+    })
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_a_share_adjustment_factor_governance",
+        backfill,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_cninfo_primary_adjustment_factors",
+        selection,
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_selection(
+        start_date="1990-12-19",
+        end_date="2026-07-29",
+        backfill_akshare=True,
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+
+
+@pytest.mark.asyncio
+async def test_scheduler_three_source_selection_skips_optional_backfill(
+    monkeypatch,
+):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    backfill = AsyncMock()
+    selection = AsyncMock(return_value={
+        "status": "dry_run",
+        "candidate": {"candidate_built": True},
+    })
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_a_share_adjustment_factor_governance",
+        backfill,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "rebuild_cninfo_primary_adjustment_factors",
+        selection,
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_selection(
+        start_date="1990-12-19",
+        end_date="2026-07-29",
+        backfill_akshare=False,
+    )
+
+    assert result["status"] == "dry_run"
+    backfill.assert_not_awaited()
+    assert selection.await_args.kwargs["dry_run"] is True
 
 
 def test_cninfo_primary_factor_report_keeps_production_isolation_visible():

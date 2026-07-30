@@ -14,6 +14,7 @@
       "write_source_observations": true,
       "rebase_legacy_appends": true,
       "normalization_version": "event_ratio_v1",
+      "akshare_snapshot_coverage_tolerance_days": 10,
       "source_priority": ["akshare", "tdx_xdxr", "baostock"],
       "quality_thresholds": {
         "min_instrument_coverage_ratio": 0.99,
@@ -392,6 +393,16 @@
       "max_requests_per_day": 50000,
       "retry_times": 5,
       "retry_interval": 3.0,
+      "a_share_adjustment_factors": {
+        "lookback_days": 30,
+        "lookahead_days": 14,
+        "timeout_seconds": 30,
+        "persistence": 3,
+        "min_level_observations": 2,
+        "min_jump_relative": 0.003,
+        "max_level_dispersion": 0.002,
+        "noise_multiplier": 4.0
+      },
       "hk_adjustment_factors": {
         "api": "stock_hk_daily",
         "factor_adjust": "qfq-factor",

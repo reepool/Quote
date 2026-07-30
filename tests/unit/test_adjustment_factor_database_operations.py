@@ -3,7 +3,7 @@ from datetime import date, datetime
 import sqlite3
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import event, select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.models import (
@@ -44,6 +44,109 @@ def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_pa
 
 def test_replace_adjustment_factor_observations_removes_stale_dates():
     asyncio.run(_exercise_replace_adjustment_factor_observations())
+
+
+def test_provider_snapshot_observations_and_status_commit_atomically():
+    asyncio.run(_exercise_atomic_provider_snapshot())
+
+
+async def _exercise_atomic_provider_snapshot():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorObservationDB.__table__,
+                AdjustmentFactorInstrumentStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000001.SZ",
+            symbol="000001",
+            name="Ping An Bank",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+
+    def observation(factor):
+        return {
+            "instrument_id": "000001.SZ",
+            "ex_date": datetime(2020, 5, 28),
+            "source": "akshare",
+            "source_profile": "akshare_tencent_price_ratio_v1",
+            "provider_factor": factor,
+            "normalized_factor": factor,
+            "normalization_version": "event_ratio_v1",
+            "quality_status": "valid",
+            "raw_payload": {"factor": factor},
+        }
+
+    async def save_snapshot(factor, run_id):
+        return await operations.save_adjustment_factor_provider_snapshot(
+            [observation(factor)],
+            instrument_id="000001.SZ",
+            source="akshare",
+            source_profile="akshare_tencent_price_ratio_v1",
+            status_source="akshare_tencent",
+            series_version="akshare_market_price_ratio_snapshot_v1",
+            coverage_status="complete_with_events",
+            start_date=date(1990, 12, 19),
+            end_date=date(2026, 7, 29),
+            ingestion_run_id=run_id,
+        )
+
+    first = await save_snapshot(1.02, "stable-run")
+    assert first == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "failed": 0,
+        "status_saved": 1,
+    }
+
+    def reject_status(_mapper, _connection, target):
+        if target.ingestion_run_id == "failing-run":
+            raise RuntimeError("injected status write failure")
+
+    event.listen(
+        AdjustmentFactorInstrumentStatusDB,
+        "before_insert",
+        reject_status,
+    )
+    try:
+        with pytest.raises(
+            RuntimeError, match="injected status write failure"
+        ):
+            await save_snapshot(1.03, "failing-run")
+    finally:
+        event.remove(
+            AdjustmentFactorInstrumentStatusDB,
+            "before_insert",
+            reject_status,
+        )
+
+    async with session_factory() as session:
+        stored_observation = (await session.execute(
+            select(AdjustmentFactorObservationDB)
+        )).scalar_one()
+        stored_status = (await session.execute(
+            select(AdjustmentFactorInstrumentStatusDB)
+        )).scalar_one()
+
+    assert stored_observation.normalized_factor == pytest.approx(1.02)
+    assert stored_observation.ingestion_run_id == "stable-run"
+    assert stored_status.ingestion_run_id == "stable-run"
+    assert stored_status.event_count == 1
+    await engine.dispose()
 
 
 async def _exercise_replace_adjustment_factor_observations():
