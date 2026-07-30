@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import date, datetime
 from unittest.mock import AsyncMock, Mock
 
@@ -24,6 +25,40 @@ from database.operations import (
     DatabaseOperations,
     GOVERNED_CORPORATE_ACTION_EFFECTIVE_DATE_EVIDENCE_SOURCES,
 )
+
+
+@pytest.mark.asyncio
+async def test_lineage_metadata_loader_returns_only_reviewed_lineage():
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.execute_read_query = AsyncMock(return_value=[
+        {
+            "instrument_id": "600018.SH",
+            "metadata_json": json.dumps({
+                "metadata": {
+                    "a_share_code_lineage": {
+                        "catalog_version": "test",
+                        "issuer_regimes": [],
+                    }
+                }
+            }),
+        },
+        {
+            "instrument_id": "600000.SH",
+            "metadata_json": json.dumps({"metadata": {"other": True}}),
+        },
+    ])
+
+    result = await operations.get_instrument_master_lineage_metadata([
+        "600018.SH",
+        "600000.SH",
+    ])
+
+    assert result == {
+        "600018.SH": {
+            "catalog_version": "test",
+            "issuer_regimes": [],
+        }
+    }
 
 
 @pytest.mark.asyncio

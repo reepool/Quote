@@ -11,7 +11,7 @@ import re
 from collections import defaultdict
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Mapping, Optional, Sequence, Union
 import pandas as pd
 from sqlalchemy import (
     text, func, desc, asc, tuple_, literal, union_all, delete, case, and_, or_,
@@ -1639,6 +1639,62 @@ class DatabaseOperations:
         except Exception as exc:
             self.db_logger.error("Failed to save instrument master metadata batch: %s", exc)
             return 0
+
+    async def get_instrument_master_lineage_metadata(
+        self,
+        instrument_ids: Sequence[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Load reviewed A-share lineage metadata for exact instruments."""
+        normalized_ids = sorted({
+            str(item).strip() for item in instrument_ids if str(item).strip()
+        })
+        if not normalized_ids:
+            return {}
+        rows: List[Dict[str, Any]] = []
+        try:
+            for offset in range(0, len(normalized_ids), 400):
+                chunk = normalized_ids[offset: offset + 400]
+                placeholders = ", ".join(
+                    f":lineage_instrument_{index}"
+                    for index in range(len(chunk))
+                )
+                params = {
+                    f"lineage_instrument_{index}": instrument_id
+                    for index, instrument_id in enumerate(chunk)
+                }
+                rows.extend(await self.execute_read_query(
+                    f"""
+                    SELECT instrument_id, metadata_json
+                    FROM instrument_master_metadata
+                    WHERE instrument_id IN ({placeholders})
+                    """,
+                    params,
+                ))
+        except Exception as exc:
+            self.db_logger.warning(
+                "Failed to load instrument lineage metadata: %s", exc
+            )
+            return {}
+        result: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            try:
+                payload = json.loads(row.get("metadata_json") or "{}")
+            except (TypeError, json.JSONDecodeError):
+                continue
+            metadata = (
+                payload.get("metadata")
+                if isinstance(payload, Mapping)
+                else None
+            )
+            lineage = (
+                metadata.get("a_share_code_lineage")
+                if isinstance(metadata, Mapping)
+                else None
+            )
+            if instrument_id and isinstance(lineage, Mapping):
+                result[instrument_id] = dict(lineage)
+        return result
 
     @staticmethod
     def _preserve_reviewed_lineage_metadata(

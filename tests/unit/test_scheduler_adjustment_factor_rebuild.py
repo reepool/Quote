@@ -168,9 +168,34 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
                 "observations_unchanged": 7,
                 "observations_retired": 1,
             },
+            "endpoint_metrics": {
+                "target_counts": {
+                    "cninfo_dividend": 10,
+                    "cninfo_allotment": 2,
+                },
+                "request_counts": {
+                    "cninfo_dividend": 11,
+                    "cninfo_allotment": 2,
+                },
+                "final_retry_targets": 1,
+                "final_retry_recovered": 1,
+            },
+            "adaptive_throttle": {
+                "http_403_count": 3,
+                "http_429_count": 0,
+                "adaptive_wait_seconds": 12.5,
+                "short_cooldown_count": 2,
+                "circuit_trip_count": 1,
+                "circuit_wait_seconds": 60,
+            },
             "errors": [],
         },
         "tdx_refresh": {
+            "refresh_mode": "targeted",
+            "target_scope": {
+                "instrument_count": 149,
+                "rotating_sample_count": 100,
+            },
             "totals": {
                 "processed_instruments": 5533,
                 "raw_events": 4,
@@ -232,12 +257,31 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
                 "review_workload": {"remaining_manual_review": 1},
             },
         },
+        "execution_status": {
+            "primary": "success",
+            "tdx_reference": "partial",
+            "reconciliation": "partial",
+        },
+        "stage_durations": {
+            "candidate_discovery_seconds": 2,
+            "cninfo_refresh_seconds": 10,
+            "tdx_refresh_seconds": 3,
+            "factor_rebuild_seconds": 1,
+            "anomaly_llm_seconds": 4,
+            "total_seconds": 20,
+        },
     })
 
     assert "A 股公司行动增量日更" in report
     assert "selected=12" in report
     assert "requested=12" in report
     assert "processed=5533" in report
+    assert "dividend targets=10 requests=11" in report
+    assert "403=3" in report
+    assert "circuits=1" in report
+    assert "mode=targeted, targets=149, rotation=100" in report
+    assert "cninfo_primary=success, tdx_reference=partial" in report
+    assert "discovery=2.0s, cninfo=10.0s" in report
     assert "total=5" in report
     assert "CNInfo事件: `40`" in report
     assert "TDX因子: `44`" in report

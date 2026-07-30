@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import json
 import os
+import time as time_module
 from datetime import datetime, date, timedelta, time
 from typing import List, Dict, Any, Optional, Union
 
@@ -916,10 +917,17 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     discovery = result.get("candidate_discovery") or {}
     cninfo_refresh = result.get("cninfo_refresh") or {}
     cninfo_counters = cninfo_refresh.get("counters") or {}
+    endpoint_metrics = cninfo_refresh.get("endpoint_metrics") or {}
+    endpoint_targets = endpoint_metrics.get("target_counts") or {}
+    endpoint_requests = endpoint_metrics.get("request_counts") or {}
+    throttle_metrics = cninfo_refresh.get("adaptive_throttle") or {}
     tdx_refresh = result.get("tdx_refresh") or {}
     tdx_totals = tdx_refresh.get("totals") or {}
+    tdx_scope = tdx_refresh.get("target_scope") or {}
     affected = result.get("affected_instruments") or {}
     readiness = result.get("data_readiness") or {}
+    execution_status = result.get("execution_status") or {}
+    stage_durations = result.get("stage_durations") or {}
     anomaly = result.get("anomaly_governance") or {}
     anomaly_llm = anomaly.get("llm") or {}
     anomaly_counts = anomaly_llm.get("counts") or {}
@@ -1005,11 +1013,35 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"retired={cninfo_counters.get('observations_retired', 0)}, "
             f"errors={len(cninfo_refresh.get('errors') or [])}"
             "`",
+            "CNInfo端点: `"
+            f"dividend targets={endpoint_targets.get('cninfo_dividend', 0)} "
+            f"requests={endpoint_requests.get('cninfo_dividend', 0)}; "
+            f"allotment targets={endpoint_targets.get('cninfo_allotment', 0)} "
+            f"requests={endpoint_requests.get('cninfo_allotment', 0)}; "
+            f"final_retry={endpoint_metrics.get('final_retry_targets', 0)}/"
+            f"recovered={endpoint_metrics.get('final_retry_recovered', 0)}"
+            "`",
+            "CNInfo限流: `"
+            f"403={throttle_metrics.get('http_403_count', 0)}, "
+            f"429={throttle_metrics.get('http_429_count', 0)}, "
+            f"wait={float(throttle_metrics.get('adaptive_wait_seconds', 0) or 0):.1f}s, "
+            f"cooldowns={throttle_metrics.get('short_cooldown_count', 0)}, "
+            f"circuits={throttle_metrics.get('circuit_trip_count', 0)}, "
+            f"circuit_wait={float(throttle_metrics.get('circuit_wait_seconds', 0) or 0):.1f}s"
+            "`",
             "TDX刷新: `"
+            f"mode={tdx_refresh.get('refresh_mode', 'N/A')}, "
+            f"targets={tdx_scope.get('instrument_count', 0)}, "
+            f"rotation={tdx_scope.get('rotating_sample_count', 0)}, "
             f"processed={tdx_totals.get('processed_instruments', 0)}, "
             f"events={tdx_totals.get('raw_events', 0)}, "
             f"errors={tdx_totals.get('errors', 0)}, "
             f"timeouts={tdx_totals.get('timeouts', 0)}"
+            "`",
+            "执行状态: `"
+            f"cninfo_primary={execution_status.get('primary', status)}, "
+            f"tdx_reference={execution_status.get('tdx_reference', 'N/A')}, "
+            f"reconciliation={execution_status.get('reconciliation', 'N/A')}"
             "`",
             "受影响标的: `"
             f"total={affected.get('count', 0)}, "
@@ -1052,6 +1084,14 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"manual={anomaly_review.get('remaining_manual_review', 0)}, "
             f"errors={anomaly_counts.get('errors', 0)}, "
             f"document_failures={anomaly_counts.get('document_failures', 0)}"
+            "`",
+            "阶段耗时: `"
+            f"discovery={float(stage_durations.get('candidate_discovery_seconds', 0) or 0):.1f}s, "
+            f"cninfo={float(stage_durations.get('cninfo_refresh_seconds', 0) or 0):.1f}s, "
+            f"tdx={float(stage_durations.get('tdx_refresh_seconds', 0) or 0):.1f}s, "
+            f"factors={float(stage_durations.get('factor_rebuild_seconds', 0) or 0):.1f}s, "
+            f"llm={float(stage_durations.get('anomaly_llm_seconds', 0) or 0):.1f}s, "
+            f"total={float(stage_durations.get('total_seconds', 0) or 0):.1f}s"
             "`",
         ]
         if factor_result.get("status") == "skipped":
@@ -5354,6 +5394,8 @@ class ScheduledTasks:
         event_lookahead_days: int = 14,
         candidate_limit: int = 1000,
         safety_sweep_size: int = 100,
+        tdx_refresh_mode: str = "targeted",
+        tdx_rotating_sample_size: int = 100,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
@@ -5389,6 +5431,8 @@ class ScheduledTasks:
                 event_lookahead_days=int(event_lookahead_days),
                 candidate_limit=int(candidate_limit),
                 safety_sweep_size=int(safety_sweep_size),
+                tdx_refresh_mode=tdx_refresh_mode,
+                tdx_rotating_sample_size=int(tdx_rotating_sample_size),
                 request_interval_seconds=float(request_interval_seconds),
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 build_canonical=bool(build_canonical),
@@ -5440,6 +5484,84 @@ class ScheduledTasks:
             return {
                 "status": "failed",
                 "operation": task_id,
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_tdx_corporate_action_weekly_full_refresh(
+        self,
+        start_date: Optional[Union[str, date, datetime]] = None,
+        end_date: Optional[Union[str, date, datetime]] = None,
+        exchanges: Optional[List[str]] = None,
+        per_instrument_timeout_sec: int = 60,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Refresh the full TDX XDXR reference universe on a periodic schedule."""
+        from utils.a_share_historical_backfill import coerce_date
+
+        task_id = "a_share_tdx_corporate_action_weekly_full_refresh"
+        self._active_tasks.add(task_id)
+        try:
+            normalized_end = coerce_date(
+                end_date or get_shanghai_time().date(),
+                field_name="end_date",
+            )
+            normalized_start = coerce_date(
+                start_date or date(1990, 12, 19),
+                field_name="start_date",
+            )
+            started_at = time_module.monotonic()
+            result = await data_manager.backfill_tdx_xdxr_history(
+                exchanges=exchanges,
+                start_date=normalized_start,
+                end_date=normalized_end,
+                instrument_ids=None,
+                derive_factors=True,
+                repair_universe_mode="current_repair",
+                per_instrument_timeout_sec=int(per_instrument_timeout_sec),
+                dry_run=False,
+            )
+            result["refresh_mode"] = "full"
+            result["duration_seconds"] = round(
+                time_module.monotonic() - started_at,
+                3,
+            )
+            if self.telegram_enabled:
+                totals = result.get("totals") or {}
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股 TDX 公司行动周度全市场参考刷新",
+                        "status": result.get("status"),
+                        "content": (
+                            "ℹ️ *A 股 TDX 公司行动周度参考刷新*\n\n"
+                            f"状态: `{result.get('status')}`\n"
+                            "模式: `full`\n"
+                            f"处理标的: `{totals.get('processed_instruments', 0)}`\n"
+                            f"事件: `{totals.get('raw_events', 0)}`\n"
+                            f"错误: `{totals.get('errors', 0)}`；"
+                            f"超时: `{totals.get('timeouts', 0)}`\n"
+                            f"耗时: `{result.get('duration_seconds', 0):.1f}s`\n"
+                            "说明: `TDX 仅为参考源，不改变 CNInfo 主源就绪度`"
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Weekly full TDX corporate-action refresh failed: %s",
+                exc,
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "refresh_mode": "full",
                 "production_isolation": True,
                 "error": str(exc),
                 "errors": [str(exc)],

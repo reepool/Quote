@@ -11,8 +11,82 @@ from data_sources.cninfo_factor_governance import (
     derive_tdx_factor_path,
     evaluate_coverage_intervals,
     match_cninfo_archive_tdx_date,
+    partition_tdx_rows_by_lineage,
     reconcile_cninfo_tdx_events,
 )
+
+
+def test_lineage_partition_suppresses_predecessor_and_transition_rows():
+    rows = [
+        {
+            "id": index,
+            "instrument_id": "600018.SH",
+            "ex_date": event_date,
+            "factor": 1.01,
+            "fenhong": 1.0,
+            "songzhuangu": 0.0,
+            "peigu": 0.0,
+            "peigujia": 0.0,
+        }
+        for index, event_date in enumerate(
+            (
+                date(2001, 1, 1),
+                date(2002, 1, 1),
+                date(2003, 1, 1),
+                date(2004, 1, 1),
+                date(2005, 1, 1),
+                date(2006, 5, 1),
+                date(2006, 10, 26),
+                date(2007, 1, 1),
+            ),
+            start=1,
+        )
+    ]
+    lineage = {
+        "600018.SH": {
+            "catalog_version": "test",
+            "issuer_regimes": [
+                {
+                    "role": "predecessor",
+                    "start_date": "2000-07-19",
+                    "end_date": "2006-09-25",
+                },
+                {
+                    "role": "current",
+                    "start_date": "2006-10-26",
+                    "end_date": None,
+                },
+            ],
+            "transitions": [{
+                "effective_date": "2006-10-26",
+                "event_type": "absorption_merger",
+                "price_continuity": "non_continuous",
+                "adjustment_factor_policy": "no_synthetic_factor",
+            }],
+        }
+    }
+
+    partition = partition_tdx_rows_by_lineage(rows, lineage)
+    suppressed = partition["suppressed_reference_events"]
+    reconciliation = reconcile_cninfo_tdx_events(
+        [],
+        [],
+        pre_suppressed_reference_events=suppressed,
+    )
+
+    assert [row["id"] for row in partition["included_rows"]] == [8]
+    assert len(suppressed) == 7
+    assert sum(
+        item["reason"] == "lineage_predecessor_issuer_event"
+        for item in suppressed
+    ) == 6
+    assert suppressed[-1]["reason"] == "lineage_non_continuous_transition"
+    assert suppressed[-1]["lineage"]["adjustment_factor_policy"] == (
+        "no_synthetic_factor"
+    )
+    assert reconciliation["status"] == "success"
+    assert reconciliation["totals"]["suppressed_reference_events"] == 7
+    assert reconciliation["totals"]["tdx_only"] == 0
 
 
 def test_segmented_coverage_intervals_merge_across_historical_and_rolling_rows():

@@ -89,6 +89,8 @@
           "event_lookahead_days": 14,
           "candidate_limit": 1000,
           "safety_sweep_size": 100,
+          "tdx_refresh_mode": "targeted",
+          "tdx_rotating_sample_size": 100,
           "request_interval_seconds": 0.5,
           "per_instrument_timeout_sec": 60,
           "build_canonical": false,
@@ -105,6 +107,30 @@
           "anomaly_llm_pipeline_download_concurrency": 8,
           "anomaly_llm_pipeline_document_parse_concurrency": 8,
           "anomaly_llm_pipeline_progress_interval_seconds": 30,
+          "max_runtime_seconds": 21600
+        }
+      },
+      "a_share_tdx_corporate_action_weekly_full_refresh": {
+        "enabled": true,
+        "manual_only": false,
+        "description": "每周 TDX 分红配股送转参考全量刷新",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 3,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "per_instrument_timeout_sec": 60,
           "max_runtime_seconds": 21600
         }
       },

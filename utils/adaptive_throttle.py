@@ -32,6 +32,10 @@ class AdaptiveThrottlePolicy:
     stable_successes_for_recovery: int = 8
     cooldown_stages_seconds: tuple[float, ...] = (5.0, 15.0, 30.0)
     max_cooldown_seconds: float = 60.0
+    circuit_density_threshold: float = 0.3
+    circuit_minimum_outcomes: int = 10
+    circuit_interval_ratio: float = 0.9
+    circuit_cooldown_seconds: tuple[float, float] = (60.0, 120.0)
     jitter_ratio: float = 0.2
 
     def __post_init__(self) -> None:
@@ -77,6 +81,36 @@ class AdaptiveThrottlePolicy:
             raise ValueError(
                 "max_cooldown_seconds must be finite and cover every cooldown stage"
             )
+        if not 0 < self.circuit_density_threshold <= 1:
+            raise ValueError(
+                "circuit_density_threshold must be in (0, 1]"
+            )
+        if self.circuit_minimum_outcomes < 2:
+            raise ValueError(
+                "circuit_minimum_outcomes must be at least 2"
+            )
+        object.__setattr__(
+            self,
+            "circuit_minimum_outcomes",
+            min(self.circuit_minimum_outcomes, self.outcome_window_size),
+        )
+        if not (
+            math.isfinite(self.circuit_interval_ratio)
+            and 0 < self.circuit_interval_ratio <= 1
+        ):
+            raise ValueError("circuit_interval_ratio must be finite and in (0, 1]")
+        circuit_range = tuple(
+            float(value) for value in self.circuit_cooldown_seconds
+        )
+        if (
+            len(circuit_range) != 2
+            or any(not math.isfinite(value) or value <= 0 for value in circuit_range)
+            or circuit_range[1] < circuit_range[0]
+        ):
+            raise ValueError(
+                "circuit_cooldown_seconds must be an ordered positive pair"
+            )
+        object.__setattr__(self, "circuit_cooldown_seconds", circuit_range)
         if not math.isfinite(self.jitter_ratio) or not 0 <= self.jitter_ratio <= 1:
             raise ValueError("jitter_ratio must be finite and in [0, 1]")
 
@@ -94,7 +128,13 @@ class AdaptiveThrottleSnapshot:
     wait_count: int
     total_wait_seconds: float
     throttle_count: int
+    http_403_count: int
+    http_429_count: int
     cooldown_count: int
+    circuit_open: bool
+    circuit_remaining_seconds: float
+    circuit_trip_count: int
+    circuit_wait_seconds: float
     recovery_count: int
     failure_count: int
 
@@ -126,6 +166,8 @@ class AdaptiveSourceThrottle:
         self._current_interval = self.policy.min_interval_seconds
         self._next_admission_at = 0.0
         self._cooldown_until = 0.0
+        self._circuit_until = 0.0
+        self._circuit_open = False
         self._cooldown_version = 0
         self._cooldown_stage = 0
         self._consecutive_throttles = 0
@@ -133,7 +175,11 @@ class AdaptiveSourceThrottle:
         self._wait_count = 0
         self._total_wait_seconds = 0.0
         self._throttle_count = 0
+        self._http_403_count = 0
+        self._http_429_count = 0
         self._cooldown_count = 0
+        self._circuit_trip_count = 0
+        self._circuit_wait_seconds = 0.0
         self._recovery_count = 0
         self._failure_count = 0
 
@@ -147,13 +193,16 @@ class AdaptiveSourceThrottle:
                     now,
                     self._next_admission_at,
                     self._cooldown_until,
+                    self._circuit_until,
                 )
                 delay = max(0.0, admission_at - now)
+                circuit_delay = max(0.0, self._circuit_until - now)
                 self._next_admission_at = admission_at + self._current_interval
                 cooldown_version = self._cooldown_version
                 if delay > 0:
                     self._wait_count += 1
                     self._total_wait_seconds += delay
+                    self._circuit_wait_seconds += min(delay, circuit_delay)
             if delay <= 0:
                 return total_delay
 
@@ -162,8 +211,11 @@ class AdaptiveSourceThrottle:
             with self._lock:
                 now = self._clock()
                 cooldown_changed = self._cooldown_version != cooldown_version
-                cooldown_active = self._cooldown_until > now
-            if not (cooldown_changed and cooldown_active):
+                source_blocked = max(
+                    self._cooldown_until,
+                    self._circuit_until,
+                ) > now
+            if not (cooldown_changed and source_blocked):
                 return total_delay
 
     def record_success(self) -> None:
@@ -172,7 +224,6 @@ class AdaptiveSourceThrottle:
         with self._lock:
             self._outcomes.append(False)
             self._consecutive_throttles = 0
-            self._cooldown_stage = 0
             self._stable_successes += 1
             density = self._throttle_density_locked()
             if (
@@ -186,6 +237,8 @@ class AdaptiveSourceThrottle:
                     self._current_interval * self.policy.recovery_factor,
                 )
                 self._stable_successes = 0
+                self._cooldown_stage = 0
+                self._circuit_open = False
                 self._recovery_count += 1
                 transition = (previous, self._current_interval)
         if transition is not None:
@@ -206,13 +259,19 @@ class AdaptiveSourceThrottle:
         if int(status_code) not in {403, 429}:
             raise ValueError("record_throttle only accepts HTTP 403 or 429")
         retry_after_seconds = self._parse_retry_after(retry_after)
-        transition: Optional[tuple[float, float, float, int, float]] = None
+        transition: Optional[
+            tuple[float, float, float, int, float, float]
+        ] = None
         with self._lock:
             now = self._clock()
             self._outcomes.append(True)
             self._consecutive_throttles += 1
             self._stable_successes = 0
             self._throttle_count += 1
+            if int(status_code) == 403:
+                self._http_403_count += 1
+            else:
+                self._http_429_count += 1
             density = self._throttle_density_locked()
 
             previous_interval = self._current_interval
@@ -250,10 +309,38 @@ class AdaptiveSourceThrottle:
                 self._cooldown_until = new_cooldown_until
                 self._cooldown_version += 1
                 self._cooldown_count += 1
+            circuit_cooldown = 0.0
+            circuit_ready = (
+                len(self._outcomes) >= self.policy.circuit_minimum_outcomes
+                and density >= self.policy.circuit_density_threshold
+                and self._current_interval
+                >= (
+                    self.policy.max_interval_seconds
+                    * self.policy.circuit_interval_ratio
+                )
+            )
+            if circuit_ready and (
+                not self._circuit_open or now >= self._circuit_until
+            ):
+                circuit_min, circuit_max = (
+                    self.policy.circuit_cooldown_seconds
+                )
+                circuit_cooldown = (
+                    circuit_min
+                    + (circuit_max - circuit_min) * self._bounded_random()
+                )
+                self._circuit_until = max(
+                    self._circuit_until,
+                    now + circuit_cooldown,
+                )
+                self._circuit_open = True
+                self._circuit_trip_count += 1
+                self._cooldown_version += 1
             if (
                 self._current_interval != previous_interval
                 or stage_changed
                 or retry_after_seconds is not None
+                or circuit_cooldown > 0
             ):
                 transition = (
                     previous_interval,
@@ -261,11 +348,13 @@ class AdaptiveSourceThrottle:
                     max(0.0, self._cooldown_until - now),
                     stage,
                     density,
+                    max(0.0, self._circuit_until - now),
                 )
         if transition is not None:
             LOGGER.warning(
                 "[AdaptiveThrottle] Source throttled: source=%s status=%s "
-                "interval=%.3f->%.3f cooldown=%.3f stage=%s density=%.3f",
+                "interval=%.3f->%.3f cooldown=%.3f stage=%s density=%.3f "
+                "circuit=%.3f",
                 self.source_key,
                 int(status_code),
                 transition[0],
@@ -273,6 +362,7 @@ class AdaptiveSourceThrottle:
                 transition[2],
                 transition[3],
                 transition[4],
+                transition[5],
             )
 
     def record_failure(self) -> None:
@@ -297,7 +387,16 @@ class AdaptiveSourceThrottle:
                 wait_count=self._wait_count,
                 total_wait_seconds=self._total_wait_seconds,
                 throttle_count=self._throttle_count,
+                http_403_count=self._http_403_count,
+                http_429_count=self._http_429_count,
                 cooldown_count=self._cooldown_count,
+                circuit_open=self._circuit_open,
+                circuit_remaining_seconds=max(
+                    0.0,
+                    self._circuit_until - self._clock(),
+                ),
+                circuit_trip_count=self._circuit_trip_count,
+                circuit_wait_seconds=self._circuit_wait_seconds,
                 recovery_count=self._recovery_count,
                 failure_count=self._failure_count,
             )

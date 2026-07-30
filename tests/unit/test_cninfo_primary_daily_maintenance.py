@@ -905,6 +905,16 @@ async def test_daily_maintenance_excludes_bse_only_from_cninfo():
         "status": "success",
         "candidate_ids": ["000001.SZ", "600000.SH"],
         "candidate_count": 2,
+        "endpoint_targets": [
+            {
+                "instrument_id": "000001.SZ",
+                "source_profile": "cninfo_dividend",
+            },
+            {
+                "instrument_id": "600000.SH",
+                "source_profile": "cninfo_dividend",
+            },
+        ],
     })
     manager.backfill_a_share_cninfo_corporate_actions = AsyncMock(
         return_value={
@@ -942,6 +952,16 @@ async def test_daily_maintenance_excludes_bse_only_from_cninfo():
     rebuild_args = manager.rebuild_cninfo_primary_adjustment_factors.await_args.kwargs
     assert cninfo_args["exchanges"] == ["SSE", "SZSE"]
     assert cninfo_args["instrument_ids"] == ["000001.SZ", "600000.SH"]
+    assert cninfo_args["endpoint_targets"] == [
+        {
+            "instrument_id": "000001.SZ",
+            "source_profile": "cninfo_dividend",
+        },
+        {
+            "instrument_id": "600000.SH",
+            "source_profile": "cninfo_dividend",
+        },
+    ]
     assert tdx_args["exchanges"] == ["SSE", "SZSE", "BSE"]
     assert tdx_args["instrument_ids"] == ["000001.SZ", "600000.SH", "920000.BJ"]
     assert rebuild_args["exchanges"] == ["SSE", "SZSE", "BSE"]
@@ -950,6 +970,9 @@ async def test_daily_maintenance_excludes_bse_only_from_cninfo():
     assert result["data_readiness"]["status"] == "partial"
     assert result["affected_instruments"]["count"] == 2
     assert result["parameters"]["cninfo_excluded_exchanges"] == ["BSE"]
+    assert result["parameters"]["tdx_effective_refresh_mode"] == "targeted"
+    assert result["tdx_refresh"]["refresh_mode"] == "targeted"
+    assert result["execution_status"]["primary"] == "success"
     assert result["cninfo_refresh"]["source_coverage"]["excluded_reason"] == (
         "source_not_supported"
     )

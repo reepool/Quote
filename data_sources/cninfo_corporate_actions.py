@@ -183,6 +183,7 @@ class CninfoEndpointResult:
     rows_received: int = 0
     ignored_placeholders: int = 0
     error: Optional[str] = None
+    retryable: bool = False
 
 
 def _clean_text(value: Any) -> Optional[str]:
@@ -561,6 +562,7 @@ class CninfoCorporateActionProvider:
         source_throttle = adaptive_throttle or get_adaptive_source_throttle(
             CNINFO_SOURCE
         )
+        self.adaptive_throttle = source_throttle
         if dividend_loader is None or allotment_loader is None:
             import akshare as ak
 
@@ -714,6 +716,10 @@ class CninfoCorporateActionProvider:
                 coverage_status="indeterminate",
                 observations=[],
                 error=str(exc),
+                retryable=(
+                    _retryable_loader_error(exc)
+                    or "transient failure exhausted" in str(exc).lower()
+                ),
             )
 
     def fetch_allotments(
@@ -785,4 +791,8 @@ class CninfoCorporateActionProvider:
                 coverage_status="indeterminate",
                 observations=[],
                 error=str(exc),
+                retryable=(
+                    _retryable_loader_error(exc)
+                    or "transient failure exhausted" in str(exc).lower()
+                ),
             )

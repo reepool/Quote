@@ -9,11 +9,14 @@ from data_manager import DataManager
 from data_sources.cninfo_corporate_action_incremental import (
     associate_exceptional_announcements,
     build_incremental_refresh_candidates,
+    build_targeted_tdx_refresh_instruments,
     classify_daily_corporate_action_title,
     normalize_active_instruments,
     resolve_daily_announcement_window,
+    resolve_tdx_refresh_mode,
     select_daily_semantic_anomalies,
     select_rotating_safety_instruments,
+    select_rotating_safety_targets,
 )
 from research.announcements import (
     AnnouncementQuery,
@@ -438,6 +441,80 @@ def test_rotating_safety_selection_is_deterministic_and_bounded():
     assert first == repeated
     assert len(first) <= 3
     assert first != next_day
+
+
+def test_endpoint_profiles_merge_without_adding_unrelated_retry_target():
+    result = build_incremental_refresh_candidates(
+        active_instruments=_active(2),
+        retry_ids=["000001.SZ"],
+        retry_profiles={"000001.SZ": ["cninfo_allotment"]},
+        announcement_ids=["000001.SZ", "000002.SZ"],
+        announcement_profiles={
+            "000001.SZ": ["cninfo_dividend"],
+            "000002.SZ": ["cninfo_dividend"],
+        },
+        max_candidates=10,
+    )
+
+    assert result["endpoint_target_count"] == 3
+    assert result["endpoint_target_counts"] == {
+        "cninfo_allotment": 1,
+        "cninfo_dividend": 2,
+    }
+    assert result["candidates"][0]["source_profiles"] == [
+        "cninfo_dividend",
+        "cninfo_allotment",
+    ]
+    assert result["candidates"][1]["source_profiles"] == [
+        "cninfo_dividend"
+    ]
+
+
+def test_special_title_routes_both_profiles_and_plain_rights_routes_one():
+    special = classify_daily_corporate_action_title(
+        "重整计划资本公积转增股本实施公告"
+    )
+    rights = classify_daily_corporate_action_title("配股发行实施公告")
+
+    assert special["source_profiles"] == [
+        "cninfo_dividend",
+        "cninfo_allotment",
+    ]
+    assert rights["source_profiles"] == ["cninfo_allotment"]
+
+
+def test_safety_and_tdx_reference_rotations_are_bounded():
+    instrument_ids = [f"{index:06d}.SZ" for index in range(1, 21)]
+    safety = select_rotating_safety_targets(
+        instrument_ids,
+        as_of_date=date(2026, 7, 30),
+        sample_size=5,
+    )
+    plan = build_targeted_tdx_refresh_instruments(
+        active_instrument_ids=instrument_ids,
+        cninfo_candidate_ids=["000001.SZ"],
+        announcement_ids=["000002.SZ"],
+        retry_or_carryover_ids=["000003.SZ"],
+        rotating_sample_size=4,
+        as_of_date=date(2026, 7, 30),
+    )
+
+    assert sum(len(values) for values in safety.values()) == 5
+    assert set(safety) == {"cninfo_dividend", "cninfo_allotment"}
+    assert plan["rotating_sample_count"] == 4
+    assert plan["instrument_count"] <= 7
+    assert {"000001.SZ", "000002.SZ", "000003.SZ"} <= set(
+        plan["instrument_ids"]
+    )
+
+
+def test_tdx_refresh_mode_resolution_is_explicit():
+    assert resolve_tdx_refresh_mode("targeted") == "targeted"
+    assert resolve_tdx_refresh_mode("full") == "full"
+    assert resolve_tdx_refresh_mode("auto", periodic_full_due=True) == "full"
+    assert resolve_tdx_refresh_mode("auto", periodic_full_due=False) == "targeted"
+    with pytest.raises(ValueError, match="tdx_refresh_mode"):
+        resolve_tdx_refresh_mode("fast")
 
 
 @pytest.mark.asyncio

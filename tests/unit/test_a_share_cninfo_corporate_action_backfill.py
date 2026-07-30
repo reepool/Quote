@@ -267,3 +267,205 @@ async def test_cninfo_indeterminate_response_remains_pending(tmp_path, monkeypat
     assert result["errors"][0]["source_profile"] == "cninfo_dividend"
     assert result["affected_instrument_ids"] == []
     manager.db_ops.reconcile_corporate_action_observation_snapshot.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_cninfo_endpoint_plan_skips_unrelated_profile(tmp_path, monkeypatch):
+    monkeypatch.setattr(asyncio, "to_thread", _inline_to_thread)
+    manager = DataManager()
+    manager.data_config = {"data_dir": str(tmp_path)}
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+    }])
+    manager.db_ops.save_corporate_action_observations = AsyncMock(return_value={
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 0,
+    })
+    manager.db_ops.reconcile_corporate_action_observation_snapshot = AsyncMock(
+        return_value=0
+    )
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    provider = Mock()
+    provider.fetch_dividends = Mock(return_value=CninfoEndpointResult(
+        source_profile="cninfo_dividend",
+        coverage_status="complete_no_events",
+        observations=[],
+    ))
+    provider.fetch_allotments = Mock()
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_actions.CninfoCorporateActionProvider",
+        lambda **_: provider,
+    )
+
+    result = await manager.backfill_a_share_cninfo_corporate_actions(
+        start_date="2026-07-01",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        endpoint_targets=[{
+            "instrument_id": "000001.SZ",
+            "source_profile": "cninfo_dividend",
+        }],
+        dry_run=False,
+        resume=False,
+        request_interval_seconds=0,
+    )
+
+    assert result["status"] == "success"
+    assert result["endpoint_plan"]["target_count"] == 1
+    assert result["endpoint_metrics"]["request_counts"] == {
+        "cninfo_dividend": 1
+    }
+    provider.fetch_dividends.assert_called_once()
+    provider.fetch_allotments.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_cninfo_final_transient_retry_recovers_once(tmp_path, monkeypatch):
+    monkeypatch.setattr(asyncio, "to_thread", _inline_to_thread)
+    manager = DataManager()
+    manager.data_config = {"data_dir": str(tmp_path)}
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[
+        {
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+        },
+        {
+            "instrument_id": "000002.SZ",
+            "symbol": "000002",
+        },
+    ])
+    manager.db_ops.save_corporate_action_observations = AsyncMock(return_value={
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 0,
+    })
+    manager.db_ops.reconcile_corporate_action_observation_snapshot = AsyncMock(
+        return_value=0
+    )
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    provider = Mock()
+    call_order = []
+
+    def _fetch_dividends(instrument_id, *_args, **_kwargs):
+        call_order.append(instrument_id)
+        if (
+            instrument_id == "000001.SZ"
+            and call_order.count("000001.SZ") == 1
+        ):
+            return CninfoEndpointResult(
+                source_profile="cninfo_dividend",
+                coverage_status="indeterminate",
+                observations=[],
+                error="CNInfo loader transient failure exhausted",
+                retryable=True,
+            )
+        return CninfoEndpointResult(
+            source_profile="cninfo_dividend",
+            coverage_status="complete_no_events",
+            observations=[],
+        )
+
+    provider.fetch_dividends = Mock(side_effect=_fetch_dividends)
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_actions.CninfoCorporateActionProvider",
+        lambda **_: provider,
+    )
+
+    result = await manager.backfill_a_share_cninfo_corporate_actions(
+        start_date="2026-07-01",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ", "000002.SZ"],
+        scopes=["dividends"],
+        endpoint_targets=[
+            {
+                "instrument_id": "000001.SZ",
+                "source_profile": "cninfo_dividend",
+            },
+            {
+                "instrument_id": "000002.SZ",
+                "source_profile": "cninfo_dividend",
+            },
+        ],
+        dry_run=False,
+        resume=False,
+        request_interval_seconds=0,
+    )
+
+    assert result["status"] == "success"
+    assert result["endpoint_metrics"]["final_retry_targets"] == 1
+    assert result["endpoint_metrics"]["final_retry_recovered"] == 1
+    assert result["endpoint_metrics"]["final_retry_failed"] == 0
+    assert provider.fetch_dividends.call_count == 3
+    assert call_order == ["000001.SZ", "000002.SZ", "000001.SZ"]
+
+
+@pytest.mark.asyncio
+async def test_cninfo_final_retry_reports_persistence_failure(tmp_path, monkeypatch):
+    monkeypatch.setattr(asyncio, "to_thread", _inline_to_thread)
+    manager = DataManager()
+    manager.data_config = {"data_dir": str(tmp_path)}
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+    }])
+    manager.db_ops.save_corporate_action_observations = AsyncMock(return_value={
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 1,
+    })
+    manager.db_ops.reconcile_corporate_action_observation_snapshot = AsyncMock(
+        return_value=0
+    )
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    provider = Mock()
+    provider.fetch_dividends = Mock(side_effect=[
+        CninfoEndpointResult(
+            source_profile="cninfo_dividend",
+            coverage_status="indeterminate",
+            observations=[],
+            error="CNInfo loader transient failure exhausted",
+            retryable=True,
+        ),
+        CninfoEndpointResult(
+            source_profile="cninfo_dividend",
+            coverage_status="complete_no_events",
+            observations=[],
+        ),
+    ])
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_actions.CninfoCorporateActionProvider",
+        lambda **_: provider,
+    )
+
+    result = await manager.backfill_a_share_cninfo_corporate_actions(
+        start_date="2026-07-01",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        scopes=["dividends"],
+        endpoint_targets=[{
+            "instrument_id": "000001.SZ",
+            "source_profile": "cninfo_dividend",
+        }],
+        dry_run=False,
+        resume=False,
+        request_interval_seconds=0,
+    )
+
+    assert result["status"] == "partial"
+    assert result["endpoint_metrics"]["final_retry_recovered"] == 0
+    assert result["endpoint_metrics"]["final_retry_failed"] == 1
+    assert result["universe"]["pending_count"] == 1

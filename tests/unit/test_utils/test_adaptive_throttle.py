@@ -75,6 +75,10 @@ def _throttle(
         {"cooldown_stages_seconds": ()},
         {"cooldown_stages_seconds": (15, 5)},
         {"max_cooldown_seconds": 10},
+        {"circuit_density_threshold": 0},
+        {"circuit_minimum_outcomes": 1},
+        {"circuit_interval_ratio": 0},
+        {"circuit_cooldown_seconds": (120, 60)},
         {"jitter_ratio": 1.1},
     ],
 )
@@ -217,3 +221,115 @@ def test_registry_rejects_conflicting_policy_for_existing_source():
 
     with pytest.raises(ValueError, match="policy conflict"):
         registry.get("cninfo", _policy(max_interval_seconds=10))
+
+
+def test_dense_interspersed_throttles_open_long_shared_circuit():
+    fake_time = _FakeTime()
+    throttle = _throttle(
+        fake_time,
+        policy=_policy(
+            circuit_density_threshold=0.5,
+            circuit_minimum_outcomes=4,
+            circuit_cooldown_seconds=(60, 120),
+        ),
+        random_value=0.5,
+    )
+    throttle.record_throttle(403)
+    throttle.record_success()
+    throttle.record_throttle(429)
+    throttle.record_success()
+    throttle.record_throttle(403)
+
+    opened = throttle.snapshot()
+    assert opened.circuit_open is True
+    assert opened.circuit_remaining_seconds == pytest.approx(90)
+    assert opened.circuit_trip_count == 1
+    assert opened.http_403_count == 2
+    assert opened.http_429_count == 1
+
+    waited = throttle.wait_before_request()
+    assert waited == pytest.approx(90)
+    assert throttle.snapshot().circuit_wait_seconds == pytest.approx(90)
+
+
+def test_admission_rechecks_circuit_opened_while_waiting():
+    fake_time = _FakeTime()
+    throttle = None
+    sleep_calls = 0
+
+    def sleep_with_concurrent_outcomes(seconds):
+        nonlocal sleep_calls
+        sleep_calls += 1
+        if sleep_calls == 1:
+            fake_time.now += 40
+            for _ in range(3):
+                throttle.record_success()
+            throttle.record_throttle(403)
+            throttle.record_throttle(403)
+            fake_time.now += seconds - 40
+        else:
+            fake_time.sleep(seconds)
+
+    throttle = AdaptiveSourceThrottle(
+        "Example",
+        _policy(
+            circuit_density_threshold=0.5,
+            circuit_minimum_outcomes=4,
+            circuit_cooldown_seconds=(60, 60),
+        ),
+        clock=fake_time.monotonic,
+        wall_clock=fake_time.wall_clock,
+        sleep_func=sleep_with_concurrent_outcomes,
+        random_func=lambda: 0.0,
+    )
+    throttle.record_throttle(403)
+    throttle.record_success()
+    throttle.record_throttle(403)
+    throttle.record_success()
+    throttle.record_throttle(403)
+
+    waited = throttle.wait_before_request()
+
+    assert waited == pytest.approx(100)
+    assert fake_time.sleeps == pytest.approx([40])
+
+
+def test_one_success_does_not_close_circuit_and_recovery_is_gradual():
+    fake_time = _FakeTime()
+    throttle = _throttle(
+        fake_time,
+        policy=_policy(
+            circuit_density_threshold=0.5,
+            circuit_minimum_outcomes=4,
+            circuit_cooldown_seconds=(60, 60),
+        ),
+    )
+    throttle.record_throttle(403)
+    throttle.record_success()
+    throttle.record_throttle(403)
+    throttle.record_success()
+    throttle.record_throttle(403)
+    throttle.wait_before_request()
+
+    throttle.record_success()
+    first_success = throttle.snapshot()
+    assert first_success.circuit_open is True
+    assert first_success.current_interval_seconds == 8
+
+    throttle.record_success()
+    recovered = throttle.snapshot()
+    assert recovered.circuit_open is False
+    assert recovered.current_interval_seconds == 4
+    assert recovered.recovery_count == 1
+
+
+def test_isolated_throttle_keeps_short_cooldown_without_circuit():
+    fake_time = _FakeTime()
+    throttle = _throttle(fake_time)
+
+    throttle.record_throttle(403)
+
+    snapshot = throttle.snapshot()
+    assert snapshot.cooldown_remaining_seconds == 5
+    assert snapshot.circuit_open is False
+    assert snapshot.circuit_trip_count == 0

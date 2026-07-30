@@ -1083,11 +1083,91 @@ def _excluded_cninfo_event_dates(
     return excluded_dates
 
 
+def partition_tdx_rows_by_lineage(
+    rows: Sequence[Mapping[str, Any]],
+    lineage_by_instrument: Mapping[str, Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Exclude explicit predecessor regimes from the current-issuer factor path."""
+    included: List[Dict[str, Any]] = []
+    suppressed: List[Dict[str, Any]] = []
+    for raw_row in rows:
+        row = dict(raw_row)
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        event_date = _date(row.get("ex_date"))
+        lineage = lineage_by_instrument.get(instrument_id)
+        if not isinstance(lineage, Mapping) or event_date is None:
+            included.append(row)
+            continue
+        current_starts = [
+            parsed
+            for regime in lineage.get("issuer_regimes") or ()
+            if isinstance(regime, Mapping)
+            and str(regime.get("role") or "").strip().lower() == "current"
+            if (parsed := _date(regime.get("start_date"))) is not None
+        ]
+        current_start = min(current_starts) if current_starts else None
+        transition = next((
+            item
+            for item in lineage.get("transitions") or ()
+            if isinstance(item, Mapping)
+            and _date(item.get("effective_date")) == event_date
+            and str(item.get("price_continuity") or "").strip().lower()
+            == "non_continuous"
+            and str(
+                item.get("adjustment_factor_policy") or ""
+            ).strip().lower() == "no_synthetic_factor"
+        ), None)
+        reason = None
+        if transition is not None:
+            reason = "lineage_non_continuous_transition"
+        elif current_start is not None and event_date < current_start:
+            reason = "lineage_predecessor_issuer_event"
+        if reason is None:
+            included.append(row)
+            continue
+        suppressed.append({
+            "instrument_id": instrument_id,
+            "tdx_id": row.get("id"),
+            "source_ex_date": event_date,
+            "effective_date": event_date,
+            "factor": row.get("factor"),
+            "cash_per_share": _number(row.get("fenhong")) / 10.0,
+            "bonus_per_share": _number(row.get("songzhuangu")) / 10.0,
+            "rights_per_share": _number(row.get("peigu")) / 10.0,
+            "rights_price": _number(row.get("peigujia")),
+            "reason": reason,
+            "lineage": {
+                "catalog_version": lineage.get("catalog_version"),
+                "active_issuer_start": current_start,
+                "transition_type": (
+                    transition.get("event_type")
+                    if isinstance(transition, Mapping)
+                    else None
+                ),
+                "price_continuity": (
+                    transition.get("price_continuity")
+                    if isinstance(transition, Mapping)
+                    else None
+                ),
+                "adjustment_factor_policy": (
+                    transition.get("adjustment_factor_policy")
+                    if isinstance(transition, Mapping)
+                    else None
+                ),
+            },
+        })
+    return {
+        "included_rows": included,
+        "suppressed_reference_events": suppressed,
+    }
+
+
 def reconcile_cninfo_tdx_events(
     cninfo_events: Sequence[Mapping[str, Any]],
     tdx_events: Sequence[Mapping[str, Any]],
     *,
     excluded_cninfo_events: Sequence[Mapping[str, Any]] = (),
+    pre_suppressed_reference_events: Sequence[Mapping[str, Any]] = (),
     sessions_by_exchange: Optional[Mapping[str, Sequence[date]]] = None,
     field_tolerance: float = 0.0001,
     rounded_field_tolerances: Optional[Mapping[str, float]] = None,
@@ -1105,7 +1185,9 @@ def reconcile_cninfo_tdx_events(
     shifted: List[Dict[str, Any]] = []
     rounded: List[Dict[str, Any]] = []
     accepted_overrides: List[Dict[str, Any]] = []
-    suppressed_reference_events: List[Dict[str, Any]] = []
+    suppressed_reference_events: List[Dict[str, Any]] = [
+        dict(item) for item in pre_suppressed_reference_events
+    ]
     conflicts: List[Dict[str, Any]] = []
     excluded_dates = _excluded_cninfo_event_dates(excluded_cninfo_events)
     for index, item in enumerate(tdx):

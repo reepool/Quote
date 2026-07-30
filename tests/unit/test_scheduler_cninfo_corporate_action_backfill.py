@@ -251,6 +251,11 @@ def test_cninfo_primary_daily_job_is_bounded_and_single_instance():
     assert job["parameters"]["anomaly_llm_max_events"] == 50
     assert job["parameters"]["anomaly_llm_title_max_concurrency"] == 50
     assert job["parameters"]["anomaly_llm_pipeline_llm_concurrency"] == 50
+    assert job["parameters"]["tdx_refresh_mode"] == "targeted"
+    assert job["parameters"]["tdx_rotating_sample_size"] == 100
+    assert config["scheduler_config"]["jobs"][
+        "a_share_tdx_corporate_action_weekly_full_refresh"
+    ]["trigger"]["day_of_week"] == "sun"
 
 
 @pytest.mark.asyncio
@@ -278,6 +283,8 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
     )
     assert maintenance.await_args.kwargs["candidate_limit"] == 1000
     assert maintenance.await_args.kwargs["safety_sweep_size"] == 100
+    assert maintenance.await_args.kwargs["tdx_refresh_mode"] == "targeted"
+    assert maintenance.await_args.kwargs["tdx_rotating_sample_size"] == 100
     assert maintenance.await_args.kwargs["build_canonical"] is False
     assert maintenance.await_args.kwargs["anomaly_llm_enabled"] is True
     assert maintenance.await_args.kwargs["anomaly_llm_max_events"] == 50
@@ -288,3 +295,28 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
         == 50
     )
     assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks
+
+
+@pytest.mark.asyncio
+async def test_scheduler_weekly_tdx_reference_refresh_uses_full_market(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    refresh = AsyncMock(return_value={
+        "status": "success",
+        "totals": {"processed_instruments": 10},
+    })
+    monkeypatch.setattr(data_manager, "backfill_tdx_xdxr_history", refresh)
+
+    result = await task.a_share_tdx_corporate_action_weekly_full_refresh(
+        end_date="2026-07-30",
+        exchanges=["SSE"],
+    )
+
+    assert result["status"] == "success"
+    assert result["refresh_mode"] == "full"
+    assert refresh.await_args.kwargs["instrument_ids"] is None
+    assert refresh.await_args.kwargs["repair_universe_mode"] == "current_repair"
+    assert (
+        "a_share_tdx_corporate_action_weekly_full_refresh"
+        not in task._active_tasks
+    )

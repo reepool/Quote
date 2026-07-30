@@ -24,6 +24,7 @@ import math
 import os
 import re
 import sqlite3
+import time
 from calendar import monthrange
 from pathlib import Path
 from typing import (
@@ -17487,6 +17488,7 @@ class DataManager:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         scopes: Optional[List[str]] = None,
+        endpoint_targets: Optional[Sequence[Mapping[str, Any]]] = None,
         dry_run: bool = True,
         resume: bool = True,
         chunk_size: int = 50,
@@ -17507,6 +17509,10 @@ class DataManager:
             AShareBackfillCheckpointStore,
             coerce_date,
             normalize_string_list,
+        )
+        from utils.adaptive_throttle import (
+            AdaptiveSourceThrottle,
+            get_adaptive_source_throttle,
         )
 
         normalized_start = coerce_date(start_date, field_name="start_date")
@@ -17530,6 +17536,31 @@ class DataManager:
             raise ValueError(
                 f"unsupported CNInfo corporate-action scopes: {unsupported_scopes}"
             )
+        profile_to_scope = {
+            DIVIDEND_PROFILE: "dividends",
+            ALLOTMENT_PROFILE: "allotments",
+        }
+        requested_profiles_by_id: Dict[str, Set[str]] = defaultdict(set)
+        for target in endpoint_targets or ():
+            instrument_id = str(target.get("instrument_id") or "").strip()
+            source_profile = str(target.get("source_profile") or "").strip()
+            if not instrument_id or source_profile not in profile_to_scope:
+                raise ValueError(
+                    "endpoint targets require a valid instrument_id and "
+                    f"source_profile, got {target!r}"
+                )
+            if profile_to_scope[source_profile] not in normalized_scopes:
+                raise ValueError(
+                    f"endpoint target {source_profile} is outside requested scopes"
+                )
+            requested_profiles_by_id[instrument_id].add(source_profile)
+        target_instrument_ids = set(requested_profiles_by_id)
+        if normalized_ids and not target_instrument_ids <= normalized_ids:
+            raise ValueError(
+                "endpoint target instruments must be included in instrument_ids"
+            )
+        if target_instrument_ids and not normalized_ids:
+            normalized_ids = set(target_instrument_ids)
         chunk_size = max(1, min(int(chunk_size), 1000))
         request_interval_seconds = max(0.0, float(request_interval_seconds))
         per_instrument_timeout_sec = max(1, int(per_instrument_timeout_sec))
@@ -17567,6 +17598,16 @@ class DataManager:
             "exchanges": normalized_exchanges,
             "instrument_ids": sorted(normalized_ids),
             "scopes": normalized_scopes,
+            "endpoint_targets": [
+                {
+                    "instrument_id": instrument_id,
+                    "source_profile": source_profile,
+                }
+                for instrument_id, profiles in sorted(
+                    requested_profiles_by_id.items()
+                )
+                for source_profile in sorted(profiles)
+            ],
             "resume": bool(resume),
             "chunk_size": chunk_size,
             "request_interval_seconds": request_interval_seconds,
@@ -17600,6 +17641,31 @@ class DataManager:
                 "pending_count": len(universe),
             },
             "production_isolation": True,
+            "endpoint_plan": {
+                "target_count": sum(
+                    len(profiles)
+                    for profiles in requested_profiles_by_id.values()
+                )
+                if requested_profiles_by_id
+                else len(universe) * len(normalized_scopes),
+                "target_counts": dict(sorted(Counter(
+                    source_profile
+                    for profiles in requested_profiles_by_id.values()
+                    for source_profile in profiles
+                ).items())) if requested_profiles_by_id else {
+                    profile: len(universe)
+                    for profile in (
+                        (DIVIDEND_PROFILE,)
+                        if normalized_scopes == ["dividends"]
+                        else (ALLOTMENT_PROFILE,)
+                        if normalized_scopes == ["allotments"]
+                        else (DIVIDEND_PROFILE, ALLOTMENT_PROFILE)
+                    )
+                },
+                "mode": (
+                    "targeted" if requested_profiles_by_id else "profile_complete"
+                ),
+            },
         }
         if dry_run:
             return result
@@ -17638,6 +17704,10 @@ class DataManager:
         provider = CninfoCorporateActionProvider(
             request_timeout_seconds=per_instrument_timeout_sec
         )
+        provider_throttle = getattr(provider, "adaptive_throttle", None)
+        if not isinstance(provider_throttle, AdaptiveSourceThrottle):
+            provider_throttle = get_adaptive_source_throttle(CNINFO_SOURCE)
+        throttle_before = provider_throttle.snapshot()
         counters = Counter({
             "requested_instruments": 0,
             "requested_endpoints": 0,
@@ -17653,7 +17723,11 @@ class DataManager:
             "indeterminate": 0,
             "missing_ex_date_events": 0,
             "ignored_placeholders": 0,
+            "final_retry_targets": 0,
+            "final_retry_recovered": 0,
+            "final_retry_failed": 0,
         })
+        endpoint_request_counts: Counter[str] = Counter()
         observed_instrument_ids: Set[str] = set()
         observed_event_keys: Set[str] = set()
         persisted_event_keys: Set[str] = set()
@@ -17671,6 +17745,170 @@ class DataManager:
         if "allotments" in normalized_scopes:
             endpoint_specs.append((ALLOTMENT_PROFILE, provider.fetch_allotments))
 
+        instrument_states: Dict[str, Dict[str, Union[bool, int]]] = {
+            item["instrument_id"]: {
+                "indeterminate": False,
+                "partial": False,
+                "pending_retry": 0,
+            }
+            for item in pending
+        }
+        final_retry_targets: List[
+            Tuple[Dict[str, Any], str, Callable[..., CninfoEndpointResult]]
+        ] = []
+
+        async def _persist_endpoint_result(
+            item: Dict[str, Any],
+            source_profile: str,
+            endpoint_result: CninfoEndpointResult,
+        ) -> CninfoEndpointResult:
+            instrument_id = item["instrument_id"]
+            instrument_state = instrument_states[instrument_id]
+            observations = endpoint_result.observations
+            if observations:
+                observed_instrument_ids.add(instrument_id)
+                observed_event_keys.update(
+                    str(observation.get("source_event_key") or "").strip()
+                    for observation in observations
+                    if str(observation.get("source_event_key") or "").strip()
+                )
+            write_stats = await self.db_ops.save_corporate_action_observations(
+                observations,
+                ingestion_run_id=resolved_checkpoint_id,
+                include_event_keys=True,
+            )
+            if int(write_stats.get("failed", 0)) == 0:
+                endpoint_persisted_event_keys = {
+                    str(observation.get("source_event_key") or "").strip()
+                    for observation in observations
+                    if str(observation.get("source_event_key") or "").strip()
+                }
+                persisted_event_keys.update(endpoint_persisted_event_keys)
+                persisted_event_keys_by_instrument[instrument_id].update(
+                    endpoint_persisted_event_keys
+                )
+            inserted_event_keys.update(
+                write_stats.get("inserted_event_keys") or []
+            )
+            changed_event_keys.update(
+                write_stats.get("changed_event_keys") or []
+            )
+            reactivated_event_keys.update(
+                write_stats.get("reactivated_event_keys") or []
+            )
+            if int(write_stats.get("inserted", 0)) > 0:
+                inserted_instrument_ids.add(instrument_id)
+            if int(write_stats.get("changed", 0)) > 0:
+                changed_instrument_ids.add(instrument_id)
+            if int(write_stats.get("reactivated", 0)) > 0:
+                reactivated_instrument_ids.add(instrument_id)
+            if int(write_stats.get("failed", 0)) > 0:
+                endpoint_result = CninfoEndpointResult(
+                    source_profile=source_profile,
+                    coverage_status="indeterminate",
+                    observations=observations,
+                    rows_received=endpoint_result.rows_received,
+                    ignored_placeholders=endpoint_result.ignored_placeholders,
+                    error=f"observation persistence incomplete: {write_stats}",
+                )
+            elif endpoint_result.coverage_status != "indeterminate":
+                try:
+                    retired = await self.db_ops.reconcile_corporate_action_observation_snapshot(
+                        instrument_id=instrument_id,
+                        source=CNINFO_SOURCE,
+                        source_profile=source_profile,
+                        requested_start_date=normalized_start,
+                        requested_end_date=normalized_end,
+                        seen_event_keys=[
+                            str(observation.get("source_event_key") or "")
+                            for observation in observations
+                        ],
+                        ingestion_run_id=resolved_checkpoint_id,
+                    )
+                    counters["observations_retired"] += int(retired)
+                    if int(retired) > 0:
+                        retired_instrument_ids.add(instrument_id)
+                except Exception as exc:
+                    endpoint_result = CninfoEndpointResult(
+                        source_profile=source_profile,
+                        coverage_status="indeterminate",
+                        observations=observations,
+                        rows_received=endpoint_result.rows_received,
+                        ignored_placeholders=endpoint_result.ignored_placeholders,
+                        error=f"observation snapshot reconciliation failed: {exc}",
+                    )
+            for key in ("inserted", "changed", "unchanged", "reactivated"):
+                counters[f"observations_{key}"] += int(write_stats.get(key, 0))
+
+            event_dates = [
+                self._date_from_any(observation.get("ex_date"))
+                for observation in observations
+                if observation.get("ex_date") is not None
+            ]
+            event_dates = [value for value in event_dates if value is not None]
+            missing_ex_dates = sum(
+                observation.get("ex_date") is None
+                for observation in observations
+            )
+            counters["missing_ex_date_events"] += int(missing_ex_dates)
+            counters["ignored_placeholders"] += int(
+                endpoint_result.ignored_placeholders
+            )
+            counters[endpoint_result.coverage_status] += 1
+            try:
+                await self.db_ops.upsert_corporate_action_instrument_status({
+                    "instrument_id": instrument_id,
+                    "source": CNINFO_SOURCE,
+                    "source_profile": source_profile,
+                    "coverage_status": endpoint_result.coverage_status,
+                    "event_count": len(observations),
+                    "missing_ex_date_count": missing_ex_dates,
+                    "requested_start_date": normalized_start,
+                    "requested_end_date": normalized_end,
+                    "earliest_event_date": min(event_dates) if event_dates else None,
+                    "latest_event_date": max(event_dates) if event_dates else None,
+                    "error_message": endpoint_result.error,
+                    "ingestion_run_id": resolved_checkpoint_id,
+                })
+            except Exception as exc:
+                counters[endpoint_result.coverage_status] -= 1
+                counters["indeterminate"] += 1
+                endpoint_result = CninfoEndpointResult(
+                    source_profile=source_profile,
+                    coverage_status="indeterminate",
+                    observations=observations,
+                    rows_received=endpoint_result.rows_received,
+                    ignored_placeholders=endpoint_result.ignored_placeholders,
+                    error=f"coverage persistence failed: {exc}",
+                )
+            if endpoint_result.coverage_status == "indeterminate":
+                instrument_state["indeterminate"] = True
+                stage.setdefault("errors", []).append({
+                    "instrument_id": instrument_id,
+                    "source_profile": source_profile,
+                    "reason": endpoint_result.error or "indeterminate response",
+                })
+            elif endpoint_result.coverage_status == "partial_missing_fields":
+                instrument_state["partial"] = True
+            return endpoint_result
+
+        def _finalize_instrument(instrument_id: str) -> None:
+            instrument_state = instrument_states[instrument_id]
+            if int(instrument_state["pending_retry"]) > 0:
+                return
+            if bool(instrument_state["partial"]):
+                stage["partial_instruments"] = sorted(
+                    set(stage.get("partial_instruments") or []) | {instrument_id}
+                )
+            else:
+                stage["partial_instruments"] = sorted(
+                    set(stage.get("partial_instruments") or []) - {instrument_id}
+                )
+            if not bool(instrument_state["indeterminate"]):
+                completed.add(instrument_id)
+                stage["completed_instruments"] = sorted(completed)
+                counters["completed_instruments"] += 1
+
         for index, item in enumerate(pending, start=1):
             instrument_id = item["instrument_id"]
             counters["requested_instruments"] += 1
@@ -17678,10 +17916,15 @@ class DataManager:
                 error for error in (stage.get("errors") or [])
                 if error.get("instrument_id") != instrument_id
             ]
-            instrument_indeterminate = False
-            instrument_partial = False
             for source_profile, fetcher in endpoint_specs:
+                if (
+                    requested_profiles_by_id
+                    and source_profile
+                    not in requested_profiles_by_id.get(instrument_id, set())
+                ):
+                    continue
                 counters["requested_endpoints"] += 1
+                endpoint_request_counts[source_profile] += 1
                 try:
                     endpoint_result = await asyncio.to_thread(
                         fetcher,
@@ -17697,152 +17940,25 @@ class DataManager:
                         observations=[],
                         error=str(exc),
                     )
-
-                observations = endpoint_result.observations
-                if observations:
-                    observed_instrument_ids.add(instrument_id)
-                    observed_event_keys.update(
-                        str(observation.get("source_event_key") or "").strip()
-                        for observation in observations
-                        if str(observation.get("source_event_key") or "").strip()
+                if (
+                    endpoint_result.coverage_status == "indeterminate"
+                    and endpoint_result.retryable
+                ):
+                    counters["final_retry_targets"] += 1
+                    instrument_states[instrument_id]["pending_retry"] = (
+                        int(instrument_states[instrument_id]["pending_retry"]) + 1
                     )
-                write_stats = await self.db_ops.save_corporate_action_observations(
-                    observations,
-                    ingestion_run_id=resolved_checkpoint_id,
-                    include_event_keys=True,
-                )
-                if int(write_stats.get("failed", 0)) == 0:
-                    endpoint_persisted_event_keys = {
-                        str(observation.get("source_event_key") or "").strip()
-                        for observation in observations
-                        if str(
-                            observation.get("source_event_key") or ""
-                        ).strip()
-                    }
-                    persisted_event_keys.update(endpoint_persisted_event_keys)
-                    persisted_event_keys_by_instrument[instrument_id].update(
-                        endpoint_persisted_event_keys
+                    final_retry_targets.append((item, source_profile, fetcher))
+                else:
+                    await _persist_endpoint_result(
+                        item,
+                        source_profile,
+                        endpoint_result,
                     )
-                inserted_event_keys.update(
-                    write_stats.get("inserted_event_keys") or []
-                )
-                changed_event_keys.update(
-                    write_stats.get("changed_event_keys") or []
-                )
-                reactivated_event_keys.update(
-                    write_stats.get("reactivated_event_keys") or []
-                )
-                if int(write_stats.get("inserted", 0)) > 0:
-                    inserted_instrument_ids.add(instrument_id)
-                if int(write_stats.get("changed", 0)) > 0:
-                    changed_instrument_ids.add(instrument_id)
-                if int(write_stats.get("reactivated", 0)) > 0:
-                    reactivated_instrument_ids.add(instrument_id)
-                if int(write_stats.get("failed", 0)) > 0:
-                    endpoint_result = CninfoEndpointResult(
-                        source_profile=source_profile,
-                        coverage_status="indeterminate",
-                        observations=observations,
-                        rows_received=endpoint_result.rows_received,
-                        ignored_placeholders=endpoint_result.ignored_placeholders,
-                        error=f"observation persistence incomplete: {write_stats}",
-                    )
-                elif endpoint_result.coverage_status != "indeterminate":
-                    try:
-                        retired = await self.db_ops.reconcile_corporate_action_observation_snapshot(
-                            instrument_id=instrument_id,
-                            source=CNINFO_SOURCE,
-                            source_profile=source_profile,
-                            requested_start_date=normalized_start,
-                            requested_end_date=normalized_end,
-                            seen_event_keys=[
-                                str(observation.get("source_event_key") or "")
-                                for observation in observations
-                            ],
-                            ingestion_run_id=resolved_checkpoint_id,
-                        )
-                        counters["observations_retired"] += int(retired)
-                        if int(retired) > 0:
-                            retired_instrument_ids.add(instrument_id)
-                    except Exception as exc:
-                        endpoint_result = CninfoEndpointResult(
-                            source_profile=source_profile,
-                            coverage_status="indeterminate",
-                            observations=observations,
-                            rows_received=endpoint_result.rows_received,
-                            ignored_placeholders=endpoint_result.ignored_placeholders,
-                            error=f"observation snapshot reconciliation failed: {exc}",
-                        )
-                for key in ("inserted", "changed", "unchanged", "reactivated"):
-                    counters[f"observations_{key}"] += int(write_stats.get(key, 0))
-
-                event_dates = [
-                    self._date_from_any(observation.get("ex_date"))
-                    for observation in observations
-                    if observation.get("ex_date") is not None
-                ]
-                event_dates = [value for value in event_dates if value is not None]
-                missing_ex_dates = sum(
-                    observation.get("ex_date") is None
-                    for observation in observations
-                )
-                counters["missing_ex_date_events"] += int(missing_ex_dates)
-                counters["ignored_placeholders"] += int(
-                    endpoint_result.ignored_placeholders
-                )
-                counters[endpoint_result.coverage_status] += 1
-                try:
-                    await self.db_ops.upsert_corporate_action_instrument_status({
-                        "instrument_id": instrument_id,
-                        "source": CNINFO_SOURCE,
-                        "source_profile": source_profile,
-                        "coverage_status": endpoint_result.coverage_status,
-                        "event_count": len(observations),
-                        "missing_ex_date_count": missing_ex_dates,
-                        "requested_start_date": normalized_start,
-                        "requested_end_date": normalized_end,
-                        "earliest_event_date": (
-                            min(event_dates) if event_dates else None
-                        ),
-                        "latest_event_date": max(event_dates) if event_dates else None,
-                        "error_message": endpoint_result.error,
-                        "ingestion_run_id": resolved_checkpoint_id,
-                    })
-                except Exception as exc:
-                    counters[endpoint_result.coverage_status] -= 1
-                    counters["indeterminate"] += 1
-                    endpoint_result = CninfoEndpointResult(
-                        source_profile=source_profile,
-                        coverage_status="indeterminate",
-                        observations=observations,
-                        rows_received=endpoint_result.rows_received,
-                        ignored_placeholders=endpoint_result.ignored_placeholders,
-                        error=f"coverage persistence failed: {exc}",
-                    )
-                if endpoint_result.coverage_status == "indeterminate":
-                    instrument_indeterminate = True
-                    stage.setdefault("errors", []).append({
-                        "instrument_id": instrument_id,
-                        "source_profile": source_profile,
-                        "reason": endpoint_result.error or "indeterminate response",
-                    })
-                elif endpoint_result.coverage_status == "partial_missing_fields":
-                    instrument_partial = True
                 if request_interval_seconds:
                     await asyncio.sleep(request_interval_seconds)
 
-            if instrument_partial:
-                stage["partial_instruments"] = sorted(
-                    set(stage.get("partial_instruments") or []) | {instrument_id}
-                )
-            else:
-                stage["partial_instruments"] = sorted(
-                    set(stage.get("partial_instruments") or []) - {instrument_id}
-                )
-            if not instrument_indeterminate:
-                completed.add(instrument_id)
-                stage["completed_instruments"] = sorted(completed)
-                counters["completed_instruments"] += 1
+            _finalize_instrument(instrument_id)
             checkpoint_store.save(checkpoint)
             if index == 1 or index % chunk_size == 0 or index == len(pending):
                 dm_logger.info(
@@ -17858,8 +17974,67 @@ class DataManager:
                     + counters["observations_unchanged"],
                 )
 
+        for retry_index, (
+            item,
+            source_profile,
+            fetcher,
+        ) in enumerate(final_retry_targets, start=1):
+            instrument_id = item["instrument_id"]
+            counters["requested_endpoints"] += 1
+            endpoint_request_counts[source_profile] += 1
+            try:
+                endpoint_result = await asyncio.to_thread(
+                    fetcher,
+                    instrument_id,
+                    item["symbol"],
+                    start_date=normalized_start,
+                    end_date=normalized_end,
+                )
+            except Exception as exc:
+                endpoint_result = CninfoEndpointResult(
+                    source_profile=source_profile,
+                    coverage_status="indeterminate",
+                    observations=[],
+                    error=str(exc),
+                )
+            endpoint_result = await _persist_endpoint_result(
+                item,
+                source_profile,
+                endpoint_result,
+            )
+            if endpoint_result.coverage_status == "indeterminate":
+                counters["final_retry_failed"] += 1
+            else:
+                counters["final_retry_recovered"] += 1
+            instrument_states[instrument_id]["pending_retry"] = max(
+                0,
+                int(instrument_states[instrument_id]["pending_retry"]) - 1,
+            )
+            _finalize_instrument(instrument_id)
+            checkpoint_store.save(checkpoint)
+            if (
+                retry_index == 1
+                or retry_index % chunk_size == 0
+                or retry_index == len(final_retry_targets)
+            ):
+                dm_logger.info(
+                    "[DataManager] CNInfo final endpoint recovery: %d/%d "
+                    "recovered=%d failed=%d",
+                    retry_index,
+                    len(final_retry_targets),
+                    counters["final_retry_recovered"],
+                    counters["final_retry_failed"],
+                )
+
         has_partial = bool(stage.get("partial_instruments"))
         has_errors = bool(stage.get("errors"))
+        throttle_after = provider_throttle.snapshot()
+
+        def _metric_delta(field_name: str) -> Union[int, float]:
+            before_value = getattr(throttle_before, field_name)
+            after_value = getattr(throttle_after, field_name)
+            return after_value - before_value
+
         result.update({
             "status": "partial" if has_partial or has_errors else "success",
             "universe": {
@@ -17868,6 +18043,35 @@ class DataManager:
                 "pending_count": len(universe) - len(completed),
             },
             "counters": dict(counters),
+            "endpoint_metrics": {
+                "request_counts": dict(sorted(endpoint_request_counts.items())),
+                "target_counts": result["endpoint_plan"]["target_counts"],
+                "final_retry_targets": int(counters["final_retry_targets"]),
+                "final_retry_recovered": int(counters["final_retry_recovered"]),
+                "final_retry_failed": int(counters["final_retry_failed"]),
+            },
+            "adaptive_throttle": {
+                "source_key": throttle_after.source_key,
+                "http_403_count": int(_metric_delta("http_403_count")),
+                "http_429_count": int(_metric_delta("http_429_count")),
+                "wait_count": int(_metric_delta("wait_count")),
+                "adaptive_wait_seconds": float(
+                    _metric_delta("total_wait_seconds")
+                ),
+                "short_cooldown_count": int(
+                    _metric_delta("cooldown_count")
+                ),
+                "circuit_trip_count": int(
+                    _metric_delta("circuit_trip_count")
+                ),
+                "circuit_wait_seconds": float(
+                    _metric_delta("circuit_wait_seconds")
+                ),
+                "ending_interval_seconds": (
+                    throttle_after.current_interval_seconds
+                ),
+                "circuit_open": throttle_after.circuit_open,
+            },
             "partial_instruments": list(stage.get("partial_instruments") or []),
             "errors": list(stage.get("errors") or [])[:50],
             "announcement_recovery_required": (
@@ -17930,6 +18134,7 @@ class DataManager:
             derive_tdx_factor_path,
             evaluate_coverage_intervals,
             match_cninfo_archive_tdx_date,
+            partition_tdx_rows_by_lineage,
             reconcile_cninfo_tdx_events,
         )
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
@@ -17986,6 +18191,22 @@ class DataManager:
             )
         if not target_ids:
             raise ValueError("CNInfo factor rebuild universe is empty")
+        lineage_by_instrument: Dict[str, Dict[str, Any]] = {}
+        lineage_loader = getattr(
+            self.db_ops,
+            "get_instrument_master_lineage_metadata",
+            None,
+        )
+        if callable(lineage_loader):
+            loaded_lineage = lineage_loader(target_ids)
+            if inspect.isawaitable(loaded_lineage):
+                loaded_lineage = await loaded_lineage
+            if isinstance(loaded_lineage, Mapping):
+                lineage_by_instrument = {
+                    str(instrument_id): dict(lineage)
+                    for instrument_id, lineage in loaded_lineage.items()
+                    if isinstance(lineage, Mapping)
+                }
 
         cninfo_rows: List[Dict[str, Any]] = []
         tdx_rows: List[Dict[str, Any]] = []
@@ -18429,13 +18650,21 @@ class DataManager:
                 "listed_date": listed_date,
             })
 
-        quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
+        lineage_partition = partition_tdx_rows_by_lineage(
+            tdx_rows,
+            lineage_by_instrument,
+        )
+        factor_tdx_rows = lineage_partition["included_rows"]
+        quote_keys = build_quote_evidence_keys(
+            factor_cninfo_rows,
+            factor_tdx_rows,
+        )
         quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
             quote_keys,
             effective_end_date=normalized_end,
         )
         cninfo_path = derive_cninfo_factor_path(factor_cninfo_rows, quote_evidence)
-        tdx_path = derive_tdx_factor_path(tdx_rows, quote_evidence)
+        tdx_path = derive_tdx_factor_path(factor_tdx_rows, quote_evidence)
 
         sessions_by_exchange: Dict[str, List[date]] = {}
         for exchange in normalized_exchanges:
@@ -18454,6 +18683,9 @@ class DataManager:
             cninfo_path["events"],
             tdx_path["events"],
             excluded_cninfo_events=cninfo_path.get("excluded_no_effect") or (),
+            pre_suppressed_reference_events=lineage_partition.get(
+                "suppressed_reference_events"
+            ) or (),
             sessions_by_exchange=sessions_by_exchange,
             field_tolerance=max(0.0, float(field_tolerance)),
             factor_relative_tolerance=max(
@@ -18999,9 +19231,9 @@ class DataManager:
     async def _load_cninfo_daily_retry_instrument_ids(
         self,
         instrument_ids: List[str],
-    ) -> List[str]:
-        """Return active instruments whose latest CNInfo endpoint attempt failed."""
-        retry_ids: Set[str] = set()
+    ) -> Dict[str, List[str]]:
+        """Return active instruments and CNInfo profiles whose latest attempt failed."""
+        retry_profiles: Dict[str, Set[str]] = defaultdict(set)
         for offset in range(0, len(instrument_ids), 400):
             chunk = instrument_ids[offset: offset + 400]
             if not chunk:
@@ -19031,12 +19263,15 @@ class DataManager:
                 """,
                 params,
             )
-            retry_ids.update(
-                str(row.get("instrument_id") or "").strip()
-                for row in rows
-                if row.get("instrument_id")
-            )
-        return sorted(retry_ids)
+            for row in rows:
+                instrument_id = str(row.get("instrument_id") or "").strip()
+                source_profile = str(row.get("source_profile") or "").strip()
+                if instrument_id and source_profile:
+                    retry_profiles[instrument_id].add(source_profile)
+        return {
+            instrument_id: sorted(profiles)
+            for instrument_id, profiles in sorted(retry_profiles.items())
+        }
 
     async def _load_cninfo_daily_event_instrument_ids(
         self,
@@ -19044,9 +19279,9 @@ class DataManager:
         *,
         start_date: date,
         end_date: date,
-    ) -> List[str]:
-        """Return active instruments with stored action dates near this run."""
-        event_ids: Set[str] = set()
+    ) -> Dict[str, List[str]]:
+        """Return active instruments and profiles with action dates near this run."""
+        event_profiles: Dict[str, Set[str]] = defaultdict(set)
         for offset in range(0, len(instrument_ids), 400):
             chunk = instrument_ids[offset: offset + 400]
             if not chunk:
@@ -19064,7 +19299,7 @@ class DataManager:
             })
             rows = await self.db_ops.execute_read_query(
                 f"""
-                SELECT DISTINCT instrument_id
+                SELECT DISTINCT instrument_id, source_profile
                 FROM corporate_action_observations
                 WHERE source = 'cninfo'
                   AND is_current = 1
@@ -19079,12 +19314,15 @@ class DataManager:
                 """,
                 params,
             )
-            event_ids.update(
-                str(row.get("instrument_id") or "").strip()
-                for row in rows
-                if row.get("instrument_id")
-            )
-        return sorted(event_ids)
+            for row in rows:
+                instrument_id = str(row.get("instrument_id") or "").strip()
+                source_profile = str(row.get("source_profile") or "").strip()
+                if instrument_id and source_profile:
+                    event_profiles[instrument_id].add(source_profile)
+        return {
+            instrument_id: sorted(profiles)
+            for instrument_id, profiles in sorted(event_profiles.items())
+        }
 
     async def _load_daily_factor_cutoff_deferred_instrument_ids(
         self,
@@ -19207,6 +19445,7 @@ class DataManager:
         )
         symbol_index = build_symbol_index(active_instruments)
         announcement_ids: Set[str] = set()
+        announcement_profiles_by_instrument: Dict[str, Set[str]] = defaultdict(set)
         deferred_announcement_ids: Set[str] = set()
         deferred_factor_ids: Set[str] = set()
         deferred_special_announcements_by_instrument: Dict[
@@ -19353,6 +19592,12 @@ class DataManager:
                     continue
                 title_records_selected += 1
                 announcement_ids.update(matched_ids)
+                for instrument_id in matched_ids:
+                    announcement_profiles_by_instrument[instrument_id].update(
+                        str(item).strip()
+                        for item in title_decision.get("source_profiles") or ()
+                        if str(item).strip()
+                    )
                 matched_record = record.with_selection_reasons(
                     ["corporate_action_announcement"]
                 )
@@ -19409,6 +19654,12 @@ class DataManager:
         return {
             "status": "partial" if errors else "success",
             "announcement_instrument_ids": sorted(announcement_ids),
+            "announcement_source_profiles": {
+                instrument_id: sorted(profiles)
+                for instrument_id, profiles in sorted(
+                    announcement_profiles_by_instrument.items()
+                )
+            },
             "deferred_announcement_instrument_ids": sorted(
                 deferred_announcement_ids
             ),
@@ -19589,7 +19840,7 @@ class DataManager:
         from data_sources.cninfo_corporate_action_incremental import (
             build_incremental_refresh_candidates,
             normalize_active_instruments,
-            select_rotating_safety_instruments,
+            select_rotating_safety_targets,
         )
 
         active_index = normalize_active_instruments(active_instruments)
@@ -19628,7 +19879,7 @@ class DataManager:
             int(candidate_limit),
         )
 
-        retry_ids, recent_event_ids = await asyncio.gather(
+        retry_result, recent_event_result = await asyncio.gather(
             self._load_cninfo_daily_retry_instrument_ids(active_ids),
             self._load_cninfo_daily_event_instrument_ids(
                 active_ids,
@@ -19651,10 +19902,38 @@ class DataManager:
             max_pages=announcement_max_pages,
             request_interval_seconds=request_interval_seconds,
         )
-        safety_ids = select_rotating_safety_instruments(
+        safety_targets_by_profile = select_rotating_safety_targets(
             active_ids,
             as_of_date=end_date,
             sample_size=safety_sweep_size,
+        )
+        safety_profiles: Dict[str, Set[str]] = defaultdict(set)
+        for source_profile, instrument_values in (
+            safety_targets_by_profile.items()
+        ):
+            for instrument_id in instrument_values:
+                safety_profiles[instrument_id].add(source_profile)
+        safety_ids = sorted(safety_profiles)
+
+        def _profile_result(
+            value: Any,
+        ) -> tuple[List[str], Dict[str, List[str]]]:
+            if isinstance(value, Mapping):
+                profile_map = {
+                    str(instrument_id): [
+                        str(profile) for profile in profiles or ()
+                    ]
+                    for instrument_id, profiles in value.items()
+                }
+                return sorted(profile_map), profile_map
+            instrument_values = sorted({
+                str(item).strip() for item in value or () if str(item).strip()
+            })
+            return instrument_values, {}
+
+        retry_ids, retry_profiles = _profile_result(retry_result)
+        recent_event_ids, recent_event_profiles = _profile_result(
+            recent_event_result
         )
         selection = build_incremental_refresh_candidates(
             active_instruments=active_index,
@@ -19665,6 +19944,15 @@ class DataManager:
             recent_event_ids=recent_event_ids,
             announcement_ids=announcement_scan.get("announcement_instrument_ids") or [],
             safety_ids=safety_ids,
+            retry_profiles=retry_profiles,
+            recent_event_profiles=recent_event_profiles,
+            announcement_profiles=announcement_scan.get(
+                "announcement_source_profiles"
+            ) or {},
+            safety_profiles={
+                instrument_id: sorted(profiles)
+                for instrument_id, profiles in safety_profiles.items()
+            },
             max_candidates=candidate_limit,
         )
         deferred_by_reason = selection.get("deferred_by_reason") or {}
@@ -20386,6 +20674,8 @@ class DataManager:
         event_lookahead_days: int = 14,
         candidate_limit: int = 1000,
         safety_sweep_size: int = 100,
+        tdx_refresh_mode: str = "targeted",
+        tdx_rotating_sample_size: int = 100,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
@@ -20406,6 +20696,8 @@ class DataManager:
         """Incrementally refresh events and rebuild only affected factor paths."""
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
+        stage_durations: Dict[str, float] = {}
+        operation_started_at = time.monotonic()
 
         normalized_end = coerce_date(
             end_date or get_shanghai_time().date(),
@@ -20516,8 +20808,11 @@ class DataManager:
                 )
             previous_trading_day = min(previous_candidates)
         from data_sources.cninfo_corporate_action_incremental import (
+            build_targeted_tdx_refresh_instruments,
             resolve_daily_announcement_window,
+            resolve_tdx_refresh_mode,
         )
+        effective_tdx_refresh_mode = resolve_tdx_refresh_mode(tdx_refresh_mode)
         resolved_window_mode = (
             normalized_schedule_mode
             if previous_trading_day is not None
@@ -20633,6 +20928,7 @@ class DataManager:
             normalized_exchanges,
         )
         if cninfo_active_ids:
+            discovery_started_at = time.monotonic()
             discovery_result = await self.discover_a_share_cninfo_daily_candidates(
                 active_instruments=cninfo_active_rows,
                 exchanges=cninfo_exchanges,
@@ -20649,8 +20945,14 @@ class DataManager:
                 safety_sweep_size=safety_sweep_size,
                 request_interval_seconds=request_interval_seconds,
             )
+            stage_durations["candidate_discovery_seconds"] = (
+                time.monotonic() - discovery_started_at
+            )
             cninfo_candidate_ids = list(
                 discovery_result.get("candidate_ids") or []
+            )
+            cninfo_endpoint_targets = list(
+                discovery_result.get("endpoint_targets") or []
             )
             announcement_governance_context = discovery_result.pop(
                 "_announcement_governance_context", None
@@ -20664,23 +20966,29 @@ class DataManager:
                 "reason": "no_instruments_in_supported_exchanges",
             }
             cninfo_candidate_ids = []
+            cninfo_endpoint_targets = []
             announcement_governance_context = None
         if cninfo_candidate_ids:
             dm_logger.info(
                 "[DataManager] CNInfo incremental refresh started: candidates=%d",
                 len(cninfo_candidate_ids),
             )
+            cninfo_started_at = time.monotonic()
             cninfo_result = await self.backfill_a_share_cninfo_corporate_actions(
                 start_date=normalized_start,
                 end_date=normalized_end,
                 exchanges=cninfo_exchanges,
                 instrument_ids=cninfo_candidate_ids,
+                endpoint_targets=cninfo_endpoint_targets,
                 dry_run=False,
                 resume=False,
                 chunk_size=50,
                 request_interval_seconds=request_interval_seconds,
                 per_instrument_timeout_sec=per_instrument_timeout_sec,
                 active_only=True,
+            )
+            stage_durations["cninfo_refresh_seconds"] = (
+                time.monotonic() - cninfo_started_at
             )
         else:
             cninfo_result = {
@@ -20736,16 +21044,48 @@ class DataManager:
                 )
                 if str(item).strip() in active_ids
             )
+        announcement_instrument_ids = set(
+            (discovery_result.get("announcement_scan") or {}).get(
+                "announcement_instrument_ids"
+            ) or []
+        )
+        if effective_tdx_refresh_mode == "full":
+            tdx_target_plan = {
+                "instrument_ids": active_ids,
+                "instrument_count": len(active_ids),
+                "rotating_sample_count": 0,
+                "reason_counts": {"full_market": len(active_ids)},
+                "targets": [],
+            }
+        else:
+            tdx_target_plan = build_targeted_tdx_refresh_instruments(
+                active_instrument_ids=active_ids,
+                cninfo_candidate_ids=cninfo_candidate_ids,
+                announcement_ids=announcement_instrument_ids,
+                retry_or_carryover_ids=carried_factor_ids,
+                rotating_sample_size=tdx_rotating_sample_size,
+                as_of_date=normalized_end,
+            )
+        tdx_started_at = time.monotonic()
         tdx_result = await self.backfill_tdx_xdxr_history(
             exchanges=normalized_exchanges,
             start_date=normalized_start,
             end_date=normalized_end,
-            instrument_ids=active_ids,
+            instrument_ids=tdx_target_plan["instrument_ids"],
             derive_factors=True,
             repair_universe_mode="current_repair",
             per_instrument_timeout_sec=per_instrument_timeout_sec,
             dry_run=False,
         )
+        stage_durations["tdx_refresh_seconds"] = (
+            time.monotonic() - tdx_started_at
+        )
+        tdx_result["refresh_mode"] = effective_tdx_refresh_mode
+        tdx_result["target_scope"] = {
+            key: value
+            for key, value in tdx_target_plan.items()
+            if key != "targets"
+        }
         cninfo_affected_ids = set(
             cninfo_result.get("affected_instrument_ids") or []
         )
@@ -20766,6 +21106,7 @@ class DataManager:
                 "instruments=%d",
                 len(affected_ids),
             )
+            factor_started_at = time.monotonic()
             rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
                 start_date=date(1990, 12, 19),
                 end_date=factor_end_date,
@@ -20774,6 +21115,9 @@ class DataManager:
                 dry_run=False,
                 build_canonical=build_canonical,
                 series_version=series_version,
+            )
+            stage_durations["factor_rebuild_seconds"] = (
+                time.monotonic() - factor_started_at
             )
         else:
             dm_logger.info(
@@ -20801,6 +21145,7 @@ class DataManager:
                     "series_version": series_version,
                 },
             }
+        anomaly_started_at = time.monotonic()
         anomaly_governance = await self._govern_cninfo_daily_anomalies(
             start_date=normalized_start,
             end_date=normalized_end,
@@ -20833,6 +21178,9 @@ class DataManager:
                 anomaly_llm_pipeline_progress_interval_seconds
             ),
         )
+        stage_durations["anomaly_llm_seconds"] = (
+            time.monotonic() - anomaly_started_at
+        )
         pending_candidate_ids = sorted({
             *pending_candidate_ids,
             *(anomaly_governance.get("deferred_instrument_ids") or []),
@@ -20853,6 +21201,7 @@ class DataManager:
                 len(promoted_instrument_ids),
                 len(final_rebuild_ids),
             )
+            promotion_factor_started_at = time.monotonic()
             promotion_rebuild_result = (
                 await self.rebuild_cninfo_primary_adjustment_factors(
                     start_date=date(1990, 12, 19),
@@ -20863,6 +21212,10 @@ class DataManager:
                     build_canonical=build_canonical,
                     series_version=series_version,
                 )
+            )
+            stage_durations["factor_rebuild_seconds"] = (
+                stage_durations.get("factor_rebuild_seconds", 0.0)
+                + time.monotonic() - promotion_factor_started_at
             )
             rebuild_result = promotion_rebuild_result
         pending_factor_ids: Set[str] = set()
@@ -21000,7 +21353,6 @@ class DataManager:
         operational_statuses = {
             str(discovery_result.get("status")),
             str(cninfo_result.get("status")),
-            str(tdx_result.get("status")),
             str(quote_cutoff_status),
             str(factor_retry_state.get("status")),
             str(anomaly_governance.get("execution_status")),
@@ -21013,6 +21365,11 @@ class DataManager:
                 promotion_rebuild_result is not None
                 and promotion_rebuild_result.get("status") == "failed"
             )
+            else "success"
+        )
+        reference_status = (
+            "partial"
+            if str(tdx_result.get("status")) in {"partial", "failed"}
             else "success"
         )
 
@@ -21400,6 +21757,9 @@ class DataManager:
             len(affected_ids),
             pending_factor_events,
         )
+        stage_durations["total_seconds"] = (
+            time.monotonic() - operation_started_at
+        )
         return {
             "status": operational_status,
             "operation": "a_share_cninfo_primary_daily_maintenance",
@@ -21428,6 +21788,9 @@ class DataManager:
                 "event_lookahead_days": int(event_lookahead_days),
                 "candidate_limit": int(candidate_limit),
                 "safety_sweep_size": int(safety_sweep_size),
+                "tdx_refresh_mode": str(tdx_refresh_mode),
+                "tdx_effective_refresh_mode": effective_tdx_refresh_mode,
+                "tdx_rotating_sample_size": int(tdx_rotating_sample_size),
                 "factor_end_date": (
                     factor_end_date.isoformat()
                     if factor_end_date is not None
@@ -21447,6 +21810,15 @@ class DataManager:
             "candidate_discovery": discovery_result,
             "cninfo_refresh": cninfo_result,
             "tdx_refresh": tdx_result,
+            "stage_durations": {
+                key: round(value, 3)
+                for key, value in sorted(stage_durations.items())
+            },
+            "execution_status": {
+                "primary": operational_status,
+                "tdx_reference": reference_status,
+                "reconciliation": reconciliation_status,
+            },
             "affected_instruments": {
                 "count": len(affected_ids),
                 "cninfo_count": len(cninfo_affected_ids),
