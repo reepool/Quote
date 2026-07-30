@@ -33,3 +33,10 @@
 
 - [x] 6.1 Run focused and regression tests, validate OpenSpec artifacts, and execute a targeted `600018.SH` dry-run
 - [x] 6.2 Review all uncommitted task changes, reassess findings for scope and severity, and fix every confirmed defect
+
+## 7. Long-Suspension TDX Reference Alignment
+
+- [x] 7.1 Add opt-in, lifecycle-bounded next-observed-trade quote alignment while preserving conservative default callers
+- [x] 7.2 Suppress terminal no-post-event-trade TDX rows from the derived path with auditable reconciliation evidence
+- [x] 7.3 Add database, factor-governance, and rebuild integration regressions for long suspension, lifecycle caps, terminal events, and downstream chain recovery
+- [x] 7.4 Run focused/full-market validation, validate OpenSpec, review the uncommitted diff, and fix every confirmed defect

@@ -19,6 +19,10 @@ for a reliable unattended daily service.
 - Apply issuer-lineage boundaries during CNInfo/TDX reconciliation so raw
   predecessor records remain stored but do not create false current-issuer
   differences or synthetic factors.
+- Align reviewed TDX reference events that occur during long suspensions to
+  the next observed trading session within explicit lifecycle bounds, and
+  suppress terminal events that have no later traded session without changing
+  raw TDX storage.
 - Report endpoint request counts, limiter behavior, TDX mode, LLM duration, and
   per-stage durations while keeping CNInfo primary readiness independent from
   reference-path completeness.
@@ -49,8 +53,8 @@ for a reliable unattended daily service.
 
 - Affected runtime paths include `DataManager` CNInfo candidate discovery and
   backfill, TDX XDXR refresh selection, shared adaptive throttling, corporate
-  action reconciliation/factor governance, scheduler task parameters, and
-  notification/report formatting.
+  action reconciliation/factor governance, bounded quote-evidence alignment,
+  scheduler task parameters, and notification/report formatting.
 - Existing explicit historical backfills remain compatible and can continue to
   request both CNInfo profiles or a full TDX sweep.
 - CNInfo remains the primary source. TDX data is neither copied into CNInfo

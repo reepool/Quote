@@ -160,7 +160,7 @@ def _quote_map(
         instrument_id = str(row.get("instrument_id") or "").strip()
         source_date = _date(row.get("source_date"))
         effective_date = _date(row.get("effective_date"))
-        if instrument_id and source_date and effective_date:
+        if instrument_id and source_date:
             result[(instrument_id, source_date)] = {
                 "effective_date": effective_date,
                 "pre_close": _positive(row.get("pre_close")),
@@ -575,11 +575,22 @@ def derive_cninfo_factor_path(
 def derive_tdx_factor_path(
     rows: Iterable[Mapping[str, Any]],
     quote_evidence: Iterable[Mapping[str, Any]],
+    *,
+    terminal_dates_by_instrument: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Rebuild a TDX event-product path while aligning source dates to sessions."""
     quote_lookup = _quote_map(quote_evidence)
+    terminal_dates = {
+        str(instrument_id).strip(): parsed
+        for instrument_id, value in (
+            terminal_dates_by_instrument or {}
+        ).items()
+        if str(instrument_id).strip()
+        if (parsed := _date(value)) is not None
+    }
     grouped: Dict[Tuple[str, date], Dict[str, Any]] = {}
     pending: List[Dict[str, Any]] = []
+    excluded_terminal: List[Dict[str, Any]] = []
     pending_source_dates: Dict[str, List[date]] = defaultdict(list)
     unlocated_pending_instruments = set()
     for row in rows:
@@ -596,6 +607,32 @@ def derive_tdx_factor_path(
             })
             unlocated_pending_instruments.add(instrument_id)
             continue
+        quote = quote_lookup.get((instrument_id, source_date))
+        effective_date = quote.get("effective_date") if quote else None
+        if effective_date is None:
+            terminal_date = terminal_dates.get(instrument_id)
+            if (
+                quote is not None
+                and terminal_date is not None
+                and source_date <= terminal_date
+            ):
+                excluded_terminal.append({
+                    "instrument_id": instrument_id,
+                    "tdx_id": row.get("id"),
+                    "source_ex_date": source_date,
+                    "effective_date": None,
+                    "factor": factor,
+                    "cash_per_share": _number(row.get("fenhong")) / 10.0,
+                    "bonus_per_share": _number(row.get("songzhuangu")) / 10.0,
+                    "rights_per_share": _number(row.get("peigu")) / 10.0,
+                    "rights_price": _number(row.get("peigujia")),
+                    "reason": "terminal_no_post_event_trade",
+                    "lifecycle": {
+                        "terminal_date": terminal_date,
+                        "terminal_type": "delisted",
+                    },
+                })
+                continue
         if factor is None or validation_result.startswith("pending_"):
             pending.append({
                 "instrument_id": instrument_id,
@@ -604,8 +641,6 @@ def derive_tdx_factor_path(
             })
             pending_source_dates[instrument_id].append(source_date)
             continue
-        quote = quote_lookup.get((instrument_id, source_date))
-        effective_date = quote.get("effective_date") if quote else None
         if effective_date is None:
             pending.append({
                 "instrument_id": instrument_id,
@@ -703,6 +738,7 @@ def derive_tdx_factor_path(
         "observations": observations_out,
         "events": events,
         "pending": pending,
+        "excluded_terminal": excluded_terminal,
     }
 
 

@@ -11,12 +11,14 @@ def _manager_with_factor_evidence(
     *,
     tdx_validation_result="computed_unvalidated",
     segmented_coverage=False,
+    delisted_date=None,
 ):
     manager = DataManager()
     manager.db_ops = Mock()
     manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
         "instrument_id": "000001.SZ",
         "symbol": "000001",
+        "delisted_date": delisted_date,
     }])
 
     async def execute_read_query(query, _params):
@@ -160,6 +162,50 @@ def _manager_with_factor_evidence(
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.invalidate_factor_cache = Mock()
     return manager
+
+
+@pytest.mark.asyncio
+async def test_primary_rebuild_suppresses_terminal_tdx_event():
+    manager = _manager_with_factor_evidence(
+        delisted_date=datetime(2020, 12, 31),
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[{
+            "instrument_id": "000001.SZ",
+            "source_date": date(2020, 5, 28),
+            "effective_date": None,
+            "pre_close": None,
+            "close": None,
+        }]
+    )
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(return_value={
+        "event-1": {
+            "factor_effect": "none",
+        },
+    })
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    call = manager.db_ops.get_quote_evidence_for_event_dates.await_args
+    assert call.kwargs["align_to_next_observed_trade"] is True
+    assert call.kwargs["effective_end_dates_by_instrument"] == {
+        "000001.SZ": date(2020, 12, 31),
+    }
+    assert result["tdx_path"]["pending_count"] == 0
+    assert result["tdx_path"]["excluded_terminal_count"] == 1
+    assert result["tdx_path"]["excluded_terminal"][0]["reason"] == (
+        "terminal_no_post_event_trade"
+    )
+    assert result["source_completeness"]["tdx_reference"]["status"] == "success"
+    assert result["reconciliation"]["totals"][
+        "suppressed_reference_events"
+    ] == 1
 
 
 def test_cninfo_suspended_events_apply_on_first_resumed_sessions():

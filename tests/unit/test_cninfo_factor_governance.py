@@ -772,6 +772,80 @@ def test_tdx_path_uses_event_product_and_effective_session():
     assert result["observations"][0]["provider_cumulative_factor"] == 1.2
 
 
+def test_tdx_terminal_event_is_audited_without_blocking_path():
+    rows = [{
+        "id": 30455,
+        "instrument_id": "000549.SZ",
+        "ex_date": date(2007, 4, 23),
+        "factor": 1.207,
+        "validation_result": "computed_unvalidated",
+        "songzhuangu": 2.07,
+    }]
+    quote_evidence = [{
+        "instrument_id": "000549.SZ",
+        "source_date": date(2007, 4, 23),
+        "effective_date": None,
+        "pre_close": None,
+        "close": None,
+    }]
+
+    result = derive_tdx_factor_path(
+        rows,
+        quote_evidence,
+        terminal_dates_by_instrument={
+            "000549.SZ": date(2007, 4, 27),
+        },
+    )
+
+    assert result["events"] == []
+    assert result["pending"] == []
+    assert result["excluded_terminal"] == [{
+        "instrument_id": "000549.SZ",
+        "tdx_id": 30455,
+        "source_ex_date": date(2007, 4, 23),
+        "effective_date": None,
+        "factor": pytest.approx(1.207),
+        "cash_per_share": 0.0,
+        "bonus_per_share": pytest.approx(0.207),
+        "rights_per_share": 0.0,
+        "rights_price": 0.0,
+        "reason": "terminal_no_post_event_trade",
+        "lifecycle": {
+            "terminal_date": date(2007, 4, 27),
+            "terminal_type": "delisted",
+        },
+    }]
+
+    missing_evidence = derive_tdx_factor_path(
+        rows,
+        [],
+        terminal_dates_by_instrument={
+            "000549.SZ": date(2007, 4, 27),
+        },
+    )
+    assert missing_evidence["excluded_terminal"] == []
+    assert missing_evidence["pending"][0]["reason"] == (
+        "missing_effective_trade_date"
+    )
+
+    pending_factor_row = {
+        **rows[0],
+        "factor": 1.0,
+        "validation_result": "pending_factor_missing_pre_close",
+    }
+    terminal_pending_factor = derive_tdx_factor_path(
+        [pending_factor_row],
+        quote_evidence,
+        terminal_dates_by_instrument={
+            "000549.SZ": date(2007, 4, 27),
+        },
+    )
+    assert terminal_pending_factor["pending"] == []
+    assert terminal_pending_factor["excluded_terminal"][0]["reason"] == (
+        "terminal_no_post_event_trade"
+    )
+
+
 def test_reconciliation_and_candidate_keep_tdx_only_as_unverified_fallback():
     cninfo_events = [
         {

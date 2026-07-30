@@ -138,6 +138,28 @@ will record evidence and constraints. Production code will only change if a
 complete, repeatable contract is verified; otherwise per-target endpoint
 routing remains the supported implementation.
 
+### 8. Align long-suspension reference events only within lifecycle bounds
+
+The factor rebuild will explicitly request `next_observed_trade` alignment for
+corporate-action evidence. Under that policy, an event date without a traded
+quote may use the first later row with `tradestatus=1` and a positive close,
+even when the gap exceeds fourteen days. The search remains bounded by the
+rebuild end date and, when present, the instrument's delisting date. Explicit
+non-continuous issuer transitions continue to be removed before quote
+alignment by the lineage partition.
+
+The database evidence API will retain its conservative fourteen-day/default
+behavior unless the caller explicitly enables this policy with a finite end
+date. This prevents unrelated callers from interpreting an arbitrary long
+local quote gap as a suspension.
+
+When a TDX event belongs to an instrument whose delisting date is within the
+rebuild window and no traded quote exists from the event through that terminal
+date, the derived TDX path will classify it as
+`terminal_no_post_event_trade`. The raw TDX row remains unchanged, the
+suppression is included in reconciliation audit output, and the event does not
+block later factor-path processing.
+
 ## Risks / Trade-offs
 
 - **[Misclassified announcement skips an endpoint]** → Uncertain and special
@@ -150,6 +172,9 @@ routing remains the supported implementation.
 - **[Lineage metadata is incomplete]** → Suppression only occurs for explicit,
   validated segment/continuity policies; otherwise reconciliation behavior is
   unchanged.
+- **[A long local quote gap is not a suspension]** → Long-gap alignment is
+  opt-in, bounded by rebuild/lifecycle dates, and never crosses an explicit
+  non-continuous lineage boundary.
 - **[Status compatibility for downstream reports]** → Existing keys remain
   available while new nested metrics and effective-mode fields are additive.
 

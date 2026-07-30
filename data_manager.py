@@ -18173,6 +18173,7 @@ class DataManager:
                     "instrument_id": instrument_id,
                     "exchange": exchange,
                     "listed_date": instrument.get("listed_date"),
+                    "delisted_date": instrument.get("delisted_date"),
                 })
         universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
         target_ids = [item["instrument_id"] for item in universe]
@@ -18182,6 +18183,12 @@ class DataManager:
         listed_date_by_instrument = {
             item["instrument_id"]: self._date_from_any(item.get("listed_date"))
             for item in universe
+        }
+        delisted_date_by_instrument = {
+            item["instrument_id"]: parsed
+            for item in universe
+            if (parsed := self._date_from_any(item.get("delisted_date")))
+            is not None
         }
         missing_ids = sorted(requested_ids - set(target_ids))
         if missing_ids:
@@ -18655,6 +18662,30 @@ class DataManager:
             lineage_by_instrument,
         )
         factor_tdx_rows = lineage_partition["included_rows"]
+        effective_end_dates_by_instrument = {
+            instrument_id: min(normalized_end, delisted_date)
+            for instrument_id, delisted_date
+            in delisted_date_by_instrument.items()
+        }
+        for instrument_id, lineage in lineage_by_instrument.items():
+            current_regime_ends = [
+                parsed
+                for regime in lineage.get("issuer_regimes") or ()
+                if isinstance(regime, Mapping)
+                and str(regime.get("role") or "").strip().lower() == "current"
+                if (parsed := self._date_from_any(regime.get("end_date")))
+                is not None
+            ]
+            if not current_regime_ends:
+                continue
+            regime_end = min(current_regime_ends)
+            effective_end_dates_by_instrument[instrument_id] = min(
+                effective_end_dates_by_instrument.get(
+                    instrument_id,
+                    normalized_end,
+                ),
+                regime_end,
+            )
         quote_keys = build_quote_evidence_keys(
             factor_cninfo_rows,
             factor_tdx_rows,
@@ -18662,9 +18693,22 @@ class DataManager:
         quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
             quote_keys,
             effective_end_date=normalized_end,
+            effective_end_dates_by_instrument=(
+                effective_end_dates_by_instrument
+            ),
+            align_to_next_observed_trade=True,
         )
         cninfo_path = derive_cninfo_factor_path(factor_cninfo_rows, quote_evidence)
-        tdx_path = derive_tdx_factor_path(factor_tdx_rows, quote_evidence)
+        tdx_path = derive_tdx_factor_path(
+            factor_tdx_rows,
+            quote_evidence,
+            terminal_dates_by_instrument={
+                instrument_id: delisted_date
+                for instrument_id, delisted_date
+                in delisted_date_by_instrument.items()
+                if delisted_date <= normalized_end
+            },
+        )
 
         sessions_by_exchange: Dict[str, List[date]] = {}
         for exchange in normalized_exchanges:
@@ -18683,9 +18727,13 @@ class DataManager:
             cninfo_path["events"],
             tdx_path["events"],
             excluded_cninfo_events=cninfo_path.get("excluded_no_effect") or (),
-            pre_suppressed_reference_events=lineage_partition.get(
-                "suppressed_reference_events"
-            ) or (),
+            pre_suppressed_reference_events=[
+                *(
+                    lineage_partition.get("suppressed_reference_events")
+                    or ()
+                ),
+                *(tdx_path.get("excluded_terminal") or ()),
+            ],
             sessions_by_exchange=sessions_by_exchange,
             field_tolerance=max(0.0, float(field_tolerance)),
             factor_relative_tolerance=max(
@@ -19205,6 +19253,12 @@ class DataManager:
                     if str(item.get("instrument_id") or "").strip()
                 }),
                 "pending": tdx_path["pending"][:sample_limit],
+                "excluded_terminal_count": len(
+                    tdx_path.get("excluded_terminal") or []
+                ),
+                "excluded_terminal": (
+                    tdx_path.get("excluded_terminal") or []
+                )[:sample_limit],
             },
             "reconciliation": reconciliation,
             "comparisons": comparisons,

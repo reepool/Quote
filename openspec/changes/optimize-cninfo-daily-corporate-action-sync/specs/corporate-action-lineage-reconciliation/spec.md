@@ -30,3 +30,33 @@ policy in reconciliation output.
 #### Scenario: Lineage policy is absent
 - **WHEN** no explicit lineage metadata authorizes suppression
 - **THEN** reconciliation SHALL preserve existing matching behavior
+
+### Requirement: Long-suspension reference events use bounded forward alignment
+The corporate-action factor rebuild SHALL align an event without same-day
+trading to the first later valid traded quote when the caller explicitly
+selects next-observed-trade alignment, and SHALL constrain that search to the
+rebuild and instrument lifecycle bounds.
+
+#### Scenario: Suspension rows are absent or carry a zero close
+- **WHEN** a TDX event occurs during a long suspension and the first later
+  valid traded quote is more than fourteen days after the event
+- **THEN** the reference path SHALL use that first later traded date when it is
+  no later than the instrument's lifecycle bound
+
+#### Scenario: Conservative caller does not opt in
+- **WHEN** a quote-evidence caller does not explicitly select
+  next-observed-trade alignment
+- **THEN** an unexplained long quote gap SHALL retain the existing bounded
+  lookup behavior
+
+### Requirement: Terminal reference events do not block the derived path
+The reference factor path SHALL preserve but suppress a TDX event when its
+instrument has reached a reviewed terminal lifecycle date and no later traded
+quote exists through that date.
+
+#### Scenario: Event occurs after the last traded session before delisting
+- **WHEN** the event date is no later than the delisting date and no valid
+  traded quote exists from the event through delisting
+- **THEN** the event SHALL be reported as
+  `terminal_no_post_event_trade`, SHALL remain in raw TDX storage, and SHALL
+  NOT create `missing_effective_trade_date` or `prior_event_pending`

@@ -6984,22 +6984,45 @@ class DatabaseOperations:
         event_dates: List[tuple[str, date]],
         *,
         effective_end_date: Optional[date] = None,
+        effective_end_dates_by_instrument: Optional[
+            Mapping[str, date]
+        ] = None,
+        align_to_next_observed_trade: bool = False,
     ) -> List[Dict[str, Any]]:
         """Return bounded unadjusted quote evidence for each source event date.
 
         A source date may fall on a weekend, holiday, or suspended session.
-        When ``effective_end_date`` is supplied, the first valid traded quote
-        through that date is accepted so a long suspension becomes effective
-        on its first resumed session. Callers that omit the bound retain the
-        legacy fourteen-day lookup. The factor formula must use the prior
-        trading session's raw close. An ex-date row's ``pre_close`` may already
-        be an exchange or provider adjusted reference price, and suspended
-        placeholder rows are not valid effective sessions.
+        Callers may explicitly select next-observed-trade alignment with a
+        finite end date so a long suspension becomes effective on its first
+        resumed session. Other callers retain the conservative fourteen-day
+        lookup unless a positive-close suspension row proves the wider gap.
+        Per-instrument bounds cap the global end date, normally at delisting.
+        The factor formula must use the prior trading session's raw close. An
+        ex-date row's ``pre_close`` may already be an exchange or provider
+        adjusted reference price, and suspended placeholder rows are not valid
+        effective sessions.
         """
         if effective_end_date is not None and not isinstance(
             effective_end_date, date
         ):
             raise ValueError("effective_end_date must be a date")
+        if align_to_next_observed_trade and effective_end_date is None:
+            raise ValueError(
+                "effective_end_date is required for next-observed-trade "
+                "alignment"
+            )
+        normalized_instrument_bounds: Dict[str, date] = {}
+        for instrument_id, bound in (
+            effective_end_dates_by_instrument or {}
+        ).items():
+            normalized_id = str(instrument_id).strip()
+            if not normalized_id:
+                continue
+            if not isinstance(bound, date):
+                raise ValueError(
+                    "effective_end_dates_by_instrument values must be dates"
+                )
+            normalized_instrument_bounds[normalized_id] = bound
         normalized = sorted({
             (str(instrument_id).strip(), parsed_date)
             for instrument_id, parsed_date in event_dates
@@ -7010,25 +7033,47 @@ class DatabaseOperations:
             for offset in range(0, len(normalized), 200):
                 chunk = normalized[offset: offset + 200]
                 values_sql = ", ".join(
-                    f"(:instrument_{index}, :date_{index})"
+                    (
+                        f"(:instrument_{index}, :date_{index}, "
+                        f":effective_end_date_{index})"
+                    )
                     for index in range(len(chunk))
                 )
                 parameters: Dict[str, Any] = {}
                 for index, (instrument_id, source_date) in enumerate(chunk):
                     parameters[f"instrument_{index}"] = instrument_id
                     parameters[f"date_{index}"] = source_date.isoformat()
-                parameters["effective_end_date"] = (
-                    effective_end_date.isoformat()
-                    if effective_end_date is not None else None
+                    instrument_bound = normalized_instrument_bounds.get(
+                        instrument_id
+                    )
+                    bounded_end = effective_end_date
+                    if instrument_bound is not None:
+                        bounded_end = (
+                            min(bounded_end, instrument_bound)
+                            if bounded_end is not None
+                            else instrument_bound
+                        )
+                    parameters[f"effective_end_date_{index}"] = (
+                        bounded_end.isoformat()
+                        if bounded_end is not None else None
+                    )
+                parameters["align_to_next_observed_trade"] = (
+                    1 if align_to_next_observed_trade else 0
                 )
                 result = await session.execute(text(f"""
-                    WITH requested(instrument_id, source_date) AS (
+                    WITH requested(
+                        instrument_id,
+                        source_date,
+                        effective_end_date
+                    ) AS (
                         VALUES {values_sql}
                     ), requested_state AS MATERIALIZED (
                         SELECT requested.instrument_id,
                                requested.source_date,
+                               requested.effective_end_date,
                                CASE
-                                   WHEN :effective_end_date IS NULL THEN NULL
+                                   WHEN requested.effective_end_date IS NULL
+                                   THEN NULL
                                    ELSE (
                                        SELECT q.tradestatus
                                        FROM daily_quotes q
@@ -7038,7 +7083,8 @@ class DatabaseOperations:
                                              requested.source_date
                                          )
                                          AND q.time < datetime(
-                                             :effective_end_date, '+1 day'
+                                             requested.effective_end_date,
+                                             '+1 day'
                                          )
                                          AND q.close > 0
                                        ORDER BY q.time
@@ -7058,7 +7104,14 @@ class DatabaseOperations:
                                          requested_state.source_date
                                      )
                                      AND q.time < CASE
-                                         WHEN :effective_end_date IS NULL
+                                         WHEN :align_to_next_observed_trade = 1
+                                         THEN datetime(
+                                             requested_state
+                                                 .effective_end_date,
+                                             '+1 day'
+                                         )
+                                         WHEN requested_state
+                                              .effective_end_date IS NULL
                                          THEN datetime(
                                              requested_state.source_date,
                                              '+15 day'
@@ -7066,7 +7119,9 @@ class DatabaseOperations:
                                          WHEN requested_state
                                               .first_quote_tradestatus = 0
                                          THEN datetime(
-                                             :effective_end_date, '+1 day'
+                                             requested_state
+                                                 .effective_end_date,
+                                             '+1 day'
                                          )
                                          ELSE min(
                                              datetime(
@@ -7074,7 +7129,9 @@ class DatabaseOperations:
                                                  '+15 day'
                                              ),
                                              datetime(
-                                                 :effective_end_date, '+1 day'
+                                                 requested_state
+                                                     .effective_end_date,
+                                                 '+1 day'
                                              )
                                          )
                                      END

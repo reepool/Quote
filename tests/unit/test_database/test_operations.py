@@ -272,6 +272,120 @@ class TestDatabaseOperations:
         assert evidence[0]["effective_date"] is None
 
     @pytest.mark.asyncio
+    async def test_factor_quote_evidence_opt_in_aligns_long_gap_to_next_trade(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'long_gap_alignment.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2016-03-17', '600145.SH', 6.40, 6.30, 1),
+                        ('2016-03-18', '600145.SH', 0.00, 0.00, 0),
+                        ('2020-06-30', '600145.SH', 5.10, 5.00, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates(
+                [("600145.SH", date(2016, 3, 18))],
+                effective_end_date=date(2020, 12, 31),
+                effective_end_dates_by_instrument={
+                    "600145.SH": date(2020, 12, 31),
+                },
+                align_to_next_observed_trade=True,
+            )
+        finally:
+            await engine.dispose()
+
+        assert evidence == [{
+            "instrument_id": "600145.SH",
+            "source_date": "2016-03-18",
+            "effective_date": "2020-06-30",
+            "pre_close": 6.40,
+            "close": 5.10,
+        }]
+
+    @pytest.mark.asyncio
+    async def test_factor_quote_evidence_next_trade_respects_lifecycle_bound(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'lifecycle_bound.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2006-12-18', '000549.SZ', 5.00, 4.90, 1),
+                        ('2010-01-04', '000549.SZ', 8.00, 7.90, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates(
+                [("000549.SZ", date(2007, 4, 23))],
+                effective_end_date=date(2010, 12, 31),
+                effective_end_dates_by_instrument={
+                    "000549.SZ": date(2007, 4, 27),
+                },
+                align_to_next_observed_trade=True,
+            )
+        finally:
+            await engine.dispose()
+
+        assert evidence == [{
+            "instrument_id": "000549.SZ",
+            "source_date": "2007-04-23",
+            "effective_date": None,
+            "pre_close": None,
+            "close": None,
+        }]
+
+    @pytest.mark.asyncio
+    async def test_factor_quote_evidence_next_trade_requires_finite_bound(
+        self,
+    ):
+        operations = DatabaseOperations(auto_initialize=False)
+
+        with pytest.raises(
+            ValueError,
+            match="effective_end_date is required",
+        ):
+            await operations.get_quote_evidence_for_event_dates(
+                [("600145.SH", date(2016, 3, 18))],
+                align_to_next_observed_trade=True,
+            )
+
+    @pytest.mark.asyncio
     async def test_get_daily_data(self, db_operations, sample_quote_data):
         """Test getting daily quote data"""
         # Insert test data
