@@ -1,0 +1,117 @@
+{
+  "catalog_version": "2026-07-30.1",
+  "reviewed_at": "2026-07-30",
+  "instruments": {
+    "600018.SH": {
+      "instrument_id": "600018.SH",
+      "symbol": "600018",
+      "exchange": "SSE",
+      "security_code_history_start": "2000-07-19",
+      "repair_history_end": "2006-09-25",
+      "issuer_regimes": [
+        {
+          "issuer_name": "Shanghai Port Container Co., Ltd. (上港集箱)",
+          "start_date": "2000-07-19",
+          "end_date": "2006-09-25",
+          "role": "predecessor"
+        },
+        {
+          "issuer_name": "Shanghai International Port (Group) Co., Ltd. (上港集团)",
+          "start_date": "2006-10-26",
+          "end_date": null,
+          "role": "current"
+        }
+      ],
+      "transitions": [
+        {
+          "effective_date": "2006-10-26",
+          "event_type": "absorption_merger",
+          "from_regime_start": "2000-07-19",
+          "to_regime_start": "2006-10-26",
+          "price_continuity": "non_continuous",
+          "adjustment_factor_policy": "no_synthetic_factor"
+        }
+      ],
+      "reviewed_decisions": [
+        {
+          "trade_date": "2001-08-16",
+          "selected_source": "akshare_tx",
+          "reason": "Tencent row independently confirmed in Eastmoney",
+          "expected": {
+            "open": 19.4,
+            "high": 19.76,
+            "low": 19.31,
+            "close": 19.6,
+            "volume": 913045,
+            "amount": 17768800,
+            "turnover": 0.0043
+          }
+        },
+        {
+          "trade_date": "2003-07-16",
+          "selected_source": "akshare_tx",
+          "reason": "Tencent close and amount independently confirmed by Sohu history",
+          "expected": {
+            "open": 13.48,
+            "high": 13.76,
+            "low": 13.45,
+            "close": 13.71,
+            "volume": 6570677,
+            "amount": 89656100,
+            "turnover": 0.0156
+          }
+        },
+        {
+          "trade_date": "2003-11-17",
+          "selected_source": "pytdx",
+          "reason": "pytdx close independently confirmed in Eastmoney",
+          "expected": {
+            "close": 12.95
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "source": "sse_official",
+          "observed_at": "2026-07-30",
+          "finding": "Security code 600018 first-listing date is 2000-07-19"
+        },
+        {
+          "source": "baostock",
+          "observed_at": "2026-07-30",
+          "finding": "Current issuer IPO/listing date is 2006-10-26"
+        },
+        {
+          "source": "cninfo",
+          "observed_at": "2026-07-30",
+          "finding": "Current issuer listing date is 2006-10-26"
+        },
+        {
+          "source": "sina_ipo",
+          "observed_at": "2026-07-30",
+          "finding": "Current issuer listed through absorption merger on 2006-10-26"
+        },
+        {
+          "source": "pytdx",
+          "observed_at": "2026-07-30",
+          "finding": "Predecessor code history covers 2000-07-19 through 2006-09-25"
+        },
+        {
+          "source": "akshare_tx",
+          "observed_at": "2026-07-30",
+          "finding": "Independent predecessor history includes 2001-08-16"
+        },
+        {
+          "source": "sohu_history",
+          "observed_at": "2026-07-30",
+          "finding": "Confirmed 2003-07-16 OHLC 13.48/13.76/13.45/13.71 and amount CNY 89,656,100"
+        },
+        {
+          "source": "eastmoney_operator_review",
+          "observed_at": "2026-07-30",
+          "finding": "Confirmed 2001-08-16 row and 2003-11-17 close 12.95"
+        }
+      ]
+    }
+  }
+}

@@ -1585,25 +1585,51 @@ class DatabaseOperations:
         try:
             async with self.get_async_session() as session:
                 await session.execute(create_sql)
+                existing_metadata: Dict[str, str] = {}
+                instrument_ids = sorted({
+                    str(row.get("instrument_id"))
+                    for row in rows
+                    if row.get("instrument_id")
+                })
+                for start in range(0, len(instrument_ids), 500):
+                    chunk = instrument_ids[start:start + 500]
+                    params = {f"instrument_id_{i}": value for i, value in enumerate(chunk)}
+                    placeholders = ", ".join(f":{key}" for key in params)
+                    result = await session.execute(
+                        text(
+                            "SELECT instrument_id, metadata_json "
+                            "FROM instrument_master_metadata "
+                            f"WHERE instrument_id IN ({placeholders})"
+                        ),
+                        params,
+                    )
+                    existing_metadata.update({
+                        str(item["instrument_id"]): item["metadata_json"]
+                        for item in result.mappings().all()
+                    })
                 for row in rows:
                     instrument_id = row.get("instrument_id")
                     if not instrument_id:
                         continue
+                    persisted_row = self._preserve_reviewed_lineage_metadata(
+                        existing_metadata.get(str(instrument_id)),
+                        row,
+                    )
                     await session.execute(
                         upsert_sql,
                         {
                             "instrument_id": instrument_id,
-                            "exchange": row.get("exchange") or "HKEX",
-                            "product_type": row.get("product_type"),
-                            "research_scope": row.get("research_scope"),
-                            "canonical_instrument_id": row.get("canonical_instrument_id"),
-                            "is_canonical": 1 if row.get("is_canonical") else 0,
-                            "counter_currency": row.get("counter_currency") or row.get("currency"),
-                            "official_lifecycle_source": row.get("official_lifecycle_source"),
-                            "source_url": row.get("source_url"),
-                            "raw_snapshot_hash": row.get("raw_snapshot_hash"),
-                            "parser_version": row.get("parser_version"),
-                            "metadata_json": json.dumps(row, ensure_ascii=False, default=str),
+                            "exchange": persisted_row.get("exchange") or "HKEX",
+                            "product_type": persisted_row.get("product_type"),
+                            "research_scope": persisted_row.get("research_scope"),
+                            "canonical_instrument_id": persisted_row.get("canonical_instrument_id"),
+                            "is_canonical": 1 if persisted_row.get("is_canonical") else 0,
+                            "counter_currency": persisted_row.get("counter_currency") or persisted_row.get("currency"),
+                            "official_lifecycle_source": persisted_row.get("official_lifecycle_source"),
+                            "source_url": persisted_row.get("source_url"),
+                            "raw_snapshot_hash": persisted_row.get("raw_snapshot_hash"),
+                            "parser_version": persisted_row.get("parser_version"),
+                            "metadata_json": json.dumps(persisted_row, ensure_ascii=False, default=str),
                             "updated_at": now_text,
                         },
                     )
@@ -1613,6 +1639,42 @@ class DatabaseOperations:
         except Exception as exc:
             self.db_logger.error("Failed to save instrument master metadata batch: %s", exc)
             return 0
+
+    @staticmethod
+    def _preserve_reviewed_lineage_metadata(
+        existing_metadata_json: Optional[str],
+        incoming_row: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Keep reviewed code lineage across routine master metadata refreshes."""
+        result = dict(incoming_row)
+        raw_incoming_metadata = result.get("metadata")
+        incoming_metadata = (
+            dict(raw_incoming_metadata)
+            if isinstance(raw_incoming_metadata, dict)
+            else {}
+        )
+        if "a_share_code_lineage" in incoming_metadata or not existing_metadata_json:
+            result["metadata"] = incoming_metadata
+            return result
+        try:
+            existing_payload = json.loads(existing_metadata_json)
+        except (TypeError, json.JSONDecodeError):
+            result["metadata"] = incoming_metadata
+            return result
+        existing_metadata = (
+            existing_payload.get("metadata")
+            if isinstance(existing_payload, dict)
+            else None
+        )
+        if (
+            isinstance(existing_metadata, dict)
+            and "a_share_code_lineage" in existing_metadata
+        ):
+            incoming_metadata["a_share_code_lineage"] = existing_metadata[
+                "a_share_code_lineage"
+            ]
+        result["metadata"] = incoming_metadata
+        return result
 
     async def save_instrument_master_discrepancies(
         self,
@@ -2048,6 +2110,7 @@ class DatabaseOperations:
         quotes: List[Dict[str, Any]],
         *,
         return_stats: bool = False,
+        insert_only: bool = False,
     ) -> Union[bool, Dict[str, int]]:
         """批量保存日线数据.
 
@@ -2127,6 +2190,10 @@ class DatabaseOperations:
                                 ))
                                 stats["changelog_written"] += 1
                             stats["inserted"] += 1
+                            continue
+
+                        if insert_only:
+                            stats["skipped"] += 1
                             continue
 
                         old_hash = existing.row_hash or self._daily_quote_hash({
@@ -2212,9 +2279,14 @@ class DatabaseOperations:
         quotes: List[Dict[str, Any]],
         *,
         return_stats: bool = False,
+        insert_only: bool = False,
     ) -> Union[bool, Dict[str, int]]:
         """批量保存日线数据 (save_daily_data的别名)"""
-        return await self.save_daily_data(quotes, return_stats=return_stats)
+        return await self.save_daily_data(
+            quotes,
+            return_stats=return_stats,
+            insert_only=insert_only,
+        )
 
     async def get_daily_data(
         self,
