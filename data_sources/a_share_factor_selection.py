@@ -500,6 +500,9 @@ def build_three_source_canonical_candidate(
     lineage_by_instrument: Optional[
         Mapping[str, Mapping[str, Any]]
     ] = None,
+    lifecycle_bounds_by_instrument: Optional[
+        Mapping[str, Mapping[str, Any]]
+    ] = None,
     special_event_dates_by_instrument: Optional[
         Mapping[str, Sequence[Any]]
     ] = None,
@@ -561,12 +564,37 @@ def build_three_source_canonical_candidate(
     agreement_counts: Dict[str, int] = defaultdict(int)
     blocked = 0
     low_confidence = 0
+    historical_single_source = 0
 
     for instrument_id in sorted(set(target_instruments)):
+        lifecycle = (
+            lifecycle_bounds_by_instrument or {}
+        ).get(instrument_id) or {}
+        lifecycle_start = max(
+            start_date,
+            _date(lifecycle.get("start_date"))
+            or _date(lifecycle.get("listed_date"))
+            or start_date,
+        )
+        lifecycle_end = min(
+            end_date,
+            _date(lifecycle.get("end_date"))
+            or _date(lifecycle.get("delisted_date"))
+            or end_date,
+        )
+        if lifecycle_end < lifecycle_start:
+            continue
+        lifecycle_ended = bool(
+            lifecycle.get("lifecycle_ended")
+            or (
+                _date(lifecycle.get("delisted_date")) is not None
+                and _date(lifecycle.get("delisted_date")) <= end_date
+            )
+        )
         for segment in build_continuity_segments(
             instrument_id=instrument_id,
-            start_date=start_date,
-            end_date=end_date,
+            start_date=lifecycle_start,
+            end_date=lifecycle_end,
             lineage=(lineage_by_instrument or {}).get(instrument_id),
         ):
             source_segment_rows = {
@@ -648,7 +676,28 @@ def build_three_source_canonical_candidate(
             selected_source: Optional[str] = None
             confidence = "blocked"
             reason = "cninfo_incomplete"
-            if eligible["cninfo"]:
+            historical_segment_ended = lifecycle_ended
+            cninfo_empty_contradicted = bool(
+                eligible["cninfo"]
+                and not source_segment_rows["cninfo"]
+                and eligible["tdx"]
+                and source_segment_rows["tdx"]
+            )
+            use_historical_tdx_fallback = bool(
+                not is_special
+                and historical_segment_ended
+                and not source_segment_rows["cninfo"]
+                and eligible["tdx"]
+                and source_segment_rows["tdx"]
+                and not eligible["legacy"]
+            )
+            if use_historical_tdx_fallback:
+                selected_source = "tdx"
+                confidence = "historical_single_source"
+                reason = "tdx_historical_single_source_fallback"
+                historical_single_source += 1
+                low_confidence += 1
+            elif eligible["cninfo"] and not cninfo_empty_contradicted:
                 if is_special:
                     selected_source = "cninfo"
                     confidence = "governed_special"
@@ -693,6 +742,10 @@ def build_three_source_canonical_candidate(
                 "confidence": confidence,
                 "reason": reason,
                 "special_action": is_special,
+                "cninfo_empty_contradicted": cninfo_empty_contradicted,
+                "historical_segment_ended": historical_segment_ended,
+                "lifecycle_start": lifecycle_start,
+                "lifecycle_end": lifecycle_end,
                 "eligible_sources": sorted(
                     source for source, value in eligible.items() if value
                 ),
@@ -747,7 +800,9 @@ def build_three_source_canonical_candidate(
     conflict_samples = [
         decision
         for decision in decisions
-        if decision["confidence"] in {"low", "blocked"}
+        if decision["confidence"] in {
+            "low", "blocked", "historical_single_source"
+        }
     ][:max(0, int(sample_limit))]
     pairwise_reconciliation: Dict[str, Dict[str, Any]] = {}
     for pair_name in (
@@ -815,6 +870,9 @@ def build_three_source_canonical_candidate(
         "segment_count": len(decisions),
         "blocked_segment_count": blocked,
         "low_confidence_segment_count": low_confidence,
+        "historical_single_source_segment_count": (
+            historical_single_source
+        ),
         "selection_counts": dict(selection_counts),
         "confidence_counts": dict(confidence_counts),
         "agreement_counts": dict(agreement_counts),

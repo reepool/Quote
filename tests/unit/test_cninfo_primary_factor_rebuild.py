@@ -1326,6 +1326,513 @@ async def test_three_source_empty_paths_require_explicit_completion_evidence():
 
 
 @pytest.mark.asyncio
+async def test_three_source_zero_event_coverage_uses_listing_lifecycle():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "listed_date": datetime(2020, 1, 1),
+    }])
+
+    async def zero_event_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+        ):
+            return []
+        if "FROM corporate_action_instrument_status" in query:
+            if "source = 'tdx'" in query:
+                return [{
+                    "instrument_id": "000001.SZ",
+                    "source_profile": "tdx_xdxr",
+                    "coverage_status": "complete_no_events",
+                    "event_count": 0,
+                    "requested_start_date": datetime(2020, 1, 1),
+                    "requested_end_date": datetime(2026, 7, 17),
+                }]
+            return [
+                {
+                    "instrument_id": "000001.SZ",
+                    "source_profile": source_profile,
+                    "coverage_status": "complete_no_events",
+                    "event_count": 0,
+                    "requested_start_date": datetime(2020, 1, 1),
+                    "requested_end_date": datetime(2026, 7, 17),
+                }
+                for source_profile in (
+                    "cninfo_dividend", "cninfo_allotment"
+                )
+            ]
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=zero_event_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["blocked_segment_count"] == 0
+    assert result["candidate"]["decisions"][0]["start_date"] == date(
+        2020, 1, 1
+    )
+    assert result["candidate"]["decisions"][0]["eligible_sources"] == [
+        "cninfo", "tdx"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_three_source_uses_historical_anchor_for_zero_event_cninfo_path():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": True,
+        "listed_date": datetime(2020, 1, 1),
+    }])
+
+    async def historical_anchor_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+        ):
+            return []
+        if "FROM corporate_action_instrument_status" in query:
+            if "source = 'tdx'" in query:
+                return []
+            return [
+                {
+                    "instrument_id": "000001.SZ",
+                    "source_profile": source_profile,
+                    "coverage_status": "complete_no_events",
+                    "event_count": 0,
+                    "requested_start_date": datetime(2020, 1, 1),
+                    "requested_end_date": datetime(2026, 7, 18),
+                }
+                for source_profile in (
+                    "cninfo_dividend", "cninfo_allotment"
+                )
+            ]
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=historical_anchor_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["blocked_segment_count"] == 0
+    assert result["candidate"][
+        "cninfo_zero_event_lifecycle_anchor_count"
+    ] == 1
+    assert result["candidate"]["decisions"][0]["selected_source"] == "cninfo"
+    assert result["candidate"]["decisions"][0]["confidence"] == "low"
+    assert result["overall_completeness"][
+        "endpoint_incomplete_instruments"
+    ] == 1
+
+
+@pytest.mark.asyncio
+async def test_three_source_listing_boundary_without_events_does_not_block():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": True,
+        "listed_date": datetime(2026, 7, 30),
+    }])
+
+    async def empty_listing_day_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=empty_listing_day_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["blocked_segment_count"] == 0
+    assert result["candidate"]["listing_boundary_zero_event_count"] == 1
+    assert result["candidate"]["decisions"][0]["selected_source"] == "cninfo"
+    assert result["candidate"]["decisions"][0]["confidence"] == "low"
+
+
+@pytest.mark.asyncio
+async def test_three_source_one_day_range_is_not_listing_boundary():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": True,
+        "status": "active",
+        "listed_date": datetime(2020, 1, 1),
+    }])
+
+    async def empty_one_day_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=empty_one_day_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2026-07-30",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["listing_boundary_zero_event_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_three_source_listing_boundary_does_not_fabricate_bse_cninfo():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "920000.BJ",
+        "symbol": "920000",
+        "is_active": True,
+        "status": "active",
+        "listed_date": datetime(2026, 7, 30),
+    }])
+
+    async def empty_bse_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=empty_bse_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["BSE"],
+        instrument_ids=["920000.BJ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["listing_boundary_zero_event_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert result["candidate"]["decisions"][0]["selected_source"] is None
+
+
+@pytest.mark.asyncio
+async def test_three_source_listing_boundary_keeps_legacy_event_visible():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": True,
+        "status": "active",
+        "listed_date": datetime(2026, 7, 30),
+    }])
+
+    async def listing_event_query(query, _params):
+        if "FROM adjustment_factors\n" in query:
+            return [{
+                "instrument_id": "000001.SZ",
+                "ex_date": datetime(2026, 7, 30),
+                "factor": 1.1,
+                "cumulative_factor": 1.1,
+                "source": "baostock",
+            }]
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=listing_event_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    decision = result["candidate"]["decisions"][0]
+    assert result["candidate"]["listing_boundary_zero_event_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert decision["eligible_sources"] == ["legacy"]
+    assert decision["source_event_counts"]["legacy"] == 1
+    assert decision["selected_source"] is None
+
+
+@pytest.mark.asyncio
+async def test_three_source_listing_boundary_blocks_pending_tdx_event():
+    manager = _manager_with_factor_evidence(
+        tdx_validation_result="pending_missing_pre_close"
+    )
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": True,
+        "status": "active",
+        "listed_date": datetime(2026, 7, 30),
+    }])
+
+    async def pending_tdx_query(query, _params):
+        if "FROM adjustment_factors_tdx" in query:
+            return [{
+                "id": 41,
+                "instrument_id": "000001.SZ",
+                "ex_date": datetime(2026, 7, 30),
+                "factor": None,
+                "cumulative_factor": None,
+                "validation_result": "pending_missing_pre_close",
+                "pre_close": None,
+                "fenhong": 2.18,
+                "songzhuangu": 0.0,
+                "peigu": 0.0,
+                "peigujia": 0.0,
+            }]
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors\n" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=pending_tdx_query
+    )
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
+        return_value=[]
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["listing_boundary_zero_event_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert result["candidate"]["decisions"][0]["selected_source"] is None
+
+
+@pytest.mark.asyncio
+async def test_three_source_infers_inactive_lifecycle_end_from_last_quote():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": False,
+        "status": "delisted",
+        "listed_date": datetime(2020, 1, 1),
+        "delisted_date": None,
+    }])
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def inactive_query(query, params):
+        if "MAX(time) AS last_quote_date" in query:
+            return [{
+                "instrument_id": "000001.SZ",
+                "last_quote_date": datetime(2021, 12, 31),
+            }]
+        if "FROM corporate_action_observations" in query:
+            return []
+        if "FROM adjustment_factors\n" in query:
+            return []
+        if (
+            "FROM corporate_action_instrument_status" in query
+            and "source = 'tdx'" not in query
+        ):
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=inactive_query)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    decision = result["candidate"]["decisions"][0]
+    assert decision["end_date"] == date(2021, 12, 31)
+    assert decision["historical_segment_ended"] is True
+    assert result["candidate"]["inferred_lifecycle_end_count"] == 1
+    assert decision["selected_source"] == "tdx"
+
+
+@pytest.mark.asyncio
+async def test_three_source_does_not_infer_auto_deactivation_as_delisting():
+    manager = _manager_with_factor_evidence()
+    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "is_active": False,
+        "status": "auto_deactivated_zombie",
+        "listed_date": datetime(2020, 1, 1),
+        "delisted_date": None,
+    }])
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def inactive_query(query, params):
+        if "MAX(time) AS last_quote_date" in query:
+            pytest.fail("auto-deactivated instrument queried for inferred delisting")
+        if "FROM corporate_action_observations" in query:
+            return []
+        if "FROM adjustment_factors\n" in query:
+            return []
+        if (
+            "FROM corporate_action_instrument_status" in query
+            and "source = 'tdx'" not in query
+        ):
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=inactive_query)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-30",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    decision = result["candidate"]["decisions"][0]
+    assert decision["end_date"] == date(2026, 7, 30)
+    assert decision["historical_segment_ended"] is False
+    assert result["candidate"]["inferred_lifecycle_end_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert decision["selected_source"] is None
+
+
+@pytest.mark.asyncio
+async def test_three_source_uses_tdx_for_cninfo_unavailable_delisted_history():
+    manager = _manager_with_factor_evidence(
+        delisted_date=datetime(2021, 12, 31),
+    )
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def historical_tdx_query(query, params):
+        if "FROM corporate_action_observations" in query:
+            return []
+        if "FROM adjustment_factors\n" in query:
+            return []
+        if (
+            "FROM corporate_action_instrument_status" in query
+            and "source = 'tdx'" not in query
+        ):
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=historical_tdx_query
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["blocked_segment_count"] == 0
+    assert result["candidate"][
+        "historical_single_source_segment_count"
+    ] == 1
+    assert result["candidate"]["tdx_historical_single_source_count"] == 1
+    assert result["candidate"]["tdx_consensus_selection_count"] == 0
+    assert result["candidate"]["decisions"][0]["selected_source"] == "tdx"
+
+
+@pytest.mark.asyncio
 async def test_three_source_legacy_uses_pre_range_cumulative_anchor():
     manager = _manager_with_factor_evidence()
     original_query = manager.db_ops.execute_read_query.side_effect

@@ -161,8 +161,8 @@ BaoStock 适合作为 SSE/SZSE 的 A 股因子备源和交叉验证源。生产�
 BaoStock 当前规定同一出口不得并发连接，且每日 API 请求不得超过 50,000 次。
 项目使用以下硬约束：
 
-- `~/.cache/quote/baostock_session.lock` 持有完整登录会话的跨进程文件锁；同一系统用户只允许一个 BaoStock 会话。
-- `~/.cache/quote/baostock_api_usage.json` 按香港自然日持久化实际 API 调用次数，应用重启或切换 worktree 不会清零。
+- `data/runtime/baostock/session.lock` 持有完整登录会话的跨进程文件锁；同一项目运行目录只允许一个 BaoStock 会话。每日配额状态保存在同目录的 `api_usage.json`，避免依赖可写的用户主目录。
+- 从旧版 `~/.cache/quote/` 路径升级时，新进程兼容读取旧配额的较大计数、协调旧会话锁，并在旧目录可写时双写状态，防止滚动升级期间重复计数或并发登录。
 - 所有登录、查询、重试、健康检查和登出都通过 `_run_bs_call` 计数。
 - 生产安全上限为每日 40,000 次，保留 10,000 次源端余量；达到上限后硬停止 BaoStock 请求并允许路由降级到 AkShare。
 - `asyncio.Lock` 继续负责单进程 socket 串行化，文件锁负责跨进程连接互斥。直接调用 `baostock` 包会绕过治理，不得用于生产任务。

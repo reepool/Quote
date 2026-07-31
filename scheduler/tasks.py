@@ -1163,6 +1163,8 @@ def _format_a_share_canonical_factor_selection_report(
         f"候选行数: `{candidate.get('row_count', 0)}`",
         f"阻塞区间: `{candidate.get('blocked_segment_count', 0)}`",
         f"低置信区间: `{candidate.get('low_confidence_segment_count', 0)}`",
+        "历史单源兜底: `"
+        f"{candidate.get('historical_single_source_segment_count', 0)}`",
         f"可供独立晋级审核: `{candidate.get('promotion_eligible', False)}`",
         "自动晋级生产: `False`",
     ]
@@ -5449,7 +5451,7 @@ class ScheduledTasks:
         build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
-        factor_relative_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
@@ -5509,7 +5511,7 @@ class ScheduledTasks:
         build_canonical: bool = True,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
-        factor_relative_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,

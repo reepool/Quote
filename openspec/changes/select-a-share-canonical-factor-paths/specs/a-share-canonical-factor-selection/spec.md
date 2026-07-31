@@ -84,6 +84,31 @@ consensus rules and SHALL NOT splice individual source events inside that segmen
 - **WHEN** no eligible consensus exists and the CNInfo path is incomplete
 - **THEN** the segment remains blocked and no source silently fills the missing path
 
+#### Scenario: Delisted lifecycle has only a complete TDX history
+- **WHEN** the lifecycle has ended, CNInfo has no event rows, TDX has a complete non-empty
+  path, and legacy provides no eligible conflicting path
+- **THEN** the system selects TDX with `historical_single_source` confidence and records a
+  bounded low-confidence audit decision
+
+#### Scenario: Historical TDX events contradict CNInfo zero-event coverage
+- **WHEN** a completed lifecycle has CNInfo zero-event endpoint evidence but TDX contains a
+  complete non-empty event path and legacy provides no eligible conflicting path
+- **THEN** the non-empty TDX history takes the guarded historical single-source branch
+  instead of selecting the empty CNInfo path
+
+#### Scenario: Active lifecycle has only one reference source
+- **WHEN** CNInfo is incomplete for an active instrument and only TDX or legacy is eligible
+- **THEN** the segment remains blocked
+
+#### Scenario: Active instrument has an ended continuity segment
+- **WHEN** an active instrument contains an earlier non-continuous lineage segment and only
+  TDX supplies that segment's events
+- **THEN** the segment remains blocked and is not treated as a completed delisted lifecycle
+
+#### Scenario: Historical reference sources disagree
+- **WHEN** CNInfo is incomplete and eligible TDX and legacy paths disagree
+- **THEN** the segment remains blocked even if the lifecycle has ended
+
 ### Requirement: Governed special-action policy
 The system MUST retain the governed CNInfo path for segments containing share reform,
 restructuring, compensation, debt conversion, debt settlement, asymmetric distributions,
@@ -109,8 +134,63 @@ status intervals do not cover the full requested history.
 
 #### Scenario: Empty path has no completion evidence
 - **WHEN** a source has no derived event in a continuity segment and no complete zero-event
-  coverage evidence for the requested range
+  coverage evidence anchored at the instrument lifecycle start
 - **THEN** that source is unavailable for consensus in the segment
+
+#### Scenario: Announcement-driven tail lacks per-instrument status
+- **WHEN** CNInfo has accepted zero-event coverage from the instrument lifecycle start and
+  no pending event or historical gap, but later announcement-driven maintenance did not
+  request the unaffected instrument
+- **THEN** the empty CNInfo path remains eligible and the tail interval gap is retained as
+  an audit warning
+
+#### Scenario: Empty CNInfo archive is contradicted
+- **WHEN** an empty CNInfo path has endpoint coverage but TDX supplies a complete non-empty
+  path for the same segment
+- **THEN** the empty CNInfo path does not silently win ordinary source selection
+
+#### Scenario: Coverage is bounded by listing lifecycle
+- **WHEN** an instrument lists after the requested start or delists before the requested end
+- **THEN** zero-event coverage and segment completeness are evaluated only from listing
+  through delisting within the requested range
+
+#### Scenario: Confirmed delisted instrument lacks delisting date
+- **WHEN** the master explicitly marks an instrument `status=delisted` without an explicit
+  delisting date and local quotes provide a last observed trading date
+- **THEN** that date bounds the completed lifecycle for source selection and audit
+
+#### Scenario: Automatic deactivation is not delisting evidence
+- **WHEN** an instrument is inactive because of missing or stale local data but is not
+  explicitly marked `status=delisted`
+- **THEN** its last local quote does not end the lifecycle or enable historical fallback
+
+#### Scenario: Instrument lists on the requested end date
+- **WHEN** a CNInfo-supported instrument's lifecycle starts on the requested end date and
+  CNInfo, TDX, and legacy all contain no event on that boundary
+- **THEN** the empty CNInfo path is accepted as a low-confidence listing-boundary
+  zero-event decision and does not block the full-market candidate
+
+#### Scenario: Unsupported exchange reaches listing boundary
+- **WHEN** an instrument is outside CNInfo-supported exchanges
+- **THEN** the listing-boundary shortcut does not fabricate CNInfo completion evidence
+
+#### Scenario: Source event exists on listing boundary
+- **WHEN** CNInfo, TDX, or legacy contains an event on the listing boundary
+- **THEN** the zero-event shortcut is not applied and normal source selection rules govern
+
+### Requirement: Production comparison tolerance
+The system SHALL default cross-provider event-factor and cumulative-path agreement to a
+0.1% relative tolerance while preserving explicit operator overrides and difference
+distribution reporting.
+
+#### Scenario: Normal provider precision difference
+- **WHEN** corresponding ordinary factor jumps differ by no more than 0.1% and cumulative
+  paths remain within the same bound
+- **THEN** the paths may form consensus and the exact difference remains auditable
+
+#### Scenario: Explicit stricter preview
+- **WHEN** an operator supplies a smaller positive tolerance
+- **THEN** the supplied tolerance is used without being silently widened
 
 ### Requirement: Existing legacy composite voting path
 The system SHALL read `adjustment_factors` as one legacy composite source and SHALL preserve

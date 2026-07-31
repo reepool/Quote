@@ -27,6 +27,10 @@ _BAOSTOCK_FACTOR_HISTORY_START = datetime(1990, 1, 1)
 _FACTOR_EPSILON = 1e-12
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _HONG_KONG_TZ = ZoneInfo("Asia/Hong_Kong")
+_DEFAULT_USAGE_STATE_PATH = "data/runtime/baostock/api_usage.json"
+_DEFAULT_SESSION_LOCK_PATH = "data/runtime/baostock/session.lock"
+_LEGACY_USAGE_STATE_PATH = "~/.cache/quote/baostock_api_usage.json"
+_LEGACY_SESSION_LOCK_PATH = "~/.cache/quote/baostock_session.lock"
 
 
 class BaostockAccessGovernor:
@@ -38,11 +42,23 @@ class BaostockAccessGovernor:
         daily_request_limit: int,
         state_path: str,
         session_lock_path: str,
+        legacy_state_path: Optional[str] = None,
+        legacy_session_lock_path: Optional[str] = None,
     ):
         self.daily_request_limit = max(1, int(daily_request_limit))
         self.state_path = self._resolve_path(state_path)
         self.session_lock_path = self._resolve_path(session_lock_path)
-        self._session_lock_handle = None
+        self.legacy_state_path = (
+            self._resolve_path(legacy_state_path)
+            if legacy_state_path
+            else None
+        )
+        self.legacy_session_lock_path = (
+            self._resolve_path(legacy_session_lock_path)
+            if legacy_session_lock_path
+            else None
+        )
+        self._session_lock_handles: List[Any] = []
 
     @staticmethod
     def _resolve_path(value: str) -> Path:
@@ -51,33 +67,69 @@ class BaostockAccessGovernor:
 
     def acquire_session(self) -> None:
         """Hold an OS lock for the complete login session."""
-        if self._session_lock_handle is not None:
+        if self._session_lock_handles:
             return
-        self.session_lock_path.parent.mkdir(parents=True, exist_ok=True)
-        handle = self.session_lock_path.open("a+", encoding="utf-8")
+        acquired: List[Any] = []
+        try:
+            legacy_handle = self._try_acquire_legacy_session_lock()
+            if legacy_handle is not None:
+                acquired.append(legacy_handle)
+            acquired.append(self._acquire_session_lock(self.session_lock_path))
+        except Exception:
+            self._release_lock_handles(acquired)
+            raise
+        self._session_lock_handles = acquired
+
+    def release_session(self) -> None:
+        handles = self._session_lock_handles
+        self._session_lock_handles = []
+        self._release_lock_handles(handles)
+
+    @staticmethod
+    def _release_lock_handles(handles: List[Any]) -> None:
+        for handle in reversed(handles):
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            finally:
+                handle.close()
+
+    @staticmethod
+    def _acquire_session_lock(path: Path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        handle = path.open("a+", encoding="utf-8")
         try:
             fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            handle.seek(0)
+            handle.truncate()
+            handle.write(str(os.getpid()))
+            handle.flush()
         except BlockingIOError as exc:
             handle.close()
             raise DataSourceError(
                 "Another local process already owns the BaoStock session",
                 ErrorCodes.DATASOURCE_RATE_LIMIT,
             ) from exc
-        handle.seek(0)
-        handle.truncate()
-        handle.write(str(os.getpid()))
-        handle.flush()
-        self._session_lock_handle = handle
-
-    def release_session(self) -> None:
-        handle = self._session_lock_handle
-        self._session_lock_handle = None
-        if handle is None:
-            return
-        try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-        finally:
+        except Exception:
             handle.close()
+            raise
+        return handle
+
+    def _try_acquire_legacy_session_lock(self):
+        path = self.legacy_session_lock_path
+        if path is None or path == self.session_lock_path:
+            return None
+        try:
+            return self._acquire_session_lock(path)
+        except DataSourceError:
+            raise
+        except OSError as exc:
+            baostock_logger.warning(
+                "BaoStock legacy session lock unavailable; "
+                "continuing with project-local lock: %s (%s)",
+                path,
+                exc,
+            )
+            return None
 
     def reserve_request(self, method: str, *, allow_cleanup: bool = False) -> int:
         """Persist one actual API call before it is sent to BaoStock."""
@@ -109,32 +161,84 @@ class BaostockAccessGovernor:
         return count
 
     def _read_state(self) -> Dict[str, Any]:
-        if not self.state_path.exists():
+        states = [self._read_state_path(self.state_path, required=True)]
+        if (
+            self.legacy_state_path is not None
+            and self.legacy_state_path != self.state_path
+        ):
+            states.append(
+                self._read_state_path(
+                    self.legacy_state_path,
+                    required=False,
+                )
+            )
+        today = datetime.now(_HONG_KONG_TZ).date().isoformat()
+        current_states = [
+            state for state in states
+            if state.get("date") == today
+        ]
+        if not current_states:
+            return {}
+        return max(
+            current_states,
+            key=lambda state: int(state.get("count", 0) or 0),
+        )
+
+    @staticmethod
+    def _read_state_path(
+        path: Path,
+        *,
+        required: bool,
+    ) -> Dict[str, Any]:
+        if not path.exists():
             return {}
         try:
-            payload = json.loads(self.state_path.read_text(encoding="utf-8"))
+            payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
+            if not required and isinstance(exc, OSError):
+                baostock_logger.warning(
+                    "BaoStock legacy quota state unavailable: %s (%s)",
+                    path,
+                    exc,
+                )
+                return {}
             raise DataSourceError(
-                f"BaoStock quota state is unreadable: {self.state_path}",
+                f"BaoStock quota state is unreadable: {path}",
                 ErrorCodes.DATASOURCE_RATE_LIMIT,
             ) from exc
         if not isinstance(payload, dict):
             raise DataSourceError(
-                f"BaoStock quota state is invalid: {self.state_path}",
+                f"BaoStock quota state is invalid: {path}",
                 ErrorCodes.DATASOURCE_RATE_LIMIT,
             )
         return payload
 
     def _write_state(self, payload: Dict[str, Any]) -> None:
-        self.state_path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path = self.state_path.with_name(
-            f"{self.state_path.name}.{os.getpid()}.tmp"
+        self._write_state_path(self.state_path, payload)
+        legacy_path = self.legacy_state_path
+        if legacy_path is None or legacy_path == self.state_path:
+            return
+        try:
+            self._write_state_path(legacy_path, payload)
+        except OSError as exc:
+            baostock_logger.warning(
+                "BaoStock legacy quota state is not writable; "
+                "project-local state remains authoritative: %s (%s)",
+                legacy_path,
+                exc,
+            )
+
+    @staticmethod
+    def _write_state_path(path: Path, payload: Dict[str, Any]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = path.with_name(
+            f"{path.name}.{os.getpid()}.tmp"
         )
         temp_path.write_text(
             json.dumps(payload, ensure_ascii=True, sort_keys=True),
             encoding="utf-8",
         )
-        os.replace(temp_path, self.state_path)
+        os.replace(temp_path, path)
 
 
 class BaostockSource(BaseDataSource):
@@ -151,8 +255,8 @@ class BaostockSource(BaseDataSource):
         connection_timeout_seconds: float = 30.0,
         login_timeout_seconds: Optional[float] = None,
         daily_request_safety_limit: int = 40000,
-        usage_state_path: str = "~/.cache/quote/baostock_api_usage.json",
-        session_lock_path: str = "~/.cache/quote/baostock_session.lock",
+        usage_state_path: str = _DEFAULT_USAGE_STATE_PATH,
+        session_lock_path: str = _DEFAULT_SESSION_LOCK_PATH,
     ):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['SSE', 'SZSE']  # 上海证券交易所、深圳证券交易所
@@ -166,10 +270,32 @@ class BaostockSource(BaseDataSource):
         )
         self._bs_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix='bs')
         self._last_success_time: float = 0.0  # 最近一次成功 API 调用的时间戳
+        resolved_usage_state_path = BaostockAccessGovernor._resolve_path(
+            usage_state_path
+        )
+        resolved_session_lock_path = BaostockAccessGovernor._resolve_path(
+            session_lock_path
+        )
         self._access_governor = BaostockAccessGovernor(
             daily_request_limit=daily_request_safety_limit,
             state_path=usage_state_path,
             session_lock_path=session_lock_path,
+            legacy_state_path=(
+                _LEGACY_USAGE_STATE_PATH
+                if resolved_usage_state_path
+                == BaostockAccessGovernor._resolve_path(
+                    _DEFAULT_USAGE_STATE_PATH
+                )
+                else None
+            ),
+            legacy_session_lock_path=(
+                _LEGACY_SESSION_LOCK_PATH
+                if resolved_session_lock_path
+                == BaostockAccessGovernor._resolve_path(
+                    _DEFAULT_SESSION_LOCK_PATH
+                )
+                else None
+            ),
         )
 
     async def _run_bs_call(self, func, *args, timeout: int = None, **kwargs):

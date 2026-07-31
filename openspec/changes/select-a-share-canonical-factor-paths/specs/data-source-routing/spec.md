@@ -66,3 +66,23 @@ configuration, provider profile, or persisted provider-snapshot state.
 - **THEN** no `akshare_tencent_price_ratio_v1`, `akshare_eastmoney_price_ratio_v1`, or
   `akshare_market_price_ratio_snapshot_v1` active implementation artifact remains, and
   database initialization removes rows carrying those exact retired identifiers
+
+### Requirement: Writable BaoStock access-governance state
+BaoStock quota state and the cross-process session lock SHALL default to a persistent
+project runtime directory rather than a user-home cache that may be read-only.
+
+#### Scenario: User home is read-only
+- **WHEN** the service starts with a read-only home filesystem and a writable project data
+  directory
+- **THEN** BaoStock initializes its access governor under
+  `data/runtime/baostock/` and remains available as the configured fallback
+
+#### Scenario: Deployment supplies explicit paths
+- **WHEN** absolute quota-state and session-lock paths are configured
+- **THEN** the adapter continues to use those explicit paths
+
+#### Scenario: Rolling upgrade from user-cache paths
+- **WHEN** a deployment changes from the previous user-cache defaults to project-local
+  runtime paths
+- **THEN** the governor preserves the larger current-day request count, coordinates the
+  legacy session lock, and mirrors state when the legacy path remains writable

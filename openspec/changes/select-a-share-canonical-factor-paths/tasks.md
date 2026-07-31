@@ -48,3 +48,12 @@
 - [x] 7.5 Remove canonical-task Sina backfill parameters and update configuration, documentation, and operator commands
 - [x] 7.6 Add and update selector, DataManager, scheduler, and regression tests
 - [x] 7.7 Run focused tests, Python compile, strict OpenSpec validation, uncommitted-change review, commit, and push
+
+## 8. Full-Market Preview Hardening
+
+- [x] 8.1 Bound continuity segments and zero-event coverage to listed/delisted lifecycles
+- [x] 8.2 Add guarded low-confidence TDX fallback for completed historical lifecycles only
+- [x] 8.3 Change canonical-selection default factor tolerance to 0.1% without overriding explicit values
+- [x] 8.4 Move BaoStock quota and session-lock defaults to writable project runtime storage
+- [x] 8.5 Add selector, DataManager, scheduler, configuration, and BaoStock regression tests
+- [x] 8.6 Run focused tests, full-market dry-run validation, strict OpenSpec validation, and uncommitted review

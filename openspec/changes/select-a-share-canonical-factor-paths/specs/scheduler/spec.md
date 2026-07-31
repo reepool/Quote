@@ -37,3 +37,11 @@ series automatically.
 - **WHEN** all candidate gates pass
 - **THEN** the report marks the candidate eligible for a separate explicit promotion action
   and leaves production reads unchanged
+
+### Requirement: Production default factor tolerance
+The manual selection task SHALL default `factor_relative_tolerance` to `0.001` and SHALL
+delegate an explicitly supplied value unchanged.
+
+#### Scenario: Operator omits factor tolerance
+- **WHEN** the task runs without a factor tolerance argument
+- **THEN** event and cumulative agreement use the 0.1% production default

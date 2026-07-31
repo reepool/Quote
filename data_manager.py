@@ -18304,7 +18304,7 @@ class DataManager:
         series_version: str = "a_share_cninfo_primary_v1",
         source_selection_mode: str = "deferred",
         field_tolerance: float = 0.0001,
-        factor_relative_tolerance: float = 0.0001,
+        factor_relative_tolerance: float = 0.001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
@@ -18371,6 +18371,8 @@ class DataManager:
                 universe.append({
                     "instrument_id": instrument_id,
                     "exchange": exchange,
+                    "is_active": instrument.get("is_active"),
+                    "status": instrument.get("status"),
                     "listed_date": instrument.get("listed_date"),
                     "delisted_date": instrument.get("delisted_date"),
                 })
@@ -18383,11 +18385,89 @@ class DataManager:
             item["instrument_id"]: self._date_from_any(item.get("listed_date"))
             for item in universe
         }
-        delisted_date_by_instrument = {
+        explicit_delisted_date_by_instrument = {
             item["instrument_id"]: parsed
             for item in universe
             if (parsed := self._date_from_any(item.get("delisted_date")))
             is not None
+        }
+        confirmed_delisted_without_date_ids = sorted({
+            item["instrument_id"]
+            for item in universe
+            if item.get("is_active") in {False, 0}
+            and str(item.get("status") or "").strip().lower() == "delisted"
+            and item["instrument_id"]
+            not in explicit_delisted_date_by_instrument
+        })
+        inferred_delisted_date_by_instrument: Dict[str, date] = {}
+        for offset in range(
+            0, len(confirmed_delisted_without_date_ids), 400
+        ):
+            chunk = confirmed_delisted_without_date_ids[offset: offset + 400]
+            placeholders = ", ".join(
+                f":inactive_instrument_{index}"
+                for index in range(len(chunk))
+            )
+            params = {
+                f"inactive_instrument_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, MAX(time) AS last_quote_date
+                FROM daily_quotes
+                WHERE instrument_id IN ({placeholders})
+                GROUP BY instrument_id
+                """,
+                params,
+            )
+            for row in rows:
+                instrument_id = str(
+                    row.get("instrument_id") or ""
+                ).strip()
+                last_quote_date = self._date_from_any(
+                    row.get("last_quote_date")
+                )
+                if instrument_id and last_quote_date is not None:
+                    inferred_delisted_date_by_instrument[
+                        instrument_id
+                    ] = last_quote_date
+        delisted_date_by_instrument = {
+            **inferred_delisted_date_by_instrument,
+            **explicit_delisted_date_by_instrument,
+        }
+        lifecycle_bounds_by_instrument = {
+            instrument_id: {
+                "listed_date": listed_date_by_instrument.get(instrument_id),
+                "delisted_date": delisted_date_by_instrument.get(
+                    instrument_id
+                ),
+                "start_date": max(
+                    normalized_start,
+                    listed_date_by_instrument.get(instrument_id)
+                    or normalized_start,
+                ),
+                "end_date": min(
+                    normalized_end,
+                    delisted_date_by_instrument.get(instrument_id)
+                    or normalized_end,
+                ),
+                "lifecycle_ended": (
+                    delisted_date_by_instrument.get(instrument_id) is not None
+                    and delisted_date_by_instrument[instrument_id]
+                    <= normalized_end
+                ),
+                "lifecycle_end_source": (
+                    "instrument_delisted_date"
+                    if instrument_id
+                    in explicit_delisted_date_by_instrument
+                    else "confirmed_delisted_last_quote_date"
+                    if instrument_id
+                    in inferred_delisted_date_by_instrument
+                    else "requested_end_date"
+                ),
+            }
+            for instrument_id in target_ids
         }
         missing_ids = sorted(requested_ids - set(target_ids))
         if missing_ids:
@@ -19109,6 +19189,7 @@ class DataManager:
         required_profiles = {"cninfo_dividend", "cninfo_allotment"}
         endpoint_incomplete_ids = set()
         cninfo_covered_ids = set()
+        cninfo_lifecycle_anchor_covered_ids = set()
         missing_profile_samples: List[Dict[str, Any]] = []
         cninfo_pending_ids = {
             str(item.get("instrument_id"))
@@ -19124,7 +19205,14 @@ class DataManager:
                 not in CNINFO_SUPPORTED_EXCHANGES
             ):
                 continue
+            lifecycle = lifecycle_bounds_by_instrument[instrument_id]
+            lifecycle_start = lifecycle["start_date"]
+            lifecycle_end = lifecycle["end_date"]
+            if lifecycle_end < lifecycle_start:
+                cninfo_covered_ids.add(instrument_id)
+                continue
             incomplete_profiles = []
+            lifecycle_anchor_covered = True
             for source_profile in sorted(required_profiles):
                 rows = endpoint_rows_by_profile.get(
                     (instrument_id, source_profile), []
@@ -19135,10 +19223,18 @@ class DataManager:
                 }
                 if instrument_id not in cninfo_pending_ids:
                     accepted_statuses.add("partial_missing_fields")
+                anchor_coverage = evaluate_coverage_intervals(
+                    rows,
+                    start_date=lifecycle_start,
+                    end_date=lifecycle_start,
+                    accepted_statuses=accepted_statuses,
+                )
+                if not anchor_coverage["covered"]:
+                    lifecycle_anchor_covered = False
                 coverage = evaluate_coverage_intervals(
                     rows,
-                    start_date=normalized_start,
-                    end_date=normalized_end,
+                    start_date=lifecycle_start,
+                    end_date=lifecycle_end,
                     accepted_statuses=accepted_statuses,
                 )
                 if coverage["covered"]:
@@ -19148,6 +19244,8 @@ class DataManager:
                     missing_profile_samples.append({
                         "instrument_id": instrument_id,
                         "source_profile": source_profile,
+                        "lifecycle_start_date": lifecycle_start.isoformat(),
+                        "lifecycle_end_date": lifecycle_end.isoformat(),
                         "reason": (
                             "missing_cninfo_endpoint_status"
                             if not rows
@@ -19162,6 +19260,8 @@ class DataManager:
                             for item in coverage["gaps"]
                         ],
                     })
+            if lifecycle_anchor_covered:
+                cninfo_lifecycle_anchor_covered_ids.add(instrument_id)
             if incomplete_profiles:
                 endpoint_incomplete_ids.add(instrument_id)
             else:
@@ -19252,13 +19352,52 @@ class DataManager:
             and set(normalized_exchanges) == full_market_exchanges
             and normalized_start <= date(1990, 12, 19)
         )
+        listing_boundary_candidate_ids = {
+            instrument_id
+            for instrument_id, lifecycle
+            in lifecycle_bounds_by_instrument.items()
+            if exchange_by_instrument.get(instrument_id)
+            in CNINFO_SUPPORTED_EXCHANGES
+            and listed_date_by_instrument.get(instrument_id) == normalized_end
+            and lifecycle["start_date"] == normalized_end
+            and lifecycle["end_date"] == normalized_end
+        }
         cninfo_event_ids = {
             str(row.get("instrument_id") or "").strip()
             for row in cninfo_path["events"]
             if str(row.get("instrument_id") or "").strip()
         }
+        tdx_event_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in tdx_path["events"]
+            if str(row.get("instrument_id") or "").strip()
+        }
+        listing_boundary_event_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in [
+                *cninfo_rows,
+                *cninfo_path["events"],
+                *tdx_rows,
+                *tdx_path["events"],
+                *legacy_selection_rows,
+            ]
+            if str(row.get("instrument_id") or "").strip()
+            in listing_boundary_candidate_ids
+            if self._date_from_any(
+                row.get("effective_date") or row.get("ex_date")
+            ) == normalized_end
+        }
+        listing_boundary_zero_event_ids = (
+            listing_boundary_candidate_ids - listing_boundary_event_ids
+        )
         baseline_covered_ids = sorted(
-            (cninfo_event_ids | cninfo_covered_ids) - cninfo_incomplete_ids
+            (
+                cninfo_event_ids
+                | cninfo_covered_ids
+                | cninfo_lifecycle_anchor_covered_ids
+                | listing_boundary_zero_event_ids
+            )
+            - cninfo_incomplete_ids
         )
         tdx_rows_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
         for row in tdx_endpoint_status_rows:
@@ -19269,10 +19408,16 @@ class DataManager:
         tdx_covered_ids = set()
         tdx_coverage_gap_samples: List[Dict[str, Any]] = []
         for instrument_id in target_ids:
+            lifecycle = lifecycle_bounds_by_instrument[instrument_id]
+            lifecycle_start = lifecycle["start_date"]
+            lifecycle_end = lifecycle["end_date"]
+            if lifecycle_end < lifecycle_start:
+                tdx_covered_ids.add(instrument_id)
+                continue
             coverage = evaluate_coverage_intervals(
                 tdx_rows_by_instrument.get(instrument_id, []),
-                start_date=normalized_start,
-                end_date=normalized_end,
+                start_date=lifecycle_start,
+                end_date=lifecycle_end,
                 accepted_statuses={
                     "complete_with_events",
                     "complete_no_events",
@@ -19283,6 +19428,8 @@ class DataManager:
             elif len(tdx_coverage_gap_samples) < sample_limit:
                 tdx_coverage_gap_samples.append({
                     "instrument_id": instrument_id,
+                    "lifecycle_start_date": lifecycle_start.isoformat(),
+                    "lifecycle_end_date": lifecycle_end.isoformat(),
                     "coverage_gaps": [
                         {
                             "start_date": item["start_date"].isoformat(),
@@ -19291,11 +19438,6 @@ class DataManager:
                         for item in coverage["gaps"]
                     ],
                 })
-        tdx_event_ids = {
-            str(row.get("instrument_id") or "").strip()
-            for row in tdx_path["events"]
-            if str(row.get("instrument_id") or "").strip()
-        }
         tdx_benchmark_covered_ids = sorted(
             (tdx_event_ids | tdx_covered_ids) - tdx_incomplete_ids
         )
@@ -19315,6 +19457,8 @@ class DataManager:
                                 (
                                     cninfo_event_ids
                                     | cninfo_covered_ids
+                                    | cninfo_lifecycle_anchor_covered_ids
+                                    | listing_boundary_zero_event_ids
                                 )
                                 - cninfo_incomplete_ids
                             ),
@@ -19329,7 +19473,11 @@ class DataManager:
                         },
                         zero_event_complete_instruments_by_source={
                             "cninfo": sorted(
-                                cninfo_covered_ids
+                                (
+                                    cninfo_covered_ids
+                                    | cninfo_lifecycle_anchor_covered_ids
+                                    | listing_boundary_zero_event_ids
+                                )
                                 - cninfo_incomplete_ids
                             ),
                             "tdx": sorted(
@@ -19338,6 +19486,9 @@ class DataManager:
                             "legacy": [],
                         },
                         lineage_by_instrument=lineage_by_instrument,
+                        lifecycle_bounds_by_instrument=(
+                            lifecycle_bounds_by_instrument
+                        ),
                         special_event_dates_by_instrument=(
                             special_event_dates_by_instrument
                         ),
@@ -19366,13 +19517,37 @@ class DataManager:
                         )
                     ),
                     "tdx_fallback_count": 0,
+                    "tdx_historical_single_source_count": int(
+                        candidate_summary.get(
+                            "historical_single_source_segment_count", 0
+                        )
+                    ),
                     "tdx_consensus_selection_count": int(
                         candidate_summary.get(
                             "selection_counts", {}
                         ).get("tdx", 0)
+                    ) - int(
+                        candidate_summary.get(
+                            "historical_single_source_segment_count", 0
+                        )
                     ),
                     "cninfo_no_effect_exclusion_count": len(
                         cninfo_path.get("excluded_no_effect") or ()
+                    ),
+                    "cninfo_zero_event_lifecycle_anchor_count": len(
+                        (
+                            cninfo_lifecycle_anchor_covered_ids
+                            - cninfo_event_ids
+                        )
+                        - cninfo_incomplete_ids
+                    ),
+                    "listing_boundary_zero_event_count": len(
+                        listing_boundary_zero_event_ids
+                        - cninfo_event_ids
+                        - cninfo_incomplete_ids
+                    ),
+                    "inferred_lifecycle_end_count": len(
+                        inferred_delisted_date_by_instrument
                     ),
                 })
             else:

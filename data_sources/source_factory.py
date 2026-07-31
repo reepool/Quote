@@ -178,11 +178,11 @@ class DataSourceFactory:
                 ),
                 usage_state_path=source_config.get(
                     'usage_state_path',
-                    '~/.cache/quote/baostock_api_usage.json',
+                    'data/runtime/baostock/api_usage.json',
                 ),
                 session_lock_path=source_config.get(
                     'session_lock_path',
-                    '~/.cache/quote/baostock_session.lock',
+                    'data/runtime/baostock/session.lock',
                 ),
             )
         elif source_name == 'akshare':

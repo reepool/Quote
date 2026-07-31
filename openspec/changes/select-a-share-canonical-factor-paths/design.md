@@ -111,7 +111,13 @@ The selector applies deterministic precedence:
 4. A governed special-action segment retains CNInfo policy and records other sources as
    differing market-account evidence.
 5. No eligible consensus: select complete CNInfo with low confidence and emit an audit
-   conflict. If CNInfo is incomplete, the segment remains blocked.
+   conflict.
+6. If the lifecycle has ended, CNInfo supplies no event rows, TDX supplies a complete
+   non-empty path, and legacy supplies no conflicting path, select TDX as an explicitly
+   labelled low-confidence historical single-source fallback. Complete CNInfo zero-event
+   endpoint evidence does not win this branch because the non-empty TDX history directly
+   contradicts that archive assumption.
+7. Otherwise an incomplete CNInfo segment remains blocked.
 
 Agreement requires both event-jump and normalized cumulative-path tolerances. Selected rows
 come from one source path within a segment; raw source dates remain auditable. Reviewed
@@ -122,10 +128,54 @@ historical factor gaps. TDX is source-complete when its derived path has no pend
 events. Recent endpoint-request interval rows are audit checks only. Legacy is available
 when the existing composite table contains a valid path for the instrument.
 
-An empty source path is eligible only when complete endpoint evidence explicitly covers the
-requested range. A non-empty derived CNInfo or TDX path remains eligible without recent
+An empty CNInfo path is eligible when accepted endpoint evidence covers the lifecycle start
+and the derived path has no pending event or historical gap. Later missing per-instrument
+endpoint intervals remain an audit warning because normal daily maintenance discovers
+announcements market-wide and refreshes only affected instruments. Full lifecycle endpoint
+coverage remains stronger evidence when available. Coverage starts at the later of the
+requested start and listing date, and ends at the earlier of the requested end and
+delisting date. A non-empty derived CNInfo or TDX path remains eligible without recent
 endpoint evidence. Legacy has no independent zero-event coverage contract, so it is
 eligible only in continuity segments containing valid normalized legacy events.
+
+An empty CNInfo path contradicted by a complete non-empty TDX path is not treated as
+ordinary eligible CNInfo evidence. An active lifecycle remains blocked unless TDX and
+legacy form an independent consensus. A completed lifecycle may use the narrower historical
+TDX fallback only when legacy supplies no eligible conflicting path.
+
+The historical TDX fallback is deliberately narrower than normal consensus. It cannot be
+used for an active lifecycle, including an earlier continuity segment of an otherwise
+active instrument, a special action whose CNInfo policy is known, an incomplete TDX path,
+or a segment where an eligible legacy path disagrees. Its selected rows retain the TDX
+source and use `historical_single_source` confidence so they remain distinguishable from
+independent consensus. The branch is evaluated before the ordinary CNInfo zero-event
+fallback so contradicted empty CNInfo archive coverage cannot hide known TDX events.
+
+When an instrument is explicitly marked `status=delisted` but lacks a delisting date, its
+last local quote date is used as an auditable inferred lifecycle end. Generic inactive or
+automatic deactivation states are insufficient because they may describe a still-listed
+instrument with stale local data.
+
+A CNInfo-supported instrument whose lifecycle starts on the requested end date has no
+post-listing interval in which an adjustment event could affect the candidate. When
+CNInfo, TDX, and legacy all contain no event on that boundary, the empty CNInfo path is
+accepted as a low-confidence listing-boundary zero-event path instead of blocking the whole
+full-market candidate.
+
+Cross-provider factor ratios use a default relative tolerance of 0.1%. This accommodates
+normal published precision differences without hiding larger differences; operators may
+still provide a stricter value and every run retains the existing factor-difference
+buckets.
+
+### Keep BaoStock runtime state writable
+
+BaoStock's persistent daily quota and cross-process session lock remain project-local
+runtime state. Defaults resolve below `data/runtime/baostock/`, which is writable in the
+deployed service and remains outside source-controlled datasets. Explicit absolute paths
+remain supported for tests and custom deployments. During migration from the previous
+user-cache defaults, the governor reads the larger current-day counter, coordinates both
+session locks, and mirrors state to the legacy path when writable. An unavailable
+read-only legacy path does not disable the project-local governor.
 
 ### Preserve audit and isolate promotion
 
@@ -147,6 +197,11 @@ operator decision.
   contract and preserve row source lineage for audit.
 - [Recent endpoint status does not cover a non-targeted instrument] -> Report an audit
   coverage warning without invalidating an otherwise complete factor path.
+- [TDX is the only surviving source for a delisted instrument] -> Permit only a labelled
+  historical single-source fallback after lifecycle and completeness checks; never apply
+  it to active instruments.
+- [Home filesystem is read-only] -> Store BaoStock lock/quota state in project runtime
+  storage rather than disabling the configured fallback source.
 - [Obsolete price-ratio rows exist] -> Delete only profiles and statuses owned by the
   removed Tencent/Eastmoney implementation; do not touch Sina, CNInfo, or TDX rows.
 
@@ -159,6 +214,8 @@ operator decision.
 3. Rewire selection coverage and reporting to the existing legacy composite path.
 4. Run a targeted local-only three-source dry-run.
 5. Build and inspect a full-market staging candidate before explicit promotion.
+6. Re-run the full-market preview with lifecycle bounds, historical fallback, and the
+   production default tolerance before writing staging.
 
 Rollback disables candidate construction. Existing CNInfo, TDX, and legacy production
 reads remain available.

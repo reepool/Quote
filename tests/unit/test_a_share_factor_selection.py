@@ -35,7 +35,9 @@ def _candidate(
     complete=None,
     zero_event_complete=None,
     lineage=None,
+    lifecycle=None,
     special=None,
+    factor_relative_tolerance=0.001,
 ):
     return build_three_source_canonical_candidate(
         cninfo_rows=cninfo,
@@ -54,6 +56,7 @@ def _candidate(
             zero_event_complete or {}
         ),
         lineage_by_instrument=lineage,
+        lifecycle_bounds_by_instrument=lifecycle,
         special_event_dates_by_instrument=special,
         sessions_by_exchange={
             "SZSE": [
@@ -62,6 +65,8 @@ def _candidate(
                 date(2021, 5, 31),
             ]
         },
+        factor_relative_tolerance=factor_relative_tolerance,
+        cumulative_relative_tolerance=factor_relative_tolerance,
     )
 
 
@@ -512,6 +517,188 @@ def test_selector_rejects_invalid_path_as_empty_consensus_vote():
     }
     assert summary["decisions"][0]["invalid_sources"] == ["tdx"]
     assert summary["decisions"][0]["eligible_sources"] == []
+
+
+def test_selector_bounds_segment_to_instrument_lifecycle():
+    candidate, summary = _candidate(
+        cninfo=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "cninfo")
+        ],
+        tdx=[],
+        legacy=[],
+        complete={
+            "cninfo": ["000001.SZ"],
+            "tdx": [],
+            "legacy": [],
+        },
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2021, 1, 4),
+                "delisted_date": date(2021, 12, 31),
+                "lifecycle_ended": True,
+            }
+        },
+    )
+
+    assert len(candidate) == 1
+    assert summary["decisions"][0]["start_date"] == date(2021, 1, 4)
+    assert summary["decisions"][0]["end_date"] == date(2021, 12, 31)
+
+
+def test_selector_uses_tdx_single_source_for_completed_history():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[],
+        complete={
+            "cninfo": [],
+            "tdx": ["000001.SZ"],
+            "legacy": [],
+        },
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "delisted_date": date(2021, 12, 31),
+                "lifecycle_ended": True,
+            }
+        },
+    )
+
+    assert summary["blocked_segment_count"] == 0
+    assert summary["historical_single_source_segment_count"] == 1
+    assert summary["low_confidence_segment_count"] == 1
+    assert summary["confidence_counts"] == {
+        "historical_single_source": 1
+    }
+    assert candidate[0]["selected_source"] == "tdx"
+    assert candidate[0]["quality_status"] == "historical_single_source"
+    assert summary["decisions"][0]["reason"] == (
+        "tdx_historical_single_source_fallback"
+    )
+
+
+def test_selector_treats_historical_tdx_events_as_contradicting_cninfo_zero_event():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[],
+        complete={
+            "cninfo": ["000001.SZ"],
+            "tdx": ["000001.SZ"],
+            "legacy": [],
+        },
+        zero_event_complete={"cninfo": ["000001.SZ"]},
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "delisted_date": date(2021, 12, 31),
+                "lifecycle_ended": True,
+            }
+        },
+    )
+
+    assert summary["blocked_segment_count"] == 0
+    assert summary["historical_single_source_segment_count"] == 1
+    assert candidate[0]["selected_source"] == "tdx"
+    assert summary["decisions"][0]["eligible_sources"] == [
+        "cninfo",
+        "tdx",
+    ]
+    assert summary["decisions"][0]["reason"] == (
+        "tdx_historical_single_source_fallback"
+    )
+
+
+def test_selector_blocks_single_reference_for_active_lifecycle():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[],
+        complete={
+            "cninfo": ["000001.SZ"],
+            "tdx": ["000001.SZ"],
+            "legacy": [],
+        },
+        zero_event_complete={"cninfo": ["000001.SZ"]},
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "lifecycle_ended": False,
+            }
+        },
+    )
+
+    assert candidate == []
+    assert summary["blocked_segment_count"] == 1
+    assert summary["historical_single_source_segment_count"] == 0
+    assert summary["decisions"][0]["cninfo_empty_contradicted"] is True
+
+
+def test_selector_does_not_use_historical_fallback_for_active_lineage_segment():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2020, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[],
+        complete={
+            "cninfo": [],
+            "tdx": ["000001.SZ"],
+            "legacy": [],
+        },
+        lineage={
+            "000001.SZ": {
+                "transitions": [{
+                    "effective_date": "2022-01-01",
+                    "price_continuity": "non_continuous",
+                }]
+            }
+        },
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "lifecycle_ended": False,
+            }
+        },
+    )
+
+    assert candidate == []
+    assert summary["blocked_segment_count"] == 2
+    assert summary["historical_single_source_segment_count"] == 0
+
+
+def test_selector_blocks_disagreeing_historical_reference_sources():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[
+            _row("000001.SZ", date(2021, 5, 28), 1.2, "legacy")
+        ],
+        complete={
+            "cninfo": [],
+            "tdx": ["000001.SZ"],
+            "legacy": ["000001.SZ"],
+        },
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "delisted_date": date(2021, 12, 31),
+                "lifecycle_ended": True,
+            }
+        },
+    )
+
+    assert candidate == []
+    assert summary["blocked_segment_count"] == 1
+    assert summary["historical_single_source_segment_count"] == 0
 
 
 def test_selector_resets_cumulative_at_lineage_boundary():

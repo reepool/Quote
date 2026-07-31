@@ -290,6 +290,10 @@ async def test_scheduler_three_source_selection_is_local_only_dry_run(
     assert result["status"] == "dry_run"
     backfill.assert_not_awaited()
     assert selection.await_args.kwargs["dry_run"] is True
+    assert (
+        selection.await_args.kwargs["factor_relative_tolerance"]
+        == 0.001
+    )
 
 
 def test_cninfo_primary_factor_report_keeps_production_isolation_visible():

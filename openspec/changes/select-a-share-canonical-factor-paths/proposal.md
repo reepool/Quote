@@ -31,6 +31,15 @@ decision without introducing another full-market source download.
   source observations or automatically changing production reads.
 - Keep a dry-run-first, local-only manual task for three-source scoring, low-confidence
   conflicts, and promotion eligibility.
+- Bound zero-event coverage and continuity segments to each instrument's listed/delisted
+  lifecycle instead of requiring impossible pre-listing or post-delisting evidence.
+- Allow an explicitly labelled low-confidence TDX historical fallback only for a completed
+  delisted lifecycle whose CNInfo archive is unavailable and whose legacy path does not
+  provide conflicting evidence.
+- Use a 0.1% default relative factor tolerance for cross-provider consensus while retaining
+  stricter configurable overrides and bounded difference buckets.
+- Keep BaoStock quota and session-lock state under the project runtime directory so normal
+  source initialization does not depend on a writable home cache.
 
 ## Capabilities
 
