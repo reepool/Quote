@@ -28,3 +28,13 @@
 
 - [x] 5.1 Run focused provider, selector, DataManager, scheduler, and database regression tests
 - [x] 5.2 Run Python compile, diff checks, strict OpenSpec validation, and review all uncommitted changes
+
+## 6. Restore Direct Sina Factor Source
+
+- [x] 6.1 Revise proposal, design, and delta specs from Tencent/Eastmoney price ratios to direct Sina `hfq-factor`
+- [x] 6.2 Restore direct Sina A-share factor acquisition with sparse incremental extraction and explicit source profile
+- [x] 6.3 Persist and load atomic complete Sina snapshots for three-source selection
+- [x] 6.4 Rewire canonical selection, scheduler parameters, and reports to CNInfo/TDX/Sina
+- [x] 6.5 Remove Tencent/Eastmoney price-ratio code, configuration, tests, documentation, and exact runtime artifacts
+- [x] 6.6 Add and update focused unit, integration, scheduler, and persistence tests
+- [x] 6.7 Run regression tests, Python compile, strict OpenSpec validation, and uncommitted-change review

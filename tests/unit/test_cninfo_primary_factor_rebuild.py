@@ -1092,17 +1092,17 @@ async def test_candidate_write_failure_blocks_promotion_and_retry_cleanup():
 
 
 @pytest.mark.asyncio
-async def test_three_source_candidate_selects_matching_akshare_path_in_dry_run():
+async def test_three_source_candidate_selects_matching_sina_path_in_dry_run():
     manager = _manager_with_factor_evidence()
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_tencent",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_with_events",
             "event_count": 1,
             "start_date": datetime(1990, 12, 19),
             "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(
@@ -1110,18 +1110,18 @@ async def test_three_source_candidate_selects_matching_akshare_path_in_dry_run()
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2020, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_tencent_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "normalized_factor": 13.5 / (13.5 - 0.218),
             "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }, {
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2019, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_eastmoney_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "normalized_factor": 1.2,
             "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "stale-eastmoney",
+            "ingestion_run_id": "stale-sina",
         }]
     )
 
@@ -1143,7 +1143,7 @@ async def test_three_source_candidate_selects_matching_akshare_path_in_dry_run()
     assert result["candidate"]["candidate_built"] is True
     assert result["candidate"]["selection_counts"] == {"cninfo": 1}
     assert result["candidate"]["confidence_counts"] == {"high": 1}
-    assert result["source_events"]["akshare_market_factor_rows"] == 1
+    assert result["source_events"]["sina_factor_rows"] == 1
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
 
 
@@ -1153,12 +1153,12 @@ async def test_three_source_candidate_persists_staging_without_promotion():
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_eastmoney",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_with_events",
             "event_count": 1,
             "start_date": datetime(1990, 12, 19),
             "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-eastmoney",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(
@@ -1166,10 +1166,10 @@ async def test_three_source_candidate_persists_staging_without_promotion():
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2020, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_eastmoney_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "normalized_factor": 13.5 / (13.5 - 0.218),
             "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "snapshot-eastmoney",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
 
@@ -1197,7 +1197,7 @@ async def test_three_source_candidate_persists_staging_without_promotion():
 
 
 @pytest.mark.asyncio
-async def test_three_source_counts_zero_event_akshare_snapshot_as_complete():
+async def test_three_source_counts_zero_event_sina_snapshot_as_complete():
     manager = _manager_with_factor_evidence()
     manager.db_ops.list_adjustment_factor_observations = AsyncMock(
         return_value=[]
@@ -1205,7 +1205,7 @@ async def test_three_source_counts_zero_event_akshare_snapshot_as_complete():
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_tencent",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_no_events",
             "event_count": 0,
             "start_date": datetime(1990, 12, 19),
@@ -1224,7 +1224,7 @@ async def test_three_source_counts_zero_event_akshare_snapshot_as_complete():
         source_selection_mode="three_source",
     )
 
-    coverage = result["source_completeness"]["akshare_market"]
+    coverage = result["source_completeness"]["sina"]
     assert coverage["status"] == "success"
     assert coverage["available_instruments"] == 1
     assert coverage["incomplete_instruments"] == 0
@@ -1250,7 +1250,7 @@ async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_tencent",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_no_events",
             "event_count": 0,
             "start_date": datetime(1990, 12, 19),
@@ -1273,8 +1273,8 @@ async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
     assert result["candidate"]["selection_counts"] == {"cninfo": 1}
     assert result["candidate"]["confidence_counts"] == {"low": 1}
     assert result["candidate"]["decisions"][0]["eligible_sources"] == [
-        "akshare",
         "cninfo",
+        "sina",
     ]
 
 
@@ -1306,20 +1306,20 @@ async def test_three_source_preserves_operator_attested_special_cninfo_path():
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2020, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_tencent_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "normalized_factor": 1.01,
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_tencent",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_with_events",
             "event_count": 1,
             "start_date": datetime(1990, 12, 19),
             "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
 
@@ -1351,20 +1351,20 @@ async def test_three_source_candidate_blocks_when_cninfo_path_is_incomplete():
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2020, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_tencent_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "normalized_factor": 1.2,
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[{
             "instrument_id": "000001.SZ",
-            "source": "akshare_tencent",
+            "source": "sina_hfq_factor",
             "coverage_status": "complete_with_events",
             "event_count": 1,
             "start_date": datetime(1990, 12, 19),
             "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-tencent",
+            "ingestion_run_id": "snapshot-sina",
         }]
     )
     manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(

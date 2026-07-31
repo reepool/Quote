@@ -158,6 +158,46 @@ class DatabaseManager:
             for table in tables:
                 table.create(bind=connection, checkfirst=True)
 
+            instruments_table_exists = connection.execute(text(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='instruments'"
+            )).scalar_one_or_none()
+            if instruments_table_exists is None:
+                return
+
+            obsolete_profiles = (
+                "akshare_tencent_price_ratio_v1",
+                "akshare_eastmoney_price_ratio_v1",
+            )
+            obsolete_series = ("akshare_market_price_ratio_snapshot_v1",)
+            deleted_observations = connection.execute(
+                AdjustmentFactorObservationDB.__table__.delete().where(
+                    AdjustmentFactorObservationDB.source_profile.in_(
+                        obsolete_profiles
+                    )
+                )
+            ).rowcount
+            deleted_statuses = connection.execute(
+                AdjustmentFactorInstrumentStatusDB.__table__.delete().where(
+                    AdjustmentFactorInstrumentStatusDB.series_version.in_(
+                        obsolete_series
+                    )
+                )
+            ).rowcount
+            deleted_total = sum(
+                int(value or 0)
+                for value in (
+                    deleted_observations,
+                    deleted_statuses,
+                )
+            )
+            if deleted_total:
+                db_logger.info(
+                    "[Database] Removed %d obsolete A-share price-ratio "
+                    "factor governance rows",
+                    deleted_total,
+                )
+
     def _ensure_corporate_action_governance_schema(self) -> None:
         """Create additive official corporate-action tables on existing DBs."""
         from .models import (

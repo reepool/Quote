@@ -30,7 +30,7 @@ def _candidate(
     *,
     cninfo,
     tdx,
-    akshare,
+    sina,
     complete=None,
     lineage=None,
     special=None,
@@ -38,7 +38,7 @@ def _candidate(
     return build_three_source_canonical_candidate(
         cninfo_rows=cninfo,
         tdx_rows=tdx,
-        akshare_rows=akshare,
+        sina_rows=sina,
         target_instruments=["000001.SZ"],
         series_version="unit__staging",
         start_date=date(2020, 1, 1),
@@ -46,7 +46,7 @@ def _candidate(
         complete_instruments_by_source=complete or {
             "cninfo": ["000001.SZ"],
             "tdx": ["000001.SZ"],
-            "akshare": ["000001.SZ"],
+            "sina": ["000001.SZ"],
         },
         lineage_by_instrument=lineage,
         special_event_dates_by_instrument=special,
@@ -138,7 +138,7 @@ def test_selector_prefers_cninfo_for_three_source_consensus():
     candidate, summary = _candidate(
         cninfo=rows,
         tdx=[{**rows[0], "source": "tdx"}],
-        akshare=[{**rows[0], "source": "akshare"}],
+        sina=[{**rows[0], "source": "sina"}],
     )
 
     assert summary["selection_counts"] == {"cninfo": 1}
@@ -155,8 +155,8 @@ def test_selector_uses_independent_consensus_for_ordinary_segment():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
         ],
-        akshare=[
-            _row("000001.SZ", date(2021, 5, 28), 1.1, "akshare")
+        sina=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "sina")
         ],
     )
 
@@ -173,8 +173,8 @@ def test_selector_keeps_cninfo_for_governed_special_segment():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
         ],
-        akshare=[
-            _row("000001.SZ", date(2021, 5, 28), 1.1, "akshare")
+        sina=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "sina")
         ],
         special={"000001.SZ": [date(2021, 5, 28)]},
     )
@@ -191,8 +191,8 @@ def test_selector_uses_low_confidence_cninfo_when_all_disagree():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
         ],
-        akshare=[
-            _row("000001.SZ", date(2021, 5, 28), 1.2, "akshare")
+        sina=[
+            _row("000001.SZ", date(2021, 5, 28), 1.2, "sina")
         ],
     )
 
@@ -207,13 +207,13 @@ def test_selector_blocks_incomplete_cninfo():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
         ],
-        akshare=[
-            _row("000001.SZ", date(2021, 5, 28), 1.2, "akshare")
+        sina=[
+            _row("000001.SZ", date(2021, 5, 28), 1.2, "sina")
         ],
         complete={
             "cninfo": [],
             "tdx": ["000001.SZ"],
-            "akshare": ["000001.SZ"],
+            "sina": ["000001.SZ"],
         },
     )
 
@@ -228,13 +228,13 @@ def test_selector_uses_independent_consensus_when_cninfo_is_incomplete():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
         ],
-        akshare=[
-            _row("000001.SZ", date(2021, 5, 28), 1.1, "akshare")
+        sina=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "sina")
         ],
         complete={
             "cninfo": [],
             "tdx": ["000001.SZ"],
-            "akshare": ["000001.SZ"],
+            "sina": ["000001.SZ"],
         },
     )
 
@@ -249,14 +249,14 @@ def test_selector_accepts_independent_zero_event_consensus():
             _row("000001.SZ", date(2021, 5, 28), 1.1, "cninfo")
         ],
         tdx=[],
-        akshare=[],
+        sina=[],
     )
 
     assert candidate == []
     assert summary["blocked_segment_count"] == 0
     assert summary["selection_counts"] == {"tdx": 1}
     assert summary["decisions"][0]["reason"] == (
-        "tdx_akshare_consensus_over_cninfo"
+        "tdx_sina_consensus_over_cninfo"
     )
 
 
@@ -266,11 +266,11 @@ def test_selector_rejects_invalid_path_as_empty_consensus_vote():
         tdx=[
             _row("000001.SZ", date(2021, 5, 28), 0.0, "tdx")
         ],
-        akshare=[],
+        sina=[],
         complete={
             "cninfo": [],
             "tdx": ["000001.SZ"],
-            "akshare": ["000001.SZ"],
+            "sina": ["000001.SZ"],
         },
     )
 
@@ -280,7 +280,7 @@ def test_selector_rejects_invalid_path_as_empty_consensus_vote():
         "tdx": ["000001.SZ"]
     }
     assert summary["decisions"][0]["invalid_sources"] == ["tdx"]
-    assert summary["decisions"][0]["eligible_sources"] == ["akshare"]
+    assert summary["decisions"][0]["eligible_sources"] == ["sina"]
 
 
 def test_selector_resets_cumulative_at_lineage_boundary():
@@ -290,11 +290,11 @@ def test_selector_resets_cumulative_at_lineage_boundary():
             _row("000001.SZ", date(2022, 5, 28), 1.2, "cninfo"),
         ],
         tdx=[],
-        akshare=[],
+        sina=[],
         complete={
             "cninfo": ["000001.SZ"],
             "tdx": [],
-            "akshare": [],
+            "sina": [],
         },
         lineage={
             "000001.SZ": {
@@ -324,11 +324,11 @@ def test_selector_excludes_provider_factor_at_non_continuous_boundary():
     candidate, summary = _candidate(
         cninfo=[],
         tdx=[boundary_row],
-        akshare=[{**boundary_row, "source": "akshare"}],
+        sina=[{**boundary_row, "source": "sina"}],
         complete={
             "cninfo": [],
             "tdx": ["000001.SZ"],
-            "akshare": ["000001.SZ"],
+            "sina": ["000001.SZ"],
         },
         lineage={
             "000001.SZ": {
@@ -345,11 +345,11 @@ def test_selector_excludes_provider_factor_at_non_continuous_boundary():
     assert second_segment["source_event_counts"] == {
         "cninfo": 0,
         "tdx": 0,
-        "akshare": 0,
+        "sina": 0,
     }
     assert second_segment["excluded_boundary_event_counts"] == {
         "tdx": 1,
-        "akshare": 1,
+        "sina": 1,
     }
 
 

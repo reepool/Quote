@@ -3,7 +3,7 @@ from datetime import date, datetime
 import sqlite3
 
 import pytest
-from sqlalchemy import event, select
+from sqlalchemy import create_engine, event, select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.models import (
@@ -50,6 +50,90 @@ def test_provider_snapshot_observations_and_status_commit_atomically():
     asyncio.run(_exercise_atomic_provider_snapshot())
 
 
+def test_adjustment_factor_schema_removes_only_obsolete_price_ratio_state(
+    tmp_path,
+):
+    database_path = tmp_path / "obsolete_factor_state.db"
+    manager = DatabaseManager(str(database_path))
+    manager.sync_engine = create_engine(f"sqlite:///{database_path}")
+
+    with manager.sync_engine.begin() as connection:
+        Base.metadata.create_all(
+            bind=connection,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorObservationDB.__table__,
+                AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorSeriesStatusDB.__table__,
+                AdjustmentFactorInstrumentStatusDB.__table__,
+            ],
+        )
+        connection.execute(InstrumentDB.__table__.insert(), {
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "name": "Ping An Bank",
+            "exchange": "SZSE",
+            "type": "stock",
+            "currency": "CNY",
+            "is_active": True,
+        })
+        connection.execute(
+            AdjustmentFactorObservationDB.__table__.insert(),
+            [
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2020, 5, 28),
+                    "source": "akshare",
+                    "source_profile": "akshare_tencent_price_ratio_v1",
+                    "normalization_version": "event_ratio_v1",
+                    "quality_status": "valid",
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2021, 5, 28),
+                    "source": "akshare",
+                    "source_profile": "sina_hfq_factor",
+                    "normalization_version": "event_ratio_v1",
+                    "quality_status": "valid",
+                },
+            ],
+        )
+        connection.execute(
+            AdjustmentFactorInstrumentStatusDB.__table__.insert(),
+            [
+                {
+                    "instrument_id": "000001.SZ",
+                    "series_version":
+                        "akshare_market_price_ratio_snapshot_v1",
+                    "source": "akshare",
+                    "coverage_status": "complete_with_events",
+                    "event_count": 1,
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "series_version": "sina_hfq_factor_snapshot_v1",
+                    "source": "sina_hfq_factor",
+                    "coverage_status": "complete_with_events",
+                    "event_count": 1,
+                },
+            ],
+        )
+
+    manager._ensure_adjustment_factor_governance_schema()
+
+    with manager.sync_engine.connect() as connection:
+        observation_profiles = set(connection.execute(
+            select(AdjustmentFactorObservationDB.source_profile)
+        ).scalars())
+        status_versions = set(connection.execute(
+            select(AdjustmentFactorInstrumentStatusDB.series_version)
+        ).scalars())
+
+    assert observation_profiles == {"sina_hfq_factor"}
+    assert status_versions == {"sina_hfq_factor_snapshot_v1"}
+    manager.sync_engine.dispose()
+
+
 async def _exercise_atomic_provider_snapshot():
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
@@ -82,7 +166,7 @@ async def _exercise_atomic_provider_snapshot():
             "instrument_id": "000001.SZ",
             "ex_date": datetime(2020, 5, 28),
             "source": "akshare",
-            "source_profile": "akshare_tencent_price_ratio_v1",
+            "source_profile": "sina_hfq_factor",
             "provider_factor": factor,
             "normalized_factor": factor,
             "normalization_version": "event_ratio_v1",
@@ -95,9 +179,9 @@ async def _exercise_atomic_provider_snapshot():
             [observation(factor)],
             instrument_id="000001.SZ",
             source="akshare",
-            source_profile="akshare_tencent_price_ratio_v1",
-            status_source="akshare_tencent",
-            series_version="akshare_market_price_ratio_snapshot_v1",
+            source_profile="sina_hfq_factor",
+            status_source="sina_hfq_factor",
+            series_version="sina_hfq_factor_snapshot_v1",
             coverage_status="complete_with_events",
             start_date=date(1990, 12, 19),
             end_date=date(2026, 7, 29),

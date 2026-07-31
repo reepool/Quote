@@ -186,17 +186,28 @@ def evaluate_calendar_coverage(
     }
 
 
+def _json_compatible(value: Any) -> Any:
+    """Recursively normalize checkpoint values without mutating runtime state."""
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {
+            str(key): _json_compatible(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_json_compatible(item) for item in value]
+    if isinstance(value, set):
+        return sorted(
+            (_json_compatible(item) for item in value),
+            key=lambda item: str(item),
+        )
+    return value
+
+
 def serialize_checkpoint_parameters(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """Convert normalized task parameters into a stable JSON contract."""
-    payload: Dict[str, Any] = {}
-    for key, value in parameters.items():
-        if isinstance(value, (date, datetime)):
-            payload[key] = value.isoformat()
-        elif isinstance(value, (list, tuple)):
-            payload[key] = list(value)
-        else:
-            payload[key] = value
-    return payload
+    return _json_compatible(parameters)
 
 
 def checkpoint_parameter_hash(parameters: Dict[str, Any]) -> str:
@@ -305,7 +316,7 @@ class AShareBackfillCheckpointStore:
             "parameters": serialize_checkpoint_parameters(parameters),
             "created_at": now,
             "updated_at": now,
-            "universe": universe,
+            "universe": _json_compatible(universe),
             "stages": {},
         }
 
@@ -315,7 +326,13 @@ class AShareBackfillCheckpointStore:
         path = self.path_for(str(payload["checkpoint_id"]))
         temporary = path.with_suffix(f".json.tmp.{os.getpid()}")
         with temporary.open("w", encoding="utf-8") as handle:
-            json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            json.dump(
+                _json_compatible(payload),
+                handle,
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, path)

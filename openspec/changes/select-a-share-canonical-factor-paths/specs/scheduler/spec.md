@@ -1,8 +1,8 @@
 ## ADDED Requirements
 
 ### Requirement: Manual three-source factor selection workflow
-The scheduler SHALL expose a manual-only, dry-run-first workflow for AkShare path backfill,
-three-source scoring, and canonical staging construction.
+The scheduler SHALL expose a manual-only, dry-run-first workflow for optional Sina factor
+backfill, CNInfo/TDX/Sina scoring, and canonical staging construction.
 
 #### Scenario: Default invocation
 - **WHEN** the task is invoked without write flags
@@ -12,17 +12,18 @@ three-source scoring, and canonical staging construction.
 - **WHEN** instrument identifiers are supplied
 - **THEN** only those instruments are fetched, scored, and reported
 
-### Requirement: Resumable bounded acquisition
-The workflow SHALL checkpoint completed provider requests, apply configured request
-intervals, and report provider failures without discarding successful observations.
+### Requirement: Resumable bounded Sina acquisition
+The workflow SHALL checkpoint completed Sina requests, apply configured request intervals,
+and report failures without discarding successful observations.
 
 #### Scenario: Interrupted full-market backfill
 - **WHEN** the task restarts with the same checkpoint and `resume=true`
-- **THEN** it skips completed instruments and continues the remaining universe
+- **THEN** it skips instruments with complete matching Sina snapshots and continues the
+  remaining universe
 
 ### Requirement: Bounded source-selection report
-The task report SHALL include source coverage, provider fallback counts, selection counts,
-confidence counts, blocked segments, agreement patterns, and bounded conflict samples.
+The report SHALL include Sina coverage, selection counts, confidence counts, blocked
+segments, agreement patterns, and bounded conflict samples.
 
 #### Scenario: Low-confidence CNInfo fallback
 - **WHEN** a segment has no eligible consensus

@@ -87,7 +87,7 @@ def test_three_source_selection_job_is_manual_dry_run_first():
 
     assert job["manual_only"] is True
     assert job["parameters"]["dry_run"] is True
-    assert job["parameters"]["backfill_akshare"] is False
+    assert job["parameters"]["backfill_sina"] is False
     assert job["parameters"]["build_canonical"] is True
     assert job["parameters"]["exchanges"] == ["SSE", "SZSE"]
     assert job["max_instances"] == 1
@@ -110,15 +110,14 @@ def test_three_source_selection_report_is_bounded_and_auditable():
             "end_date": "2026-07-29",
             "exchanges": ["SSE", "SZSE"],
             "instrument_ids": ["000001.SZ"],
-            "backfill_akshare": True,
+            "backfill_sina": True,
         },
-        "akshare_backfill": {
+        "sina_backfill": {
             "status": "success",
             "checkpoint_id": "unit",
             "observations": {
                 "provider_profile_counts": {
-                    "akshare_tencent_price_ratio_v1": 10,
-                    "akshare_eastmoney_price_ratio_v1": 2,
+                    "sina_hfq_factor": 10,
                 },
             },
         },
@@ -126,8 +125,8 @@ def test_three_source_selection_report_is_bounded_and_auditable():
             "source_events": {
                 "cninfo_rows": 10,
                 "tdx_rows": 12,
-                "akshare_market_factor_rows": 9,
-                "akshare_market_instruments": 1,
+                "sina_factor_rows": 9,
+                "sina_instruments": 1,
             },
             "source_selection": {
                 "selection_counts": {"cninfo": 1},
@@ -146,7 +145,7 @@ def test_three_source_selection_report_is_bounded_and_auditable():
     })
 
     assert "生产表影响: `无" in content
-    assert "akshare_tencent_price_ratio_v1=10" in content
+    assert "sina_hfq_factor=10" in content
     assert "cninfo=1" in content
     assert "low=1" in content
     assert "cninfo__tdx=1" in content
@@ -211,7 +210,7 @@ async def test_scheduler_three_source_selection_coordinates_without_promotion(
         end_date="2026-07-29",
         exchanges=["SZSE"],
         instrument_ids=["000001.SZ"],
-        backfill_akshare=True,
+        backfill_sina=True,
         dry_run=False,
         resume=True,
         chunk_size=25,
@@ -272,7 +271,7 @@ async def test_scheduler_ignores_legacy_promotion_gates_after_clean_backfill(
     result = await task.a_share_canonical_adjustment_factor_selection(
         start_date="1990-12-19",
         end_date="2026-07-29",
-        backfill_akshare=True,
+        backfill_sina=True,
         dry_run=False,
     )
 
@@ -304,7 +303,7 @@ async def test_scheduler_three_source_selection_skips_optional_backfill(
     result = await task.a_share_canonical_adjustment_factor_selection(
         start_date="1990-12-19",
         end_date="2026-07-29",
-        backfill_akshare=False,
+        backfill_sina=False,
     )
 
     assert result["status"] == "dry_run"

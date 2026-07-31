@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Comparable independent factor paths
-The system SHALL rebuild CNInfo, TDX, and eligible AkShare observations into positive
+The system SHALL rebuild CNInfo, TDX, and complete Sina `hfq-factor` observations into positive
 adjacent event ratios and latest-session unit-anchored cumulative paths without modifying
 the source observations.
 
@@ -39,15 +39,15 @@ The system SHALL select one complete source path per continuity segment using de
 consensus rules and SHALL NOT splice individual source events inside that segment.
 
 #### Scenario: Three sources agree
-- **WHEN** eligible CNInfo, TDX, and AkShare paths agree
+- **WHEN** eligible CNInfo, TDX, and Sina paths agree
 - **THEN** the system selects CNInfo and records high-confidence three-source evidence
 
 #### Scenario: CNInfo agrees with one independent source
-- **WHEN** CNInfo agrees with either TDX or AkShare
+- **WHEN** CNInfo agrees with either TDX or Sina
 - **THEN** the system selects CNInfo and records the agreeing source
 
 #### Scenario: Independent sources agree on ordinary actions
-- **WHEN** TDX and AkShare agree, CNInfo differs, and the segment contains only ordinary
+- **WHEN** TDX and Sina agree, CNInfo differs, and the segment contains only ordinary
   symmetric actions
 - **THEN** the system selects the independent consensus path and records why CNInfo was not
   selected
@@ -65,8 +65,8 @@ The system MUST retain the governed CNInfo path for segments containing share re
 restructuring, compensation, debt conversion, debt settlement, asymmetric distributions,
 or another approved special-action classification.
 
-#### Scenario: TDX and AkShare agree against special CNInfo path
-- **WHEN** TDX and AkShare agree but the CNInfo segment is governed as a special action
+#### Scenario: TDX and Sina agree against special CNInfo path
+- **WHEN** TDX and Sina agree but the CNInfo segment is governed as a special action
 - **THEN** the system keeps CNInfo and records the disagreement as market-account evidence
 
 ### Requirement: Versioned selection provenance

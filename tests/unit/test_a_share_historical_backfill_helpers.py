@@ -183,6 +183,29 @@ def test_checkpoint_store_is_parameter_bound_and_atomic(tmp_path):
         store.load(checkpoint_id, changed)
 
 
+def test_checkpoint_store_serializes_nested_universe_dates(tmp_path):
+    parameters = {
+        "start_date": date(1990, 12, 19),
+        "end_date": date(2026, 7, 30),
+        "resume": True,
+    }
+    universe = [{
+        "instrument_id": "600000.SH",
+        "listed_date": datetime(1999, 11, 10, 0, 0),
+        "metadata": {"dates": [date(1999, 11, 10)]},
+    }]
+    store = AShareBackfillCheckpointStore(tmp_path)
+    checkpoint_id = store.resolve_id(parameters)
+    payload = store.initialize(checkpoint_id, parameters, universe)
+
+    store.save(payload)
+    loaded = store.load(checkpoint_id, parameters)
+
+    assert loaded is not None
+    assert loaded["universe"][0]["listed_date"] == "1999-11-10T00:00:00"
+    assert loaded["universe"][0]["metadata"]["dates"] == ["1999-11-10"]
+
+
 def test_pending_quote_repair_policy_changes_checkpoint_identity(tmp_path):
     store = AShareBackfillCheckpointStore(tmp_path)
     common = {

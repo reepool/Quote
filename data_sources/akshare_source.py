@@ -19,11 +19,6 @@ import pandas as pd
 import akshare as ak
 
 from .base_source import BaseDataSource, RateLimitConfig
-from .a_share_factor_adapter import (
-    AkshareAShareFactorAdapter,
-    AkshareFactorPathResult,
-    PriceRatioFactorError,
-)
 from .adjustment_config import AdjustmentConfig
 from utils.exceptions import DataSourceError, NetworkError, ErrorCodes
 from utils import log_execution, data_source_metrics, config_manager, get_shanghai_time, exchange_mapper
@@ -33,6 +28,10 @@ from utils import akshare_logger
 class AkShareSource(BaseDataSource):
     """AkShare数据源 - 支持 A 股 (SSE/SZSE/BSE) + 港股 (HKEX) + 美股 (NASDAQ/NYSE)"""
 
+    _A_SHARE_FACTOR_CONFIG_DEFAULTS = {
+        "request_timeout_seconds": 30.0,
+        "material_ratio_threshold": 0.0001,
+    }
     _HK_FACTOR_CONFIG_DEFAULTS = {
         "api": "stock_hk_daily",
         "factor_adjust": "qfq-factor",
@@ -1116,6 +1115,23 @@ class AkShareSource(BaseDataSource):
         })
         return cfg
 
+    def _get_a_share_factor_config(self) -> Dict[str, Any]:
+        """读取 A 股新浪因子请求配置，缺失项使用安全默认值。"""
+        configured = config_manager.get_nested(
+            "data_sources_config.akshare.a_share_adjustment_factors",
+            {},
+        )
+        if not isinstance(configured, dict):
+            configured = {}
+
+        cfg = dict(self._A_SHARE_FACTOR_CONFIG_DEFAULTS)
+        cfg.update({
+            key: value
+            for key, value in configured.items()
+            if key in cfg
+        })
+        return cfg
+
     def _hk_factor_invalid_result(
         self,
         message: str,
@@ -1180,7 +1196,7 @@ class AkShareSource(BaseDataSource):
                             cum_val,
                             1.0,
                             rel_tol=rel_tol,
-                            abs_tol=abs_tol,
+                            abs_tol=max(abs_tol, threshold),
                         )
                     )
                 else:
@@ -1192,7 +1208,7 @@ class AkShareSource(BaseDataSource):
                         day_factor_raw,
                         1.0,
                         rel_tol=rel_tol,
-                        abs_tol=abs_tol,
+                        abs_tol=max(abs_tol, threshold),
                     )
             elif shift_val is not None and shift_val > threshold:
                 is_event_day = True
@@ -1455,12 +1471,17 @@ class AkShareSource(BaseDataSource):
             akshare_logger.error(f"[{self.name}] Health check failed: {e}")
             return False
 
-    async def get_adjustment_factors(self, instrument_id: str, symbol: str,
-                                     start_date: datetime, end_date: datetime
-                                     ) -> Optional[List[Dict[str, Any]]]:
+    async def get_adjustment_factors(
+        self,
+        instrument_id: str,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+        required_coverage_start_date: Optional[date] = None,
+    ) -> Optional[List[Dict[str, Any]]]:
         """获取复权因子数据
 
-        A 股优先使用腾讯原始/后复权行情反推稳定因子平台，失败后回退东财。
+        A 股直接读取新浪 hfq-factor 累计因子并压缩为稀疏事件。
         """
         try:
             # HKEX 分支: 通过不复权/后复权价格反推因子
@@ -1470,69 +1491,183 @@ class AkShareSource(BaseDataSource):
                     instrument_id, symbol, start_date, end_date
                 )
 
-            result = await self.get_a_share_adjustment_factor_path(
-                instrument_id,
-                symbol,
-                start_date,
-                end_date,
+            await self.rate_limiter.acquire()
+            factor_config = self._get_a_share_factor_config()
+            request_timeout_seconds = float(
+                factor_config["request_timeout_seconds"]
             )
-            return result.events
+            if request_timeout_seconds <= 0:
+                raise ValueError(
+                    "A-share Sina factor request_timeout_seconds must be positive"
+                )
+            if suffix in {'SH', 'SSE'}:
+                ak_symbol = f"sh{symbol}"
+            elif suffix in {'SZ', 'SZSE'}:
+                ak_symbol = f"sz{symbol}"
+            elif suffix in {'BJ', 'BSE'}:
+                ak_symbol = f"bj{symbol}"
+            else:
+                akshare_logger.warning(
+                    "Unsupported A-share instrument for Sina factor: %s",
+                    instrument_id,
+                )
+                return None
 
-        except PriceRatioFactorError as e:
-            akshare_logger.warning(
-                "AkShare A-share factor path unavailable for %s: %s",
-                instrument_id,
-                e,
+            try:
+                factor_df = await asyncio.to_thread(
+                    self._fetch_sina_hfq_factor_frame,
+                    ak_symbol,
+                    request_timeout_seconds,
+                )
+            except TimeoutError:
+                akshare_logger.warning(
+                    "Sina hfq-factor request timed out after %.1fs for %s",
+                    request_timeout_seconds,
+                    ak_symbol,
+                )
+                return None
+            except Exception as fetch_error:
+                akshare_logger.warning(
+                    "Sina hfq-factor fetch failed for %s: %s",
+                    ak_symbol,
+                    fetch_error,
+                )
+                return None
+            if factor_df is None or factor_df.empty:
+                akshare_logger.warning(
+                    "Sina hfq-factor response unavailable for %s",
+                    instrument_id,
+                )
+                return None
+
+            factor_df = factor_df.copy()
+            if 'date' in factor_df.columns:
+                factor_df = factor_df.set_index('date')
+            factor_df.index = pd.to_datetime(factor_df.index, errors='coerce')
+            factor_df = factor_df[factor_df.index.notna()]
+            factor_df = factor_df.sort_index()
+
+            factor_col = next(
+                (
+                    column
+                    for column in ('hfq_factor', 'factor')
+                    if column in factor_df.columns
+                ),
+                None,
             )
-            return None
+            if factor_col is None and len(factor_df.columns) == 1:
+                factor_col = factor_df.columns[0]
+            if factor_col is None:
+                akshare_logger.warning(
+                    "Sina hfq-factor response has no factor column for %s",
+                    instrument_id,
+                )
+                return None
+
+            cumulative = pd.to_numeric(
+                factor_df[factor_col],
+                errors='coerce',
+            ).dropna()
+            cumulative = cumulative[cumulative > 0]
+            if cumulative.empty:
+                akshare_logger.warning(
+                    "Sina hfq-factor response has no positive factors for %s",
+                    instrument_id,
+                )
+                return None
+
+            required_coverage_start = (
+                required_coverage_start_date or start_date.date()
+            )
+            if isinstance(required_coverage_start, datetime):
+                required_coverage_start = required_coverage_start.date()
+            earliest_factor_date = cumulative.index.min().date()
+            if earliest_factor_date > required_coverage_start:
+                akshare_logger.warning(
+                    "Sina hfq-factor history is truncated for %s: "
+                    "earliest=%s required=%s",
+                    instrument_id,
+                    earliest_factor_date,
+                    required_coverage_start,
+                )
+                return None
+
+            factors = self._build_sparse_factor_events(
+                instrument_id=instrument_id,
+                cum_factor=cumulative,
+                requested_start=start_date.date(),
+                requested_end=end_date.date(),
+                threshold=float(
+                    factor_config["material_ratio_threshold"]
+                ),
+                source='akshare',
+                event_mode='factor_ratio',
+                rel_tol=1e-10,
+                abs_tol=1e-12,
+            )
+            akshare_logger.info(
+                "Retrieved %d Sina hfq-factor events for %s",
+                len(factors),
+                instrument_id,
+            )
+            return factors
         except Exception as e:
             akshare_logger.error(
                 f"Failed to get adjustment factors from AkShare for {instrument_id}: {e}"
             )
             return None
 
-    async def get_a_share_adjustment_factor_path(
-        self,
-        instrument_id: str,
+    @staticmethod
+    def _fetch_sina_hfq_factor_frame(
         symbol: str,
-        start_date: datetime,
-        end_date: datetime,
-    ) -> AkshareFactorPathResult:
-        """Return A-share events together with the provider snapshot profile."""
+        request_timeout_seconds: float,
+    ) -> pd.DataFrame:
+        """Fetch the direct Sina factor payload with bounded socket timeouts.
 
-        suffix = (
-            instrument_id.split('.')[-1].upper()
-            if '.' in instrument_id else ''
+        AkShare's public wrapper does not expose ``requests`` timeout arguments.
+        This compatibility boundary uses the same endpoint and decoder while
+        ensuring a stalled request cannot occupy the shared executor forever.
+        """
+        from akshare.stock.stock_zh_a_sina import (
+            demjson,
+            requests as sina_requests,
+            zh_sina_a_stock_hfq_url,
         )
-        if suffix == 'HK':
-            raise PriceRatioFactorError(
-                "A-share factor path metadata is unavailable for HKEX"
+
+        timeout_seconds = float(request_timeout_seconds)
+        connect_timeout = min(10.0, timeout_seconds)
+        try:
+            response = sina_requests.get(
+                zh_sina_a_stock_hfq_url.format(symbol),
+                timeout=(connect_timeout, timeout_seconds),
             )
-        await self.rate_limiter.acquire()
-        factor_config = config_manager.get_nested(
-            "data_sources_config.akshare.a_share_adjustment_factors",
-            {},
-        )
-        if not isinstance(factor_config, dict):
-            factor_config = {}
-        adapter = AkshareAShareFactorAdapter(
-            akshare_module=ak,
-            to_thread=asyncio.to_thread,
-            config=factor_config,
-        )
-        result = await adapter.fetch(
-            instrument_id=instrument_id,
-            symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
-        )
-        akshare_logger.info(
-            "Retrieved %d adjustment factors from %s for %s",
-            len(result.events),
-            result.source_profile,
-            instrument_id,
-        )
-        return result
+            response.raise_for_status()
+        except sina_requests.exceptions.Timeout as exc:
+            raise TimeoutError(
+                f"Sina hfq-factor request timed out for {symbol}"
+            ) from exc
+
+        assignment = str(response.text or "").split("=", 1)
+        if len(assignment) != 2:
+            raise ValueError("Sina hfq-factor response has no assignment payload")
+        payload_text = assignment[1].split("\n", 1)[0].strip().rstrip(";")
+        payload = demjson.decode(payload_text)
+        if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+            raise ValueError("Sina hfq-factor response has invalid data payload")
+        rows = payload["data"]
+        declared_total = payload.get("total")
+        if declared_total is not None and int(declared_total) != len(rows):
+            raise ValueError(
+                "Sina hfq-factor response is incomplete: "
+                f"declared={declared_total} received={len(rows)}"
+            )
+        if not rows:
+            raise ValueError("Sina hfq-factor response contains no factor rows")
+        frame = pd.DataFrame(rows)
+        if frame.shape[1] != 2:
+            raise ValueError("Sina hfq-factor rows have an unexpected shape")
+        frame.columns = ["date", "hfq_factor"]
+        return frame
 
     async def _get_hk_adjustment_factors(
         self, instrument_id: str, symbol: str,

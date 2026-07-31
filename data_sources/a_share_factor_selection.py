@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
-SOURCE_ORDER = ("cninfo", "tdx", "akshare")
+SOURCE_ORDER = ("cninfo", "tdx", "sina")
 
 
 def _date(value: Any) -> Optional[date]:
@@ -275,7 +275,7 @@ def build_three_source_canonical_candidate(
     *,
     cninfo_rows: Iterable[Mapping[str, Any]],
     tdx_rows: Iterable[Mapping[str, Any]],
-    akshare_rows: Iterable[Mapping[str, Any]],
+    sina_rows: Iterable[Mapping[str, Any]],
     target_instruments: Sequence[str],
     series_version: str,
     start_date: date,
@@ -298,7 +298,7 @@ def build_three_source_canonical_candidate(
     source_results = {
         "cninfo": _source_rows(cninfo_rows, default_source="cninfo"),
         "tdx": _source_rows(tdx_rows, default_source="tdx"),
-        "akshare": _source_rows(akshare_rows, default_source="akshare"),
+        "sina": _source_rows(sina_rows, default_source="sina"),
     }
     paths = {
         source: result[0] for source, result in source_results.items()
@@ -378,8 +378,8 @@ def build_three_source_canonical_candidate(
             pairwise: Dict[str, Dict[str, Any]] = {}
             for left, right in (
                 ("cninfo", "tdx"),
-                ("cninfo", "akshare"),
-                ("tdx", "akshare"),
+                ("cninfo", "sina"),
+                ("tdx", "sina"),
             ):
                 key = f"{left}__{right}"
                 if eligible[left] and eligible[right]:
@@ -423,7 +423,7 @@ def build_three_source_canonical_candidate(
                     reason = "governed_special_action_cninfo_policy"
                 elif (
                     pairwise["cninfo__tdx"].get("agrees")
-                    and pairwise["cninfo__akshare"].get("agrees")
+                    and pairwise["cninfo__sina"].get("agrees")
                 ):
                     selected_source = "cninfo"
                     confidence = "high"
@@ -432,14 +432,14 @@ def build_three_source_canonical_candidate(
                     selected_source = "cninfo"
                     confidence = "high"
                     reason = "cninfo_tdx_consensus"
-                elif pairwise["cninfo__akshare"].get("agrees"):
+                elif pairwise["cninfo__sina"].get("agrees"):
                     selected_source = "cninfo"
                     confidence = "high"
-                    reason = "cninfo_akshare_consensus"
-                elif pairwise["tdx__akshare"].get("agrees"):
+                    reason = "cninfo_sina_consensus"
+                elif pairwise["tdx__sina"].get("agrees"):
                     selected_source = "tdx"
                     confidence = "independent_consensus"
-                    reason = "tdx_akshare_consensus_over_cninfo"
+                    reason = "tdx_sina_consensus_over_cninfo"
                 else:
                     selected_source = "cninfo"
                     confidence = "low"
@@ -447,11 +447,11 @@ def build_three_source_canonical_candidate(
                     low_confidence += 1
             elif (
                 not is_special
-                and pairwise["tdx__akshare"].get("agrees")
+                and pairwise["tdx__sina"].get("agrees")
             ):
                 selected_source = "tdx"
                 confidence = "independent_consensus"
-                reason = "tdx_akshare_consensus_without_complete_cninfo"
+                reason = "tdx_sina_consensus_without_complete_cninfo"
             else:
                 blocked += 1
 

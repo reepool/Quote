@@ -1112,7 +1112,7 @@ def _format_a_share_canonical_factor_selection_report(
         "failed": "失败",
     }.get(status, status)
     parameters = result.get("parameters") or {}
-    backfill = result.get("akshare_backfill") or {}
+    backfill = result.get("sina_backfill") or {}
     selection = result.get("selection") or {}
     source_events = selection.get("source_events") or {}
     source_selection = selection.get("source_selection") or {}
@@ -1129,10 +1129,10 @@ def _format_a_share_canonical_factor_selection_report(
         f"`{parameters.get('end_date', 'N/A')}`",
         f"市场: `{','.join(parameters.get('exchanges') or [])}`",
         f"定向标的: `{len(parameters.get('instrument_ids') or [])}`",
-        f"AkShare回补: `enabled={parameters.get('backfill_akshare', False)}, "
+        f"新浪因子回补: `enabled={parameters.get('backfill_sina', False)}, "
         f"status={backfill.get('status', 'skipped')}, "
         f"checkpoint={backfill.get('checkpoint_id', 'N/A')}`",
-        "AkShare提供方: `"
+        "新浪因子快照: `"
         + ", ".join(
             f"{profile}={count}"
             for profile, count in sorted(provider_counts.items())
@@ -1141,10 +1141,10 @@ def _format_a_share_canonical_factor_selection_report(
         "来源覆盖: `"
         f"cninfo_events={source_events.get('cninfo_rows', 0)}, "
         f"tdx_events={source_events.get('tdx_rows', 0)}, "
-        "akshare_events="
-        f"{source_events.get('akshare_market_factor_rows', 0)}, "
-        "akshare_instruments="
-        f"{source_events.get('akshare_market_instruments', 0)}`",
+        "sina_events="
+        f"{source_events.get('sina_factor_rows', 0)}, "
+        "sina_instruments="
+        f"{source_events.get('sina_instruments', 0)}`",
         "路径选择: `"
         + ", ".join(
             f"{source}={count}"
@@ -5475,7 +5475,7 @@ class ScheduledTasks:
         end_date: Union[str, date, datetime],
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
-        backfill_akshare: bool = False,
+        backfill_sina: bool = False,
         dry_run: bool = True,
         resume: bool = True,
         chunk_size: int = 100,
@@ -5489,7 +5489,7 @@ class ScheduledTasks:
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Backfill optional AkShare evidence and build a three-source staging candidate."""
+        """Backfill optional Sina evidence and build a three-source staging candidate."""
         task_id = "a_share_canonical_adjustment_factor_selection"
         self._active_tasks.add(task_id)
         parameters = {
@@ -5497,7 +5497,7 @@ class ScheduledTasks:
             "end_date": end_date,
             "exchanges": exchanges or ["SSE", "SZSE"],
             "instrument_ids": instrument_ids or [],
-            "backfill_akshare": bool(backfill_akshare),
+            "backfill_sina": bool(backfill_sina),
             "dry_run": bool(dry_run),
             "resume": bool(resume),
             "chunk_size": int(chunk_size),
@@ -5513,9 +5513,9 @@ class ScheduledTasks:
         try:
             backfill_result: Dict[str, Any] = {
                 "status": "skipped",
-                "reason": "backfill_akshare_false",
+                "reason": "backfill_sina_false",
             }
-            if backfill_akshare:
+            if backfill_sina:
                 backfill_result = (
                     await data_manager.rebuild_a_share_adjustment_factor_governance(
                         start_date=start_date,
@@ -5610,7 +5610,7 @@ class ScheduledTasks:
                 "dry_run": bool(dry_run),
                 "production_isolation": True,
                 "parameters": parameters,
-                "akshare_backfill": backfill_result,
+                "sina_backfill": backfill_result,
                 "selection": selection_result,
                 "promoted": False,
             }

@@ -527,6 +527,7 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
         "instrument_id": "000001.SZ",
         "symbol": "000001",
+        "listed_date": date(1991, 4, 3),
     }])
 
     async def list_observations(**_kwargs):
@@ -543,7 +544,7 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
         return list(stored_snapshot_statuses)
 
     async def replace_statuses(rows, *, series_version, instrument_ids):
-        if series_version == "akshare_market_price_ratio_snapshot_v1":
+        if series_version == "sina_hfq_factor_snapshot_v1":
             stored_snapshot_statuses[:] = rows
         return len(rows)
 
@@ -608,24 +609,15 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     manager.db_ops.upsert_adjustment_factor_series_status = AsyncMock()
     manager.db_ops.promote_canonical_adjustment_factor_series = AsyncMock()
     source = SimpleNamespace(
-        get_a_share_adjustment_factor_path=AsyncMock(
-            return_value=SimpleNamespace(
-                events=[{
-                    "instrument_id": "000001.SZ",
-                    "ex_date": datetime(2020, 5, 28),
-                    "factor": 1.02,
-                    "cumulative_factor": 10.0,
-                    "source": "akshare",
-                    "source_profile": (
-                        "akshare_tencent_price_ratio_v1"
-                    ),
-                }],
-                source_profile="akshare_tencent_price_ratio_v1",
-                diagnostics={
-                    "first_overlap_date": "2020-05-20",
-                    "last_overlap_date": "2026-07-16",
-                },
-            )
+        get_adjustment_factors=AsyncMock(
+            return_value=[{
+                "instrument_id": "000001.SZ",
+                "ex_date": datetime(2020, 5, 28),
+                "factor": 1.02,
+                "cumulative_factor": 10.0,
+                "source": "akshare",
+                "source_profile": "sina_hfq_factor",
+            }]
         )
     )
     manager.source_factory = Mock()
@@ -649,10 +641,15 @@ async def test_factor_rebuild_write_resumes_without_second_source_request(tmp_pa
     assert first["canonical"]["staging_series_version"] != "a_share_event_product_v1"
     assert second["universe"]["pending_count"] == 0
     assert first["observations"]["provider_profile_counts"] == {
-        "akshare_tencent_price_ratio_v1": 1
+        "sina_hfq_factor": 1
     }
-    assert first["observations"]["provider_fallback_instruments"] == 0
-    assert source.get_a_share_adjustment_factor_path.await_count == 1
+    assert source.get_adjustment_factors.await_count == 1
+    assert (
+        source.get_adjustment_factors.await_args.kwargs[
+            "required_coverage_start_date"
+        ]
+        == date(1991, 4, 3)
+    )
     assert (
         manager.db_ops.save_adjustment_factor_provider_snapshot.await_count
         == 1
@@ -694,7 +691,7 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
         return list(stored_snapshot_statuses)
 
     async def replace_statuses(rows, *, series_version, instrument_ids):
-        if series_version == "akshare_market_price_ratio_snapshot_v1":
+        if series_version == "sina_hfq_factor_snapshot_v1":
             existing = {
                 row["instrument_id"]: row
                 for row in stored_snapshot_statuses
@@ -766,25 +763,24 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
         return_value={"canonical_rows": 3, "instrument_statuses": 3}
     )
 
-    async def get_factor_path(instrument_id, _symbol, _start, _end):
-        return SimpleNamespace(
-            events=[{
-                "instrument_id": instrument_id,
-                "ex_date": datetime(2020, 5, 28),
-                "factor": 1.02,
-                "cumulative_factor": 1.02,
-                "source": "akshare",
-                "source_profile": "akshare_tencent_price_ratio_v1",
-            }],
-            source_profile="akshare_tencent_price_ratio_v1",
-            diagnostics={
-                "first_overlap_date": "2020-05-20",
-                "last_overlap_date": date.today().isoformat(),
-            },
-        )
+    async def get_factor_path(
+        instrument_id,
+        _symbol,
+        _start,
+        _end,
+        **_kwargs,
+    ):
+        return [{
+            "instrument_id": instrument_id,
+            "ex_date": datetime(2020, 5, 28),
+            "factor": 1.02,
+            "cumulative_factor": 1.02,
+            "source": "akshare",
+            "source_profile": "sina_hfq_factor",
+        }]
 
     source = SimpleNamespace(
-        get_a_share_adjustment_factor_path=AsyncMock(
+        get_adjustment_factors=AsyncMock(
             side_effect=get_factor_path
         )
     )

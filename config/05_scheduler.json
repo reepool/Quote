@@ -306,7 +306,7 @@
       "a_share_canonical_adjustment_factor_selection": {
         "enabled": true,
         "manual_only": true,
-        "description": "A股CNInfo、TDX与AkShare三源复权路径选择及隔离候选构造（仅手工触发，默认 dry-run，不自动晋级）",
+        "description": "A股CNInfo、TDX与新浪三源复权路径选择及隔离候选构造（仅手工触发，默认 dry-run，不自动晋级）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -317,7 +317,7 @@
           "end_date": null,
           "exchanges": ["SSE", "SZSE"],
           "instrument_ids": [],
-          "backfill_akshare": false,
+          "backfill_sina": false,
           "dry_run": true,
           "resume": true,
           "chunk_size": 100,

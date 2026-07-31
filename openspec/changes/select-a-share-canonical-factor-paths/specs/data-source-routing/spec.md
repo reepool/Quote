@@ -1,48 +1,68 @@
 ## ADDED Requirements
 
-### Requirement: Tencent-first A-share factor routing
-The AkShare A-share factor adapter SHALL request Tencent raw and adjusted daily histories
-first and SHALL use Eastmoney only when Tencent is unavailable or structurally invalid.
+### Requirement: Direct Sina A-share factor routing
+The AkShare A-share factor adapter SHALL request the direct Sina `hfq-factor` endpoint used
+by `stock_zh_a_daily(adjust="hfq-factor")` and SHALL NOT download Tencent or Eastmoney raw
+or adjusted price histories to derive factors.
 
-#### Scenario: Tencent succeeds
-- **WHEN** Tencent returns overlapping valid raw and adjusted histories
-- **THEN** the adapter emits `akshare_tencent_price_ratio_v1` observations and does not call
-  Eastmoney
+#### Scenario: Sina succeeds
+- **WHEN** Sina returns a positive dated cumulative factor series
+- **THEN** the adapter emits sparse `sina_hfq_factor` observations for material factor
+  changes in the requested range
 
-#### Scenario: Tencent fails
-- **WHEN** Tencent raises an error, returns no overlap, or fails factor-path validation
-- **THEN** the adapter calls Eastmoney and labels successful observations
-  `akshare_eastmoney_price_ratio_v1`
+#### Scenario: Sina is unavailable
+- **WHEN** the endpoint raises an error or returns an indeterminate response
+- **THEN** the adapter reports the acquisition failure and preserves the prior complete
+  governed snapshot
 
-#### Scenario: Both providers fail
-- **WHEN** neither Tencent nor Eastmoney can produce a valid path
-- **THEN** the adapter returns an indeterminate result and preserves prior observations
+#### Scenario: Valid zero-event window
+- **WHEN** the endpoint is valid and the requested window contains no factor change
+- **THEN** the adapter records complete zero-event coverage rather than treating it as a
+  provider failure
 
-### Requirement: Stable adjusted-price ratio extraction
-The AkShare adapter MUST derive factor events only from persistent changes in aligned,
-positive adjusted-to-raw price ratios and MUST reject excessive rounding noise.
+#### Scenario: One request times out
+- **WHEN** a Sina factor request exceeds the configured per-instrument timeout
+- **THEN** the adapter reports an indeterminate acquisition failure, preserves the prior
+  complete snapshot, and allows the checkpointed batch to continue
 
-#### Scenario: Piecewise stable ratio jump
-- **WHEN** aligned ratios form two stable levels separated by a persistent material change
-- **THEN** the adapter emits one event ratio at the first trading date of the new level
+#### Scenario: Truncated Sina history
+- **WHEN** the declared response row count is incomplete or the response lacks an anchor at
+  or before the requested instrument lifecycle start
+- **THEN** the adapter treats the response as indeterminate and does not certify a complete
+  voting path
 
-#### Scenario: Rounded daily jitter
-- **WHEN** daily ratio changes remain within the configured level dispersion and jump
-  thresholds
-- **THEN** the adapter emits no factor event
+### Requirement: Incremental factor extraction
+The AkShare adapter MUST use a pre-range anchor when extracting a bounded incremental
+window and MUST persist sparse factor events rather than daily plateaus.
 
-### Requirement: Shared proxy patch bootstrap
-The Eastmoney fallback SHALL rely on the process-level `akshare_proxy_patch` bootstrap and
-MUST NOT create a local proxy, embed credentials, or install a second patch.
+#### Scenario: Factor changes inside the window
+- **WHEN** the cumulative factor differs materially from the preceding anchor value
+- **THEN** the adapter emits the adjacent positive factor ratio on the change date
 
-#### Scenario: Eastmoney is protected by configured patch
-- **WHEN** the runtime has enabled the shared AkShare proxy patch
-- **THEN** the fallback uses the already patched AkShare request stack
+#### Scenario: Provider precision drift
+- **WHEN** an adjacent cumulative ratio remains within the configured material-change
+  threshold of one
+- **THEN** the adapter does not emit a factor event
 
-### Requirement: Explicit provider lineage
-Every AkShare factor observation SHALL preserve the actual upstream provider, extraction
-version, requested range, overlap coverage, and quality diagnostics.
+#### Scenario: No anchor before the window
+- **WHEN** a bounded response has no reliable point before the requested start
+- **THEN** the adapter does not fabricate the first in-window value as a new event
 
-#### Scenario: Eastmoney fallback succeeds
-- **WHEN** Eastmoney supplies the path after Tencent fails
-- **THEN** no result field identifies the observation as Tencent
+### Requirement: Explicit Sina snapshot lineage
+Every governed Sina factor snapshot SHALL preserve the source profile, requested coverage,
+ingestion id, event count, and quality status.
+
+#### Scenario: Snapshot replacement
+- **WHEN** a complete Sina refresh succeeds for an instrument and range
+- **THEN** selection uses only rows belonging to the new snapshot and does not combine stale
+  historical observations
+
+### Requirement: Removed price-ratio providers
+The system SHALL contain no active Tencent/Eastmoney A-share price-ratio factor route,
+configuration, provider profile, or persisted provider-snapshot state.
+
+#### Scenario: Source scan
+- **WHEN** code, configuration, tests, documentation, and governed factor status are audited
+- **THEN** no `akshare_tencent_price_ratio_v1`, `akshare_eastmoney_price_ratio_v1`, or
+  `akshare_market_price_ratio_snapshot_v1` active implementation artifact remains, and
+  database initialization removes rows carrying those exact retired identifiers

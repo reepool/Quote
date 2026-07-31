@@ -115,16 +115,18 @@ checkpoint。
 
 #### 3.2 定向写入与核对
 
-先用长历史、已知 BaoStock 异常和无分红样本进行 smoke test。A 股 AkShare 路径优先使用
-腾讯不复权/后复权行情的同日价格比，腾讯不可用或响应结构无效时回退东财；东财沿用进程级
-`akshare_proxy_patch`，不会在业务代码内另建代理。每只股票处理后保存 checkpoint。
+先用长历史、已知 BaoStock 异常和无分红样本进行 smoke test。A 股因子通过 AkShare
+适配器调用 `stock_zh_a_daily(adjust="hfq-factor")` 所使用的同一新浪因子端点，解析累计
+因子并只保存发生变化的稀疏事件，不下载或保存不复权/后复权价格历史。适配器自行管理该
+因子端点的连接/读取超时，因为上游函数没有暴露 timeout 参数。每只股票成功后原子更新
+新浪快照状态并保存 checkpoint。单只请求默认 30 秒超时，微小累计因子漂移不会生成伪事件；
 `request_interval_seconds` 默认 1 秒，不允许并发任务。
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ backfill_akshare=true chunk_size=2 request_interval_seconds=1.0 resume=false build_canonical=true dry_run=false
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ backfill_sina=true chunk_size=2 request_interval_seconds=1.0 resume=false build_canonical=true dry_run=false
 ```
 
-该命令先写 AkShare 隔离 observation，再写三源 staging candidate。旧的 AkShare 回补函数
+该命令先写新浪隔离 observation，再写三源 staging candidate。旧的因子回补函数
 在此工作流中被强制使用 `build_canonical=false`，因此不会触发其历史自动晋级分支；三源候选
 同样不会改写配置中的生产 canonical 版本。
 
@@ -134,29 +136,29 @@ checkpoint。
 不得与其他 AkShare/Sina 全市场任务并发，也不得注册为 cron。
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_akshare=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=true
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=true
 ```
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_akshare=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=false
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=false
 ```
 
 中断后使用相同参数和 checkpoint 继续。不要把 dry-run checkpoint 用于 write；当前实现
 已保证 dry-run 不创建或读取 checkpoint。CNInfo 不支持 BSE，因此三源选择的完整市场口径
 仅为 SSE、SZSE；BSE 不得混入三源全市场门禁。
 
-如果 AkShare observation 已经完整，只需重新预演选择，不重复访问外部接口：
+如果新浪 observation 已经完整，只需重新预演选择，不重复访问外部接口：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_akshare=false build_canonical=true dry_run=true
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=false build_canonical=true dry_run=true
 ```
 
 ### 4. 三源选择与显式候选构造
 
 三源选择按股票及法律主体价格连续区间选择一套完整路径，不逐事件拼接：
 
-- CNInfo 与 TDX 或 AkShare 任一来源一致时选择 CNInfo。
-- TDX 与 AkShare 一致而 CNInfo 不一致时，普通对称事项选择独立双源共识路径。
+- CNInfo 与 TDX 或新浪任一来源一致时选择 CNInfo。
+- TDX 与新浪一致而 CNInfo 不一致时，普通对称事项选择独立双源共识路径。
 - 股改、重整、补偿、债转股等已治理特殊事项继续选择 CNInfo。
 - 三源均不一致且 CNInfo 完整时使用 CNInfo 低置信兜底并输出冲突样本。
 - CNInfo 不完整且没有合格共识时保持 blocked，不静默补齐。
@@ -169,7 +171,7 @@ checkpoint。
 确认全市场预演后写入隔离 staging：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_akshare=false build_canonical=true dry_run=false
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=false build_canonical=true dry_run=false
 ```
 
 该操作不会切换生产读取，也不会调用 promotion。`promotion_eligible=true` 仅表示候选通过
@@ -198,7 +200,7 @@ Benchmark 本身不选择主源，至少报告：
 - CNInfo 路径不存在待处理因子事件。
 - CNInfo 路径不存在未处置的历史因子缺口。
 - 每个连续区间只选择一个完整来源路径，没有逐事件拼接。
-- 特殊事项没有被 TDX/AkShare 市场口径覆盖。
+- 特殊事项没有被 TDX/新浪市场口径覆盖。
 - 不存在 blocked 选择区间。
 - 候选构造和写入过程没有未解决错误。
 

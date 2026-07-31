@@ -5,7 +5,7 @@
 改造说明:
   所有数据源统一下载非复权(原始)数据, 复权由 utils.adjustment.AdjustmentEngine 动态计算.
   BaoStock 同时通过 query_adjust_factor 接口获取复权因子.
-  AkShare 同时通过 stock_zh_a_daily(adjust="hfq-factor") 获取复权因子.
+  AkShare 适配器同时通过新浪 hfq-factor 端点获取复权因子.
 """
 
 from enum import Enum
