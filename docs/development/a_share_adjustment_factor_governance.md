@@ -113,65 +113,60 @@ checkpoint。
 /run a_share_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ source=akshare chunk_size=2 request_interval_seconds=1.0 resume=false dry_run=true
 ```
 
-#### 3.2 定向写入与核对
+#### 3.2 现有复合路径维护
 
-先用长历史、已知 BaoStock 异常和无分红样本进行 smoke test。A 股因子通过 AkShare
-适配器调用 `stock_zh_a_daily(adjust="hfq-factor")` 所使用的同一新浪因子端点，解析累计
-因子并只保存发生变化的稀疏事件，不下载或保存不复权/后复权价格历史。适配器自行管理该
-因子端点的连接/读取超时，因为上游函数没有暴露 timeout 参数。每只股票成功后原子更新
-新浪快照状态并保存 checkpoint。单只请求默认 30 秒超时，微小累计因子漂移不会生成伪事件；
-`request_interval_seconds` 默认 1 秒，不允许并发任务。
+`adjustment_factors` 是一条现有的复合运行路径，不是两张互相独立的投票表。BaoStock
+提供历史底座，日常维护通过 AkShare 的新浪 `hfq-factor` 路径提取稀疏增量事件，并按既有
+累计尾部重基后续接。行级 `source` 用于保留来源沿革，但主因子选择时整张表只算一个
+`legacy` 投票源。
 
-```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ backfill_sina=true chunk_size=2 request_interval_seconds=1.0 resume=false build_canonical=true dry_run=false
-```
-
-该命令先写新浪隔离 observation，再写三源 staging candidate。旧的因子回补函数
-在此工作流中被强制使用 `build_canonical=false`，因此不会触发其历史自动晋级分支；三源候选
-同样不会改写配置中的生产 canonical 版本。
-
-#### 3.3 全市场回补
-
-必须先 dry-run，再执行 write。全市场任务预计约 5,000 至 6,000 次股票级请求；
-不得与其他 AkShare/Sina 全市场任务并发，也不得注册为 cron。
+需要单独维护这条复合路径时，继续使用原有回补任务：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=true
+/run a_share_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ source=akshare chunk_size=2 request_interval_seconds=1.0 resume=false build_canonical=false dry_run=false
 ```
+
+该任务只负责现有路径维护。主因子选择任务不会调用它，也不会发起外部请求。
+
+#### 3.3 本地三源定向预演
+
+先对已知普通分红、特殊事项和非连续法律主体样本执行本地预演：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=true chunk_size=100 request_interval_seconds=1.0 resume=true build_canonical=true dry_run=false
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ,600018.SH,000623.SZ,002076.SZ build_canonical=true dry_run=true
 ```
 
-中断后使用相同参数和 checkpoint 继续。不要把 dry-run checkpoint 用于 write；当前实现
-已保证 dry-run 不创建或读取 checkpoint。CNInfo 不支持 BSE，因此三源选择的完整市场口径
-仅为 SSE、SZSE；BSE 不得混入三源全市场门禁。
-
-如果新浪 observation 已经完整，只需重新预演选择，不重复访问外部接口：
+确认定向结果后，再做全市场本地预演：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=false build_canonical=true dry_run=true
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE build_canonical=true dry_run=true
 ```
+
+该任务只读取本地 CNInfo、TDX 和 `adjustment_factors`，没有 provider 回填、checkpoint、
+chunk 或请求间隔参数。CNInfo 不支持 BSE，因此三源选择的完整市场口径仅为 SSE、SZSE。
 
 ### 4. 三源选择与显式候选构造
 
 三源选择按股票及法律主体价格连续区间选择一套完整路径，不逐事件拼接：
 
-- CNInfo 与 TDX 或新浪任一来源一致时选择 CNInfo。
-- TDX 与新浪一致而 CNInfo 不一致时，普通对称事项选择独立双源共识路径。
+- CNInfo 与 TDX 或现有复合路径任一来源一致时选择 CNInfo。
+- TDX 与现有复合路径一致而 CNInfo 不一致时，普通对称事项选择独立双源共识路径。
 - 股改、重整、补偿、债转股等已治理特殊事项继续选择 CNInfo。
 - 三源均不一致且 CNInfo 完整时使用 CNInfo 低置信兜底并输出冲突样本。
 - CNInfo 不完整且没有合格共识时保持 blocked，不静默补齐。
 - `price_continuity=non_continuous` 的吸收合并或重新上市边界重置累计基线，不生成虚拟因子。
+- CNInfo/TDX 的近期接口请求区间只作为审计信息；只要因子链没有待处理事件或历史缺口，
+  就不会因为没有覆盖完整历史请求区间而失去投票资格。
 
 报告中的 `selection_counts` 是各连续区间所选来源数，`confidence_counts` 区分高置信、
 特殊治理、独立双源共识、低置信和 blocked；`agreement_counts` 说明形成共识的来源组合。
+事件对账先区分精确日期匹配、交易日偏移匹配、冲突和单边事件，并对相对因子差异分桶；
 `conflict_samples` 仅展示有上限的异常样本，完整决策证据保存在 staging 版本状态报告中。
 
 确认全市场预演后写入隔离 staging：
 
 ```text
-/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE backfill_sina=false build_canonical=true dry_run=false
+/run a_share_canonical_adjustment_factor_selection start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE build_canonical=true dry_run=false
 ```
 
 该操作不会切换生产读取，也不会调用 promotion。`promotion_eligible=true` 仅表示候选通过
@@ -183,7 +178,7 @@ Benchmark 本身不选择主源，至少报告：
 
 - 各来源可用股票数和相对全市场覆盖率。
 - 与 CNInfo 自研路径可比较的股票数和比例。
-- CNInfo 自研、TDX 自研、Sina、BaoStock 所有可用路径的两两比较矩阵。
+- CNInfo 自研、TDX 自研、BaoStock 加新浪复合路径的两两比较矩阵。
 - 归一化前复权路径的平均、P50、P95 和最大误差。
 - 路径比较只在双方共同的最新事件日期内归一化；双方末端事件日期不同的股票
   另计入 `endpoint_mismatch_instruments` 和样本，不能静默视为路径质量误差或一致。
@@ -200,7 +195,7 @@ Benchmark 本身不选择主源，至少报告：
 - CNInfo 路径不存在待处理因子事件。
 - CNInfo 路径不存在未处置的历史因子缺口。
 - 每个连续区间只选择一个完整来源路径，没有逐事件拼接。
-- 特殊事项没有被 TDX/新浪市场口径覆盖。
+- 特殊事项没有被 TDX/现有复合市场口径覆盖。
 - 不存在 blocked 选择区间。
 - 候选构造和写入过程没有未解决错误。
 

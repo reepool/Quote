@@ -18316,6 +18316,7 @@ class DataManager:
         )
         from data_sources.a_share_factor_selection import (
             build_three_source_canonical_candidate,
+            normalize_legacy_composite_rows,
         )
         from data_sources.cninfo_factor_governance import (
             CNINFO_FACTOR_PROFILE,
@@ -18517,8 +18518,8 @@ class DataManager:
                 SELECT instrument_id, ex_date, factor, cumulative_factor, source
                 FROM adjustment_factors
                 WHERE instrument_id IN ({placeholders})
-                  AND date(ex_date) BETWEEN :start_date AND :end_date
-                ORDER BY instrument_id, source, ex_date
+                  AND date(ex_date) <= :end_date
+                ORDER BY instrument_id, ex_date
                 """,
                 params,
             ))
@@ -18982,63 +18983,44 @@ class DataManager:
             "source_selection_status": "deferred",
             "promotion_eligible": False,
         }
-        source_observations = (
-            await self.db_ops.list_adjustment_factor_observations(
-                instrument_ids=target_ids,
-                sources=["akshare"],
-                start_date=normalized_start,
-                end_date=normalized_end,
+        def _has_positive_legacy_values(row: Mapping[str, Any]) -> bool:
+            try:
+                factor = float(row.get("factor"))
+                cumulative = float(row.get("cumulative_factor"))
+            except (TypeError, ValueError):
+                return False
+            return (
+                math.isfinite(factor)
+                and factor > 0
+                and math.isfinite(cumulative)
+                and cumulative > 0
             )
-        )
-        sina_snapshot_statuses = (
-            await self.db_ops.list_adjustment_factor_instrument_statuses(
-                series_version=SINA_FACTOR_SNAPSHOT_SERIES,
-                instrument_ids=target_ids,
-            )
-        )
-        sina_snapshot_by_instrument = {
-            str(row.get("instrument_id") or "").strip(): row
-            for row in sina_snapshot_statuses
-            if str(row.get("coverage_status") or "").strip()
-            in {"complete_with_events", "complete_no_events"}
-            and str(row.get("source") or "").strip()
-            == SINA_FACTOR_STATUS_SOURCE
-            and (
-                self._date_from_any(row.get("start_date")) is not None
-                and self._date_from_any(row.get("start_date"))
-                <= normalized_start
-            )
-            and (
-                self._date_from_any(row.get("end_date")) is not None
-                and self._date_from_any(row.get("end_date"))
-                >= normalized_end
-            )
-            and str(row.get("ingestion_run_id") or "").strip()
-        }
-        sina_selection_rows = [
-            row for row in source_observations
-            if (
-                snapshot := sina_snapshot_by_instrument.get(
-                    str(row.get("instrument_id") or "").strip()
-                )
-            ) is not None
-            if str(row.get("source_profile") or "").strip()
-            == SINA_FACTOR_SOURCE_PROFILE
-            and str(row.get("ingestion_run_id") or "").strip()
-            == str(snapshot.get("ingestion_run_id") or "").strip()
-            and row.get("normalized_factor") is not None
+
+        normalized_legacy_rows = normalize_legacy_composite_rows(legacy_rows)
+        legacy_invalid_rows = [
+            row
+            for row in normalized_legacy_rows
+            if row.get("normalized_factor") is None
         ]
-        sina_complete_ids = sorted(
-            sina_snapshot_by_instrument
-        )
-        sina_comparison_rows = build_event_product_path([
-            {
-                "instrument_id": row.get("instrument_id"),
-                "ex_date": row.get("ex_date"),
-                "factor": row.get("normalized_factor"),
-            }
-            for row in sina_selection_rows
-        ])
+        legacy_invalid_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in legacy_invalid_rows
+            if str(row.get("instrument_id") or "").strip()
+        }
+        legacy_selection_rows = [
+            row
+            for row in normalized_legacy_rows
+            if (
+                parsed := self._date_from_any(row.get("ex_date"))
+            ) is not None
+            and normalized_start <= parsed <= normalized_end
+        ]
+        legacy_complete_ids = sorted({
+            str(row.get("instrument_id") or "").strip()
+            for row in legacy_selection_rows
+            if str(row.get("instrument_id") or "").strip()
+            and _has_positive_legacy_values(row)
+        } - legacy_invalid_ids)
         special_event_dates_by_instrument: Dict[
             str, List[date]
         ] = defaultdict(list)
@@ -19095,21 +19077,14 @@ class DataManager:
             }
             for row in tdx_path["events"]
         ]
-        baostock_rows = [
-            row for row in legacy_rows
-            if str(row.get("source") or "").lower() == "baostock"
-        ]
         comparisons = {
             "tdx": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows, tdx_comparison_rows, sample_limit=sample_limit
             ),
-            "sina": compare_normalized_cumulative_paths(
+            "legacy": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows,
-                sina_comparison_rows,
+                legacy_selection_rows,
                 sample_limit=sample_limit,
-            ),
-            "baostock": compare_normalized_cumulative_paths(
-                cninfo_comparison_rows, baostock_rows, sample_limit=sample_limit
             ),
         }
 
@@ -19133,6 +19108,7 @@ class DataManager:
         }
         required_profiles = {"cninfo_dividend", "cninfo_allotment"}
         endpoint_incomplete_ids = set()
+        cninfo_covered_ids = set()
         missing_profile_samples: List[Dict[str, Any]] = []
         cninfo_pending_ids = {
             str(item.get("instrument_id"))
@@ -19188,7 +19164,12 @@ class DataManager:
                     })
             if incomplete_profiles:
                 endpoint_incomplete_ids.add(instrument_id)
-        cninfo_incomplete_ids = cninfo_pending_ids | endpoint_incomplete_ids
+            else:
+                cninfo_covered_ids.add(instrument_id)
+        # Endpoint intervals describe which instruments were requested by
+        # announcement-driven maintenance. They are audit evidence, not proof
+        # that an already-derived factor path is incomplete.
+        cninfo_incomplete_ids = cninfo_pending_ids
         tdx_incomplete_ids = {
             str(item.get("instrument_id"))
             for item in tdx_path["pending"]
@@ -19234,17 +19215,20 @@ class DataManager:
                 )[:sample_limit],
                 "totals": reconciliation.get("totals") or {},
             },
-            "sina": {
+            "legacy": {
                 "status": (
                     "success"
-                    if set(sina_complete_ids) == set(target_ids)
+                    if set(legacy_complete_ids) == set(target_ids)
                     else "partial"
                 ),
-                "available_instruments": len(sina_complete_ids),
+                "available_instruments": len(legacy_complete_ids),
                 "incomplete_instruments": (
-                    len(target_ids) - len(sina_complete_ids)
+                    len(target_ids) - len(legacy_complete_ids)
                 ),
-                "source_profile": SINA_FACTOR_SOURCE_PROFILE,
+                "normalization_failure_instruments": len(
+                    legacy_invalid_ids
+                ),
+                "source_profile": "baostock_sina_legacy_composite",
             },
         }
         overall_completeness = {
@@ -19268,17 +19252,13 @@ class DataManager:
             and set(normalized_exchanges) == full_market_exchanges
             and normalized_start <= date(1990, 12, 19)
         )
-        pending_factor_ids = {
-            str(item.get("instrument_id"))
-            for item in [
-                *cninfo_path["pending"],
-                *cninfo_path.get("historical_gaps", []),
-                *tdx_path["pending"],
-            ]
-            if item.get("instrument_id")
+        cninfo_event_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in cninfo_path["events"]
+            if str(row.get("instrument_id") or "").strip()
         }
         baseline_covered_ids = sorted(
-            set(target_ids) - endpoint_incomplete_ids - pending_factor_ids
+            (cninfo_event_ids | cninfo_covered_ids) - cninfo_incomplete_ids
         )
         tdx_rows_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
         for row in tdx_endpoint_status_rows:
@@ -19311,26 +19291,51 @@ class DataManager:
                         for item in coverage["gaps"]
                     ],
                 })
+        tdx_event_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in tdx_path["events"]
+            if str(row.get("instrument_id") or "").strip()
+        }
+        tdx_benchmark_covered_ids = sorted(
+            (tdx_event_ids | tdx_covered_ids) - tdx_incomplete_ids
+        )
         if build_canonical:
             if normalized_selection_mode == "three_source":
                 candidate_rows, candidate_summary = (
                     build_three_source_canonical_candidate(
                         cninfo_rows=cninfo_path["events"],
                         tdx_rows=tdx_path["events"],
-                        sina_rows=sina_selection_rows,
+                        legacy_rows=legacy_selection_rows,
                         target_instruments=target_ids,
                         series_version=staging_version,
                         start_date=normalized_start,
                         end_date=normalized_end,
                         complete_instruments_by_source={
                             "cninfo": sorted(
-                                set(cninfo_target_ids)
+                                (
+                                    cninfo_event_ids
+                                    | cninfo_covered_ids
+                                )
+                                - cninfo_incomplete_ids
+                            ),
+                            "tdx": sorted(
+                                (
+                                    tdx_event_ids
+                                    | tdx_covered_ids
+                                )
+                                - tdx_incomplete_ids
+                            ),
+                            "legacy": legacy_complete_ids,
+                        },
+                        zero_event_complete_instruments_by_source={
+                            "cninfo": sorted(
+                                cninfo_covered_ids
                                 - cninfo_incomplete_ids
                             ),
                             "tdx": sorted(
                                 tdx_covered_ids - tdx_incomplete_ids
                             ),
-                            "sina": sina_complete_ids,
+                            "legacy": [],
                         },
                         lineage_by_instrument=lineage_by_instrument,
                         special_event_dates_by_instrument=(
@@ -19391,14 +19396,13 @@ class DataManager:
             cninfo_comparison_rows,
             {
                 "tdx_event_derived_v1": tdx_comparison_rows,
-                "sina_hfq_factor": sina_comparison_rows,
-                "baostock_legacy": baostock_rows,
+                "baostock_sina_legacy_composite": legacy_selection_rows,
             },
             target_instruments=target_ids,
             baseline_covered_instruments=baseline_covered_ids,
             reference_covered_instruments={
-                "tdx_event_derived_v1": sorted(tdx_covered_ids),
-                "sina_hfq_factor": sina_complete_ids,
+                "tdx_event_derived_v1": tdx_benchmark_covered_ids,
+                "baostock_sina_legacy_composite": legacy_complete_ids,
             },
             full_market_scope=full_market_scope,
             sample_limit=sample_limit,
@@ -19754,8 +19758,60 @@ class DataManager:
             "source_events": {
                 "cninfo_rows": len(cninfo_rows),
                 "tdx_rows": len(tdx_rows),
-                "sina_factor_rows": len(sina_selection_rows),
-                "sina_instruments": len(sina_complete_ids),
+                "legacy_factor_rows": len(legacy_selection_rows),
+                "legacy_raw_rows_through_end": len(legacy_rows),
+                "legacy_instruments": len(legacy_complete_ids),
+                "legacy_normalization_failure_rows": len(
+                    legacy_invalid_rows
+                ),
+                "legacy_normalization_failure_samples": [
+                    {
+                        "instrument_id": row.get("instrument_id"),
+                        "ex_date": (
+                            parsed.isoformat()
+                            if (
+                                parsed := self._date_from_any(
+                                    row.get("ex_date")
+                                )
+                            ) is not None
+                            else None
+                        ),
+                        "upstream_source": row.get("upstream_source"),
+                        "normalization_method": row.get(
+                            "legacy_normalization_method"
+                        ),
+                    }
+                    for row in legacy_invalid_rows[:sample_limit]
+                ],
+                "legacy_basis_conflict_rows": sum(
+                    bool(row.get("legacy_basis_conflict"))
+                    for row in legacy_selection_rows
+                ),
+                "legacy_basis_conflict_samples": [
+                    {
+                        "instrument_id": row.get("instrument_id"),
+                        "ex_date": (
+                            parsed.isoformat()
+                            if (
+                                parsed := self._date_from_any(
+                                    row.get("ex_date")
+                                )
+                            ) is not None
+                            else None
+                        ),
+                        "upstream_source": row.get("upstream_source"),
+                        "provider_cumulative_factor": row.get(
+                            "provider_cumulative_factor"
+                        ),
+                        "cumulative_ratio": row.get(
+                            "legacy_cumulative_ratio"
+                        ),
+                        "stored_factor": row.get("legacy_stored_factor"),
+                        "selected_factor": row.get("normalized_factor"),
+                    }
+                    for row in legacy_selection_rows
+                    if row.get("legacy_basis_conflict")
+                ][:sample_limit],
                 "resolved_effective_date_events": len(resolved_date_evidence),
                 "resolved_effective_dates_outside_range": resolved_outside_range,
             },

@@ -9,7 +9,35 @@ from datetime import date, datetime, timedelta
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
-SOURCE_ORDER = ("cninfo", "tdx", "sina")
+SOURCE_ORDER = ("cninfo", "tdx", "legacy")
+
+FACTOR_DIFFERENCE_BUCKETS = (
+    ("le_0_01_pct", 0.0001),
+    ("0_01_to_0_1_pct", 0.001),
+    ("0_1_to_0_5_pct", 0.005),
+    ("0_5_to_1_pct", 0.01),
+)
+
+LEGACY_NO_CHANGE_TOLERANCE = 1e-12
+LEGACY_SOURCE_SWITCH_REL_TOLERANCE = 0.001
+
+
+def _factor_difference_buckets(
+    differences: Iterable[float],
+) -> Dict[str, int]:
+    counts = {
+        label: 0
+        for label, _ in FACTOR_DIFFERENCE_BUCKETS
+    }
+    counts["gt_1_pct"] = 0
+    for difference in differences:
+        for label, upper_bound in FACTOR_DIFFERENCE_BUCKETS:
+            if difference <= upper_bound:
+                counts[label] += 1
+                break
+        else:
+            counts["gt_1_pct"] += 1
+    return counts
 
 
 def _date(value: Any) -> Optional[date]:
@@ -31,6 +59,165 @@ def _positive(value: Any) -> Optional[float]:
     except (TypeError, ValueError):
         return None
     return number if math.isfinite(number) and number > 0 else None
+
+
+def normalize_legacy_composite_rows(
+    rows: Iterable[Mapping[str, Any]],
+    *,
+    no_change_tolerance: float = LEGACY_NO_CHANGE_TOLERANCE,
+    source_switch_rel_tolerance: float = (
+        LEGACY_SOURCE_SWITCH_REL_TOLERANCE
+    ),
+) -> List[Dict[str, Any]]:
+    """Convert legacy cumulative levels into adjacent event ratios.
+
+    BaoStock history may store its cumulative level in both ``factor`` and
+    ``cumulative_factor``. Sina tail rows normally rebase onto that cumulative
+    chain, but older direct writers may preserve the Sina absolute cumulative
+    basis. At a provider switch, a materially inconsistent cumulative ratio is
+    therefore replaced by the stored adjacent event factor. The returned rows
+    rebuild one internal cumulative chain while retaining the provider level
+    for audit; the source table is not changed.
+    """
+
+    grouped: Dict[str, Dict[date, Mapping[str, Any]]] = defaultdict(dict)
+    for row in rows:
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        ex_date = _date(row.get("ex_date"))
+        if instrument_id and ex_date is not None:
+            grouped[instrument_id][ex_date] = row
+
+    normalized: List[Dict[str, Any]] = []
+    for instrument_id, dated_rows in sorted(grouped.items()):
+        previous_cumulative: Optional[float] = None
+        previous_upstream_source: Optional[str] = None
+        normalized_cumulative = 1.0
+        for ex_date, row in sorted(dated_rows.items()):
+            cumulative = _positive(row.get("cumulative_factor"))
+            stored_factor = _positive(row.get("factor"))
+            upstream_source = str(row.get("source") or "unknown").strip().lower()
+            if cumulative is None:
+                normalized.append({
+                    **dict(row),
+                    "instrument_id": instrument_id,
+                    "ex_date": ex_date,
+                    "normalized_factor": None,
+                    "source": "legacy",
+                    "upstream_source": upstream_source,
+                    "source_profile": "baostock_sina_legacy_composite",
+                    "legacy_normalization_method": "invalid_cumulative",
+                    "legacy_basis_conflict": False,
+                })
+                previous_cumulative = None
+                previous_upstream_source = None
+                normalized_cumulative = 1.0
+                continue
+
+            cumulative_ratio = (
+                cumulative / previous_cumulative
+                if previous_cumulative is not None
+                else None
+            )
+            provider_switched = (
+                previous_upstream_source is not None
+                and upstream_source != previous_upstream_source
+            )
+            initial_source_unbridged = (
+                previous_cumulative is None
+                and upstream_source != "baostock"
+                and stored_factor is None
+            )
+            if initial_source_unbridged:
+                normalized.append({
+                    **dict(row),
+                    "instrument_id": instrument_id,
+                    "ex_date": ex_date,
+                    "normalized_factor": None,
+                    "provider_cumulative_factor": cumulative,
+                    "source": "legacy",
+                    "upstream_source": upstream_source,
+                    "source_profile": "baostock_sina_legacy_composite",
+                    "legacy_normalization_method": (
+                        "invalid_initial_source_factor"
+                    ),
+                    "legacy_basis_conflict": False,
+                    "legacy_cumulative_ratio": None,
+                    "legacy_stored_factor": None,
+                })
+                previous_cumulative = cumulative
+                previous_upstream_source = upstream_source
+                normalized_cumulative = 1.0
+                continue
+            if provider_switched and stored_factor is None:
+                normalized.append({
+                    **dict(row),
+                    "instrument_id": instrument_id,
+                    "ex_date": ex_date,
+                    "normalized_factor": None,
+                    "provider_cumulative_factor": cumulative,
+                    "source": "legacy",
+                    "upstream_source": upstream_source,
+                    "source_profile": "baostock_sina_legacy_composite",
+                    "legacy_normalization_method": (
+                        "invalid_source_switch_factor"
+                    ),
+                    "legacy_basis_conflict": True,
+                    "legacy_cumulative_ratio": cumulative_ratio,
+                    "legacy_stored_factor": None,
+                })
+                previous_cumulative = cumulative
+                previous_upstream_source = upstream_source
+                normalized_cumulative = 1.0
+                continue
+            basis_conflict = bool(
+                provider_switched
+                and cumulative_ratio is not None
+                and stored_factor is not None
+                and not math.isclose(
+                    cumulative_ratio,
+                    stored_factor,
+                    rel_tol=max(0.0, source_switch_rel_tolerance),
+                    abs_tol=max(0.0, no_change_tolerance),
+                )
+            )
+            if basis_conflict:
+                factor = stored_factor
+                normalization_method = "stored_factor_at_source_switch"
+            elif cumulative_ratio is not None:
+                factor = cumulative_ratio
+                normalization_method = "cumulative_ratio"
+            elif upstream_source == "baostock":
+                factor = cumulative
+                normalization_method = "initial_cumulative"
+            elif stored_factor is not None:
+                factor = stored_factor
+                normalization_method = "initial_stored_factor"
+            else:
+                factor = cumulative
+                normalization_method = "initial_cumulative"
+
+            previous_cumulative = cumulative
+            previous_upstream_source = upstream_source
+            normalized_cumulative *= factor
+            if abs(factor - 1.0) <= max(0.0, no_change_tolerance):
+                continue
+            normalized.append({
+                **dict(row),
+                "instrument_id": instrument_id,
+                "ex_date": ex_date,
+                "factor": factor,
+                "normalized_factor": factor,
+                "cumulative_factor": normalized_cumulative,
+                "provider_cumulative_factor": cumulative,
+                "source": "legacy",
+                "upstream_source": upstream_source,
+                "source_profile": "baostock_sina_legacy_composite",
+                "legacy_normalization_method": normalization_method,
+                "legacy_basis_conflict": basis_conflict,
+                "legacy_cumulative_ratio": cumulative_ratio,
+                "legacy_stored_factor": stored_factor,
+            })
+    return normalized
 
 
 def build_continuity_segments(
@@ -153,9 +340,12 @@ def compare_segment_paths(
         return {
             "agrees": True,
             "event_matches": 0,
+            "exact_matches": 0,
+            "shifted_matches": 0,
             "event_conflicts": 0,
             "left_only": 0,
             "right_only": 0,
+            "factor_difference_buckets": _factor_difference_buckets(()),
             "max_cumulative_relative_error": 0.0,
         }
 
@@ -214,6 +404,19 @@ def compare_segment_paths(
     matches = list(matches_by_state[(len(left), len(right))][3])
     matched_left = {left_index for left_index, _ in matches}
     matched_right = {right_index for _, right_index in matches}
+    exact_matches = 0
+    shifted_matches = 0
+    factor_differences = []
+    for left_index, right_index in matches:
+        if left[left_index]["ex_date"] == right[right_index]["ex_date"]:
+            exact_matches += 1
+        else:
+            shifted_matches += 1
+        factor_differences.append(abs(
+            float(left[left_index]["factor"])
+            / float(right[right_index]["factor"])
+            - 1.0
+        ))
     unmatched_left = [
         index for index in range(len(left)) if index not in matched_left
     ]
@@ -242,6 +445,11 @@ def compare_segment_paths(
             _, right_index = min(candidates)
             used_unmatched_right.add(right_index)
             conflicts += 1
+            factor_differences.append(abs(
+                float(left[left_index]["factor"])
+                / float(right[right_index]["factor"])
+                - 1.0
+            ))
 
     left_only = len(left) - len(matches) - conflicts
     right_only = len(right) - len(matches) - conflicts
@@ -264,9 +472,14 @@ def compare_segment_paths(
     return {
         "agrees": agrees,
         "event_matches": len(matches),
+        "exact_matches": exact_matches,
+        "shifted_matches": shifted_matches,
         "event_conflicts": conflicts,
         "left_only": left_only,
         "right_only": right_only,
+        "factor_difference_buckets": _factor_difference_buckets(
+            factor_differences
+        ),
         "max_cumulative_relative_error": max_cumulative_error,
     }
 
@@ -275,12 +488,15 @@ def build_three_source_canonical_candidate(
     *,
     cninfo_rows: Iterable[Mapping[str, Any]],
     tdx_rows: Iterable[Mapping[str, Any]],
-    sina_rows: Iterable[Mapping[str, Any]],
+    legacy_rows: Iterable[Mapping[str, Any]],
     target_instruments: Sequence[str],
     series_version: str,
     start_date: date,
     end_date: date,
     complete_instruments_by_source: Mapping[str, Sequence[str]],
+    zero_event_complete_instruments_by_source: Optional[
+        Mapping[str, Sequence[str]]
+    ] = None,
     lineage_by_instrument: Optional[
         Mapping[str, Mapping[str, Any]]
     ] = None,
@@ -298,7 +514,7 @@ def build_three_source_canonical_candidate(
     source_results = {
         "cninfo": _source_rows(cninfo_rows, default_source="cninfo"),
         "tdx": _source_rows(tdx_rows, default_source="tdx"),
-        "sina": _source_rows(sina_rows, default_source="sina"),
+        "legacy": _source_rows(legacy_rows, default_source="legacy"),
     }
     paths = {
         source: result[0] for source, result in source_results.items()
@@ -315,6 +531,15 @@ def build_three_source_canonical_candidate(
         - invalid_path_instruments.get(source, set())
         for source, instrument_ids
         in complete_instruments_by_source.items()
+    }
+    zero_event_completed = {
+        source: {
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        }
+        for source, instrument_ids
+        in (zero_event_complete_instruments_by_source or {}).items()
     }
     special_dates = {
         instrument_id: {
@@ -366,7 +591,14 @@ def build_three_source_canonical_candidate(
                 for source in SOURCE_ORDER
             }
             eligible = {
-                source: instrument_id in completed.get(source, set())
+                source: (
+                    instrument_id in completed.get(source, set())
+                    and (
+                        bool(source_segment_rows[source])
+                        or instrument_id
+                        in zero_event_completed.get(source, set())
+                    )
+                )
                 for source in SOURCE_ORDER
             }
             invalid_sources = sorted(
@@ -378,8 +610,8 @@ def build_three_source_canonical_candidate(
             pairwise: Dict[str, Dict[str, Any]] = {}
             for left, right in (
                 ("cninfo", "tdx"),
-                ("cninfo", "sina"),
-                ("tdx", "sina"),
+                ("cninfo", "legacy"),
+                ("tdx", "legacy"),
             ):
                 key = f"{left}__{right}"
                 if eligible[left] and eligible[right]:
@@ -423,7 +655,7 @@ def build_three_source_canonical_candidate(
                     reason = "governed_special_action_cninfo_policy"
                 elif (
                     pairwise["cninfo__tdx"].get("agrees")
-                    and pairwise["cninfo__sina"].get("agrees")
+                    and pairwise["cninfo__legacy"].get("agrees")
                 ):
                     selected_source = "cninfo"
                     confidence = "high"
@@ -432,14 +664,14 @@ def build_three_source_canonical_candidate(
                     selected_source = "cninfo"
                     confidence = "high"
                     reason = "cninfo_tdx_consensus"
-                elif pairwise["cninfo__sina"].get("agrees"):
+                elif pairwise["cninfo__legacy"].get("agrees"):
                     selected_source = "cninfo"
                     confidence = "high"
-                    reason = "cninfo_sina_consensus"
-                elif pairwise["tdx__sina"].get("agrees"):
+                    reason = "cninfo_legacy_consensus"
+                elif pairwise["tdx__legacy"].get("agrees"):
                     selected_source = "tdx"
                     confidence = "independent_consensus"
-                    reason = "tdx_sina_consensus_over_cninfo"
+                    reason = "tdx_legacy_consensus_over_cninfo"
                 else:
                     selected_source = "cninfo"
                     confidence = "low"
@@ -447,11 +679,11 @@ def build_three_source_canonical_candidate(
                     low_confidence += 1
             elif (
                 not is_special
-                and pairwise["tdx__sina"].get("agrees")
+                and pairwise["tdx__legacy"].get("agrees")
             ):
                 selected_source = "tdx"
                 confidence = "independent_consensus"
-                reason = "tdx_sina_consensus_without_complete_cninfo"
+                reason = "tdx_legacy_consensus_without_complete_cninfo"
             else:
                 blocked += 1
 
@@ -517,6 +749,61 @@ def build_three_source_canonical_candidate(
         for decision in decisions
         if decision["confidence"] in {"low", "blocked"}
     ][:max(0, int(sample_limit))]
+    pairwise_reconciliation: Dict[str, Dict[str, Any]] = {}
+    for pair_name in (
+        "cninfo__tdx",
+        "cninfo__legacy",
+        "tdx__legacy",
+    ):
+        comparisons = [
+            decision["pairwise"][pair_name]
+            for decision in decisions
+            if decision["pairwise"][pair_name].get("reason")
+            != "source_incomplete"
+        ]
+        bucket_counts = {
+            label: sum(
+                int(
+                    comparison.get(
+                        "factor_difference_buckets", {}
+                    ).get(label, 0)
+                )
+                for comparison in comparisons
+            )
+            for label, _ in FACTOR_DIFFERENCE_BUCKETS
+        }
+        bucket_counts["gt_1_pct"] = sum(
+            int(
+                comparison.get(
+                    "factor_difference_buckets", {}
+                ).get("gt_1_pct", 0)
+            )
+            for comparison in comparisons
+        )
+        pairwise_reconciliation[pair_name] = {
+            "compared_segments": len(comparisons),
+            "exact_matches": sum(
+                int(item.get("exact_matches", 0))
+                for item in comparisons
+            ),
+            "shifted_matches": sum(
+                int(item.get("shifted_matches", 0))
+                for item in comparisons
+            ),
+            "conflicts": sum(
+                int(item.get("event_conflicts", 0))
+                for item in comparisons
+            ),
+            "left_only": sum(
+                int(item.get("left_only", 0))
+                for item in comparisons
+            ),
+            "right_only": sum(
+                int(item.get("right_only", 0))
+                for item in comparisons
+            ),
+            "factor_difference_buckets": bucket_counts,
+        }
     summary = {
         "series_version": series_version,
         "source_selection_status": (
@@ -531,6 +818,7 @@ def build_three_source_canonical_candidate(
         "selection_counts": dict(selection_counts),
         "confidence_counts": dict(confidence_counts),
         "agreement_counts": dict(agreement_counts),
+        "pairwise_reconciliation": pairwise_reconciliation,
         "invalid_path_instruments_by_source": {
             source: sorted(instrument_ids)
             for source, instrument_ids

@@ -87,7 +87,9 @@ def test_three_source_selection_job_is_manual_dry_run_first():
 
     assert job["manual_only"] is True
     assert job["parameters"]["dry_run"] is True
-    assert job["parameters"]["backfill_sina"] is False
+    assert "backfill_sina" not in job["parameters"]
+    assert "resume" not in job["parameters"]
+    assert "checkpoint_id" not in job["parameters"]
     assert job["parameters"]["build_canonical"] is True
     assert job["parameters"]["exchanges"] == ["SSE", "SZSE"]
     assert job["max_instances"] == 1
@@ -110,23 +112,13 @@ def test_three_source_selection_report_is_bounded_and_auditable():
             "end_date": "2026-07-29",
             "exchanges": ["SSE", "SZSE"],
             "instrument_ids": ["000001.SZ"],
-            "backfill_sina": True,
-        },
-        "sina_backfill": {
-            "status": "success",
-            "checkpoint_id": "unit",
-            "observations": {
-                "provider_profile_counts": {
-                    "sina_hfq_factor": 10,
-                },
-            },
         },
         "selection": {
             "source_events": {
                 "cninfo_rows": 10,
                 "tdx_rows": 12,
-                "sina_factor_rows": 9,
-                "sina_instruments": 1,
+                "legacy_factor_rows": 9,
+                "legacy_instruments": 1,
             },
             "source_selection": {
                 "selection_counts": {"cninfo": 1},
@@ -139,16 +131,35 @@ def test_three_source_selection_report_is_bounded_and_auditable():
                 "blocked_segment_count": 0,
                 "low_confidence_segment_count": 1,
                 "promotion_eligible": True,
+                "pairwise_reconciliation": {
+                    "cninfo__legacy": {
+                        "exact_matches": 8,
+                        "shifted_matches": 1,
+                        "conflicts": 1,
+                        "left_only": 2,
+                        "right_only": 3,
+                        "factor_difference_buckets": {
+                            "le_0_01_pct": 4,
+                            "0_01_to_0_1_pct": 3,
+                            "0_1_to_0_5_pct": 2,
+                            "0_5_to_1_pct": 1,
+                            "gt_1_pct": 1,
+                        },
+                    },
+                },
                 "conflict_samples": samples,
             },
         },
     })
 
     assert "生产表影响: `无" in content
-    assert "sina_hfq_factor=10" in content
+    assert "数据获取: `local_only`" in content
+    assert "legacy_events=9" in content
     assert "cninfo=1" in content
     assert "low=1" in content
     assert "cninfo__tdx=1" in content
+    assert "cninfo__legacy: exact=8, shifted=1" in content
+    assert "gt_1_pct=1" in content
     assert "自动晋级生产: `False`" in content
     assert "000019.SZ" in content
     assert "000020.SZ" not in content
@@ -186,10 +197,7 @@ async def test_scheduler_three_source_selection_coordinates_without_promotion(
 ):
     task = ScheduledTasks()
     task.telegram_enabled = False
-    backfill = AsyncMock(return_value={
-        "status": "success",
-        "observations": {"completed_instruments": 1},
-    })
+    backfill = AsyncMock()
     selection = AsyncMock(return_value={
         "status": "success",
         "candidate": {"candidate_built": True, "promotion_eligible": True},
@@ -210,23 +218,14 @@ async def test_scheduler_three_source_selection_coordinates_without_promotion(
         end_date="2026-07-29",
         exchanges=["SZSE"],
         instrument_ids=["000001.SZ"],
-        backfill_sina=True,
         dry_run=False,
-        resume=True,
-        chunk_size=25,
-        request_interval_seconds=1.5,
-        checkpoint_id="unit",
         build_canonical=True,
         factor_relative_tolerance=0.0002,
     )
 
     assert result["status"] == "success"
     assert result["promoted"] is False
-    assert backfill.await_args.kwargs["source"] == "akshare"
-    assert backfill.await_args.kwargs["build_canonical"] is False
-    assert backfill.await_args.kwargs["resume"] is True
-    assert backfill.await_args.kwargs["chunk_size"] == 25
-    assert backfill.await_args.kwargs["checkpoint_id"] == "unit"
+    backfill.assert_not_awaited()
     assert selection.await_args.kwargs["source_selection_mode"] == "three_source"
     assert selection.await_args.kwargs["build_canonical"] is True
     assert selection.await_args.kwargs["factor_relative_tolerance"] == 0.0002
@@ -237,31 +236,15 @@ async def test_scheduler_three_source_selection_coordinates_without_promotion(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_ignores_legacy_promotion_gates_after_clean_backfill(
+async def test_scheduler_reports_partial_when_local_selection_is_partial(
     monkeypatch,
 ):
     task = ScheduledTasks()
     task.telegram_enabled = False
-    backfill = AsyncMock(return_value={
-        "status": "partial",
-        "observations": {
-            "errors": 0,
-            "provider_failure_instruments": 0,
-        },
-        "universe": {"pending_count": 0},
-        "canonical": {
-            "quality_gates": {"full_market_scope": False},
-        },
-    })
     selection = AsyncMock(return_value={
-        "status": "success",
+        "status": "partial",
         "candidate": {"candidate_built": True},
     })
-    monkeypatch.setattr(
-        data_manager,
-        "rebuild_a_share_adjustment_factor_governance",
-        backfill,
-    )
     monkeypatch.setattr(
         data_manager,
         "rebuild_cninfo_primary_adjustment_factors",
@@ -271,15 +254,14 @@ async def test_scheduler_ignores_legacy_promotion_gates_after_clean_backfill(
     result = await task.a_share_canonical_adjustment_factor_selection(
         start_date="1990-12-19",
         end_date="2026-07-29",
-        backfill_sina=True,
         dry_run=False,
     )
 
-    assert result["status"] == "success"
+    assert result["status"] == "partial"
 
 
 @pytest.mark.asyncio
-async def test_scheduler_three_source_selection_skips_optional_backfill(
+async def test_scheduler_three_source_selection_is_local_only_dry_run(
     monkeypatch,
 ):
     task = ScheduledTasks()
@@ -303,7 +285,6 @@ async def test_scheduler_three_source_selection_skips_optional_backfill(
     result = await task.a_share_canonical_adjustment_factor_selection(
         start_date="1990-12-19",
         end_date="2026-07-29",
-        backfill_sina=False,
     )
 
     assert result["status"] == "dry_run"

@@ -1,8 +1,8 @@
 ## ADDED Requirements
 
 ### Requirement: Manual three-source factor selection workflow
-The scheduler SHALL expose a manual-only, dry-run-first workflow for optional Sina factor
-backfill, CNInfo/TDX/Sina scoring, and canonical staging construction.
+The scheduler SHALL expose a manual-only, dry-run-first workflow for local CNInfo/TDX/legacy
+composite scoring and canonical staging construction.
 
 #### Scenario: Default invocation
 - **WHEN** the task is invoked without write flags
@@ -10,20 +10,20 @@ backfill, CNInfo/TDX/Sina scoring, and canonical staging construction.
 
 #### Scenario: Targeted pilot
 - **WHEN** instrument identifiers are supplied
-- **THEN** only those instruments are fetched, scored, and reported
+- **THEN** only those local instrument paths are scored and reported
 
-### Requirement: Resumable bounded Sina acquisition
-The workflow SHALL checkpoint completed Sina requests, apply configured request intervals,
-and report failures without discarding successful observations.
+### Requirement: Local-only canonical selection
+The workflow MUST NOT download or backfill a provider while constructing a canonical
+candidate.
 
-#### Scenario: Interrupted full-market backfill
-- **WHEN** the task restarts with the same checkpoint and `resume=true`
-- **THEN** it skips instruments with complete matching Sina snapshots and continues the
-  remaining universe
+#### Scenario: Canonical selection executes
+- **WHEN** an operator runs targeted or full-market selection
+- **THEN** it reads the three existing local paths and performs no external factor request
 
 ### Requirement: Bounded source-selection report
-The report SHALL include Sina coverage, selection counts, confidence counts, blocked
-segments, agreement patterns, and bounded conflict samples.
+The report SHALL include legacy coverage, selection counts, confidence counts, blocked
+segments, agreement patterns, event-date matching counts, factor-difference buckets, and
+bounded conflict samples.
 
 #### Scenario: Low-confidence CNInfo fallback
 - **WHEN** a segment has no eligible consensus

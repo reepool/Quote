@@ -1016,6 +1016,41 @@ async def test_endpoint_and_reconciliation_gaps_are_candidate_audit_only():
 
 
 @pytest.mark.asyncio
+async def test_three_source_keeps_cninfo_eligible_without_endpoint_audit_rows():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        if (
+            "FROM corporate_action_instrument_status" in query
+            and "source = 'tdx'" not in query
+        ):
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["source_completeness"]["cninfo"]["status"] == "success"
+    assert result["source_completeness"]["cninfo"][
+        "endpoint_incomplete_instruments"
+    ] == 1
+    assert "cninfo" in result["candidate"]["decisions"][0][
+        "eligible_sources"
+    ]
+    assert result["candidate"]["audit_checks"]["endpoint_completeness"] is False
+
+
+@pytest.mark.asyncio
 async def test_partial_history_rebuild_preserves_daily_factor_retry_queue():
     manager = _manager_with_factor_evidence()
 
@@ -1092,37 +1127,22 @@ async def test_candidate_write_failure_blocks_promotion_and_retry_cleanup():
 
 
 @pytest.mark.asyncio
-async def test_three_source_candidate_selects_matching_sina_path_in_dry_run():
+async def test_three_source_candidate_selects_matching_legacy_path_in_dry_run():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_with_events",
-            "event_count": 1,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-sina",
-        }]
-    )
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "ex_date": datetime(2020, 5, 28),
-            "source": "akshare",
-            "source_profile": "sina_hfq_factor",
-            "normalized_factor": 13.5 / (13.5 - 0.218),
-            "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "snapshot-sina",
-        }, {
-            "instrument_id": "000001.SZ",
-            "ex_date": datetime(2019, 5, 28),
-            "source": "akshare",
-            "source_profile": "sina_hfq_factor",
-            "normalized_factor": 1.2,
-            "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "stale-sina",
-        }]
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def matching_legacy_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM adjustment_factors\n" in query:
+            return [{
+                **rows[0],
+                "factor": 13.5 / (13.5 - 0.218),
+                "cumulative_factor": 13.5 / (13.5 - 0.218),
+            }]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=matching_legacy_query
     )
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
@@ -1143,34 +1163,30 @@ async def test_three_source_candidate_selects_matching_sina_path_in_dry_run():
     assert result["candidate"]["candidate_built"] is True
     assert result["candidate"]["selection_counts"] == {"cninfo": 1}
     assert result["candidate"]["confidence_counts"] == {"high": 1}
-    assert result["source_events"]["sina_factor_rows"] == 1
+    assert result["source_events"]["legacy_factor_rows"] == 1
+    assert result["source_events"]["legacy_instruments"] == 1
+    manager.db_ops.list_adjustment_factor_observations.assert_not_awaited()
+    manager.db_ops.list_adjustment_factor_instrument_statuses.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
 
 
 @pytest.mark.asyncio
 async def test_three_source_candidate_persists_staging_without_promotion():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_with_events",
-            "event_count": 1,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-sina",
-        }]
-    )
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "ex_date": datetime(2020, 5, 28),
-            "source": "akshare",
-            "source_profile": "sina_hfq_factor",
-            "normalized_factor": 13.5 / (13.5 - 0.218),
-            "provider_cumulative_factor": 1.0,
-            "ingestion_run_id": "snapshot-sina",
-        }]
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def matching_legacy_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM adjustment_factors\n" in query:
+            return [{
+                **rows[0],
+                "factor": 13.5 / (13.5 - 0.218),
+                "cumulative_factor": 13.5 / (13.5 - 0.218),
+            }]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=matching_legacy_query
     )
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
@@ -1194,24 +1210,21 @@ async def test_three_source_candidate_persists_staging_without_promotion():
         "cninfo_event_derived_v1"
     )
     manager.db_ops.replace_canonical_adjustment_factors.assert_awaited_once()
+    manager.db_ops.list_adjustment_factor_observations.assert_not_awaited()
 
 
 @pytest.mark.asyncio
-async def test_three_source_counts_zero_event_sina_snapshot_as_complete():
+async def test_three_source_marks_missing_legacy_path_unavailable():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[]
-    )
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_no_events",
-            "event_count": 0,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-empty",
-        }]
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def missing_legacy_query(query, params):
+        if "FROM adjustment_factors\n" in query:
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=missing_legacy_query
     )
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
@@ -1224,18 +1237,24 @@ async def test_three_source_counts_zero_event_sina_snapshot_as_complete():
         source_selection_mode="three_source",
     )
 
-    coverage = result["source_completeness"]["sina"]
-    assert coverage["status"] == "success"
-    assert coverage["available_instruments"] == 1
-    assert coverage["incomplete_instruments"] == 0
+    coverage = result["source_completeness"]["legacy"]
+    assert coverage["status"] == "partial"
+    assert coverage["available_instruments"] == 0
+    assert coverage["incomplete_instruments"] == 1
+    assert result["candidate"]["decisions"][0]["eligible_sources"] == [
+        "cninfo",
+        "tdx",
+    ]
 
 
 @pytest.mark.asyncio
-async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
+async def test_three_source_keeps_tdx_eligible_without_endpoint_audit_rows():
     manager = _manager_with_factor_evidence()
     original_query = manager.db_ops.execute_read_query.side_effect
 
     async def execute_read_query(query, params):
+        if "FROM adjustment_factors\n" in query:
+            return []
         if (
             "FROM corporate_action_instrument_status" in query
             and "source = 'tdx'" in query
@@ -1244,20 +1263,6 @@ async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
         return await original_query(query, params)
 
     manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[]
-    )
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_no_events",
-            "event_count": 0,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-empty",
-        }]
-    )
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
         start_date="1990-12-19",
@@ -1274,8 +1279,204 @@ async def test_three_source_does_not_let_uncovered_tdx_empty_path_vote():
     assert result["candidate"]["confidence_counts"] == {"low": 1}
     assert result["candidate"]["decisions"][0]["eligible_sources"] == [
         "cninfo",
-        "sina",
+        "tdx",
     ]
+    assert result["benchmark"]["tdx_coverage_gap_samples"]
+
+
+@pytest.mark.asyncio
+async def test_three_source_empty_paths_require_explicit_completion_evidence():
+    manager = _manager_with_factor_evidence()
+
+    async def empty_source_query(query, _params):
+        if (
+            "FROM corporate_action_observations" in query
+            or "FROM adjustment_factors_tdx" in query
+            or "FROM adjustment_factors\n" in query
+            or "FROM corporate_action_instrument_status" in query
+        ):
+            return []
+        return []
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=empty_source_query)
+    manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(return_value=[])
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["row_count"] == 0
+    assert result["candidate"]["blocked_segment_count"] == 1
+    assert result["candidate"]["decisions"][0]["eligible_sources"] == []
+    assert result["candidate"]["candidate_promotion_eligible"] is False
+    assert result["benchmark"]["baseline_covered_instruments"] == 0
+    assert result["benchmark"]["baseline_coverage_ratio"] == 0.0
+    assert result["benchmark"]["reference_sources"][
+        "tdx_event_derived_v1"
+    ]["available_instruments"] == 0
+    assert result["benchmark"]["reference_sources"][
+        "tdx_event_derived_v1"
+    ]["coverage_ratio"] == 0.0
+
+
+@pytest.mark.asyncio
+async def test_three_source_legacy_uses_pre_range_cumulative_anchor():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+    expected_factor = 13.5 / (13.5 - 0.218)
+
+    async def anchored_legacy_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM adjustment_factors\n" in query:
+            return [
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2019, 12, 31),
+                    "factor": 10.0,
+                    "cumulative_factor": 10.0,
+                    "source": "baostock",
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2020, 5, 28),
+                    "factor": 10.0 * expected_factor,
+                    "cumulative_factor": 10.0 * expected_factor,
+                    "source": "baostock",
+                },
+            ]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=anchored_legacy_query
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    decision = result["candidate"]["decisions"][0]
+    assert decision["source_event_counts"]["legacy"] == 1
+    assert decision["pairwise"]["cninfo__legacy"]["agrees"] is True
+    assert result["candidate"]["confidence_counts"] == {"high": 1}
+
+
+@pytest.mark.asyncio
+async def test_three_source_reports_unrebased_legacy_provider_switch():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+    expected_factor = 13.5 / (13.5 - 0.218)
+
+    async def unrebased_legacy_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM adjustment_factors\n" in query:
+            return [
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2019, 12, 31),
+                    "factor": 10.0,
+                    "cumulative_factor": 10.0,
+                    "source": "baostock",
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2020, 5, 28),
+                    "factor": expected_factor,
+                    "cumulative_factor": 18.0,
+                    "source": "akshare",
+                },
+            ]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=unrebased_legacy_query
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["decisions"][0]["pairwise"][
+        "cninfo__legacy"
+    ]["agrees"] is True
+    assert result["source_events"]["legacy_basis_conflict_rows"] == 1
+    sample = result["source_events"]["legacy_basis_conflict_samples"][0]
+    assert sample["instrument_id"] == "000001.SZ"
+    assert sample["cumulative_ratio"] == pytest.approx(1.8)
+    assert sample["stored_factor"] == pytest.approx(expected_factor)
+    assert sample["selected_factor"] == pytest.approx(expected_factor)
+
+
+@pytest.mark.asyncio
+async def test_three_source_preserves_pre_range_legacy_normalization_failure():
+    manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def invalid_prefix_query(query, params):
+        rows = await original_query(query, params)
+        if "FROM adjustment_factors\n" in query:
+            return [
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2019, 12, 31),
+                    "factor": 1.0,
+                    "cumulative_factor": 0.0,
+                    "source": "baostock",
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "ex_date": datetime(2020, 5, 28),
+                    "factor": 13.5 / (13.5 - 0.218),
+                    "cumulative_factor": 13.5 / (13.5 - 0.218),
+                    "source": "baostock",
+                },
+            ]
+        return rows
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=invalid_prefix_query
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="2020-01-01",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    assert result["source_completeness"]["legacy"][
+        "normalization_failure_instruments"
+    ] == 1
+    assert result["candidate"]["decisions"][0]["eligible_sources"] == [
+        "cninfo",
+        "tdx",
+    ]
+    assert result["source_events"][
+        "legacy_normalization_failure_rows"
+    ] == 1
+    assert result["source_events"][
+        "legacy_normalization_failure_samples"
+    ][0]["ex_date"] == "2019-12-31"
 
 
 @pytest.mark.asyncio
@@ -1301,27 +1502,6 @@ async def test_three_source_preserves_operator_attested_special_cninfo_path():
         return rows
 
     manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "ex_date": datetime(2020, 5, 28),
-            "source": "akshare",
-            "source_profile": "sina_hfq_factor",
-            "normalized_factor": 1.01,
-            "ingestion_run_id": "snapshot-sina",
-        }]
-    )
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_with_events",
-            "event_count": 1,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-sina",
-        }]
-    )
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
         start_date="1990-12-19",
@@ -1343,29 +1523,18 @@ async def test_three_source_preserves_operator_attested_special_cninfo_path():
 @pytest.mark.asyncio
 async def test_three_source_candidate_blocks_when_cninfo_path_is_incomplete():
     manager = _manager_with_factor_evidence()
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def missing_legacy_query(query, params):
+        if "FROM adjustment_factors\n" in query:
+            return []
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(
+        side_effect=missing_legacy_query
+    )
     manager.db_ops.get_quote_evidence_for_event_dates = AsyncMock(
         return_value=[]
-    )
-    manager.db_ops.list_adjustment_factor_observations = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "ex_date": datetime(2020, 5, 28),
-            "source": "akshare",
-            "source_profile": "sina_hfq_factor",
-            "normalized_factor": 1.2,
-            "ingestion_run_id": "snapshot-sina",
-        }]
-    )
-    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
-        return_value=[{
-            "instrument_id": "000001.SZ",
-            "source": "sina_hfq_factor",
-            "coverage_status": "complete_with_events",
-            "event_count": 1,
-            "start_date": datetime(1990, 12, 19),
-            "end_date": datetime(2026, 7, 17),
-            "ingestion_run_id": "snapshot-sina",
-        }]
     )
     manager.db_ops.replace_canonical_adjustment_factors = AsyncMock(
         return_value=0

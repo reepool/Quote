@@ -38,3 +38,13 @@
 - [x] 6.5 Remove Tencent/Eastmoney price-ratio code, configuration, tests, documentation, and exact runtime artifacts
 - [x] 6.6 Add and update focused unit, integration, scheduler, and persistence tests
 - [x] 6.7 Run regression tests, Python compile, strict OpenSpec validation, and uncommitted-change review
+
+## 7. Use Existing Legacy Composite Third Source
+
+- [x] 7.1 Revise proposal, design, and delta specs from an independent Sina snapshot to the existing BaoStock-plus-Sina legacy composite path
+- [x] 7.2 Rewire three-source selection and source coverage from Sina snapshots to local legacy rows without provider downloads
+- [x] 7.3 Separate CNInfo and TDX factor-path eligibility from recent endpoint audit intervals
+- [x] 7.4 Add exact/shifted event reconciliation counts and factor-difference buckets to bounded selection reports
+- [x] 7.5 Remove canonical-task Sina backfill parameters and update configuration, documentation, and operator commands
+- [x] 7.6 Add and update selector, DataManager, scheduler, and regression tests
+- [x] 7.7 Run focused tests, Python compile, strict OpenSpec validation, uncommitted-change review, commit, and push
