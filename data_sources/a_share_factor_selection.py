@@ -8,8 +8,12 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
+from data_sources.a_share_factor_source_overrides import (
+    ReviewedFactorSourceOverride,
+)
 
-SOURCE_ORDER = ("cninfo", "tdx", "legacy")
+BAOSTOCK_SINA_SOURCE = "baostock_sina_composite"
+SOURCE_ORDER = ("cninfo", "tdx", BAOSTOCK_SINA_SOURCE)
 
 FACTOR_DIFFERENCE_BUCKETS = (
     ("le_0_01_pct", 0.0001),
@@ -61,7 +65,7 @@ def _positive(value: Any) -> Optional[float]:
     return number if math.isfinite(number) and number > 0 else None
 
 
-def normalize_legacy_composite_rows(
+def normalize_baostock_sina_composite_rows(
     rows: Iterable[Mapping[str, Any]],
     *,
     no_change_tolerance: float = LEGACY_NO_CHANGE_TOLERANCE,
@@ -69,7 +73,7 @@ def normalize_legacy_composite_rows(
         LEGACY_SOURCE_SWITCH_REL_TOLERANCE
     ),
 ) -> List[Dict[str, Any]]:
-    """Convert legacy cumulative levels into adjacent event ratios.
+    """Convert BaoStock-Sina cumulative levels into adjacent event ratios.
 
     BaoStock history may store its cumulative level in both ``factor`` and
     ``cumulative_factor``. Sina tail rows normally rebase onto that cumulative
@@ -102,11 +106,11 @@ def normalize_legacy_composite_rows(
                     "instrument_id": instrument_id,
                     "ex_date": ex_date,
                     "normalized_factor": None,
-                    "source": "legacy",
+                    "source": BAOSTOCK_SINA_SOURCE,
                     "upstream_source": upstream_source,
-                    "source_profile": "baostock_sina_legacy_composite",
-                    "legacy_normalization_method": "invalid_cumulative",
-                    "legacy_basis_conflict": False,
+                    "source_profile": BAOSTOCK_SINA_SOURCE,
+                    "composite_normalization_method": "invalid_cumulative",
+                    "composite_basis_conflict": False,
                 })
                 previous_cumulative = None
                 previous_upstream_source = None
@@ -134,15 +138,15 @@ def normalize_legacy_composite_rows(
                     "ex_date": ex_date,
                     "normalized_factor": None,
                     "provider_cumulative_factor": cumulative,
-                    "source": "legacy",
+                    "source": BAOSTOCK_SINA_SOURCE,
                     "upstream_source": upstream_source,
-                    "source_profile": "baostock_sina_legacy_composite",
-                    "legacy_normalization_method": (
+                    "source_profile": BAOSTOCK_SINA_SOURCE,
+                    "composite_normalization_method": (
                         "invalid_initial_source_factor"
                     ),
-                    "legacy_basis_conflict": False,
-                    "legacy_cumulative_ratio": None,
-                    "legacy_stored_factor": None,
+                    "composite_basis_conflict": False,
+                    "composite_cumulative_ratio": None,
+                    "composite_stored_factor": None,
                 })
                 previous_cumulative = cumulative
                 previous_upstream_source = upstream_source
@@ -155,15 +159,15 @@ def normalize_legacy_composite_rows(
                     "ex_date": ex_date,
                     "normalized_factor": None,
                     "provider_cumulative_factor": cumulative,
-                    "source": "legacy",
+                    "source": BAOSTOCK_SINA_SOURCE,
                     "upstream_source": upstream_source,
-                    "source_profile": "baostock_sina_legacy_composite",
-                    "legacy_normalization_method": (
+                    "source_profile": BAOSTOCK_SINA_SOURCE,
+                    "composite_normalization_method": (
                         "invalid_source_switch_factor"
                     ),
-                    "legacy_basis_conflict": True,
-                    "legacy_cumulative_ratio": cumulative_ratio,
-                    "legacy_stored_factor": None,
+                    "composite_basis_conflict": True,
+                    "composite_cumulative_ratio": cumulative_ratio,
+                    "composite_stored_factor": None,
                 })
                 previous_cumulative = cumulative
                 previous_upstream_source = upstream_source
@@ -209,13 +213,13 @@ def normalize_legacy_composite_rows(
                 "normalized_factor": factor,
                 "cumulative_factor": normalized_cumulative,
                 "provider_cumulative_factor": cumulative,
-                "source": "legacy",
+                "source": BAOSTOCK_SINA_SOURCE,
                 "upstream_source": upstream_source,
-                "source_profile": "baostock_sina_legacy_composite",
-                "legacy_normalization_method": normalization_method,
-                "legacy_basis_conflict": basis_conflict,
-                "legacy_cumulative_ratio": cumulative_ratio,
-                "legacy_stored_factor": stored_factor,
+                "source_profile": BAOSTOCK_SINA_SOURCE,
+                "composite_normalization_method": normalization_method,
+                "composite_basis_conflict": basis_conflict,
+                "composite_cumulative_ratio": cumulative_ratio,
+                "composite_stored_factor": stored_factor,
             })
     return normalized
 
@@ -488,7 +492,7 @@ def build_three_source_canonical_candidate(
     *,
     cninfo_rows: Iterable[Mapping[str, Any]],
     tdx_rows: Iterable[Mapping[str, Any]],
-    legacy_rows: Iterable[Mapping[str, Any]],
+    baostock_sina_rows: Iterable[Mapping[str, Any]],
     target_instruments: Sequence[str],
     series_version: str,
     start_date: date,
@@ -507,6 +511,9 @@ def build_three_source_canonical_candidate(
         Mapping[str, Sequence[Any]]
     ] = None,
     sessions_by_exchange: Optional[Mapping[str, Sequence[Any]]] = None,
+    reviewed_source_overrides: Optional[
+        Mapping[str, ReviewedFactorSourceOverride]
+    ] = None,
     factor_relative_tolerance: float = 0.001,
     cumulative_relative_tolerance: float = 0.001,
     max_session_shift: int = 3,
@@ -517,7 +524,10 @@ def build_three_source_canonical_candidate(
     source_results = {
         "cninfo": _source_rows(cninfo_rows, default_source="cninfo"),
         "tdx": _source_rows(tdx_rows, default_source="tdx"),
-        "legacy": _source_rows(legacy_rows, default_source="legacy"),
+        BAOSTOCK_SINA_SOURCE: _source_rows(
+            baostock_sina_rows,
+            default_source=BAOSTOCK_SINA_SOURCE,
+        ),
     }
     paths = {
         source: result[0] for source, result in source_results.items()
@@ -638,8 +648,8 @@ def build_three_source_canonical_candidate(
             pairwise: Dict[str, Dict[str, Any]] = {}
             for left, right in (
                 ("cninfo", "tdx"),
-                ("cninfo", "legacy"),
-                ("tdx", "legacy"),
+                ("cninfo", BAOSTOCK_SINA_SOURCE),
+                ("tdx", BAOSTOCK_SINA_SOURCE),
             ):
                 key = f"{left}__{right}"
                 if eligible[left] and eligible[right]:
@@ -676,6 +686,7 @@ def build_three_source_canonical_candidate(
             selected_source: Optional[str] = None
             confidence = "blocked"
             reason = "cninfo_incomplete"
+            override_evidence: Optional[Dict[str, Any]] = None
             historical_segment_ended = lifecycle_ended
             cninfo_empty_contradicted = bool(
                 eligible["cninfo"]
@@ -689,12 +700,34 @@ def build_three_source_canonical_candidate(
                 and not source_segment_rows["cninfo"]
                 and eligible["tdx"]
                 and source_segment_rows["tdx"]
-                and not eligible["legacy"]
+                and not pairwise[
+                    f"tdx__{BAOSTOCK_SINA_SOURCE}"
+                ].get("agrees")
             )
-            if use_historical_tdx_fallback:
+            reviewed_override = (
+                reviewed_source_overrides or {}
+            ).get(instrument_id)
+            if reviewed_override is not None:
+                override_source = reviewed_override.selected_source
+                override_evidence = reviewed_override.as_selection_evidence()
+                if (
+                    eligible.get(override_source, False)
+                    and paths.get(override_source, {}).get(instrument_id)
+                ):
+                    selected_source = override_source
+                    confidence = "reviewed_source_override"
+                    reason = reviewed_override.reason
+                else:
+                    reason = "reviewed_source_override_ineligible"
+                    blocked += 1
+            elif use_historical_tdx_fallback:
                 selected_source = "tdx"
                 confidence = "historical_single_source"
-                reason = "tdx_historical_single_source_fallback"
+                reason = (
+                    "tdx_historical_with_baostock_sina_conflict_fallback"
+                    if eligible[BAOSTOCK_SINA_SOURCE]
+                    else "tdx_historical_single_source_fallback"
+                )
                 historical_single_source += 1
                 low_confidence += 1
             elif eligible["cninfo"] and not cninfo_empty_contradicted:
@@ -704,7 +737,9 @@ def build_three_source_canonical_candidate(
                     reason = "governed_special_action_cninfo_policy"
                 elif (
                     pairwise["cninfo__tdx"].get("agrees")
-                    and pairwise["cninfo__legacy"].get("agrees")
+                    and pairwise[
+                        f"cninfo__{BAOSTOCK_SINA_SOURCE}"
+                    ].get("agrees")
                 ):
                     selected_source = "cninfo"
                     confidence = "high"
@@ -713,14 +748,18 @@ def build_three_source_canonical_candidate(
                     selected_source = "cninfo"
                     confidence = "high"
                     reason = "cninfo_tdx_consensus"
-                elif pairwise["cninfo__legacy"].get("agrees"):
+                elif pairwise[
+                    f"cninfo__{BAOSTOCK_SINA_SOURCE}"
+                ].get("agrees"):
                     selected_source = "cninfo"
                     confidence = "high"
-                    reason = "cninfo_legacy_consensus"
-                elif pairwise["tdx__legacy"].get("agrees"):
+                    reason = "cninfo_baostock_sina_consensus"
+                elif pairwise[
+                    f"tdx__{BAOSTOCK_SINA_SOURCE}"
+                ].get("agrees"):
                     selected_source = "tdx"
                     confidence = "independent_consensus"
-                    reason = "tdx_legacy_consensus_over_cninfo"
+                    reason = "tdx_baostock_sina_consensus_over_cninfo"
                 else:
                     selected_source = "cninfo"
                     confidence = "low"
@@ -728,11 +767,15 @@ def build_three_source_canonical_candidate(
                     low_confidence += 1
             elif (
                 not is_special
-                and pairwise["tdx__legacy"].get("agrees")
+                and pairwise[
+                    f"tdx__{BAOSTOCK_SINA_SOURCE}"
+                ].get("agrees")
             ):
                 selected_source = "tdx"
                 confidence = "independent_consensus"
-                reason = "tdx_legacy_consensus_without_complete_cninfo"
+                reason = (
+                    "tdx_baostock_sina_consensus_without_complete_cninfo"
+                )
             else:
                 blocked += 1
 
@@ -741,6 +784,7 @@ def build_three_source_canonical_candidate(
                 "selected_source": selected_source,
                 "confidence": confidence,
                 "reason": reason,
+                "reviewed_source_override": override_evidence,
                 "special_action": is_special,
                 "cninfo_empty_contradicted": cninfo_empty_contradicted,
                 "historical_segment_ended": historical_segment_ended,
@@ -801,14 +845,24 @@ def build_three_source_canonical_candidate(
         decision
         for decision in decisions
         if decision["confidence"] in {
-            "low", "blocked", "historical_single_source"
+            "low", "historical_single_source"
         }
+    ][:max(0, int(sample_limit))]
+    blocked_decisions = [
+        decision
+        for decision in decisions
+        if decision["confidence"] == "blocked"
+    ][:max(0, int(sample_limit))]
+    reviewed_source_override_samples = [
+        decision
+        for decision in decisions
+        if decision["confidence"] == "reviewed_source_override"
     ][:max(0, int(sample_limit))]
     pairwise_reconciliation: Dict[str, Dict[str, Any]] = {}
     for pair_name in (
         "cninfo__tdx",
-        "cninfo__legacy",
-        "tdx__legacy",
+        f"cninfo__{BAOSTOCK_SINA_SOURCE}",
+        f"tdx__{BAOSTOCK_SINA_SOURCE}",
     ):
         comparisons = [
             decision["pairwise"][pair_name]
@@ -884,6 +938,10 @@ def build_three_source_canonical_candidate(
             if instrument_ids
         },
         "decisions": decisions,
+        "blocked_decisions": blocked_decisions,
+        "reviewed_source_override_samples": (
+            reviewed_source_override_samples
+        ),
         "conflict_samples": conflict_samples,
         "promotion_eligible": blocked == 0,
     }

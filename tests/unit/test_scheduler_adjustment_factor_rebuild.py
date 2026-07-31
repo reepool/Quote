@@ -117,8 +117,8 @@ def test_three_source_selection_report_is_bounded_and_auditable():
             "source_events": {
                 "cninfo_rows": 10,
                 "tdx_rows": 12,
-                "legacy_factor_rows": 9,
-                "legacy_instruments": 1,
+                "baostock_sina_factor_rows": 9,
+                "baostock_sina_instruments": 1,
             },
             "source_selection": {
                 "selection_counts": {"cninfo": 1},
@@ -132,7 +132,7 @@ def test_three_source_selection_report_is_bounded_and_auditable():
                 "low_confidence_segment_count": 1,
                 "promotion_eligible": True,
                 "pairwise_reconciliation": {
-                    "cninfo__legacy": {
+                    "cninfo__baostock_sina_composite": {
                         "exact_matches": 8,
                         "shifted_matches": 1,
                         "conflicts": 1,
@@ -147,6 +147,26 @@ def test_three_source_selection_report_is_bounded_and_auditable():
                         },
                     },
                 },
+                "blocked_decisions": [{
+                    "instrument_id": "600455.SH",
+                    "start_date": "1990-12-19",
+                    "end_date": "2026-07-29",
+                    "reason": "reviewed_source_override_ineligible",
+                    "confidence": "blocked",
+                }],
+                "reviewed_source_override_samples": [{
+                    "instrument_id": "000004.SZ",
+                    "start_date": "1990-12-19",
+                    "end_date": "2026-07-29",
+                    "selected_source": "tdx",
+                    "reason": "reviewed_source_override",
+                    "reviewed_source_override": {
+                        "reason": (
+                            "operator_reviewed_whole_lifecycle_tdx_path"
+                        ),
+                        "catalog_version": "unit-v1",
+                    },
+                }],
                 "conflict_samples": samples,
             },
         },
@@ -154,13 +174,24 @@ def test_three_source_selection_report_is_bounded_and_auditable():
 
     assert "生产表影响: `无" in content
     assert "数据获取: `local_only`" in content
-    assert "legacy_events=9" in content
+    assert "BaoStock_Sina composite events=9" in content
     assert "cninfo=1" in content
     assert "low=1" in content
     assert "cninfo__tdx=1" in content
-    assert "cninfo__legacy: exact=8, shifted=1" in content
+    assert (
+        "cninfo__BaoStock_Sina composite: exact=8, shifted=1"
+        in content
+    )
     assert "gt_1_pct=1" in content
     assert "自动晋级生产: `False`" in content
+    assert "硬阻塞明细:" in content
+    assert "600455.SH" in content
+    assert "人工全生命周期来源覆盖:" in content
+    assert "000004.SZ" in content
+    assert "catalog=unit-v1" in content
+    assert content.index("硬阻塞明细:") < content.index(
+        "低置信与历史单源样本:"
+    )
     assert "000019.SZ" in content
     assert "000020.SZ" not in content
 

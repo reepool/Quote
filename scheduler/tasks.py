@@ -1104,6 +1104,13 @@ def _format_a_share_canonical_factor_selection_report(
     result: Dict[str, Any],
 ) -> str:
     """Build a bounded report for the manual three-source selection workflow."""
+    def _source_label(value: Any) -> str:
+        normalized = str(value or "")
+        return normalized.replace(
+            "baostock_sina_composite",
+            "BaoStock_Sina composite",
+        )
+
     status = str(result.get("status") or "unknown").lower()
     label = {
         "success": "完成",
@@ -1131,13 +1138,13 @@ def _format_a_share_canonical_factor_selection_report(
         "来源覆盖: `"
         f"cninfo_events={source_events.get('cninfo_rows', 0)}, "
         f"tdx_events={source_events.get('tdx_rows', 0)}, "
-        "legacy_events="
-        f"{source_events.get('legacy_factor_rows', 0)}, "
-        "legacy_instruments="
-        f"{source_events.get('legacy_instruments', 0)}`",
+        "BaoStock_Sina composite events="
+        f"{source_events.get('baostock_sina_factor_rows', 0)}, "
+        "instruments="
+        f"{source_events.get('baostock_sina_instruments', 0)}`",
         "路径选择: `"
         + ", ".join(
-            f"{source}={count}"
+            f"{_source_label(source)}={count}"
             for source, count in sorted(
                 (source_selection.get("selection_counts") or {}).items()
             )
@@ -1173,7 +1180,8 @@ def _format_a_share_canonical_factor_selection_report(
             "事件对账: `"
             + "; ".join(
                 (
-                    f"{name}: exact={values.get('exact_matches', 0)}, "
+                    f"{_source_label(name)}: "
+                    f"exact={values.get('exact_matches', 0)}, "
                     f"shifted={values.get('shifted_matches', 0)}, "
                     f"conflicts={values.get('conflicts', 0)}, "
                     f"left_only={values.get('left_only', 0)}, "
@@ -1208,9 +1216,38 @@ def _format_a_share_canonical_factor_selection_report(
             )
             + "`"
         )
-    samples = candidate.get("conflict_samples") or []
+    blocked_decisions = candidate.get("blocked_decisions") or []
+    if blocked_decisions:
+        lines.extend(["", "硬阻塞明细:", "```text"])
+        for item in blocked_decisions[:20]:
+            lines.append(
+                f"{item.get('instrument_id', 'unknown')} "
+                f"{item.get('start_date', '?')}..{item.get('end_date', '?')}: "
+                f"{item.get('reason', 'blocked')}"
+            )
+        lines.append("```")
+    override_samples = (
+        candidate.get("reviewed_source_override_samples") or []
+    )
+    if override_samples:
+        lines.extend(["", "人工全生命周期来源覆盖:", "```text"])
+        for item in override_samples[:20]:
+            evidence = item.get("reviewed_source_override") or {}
+            lines.append(
+                f"{item.get('instrument_id', 'unknown')} "
+                f"{item.get('start_date', '?')}..{item.get('end_date', '?')}: "
+                f"{_source_label(item.get('selected_source'))}; "
+                f"{evidence.get('reason', item.get('reason', 'reviewed'))}; "
+                f"catalog={evidence.get('catalog_version', 'unknown')}"
+            )
+        lines.append("```")
+    samples = [
+        item
+        for item in (candidate.get("conflict_samples") or [])
+        if item.get("confidence") != "blocked"
+    ]
     if samples:
-        lines.extend(["", "冲突样本:", "```text"])
+        lines.extend(["", "低置信与历史单源样本:", "```text"])
         for item in samples[:20]:
             lines.append(
                 f"{item.get('instrument_id', 'unknown')} "
@@ -5516,7 +5553,7 @@ class ScheduledTasks:
         sample_limit: int = 20,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Build a local CNInfo/TDX/legacy three-source staging candidate."""
+        """Build a local CNInfo/TDX/BaoStock-Sina staging candidate."""
         task_id = "a_share_canonical_adjustment_factor_selection"
         self._active_tasks.add(task_id)
         parameters = {

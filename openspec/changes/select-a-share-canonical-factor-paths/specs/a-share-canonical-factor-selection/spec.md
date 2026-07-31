@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Comparable independent factor paths
-The system SHALL rebuild CNInfo, TDX, and the existing BaoStock-plus-Sina legacy composite
+The system SHALL rebuild CNInfo, TDX, and the existing BaoStock-plus-Sina composite
 path into positive adjacent event ratios and latest-session unit-anchored cumulative paths
 without modifying source data.
 
@@ -10,21 +10,21 @@ without modifying source data.
 - **THEN** the normalized comparison reports them as equivalent
 
 #### Scenario: Legacy factor field contains cumulative levels
-- **WHEN** legacy BaoStock rows store cumulative levels in both factor columns
+- **WHEN** BaoStock rows in the composite path store cumulative levels in both factor columns
 - **THEN** selection reads a pre-range cumulative anchor and compares adjacent ratios
-  without modifying the legacy table
+  without modifying the physical composite table
 
 #### Scenario: Legacy provider cumulative bases differ
 - **WHEN** a BaoStock-to-Sina source switch has a cross-provider cumulative ratio that
   materially conflicts with the stored positive adjacent event factor
 - **THEN** selection uses the stored event factor, rebuilds an internal continuous
   cumulative chain, and preserves the provider level and conflict diagnostic without
-  modifying the legacy table
+  modifying the physical composite table
 
 #### Scenario: Legacy provider switch lacks a valid bridge
 - **WHEN** a provider switch has no positive stored adjacent event factor, or a prefix row
   cannot be normalized before the requested start date
-- **THEN** the legacy path is ineligible for automatic source consensus and the failure
+- **THEN** the composite path is ineligible for automatic source consensus and the failure
   remains visible in bounded diagnostics
 
 #### Scenario: Invalid event ratio
@@ -63,15 +63,15 @@ The system SHALL select one complete source path per continuity segment using de
 consensus rules and SHALL NOT splice individual source events inside that segment.
 
 #### Scenario: Three sources agree
-- **WHEN** eligible CNInfo, TDX, and legacy composite paths agree
+- **WHEN** eligible CNInfo, TDX, and BaoStock-Sina composite paths agree
 - **THEN** the system selects CNInfo and records high-confidence three-source evidence
 
 #### Scenario: CNInfo agrees with one independent source
-- **WHEN** CNInfo agrees with either TDX or the legacy composite
+- **WHEN** CNInfo agrees with either TDX or the BaoStock-Sina composite
 - **THEN** the system selects CNInfo and records the agreeing source
 
 #### Scenario: Independent sources agree on ordinary actions
-- **WHEN** TDX and the legacy composite agree, CNInfo differs, and the segment contains only ordinary
+- **WHEN** TDX and the BaoStock-Sina composite agree, CNInfo differs, and the segment contains only ordinary
   symmetric actions
 - **THEN** the system selects the independent consensus path and records why CNInfo was not
   selected
@@ -84,20 +84,20 @@ consensus rules and SHALL NOT splice individual source events inside that segmen
 - **WHEN** no eligible consensus exists and the CNInfo path is incomplete
 - **THEN** the segment remains blocked and no source silently fills the missing path
 
-#### Scenario: Delisted lifecycle has only a complete TDX history
+#### Scenario: Delisted lifecycle has a complete TDX history
 - **WHEN** the lifecycle has ended, CNInfo has no event rows, TDX has a complete non-empty
-  path, and legacy provides no eligible conflicting path
+  path, and the BaoStock-Sina composite path is absent or conflicting
 - **THEN** the system selects TDX with `historical_single_source` confidence and records a
-  bounded low-confidence audit decision
+  bounded low-confidence audit decision including any composite conflict
 
 #### Scenario: Historical TDX events contradict CNInfo zero-event coverage
 - **WHEN** a completed lifecycle has CNInfo zero-event endpoint evidence but TDX contains a
-  complete non-empty event path and legacy provides no eligible conflicting path
+  complete non-empty event path
 - **THEN** the non-empty TDX history takes the guarded historical single-source branch
   instead of selecting the empty CNInfo path
 
 #### Scenario: Active lifecycle has only one reference source
-- **WHEN** CNInfo is incomplete for an active instrument and only TDX or legacy is eligible
+- **WHEN** CNInfo is incomplete for an active instrument and only TDX or the composite is eligible
 - **THEN** the segment remains blocked
 
 #### Scenario: Active instrument has an ended continuity segment
@@ -106,16 +106,50 @@ consensus rules and SHALL NOT splice individual source events inside that segmen
 - **THEN** the segment remains blocked and is not treated as a completed delisted lifecycle
 
 #### Scenario: Historical reference sources disagree
-- **WHEN** CNInfo is incomplete and eligible TDX and legacy paths disagree
-- **THEN** the segment remains blocked even if the lifecycle has ended
+- **WHEN** CNInfo has no event rows, eligible TDX and BaoStock-Sina composite paths
+  disagree, and the lifecycle has ended
+- **THEN** the system selects the complete TDX path with
+  `historical_single_source` confidence and preserves the disagreement in audit evidence
+
+### Requirement: Reviewed whole-lifecycle source overrides
+The system SHALL apply strictly validated reviewed source overrides before automatic
+consensus without changing any source observation.
+
+#### Scenario: Reviewed complete TDX override
+- **WHEN** a reviewed catalog fixes an instrument's whole lifecycle to TDX and its TDX
+  path is complete and non-empty
+- **THEN** every continuity segment selects TDX, records `reviewed_source_override`
+  confidence, and preserves the catalog version and reason
+
+#### Scenario: Reviewed override path is unavailable
+- **WHEN** the configured source path is incomplete or empty across the governed lifecycle
+- **THEN** the segment remains blocked with an explicit override-ineligible reason
+
+#### Scenario: Reviewed lifecycle contains a complete zero-event segment
+- **WHEN** the configured source path is non-empty across the lifecycle and one continuity
+  segment has explicit complete zero-event evidence
+- **THEN** that segment retains the reviewed source decision without creating a factor row
+
+#### Scenario: Invalid override catalog
+- **WHEN** an entry has an unknown instrument identifier, source, scope, review date, or
+  reason
+- **THEN** catalog loading fails closed before candidate construction
+
+#### Scenario: No reviewed overrides remain
+- **WHEN** the versioned catalog contains an empty `instruments` object
+- **THEN** candidate construction proceeds without reviewed source overrides
+
+#### Scenario: Comparison-only rebuild does not construct a candidate
+- **WHEN** three-source evidence is rebuilt with `build_canonical=false`
+- **THEN** the override catalog is not loaded because no source decision is applied
 
 ### Requirement: Governed special-action policy
 The system MUST retain the governed CNInfo path for segments containing share reform,
 restructuring, compensation, debt conversion, debt settlement, asymmetric distributions,
 or another approved special-action classification.
 
-#### Scenario: TDX and legacy agree against special CNInfo path
-- **WHEN** TDX and the legacy composite agree but the CNInfo segment is governed as a special action
+#### Scenario: TDX and the composite agree against special CNInfo path
+- **WHEN** TDX and the BaoStock-Sina composite agree but the CNInfo segment is governed as a special action
 - **THEN** the system keeps CNInfo and records the disagreement as market-account evidence
 
 ### Requirement: Factor-path completeness is separate from endpoint audit coverage
@@ -166,7 +200,7 @@ status intervals do not cover the full requested history.
 
 #### Scenario: Instrument lists on the requested end date
 - **WHEN** a CNInfo-supported instrument's lifecycle starts on the requested end date and
-  CNInfo, TDX, and legacy all contain no event on that boundary
+  CNInfo, TDX, and the composite all contain no event on that boundary
 - **THEN** the empty CNInfo path is accepted as a low-confidence listing-boundary
   zero-event decision and does not block the full-market candidate
 
@@ -175,7 +209,7 @@ status intervals do not cover the full requested history.
 - **THEN** the listing-boundary shortcut does not fabricate CNInfo completion evidence
 
 #### Scenario: Source event exists on listing boundary
-- **WHEN** CNInfo, TDX, or legacy contains an event on the listing boundary
+- **WHEN** CNInfo, TDX, or the composite contains an event on the listing boundary
 - **THEN** the zero-event shortcut is not applied and normal source selection rules govern
 
 ### Requirement: Production comparison tolerance
@@ -192,22 +226,22 @@ distribution reporting.
 - **WHEN** an operator supplies a smaller positive tolerance
 - **THEN** the supplied tolerance is used without being silently widened
 
-### Requirement: Existing legacy composite voting path
-The system SHALL read `adjustment_factors` as one legacy composite source and SHALL preserve
+### Requirement: Existing BaoStock-Sina composite voting path
+The system SHALL read `adjustment_factors` as one `baostock_sina_composite` source and SHALL preserve
 its BaoStock/Sina row lineage without assigning separate votes to those row sources.
 
-#### Scenario: Rebased legacy path exists
-- **WHEN** an instrument has valid legacy factor rows in the requested continuity segment
+#### Scenario: Rebased composite path exists
+- **WHEN** an instrument has valid BaoStock-Sina composite factor rows in the requested continuity segment
 - **THEN** the composite path is eligible as the third source without an external download
 
-#### Scenario: Legacy path has no rows
-- **WHEN** an instrument has no valid legacy factor rows
-- **THEN** legacy is unavailable and is not treated as a complete zero-event vote
+#### Scenario: Composite path has no rows
+- **WHEN** an instrument has no valid BaoStock-Sina composite factor rows
+- **THEN** the composite source is unavailable and is not treated as a complete zero-event vote
 
-#### Scenario: Legacy rows exist only in another continuity segment
-- **WHEN** valid legacy rows exist for the instrument but not in the requested continuity
+#### Scenario: Composite rows exist only in another continuity segment
+- **WHEN** valid BaoStock-Sina composite rows exist for the instrument but not in the requested continuity
   segment
-- **THEN** legacy is unavailable in that segment and cannot form an empty-path consensus
+- **THEN** the composite source is unavailable in that segment and cannot form an empty-path consensus
 
 ### Requirement: Versioned selection provenance
 The system SHALL persist selected source, source profile, confidence, evidence count,
@@ -218,6 +252,16 @@ candidate segment.
 - **WHEN** an operator queries the candidate version quality report
 - **THEN** the report explains each low-confidence, overridden, or blocked segment without
   requiring direct database inspection
+
+#### Scenario: Blocked decisions coexist with low-confidence samples
+- **WHEN** blocked, low-confidence, and historical single-source decisions all exist
+- **THEN** the report exposes a separate bounded `blocked_decisions` collection before
+  other conflict samples without changing their existing confidence labels
+
+#### Scenario: Reviewed source overrides remain auditable
+- **WHEN** a reviewed whole-lifecycle source override is applied successfully
+- **THEN** the report exposes a bounded `reviewed_source_override_samples` collection
+  with the instrument, selected source, reason, and catalog version
 
 ### Requirement: Staging-only candidate construction
 The system SHALL build canonical rows only in an explicit versioned staging candidate and

@@ -3,10 +3,14 @@ from datetime import date
 import pytest
 
 from data_sources.a_share_factor_selection import (
+    BAOSTOCK_SINA_SOURCE,
     build_continuity_segments,
     build_three_source_canonical_candidate,
     compare_segment_paths,
-    normalize_legacy_composite_rows,
+    normalize_baostock_sina_composite_rows,
+)
+from data_sources.a_share_factor_source_overrides import (
+    ReviewedFactorSourceOverride,
 )
 from utils.adjustment import AdjustmentEngine
 
@@ -37,27 +41,34 @@ def _candidate(
     lineage=None,
     lifecycle=None,
     special=None,
+    reviewed_source_overrides=None,
     factor_relative_tolerance=0.001,
 ):
+    normalized_complete = dict(complete or {
+        "cninfo": ["000001.SZ"],
+        "tdx": ["000001.SZ"],
+        BAOSTOCK_SINA_SOURCE: ["000001.SZ"] if legacy else [],
+    })
+    if "legacy" in normalized_complete:
+        normalized_complete[BAOSTOCK_SINA_SOURCE] = (
+            normalized_complete.pop("legacy")
+        )
     return build_three_source_canonical_candidate(
         cninfo_rows=cninfo,
         tdx_rows=tdx,
-        legacy_rows=legacy,
+        baostock_sina_rows=legacy,
         target_instruments=["000001.SZ"],
         series_version="unit__staging",
         start_date=date(2020, 1, 1),
         end_date=date(2022, 12, 31),
-        complete_instruments_by_source=complete or {
-            "cninfo": ["000001.SZ"],
-            "tdx": ["000001.SZ"],
-            "legacy": ["000001.SZ"] if legacy else [],
-        },
+        complete_instruments_by_source=normalized_complete,
         zero_event_complete_instruments_by_source=(
             zero_event_complete or {}
         ),
         lineage_by_instrument=lineage,
         lifecycle_bounds_by_instrument=lifecycle,
         special_event_dates_by_instrument=special,
+        reviewed_source_overrides=reviewed_source_overrides,
         sessions_by_exchange={
             "SZSE": [
                 date(2021, 5, 27),
@@ -71,7 +82,7 @@ def _candidate(
 
 
 def test_legacy_composite_normalizes_cumulative_levels_to_event_ratios():
-    rows = normalize_legacy_composite_rows([
+    rows = normalize_baostock_sina_composite_rows([
         {
             "instrument_id": "600018.SH",
             "ex_date": date(2006, 10, 26),
@@ -100,11 +111,11 @@ def test_legacy_composite_normalizes_cumulative_levels_to_event_ratios():
         9.864413 / 9.778728,
     ])
     assert rows[1]["upstream_source"] == "baostock"
-    assert rows[1]["source_profile"] == "baostock_sina_legacy_composite"
+    assert rows[1]["source_profile"] == "baostock_sina_composite"
 
 
 def test_legacy_composite_uses_stored_factor_for_unrebased_source_switch():
-    rows = normalize_legacy_composite_rows([
+    rows = normalize_baostock_sina_composite_rows([
         {
             "instrument_id": "000636.SZ",
             "ex_date": date(2025, 7, 11),
@@ -126,8 +137,8 @@ def test_legacy_composite_uses_stored_factor_for_unrebased_source_switch():
         9.991164 * 1.001539
     )
     assert rows[1]["provider_cumulative_factor"] == pytest.approx(18.551202)
-    assert rows[1]["legacy_basis_conflict"] is True
-    assert rows[1]["legacy_normalization_method"] == (
+    assert rows[1]["composite_basis_conflict"] is True
+    assert rows[1]["composite_normalization_method"] == (
         "stored_factor_at_source_switch"
     )
 
@@ -135,7 +146,7 @@ def test_legacy_composite_uses_stored_factor_for_unrebased_source_switch():
 def test_legacy_composite_keeps_rebased_source_switch_on_cumulative_chain():
     first_cumulative = 16.383859
     event_factor = 1.028404
-    rows = normalize_legacy_composite_rows([
+    rows = normalize_baostock_sina_composite_rows([
         {
             "instrument_id": "600018.SH",
             "ex_date": date(2025, 7, 17),
@@ -156,12 +167,12 @@ def test_legacy_composite_keeps_rebased_source_switch_on_cumulative_chain():
     assert rows[1]["cumulative_factor"] == pytest.approx(
         first_cumulative * event_factor
     )
-    assert rows[1]["legacy_basis_conflict"] is False
-    assert rows[1]["legacy_normalization_method"] == "cumulative_ratio"
+    assert rows[1]["composite_basis_conflict"] is False
+    assert rows[1]["composite_normalization_method"] == "cumulative_ratio"
 
 
 def test_legacy_composite_continues_after_unrebased_source_switch():
-    rows = normalize_legacy_composite_rows([
+    rows = normalize_baostock_sina_composite_rows([
         {
             "instrument_id": "000636.SZ",
             "ex_date": date(2025, 7, 11),
@@ -195,7 +206,7 @@ def test_legacy_composite_continues_after_unrebased_source_switch():
 
 
 def test_legacy_composite_rejects_switch_without_valid_stored_factor():
-    rows = normalize_legacy_composite_rows([
+    rows = normalize_baostock_sina_composite_rows([
         {
             "instrument_id": "000001.SZ",
             "ex_date": date(2019, 1, 1),
@@ -213,15 +224,15 @@ def test_legacy_composite_rejects_switch_without_valid_stored_factor():
     ])
 
     assert rows[1]["normalized_factor"] is None
-    assert rows[1]["legacy_basis_conflict"] is True
-    assert rows[1]["legacy_normalization_method"] == (
+    assert rows[1]["composite_basis_conflict"] is True
+    assert rows[1]["composite_normalization_method"] == (
         "invalid_source_switch_factor"
     )
-    assert rows[1]["legacy_cumulative_ratio"] == pytest.approx(1.8)
+    assert rows[1]["composite_cumulative_ratio"] == pytest.approx(1.8)
 
 
 def test_legacy_composite_rejects_initial_non_baostock_without_event_factor():
-    rows = normalize_legacy_composite_rows([{
+    rows = normalize_baostock_sina_composite_rows([{
         "instrument_id": "000001.SZ",
         "ex_date": date(2020, 1, 1),
         "factor": 0.0,
@@ -230,8 +241,8 @@ def test_legacy_composite_rejects_initial_non_baostock_without_event_factor():
     }])
 
     assert rows[0]["normalized_factor"] is None
-    assert rows[0]["legacy_basis_conflict"] is False
-    assert rows[0]["legacy_normalization_method"] == (
+    assert rows[0]["composite_basis_conflict"] is False
+    assert rows[0]["composite_normalization_method"] == (
         "invalid_initial_source_factor"
     )
     assert rows[0]["provider_cumulative_factor"] == pytest.approx(18.0)
@@ -403,6 +414,45 @@ def test_selector_blocks_incomplete_cninfo():
     assert candidate == []
     assert summary["blocked_segment_count"] == 1
     assert summary["promotion_eligible"] is False
+    assert summary["blocked_decisions"][0]["instrument_id"] == "000001.SZ"
+    assert summary["blocked_decisions"][0]["confidence"] == "blocked"
+
+
+def test_selector_samples_blocked_and_low_confidence_independently():
+    candidate, summary = build_three_source_canonical_candidate(
+        cninfo_rows=[
+            _row("000003.SZ", date(2021, 5, 28), 1.05, "cninfo")
+        ],
+        tdx_rows=[
+            _row("000003.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        baostock_sina_rows=[
+            _row("000003.SZ", date(2021, 5, 28), 1.2, "baostock")
+        ],
+        target_instruments=[
+            "000001.SZ",
+            "000002.SZ",
+            "000003.SZ",
+        ],
+        series_version="unit__staging",
+        start_date=date(2020, 1, 1),
+        end_date=date(2022, 12, 31),
+        complete_instruments_by_source={
+            "cninfo": ["000003.SZ"],
+            "tdx": ["000003.SZ"],
+            BAOSTOCK_SINA_SOURCE: ["000003.SZ"],
+        },
+        sample_limit=2,
+    )
+
+    assert len(candidate) == 1
+    assert [
+        item["instrument_id"] for item in summary["blocked_decisions"]
+    ] == ["000001.SZ", "000002.SZ"]
+    assert [
+        item["instrument_id"] for item in summary["conflict_samples"]
+    ] == ["000003.SZ"]
+    assert summary["conflict_samples"][0]["confidence"] == "low"
 
 
 def test_selector_uses_independent_consensus_when_cninfo_is_incomplete():
@@ -451,7 +501,7 @@ def test_selector_requires_segment_local_rows_without_zero_event_evidence():
     candidate, summary = build_three_source_canonical_candidate(
         cninfo_rows=[],
         tdx_rows=[],
-        legacy_rows=[
+        baostock_sina_rows=[
             _row("600018.SH", date(2007, 6, 22), 1.01, "legacy")
         ],
         target_instruments=["600018.SH"],
@@ -461,7 +511,7 @@ def test_selector_requires_segment_local_rows_without_zero_event_evidence():
         complete_instruments_by_source={
             "cninfo": [],
             "tdx": ["600018.SH"],
-            "legacy": ["600018.SH"],
+            BAOSTOCK_SINA_SOURCE: ["600018.SH"],
         },
         lineage_by_instrument={
             "600018.SH": {
@@ -476,7 +526,9 @@ def test_selector_requires_segment_local_rows_without_zero_event_evidence():
     assert candidate == []
     assert summary["blocked_segment_count"] == 2
     assert summary["decisions"][0]["eligible_sources"] == []
-    assert summary["decisions"][1]["eligible_sources"] == ["legacy"]
+    assert summary["decisions"][1]["eligible_sources"] == [
+        BAOSTOCK_SINA_SOURCE
+    ]
 
 
 def test_selector_accepts_explicit_complete_zero_event_source():
@@ -673,7 +725,7 @@ def test_selector_does_not_use_historical_fallback_for_active_lineage_segment():
     assert summary["historical_single_source_segment_count"] == 0
 
 
-def test_selector_blocks_disagreeing_historical_reference_sources():
+def test_selector_uses_tdx_for_disagreeing_completed_historical_sources():
     candidate, summary = _candidate(
         cninfo=[],
         tdx=[
@@ -696,9 +748,153 @@ def test_selector_blocks_disagreeing_historical_reference_sources():
         },
     )
 
+    assert candidate[0]["selected_source"] == "tdx"
+    assert summary["blocked_segment_count"] == 0
+    assert summary["historical_single_source_segment_count"] == 1
+    assert summary["decisions"][0]["reason"] == (
+        "tdx_historical_with_baostock_sina_conflict_fallback"
+    )
+
+
+def test_selector_preserves_consensus_for_agreeing_completed_history():
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "baostock")
+        ],
+        complete={
+            "cninfo": [],
+            "tdx": ["000001.SZ"],
+            "legacy": ["000001.SZ"],
+        },
+        lifecycle={
+            "000001.SZ": {
+                "listed_date": date(2020, 1, 1),
+                "delisted_date": date(2021, 12, 31),
+                "lifecycle_ended": True,
+            }
+        },
+    )
+
+    assert candidate[0]["selected_source"] == "tdx"
+    assert summary["historical_single_source_segment_count"] == 0
+    assert summary["confidence_counts"] == {"independent_consensus": 1}
+    assert summary["decisions"][0]["reason"] == (
+        "tdx_baostock_sina_consensus_without_complete_cninfo"
+    )
+
+
+def test_reviewed_lifecycle_override_precedes_automatic_special_policy():
+    override = ReviewedFactorSourceOverride(
+        instrument_id="000001.SZ",
+        selected_source="tdx",
+        scope="whole_lifecycle",
+        reason="operator_reviewed_whole_lifecycle_tdx_path",
+        catalog_version="unit-v1",
+        reviewed_at=date(2026, 7, 31),
+    )
+    candidate, summary = _candidate(
+        cninfo=[
+            _row("000001.SZ", date(2021, 5, 28), 1.05, "cninfo")
+        ],
+        tdx=[
+            _row("000001.SZ", date(2021, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[
+            _row("000001.SZ", date(2021, 5, 28), 1.2, "baostock")
+        ],
+        special={"000001.SZ": [date(2021, 5, 28)]},
+        reviewed_source_overrides={"000001.SZ": override},
+    )
+
+    assert candidate[0]["selected_source"] == "tdx"
+    assert candidate[0]["quality_status"] == "reviewed_source_override"
+    decision = summary["decisions"][0]
+    assert decision["confidence"] == "reviewed_source_override"
+    assert decision["special_action"] is True
+    assert decision["reviewed_source_override"] == {
+        "instrument_id": "000001.SZ",
+        "selected_source": "tdx",
+        "scope": "whole_lifecycle",
+        "reason": "operator_reviewed_whole_lifecycle_tdx_path",
+        "catalog_version": "unit-v1",
+        "reviewed_at": "2026-07-31",
+    }
+    assert summary["reviewed_source_override_samples"] == [decision]
+
+
+def test_selector_blocks_when_reviewed_override_source_is_ineligible():
+    override = ReviewedFactorSourceOverride(
+        instrument_id="000001.SZ",
+        selected_source="tdx",
+        scope="whole_lifecycle",
+        reason="operator_reviewed_whole_lifecycle_tdx_path",
+        catalog_version="unit-v1",
+        reviewed_at=date(2026, 7, 31),
+    )
+    candidate, summary = _candidate(
+        cninfo=[
+            _row("000001.SZ", date(2021, 5, 28), 1.05, "cninfo")
+        ],
+        tdx=[],
+        legacy=[],
+        complete={
+            "cninfo": ["000001.SZ"],
+            "tdx": [],
+            "legacy": [],
+        },
+        reviewed_source_overrides={"000001.SZ": override},
+    )
+
     assert candidate == []
     assert summary["blocked_segment_count"] == 1
-    assert summary["historical_single_source_segment_count"] == 0
+    assert summary["blocked_decisions"][0]["reason"] == (
+        "reviewed_source_override_ineligible"
+    )
+
+
+def test_reviewed_override_selects_complete_zero_event_segment():
+    override = ReviewedFactorSourceOverride(
+        instrument_id="000001.SZ",
+        selected_source="tdx",
+        scope="whole_lifecycle",
+        reason="operator_reviewed_whole_lifecycle_tdx_path",
+        catalog_version="unit-v1",
+        reviewed_at=date(2026, 7, 31),
+    )
+    candidate, summary = _candidate(
+        cninfo=[],
+        tdx=[
+            _row("000001.SZ", date(2020, 5, 28), 1.1, "tdx")
+        ],
+        legacy=[],
+        complete={
+            "cninfo": [],
+            "tdx": ["000001.SZ"],
+            "legacy": [],
+        },
+        zero_event_complete={"tdx": ["000001.SZ"]},
+        lineage={
+            "000001.SZ": {
+                "transitions": [{
+                    "effective_date": "2022-01-01",
+                    "price_continuity": "non_continuous",
+                }]
+            }
+        },
+        reviewed_source_overrides={"000001.SZ": override},
+    )
+
+    assert len(candidate) == 1
+    assert summary["blocked_segment_count"] == 0
+    assert [
+        decision["selected_source"]
+        for decision in summary["decisions"]
+    ] == ["tdx", "tdx"]
+    assert summary["decisions"][1]["source_event_counts"]["tdx"] == 0
 
 
 def test_selector_resets_cumulative_at_lineage_boundary():
@@ -763,11 +959,11 @@ def test_selector_excludes_provider_factor_at_non_continuous_boundary():
     assert second_segment["source_event_counts"] == {
         "cninfo": 0,
         "tdx": 0,
-        "legacy": 0,
+        BAOSTOCK_SINA_SOURCE: 0,
     }
     assert second_segment["excluded_boundary_event_counts"] == {
         "tdx": 1,
-        "legacy": 1,
+        BAOSTOCK_SINA_SOURCE: 1,
     }
 
 

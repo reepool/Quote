@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Manual three-source factor selection workflow
-The scheduler SHALL expose a manual-only, dry-run-first workflow for local CNInfo/TDX/legacy
+The scheduler SHALL expose a manual-only, dry-run-first workflow for local CNInfo/TDX/BaoStock-Sina
 composite scoring and canonical staging construction.
 
 #### Scenario: Default invocation
@@ -21,13 +21,18 @@ candidate.
 - **THEN** it reads the three existing local paths and performs no external factor request
 
 ### Requirement: Bounded source-selection report
-The report SHALL include legacy coverage, selection counts, confidence counts, blocked
+The report SHALL include BaoStock-Sina composite coverage, selection counts, confidence counts, blocked
 segments, agreement patterns, event-date matching counts, factor-difference buckets, and
 bounded conflict samples.
 
 #### Scenario: Low-confidence CNInfo fallback
 - **WHEN** a segment has no eligible consensus
 - **THEN** the report counts the fallback and includes its decision reason in bounded samples
+
+#### Scenario: Blocked decisions are not hidden by sample ordering
+- **WHEN** blocked decisions coexist with more numerous low-confidence decisions
+- **THEN** the report prints a separate bounded hard-blocker section before other samples
+  and does not relabel the low-confidence decisions as blocked
 
 ### Requirement: No implicit production promotion
 The task MUST NOT switch the configured production factor dataset or promote a staging

@@ -1,0 +1,18 @@
+{
+  "catalog_version": "a_share_canonical_factor_source_overrides_v1",
+  "reviewed_at": "2026-07-31",
+  "instruments": {
+    "000004.SZ": {
+      "instrument_id": "000004.SZ",
+      "selected_source": "tdx",
+      "scope": "whole_lifecycle",
+      "reason": "operator_reviewed_whole_lifecycle_tdx_path"
+    },
+    "600455.SH": {
+      "instrument_id": "600455.SH",
+      "selected_source": "tdx",
+      "scope": "whole_lifecycle",
+      "reason": "operator_reviewed_whole_lifecycle_tdx_path"
+    }
+  }
+}

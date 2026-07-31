@@ -18316,7 +18316,11 @@ class DataManager:
         )
         from data_sources.a_share_factor_selection import (
             build_three_source_canonical_candidate,
-            normalize_legacy_composite_rows,
+            normalize_baostock_sina_composite_rows,
+        )
+        from data_sources.a_share_factor_source_overrides import (
+            FactorSourceOverrideCatalogError,
+            load_factor_source_override_catalog,
         )
         from data_sources.cninfo_factor_governance import (
             CNINFO_FACTOR_PROFILE,
@@ -18356,14 +18360,50 @@ class DataManager:
             raise ValueError(
                 "source_selection_mode must be deferred or three_source"
             )
+        reviewed_source_overrides = (
+            load_factor_source_override_catalog()
+            if (
+                normalized_selection_mode == "three_source"
+                and build_canonical
+            )
+            else {}
+        )
+
+        instruments_by_exchange: Dict[str, List[Dict[str, Any]]] = {}
+        if reviewed_source_overrides:
+            for exchange in sorted(CNINFO_SUPPORTED_EXCHANGES):
+                instruments_by_exchange[exchange] = (
+                    await self.db_ops.get_instruments_list(
+                        exchange=exchange,
+                        type="stock",
+                        is_active=None,
+                    )
+                )
+            known_cninfo_instrument_ids = {
+                str(instrument.get("instrument_id") or "").strip()
+                for instruments in instruments_by_exchange.values()
+                for instrument in instruments
+                if str(instrument.get("instrument_id") or "").strip()
+            }
+            unknown_override_ids = sorted(
+                set(reviewed_source_overrides)
+                - known_cninfo_instrument_ids
+            )
+            if unknown_override_ids:
+                raise FactorSourceOverrideCatalogError(
+                    "reviewed source override instruments are absent from "
+                    f"the SSE/SZSE stock master: {unknown_override_ids[:20]}"
+                )
 
         universe: List[Dict[str, Any]] = []
         for exchange in normalized_exchanges:
-            instruments = await self.db_ops.get_instruments_list(
-                exchange=exchange,
-                type="stock",
-                is_active=None,
-            )
+            instruments = instruments_by_exchange.get(exchange)
+            if instruments is None:
+                instruments = await self.db_ops.get_instruments_list(
+                    exchange=exchange,
+                    type="stock",
+                    is_active=None,
+                )
             for instrument in instruments:
                 instrument_id = str(instrument.get("instrument_id") or "").strip()
                 if requested_ids and instrument_id not in requested_ids:
@@ -18378,6 +18418,13 @@ class DataManager:
                 })
         universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
         target_ids = [item["instrument_id"] for item in universe]
+        target_id_set = set(target_ids)
+        reviewed_source_overrides = {
+            instrument_id: override
+            for instrument_id, override
+            in reviewed_source_overrides.items()
+            if instrument_id in target_id_set
+        }
         exchange_by_instrument = {
             item["instrument_id"]: item["exchange"] for item in universe
         }
@@ -19076,7 +19123,9 @@ class DataManager:
                 and cumulative > 0
             )
 
-        normalized_legacy_rows = normalize_legacy_composite_rows(legacy_rows)
+        normalized_legacy_rows = normalize_baostock_sina_composite_rows(
+            legacy_rows
+        )
         legacy_invalid_rows = [
             row
             for row in normalized_legacy_rows
@@ -19161,7 +19210,7 @@ class DataManager:
             "tdx": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows, tdx_comparison_rows, sample_limit=sample_limit
             ),
-            "legacy": compare_normalized_cumulative_paths(
+            "baostock_sina_composite": compare_normalized_cumulative_paths(
                 cninfo_comparison_rows,
                 legacy_selection_rows,
                 sample_limit=sample_limit,
@@ -19315,7 +19364,7 @@ class DataManager:
                 )[:sample_limit],
                 "totals": reconciliation.get("totals") or {},
             },
-            "legacy": {
+            "baostock_sina_composite": {
                 "status": (
                     "success"
                     if set(legacy_complete_ids) == set(target_ids)
@@ -19328,7 +19377,7 @@ class DataManager:
                 "normalization_failure_instruments": len(
                     legacy_invalid_ids
                 ),
-                "source_profile": "baostock_sina_legacy_composite",
+                "source_profile": "baostock_sina_composite",
             },
         }
         overall_completeness = {
@@ -19447,7 +19496,7 @@ class DataManager:
                     build_three_source_canonical_candidate(
                         cninfo_rows=cninfo_path["events"],
                         tdx_rows=tdx_path["events"],
-                        legacy_rows=legacy_selection_rows,
+                        baostock_sina_rows=legacy_selection_rows,
                         target_instruments=target_ids,
                         series_version=staging_version,
                         start_date=normalized_start,
@@ -19469,7 +19518,7 @@ class DataManager:
                                 )
                                 - tdx_incomplete_ids
                             ),
-                            "legacy": legacy_complete_ids,
+                            "baostock_sina_composite": legacy_complete_ids,
                         },
                         zero_event_complete_instruments_by_source={
                             "cninfo": sorted(
@@ -19483,7 +19532,7 @@ class DataManager:
                             "tdx": sorted(
                                 tdx_covered_ids - tdx_incomplete_ids
                             ),
-                            "legacy": [],
+                            "baostock_sina_composite": [],
                         },
                         lineage_by_instrument=lineage_by_instrument,
                         lifecycle_bounds_by_instrument=(
@@ -19493,6 +19542,7 @@ class DataManager:
                             special_event_dates_by_instrument
                         ),
                         sessions_by_exchange=sessions_by_exchange,
+                        reviewed_source_overrides=reviewed_source_overrides,
                         factor_relative_tolerance=max(
                             0.0, float(factor_relative_tolerance)
                         ),
@@ -19501,6 +19551,15 @@ class DataManager:
                         ),
                         max_session_shift=max(0, int(max_session_shift)),
                         sample_limit=max(0, int(sample_limit)),
+                    )
+                )
+                reviewed_tdx_override_count = sum(
+                    1
+                    for decision in candidate_summary.get("decisions", ())
+                    if (
+                        decision.get("selected_source") == "tdx"
+                        and decision.get("confidence")
+                        == "reviewed_source_override"
                     )
                 )
                 candidate_summary.update({
@@ -19530,6 +19589,9 @@ class DataManager:
                         candidate_summary.get(
                             "historical_single_source_segment_count", 0
                         )
+                    ) - reviewed_tdx_override_count,
+                    "tdx_reviewed_source_override_count": (
+                        reviewed_tdx_override_count
                     ),
                     "cninfo_no_effect_exclusion_count": len(
                         cninfo_path.get("excluded_no_effect") or ()
@@ -19571,13 +19633,13 @@ class DataManager:
             cninfo_comparison_rows,
             {
                 "tdx_event_derived_v1": tdx_comparison_rows,
-                "baostock_sina_legacy_composite": legacy_selection_rows,
+                "baostock_sina_composite": legacy_selection_rows,
             },
             target_instruments=target_ids,
             baseline_covered_instruments=baseline_covered_ids,
             reference_covered_instruments={
                 "tdx_event_derived_v1": tdx_benchmark_covered_ids,
-                "baostock_sina_legacy_composite": legacy_complete_ids,
+                "baostock_sina_composite": legacy_complete_ids,
             },
             full_market_scope=full_market_scope,
             sample_limit=sample_limit,
@@ -19933,13 +19995,13 @@ class DataManager:
             "source_events": {
                 "cninfo_rows": len(cninfo_rows),
                 "tdx_rows": len(tdx_rows),
-                "legacy_factor_rows": len(legacy_selection_rows),
-                "legacy_raw_rows_through_end": len(legacy_rows),
-                "legacy_instruments": len(legacy_complete_ids),
-                "legacy_normalization_failure_rows": len(
+                "baostock_sina_factor_rows": len(legacy_selection_rows),
+                "baostock_sina_raw_rows_through_end": len(legacy_rows),
+                "baostock_sina_instruments": len(legacy_complete_ids),
+                "baostock_sina_normalization_failure_rows": len(
                     legacy_invalid_rows
                 ),
-                "legacy_normalization_failure_samples": [
+                "baostock_sina_normalization_failure_samples": [
                     {
                         "instrument_id": row.get("instrument_id"),
                         "ex_date": (
@@ -19953,16 +20015,16 @@ class DataManager:
                         ),
                         "upstream_source": row.get("upstream_source"),
                         "normalization_method": row.get(
-                            "legacy_normalization_method"
+                            "composite_normalization_method"
                         ),
                     }
                     for row in legacy_invalid_rows[:sample_limit]
                 ],
-                "legacy_basis_conflict_rows": sum(
-                    bool(row.get("legacy_basis_conflict"))
+                "baostock_sina_basis_conflict_rows": sum(
+                    bool(row.get("composite_basis_conflict"))
                     for row in legacy_selection_rows
                 ),
-                "legacy_basis_conflict_samples": [
+                "baostock_sina_basis_conflict_samples": [
                     {
                         "instrument_id": row.get("instrument_id"),
                         "ex_date": (
@@ -19979,14 +20041,25 @@ class DataManager:
                             "provider_cumulative_factor"
                         ),
                         "cumulative_ratio": row.get(
-                            "legacy_cumulative_ratio"
+                            "composite_cumulative_ratio"
                         ),
-                        "stored_factor": row.get("legacy_stored_factor"),
+                        "stored_factor": row.get(
+                            "composite_stored_factor"
+                        ),
                         "selected_factor": row.get("normalized_factor"),
                     }
                     for row in legacy_selection_rows
-                    if row.get("legacy_basis_conflict")
+                    if row.get("composite_basis_conflict")
                 ][:sample_limit],
+                "reviewed_source_override_catalog_version": (
+                    next(iter(reviewed_source_overrides.values()))
+                    .catalog_version
+                    if reviewed_source_overrides
+                    else None
+                ),
+                "reviewed_source_override_count": len(
+                    reviewed_source_overrides
+                ),
                 "resolved_effective_date_events": len(resolved_date_evidence),
                 "resolved_effective_dates_outside_range": resolved_outside_range,
             },

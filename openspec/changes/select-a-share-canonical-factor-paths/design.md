@@ -1,7 +1,7 @@
 ## Context
 
 CNInfo and TDX event-derived paths are complete and independently persisted. The current
-production fallback is `adjustment_factors`, a composite legacy path. BaoStock supplies its
+production fallback is `adjustment_factors`, the BaoStock-Sina composite path. BaoStock supplies its
 historical base and the AkShare route obtains direct Sina `hfq-factor` changes during daily
 and maintenance updates. New tail ratios are rebased onto the existing cumulative tail, so
 the table is one operational path rather than two independent votes.
@@ -11,7 +11,8 @@ hfq daily prices. It required two historical price downloads per instrument, int
 rounded-price extraction failures, and left the direct Sina path only partially represented
 in the governed observation table. A separate complete Sina source would require a new
 full-market backfill that is not needed for the current objective. The canonical selector
-should use the three paths already maintained locally: CNInfo, TDX, and legacy composite.
+should use the three paths already maintained locally: CNInfo, TDX, and BaoStock-Sina
+composite.
 
 Known absorption mergers and other legal-subject discontinuities remain available through
 instrument lineage metadata. Cumulative factors must reset at transitions marked
@@ -21,8 +22,8 @@ instrument lineage metadata. Cumulative factors must reset at transitions marked
 
 **Goals:**
 
-- Keep direct Sina A-share `hfq-factor` acquisition for normal legacy-tail maintenance.
-- Normalize CNInfo, TDX, and the existing legacy composite path to comparable event ratios and
+- Keep direct Sina A-share `hfq-factor` acquisition for normal composite-tail maintenance.
+- Normalize CNInfo, TDX, and the existing BaoStock-Sina composite path to comparable event ratios and
   latest-session unit anchors.
 - Select one internally consistent source path per continuity segment using deterministic
   consensus and special-action rules.
@@ -41,7 +42,7 @@ instrument lineage metadata. Cumulative factors must reset at transitions marked
 - Recomputing special restructuring economics from market prices.
 - Downloading raw or adjusted price histories to derive the Sina factor path.
 - Downloading a separate full-market Sina history solely for canonical selection.
-- Treating BaoStock and Sina rows inside the legacy table as separate voting sources.
+- Treating BaoStock and Sina rows inside the composite table as separate voting sources.
 
 ## Decisions
 
@@ -66,12 +67,12 @@ Alternative rejected: Tencent/Eastmoney adjusted-to-raw price ratios. They dupli
 downloads, are sensitive to rounded close prices, and add no benefit while a direct factor
 endpoint is available.
 
-### Use the existing legacy composite as the third path
+### Use the existing BaoStock-Sina composite as the third path
 
 The selector reads `adjustment_factors` as one path. Its row-level `source` remains
 available for lineage and diagnostics, but rows are never split into BaoStock and Sina
-votes. A legacy tail append is eligible only after it has been rebased onto the existing
-cumulative tail by the established persistence path. An instrument with no legacy rows is
+votes. A composite tail append is eligible only after it has been rebased onto the existing
+cumulative tail by the established persistence path. An instrument with no composite rows is
 reported as unavailable rather than assumed to be a complete zero-event vote.
 
 BaoStock history may store cumulative levels in both `factor` and `cumulative_factor`.
@@ -83,7 +84,7 @@ ratio materially conflicts with the stored positive adjacent event factor, selec
 the stored event factor and rebuilds an internal continuous cumulative chain. It retains
 the provider cumulative level, chosen normalization method, and conflict flag for audit.
 If a provider switch has no positive stored event factor, or any prefix row cannot be
-normalized, the legacy path is ineligible even when the failure falls before a bounded
+normalized, the composite path is ineligible even when the failure falls before a bounded
 request's start date.
 Exact no-change ratios are omitted. This conversion is read-only and retains the underlying
 row source for diagnostics.
@@ -104,20 +105,23 @@ new segment and reset the cumulative product.
 
 The selector applies deterministic precedence:
 
-1. CNInfo, TDX, and legacy agree: select CNInfo with high confidence.
-2. CNInfo agrees with TDX or legacy: select CNInfo with high confidence.
-3. TDX and legacy agree while CNInfo differs: select the consensus path only for ordinary
+1. A strictly validated reviewed whole-lifecycle source override selects its configured
+   complete path and records the catalog version and reason.
+2. CNInfo, TDX, and the BaoStock-Sina composite agree: select CNInfo with high confidence.
+3. CNInfo agrees with TDX or the composite: select CNInfo with high confidence.
+4. TDX and the composite agree while CNInfo differs: select the consensus path only for ordinary
    symmetric actions.
-4. A governed special-action segment retains CNInfo policy and records other sources as
+5. A governed special-action segment retains CNInfo policy and records other sources as
    differing market-account evidence.
-5. No eligible consensus: select complete CNInfo with low confidence and emit an audit
+6. No eligible consensus: select complete CNInfo with low confidence and emit an audit
    conflict.
-6. If the lifecycle has ended, CNInfo supplies no event rows, TDX supplies a complete
-   non-empty path, and legacy supplies no conflicting path, select TDX as an explicitly
-   labelled low-confidence historical single-source fallback. Complete CNInfo zero-event
-   endpoint evidence does not win this branch because the non-empty TDX history directly
-   contradicts that archive assumption.
-7. Otherwise an incomplete CNInfo segment remains blocked.
+7. If the lifecycle has ended, CNInfo supplies no event rows, and TDX supplies a complete
+   non-empty path, select TDX as an explicitly labelled low-confidence historical path.
+   A conflicting BaoStock-Sina composite path remains audit evidence but does not block
+   this reviewed lifecycle policy. Complete CNInfo zero-event endpoint evidence does not
+   win this branch because the non-empty TDX history directly contradicts that archive
+   assumption.
+8. Otherwise an incomplete CNInfo segment remains blocked.
 
 Agreement requires both event-jump and normalized cumulative-path tolerances. Selected rows
 come from one source path within a segment; raw source dates remain auditable. Reviewed
@@ -136,20 +140,28 @@ coverage remains stronger evidence when available. Coverage starts at the later 
 requested start and listing date, and ends at the earlier of the requested end and
 delisting date. A non-empty derived CNInfo or TDX path remains eligible without recent
 endpoint evidence. Legacy has no independent zero-event coverage contract, so it is
-eligible only in continuity segments containing valid normalized legacy events.
+eligible only in continuity segments containing valid normalized composite events.
 
 An empty CNInfo path contradicted by a complete non-empty TDX path is not treated as
-ordinary eligible CNInfo evidence. An active lifecycle remains blocked unless TDX and
-legacy form an independent consensus. A completed lifecycle may use the narrower historical
-TDX fallback only when legacy supplies no eligible conflicting path.
+ordinary eligible CNInfo evidence. An active lifecycle remains blocked unless TDX and the
+composite form an independent consensus. A completed lifecycle may use the narrower historical
+TDX fallback even when the BaoStock-Sina composite path conflicts.
 
 The historical TDX fallback is deliberately narrower than normal consensus. It cannot be
 used for an active lifecycle, including an earlier continuity segment of an otherwise
 active instrument, a special action whose CNInfo policy is known, an incomplete TDX path,
-or a segment where an eligible legacy path disagrees. Its selected rows retain the TDX
-source and use `historical_single_source` confidence so they remain distinguishable from
-independent consensus. The branch is evaluated before the ordinary CNInfo zero-event
-fallback so contradicted empty CNInfo archive coverage cannot hide known TDX events.
+or a special action whose CNInfo policy is known. Its selected rows retain the TDX source
+and use `historical_single_source` confidence so they remain distinguishable from
+independent consensus. A composite conflict is retained in pairwise evidence and the
+decision reason. The branch is evaluated before the ordinary CNInfo zero-event fallback
+so contradicted empty CNInfo archive coverage cannot hide known TDX events.
+
+Reviewed source overrides are stored in a small source-controlled catalog, validated at
+load time, and applied only when the selected source path is complete and non-empty. The
+initial reviewed decisions select TDX for the full lifecycles of `000004.SZ` and
+`600455.SH`. Invalid, unknown-source, or ineligible overrides fail closed rather than
+silently selecting a path. Source observations and the physical `adjustment_factors`
+table remain unchanged.
 
 When an instrument is explicitly marked `status=delisted` but lacks a delisting date, its
 last local quote date is used as an auditable inferred lifecycle end. Generic inactive or
@@ -158,7 +170,7 @@ instrument with stale local data.
 
 A CNInfo-supported instrument whose lifecycle starts on the requested end date has no
 post-listing interval in which an adjustment event could affect the candidate. When
-CNInfo, TDX, and legacy all contain no event on that boundary, the empty CNInfo path is
+CNInfo, TDX, and BaoStock-Sina composite all contain no event on that boundary, the empty CNInfo path is
 accepted as a low-confidence listing-boundary zero-event path instead of blocking the whole
 full-market candidate.
 
@@ -183,6 +195,16 @@ Canonical rows use `adjustment_factors_canonical`. Compact metadata remains in e
 fields; full decisions, scores, agreements, lineage boundaries, and reasons remain in
 `adjustment_factor_series_status.report_json`. Source observations remain isolated.
 
+Operator-facing reports and newly persisted selection provenance use the unambiguous
+`baostock_sina_composite` source identifier and `BaoStock_Sina composite` display name.
+The existing physical `adjustment_factors` table is not renamed because that would require
+an unrelated storage migration.
+
+Blocked decisions are collected independently from low-confidence and historical
+single-source samples. Reports show the blocked list first, bounded by the configured
+sample limit, and retain the other decision classes under their existing confidence and
+reason labels.
+
 The manual workflow reads all three local paths and builds a staging candidate.
 `build_canonical=true` never switches production reads. Explicit promotion remains a later
 operator decision.
@@ -197,9 +219,11 @@ operator decision.
   contract and preserve row source lineage for audit.
 - [Recent endpoint status does not cover a non-targeted instrument] -> Report an audit
   coverage warning without invalidating an otherwise complete factor path.
-- [TDX is the only surviving source for a delisted instrument] -> Permit only a labelled
-  historical single-source fallback after lifecycle and completeness checks; never apply
-  it to active instruments.
+- [TDX is selected over conflicting historical composite evidence] -> Permit only a
+  labelled completed-lifecycle fallback after lifecycle and TDX completeness checks;
+  preserve the conflict evidence and never apply the rule to active instruments.
+- [Reviewed override becomes stale] -> Require a complete non-empty selected path and
+  preserve catalog version and reason; otherwise block instead of falling back silently.
 - [Home filesystem is read-only] -> Store BaoStock lock/quota state in project runtime
   storage rather than disabling the configured fallback source.
 - [Obsolete price-ratio rows exist] -> Delete only profiles and statuses owned by the
@@ -207,15 +231,16 @@ operator decision.
 
 ## Migration Plan
 
-1. Keep and test direct Sina `hfq-factor` acquisition for legacy incremental maintenance.
+1. Keep and test direct Sina `hfq-factor` acquisition for composite incremental maintenance.
 2. Remove Tencent/Eastmoney price-ratio code, configuration, tests, documentation, and
    exact owned runtime artifacts. Database initialization performs an idempotent cleanup
    of only the retired provider profiles and snapshot series.
-3. Rewire selection coverage and reporting to the existing legacy composite path.
+3. Rewire selection coverage and reporting to the existing BaoStock-Sina composite path.
 4. Run a targeted local-only three-source dry-run.
 5. Build and inspect a full-market staging candidate before explicit promotion.
-6. Re-run the full-market preview with lifecycle bounds, historical fallback, and the
+6. Apply the reviewed source-override catalog and emit blocked-first reports.
+7. Re-run the full-market preview with lifecycle bounds, historical fallback, and the
    production default tolerance before writing staging.
 
-Rollback disables candidate construction. Existing CNInfo, TDX, and legacy production
+Rollback disables candidate construction. Existing CNInfo, TDX, and composite production
 reads remain available.

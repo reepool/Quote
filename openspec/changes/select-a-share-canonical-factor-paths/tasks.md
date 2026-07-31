@@ -57,3 +57,12 @@
 - [x] 8.4 Move BaoStock quota and session-lock defaults to writable project runtime storage
 - [x] 8.5 Add selector, DataManager, scheduler, configuration, and BaoStock regression tests
 - [x] 8.6 Run focused tests, full-market dry-run validation, strict OpenSpec validation, and uncommitted review
+
+## 9. Reviewed Historical Source Decisions
+
+- [x] 9.1 Extend proposal, design, and delta specs for reviewed whole-lifecycle overrides, completed-lifecycle TDX conflict fallback, BaoStock-Sina naming, and blocked-first reporting
+- [x] 9.2 Allow complete TDX paths to resolve ended lifecycles whose CNInfo path is empty even when the BaoStock-Sina composite conflicts
+- [x] 9.3 Add and apply a strictly validated reviewed whole-lifecycle source-override catalog for `000004.SZ` and `600455.SH`
+- [x] 9.4 Use `BaoStock_Sina composite` in operator-facing and persisted selection provenance and emit independent bounded blocked decisions
+- [x] 9.5 Add selector, catalog, DataManager, and scheduler report regression tests
+- [x] 9.6 Run focused tests, Python compile, strict OpenSpec validation, uncommitted review, commit, and push

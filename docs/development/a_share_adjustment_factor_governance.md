@@ -118,7 +118,8 @@ checkpoint。
 `adjustment_factors` 是一条现有的复合运行路径，不是两张互相独立的投票表。BaoStock
 提供历史底座，日常维护通过 AkShare 的新浪 `hfq-factor` 路径提取稀疏增量事件，并按既有
 累计尾部重基后续接。行级 `source` 用于保留来源沿革，但主因子选择时整张表只算一个
-`legacy` 投票源。
+`BaoStock_Sina composite` 投票源。`adjustment_factors` 物理表名仅为兼容既有存储，
+不表示该路径已经淘汰。
 
 需要单独维护这条复合路径时，继续使用原有回补任务：
 
@@ -161,7 +162,9 @@ chunk 或请求间隔参数。CNInfo 不支持 BSE，因此三源选择的完整
 报告中的 `selection_counts` 是各连续区间所选来源数，`confidence_counts` 区分高置信、
 特殊治理、独立双源共识、低置信和 blocked；`agreement_counts` 说明形成共识的来源组合。
 事件对账先区分精确日期匹配、交易日偏移匹配、冲突和单边事件，并对相对因子差异分桶；
-`conflict_samples` 仅展示有上限的异常样本，完整决策证据保存在 staging 版本状态报告中。
+`blocked_decisions`、`reviewed_source_override_samples` 和
+`conflict_samples` 分别展示有上限的硬阻塞、人工全生命周期来源覆盖和异常样本；
+完整决策证据保存在 staging 版本状态报告中。
 
 确认全市场预演后写入隔离 staging：
 
@@ -215,7 +218,7 @@ CNInfo 与 TDX 继续独立保存。跨源差异用于解释和抽查，不能�
 继续留在日更重试集合中。起点晚于 `1990-12-19` 的区间重建以及因子路径写入不完整的运行
 不得清理重试集合。
 
-与 legacy BaoStock 路径的前复权误差是诊断指标，不把 BaoStock 当作权威答案。较大差异
+与 `BaoStock_Sina composite` 路径的前复权误差是诊断指标，不把 BaoStock 当作权威答案。较大差异
 必须结合 TDX XDXR、交易所/巨潮已实施分红公告以及价格连续性进一步确认。
 
 旧版本 TDX 回补没有持久化股票级空结果。升级后需至少重新执行一次对应范围的 TDX XDXR
@@ -250,15 +253,14 @@ staging 行、逐证券覆盖状态和候选状态，不执行 production promot
 请求数据集、实际数据集、版本、逐证券覆盖状态和 fallback 状态。
 
 候选阶段的回滚是停止后续晋级并保留 staging 证据，无需修改生产配置。生产晋级后的回滚
-只需把 `read_dataset` 改回 `legacy` 并重启应用。不要删除 CNInfo、TDX、AkShare 或
-BaoStock observation、legacy 表及 canonical 版本；保留这些证据用于追溯和复核。
+只需把 `read_dataset` 改回兼容配置值 `legacy` 并重启应用。不要删除 CNInfo、TDX、
+BaoStock/Sina observation、`adjustment_factors` 复合路径或 canonical 版本；保留这些
+证据用于追溯和复核。
 
 ## 已知限制
 
-- AkShare 腾讯/东财价格比不是官方公司行动源，可能缺少早期、退市或特殊证券数据；仅有
-  稳定、持久且超过噪声阈值的平台跳变才有三源投票资格。适配器会读取请求区间前后少量
-  行情用于确认平台稳定性，但只输出区间内事件；快照首尾覆盖未通过上市/退市生命周期
-  校验时不会标记为完整来源。
+- `BaoStock_Sina composite` 是既有累计路径，不是第三张官方事件表；来源切换时会保留
+  重基和基准冲突诊断，不能拆成 BaoStock、Sina 两个独立投票源。
 - TDX XDXR 也是待核对证据，不能单独证明无遗漏。
 - 官方公告能验证现金分红、送转和配股语义，但通常不直接提供完整累积复权序列。
 - 最终替换 BaoStock 前，仍需对重大差异样本做事件级官方公告核验，并对全市场前复权

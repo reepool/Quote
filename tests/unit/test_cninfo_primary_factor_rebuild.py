@@ -5,7 +5,38 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
+from data_sources.a_share_factor_source_overrides import (
+    FactorSourceOverrideCatalogError,
+    ReviewedFactorSourceOverride,
+)
 from data_sources.cninfo_factor_governance import derive_cninfo_factor_path
+
+
+def _instrument_master_side_effect(*target_instruments):
+    instruments_by_id = {
+        "000004.SZ": {
+            "instrument_id": "000004.SZ",
+            "symbol": "000004",
+        },
+        "600455.SH": {
+            "instrument_id": "600455.SH",
+            "symbol": "600455",
+        },
+    }
+    instruments_by_id.update({
+        str(instrument["instrument_id"]): dict(instrument)
+        for instrument in target_instruments
+    })
+
+    def get_instruments(exchange, **_):
+        suffix = {"SSE": ".SH", "SZSE": ".SZ", "BSE": ".BJ"}[exchange]
+        return [
+            instrument
+            for instrument_id, instrument in instruments_by_id.items()
+            if instrument_id.endswith(suffix)
+        ]
+
+    return get_instruments
 
 
 def _manager_with_factor_evidence(
@@ -16,11 +47,13 @@ def _manager_with_factor_evidence(
 ):
     manager = DataManager()
     manager.db_ops = Mock()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "delisted_date": delisted_date,
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "delisted_date": delisted_date,
+        })
+    )
 
     async def execute_read_query(query, _params):
         if "FROM corporate_action_observations" in query:
@@ -1163,8 +1196,8 @@ async def test_three_source_candidate_selects_matching_legacy_path_in_dry_run():
     assert result["candidate"]["candidate_built"] is True
     assert result["candidate"]["selection_counts"] == {"cninfo": 1}
     assert result["candidate"]["confidence_counts"] == {"high": 1}
-    assert result["source_events"]["legacy_factor_rows"] == 1
-    assert result["source_events"]["legacy_instruments"] == 1
+    assert result["source_events"]["baostock_sina_factor_rows"] == 1
+    assert result["source_events"]["baostock_sina_instruments"] == 1
     manager.db_ops.list_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.list_adjustment_factor_instrument_statuses.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
@@ -1214,6 +1247,110 @@ async def test_three_source_candidate_persists_staging_without_promotion():
 
 
 @pytest.mark.asyncio
+async def test_three_source_rebuild_applies_reviewed_source_override(
+    monkeypatch,
+):
+    manager = _manager_with_factor_evidence()
+    override = ReviewedFactorSourceOverride(
+        instrument_id="000001.SZ",
+        selected_source="tdx",
+        scope="whole_lifecycle",
+        reason="operator_reviewed_whole_lifecycle_tdx_path",
+        catalog_version="unit-v1",
+        reviewed_at=date(2026, 7, 31),
+    )
+    monkeypatch.setattr(
+        "data_sources.a_share_factor_source_overrides."
+        "load_factor_source_override_catalog",
+        lambda: {"000001.SZ": override},
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=True,
+        source_selection_mode="three_source",
+    )
+
+    decision = result["candidate"]["decisions"][0]
+    assert decision["selected_source"] == "tdx"
+    assert decision["confidence"] == "reviewed_source_override"
+    assert decision["reviewed_source_override"]["catalog_version"] == (
+        "unit-v1"
+    )
+    assert result["source_events"][
+        "reviewed_source_override_catalog_version"
+    ] == "unit-v1"
+    assert result["candidate"]["tdx_reviewed_source_override_count"] == 1
+    assert result["candidate"]["tdx_consensus_selection_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_three_source_rebuild_rejects_unknown_override_outside_target(
+    monkeypatch,
+):
+    manager = _manager_with_factor_evidence()
+    override = ReviewedFactorSourceOverride(
+        instrument_id="000002.SZ",
+        selected_source="tdx",
+        scope="whole_lifecycle",
+        reason="operator_reviewed_whole_lifecycle_tdx_path",
+        catalog_version="unit-v1",
+        reviewed_at=date(2026, 7, 31),
+    )
+    monkeypatch.setattr(
+        "data_sources.a_share_factor_source_overrides."
+        "load_factor_source_override_catalog",
+        lambda: {"000002.SZ": override},
+    )
+
+    with pytest.raises(
+        FactorSourceOverrideCatalogError,
+        match="absent from the SSE/SZSE stock master",
+    ):
+        await manager.rebuild_cninfo_primary_adjustment_factors(
+            start_date="1990-12-19",
+            end_date="2026-07-17",
+            exchanges=["SZSE"],
+            instrument_ids=["000001.SZ"],
+            dry_run=True,
+            build_canonical=True,
+            source_selection_mode="three_source",
+        )
+
+
+@pytest.mark.asyncio
+async def test_three_source_without_candidate_does_not_load_override_catalog(
+    monkeypatch,
+):
+    manager = _manager_with_factor_evidence()
+
+    def fail_if_loaded():
+        raise AssertionError("override catalog must not be loaded")
+
+    monkeypatch.setattr(
+        "data_sources.a_share_factor_source_overrides."
+        "load_factor_source_override_catalog",
+        fail_if_loaded,
+    )
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+        build_canonical=False,
+        source_selection_mode="three_source",
+    )
+
+    assert result["candidate"]["candidate_built"] is False
+
+
+@pytest.mark.asyncio
 async def test_three_source_marks_missing_legacy_path_unavailable():
     manager = _manager_with_factor_evidence()
     original_query = manager.db_ops.execute_read_query.side_effect
@@ -1237,7 +1374,7 @@ async def test_three_source_marks_missing_legacy_path_unavailable():
         source_selection_mode="three_source",
     )
 
-    coverage = result["source_completeness"]["legacy"]
+    coverage = result["source_completeness"]["baostock_sina_composite"]
     assert coverage["status"] == "partial"
     assert coverage["available_instruments"] == 0
     assert coverage["incomplete_instruments"] == 1
@@ -1328,11 +1465,13 @@ async def test_three_source_empty_paths_require_explicit_completion_evidence():
 @pytest.mark.asyncio
 async def test_three_source_zero_event_coverage_uses_listing_lifecycle():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "listed_date": datetime(2020, 1, 1),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "listed_date": datetime(2020, 1, 1),
+        })
+    )
 
     async def zero_event_query(query, _params):
         if (
@@ -1395,12 +1534,14 @@ async def test_three_source_zero_event_coverage_uses_listing_lifecycle():
 @pytest.mark.asyncio
 async def test_three_source_uses_historical_anchor_for_zero_event_cninfo_path():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": True,
-        "listed_date": datetime(2020, 1, 1),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": True,
+            "listed_date": datetime(2020, 1, 1),
+        })
+    )
 
     async def historical_anchor_query(query, _params):
         if (
@@ -1458,12 +1599,14 @@ async def test_three_source_uses_historical_anchor_for_zero_event_cninfo_path():
 @pytest.mark.asyncio
 async def test_three_source_listing_boundary_without_events_does_not_block():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": True,
-        "listed_date": datetime(2026, 7, 30),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": True,
+            "listed_date": datetime(2026, 7, 30),
+        })
+    )
 
     async def empty_listing_day_query(query, _params):
         if (
@@ -1501,13 +1644,15 @@ async def test_three_source_listing_boundary_without_events_does_not_block():
 @pytest.mark.asyncio
 async def test_three_source_one_day_range_is_not_listing_boundary():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": True,
-        "status": "active",
-        "listed_date": datetime(2020, 1, 1),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": True,
+            "status": "active",
+            "listed_date": datetime(2020, 1, 1),
+        })
+    )
 
     async def empty_one_day_query(query, _params):
         if (
@@ -1543,13 +1688,15 @@ async def test_three_source_one_day_range_is_not_listing_boundary():
 @pytest.mark.asyncio
 async def test_three_source_listing_boundary_does_not_fabricate_bse_cninfo():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "920000.BJ",
-        "symbol": "920000",
-        "is_active": True,
-        "status": "active",
-        "listed_date": datetime(2026, 7, 30),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "920000.BJ",
+            "symbol": "920000",
+            "is_active": True,
+            "status": "active",
+            "listed_date": datetime(2026, 7, 30),
+        })
+    )
 
     async def empty_bse_query(query, _params):
         if (
@@ -1586,13 +1733,15 @@ async def test_three_source_listing_boundary_does_not_fabricate_bse_cninfo():
 @pytest.mark.asyncio
 async def test_three_source_listing_boundary_keeps_legacy_event_visible():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": True,
-        "status": "active",
-        "listed_date": datetime(2026, 7, 30),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": True,
+            "status": "active",
+            "listed_date": datetime(2026, 7, 30),
+        })
+    )
 
     async def listing_event_query(query, _params):
         if "FROM adjustment_factors\n" in query:
@@ -1631,8 +1780,8 @@ async def test_three_source_listing_boundary_keeps_legacy_event_visible():
     decision = result["candidate"]["decisions"][0]
     assert result["candidate"]["listing_boundary_zero_event_count"] == 0
     assert result["candidate"]["blocked_segment_count"] == 1
-    assert decision["eligible_sources"] == ["legacy"]
-    assert decision["source_event_counts"]["legacy"] == 1
+    assert decision["eligible_sources"] == ["baostock_sina_composite"]
+    assert decision["source_event_counts"]["baostock_sina_composite"] == 1
     assert decision["selected_source"] is None
 
 
@@ -1641,13 +1790,15 @@ async def test_three_source_listing_boundary_blocks_pending_tdx_event():
     manager = _manager_with_factor_evidence(
         tdx_validation_result="pending_missing_pre_close"
     )
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": True,
-        "status": "active",
-        "listed_date": datetime(2026, 7, 30),
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": True,
+            "status": "active",
+            "listed_date": datetime(2026, 7, 30),
+        })
+    )
 
     async def pending_tdx_query(query, _params):
         if "FROM adjustment_factors_tdx" in query:
@@ -1697,14 +1848,16 @@ async def test_three_source_listing_boundary_blocks_pending_tdx_event():
 @pytest.mark.asyncio
 async def test_three_source_infers_inactive_lifecycle_end_from_last_quote():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": False,
-        "status": "delisted",
-        "listed_date": datetime(2020, 1, 1),
-        "delisted_date": None,
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": False,
+            "status": "delisted",
+            "listed_date": datetime(2020, 1, 1),
+            "delisted_date": None,
+        })
+    )
     original_query = manager.db_ops.execute_read_query.side_effect
 
     async def inactive_query(query, params):
@@ -1746,14 +1899,16 @@ async def test_three_source_infers_inactive_lifecycle_end_from_last_quote():
 @pytest.mark.asyncio
 async def test_three_source_does_not_infer_auto_deactivation_as_delisting():
     manager = _manager_with_factor_evidence()
-    manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
-        "instrument_id": "000001.SZ",
-        "symbol": "000001",
-        "is_active": False,
-        "status": "auto_deactivated_zombie",
-        "listed_date": datetime(2020, 1, 1),
-        "delisted_date": None,
-    }])
+    manager.db_ops.get_instruments_list = AsyncMock(
+        side_effect=_instrument_master_side_effect({
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "is_active": False,
+            "status": "auto_deactivated_zombie",
+            "listed_date": datetime(2020, 1, 1),
+            "delisted_date": None,
+        })
+    )
     original_query = manager.db_ops.execute_read_query.side_effect
 
     async def inactive_query(query, params):
@@ -1874,8 +2029,10 @@ async def test_three_source_legacy_uses_pre_range_cumulative_anchor():
     )
 
     decision = result["candidate"]["decisions"][0]
-    assert decision["source_event_counts"]["legacy"] == 1
-    assert decision["pairwise"]["cninfo__legacy"]["agrees"] is True
+    assert decision["source_event_counts"]["baostock_sina_composite"] == 1
+    assert decision["pairwise"][
+        "cninfo__baostock_sina_composite"
+    ]["agrees"] is True
     assert result["candidate"]["confidence_counts"] == {"high": 1}
 
 
@@ -1921,10 +2078,14 @@ async def test_three_source_reports_unrebased_legacy_provider_switch():
     )
 
     assert result["candidate"]["decisions"][0]["pairwise"][
-        "cninfo__legacy"
+        "cninfo__baostock_sina_composite"
     ]["agrees"] is True
-    assert result["source_events"]["legacy_basis_conflict_rows"] == 1
-    sample = result["source_events"]["legacy_basis_conflict_samples"][0]
+    assert result["source_events"][
+        "baostock_sina_basis_conflict_rows"
+    ] == 1
+    sample = result["source_events"][
+        "baostock_sina_basis_conflict_samples"
+    ][0]
     assert sample["instrument_id"] == "000001.SZ"
     assert sample["cumulative_ratio"] == pytest.approx(1.8)
     assert sample["stored_factor"] == pytest.approx(expected_factor)
@@ -1971,7 +2132,7 @@ async def test_three_source_preserves_pre_range_legacy_normalization_failure():
         source_selection_mode="three_source",
     )
 
-    assert result["source_completeness"]["legacy"][
+    assert result["source_completeness"]["baostock_sina_composite"][
         "normalization_failure_instruments"
     ] == 1
     assert result["candidate"]["decisions"][0]["eligible_sources"] == [
@@ -1979,10 +2140,10 @@ async def test_three_source_preserves_pre_range_legacy_normalization_failure():
         "tdx",
     ]
     assert result["source_events"][
-        "legacy_normalization_failure_rows"
+        "baostock_sina_normalization_failure_rows"
     ] == 1
     assert result["source_events"][
-        "legacy_normalization_failure_samples"
+        "baostock_sina_normalization_failure_samples"
     ][0]["ex_date"] == "2019-12-31"
 
 
