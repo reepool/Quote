@@ -531,6 +531,11 @@ async def test_daily_maintenance_merges_active_canonical_targeted_candidate():
     manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
         return_value=[]
     )
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value={
+        "successful_through": date(2026, 7, 29),
+        "last_status": "success",
+        "last_attempted_through": date(2026, 7, 29),
+    })
     manager.db_ops.replace_corporate_action_daily_factor_retry_instruments = (
         AsyncMock(return_value={})
     )
@@ -639,6 +644,86 @@ async def test_daily_maintenance_merges_active_canonical_targeted_candidate():
     ]
     assert result["canonical_maintenance"]["status"] == "success"
     assert result["production_isolation"] is False
+
+
+@pytest.mark.asyncio
+async def test_daily_maintenance_defers_canonical_merge_for_stale_predecessor():
+    manager = DataManager()
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+        },
+        {"source": "configured_default"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[
+        {"instrument_id": "600000.SH", "symbol": "600000"},
+    ])
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 28)
+    )
+    manager.db_ops.get_adjustment_factor_series_status = AsyncMock(
+        return_value={"status": "promoted", "promotion_eligible": True}
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[]
+    )
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value={
+        "successful_through": date(2026, 7, 25),
+        "last_status": "success",
+    })
+    manager.db_ops.replace_corporate_action_daily_factor_retry_instruments = (
+        AsyncMock(return_value={})
+    )
+    manager.db_ops.merge_canonical_adjustment_factor_subset = AsyncMock()
+    manager.discover_a_share_cninfo_daily_candidates = AsyncMock(return_value={
+        "status": "success",
+        "candidate_ids": ["600000.SH"],
+        "candidate_count": 1,
+    })
+    manager.backfill_a_share_cninfo_corporate_actions = AsyncMock(return_value={
+        "status": "success",
+        "affected_instrument_ids": ["600000.SH"],
+    })
+    manager.backfill_tdx_xdxr_history = AsyncMock(return_value={
+        "status": "success",
+        "event_instrument_ids": [],
+        "totals": {},
+    })
+    source_rebuild = {
+        "status": "success",
+        "cninfo_path": {"pending_count": 0},
+        "tdx_path": {"pending_count": 0},
+        "reconciliation": {"status": "success", "totals": {}},
+        "source_completeness": {},
+    }
+    manager.rebuild_cninfo_primary_adjustment_factors = AsyncMock(
+        return_value=source_rebuild
+    )
+    manager._load_daily_factor_cutoff_deferred_instrument_ids = AsyncMock(
+        return_value=[]
+    )
+    manager._govern_cninfo_daily_anomalies = AsyncMock(return_value={
+        "status": "success",
+        "execution_status": "success",
+        "readiness_status": "success",
+        "deferred_instrument_ids": [],
+        "promoted_instrument_ids": [],
+    })
+
+    result = await manager.maintain_a_share_cninfo_primary_factors(
+        end_date="2026-07-29",
+        exchanges=["SSE"],
+        request_interval_seconds=0,
+    )
+
+    assert result["canonical_maintenance"]["status"] == "partial"
+    assert result["canonical_maintenance"]["predecessor"]["reason"] == (
+        "predecessor_watermark_stale"
+    )
+    assert manager.rebuild_cninfo_primary_adjustment_factors.await_count == 1
+    manager.db_ops.merge_canonical_adjustment_factor_subset.assert_not_awaited()
 
 
 @pytest.mark.asyncio

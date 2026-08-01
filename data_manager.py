@@ -388,7 +388,7 @@ class DataManager:
                 self._factor_activation_error = str(exc)
                 dm_logger.error(
                     "[DataManager] Invalid factor activation manifest; "
-                    "using configured compatibility path: %s",
+                    "canonical reads will remain unavailable until repaired: %s",
                     exc,
                 )
             self._factor_activation_signature = signature
@@ -429,7 +429,7 @@ class DataManager:
         ).strip()
         if not series_version or len(series_version) > 64:
             raise ValueError("canonical_series_version must contain 1 to 64 characters")
-        allow_legacy_fallback = bool(governance.get("allow_legacy_fallback", True))
+        allow_legacy_fallback = bool(governance.get("allow_legacy_fallback", False))
         cache_key = (
             f"{requested_dataset}:{series_version}:{int(allow_legacy_fallback)}:"
             f"{instrument_id}"
@@ -447,11 +447,49 @@ class DataManager:
         factors: List[Dict[str, Any]] = []
         series_status = None
         instrument_status = None
-        if requested_dataset == "canonical":
-            series_status = await self.db_ops.get_adjustment_factor_series_status(
-                series_version
+        normalized_instrument_id = str(instrument_id or "").strip().upper()
+        symbol = normalized_instrument_id.rsplit(".", 1)[0]
+        activation_error = str(
+            activation_metadata.get("error") or ""
+        ).strip()
+        uses_a_share_canonical = (
+            normalized_instrument_id.endswith(".SH")
+            and not symbol.startswith("900")
+        ) or (
+            normalized_instrument_id.endswith(".SZ")
+            and not symbol.startswith("200")
+        )
+        if requested_dataset == "canonical" and activation_error:
+            availability_error = (
+                "canonical factor activation is invalid: "
+                f"{activation_error}"
             )
-            if series_status and series_status.get("promotion_eligible"):
+        elif requested_dataset == "canonical" and not uses_a_share_canonical:
+            # The promoted CNInfo series covers SSE/SZSE A shares only. Other
+            # markets keep their independently maintained composite factors.
+            factors = await self.db_ops.get_adjustment_factors(instrument_id)
+            actual_dataset = "baostock_sina_composite"
+        elif requested_dataset == "canonical":
+            status_loader = getattr(
+                self.db_ops,
+                "get_adjustment_factor_series_status_light",
+                None,
+            )
+            if callable(status_loader) and inspect.iscoroutinefunction(
+                status_loader
+            ):
+                series_status = await status_loader(series_version)
+            else:
+                series_status = (
+                    await self.db_ops.get_adjustment_factor_series_status(
+                        series_version
+                    )
+                )
+            if (
+                not availability_error
+                and series_status
+                and series_status.get("promotion_eligible")
+            ):
                 instrument_status = (
                     await self.db_ops.get_adjustment_factor_instrument_status(
                         instrument_id, series_version
@@ -470,13 +508,34 @@ class DataManager:
                             "canonical coverage says events exist but no factor rows were found"
                         )
                     else:
-                        decisions = (
-                            series_status.get("decisions")
-                            or (
-                                series_status.get("candidate") or {}
-                            ).get("decisions")
-                            or []
+                        decision_loader = getattr(
+                            self.db_ops,
+                            "get_adjustment_factor_decisions",
+                            None,
                         )
+                        decisions = (
+                            await decision_loader(
+                                series_version=series_version,
+                                instrument_id=instrument_id,
+                            )
+                            if callable(decision_loader)
+                            and inspect.iscoroutinefunction(decision_loader)
+                            else [
+                                item
+                                for item in (
+                                    (series_status or {}).get("decisions")
+                                    or []
+                                )
+                                if item.get("instrument_id") == instrument_id
+                            ]
+                        )
+                        if not decisions:
+                            availability_error = (
+                                "canonical selection decisions are missing for "
+                                f"{instrument_id}; run the canonical decision "
+                                "migration before serving adjusted quotes"
+                            )
+                            factors = []
                         continuity_segments = [{
                             "segment_id": item.get("segment_id"),
                             "start_date": item.get("start_date"),
@@ -487,7 +546,7 @@ class DataManager:
                         } for item in decisions
                         if str(item.get("instrument_id") or "").strip()
                         == instrument_id]
-                        if continuity_segments:
+                        if continuity_segments and not availability_error:
                             factors = [
                                 {
                                     **factor,
@@ -503,11 +562,15 @@ class DataManager:
                     availability_error = (
                         f"canonical factor coverage is unavailable for {instrument_id}"
                     )
-            else:
+            elif not availability_error:
                 availability_error = (
                     f"canonical factor series {series_version} is not promotion eligible"
                 )
-            if availability_error and allow_legacy_fallback:
+            if (
+                availability_error
+                and allow_legacy_fallback
+                and not activation_error
+            ):
                 factors = await self.db_ops.get_adjustment_factors(instrument_id)
                 actual_dataset = "legacy"
                 fallback_used = True
@@ -570,6 +633,11 @@ class DataManager:
         governance = self.data_config.get("adjustment_factor_governance", {})
         if not is_a_share:
             saved = await self.db_ops.save_adjustment_factors(factors)
+            if int(saved or 0) != len(factors):
+                raise RuntimeError(
+                    "factor persistence incomplete: "
+                    f"expected={len(factors)} saved={int(saved or 0)}"
+                )
             return {"saved": saved, "observation_stats": {}, "rebase_stats": {}}
 
         from data_sources.adjustment_factor_governance import normalize_source_path
@@ -608,6 +676,11 @@ class DataManager:
                 observations
             )
         saved = await self.db_ops.save_adjustment_factors(legacy_rows) if legacy_rows else 0
+        if legacy_rows and int(saved or 0) != len(legacy_rows):
+            raise RuntimeError(
+                "factor persistence incomplete: "
+                f"expected={len(legacy_rows)} saved={int(saved or 0)}"
+            )
         for instrument_id in {str(item.get("instrument_id")) for item in factors}:
             self.invalidate_factor_cache(instrument_id)
         return {
@@ -16393,7 +16466,7 @@ class DataManager:
         progress_log_every: int = 500,
         skip_filter: bool = False,
         sync_reason: str = 'daily',
-    ) -> Dict[str, int]:
+    ) -> Dict[str, Any]:
         """批量同步复权因子（Phase 2）
 
         在日线更新全部完成后统一调用，避免与日线获取竞争限流窗口。
@@ -16408,7 +16481,14 @@ class DataManager:
             {'synced': int, 'skipped': int, 'failed': int, 'filtered_total': int}
         """
         total = len(stocks)
-        result = {'synced': 0, 'skipped': 0, 'failed': 0, 'filtered_total': total}
+        result: Dict[str, Any] = {
+            'status': 'success',
+            'synced': 0,
+            'skipped': 0,
+            'failed': 0,
+            'filtered_total': total,
+        }
+        discovered_event_symbols: Optional[set[str]] = None
 
         daily_sync_enabled = self.config.get_nested(
             f'routing.factor.{exchange}.daily_sync_enabled',
@@ -16421,6 +16501,8 @@ class DataManager:
                 exchange, total
             )
             result['skipped'] = total
+            result['status'] = 'partial'
+            result['reason'] = 'daily_factor_sync_disabled'
             return result
 
         if not skip_filter:
@@ -16441,6 +16523,9 @@ class DataManager:
             ex_div_symbols = await self._query_ex_dividend_symbols(target_dates)
 
             if ex_div_symbols is not None:
+                discovered_event_symbols = {
+                    str(symbol) for symbol in ex_div_symbols
+                }
                 # 精准模式：仅同步有除权除息事件的品种
                 filtered_stocks = [
                     s for s in stocks if s['symbol'] in ex_div_symbols
@@ -16466,6 +16551,8 @@ class DataManager:
                     "(will be handled by weekly maintenance)", exchange
                 )
                 result['skipped'] = total
+                result['status'] = 'partial'
+                result['reason'] = 'ex_dividend_discovery_failed'
                 return result
 
         dm_logger.info(
@@ -16485,6 +16572,16 @@ class DataManager:
                 if factors:
                     await self._persist_adjustment_factor_batch(exchange, factors)
                     result['synced'] += 1
+                elif (
+                    discovered_event_symbols is not None
+                    and stock['symbol'] in discovered_event_symbols
+                ):
+                    result['failed'] += 1
+                    dm_logger.warning(
+                        "[DataManager] Factor source returned no rows for known "
+                        "ex-dividend event: %s (%s)",
+                        stock['symbol'], stock['instrument_id'],
+                    )
                 else:
                     result['skipped'] += 1
             except Exception as e:
@@ -16504,7 +16601,274 @@ class DataManager:
             "[DataManager] %s factor sync completed: synced=%d, skipped=%d, failed=%d",
             exchange, result['synced'], result['skipped'], result['failed']
         )
+        if result['failed']:
+            result['status'] = 'partial'
+            result['reason'] = 'factor_download_failures'
         return result
+
+    async def _record_a_share_quote_composite_watermark(
+        self,
+        *,
+        target_date: date,
+        exchanges: Sequence[str],
+        update_results: Mapping[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        """Persist the successful quote/BaoStock-Sina dependency cutoff."""
+
+        governed_exchanges = sorted(
+            {str(value).upper() for value in exchanges} & {'SSE', 'SZSE'}
+        )
+        if not governed_exchanges:
+            return None
+        exchange_stats = update_results.get('exchange_stats') or {}
+        factor_stats = update_results.get('factor_stats') or {}
+        failures: List[str] = []
+        quote_cutoffs: Dict[str, Optional[date]] = {}
+        expected_cutoffs: Dict[str, Optional[date]] = {}
+        cutoff_loader = getattr(self.db_ops, 'get_previous_trading_day', None)
+        for exchange in governed_exchanges:
+            if callable(cutoff_loader) and inspect.iscoroutinefunction(
+                cutoff_loader
+            ):
+                expected_cutoffs[exchange] = self._date_from_any(
+                    await cutoff_loader(
+                        exchange,
+                        target_date + timedelta(days=1),
+                    )
+                )
+            else:
+                expected_cutoffs[exchange] = None
+        coverage_loader = getattr(
+            self.db_ops, 'get_latest_stock_quote_dates_by_exchange', None
+        )
+        persisted_cutoffs: Dict[str, Any] = {}
+        if callable(coverage_loader) and inspect.iscoroutinefunction(
+            coverage_loader
+        ):
+            persisted_cutoffs = await coverage_loader(
+                governed_exchanges,
+                listed_on_or_before=target_date,
+                completed_on_or_before=target_date,
+            )
+        for exchange in governed_exchanges:
+            quote_state = exchange_stats.get(exchange)
+            factor_state = factor_stats.get(exchange)
+            quote_cutoff = self._date_from_any(persisted_cutoffs.get(exchange))
+            quote_cutoffs[exchange] = quote_cutoff
+            if quote_cutoff is None:
+                failures.append(f'{exchange}:quote_cutoff_unavailable')
+            elif (
+                expected_cutoffs.get(exchange) is not None
+                and quote_cutoff < expected_cutoffs[exchange]
+            ):
+                failures.append(f'{exchange}:quote_persisted_coverage_stale')
+            if not isinstance(quote_state, Mapping):
+                failures.append(f'{exchange}:quote_status_missing')
+            else:
+                quote_write_stats = quote_state.get('changelog_stats')
+                quote_write_failures = int(
+                    (
+                        quote_write_stats.get('failed')
+                        if isinstance(quote_write_stats, Mapping)
+                        else 0
+                    )
+                    or 0
+                )
+                if (
+                    quote_state.get('error')
+                    or int(quote_state.get('failure_count') or 0)
+                    or quote_write_failures
+                ):
+                    failures.append(f'{exchange}:quote_update_failed')
+            if not isinstance(factor_state, Mapping):
+                failures.append(f'{exchange}:factor_status_missing')
+            elif str(factor_state.get('status') or 'success') != 'success':
+                failures.append(
+                    f"{exchange}:factor_{factor_state.get('reason') or 'partial'}"
+                )
+        status = 'success' if not failures else 'partial'
+        metadata = {
+            'exchanges': governed_exchanges,
+            'requested_target_date': target_date.isoformat(),
+            'quote_cutoff_by_exchange': {
+                exchange: cutoff.isoformat() if cutoff is not None else None
+                for exchange, cutoff in quote_cutoffs.items()
+            },
+            'expected_quote_cutoff_by_exchange': {
+                exchange: cutoff.isoformat() if cutoff is not None else None
+                for exchange, cutoff in expected_cutoffs.items()
+            },
+            'failure_reasons': failures[:20],
+            'quote_failure_count': int(
+                update_results.get('failure_count') or 0
+            ),
+            'factor_stats': {
+                exchange: {
+                    key: value
+                    for key, value in dict(factor_stats.get(exchange) or {}).items()
+                    if key in {
+                        'status', 'synced', 'skipped', 'failed',
+                        'filtered_total', 'reason',
+                    }
+                }
+                for exchange in governed_exchanges
+            },
+        }
+        writer = getattr(self.db_ops, 'upsert_operational_watermark', None)
+        if not callable(writer) or not inspect.iscoroutinefunction(writer):
+            return {
+                'status': 'unavailable',
+                'reason': 'watermark_storage_unavailable',
+                'attempted_through': target_date.isoformat(),
+                'metadata': metadata,
+            }
+        per_exchange: Dict[str, Any] = {}
+        for exchange in governed_exchanges:
+            exchange_failures = [
+                reason for reason in failures
+                if reason.startswith(f'{exchange}:')
+            ]
+            per_exchange[exchange] = await writer(
+                watermark_name=(
+                    f'a_share_quote_baostock_sina:{exchange}'
+                ),
+                status='success' if not exchange_failures else 'partial',
+                attempted_through=quote_cutoffs.get(exchange) or target_date,
+                metadata={
+                    'exchange': exchange,
+                    'failure_reasons': exchange_failures,
+                    'quote_stats': dict(exchange_stats.get(exchange) or {}),
+                    'factor_stats': dict(factor_stats.get(exchange) or {}),
+                },
+            )
+        # Keep the aggregate key for operational compatibility, but a subset
+        # run must never advance a full A-share readiness watermark.
+        aggregate_status = (
+            status
+            if set(governed_exchanges) == {'SSE', 'SZSE'}
+            else 'partial'
+        )
+        available_cutoffs = [
+            cutoff for cutoff in quote_cutoffs.values() if cutoff is not None
+        ]
+        aggregate_cutoff = (
+            min(available_cutoffs)
+            if len(available_cutoffs) == len(governed_exchanges)
+            else target_date
+        )
+        aggregate = await writer(
+            watermark_name='a_share_quote_baostock_sina',
+            status=aggregate_status,
+            attempted_through=aggregate_cutoff,
+            metadata=metadata,
+        )
+        return {
+            **aggregate,
+            'status': aggregate_status,
+            'per_exchange': per_exchange,
+        }
+
+    async def _canonical_predecessor_readiness(
+        self,
+        factor_cutoff: Optional[date],
+        exchanges: Sequence[str] = ('SSE', 'SZSE'),
+    ) -> Dict[str, Any]:
+        """Evaluate the durable quote/composite cutoff for canonical merge."""
+
+        if factor_cutoff is None:
+            return {
+                'eligible': False,
+                'reason': 'factor_cutoff_unavailable',
+                'required_through': None,
+            }
+        loader = getattr(self.db_ops, 'get_operational_watermark', None)
+        if not callable(loader) or not inspect.iscoroutinefunction(loader):
+            return {
+                'eligible': False,
+                'reason': 'predecessor_watermark_storage_unavailable',
+                'required_through': factor_cutoff.isoformat(),
+            }
+        required_exchanges = sorted(
+            {str(value).upper() for value in exchanges} & {'SSE', 'SZSE'}
+        ) or ['SSE', 'SZSE']
+        rows: Dict[str, Mapping[str, Any]] = {}
+        for exchange in required_exchanges:
+            row = await loader(
+                f'a_share_quote_baostock_sina:{exchange}'
+            )
+            if isinstance(row, Mapping):
+                rows[exchange] = row
+        # One release-cycle compatibility path for a watermark written before
+        # per-exchange keys existed. It is accepted only when its metadata
+        # proves that the same complete exchange set was processed.
+        if len(rows) != len(required_exchanges):
+            legacy_row = await loader('a_share_quote_baostock_sina')
+            legacy_exchanges = {
+                str(value).upper()
+                for value in (
+                    (legacy_row or {}).get('metadata', {}).get('exchanges', [])
+                    if isinstance(legacy_row, Mapping) else []
+                )
+            }
+            if (
+                isinstance(legacy_row, Mapping)
+                and set(required_exchanges) <= legacy_exchanges
+            ):
+                rows = {
+                    exchange: legacy_row for exchange in required_exchanges
+                }
+
+        def _successful_date(row: Mapping[str, Any]) -> Optional[date]:
+            raw_value = row.get('successful_through')
+            if isinstance(raw_value, datetime):
+                return raw_value.date()
+            if isinstance(raw_value, date):
+                return raw_value
+            try:
+                return datetime.fromisoformat(str(raw_value)[:10]).date()
+            except (TypeError, ValueError):
+                return None
+
+        successful_dates = {
+            exchange: _successful_date(row)
+            for exchange, row in rows.items()
+        }
+        missing_exchanges = sorted(
+            set(required_exchanges) - set(successful_dates)
+        )
+        stale_exchanges = sorted(
+            exchange for exchange, successful in successful_dates.items()
+            if successful is None or successful < factor_cutoff
+        )
+        eligible = not missing_exchanges and not stale_exchanges
+        successful_through = (
+            min(successful_dates.values())
+            if eligible and successful_dates else None
+        )
+        return {
+            'eligible': eligible,
+            'reason': (
+                'ready'
+                if eligible
+                else 'predecessor_watermark_missing'
+                if missing_exchanges
+                else 'predecessor_watermark_stale'
+            ),
+            'required_through': factor_cutoff.isoformat(),
+            'required_exchanges': required_exchanges,
+            'missing_exchanges': missing_exchanges,
+            'stale_exchanges': stale_exchanges,
+            'successful_through_by_exchange': {
+                exchange: (
+                    successful.isoformat() if successful is not None else None
+                )
+                for exchange, successful in successful_dates.items()
+            },
+            'successful_through': (
+                successful_through.isoformat()
+                if successful_through is not None else None
+            ),
+        }
 
     @staticmethod
     def _build_factor_target_dates(stocks: List[Dict[str, Any]]) -> set:
@@ -18443,6 +18807,81 @@ class DataManager:
                 confirm=confirm,
             )
 
+    async def maintain_a_share_canonical_adjustment_factor_storage(
+        self,
+        *,
+        operation: str = "migrate_decisions",
+        series_versions: Optional[Sequence[str]] = None,
+        keep_recent_staging: int = 2,
+        keep_recent_benchmarks: int = 5,
+        endpoint_status_retention_days: int = 90,
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Migrate or retain canonical operational metadata explicitly."""
+
+        normalized_operation = str(operation or "").strip().lower()
+        if normalized_operation not in {"migrate_decisions", "retention"}:
+            raise ValueError(
+                "operation must be migrate_decisions or retention"
+            )
+        governance, activation = self._effective_adjustment_factor_governance()
+        active_version = str(
+            governance.get("canonical_series_version")
+            or "a_share_cninfo_primary_v1"
+        ).strip()
+        if normalized_operation == "migrate_decisions":
+            requested_versions = sorted({
+                str(value or "").strip()
+                for value in (series_versions or ())
+                if str(value or "").strip()
+            })
+            if not requested_versions:
+                available = (
+                    await self.db_ops.list_adjustment_factor_series_versions()
+                )
+                staging = [
+                    value for value in available if "__staging__" in value
+                ][:max(0, int(keep_recent_staging))]
+                benchmarks = [
+                    value for value in available if "__benchmark__" in value
+                ][:max(0, int(keep_recent_benchmarks))]
+                requested_versions = sorted({
+                    active_version, *staging, *benchmarks,
+                })
+            result = await self.db_ops.migrate_adjustment_factor_series_decisions(
+                series_versions=requested_versions,
+                dry_run=bool(dry_run),
+                confirm=bool(confirm),
+            )
+            if not dry_run:
+                self.invalidate_factor_cache()
+        else:
+            protected = {
+                active_version,
+                str(activation.get("canonical_series_version") or "").strip(),
+            } - {""}
+            result = (
+                await self.db_ops.maintain_adjustment_factor_operational_storage(
+                    active_series_version=active_version,
+                    protected_series_versions=sorted(protected),
+                    keep_recent_staging=int(keep_recent_staging),
+                    keep_recent_benchmarks=int(keep_recent_benchmarks),
+                    endpoint_status_retention_days=int(
+                        endpoint_status_retention_days
+                    ),
+                    dry_run=bool(dry_run),
+                    confirm=bool(confirm),
+                )
+            )
+        return {
+            "operation": "a_share_canonical_adjustment_factor_storage_maintenance",
+            "maintenance_operation": normalized_operation,
+            "active_series_version": active_version,
+            "activation": activation,
+            **result,
+        }
+
     async def _promote_a_share_canonical_adjustment_factor_candidate(
         self,
         *,
@@ -18672,6 +19111,10 @@ class DataManager:
         from data_sources.a_share_factor_selection import (
             build_three_source_canonical_candidate,
             normalize_baostock_sina_composite_rows,
+        )
+        from data_sources.a_share_canonical_operations import (
+            qualify_composite_paths,
+            summarize_canonical_decisions,
         )
         from data_sources.a_share_factor_source_overrides import (
             FactorSourceOverrideCatalogError,
@@ -19486,7 +19929,7 @@ class DataManager:
             for row in normalized_legacy_rows
             if row.get("normalized_factor") is None
         ]
-        legacy_invalid_ids = {
+        composite_invalid_ids = {
             str(row.get("instrument_id") or "").strip()
             for row in legacy_invalid_rows
             if str(row.get("instrument_id") or "").strip()
@@ -19499,12 +19942,18 @@ class DataManager:
             ) is not None
             and normalized_start <= parsed <= normalized_end
         ]
-        legacy_complete_ids = sorted({
+        composite_path_diagnostics = qualify_composite_paths(
+            normalized_legacy_rows
+        )
+        composite_path_eligible_ids = sorted({
             str(row.get("instrument_id") or "").strip()
             for row in legacy_selection_rows
             if str(row.get("instrument_id") or "").strip()
             and _has_positive_legacy_values(row)
-        } - legacy_invalid_ids)
+            and composite_path_diagnostics.get(
+                str(row.get("instrument_id") or "").strip(), {}
+            ).get("path_eligible")
+        } - composite_invalid_ids)
         special_event_dates_by_instrument: Dict[
             str, List[date]
         ] = defaultdict(list)
@@ -19722,17 +20171,21 @@ class DataManager:
             "baostock_sina_composite": {
                 "status": (
                     "success"
-                    if set(legacy_complete_ids) == set(target_ids)
+                    if set(composite_path_eligible_ids) == set(target_ids)
                     else "partial"
                 ),
-                "available_instruments": len(legacy_complete_ids),
+                "path_eligible_instruments": len(
+                    composite_path_eligible_ids
+                ),
                 "incomplete_instruments": (
-                    len(target_ids) - len(legacy_complete_ids)
+                    len(target_ids) - len(composite_path_eligible_ids)
                 ),
                 "normalization_failure_instruments": len(
-                    legacy_invalid_ids
+                    composite_invalid_ids
                 ),
                 "source_profile": "baostock_sina_composite",
+                "qualification_basis": "factor_path_integrity",
+                "event_completeness": "not_asserted",
             },
         }
         overall_completeness = {
@@ -19873,7 +20326,9 @@ class DataManager:
                                 )
                                 - tdx_incomplete_ids
                             ),
-                            "baostock_sina_composite": legacy_complete_ids,
+                            "baostock_sina_composite": (
+                                composite_path_eligible_ids
+                            ),
                         },
                         zero_event_complete_instruments_by_source={
                             "cninfo": sorted(
@@ -19918,17 +20373,11 @@ class DataManager:
                     )
                 )
                 candidate_summary.update({
-                    "conflict_count": (
-                        int(
-                            candidate_summary.get(
-                                "blocked_segment_count", 0
-                            )
-                        )
-                        + int(
-                            candidate_summary.get(
-                                "low_confidence_segment_count", 0
-                            )
-                        )
+                    # Low-confidence selections remain usable and are reported
+                    # separately.  Only blocked segments are conflicts, matching
+                    # the persisted summary produced after candidate writes.
+                    "conflict_count": int(
+                        candidate_summary.get("blocked_segment_count", 0)
                     ),
                     "tdx_fallback_count": 0,
                     "tdx_historical_single_source_count": int(
@@ -19994,7 +20443,7 @@ class DataManager:
             baseline_covered_instruments=baseline_covered_ids,
             reference_covered_instruments={
                 "tdx_event_derived_v1": tdx_benchmark_covered_ids,
-                "baostock_sina_composite": legacy_complete_ids,
+                "baostock_sina_composite": composite_path_eligible_ids,
             },
             full_market_scope=full_market_scope,
             sample_limit=sample_limit,
@@ -20204,6 +20653,13 @@ class DataManager:
                     "end_date": normalized_end,
                     "ingestion_run_id": run_id,
                 } for instrument_id in target_ids]
+                candidate_summary.update(
+                    summarize_canonical_decisions(
+                        candidate_summary.get("decisions") or [],
+                        instrument_statuses=status_rows,
+                        sample_limit=sample_limit,
+                    )
+                )
                 write_result["instrument_statuses"] = (
                     await self.db_ops.replace_adjustment_factor_instrument_statuses(
                         status_rows,
@@ -20269,7 +20725,7 @@ class DataManager:
                         "end_date": normalized_end.isoformat(),
                         "reconciliation": reconciliation,
                         "comparisons": comparisons,
-                        "overall_completeness": overall_completeness,
+                        "source_overall_completeness": overall_completeness,
                     },
                 )
             pending_retry_ids = sorted({
@@ -20375,7 +20831,19 @@ class DataManager:
                 "tdx_rows": len(tdx_rows),
                 "baostock_sina_factor_rows": len(legacy_selection_rows),
                 "baostock_sina_raw_rows_through_end": len(legacy_rows),
-                "baostock_sina_instruments": len(legacy_complete_ids),
+                "baostock_sina_instruments": len(
+                    composite_path_eligible_ids
+                ),
+                "baostock_sina_event_completeness": "not_asserted",
+                "baostock_sina_path_qualification_samples": [
+                    {
+                        "instrument_id": instrument_id,
+                        **composite_path_diagnostics[instrument_id],
+                    }
+                    for instrument_id in sorted(
+                        composite_path_diagnostics
+                    )[:sample_limit]
+                ],
                 "baostock_sina_normalization_failure_rows": len(
                     legacy_invalid_rows
                 ),
@@ -22266,13 +22734,37 @@ class DataManager:
             )
             else ""
         )
-        active_canonical_status = (
-            await self.db_ops.get_adjustment_factor_series_status(
-                active_canonical_version
+        active_canonical_status = None
+        canonical_status_check_available = False
+        if active_canonical_version:
+            light_status_loader = getattr(
+                self.db_ops,
+                "get_adjustment_factor_series_status_light",
+                None,
             )
-            if active_canonical_version
-            else None
-        )
+            compatibility_status_loader = getattr(
+                self.db_ops,
+                "get_adjustment_factor_series_status",
+                None,
+            )
+            active_status_loader = (
+                light_status_loader
+                if callable(light_status_loader)
+                and inspect.iscoroutinefunction(light_status_loader)
+                else compatibility_status_loader
+                if callable(compatibility_status_loader)
+                and inspect.iscoroutinefunction(compatibility_status_loader)
+                else None
+            )
+            if active_status_loader is not None:
+                canonical_status_check_available = True
+                loaded_active_status = active_status_loader(
+                    active_canonical_version
+                )
+                if inspect.isawaitable(loaded_active_status):
+                    loaded_active_status = await loaded_active_status
+                if isinstance(loaded_active_status, Mapping):
+                    active_canonical_status = dict(loaded_active_status)
         canonical_activation_valid = bool(
             active_canonical_status
             and active_canonical_status.get("status") == "promoted"
@@ -22635,6 +23127,7 @@ class DataManager:
             "activation": factor_activation,
             "active_series_version": active_canonical_version or None,
             "activation_valid": canonical_activation_valid,
+            "activation_check_available": canonical_status_check_available,
             "status": "inactive",
             "scope_instrument_count": 0,
             "missing_coverage_count": len(
@@ -22646,7 +23139,11 @@ class DataManager:
             "errors": [],
         }
         canonical_retry_ids: Set[str] = set()
-        if active_canonical_version and not canonical_activation_valid:
+        if (
+            active_canonical_version
+            and canonical_status_check_available
+            and not canonical_activation_valid
+        ):
             canonical_maintenance.update({
                 "status": "failed",
                 "errors": [
@@ -22668,6 +23165,19 @@ class DataManager:
             canonical_maintenance["scope_instrument_ids"] = (
                 canonical_scope_ids[:100]
             )
+            predecessor_readiness = (
+                await self._canonical_predecessor_readiness(
+                    factor_end_date,
+                    exchanges=sorted({
+                        exchange
+                        for exchange, instrument_ids
+                        in active_ids_by_exchange.items()
+                        if set(instrument_ids) & set(canonical_scope_ids)
+                        and exchange in CNINFO_SUPPORTED_EXCHANGES
+                    }),
+                )
+            )
+            canonical_maintenance["predecessor"] = predecessor_readiness
             if canonical_scope_ids and factor_end_date is None:
                 canonical_retry_ids.update(canonical_scope_ids)
                 canonical_maintenance.update({
@@ -22675,6 +23185,18 @@ class DataManager:
                     "errors": [
                         "factor cutoff is unavailable for canonical "
                         "incremental maintenance"
+                    ],
+                })
+            elif (
+                canonical_scope_ids
+                and not predecessor_readiness.get("eligible")
+            ):
+                canonical_retry_ids.update(canonical_scope_ids)
+                canonical_maintenance.update({
+                    "status": "partial",
+                    "errors": [
+                        "promoted canonical merge deferred: "
+                        + str(predecessor_readiness.get("reason"))
                     ],
                 })
             elif canonical_scope_ids:
@@ -32800,6 +33322,11 @@ class DataManager:
                                         stat_value = int(write_stats.get(stat_key, 0) or 0)
                                         exchange_result['changelog_stats'][stat_key] += stat_value
                                         update_results['changelog_stats'][stat_key] += stat_value
+                                    if int(write_stats.get('failed', 0) or 0):
+                                        raise RuntimeError(
+                                            "daily quote persistence was incomplete: "
+                                            f"failed={int(write_stats.get('failed') or 0)}"
+                                        )
                                     exchange_result['quotes_added'] += len(data)
                                     update_results['total_quotes_added'] += len(data)
                                     if is_catchup:
@@ -32907,6 +33434,26 @@ class DataManager:
                     update_results['failure_count'] += 1
                     update_results['exchange_stats'][exchange] = {'error': str(e)}
                     continue
+
+            try:
+                update_results['quote_composite_watermark'] = (
+                    await self._record_a_share_quote_composite_watermark(
+                        target_date=target_date,
+                        exchanges=exchanges,
+                        update_results=update_results,
+                    )
+                )
+            except Exception as watermark_error:
+                dm_logger.error(
+                    "[DataManager] Failed to persist A-share quote composite "
+                    "watermark: %s",
+                    watermark_error,
+                )
+                update_results['quote_composite_watermark'] = {
+                    'status': 'failed',
+                    'reason': 'watermark_persistence_failed',
+                    'error': str(watermark_error),
+                }
 
             # 生成并发送详细的更新报告
             dm_logger.info("[DataManager] Generating daily update completion report...")

@@ -109,6 +109,64 @@ class TestDailyFactorSyncPolicy:
         manager.source_factory.get_adjustment_factors.assert_awaited_once()
 
     @pytest.mark.asyncio
+    async def test_factor_sync_reports_failed_when_persistence_is_incomplete(self):
+        manager = DataManager()
+        manager.config = Mock()
+        manager.config.get_nested = Mock(return_value=True)
+        manager.source_factory = Mock()
+        manager.source_factory.get_adjustment_factors = AsyncMock(return_value=[{
+            'instrument_id': '00001.HK',
+            'ex_date': datetime(2026, 4, 13),
+            'factor': 1.01,
+            'cumulative_factor': 1.01,
+            'source': 'akshare',
+        }])
+        manager.db_ops = Mock()
+        manager.db_ops.save_adjustment_factors = AsyncMock(return_value=0)
+
+        result = await manager._batch_sync_adjustment_factors(
+            exchange='HKEX',
+            stocks=[{
+                'instrument_id': '00001.HK',
+                'symbol': '00001',
+                'start_date': date(2026, 4, 13),
+                'end_date': date(2026, 4, 13),
+            }],
+            skip_filter=True,
+            progress_log_every=0,
+            sync_reason='maintenance',
+        )
+
+        assert result['status'] == 'partial'
+        assert result['synced'] == 0
+        assert result['failed'] == 1
+
+    @pytest.mark.asyncio
+    async def test_known_ex_dividend_with_empty_factor_result_is_partial(self):
+        manager = DataManager()
+        manager.config = Mock()
+        manager.config.get_nested = Mock(return_value=True)
+        manager._query_ex_dividend_symbols = AsyncMock(return_value={"000001"})
+        manager.source_factory = Mock()
+        manager.source_factory.get_adjustment_factors = AsyncMock(return_value=[])
+
+        result = await manager._batch_sync_adjustment_factors(
+            exchange="SZSE",
+            stocks=[{
+                "instrument_id": "000001.SZ",
+                "symbol": "000001",
+                "start_date": date(2026, 7, 31),
+                "end_date": date(2026, 7, 31),
+            }],
+            progress_log_every=0,
+            sync_reason="daily",
+        )
+
+        assert result["status"] == "partial"
+        assert result["failed"] == 1
+        assert result["reason"] == "factor_download_failures"
+
+    @pytest.mark.asyncio
     async def test_weekly_sync_respects_maintenance_policy(self):
         manager = DataManager()
         manager.config = Mock()

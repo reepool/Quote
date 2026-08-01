@@ -8,13 +8,13 @@
     "batch_size": 50,
     "download_chunk_days": 0,
     "adjustment_factor_governance": {
-      "read_dataset": "legacy",
-      "canonical_series_version": "a_share_event_product_v1",
-      "allow_legacy_fallback": true,
+      "read_dataset": "canonical",
+      "canonical_series_version": "a_share_cninfo_primary_v1",
+      "allow_legacy_fallback": false,
       "write_source_observations": true,
       "rebase_legacy_appends": true,
       "normalization_version": "event_ratio_v1",
-      "source_priority": ["akshare", "tdx_xdxr", "baostock"],
+      "source_priority": ["cninfo", "tdx_xdxr", "baostock_sina_composite"],
       "quality_thresholds": {
         "min_instrument_coverage_ratio": 0.99,
         "max_conflict_ratio": 0.001,

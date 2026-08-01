@@ -17,7 +17,7 @@ from sqlalchemy import (
     text, func, desc, asc, tuple_, literal, union_all, delete, update, case,
     and_, or_,
 )
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import aliased, sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
 
@@ -29,7 +29,9 @@ from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
     DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB,
     AdjustmentFactorObservationDB, AdjustmentFactorCanonicalDB,
-    AdjustmentFactorSeriesStatusDB, AdjustmentFactorInstrumentStatusDB,
+    AdjustmentFactorSeriesStatusDB, AdjustmentFactorDecisionDB,
+    AdjustmentFactorInstrumentStatusDB,
+    OperationalWatermarkDB,
     CorporateActionObservationDB, CorporateActionInstrumentStatusDB,
     CorporateActionEffectiveDateEvidenceDB,
     CorporateActionDocumentArtifactDB, CorporateActionDocumentPageDB,
@@ -7440,9 +7442,30 @@ class DatabaseOperations:
         series_version: str,
         report: Dict[str, Any],
     ) -> None:
+        from data_sources.a_share_canonical_operations import (
+            compact_canonical_report,
+            extract_canonical_report_decisions,
+        )
+
         async with self.get_async_session() as session:
             existing = await session.get(AdjustmentFactorSeriesStatusDB, series_version)
-            values = self._adjustment_factor_series_status_values(report)
+            candidate = report.get("candidate")
+            has_decision_collection = (
+                "decisions" in report
+                or (
+                    isinstance(candidate, Mapping)
+                    and "decisions" in candidate
+                )
+            )
+            if has_decision_collection:
+                await self._replace_adjustment_factor_decisions_in_session(
+                    session,
+                    series_version=series_version,
+                    decisions=extract_canonical_report_decisions(report),
+                )
+            values = self._adjustment_factor_series_status_values(
+                compact_canonical_report(report)
+            )
             if existing is None:
                 session.add(AdjustmentFactorSeriesStatusDB(series_version=series_version, **values))
             else:
@@ -7450,6 +7473,99 @@ class DatabaseOperations:
                     setattr(existing, key, value)
                 existing.updated_at = get_shanghai_time()
             await session.commit()
+
+    @staticmethod
+    def _adjustment_factor_decision_payload(
+        series_version: str,
+        decision: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        instrument_id = str(decision.get("instrument_id") or "").strip()
+        segment_id = str(decision.get("segment_id") or "").strip()
+        if not instrument_id or not segment_id:
+            raise ValueError(
+                "canonical decision requires instrument_id and segment_id"
+            )
+        return {
+            "series_version": series_version,
+            "instrument_id": instrument_id,
+            "segment_id": segment_id,
+            "start_date": DatabaseOperations._coerce_datetime(
+                decision.get("start_date")
+            ),
+            "end_date": DatabaseOperations._coerce_datetime(
+                decision.get("end_date")
+            ),
+            "selected_source": (
+                str(decision.get("selected_source") or "").strip() or None
+            ),
+            "confidence": str(
+                decision.get("confidence") or "unknown"
+            ).strip(),
+            "reason": str(decision.get("reason") or "").strip() or None,
+            "reset_at_start": bool(decision.get("reset_at_start")),
+            "decision_json": json.dumps(
+                dict(decision), ensure_ascii=True, default=str, sort_keys=True
+            ),
+        }
+
+    async def _replace_adjustment_factor_decisions_in_session(
+        self,
+        session: Any,
+        *,
+        series_version: str,
+        decisions: Sequence[Mapping[str, Any]],
+        instrument_ids: Optional[Sequence[str]] = None,
+    ) -> int:
+        filters = [
+            AdjustmentFactorDecisionDB.series_version == series_version
+        ]
+        if instrument_ids is not None:
+            affected = sorted({
+                str(value or "").strip() for value in instrument_ids
+                if str(value or "").strip()
+            })
+            if not affected:
+                return 0
+            filters.append(
+                AdjustmentFactorDecisionDB.instrument_id.in_(affected)
+            )
+        await session.execute(
+            delete(AdjustmentFactorDecisionDB).where(*filters)
+        )
+        saved = 0
+        identities: set[tuple[str, str]] = set()
+        for decision in decisions:
+            payload = self._adjustment_factor_decision_payload(
+                series_version, decision
+            )
+            identity = (payload["instrument_id"], payload["segment_id"])
+            if identity in identities:
+                raise ValueError(
+                    f"duplicate canonical decision identity: {identity}"
+                )
+            identities.add(identity)
+            session.add(AdjustmentFactorDecisionDB(**payload))
+            saved += 1
+        return saved
+
+    async def replace_adjustment_factor_decisions(
+        self,
+        decisions: Sequence[Mapping[str, Any]],
+        *,
+        series_version: str,
+        instrument_ids: Optional[Sequence[str]] = None,
+    ) -> int:
+        """Replace normalized decisions for a series or bounded instrument set."""
+
+        async with self.get_async_session() as session:
+            saved = await self._replace_adjustment_factor_decisions_in_session(
+                session,
+                series_version=series_version,
+                decisions=decisions,
+                instrument_ids=instrument_ids,
+            )
+            await session.commit()
+            return saved
 
     def _adjustment_factor_series_status_values(
         self,
@@ -7484,6 +7600,677 @@ class DatabaseOperations:
                 "status": row.status,
                 "promotion_eligible": bool(row.promotion_eligible),
             }
+
+    async def get_adjustment_factor_series_status_light(
+        self,
+        series_version: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return scalar series readiness without reading report_json."""
+
+        async with self.get_async_session() as session:
+            row = await session.get(AdjustmentFactorSeriesStatusDB, series_version)
+            if row is None:
+                return None
+            return {
+                "series_version": row.series_version,
+                "status": row.status,
+                "start_date": row.start_date,
+                "end_date": row.end_date,
+                "instrument_count": row.instrument_count,
+                "row_count": row.row_count,
+                "coverage_ratio": row.coverage_ratio,
+                "conflict_count": row.conflict_count,
+                "max_cumulative_error_pct": row.max_cumulative_error_pct,
+                "promotion_eligible": bool(row.promotion_eligible),
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            }
+
+    async def get_adjustment_factor_series_quality(
+        self,
+        series_version: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the bounded persisted quality report for an operator query."""
+
+        async with self.get_async_session() as session:
+            row = await session.get(AdjustmentFactorSeriesStatusDB, series_version)
+            if row is None:
+                return None
+            try:
+                report = json.loads(row.report_json or "{}")
+            except json.JSONDecodeError:
+                report = {"report_error": "invalid_json"}
+            else:
+                # Older series can still embed every source-selection decision.
+                # Keep the operator endpoint bounded until explicit migration.
+                from data_sources.a_share_canonical_operations import (
+                    compact_canonical_report,
+                )
+
+                report = compact_canonical_report(report)
+            return report | {
+                "series_version": row.series_version,
+                "status": row.status,
+                "start_date": row.start_date,
+                "end_date": row.end_date,
+                "instrument_count": row.instrument_count,
+                "row_count": row.row_count,
+                "coverage_ratio": row.coverage_ratio,
+                "conflict_count": row.conflict_count,
+                "max_cumulative_error_pct": row.max_cumulative_error_pct,
+                "promotion_eligible": bool(row.promotion_eligible),
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            }
+
+    async def list_adjustment_factor_series_versions(self) -> List[str]:
+        """Return available canonical series versions without report payloads."""
+
+        async with self.get_async_session() as session:
+            rows = (await session.execute(
+                select(AdjustmentFactorSeriesStatusDB.series_version).order_by(
+                    AdjustmentFactorSeriesStatusDB.updated_at.desc(),
+                    AdjustmentFactorSeriesStatusDB.series_version,
+                )
+            )).scalars().all()
+            return [str(value) for value in rows]
+
+    async def upsert_operational_watermark(
+        self,
+        *,
+        watermark_name: str,
+        status: str,
+        attempted_through: Union[date, datetime, str],
+        metadata: Optional[Mapping[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Record an attempt while advancing success only on full success."""
+
+        name = str(watermark_name or "").strip()
+        normalized_status = str(status or "").strip().lower()
+        if not name:
+            raise ValueError("watermark_name is required")
+        if normalized_status not in {"success", "failed", "partial"}:
+            raise ValueError("watermark status must be success, partial, or failed")
+        attempted = self._coerce_datetime(attempted_through)
+        completed_at = get_shanghai_time().replace(tzinfo=None)
+        async with self.get_async_session() as session:
+            row = (await session.execute(
+                select(OperationalWatermarkDB).where(
+                    OperationalWatermarkDB.watermark_name == name
+                )
+            )).scalar_one_or_none()
+            if row is None:
+                row = OperationalWatermarkDB(watermark_name=name)
+                session.add(row)
+            row.last_attempted_through = attempted
+            row.last_status = normalized_status
+            row.completed_at = completed_at
+            row.metadata_json = json.dumps(
+                dict(metadata or {}),
+                ensure_ascii=True,
+                default=str,
+                sort_keys=True,
+            )
+            if normalized_status == "success" and (
+                row.successful_through is None
+                or attempted > row.successful_through
+            ):
+                row.successful_through = attempted
+            row.updated_at = completed_at
+            result = {
+                "watermark_name": name,
+                "successful_through": row.successful_through,
+                "last_attempted_through": row.last_attempted_through,
+                "last_status": row.last_status,
+                "completed_at": row.completed_at,
+                "metadata": dict(metadata or {}),
+            }
+            await session.commit()
+            return result
+
+    async def get_operational_watermark(
+        self,
+        watermark_name: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Read one compact dependency watermark."""
+
+        name = str(watermark_name or "").strip()
+        async with self.get_async_session() as session:
+            row = (await session.execute(
+                select(OperationalWatermarkDB).where(
+                    OperationalWatermarkDB.watermark_name == name
+                )
+            )).scalar_one_or_none()
+            if row is None:
+                return None
+            try:
+                metadata = json.loads(row.metadata_json or "{}")
+            except json.JSONDecodeError:
+                metadata = {"metadata_error": "invalid_json"}
+            return {
+                "watermark_name": row.watermark_name,
+                "successful_through": row.successful_through,
+                "last_attempted_through": row.last_attempted_through,
+                "last_status": row.last_status,
+                "completed_at": row.completed_at,
+                "metadata": metadata,
+            }
+
+    @staticmethod
+    def _adjustment_factor_decision_dict(
+        row: AdjustmentFactorDecisionDB,
+    ) -> Dict[str, Any]:
+        try:
+            payload = json.loads(row.decision_json or "{}")
+        except json.JSONDecodeError:
+            payload = {}
+        return payload | {
+            "series_version": row.series_version,
+            "instrument_id": row.instrument_id,
+            "segment_id": row.segment_id,
+            "start_date": row.start_date,
+            "end_date": row.end_date,
+            "selected_source": row.selected_source,
+            "confidence": row.confidence,
+            "reason": row.reason,
+            "reset_at_start": bool(row.reset_at_start),
+        }
+
+    async def get_adjustment_factor_decisions(
+        self,
+        *,
+        series_version: str,
+        instrument_id: str,
+    ) -> List[Dict[str, Any]]:
+        """Return one instrument's decisions, including rollout compatibility."""
+
+        async with self.get_async_session() as session:
+            rows = (await session.execute(
+                select(AdjustmentFactorDecisionDB).where(
+                    AdjustmentFactorDecisionDB.series_version == series_version,
+                    AdjustmentFactorDecisionDB.instrument_id == instrument_id,
+                ).order_by(
+                    AdjustmentFactorDecisionDB.start_date,
+                    AdjustmentFactorDecisionDB.segment_id,
+                )
+            )).scalars().all()
+            if rows:
+                return [
+                    self._adjustment_factor_decision_dict(row) for row in rows
+                ]
+
+            # During the one-time normalized-decision rollout, an existing
+            # promoted series may still carry decisions only in report_json.
+            # Keep reads available until the explicit migration compacts it.
+            series_row = await session.get(
+                AdjustmentFactorSeriesStatusDB,
+                series_version,
+            )
+            if series_row is None:
+                return []
+            try:
+                from data_sources.a_share_canonical_operations import (
+                    extract_canonical_report_decisions,
+                )
+
+                report = json.loads(series_row.report_json or "{}")
+                legacy_decisions = extract_canonical_report_decisions(report)
+            except (json.JSONDecodeError, TypeError, ValueError) as exc:
+                self.db_logger.warning(
+                    "Failed to read legacy canonical decisions for %s: %s",
+                    series_version,
+                    exc,
+                )
+                return []
+            return [
+                {**decision, "series_version": series_version}
+                for decision in legacy_decisions
+                if str(decision.get("instrument_id") or "").strip()
+                == instrument_id
+            ]
+
+    async def get_adjustment_factor_decision_page(
+        self,
+        *,
+        series_version: str,
+        instrument_id: Optional[str] = None,
+        confidence: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return a bounded canonical decision page."""
+
+        async with self.get_async_session() as session:
+            filters = [
+                AdjustmentFactorDecisionDB.series_version == series_version
+            ]
+            if instrument_id:
+                filters.append(
+                    AdjustmentFactorDecisionDB.instrument_id == instrument_id
+                )
+            if confidence:
+                filters.append(
+                    AdjustmentFactorDecisionDB.confidence == confidence
+                )
+            total = int(await session.scalar(
+                select(func.count()).select_from(
+                    AdjustmentFactorDecisionDB
+                ).where(*filters)
+            ) or 0)
+            rows = (await session.execute(
+                select(AdjustmentFactorDecisionDB).where(*filters).order_by(
+                    AdjustmentFactorDecisionDB.instrument_id,
+                    AdjustmentFactorDecisionDB.start_date,
+                    AdjustmentFactorDecisionDB.segment_id,
+                ).offset(offset).limit(limit)
+            )).scalars().all()
+            items = [self._adjustment_factor_decision_dict(row) for row in rows]
+            if total == 0:
+                series_row = await session.get(
+                    AdjustmentFactorSeriesStatusDB,
+                    series_version,
+                )
+                if series_row is not None:
+                    try:
+                        from data_sources.a_share_canonical_operations import (
+                            extract_canonical_report_decisions,
+                        )
+
+                        report = json.loads(series_row.report_json or "{}")
+                        legacy_items = extract_canonical_report_decisions(report)
+                    except (json.JSONDecodeError, TypeError, ValueError) as exc:
+                        self.db_logger.warning(
+                            "Failed to page legacy canonical decisions for %s: %s",
+                            series_version,
+                            exc,
+                        )
+                        legacy_items = []
+                    if instrument_id:
+                        legacy_items = [
+                            item for item in legacy_items
+                            if str(item.get("instrument_id") or "").strip()
+                            == instrument_id
+                        ]
+                    if confidence:
+                        legacy_items = [
+                            item for item in legacy_items
+                            if str(item.get("confidence") or "").strip()
+                            == confidence
+                        ]
+                    legacy_items.sort(key=lambda item: (
+                        str(item.get("instrument_id") or ""),
+                        str(item.get("start_date") or ""),
+                        str(item.get("segment_id") or ""),
+                    ))
+                    total = len(legacy_items)
+                    items = [
+                        {**item, "series_version": series_version}
+                        for item in legacy_items[offset:offset + limit]
+                    ]
+            return {
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(items),
+                "has_more": offset + len(items) < total,
+                "items": items,
+            }
+
+    async def migrate_adjustment_factor_series_decisions(
+        self,
+        *,
+        series_versions: Sequence[str],
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Normalize legacy report decisions and compact reports atomically."""
+
+        from data_sources.a_share_canonical_operations import (
+            compact_canonical_report,
+            extract_canonical_report_decisions,
+        )
+
+        normalized_versions = sorted({
+            str(value or "").strip() for value in series_versions
+            if str(value or "").strip()
+        })
+        result: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "success",
+            "dry_run": bool(dry_run),
+            "confirmed": bool(confirm),
+            "versions": [],
+            "migrated_decisions": 0,
+            "compacted_reports": 0,
+        }
+        if not dry_run and not confirm:
+            raise ValueError("decision migration apply requires confirm=true")
+        async with self.get_async_session() as session:
+            for series_version in normalized_versions:
+                row = await session.get(
+                    AdjustmentFactorSeriesStatusDB, series_version
+                )
+                if row is None:
+                    result["versions"].append({
+                        "series_version": series_version,
+                        "status": "missing",
+                    })
+                    continue
+                try:
+                    report = json.loads(row.report_json or "{}")
+                except json.JSONDecodeError as exc:
+                    raise RuntimeError(
+                        f"invalid series report JSON for {series_version}"
+                    ) from exc
+                decisions = extract_canonical_report_decisions(report)
+                existing_count = int(await session.scalar(
+                    select(func.count()).select_from(
+                        AdjustmentFactorDecisionDB
+                    ).where(
+                        AdjustmentFactorDecisionDB.series_version
+                        == series_version
+                    )
+                ) or 0)
+                action = "already_compact"
+                if decisions:
+                    identities = {
+                        (
+                            str(item.get("instrument_id") or "").strip(),
+                            str(item.get("segment_id") or "").strip(),
+                        )
+                        for item in decisions
+                    }
+                    if (
+                        any(not instrument_id or not segment_id for instrument_id, segment_id in identities)
+                        or len(identities) != len(decisions)
+                    ):
+                        raise RuntimeError(
+                            f"decision identity validation failed for {series_version}"
+                        )
+                    action = "migrate"
+                    if not dry_run:
+                        saved = await self._replace_adjustment_factor_decisions_in_session(
+                            session,
+                            series_version=series_version,
+                            decisions=decisions,
+                        )
+                        await session.flush()
+                        persisted_count = int(await session.scalar(
+                            select(func.count()).select_from(
+                                AdjustmentFactorDecisionDB
+                            ).where(
+                                AdjustmentFactorDecisionDB.series_version
+                                == series_version
+                            )
+                        ) or 0)
+                        if saved != len(decisions) or persisted_count != len(decisions):
+                            raise RuntimeError(
+                                f"decision count validation failed for {series_version}"
+                            )
+                        persisted_identities = set((await session.execute(
+                            select(
+                                AdjustmentFactorDecisionDB.instrument_id,
+                                AdjustmentFactorDecisionDB.segment_id,
+                            ).where(
+                                AdjustmentFactorDecisionDB.series_version
+                                == series_version
+                            )
+                        )).all())
+                        if persisted_identities != identities:
+                            raise RuntimeError(
+                                f"decision identity verification failed for {series_version}"
+                            )
+                        persisted_payloads = {
+                            (instrument_id, segment_id): payload
+                            for instrument_id, segment_id, payload
+                            in (await session.execute(select(
+                                AdjustmentFactorDecisionDB.instrument_id,
+                                AdjustmentFactorDecisionDB.segment_id,
+                                AdjustmentFactorDecisionDB.decision_json,
+                            ).where(
+                                AdjustmentFactorDecisionDB.series_version
+                                == series_version
+                            ))).all()
+                        }
+                        expected_payloads = {
+                            (
+                                str(item.get("instrument_id") or "").strip(),
+                                str(item.get("segment_id") or "").strip(),
+                            ): json.dumps(
+                                dict(item),
+                                ensure_ascii=True,
+                                default=str,
+                                sort_keys=True,
+                            )
+                            for item in decisions
+                        }
+                        if persisted_payloads != expected_payloads:
+                            raise RuntimeError(
+                                f"decision payload verification failed for {series_version}"
+                            )
+                        compact = compact_canonical_report(report)
+                        row.report_json = json.dumps(
+                            compact, ensure_ascii=True, default=str, sort_keys=True
+                        )
+                        row.updated_at = get_shanghai_time()
+                        result["migrated_decisions"] += saved
+                        result["compacted_reports"] += 1
+                else:
+                    expected_count = report.get("decision_count")
+                    if (
+                        expected_count is not None
+                        and int(expected_count) != existing_count
+                    ):
+                        raise RuntimeError(
+                            "compacted decision count validation failed for "
+                            f"{series_version}: report={int(expected_count)}, "
+                            f"persisted={existing_count}"
+                        )
+                    compact = compact_canonical_report(report)
+                    if compact != report:
+                        action = "recompact"
+                        if not dry_run:
+                            row.report_json = json.dumps(
+                                compact,
+                                ensure_ascii=True,
+                                default=str,
+                                sort_keys=True,
+                            )
+                            row.updated_at = get_shanghai_time()
+                            result["compacted_reports"] += 1
+                result["versions"].append({
+                    "series_version": series_version,
+                    "status": action,
+                    "report_decisions": len(decisions),
+                    "existing_decisions": existing_count,
+                    "report_bytes": len((row.report_json or "").encode("utf-8")),
+                })
+            if dry_run:
+                await session.rollback()
+            else:
+                await session.commit()
+        if any(
+            item.get("status") == "missing"
+            for item in result["versions"]
+        ):
+            result["status"] = "partial"
+        return result
+
+    async def maintain_adjustment_factor_operational_storage(
+        self,
+        *,
+        active_series_version: str,
+        protected_series_versions: Optional[Sequence[str]] = None,
+        keep_recent_staging: int = 2,
+        keep_recent_benchmarks: int = 5,
+        endpoint_status_retention_days: int = 90,
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Preview or apply protected canonical operational retention."""
+
+        active_version = str(active_series_version or "").strip()
+        if not active_version:
+            raise ValueError("active_series_version is required")
+        if not dry_run and not confirm:
+            raise ValueError("retention apply requires confirm=true")
+        keep_staging = max(0, int(keep_recent_staging))
+        keep_benchmarks = max(0, int(keep_recent_benchmarks))
+        retention_days = max(1, int(endpoint_status_retention_days))
+        cutoff = get_shanghai_time().replace(tzinfo=None) - timedelta(
+            days=retention_days
+        )
+
+        async with self.get_async_session() as session:
+            series_rows = (await session.execute(
+                select(AdjustmentFactorSeriesStatusDB).order_by(
+                    AdjustmentFactorSeriesStatusDB.updated_at.desc(),
+                    AdjustmentFactorSeriesStatusDB.created_at.desc(),
+                )
+            )).scalars().all()
+            staging_rows = [
+                row for row in series_rows
+                if "__staging__" in row.series_version
+            ]
+            benchmark_rows = [
+                row for row in series_rows
+                if "__benchmark__" in row.series_version
+            ]
+            protected_versions = {
+                active_version,
+                *(
+                    str(value or "").strip()
+                    for value in (protected_series_versions or ())
+                    if str(value or "").strip()
+                ),
+            }
+            protected_versions.update(
+                row.series_version for row in staging_rows[:keep_staging]
+            )
+            protected_versions.update(
+                row.series_version for row in benchmark_rows[:keep_benchmarks]
+            )
+            candidate_versions = sorted({
+                row.series_version
+                for row in [*staging_rows, *benchmark_rows]
+                if row.series_version not in protected_versions
+            })
+
+            async def _count(model: Any, versions: Sequence[str]) -> int:
+                if not versions:
+                    return 0
+                return int(await session.scalar(
+                    select(func.count()).select_from(model).where(
+                        model.series_version.in_(versions)
+                    )
+                ) or 0)
+
+            factor_rows = await _count(
+                AdjustmentFactorCanonicalDB, candidate_versions
+            )
+            decision_rows = await _count(
+                AdjustmentFactorDecisionDB, candidate_versions
+            )
+            instrument_status_rows = await _count(
+                AdjustmentFactorInstrumentStatusDB, candidate_versions
+            )
+            report_bytes = sum(
+                len((row.report_json or "").encode("utf-8"))
+                for row in series_rows
+                if row.series_version in candidate_versions
+            )
+            ranked_endpoint_rows = select(
+                CorporateActionInstrumentStatusDB.id.label("id"),
+                func.row_number().over(
+                    partition_by=(
+                        CorporateActionInstrumentStatusDB.instrument_id,
+                        CorporateActionInstrumentStatusDB.source,
+                        CorporateActionInstrumentStatusDB.source_profile,
+                    ),
+                    order_by=(
+                        CorporateActionInstrumentStatusDB.last_attempt_at.desc(),
+                        CorporateActionInstrumentStatusDB.id.desc(),
+                    ),
+                ).label("recency_rank"),
+            ).subquery()
+            latest_endpoint_ids = select(
+                ranked_endpoint_rows.c.id
+            ).where(ranked_endpoint_rows.c.recency_rank == 1)
+            endpoint_row = aliased(CorporateActionInstrumentStatusDB)
+            covering_row = aliased(CorporateActionInstrumentStatusDB)
+            dominated_endpoint_ids = select(endpoint_row.id).where(
+                endpoint_row.last_attempt_at < cutoff,
+                endpoint_row.id.not_in(latest_endpoint_ids),
+                select(covering_row.id).where(
+                    covering_row.id != endpoint_row.id,
+                    covering_row.instrument_id == endpoint_row.instrument_id,
+                    covering_row.source == endpoint_row.source,
+                    covering_row.source_profile == endpoint_row.source_profile,
+                    covering_row.requested_start_date
+                    <= endpoint_row.requested_start_date,
+                    covering_row.requested_end_date
+                    >= endpoint_row.requested_end_date,
+                    covering_row.coverage_status.in_((
+                        "complete_with_events",
+                        "complete_no_events",
+                    )),
+                ).exists(),
+            )
+            endpoint_filter = CorporateActionInstrumentStatusDB.id.in_(
+                dominated_endpoint_ids
+            )
+            endpoint_status_rows = int(await session.scalar(
+                select(func.count()).select_from(
+                    CorporateActionInstrumentStatusDB
+                ).where(endpoint_filter)
+            ) or 0)
+            result = {
+                "status": "dry_run" if dry_run else "success",
+                "dry_run": bool(dry_run),
+                "confirmed": bool(confirm),
+                "active_series_version": active_version,
+                "protected_versions": sorted(protected_versions),
+                "candidate_versions": candidate_versions,
+                "candidate_counts": {
+                    "series_statuses": len(candidate_versions),
+                    "canonical_factors": factor_rows,
+                    "decisions": decision_rows,
+                    "instrument_statuses": instrument_status_rows,
+                    "endpoint_statuses": endpoint_status_rows,
+                    "report_bytes": report_bytes,
+                },
+                "policy": {
+                    "keep_recent_staging": keep_staging,
+                    "keep_recent_benchmarks": keep_benchmarks,
+                    "endpoint_status_retention_days": retention_days,
+                    "endpoint_latest_and_nondominated_intervals_protected": True,
+                },
+            }
+            if dry_run:
+                await session.rollback()
+                return result
+            if candidate_versions:
+                for model in (
+                    AdjustmentFactorCanonicalDB,
+                    AdjustmentFactorDecisionDB,
+                    AdjustmentFactorInstrumentStatusDB,
+                ):
+                    await session.execute(delete(model).where(
+                        model.series_version.in_(candidate_versions)
+                    ))
+                await session.execute(
+                    delete(AdjustmentFactorSeriesStatusDB).where(
+                        AdjustmentFactorSeriesStatusDB.series_version.in_(
+                            candidate_versions
+                        )
+                    )
+                )
+            await session.execute(
+                delete(CorporateActionInstrumentStatusDB).where(
+                    endpoint_filter
+                )
+            )
+            await session.commit()
+            return result
 
     async def replace_adjustment_factor_instrument_statuses(
         self,
@@ -7594,6 +8381,8 @@ class DatabaseOperations:
         canonical_row_count: int,
         canonical_instrument_ids: set[str],
         status_rows: Sequence[Mapping[str, Any]],
+        decision_count: int,
+        decision_instrument_ids: Optional[set[str]] = None,
         require_full_market: bool,
     ) -> List[str]:
         errors: List[str] = []
@@ -7711,8 +8500,42 @@ class DatabaseOperations:
             errors.append(
                 "event-bearing instrument coverage does not match canonical rows"
             )
+        normalized_decision_ids = {
+            str(value or "").strip()
+            for value in (decision_instrument_ids or set())
+            if str(value or "").strip()
+        }
+        covered_status_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in status_rows
+            if str(row.get("coverage_status") or "").strip()
+            in {"complete_with_events", "complete_no_events"}
+        } - {""}
+        if covered_status_ids != normalized_decision_ids:
+            errors.append(
+                "covered instrument scope does not match normalized decisions"
+            )
         if int(report.get("blocked_segment_count") or 0) != 0:
             errors.append("candidate contains blocked selection segments")
+        expected_decision_count = (
+            int(report.get("decision_count") or 0)
+            if (
+                report.get("decision_count") is not None
+                or report.get("decision_storage")
+                == "adjustment_factor_decisions"
+            )
+            else len(report.get("decisions") or [])
+            if "decisions" in report
+            else None
+        )
+        if (
+            expected_decision_count is not None
+            and expected_decision_count != decision_count
+        ):
+            errors.append(
+                "canonical decision count mismatch: "
+                f"report={expected_decision_count} persisted={decision_count}"
+            )
         return errors
 
     async def _inspect_canonical_candidate_in_session(
@@ -7738,6 +8561,7 @@ class DatabaseOperations:
                 "canonical_row_count": 0,
                 "canonical_instrument_ids": set(),
                 "instrument_status_count": 0,
+                "decision_count": 0,
                 "complete_with_events": 0,
                 "complete_no_events": 0,
             }
@@ -7775,6 +8599,25 @@ class DatabaseOperations:
                 ).distinct()
             )).scalars().all()
         }
+        decision_count = int(await session.scalar(
+            select(func.count()).select_from(
+                AdjustmentFactorDecisionDB
+            ).where(
+                AdjustmentFactorDecisionDB.series_version
+                == staging_series_version
+            )
+        ) or 0)
+        decision_instrument_ids = {
+            str(value)
+            for value in (await session.execute(
+                select(
+                    AdjustmentFactorDecisionDB.instrument_id
+                ).where(
+                    AdjustmentFactorDecisionDB.series_version
+                    == staging_series_version
+                ).distinct()
+            )).scalars().all()
+        }
         errors = self._canonical_candidate_validation_errors(
             staging_series_version=staging_series_version,
             target_series_version=target_series_version,
@@ -7783,6 +8626,8 @@ class DatabaseOperations:
             canonical_row_count=canonical_row_count,
             canonical_instrument_ids=canonical_instrument_ids,
             status_rows=status_rows,
+            decision_count=decision_count,
+            decision_instrument_ids=decision_instrument_ids,
             require_full_market=require_full_market,
         )
         return {
@@ -7795,6 +8640,7 @@ class DatabaseOperations:
             "canonical_row_count": canonical_row_count,
             "canonical_instrument_ids": canonical_instrument_ids,
             "instrument_status_count": len(status_rows),
+            "decision_count": decision_count,
             "complete_with_events": sum(
                 row["coverage_status"] == "complete_with_events"
                 for row in status_rows
@@ -7856,12 +8702,21 @@ class DatabaseOperations:
                 )
             )).scalars().all()
             staging_statuses = state["status_models"]
+            staging_decisions = (await session.execute(
+                select(AdjustmentFactorDecisionDB).where(
+                    AdjustmentFactorDecisionDB.series_version
+                    == staging_series_version
+                )
+            )).scalars().all()
 
             await session.execute(delete(AdjustmentFactorCanonicalDB).where(
                 AdjustmentFactorCanonicalDB.series_version == target_series_version
             ))
             await session.execute(delete(AdjustmentFactorInstrumentStatusDB).where(
                 AdjustmentFactorInstrumentStatusDB.series_version == target_series_version
+            ))
+            await session.execute(delete(AdjustmentFactorDecisionDB).where(
+                AdjustmentFactorDecisionDB.series_version == target_series_version
             ))
             for row in staging_rows:
                 session.add(AdjustmentFactorCanonicalDB(
@@ -7886,6 +8741,19 @@ class DatabaseOperations:
                     end_date=row.end_date,
                     ingestion_run_id=row.ingestion_run_id,
                 ))
+            for row in staging_decisions:
+                session.add(AdjustmentFactorDecisionDB(
+                    series_version=target_series_version,
+                    instrument_id=row.instrument_id,
+                    segment_id=row.segment_id,
+                    start_date=row.start_date,
+                    end_date=row.end_date,
+                    selected_source=row.selected_source,
+                    confidence=row.confidence,
+                    reason=row.reason,
+                    reset_at_start=row.reset_at_start,
+                    decision_json=row.decision_json,
+                ))
 
             target_report = {
                 **state["report"],
@@ -7900,6 +8768,10 @@ class DatabaseOperations:
                     "instrument_statuses": len(staging_statuses),
                 },
             }
+            from data_sources.a_share_canonical_operations import (
+                compact_canonical_report,
+            )
+            target_report = compact_canonical_report(target_report)
             existing = await session.get(
                 AdjustmentFactorSeriesStatusDB, target_series_version
             )
@@ -8045,6 +8917,53 @@ class DatabaseOperations:
                     + "; ".join(state["errors"])
                 )
 
+            from data_sources.a_share_canonical_operations import (
+                extract_canonical_report_decisions,
+            )
+
+            try:
+                target_report = json.loads(target_status.report_json or "{}")
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(
+                    "canonical target report contains invalid JSON"
+                ) from exc
+            legacy_decisions = extract_canonical_report_decisions(target_report)
+            if legacy_decisions:
+                saved = await self._replace_adjustment_factor_decisions_in_session(
+                    session,
+                    series_version=target_series_version,
+                    decisions=legacy_decisions,
+                )
+                await session.flush()
+                persisted_count = int(await session.scalar(
+                    select(func.count()).select_from(
+                        AdjustmentFactorDecisionDB
+                    ).where(
+                        AdjustmentFactorDecisionDB.series_version
+                        == target_series_version
+                    )
+                ) or 0)
+                if saved != len(legacy_decisions) or persisted_count != saved:
+                    raise RuntimeError(
+                        "canonical target decision migration failed before merge"
+                    )
+            else:
+                expected_decision_count = target_report.get("decision_count")
+                if expected_decision_count is not None:
+                    persisted_count = int(await session.scalar(
+                        select(func.count()).select_from(
+                            AdjustmentFactorDecisionDB
+                        ).where(
+                            AdjustmentFactorDecisionDB.series_version
+                            == target_series_version
+                        )
+                    ) or 0)
+                    if persisted_count != int(expected_decision_count):
+                        raise RuntimeError(
+                            "canonical target decision migration is incomplete "
+                            "before merge"
+                        )
+
             # Claim the target generation before deleting any rows.  SQLite
             # serializes this conditional UPDATE with other writers; a
             # concurrent promotion that changed updated_at makes rowcount zero
@@ -8074,6 +8993,12 @@ class DatabaseOperations:
                     == staging_series_version
                 )
             )).scalars().all()
+            staging_decision_models = (await session.execute(
+                select(AdjustmentFactorDecisionDB).where(
+                    AdjustmentFactorDecisionDB.series_version
+                    == staging_series_version
+                )
+            )).scalars().all()
             await session.execute(delete(AdjustmentFactorCanonicalDB).where(
                 AdjustmentFactorCanonicalDB.series_version
                 == target_series_version,
@@ -8087,6 +9012,11 @@ class DatabaseOperations:
                 AdjustmentFactorInstrumentStatusDB.instrument_id.in_(
                     expected_ids
                 ),
+            ))
+            await session.execute(delete(AdjustmentFactorDecisionDB).where(
+                AdjustmentFactorDecisionDB.series_version
+                == target_series_version,
+                AdjustmentFactorDecisionDB.instrument_id.in_(expected_ids),
             ))
             for row in staging_rows:
                 session.add(AdjustmentFactorCanonicalDB(
@@ -8111,31 +9041,32 @@ class DatabaseOperations:
                     end_date=row.end_date,
                     ingestion_run_id=row.ingestion_run_id,
                 ))
+            for row in staging_decision_models:
+                session.add(AdjustmentFactorDecisionDB(
+                    series_version=target_series_version,
+                    instrument_id=row.instrument_id,
+                    segment_id=row.segment_id,
+                    start_date=row.start_date,
+                    end_date=row.end_date,
+                    selected_source=row.selected_source,
+                    confidence=row.confidence,
+                    reason=row.reason,
+                    reset_at_start=row.reset_at_start,
+                    decision_json=row.decision_json,
+                ))
             await session.flush()
 
-            target_report = json.loads(target_status.report_json or "{}")
             staging_report = dict(state["report"])
-            prior_decisions = [
-                item
-                for item in (target_report.get("decisions") or [])
-                if str(item.get("instrument_id") or "").strip()
-                not in expected_id_set
-            ]
+            merged_decision_models = (await session.execute(
+                select(AdjustmentFactorDecisionDB).where(
+                    AdjustmentFactorDecisionDB.series_version
+                    == target_series_version
+                )
+            )).scalars().all()
             merged_decisions = [
-                *prior_decisions,
-                *(staging_report.get("decisions") or []),
+                self._adjustment_factor_decision_dict(row)
+                for row in merged_decision_models
             ]
-            selection_counts: Dict[str, int] = defaultdict(int)
-            confidence_counts: Dict[str, int] = defaultdict(int)
-            for decision in merged_decisions:
-                selected_source = str(
-                    decision.get("selected_source") or ""
-                ).strip()
-                confidence = str(decision.get("confidence") or "").strip()
-                if selected_source:
-                    selection_counts[selected_source] += 1
-                if confidence:
-                    confidence_counts[confidence] += 1
             row_count = int(await session.scalar(
                 select(func.count()).select_from(
                     AdjustmentFactorCanonicalDB
@@ -8152,6 +9083,25 @@ class DatabaseOperations:
                     == target_series_version
                 )
             ) or 0)
+            merged_status_models = (await session.execute(
+                select(AdjustmentFactorInstrumentStatusDB).where(
+                    AdjustmentFactorInstrumentStatusDB.series_version
+                    == target_series_version
+                )
+            )).scalars().all()
+            merged_status_rows = [{
+                "instrument_id": row.instrument_id,
+                "coverage_status": row.coverage_status,
+                "event_count": row.event_count,
+            } for row in merged_status_models]
+            from data_sources.a_share_canonical_operations import (
+                compact_canonical_report,
+                summarize_canonical_decisions,
+            )
+            merged_summary = summarize_canonical_decisions(
+                merged_decisions,
+                instrument_statuses=merged_status_rows,
+            )
             incremental_updates = list(
                 target_report.get("incremental_updates") or []
             )[-19:]
@@ -8163,6 +9113,7 @@ class DatabaseOperations:
             })
             updated_report = {
                 **target_report,
+                **merged_summary,
                 "status": "promoted",
                 "promotion_eligible": True,
                 "row_count": row_count,
@@ -8171,21 +9122,10 @@ class DatabaseOperations:
                     str(target_report.get("end_date") or ""),
                     str(staging_report.get("end_date") or ""),
                 ),
-                "decisions": merged_decisions,
-                "selection_counts": dict(sorted(selection_counts.items())),
-                "confidence_counts": dict(sorted(confidence_counts.items())),
-                "conflict_count": sum(
-                    confidence_counts.get(value, 0)
-                    for value in (
-                        "blocked",
-                        "low",
-                        "historical_single_source",
-                    )
-                ),
                 "incremental_updates": incremental_updates,
             }
             values = self._adjustment_factor_series_status_values(
-                updated_report
+                compact_canonical_report(updated_report)
             )
             values["row_count"] = row_count
             values["instrument_count"] = instrument_count

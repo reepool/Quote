@@ -949,3 +949,121 @@ async def test_update_daily_data_fetches_new_instrument_from_listed_date():
     )
     assert result['catchup_stats']['new_instrument_count'] == 1
     assert result['catchup_stats']['catchup_quotes_added'] == 1
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_marks_partial_quote_persistence_as_failure():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._batch_sync_adjustment_factors = AsyncMock(return_value={'synced': 0})
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '920083.BJ',
+        'symbol': '920083',
+        'exchange': 'BSE',
+        'type': 'stock',
+        'listed_date': datetime(2026, 6, 12),
+        'source_symbol': '920083',
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.db_ops.save_daily_quotes = AsyncMock(return_value={
+        'inserted': 0,
+        'changed': 0,
+        'unchanged': 0,
+        'skipped': 0,
+        'failed': 1,
+        'changelog_written': 0,
+    })
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[{
+        'instrument_id': '920083.BJ',
+        'time': datetime(2026, 6, 12),
+        'open': 1,
+        'high': 1,
+        'low': 1,
+        'close': 1,
+        'volume': 1,
+        'amount': 1,
+        'tradestatus': 1,
+        'factor': 1,
+    }])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['BSE'],
+            target_date=date(2026, 6, 15),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    assert result['failure_count'] == 1
+    assert result['success_count'] == 0
+    assert result['changelog_stats']['failed'] == 1
+    manager._batch_sync_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_preserves_results_when_watermark_write_fails():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._record_a_share_quote_composite_watermark = AsyncMock(
+        side_effect=RuntimeError('watermark unavailable')
+    )
+    manager._batch_sync_adjustment_factors = AsyncMock(return_value={'synced': 0})
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '920083.BJ',
+        'symbol': '920083',
+        'exchange': 'BSE',
+        'type': 'stock',
+        'listed_date': datetime(2026, 6, 12),
+        'source_symbol': '920083',
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.db_ops.save_daily_quotes = AsyncMock(return_value={
+        'inserted': 1,
+        'changed': 0,
+        'unchanged': 0,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 1,
+    })
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[{
+        'instrument_id': '920083.BJ',
+        'time': datetime(2026, 6, 12),
+        'open': 1,
+        'high': 1,
+        'low': 1,
+        'close': 1,
+        'volume': 1,
+        'amount': 1,
+        'tradestatus': 1,
+        'factor': 1,
+    }])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['BSE'],
+            target_date=date(2026, 6, 15),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    assert result['success_count'] == 1
+    assert result['failure_count'] == 0
+    assert result['total_quotes_added'] == 1
+    assert result['quote_composite_watermark'] == {
+        'status': 'failed',
+        'reason': 'watermark_persistence_failed',
+        'error': 'watermark unavailable',
+    }
+    manager._generate_daily_update_report.assert_awaited_once()

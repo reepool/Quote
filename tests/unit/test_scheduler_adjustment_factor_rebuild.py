@@ -9,6 +9,7 @@ from scheduler.tasks import (
     _format_a_share_canonical_factor_selection_report,
     _format_a_share_canonical_factor_promotion_report,
     _format_a_share_factor_rebuild_report,
+    _format_a_share_canonical_storage_report,
     _format_cninfo_primary_factor_report,
     data_manager,
 )
@@ -110,6 +111,37 @@ def test_canonical_promotion_job_is_manual_and_dry_run_first():
     assert job["parameters"]["activate_reads"] is True
 
 
+def test_canonical_storage_job_is_manual_preview_first():
+    config = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )
+    jobs = config["scheduler_config"]["jobs"]
+
+    assert jobs["a_share_adjustment_factor_rebuild"]["enabled"] is False
+    maintenance = jobs[
+        "a_share_canonical_adjustment_factor_storage_maintenance"
+    ]
+    assert maintenance["manual_only"] is True
+    assert maintenance["parameters"]["dry_run"] is True
+    assert maintenance["parameters"]["confirm"] is False
+
+
+def test_canonical_storage_report_is_bounded():
+    content = _format_a_share_canonical_storage_report({
+        "status": "dry_run",
+        "maintenance_operation": "retention",
+        "dry_run": True,
+        "confirmed": False,
+        "active_series_version": "v1",
+        "candidate_counts": {"series_statuses": 30, "report_bytes": 1000},
+        "candidate_versions": [f"v1__staging__{index}" for index in range(30)],
+    })
+
+    assert "series_statuses=30" in content
+    assert "v1__staging__19" in content
+    assert "v1__staging__20" not in content
+
+
 def test_canonical_promotion_report_separates_preflight_and_activation():
     content = _format_a_share_canonical_factor_promotion_report({
         "status": "partial",
@@ -178,6 +210,59 @@ async def test_scheduler_canonical_promotion_delegates_confirmation(monkeypatch)
     assert (
         "a_share_canonical_adjustment_factor_promotion"
         not in task._active_tasks
+    )
+
+
+@pytest.mark.asyncio
+async def test_scheduler_canonical_storage_delegates_confirmation(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    maintain = AsyncMock(return_value={
+        "status": "dry_run",
+        "maintenance_operation": "retention",
+        "dry_run": True,
+    })
+    monkeypatch.setattr(
+        data_manager,
+        "maintain_a_share_canonical_adjustment_factor_storage",
+        maintain,
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_storage_maintenance(
+        operation="retention",
+        dry_run=False,
+        confirm=True,
+    )
+
+    assert result["maintenance_operation"] == "retention"
+    assert maintain.await_args.kwargs["dry_run"] is False
+    assert maintain.await_args.kwargs["confirm"] is True
+
+
+@pytest.mark.asyncio
+async def test_scheduler_canonical_storage_reports_failure(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = True
+    task._send_task_report = AsyncMock(return_value=True)
+    monkeypatch.setattr(
+        data_manager,
+        "maintain_a_share_canonical_adjustment_factor_storage",
+        AsyncMock(side_effect=RuntimeError("storage unavailable")),
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_storage_maintenance(
+        operation="retention",
+        dry_run=False,
+        confirm=True,
+    )
+
+    assert result["status"] == "failed"
+    assert result["errors"] == ["storage unavailable"]
+    report = task._send_task_report.await_args.kwargs
+    assert report["report_data"]["status"] == "failed"
+    assert report["report_data"]["result"] == result
+    assert report["task_name"] == (
+        "a_share_canonical_adjustment_factor_storage_maintenance"
     )
 
 
@@ -293,18 +378,17 @@ async def test_scheduler_factor_rebuild_delegates_manual_parameters(monkeypatch)
         rebuild,
     )
 
-    result = await task.a_share_adjustment_factor_rebuild(
-        start_date="1990-12-19",
-        end_date="2026-07-16",
-        exchanges=["SZSE"],
-        instrument_ids=["000001.SZ"],
-        dry_run=True,
-        request_interval_seconds=1.5,
-    )
+    with pytest.raises(RuntimeError, match="deprecated"):
+        await task.a_share_adjustment_factor_rebuild(
+            start_date="1990-12-19",
+            end_date="2026-07-16",
+            exchanges=["SZSE"],
+            instrument_ids=["000001.SZ"],
+            dry_run=True,
+            request_interval_seconds=1.5,
+        )
 
-    assert result["status"] == "dry_run"
-    assert rebuild.await_args.kwargs["instrument_ids"] == ["000001.SZ"]
-    assert rebuild.await_args.kwargs["request_interval_seconds"] == 1.5
+    rebuild.assert_not_awaited()
     assert "a_share_adjustment_factor_rebuild" not in task._active_tasks
 
 

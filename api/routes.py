@@ -149,6 +149,31 @@ async def get_instrument_by_symbol(symbol: str):
         raise HTTPException(status_code=500, detail=f"Failed to get instrument: {str(e)}")
 
 
+def _resolve_adjustment_factor_series_version(
+    requested: Optional[str],
+) -> str:
+    """Resolve the active canonical version and fail on invalid activation."""
+
+    explicit = _normalize_optional_query(requested)
+    if explicit:
+        return str(explicit)
+    governance, activation = (
+        data_manager._effective_adjustment_factor_governance()
+    )
+    if not explicit and activation.get("error"):
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "canonical factor activation is invalid: "
+                + str(activation["error"])
+            ),
+        )
+    return str(
+        governance.get("canonical_series_version")
+        or "a_share_cninfo_primary_v1"
+    )
+
+
 @router.get(
     "/instruments/hkex/master/review-required",
     response_model=HKEXReviewRequiredResponse,
@@ -3673,7 +3698,7 @@ async def review_corporate_action_resolutions_batch(
 )
 async def get_canonical_adjustment_factors(
     instrument_id: Optional[str] = Query(None),
-    series_version: str = Query("a_share_event_product_v1"),
+    series_version: Optional[str] = Query(None),
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
     limit: int = Query(100, ge=1, le=1000),
@@ -3684,7 +3709,7 @@ async def get_canonical_adjustment_factors(
         convert_to_database_format(str(instrument_id).strip())
         if _normalize_optional_query(instrument_id) else None
     )
-    version = str(_query_default(series_version, "a_share_event_product_v1"))
+    version = _resolve_adjustment_factor_series_version(series_version)
     page = await data_manager.db_ops.get_canonical_adjustment_factor_page(
         series_version=version,
         instrument_id=normalized_id,
@@ -3712,11 +3737,13 @@ async def get_canonical_adjustment_factors(
     tags=["Corporate Actions"],
 )
 async def get_adjustment_factor_quality(
-    series_version: str = Query("a_share_event_product_v1"),
+    series_version: Optional[str] = Query(None),
 ):
     """Query canonical series quality and promotion eligibility."""
-    version = str(_query_default(series_version, "a_share_event_product_v1"))
-    report = await data_manager.db_ops.get_adjustment_factor_series_status(version)
+    version = _resolve_adjustment_factor_series_version(series_version)
+    report = await data_manager.db_ops.get_adjustment_factor_series_quality(
+        version
+    )
     if report is None:
         raise HTTPException(status_code=404, detail="factor series status not found")
     return AdjustmentFactorQualityResponse(
@@ -3724,6 +3751,45 @@ async def get_adjustment_factor_quality(
         status=str(report.get("status") or "unknown"),
         promotion_eligible=bool(report.get("promotion_eligible")),
         report=report,
+    )
+
+
+@router.get(
+    "/corporate-actions/adjustment-factor-decisions",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_adjustment_factor_decisions(
+    series_version: Optional[str] = Query(None),
+    instrument_id: Optional[str] = Query(None),
+    confidence: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query normalized canonical source-selection decisions."""
+
+    version = _resolve_adjustment_factor_series_version(series_version)
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id)
+        else None
+    )
+    page = await data_manager.db_ops.get_adjustment_factor_decision_page(
+        series_version=version,
+        instrument_id=normalized_id,
+        confidence=_normalize_optional_query(confidence),
+        limit=limit,
+        offset=offset,
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="adjustment_factor_decisions",
+        filters={
+            "series_version": version,
+            "instrument_id": normalized_id,
+            "confidence": _normalize_optional_query(confidence),
+        },
+        items=page.pop("items"),
+        **page,
     )
 
 

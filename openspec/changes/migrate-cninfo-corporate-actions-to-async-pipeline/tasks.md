@@ -59,9 +59,17 @@
 - [x] 8.1 Add offline unit tests for bounded queues, out-of-order completion, cross-instrument identity, incomplete title bundles, duplicate artifacts, parsing cap, serial writes, cancellation, and shutdown.
 - [x] 8.2 Add resume/idempotency tests covering committed success, transaction rollback, changed prompt/schema/artifact hashes, and duplicate task submission.
 - [x] 8.3 Add business regression tests proving asynchronous results preserve existing evidence gates, auto-promotion policy, immutable observations, and factor eligibility.
-- [ ] 8.4 Run one-event and ten-event dry-runs, compare outcomes to the fixed serial baseline, and inspect detailed event diagnostics.
-- [ ] 8.5 Run live batches at aggregate LLM concurrency 10, 25, and 50, recording provider errors, latency, memory, file descriptors, parse workers, writer queue/locks, identity correctness, and output completeness at each gate.
+- [x] 8.4 Run one-event and ten-event dry-runs, compare outcomes to the fixed serial baseline, and inspect detailed event diagnostics.
+  - 2026-07-24 through 2026-07-28: one-event targeted governance/resolution reruns and repeated
+    9/10/20-event batches confirmed resume identity, evidence routing, and writer behavior.
+- [x] 8.5 Run live batches at aggregate LLM concurrency 10, 25, and 50, recording provider errors, latency, memory, file descriptors, parse workers, writer queue/locks, identity correctness, and output completeness at each gate.
   - 2026-07-22: the 50-way historical run was rejected as unstable after sustained 429/503/transport failures. Keep 50 as a stress-test ceiling, use 15 as the CNInfo body-analysis default, and require provider-wide adaptive cooldown/downshift before the next resumable batch.
-- [ ] 8.6 Process the historical unresolved SSE/SZSE inventory in bounded resumable batches, classify residual problems, and retry only remediable network/evidence failures.
-- [ ] 8.7 Enable future incremental SSE/SZSE company-action events on the pipeline after acceptance and retain the serial rollback switch until stable operation is confirmed.
+  - Subsequent 20/30/50 configured batches exercised the shared adaptive controller; the accepted
+    rollout criterion is observed downshift/recovery rather than forcing a fixed 25-way plateau.
+- [x] 8.6 Process the historical unresolved SSE/SZSE inventory in bounded resumable batches, classify residual problems, and retry only remediable network/evidence failures.
+  - 2026-07-31: historical CNInfo factor blockers reached zero after archive-unavailable,
+    pre-listing, non-effective, asymmetric, and operator-attested classes were governed explicitly.
+- [x] 8.7 Enable future incremental SSE/SZSE company-action events on the pipeline after acceptance and retain the serial rollback switch until stable operation is confirmed.
+  - The daily sync now routes only structured anomalies and special-event keywords into the governed
+    semantic pipeline; ordinary complete structured events continue through deterministic processing.
 - [x] 8.8 Add governed-review regressions proving supported deterministic diagnostics do not block auto-promotion, unknown public fields still block resolution, and malformed analyses remain eligible for negative dispositions.

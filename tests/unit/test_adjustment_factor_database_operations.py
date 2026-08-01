@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.models import (
     AdjustmentFactorCanonicalDB,
+    AdjustmentFactorDecisionDB,
     AdjustmentFactorInstrumentStatusDB,
     AdjustmentFactorObservationDB,
     AdjustmentFactorSeriesStatusDB,
@@ -39,6 +40,29 @@ def _candidate_report(*, full_market: bool, row_count: int, instrument_count: in
     }
 
 
+def _decision_row(
+    series_version: str,
+    instrument_id: str,
+    selected_source: str,
+) -> AdjustmentFactorDecisionDB:
+    decision = {
+        "instrument_id": instrument_id,
+        "segment_id": f"{instrument_id}:1",
+        "selected_source": selected_source,
+        "confidence": "high",
+        "reason": "unit_consensus",
+    }
+    return AdjustmentFactorDecisionDB(
+        series_version=series_version,
+        instrument_id=instrument_id,
+        segment_id=decision["segment_id"],
+        selected_source=selected_source,
+        confidence="high",
+        reason="unit_consensus",
+        decision_json=json.dumps(decision),
+    )
+
+
 def test_candidate_validation_accepts_truncated_prefix_for_long_target():
     target = "a" * 64
     token = "0123456789abcdef"
@@ -62,6 +86,8 @@ def test_candidate_validation_accepts_truncated_prefix_for_long_target():
             "coverage_status": "complete_with_events",
             "event_count": 1,
         }],
+        decision_count=0,
+        decision_instrument_ids={"000001.SZ"},
         require_full_market=True,
     )
 
@@ -84,10 +110,102 @@ def test_candidate_validation_rejects_missing_persisted_gate():
             "coverage_status": "complete_with_events",
             "event_count": 1,
         }],
+        decision_count=0,
+        decision_instrument_ids={"000001.SZ"},
         require_full_market=True,
     )
 
     assert any("candidate_write_success" in error for error in errors)
+
+
+def test_candidate_validation_rejects_missing_normalized_decisions():
+    report = _candidate_report(
+        full_market=True,
+        row_count=1,
+        instrument_count=1,
+    )
+    report.update({
+        "decision_count": 1,
+        "decision_storage": "adjustment_factor_decisions",
+    })
+
+    errors = DatabaseOperations._canonical_candidate_validation_errors(
+        staging_series_version="v1__staging__unit",
+        target_series_version="v1",
+        persisted_status="validated_staging",
+        report=report,
+        canonical_row_count=1,
+        canonical_instrument_ids={"000001.SZ"},
+        status_rows=[{
+            "instrument_id": "000001.SZ",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+        }],
+        decision_count=0,
+        decision_instrument_ids=set(),
+        require_full_market=True,
+    )
+
+    assert any("decision count mismatch" in error for error in errors)
+
+
+def test_candidate_validation_rejects_legacy_report_without_decisions():
+    report = _candidate_report(
+        full_market=True,
+        row_count=1,
+        instrument_count=1,
+    )
+    report.pop("decisions")
+
+    errors = DatabaseOperations._canonical_candidate_validation_errors(
+        staging_series_version="v1__staging__unit",
+        target_series_version="v1",
+        persisted_status="validated_staging",
+        report=report,
+        canonical_row_count=1,
+        canonical_instrument_ids={"000001.SZ"},
+        status_rows=[{
+            "instrument_id": "000001.SZ",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+        }],
+        decision_count=0,
+        decision_instrument_ids=set(),
+        require_full_market=True,
+    )
+
+    assert any("normalized decisions" in error for error in errors)
+
+
+def test_candidate_validation_accepts_decision_for_complete_no_events_scope():
+    report = _candidate_report(
+        full_market=True,
+        row_count=0,
+        instrument_count=1,
+    )
+    report.update({
+        "decision_count": 1,
+        "decision_storage": "adjustment_factor_decisions",
+    })
+
+    errors = DatabaseOperations._canonical_candidate_validation_errors(
+        staging_series_version="v1__staging__unit",
+        target_series_version="v1",
+        persisted_status="validated_staging",
+        report=report,
+        canonical_row_count=0,
+        canonical_instrument_ids=set(),
+        status_rows=[{
+            "instrument_id": "000001.SZ",
+            "coverage_status": "complete_no_events",
+            "event_count": 0,
+        }],
+        decision_count=1,
+        decision_instrument_ids={"000001.SZ"},
+        require_full_market=True,
+    )
+
+    assert errors == []
 
 
 def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_path):
@@ -108,7 +226,9 @@ def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_pa
             "adjustment_factor_observations",
             "adjustment_factors_canonical",
             "adjustment_factor_series_status",
+            "adjustment_factor_decisions",
             "adjustment_factor_instrument_status",
+            "operational_watermarks",
         } <= tables
     finally:
         manager.close()
@@ -410,6 +530,7 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
             tables=[
                 InstrumentDB.__table__,
                 AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorDecisionDB.__table__,
                 AdjustmentFactorInstrumentStatusDB.__table__,
                 AdjustmentFactorSeriesStatusDB.__table__,
             ],
@@ -443,6 +564,11 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
             coverage_status="complete_with_events",
             event_count=1,
         ))
+        session.add(_decision_row(
+            "v1__staging__unit",
+            "000001.SZ",
+            "akshare",
+        ))
         session.add(AdjustmentFactorSeriesStatusDB(
             series_version="v1__staging__unit",
             status="validated_staging",
@@ -461,6 +587,8 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
                 "row_count": 1,
                 "instrument_count": 1,
                 "blocked_segment_count": 0,
+                "decision_count": 1,
+                "decision_storage": "adjustment_factor_decisions",
             }),
         ))
         session.add(AdjustmentFactorSeriesStatusDB(
@@ -509,6 +637,7 @@ async def test_promote_canonical_series_rejects_persisted_count_mismatch():
             tables=[
                 InstrumentDB.__table__,
                 AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorDecisionDB.__table__,
                 AdjustmentFactorInstrumentStatusDB.__table__,
                 AdjustmentFactorSeriesStatusDB.__table__,
             ],
@@ -564,7 +693,10 @@ async def test_promote_canonical_series_rejects_persisted_count_mismatch():
 
 
 @pytest.mark.asyncio
-async def test_incremental_merge_replaces_only_expected_instrument():
+@pytest.mark.parametrize("legacy_target", [False, True])
+async def test_incremental_merge_replaces_only_expected_instrument(
+    legacy_target,
+):
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
     async with engine.begin() as connection:
@@ -573,6 +705,7 @@ async def test_incremental_merge_replaces_only_expected_instrument():
             tables=[
                 InstrumentDB.__table__,
                 AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorDecisionDB.__table__,
                 AdjustmentFactorInstrumentStatusDB.__table__,
                 AdjustmentFactorSeriesStatusDB.__table__,
             ],
@@ -588,6 +721,7 @@ async def test_incremental_merge_replaces_only_expected_instrument():
                 currency="CNY",
                 is_active=True,
             ))
+        legacy_decisions = []
         for instrument_id, factor in (
             ("000001.SZ", 1.01),
             ("000002.SZ", 1.02),
@@ -610,6 +744,11 @@ async def test_incremental_merge_replaces_only_expected_instrument():
                 coverage_status="complete_with_events",
                 event_count=1,
             ))
+            decision_row = _decision_row("v1", instrument_id, "cninfo")
+            if legacy_target:
+                legacy_decisions.append(json.loads(decision_row.decision_json))
+            else:
+                session.add(decision_row)
         session.add(AdjustmentFactorSeriesStatusDB(
             series_version="v1",
             status="promoted",
@@ -621,7 +760,12 @@ async def test_incremental_merge_replaces_only_expected_instrument():
                 "promotion_eligible": True,
                 "row_count": 2,
                 "instrument_count": 2,
-                "decisions": [],
+                "decision_count": 2,
+                **(
+                    {"decisions": legacy_decisions}
+                    if legacy_target
+                    else {"decision_storage": "adjustment_factor_decisions"}
+                ),
             }),
         ))
         session.add(AdjustmentFactorCanonicalDB(
@@ -642,16 +786,26 @@ async def test_incremental_merge_replaces_only_expected_instrument():
             coverage_status="complete_with_events",
             event_count=1,
         ))
+        session.add(_decision_row(
+            "v1__staging__daily",
+            "000001.SZ",
+            "tdx",
+        ))
+        staging_report = _candidate_report(
+            full_market=False,
+            row_count=1,
+            instrument_count=1,
+        )
+        staging_report.update({
+            "decision_count": 1,
+            "decision_storage": "adjustment_factor_decisions",
+        })
         session.add(AdjustmentFactorSeriesStatusDB(
             series_version="v1__staging__daily",
             status="validated_incremental_staging",
             instrument_count=1,
             row_count=1,
-            report_json=json.dumps(_candidate_report(
-                full_market=False,
-                row_count=1,
-                instrument_count=1,
-            )),
+            report_json=json.dumps(staging_report),
         ))
         await session.commit()
 
@@ -670,6 +824,11 @@ async def test_incremental_merge_replaces_only_expected_instrument():
             ).order_by(AdjustmentFactorCanonicalDB.instrument_id)
         )).scalars().all()
         status = await session.get(AdjustmentFactorSeriesStatusDB, "v1")
+        decisions = (await session.execute(
+            select(AdjustmentFactorDecisionDB).where(
+                AdjustmentFactorDecisionDB.series_version == "v1"
+            ).order_by(AdjustmentFactorDecisionDB.instrument_id)
+        )).scalars().all()
 
     assert result["target_row_count"] == 2
     assert [(row.instrument_id, row.factor) for row in rows] == [
@@ -678,6 +837,11 @@ async def test_incremental_merge_replaces_only_expected_instrument():
     ]
     assert status.status == "promoted"
     assert status.promotion_eligible is True
+    assert [row.instrument_id for row in decisions] == [
+        "000001.SZ",
+        "000002.SZ",
+    ]
+    assert "decisions" not in json.loads(status.report_json)
     await engine.dispose()
 
 
@@ -691,6 +855,7 @@ async def test_incremental_merge_rejects_coverage_end_regression():
             tables=[
                 InstrumentDB.__table__,
                 AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorDecisionDB.__table__,
                 AdjustmentFactorInstrumentStatusDB.__table__,
                 AdjustmentFactorSeriesStatusDB.__table__,
             ],

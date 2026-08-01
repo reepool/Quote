@@ -233,9 +233,9 @@
         }
       },
       "a_share_adjustment_factor_rebuild": {
-        "enabled": true,
+        "enabled": false,
         "manual_only": true,
-        "description": "A股多源复权因子隔离回补、标准序列重建与质量验证（仅手工触发，默认 dry-run）",
+        "description": "已废弃：AkShare时代的A股复权因子重建入口，请使用CNInfo重建、三源选择和晋级任务",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -342,6 +342,26 @@
           "target_series_version": "a_share_cninfo_primary_v1",
           "action": "promote",
           "activate_reads": true,
+          "dry_run": true,
+          "confirm": false,
+          "max_runtime_seconds": 3600
+        }
+      },
+      "a_share_canonical_adjustment_factor_storage_maintenance": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股主复权因子决策迁移与存储保留维护（仅手工触发，默认预演）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "operation": "migrate_decisions",
+          "series_versions": [],
+          "keep_recent_staging": 2,
+          "keep_recent_benchmarks": 5,
+          "endpoint_status_retention_days": 90,
           "dry_run": true,
           "confirm": false,
           "max_runtime_seconds": 3600

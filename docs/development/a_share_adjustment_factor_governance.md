@@ -104,14 +104,10 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
 
 ### 3. 参考累计因子补足
 
-#### 3.1 定向预演
+#### 3.1 已废弃入口
 
-预演只统计股票池和已有 observation，不访问外部因子接口、不写数据库、也不创建
-checkpoint。
-
-```text
-/run a_share_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ source=akshare chunk_size=2 request_interval_seconds=1.0 resume=false dry_run=true
-```
+`a_share_adjustment_factor_rebuild` 是早期 AkShare 全历史回补入口，现已禁用。它会显式返回
+deprecated 错误，不再用于预演、日更或主因子选择。
 
 #### 3.2 现有复合路径维护
 
@@ -121,13 +117,9 @@ checkpoint。
 `BaoStock_Sina composite` 投票源。`adjustment_factors` 物理表名仅为兼容既有存储，
 不表示该路径已经淘汰。
 
-需要单独维护这条复合路径时，继续使用原有回补任务：
-
-```text
-/run a_share_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ source=akshare chunk_size=2 request_interval_seconds=1.0 resume=false build_canonical=false dry_run=false
-```
-
-该任务只负责现有路径维护。主因子选择任务不会调用它，也不会发起外部请求。
+这条复合路径由每日行情更新中的复权因子阶段续接，并由 `weekly_data_maintenance` 的
+`sync_adjustment_factors=true` 周维护覆盖近期窗口。主因子选择任务只读取已经落库的本地路径，
+不会调用已废弃入口，也不会为三源比较重新下载全历史行情。
 
 #### 3.3 本地三源定向预演
 
@@ -228,38 +220,46 @@ complete_no_events` 并纳入 benchmark 覆盖率；已有事件路径仍会作�
 质量查询：
 
 ```text
-GET /api/v1/corporate-actions/adjustment-factor-quality?series_version=a_share_event_product_v1
+GET /api/v1/corporate-actions/adjustment-factor-quality?series_version=a_share_cninfo_primary_v1
 GET /api/v1/corporate-actions/adjustment-factor-observations?instrument_id=000001.SZ&source=cninfo&source_profile=cninfo_event_derived_v1&limit=100
-GET /api/v1/corporate-actions/adjustment-factor-canonical?instrument_id=000001.SZ&series_version=a_share_event_product_v1&limit=100
+GET /api/v1/corporate-actions/adjustment-factor-canonical?instrument_id=000001.SZ&series_version=a_share_cninfo_primary_v1&limit=100
+GET /api/v1/corporate-actions/adjustment-factor-decisions?instrument_id=000001.SZ&limit=100
 ```
+
+质量接口返回有界汇总、覆盖指标和少量诊断样本；完整主源选择证据保存在
+`adjustment_factor_decisions`，应通过 decisions 接口按证券或分页读取。旧版本若仍只在
+`report_json` 内保存全市场决策，迁移期间会临时只抽取请求证券的旧决策；应尽快完成决策迁移，
+恢复普通的有界读取。若规范化表和旧报告都没有该证券的有效决策，调整行情读取会显式不可用，
+避免错误跨越法律主体或价格连续区间。
 
 ## 晋级与回滚
 
-默认配置保持：
+生产默认配置为：
 
 ```json
 {
-  "read_dataset": "legacy",
-  "canonical_series_version": "a_share_event_product_v1",
-  "allow_legacy_fallback": true
+  "read_dataset": "canonical",
+  "canonical_series_version": "a_share_cninfo_primary_v1",
+  "allow_legacy_fallback": false
 }
 ```
 
 默认 write 只写独立 observation 和由参数哈希标识的 benchmark 版本。显式三源选择只写
 staging 行、逐证券覆盖状态和候选状态，不执行 production promotion。只有候选
 `candidate_promotion_eligible=true`、最近一次日更成功且人工复核通过后，才能由独立的
-显式晋级操作更新目标 canonical 版本，并另行把 `read_dataset` 改为 `canonical`。
+显式晋级操作更新目标 canonical 版本，并在 `activate_reads=true` 时写入受校验的运行时激活清单。
 定向、部分完成或中断任务不能修改已晋级版本。报价 API 会在 `factor_metadata` 中披露
 请求数据集、实际数据集、版本、逐证券覆盖状态和 fallback 状态。
 
 候选阶段的回滚是停止后续晋级并保留 staging 证据，无需修改生产配置。生产晋级后的回滚
-只需把 `read_dataset` 改回兼容配置值 `legacy` 并重启应用。不要删除 CNInfo、TDX、
+必须通过 `a_share_canonical_adjustment_factor_promotion action=rollback` 显式确认切换到
+`baostock_sina_composite`，不能依赖无效激活清单或静默 fallback。不要删除 CNInfo、TDX、
 BaoStock/Sina observation、`adjustment_factors` 复合路径或 canonical 版本；保留这些
 证据用于追溯和复核。
 
 ## 已知限制
 
-- `BaoStock_Sina composite` 是既有累计路径，不是第三张官方事件表；来源切换时会保留
+- `BaoStock_Sina composite` 是既有累计路径，不是第三张官方事件表，也不声明 XDXR 事件完整；来源切换时会保留
   重基和基准冲突诊断，不能拆成 BaoStock、Sina 两个独立投票源。
 - TDX XDXR 也是待核对证据，不能单独证明无遗漏。
 - 官方公告能验证现金分红、送转和配股语义，但通常不直接提供完整累积复权序列。

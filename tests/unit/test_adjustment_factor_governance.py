@@ -371,7 +371,16 @@ async def test_factor_cache_uses_eligible_canonical_and_explicit_fallback():
     }
     manager.db_ops = Mock()
     manager.db_ops.get_adjustment_factor_series_status = AsyncMock(
-        return_value={"promotion_eligible": True}
+        return_value={
+            "promotion_eligible": True,
+            "decisions": [{
+                "instrument_id": "000001.SZ",
+                "segment_id": "000001.SZ:1",
+                "start_date": "1991-04-03",
+                "end_date": "2026-07-31",
+                "reset_at_start": False,
+            }],
+        }
     )
     manager.db_ops.get_adjustment_factor_instrument_status = AsyncMock(
         return_value={"coverage_status": "complete_with_events"}
@@ -384,7 +393,10 @@ async def test_factor_cache_uses_eligible_canonical_and_explicit_fallback():
     canonical = await manager.get_cached_adjustment_factor_bundle("000001.SZ")
 
     assert canonical["actual_dataset"] == "canonical"
-    assert canonical["factors"] == [{"factor": 1.1}]
+    assert canonical["factors"][0]["factor"] == 1.1
+    assert canonical["factors"][0]["continuity_segments"][0][
+        "segment_id"
+    ] == "000001.SZ:1"
     manager.db_ops.get_adjustment_factors.assert_not_awaited()
 
     manager._factor_cache = {}
@@ -409,6 +421,10 @@ async def test_factor_cache_distinguishes_complete_no_events_from_missing_covera
             "allow_legacy_fallback": False,
         }
     }
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        manager.data_config["adjustment_factor_governance"],
+        {"error": None, "source": "unit_test"},
+    ))
     manager.db_ops = Mock()
     manager.db_ops.get_adjustment_factor_series_status = AsyncMock(
         return_value={"promotion_eligible": True}
@@ -429,6 +445,33 @@ async def test_factor_cache_distinguishes_complete_no_events_from_missing_covera
     )
     missing = await manager.get_cached_adjustment_factor_bundle("000002.SZ")
     assert missing["availability_error"]
+
+
+@pytest.mark.asyncio
+async def test_non_a_share_factor_reads_keep_market_composite_path():
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        {
+            "read_dataset": "canonical",
+            "canonical_series_version": "a_share_cninfo_primary_v1",
+            "allow_legacy_fallback": False,
+        },
+        {"error": None, "source": "configured_default"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factors = AsyncMock(
+        return_value=[{"factor": 1.2}]
+    )
+    manager.db_ops.get_adjustment_factor_series_status_light = AsyncMock()
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("00700.HK")
+
+    assert bundle["requested_dataset"] == "canonical"
+    assert bundle["actual_dataset"] == "baostock_sina_composite"
+    assert bundle["factors"] == [{"factor": 1.2}]
+    assert bundle["availability_error"] is None
+    manager.db_ops.get_adjustment_factor_series_status_light.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -479,6 +522,316 @@ async def test_factor_cache_attaches_continuity_segments_from_series_report():
         "600018.SH:1",
         "600018.SH:2",
     ]
+
+
+@pytest.mark.asyncio
+async def test_factor_cache_uses_light_status_and_per_instrument_decisions():
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager.data_config = {
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+            "allow_legacy_fallback": False,
+        }
+    }
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        manager.data_config["adjustment_factor_governance"],
+        {"error": None, "source": "unit_test"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factor_series_status_light = AsyncMock(
+        return_value={"promotion_eligible": True}
+    )
+    manager.db_ops.get_adjustment_factor_series_status = AsyncMock()
+    manager.db_ops.get_adjustment_factor_instrument_status = AsyncMock(
+        return_value={"coverage_status": "complete_with_events"}
+    )
+    manager.db_ops.get_adjustment_factor_decisions = AsyncMock(return_value=[{
+        "instrument_id": "600018.SH",
+        "segment_id": "600018.SH:2",
+        "start_date": "2006-10-26",
+        "end_date": "2026-07-31",
+        "reset_at_start": True,
+    }])
+    manager.db_ops.get_canonical_adjustment_factors = AsyncMock(return_value=[{
+        "ex_date": datetime(2020, 1, 1),
+        "factor": 1.1,
+        "cumulative_factor": 1.1,
+    }])
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("600018.SH")
+
+    manager.db_ops.get_adjustment_factor_series_status.assert_not_awaited()
+    manager.db_ops.get_adjustment_factor_decisions.assert_awaited_once_with(
+        series_version="v1",
+        instrument_id="600018.SH",
+    )
+    assert bundle["factors"][0]["continuity_segments"][0][
+        "reset_at_start"
+    ] is True
+
+
+@pytest.mark.asyncio
+async def test_factor_cache_fails_closed_when_normalized_decisions_are_missing():
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager.data_config = {
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+            "allow_legacy_fallback": False,
+        }
+    }
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        manager.data_config["adjustment_factor_governance"],
+        {"error": None, "source": "unit_test"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factor_series_status_light = AsyncMock(
+        return_value={"promotion_eligible": True}
+    )
+    manager.db_ops.get_adjustment_factor_instrument_status = AsyncMock(
+        return_value={"coverage_status": "complete_with_events"}
+    )
+    manager.db_ops.get_canonical_adjustment_factors = AsyncMock(return_value=[{
+        "ex_date": datetime(2020, 1, 1),
+        "factor": 1.1,
+        "cumulative_factor": 1.1,
+    }])
+    manager.db_ops.get_adjustment_factor_decisions = AsyncMock(return_value=[])
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("000001.SZ")
+
+    assert bundle["factors"] == []
+    assert "decision migration" in bundle["availability_error"]
+
+
+@pytest.mark.asyncio
+async def test_predecessor_readiness_requires_each_requested_exchange():
+    manager = DataManager()
+    manager.db_ops = Mock()
+
+    async def load_watermark(name):
+        if name == "a_share_quote_baostock_sina:SSE":
+            return {"successful_through": date(2026, 7, 31)}
+        if name == "a_share_quote_baostock_sina":
+            return {
+                "successful_through": date(2026, 7, 31),
+                "metadata": {"exchanges": ["SSE"]},
+            }
+        return None
+
+    manager.db_ops.get_operational_watermark = AsyncMock(
+        side_effect=load_watermark
+    )
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE", "SZSE"],
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["reason"] == "predecessor_watermark_missing"
+    assert readiness["missing_exchanges"] == ["SZSE"]
+
+
+@pytest.mark.asyncio
+async def test_subset_quote_update_does_not_advance_aggregate_watermark():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 31)}
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 7, 31),
+        exchanges=["SSE"],
+        update_results={
+            "exchange_stats": {
+                "SSE": {"failure_count": 0},
+            },
+            "factor_stats": {
+                "SSE": {"status": "success", "failed": 0},
+            },
+        },
+    )
+
+    calls = manager.db_ops.upsert_operational_watermark.await_args_list
+    assert calls[0].kwargs["watermark_name"] == (
+        "a_share_quote_baostock_sina:SSE"
+    )
+    assert calls[0].kwargs["status"] == "success"
+    assert calls[0].kwargs["attempted_through"] == date(2026, 7, 31)
+    assert calls[1].kwargs["watermark_name"] == (
+        "a_share_quote_baostock_sina"
+    )
+    assert calls[1].kwargs["status"] == "partial"
+    assert result["status"] == "partial"
+
+
+@pytest.mark.asyncio
+async def test_quote_persistence_failure_keeps_predecessor_watermark_partial():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={
+            "SSE": date(2026, 7, 31),
+            "SZSE": date(2026, 7, 31),
+        }
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 8, 1),
+        exchanges=["SSE", "SZSE"],
+        update_results={
+            "exchange_stats": {
+                exchange: {
+                    "failure_count": 0,
+                    "changelog_stats": {"failed": int(exchange == "SZSE")},
+                }
+                for exchange in ("SSE", "SZSE")
+            },
+            "factor_stats": {
+                exchange: {"status": "success", "failed": 0}
+                for exchange in ("SSE", "SZSE")
+            },
+        },
+    )
+
+    calls = manager.db_ops.upsert_operational_watermark.await_args_list
+    assert calls[0].kwargs["status"] == "success"
+    assert calls[1].kwargs["status"] == "partial"
+    assert calls[2].kwargs["status"] == "partial"
+    assert result["status"] == "partial"
+    assert result["metadata"]["quote_cutoff_by_exchange"] == {
+        "SSE": "2026-07-31",
+        "SZSE": "2026-07-31",
+    }
+
+
+@pytest.mark.asyncio
+async def test_stale_persisted_quote_coverage_keeps_watermark_partial():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 30)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 7, 31),
+        exchanges=["SSE"],
+        update_results={
+            "exchange_stats": {"SSE": {"failure_count": 0}},
+            "factor_stats": {"SSE": {"status": "success", "failed": 0}},
+        },
+    )
+
+    first_call = manager.db_ops.upsert_operational_watermark.await_args_list[0]
+    assert first_call.kwargs["status"] == "partial"
+    assert first_call.kwargs["attempted_through"] == date(2026, 7, 30)
+    assert result["metadata"]["failure_reasons"] == [
+        "SSE:quote_persisted_coverage_stale"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_invalid_activation_never_silently_falls_back(tmp_path):
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager.data_config = {
+        "data_dir": str(tmp_path),
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+            "allow_legacy_fallback": True,
+        },
+    }
+    activation_path = resolve_factor_activation_path(tmp_path)
+    activation_path.parent.mkdir(parents=True, exist_ok=True)
+    activation_path.write_text("{invalid", encoding="utf-8")
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factors = AsyncMock(return_value=[
+        {"factor": 9.9}
+    ])
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("000001.SZ")
+
+    assert bundle["actual_dataset"] == "canonical"
+    assert "activation is invalid" in bundle["availability_error"]
+    manager.db_ops.get_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_invalid_activation_also_blocks_non_a_share_composite_routing():
+    manager = DataManager()
+    manager._factor_cache = {}
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        {
+            "read_dataset": "canonical",
+            "canonical_series_version": "a_share_cninfo_primary_v1",
+            "allow_legacy_fallback": False,
+        },
+        {"error": "invalid activation manifest", "source": "configured_default"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_adjustment_factors = AsyncMock(return_value=[
+        {"factor": 1.2}
+    ])
+
+    bundle = await manager.get_cached_adjustment_factor_bundle("00700.HK")
+
+    assert bundle["actual_dataset"] == "canonical"
+    assert "activation is invalid" in bundle["availability_error"]
+    assert bundle["factors"] == []
+    manager.db_ops.get_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_applied_decision_migration_invalidates_factor_cache():
+    manager = DataManager()
+    manager._factor_cache = {"canonical:v1:0:000001.SZ": (0.0, {})}
+    manager.data_config = {
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+        },
+    }
+    manager.db_ops = Mock()
+    manager.db_ops.list_adjustment_factor_series_versions = AsyncMock(
+        return_value=["v1"]
+    )
+    manager.db_ops.migrate_adjustment_factor_series_decisions = AsyncMock(
+        return_value={"status": "success", "dry_run": False}
+    )
+
+    result = await manager.maintain_a_share_canonical_adjustment_factor_storage(
+        operation="migrate_decisions",
+        series_versions=["v1"],
+        dry_run=False,
+        confirm=True,
+    )
+
+    assert result["status"] == "success"
+    assert manager._factor_cache == {}
 
 
 @pytest.mark.asyncio

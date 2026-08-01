@@ -363,6 +363,57 @@ class AdjustmentFactorSeriesStatusDB(Base):
     updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
 
 
+class AdjustmentFactorDecisionDB(Base):
+    """One canonical source-selection decision for a continuity segment."""
+    __tablename__ = 'adjustment_factor_decisions'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    series_version = Column(String(64), nullable=False, index=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    segment_id = Column(String(128), nullable=False)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+    selected_source = Column(String(32), nullable=True, index=True)
+    confidence = Column(String(32), nullable=False, default='unknown', index=True)
+    reason = Column(String(128), nullable=True)
+    reset_at_start = Column(Boolean, nullable=False, default=False)
+    decision_json = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'series_version', 'instrument_id', 'segment_id',
+            name='uq_adj_factor_decision_version_instrument_segment',
+        ),
+        Index(
+            'idx_adj_factor_decision_version_instrument',
+            'series_version', 'instrument_id', 'start_date',
+        ),
+    )
+
+
+class OperationalWatermarkDB(Base):
+    """Durable success watermark for dependent operational workflows."""
+    __tablename__ = 'operational_watermarks'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    watermark_name = Column(String(64), nullable=False, unique=True, index=True)
+    successful_through = Column(DateTime, nullable=True, index=True)
+    last_attempted_through = Column(DateTime, nullable=True)
+    last_status = Column(String(16), nullable=False, default='unknown', index=True)
+    completed_at = Column(DateTime, nullable=True)
+    metadata_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+
 class AdjustmentFactorInstrumentStatusDB(Base):
     """Per-instrument completeness state for one canonical series version."""
     __tablename__ = 'adjustment_factor_instrument_status'

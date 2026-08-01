@@ -104,7 +104,7 @@ async def test_observation_and_canonical_routes_forward_filters(monkeypatch):
 @pytest.mark.asyncio
 async def test_factor_quality_route_exposes_deferred_source_selection(monkeypatch):
     db_ops = SimpleNamespace(
-        get_adjustment_factor_series_status=AsyncMock(return_value={
+        get_adjustment_factor_series_quality=AsyncMock(return_value={
             "status": "benchmarked",
             "promotion_eligible": False,
             "source_selection_status": "deferred",
@@ -123,7 +123,7 @@ async def test_factor_quality_route_exposes_deferred_source_selection(monkeypatc
     assert response.status == "benchmarked"
     assert response.promotion_eligible is False
     assert response.report["source_selection_status"] == "deferred"
-    db_ops.get_adjustment_factor_series_status.assert_awaited_once_with(
+    db_ops.get_adjustment_factor_series_quality.assert_awaited_once_with(
         "benchmark-v1"
     )
 

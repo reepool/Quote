@@ -143,16 +143,20 @@ class DatabaseManager:
         """Create additive adjustment-factor governance tables on existing DBs."""
         from .models import (
             AdjustmentFactorCanonicalDB,
+            AdjustmentFactorDecisionDB,
             AdjustmentFactorInstrumentStatusDB,
             AdjustmentFactorObservationDB,
             AdjustmentFactorSeriesStatusDB,
+            OperationalWatermarkDB,
         )
 
         tables = (
             AdjustmentFactorObservationDB.__table__,
             AdjustmentFactorCanonicalDB.__table__,
             AdjustmentFactorSeriesStatusDB.__table__,
+            AdjustmentFactorDecisionDB.__table__,
             AdjustmentFactorInstrumentStatusDB.__table__,
+            OperationalWatermarkDB.__table__,
         )
         with self.sync_engine.begin() as connection:
             for table in tables:

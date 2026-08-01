@@ -1348,6 +1348,62 @@ def _format_a_share_canonical_factor_promotion_report(
     return "\n".join(lines)
 
 
+def _format_a_share_canonical_storage_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a bounded report for decision migration and retention."""
+
+    icon, label = _format_scheduler_status(result.get("status"))
+    counts = result.get("candidate_counts") or {}
+    versions = result.get("versions") or []
+    lines = [
+        f"{icon} *A 股主复权因子存储维护*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{result.get('status', 'unknown')}`",
+        f"操作: `{result.get('maintenance_operation')}`",
+        f"预演: `{bool(result.get('dry_run'))}`",
+        f"人工确认: `{bool(result.get('confirmed'))}`",
+        "活动版本: `"
+        f"{result.get('active_series_version') or 'N/A'}`",
+    ]
+    if versions:
+        lines.append(
+            "决策迁移: `"
+            f"versions={len(versions)}, "
+            f"decisions={result.get('migrated_decisions', 0)}, "
+            f"reports={result.get('compacted_reports', 0)}`"
+        )
+        lines.extend([
+            "版本样本:",
+            "```text",
+            *[
+                f"{item.get('series_version')}: "
+                f"{item.get('status')} decisions="
+                f"{item.get('report_decisions', 0)}"
+                for item in versions[:20]
+            ],
+            "```",
+        ])
+    if counts:
+        lines.append(
+            "保留候选: `"
+            + ", ".join(
+                f"{key}={value}" for key, value in counts.items()
+            )
+            + "`"
+        )
+        candidates = result.get("candidate_versions") or []
+        if candidates:
+            lines.extend([
+                "候选版本:",
+                "```text",
+                *[str(value) for value in candidates[:20]],
+                "```",
+            ])
+    return "\n".join(lines)
+
+
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
     """Return a compact operator summary for shared instrument master governance."""
     if not isinstance(governance, dict) or not governance:
@@ -4839,62 +4895,14 @@ class ScheduledTasks:
         build_canonical: bool = True,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
-        """Run the manual checkpointed A-share factor governance workflow."""
-        task_id = 'a_share_adjustment_factor_rebuild'
-        self._active_tasks.add(task_id)
-        try:
-            result = await data_manager.rebuild_a_share_adjustment_factor_governance(
-                start_date=start_date,
-                end_date=end_date,
-                exchanges=exchanges,
-                instrument_ids=instrument_ids,
-                source=source,
-                dry_run=dry_run,
-                resume=resume,
-                chunk_size=chunk_size,
-                request_interval_seconds=request_interval_seconds,
-                checkpoint_id=checkpoint_id,
-                build_canonical=build_canonical,
-            )
-            if self.telegram_enabled:
-                await self._send_task_report(
-                    report_data={
-                        'name': 'A 股复权因子重建与治理',
-                        'status': result.get('status'),
-                        'content': _format_a_share_factor_rebuild_report(result),
-                        'result': result,
-                    },
-                    report_type='maintenance_report',
-                    task_name=task_id,
-                    job_config=job_config,
-                )
-            return result
-        except Exception as exc:
-            scheduler_logger.exception(
-                "[Scheduler] A-share factor rebuild failed: %s", exc
-            )
-            failure = {
-                'status': 'failed',
-                'operation': task_id,
-                'dry_run': dry_run,
-                'error': str(exc),
-                'errors': [str(exc)],
-            }
-            if self.telegram_enabled:
-                await self._send_task_report(
-                    report_data={
-                        'name': 'A 股复权因子重建与治理',
-                        'status': 'failed',
-                        'content': _format_a_share_factor_rebuild_report(failure),
-                        'result': failure,
-                    },
-                    report_type='maintenance_report',
-                    task_name=task_id,
-                    job_config=job_config,
-                )
-            return failure
-        finally:
-            self._active_tasks.discard(task_id)
+        """Reject the obsolete AkShare-era rebuild entry point."""
+
+        raise RuntimeError(
+            "a_share_adjustment_factor_rebuild is deprecated; use "
+            "a_share_cninfo_adjustment_factor_rebuild, "
+            "a_share_canonical_adjustment_factor_selection, and "
+            "a_share_canonical_adjustment_factor_promotion"
+        )
 
     async def a_share_corporate_action_validation(
         self,
@@ -5809,6 +5817,82 @@ class ScheduledTasks:
                             _format_a_share_canonical_factor_promotion_report(
                                 failure
                             )
+                        ),
+                        "result": failure,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_canonical_adjustment_factor_storage_maintenance(
+        self,
+        operation: str = "migrate_decisions",
+        series_versions: Optional[List[str]] = None,
+        keep_recent_staging: int = 2,
+        keep_recent_benchmarks: int = 5,
+        endpoint_status_retention_days: int = 90,
+        dry_run: bool = True,
+        confirm: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Preview or apply canonical metadata migration and retention."""
+
+        task_id = "a_share_canonical_adjustment_factor_storage_maintenance"
+        self._active_tasks.add(task_id)
+        try:
+            result = (
+                await data_manager
+                .maintain_a_share_canonical_adjustment_factor_storage(
+                    operation=operation,
+                    series_versions=series_versions,
+                    keep_recent_staging=int(keep_recent_staging),
+                    keep_recent_benchmarks=int(keep_recent_benchmarks),
+                    endpoint_status_retention_days=int(
+                        endpoint_status_retention_days
+                    ),
+                    dry_run=bool(dry_run),
+                    confirm=bool(confirm),
+                )
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股主复权因子存储维护",
+                        "status": result.get("status"),
+                        "content": _format_a_share_canonical_storage_report(
+                            result
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Canonical factor storage maintenance failed: %s",
+                exc,
+            )
+            failure = {
+                "status": "failed",
+                "operation": task_id,
+                "maintenance_operation": operation,
+                "dry_run": bool(dry_run),
+                "confirmed": bool(confirm),
+                "errors": [str(exc)],
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股主复权因子存储维护",
+                        "status": "failed",
+                        "content": _format_a_share_canonical_storage_report(
+                            failure
                         ),
                         "result": failure,
                     },

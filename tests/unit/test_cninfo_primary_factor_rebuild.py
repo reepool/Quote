@@ -1384,7 +1384,7 @@ async def test_three_source_marks_missing_legacy_path_unavailable():
 
     coverage = result["source_completeness"]["baostock_sina_composite"]
     assert coverage["status"] == "partial"
-    assert coverage["available_instruments"] == 0
+    assert coverage["path_eligible_instruments"] == 0
     assert coverage["incomplete_instruments"] == 1
     assert result["candidate"]["decisions"][0]["eligible_sources"] == [
         "cninfo",
@@ -1422,6 +1422,8 @@ async def test_three_source_keeps_tdx_eligible_without_endpoint_audit_rows():
     assert result["candidate"]["row_count"] == 1
     assert result["candidate"]["selection_counts"] == {"cninfo": 1}
     assert result["candidate"]["confidence_counts"] == {"low": 1}
+    assert result["candidate"]["low_confidence_segment_count"] == 1
+    assert result["candidate"]["conflict_count"] == 0
     assert result["candidate"]["decisions"][0]["eligible_sources"] == [
         "cninfo",
         "tdx",
