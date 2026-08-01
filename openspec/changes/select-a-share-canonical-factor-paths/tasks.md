@@ -66,3 +66,14 @@
 - [x] 9.4 Use `BaoStock_Sina composite` in operator-facing and persisted selection provenance and emit independent bounded blocked decisions
 - [x] 9.5 Add selector, catalog, DataManager, and scheduler report regression tests
 - [x] 9.6 Run focused tests, Python compile, strict OpenSpec validation, uncommitted review, commit, and push
+
+## 10. Canonical Production Release and Daily Continuation
+
+- [x] 10.1 Extend proposal, design, and delta specs for explicit promotion, runtime activation, rollback, and daily continuation
+- [x] 10.2 Add strict persisted staging preflight and atomic stable-version promotion/targeted merge database operations
+- [x] 10.3 Add a validated runtime activation manifest and integrate canonical/composite read selection
+- [x] 10.4 Add the manual-only dry-run-first promotion/rollback scheduler task and bounded report
+- [x] 10.5 Extend daily corporate-action maintenance with active-canonical targeted selection, atomic merge, retry handling, and reporting
+- [x] 10.6 Add database, DataManager, activation, scheduler, and daily-maintenance regression tests
+- [x] 10.7 Update operator documentation and task configuration
+- [x] 10.8 Run focused tests, Python compile, strict OpenSpec validation, uncommitted review, commit, and push

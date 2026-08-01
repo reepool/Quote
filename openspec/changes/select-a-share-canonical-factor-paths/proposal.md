@@ -32,6 +32,15 @@ decision without introducing another full-market source download.
   source observations or automatically changing production reads.
 - Keep a dry-run-first, local-only manual task for three-source scoring, low-confidence
   conflicts, and promotion eligibility.
+- Add a separate dry-run-first manual promotion task that validates a full-market staging
+  candidate, atomically copies it to a stable canonical version, and activates production
+  reads only after explicit operator confirmation.
+- Persist canonical activation in a project-runtime manifest so activation survives a
+  restart without rewriting source-controlled configuration; support an explicit rollback
+  to the BaoStock-Sina composite read path.
+- Once canonical reads are active, extend daily corporate-action maintenance to rebuild a
+  three-source staging path only for affected or newly uncovered instruments and atomically
+  merge validated rows into the stable canonical version.
 - Bound zero-event coverage and continuity segments to each instrument's listed/delisted
   lifecycle instead of requiring impossible pre-listing or post-delisting evidence.
 - Allow an explicitly labelled low-confidence TDX historical fallback only for a completed
@@ -61,13 +70,16 @@ decision without introducing another full-market source download.
 - `data-source-routing`: A-share AkShare factor acquisition continues using the direct Sina
   `hfq-factor` endpoint to append sparse events to the rebased composite path.
 - `scheduler`: Operators can run local-only, dry-run-first three-source factor selection
-  without automatically promoting the production series.
+  without automatically promoting the production series, then use a separate confirmed
+  task for promotion or rollback.
 
 ## Impact
 
 - Factor acquisition: `data_sources/akshare_source.py`; the temporary A-share price-ratio
   adapter is removed.
 - Orchestration: `data_manager.py`, scheduler task parameters, reports, and configuration.
+- Runtime activation: a strictly validated manifest below `data/runtime/` records the
+  active canonical version or the BaoStock-Sina composite rollback state.
 - Storage: existing CNInfo and TDX observations, the existing `adjustment_factors`
   BaoStock-Sina composite
   table, and canonical staging tables; no new full-market provider snapshot is required.

@@ -933,6 +933,7 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     anomaly_counts = anomaly_llm.get("counts") or {}
     anomaly_promotion = anomaly_llm.get("auto_promotion") or {}
     anomaly_review = anomaly_llm.get("review_workload") or {}
+    canonical_maintenance = result.get("canonical_maintenance") or {}
     anomaly_reason_counts = anomaly.get("reason_counts") or {}
     anomaly_reason_summary = ",".join(
         f"{reason}:{count}"
@@ -943,7 +944,13 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         "",
         f"结论: *{label}*",
         f"状态: `{status}`",
-        f"生产表影响: `无`",
+        "生产表影响: `"
+        + (
+            "promoted canonical 定向更新"
+            if canonical_maintenance.get("merge")
+            else "无"
+        )
+        + "`",
         f"范围: `{parameters.get('start_date', 'N/A')}` 至 `{parameters.get('end_date', 'N/A')}`",
         f"市场: `{','.join(parameters.get('exchanges') or [])}`",
         f"CNInfo事件: `{(factor_result.get('source_events') or {}).get('cninfo_rows', 0)}`",
@@ -1041,7 +1048,20 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             "执行状态: `"
             f"cninfo_primary={execution_status.get('primary', status)}, "
             f"tdx_reference={execution_status.get('tdx_reference', 'N/A')}, "
-            f"reconciliation={execution_status.get('reconciliation', 'N/A')}"
+            f"reconciliation={execution_status.get('reconciliation', 'N/A')}, "
+            f"canonical={execution_status.get('canonical', 'inactive')}"
+            "`",
+            "Canonical日更: `"
+            f"status={canonical_maintenance.get('status', 'inactive')}, "
+            "series="
+            f"{canonical_maintenance.get('active_series_version') or 'N/A'}, "
+            f"scope={canonical_maintenance.get('scope_instrument_count', 0)}, "
+            "missing_coverage="
+            f"{canonical_maintenance.get('missing_coverage_count', 0)}, "
+            "merge_eligible="
+            f"{canonical_maintenance.get('incremental_merge_eligible', False)}, "
+            "merged_rows="
+            f"{(canonical_maintenance.get('merge') or {}).get('canonical_rows', 0)}"
             "`",
             "受影响标的: `"
             f"total={affected.get('count', 0)}, "
@@ -1090,6 +1110,8 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"cninfo={float(stage_durations.get('cninfo_refresh_seconds', 0) or 0):.1f}s, "
             f"tdx={float(stage_durations.get('tdx_refresh_seconds', 0) or 0):.1f}s, "
             f"factors={float(stage_durations.get('factor_rebuild_seconds', 0) or 0):.1f}s, "
+            "canonical="
+            f"{float(stage_durations.get('canonical_maintenance_seconds', 0) or 0):.1f}s, "
             f"llm={float(stage_durations.get('anomaly_llm_seconds', 0) or 0):.1f}s, "
             f"total={float(stage_durations.get('total_seconds', 0) or 0):.1f}s"
             "`",
@@ -1254,6 +1276,74 @@ def _format_a_share_canonical_factor_selection_report(
                 f"{item.get('start_date', '?')}..{item.get('end_date', '?')}: "
                 f"{item.get('reason', 'conflict')}"
             )
+        lines.append("```")
+    return "\n".join(lines)
+
+
+def _format_a_share_canonical_factor_promotion_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a bounded promotion, activation, or rollback report."""
+
+    status = str(result.get("status") or "unknown").lower()
+    label = {
+        "success": "完成",
+        "partial": "部分完成",
+        "dry_run": "预演完成",
+        "blocked": "阻塞",
+        "failed": "失败",
+    }.get(status, status)
+    parameters = result.get("parameters") or {}
+    preflight = result.get("preflight") or {}
+    freshness = preflight.get("freshness") or {}
+    promotion = result.get("promotion") or {}
+    activation = result.get("activation") or {}
+    lines = [
+        "ℹ️ *A 股主复权因子发布与回滚*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{status}`",
+        f"操作: `{result.get('action', 'promote')}`",
+        f"预演: `{bool(result.get('dry_run'))}`",
+        f"人工确认: `{bool(result.get('confirmed'))}`",
+        "staging: `"
+        f"{parameters.get('staging_series_version') or 'N/A'}`",
+        "稳定版本: `"
+        f"{parameters.get('target_series_version') or 'N/A'}`",
+        f"预检通过: `{bool(preflight.get('eligible'))}`",
+        "持久化计数: `"
+        f"rows={preflight.get('canonical_row_count', 0)}, "
+        f"instruments={preflight.get('instrument_status_count', 0)}, "
+        f"with_events={preflight.get('complete_with_events', 0)}, "
+        f"no_events={preflight.get('complete_no_events', 0)}`",
+    ]
+    if freshness:
+        lines.append(
+            "最新交易日门禁: `"
+            f"eligible={freshness.get('eligible', False)}, "
+            f"candidate_end={freshness.get('candidate_end_date')}, "
+            f"sessions={freshness.get('latest_completed_sessions')}`"
+        )
+    if promotion:
+        lines.append(
+            "原子晋级: `"
+            f"rows={promotion.get('canonical_rows', 0)}, "
+            f"instruments={promotion.get('instrument_statuses', 0)}`"
+        )
+    if activation:
+        lines.append(
+            "生产读取: `"
+            f"dataset={activation.get('read_dataset')}, "
+            "series="
+            f"{activation.get('canonical_series_version') or 'N/A'}`"
+        )
+    errors = [
+        *(preflight.get("errors") or []),
+        *(result.get("errors") or []),
+    ]
+    if errors:
+        lines.extend(["", "阻塞或错误:", "```text"])
+        lines.extend(str(error) for error in errors[:20])
         lines.append("```")
     return "\n".join(lines)
 
@@ -5649,6 +5739,87 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_id)
 
+    async def a_share_canonical_adjustment_factor_promotion(
+        self,
+        staging_series_version: Optional[str] = None,
+        target_series_version: str = "a_share_cninfo_primary_v1",
+        action: str = "promote",
+        activate_reads: bool = True,
+        dry_run: bool = True,
+        confirm: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Explicitly validate/promote/activate or roll back canonical reads."""
+
+        task_id = "a_share_canonical_adjustment_factor_promotion"
+        self._active_tasks.add(task_id)
+        try:
+            result = (
+                await data_manager
+                .promote_a_share_canonical_adjustment_factor_candidate(
+                    staging_series_version=staging_series_version,
+                    target_series_version=target_series_version,
+                    action=action,
+                    activate_reads=bool(activate_reads),
+                    dry_run=bool(dry_run),
+                    confirm=bool(confirm),
+                )
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股主复权因子发布与回滚",
+                        "status": result.get("status"),
+                        "content": (
+                            _format_a_share_canonical_factor_promotion_report(
+                                result
+                            )
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share canonical factor promotion failed: %s",
+                exc,
+            )
+            failure = {
+                "status": "failed",
+                "operation": task_id,
+                "action": str(action or "promote"),
+                "dry_run": bool(dry_run),
+                "confirmed": bool(confirm),
+                "parameters": {
+                    "staging_series_version": staging_series_version,
+                    "target_series_version": target_series_version,
+                    "activate_reads": bool(activate_reads),
+                },
+                "errors": [str(exc)],
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股主复权因子发布与回滚",
+                        "status": "failed",
+                        "content": (
+                            _format_a_share_canonical_factor_promotion_report(
+                                failure
+                            )
+                        ),
+                        "result": failure,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
     async def a_share_cninfo_corporate_action_daily_sync(
         self,
         start_date: Optional[Union[str, date, datetime]] = None,
@@ -5668,6 +5839,7 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
+        maintain_promoted_canonical: bool = True,
         series_version: str = "a_share_cninfo_primary_v1",
         anomaly_llm_enabled: bool = True,
         anomaly_llm_max_events: int = 50,
@@ -5705,6 +5877,9 @@ class ScheduledTasks:
                 request_interval_seconds=float(request_interval_seconds),
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 build_canonical=bool(build_canonical),
+                maintain_promoted_canonical=bool(
+                    maintain_promoted_canonical
+                ),
                 series_version=series_version,
                 anomaly_llm_enabled=bool(anomaly_llm_enabled),
                 anomaly_llm_max_events=int(anomaly_llm_max_events),

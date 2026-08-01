@@ -1234,6 +1234,8 @@ async def test_three_source_candidate_persists_staging_without_promotion():
 
     assert result["candidate"]["staging_series_version"]
     assert result["candidate"]["promoted"] is False
+    assert result["candidate"]["candidate_promotion_eligible"] is False
+    assert result["candidate"]["incremental_merge_eligible"] is True
     assert result["write_result"]["canonical_saved_rows"] == 1
     canonical_call = (
         manager.db_ops.replace_canonical_adjustment_factors.await_args
@@ -1244,6 +1246,12 @@ async def test_three_source_candidate_persists_staging_without_promotion():
     )
     manager.db_ops.replace_canonical_adjustment_factors.assert_awaited_once()
     manager.db_ops.list_adjustment_factor_observations.assert_not_awaited()
+    staging_status = (
+        manager.db_ops.upsert_adjustment_factor_series_status.await_args_list[
+            -1
+        ].args[1]
+    )
+    assert staging_status["status"] == "validated_incremental_staging"
 
 
 @pytest.mark.asyncio

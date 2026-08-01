@@ -29,6 +29,8 @@ instrument lineage metadata. Cumulative factors must reset at transitions marked
   consensus and special-action rules.
 - Produce versioned canonical staging rows, per-instrument selection evidence, bounded
   conflict samples, and promotion gates without changing production reads.
+- Promote an explicitly confirmed, current, full-market staging version atomically and
+  keep the stable canonical version current through affected-instrument daily merges.
 - Support local-only dry-run, targeted pilot, and repeatable operator execution.
 - Remove the unused Tencent/Eastmoney price-ratio implementation and its persisted state.
 - Keep endpoint-request coverage and cross-source differences visible as audit evidence
@@ -38,7 +40,7 @@ instrument lineage metadata. Cumulative factors must reset at transitions marked
 
 - Treating any provider as absolute truth or overwriting source observations.
 - Event-by-event source splicing inside one continuity segment.
-- Automatically promoting or changing `read_dataset`.
+- Automatically promoting or changing production reads from the selection task.
 - Recomputing special restructuring economics from market prices.
 - Downloading raw or adjusted price histories to derive the Sina factor path.
 - Downloading a separate full-market Sina history solely for canonical selection.
@@ -206,8 +208,47 @@ sample limit, and retain the other decision classes under their existing confide
 reason labels.
 
 The manual workflow reads all three local paths and builds a staging candidate.
-`build_canonical=true` never switches production reads. Explicit promotion remains a later
-operator decision.
+`build_canonical=true` never switches production reads.
+
+### Promote and activate only through a separate confirmed task
+
+The promotion task defaults to dry-run and accepts one exact staging version plus one
+stable target version. It validates the persisted staging state rather than trusting
+runtime arguments. A promotable full-market candidate must be `validated_staging`, carry
+`candidate_promotion_eligible=true`, have all blocking gates true, have no incomplete
+instrument status, and have row, event-count, and instrument-count totals that match the
+persisted report. The staging prefix must match the target stable version, and its end date
+must cover the latest completed SSE/SZSE trading session.
+
+A write requires `confirm=true`. The database operation rechecks the persisted staging
+state inside the same transaction that replaces the target rows and coverage statuses.
+After the target version is committed, the task optionally activates canonical reads by
+atomically replacing a strictly validated project-runtime manifest. Activation failure
+does not corrupt the promoted database version: the prior read path remains active and the
+task reports a partial result that can be safely retried.
+
+The runtime manifest records only `canonical` plus the stable series version, or
+`baostock_sina_composite` for rollback. It overrides the compatibility defaults in
+`config/03_data.json`, is read dynamically with bounded caching, and therefore survives a
+restart without modifying source-controlled configuration. Invalid manifests fail closed
+to the configured BaoStock-Sina compatibility path.
+
+### Continue the promoted canonical version during daily maintenance
+
+Daily source acquisition and independent CNInfo/TDX path rebuilding remain unchanged.
+When the runtime manifest activates a promoted canonical version, the daily task adds a
+final local-only three-source stage for affected instruments and active SSE/SZSE
+instruments missing canonical coverage. The targeted candidate is written to its own
+staging version. It may be merged only when every non-full-market blocking gate succeeds,
+no segment or instrument is incomplete, and the stable target is still promoted and
+active.
+
+The database merges only the targeted instruments in one transaction, preserving all
+other canonical rows. It replaces their coverage states, updates full decision provenance,
+recomputes stable row and instrument totals, and records bounded incremental history.
+Failure leaves the prior stable rows unchanged and carries the affected instruments into
+the existing retry queue. An inactive canonical manifest never causes the daily task to
+write the stable canonical version.
 
 ## Risks / Trade-offs
 
@@ -224,6 +265,12 @@ operator decision.
   preserve the conflict evidence and never apply the rule to active instruments.
 - [Reviewed override becomes stale] -> Require a complete non-empty selected path and
   preserve catalog version and reason; otherwise block instead of falling back silently.
+- [Staging report and rows diverge] -> Recount rows, statuses, and event totals before and
+  inside promotion; fail closed without touching the stable version.
+- [Daily targeted candidate fails] -> Preserve the previous stable rows and keep affected
+  instruments in the factor retry queue.
+- [Activation file is invalid or unwritable] -> Keep the prior read path active and report
+  the promoted-but-not-activated state explicitly.
 - [Home filesystem is read-only] -> Store BaoStock lock/quota state in project runtime
   storage rather than disabling the configured fallback source.
 - [Obsolete price-ratio rows exist] -> Delete only profiles and statuses owned by the
@@ -241,6 +288,9 @@ operator decision.
 6. Apply the reviewed source-override catalog and emit blocked-first reports.
 7. Re-run the full-market preview with lifecycle bounds, historical fallback, and the
    production default tolerance before writing staging.
+8. Dry-run the explicit promotion task, then confirm atomic promotion and canonical
+   activation.
+9. Verify one daily affected-instrument merge and the explicit composite rollback path.
 
-Rollback disables candidate construction. Existing CNInfo, TDX, and composite production
-reads remain available.
+Rollback writes the runtime activation manifest back to `baostock_sina_composite`.
+Existing CNInfo, TDX, composite, staging, and promoted canonical rows remain available.

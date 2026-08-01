@@ -7,6 +7,7 @@ import pytest
 from scheduler.tasks import (
     ScheduledTasks,
     _format_a_share_canonical_factor_selection_report,
+    _format_a_share_canonical_factor_promotion_report,
     _format_a_share_factor_rebuild_report,
     _format_cninfo_primary_factor_report,
     data_manager,
@@ -93,6 +94,91 @@ def test_three_source_selection_job_is_manual_dry_run_first():
     assert job["parameters"]["build_canonical"] is True
     assert job["parameters"]["exchanges"] == ["SSE", "SZSE"]
     assert job["max_instances"] == 1
+
+
+def test_canonical_promotion_job_is_manual_and_dry_run_first():
+    config = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )
+    job = config["scheduler_config"]["jobs"][
+        "a_share_canonical_adjustment_factor_promotion"
+    ]
+
+    assert job["manual_only"] is True
+    assert job["parameters"]["dry_run"] is True
+    assert job["parameters"]["confirm"] is False
+    assert job["parameters"]["activate_reads"] is True
+
+
+def test_canonical_promotion_report_separates_preflight_and_activation():
+    content = _format_a_share_canonical_factor_promotion_report({
+        "status": "partial",
+        "action": "promote",
+        "dry_run": False,
+        "confirmed": True,
+        "parameters": {
+            "staging_series_version": "v1__staging__unit",
+            "target_series_version": "v1",
+        },
+        "preflight": {
+            "eligible": True,
+            "canonical_row_count": 10,
+            "instrument_status_count": 2,
+            "complete_with_events": 2,
+            "complete_no_events": 0,
+            "freshness": {
+                "eligible": True,
+                "candidate_end_date": "2026-07-31",
+                "latest_completed_sessions": {
+                    "SSE": "2026-07-31",
+                    "SZSE": "2026-07-31",
+                },
+            },
+        },
+        "promotion": {"canonical_rows": 10, "instrument_statuses": 2},
+        "errors": ["activation failed"],
+    })
+
+    assert "预检通过: `True`" in content
+    assert "原子晋级: `rows=10, instruments=2`" in content
+    assert "阻塞或错误:" in content
+    assert "activation failed" in content
+
+
+@pytest.mark.asyncio
+async def test_scheduler_canonical_promotion_delegates_confirmation(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    promote = AsyncMock(return_value={
+        "status": "dry_run",
+        "action": "promote",
+        "dry_run": True,
+        "confirmed": False,
+        "parameters": {},
+        "preflight": {"eligible": True},
+    })
+    monkeypatch.setattr(
+        data_manager,
+        "promote_a_share_canonical_adjustment_factor_candidate",
+        promote,
+    )
+
+    result = await task.a_share_canonical_adjustment_factor_promotion(
+        staging_series_version="v1__staging__unit",
+        target_series_version="v1",
+        dry_run=True,
+        confirm=False,
+    )
+
+    assert result["status"] == "dry_run"
+    assert promote.await_args.kwargs["staging_series_version"] == (
+        "v1__staging__unit"
+    )
+    assert promote.await_args.kwargs["confirm"] is False
+    assert (
+        "a_share_canonical_adjustment_factor_promotion"
+        not in task._active_tasks
+    )
 
 
 def test_three_source_selection_report_is_bounded_and_auditable():

@@ -159,6 +159,7 @@ async def test_adjusted_quote_discloses_canonical_factor_metadata(monkeypatch):
         "series_version": "v1",
         "fallback_used": False,
         "availability_error": None,
+        "activation": None,
         "coverage_status": "complete_no_events",
     }
 

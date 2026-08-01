@@ -14,7 +14,8 @@ from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Mapping, Optional, Sequence, Union
 import pandas as pd
 from sqlalchemy import (
-    text, func, desc, asc, tuple_, literal, union_all, delete, case, and_, or_,
+    text, func, desc, asc, tuple_, literal, union_all, delete, update, case,
+    and_, or_,
 )
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
@@ -7583,29 +7584,278 @@ class DatabaseOperations:
                 "ingestion_run_id": row.ingestion_run_id,
             } for row in rows]
 
+    @staticmethod
+    def _canonical_candidate_validation_errors(
+        *,
+        staging_series_version: str,
+        target_series_version: str,
+        persisted_status: str,
+        report: Mapping[str, Any],
+        canonical_row_count: int,
+        canonical_instrument_ids: set[str],
+        status_rows: Sequence[Mapping[str, Any]],
+        require_full_market: bool,
+    ) -> List[str]:
+        errors: List[str] = []
+        if staging_series_version == target_series_version:
+            errors.append("staging and target series versions must differ")
+        staging_prefix, separator, staging_token = staging_series_version.partition(
+            "__staging__"
+        )
+        expected_prefix = (
+            target_series_version[
+                : 64 - len("__staging__") - len(staging_token)
+            ]
+            if separator and staging_token
+            else ""
+        )
+        if (
+            not separator
+            or not staging_token
+            or len(staging_series_version) > 64
+            or staging_prefix != expected_prefix
+        ):
+            errors.append("staging version does not belong to target version")
+
+        expected_status = (
+            "validated_staging"
+            if require_full_market
+            else "validated_incremental_staging"
+        )
+        if persisted_status != expected_status:
+            errors.append(
+                f"staging status must be {expected_status}, "
+                f"got {persisted_status or 'missing'}"
+            )
+        eligibility_key = (
+            "candidate_promotion_eligible"
+            if require_full_market
+            else "incremental_merge_eligible"
+        )
+        if not bool(report.get(eligibility_key)):
+            errors.append(f"{eligibility_key} is false")
+
+        gates = report.get("blocking_quality_gates") or {}
+        expected_gate_names = (
+            (
+                "full_market_scope",
+                "no_cninfo_pending_factor_events",
+                "no_historical_factor_gaps",
+                "no_unverified_tdx_fallback",
+                "no_blocked_selection_segments",
+                "candidate_write_success",
+            )
+            if require_full_market
+            else (
+                "no_cninfo_pending_factor_events",
+                "no_historical_factor_gaps",
+                "no_unverified_tdx_fallback",
+                "no_blocked_selection_segments",
+                "candidate_write_success",
+            )
+        )
+        missing = sorted(
+            gate_name
+            for gate_name in expected_gate_names
+            if gate_name not in gates
+        )
+        failed = sorted(
+            gate_name
+            for gate_name in expected_gate_names
+            if gate_name in gates and not bool(gates[gate_name])
+        )
+        if missing or failed:
+            errors.append(
+                "blocking quality gates are incomplete or failed: "
+                f"missing={missing or []}, failed={failed or []}"
+            )
+        if require_full_market and not bool(gates.get("full_market_scope")):
+            errors.append("candidate is not a full-market build")
+
+        report_row_count = int(report.get("row_count") or 0)
+        report_instrument_count = int(report.get("instrument_count") or 0)
+        if report_row_count != canonical_row_count:
+            errors.append(
+                "canonical row count mismatch: "
+                f"report={report_row_count} persisted={canonical_row_count}"
+            )
+        if report_instrument_count != len(status_rows):
+            errors.append(
+                "instrument status count mismatch: "
+                f"report={report_instrument_count} persisted={len(status_rows)}"
+            )
+
+        incomplete_ids = sorted({
+            str(row.get("instrument_id") or "").strip()
+            for row in status_rows
+            if str(row.get("coverage_status") or "").strip()
+            not in {"complete_with_events", "complete_no_events"}
+        } - {""})
+        if incomplete_ids:
+            errors.append(
+                f"incomplete instrument statuses: {incomplete_ids[:20]}"
+            )
+        event_count = sum(int(row.get("event_count") or 0) for row in status_rows)
+        if event_count != canonical_row_count:
+            errors.append(
+                "instrument event count mismatch: "
+                f"statuses={event_count} persisted={canonical_row_count}"
+            )
+        event_status_ids = {
+            str(row.get("instrument_id") or "").strip()
+            for row in status_rows
+            if str(row.get("coverage_status") or "").strip()
+            == "complete_with_events"
+        } - {""}
+        if event_status_ids != canonical_instrument_ids:
+            errors.append(
+                "event-bearing instrument coverage does not match canonical rows"
+            )
+        if int(report.get("blocked_segment_count") or 0) != 0:
+            errors.append("candidate contains blocked selection segments")
+        return errors
+
+    async def _inspect_canonical_candidate_in_session(
+        self,
+        session: Any,
+        *,
+        staging_series_version: str,
+        target_series_version: str,
+        require_full_market: bool,
+    ) -> Dict[str, Any]:
+        series_row = await session.get(
+            AdjustmentFactorSeriesStatusDB,
+            staging_series_version,
+        )
+        if series_row is None:
+            return {
+                "eligible": False,
+                "errors": ["staging series status is missing"],
+                "report": {},
+                "persisted_status": "missing",
+                "status_models": [],
+                "status_rows": [],
+                "canonical_row_count": 0,
+                "canonical_instrument_ids": set(),
+                "instrument_status_count": 0,
+                "complete_with_events": 0,
+                "complete_no_events": 0,
+            }
+        try:
+            report = json.loads(series_row.report_json or "{}")
+        except json.JSONDecodeError:
+            report = {}
+        status_models = (await session.execute(
+            select(AdjustmentFactorInstrumentStatusDB).where(
+                AdjustmentFactorInstrumentStatusDB.series_version
+                == staging_series_version
+            )
+        )).scalars().all()
+        status_rows = [{
+            "instrument_id": row.instrument_id,
+            "coverage_status": row.coverage_status,
+            "event_count": row.event_count,
+        } for row in status_models]
+        canonical_row_count = int(await session.scalar(
+            select(func.count()).select_from(
+                AdjustmentFactorCanonicalDB
+            ).where(
+                AdjustmentFactorCanonicalDB.series_version
+                == staging_series_version
+            )
+        ) or 0)
+        canonical_instrument_ids = {
+            str(value)
+            for value in (await session.execute(
+                select(
+                    AdjustmentFactorCanonicalDB.instrument_id
+                ).where(
+                    AdjustmentFactorCanonicalDB.series_version
+                    == staging_series_version
+                ).distinct()
+            )).scalars().all()
+        }
+        errors = self._canonical_candidate_validation_errors(
+            staging_series_version=staging_series_version,
+            target_series_version=target_series_version,
+            persisted_status=str(series_row.status or ""),
+            report=report,
+            canonical_row_count=canonical_row_count,
+            canonical_instrument_ids=canonical_instrument_ids,
+            status_rows=status_rows,
+            require_full_market=require_full_market,
+        )
+        return {
+            "eligible": not errors,
+            "errors": errors,
+            "report": report,
+            "persisted_status": str(series_row.status or ""),
+            "status_models": status_models,
+            "status_rows": status_rows,
+            "canonical_row_count": canonical_row_count,
+            "canonical_instrument_ids": canonical_instrument_ids,
+            "instrument_status_count": len(status_rows),
+            "complete_with_events": sum(
+                row["coverage_status"] == "complete_with_events"
+                for row in status_rows
+            ),
+            "complete_no_events": sum(
+                row["coverage_status"] == "complete_no_events"
+                for row in status_rows
+            ),
+        }
+
+    async def inspect_canonical_adjustment_factor_candidate(
+        self,
+        *,
+        staging_series_version: str,
+        target_series_version: str,
+        require_full_market: bool = True,
+    ) -> Dict[str, Any]:
+        """Recount and validate one persisted canonical staging candidate."""
+
+        async with self.get_async_session() as session:
+            state = await self._inspect_canonical_candidate_in_session(
+                session,
+                staging_series_version=staging_series_version,
+                target_series_version=target_series_version,
+                require_full_market=require_full_market,
+            )
+            return {
+                key: value
+                for key, value in state.items()
+                if key not in {
+                    "status_models",
+                    "canonical_instrument_ids",
+                }
+            }
+
     async def promote_canonical_adjustment_factor_series(
         self,
         *,
         staging_series_version: str,
         target_series_version: str,
-        report: Dict[str, Any],
+        report: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, int]:
         """Atomically replace one production series from a validated staging version."""
-        if staging_series_version == target_series_version:
-            raise ValueError("staging and target series versions must differ")
         async with self.get_async_session() as session:
+            state = await self._inspect_canonical_candidate_in_session(
+                session,
+                staging_series_version=staging_series_version,
+                target_series_version=target_series_version,
+                require_full_market=True,
+            )
+            if not state["eligible"]:
+                raise RuntimeError(
+                    "canonical promotion validation failed: "
+                    + "; ".join(state["errors"])
+                )
             staging_rows = (await session.execute(
                 select(AdjustmentFactorCanonicalDB).where(
                     AdjustmentFactorCanonicalDB.series_version == staging_series_version
                 )
             )).scalars().all()
-            staging_statuses = (await session.execute(
-                select(AdjustmentFactorInstrumentStatusDB).where(
-                    AdjustmentFactorInstrumentStatusDB.series_version == staging_series_version
-                )
-            )).scalars().all()
-            if not staging_statuses:
-                raise RuntimeError("staging series has no instrument coverage states")
+            staging_statuses = state["status_models"]
 
             await session.execute(delete(AdjustmentFactorCanonicalDB).where(
                 AdjustmentFactorCanonicalDB.series_version == target_series_version
@@ -7638,11 +7888,17 @@ class DatabaseOperations:
                 ))
 
             target_report = {
-                **report,
+                **state["report"],
                 "series_version": target_series_version,
                 "staging_series_version": staging_series_version,
                 "status": "promoted",
                 "promotion_eligible": True,
+                "promotion": {
+                    "staging_series_version": staging_series_version,
+                    "promoted_at": get_shanghai_time().isoformat(),
+                    "canonical_rows": len(staging_rows),
+                    "instrument_statuses": len(staging_statuses),
+                },
             }
             existing = await session.get(
                 AdjustmentFactorSeriesStatusDB, target_series_version
@@ -7661,6 +7917,287 @@ class DatabaseOperations:
             return {
                 "canonical_rows": len(staging_rows),
                 "instrument_statuses": len(staging_statuses),
+            }
+
+    async def merge_canonical_adjustment_factor_subset(
+        self,
+        *,
+        staging_series_version: str,
+        target_series_version: str,
+        expected_instrument_ids: Sequence[str],
+    ) -> Dict[str, int]:
+        """Atomically merge a validated targeted staging candidate."""
+
+        expected_ids = sorted({
+            str(value or "").strip()
+            for value in expected_instrument_ids
+            if str(value or "").strip()
+        })
+        if not expected_ids:
+            raise ValueError("expected_instrument_ids must not be empty")
+        expected_id_set = set(expected_ids)
+        async with self.get_async_session() as session:
+            state = await self._inspect_canonical_candidate_in_session(
+                session,
+                staging_series_version=staging_series_version,
+                target_series_version=target_series_version,
+                require_full_market=False,
+            )
+            staged_ids = sorted({
+                str(row.get("instrument_id") or "").strip()
+                for row in state["status_rows"]
+                if str(row.get("instrument_id") or "").strip()
+            })
+            if staged_ids != expected_ids:
+                state["errors"].append(
+                    "targeted staging scope does not match expected instruments"
+                )
+                state["eligible"] = False
+            target_status = await session.get(
+                AdjustmentFactorSeriesStatusDB,
+                target_series_version,
+            )
+            if (
+                target_status is None
+                or target_status.status != "promoted"
+                or not target_status.promotion_eligible
+            ):
+                state["errors"].append(
+                    "target canonical version is not promoted and active-ready"
+                )
+                state["eligible"] = False
+            target_generation = (
+                target_status.updated_at
+                if target_status is not None
+                else None
+            )
+            if target_status is not None and target_generation is None:
+                state["errors"].append(
+                    "target canonical version has no generation timestamp"
+                )
+                state["eligible"] = False
+            target_status_models = (await session.execute(
+                select(AdjustmentFactorInstrumentStatusDB).where(
+                    AdjustmentFactorInstrumentStatusDB.series_version
+                    == target_series_version,
+                    AdjustmentFactorInstrumentStatusDB.instrument_id.in_(
+                        expected_ids
+                    ),
+                )
+            )).scalars().all()
+            staged_status_by_id = {
+                row.instrument_id: row for row in state["status_models"]
+            }
+            target_status_by_id = {
+                row.instrument_id: row for row in target_status_models
+            }
+            missing_staged_ids = sorted(
+                expected_id_set - set(staged_status_by_id)
+            )
+            if missing_staged_ids:
+                state["errors"].append(
+                    "targeted staging coverage is missing instruments: "
+                    f"{missing_staged_ids[:20]}"
+                )
+                state["eligible"] = False
+            end_regressed_ids: List[str] = []
+            start_regressed_ids: List[str] = []
+            for instrument_id in expected_ids:
+                staged_status = staged_status_by_id.get(instrument_id)
+                target_status_row = target_status_by_id.get(instrument_id)
+                if staged_status is None or target_status_row is None:
+                    continue
+                target_end = self._coerce_date_value(
+                    target_status_row.end_date
+                )
+                staged_end = self._coerce_date_value(staged_status.end_date)
+                if (
+                    target_end is not None
+                    and (staged_end is None or staged_end < target_end)
+                ):
+                    end_regressed_ids.append(instrument_id)
+                target_start = self._coerce_date_value(
+                    target_status_row.start_date
+                )
+                staged_start = self._coerce_date_value(
+                    staged_status.start_date
+                )
+                if (
+                    target_start is not None
+                    and (staged_start is None or staged_start > target_start)
+                ):
+                    start_regressed_ids.append(instrument_id)
+            if end_regressed_ids:
+                state["errors"].append(
+                    "targeted staging coverage end regresses for instruments: "
+                    f"{end_regressed_ids[:20]}"
+                )
+                state["eligible"] = False
+            if start_regressed_ids:
+                state["errors"].append(
+                    "targeted staging coverage start regresses for instruments: "
+                    f"{start_regressed_ids[:20]}"
+                )
+                state["eligible"] = False
+            if not state["eligible"]:
+                raise RuntimeError(
+                    "canonical incremental merge validation failed: "
+                    + "; ".join(state["errors"])
+                )
+
+            # Claim the target generation before deleting any rows.  SQLite
+            # serializes this conditional UPDATE with other writers; a
+            # concurrent promotion that changed updated_at makes rowcount zero
+            # and the whole merge transaction is rolled back.
+            generation_timestamp = get_shanghai_time()
+            generation_update = await session.execute(
+                update(AdjustmentFactorSeriesStatusDB)
+                .where(
+                    AdjustmentFactorSeriesStatusDB.series_version
+                    == target_series_version,
+                    AdjustmentFactorSeriesStatusDB.status == "promoted",
+                    AdjustmentFactorSeriesStatusDB.promotion_eligible.is_(True),
+                    AdjustmentFactorSeriesStatusDB.updated_at
+                    == target_generation,
+                )
+                .values(updated_at=generation_timestamp)
+            )
+            if generation_update.rowcount != 1:
+                raise RuntimeError(
+                    "canonical target generation changed before incremental merge"
+                )
+            target_status.updated_at = generation_timestamp
+
+            staging_rows = (await session.execute(
+                select(AdjustmentFactorCanonicalDB).where(
+                    AdjustmentFactorCanonicalDB.series_version
+                    == staging_series_version
+                )
+            )).scalars().all()
+            await session.execute(delete(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.series_version
+                == target_series_version,
+                AdjustmentFactorCanonicalDB.instrument_id.in_(expected_ids),
+            ))
+            await session.execute(delete(
+                AdjustmentFactorInstrumentStatusDB
+            ).where(
+                AdjustmentFactorInstrumentStatusDB.series_version
+                == target_series_version,
+                AdjustmentFactorInstrumentStatusDB.instrument_id.in_(
+                    expected_ids
+                ),
+            ))
+            for row in staging_rows:
+                session.add(AdjustmentFactorCanonicalDB(
+                    instrument_id=row.instrument_id,
+                    ex_date=row.ex_date,
+                    series_version=target_series_version,
+                    factor=row.factor,
+                    cumulative_factor=row.cumulative_factor,
+                    selected_source=row.selected_source,
+                    source_profile=row.source_profile,
+                    quality_status=row.quality_status,
+                    evidence_count=row.evidence_count,
+                ))
+            for row in state["status_models"]:
+                session.add(AdjustmentFactorInstrumentStatusDB(
+                    instrument_id=row.instrument_id,
+                    series_version=target_series_version,
+                    source=row.source,
+                    coverage_status=row.coverage_status,
+                    event_count=row.event_count,
+                    start_date=row.start_date,
+                    end_date=row.end_date,
+                    ingestion_run_id=row.ingestion_run_id,
+                ))
+            await session.flush()
+
+            target_report = json.loads(target_status.report_json or "{}")
+            staging_report = dict(state["report"])
+            prior_decisions = [
+                item
+                for item in (target_report.get("decisions") or [])
+                if str(item.get("instrument_id") or "").strip()
+                not in expected_id_set
+            ]
+            merged_decisions = [
+                *prior_decisions,
+                *(staging_report.get("decisions") or []),
+            ]
+            selection_counts: Dict[str, int] = defaultdict(int)
+            confidence_counts: Dict[str, int] = defaultdict(int)
+            for decision in merged_decisions:
+                selected_source = str(
+                    decision.get("selected_source") or ""
+                ).strip()
+                confidence = str(decision.get("confidence") or "").strip()
+                if selected_source:
+                    selection_counts[selected_source] += 1
+                if confidence:
+                    confidence_counts[confidence] += 1
+            row_count = int(await session.scalar(
+                select(func.count()).select_from(
+                    AdjustmentFactorCanonicalDB
+                ).where(
+                    AdjustmentFactorCanonicalDB.series_version
+                    == target_series_version
+                )
+            ) or 0)
+            instrument_count = int(await session.scalar(
+                select(func.count()).select_from(
+                    AdjustmentFactorInstrumentStatusDB
+                ).where(
+                    AdjustmentFactorInstrumentStatusDB.series_version
+                    == target_series_version
+                )
+            ) or 0)
+            incremental_updates = list(
+                target_report.get("incremental_updates") or []
+            )[-19:]
+            incremental_updates.append({
+                "staging_series_version": staging_series_version,
+                "updated_at": get_shanghai_time().isoformat(),
+                "instrument_count": len(expected_ids),
+                "canonical_rows": len(staging_rows),
+            })
+            updated_report = {
+                **target_report,
+                "status": "promoted",
+                "promotion_eligible": True,
+                "row_count": row_count,
+                "instrument_count": instrument_count,
+                "end_date": max(
+                    str(target_report.get("end_date") or ""),
+                    str(staging_report.get("end_date") or ""),
+                ),
+                "decisions": merged_decisions,
+                "selection_counts": dict(sorted(selection_counts.items())),
+                "confidence_counts": dict(sorted(confidence_counts.items())),
+                "conflict_count": sum(
+                    confidence_counts.get(value, 0)
+                    for value in (
+                        "blocked",
+                        "low",
+                        "historical_single_source",
+                    )
+                ),
+                "incremental_updates": incremental_updates,
+            }
+            values = self._adjustment_factor_series_status_values(
+                updated_report
+            )
+            values["row_count"] = row_count
+            values["instrument_count"] = instrument_count
+            for key, value in values.items():
+                setattr(target_status, key, value)
+            target_status.updated_at = get_shanghai_time()
+            await session.commit()
+            return {
+                "canonical_rows": len(staging_rows),
+                "instrument_statuses": len(state["status_models"]),
+                "target_row_count": row_count,
+                "target_instrument_count": instrument_count,
             }
 
     async def prepare_legacy_factor_appends(

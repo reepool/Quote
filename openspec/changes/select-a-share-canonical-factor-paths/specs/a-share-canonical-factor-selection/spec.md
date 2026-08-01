@@ -278,3 +278,79 @@ MUST NOT change production reads or source paths.
 #### Scenario: Incomplete candidate write
 - **WHEN** canonical rows or instrument statuses are only partially written
 - **THEN** the candidate is not promotion-eligible
+
+### Requirement: Validated full-market canonical promotion
+The system SHALL promote a canonical staging version only through an explicit confirmed
+operation that revalidates persisted rows, coverage states, quality gates, scope, and
+freshness.
+
+#### Scenario: Promotion preview
+- **WHEN** an operator requests promotion with `dry_run=true`
+- **THEN** the system reports every promotion gate without changing the stable canonical
+  version or production read activation
+
+#### Scenario: Confirmed eligible promotion
+- **WHEN** a full-market staging version is current, all persisted blocking gates pass,
+  row and coverage counts agree, no instrument is incomplete, and `confirm=true`
+- **THEN** the system atomically replaces the stable canonical version and preserves the
+  staging version for audit
+
+#### Scenario: Staging persistence mismatch
+- **WHEN** the staging report row count, instrument count, summed event count, or persisted
+  coverage states disagree
+- **THEN** promotion fails before deleting or replacing any stable canonical row
+
+#### Scenario: Stale or targeted staging version
+- **WHEN** the staging candidate does not cover the full SSE/SZSE universe through the
+  latest completed trading session
+- **THEN** promotion remains blocked even if its selected rows contain no factor error
+
+### Requirement: Runtime canonical activation and rollback
+The system SHALL activate canonical reads through an atomic project-runtime manifest and
+SHALL support an explicit rollback to the BaoStock-Sina composite path.
+
+#### Scenario: Promotion and activation succeed
+- **WHEN** the stable canonical version is promoted and activation is requested
+- **THEN** subsequent factor reads use that canonical version and the choice survives an
+  application restart
+
+#### Scenario: Activation persistence fails
+- **WHEN** stable promotion succeeds but the activation manifest cannot be replaced
+- **THEN** the prior production read path remains active and the operation reports partial
+  completion without deleting the promoted version
+
+#### Scenario: Explicit composite rollback
+- **WHEN** an operator confirms rollback
+- **THEN** production reads return to the BaoStock-Sina composite path without deleting
+  any canonical or source evidence
+
+#### Scenario: Invalid activation manifest
+- **WHEN** the runtime manifest has an unsupported dataset, missing canonical version, or
+  invalid JSON
+- **THEN** factor reads fail closed to the configured compatibility path and expose the
+  activation error in provenance
+
+### Requirement: Atomic incremental canonical continuation
+The system SHALL maintain an active stable canonical version by atomically replacing only
+the affected instruments from a validated local three-source staging candidate.
+
+#### Scenario: Daily affected instruments are valid
+- **WHEN** daily maintenance changes corporate actions for an instrument and its targeted
+  candidate passes every applicable non-full-market blocking gate
+- **THEN** the stable canonical version replaces only that instrument's rows, coverage
+  state, and decision evidence
+
+#### Scenario: Newly listed instrument lacks canonical coverage
+- **WHEN** an active SSE/SZSE instrument has no status in the active canonical version
+- **THEN** daily maintenance includes it in the targeted local selection scope even when it
+  has no corporate-action event
+
+#### Scenario: Targeted candidate is blocked
+- **WHEN** any affected segment is blocked or a targeted write count is incomplete
+- **THEN** the stable canonical rows remain unchanged and the affected instrument stays in
+  the daily factor retry queue
+
+#### Scenario: Canonical reads are not active
+- **WHEN** production reads use the BaoStock-Sina composite path
+- **THEN** daily maintenance does not merge a targeted staging candidate into a stable
+  canonical version

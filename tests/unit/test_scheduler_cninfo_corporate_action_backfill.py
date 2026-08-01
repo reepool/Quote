@@ -286,6 +286,10 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
     assert maintenance.await_args.kwargs["tdx_refresh_mode"] == "targeted"
     assert maintenance.await_args.kwargs["tdx_rotating_sample_size"] == 100
     assert maintenance.await_args.kwargs["build_canonical"] is False
+    assert (
+        maintenance.await_args.kwargs["maintain_promoted_canonical"]
+        is True
+    )
     assert maintenance.await_args.kwargs["anomaly_llm_enabled"] is True
     assert maintenance.await_args.kwargs["anomaly_llm_max_events"] == 50
     assert (

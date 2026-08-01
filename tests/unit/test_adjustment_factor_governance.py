@@ -14,6 +14,11 @@ from data_sources.adjustment_factor_governance import (
     rebase_legacy_tail,
     reconcile_factor_events,
 )
+from data_sources.a_share_factor_activation import (
+    CANONICAL_DATASET,
+    load_factor_activation,
+    resolve_factor_activation_path,
+)
 
 
 def _observation(
@@ -477,6 +482,91 @@ async def test_factor_cache_attaches_continuity_segments_from_series_report():
 
 
 @pytest.mark.asyncio
+async def test_confirmed_canonical_promotion_activates_runtime_reads(tmp_path):
+    manager = DataManager()
+    manager.data_config = {
+        "data_dir": str(tmp_path),
+        "adjustment_factor_governance": {
+            "read_dataset": "legacy",
+            "canonical_series_version": "old",
+            "allow_legacy_fallback": True,
+        },
+    }
+    manager.db_ops = Mock()
+    manager.invalidate_factor_cache = Mock()
+    manager.db_ops.inspect_canonical_adjustment_factor_candidate = AsyncMock(
+        return_value={
+            "eligible": True,
+            "errors": [],
+            "report": {"end_date": date.today().isoformat()},
+            "canonical_row_count": 10,
+            "instrument_status_count": 2,
+        }
+    )
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date.today()
+    )
+    manager.db_ops.promote_canonical_adjustment_factor_series = AsyncMock(
+        return_value={"canonical_rows": 10, "instrument_statuses": 2}
+    )
+
+    result = (
+        await manager
+        .promote_a_share_canonical_adjustment_factor_candidate(
+            staging_series_version="v1__staging__unit",
+            target_series_version="v1",
+            dry_run=False,
+            confirm=True,
+        )
+    )
+
+    activation = load_factor_activation(
+        resolve_factor_activation_path(tmp_path)
+    )
+    assert result["status"] == "success"
+    assert activation is not None
+    assert activation.read_dataset == CANONICAL_DATASET
+    assert activation.canonical_series_version == "v1"
+    manager.db_ops.promote_canonical_adjustment_factor_series.assert_awaited_once()
+    assert manager.invalidate_factor_cache.call_count >= 2
+
+
+@pytest.mark.asyncio
+async def test_canonical_promotion_preview_never_writes(tmp_path):
+    manager = DataManager()
+    manager.data_config = {
+        "data_dir": str(tmp_path),
+        "adjustment_factor_governance": {"read_dataset": "legacy"},
+    }
+    manager.db_ops = Mock()
+    manager.db_ops.inspect_canonical_adjustment_factor_candidate = AsyncMock(
+        return_value={
+            "eligible": True,
+            "errors": [],
+            "report": {"end_date": date.today().isoformat()},
+        }
+    )
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date.today()
+    )
+    manager.db_ops.promote_canonical_adjustment_factor_series = AsyncMock()
+
+    result = (
+        await manager
+        .promote_a_share_canonical_adjustment_factor_candidate(
+            staging_series_version="v1__staging__unit",
+            target_series_version="v1",
+            dry_run=True,
+            confirm=False,
+        )
+    )
+
+    assert result["status"] == "dry_run"
+    assert not resolve_factor_activation_path(tmp_path).exists()
+    manager.db_ops.promote_canonical_adjustment_factor_series.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_factor_rebuild_dry_run_does_not_create_checkpoint(tmp_path):
     manager = DataManager()
     manager.data_config = {
@@ -803,3 +893,12 @@ async def test_full_market_rebuild_promotes_staging_version_only_after_gates_pas
     promote_kwargs = manager.db_ops.promote_canonical_adjustment_factor_series.await_args.kwargs
     assert promote_kwargs["staging_series_version"] == replace_kwargs["series_version"]
     assert promote_kwargs["target_series_version"] == "a_share_event_product_v1"
+    staging_reports = [
+        call.args[1]
+        for call in manager.db_ops.upsert_adjustment_factor_series_status.await_args_list
+        if "__staging__" in str(call.args[0])
+    ]
+    assert staging_reports
+    assert staging_reports[-1]["status"] == "validated_staging"
+    assert staging_reports[-1]["candidate_promotion_eligible"] is True
+    assert staging_reports[-1]["blocking_quality_gates"]["candidate_write_success"] is True

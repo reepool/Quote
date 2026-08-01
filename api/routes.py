@@ -3859,7 +3859,7 @@ async def get_daily_quotes(
                 key: factor_bundle.get(key)
                 for key in (
                     "requested_dataset", "actual_dataset", "series_version",
-                    "fallback_used", "availability_error",
+                    "fallback_used", "availability_error", "activation",
                 )
             }
             factor_metadata["coverage_status"] = (

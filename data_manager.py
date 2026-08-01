@@ -186,6 +186,15 @@ class DataManager:
         # TTL = 1 小时, 适用于 API 高频查询场景
         self._factor_cache: Dict[str, tuple] = {}
         self._FACTOR_CACHE_TTL: float = 3600.0  # 秒
+        self._factor_activation_signature: Optional[
+            Tuple[bool, Optional[int], Optional[int]]
+        ] = None
+        self._factor_activation = None
+        self._factor_activation_error: Optional[str] = None
+        # Serialize canonical promotion and targeted daily merges in-process.
+        # The database layer also performs a target-generation compare-and-swap
+        # so a second process cannot silently overwrite a newer promotion.
+        self._canonical_mutation_lock = asyncio.Lock()
         self._dcf_run_cache: Dict[str, Dict[str, Any]] = {}
 
     def refresh_runtime_config(self) -> None:
@@ -198,6 +207,10 @@ class DataManager:
             self.data_config.get('data_dir', 'data'),
             'download_progress.json',
         )
+        self._factor_activation_signature = None
+        self._factor_activation = None
+        self._factor_activation_error = None
+        self.invalidate_factor_cache()
 
     def _get_or_create_llm_client(self):
         """Return the application-owned common LLM client."""
@@ -344,13 +357,72 @@ class DataManager:
         bundle = await self.get_cached_adjustment_factor_bundle(instrument_id)
         return bundle["factors"]
 
+    def _effective_adjustment_factor_governance(
+        self,
+    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Merge configured defaults with the validated runtime activation."""
+
+        from data_sources.a_share_factor_activation import (
+            FactorActivationError,
+            load_factor_activation,
+            resolve_factor_activation_path,
+        )
+
+        governance = dict(
+            self.data_config.get("adjustment_factor_governance") or {}
+        )
+        path = resolve_factor_activation_path(
+            self.data_config.get("data_dir", "data")
+        )
+        try:
+            stat = path.stat()
+            signature = (True, stat.st_mtime_ns, stat.st_size)
+        except FileNotFoundError:
+            signature = (False, None, None)
+        if signature != self._factor_activation_signature:
+            try:
+                self._factor_activation = load_factor_activation(path)
+                self._factor_activation_error = None
+            except FactorActivationError as exc:
+                self._factor_activation = None
+                self._factor_activation_error = str(exc)
+                dm_logger.error(
+                    "[DataManager] Invalid factor activation manifest; "
+                    "using configured compatibility path: %s",
+                    exc,
+                )
+            self._factor_activation_signature = signature
+            self.invalidate_factor_cache()
+
+        metadata = {
+            "path": str(path),
+            "source": (
+                "runtime_manifest"
+                if self._factor_activation is not None
+                else "configured_default"
+            ),
+            "error": self._factor_activation_error,
+        }
+        if self._factor_activation is not None:
+            governance["read_dataset"] = (
+                self._factor_activation.read_dataset
+            )
+            if self._factor_activation.canonical_series_version:
+                governance["canonical_series_version"] = (
+                    self._factor_activation.canonical_series_version
+                )
+            metadata.update(self._factor_activation.as_dict())
+        return governance, metadata
+
     async def get_cached_adjustment_factor_bundle(
         self, instrument_id: str
     ) -> Dict[str, Any]:
         """Return factors plus the configured dataset/version provenance."""
         import time
 
-        governance = self.data_config.get("adjustment_factor_governance", {})
+        governance, activation_metadata = (
+            self._effective_adjustment_factor_governance()
+        )
         requested_dataset = str(governance.get("read_dataset", "legacy")).lower()
         series_version = str(
             governance.get("canonical_series_version", "a_share_event_product_v1")
@@ -440,9 +512,17 @@ class DataManager:
                 actual_dataset = "legacy"
                 fallback_used = True
                 availability_error = None
-        else:
+        elif requested_dataset in {
+            "legacy",
+            "baostock_sina_composite",
+        }:
             factors = await self.db_ops.get_adjustment_factors(instrument_id)
-            actual_dataset = "legacy"
+            actual_dataset = requested_dataset
+        else:
+            raise ValueError(
+                f"unsupported adjustment-factor read dataset: "
+                f"{requested_dataset}"
+            )
 
         bundle = {
             "factors": factors,
@@ -453,6 +533,7 @@ class DataManager:
             "availability_error": availability_error,
             "series_status": series_status,
             "instrument_status": instrument_status,
+            "activation": activation_metadata,
         }
         self._factor_cache[cache_key] = (now, bundle)
         return bundle
@@ -17342,6 +17423,7 @@ class DataManager:
             "target_series_version": target_series_version,
             "staging_series_version": staging_series_version,
         })
+        candidate_write_success = True
         if build_canonical:
             event_counts: Dict[str, int] = {}
             for row in canonical_rows:
@@ -17375,18 +17457,61 @@ class DataManager:
                     instrument_ids=target_ids,
                 )
             )
+            candidate_write_success = (
+                canonical_summary["saved_rows"] == len(canonical_rows)
+                and canonical_summary["saved_instrument_statuses"]
+                == len(instrument_status_rows)
+            )
+            blocking_quality_gates = {
+                "full_market_scope": bool(
+                    quality_gates.get("full_market_scope")
+                ),
+                "no_cninfo_pending_factor_events": bool(
+                    quality_gates.get("coverage")
+                    and quality_gates.get("no_download_errors")
+                ),
+                "no_historical_factor_gaps": bool(
+                    quality_gates.get("coverage")
+                ),
+                "no_unverified_tdx_fallback": bool(
+                    quality_gates.get("tdx_event_reconciliation")
+                ),
+                "no_blocked_selection_segments": bool(
+                    quality_gates.get("source_internal_consistency")
+                    and quality_gates.get(
+                        "tdx_adjusted_price_equivalence"
+                    )
+                ),
+                "candidate_write_success": candidate_write_success,
+            }
             staging_report = {
                 **canonical_summary,
-                "status": "validated_staging" if promotion_eligible else "partial",
-                "candidate_promotion_eligible": promotion_eligible,
+                "status": (
+                    "validated_staging"
+                    if promotion_eligible and candidate_write_success
+                    else "partial"
+                ),
+                "blocking_quality_gates": blocking_quality_gates,
+                "candidate_promotion_eligible": (
+                    promotion_eligible and candidate_write_success
+                ),
+                "blocked_segment_count": 0,
                 "promotion_eligible": False,
             }
             await self.db_ops.upsert_adjustment_factor_series_status(
                 staging_series_version, staging_report
             )
+            canonical_summary["promotion_eligible"] = (
+                promotion_eligible and candidate_write_success
+            )
+            canonical_summary["status"] = (
+                "success"
+                if canonical_summary["promotion_eligible"]
+                else "partial"
+            )
             canonical_summary["status_persisted"] = True
             canonical_summary["promoted"] = False
-            if promotion_eligible:
+            if staging_report["candidate_promotion_eligible"]:
                 canonical_summary["promotion_result"] = (
                     await self.db_ops.promote_canonical_adjustment_factor_series(
                         staging_series_version=staging_series_version,
@@ -17401,7 +17526,11 @@ class DataManager:
             "provider_failure_instruments": counters["errors"],
         })
         result["canonical"] = canonical_summary
-        result["status"] = "success" if promotion_eligible else "partial"
+        result["status"] = (
+            "success"
+            if promotion_eligible and candidate_write_success
+            else "partial"
+        )
         result["universe"]["completed_count"] = len(completed)
         result["universe"]["pending_count"] = len(universe) - len(completed)
         assert checkpoint is not None
@@ -18290,6 +18419,232 @@ class DataManager:
             ),
         })
         checkpoint_store.save(checkpoint)
+        return result
+
+    async def promote_a_share_canonical_adjustment_factor_candidate(
+        self,
+        *,
+        staging_series_version: Optional[str] = None,
+        target_series_version: str = "a_share_cninfo_primary_v1",
+        action: str = "promote",
+        activate_reads: bool = True,
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Serialize canonical promotion, activation, and rollback operations."""
+
+        async with self._canonical_mutation_lock:
+            return await self._promote_a_share_canonical_adjustment_factor_candidate(
+                staging_series_version=staging_series_version,
+                target_series_version=target_series_version,
+                action=action,
+                activate_reads=activate_reads,
+                dry_run=dry_run,
+                confirm=confirm,
+            )
+
+    async def _promote_a_share_canonical_adjustment_factor_candidate(
+        self,
+        *,
+        staging_series_version: Optional[str] = None,
+        target_series_version: str = "a_share_cninfo_primary_v1",
+        action: str = "promote",
+        activate_reads: bool = True,
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Validate, promote, activate, or roll back the canonical read path."""
+
+        from data_sources.a_share_factor_activation import (
+            CANONICAL_DATASET,
+            COMPOSITE_DATASET,
+            resolve_factor_activation_path,
+            write_factor_activation,
+        )
+
+        normalized_action = str(action or "").strip().lower()
+        if normalized_action not in {"promote", "rollback"}:
+            raise ValueError("action must be promote or rollback")
+        normalized_target = str(target_series_version or "").strip()
+        if not normalized_target or len(normalized_target) > 64:
+            raise ValueError(
+                "target_series_version must contain 1 to 64 characters"
+            )
+        if "__staging__" in normalized_target:
+            raise ValueError(
+                "target_series_version must be a stable version"
+            )
+        normalized_staging = str(staging_series_version or "").strip()
+        governance_before, activation_before = (
+            self._effective_adjustment_factor_governance()
+        )
+        activation_path = resolve_factor_activation_path(
+            self.data_config.get("data_dir", "data")
+        )
+        result: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "running",
+            "operation": (
+                "a_share_canonical_adjustment_factor_promotion"
+            ),
+            "action": normalized_action,
+            "dry_run": bool(dry_run),
+            "confirmed": bool(confirm),
+            "parameters": {
+                "staging_series_version": normalized_staging or None,
+                "target_series_version": normalized_target,
+                "activate_reads": bool(activate_reads),
+            },
+            "activation_before": {
+                "read_dataset": governance_before.get("read_dataset"),
+                "canonical_series_version": governance_before.get(
+                    "canonical_series_version"
+                ),
+                **activation_before,
+            },
+            "promotion": None,
+            "activation": None,
+            "errors": [],
+        }
+
+        if normalized_action == "rollback":
+            result["preflight"] = {
+                "eligible": True,
+                "target_read_dataset": COMPOSITE_DATASET,
+                "canonical_rows_deleted": 0,
+            }
+            if dry_run:
+                return result
+            if not confirm:
+                result.update({
+                    "status": "blocked",
+                    "errors": ["rollback requires confirm=true"],
+                })
+                return result
+            activation = write_factor_activation(
+                activation_path,
+                read_dataset=COMPOSITE_DATASET,
+                canonical_series_version=None,
+                reason="operator_confirmed_canonical_rollback",
+            )
+            self._factor_activation_signature = None
+            self.invalidate_factor_cache()
+            result.update({
+                "status": "success",
+                "activation": activation.as_dict(),
+            })
+            return result
+
+        if not normalized_staging:
+            raise ValueError(
+                "staging_series_version is required for promotion"
+            )
+        preflight = (
+            await self.db_ops.inspect_canonical_adjustment_factor_candidate(
+                staging_series_version=normalized_staging,
+                target_series_version=normalized_target,
+                require_full_market=True,
+            )
+        )
+        freshness: Dict[str, Any] = {
+            "eligible": False,
+            "candidate_end_date": None,
+            "latest_completed_sessions": {},
+        }
+        candidate_end = self._date_from_any(
+            (preflight.get("report") or {}).get("end_date")
+        )
+        freshness["candidate_end_date"] = (
+            candidate_end.isoformat() if candidate_end else None
+        )
+        now = get_shanghai_time()
+        completed_session_cutoff = (
+            now.date() + timedelta(days=1)
+            if now.hour >= 18
+            else now.date()
+        )
+        latest_sessions: List[date] = []
+        for exchange in ("SSE", "SZSE"):
+            latest = self._date_from_any(
+                await self.db_ops.get_previous_trading_day(
+                    exchange,
+                    completed_session_cutoff,
+                )
+            )
+            freshness["latest_completed_sessions"][exchange] = (
+                latest.isoformat() if latest else None
+            )
+            if latest is not None:
+                latest_sessions.append(latest)
+        freshness["eligible"] = bool(
+            candidate_end is not None
+            and len(latest_sessions) == 2
+            and candidate_end >= max(latest_sessions)
+        )
+        preflight_errors = list(preflight.get("errors") or [])
+        if not freshness["eligible"]:
+            preflight_errors.append(
+                "candidate does not cover the latest completed SSE/SZSE "
+                "trading session"
+            )
+        preflight["freshness"] = freshness
+        preflight["errors"] = preflight_errors
+        preflight["eligible"] = bool(
+            preflight.get("eligible") and freshness["eligible"]
+        )
+        result["preflight"] = preflight
+        if dry_run:
+            result["status"] = (
+                "dry_run" if preflight["eligible"] else "blocked"
+            )
+            return result
+        if not confirm:
+            result.update({
+                "status": "blocked",
+                "errors": ["promotion requires confirm=true"],
+            })
+            return result
+        if not preflight["eligible"]:
+            result.update({
+                "status": "blocked",
+                "errors": preflight_errors,
+            })
+            return result
+
+        promotion = (
+            await self.db_ops.promote_canonical_adjustment_factor_series(
+                staging_series_version=normalized_staging,
+                target_series_version=normalized_target,
+            )
+        )
+        result["promotion"] = promotion
+        # Promotion replaces rows behind the same dataset/version cache key.
+        # Clear cached reads even when activation is intentionally unchanged.
+        self.invalidate_factor_cache()
+        if activate_reads:
+            try:
+                activation = write_factor_activation(
+                    activation_path,
+                    read_dataset=CANONICAL_DATASET,
+                    canonical_series_version=normalized_target,
+                    reason="operator_confirmed_canonical_promotion",
+                )
+                self._factor_activation_signature = None
+                result["activation"] = activation.as_dict()
+            except Exception as exc:
+                dm_logger.exception(
+                    "[DataManager] Canonical series was promoted but read "
+                    "activation failed: %s",
+                    exc,
+                )
+                result.update({
+                    "status": "partial",
+                    "errors": [
+                        "canonical series promoted but activation failed: "
+                        f"{exc}"
+                    ],
+                })
+                return result
+        result["status"] = "success"
         return result
 
     async def rebuild_cninfo_primary_adjustment_factors(
@@ -19677,6 +20032,11 @@ class DataManager:
             "tdx_reference_completeness": not tdx_path["pending"],
             "event_reconciliation": reconciliation.get("status") == "success",
         }
+        incremental_blocking_gates = {
+            key: value
+            for key, value in blocking_quality_gates.items()
+            if key != "full_market_scope"
+        }
         candidate_summary.update({
             # Reference-source coverage and cross-source differences remain
             # visible for audit, but cannot veto a CNInfo-primary candidate.
@@ -19690,6 +20050,12 @@ class DataManager:
             "promotion_eligible": (
                 bool(build_canonical)
                 and all(blocking_quality_gates.values())
+            ),
+            "incremental_merge_eligible": (
+                bool(build_canonical)
+                and bool(requested_ids)
+                and normalized_selection_mode == "three_source"
+                and all(incremental_blocking_gates.values())
             ),
         })
 
@@ -19876,6 +20242,14 @@ class DataManager:
                         bool(candidate_summary["promotion_eligible"])
                         and not candidate_write_failed
                     ),
+                    "incremental_merge_eligible": (
+                        bool(
+                            candidate_summary[
+                                "incremental_merge_eligible"
+                            ]
+                        )
+                        and not candidate_write_failed
+                    ),
                 })
                 await self.db_ops.upsert_adjustment_factor_series_status(
                     staging_version,
@@ -19884,6 +20258,10 @@ class DataManager:
                         "status": (
                             "validated_staging"
                             if candidate_summary["candidate_promotion_eligible"]
+                            else "validated_incremental_staging"
+                            if candidate_summary[
+                                "incremental_merge_eligible"
+                            ]
                             else "partial"
                         ),
                         "promotion_eligible": False,
@@ -21574,6 +21952,41 @@ class DataManager:
             "llm": llm_result,
         }
 
+    async def _merge_promoted_canonical_target(
+        self,
+        *,
+        active_canonical_version: str,
+        staging_version: str,
+        canonical_scope_ids: Sequence[str],
+    ) -> Dict[str, Any]:
+        """Merge a targeted candidate while serializing against promotion."""
+
+        async with self._canonical_mutation_lock:
+            latest_governance, _ = (
+                self._effective_adjustment_factor_governance()
+            )
+            latest_active_series = (
+                str(
+                    latest_governance.get("canonical_series_version") or ""
+                ).strip()
+                if str(latest_governance.get("read_dataset") or "").strip().lower()
+                == "canonical"
+                else ""
+            )
+            if (
+                latest_active_series != active_canonical_version
+                or not latest_active_series
+            ):
+                raise RuntimeError(
+                    "runtime canonical activation changed during "
+                    "daily maintenance; targeted merge aborted"
+                )
+            return await self.db_ops.merge_canonical_adjustment_factor_subset(
+                staging_series_version=staging_version,
+                target_series_version=active_canonical_version,
+                expected_instrument_ids=canonical_scope_ids,
+            )
+
     async def maintain_a_share_cninfo_primary_factors(
         self,
         *,
@@ -21594,6 +22007,7 @@ class DataManager:
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
         build_canonical: bool = False,
+        maintain_promoted_canonical: bool = True,
         series_version: str = "a_share_cninfo_primary_v1",
         anomaly_llm_enabled: bool = True,
         anomaly_llm_max_events: int = 50,
@@ -21833,14 +22247,64 @@ class DataManager:
             for exchange in cninfo_exchanges
             for row in active_rows_by_exchange.get(exchange, [])
         ]
+        effective_factor_governance, factor_activation = (
+            self._effective_adjustment_factor_governance()
+        )
+        active_canonical_version = (
+            str(
+                effective_factor_governance.get(
+                    "canonical_series_version"
+                )
+                or ""
+            ).strip()
+            if (
+                maintain_promoted_canonical
+                and str(
+                    effective_factor_governance.get("read_dataset") or ""
+                ).strip().lower()
+                == "canonical"
+            )
+            else ""
+        )
+        active_canonical_status = (
+            await self.db_ops.get_adjustment_factor_series_status(
+                active_canonical_version
+            )
+            if active_canonical_version
+            else None
+        )
+        canonical_activation_valid = bool(
+            active_canonical_status
+            and active_canonical_status.get("status") == "promoted"
+            and active_canonical_status.get("promotion_eligible")
+        )
+        canonical_missing_coverage_ids: List[str] = []
+        if canonical_activation_valid:
+            canonical_status_rows = (
+                await self.db_ops
+                .list_adjustment_factor_instrument_statuses(
+                    series_version=active_canonical_version,
+                )
+            )
+            canonical_covered_ids = {
+                str(row.get("instrument_id") or "").strip()
+                for row in canonical_status_rows
+                if str(row.get("instrument_id") or "").strip()
+            }
+            canonical_missing_coverage_ids = sorted(
+                set(cninfo_active_ids) - canonical_covered_ids
+            )
         dm_logger.info(
             "[DataManager] A-share corporate-action incremental maintenance started: "
-            "range=%s..%s active=%d cninfo_active=%d exchanges=%s",
+            "range=%s..%s active=%d cninfo_active=%d exchanges=%s "
+            "canonical=%s missing_coverage=%d",
             normalized_start,
             normalized_end,
             len(active_ids),
             len(cninfo_active_ids),
             normalized_exchanges,
+            active_canonical_version or "inactive",
+            len(canonical_missing_coverage_ids),
         )
         if cninfo_active_ids:
             discovery_started_at = time.monotonic()
@@ -21883,6 +22347,35 @@ class DataManager:
             cninfo_candidate_ids = []
             cninfo_endpoint_targets = []
             announcement_governance_context = None
+        if canonical_missing_coverage_ids:
+            cninfo_candidate_ids = sorted({
+                *cninfo_candidate_ids,
+                *canonical_missing_coverage_ids,
+            })
+            missing_endpoint_targets = [
+                {
+                    "instrument_id": instrument_id,
+                    "source_profile": source_profile,
+                }
+                for instrument_id in canonical_missing_coverage_ids
+                for source_profile in (
+                    "cninfo_dividend",
+                    "cninfo_allotment",
+                )
+            ]
+            cninfo_endpoint_targets = [
+                *cninfo_endpoint_targets,
+                *missing_endpoint_targets,
+            ]
+            discovery_result["canonical_missing_coverage_count"] = len(
+                canonical_missing_coverage_ids
+            )
+            discovery_result["canonical_missing_coverage_ids"] = (
+                canonical_missing_coverage_ids[:100]
+            )
+            discovery_result["canonical_missing_endpoint_targets"] = (
+                missing_endpoint_targets[:200]
+            )
         if cninfo_candidate_ids:
             dm_logger.info(
                 "[DataManager] CNInfo incremental refresh started: candidates=%d",
@@ -22028,7 +22521,9 @@ class DataManager:
                 exchanges=normalized_exchanges,
                 instrument_ids=affected_ids,
                 dry_run=False,
-                build_canonical=build_canonical,
+                build_canonical=bool(
+                    build_canonical and not canonical_activation_valid
+                ),
                 series_version=series_version,
             )
             stage_durations["factor_rebuild_seconds"] = (
@@ -22124,7 +22619,9 @@ class DataManager:
                     exchanges=normalized_exchanges,
                     instrument_ids=final_rebuild_ids,
                     dry_run=False,
-                    build_canonical=build_canonical,
+                    build_canonical=bool(
+                        build_canonical and not canonical_activation_valid
+                    ),
                     series_version=series_version,
                 )
             )
@@ -22133,6 +22630,144 @@ class DataManager:
                 + time.monotonic() - promotion_factor_started_at
             )
             rebuild_result = promotion_rebuild_result
+        canonical_maintenance: Dict[str, Any] = {
+            "enabled": bool(maintain_promoted_canonical),
+            "activation": factor_activation,
+            "active_series_version": active_canonical_version or None,
+            "activation_valid": canonical_activation_valid,
+            "status": "inactive",
+            "scope_instrument_count": 0,
+            "missing_coverage_count": len(
+                canonical_missing_coverage_ids
+            ),
+            "staging_series_version": None,
+            "incremental_merge_eligible": False,
+            "merge": None,
+            "errors": [],
+        }
+        canonical_retry_ids: Set[str] = set()
+        if active_canonical_version and not canonical_activation_valid:
+            canonical_maintenance.update({
+                "status": "failed",
+                "errors": [
+                    "runtime activation points to a canonical version that "
+                    "is not promoted and eligible"
+                ],
+            })
+        elif canonical_activation_valid:
+            canonical_scope_ids = sorted(
+                (
+                    set(factor_rebuild_scope_ids)
+                    | set(canonical_missing_coverage_ids)
+                )
+                & set(cninfo_active_ids)
+            )
+            canonical_maintenance["scope_instrument_count"] = len(
+                canonical_scope_ids
+            )
+            canonical_maintenance["scope_instrument_ids"] = (
+                canonical_scope_ids[:100]
+            )
+            if canonical_scope_ids and factor_end_date is None:
+                canonical_retry_ids.update(canonical_scope_ids)
+                canonical_maintenance.update({
+                    "status": "partial",
+                    "errors": [
+                        "factor cutoff is unavailable for canonical "
+                        "incremental maintenance"
+                    ],
+                })
+            elif canonical_scope_ids:
+                canonical_started_at = time.monotonic()
+                try:
+                    canonical_rebuild = (
+                        await self.rebuild_cninfo_primary_adjustment_factors(
+                            start_date=date(1990, 12, 19),
+                            end_date=factor_end_date,
+                            exchanges=["SSE", "SZSE"],
+                            instrument_ids=canonical_scope_ids,
+                            dry_run=False,
+                            build_canonical=True,
+                            series_version=active_canonical_version,
+                            source_selection_mode="three_source",
+                        )
+                    )
+                    canonical_candidate = (
+                        canonical_rebuild.get("candidate") or {}
+                    )
+                    staging_version = str(
+                        canonical_candidate.get(
+                            "staging_series_version"
+                        )
+                        or ""
+                    ).strip()
+                    merge_eligible = bool(
+                        canonical_candidate.get(
+                            "incremental_merge_eligible"
+                        )
+                    )
+                    canonical_maintenance.update({
+                        "status": canonical_rebuild.get("status"),
+                        "staging_series_version": (
+                            staging_version or None
+                        ),
+                        "incremental_merge_eligible": merge_eligible,
+                        "candidate": {
+                            "row_count": canonical_candidate.get(
+                                "row_count", 0
+                            ),
+                            "blocked_segment_count": (
+                                canonical_candidate.get(
+                                    "blocked_segment_count", 0
+                                )
+                            ),
+                            "low_confidence_segment_count": (
+                                canonical_candidate.get(
+                                    "low_confidence_segment_count", 0
+                                )
+                            ),
+                        },
+                    })
+                    if not merge_eligible or not staging_version:
+                        canonical_retry_ids.update(canonical_scope_ids)
+                        canonical_maintenance["status"] = "partial"
+                        canonical_maintenance["errors"].append(
+                            "targeted canonical candidate did not pass "
+                            "incremental merge gates"
+                        )
+                    else:
+                        merge_result = (
+                            await self._merge_promoted_canonical_target(
+                                active_canonical_version=(
+                                    active_canonical_version
+                                ),
+                                staging_version=staging_version,
+                                canonical_scope_ids=canonical_scope_ids,
+                            )
+                        )
+                        canonical_maintenance.update({
+                            "status": "success",
+                            "merge": merge_result,
+                        })
+                        for instrument_id in canonical_scope_ids:
+                            self.invalidate_factor_cache(instrument_id)
+                except Exception as exc:
+                    dm_logger.exception(
+                        "[DataManager] Daily canonical incremental "
+                        "maintenance failed: %s",
+                        exc,
+                    )
+                    canonical_retry_ids.update(canonical_scope_ids)
+                    canonical_maintenance.update({
+                        "status": "failed",
+                        "errors": [str(exc)],
+                    })
+                finally:
+                    stage_durations[
+                        "canonical_maintenance_seconds"
+                    ] = time.monotonic() - canonical_started_at
+            else:
+                canonical_maintenance["status"] = "success"
         pending_factor_ids: Set[str] = set()
         if factor_end_date is None:
             pending_factor_ids.update(factor_rebuild_scope_ids)
@@ -22179,6 +22814,7 @@ class DataManager:
                     promoted_instrument_ids,
                 ))
             pending_factor_ids.update(initial_pending_ids)
+        pending_factor_ids.update(canonical_retry_ids)
         factor_retry_state: Dict[str, Any] = {"status": "not_supported"}
         factor_retry_persister = getattr(
             self.db_ops,
@@ -22271,6 +22907,7 @@ class DataManager:
             str(quote_cutoff_status),
             str(factor_retry_state.get("status")),
             str(anomaly_governance.get("execution_status")),
+            str(canonical_maintenance.get("status")),
         }
         operational_status = (
             "partial"
@@ -22678,7 +23315,9 @@ class DataManager:
         return {
             "status": operational_status,
             "operation": "a_share_cninfo_primary_daily_maintenance",
-            "production_isolation": True,
+            "production_isolation": not bool(
+                canonical_maintenance.get("merge")
+            ),
             "parameters": {
                 "start_date": normalized_start.isoformat(),
                 "end_date": normalized_end.isoformat(),
@@ -22706,6 +23345,12 @@ class DataManager:
                 "tdx_refresh_mode": str(tdx_refresh_mode),
                 "tdx_effective_refresh_mode": effective_tdx_refresh_mode,
                 "tdx_rotating_sample_size": int(tdx_rotating_sample_size),
+                "maintain_promoted_canonical": bool(
+                    maintain_promoted_canonical
+                ),
+                "active_canonical_series_version": (
+                    active_canonical_version or None
+                ),
                 "factor_end_date": (
                     factor_end_date.isoformat()
                     if factor_end_date is not None
@@ -22733,6 +23378,7 @@ class DataManager:
                 "primary": operational_status,
                 "tdx_reference": reference_status,
                 "reconciliation": reconciliation_status,
+                "canonical": canonical_maintenance.get("status"),
             },
             "affected_instruments": {
                 "count": len(affected_ids),
@@ -22741,6 +23387,7 @@ class DataManager:
                 "instrument_ids": affected_ids[:100],
             },
             "factor_rebuild": rebuild_result,
+            "canonical_maintenance": canonical_maintenance,
             "factor_rebuild_phases": {
                 "initial_status": initial_rebuild_result.get("status"),
                 "initial_readiness": _readiness_phase_summary(

@@ -503,6 +503,145 @@ async def test_daily_maintenance_rebuilds_after_anomaly_promotion():
 
 
 @pytest.mark.asyncio
+async def test_daily_maintenance_merges_active_canonical_targeted_candidate():
+    manager = DataManager()
+    manager.data_config = {
+        "adjustment_factor_governance": {},
+    }
+    manager._effective_adjustment_factor_governance = Mock(return_value=(
+        {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+        },
+        {"source": "runtime_manifest"},
+    ))
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[
+        {"instrument_id": "600000.SH", "symbol": "600000"},
+    ])
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 28)
+    )
+    manager.db_ops.get_adjustment_factor_series_status = AsyncMock(
+        return_value={
+            "status": "promoted",
+            "promotion_eligible": True,
+        }
+    )
+    manager.db_ops.list_adjustment_factor_instrument_statuses = AsyncMock(
+        return_value=[]
+    )
+    manager.db_ops.replace_corporate_action_daily_factor_retry_instruments = (
+        AsyncMock(return_value={})
+    )
+    manager.db_ops.merge_canonical_adjustment_factor_subset = AsyncMock(
+        return_value={
+            "canonical_rows": 2,
+            "instrument_statuses": 1,
+            "target_row_count": 100,
+            "target_instrument_count": 1,
+        }
+    )
+    manager.discover_a_share_cninfo_daily_candidates = AsyncMock(
+        return_value={
+            "status": "success",
+            "candidate_ids": ["600000.SH"],
+            "candidate_count": 1,
+        }
+    )
+    manager.backfill_a_share_cninfo_corporate_actions = AsyncMock(
+        return_value={
+            "status": "success",
+            "affected_instrument_ids": ["600000.SH"],
+        }
+    )
+    manager.backfill_tdx_xdxr_history = AsyncMock(return_value={
+        "status": "success",
+        "event_instrument_ids": [],
+        "totals": {},
+    })
+    base_rebuild = {
+        "status": "success",
+        "cninfo_path": {"pending_count": 0},
+        "tdx_path": {"pending_count": 0},
+        "reconciliation": {"status": "success", "totals": {}},
+        "source_completeness": {
+            "cninfo": {
+                "status": "success",
+                "incomplete_instruments": 0,
+                "all_instrument_ids": [],
+            },
+            "tdx_reference": {
+                "status": "success",
+                "incomplete_instruments": 0,
+                "all_instrument_ids": [],
+            },
+        },
+        "overall_completeness": {
+            "status": "success",
+            "overall_incomplete_instruments": 0,
+        },
+    }
+    targeted_rebuild = {
+        **base_rebuild,
+        "candidate": {
+            "staging_series_version": "v1__staging__daily",
+            "incremental_merge_eligible": True,
+            "row_count": 2,
+            "blocked_segment_count": 0,
+        },
+    }
+    manager.rebuild_cninfo_primary_adjustment_factors = AsyncMock(
+        side_effect=[base_rebuild, targeted_rebuild]
+    )
+    manager._load_daily_factor_cutoff_deferred_instrument_ids = AsyncMock(
+        return_value=[]
+    )
+    manager._govern_cninfo_daily_anomalies = AsyncMock(return_value={
+        "status": "success",
+        "execution_status": "success",
+        "readiness_status": "success",
+        "deferred_instrument_ids": [],
+        "promoted_instrument_ids": [],
+    })
+
+    result = await manager.maintain_a_share_cninfo_primary_factors(
+        end_date="2026-07-29",
+        exchanges=["SSE"],
+        request_interval_seconds=0,
+    )
+
+    assert manager.rebuild_cninfo_primary_adjustment_factors.await_count == 2
+    targeted_call = (
+        manager.rebuild_cninfo_primary_adjustment_factors.await_args_list[
+            1
+        ].kwargs
+    )
+    assert targeted_call["source_selection_mode"] == "three_source"
+    assert targeted_call["build_canonical"] is True
+    manager.db_ops.merge_canonical_adjustment_factor_subset.assert_awaited_once_with(
+        staging_series_version="v1__staging__daily",
+        target_series_version="v1",
+        expected_instrument_ids=["600000.SH"],
+    )
+    cninfo_args = (
+        manager.backfill_a_share_cninfo_corporate_actions.await_args.kwargs
+    )
+    assert cninfo_args["endpoint_targets"] == [
+        {
+            "instrument_id": "600000.SH",
+            "source_profile": "cninfo_dividend",
+        },
+        {
+            "instrument_id": "600000.SH",
+            "source_profile": "cninfo_allotment",
+        },
+    ]
+    assert result["canonical_maintenance"]["status"] == "success"
+    assert result["production_isolation"] is False
+
+
+@pytest.mark.asyncio
 async def test_post_promotion_rebuild_does_not_mask_initial_rebuild_failure():
     manager = DataManager()
     manager.db_ops = Mock()

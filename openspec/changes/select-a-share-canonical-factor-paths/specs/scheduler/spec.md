@@ -50,3 +50,37 @@ delegate an explicitly supplied value unchanged.
 #### Scenario: Operator omits factor tolerance
 - **WHEN** the task runs without a factor tolerance argument
 - **THEN** event and cumulative agreement use the 0.1% production default
+
+### Requirement: Explicit canonical promotion and rollback workflow
+The scheduler SHALL expose a manual-only, dry-run-first task for canonical promotion,
+activation, and rollback.
+
+#### Scenario: Promotion task defaults
+- **WHEN** the task is invoked without `dry_run=false` and `confirm=true`
+- **THEN** it performs validation only and does not mutate canonical rows or production
+  activation
+
+#### Scenario: Confirmed promotion
+- **WHEN** the operator supplies an eligible staging version, `dry_run=false`, and
+  `confirm=true`
+- **THEN** the task promotes the stable version, optionally activates reads, and reports
+  database and activation outcomes separately
+
+#### Scenario: Confirmed rollback
+- **WHEN** the operator supplies `action=rollback`, `dry_run=false`, and `confirm=true`
+- **THEN** the task activates the BaoStock-Sina composite read path without deleting
+  canonical data
+
+### Requirement: Daily promoted-canonical maintenance
+The scheduled corporate-action daily task SHALL maintain a currently active canonical
+version after normal source refresh and factor-path rebuilding.
+
+#### Scenario: Canonical version is active
+- **WHEN** the daily task has affected or newly uncovered SSE/SZSE instruments
+- **THEN** it runs local three-source targeted selection and atomically merges only an
+  eligible targeted candidate
+
+#### Scenario: Daily canonical merge fails
+- **WHEN** targeted selection or merge fails
+- **THEN** the task reports partial, preserves the prior stable version, and carries the
+  affected scope into the retry queue

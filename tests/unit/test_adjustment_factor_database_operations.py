@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import date, datetime
 import sqlite3
 
@@ -16,6 +17,77 @@ from database.models import (
 )
 from database.connection import DatabaseManager
 from database.operations import DatabaseOperations
+
+
+def _candidate_report(*, full_market: bool, row_count: int, instrument_count: int):
+    gates = {
+        "full_market_scope": full_market,
+        "no_cninfo_pending_factor_events": True,
+        "no_historical_factor_gaps": True,
+        "no_unverified_tdx_fallback": True,
+        "no_blocked_selection_segments": True,
+        "candidate_write_success": True,
+    }
+    return {
+        "candidate_promotion_eligible": full_market,
+        "incremental_merge_eligible": not full_market,
+        "blocking_quality_gates": gates,
+        "row_count": row_count,
+        "instrument_count": instrument_count,
+        "blocked_segment_count": 0,
+        "decisions": [],
+    }
+
+
+def test_candidate_validation_accepts_truncated_prefix_for_long_target():
+    target = "a" * 64
+    token = "0123456789abcdef"
+    staging = (
+        f"{target[:64 - len('__staging__') - len(token)]}"
+        f"__staging__{token}"
+    )
+
+    errors = DatabaseOperations._canonical_candidate_validation_errors(
+        staging_series_version=staging,
+        target_series_version=target,
+        persisted_status="validated_staging",
+        report={
+            **_candidate_report(full_market=True, row_count=1, instrument_count=1),
+            "candidate_promotion_eligible": True,
+        },
+        canonical_row_count=1,
+        canonical_instrument_ids={"000001.SZ"},
+        status_rows=[{
+            "instrument_id": "000001.SZ",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+        }],
+        require_full_market=True,
+    )
+
+    assert not any("staging version" in error for error in errors)
+
+
+def test_candidate_validation_rejects_missing_persisted_gate():
+    report = _candidate_report(full_market=True, row_count=1, instrument_count=1)
+    report["blocking_quality_gates"].pop("candidate_write_success")
+
+    errors = DatabaseOperations._canonical_candidate_validation_errors(
+        staging_series_version="v1__staging__unit",
+        target_series_version="v1",
+        persisted_status="validated_staging",
+        report=report,
+        canonical_row_count=1,
+        canonical_instrument_ids={"000001.SZ"},
+        status_rows=[{
+            "instrument_id": "000001.SZ",
+            "coverage_status": "complete_with_events",
+            "event_count": 1,
+        }],
+        require_full_market=True,
+    )
+
+    assert any("candidate_write_success" in error for error in errors)
 
 
 def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_path):
@@ -372,6 +444,26 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
             event_count=1,
         ))
         session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1__staging__unit",
+            status="validated_staging",
+            instrument_count=1,
+            row_count=1,
+            report_json=json.dumps({
+                "candidate_promotion_eligible": True,
+                "blocking_quality_gates": {
+                    "full_market_scope": True,
+                    "no_cninfo_pending_factor_events": True,
+                    "no_historical_factor_gaps": True,
+                    "no_unverified_tdx_fallback": True,
+                    "no_blocked_selection_segments": True,
+                    "candidate_write_success": True,
+                },
+                "row_count": 1,
+                "instrument_count": 1,
+                "blocked_segment_count": 0,
+            }),
+        ))
+        session.add(AdjustmentFactorSeriesStatusDB(
             series_version="v1",
             status="promoted",
             promotion_eligible=True,
@@ -383,13 +475,6 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
     result = await operations.promote_canonical_adjustment_factor_series(
         staging_series_version="v1__staging__unit",
         target_series_version="v1",
-        report={
-            "instrument_count": 1,
-            "row_count": 1,
-            "coverage_ratio": 1.0,
-            "conflict_count": 0,
-            "promotion_eligible": True,
-        },
     )
 
     async with session_factory() as session:
@@ -411,4 +496,287 @@ async def test_promote_canonical_series_atomically_copies_staging_rows_and_statu
     assert target_status.status == "promoted"
     assert target_status.promotion_eligible is True
     assert instrument_status.coverage_status == "complete_with_events"
+    await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_promote_canonical_series_rejects_persisted_count_mismatch():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorInstrumentStatusDB.__table__,
+                AdjustmentFactorSeriesStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000001.SZ",
+            symbol="000001",
+            name="Ping An Bank",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        session.add(AdjustmentFactorCanonicalDB(
+            instrument_id="000001.SZ",
+            ex_date=datetime(2020, 5, 28),
+            series_version="v1__staging__bad",
+            factor=1.02,
+            cumulative_factor=1.02,
+            selected_source="cninfo",
+            source_profile="unit",
+            quality_status="high",
+            evidence_count=2,
+        ))
+        session.add(AdjustmentFactorInstrumentStatusDB(
+            instrument_id="000001.SZ",
+            series_version="v1__staging__bad",
+            source="cninfo",
+            coverage_status="complete_with_events",
+            event_count=1,
+        ))
+        session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1__staging__bad",
+            status="validated_staging",
+            report_json=json.dumps(_candidate_report(
+                full_market=True,
+                row_count=2,
+                instrument_count=1,
+            )),
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+
+    with pytest.raises(RuntimeError, match="row count mismatch"):
+        await operations.promote_canonical_adjustment_factor_series(
+            staging_series_version="v1__staging__bad",
+            target_series_version="v1",
+        )
+    await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_incremental_merge_replaces_only_expected_instrument():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorInstrumentStatusDB.__table__,
+                AdjustmentFactorSeriesStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        for instrument_id in ("000001.SZ", "000002.SZ"):
+            session.add(InstrumentDB(
+                instrument_id=instrument_id,
+                symbol=instrument_id[:6],
+                name=instrument_id,
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                is_active=True,
+            ))
+        for instrument_id, factor in (
+            ("000001.SZ", 1.01),
+            ("000002.SZ", 1.02),
+        ):
+            session.add(AdjustmentFactorCanonicalDB(
+                instrument_id=instrument_id,
+                ex_date=datetime(2020, 5, 28),
+                series_version="v1",
+                factor=factor,
+                cumulative_factor=factor,
+                selected_source="cninfo",
+                source_profile="unit",
+                quality_status="high",
+                evidence_count=2,
+            ))
+            session.add(AdjustmentFactorInstrumentStatusDB(
+                instrument_id=instrument_id,
+                series_version="v1",
+                source="cninfo",
+                coverage_status="complete_with_events",
+                event_count=1,
+            ))
+        session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1",
+            status="promoted",
+            promotion_eligible=True,
+            instrument_count=2,
+            row_count=2,
+            report_json=json.dumps({
+                "status": "promoted",
+                "promotion_eligible": True,
+                "row_count": 2,
+                "instrument_count": 2,
+                "decisions": [],
+            }),
+        ))
+        session.add(AdjustmentFactorCanonicalDB(
+            instrument_id="000001.SZ",
+            ex_date=datetime(2021, 5, 28),
+            series_version="v1__staging__daily",
+            factor=1.05,
+            cumulative_factor=1.05,
+            selected_source="tdx",
+            source_profile="unit",
+            quality_status="independent_consensus",
+            evidence_count=2,
+        ))
+        session.add(AdjustmentFactorInstrumentStatusDB(
+            instrument_id="000001.SZ",
+            series_version="v1__staging__daily",
+            source="tdx",
+            coverage_status="complete_with_events",
+            event_count=1,
+        ))
+        session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1__staging__daily",
+            status="validated_incremental_staging",
+            instrument_count=1,
+            row_count=1,
+            report_json=json.dumps(_candidate_report(
+                full_market=False,
+                row_count=1,
+                instrument_count=1,
+            )),
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    result = await operations.merge_canonical_adjustment_factor_subset(
+        staging_series_version="v1__staging__daily",
+        target_series_version="v1",
+        expected_instrument_ids=["000001.SZ"],
+    )
+
+    async with session_factory() as session:
+        rows = (await session.execute(
+            select(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.series_version == "v1"
+            ).order_by(AdjustmentFactorCanonicalDB.instrument_id)
+        )).scalars().all()
+        status = await session.get(AdjustmentFactorSeriesStatusDB, "v1")
+
+    assert result["target_row_count"] == 2
+    assert [(row.instrument_id, row.factor) for row in rows] == [
+        ("000001.SZ", pytest.approx(1.05)),
+        ("000002.SZ", pytest.approx(1.02)),
+    ]
+    assert status.status == "promoted"
+    assert status.promotion_eligible is True
+    await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_incremental_merge_rejects_coverage_end_regression():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                AdjustmentFactorCanonicalDB.__table__,
+                AdjustmentFactorInstrumentStatusDB.__table__,
+                AdjustmentFactorSeriesStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(AdjustmentFactorCanonicalDB(
+            instrument_id="000001.SZ",
+            ex_date=datetime(2025, 5, 28),
+            series_version="v1",
+            factor=1.02,
+            cumulative_factor=1.02,
+            selected_source="cninfo",
+            source_profile="unit",
+            quality_status="high",
+            evidence_count=2,
+        ))
+        session.add(AdjustmentFactorInstrumentStatusDB(
+            instrument_id="000001.SZ",
+            series_version="v1",
+            source="cninfo",
+            coverage_status="complete_with_events",
+            event_count=1,
+            start_date=datetime(2020, 1, 1),
+            end_date=datetime(2025, 5, 28),
+        ))
+        session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1",
+            status="promoted",
+            promotion_eligible=True,
+            instrument_count=1,
+            row_count=1,
+            report_json=json.dumps({
+                "status": "promoted",
+                "promotion_eligible": True,
+                "row_count": 1,
+                "instrument_count": 1,
+            }),
+        ))
+        session.add(AdjustmentFactorCanonicalDB(
+            instrument_id="000001.SZ",
+            ex_date=datetime(2024, 5, 28),
+            series_version="v1__staging__regression",
+            factor=1.03,
+            cumulative_factor=1.03,
+            selected_source="cninfo",
+            source_profile="unit",
+            quality_status="high",
+            evidence_count=2,
+        ))
+        session.add(AdjustmentFactorInstrumentStatusDB(
+            instrument_id="000001.SZ",
+            series_version="v1__staging__regression",
+            source="cninfo",
+            coverage_status="complete_with_events",
+            event_count=1,
+            start_date=datetime(2021, 1, 1),
+            end_date=datetime(2024, 5, 28),
+        ))
+        session.add(AdjustmentFactorSeriesStatusDB(
+            series_version="v1__staging__regression",
+            status="validated_incremental_staging",
+            instrument_count=1,
+            row_count=1,
+            report_json=json.dumps(_candidate_report(
+                full_market=False,
+                row_count=1,
+                instrument_count=1,
+            )),
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    with pytest.raises(RuntimeError, match="coverage end regresses") as exc_info:
+        await operations.merge_canonical_adjustment_factor_subset(
+            staging_series_version="v1__staging__regression",
+            target_series_version="v1",
+            expected_instrument_ids=["000001.SZ"],
+        )
+    assert "coverage start regresses" in str(exc_info.value)
+
+    async with session_factory() as session:
+        row = (await session.execute(
+            select(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.series_version == "v1"
+            )
+        )).scalar_one()
+        assert row.ex_date == datetime(2025, 5, 28)
     await engine.dispose()
