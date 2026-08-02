@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
@@ -5,6 +6,310 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementQuery,
+    AnnouncementRecord,
+    AnnouncementScanResult,
+    AnnouncementScope,
+    build_announcement_key,
+)
+from data_sources.cninfo_corporate_action_documents import CorporateActionPageText
+
+
+def _mock_bse_official_refresh(manager, *, status="success"):
+    manager._refresh_bse_official_recent_corporate_actions = AsyncMock(
+        return_value={
+            "status": status,
+            "source": "bse",
+            "coverage_scope": "recent_window_only",
+            "full_history_complete": False,
+            "affected_instrument_ids": [],
+        }
+    )
+
+
+@pytest.mark.asyncio
+async def test_bse_official_recent_refresh_scans_market_once_and_marks_window(
+    monkeypatch,
+):
+    async def run_inline(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("data_manager.asyncio.to_thread", run_inline)
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.save_corporate_action_observations = AsyncMock(
+        return_value={
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+        }
+    )
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    query = AnnouncementQuery(
+        purpose_key="a_share_bse_corporate_action_daily",
+        source="bse",
+        scope=AnnouncementScope(
+            exchange="BSE",
+            start_date="2026-07-28",
+            end_date="2026-07-31",
+            keyword="权益分派实施公告",
+        ),
+    )
+    scan = AnnouncementScanResult(
+        source="bse",
+        query=query,
+        status="success_empty",
+        records=(),
+        pages_scanned=1,
+        requests_made=1,
+        announcements_seen=0,
+        is_complete=True,
+        stop_reason="last_page",
+    )
+    service = SimpleNamespace(acquire=Mock(return_value=SimpleNamespace(
+        scan_result=scan
+    )))
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=service
+    )
+
+    result = await manager._refresh_bse_official_recent_corporate_actions(
+        active_instruments=[
+            {"instrument_id": "920001.BJ", "symbol": "920001"},
+            {"instrument_id": "920002.BJ", "symbol": "920002"},
+        ],
+        start_date=date(2026, 7, 28),
+        end_date=date(2026, 7, 31),
+        page_size=30,
+        max_pages=10,
+        request_interval_seconds=0,
+        request_timeout_seconds=10,
+    )
+
+    assert result["status"] == "success"
+    assert result["coverage_scope"] == "recent_window_only"
+    assert result["full_history_complete"] is False
+    service.acquire.assert_called_once()
+    requested_query = service.acquire.call_args.args[0]
+    assert requested_query.scope.symbol is None
+    assert requested_query.scope.exchange == "BSE"
+    assert result["instrument_status_count"] == 0
+    manager.db_ops.upsert_corporate_action_instrument_status.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_bse_official_refresh_persists_only_source_isolated_evidence(
+    monkeypatch,
+):
+    async def run_inline(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("data_manager.asyncio.to_thread", run_inline)
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.save_corporate_action_document_bundle = AsyncMock(
+        return_value={"artifact": "inserted"}
+    )
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(
+        return_value={"items": []}
+    )
+    manager.db_ops.save_corporate_action_observations = AsyncMock(
+        return_value={
+            "inserted": 1, "changed": 0, "unchanged": 0, "failed": 0,
+        }
+    )
+    manager.db_ops.upsert_corporate_action_instrument_status = AsyncMock()
+    manager.db_ops.save_adjustment_factors = AsyncMock()
+    manager.db_ops.save_tdx_adjustment_factors = AsyncMock()
+    manager.db_ops.replace_canonical_adjustment_factors = AsyncMock()
+    record = AnnouncementRecord(
+        source="bse",
+        source_announcement_id="bse-1",
+        announcement_key=build_announcement_key("bse", "bse-1"),
+        title="乐创技术2025年年度权益分派实施公告",
+        published_at="2026-07-16T00:00:00+00:00",
+        published_at_raw="2026-07-16",
+        exchange="BSE",
+        market="BSE",
+        symbols=("920425",),
+        attachments=(AnnouncementAttachment(
+            source_url="/disclosure/example.pdf",
+            resolved_url="https://www.bse.cn/disclosure/example.pdf",
+        ),),
+    )
+    query = AnnouncementQuery(
+        purpose_key="a_share_bse_corporate_action_daily",
+        source="bse",
+        scope=AnnouncementScope(
+            exchange="BSE",
+            start_date="2026-07-15",
+            end_date="2026-07-31",
+            keyword="权益分派实施公告",
+        ),
+    )
+    scan = AnnouncementScanResult(
+        source="bse",
+        query=query,
+        status="success",
+        records=(record,),
+        pages_scanned=1,
+        requests_made=1,
+        announcements_seen=1,
+        is_complete=True,
+        stop_reason="last_page",
+    )
+    service = SimpleNamespace(acquire=Mock(return_value=SimpleNamespace(
+        scan_result=scan
+    )))
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=service
+    )
+    page = CorporateActionPageText(
+        page_number=1,
+        text=(
+            "每10股派发现金红利2.50元。股权登记日2026年7月22日，"
+            "除权除息日2026年7月23日。"
+        ),
+        text_hash="a" * 64,
+    )
+    bundle = SimpleNamespace(
+        announcement_id="bse:bse-1",
+        source_url="https://www.bse.cn/disclosure/example.pdf",
+        content_hash="b" * 64,
+        archive_path="bse_bse-1/document.pdf",
+        pages=(page,),
+        artifact_row=Mock(return_value={
+            "announcement_id": "bse:bse-1",
+            "source_url": "https://www.bse.cn/disclosure/example.pdf",
+            "content_hash": "b" * 64,
+            "archive_path": "bse_bse-1/document.pdf",
+            "parser_version": "document.v1",
+        }),
+    )
+    document_service = SimpleNamespace(ingest=Mock(return_value=bundle))
+    monkeypatch.setattr(
+        "data_sources.cninfo_corporate_action_documents."
+        "CninfoCorporateActionDocumentService",
+        Mock(return_value=document_service),
+    )
+
+    result = await manager._refresh_bse_official_recent_corporate_actions(
+        active_instruments=[{
+            "instrument_id": "920425.BJ", "symbol": "920425",
+        }],
+        start_date=date(2026, 7, 15),
+        end_date=date(2026, 7, 31),
+        page_size=30,
+        max_pages=10,
+        request_interval_seconds=0,
+        request_timeout_seconds=10,
+    )
+
+    assert result["status"] == "success"
+    assert result["parsed_event_count"] == 1
+    saved_rows = (
+        manager.db_ops.save_corporate_action_observations.await_args.args[0]
+    )
+    assert saved_rows[0]["source"] == "bse"
+    assert saved_rows[0]["source_profile"] == (
+        "bse_dividend_implementation"
+    )
+    manager.db_ops.save_adjustment_factors.assert_not_awaited()
+    manager.db_ops.save_tdx_adjustment_factors.assert_not_awaited()
+    manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+    manager.db_ops.get_corporate_action_document_bundle.return_value = {
+        "items": [{
+            "announcement_id": "bse:bse-1",
+            "source_url": "https://www.bse.cn/disclosure/example.pdf",
+            "content_hash": "b" * 64,
+            "archive_path": "bse_bse-1/document.pdf",
+            "parser_version": "document.v1",
+            "metadata": {
+                "requested_source_url": (
+                    "https://www.bse.cn/disclosure/example.pdf"
+                ),
+            },
+            "pages": [{
+                "page_number": 1,
+                "text": page.text,
+                "text_hash": page.text_hash,
+                "extraction_method": "native_text",
+                "quality_status": "usable",
+            }],
+        }]
+    }
+    repeated = await manager._refresh_bse_official_recent_corporate_actions(
+        active_instruments=[{
+            "instrument_id": "920425.BJ", "symbol": "920425",
+        }],
+        start_date=date(2026, 7, 15),
+        end_date=date(2026, 7, 31),
+        page_size=30,
+        max_pages=10,
+        request_interval_seconds=0,
+        request_timeout_seconds=10,
+    )
+
+    assert repeated["documents_saved"] == 0
+    assert repeated["documents_reused"] == 1
+    assert document_service.ingest.call_count == 1
+    assert manager.db_ops.save_corporate_action_document_bundle.await_count == 1
+
+    revised_record = replace(
+        record,
+        attachments=(AnnouncementAttachment(
+            source_url="/disclosure/example-v2.pdf",
+            resolved_url="https://www.bse.cn/disclosure/example-v2.pdf",
+        ),),
+    )
+    service.acquire.return_value = SimpleNamespace(scan_result=replace(
+        scan,
+        records=(revised_record,),
+    ))
+    revised_bundle = SimpleNamespace(
+        announcement_id=bundle.announcement_id,
+        source_url="https://www.bse.cn/disclosure/example-v2.pdf",
+        content_hash="c" * 64,
+        archive_path="bse_bse-1/document-v2.pdf",
+        pages=bundle.pages,
+        artifact_row=Mock(return_value={
+            "announcement_id": "bse:bse-1",
+            "source_url": "https://www.bse.cn/disclosure/example-v2.pdf",
+            "content_hash": "c" * 64,
+            "archive_path": "bse_bse-1/document-v2.pdf",
+            "parser_version": "document.v1",
+        }),
+    )
+    document_service.ingest.return_value = revised_bundle
+
+    revised = await manager._refresh_bse_official_recent_corporate_actions(
+        active_instruments=[{
+            "instrument_id": "920425.BJ", "symbol": "920425",
+        }],
+        start_date=date(2026, 7, 15),
+        end_date=date(2026, 7, 31),
+        page_size=30,
+        max_pages=10,
+        request_interval_seconds=0,
+        request_timeout_seconds=10,
+    )
+
+    assert revised["documents_saved"] == 1
+    assert revised["documents_reused"] == 0
+    assert document_service.ingest.call_count == 2
+    assert document_service.ingest.call_args.kwargs["source_url"].endswith(
+        "example-v2.pdf"
+    )
+    revised_artifact = (
+        manager.db_ops.save_corporate_action_document_bundle.await_args.args[0]
+    )
+    assert revised_artifact["metadata"]["requested_source_url"].endswith(
+        "example-v2.pdf"
+    )
 
 
 def _anomaly_kwargs(**overrides):
@@ -1111,6 +1416,7 @@ async def test_cutoff_deferred_loader_includes_governed_effective_date_evidence(
 async def test_daily_maintenance_excludes_bse_only_from_cninfo():
     manager = DataManager()
     manager.db_ops = Mock()
+    _mock_bse_official_refresh(manager)
 
     async def active_instruments(exchange, **_kwargs):
         return [{
@@ -1206,6 +1512,7 @@ async def test_daily_maintenance_excludes_bse_only_from_cninfo():
 async def test_bse_only_daily_maintenance_skips_cninfo_but_runs_tdx():
     manager = DataManager()
     manager.db_ops = Mock()
+    _mock_bse_official_refresh(manager)
     manager.db_ops.get_active_instruments = AsyncMock(
         return_value=[{"instrument_id": "920000.BJ"}]
     )
@@ -1233,6 +1540,36 @@ async def test_bse_only_daily_maintenance_skips_cninfo_but_runs_tdx():
     manager.rebuild_cninfo_primary_adjustment_factors.assert_not_awaited()
     assert result["status"] == "success"
     assert result["cninfo_refresh"]["status"] == "skipped"
+
+
+@pytest.mark.asyncio
+async def test_bse_official_failure_does_not_stop_independent_tdx_refresh():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        "instrument_id": "920000.BJ",
+        "symbol": "920000",
+    }])
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    _mock_bse_official_refresh(manager, status="failed")
+    manager.backfill_tdx_xdxr_history = AsyncMock(return_value={
+        "status": "success",
+        "event_instrument_ids": [],
+        "totals": {},
+    })
+    manager.rebuild_cninfo_primary_adjustment_factors = AsyncMock()
+
+    result = await manager.maintain_a_share_cninfo_primary_factors(
+        end_date="2026-08-02",
+        exchanges=["BSE"],
+    )
+
+    manager.backfill_tdx_xdxr_history.assert_awaited_once()
+    assert result["status"] == "partial"
+    assert result["bse_official_refresh"]["status"] == "failed"
+    assert result["tdx_refresh"]["status"] == "success"
     assert result["factor_rebuild"]["status"] == "skipped"
     assert result["parameters"]["tdx_exchanges"] == ["BSE"]
 
@@ -1305,6 +1642,7 @@ async def test_daily_maintenance_propagates_discovery_partial_operational_status
 async def test_daily_maintenance_caps_factor_end_at_latest_common_quote_date():
     manager = DataManager()
     manager.db_ops = Mock()
+    _mock_bse_official_refresh(manager)
 
     async def active_instruments(exchange, **_kwargs):
         return [{
@@ -1474,6 +1812,7 @@ async def test_daily_maintenance_defers_rebuild_when_quote_cutoff_is_unavailable
 async def test_bse_only_daily_maintenance_persists_factor_retry_without_scan():
     manager = DataManager()
     manager.db_ops = Mock()
+    _mock_bse_official_refresh(manager)
     manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
         "instrument_id": "920000.BJ",
         "symbol": "920000",
@@ -1544,6 +1883,7 @@ async def test_bse_only_daily_maintenance_persists_factor_retry_without_scan():
 async def test_daily_maintenance_preserves_retry_queue_when_load_fails():
     manager = DataManager()
     manager.db_ops = Mock()
+    _mock_bse_official_refresh(manager)
     manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
         "instrument_id": "920000.BJ",
         "symbol": "920000",

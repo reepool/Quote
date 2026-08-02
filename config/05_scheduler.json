@@ -350,7 +350,7 @@
       "a_share_canonical_adjustment_factor_storage_maintenance": {
         "enabled": true,
         "manual_only": true,
-        "description": "A股主复权因子决策迁移与存储保留维护（仅手工触发，默认预演）",
+        "description": "A股主复权因子决策迁移、摘要刷新与存储保留维护（仅手工触发，默认预演）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,

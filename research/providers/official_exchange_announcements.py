@@ -8,6 +8,7 @@ import math
 import re
 import time
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any, Dict, List, Mapping, Optional
 from urllib.parse import urljoin
 
@@ -114,9 +115,20 @@ class OfficialExchangeAnnouncementProvider:
             raise ValueError(f"official announcement provider is disabled: {config.source}")
         self.config = config
         self.source_name = config.source
+        self.endpoint_mode = str(
+            config.options.get("endpoint_mode") or "instrument"
+        ).strip().lower()
+        if self.endpoint_mode not in {"instrument", "recent_market"}:
+            raise ValueError(
+                "official announcement endpoint_mode must be instrument or "
+                "recent_market"
+            )
+        supports_market_scope = (
+            config.exchange == "BSE" and self.endpoint_mode == "recent_market"
+        )
         self.capabilities = AnnouncementProviderCapabilities(
             exchanges=frozenset({config.exchange}),
-            supports_market_scope=False,
+            supports_market_scope=supports_market_scope,
             supports_instrument_scope=True,
             supports_date_filter=True,
             supports_keyword_filter=True,
@@ -141,7 +153,7 @@ class OfficialExchangeAnnouncementProvider:
     def discover(self, query: AnnouncementQuery) -> AnnouncementScanResult:
         self.capabilities.validate(query)
         scope = query.scope
-        if not scope.symbol:
+        if not scope.symbol and not self.capabilities.supports_market_scope:
             raise ValueError(f"{self.source_name} instrument query requires symbol")
         page_size = min(scope.page_size, self.capabilities.max_page_size)
         records: List[AnnouncementRecord] = []
@@ -227,6 +239,9 @@ class OfficialExchangeAnnouncementProvider:
             page_records = self._apply_local_filters(
                 normalized_page_records,
                 keyword=scope.keyword,
+                symbol=scope.symbol,
+                start_date=scope.start_date,
+                end_date=scope.end_date,
             )
             records.extend(page_records)
             LOGGER.info(
@@ -242,6 +257,12 @@ class OfficialExchangeAnnouncementProvider:
                 reached_prior_cursor = True
                 is_complete = True
                 stop_reason = "watermark_reached"
+                break
+            if self._page_reached_start_date(
+                normalized_page_records, scope.start_date
+            ):
+                is_complete = True
+                stop_reason = "requested_start_date_reached"
                 break
             page_count = self._page_count(
                 payload,
@@ -291,9 +312,20 @@ class OfficialExchangeAnnouncementProvider:
             diagnostics={
                 "effective_page_size": page_size,
                 "endpoint_url": self.config.endpoint_url,
+                "endpoint_mode": self.endpoint_mode,
+                "requested_start_date": scope.start_date,
+                "requested_end_date": scope.end_date,
+                "observed_earliest_published_at": min(
+                    (
+                        record.published_at
+                        for record in records
+                        if record.published_at
+                    ),
+                    default=None,
+                ),
                 "keyword_filter_mode": (
                     "local_exact"
-                    if self.config.exchange == "SSE" and scope.keyword
+                    if self.config.exchange in {"SSE", "BSE"} and scope.keyword
                     else "upstream" if scope.keyword else "none"
                 ),
             },
@@ -302,7 +334,7 @@ class OfficialExchangeAnnouncementProvider:
     def _request_page(
         self,
         *,
-        symbol: str,
+        symbol: Optional[str],
         page_num: int,
         page_size: int,
         start_date: Optional[str],
@@ -339,7 +371,7 @@ class OfficialExchangeAnnouncementProvider:
     def _request_kwargs(
         self,
         *,
-        symbol: str,
+        symbol: Optional[str],
         page_num: int,
         page_size: int,
         start_date: Optional[str],
@@ -379,6 +411,38 @@ class OfficialExchangeAnnouncementProvider:
                 body["keyword"] = keyword
             return {"json": body}
         if self.config.exchange == "BSE":
+            if self.endpoint_mode == "recent_market":
+                need_fields = self.config.options.get("need_fields") or [
+                    "companyCd", "companyName", "disclosureTitle",
+                    "disclosurePostTitle", "destFilePath", "publishDate",
+                    "xxfcbj", "fileExt", "xxzrlx",
+                ]
+                form_fields: List[tuple[str, Any]] = [
+                    ("siteId", str(self.config.options.get("site_id", 6))),
+                    ("flag", str(self.config.options.get("flag", 0))),
+                    ("page", str(page_num - 1)),
+                    ("companyCd", symbol or ""),
+                    ("isNewThree", str(
+                        self.config.options.get("is_new_three", "1")
+                    )),
+                    ("startTime", start_date or ""),
+                    ("endTime", end_date or ""),
+                    ("keyword", keyword or ""),
+                    ("hyType", ""),
+                ]
+                for value in self.config.options.get("disclosure_type", []):
+                    form_fields.append(("disclosureType[]", value))
+                for value in self.config.options.get(
+                    "disclosure_subtype", []
+                ):
+                    form_fields.append(("disclosureSubtype[]", value))
+                for value in self.config.options.get("xxfcbj", ["2"]):
+                    form_fields.append(("xxfcbj[]", value))
+                for value in need_fields:
+                    form_fields.append(("needFields[]", value))
+                return {
+                    "data": form_fields,
+                }
             return {
                 "data": {
                     "page": str(page_num - 1),
@@ -417,6 +481,35 @@ class OfficialExchangeAnnouncementProvider:
             return self._required_dict_rows(payload, "result")
         if self.config.exchange == "SZSE":
             return self._required_dict_rows(payload, "data")
+        if self.endpoint_mode == "recent_market":
+            data = payload.get("data")
+            if not isinstance(data, Mapping):
+                raise ValueError(
+                    "exchange announcement container data is not an object"
+                )
+            content = data.get("content")
+            if not isinstance(content, list):
+                raise ValueError(
+                    "exchange announcement container data.content is not a list"
+                )
+            rows: List[Dict[str, Any]] = []
+            for index, group in enumerate(content):
+                if not isinstance(group, Mapping):
+                    raise ValueError(
+                        "exchange announcement data.content contains a "
+                        "non-object row"
+                    )
+                disclosures = group.get("disclosures")
+                if not isinstance(disclosures, list):
+                    raise ValueError(
+                        "exchange announcement container "
+                        f"data.content[{index}].disclosures is not a list"
+                    )
+                rows.extend(self._dict_rows(
+                    disclosures,
+                    container=f"data.content[{index}].disclosures",
+                ))
+            return rows
         candidates: List[tuple[str, Any]] = [
             (key, payload[key])
             for key in ("content", "data", "rows")
@@ -448,16 +541,35 @@ class OfficialExchangeAnnouncementProvider:
         records: List[AnnouncementRecord],
         *,
         keyword: Optional[str],
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> List[AnnouncementRecord]:
-        if self.config.exchange != "SSE" or not keyword:
-            return records
-        return [record for record in records if keyword in record.title]
+        output = records
+        if symbol:
+            output = [record for record in output if symbol in record.symbols]
+        if keyword and self.config.exchange in {"SSE", "BSE"}:
+            output = [record for record in output if keyword in record.title]
+        if self.config.exchange == "BSE" and self.endpoint_mode == "recent_market":
+            if start_date:
+                output = [
+                    record for record in output
+                    if self._published_date(record) is not None
+                    and self._published_date(record) >= date.fromisoformat(start_date)
+                ]
+            if end_date:
+                output = [
+                    record for record in output
+                    if self._published_date(record) is not None
+                    and self._published_date(record) <= date.fromisoformat(end_date)
+                ]
+        return output
 
     def _normalize_record(
         self,
         row: Mapping[str, Any],
         *,
-        expected_symbol: str,
+        expected_symbol: Optional[str],
     ) -> Optional[AnnouncementRecord]:
         if self.config.exchange == "SSE":
             title = self._text(row.get("TITLE"))
@@ -492,7 +604,7 @@ class OfficialExchangeAnnouncementProvider:
             attachment_type = self._suffix(raw_url)
         if not title or not raw_url:
             return None
-        if symbols and expected_symbol not in symbols:
+        if symbols and expected_symbol and expected_symbol not in symbols:
             return None
         resolved_url = urljoin(self.config.artifact_base_url, raw_url)
         identity_is_derived = not bool(raw_id)
@@ -500,7 +612,7 @@ class OfficialExchangeAnnouncementProvider:
             source=self.source_name,
             title=title,
             published_at_raw=published_raw,
-            symbols=symbols or [expected_symbol],
+            symbols=symbols or ([expected_symbol] if expected_symbol else []),
             source_urls=[resolved_url],
         )
         published_at, diagnostics = normalize_published_at(published_raw)
@@ -526,7 +638,7 @@ class OfficialExchangeAnnouncementProvider:
             published_at_raw=published_raw,
             exchange=self.config.exchange,
             market=self.config.exchange,
-            symbols=tuple(symbols or [expected_symbol]),
+            symbols=tuple(symbols or ([expected_symbol] if expected_symbol else [])),
             attachments=(attachment,),
             raw_payload=dict(row),
             diagnostics=tuple(diagnostics),
@@ -548,6 +660,12 @@ class OfficialExchangeAnnouncementProvider:
         if self.config.exchange == "SZSE":
             total = int(payload.get("announceCount") or row_count)
             return max(1, math.ceil(total / page_size))
+        if self.endpoint_mode == "recent_market":
+            data = payload.get("data")
+            if isinstance(data, Mapping):
+                for value in (data.get("totalPages"), data.get("pageCount")):
+                    if value not in (None, ""):
+                        return max(1, int(value))
         list_info = payload.get("listInfo")
         values: List[Any] = [payload.get("totalPages"), payload.get("pageCount")]
         if isinstance(list_info, Mapping):
@@ -566,6 +684,37 @@ class OfficialExchangeAnnouncementProvider:
             return False
         times = [record.published_at for record in records if record.published_at]
         return bool(times) and max(times) <= cursor.value
+
+    @classmethod
+    def _page_reached_start_date(
+        cls,
+        records: List[AnnouncementRecord],
+        start_date: Optional[str],
+    ) -> bool:
+        if not start_date:
+            return False
+        published_dates = [
+            value for record in records
+            if (value := cls._published_date(record)) is not None
+        ]
+        return bool(published_dates) and min(published_dates) < date.fromisoformat(
+            start_date
+        )
+
+    @staticmethod
+    def _published_date(record: AnnouncementRecord) -> Optional[date]:
+        raw = str(record.published_at_raw or "").strip()
+        if len(raw) >= 10:
+            try:
+                return date.fromisoformat(raw[:10].replace("/", "-"))
+            except ValueError:
+                pass
+        if record.published_at:
+            try:
+                return date.fromisoformat(record.published_at[:10])
+            except ValueError:
+                return None
+        return None
 
     @staticmethod
     def _deduplicate_records(records: List[AnnouncementRecord]) -> List[AnnouncementRecord]:

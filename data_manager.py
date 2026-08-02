@@ -263,20 +263,21 @@ class DataManager:
                 research_config=self.research_config
             )
         else:
-            cninfo_config = dict(
-                acquisition_config.provider_configs.get("cninfo") or {}
-            )
-            if request_timeout_seconds is not None:
-                cninfo_config["request_timeout_seconds"] = max(
-                    1.0, float(request_timeout_seconds)
-                )
-            if request_interval_seconds is not None:
-                cninfo_config["request_interval_seconds"] = max(
-                    0.0, float(request_interval_seconds)
-                )
+            provider_overrides: Dict[str, Dict[str, Any]] = {}
+            for source, configured in acquisition_config.provider_configs.items():
+                source_config = dict(configured or {})
+                if request_timeout_seconds is not None:
+                    source_config["request_timeout_seconds"] = max(
+                        1.0, float(request_timeout_seconds)
+                    )
+                if request_interval_seconds is not None:
+                    source_config["request_interval_seconds"] = max(
+                        0.0, float(request_interval_seconds)
+                    )
+                provider_overrides[source] = source_config
             registry = OfficialAnnouncementProviderRegistry(
                 research_config=self.research_config,
-                provider_config_overrides={"cninfo": cninfo_config},
+                provider_config_overrides=provider_overrides,
             )
         return AnnouncementAcquisitionService(
             registry=registry,
@@ -18821,16 +18822,19 @@ class DataManager:
         """Migrate or retain canonical operational metadata explicitly."""
 
         normalized_operation = str(operation or "").strip().lower()
-        if normalized_operation not in {"migrate_decisions", "retention"}:
+        if normalized_operation not in {
+            "migrate_decisions", "refresh_summaries", "retention"
+        }:
             raise ValueError(
-                "operation must be migrate_decisions or retention"
+                "operation must be migrate_decisions, refresh_summaries, "
+                "or retention"
             )
         governance, activation = self._effective_adjustment_factor_governance()
         active_version = str(
             governance.get("canonical_series_version")
             or "a_share_cninfo_primary_v1"
         ).strip()
-        if normalized_operation == "migrate_decisions":
+        if normalized_operation in {"migrate_decisions", "refresh_summaries"}:
             requested_versions = sorted({
                 str(value or "").strip()
                 for value in (series_versions or ())
@@ -18849,11 +18853,18 @@ class DataManager:
                 requested_versions = sorted({
                     active_version, *staging, *benchmarks,
                 })
-            result = await self.db_ops.migrate_adjustment_factor_series_decisions(
-                series_versions=requested_versions,
-                dry_run=bool(dry_run),
-                confirm=bool(confirm),
-            )
+            if normalized_operation == "migrate_decisions":
+                result = await self.db_ops.migrate_adjustment_factor_series_decisions(
+                    series_versions=requested_versions,
+                    dry_run=bool(dry_run),
+                    confirm=bool(confirm),
+                )
+            else:
+                result = await self.db_ops.refresh_adjustment_factor_series_summaries(
+                    series_versions=requested_versions,
+                    dry_run=bool(dry_run),
+                    confirm=bool(confirm),
+                )
             if not dry_run:
                 self.invalidate_factor_cache()
         else:
@@ -22455,6 +22466,336 @@ class DataManager:
                 expected_instrument_ids=canonical_scope_ids,
             )
 
+    async def _refresh_bse_official_recent_corporate_actions(
+        self,
+        *,
+        active_instruments: Sequence[Mapping[str, Any]],
+        start_date: date,
+        end_date: date,
+        page_size: int,
+        max_pages: int,
+        request_interval_seconds: float,
+        request_timeout_seconds: float,
+    ) -> Dict[str, Any]:
+        """Scan one bounded BSE market window and persist official evidence."""
+
+        from data_sources.bse_corporate_actions import (
+            BSE_DIVIDEND_PROFILE,
+            parse_bse_dividend_implementation,
+        )
+        from data_sources.cninfo_corporate_action_documents import (
+            CorporateActionPageText,
+            CninfoCorporateActionDocumentService,
+        )
+        from research.announcements import AnnouncementQuery, AnnouncementScope
+
+        instrument_by_symbol = {
+            str(item.get("symbol") or "").strip(): str(
+                item.get("instrument_id") or ""
+            ).strip()
+            for item in active_instruments
+            if str(item.get("symbol") or "").strip()
+            and str(item.get("instrument_id") or "").strip()
+        }
+        if not instrument_by_symbol:
+            return {
+                "status": "skipped",
+                "reason": "no_active_bse_instruments",
+                "source": "bse",
+                "source_profile": BSE_DIVIDEND_PROFILE,
+                "coverage_scope": "recent_window_only",
+            }
+        service = self._build_official_announcement_acquisition_service(
+            request_timeout_seconds=request_timeout_seconds,
+            request_interval_seconds=request_interval_seconds,
+        )
+        ingestion_run_id = (
+            "bse-ca-" + hashlib.sha256(
+                f"{start_date.isoformat()}|{end_date.isoformat()}".encode("utf-8")
+            ).hexdigest()[:16]
+        )
+        try:
+            route_result = await asyncio.to_thread(
+                service.acquire,
+                AnnouncementQuery(
+                    purpose_key="a_share_bse_corporate_action_daily",
+                    source="bse",
+                    scope=AnnouncementScope(
+                        exchange="BSE",
+                        market="BSE",
+                        start_date=start_date.isoformat(),
+                        end_date=end_date.isoformat(),
+                        keyword="权益分派实施公告",
+                        page_size=max(1, int(page_size)),
+                        max_pages=max(1, int(max_pages)),
+                    ),
+                ),
+            )
+            scan_result = route_result.scan_result
+            if scan_result is None:
+                raise RuntimeError("bse_announcement_route_returned_no_result")
+        except Exception as exc:
+            dm_logger.exception(
+                "[DataManager] BSE official corporate-action discovery failed: %s",
+                exc,
+            )
+            return {
+                "status": "failed",
+                "source": "bse",
+                "source_profile": BSE_DIVIDEND_PROFILE,
+                "coverage_scope": "recent_window_only",
+                "requested_start_date": start_date.isoformat(),
+                "requested_end_date": end_date.isoformat(),
+                "errors": [str(exc)],
+            }
+
+        document_service = CninfoCorporateActionDocumentService(
+            research_config=self.research_config
+        )
+        observations: List[Dict[str, Any]] = []
+        parse_diagnostics: List[Dict[str, Any]] = []
+        event_counts: Dict[str, int] = defaultdict(int)
+        missing_ex_dates: Dict[str, int] = defaultdict(int)
+        documents_saved = 0
+        documents_reused = 0
+        for record in scan_result.records:
+            symbol = next(
+                (value for value in record.symbols if value in instrument_by_symbol),
+                None,
+            )
+            instrument_id = instrument_by_symbol.get(symbol or "")
+            if not instrument_id:
+                parse_diagnostics.append({
+                    "announcement_key": record.announcement_key,
+                    "status": "skipped",
+                    "diagnostics": ["instrument_not_in_active_bse_universe"],
+                })
+                continue
+            if not record.attachments:
+                parse_diagnostics.append({
+                    "instrument_id": instrument_id,
+                    "announcement_key": record.announcement_key,
+                    "status": "partial",
+                    "diagnostics": ["official_attachment_missing"],
+                })
+                missing_ex_dates[instrument_id] += 1
+                continue
+            try:
+                announcement_id = f"bse:{record.source_announcement_id}"
+                attachment_url = (
+                    record.attachments[0].resolved_url
+                    or record.attachments[0].source_url
+                )
+                existing = (
+                    await self.db_ops.get_corporate_action_document_bundle(
+                        announcement_id=announcement_id,
+                        limit=1000,
+                        offset=0,
+                    )
+                )
+                stored = (existing.get("items") or [None])[-1]
+                stored_metadata = (
+                    dict(stored.get("metadata") or {}) if stored else {}
+                )
+                stored_requested_url = (
+                    stored_metadata.get("requested_source_url")
+                    or (stored.get("source_url") if stored else None)
+                )
+                if (
+                    stored
+                    and stored.get("pages")
+                    and str(stored_requested_url or "").strip()
+                    == str(attachment_url or "").strip()
+                ):
+                    bundle_pages = tuple(
+                        CorporateActionPageText(
+                            page_number=int(page["page_number"]),
+                            text=str(page["text"]),
+                            text_hash=str(page["text_hash"]),
+                            announcement_id=announcement_id,
+                            extraction_method=str(
+                                page.get("extraction_method")
+                                or "native_text"
+                            ),
+                            quality_status=str(
+                                page.get("quality_status") or "usable"
+                            ),
+                        )
+                        for page in stored["pages"]
+                    )
+                    document_metadata = {
+                        "announcement_id": announcement_id,
+                        "source_url": stored.get("source_url"),
+                        "content_hash": stored.get("content_hash"),
+                        "archive_path": stored.get("archive_path"),
+                        "parser_version": stored.get("parser_version"),
+                    }
+                    documents_reused += 1
+                else:
+                    bundle = await asyncio.to_thread(
+                        document_service.ingest,
+                        announcement_id=announcement_id,
+                        source_url=attachment_url,
+                        source="bse",
+                        title=record.title,
+                        announcement_time=record.published_at_raw,
+                    )
+                    artifact_row = bundle.artifact_row(
+                        title=record.title,
+                        announcement_time=record.published_at_raw,
+                    )
+                    artifact_row["metadata"] = {
+                        **dict(artifact_row.get("metadata") or {}),
+                        "requested_source_url": attachment_url,
+                    }
+                    await self.db_ops.save_corporate_action_document_bundle(
+                        artifact_row,
+                        [page.to_row() for page in bundle.pages],
+                    )
+                    bundle_pages = tuple(bundle.pages)
+                    document_metadata = {
+                        "announcement_id": bundle.announcement_id,
+                        "source_url": bundle.source_url,
+                        "content_hash": bundle.content_hash,
+                        "archive_path": bundle.archive_path,
+                        "parser_version": artifact_row["parser_version"],
+                    }
+                    documents_saved += 1
+                parsed = parse_bse_dividend_implementation(
+                    record=record,
+                    instrument_id=instrument_id,
+                    pages=bundle_pages,
+                    document=document_metadata,
+                    as_of_date=end_date,
+                )
+            except Exception as exc:
+                parsed = None
+                parse_diagnostics.append({
+                    "instrument_id": instrument_id,
+                    "announcement_key": record.announcement_key,
+                    "status": "partial",
+                    "diagnostics": [
+                        f"document_processing_failed:{type(exc).__name__}:{exc}"
+                    ],
+                })
+                missing_ex_dates[instrument_id] += 1
+            if parsed is None:
+                continue
+            if parsed.observation is not None:
+                observations.append(parsed.observation)
+                event_counts[instrument_id] += 1
+            else:
+                missing_ex_dates[instrument_id] += int(
+                    "ex_date_missing" in parsed.diagnostics
+                )
+            parse_diagnostics.append({
+                "instrument_id": instrument_id,
+                "announcement_key": record.announcement_key,
+                "status": parsed.status,
+                "diagnostics": list(parsed.diagnostics),
+            })
+
+        persistence = await self.db_ops.save_corporate_action_observations(
+            observations,
+            ingestion_run_id=ingestion_run_id,
+            include_event_keys=True,
+        )
+        scan_complete = bool(scan_result.is_complete) and scan_result.status in {
+            "success", "success_empty"
+        }
+        parse_failed_ids = {
+            str(item.get("instrument_id") or "").strip()
+            for item in parse_diagnostics
+            if item.get("status") == "partial" and item.get("instrument_id")
+        }
+        status_errors: List[Dict[str, str]] = []
+        status_instrument_ids = sorted(
+            set(event_counts) | parse_failed_ids
+        )
+        for instrument_id in status_instrument_ids:
+            coverage_status = (
+                "partial"
+                if not scan_complete or instrument_id in parse_failed_ids
+                else "complete_with_events"
+            )
+            try:
+                await self.db_ops.upsert_corporate_action_instrument_status({
+                    "instrument_id": instrument_id,
+                    "source": "bse",
+                    "source_profile": BSE_DIVIDEND_PROFILE,
+                    "coverage_status": coverage_status,
+                    "event_count": event_counts.get(instrument_id, 0),
+                    "missing_ex_date_count": missing_ex_dates.get(
+                        instrument_id, 0
+                    ),
+                    "requested_start_date": start_date,
+                    "requested_end_date": end_date,
+                    "earliest_event_date": min(
+                        (
+                            item["ex_date"] for item in observations
+                            if item["instrument_id"] == instrument_id
+                        ),
+                        default=None,
+                    ),
+                    "latest_event_date": max(
+                        (
+                            item["ex_date"] for item in observations
+                            if item["instrument_id"] == instrument_id
+                        ),
+                        default=None,
+                    ),
+                    "error_message": (
+                        "; ".join(scan_result.errors) or None
+                        if not scan_complete
+                        else None
+                    ),
+                    "ingestion_run_id": ingestion_run_id,
+                })
+            except Exception as exc:
+                status_errors.append({
+                    "instrument_id": instrument_id,
+                    "error": str(exc),
+                })
+        failed = bool(
+            scan_result.status in {"failed", "indeterminate"}
+            or persistence.get("failed")
+            or status_errors
+        )
+        partial = bool(
+            failed
+            or scan_result.status == "degraded"
+            or parse_failed_ids
+        )
+        return {
+            "status": "partial" if partial else "success",
+            "source": "bse",
+            "source_profile": BSE_DIVIDEND_PROFILE,
+            "coverage_scope": "recent_window_only",
+            "full_history_complete": False,
+            "requested_start_date": start_date.isoformat(),
+            "requested_end_date": end_date.isoformat(),
+            "scan": {
+                "status": scan_result.status,
+                "is_complete": scan_result.is_complete,
+                "stop_reason": scan_result.stop_reason,
+                "pages_scanned": scan_result.pages_scanned,
+                "announcements_seen": scan_result.announcements_seen,
+                "diagnostics": scan_result.diagnostics,
+                "errors": list(scan_result.errors),
+            },
+            "active_instrument_count": len(instrument_by_symbol),
+            "matched_announcement_count": len(scan_result.records),
+            "parsed_event_count": len(observations),
+            "documents_saved": documents_saved,
+            "documents_reused": documents_reused,
+            "instrument_status_count": len(status_instrument_ids),
+            "parse_partial_count": len(parse_failed_ids),
+            "parse_diagnostics": parse_diagnostics[:50],
+            "persistence": persistence,
+            "status_errors": status_errors[:50],
+            "affected_instrument_ids": sorted(event_counts),
+        }
+
     async def maintain_a_share_cninfo_primary_factors(
         self,
         *,
@@ -22621,6 +22962,50 @@ class DataManager:
             schedule_mode=resolved_window_mode,
             previous_trading_day=previous_trading_day,
         )
+
+        bse_active_rows = active_rows_by_exchange.get("BSE", [])
+        if "BSE" in normalized_exchanges:
+            bse_started_at = time.monotonic()
+            try:
+                bse_official_result = (
+                    await self._refresh_bse_official_recent_corporate_actions(
+                        active_instruments=bse_active_rows,
+                        start_date=max(
+                            normalized_start,
+                            announcement_window["start_date"],
+                        ),
+                        end_date=normalized_end,
+                        page_size=announcement_page_size,
+                        max_pages=announcement_max_pages,
+                        request_interval_seconds=request_interval_seconds,
+                        request_timeout_seconds=max(
+                            1.0, float(per_instrument_timeout_sec)
+                        ),
+                    )
+                )
+            except Exception as exc:
+                dm_logger.exception(
+                    "[DataManager] BSE official recent stage failed without "
+                    "interrupting independent sources: %s",
+                    exc,
+                )
+                bse_official_result = {
+                    "status": "failed",
+                    "source": "bse",
+                    "coverage_scope": "recent_window_only",
+                    "full_history_complete": False,
+                    "errors": [str(exc)],
+                }
+            stage_durations["bse_official_refresh_seconds"] = (
+                time.monotonic() - bse_started_at
+            )
+        else:
+            bse_official_result = {
+                "status": "skipped",
+                "source": "bse",
+                "coverage_scope": "recent_window_only",
+                "reason": "bse_not_requested",
+            }
 
         factor_retry_ids: Set[str] = set()
         factor_retry_load_error: Optional[str] = None
@@ -23430,6 +23815,7 @@ class DataManager:
             str(factor_retry_state.get("status")),
             str(anomaly_governance.get("execution_status")),
             str(canonical_maintenance.get("status")),
+            str(bse_official_result.get("status")),
         }
         operational_status = (
             "partial"
@@ -23847,6 +24233,9 @@ class DataManager:
                 "cninfo_exchanges": cninfo_exchanges,
                 "cninfo_excluded_exchanges": cninfo_excluded_exchanges,
                 "tdx_exchanges": normalized_exchanges,
+                "bse_official_exchanges": (
+                    ["BSE"] if "BSE" in normalized_exchanges else []
+                ),
                 "requested_instrument_ids": sorted(requested_ids),
                 "active_instrument_count": len(active_ids),
                 "cninfo_candidate_count": len(cninfo_candidate_ids),
@@ -23891,6 +24280,7 @@ class DataManager:
             },
             "candidate_discovery": discovery_result,
             "cninfo_refresh": cninfo_result,
+            "bse_official_refresh": bse_official_result,
             "tdx_refresh": tdx_result,
             "stage_durations": {
                 key: round(value, 3)
@@ -23899,6 +24289,7 @@ class DataManager:
             "execution_status": {
                 "primary": operational_status,
                 "tdx_reference": reference_status,
+                "bse_official": bse_official_result.get("status"),
                 "reconciliation": reconciliation_status,
                 "canonical": canonical_maintenance.get("status"),
             },

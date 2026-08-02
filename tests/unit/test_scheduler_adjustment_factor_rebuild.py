@@ -587,6 +587,17 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
             },
             "errors": [],
         },
+        "bse_official_refresh": {
+            "status": "success",
+            "coverage_scope": "recent_window_only",
+            "full_history_complete": False,
+            "requested_start_date": "2026-07-21",
+            "requested_end_date": "2026-07-22",
+            "matched_announcement_count": 2,
+            "parsed_event_count": 1,
+            "parse_partial_count": 0,
+            "scan": {"pages_scanned": 2},
+        },
         "tdx_refresh": {
             "refresh_mode": "targeted",
             "target_scope": {
@@ -656,12 +667,14 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
         },
         "execution_status": {
             "primary": "success",
+            "bse_official": "success",
             "tdx_reference": "partial",
             "reconciliation": "partial",
         },
         "stage_durations": {
             "candidate_discovery_seconds": 2,
             "cninfo_refresh_seconds": 10,
+            "bse_official_refresh_seconds": 1.5,
             "tdx_refresh_seconds": 3,
             "factor_rebuild_seconds": 1,
             "anomaly_llm_seconds": 4,
@@ -676,9 +689,11 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
     assert "dividend targets=10 requests=11" in report
     assert "403=3" in report
     assert "circuits=1" in report
+    assert "BSE官方近期证据: `status=success" in report
+    assert "events=1, partial=0, full_history=False" in report
     assert "mode=targeted, targets=149, rotation=100" in report
-    assert "cninfo_primary=success, tdx_reference=partial" in report
-    assert "discovery=2.0s, cninfo=10.0s" in report
+    assert "cninfo_primary=success, bse_official=success" in report
+    assert "discovery=2.0s, cninfo=10.0s, bse=1.5s" in report
     assert "total=5" in report
     assert "CNInfo事件: `40`" in report
     assert "TDX因子: `44`" in report

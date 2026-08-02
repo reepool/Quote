@@ -1963,33 +1963,36 @@
         }
       },
       "bse": {
-        "enabled": false,
+        "enabled": true,
         "transport": "direct",
         "cost_tier": "free",
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
-        "role": "official_bse_structured_financial_filings",
+        "role": "official_bse_recent_announcements",
         "announcements": {
-          "enabled": false,
+          "enabled": true,
           "source": "bse",
           "exchange": "BSE",
           "method": "POST",
-          "endpoint_url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
+          "endpoint_url": "https://www.bse.cn/disclosureInfoController/initDisclosureList.do",
           "referer": "https://www.bse.cn/disclosure/announcement.html",
           "artifact_base_url": "https://www.bse.cn/",
           "approved_attachment_hosts": [
             "www.bse.cn"
           ],
           "request_timeout_seconds": 20.0,
-          "request_interval_seconds": 0.2,
+          "request_interval_seconds": 0.5,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
           "max_page_size": 100,
           "options": {
+            "endpoint_mode": "recent_market",
+            "site_id": 6,
+            "flag": 0,
             "is_new_three": "1",
-            "xxfcbj": "1"
+            "xxfcbj": ["2"]
           },
-          "note": "Provider supports the observed null([{listInfo:...}]) JSONP array wrapper but remains disabled because 2026-07-21 bounded probes did not establish stable DNS/endpoint availability. CNInfo remains the BSE primary until a repeated live gate passes."
+          "note": "Current BSE official recent-market feed. It is suitable only for bounded recent announcement evidence and does not establish full-history completeness."
         },
         "financial_statements": {
           "enabled": false,
@@ -2077,6 +2080,17 @@
           ]
         },
         "purposes": {
+          "a_share_bse_corporate_action_daily": {
+            "BSE": {
+              "sources": ["bse"],
+              "fallback_on": [
+                "failed",
+                "degraded",
+                "identity_not_found",
+                "indeterminate"
+              ]
+            }
+          },
           "business_profile_evidence": {
             "SSE": {
               "sources": [

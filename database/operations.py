@@ -7941,6 +7941,7 @@ class DatabaseOperations:
             "versions": [],
             "migrated_decisions": 0,
             "compacted_reports": 0,
+            "refreshed_summaries": 0,
         }
         if not dry_run and not confirm:
             raise ValueError("decision migration apply requires confirm=true")
@@ -8047,13 +8048,7 @@ class DatabaseOperations:
                             raise RuntimeError(
                                 f"decision payload verification failed for {series_version}"
                             )
-                        compact = compact_canonical_report(report)
-                        row.report_json = json.dumps(
-                            compact, ensure_ascii=True, default=str, sort_keys=True
-                        )
-                        row.updated_at = get_shanghai_time()
                         result["migrated_decisions"] += saved
-                        result["compacted_reports"] += 1
                 else:
                     expected_count = report.get("decision_count")
                     if (
@@ -8065,24 +8060,24 @@ class DatabaseOperations:
                             f"{series_version}: report={int(expected_count)}, "
                             f"persisted={existing_count}"
                         )
-                    compact = compact_canonical_report(report)
-                    if compact != report:
+                    if compact_canonical_report(report) != report:
                         action = "recompact"
-                        if not dry_run:
-                            row.report_json = json.dumps(
-                                compact,
-                                ensure_ascii=True,
-                                default=str,
-                                sort_keys=True,
-                            )
-                            row.updated_at = get_shanghai_time()
-                            result["compacted_reports"] += 1
+                summary_refresh = await self._refresh_adjustment_factor_series_summary_in_session(
+                    session,
+                    series_row=row,
+                    decision_rows=decisions or None,
+                    apply=not dry_run,
+                )
+                if not dry_run:
+                    result["compacted_reports"] += 1
+                    result["refreshed_summaries"] += 1
                 result["versions"].append({
                     "series_version": series_version,
                     "status": action,
                     "report_decisions": len(decisions),
                     "existing_decisions": existing_count,
                     "report_bytes": len((row.report_json or "").encode("utf-8")),
+                    "summary_refresh": summary_refresh,
                 })
             if dry_run:
                 await session.rollback()
@@ -8091,6 +8086,241 @@ class DatabaseOperations:
         if any(
             item.get("status") == "missing"
             for item in result["versions"]
+        ):
+            result["status"] = "partial"
+        return result
+
+    async def _canonical_factor_fingerprint_in_session(
+        self,
+        session: Any,
+        *,
+        series_version: str,
+    ) -> Dict[str, Any]:
+        """Return a stable factor-row identity and economics fingerprint."""
+
+        rows = (await session.execute(select(
+            AdjustmentFactorCanonicalDB.instrument_id,
+            AdjustmentFactorCanonicalDB.ex_date,
+            AdjustmentFactorCanonicalDB.factor,
+            AdjustmentFactorCanonicalDB.cumulative_factor,
+            AdjustmentFactorCanonicalDB.selected_source,
+            AdjustmentFactorCanonicalDB.source_profile,
+            AdjustmentFactorCanonicalDB.quality_status,
+            AdjustmentFactorCanonicalDB.evidence_count,
+        ).where(
+            AdjustmentFactorCanonicalDB.series_version == series_version
+        ).order_by(
+            AdjustmentFactorCanonicalDB.instrument_id,
+            AdjustmentFactorCanonicalDB.ex_date,
+        ))).all()
+        digest = hashlib.sha256()
+        for values in rows:
+            digest.update(json.dumps(
+                [str(value) if value is not None else None for value in values],
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode("utf-8"))
+            digest.update(b"\n")
+        return {"row_count": len(rows), "sha256": digest.hexdigest()}
+
+    async def _refresh_adjustment_factor_series_summary_in_session(
+        self,
+        session: Any,
+        *,
+        series_row: AdjustmentFactorSeriesStatusDB,
+        decision_rows: Optional[Sequence[Mapping[str, Any]]] = None,
+        apply: bool,
+    ) -> Dict[str, Any]:
+        """Rebuild one bounded series summary without touching factor rows."""
+
+        from data_sources.a_share_canonical_operations import (
+            compact_canonical_report,
+            summarize_canonical_decisions,
+        )
+
+        series_version = series_row.series_version
+        try:
+            report = json.loads(series_row.report_json or "{}")
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                f"invalid series report JSON for {series_version}"
+            ) from exc
+        if decision_rows is None:
+            decision_models = (await session.execute(select(
+                AdjustmentFactorDecisionDB
+            ).where(
+                AdjustmentFactorDecisionDB.series_version == series_version
+            ).order_by(
+                AdjustmentFactorDecisionDB.instrument_id,
+                AdjustmentFactorDecisionDB.start_date,
+                AdjustmentFactorDecisionDB.segment_id,
+            ))).scalars().all()
+            normalized_decisions = [
+                self._adjustment_factor_decision_dict(item)
+                for item in decision_models
+            ]
+        else:
+            normalized_decisions = [dict(item) for item in decision_rows]
+        status_models = (await session.execute(select(
+            AdjustmentFactorInstrumentStatusDB
+        ).where(
+            AdjustmentFactorInstrumentStatusDB.series_version == series_version
+        ).order_by(
+            AdjustmentFactorInstrumentStatusDB.instrument_id
+        ))).scalars().all()
+        status_rows = [{
+            "instrument_id": item.instrument_id,
+            "coverage_status": item.coverage_status,
+            "event_count": item.event_count,
+        } for item in status_models]
+        factor_before = await self._canonical_factor_fingerprint_in_session(
+            session, series_version=series_version
+        )
+        summary = summarize_canonical_decisions(
+            normalized_decisions,
+            instrument_statuses=status_rows,
+        )
+        coverage_refresh_status = "recomputed"
+        if not status_rows:
+            coverage_refresh_status = "preserved_no_instrument_statuses"
+            preserved_coverage = (
+                series_row.coverage_ratio
+                if series_row.coverage_ratio is not None
+                else report.get("coverage_ratio")
+            )
+            preserved_completeness = report.get("overall_completeness")
+            summary["coverage_ratio"] = float(preserved_coverage or 0.0)
+            if isinstance(preserved_completeness, Mapping):
+                summary["overall_completeness"] = dict(
+                    preserved_completeness
+                )
+        refreshed_instrument_count = (
+            len(status_rows)
+            if status_rows
+            else int(
+                report.get("instrument_count")
+                or series_row.instrument_count
+                or 0
+            )
+        )
+        source_priority = report.get("source_priority")
+        if source_priority is None:
+            try:
+                source_priority = json.loads(
+                    series_row.source_priority_json or "[]"
+                )
+            except json.JSONDecodeError:
+                source_priority = []
+        refreshed_report = compact_canonical_report({
+            **report,
+            **summary,
+            "status": series_row.status,
+            "promotion_eligible": bool(series_row.promotion_eligible),
+            "source_priority": source_priority,
+            "start_date": report.get("start_date") or series_row.start_date,
+            "end_date": report.get("end_date") or series_row.end_date,
+            "instrument_count": refreshed_instrument_count,
+            "row_count": factor_before["row_count"],
+            "coverage_refresh_status": coverage_refresh_status,
+            "max_cumulative_error_pct": (
+                report.get("max_cumulative_error_pct")
+                if report.get("max_cumulative_error_pct") is not None
+                else series_row.max_cumulative_error_pct
+            ),
+        })
+        before = {
+            "coverage_ratio": float(series_row.coverage_ratio or 0.0),
+            "conflict_count": int(series_row.conflict_count or 0),
+            "overall_completeness": report.get("overall_completeness"),
+            "decision_count": int(report.get("decision_count") or 0),
+        }
+        after = {
+            "coverage_ratio": float(summary["coverage_ratio"]),
+            "conflict_count": int(summary["conflict_count"]),
+            "overall_completeness": summary["overall_completeness"],
+            "decision_count": int(summary["decision_count"]),
+            "low_confidence_segment_count": int(
+                summary["low_confidence_segment_count"]
+            ),
+            "historical_single_source_segment_count": int(
+                summary["historical_single_source_segment_count"]
+            ),
+            "coverage_refresh_status": coverage_refresh_status,
+        }
+        if apply:
+            values = self._adjustment_factor_series_status_values(
+                refreshed_report
+            )
+            for key, value in values.items():
+                setattr(series_row, key, value)
+            series_row.updated_at = get_shanghai_time()
+            await session.flush()
+        factor_after = await self._canonical_factor_fingerprint_in_session(
+            session, series_version=series_version
+        )
+        if factor_after != factor_before:
+            raise RuntimeError(
+                "canonical factor rows changed during summary refresh for "
+                f"{series_version}"
+            )
+        return {
+            "before": before,
+            "after": after,
+            "factor_rows": factor_after,
+            "factor_rows_unchanged": True,
+        }
+
+    async def refresh_adjustment_factor_series_summaries(
+        self,
+        *,
+        series_versions: Sequence[str],
+        dry_run: bool = True,
+        confirm: bool = False,
+    ) -> Dict[str, Any]:
+        """Preview or apply canonical summary repair for normalized series."""
+
+        normalized_versions = sorted({
+            str(value or "").strip() for value in series_versions
+            if str(value or "").strip()
+        })
+        if not dry_run and not confirm:
+            raise ValueError("summary refresh apply requires confirm=true")
+        result: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "success",
+            "dry_run": bool(dry_run),
+            "confirmed": bool(confirm),
+            "versions": [],
+            "refreshed_summaries": 0,
+        }
+        async with self.get_async_session() as session:
+            for series_version in normalized_versions:
+                row = await session.get(
+                    AdjustmentFactorSeriesStatusDB, series_version
+                )
+                if row is None:
+                    result["versions"].append({
+                        "series_version": series_version,
+                        "status": "missing",
+                    })
+                    continue
+                refresh = await self._refresh_adjustment_factor_series_summary_in_session(
+                    session,
+                    series_row=row,
+                    apply=not dry_run,
+                )
+                result["versions"].append({
+                    "series_version": series_version,
+                    "status": "refreshed" if not dry_run else "preview",
+                    **refresh,
+                })
+                if not dry_run:
+                    result["refreshed_summaries"] += 1
+            if dry_run:
+                await session.rollback()
+            else:
+                await session.commit()
+        if any(
+            item.get("status") == "missing" for item in result["versions"]
         ):
             result["status"] = "partial"
         return result

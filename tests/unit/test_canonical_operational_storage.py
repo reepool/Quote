@@ -5,7 +5,9 @@ import pytest
 
 from database.connection import DatabaseManager
 from database.models import (
+    AdjustmentFactorCanonicalDB,
     AdjustmentFactorDecisionDB,
+    AdjustmentFactorInstrumentStatusDB,
     AdjustmentFactorSeriesStatusDB,
     CorporateActionInstrumentStatusDB,
     InstrumentDB,
@@ -154,6 +156,209 @@ async def test_decision_migration_is_previewable_verified_and_idempotent(tmp_pat
         )
         assert "decisions" not in status
         assert status["decision_count"] == 1
+        assert applied["refreshed_summaries"] == 1
+        assert repeated["refreshed_summaries"] == 1
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_summary_refresh_repairs_stale_scalars_without_changing_factors(
+    tmp_path,
+):
+    manager, operations = await _ops_for_tmp_db(tmp_path)
+    try:
+        decision = _decision() | {"confidence": "low"}
+        with manager.get_session() as session:
+            session.add(AdjustmentFactorSeriesStatusDB(
+                series_version="stable-v1",
+                status="promoted",
+                promotion_eligible=True,
+                instrument_count=1,
+                row_count=1,
+                coverage_ratio=0.0,
+                conflict_count=1,
+                report_json=json.dumps({
+                    "status": "promoted",
+                    "promotion_eligible": True,
+                    "instrument_count": 1,
+                    "row_count": 1,
+                    "coverage_ratio": 0.0,
+                    "conflict_count": 1,
+                    "overall_completeness": {"status": "partial"},
+                    "decision_count": 1,
+                }),
+            ))
+            session.add(AdjustmentFactorDecisionDB(
+                **operations._adjustment_factor_decision_payload(
+                    "stable-v1", decision
+                )
+            ))
+            session.add(AdjustmentFactorInstrumentStatusDB(
+                instrument_id="000001.SZ",
+                series_version="stable-v1",
+                source="canonical",
+                coverage_status="complete_with_events",
+                event_count=1,
+            ))
+            session.add(AdjustmentFactorCanonicalDB(
+                instrument_id="000001.SZ",
+                ex_date=datetime(2026, 7, 31),
+                series_version="stable-v1",
+                factor=0.98,
+                cumulative_factor=1.0,
+                selected_source="cninfo",
+                source_profile="unit",
+                quality_status="low",
+                evidence_count=2,
+            ))
+            session.commit()
+
+        preview = await operations.refresh_adjustment_factor_series_summaries(
+            series_versions=["stable-v1"],
+            dry_run=True,
+        )
+        preview_row = preview["versions"][0]
+        assert preview_row["before"]["coverage_ratio"] == 0.0
+        assert preview_row["after"]["coverage_ratio"] == 1.0
+        assert preview_row["after"]["conflict_count"] == 0
+        assert preview_row["after"]["low_confidence_segment_count"] == 1
+        assert preview_row["factor_rows_unchanged"] is True
+        stale = await operations.get_adjustment_factor_series_status_light(
+            "stable-v1"
+        )
+        assert stale["coverage_ratio"] == 0.0
+
+        applied = await operations.refresh_adjustment_factor_series_summaries(
+            series_versions=["stable-v1"],
+            dry_run=False,
+            confirm=True,
+        )
+        status = await operations.get_adjustment_factor_series_status(
+            "stable-v1"
+        )
+        light = await operations.get_adjustment_factor_series_status_light(
+            "stable-v1"
+        )
+        factors = await operations.get_canonical_adjustment_factor_page(
+            series_version="stable-v1",
+            limit=10,
+        )
+
+        assert applied["refreshed_summaries"] == 1
+        assert light["coverage_ratio"] == 1.0
+        assert light["conflict_count"] == 0
+        assert status["status"] == "promoted"
+        assert status["overall_completeness"]["status"] == "success"
+        assert status["low_confidence_segment_count"] == 1
+        assert status["conflict_count"] == 0
+        assert factors["total"] == 1
+        assert factors["items"][0]["factor"] == 0.98
+        assert factors["items"][0]["selected_source"] == "cninfo"
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_summary_refresh_counts_only_blocked_decisions_as_conflicts(tmp_path):
+    manager, operations = await _ops_for_tmp_db(tmp_path)
+    try:
+        with manager.get_session() as session:
+            session.add(AdjustmentFactorSeriesStatusDB(
+                series_version="blocked-v1",
+                status="candidate",
+                report_json=json.dumps({"decision_count": 2}),
+            ))
+            for suffix, confidence in (
+                ("blocked", "blocked"),
+                ("historical", "historical_single_source"),
+            ):
+                decision = _decision() | {
+                    "segment_id": f"000001.SZ:{suffix}",
+                    "confidence": confidence,
+                }
+                session.add(AdjustmentFactorDecisionDB(
+                    **operations._adjustment_factor_decision_payload(
+                        "blocked-v1", decision
+                    )
+                ))
+            session.add(AdjustmentFactorInstrumentStatusDB(
+                instrument_id="000001.SZ",
+                series_version="blocked-v1",
+                source="canonical",
+                coverage_status="incomplete",
+                event_count=0,
+            ))
+            session.commit()
+
+        result = await operations.refresh_adjustment_factor_series_summaries(
+            series_versions=["blocked-v1"],
+            dry_run=False,
+            confirm=True,
+        )
+        after = result["versions"][0]["after"]
+
+        assert after["coverage_ratio"] == 0.0
+        assert after["conflict_count"] == 1
+        assert after["historical_single_source_segment_count"] == 1
+        assert after["overall_completeness"]["status"] == "partial"
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_summary_refresh_preserves_coverage_without_normalized_statuses(
+    tmp_path,
+):
+    manager, operations = await _ops_for_tmp_db(tmp_path)
+    try:
+        with manager.get_session() as session:
+            session.add(AdjustmentFactorSeriesStatusDB(
+                series_version="legacy-coverage-v1",
+                status="promoted",
+                promotion_eligible=True,
+                instrument_count=4,
+                coverage_ratio=0.75,
+                conflict_count=1,
+                report_json=json.dumps({
+                    "instrument_count": 4,
+                    "coverage_ratio": 0.75,
+                    "overall_completeness": {
+                        "status": "partial",
+                        "instrument_count": 4,
+                        "complete_instrument_count": 3,
+                        "incomplete_instrument_count": 1,
+                    },
+                }),
+            ))
+            session.add(AdjustmentFactorDecisionDB(
+                **operations._adjustment_factor_decision_payload(
+                    "legacy-coverage-v1",
+                    _decision() | {"confidence": "low"},
+                )
+            ))
+            session.commit()
+
+        result = await operations.refresh_adjustment_factor_series_summaries(
+            series_versions=["legacy-coverage-v1"],
+            dry_run=False,
+            confirm=True,
+        )
+        status = await operations.get_adjustment_factor_series_status(
+            "legacy-coverage-v1"
+        )
+
+        assert result["versions"][0]["after"]["coverage_ratio"] == 0.75
+        assert result["versions"][0]["after"]["conflict_count"] == 0
+        assert result["versions"][0]["after"][
+            "coverage_refresh_status"
+        ] == "preserved_no_instrument_statuses"
+        assert status["instrument_count"] == 4
+        assert status["coverage_ratio"] == 0.75
+        assert status["overall_completeness"]["status"] == "partial"
+        assert status["coverage_refresh_status"] == (
+            "preserved_no_instrument_statuses"
+        )
     finally:
         await manager.close_async()
 

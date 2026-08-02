@@ -855,6 +855,125 @@ def test_bse_provider_unwraps_live_jsonp_single_object_array():
     assert result.cursor_commit_allowed is True
 
 
+def test_bse_recent_market_provider_flattens_and_stops_at_date_boundary():
+    newest = {
+        "data": {
+            "content": [{
+                "disclosures": [{
+                    "disclosureId": "bse-new",
+                    "disclosureTitle": "乐创技术2025年年度权益分派实施公告",
+                    "publishDate": "2026-07-16",
+                    "destFilePath": "/disclosure/new.pdf",
+                    "companyCd": "920425",
+                    "fileExt": "pdf",
+                }],
+            }],
+            "totalPages": 3,
+        }
+    }
+    boundary = {
+        "data": {
+            "content": [{
+                "disclosures": [
+                    {
+                        "disclosureId": "bse-in-range",
+                        "disclosureTitle": "测试公司权益分派实施公告",
+                        "publishDate": "2026-07-10",
+                        "destFilePath": "/disclosure/in-range.pdf",
+                        "companyCd": "920001",
+                    },
+                    {
+                        "disclosureId": "bse-old",
+                        "disclosureTitle": "测试公司权益分派实施公告",
+                        "publishDate": "2026-07-01",
+                        "destFilePath": "/disclosure/old.pdf",
+                        "companyCd": "920001",
+                    },
+                ],
+            }],
+            "totalPages": 3,
+        }
+    }
+    session = _ExchangeSession([
+        _ExchangeResponse(newest),
+        _ExchangeResponse(boundary),
+    ])
+    provider = _exchange_provider(
+        "BSE",
+        session,
+        options={"endpoint_mode": "recent_market", "xxfcbj": ["2"]},
+    )
+
+    result = provider.discover(AnnouncementQuery(
+        purpose_key="a_share_bse_corporate_action_daily",
+        source="bse",
+        scope=AnnouncementScope(
+            exchange="BSE",
+            start_date="2026-07-05",
+            end_date="2026-07-20",
+            keyword="权益分派实施公告",
+            page_size=20,
+            max_pages=10,
+        ),
+    ))
+
+    assert result.status == "success"
+    assert result.is_complete is True
+    assert result.stop_reason == "requested_start_date_reached"
+    assert result.pages_scanned == 2
+    assert [record.source_announcement_id for record in result.records] == [
+        "bse-new", "bse-in-range",
+    ]
+    assert ("companyCd", "") in session.calls[0]["data"]
+    assert ("xxfcbj[]", "2") in session.calls[0]["data"]
+    assert ("needFields[]", "companyCd") in session.calls[0]["data"]
+    assert not any(
+        key in {"xxfcbj", "needFields"}
+        for key, _value in session.calls[0]["data"]
+    )
+
+
+def test_bse_recent_market_provider_applies_optional_symbol_filter_locally():
+    payload = {
+        "data": {
+            "content": [{
+                "disclosures": [
+                    {
+                        "disclosureId": "bse-1",
+                        "disclosureTitle": "甲公司权益分派实施公告",
+                        "publishDate": "2026-07-16",
+                        "destFilePath": "/one.pdf",
+                        "companyCd": "920001",
+                    },
+                    {
+                        "disclosureId": "bse-2",
+                        "disclosureTitle": "乙公司权益分派实施公告",
+                        "publishDate": "2026-07-16",
+                        "destFilePath": "/two.pdf",
+                        "companyCd": "920002",
+                    },
+                ],
+            }],
+            "totalPages": 1,
+        }
+    }
+    result = _exchange_provider(
+        "BSE",
+        _ExchangeSession([_ExchangeResponse(payload)]),
+        options={"endpoint_mode": "recent_market"},
+    ).discover(AnnouncementQuery(
+        purpose_key="unit_test",
+        source="bse",
+        scope=AnnouncementScope(
+            exchange="BSE",
+            symbol="920002",
+            keyword="权益分派实施公告",
+        ),
+    ))
+
+    assert [record.symbols for record in result.records] == [("920002",)]
+
+
 def test_exchange_provider_marks_exhausted_page_bound_incomplete():
     payload = {
         "result": [
@@ -902,7 +1021,7 @@ def test_repository_config_registers_enabled_announcement_sources_and_routes():
     assert registry.get("cninfo") is not None
     assert registry.get("sse") is not None
     assert registry.get("szse") is not None
-    assert registry.get("bse") is None
+    assert registry.get("bse") is not None
     assert acquisition_config.route_for(
         "business_profile_evidence:600028.SH",
         "SSE",

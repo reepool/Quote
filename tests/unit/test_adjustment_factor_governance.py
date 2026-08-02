@@ -754,6 +754,51 @@ async def test_stale_persisted_quote_coverage_keeps_watermark_partial():
 
 
 @pytest.mark.asyncio
+async def test_non_trading_day_watermark_stays_on_latest_completed_session():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={
+            "SSE": date(2026, 7, 31),
+            "SZSE": date(2026, 7, 31),
+        }
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 8, 2),
+        exchanges=["SSE", "SZSE"],
+        update_results={
+            "exchange_stats": {
+                exchange: {"failure_count": 0}
+                for exchange in ("SSE", "SZSE")
+            },
+            "factor_stats": {
+                exchange: {"status": "success", "failed": 0}
+                for exchange in ("SSE", "SZSE")
+            },
+        },
+    )
+
+    calls = manager.db_ops.upsert_operational_watermark.await_args_list
+    assert result["status"] == "success"
+    assert all(
+        call.kwargs["attempted_through"] == date(2026, 7, 31)
+        for call in calls
+    )
+    assert result["metadata"]["requested_target_date"] == "2026-08-02"
+    assert result["metadata"]["expected_quote_cutoff_by_exchange"] == {
+        "SSE": "2026-07-31",
+        "SZSE": "2026-07-31",
+    }
+
+
+@pytest.mark.asyncio
 async def test_invalid_activation_never_silently_falls_back(tmp_path):
     manager = DataManager()
     manager._factor_cache = {}
@@ -825,6 +870,32 @@ async def test_applied_decision_migration_invalidates_factor_cache():
 
     result = await manager.maintain_a_share_canonical_adjustment_factor_storage(
         operation="migrate_decisions",
+        series_versions=["v1"],
+        dry_run=False,
+        confirm=True,
+    )
+
+    assert result["status"] == "success"
+    assert manager._factor_cache == {}
+
+
+@pytest.mark.asyncio
+async def test_applied_summary_refresh_invalidates_factor_cache():
+    manager = DataManager()
+    manager._factor_cache = {"canonical:v1:0:000001.SZ": (0.0, {})}
+    manager.data_config = {
+        "adjustment_factor_governance": {
+            "read_dataset": "canonical",
+            "canonical_series_version": "v1",
+        },
+    }
+    manager.db_ops = Mock()
+    manager.db_ops.refresh_adjustment_factor_series_summaries = AsyncMock(
+        return_value={"status": "success", "dry_run": False}
+    )
+
+    result = await manager.maintain_a_share_canonical_adjustment_factor_storage(
+        operation="refresh_summaries",
         series_versions=["v1"],
         dry_run=False,
         confirm=True,

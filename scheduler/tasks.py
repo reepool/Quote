@@ -916,6 +916,8 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     reference_sources = benchmark.get("reference_sources") or {}
     discovery = result.get("candidate_discovery") or {}
     cninfo_refresh = result.get("cninfo_refresh") or {}
+    bse_official = result.get("bse_official_refresh") or {}
+    bse_scan = bse_official.get("scan") or {}
     cninfo_counters = cninfo_refresh.get("counters") or {}
     endpoint_metrics = cninfo_refresh.get("endpoint_metrics") or {}
     endpoint_targets = endpoint_metrics.get("target_counts") or {}
@@ -1036,6 +1038,17 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"circuits={throttle_metrics.get('circuit_trip_count', 0)}, "
             f"circuit_wait={float(throttle_metrics.get('circuit_wait_seconds', 0) or 0):.1f}s"
             "`",
+            "BSE官方近期证据: `"
+            f"status={bse_official.get('status', 'N/A')}, "
+            f"scope={bse_official.get('coverage_scope', 'recent_window_only')}, "
+            f"window={bse_official.get('requested_start_date', 'N/A')}.."
+            f"{bse_official.get('requested_end_date', 'N/A')}, "
+            f"pages={bse_scan.get('pages_scanned', 0)}, "
+            f"announcements={bse_official.get('matched_announcement_count', 0)}, "
+            f"events={bse_official.get('parsed_event_count', 0)}, "
+            f"partial={bse_official.get('parse_partial_count', 0)}, "
+            f"full_history={bse_official.get('full_history_complete', False)}"
+            "`",
             "TDX刷新: `"
             f"mode={tdx_refresh.get('refresh_mode', 'N/A')}, "
             f"targets={tdx_scope.get('instrument_count', 0)}, "
@@ -1047,6 +1060,7 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             "`",
             "执行状态: `"
             f"cninfo_primary={execution_status.get('primary', status)}, "
+            f"bse_official={execution_status.get('bse_official', 'N/A')}, "
             f"tdx_reference={execution_status.get('tdx_reference', 'N/A')}, "
             f"reconciliation={execution_status.get('reconciliation', 'N/A')}, "
             f"canonical={execution_status.get('canonical', 'inactive')}"
@@ -1108,6 +1122,7 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             "阶段耗时: `"
             f"discovery={float(stage_durations.get('candidate_discovery_seconds', 0) or 0):.1f}s, "
             f"cninfo={float(stage_durations.get('cninfo_refresh_seconds', 0) or 0):.1f}s, "
+            f"bse={float(stage_durations.get('bse_official_refresh_seconds', 0) or 0):.1f}s, "
             f"tdx={float(stage_durations.get('tdx_refresh_seconds', 0) or 0):.1f}s, "
             f"factors={float(stage_durations.get('factor_rebuild_seconds', 0) or 0):.1f}s, "
             "canonical="
