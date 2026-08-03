@@ -29,6 +29,7 @@
           "corporate_action_semantic_extraction": 1,
           "corporate_action_semantic_verification": 1,
           "business_profile_extraction": 1,
+          "business_profile_semantic_verification": 1,
           "direct": 1
         }
       }

@@ -959,7 +959,7 @@ async def get_research_business_profile_review_queue(
     record_type: Optional[str] = Query(None),
     limit: int = Query(200, ge=1, le=1000),
 ):
-    """读取候选业务画像事实，不触发同步或审批。"""
+    """读取候选事实和分层异常，不触发同步、模型调用或审批。"""
     try:
         payload = await data_manager.get_research_business_profile_review_queue(
             instrument_id=_normalize_optional_query(instrument_id),

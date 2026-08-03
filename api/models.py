@@ -738,6 +738,7 @@ class ResearchCompanyBusinessProfileResponse(BaseModel):
     approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_facts: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
+    exceptions: List[Dict[str, Any]] = Field(default_factory=list)
     profile_lifecycle: Dict[str, Any] = Field(
         default_factory=dict,
         description="业务 regime、画像变更事件及双时点历史",
@@ -768,6 +769,9 @@ class ResearchCompanyCommodityExposureResponse(BaseModel):
     data_available_cutoff: str
     approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+    approved_exposure_facts: List[Dict[str, Any]] = Field(default_factory=list)
+    candidate_exposure_facts: List[Dict[str, Any]] = Field(default_factory=list)
+    exceptions: List[Dict[str, Any]] = Field(default_factory=list)
     executable_exposure_mappings: List[Dict[str, Any]] = Field(default_factory=list)
     industry_default_profile: Dict[str, Any] = Field(default_factory=dict)
     conflicts: List[Dict[str, Any]] = Field(default_factory=list)
@@ -782,6 +786,10 @@ class ResearchBusinessProfileReviewQueueResponse(BaseModel):
 
     status: str
     row_count: int
+    candidate_count: int = 0
+    machine_rework_count: int = 0
+    quick_review_count: int = 0
+    deep_review_count: int = 0
     rows: List[Dict[str, Any]] = Field(default_factory=list)
 
 

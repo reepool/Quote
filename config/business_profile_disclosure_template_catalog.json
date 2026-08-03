@@ -1,7 +1,7 @@
 {
   "schema_version": "business_profile_disclosure_template_catalog.v1",
   "catalog_version": "business_profile_disclosure_templates.2026.1",
-  "fact_catalog_version": "business_profile_facts.2026.1",
+  "fact_catalog_version": "business_profile_facts.2026.2",
   "templates": [
     {
       "template_id": "common_periodic_report.v1",
@@ -104,7 +104,7 @@
           "required_headers": ["营业收入", "营业成本", "毛利率"],
           "optional_headers": ["分行业", "分产品", "分地区", "同比增减", "占营业收入比重"],
           "min_required_header_matches": 2,
-          "field_ids": ["segment.name", "segment.type", "segment.revenue", "segment.revenue_share", "segment.cost", "segment.gross_margin"],
+          "field_ids": ["segment.name", "segment.type", "segment.revenue", "segment.revenue_share", "segment.cost", "segment.cost_share", "segment.profit_share", "segment.gross_margin"],
           "row_role_markers": {
             "total": ["合计"],
             "subtotal": ["小计"],

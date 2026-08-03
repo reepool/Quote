@@ -21,6 +21,7 @@ from research.business_profile_review import BusinessProfileReviewService
 from research.providers.base import FinancialSourceFileManifest
 from tests.unit.test_research.test_business_profile_governance import (
     _approved_evidence,
+    _governed_upsert,
     _storage,
 )
 
@@ -84,7 +85,7 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     review_service = BusinessProfileReviewService(repository)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
     insignificant = _candidate_segment()
     insignificant["record_id"] = "segment-small"
@@ -139,7 +140,7 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
 def test_readiness_audit_reports_candidate_and_manifest_shortfalls(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
 
     missing = audit_product_label_review_readiness(
@@ -181,7 +182,7 @@ def test_readiness_audit_reports_candidate_and_manifest_shortfalls(tmp_path):
 def test_precision_rows_exclude_ambiguous_and_cross_source_duplicates(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
 
     duplicate = _candidate_segment()
@@ -224,7 +225,7 @@ def test_precision_rows_exclude_ambiguous_and_cross_source_duplicates(tmp_path):
 def test_catalog_issue_rows_select_material_unresolved_labels_only(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
 
     unresolved = _candidate_segment()
@@ -283,7 +284,7 @@ def test_catalog_issue_rows_select_material_unresolved_labels_only(tmp_path):
 def test_catalog_issue_review_package_exports_promotion_evidence(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     unresolved = _candidate_segment()
     unresolved["record_id"] = "segment-unresolved"
     unresolved["segment_id"] = "glass-products"
@@ -342,7 +343,7 @@ def test_catalog_issue_review_package_exports_promotion_evidence(tmp_path):
 def test_catalog_issue_evidence_rejects_tampering_and_nonpromotion(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     unresolved = _candidate_segment()
     unresolved["record_id"] = "segment-unresolved"
     unresolved["segment_name_raw"] = "玻璃制品"
@@ -437,7 +438,7 @@ def test_catalog_issue_review_hash_ignores_archive_location_and_document_order()
 def test_industry_coverage_requires_periodic_report_manifest(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     segment = _candidate_segment()
     segment["metadata"]["industry_group"] = "coal"
     repository.upsert("segments", segment)
@@ -477,7 +478,7 @@ def test_industry_coverage_requires_periodic_report_manifest(tmp_path):
 def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
     pdf_path = tmp_path / "annual.pdf"
     pdf_path.write_bytes(b"%PDF-official-fixture")
@@ -509,7 +510,7 @@ def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_pa
 def test_review_package_ignores_invalid_manifest_outside_selected_period(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
     selected_pdf = tmp_path / "annual-2025.pdf"
     selected_pdf.write_bytes(b"%PDF-selected")
@@ -536,7 +537,7 @@ def test_review_package_ignores_invalid_manifest_outside_selected_period(tmp_pat
 def test_review_evaluation_is_fail_closed_and_detects_source_tampering(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
     pdf_dir = tmp_path / "pdfs" / "601088.SH"
     pdf_dir.mkdir(parents=True)
@@ -579,7 +580,7 @@ def test_review_evaluation_is_fail_closed_and_detects_source_tampering(tmp_path)
 def test_review_evaluation_blocks_excessive_exclusions(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
     pdf_path = tmp_path / "annual.pdf"
     pdf_path.write_bytes(b"%PDF-official-fixture")

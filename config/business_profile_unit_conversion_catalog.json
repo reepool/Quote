@@ -1,7 +1,7 @@
 {
   "schema_version": "business_profile_unit_conversion_catalog.v1",
   "catalog_version": "business_profile_units.2026.1",
-  "fact_catalog_version": "business_profile_facts.2026.1",
+  "fact_catalog_version": "business_profile_facts.2026.2",
   "released_on": "2026-07-17",
   "period_basis_values": [
     "instant",

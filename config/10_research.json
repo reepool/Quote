@@ -106,16 +106,40 @@
         },
         "llm_extraction": {
           "enabled": false,
-          "provider": "openai_compatible",
-          "base_url": "",
-          "model": "",
-          "api_key_env": "",
-          "endpoint": "/v1/chat/completions",
-          "timeout_seconds": 90.0,
-          "max_input_characters": 30000,
-          "temperature": 0.0,
           "candidate_only": true,
-          "note": "Reserved interface only. It accepts selected filing sections, returns business_profile_llm_report.v1 JSON, and has no scheduler or DCF integration until a local model and quality benchmark are approved."
+          "deprecated": true,
+          "common_llm_profile": "semantic_extraction",
+          "note": "Legacy selected-section adapter compatibility switch only. Production extraction and verification use the common LLM gateway profile from config/11_llm.json; provider connection settings are not owned here."
+        },
+        "semantic_production": {
+          "enabled": false,
+          "promotion_enabled": false,
+          "scheduler_enabled": false,
+          "retry_limit": 3,
+          "checkpoint_root": "data/checkpoints/business_profile_semantic",
+          "budgets": {
+            "max_documents": 3,
+            "max_pages": 40,
+            "max_characters": 120000,
+            "max_tokens": 20000,
+            "max_cost": 5.0,
+            "max_elapsed_seconds": 900.0,
+            "max_errors": 10,
+            "max_concurrency": 2
+          },
+          "thresholds": {
+            "max_unsupported_output_rate": 0.01,
+            "max_conflict_rate": 0.02,
+            "max_drift_rate": 0.03,
+            "max_exception_backlog": 100
+          },
+          "kill_switches": {
+            "all_writes": false,
+            "network_calls": false,
+            "promotion": false,
+            "scope_widening": false
+          },
+          "note": "Disabled until frozen field-family manifests, bounded cohort validation, rollback drills, and exception-backlog gates pass."
         }
       },
       "industry": {

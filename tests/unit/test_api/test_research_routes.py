@@ -1418,6 +1418,13 @@ class TestResearchRoutes:
                 "approved_exposures": [],
                 "candidate_exposures": [],
                 "candidate_facts": {},
+                "exceptions": [
+                    {
+                        "exception_id": "exception-1",
+                        "tier": "machine_rework",
+                        "reason_codes": ["ocr_required"],
+                    }
+                ],
                 "executable_exposure_mappings": [],
                 "model_scores": {"industry_model_score": 0.9},
                 "model_recommendation": "industry_default",
@@ -1439,6 +1446,7 @@ class TestResearchRoutes:
 
         assert isinstance(response, ResearchCompanyBusinessProfileResponse)
         assert response.model_recommendation == "industry_default"
+        assert response.exceptions[0]["tier"] == "machine_rework"
         mock_dm.get_research_company_business_profile.assert_awaited_once_with(
             "601088.SH",
             as_of_date="2026-04-30",
@@ -1471,6 +1479,9 @@ class TestResearchRoutes:
                 "data_available_cutoff": "2026-04-30",
                 "approved_exposures": [{"exposure_id": "coal"}],
                 "candidate_exposures": [],
+                "approved_exposure_facts": [{"fact_id": "fact-1"}],
+                "candidate_exposure_facts": [],
+                "exceptions": [],
                 "executable_exposure_mappings": [],
                 "industry_default_profile": {},
                 "conflicts": [],
@@ -1491,6 +1502,7 @@ class TestResearchRoutes:
 
         assert isinstance(response, ResearchCompanyCommodityExposureResponse)
         assert response.approved_exposures[0]["exposure_id"] == "coal"
+        assert response.approved_exposure_facts[0]["fact_id"] == "fact-1"
 
     @patch("api.routes.data_manager")
     def test_get_research_business_profile_review_queue_success(self, mock_dm):
@@ -1498,7 +1510,17 @@ class TestResearchRoutes:
             return_value={
                 "status": "success",
                 "row_count": 1,
-                "rows": [{"record_type": "exposures", "exposure_id": "candidate"}],
+                "candidate_count": 0,
+                "machine_rework_count": 0,
+                "quick_review_count": 1,
+                "deep_review_count": 0,
+                "rows": [
+                    {
+                        "queue_kind": "exception",
+                        "review_tier": "quick_review",
+                        "record_type": "relationships",
+                    }
+                ],
             }
         )
 
@@ -1512,6 +1534,7 @@ class TestResearchRoutes:
 
         assert isinstance(response, ResearchBusinessProfileReviewQueueResponse)
         assert response.row_count == 1
+        assert response.quick_review_count == 1
 
     @patch("api.routes.data_manager")
     def test_get_research_financial_summary_success(self, mock_dm):

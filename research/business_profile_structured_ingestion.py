@@ -5,12 +5,18 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict
+import math
 from typing import Any, Optional
 
+from research.business_profile_fact_catalog import (
+    BusinessFactCatalog,
+    load_business_fact_catalog,
+)
 from research.business_profile_product_catalog import (
     BusinessProductCatalog,
     load_business_product_catalog,
 )
+from research.business_profile_temporal import derive_report_observation_interval
 from research.providers.akshare_business_profile import (
     BusinessCompositionRow,
     StructuredBusinessProfileSnapshot,
@@ -30,9 +36,11 @@ class StructuredBusinessProfileCandidateWriter:
         repository: Any,
         *,
         product_catalog: Optional[BusinessProductCatalog] = None,
+        fact_catalog: Optional[BusinessFactCatalog] = None,
     ):
         self.repository = repository
         self.product_catalog = product_catalog or load_business_product_catalog()
+        self.fact_catalog = fact_catalog or load_business_fact_catalog()
 
     def write(
         self,
@@ -225,6 +233,12 @@ class StructuredBusinessProfileCandidateWriter:
     ) -> dict[str, Any]:
         product_resolution = None
         commodity_candidates: list[dict[str, Any]] = []
+        segment_type_definition = self.fact_catalog.require("segment.type")
+        if row.classification_type not in segment_type_definition.allowed_values:
+            raise ValueError(
+                "structured segment_type is not supported by fact catalog "
+                f"{self.fact_catalog.catalog_version}: {row.classification_type}"
+            )
         if row.classification_type == "product":
             product_resolution = self.product_catalog.resolve_alias(
                 row.item_name,
@@ -259,6 +273,12 @@ class StructuredBusinessProfileCandidateWriter:
             exclude_record_id=record_id,
         )
         revenue_share, revenue_share_diagnostic = _validated_fraction(row.revenue_ratio)
+        cost_share, cost_share_diagnostic = _validated_fraction(row.cost_ratio)
+        profit_share, profit_share_diagnostic = _validated_fraction(row.profit_ratio)
+        gross_margin, gross_margin_diagnostic = _validated_gross_margin(row.gross_margin)
+        observation_start, observation_end = derive_report_observation_interval(
+            row.report_period
+        )
         return {
             "record_id": record_id,
             "instrument_id": row.instrument_id,
@@ -278,7 +298,11 @@ class StructuredBusinessProfileCandidateWriter:
             "segment_type": row.classification_type,
             "revenue": row.revenue,
             "revenue_share": revenue_share,
+            "segment_cost": row.cost,
+            "cost_share": cost_share,
             "segment_profit": row.profit,
+            "profit_share": profit_share,
+            "gross_margin": gross_margin,
             "segment_assets": None,
             "currency": "CNY",
             "consolidation_scope": "source_reported_unknown",
@@ -291,8 +315,8 @@ class StructuredBusinessProfileCandidateWriter:
             "extraction_method": "provider_structured_fields",
             "confidence": 1.0,
             "review_status": "candidate",
-            "valid_from": row.report_period,
-            "valid_to": None,
+            "valid_from": observation_start,
+            "valid_to": observation_end,
             "business_regime_id": None,
             "knowledge_from": available_date,
             "knowledge_to": None,
@@ -307,11 +331,8 @@ class StructuredBusinessProfileCandidateWriter:
                 "industry_group": str(industry_group or "").strip() or None,
                 "parser_version": PARSER_VERSION,
                 "product_catalog_version": self.product_catalog.catalog_version,
+                "fact_catalog_version": self.fact_catalog.catalog_version,
                 "revenue_ratio": row.revenue_ratio,
-                "cost": row.cost,
-                "cost_ratio": row.cost_ratio,
-                "profit_ratio": row.profit_ratio,
-                "gross_margin": row.gross_margin,
                 "product_resolution": (
                     asdict(product_resolution)
                     if product_resolution is not None
@@ -319,6 +340,9 @@ class StructuredBusinessProfileCandidateWriter:
                 ),
                 "commodity_mapping_candidates": commodity_candidates,
                 "revenue_share_diagnostic": revenue_share_diagnostic,
+                "cost_share_diagnostic": cost_share_diagnostic,
+                "profit_share_diagnostic": profit_share_diagnostic,
+                "gross_margin_diagnostic": gross_margin_diagnostic,
                 "semantic_inference_performed": False,
                 "requires_human_approval": True,
             },
@@ -372,6 +396,16 @@ def _validated_fraction(
         return None, None
     if value < 0 or value > 1:
         return None, "source_ratio_out_of_range"
+    return value, None
+
+
+def _validated_gross_margin(
+    value: Optional[float],
+) -> tuple[Optional[float], Optional[str]]:
+    if value is None:
+        return None, None
+    if not math.isfinite(value) or value > 1:
+        return None, "source_gross_margin_out_of_range"
     return value, None
 
 

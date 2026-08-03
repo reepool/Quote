@@ -4,6 +4,7 @@ from research.business_profile_governance import BusinessProfileRepository
 from scripts.research_business_profile_precision_review import main
 from tests.unit.test_research.test_business_profile_governance import (
     _approved_evidence,
+    _governed_upsert,
     _storage,
 )
 from tests.unit.test_research.test_business_profile_precision_review import (
@@ -15,7 +16,7 @@ from tests.unit.test_research.test_business_profile_precision_review import (
 def test_catalog_issue_cli_exports_review_package_and_promotion_evidence(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     unresolved = _candidate_segment()
     unresolved["record_id"] = "segment-unresolved"
     unresolved["segment_name_raw"] = "玻璃制品"

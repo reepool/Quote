@@ -2,6 +2,8 @@ import json
 
 import pytest
 
+from utils.llm.errors import LlmSchemaValidationError
+
 from research.business_profile_llm import (
     BusinessProfileDocumentSection,
     OpenAICompatibleBusinessProfileExtractor,
@@ -41,7 +43,7 @@ def test_llm_interface_accepts_strict_candidate_report():
         captured.update({"url": url, "headers": headers, "payload": payload, "timeout": timeout})
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.1",
+            "fact_catalog_version": "business_profile_facts.2026.2",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -89,10 +91,10 @@ def test_llm_interface_accepts_strict_candidate_report():
         message for message in captured["payload"]["messages"] if message.get("role") == "user"
     )
     user_payload = json.loads(user_message["content"])
-    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.1"
+    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.2"
     assert any(item["field_id"] == "segment.name" for item in user_payload["fact_fields"])
     assert result.report["facts"][0]["review_status"] == "candidate"
-    assert result.fact_catalog_version == "business_profile_facts.2026.1"
+    assert result.fact_catalog_version == "business_profile_facts.2026.2"
     assert result.request_hash
     assert result.response_hash
     assert result.model == "provider-model-v2"
@@ -121,7 +123,7 @@ def test_llm_interface_rejects_unknown_evidence_and_inferred_relationship():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.1",
+            "fact_catalog_version": "business_profile_facts.2026.2",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [],
@@ -147,7 +149,7 @@ def test_llm_interface_rejects_unknown_evidence_and_inferred_relationship():
         ),
         transport=transport,
     )
-    with pytest.raises(ValueError, match="explicitly stated"):
+    with pytest.raises(LlmSchemaValidationError, match="explicitly_stated"):
         extractor.extract(
             instrument_id="601088.SH",
             report_period="2025-12-31",
@@ -159,7 +161,7 @@ def test_llm_interface_rejects_unknown_fact_catalog_field():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.1",
+            "fact_catalog_version": "business_profile_facts.2026.2",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -224,7 +226,7 @@ def test_llm_interface_rejects_candidate_numeric_fact_without_unit():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.1",
+            "fact_catalog_version": "business_profile_facts.2026.2",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -251,6 +253,73 @@ def test_llm_interface_rejects_candidate_numeric_fact_without_unit():
     )
 
     with pytest.raises(ValueError, match="raw_unit"):
+        extractor.extract(
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            sections=[_section()],
+        )
+
+
+def test_llm_interface_rejects_unknown_units_and_model_supplied_governed_ids():
+    def report_with_fact(fact):
+        return {
+            "schema_version": "business_profile_llm_report.v1",
+            "fact_catalog_version": "business_profile_facts.2026.2",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "facts": [fact],
+            "relationships": [],
+            "warnings": [],
+        }
+
+    invalid_unit = report_with_fact(
+        {
+            "field_id": "segment.revenue",
+            "status": "candidate",
+            "review_status": "candidate",
+            "raw_value": "1000",
+            "raw_unit": "model_coin",
+            "evidence_section_ids": ["page-31-main-business"],
+        }
+    )
+    extractor = OpenAICompatibleBusinessProfileExtractor(
+        OpenAICompatibleLlmConfig(
+            enabled=True,
+            base_url="http://127.0.0.1:8000",
+            model="future-local-model",
+        ),
+        transport=lambda *_: {
+            "choices": [{"message": {"content": json.dumps(invalid_unit)}}]
+        },
+    )
+    with pytest.raises(ValueError, match="unknown business-profile unit"):
+        extractor.extract(
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            sections=[_section()],
+        )
+
+    invented_id = report_with_fact(
+        {
+            "field_id": "segment.name",
+            "status": "candidate",
+            "review_status": "candidate",
+            "raw_value": "动力煤",
+            "product_id": "model-invented-id",
+            "evidence_section_ids": ["page-31-main-business"],
+        }
+    )
+    extractor = OpenAICompatibleBusinessProfileExtractor(
+        OpenAICompatibleLlmConfig(
+            enabled=True,
+            base_url="http://127.0.0.1:8000",
+            model="future-local-model",
+        ),
+        transport=lambda *_: {
+            "choices": [{"message": {"content": json.dumps(invented_id)}}]
+        },
+    )
+    with pytest.raises(LlmSchemaValidationError, match="additionalProperties"):
         extractor.extract(
             instrument_id="601088.SH",
             report_period="2025-12-31",

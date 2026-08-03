@@ -11658,6 +11658,18 @@ class ResearchStorageManager:
                 "knowledge_to",
                 "knowledge_to TEXT",
             )
+        for column_name in (
+            "segment_cost",
+            "cost_share",
+            "profit_share",
+            "gross_margin",
+        ):
+            cls._ensure_column(
+                conn,
+                "company_business_segments",
+                column_name,
+                f"{column_name} REAL",
+            )
         for table_name in (
             "company_business_segments",
             "company_operating_facts",
@@ -11674,6 +11686,50 @@ class ResearchStorageManager:
             "company_commodity_exposures",
             "supersedes_exposure_id",
             "supersedes_exposure_id TEXT",
+        )
+        exposure_columns = {
+            str(row["name"]): row
+            for row in conn.execute(
+                "PRAGMA table_info(company_commodity_exposures)"
+            ).fetchall()
+        }
+        lag_column = exposure_columns.get("lag_days")
+        if lag_column is not None and int(lag_column["notnull"] or 0) == 1:
+            conn.execute(
+                "ALTER TABLE company_commodity_exposures "
+                "RENAME COLUMN lag_days TO lag_days_legacy_not_null"
+            )
+            conn.execute(
+                "ALTER TABLE company_commodity_exposures ADD COLUMN lag_days INTEGER"
+            )
+            conn.execute(
+                "UPDATE company_commodity_exposures "
+                "SET lag_days = lag_days_legacy_not_null"
+            )
+        for column_name, definition in (
+            ("fact_ids_json", "fact_ids_json TEXT NOT NULL DEFAULT '[]'"),
+            ("mapping_ids_json", "mapping_ids_json TEXT NOT NULL DEFAULT '[]'"),
+            ("assumption_ids_json", "assumption_ids_json TEXT NOT NULL DEFAULT '[]'"),
+            ("direction_rule_id", "direction_rule_id TEXT"),
+            ("build_policy_version", "build_policy_version TEXT"),
+            ("build_policy_hash", "build_policy_hash TEXT"),
+            ("component_lineage_hash", "component_lineage_hash TEXT"),
+            ("legacy_compatibility_status", "legacy_compatibility_status TEXT"),
+        ):
+            cls._ensure_column(
+                conn,
+                "company_commodity_exposures",
+                column_name,
+                definition,
+            )
+        conn.execute(
+            """
+            CREATE VIEW IF NOT EXISTS company_commodity_exposures_legacy_compatibility AS
+            SELECT * FROM company_commodity_exposures
+            WHERE component_lineage_hash IS NULL
+               OR json_array_length(fact_ids_json) = 0
+               OR json_array_length(mapping_ids_json) = 0
+            """
         )
         for table_name in (
             "company_business_segments",
@@ -11717,6 +11773,62 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_ingestion_runs_job_name
             ON ingestion_runs(job_name, started_at);
+
+            CREATE TABLE IF NOT EXISTS business_profile_semantic_runs (
+                run_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                source_document_id TEXT NOT NULL,
+                field_family TEXT NOT NULL,
+                status TEXT NOT NULL,
+                bundle_hash TEXT NOT NULL,
+                fact_catalog_version TEXT,
+                product_catalog_version TEXT,
+                evidence_count INTEGER NOT NULL DEFAULT 0,
+                fact_count INTEGER NOT NULL DEFAULT 0,
+                activity_count INTEGER NOT NULL DEFAULT 0,
+                relationship_count INTEGER NOT NULL DEFAULT 0,
+                error_code TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                started_at TEXT NOT NULL,
+                completed_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_semantic_runs_scope
+            ON business_profile_semantic_runs(
+                instrument_id, source_document_id, field_family, status, updated_at
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_exceptions (
+                exception_id TEXT PRIMARY KEY,
+                target_type TEXT NOT NULL,
+                target_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                field_family TEXT NOT NULL,
+                tier TEXT NOT NULL,
+                reason_codes_json TEXT NOT NULL,
+                retry_count INTEGER NOT NULL DEFAULT 0,
+                next_retry_at TEXT,
+                gate_signature TEXT NOT NULL,
+                gate_manifest_hash TEXT NOT NULL,
+                evidence_references_json TEXT NOT NULL DEFAULT '[]',
+                ranked_choices_json TEXT NOT NULL DEFAULT '[]',
+                status TEXT NOT NULL DEFAULT 'open',
+                resolved_at TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(target_type, target_id, gate_signature)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_exceptions_queue
+            ON business_profile_exceptions(
+                status, tier, field_family, next_retry_at, updated_at
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_exceptions_target
+            ON business_profile_exceptions(instrument_id, target_type, target_id);
 
             CREATE TABLE IF NOT EXISTS company_profiles (
                 instrument_id TEXT PRIMARY KEY,
@@ -11776,6 +11888,10 @@ class ResearchStorageManager:
             ON business_profile_evidence(instrument_id, report_period, data_available_date);
             CREATE INDEX IF NOT EXISTS idx_business_profile_evidence_review
             ON business_profile_evidence(review_status, updated_at);
+            CREATE INDEX IF NOT EXISTS idx_business_profile_evidence_asof_v2
+            ON business_profile_evidence(
+                instrument_id, review_status, data_available_date, evidence_id
+            );
 
             CREATE TABLE IF NOT EXISTS company_business_profile_events (
                 event_id TEXT PRIMARY KEY,
@@ -11805,6 +11921,10 @@ class ResearchStorageManager:
             );
             CREATE INDEX IF NOT EXISTS idx_company_business_profile_events_review
             ON company_business_profile_events(review_status, materiality, updated_at);
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_events_identity_v2
+            ON company_business_profile_events(
+                instrument_id, review_status, data_available_date, event_type, event_date
+            );
 
             CREATE TABLE IF NOT EXISTS company_business_profile_regimes (
                 regime_id TEXT PRIMARY KEY,
@@ -11836,6 +11956,11 @@ class ResearchStorageManager:
             );
             CREATE INDEX IF NOT EXISTS idx_company_business_profile_regimes_key
             ON company_business_profile_regimes(instrument_id, regime_key, version);
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_regimes_identity_v2
+            ON company_business_profile_regimes(
+                instrument_id, review_status, regime_key, knowledge_from, knowledge_to,
+                valid_from, valid_to, version
+            );
 
             CREATE TABLE IF NOT EXISTS company_business_segments (
                 record_id TEXT PRIMARY KEY,
@@ -11847,7 +11972,11 @@ class ResearchStorageManager:
                 segment_type TEXT NOT NULL,
                 revenue REAL,
                 revenue_share REAL,
+                segment_cost REAL,
+                cost_share REAL,
                 segment_profit REAL,
+                profit_share REAL,
+                gross_margin REAL,
                 segment_assets REAL,
                 currency TEXT,
                 consolidation_scope TEXT,
@@ -11876,6 +12005,13 @@ class ResearchStorageManager:
             ON company_business_segments(instrument_id, data_available_date, review_status);
             CREATE INDEX IF NOT EXISTS idx_company_business_segments_period
             ON company_business_segments(instrument_id, report_period, segment_type);
+            CREATE INDEX IF NOT EXISTS idx_company_business_segments_identity_v2
+            ON company_business_segments(
+                instrument_id, review_status, segment_id, segment_type,
+                consolidation_scope, report_period, knowledge_from, knowledge_to, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_business_segments_supersession_v2
+            ON company_business_segments(supersedes_record_id, review_status);
 
             CREATE TABLE IF NOT EXISTS company_operating_facts (
                 record_id TEXT PRIMARY KEY,
@@ -11913,6 +12049,14 @@ class ResearchStorageManager:
             ON company_operating_facts(instrument_id, data_available_date, review_status);
             CREATE INDEX IF NOT EXISTS idx_company_operating_facts_type
             ON company_operating_facts(instrument_id, report_period, fact_type);
+            CREATE INDEX IF NOT EXISTS idx_company_operating_facts_identity_v2
+            ON company_operating_facts(
+                instrument_id, review_status, fact_type, segment_id, project_id,
+                fact_scope, unit_normalized, report_period, knowledge_from,
+                knowledge_to, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_operating_facts_supersession_v2
+            ON company_operating_facts(supersedes_record_id, review_status);
 
             CREATE TABLE IF NOT EXISTS company_value_chain_roles (
                 record_id TEXT PRIMARY KEY,
@@ -11943,6 +12087,112 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_company_value_chain_roles_asof
             ON company_value_chain_roles(instrument_id, data_available_date, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_value_chain_roles_identity_v2
+            ON company_value_chain_roles(
+                instrument_id, review_status, segment_id, role, knowledge_from,
+                knowledge_to, valid_from, valid_to, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_value_chain_roles_supersession_v2
+            ON company_value_chain_roles(supersedes_record_id, review_status);
+
+            CREATE TABLE IF NOT EXISTS company_business_activities (
+                activity_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                subject_scope TEXT NOT NULL,
+                action TEXT NOT NULL,
+                object_type TEXT NOT NULL,
+                object_raw TEXT NOT NULL,
+                object_id TEXT,
+                segment_id TEXT,
+                geography TEXT,
+                value REAL,
+                unit TEXT,
+                share REAL,
+                evidence_id TEXT NOT NULL,
+                run_id TEXT,
+                data_available_date TEXT NOT NULL,
+                extraction_method TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT NOT NULL,
+                knowledge_to TEXT,
+                supersedes_activity_id TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_business_activities_asof
+            ON company_business_activities(
+                instrument_id, review_status, report_period, knowledge_from, knowledge_to
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_business_activities_identity
+            ON company_business_activities(
+                instrument_id, action, object_type, object_id, segment_id, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_business_activities_supersession
+            ON company_business_activities(supersedes_activity_id, review_status);
+
+            CREATE TABLE IF NOT EXISTS company_supply_chain_relationships (
+                relationship_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                relationship_type TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                counterparty_name_raw TEXT,
+                counterparty_name_normalized TEXT,
+                counterparty_entity_id TEXT,
+                resolution_basis TEXT,
+                anonymous INTEGER NOT NULL DEFAULT 0,
+                scope_type TEXT NOT NULL,
+                scope_id TEXT NOT NULL,
+                object_raw TEXT,
+                object_id TEXT,
+                disclosed_value REAL,
+                disclosed_unit TEXT,
+                disclosed_share REAL,
+                evidence_id TEXT NOT NULL,
+                run_id TEXT,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT NOT NULL,
+                knowledge_to TEXT,
+                supersedes_relationship_id TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_supply_chain_relationships_asof
+            ON company_supply_chain_relationships(
+                instrument_id, review_status, valid_from, valid_to,
+                knowledge_from, knowledge_to
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_supply_chain_relationships_identity
+            ON company_supply_chain_relationships(
+                instrument_id, relationship_type, counterparty_name_normalized,
+                scope_id, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_supply_chain_relationships_entity
+            ON company_supply_chain_relationships(counterparty_entity_id, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_supply_chain_relationships_supersession
+            ON company_supply_chain_relationships(
+                supersedes_relationship_id, review_status
+            );
 
             CREATE TABLE IF NOT EXISTS company_commodity_exposures (
                 exposure_id TEXT PRIMARY KEY,
@@ -11957,7 +12207,7 @@ class ResearchStorageManager:
                 mapping_basis TEXT NOT NULL,
                 price_series_id TEXT,
                 spread_definition_id TEXT,
-                lag_days INTEGER NOT NULL DEFAULT 0,
+                lag_days INTEGER,
                 pass_through_score REAL,
                 hedge_adjustment REAL,
                 evidence_id TEXT NOT NULL,
@@ -11969,6 +12219,14 @@ class ResearchStorageManager:
                 business_regime_id TEXT,
                 knowledge_from TEXT,
                 knowledge_to TEXT,
+                fact_ids_json TEXT NOT NULL DEFAULT '[]',
+                mapping_ids_json TEXT NOT NULL DEFAULT '[]',
+                assumption_ids_json TEXT NOT NULL DEFAULT '[]',
+                direction_rule_id TEXT,
+                build_policy_version TEXT,
+                build_policy_hash TEXT,
+                component_lineage_hash TEXT,
+                legacy_compatibility_status TEXT,
                 supersedes_exposure_id TEXT,
                 version INTEGER NOT NULL DEFAULT 1,
                 lineage_hash TEXT NOT NULL,
@@ -11982,6 +12240,103 @@ class ResearchStorageManager:
             ON company_commodity_exposures(instrument_id, data_available_date, review_status);
             CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_commodity
             ON company_commodity_exposures(commodity_id, exposure_role, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_identity_v2
+            ON company_commodity_exposures(
+                instrument_id, review_status, scope_type, scope_id, commodity_id,
+                exposure_role, knowledge_from, knowledge_to, effective_from,
+                effective_to, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_supersession_v2
+            ON company_commodity_exposures(supersedes_exposure_id, review_status);
+
+            CREATE TABLE IF NOT EXISTS company_commodity_exposure_facts (
+                fact_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                activity_id TEXT,
+                segment_id TEXT,
+                exposure_fact_type TEXT NOT NULL,
+                object_raw TEXT NOT NULL,
+                product_id TEXT,
+                value_raw REAL,
+                unit_raw TEXT,
+                value_normalized REAL,
+                unit_normalized TEXT,
+                share REAL,
+                fact_scope TEXT NOT NULL,
+                evidence_id TEXT NOT NULL,
+                run_id TEXT,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT NOT NULL,
+                knowledge_to TEXT,
+                supersedes_fact_id TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposure_facts_asof
+            ON company_commodity_exposure_facts(
+                instrument_id, review_status, report_period, knowledge_from, knowledge_to
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposure_facts_identity
+            ON company_commodity_exposure_facts(
+                instrument_id, activity_id, exposure_fact_type, product_id, segment_id,
+                fact_scope, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposure_facts_supersession
+            ON company_commodity_exposure_facts(supersedes_fact_id, review_status);
+
+            CREATE TABLE IF NOT EXISTS company_commodity_exposure_assumptions (
+                assumption_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                scope_type TEXT NOT NULL,
+                scope_id TEXT NOT NULL,
+                assumption_type TEXT NOT NULL,
+                assumption_value REAL NOT NULL,
+                unit TEXT NOT NULL,
+                method TEXT NOT NULL,
+                sample_start TEXT,
+                sample_end TEXT,
+                evidence_id TEXT,
+                run_id TEXT,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                effective_from TEXT,
+                effective_to TEXT,
+                knowledge_from TEXT NOT NULL,
+                knowledge_to TEXT,
+                supersedes_assumption_id TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposure_assumptions_asof
+            ON company_commodity_exposure_assumptions(
+                instrument_id, review_status, effective_from, effective_to,
+                knowledge_from, knowledge_to
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_company_commodity_exposure_assumptions_identity
+            ON company_commodity_exposure_assumptions(
+                instrument_id, scope_type, scope_id, assumption_type, version
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposure_assumptions_supersession
+            ON company_commodity_exposure_assumptions(
+                supersedes_assumption_id, review_status
+            );
 
             CREATE TABLE IF NOT EXISTS business_profile_review_audit (
                 audit_id TEXT PRIMARY KEY,

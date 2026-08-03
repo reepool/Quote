@@ -1,0 +1,217 @@
+{
+  "archive_artifacts": {
+    "archive_exists": true,
+    "archive_inventory_hash": "13295f3ed55abc78d098ca7f0bd7b15643666ea9ca39bbaa83e4e95a0fb941ae",
+    "file_count": 56,
+    "page_artifact_count": 0,
+    "suffix_counts": {
+      ".pdf": 56
+    }
+  },
+  "baseline_hash": "7784f0e7243c21a3f8c3144f6314d318312406b32344d7c12f6e0c189cb84c61",
+  "catalogs": {
+    "fact_catalog": {
+      "catalog_version": "business_profile_facts.2026.2",
+      "entry_count": 31,
+      "file_hash": "61df9bf9ff8621e3396274f8e1ced4773337ab34453fbf854468870db729f755",
+      "schema_version": "business_profile_fact_catalog.v1"
+    },
+    "product_catalog": {
+      "alias_count": 48,
+      "catalog_version": "business_profile_products.2026.2",
+      "commodity_mapping_count": 44,
+      "entry_count": 40,
+      "file_hash": "612ec41390c7b9d6f92f4a03630cb74ed97a83f021fb0800ce9f694b17ee80f2",
+      "schema_version": "business_profile_product_catalog.v2"
+    }
+  },
+  "enablement": {
+    "business_profile_module_enabled": false,
+    "llm_candidate_only": true,
+    "llm_extraction_enabled": false,
+    "semantic_production_enabled": false,
+    "semantic_promotion_enabled": false,
+    "semantic_scheduler_enabled": false,
+    "semantic_scheduler_gate_enabled": false,
+    "semantic_scheduler_manual_only": false,
+    "structured_scheduler_enabled": false,
+    "structured_scheduler_manual_only": false,
+    "structured_source_enabled": false
+  },
+  "field_families": {
+    "field_families": [
+      {
+        "field_family": "structured_segments",
+        "llm_allowed": false,
+        "output_record_types": [
+          "segments"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "structured_or_official_table",
+        "verification_policy": "deterministic_reconciliation"
+      },
+      {
+        "field_family": "tabular_operating_facts",
+        "llm_allowed": false,
+        "output_record_types": [
+          "operating_facts"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "official_table",
+        "verification_policy": "deterministic_reconciliation"
+      },
+      {
+        "field_family": "atomic_activities",
+        "llm_allowed": true,
+        "output_record_types": [
+          "activities"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "official_semantic",
+        "verification_policy": "independent_semantic_verification"
+      },
+      {
+        "field_family": "named_relationships",
+        "llm_allowed": true,
+        "output_record_types": [
+          "relationships"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "official_semantic",
+        "verification_policy": "independent_semantic_and_entity_resolution"
+      },
+      {
+        "field_family": "derived_value_chain_roles",
+        "llm_allowed": false,
+        "output_record_types": [
+          "value_chain_roles"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "governed_derivation",
+        "verification_policy": "deterministic_rule"
+      },
+      {
+        "field_family": "commodity_exposure_facts",
+        "llm_allowed": false,
+        "output_record_types": [
+          "exposure_facts"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "governed_derivation",
+        "verification_policy": "deterministic_rule"
+      },
+      {
+        "field_family": "commodity_exposure_publication",
+        "llm_allowed": false,
+        "output_record_types": [
+          "exposures"
+        ],
+        "requires_official_evidence": true,
+        "source_stage": "governed_publication",
+        "verification_policy": "approved_component_assembly"
+      }
+    ],
+    "schema_version": "business_profile_field_families.v1"
+  },
+  "generated_at": "2026-08-03T10:48:59.161046+00:00",
+  "official_manifests": {
+    "active_manifest_count": 56,
+    "database_exists": true,
+    "instrument_count": 5,
+    "instrument_period_count": 51,
+    "manifest_count": 56,
+    "manifest_inventory_hash": "daf718caaa2f33e2a34f149407b4690697c0c8a168d3067259ed889922dbb8f0",
+    "manifest_table_exists": true,
+    "report_type_counts": {
+      "annual_report": 32,
+      "semiannual_report": 24
+    },
+    "source_counts": {
+      "cninfo": 51,
+      "szse": 5
+    },
+    "status_counts": {
+      "archived": 54,
+      "archived_unchanged_content": 2
+    }
+  },
+  "production_tables": {
+    "database_exists": true,
+    "database_size_bytes": 3162812416,
+    "tables": {
+      "business_profile_evidence": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "business_profile_exceptions": {
+        "exists": false,
+        "row_count": null
+      },
+      "business_profile_review_audit": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "business_profile_semantic_runs": {
+        "exists": false,
+        "row_count": null
+      },
+      "company_business_activities": {
+        "exists": false,
+        "row_count": null
+      },
+      "company_business_profile_events": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "company_business_profile_regimes": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "company_business_segments": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "company_commodity_exposure_assumptions": {
+        "exists": false,
+        "row_count": null
+      },
+      "company_commodity_exposure_facts": {
+        "exists": false,
+        "row_count": null
+      },
+      "company_commodity_exposures": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "company_operating_facts": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      },
+      "company_supply_chain_relationships": {
+        "exists": false,
+        "row_count": null
+      },
+      "company_value_chain_roles": {
+        "exists": true,
+        "review_status_counts": {},
+        "row_count": 0,
+        "status_counts": {}
+      }
+    }
+  },
+  "schema_version": "business_profile_semantic_production_baseline.v1"
+}

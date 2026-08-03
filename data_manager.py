@@ -1556,6 +1556,84 @@ class DataManager:
             resume=resume,
         )
 
+    async def run_business_profile_semantic_production(
+        self,
+        *,
+        mode: str = "resume",
+        knowledge_cutoff: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        field_families: Optional[List[str]] = None,
+        runtime_identities: Optional[Dict[str, str]] = None,
+        promotion_manifest_hashes: Optional[Dict[str, str]] = None,
+        checkpoint_path: Optional[str] = None,
+        stage_payload: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Run one explicitly scoped semantic-production stage or resume step."""
+        if not self.research_config.enabled:
+            return {"status": "disabled", "reason": "research_config.enabled is false"}
+        if self.research_storage is None:
+            return {"status": "unavailable", "reason": "research storage is not initialized"}
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        production_payload = dict(module.get("semantic_production") or {})
+        if production_payload.get("enabled") is not True:
+            return {"status": "disabled", "reason": "business profile semantic production is disabled"}
+        instruments = tuple(
+            convert_to_database_format(item) for item in (instrument_ids or []) if item
+        )
+        families = tuple(str(item).strip() for item in (field_families or []) if str(item).strip())
+        identities = dict(runtime_identities or {})
+        if not instruments or not families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": "semantic production requires instruments, field families, and runtime identities",
+            }
+
+        from research.business_profile_semantic_pipeline import (
+            BusinessProfileSemanticPipeline,
+            SemanticProductionCheckpointStore,
+            SemanticProductionScope,
+            parse_semantic_production_config,
+        )
+
+        config = parse_semantic_production_config(production_payload)
+        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
+        checkpoint_root = Path(
+            production_payload.get("checkpoint_root")
+            or "data/checkpoints/business_profile_semantic"
+        )
+        resolved_checkpoint = Path(checkpoint_path) if checkpoint_path else (
+            checkpoint_root / f"{hashlib.sha256('|'.join(sorted(instruments)).encode()).hexdigest()[:16]}.json"
+        )
+
+        def artifact_handler(stage: str):
+            def run(**kwargs: Any) -> Mapping[str, Any]:
+                payload = dict(kwargs["payload"])
+                stage_result = payload.get(stage)
+                if not isinstance(stage_result, Mapping):
+                    raise ValueError(f"semantic stage payload is missing: {stage}")
+                return dict(stage_result)
+
+            return run
+
+        pipeline = BusinessProfileSemanticPipeline(
+            config=config,
+            checkpoint_store=SemanticProductionCheckpointStore(resolved_checkpoint),
+            handlers={stage: artifact_handler(stage) for stage in ("plan", "select", "extract", "verify", "promote")},
+        )
+        scope = SemanticProductionScope(
+            instruments=instruments,
+            field_families=families,
+            knowledge_cutoff=cutoff,
+            identities=identities,
+            promotion_manifest_hashes=dict(promotion_manifest_hashes or {}),
+        )
+        return await asyncio.to_thread(
+            pipeline.run,
+            mode,
+            scope=scope,
+            payload=dict(stage_payload or {}),
+        )
+
     async def get_research_company_profile(
         self,
         instrument_id: str,
@@ -1651,6 +1729,21 @@ class DataManager:
             "data_available_cutoff": context.get("data_available_cutoff"),
             "approved_exposures": context.get("approved_exposures") or [],
             "candidate_exposures": context.get("candidate_exposures") or [],
+            "approved_exposure_facts": (
+                context.get("company_specific_profile", {}).get(
+                    "commodity_exposure_facts"
+                )
+                or []
+            ),
+            "candidate_exposure_facts": (
+                context.get("candidate_facts", {}).get("exposure_facts") or []
+            ),
+            "exceptions": [
+                item
+                for item in (context.get("exceptions") or [])
+                if item.get("field_family")
+                in {"commodity_exposure_facts", "commodity_exposure_publication"}
+            ],
             "executable_exposure_mappings": context.get("executable_exposure_mappings") or [],
             "industry_default_profile": context.get("industry_default_profile") or {},
             "conflicts": context.get("conflicts") or [],
@@ -1675,15 +1768,46 @@ class DataManager:
             convert_to_database_format(instrument_id) if instrument_id else None
         )
         repository = BusinessProfileRepository(storage)
-        rows = await asyncio.to_thread(
+        candidate_rows = await asyncio.to_thread(
             repository.get_review_queue,
             instrument_id=normalized_id,
             record_type=record_type,
             limit=limit,
         )
+        exception_rows = await asyncio.to_thread(
+            repository.list_exceptions,
+            instrument_id=normalized_id,
+            target_type=record_type,
+            status="open",
+            limit=limit,
+        )
+        rows = [
+            {"queue_kind": "candidate", "review_tier": None, **row}
+            for row in candidate_rows
+        ] + [
+            {
+                "queue_kind": "exception",
+                "record_type": row.get("target_type"),
+                "review_tier": row.get("tier"),
+                **row,
+            }
+            for row in exception_rows
+        ]
+        rows.sort(key=lambda item: str(item.get("updated_at") or ""), reverse=True)
+        rows = rows[: max(1, min(int(limit), 1000))]
         return {
             "status": "success" if rows else "empty",
             "row_count": len(rows),
+            "candidate_count": sum(item["queue_kind"] == "candidate" for item in rows),
+            "machine_rework_count": sum(
+                item.get("review_tier") == "machine_rework" for item in rows
+            ),
+            "quick_review_count": sum(
+                item.get("review_tier") == "quick_review" for item in rows
+            ),
+            "deep_review_count": sum(
+                item.get("review_tier") == "deep_review" for item in rows
+            ),
             "rows": rows,
         }
 

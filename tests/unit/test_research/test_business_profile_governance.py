@@ -97,6 +97,36 @@ def _approved_evidence(instrument_id="601088.SH"):
     }
 
 
+def _governed_upsert(repository, record_type, record):
+    """Insert test records through the same candidate-first audited path as production."""
+
+    payload = dict(record)
+    requested_status = str(payload.get("review_status") or "candidate")
+    if requested_status == "candidate":
+        return repository.upsert(record_type, payload)
+    if requested_status != "approved":
+        raise ValueError(f"unsupported test review status: {requested_status}")
+    payload["review_status"] = "candidate"
+    record_id = repository.upsert(record_type, payload)
+    spec = BusinessProfileRepository._TABLES[record_type]
+    current = next(
+        item
+        for item in repository.list_records(record_type)
+        if str(item[spec["pk"]]) == str(record_id)
+    )
+    BusinessProfileReviewService(repository).system_promote_record(
+        record_type,
+        record_id,
+        field_family="test_fixture",
+        policy_version="test_fixture_policy.v1",
+        gate_manifest_hash="test-fixture-gates",
+        reviewer_version="v1",
+        expected_updated_at=current["updated_at"],
+        evidence_references=["test-fixture:official-evidence"],
+    )
+    return record_id
+
+
 def test_initialize_creates_business_profile_governance_tables(tmp_path):
     _, research_db = _storage(tmp_path)
 
@@ -132,6 +162,131 @@ def test_initialize_creates_business_profile_governance_tables(tmp_path):
         "knowledge_to",
         "supersedes_record_id",
     }.issubset(segment_columns)
+    with sqlite3.connect(research_db) as conn:
+        indexes = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'index'"
+            ).fetchall()
+        }
+    assert {
+        "idx_business_profile_evidence_asof_v2",
+        "idx_company_business_profile_regimes_identity_v2",
+        "idx_company_business_segments_identity_v2",
+        "idx_company_operating_facts_identity_v2",
+        "idx_company_value_chain_roles_identity_v2",
+        "idx_company_commodity_exposures_identity_v2",
+    }.issubset(indexes)
+
+
+def test_repository_rejects_unknown_fields_before_persistence(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    evidence = _approved_evidence()
+    evidence["model_supplied_policy_id"] = "invented"
+
+    with pytest.raises(ValueError, match="unknown fields"):
+        repository.upsert("evidence", evidence)
+    assert repository.list_records("evidence") == []
+
+
+def test_resolver_reports_migration_required_without_mutating_legacy_database(tmp_path):
+    legacy_db = tmp_path / "legacy.db"
+    with sqlite3.connect(legacy_db) as conn:
+        conn.execute("CREATE TABLE legacy_marker (id INTEGER PRIMARY KEY)")
+        conn.commit()
+
+    class _LegacyStorage:
+        @staticmethod
+        def _apply_pragmas(conn):
+            conn.row_factory = sqlite3.Row
+
+        @contextmanager
+        def get_connection(self):
+            conn = sqlite3.connect(legacy_db)
+            conn.row_factory = sqlite3.Row
+            try:
+                yield conn
+            finally:
+                conn.close()
+
+    context = BusinessProfileResolver(
+        BusinessProfileRepository(_LegacyStorage())
+    ).resolve("601088.SH", as_of_date="2026-04-30")
+
+    assert context["status"] == "not_ready"
+    assert context["readiness"]["storage_status"] == "migration_required"
+    with sqlite3.connect(legacy_db) as conn:
+        tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    assert tables == {"legacy_marker"}
+
+
+def test_readiness_distinguishes_stale_flow_missing_state_and_human_exception(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(
+        repository,
+        "segments",
+        {
+            "record_id": "stale-segment",
+            "instrument_id": "601088.SH",
+            "report_period": "2024-12-31",
+            "segment_id": "coal",
+            "segment_name_raw": "coal",
+            "segment_type": "product",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2025-03-28",
+            "confidence": 1.0,
+            "review_status": "approved",
+            "valid_from": "2024-01-01",
+            "valid_to": "2024-12-31",
+        },
+    )
+    _governed_upsert(
+        repository,
+        "value_chain_roles",
+        {
+            "record_id": "held-role",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "role": "processor",
+            "mapping_basis": "atomic_activity_rule",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2026-03-28",
+            "confidence": 1.0,
+            "review_status": "candidate",
+            "valid_from": "2026-03-28",
+        },
+    )
+    role = next(
+        item
+        for item in repository.list_records("value_chain_roles")
+        if item["record_id"] == "held-role"
+    )
+    BusinessProfileReviewService(repository).review_record(
+        "value_chain_roles",
+        "held-role",
+        decision="held",
+        reviewer="analyst@example",
+        reason="economic scope is ambiguous",
+        expected_review_status="candidate",
+        expected_updated_at=role["updated_at"],
+    )
+
+    readiness = BusinessProfileResolver(repository).resolve(
+        "601088.SH",
+        as_of_date="2026-12-31",
+    )["readiness"]["temporal_coverage"]
+
+    assert readiness["segments"]["status"] == "stale_flow_coverage"
+    assert readiness["value_chain_roles"]["status"] == "missing_current_state"
+    assert readiness["value_chain_roles"]["unresolved_exception_count"] == 1
 
 
 def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path):
@@ -161,9 +316,9 @@ def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path)
             "evidence_text_hash": "new-text-hash",
         }
     )
-    repository.upsert("evidence", old_evidence)
-    repository.upsert("evidence", new_evidence)
-    repository.upsert(
+    _governed_upsert(repository, "evidence", old_evidence)
+    _governed_upsert(repository, "evidence", new_evidence)
+    _governed_upsert(repository,
         "regimes",
         {
             "regime_id": "regime-old-v1",
@@ -180,7 +335,7 @@ def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path)
             "review_status": "approved",
         },
     )
-    repository.upsert(
+    _governed_upsert(repository,
         "regimes",
         {
             "regime_id": "regime-new-v1",
@@ -197,7 +352,7 @@ def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path)
             "review_status": "approved",
         },
     )
-    repository.upsert(
+    _governed_upsert(repository,
         "events",
         {
             "event_id": "event-reverse-merger",
@@ -231,7 +386,8 @@ def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path)
             None,
         ),
     ):
-        repository.upsert(
+        _governed_upsert(
+            repository,
             "segments",
             {
                 "record_id": record_id,
@@ -280,8 +436,8 @@ def test_reverse_merger_regime_does_not_rewrite_pre_disclosure_profile(tmp_path)
 def test_candidate_material_profile_event_does_not_replace_active_regime(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
-    repository.upsert(
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(repository,
         "regimes",
         {
             "regime_id": "regime-current",
@@ -296,7 +452,7 @@ def test_candidate_material_profile_event_does_not_replace_active_regime(tmp_pat
             "review_status": "approved",
         },
     )
-    repository.upsert(
+    _governed_upsert(repository,
         "events",
         {
             "event_id": "event-pending-disposal",
@@ -332,8 +488,8 @@ def test_candidate_material_profile_event_does_not_replace_active_regime(tmp_pat
 def test_material_business_expansion_keeps_existing_segments_in_same_regime(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
-    repository.upsert(
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(repository,
         "regimes",
         {
             "regime_id": "regime-integrated",
@@ -352,7 +508,7 @@ def test_material_business_expansion_keeps_existing_segments_in_same_regime(tmp_
         ("segment-coal", "coal production"),
         ("segment-power", "power generation expansion"),
     ):
-        repository.upsert(
+        _governed_upsert(repository,
             "segments",
             {
                 "record_id": record_id,
@@ -386,12 +542,12 @@ def test_material_business_expansion_keeps_existing_segments_in_same_regime(tmp_
 def test_overlapping_approved_regimes_fail_closed(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     for regime_id, valid_from in (
         ("regime-one", "2020-01-01"),
         ("regime-two", "2025-01-01"),
     ):
-        repository.upsert(
+        _governed_upsert(repository,
             "regimes",
             {
                 "regime_id": regime_id,
@@ -406,7 +562,7 @@ def test_overlapping_approved_regimes_fail_closed(tmp_path):
                 "review_status": "approved",
             },
         )
-        repository.upsert(
+        _governed_upsert(repository,
             "segments",
             {
                 "record_id": f"segment-{regime_id}",
@@ -437,8 +593,8 @@ def test_overlapping_approved_regimes_fail_closed(tmp_path):
 def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
-    repository.upsert(
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(repository,
         "segments",
         {
             "record_id": "segment-coal-2025",
@@ -456,7 +612,7 @@ def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
             "valid_from": "2026-03-28",
         },
     )
-    repository.upsert(
+    _governed_upsert(repository,
         "exposures",
         {
             "exposure_id": "exposure-coal-approved",
@@ -478,7 +634,7 @@ def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
             "effective_from": "2026-03-28",
         },
     )
-    repository.upsert(
+    _governed_upsert(repository,
         "exposures",
         {
             "exposure_id": "exposure-future-candidate",
@@ -526,8 +682,8 @@ def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
 def test_approved_special_commodity_series_is_executable(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
-    repository.upsert(
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(repository,
         "exposures",
         {
             "exposure_id": "exposure-soda-ash-cost",
@@ -568,12 +724,13 @@ def test_approved_special_commodity_series_is_executable(tmp_path):
 
 
 def test_approved_fact_with_unapproved_evidence_is_not_valuation_eligible(tmp_path):
-    storage, _ = _storage(tmp_path)
+    storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     evidence = _approved_evidence()
     evidence["review_status"] = "candidate"
-    repository.upsert("evidence", evidence)
-    repository.upsert(
+    _governed_upsert(repository, "evidence", evidence)
+    _governed_upsert(
+        repository,
         "value_chain_roles",
         {
             "record_id": "role-upstream",
@@ -585,10 +742,19 @@ def test_approved_fact_with_unapproved_evidence_is_not_valuation_eligible(tmp_pa
             "evidence_id": "evidence-2025-ar",
             "data_available_date": "2026-03-28",
             "confidence": 0.95,
-            "review_status": "approved",
+            "review_status": "candidate",
             "valid_from": "2026-03-28",
         },
     )
+    with sqlite3.connect(research_db) as conn:
+        conn.execute(
+            """
+            UPDATE company_value_chain_roles
+            SET review_status = 'approved'
+            WHERE record_id = 'role-upstream'
+            """
+        )
+        conn.commit()
 
     context = BusinessProfileResolver(repository).resolve(
         "601088.SH",
@@ -608,12 +774,12 @@ def test_approved_fact_with_unapproved_evidence_is_not_valuation_eligible(tmp_pa
 def test_review_queue_returns_only_candidates(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     candidate = _approved_evidence("600019.SH")
     candidate["evidence_id"] = "evidence-candidate"
     candidate["source_document_id"] = "candidate-doc"
     candidate["review_status"] = "candidate"
-    repository.upsert("evidence", candidate)
+    _governed_upsert(repository, "evidence", candidate)
 
     queue = repository.get_review_queue(record_type="evidence")
 
@@ -628,7 +794,7 @@ def test_review_approval_is_optimistic_and_audit_is_immutable(tmp_path):
     review_service = BusinessProfileReviewService(repository)
     evidence = _approved_evidence()
     evidence["review_status"] = "candidate"
-    repository.upsert("evidence", evidence)
+    _governed_upsert(repository, "evidence", evidence)
     candidate = repository.list_records("evidence")[0]
 
     audit = review_service.review_record(
@@ -652,7 +818,7 @@ def test_review_approval_is_optimistic_and_audit_is_immutable(tmp_path):
         audit
     ]
 
-    repository.upsert("evidence", evidence)
+    _governed_upsert(repository, "evidence", evidence)
     after_ingestion_rerun = repository.list_records("evidence")[0]
     assert after_ingestion_rerun["review_status"] == "approved"
     assert after_ingestion_rerun["updated_at"] == reviewed["updated_at"]
@@ -698,7 +864,7 @@ def test_non_official_evidence_approval_requires_review_reference(tmp_path):
     evidence = _approved_evidence()
     evidence["review_status"] = "candidate"
     evidence["source_tier"] = "structured_aggregator"
-    repository.upsert("evidence", evidence)
+    _governed_upsert(repository, "evidence", evidence)
     candidate = repository.list_records("evidence")[0]
 
     with pytest.raises(
@@ -733,20 +899,7 @@ def test_candidate_upsert_cannot_overwrite_concurrent_terminal_review(tmp_path):
     repository = BusinessProfileRepository(storage)
     evidence = _approved_evidence()
     evidence["review_status"] = "candidate"
-    repository.upsert("evidence", evidence)
-
-    class _RaceCursor:
-        def __init__(self, cursor, callback):
-            self._cursor = cursor
-            self._callback = callback
-
-        def fetchone(self):
-            row = self._cursor.fetchone()
-            self._callback()
-            return row
-
-        def __getattr__(self, name):
-            return getattr(self._cursor, name)
+    _governed_upsert(repository, "evidence", evidence)
 
     class _RaceConnection:
         def __init__(self, conn):
@@ -754,31 +907,22 @@ def test_candidate_upsert_cannot_overwrite_concurrent_terminal_review(tmp_path):
             self._triggered = False
 
         def execute(self, sql, params=()):
-            cursor = self._conn.execute(sql, params)
-            if (
-                not self._triggered
-                and "SELECT review_status" in sql
-                and "business_profile_evidence" in sql
-            ):
+            if not self._triggered and sql == "BEGIN IMMEDIATE":
                 self._triggered = True
-
-                def approve_after_precheck():
-                    with sqlite3.connect(research_db) as review_conn:
-                        review_conn.execute(
-                            """
-                            UPDATE business_profile_evidence
-                            SET review_status = 'approved',
-                                reviewed_by = 'concurrent-reviewer',
-                                reviewed_at = '2026-07-18T12:00:00+08:00',
-                                updated_at = '2026-07-18T12:00:00+08:00'
-                            WHERE evidence_id = ?
-                            """,
-                            (evidence["evidence_id"],),
-                        )
-                        review_conn.commit()
-
-                return _RaceCursor(cursor, approve_after_precheck)
-            return cursor
+                with sqlite3.connect(research_db) as review_conn:
+                    review_conn.execute(
+                        """
+                        UPDATE business_profile_evidence
+                        SET review_status = 'approved',
+                            reviewed_by = 'concurrent-reviewer',
+                            reviewed_at = '2026-07-18T12:00:00+08:00',
+                            updated_at = '2026-07-18T12:00:00+08:00'
+                        WHERE evidence_id = ?
+                        """,
+                        (evidence["evidence_id"],),
+                    )
+                    review_conn.commit()
+            return self._conn.execute(sql, params)
 
         def __getattr__(self, name):
             return getattr(self._conn, name)
@@ -804,8 +948,8 @@ def test_fact_approval_requires_same_instrument_approved_evidence(tmp_path):
     review_service = BusinessProfileReviewService(repository)
     evidence = _approved_evidence()
     evidence["review_status"] = "candidate"
-    repository.upsert("evidence", evidence)
-    repository.upsert(
+    _governed_upsert(repository, "evidence", evidence)
+    _governed_upsert(repository,
         "segments",
         {
             "record_id": "segment-candidate",
@@ -861,18 +1005,19 @@ def test_supersede_requires_an_approved_same_instrument_replacement(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     review_service = BusinessProfileReviewService(repository)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     for record_id, supersedes_record_id in (
         ("segment-old", None),
         ("segment-new", "segment-old"),
     ):
-        repository.upsert(
+        _governed_upsert(
+            repository,
             "segments",
             {
                 "record_id": record_id,
                 "instrument_id": "601088.SH",
                 "report_period": "2025-12-31",
-                "segment_id": record_id,
+                "segment_id": "stable-segment",
                 "segment_name_raw": record_id,
                 "segment_type": "product",
                 "evidence_id": "evidence-2025-ar",
@@ -880,6 +1025,7 @@ def test_supersede_requires_an_approved_same_instrument_replacement(tmp_path):
                 "confidence": 1.0,
                 "review_status": "approved",
                 "supersedes_record_id": supersedes_record_id,
+                "version": 2 if supersedes_record_id else 1,
             },
         )
     old = next(

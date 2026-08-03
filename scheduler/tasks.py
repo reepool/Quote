@@ -7022,6 +7022,62 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_id)
 
+    async def business_profile_semantic_maintenance(
+        self,
+        mode: str = "resume",
+        knowledge_cutoff: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        field_families: Optional[List[str]] = None,
+        runtime_identities: Optional[Dict[str, str]] = None,
+        promotion_manifest_hashes: Optional[Dict[str, str]] = None,
+        checkpoint_path: Optional[str] = None,
+        stage_payload: Optional[Dict[str, Any]] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run disabled-by-default hash-scoped semantic maintenance."""
+        task_id = "business_profile_semantic_maintenance"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.run_business_profile_semantic_production(
+                mode=mode,
+                knowledge_cutoff=knowledge_cutoff,
+                instrument_ids=instrument_ids,
+                field_families=field_families,
+                runtime_identities=runtime_identities,
+                promotion_manifest_hashes=promotion_manifest_hashes,
+                checkpoint_path=checkpoint_path,
+                stage_payload=stage_payload,
+            )
+            status = str(result.get("status") or "failed")
+            success = status in {"success", "unchanged", "disabled"}
+            await self._send_task_report(
+                report_data={
+                    "name": "业务画像语义增量生产报告",
+                    "status": "success" if success else "error",
+                    "tasks_completed": len(result.get("completed_stages") or []),
+                    "duration": f"{(result.get('metrics') or {}).get('elapsed_seconds', 0):.2f}s",
+                    "maintenance_tasks": [
+                        {
+                            "task_name": task_id,
+                            "status": result.get("reason") or status,
+                        }
+                    ],
+                    "business_profile_semantic_production": result,
+                },
+                report_type="maintenance_report",
+                task_name="业务画像语义增量生产",
+                job_config=job_config,
+            )
+            return success
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Business-profile semantic maintenance failed: %s",
+                exc,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
     async def industry_shadow_sync(
         self,
         exchanges: Optional[List[str]] = None,

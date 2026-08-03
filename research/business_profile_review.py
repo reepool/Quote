@@ -12,10 +12,16 @@ from research.business_profile_governance import (
     _json_loads,
     _stable_hash,
 )
+from research.business_profile_temporal import (
+    get_business_profile_supersession_column,
+    get_business_profile_temporal_policy,
+)
 from utils.date_utils import get_shanghai_time
 
 
-REVIEW_DECISIONS = {"approved", "rejected", "superseded"}
+REVIEW_DECISIONS = {"held", "approved", "rejected", "superseded"}
+SYSTEM_PROMOTION_SCHEMA_VERSION = "business_profile_system_promotion.v1"
+SYSTEM_PROMOTION_REVIEWER_PREFIX = "system:business_profile_auto_promotion."
 OFFICIAL_EVIDENCE_SOURCE_TIERS = {
     "official_backup",
     "official_filing",
@@ -43,6 +49,7 @@ class BusinessProfileReviewService:
         evidence_references: Optional[Sequence[str]] = None,
         replacement_record_id: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
+        _system_promotion: bool = False,
     ) -> Dict[str, Any]:
         """Apply one optimistic, audited review decision in a single transaction."""
         spec = self._record_spec(record_type)
@@ -53,6 +60,8 @@ class BusinessProfileReviewService:
         normalized_reason = str(reason or "").strip()
         if not normalized_reviewer:
             raise ValueError("reviewer is required")
+        if normalized_reviewer.startswith("system:") and not _system_promotion:
+            raise ValueError("system reviewer identities require system_promote_record")
         if not normalized_reason:
             raise ValueError("reason is required")
         expected_status = str(expected_review_status or "").strip().lower()
@@ -61,10 +70,16 @@ class BusinessProfileReviewService:
         expected_updated = str(expected_updated_at or "").strip()
         if not expected_updated:
             raise ValueError("expected_updated_at is required")
-        required_status = (
-            "approved" if normalized_decision == "superseded" else "candidate"
-        )
-        if expected_status != required_status:
+        if _system_promotion:
+            allowed_expected_statuses = {"candidate"}
+        elif normalized_decision == "superseded":
+            allowed_expected_statuses = {"approved"}
+        elif normalized_decision == "held":
+            allowed_expected_statuses = {"candidate"}
+        else:
+            allowed_expected_statuses = {"candidate", "held"}
+        if expected_status not in allowed_expected_statuses:
+            required_status = "/".join(sorted(allowed_expected_statuses))
             raise ValueError(
                 f"{normalized_decision} requires expected_review_status={required_status}"
             )
@@ -90,6 +105,12 @@ class BusinessProfileReviewService:
                     raise ValueError(
                         f"business profile record not found: {record_type}:{record_id}"
                     )
+                if _system_promotion:
+                    self._validate_no_prior_human_decision(
+                        conn,
+                        record_type=record_type,
+                        record_id=record_id,
+                    )
                 self._validate_expected_review_state(
                     row,
                     expected_status=expected_status,
@@ -101,6 +122,16 @@ class BusinessProfileReviewService:
                         record_type,
                         row,
                         evidence_references=references,
+                    )
+                    self.repository._validate_temporal_state(
+                        conn,
+                        record_type,
+                        {
+                            "spec": spec,
+                            "payload": row,
+                            "pk_value": str(row[spec["pk"]]),
+                            "status": "approved",
+                        },
                     )
                 if normalized_decision == "superseded":
                     replacement = self._load_review_row(conn, spec, replacement_id)
@@ -130,6 +161,56 @@ class BusinessProfileReviewService:
                 conn.rollback()
                 raise
         return audit
+
+    def system_promote_record(
+        self,
+        record_type: str,
+        record_id: str,
+        *,
+        field_family: str,
+        policy_version: str,
+        gate_manifest_hash: str,
+        reviewer_version: str,
+        expected_updated_at: str,
+        evidence_references: Optional[Sequence[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Approve one candidate through the normal optimistic audit transition."""
+
+        normalized = {
+            "field_family": str(field_family or "").strip(),
+            "policy_version": str(policy_version or "").strip(),
+            "gate_manifest_hash": str(gate_manifest_hash or "").strip(),
+            "reviewer_version": str(reviewer_version or "").strip(),
+        }
+        missing = [key for key, value in normalized.items() if not value]
+        if missing:
+            raise ValueError(
+                "system promotion identity is incomplete: " + ", ".join(sorted(missing))
+            )
+        if not normalized["reviewer_version"].startswith("v"):
+            raise ValueError("reviewer_version must be versioned")
+        promotion_metadata = dict(metadata or {})
+        promotion_metadata["system_promotion"] = {
+            "schema_version": SYSTEM_PROMOTION_SCHEMA_VERSION,
+            **normalized,
+        }
+        reviewer = SYSTEM_PROMOTION_REVIEWER_PREFIX + normalized["reviewer_version"]
+        return self.review_record(
+            record_type,
+            record_id,
+            decision="approved",
+            reviewer=reviewer,
+            reason=(
+                "all fail-closed automatic-promotion gates passed under "
+                f"{normalized['policy_version']}"
+            ),
+            expected_review_status="candidate",
+            expected_updated_at=expected_updated_at,
+            evidence_references=evidence_references,
+            metadata=promotion_metadata,
+            _system_promotion=True,
+        )
 
     def list_review_audit(
         self,
@@ -218,6 +299,30 @@ class BusinessProfileReviewService:
             )
 
     @staticmethod
+    def _validate_no_prior_human_decision(
+        conn: Any,
+        *,
+        record_type: str,
+        record_id: str,
+    ) -> None:
+        row = conn.execute(
+            """
+            SELECT reviewer, decision
+            FROM business_profile_review_audit
+            WHERE record_type = ? AND record_id = ?
+              AND reviewer NOT LIKE 'system:%'
+            ORDER BY reviewed_at DESC, audit_id DESC
+            LIMIT 1
+            """,
+            (record_type, record_id),
+        ).fetchone()
+        if row is not None:
+            raise ValueError(
+                "prior human decision blocks automatic promotion: "
+                f"{record_type}:{record_id}:{row['decision']}"
+            )
+
+    @staticmethod
     def _validate_approval_evidence(
         conn: Any,
         record_type: str,
@@ -236,6 +341,12 @@ class BusinessProfileReviewService:
                 )
             return
         evidence_id = str(row.get("evidence_id") or "").strip()
+        if record_type == "exposure_assumptions" and not evidence_id:
+            if not evidence_references:
+                raise ValueError(
+                    "calibrated exposure assumption approval requires evidence_references"
+                )
+            return
         evidence = conn.execute(
             """
             SELECT instrument_id, review_status
@@ -266,6 +377,8 @@ class BusinessProfileReviewService:
         current_id = (
             row.get("record_id")
             or row.get("exposure_id")
+            or row.get("fact_id")
+            or row.get("assumption_id")
             or row.get("event_id")
             or row.get("regime_id")
             or row.get("evidence_id")
@@ -276,12 +389,15 @@ class BusinessProfileReviewService:
             raise ValueError("replacement record instrument mismatch")
         if replacement.get("review_status") != "approved":
             raise ValueError("replacement record must already be approved")
-        pointer = (
-            replacement.get("supersedes_exposure_id")
-            if record_type == "exposures"
-            else replacement.get("supersedes_record_id")
-        )
-        if pointer and str(pointer) != str(current_id):
+        policy = get_business_profile_temporal_policy(record_type)
+        if not BusinessProfileRepository._same_stable_identity(
+            policy.stable_identity_fields,
+            row,
+            replacement,
+        ):
+            raise ValueError("replacement record stable identity mismatch")
+        pointer = replacement.get(get_business_profile_supersession_column(record_type))
+        if str(pointer or "") != str(current_id):
             raise ValueError("replacement record supersession pointer mismatch")
 
     def _update_review_status(

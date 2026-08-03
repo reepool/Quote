@@ -25,7 +25,7 @@ def test_default_unit_catalog_has_canonical_unit_for_each_dimension():
     }
 
     assert catalog.catalog_version == "business_profile_units.2026.1"
-    assert catalog.fact_catalog_version == "business_profile_facts.2026.1"
+    assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
     assert dimensions == canonical_dimensions
     assert len(catalog.units) == 36
     assert len(catalog.conversions) == 17

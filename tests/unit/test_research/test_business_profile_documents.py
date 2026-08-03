@@ -97,6 +97,7 @@ def test_classifies_operating_resource_contract_and_hedging_disclosures():
     cases = {
         "2026年6月份主要经营数据公告": "operating_data",
         "关于矿产资源储量更新的公告": "resource_report",
+        "关于新能源材料项目建成投产的公告": "capacity_change",
         "关于签署重大销售合同的公告": "major_contract",
         "关于开展商品期货套期保值业务的公告": "hedging_disclosure",
     }

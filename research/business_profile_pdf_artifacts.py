@@ -803,3 +803,37 @@ class BusinessProfilePdfArtifactStore:
     @staticmethod
     def read(path: str | Path) -> Dict[str, Any]:
         return json.loads(gzip.decompress(Path(path).read_bytes()).decode("utf-8"))
+
+
+def ensure_archived_pdf_page_artifact(
+    manifest: Mapping[str, Any],
+    *,
+    extractor: Optional[BusinessProfilePdfArtifactExtractor] = None,
+    store: Optional[BusinessProfilePdfArtifactStore] = None,
+    target_page_numbers: Iterable[int] = (),
+) -> Dict[str, Any]:
+    """Create or reuse native page artifacts for one verified archived PDF."""
+
+    archive_path = Path(str(manifest.get("archive_path") or ""))
+    expected_hash = str(manifest.get("content_hash") or "").strip()
+    if not archive_path.is_file():
+        raise FileNotFoundError(archive_path)
+    if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+        raise ValueError("manifest content_hash must be a sha256 hex digest")
+    actual_hash = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+    if actual_hash != expected_hash:
+        raise RuntimeError(f"archived PDF hash mismatch: {archive_path}")
+    active_extractor = extractor or BusinessProfilePdfArtifactExtractor()
+    active_store = store or BusinessProfilePdfArtifactStore()
+    artifact = active_extractor.extract_file(
+        archive_path,
+        source_file_id=str(manifest.get("source_file_id") or "") or None,
+        target_page_numbers=target_page_numbers,
+    )
+    write_result = active_store.write(artifact)
+    return {
+        "artifact": artifact,
+        "artifact_path": write_result.artifact_path,
+        "artifact_hash": write_result.artifact_hash,
+        "status": write_result.status,
+    }

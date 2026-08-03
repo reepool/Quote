@@ -12,6 +12,7 @@ from research.business_profile_pdf_artifacts import (
     build_not_disclosed_diagnostic,
     build_table_parse_failure_diagnostic,
     build_unsupported_template_diagnostic,
+    ensure_archived_pdf_page_artifact,
 )
 from scripts.research_business_profile_pdf_artifact import build_pdf_artifact
 
@@ -252,3 +253,32 @@ def test_diagnostics_only_command_helper_does_not_write_artifact(tmp_path):
     assert payload["parameter_hash"]
     assert payload["parser_diagnostics"] == []
     assert not (tmp_path / "derived").exists()
+
+
+def test_archived_manifest_page_artifact_is_hash_bound_and_reused(tmp_path):
+    source_path = tmp_path / "original" / "report.pdf"
+    source_path.parent.mkdir(parents=True)
+    content = _pdf_bytes(["Principal Business native text"])
+    source_path.write_bytes(content)
+    manifest = {
+        "source_file_id": "source-1",
+        "archive_path": str(source_path),
+        "content_hash": __import__("hashlib").sha256(content).hexdigest(),
+    }
+
+    first = ensure_archived_pdf_page_artifact(
+        manifest,
+        extractor=BusinessProfilePdfArtifactExtractor(low_text_character_threshold=5),
+    )
+    second = ensure_archived_pdf_page_artifact(
+        manifest,
+        extractor=BusinessProfilePdfArtifactExtractor(low_text_character_threshold=5),
+    )
+
+    assert first["status"] == "written"
+    assert second["status"] == "unchanged"
+    assert first["artifact_hash"] == second["artifact_hash"]
+
+    source_path.write_bytes(content + b"changed")
+    with pytest.raises(RuntimeError, match="hash mismatch"):
+        ensure_archived_pdf_page_artifact(manifest)

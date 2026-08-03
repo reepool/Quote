@@ -966,6 +966,34 @@
           "max_runtime_seconds": 960
         }
       },
+      "business_profile_semantic_maintenance": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股业务画像语义增量生产（默认关闭，仅处理哈希变化、覆盖缺口和到期机器重试）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 11,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "mode": "resume",
+          "knowledge_cutoff": null,
+          "instrument_ids": [],
+          "field_families": [],
+          "runtime_identities": {},
+          "promotion_manifest_hashes": {},
+          "checkpoint_path": null,
+          "stage_payload": {},
+          "max_runtime_seconds": 960
+        }
+      },
       "industry_official_mapping_refresh": {
         "enabled": false,
         "description": "研究域申万官方历史分类映射审计缓存刷新（非 current membership 前置）",

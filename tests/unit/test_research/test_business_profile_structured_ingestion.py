@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import replace
 
 import pandas as pd
+import pytest
 
 from research.business_profile_product_catalog import load_business_product_catalog
 from research.business_profile_governance import BusinessProfileRepository
@@ -105,6 +106,14 @@ def test_writer_creates_candidate_evidence_and_segments_without_exposures(tmp_pa
     )
     assert mapped["segment_name_normalized"] == "coal.thermal_coal"
     assert mapped["revenue_share"] == 0.8
+    assert mapped["segment_cost"] == 600
+    assert mapped["cost_share"] == 0.75
+    assert mapped["profit_share"] == 0.9
+    assert mapped["gross_margin"] == 0.4
+    assert mapped["metadata"]["fact_catalog_version"] == (
+        "business_profile_facts.2026.2"
+    )
+    assert "cost" not in mapped["metadata"]
     assert mapped["metadata"]["commodity_mapping_candidates"]
     assert unknown["segment_name_normalized"] is None
     assert unknown["metadata"]["product_resolution"]["diagnostics"] == [
@@ -112,6 +121,47 @@ def test_writer_creates_candidate_evidence_and_segments_without_exposures(tmp_pa
     ]
 
 
+def test_writer_preserves_negative_gross_margin_and_rejects_unknown_segment_type(
+    tmp_path,
+):
+    repository = _repository(tmp_path)
+    writer = StructuredBusinessProfileCandidateWriter(repository)
+    snapshot = _snapshot()
+    negative_margin = replace(
+        snapshot.composition.rows[0],
+        gross_margin=-0.25,
+        source_row_hash="negative-margin",
+    )
+    writer.write(
+        replace(
+            snapshot,
+            composition=replace(
+                snapshot.composition,
+                payload_hash="negative-margin-payload",
+                rows=(negative_margin,),
+            ),
+        ),
+        industry_group="coal",
+    )
+    segment = repository.get_profile_history("601088.SH")["segments"][0]
+    assert segment["gross_margin"] == -0.25
+
+    invalid = replace(
+        negative_margin,
+        classification_type="model_invented_dimension",
+        source_row_hash="invalid-dimension",
+    )
+    with pytest.raises(ValueError, match="not supported by fact catalog"):
+        writer.write(
+            replace(
+                snapshot,
+                composition=replace(
+                    snapshot.composition,
+                    payload_hash="invalid-dimension-payload",
+                    rows=(invalid,),
+                ),
+            )
+        )
 def test_writer_is_idempotent_for_unchanged_source_payload(tmp_path):
     repository = _repository(tmp_path)
     writer = StructuredBusinessProfileCandidateWriter(repository)

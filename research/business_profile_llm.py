@@ -15,6 +15,10 @@ from research.business_profile_fact_catalog import (
     BusinessFactDefinition,
     load_business_fact_catalog,
 )
+from research.business_profile_unit_conversions import (
+    UnitConversionCatalog,
+    load_unit_conversion_catalog,
+)
 from utils.llm import (
     LlmClient,
     LlmConfig,
@@ -188,6 +192,7 @@ class OpenAICompatibleBusinessProfileExtractor:
         transport: Optional[Transport] = None,
         llm_client: Optional[LlmClientProtocol] = None,
         fact_catalog: Optional[BusinessFactCatalog] = None,
+        unit_catalog: Optional[UnitConversionCatalog] = None,
     ):
         self.config = config
         if transport is not None and llm_client is not None:
@@ -223,6 +228,9 @@ class OpenAICompatibleBusinessProfileExtractor:
         )
         self._owns_gateway = llm_client is None
         self.fact_catalog = fact_catalog or load_business_fact_catalog()
+        self.unit_catalog = unit_catalog or load_unit_conversion_catalog()
+        if self.unit_catalog.fact_catalog_version != self.fact_catalog.catalog_version:
+            raise ValueError("business-profile LLM catalog versions do not match")
 
     def extract(
         self,
@@ -333,6 +341,7 @@ class OpenAICompatibleBusinessProfileExtractor:
             report_period=period,
             valid_section_ids={section.section_id for section in validated_sections},
             fact_catalog=self.fact_catalog,
+            unit_catalog=self.unit_catalog,
         )
         return LlmExtractionEnvelope(
             schema_version=LLM_REPORT_SCHEMA_VERSION,
@@ -392,14 +401,60 @@ class OpenAICompatibleBusinessProfileExtractor:
                 "fact_catalog_version": {"type": "string"},
                 "instrument_id": {"type": "string"},
                 "report_period": {"type": "string"},
-                "facts": {"type": "array", "items": {"type": "object"}},
+                "facts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "field_id",
+                            "status",
+                            "review_status",
+                            "evidence_section_ids",
+                        ],
+                        "properties": {
+                            "field_id": {"type": "string"},
+                            "status": {"type": "string"},
+                            "review_status": {"const": "candidate"},
+                            "raw_value": {},
+                            "raw_unit": {"type": "string"},
+                            "unit": {"type": "string"},
+                            "evidence_section_ids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                        "additionalProperties": False,
+                    },
+                },
                 "relationships": {
                     "type": "array",
-                    "items": {"type": "object"},
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "relationship_type",
+                            "subject",
+                            "object",
+                            "explicitly_stated",
+                            "review_status",
+                            "evidence_section_ids",
+                        ],
+                        "properties": {
+                            "relationship_type": {"type": "string"},
+                            "subject": {"type": "string"},
+                            "object": {"type": "string"},
+                            "explicitly_stated": {"const": True},
+                            "review_status": {"const": "candidate"},
+                            "evidence_section_ids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                        "additionalProperties": False,
+                    },
                 },
                 "warnings": {"type": "array", "items": {"type": "string"}},
             },
-            "additionalProperties": True,
+            "additionalProperties": False,
         }
 
 
@@ -410,6 +465,7 @@ def _parse_and_validate_report(
     report_period: str,
     valid_section_ids: set[str],
     fact_catalog: BusinessFactCatalog,
+    unit_catalog: UnitConversionCatalog,
 ) -> dict[str, Any]:
     if not isinstance(report, dict):
         raise ValueError("LLM structured report must be an object")
@@ -421,6 +477,19 @@ def _parse_and_validate_report(
         raise ValueError("LLM structured report report_period mismatch")
     if report.get("fact_catalog_version") != fact_catalog.catalog_version:
         raise ValueError("LLM structured report fact_catalog_version mismatch")
+    _reject_unknown_keys(
+        report,
+        {
+            "schema_version",
+            "fact_catalog_version",
+            "instrument_id",
+            "report_period",
+            "facts",
+            "relationships",
+            "warnings",
+        },
+        "report",
+    )
 
     facts = _object_list(report.get("facts"), "facts")
     relationships = _object_list(report.get("relationships"), "relationships")
@@ -430,6 +499,19 @@ def _parse_and_validate_report(
 
     for index, fact in enumerate(facts):
         location = f"facts[{index}]"
+        _reject_unknown_keys(
+            fact,
+            {
+                "field_id",
+                "status",
+                "review_status",
+                "raw_value",
+                "raw_unit",
+                "unit",
+                "evidence_section_ids",
+            },
+            location,
+        )
         field_id = _required_text(fact.get("field_id"), f"{location}.field_id")
         definition = fact_catalog.get(field_id)
         if definition is None:
@@ -447,6 +529,7 @@ def _parse_and_validate_report(
             _validate_candidate_fact_value(
                 fact,
                 definition=definition,
+                unit_catalog=unit_catalog,
                 location=location,
             )
         _validate_evidence_refs(
@@ -456,6 +539,18 @@ def _parse_and_validate_report(
         )
 
     for index, relationship in enumerate(relationships):
+        _reject_unknown_keys(
+            relationship,
+            {
+                "relationship_type",
+                "subject",
+                "object",
+                "explicitly_stated",
+                "review_status",
+                "evidence_section_ids",
+            },
+            f"relationships[{index}]",
+        )
         relationship_type = _required_text(
             relationship.get("relationship_type"),
             f"relationships[{index}].relationship_type",
@@ -523,6 +618,7 @@ def _validate_candidate_fact_value(
     fact: Mapping[str, Any],
     *,
     definition: BusinessFactDefinition,
+    unit_catalog: UnitConversionCatalog,
     location: str,
 ) -> None:
     if "raw_value" not in fact or fact.get("raw_value") is None:
@@ -540,10 +636,20 @@ def _validate_candidate_fact_value(
             and numeric_value != numeric_value.to_integral_value()
         ):
             raise ValueError(f"{location} raw_value must be integer")
-        _required_text(
+        raw_unit = _required_text(
             fact.get("raw_unit") or fact.get("unit"),
             f"{location}.raw_unit",
         )
+        resolved_unit = unit_catalog.resolve_unit(raw_unit)
+        allowed_dimensions = {
+            unit_catalog.resolve_unit(unit).dimension
+            for unit in definition.canonical_units
+        }
+        if resolved_unit.dimension not in allowed_dimensions:
+            raise ValueError(
+                f"{location} raw_unit dimension is invalid for "
+                f"{definition.field_id}: {raw_unit}"
+            )
         return
     value_text = _required_text(raw_value, f"{location}.raw_value")
     if definition.value_type == "enum" and value_text not in definition.allowed_values:
@@ -573,6 +679,16 @@ def _object_list(value: Any, field_name: str) -> list[dict[str, Any]]:
     if not all(isinstance(item, dict) for item in value):
         raise ValueError(f"LLM structured report {field_name} must contain objects")
     return value
+
+
+def _reject_unknown_keys(
+    value: Mapping[str, Any],
+    allowed: set[str],
+    location: str,
+) -> None:
+    unknown = sorted(set(value) - allowed)
+    if unknown:
+        raise ValueError(f"{location} contains unknown fields: {unknown}")
 
 
 def _normalize_instrument_id(value: str) -> str:

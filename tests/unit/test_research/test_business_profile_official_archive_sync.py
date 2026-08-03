@@ -20,6 +20,7 @@ from research.business_profile_official_archive_sync import (
 )
 from tests.unit.test_research.test_business_profile_governance import (
     _approved_evidence,
+    _governed_upsert,
     _storage,
 )
 
@@ -138,13 +139,13 @@ def _resolution(candidates, *, source):
 
 def _seed_review_candidate(storage):
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
 
 
 def _seed_catalog_issue_candidate(storage):
     repository = BusinessProfileRepository(storage)
-    repository.upsert("evidence", _approved_evidence())
+    _governed_upsert(repository, "evidence", _approved_evidence())
     segment = _candidate_segment()
     segment["record_id"] = "segment-catalog-issue"
     segment["segment_id"] = "glass-products"
@@ -165,7 +166,7 @@ def _seed_invalid_review_candidate(storage):
     evidence = _approved_evidence("BAD-ID")
     evidence["evidence_id"] = "evidence-bad-id"
     evidence["source_document_id"] = "source-bad-id"
-    repository.upsert("evidence", evidence)
+    _governed_upsert(repository, "evidence", evidence)
     repository.upsert(
         "segments",
         _candidate_segment(
