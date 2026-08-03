@@ -936,6 +936,8 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     anomaly_promotion = anomaly_llm.get("auto_promotion") or {}
     anomaly_review = anomaly_llm.get("review_workload") or {}
     canonical_maintenance = result.get("canonical_maintenance") or {}
+    canonical_predecessor = canonical_maintenance.get("predecessor") or {}
+    factor_retry_state = result.get("factor_retry_state") or {}
     anomaly_reason_counts = anomaly.get("reason_counts") or {}
     anomaly_reason_summary = ",".join(
         f"{reason}:{count}"
@@ -1077,6 +1079,24 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             "merged_rows="
             f"{(canonical_maintenance.get('merge') or {}).get('canonical_rows', 0)}"
             "`",
+            "Canonical阻塞: `"
+            f"reason={canonical_maintenance.get('blocker_reason') or 'none'}, "
+            "workflow_deferred="
+            f"{canonical_maintenance.get('workflow_deferred', False)}, "
+            "actionable_retry="
+            f"{canonical_maintenance.get('actionable_retry_count', 0)}"
+            "`",
+            "因子重试队列: `"
+            f"status={factor_retry_state.get('status', 'N/A')}, "
+            "actionable="
+            f"{factor_retry_state.get('actionable_retry_count', 0)}"
+            "`",
+            "Canonical前序: `"
+            f"reason={canonical_predecessor.get('reason', 'N/A')}, "
+            f"required={canonical_predecessor.get('required_through', 'N/A')}, "
+            "cutoffs="
+            f"{canonical_predecessor.get('successful_through_by_exchange', {})}"
+            "`",
             "受影响标的: `"
             f"total={affected.get('count', 0)}, "
             f"cninfo={affected.get('cninfo_count', 0)}, "
@@ -1133,6 +1153,28 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         ]
         if factor_result.get("status") == "skipped":
             incremental_lines.append("因子重建: `无需执行（本轮无受影响标的）`")
+        unmatched_samples = []
+        for instrument_id, items in sorted(
+            (
+                anomaly.get(
+                    "deferred_special_announcements_by_instrument"
+                ) or {}
+            ).items()
+        ):
+            for item in items or ():
+                title = str(item.get("title") or "").strip()
+                if title:
+                    unmatched_samples.append(
+                        f"{instrument_id}:{title[:80]}"
+                    )
+                if len(unmatched_samples) >= 5:
+                    break
+            if len(unmatched_samples) >= 5:
+                break
+        if unmatched_samples:
+            incremental_lines.append(
+                "待处理公告样本: `" + "；".join(unmatched_samples) + "`"
+            )
         lines[8:8] = incremental_lines
     return "\n".join(lines)
 

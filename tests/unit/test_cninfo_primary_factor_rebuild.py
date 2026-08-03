@@ -1460,6 +1460,7 @@ async def test_three_source_empty_paths_require_explicit_completion_evidence():
 
     assert result["candidate"]["row_count"] == 0
     assert result["candidate"]["blocked_segment_count"] == 1
+    assert result["candidate"]["blocked_instrument_ids"] == ["000001.SZ"]
     assert result["candidate"]["decisions"][0]["eligible_sources"] == []
     assert result["candidate"]["candidate_promotion_eligible"] is False
     assert result["benchmark"]["baseline_covered_instruments"] == 0

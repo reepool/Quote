@@ -654,6 +654,11 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
                 "exceptional_implementation_title": 2,
                 "incomplete_structured_event": 1,
             },
+            "deferred_special_announcements_by_instrument": {
+                "600000.SH": [{
+                    "title": "重整计划资本公积金转增股本实施公告",
+                }],
+            },
             "llm": {
                 "counts": {
                     "processed": 2,
@@ -670,6 +675,25 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
             "bse_official": "success",
             "tdx_reference": "partial",
             "reconciliation": "partial",
+        },
+        "canonical_maintenance": {
+            "status": "partial",
+            "active_series_version": "v1",
+            "scope_instrument_count": 5,
+            "blocker_reason": "predecessor_watermark_stale",
+            "workflow_deferred": True,
+            "actionable_retry_count": 0,
+            "predecessor": {
+                "reason": "predecessor_watermark_stale",
+                "required_through": "2026-07-22",
+                "successful_through_by_exchange": {
+                    "SSE": "2026-07-21",
+                },
+            },
+        },
+        "factor_retry_state": {
+            "status": "success",
+            "actionable_retry_count": 2,
         },
         "stage_durations": {
             "candidate_discovery_seconds": 2,
@@ -706,6 +730,10 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
         "incomplete_structured_event:1"
     ) in report
     assert "processed=2, analyzed=2, promoted=1, manual=1" in report
+    assert "reason=predecessor_watermark_stale" in report
+    assert "workflow_deferred=True, actionable_retry=0" in report
+    assert "因子重试队列: `status=success, actionable=2`" in report
+    assert "600000.SH:重整计划资本公积金转增股本实施公告" in report
 
 
 @pytest.mark.asyncio

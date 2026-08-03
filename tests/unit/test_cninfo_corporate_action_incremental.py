@@ -77,11 +77,9 @@ def test_trading_day_announcement_window_spans_long_holiday():
         "股权分置改革方案实施公告",
         "重整计划资本公积金转增股本实施公告",
         "业绩承诺补偿股份赠与完成公告",
-        "关于部分A股限制性股票回购注销实施公告",
-        "关于回购股份完成注销的公告",
-        "关于已回购股份完成注销暨股份变动的公告",
-        "库存股注销完成暨股份变动公告",
-        "关于减少注册资本实施完成的公告",
+        "业绩承诺补偿股份回购注销完成公告",
+        "2025年度利润分配实施公告",
+        "2025年度现金红利发放公告",
     ],
 )
 def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
@@ -101,10 +99,26 @@ def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
         "关于为全资子公司提供担保的公告",
         "关于回购公司股份方案的公告",
         "限制性股票归属结果暨股份上市公告",
+        "关于向特定对象发行股票不存在直接或间接财务资助或补偿的公告",
+        "关于部分A股限制性股票回购注销实施公告",
+        "关于回购股份完成注销的公告",
+        "关于已回购股份完成注销暨股份变动的公告",
+        "库存股注销完成暨股份变动公告",
+        "关于减少注册资本实施完成的公告",
+        "关于权益分派后调整限制性股票回购价格的公告",
     ],
 )
 def test_daily_title_trigger_rejects_unrelated_disclosures(title):
     assert classify_daily_corporate_action_title(title)["selected"] is False
+
+
+def test_distribution_implementation_takes_precedence_over_exclusion_words():
+    decision = classify_daily_corporate_action_title(
+        "2025年度权益分派实施暨回购价格调整公告"
+    )
+
+    assert decision["selected"] is True
+    assert decision["source_profiles"] == ["cninfo_dividend"]
 
 
 def test_exceptional_title_requires_semantic_review():

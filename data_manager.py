@@ -16773,6 +16773,8 @@ class DataManager:
         self,
         factor_cutoff: Optional[date],
         exchanges: Sequence[str] = ('SSE', 'SZSE'),
+        instrument_ids: Sequence[str] = (),
+        source_completeness: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Evaluate the durable quote/composite cutoff for canonical merge."""
 
@@ -16837,6 +16839,126 @@ class DataManager:
         missing_exchanges = sorted(
             set(required_exchanges) - set(successful_dates)
         )
+        recovery: Dict[str, Any] = {
+            'attempted': False,
+            'eligible': False,
+            'recovered_exchanges': [],
+        }
+        if missing_exchanges:
+            recovery['attempted'] = True
+            coverage_loader = getattr(
+                self.db_ops,
+                'get_latest_stock_quote_dates_by_exchange',
+                None,
+            )
+            writer = getattr(self.db_ops, 'upsert_operational_watermark', None)
+            composite = (
+                (source_completeness or {}).get('baostock_sina_composite')
+                or {}
+            )
+            normalized_instrument_ids = sorted({
+                str(value).strip()
+                for value in instrument_ids
+                if str(value).strip()
+            })
+            composite_eligible_ids = {
+                str(value).strip()
+                for value in (
+                    composite.get('eligible_instrument_ids') or []
+                )
+                if str(value).strip()
+            }
+            raw_composite_incomplete = composite.get(
+                'incomplete_instruments'
+            )
+            try:
+                composite_incomplete_count = int(raw_composite_incomplete)
+            except (TypeError, ValueError):
+                composite_incomplete_count = -1
+            composite_eligible = (
+                composite.get('eligible_instrument_ids_complete') is True
+                and composite_incomplete_count == 0
+                and set(normalized_instrument_ids) <= composite_eligible_ids
+            )
+            recovery.update({
+                'instrument_count': len(normalized_instrument_ids),
+                'composite_path_eligible': composite_eligible,
+                'composite_eligible_instrument_count': len(
+                    composite_eligible_ids
+                ),
+                'quote_cutoff_by_exchange': {},
+            })
+            if (
+                normalized_instrument_ids
+                and composite_eligible
+                and callable(coverage_loader)
+                and callable(writer)
+            ):
+                quote_cutoffs_raw = coverage_loader(
+                    missing_exchanges,
+                    listed_on_or_before=factor_cutoff,
+                    completed_on_or_before=factor_cutoff,
+                )
+                if inspect.isawaitable(quote_cutoffs_raw):
+                    quote_cutoffs_raw = await quote_cutoffs_raw
+                quote_cutoffs = {
+                    exchange: self._date_from_any(value)
+                    for exchange, value in dict(quote_cutoffs_raw or {}).items()
+                }
+                recovery['quote_cutoff_by_exchange'] = {
+                    exchange: (
+                        cutoff.isoformat() if cutoff is not None else None
+                    )
+                    for exchange, cutoff in sorted(quote_cutoffs.items())
+                }
+                recoverable_exchanges = [
+                    exchange for exchange in missing_exchanges
+                    if quote_cutoffs.get(exchange) is not None
+                    and quote_cutoffs[exchange] >= factor_cutoff
+                ]
+                if len(recoverable_exchanges) == len(missing_exchanges):
+                    for exchange in recoverable_exchanges:
+                        try:
+                            recovered_row = writer(
+                                watermark_name=(
+                                    f'a_share_quote_baostock_sina:{exchange}'
+                                ),
+                                status='success',
+                                attempted_through=factor_cutoff,
+                                metadata={
+                                    'exchange': exchange,
+                                    'recovery_mode': 'verified_existing_data',
+                                    'quote_cutoff': quote_cutoffs[
+                                        exchange
+                                    ].isoformat(),
+                                    'instrument_count': len(
+                                        normalized_instrument_ids
+                                    ),
+                                    'composite_path_eligible_instruments': int(
+                                        composite.get(
+                                            'path_eligible_instruments', 0
+                                        ) or 0
+                                    ),
+                                },
+                            )
+                            if inspect.isawaitable(recovered_row):
+                                recovered_row = await recovered_row
+                        except Exception as exc:
+                            recovery.setdefault('errors', []).append(
+                                f'{exchange}:{exc}'
+                            )
+                            continue
+                        rows[exchange] = (
+                            recovered_row
+                            if isinstance(recovered_row, Mapping)
+                            else {'successful_through': factor_cutoff}
+                        )
+                        successful_dates[exchange] = factor_cutoff
+                        recovery['recovered_exchanges'].append(exchange)
+                    missing_exchanges = sorted(
+                        set(required_exchanges) - set(successful_dates)
+                    )
+                    recovery['eligible'] = not missing_exchanges
         stale_exchanges = sorted(
             exchange for exchange, successful in successful_dates.items()
             if successful is None or successful < factor_cutoff
@@ -16849,7 +16971,9 @@ class DataManager:
         return {
             'eligible': eligible,
             'reason': (
-                'ready'
+                'verified_existing_data'
+                if eligible and recovery.get('eligible')
+                else 'ready'
                 if eligible
                 else 'predecessor_watermark_missing'
                 if missing_exchanges
@@ -16869,6 +16993,7 @@ class DataManager:
                 successful_through.isoformat()
                 if successful_through is not None else None
             ),
+            'recovery': recovery,
         }
 
     @staticmethod
@@ -20188,6 +20313,10 @@ class DataManager:
                 "path_eligible_instruments": len(
                     composite_path_eligible_ids
                 ),
+                "eligible_instrument_ids": (
+                    composite_path_eligible_ids if requested_ids else []
+                ),
+                "eligible_instrument_ids_complete": bool(requested_ids),
                 "incomplete_instruments": (
                     len(target_ids) - len(composite_path_eligible_ids)
                 ),
@@ -23522,6 +23651,10 @@ class DataManager:
             "incremental_merge_eligible": False,
             "merge": None,
             "errors": [],
+            "blocker_reason": None,
+            "workflow_deferred": False,
+            "actionable_retry_instrument_ids": [],
+            "actionable_retry_count": 0,
         }
         canonical_retry_ids: Set[str] = set()
         if (
@@ -23560,13 +23693,18 @@ class DataManager:
                         if set(instrument_ids) & set(canonical_scope_ids)
                         and exchange in CNINFO_SUPPORTED_EXCHANGES
                     }),
+                    instrument_ids=canonical_scope_ids,
+                    source_completeness=(
+                        initial_rebuild_result.get("source_completeness") or {}
+                    ),
                 )
             )
             canonical_maintenance["predecessor"] = predecessor_readiness
             if canonical_scope_ids and factor_end_date is None:
-                canonical_retry_ids.update(canonical_scope_ids)
                 canonical_maintenance.update({
                     "status": "partial",
+                    "blocker_reason": "factor_cutoff_unavailable",
+                    "workflow_deferred": True,
                     "errors": [
                         "factor cutoff is unavailable for canonical "
                         "incremental maintenance"
@@ -23576,9 +23714,12 @@ class DataManager:
                 canonical_scope_ids
                 and not predecessor_readiness.get("eligible")
             ):
-                canonical_retry_ids.update(canonical_scope_ids)
                 canonical_maintenance.update({
                     "status": "partial",
+                    "blocker_reason": str(
+                        predecessor_readiness.get("reason")
+                    ),
+                    "workflow_deferred": True,
                     "errors": [
                         "promoted canonical merge deferred: "
                         + str(predecessor_readiness.get("reason"))
@@ -23633,11 +23774,42 @@ class DataManager:
                                     "low_confidence_segment_count", 0
                                 )
                             ),
+                            "blocked_instrument_ids": sorted({
+                                str(item).strip()
+                                for item in (
+                                    canonical_candidate.get(
+                                        "blocked_instrument_ids"
+                                    ) or []
+                                )
+                                if str(item).strip()
+                            })[:100],
                         },
                     })
                     if not merge_eligible or not staging_version:
-                        canonical_retry_ids.update(canonical_scope_ids)
+                        candidate_retry_ids = {
+                            str(item).strip()
+                            for item in (
+                                canonical_candidate.get(
+                                    "blocked_instrument_ids"
+                                ) or []
+                            )
+                            if str(item).strip()
+                        }
+                        for path_name in ("cninfo_path", "tdx_path"):
+                            candidate_retry_ids.update(
+                                str(item).strip()
+                                for item in (
+                                    canonical_rebuild.get(path_name) or {}
+                                ).get("pending_instrument_ids", [])
+                                if str(item).strip()
+                            )
+                        if not candidate_retry_ids:
+                            candidate_retry_ids.update(canonical_scope_ids)
+                        canonical_retry_ids.update(candidate_retry_ids)
                         canonical_maintenance["status"] = "partial"
+                        canonical_maintenance["blocker_reason"] = (
+                            "canonical_candidate_gate_failed"
+                        )
                         canonical_maintenance["errors"].append(
                             "targeted canonical candidate did not pass "
                             "incremental merge gates"
@@ -23667,6 +23839,7 @@ class DataManager:
                     canonical_retry_ids.update(canonical_scope_ids)
                     canonical_maintenance.update({
                         "status": "failed",
+                        "blocker_reason": "canonical_maintenance_failed",
                         "errors": [str(exc)],
                     })
                 finally:
@@ -23675,6 +23848,12 @@ class DataManager:
                     ] = time.monotonic() - canonical_started_at
             else:
                 canonical_maintenance["status"] = "success"
+        canonical_maintenance["actionable_retry_instrument_ids"] = sorted(
+            canonical_retry_ids
+        )[:100]
+        canonical_maintenance["actionable_retry_count"] = len(
+            canonical_retry_ids
+        )
         pending_factor_ids: Set[str] = set()
         if factor_end_date is None:
             pending_factor_ids.update(factor_rebuild_scope_ids)
@@ -23751,6 +23930,10 @@ class DataManager:
                         if isinstance(persisted_factor_retry_state, Mapping)
                         else {}
                     ),
+                    "actionable_retry_count": len(pending_factor_ids),
+                    "actionable_retry_instrument_ids": sorted(
+                        pending_factor_ids
+                    )[:100],
                 }
             except Exception as exc:
                 dm_logger.exception(
@@ -23761,6 +23944,10 @@ class DataManager:
                 factor_retry_state = {
                     "status": "failed",
                     "error": str(exc),
+                    "actionable_retry_count": len(pending_factor_ids),
+                    "actionable_retry_instrument_ids": sorted(
+                        pending_factor_ids
+                    )[:100],
                 }
         if announcement_governance_context:
             try:

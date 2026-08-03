@@ -637,6 +637,173 @@ async def test_predecessor_readiness_requires_each_requested_exchange():
 
 
 @pytest.mark.asyncio
+async def test_predecessor_readiness_recovers_verified_existing_data():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value=None)
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={
+            "SSE": date(2026, 7, 31),
+            "SZSE": date(2026, 7, 31),
+        }
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: {
+            **kwargs,
+            "successful_through": kwargs["attempted_through"],
+        }
+    )
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE", "SZSE"],
+        instrument_ids=["600000.SH", "000001.SZ"],
+        source_completeness={
+            "baostock_sina_composite": {
+                "path_eligible_instruments": 2,
+                "incomplete_instruments": 0,
+                "eligible_instrument_ids": ["600000.SH", "000001.SZ"],
+                "eligible_instrument_ids_complete": True,
+            }
+        },
+    )
+
+    assert readiness["eligible"] is True
+    assert readiness["reason"] == "verified_existing_data"
+    assert readiness["recovery"]["recovered_exchanges"] == ["SSE", "SZSE"]
+    assert manager.db_ops.upsert_operational_watermark.await_count == 2
+    for call in manager.db_ops.upsert_operational_watermark.await_args_list:
+        assert call.kwargs["metadata"]["recovery_mode"] == (
+            "verified_existing_data"
+        )
+
+
+@pytest.mark.asyncio
+async def test_predecessor_readiness_does_not_recover_incomplete_composite():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value=None)
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 31)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock()
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE"],
+        instrument_ids=["600000.SH"],
+        source_completeness={
+            "baostock_sina_composite": {
+                "path_eligible_instruments": 0,
+                "incomplete_instruments": 1,
+                "eligible_instrument_ids": [],
+                "eligible_instrument_ids_complete": True,
+            }
+        },
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["reason"] == "predecessor_watermark_missing"
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange.assert_not_awaited()
+    manager.db_ops.upsert_operational_watermark.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_predecessor_readiness_requires_matching_composite_instruments():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value=None)
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 31)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock()
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE"],
+        instrument_ids=["600000.SH"],
+        source_completeness={
+            "baostock_sina_composite": {
+                "path_eligible_instruments": 1,
+                "incomplete_instruments": 0,
+                "eligible_instrument_ids": ["600001.SH"],
+                "eligible_instrument_ids_complete": True,
+            }
+        },
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["reason"] == "predecessor_watermark_missing"
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange.assert_not_awaited()
+    manager.db_ops.upsert_operational_watermark.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_predecessor_recovery_write_failure_remains_blocked():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value=None)
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 31)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=RuntimeError("watermark write failed")
+    )
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE"],
+        instrument_ids=["600000.SH"],
+        source_completeness={
+            "baostock_sina_composite": {
+                "path_eligible_instruments": 1,
+                "incomplete_instruments": 0,
+                "eligible_instrument_ids": ["600000.SH"],
+                "eligible_instrument_ids_complete": True,
+            }
+        },
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["reason"] == "predecessor_watermark_missing"
+    assert readiness["recovery"]["errors"] == [
+        "SSE:watermark write failed"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_predecessor_readiness_does_not_recover_stale_watermark():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value={
+        "successful_through": date(2026, 7, 30),
+    })
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SSE": date(2026, 7, 31)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock()
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE"],
+        instrument_ids=["600000.SH"],
+        source_completeness={
+            "baostock_sina_composite": {
+                "path_eligible_instruments": 1,
+                "incomplete_instruments": 0,
+                "eligible_instrument_ids": ["600000.SH"],
+                "eligible_instrument_ids_complete": True,
+            }
+        },
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["reason"] == "predecessor_watermark_stale"
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange.assert_not_awaited()
+    manager.db_ops.upsert_operational_watermark.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_subset_quote_update_does_not_advance_aggregate_watermark():
     manager = DataManager()
     manager.db_ops = Mock()

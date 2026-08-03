@@ -1029,6 +1029,13 @@ async def test_daily_maintenance_defers_canonical_merge_for_stale_predecessor():
     )
     assert manager.rebuild_cninfo_primary_adjustment_factors.await_count == 1
     manager.db_ops.merge_canonical_adjustment_factor_subset.assert_not_awaited()
+    retry_call = (
+        manager.db_ops
+        .replace_corporate_action_daily_factor_retry_instruments.await_args
+    )
+    assert retry_call.args[0] == []
+    assert result["canonical_maintenance"]["workflow_deferred"] is True
+    assert result["canonical_maintenance"]["actionable_retry_count"] == 0
 
 
 @pytest.mark.asyncio
@@ -1540,6 +1547,8 @@ async def test_bse_only_daily_maintenance_skips_cninfo_but_runs_tdx():
     manager.rebuild_cninfo_primary_adjustment_factors.assert_not_awaited()
     assert result["status"] == "success"
     assert result["cninfo_refresh"]["status"] == "skipped"
+    assert result["bse_official_refresh"]["status"] == "success"
+    assert result["execution_status"]["bse_official"] == "success"
 
 
 @pytest.mark.asyncio

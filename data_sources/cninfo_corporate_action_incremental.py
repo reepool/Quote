@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v2"
+    "cninfo_corporate_action_daily_title_trigger_v3"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -62,6 +62,7 @@ _DAILY_IMPLEMENTATION_MARKERS = (
     "完成",
     "完毕",
     "派发",
+    "发放",
     "派息",
     "股权登记",
     "到账",
@@ -106,6 +107,60 @@ _DIVIDEND_SUBJECT_MARKERS = {
     "送股",
     "转增",
 }
+_GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS = (
+    "权益分派实施",
+    "利润分配实施",
+    "现金红利发放",
+    "分红派息实施",
+)
+
+
+def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
+    """Return a deterministic non-XDXR reason, preserving real distributions."""
+    if any(
+        marker in normalized_title
+        for marker in _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS
+    ):
+        return None
+    if (
+        "向特定对象发行" in normalized_title
+        and "不存在" in normalized_title
+        and (
+            "财务资助" in normalized_title
+            or "补偿" in normalized_title
+        )
+    ):
+        return "private_placement_assistance_disclaimer"
+    if (
+        "注销" in normalized_title
+        and any(
+            marker in normalized_title
+            for marker in ("回购", "限制性股票", "库存股")
+        )
+        and not any(
+            marker in normalized_title
+            for marker in _DAILY_EXCEPTIONAL_ACTION_MARKERS
+        )
+    ):
+        return "ordinary_share_cancellation"
+    if (
+        "减少注册资本" in normalized_title
+        and not any(
+            marker in normalized_title
+            for marker in _DAILY_EXCEPTIONAL_ACTION_MARKERS
+        )
+    ):
+        return "ordinary_registered_capital_change"
+    if (
+        "权益分派" in normalized_title
+        and "回购价格" in normalized_title
+        and any(
+            marker in normalized_title
+            for marker in ("调整", "调减")
+        )
+    ):
+        return "post_distribution_repurchase_price_adjustment"
+    return None
 
 
 @dataclass(frozen=True)
@@ -172,6 +227,19 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
             "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
         }
     normalized_title = unicodedata.normalize("NFKC", str(title or "")).strip()
+    exclusion_reason = _daily_title_exclusion_reason(normalized_title)
+    if exclusion_reason:
+        return {
+            "selected": False,
+            "reason": f"deterministic_exclusion:{exclusion_reason}",
+            "subject_markers": [],
+            "implementation_markers": [],
+            "exceptional_markers": [],
+            "requires_semantic_review": False,
+            "source_profiles": [],
+            "prefilter": prefilter,
+            "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+        }
     subject_markers = [
         marker for marker in _DAILY_ACTION_SUBJECT_MARKERS
         if marker in normalized_title

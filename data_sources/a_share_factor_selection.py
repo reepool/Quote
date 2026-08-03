@@ -853,6 +853,12 @@ def build_three_source_canonical_candidate(
         for decision in decisions
         if decision["confidence"] == "blocked"
     ][:max(0, int(sample_limit))]
+    blocked_instrument_ids = sorted({
+        str(decision.get("instrument_id") or "").strip()
+        for decision in decisions
+        if decision["confidence"] == "blocked"
+        and str(decision.get("instrument_id") or "").strip()
+    })
     reviewed_source_override_samples = [
         decision
         for decision in decisions
@@ -923,6 +929,7 @@ def build_three_source_canonical_candidate(
         "instrument_count": len(set(target_instruments)),
         "segment_count": len(decisions),
         "blocked_segment_count": blocked,
+        "blocked_instrument_ids": blocked_instrument_ids,
         "low_confidence_segment_count": low_confidence,
         "historical_single_source_segment_count": (
             historical_single_source
