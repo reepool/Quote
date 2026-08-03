@@ -555,7 +555,17 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
             "status": "success",
             "candidate_count": 12,
             "deferred_count": 0,
-            "announcement_scan": {"announcements_seen": 88},
+            "announcement_scan": {
+                "announcements_seen": 88,
+                "carryover_revalidation": {
+                    "policy_version": (
+                        "cninfo_corporate_action_daily_title_trigger_v3"
+                    ),
+                    "evaluated": 5,
+                    "excluded": 5,
+                    "cleared_candidate_instruments": 5,
+                },
+            },
         },
         "cninfo_refresh": {
             "counters": {
@@ -734,6 +744,8 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
     assert "workflow_deferred=True, actionable_retry=0" in report
     assert "因子重试队列: `status=success, actionable=2`" in report
     assert "600000.SH:重整计划资本公积金转增股本实施公告" in report
+    assert "公告待办重验:" in report
+    assert "evaluated=5, excluded=5, rerouted_structured=0" in report
 
 
 @pytest.mark.asyncio

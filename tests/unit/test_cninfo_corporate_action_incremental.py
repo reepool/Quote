@@ -7,6 +7,7 @@ import pytest
 
 from data_manager import DataManager
 from data_sources.cninfo_corporate_action_incremental import (
+    DAILY_TITLE_TRIGGER_POLICY_VERSION,
     associate_exceptional_announcements,
     build_incremental_refresh_candidates,
     build_targeted_tdx_refresh_instruments,
@@ -699,7 +700,152 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
         "pending_semantic_event_keys_by_instrument"
     ] == {"600001.SH": ["event-1"]}
+    assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
+        "selection_policy_version"
+    ] == DAILY_TITLE_TRIGGER_POLICY_VERSION
     storage.store_announcement_audit.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_scan_revalidates_legacy_special_announcement_carryovers():
+    manager = DataManager()
+    storage = Mock()
+    storage.get_announcement_scan_state.return_value = {
+        "metadata": {
+            "selection_policy_version": (
+                "cninfo_corporate_action_daily_title_trigger_v2"
+            ),
+            "pending_candidate_ids": [
+                "600001.SH",
+                "600002.SH",
+                "600003.SH",
+                "600004.SH",
+                "600005.SH",
+                "600006.SH",
+            ],
+            "pending_candidate_reasons": {
+                "600001.SH": "unmatched_special_announcement",
+                "600002.SH": "unmatched_special_announcement",
+                "600003.SH": "unmatched_special_announcement",
+                "600004.SH": "semantic_anomaly_deferred",
+                "600005.SH": "unmatched_special_announcement",
+                "600006.SH": "unmatched_special_announcement",
+            },
+            "pending_special_announcements_by_instrument": {
+                "600001.SH": [{
+                    "announcement_key": "disclaimer-1",
+                    "title": (
+                        "关于本次向特定对象发行股票不存在直接或通过"
+                        "利益相关方向参与认购的投资者提供财务资助或补偿的公告"
+                    ),
+                }],
+                "600002.SH": [{
+                    "announcement_key": "restructuring-1",
+                    "title": "重整计划资本公积金转增股本实施公告",
+                }],
+                "600003.SH": [{
+                    "announcement_key": "missing-title-1",
+                }],
+                "600004.SH": [{
+                    "announcement_key": "disclaimer-2",
+                    "title": (
+                        "关于向特定对象发行股票不存在直接或间接财务资助"
+                        "或补偿的公告"
+                    ),
+                }],
+                "600005.SH": [{
+                    "announcement_key": "distribution-1",
+                    "title": "2025年度权益分派实施公告",
+                }],
+                "600006.SH": [],
+            },
+        },
+    }
+    manager.research_config = Mock(enabled=True)
+    manager.research_storage = storage
+    active_instruments = {
+        instrument_id: {
+            "instrument_id": instrument_id,
+            "symbol": instrument_id.split(".")[0],
+            "exchange": "SSE",
+        }
+        for instrument_id in (
+            "600001.SH",
+            "600002.SH",
+            "600003.SH",
+            "600004.SH",
+            "600005.SH",
+            "600006.SH",
+        )
+    }
+
+    def acquire(query: AnnouncementQuery):
+        scan = AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success_empty",
+            records=(),
+            pages_scanned=1,
+            requests_made=1,
+            announcements_seen=0,
+            is_complete=True,
+            stop_reason="last_page",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success_empty",
+            selected_source="cninfo",
+            scan_result=scan,
+            attempts=(),
+        )
+
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=Mock(acquire=acquire)
+    )
+
+    result = await manager._scan_cninfo_daily_announcement_activity(
+        active_instruments=active_instruments,
+        exchanges=["SSE"],
+        start_date=date(2026, 7, 31),
+        end_date=date(2026, 8, 3),
+        run_at=datetime(
+            2026, 8, 3, 10, 38,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        overlap_days=2,
+        page_size=30,
+        max_pages=60,
+        request_interval_seconds=0,
+    )
+
+    assert result["deferred_announcement_instrument_ids"] == [
+        "600002.SH",
+        "600003.SH",
+        "600004.SH",
+        "600006.SH",
+    ]
+    assert set(result["deferred_special_announcements_by_instrument"]) == {
+        "600002.SH",
+        "600003.SH",
+    }
+    assert result["announcement_instrument_ids"] == ["600005.SH"]
+    assert result["announcement_source_profiles"] == {
+        "600005.SH": ["cninfo_dividend"],
+    }
+    assert result["carryover_revalidation"]["evaluated"] == 5
+    assert result["carryover_revalidation"]["excluded"] == 2
+    assert result["carryover_revalidation"][
+        "cleared_candidate_instruments"
+    ] == 2
+    assert result["carryover_revalidation"]["rerouted_structured"] == 1
+    assert result["carryover_revalidation"]["retained_exceptional"] == 1
+    assert result["carryover_revalidation"]["retained_missing_title"] == 1
+    assert result["carryover_revalidation"][
+        "retained_missing_announcement"
+    ] == 1
+    assert result["carryover_revalidation"]["policy_version"] == (
+        DAILY_TITLE_TRIGGER_POLICY_VERSION
+    )
 
 
 def test_deferred_announcement_queue_is_prioritized_on_next_run():

@@ -935,6 +935,10 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     anomaly_counts = anomaly_llm.get("counts") or {}
     anomaly_promotion = anomaly_llm.get("auto_promotion") or {}
     anomaly_review = anomaly_llm.get("review_workload") or {}
+    announcement_scan = discovery.get("announcement_scan") or {}
+    carryover_revalidation = (
+        announcement_scan.get("carryover_revalidation") or {}
+    )
     canonical_maintenance = result.get("canonical_maintenance") or {}
     canonical_predecessor = canonical_maintenance.get("predecessor") or {}
     factor_retry_state = result.get("factor_retry_state") or {}
@@ -1153,6 +1157,20 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         ]
         if factor_result.get("status") == "skipped":
             incremental_lines.append("因子重建: `无需执行（本轮无受影响标的）`")
+        if int(carryover_revalidation.get("evaluated", 0) or 0):
+            incremental_lines.append(
+                "公告待办重验: `"
+                f"policy={carryover_revalidation.get('policy_version', 'N/A')}, "
+                f"evaluated={carryover_revalidation.get('evaluated', 0)}, "
+                f"excluded={carryover_revalidation.get('excluded', 0)}, "
+                "rerouted_structured="
+                f"{carryover_revalidation.get('rerouted_structured', 0)}, "
+                "retained_exceptional="
+                f"{carryover_revalidation.get('retained_exceptional', 0)}, "
+                "retained_missing_title="
+                f"{carryover_revalidation.get('retained_missing_title', 0)}"
+                "`"
+            )
         unmatched_samples = []
         for instrument_id, items in sorted(
             (

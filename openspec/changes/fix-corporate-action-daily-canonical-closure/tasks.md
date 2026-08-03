@@ -28,3 +28,10 @@
 - [x] 5.2 Validate the OpenSpec change and mark all completed tasks.
 - [x] 5.3 Review all uncommitted changes, fix confirmed defects, and re-run focused tests.
 - [x] 5.4 Commit and push only the files created or modified for this change.
+
+## 6. Persisted Announcement Policy Upgrade
+
+- [x] 6.1 Reclassify persisted special-announcement queues with the active title policy and remove obsolete non-XDXR carryovers without clearing unrelated deferred reasons.
+- [x] 6.2 Persist the active title-policy version and expose bounded carryover revalidation counts.
+- [x] 6.3 Add regression coverage for legacy private-placement disclaimers, retained exceptional notices, missing-title fail-closed behavior, and current policy metadata.
+- [x] 6.4 Run focused tests, validate the amended OpenSpec, review the diff, and commit and push only this follow-up change.

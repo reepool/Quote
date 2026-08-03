@@ -45,6 +45,14 @@ The system SHALL exclude deterministic non-XDXR announcements before semantic an
 - **WHEN** a title contains an annual or interim equity-distribution or profit-distribution implementation pattern
 - **THEN** the system SHALL keep it eligible for structured refresh and semantic governance when necessary
 
+#### Scenario: Persisted queue predates the current title policy
+- **WHEN** a deferred special announcement was stored under an older title policy
+- **THEN** the system SHALL reclassify its title with the current policy before carrying it forward, remove deterministic non-XDXR entries from the deferred candidate queue, and retain entries that remain exceptional or cannot be safely reclassified
+
+#### Scenario: Current policy version is persisted
+- **WHEN** the daily scan state is written
+- **THEN** the system SHALL persist the active title-trigger policy version rather than a hard-coded historical version
+
 ### Requirement: BSE successful empty windows are non-blocking
 The system SHALL treat a complete BSE official scan with no matching distribution implementation notice as a successful empty result.
 

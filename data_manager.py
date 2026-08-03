@@ -21364,6 +21364,7 @@ class DataManager:
         title_records_evaluated = 0
         title_records_selected = 0
         title_filter_reasons: Counter[str] = Counter()
+        carryover_revalidation: Counter[str] = Counter()
         normalized_run_at = run_at or get_shanghai_time()
         if normalized_run_at.tzinfo is None:
             normalized_run_at = normalized_run_at.replace(
@@ -21398,11 +21399,6 @@ class DataManager:
                 )
             if state:
                 state_metadata = state.get("metadata") or {}
-                deferred_announcement_ids.update(
-                    str(item).strip()
-                    for item in state_metadata.get("pending_candidate_ids", [])
-                    if str(item).strip() in active_instruments
-                )
                 deferred_factor_ids.update(
                     str(item).strip()
                     for item in state_metadata.get(
@@ -21410,6 +21406,31 @@ class DataManager:
                     )
                     if str(item).strip()
                 )
+                state_semantic_event_keys: Dict[str, Set[str]] = {}
+                for instrument_id, event_keys in (
+                    state_metadata.get(
+                        "pending_semantic_event_keys_by_instrument", {}
+                    )
+                    or {}
+                ).items():
+                    normalized_instrument_id = str(
+                        instrument_id or ""
+                    ).strip()
+                    if normalized_instrument_id not in active_instruments:
+                        continue
+                    normalized_event_keys = {
+                        str(item).strip()
+                        for item in event_keys or ()
+                        if str(item).strip()
+                    }
+                    state_semantic_event_keys[
+                        normalized_instrument_id
+                    ] = normalized_event_keys
+                    deferred_semantic_event_keys_by_instrument[
+                        normalized_instrument_id
+                    ].update(normalized_event_keys)
+                special_instruments = set()
+                retained_special_instruments = set()
                 for instrument_id, announcements in (
                     state_metadata.get(
                         "pending_special_announcements_by_instrument", {}
@@ -21418,28 +21439,108 @@ class DataManager:
                     normalized_instrument_id = str(instrument_id or "").strip()
                     if normalized_instrument_id not in active_instruments:
                         continue
-                    deferred_special_announcements_by_instrument[
-                        normalized_instrument_id
-                    ].extend(
-                        dict(item)
-                        for item in announcements or ()
-                        if isinstance(item, Mapping)
-                    )
-                for instrument_id, event_keys in (
-                    state_metadata.get(
-                        "pending_semantic_event_keys_by_instrument", {}
-                    ) or {}
-                ).items():
-                    normalized_instrument_id = str(instrument_id or "").strip()
-                    if normalized_instrument_id not in active_instruments:
+                    special_instruments.add(normalized_instrument_id)
+                    carried_announcements = list(announcements or ())
+                    if not carried_announcements:
+                        carryover_revalidation[
+                            "retained_missing_announcement"
+                        ] += 1
+                        retained_special_instruments.add(
+                            normalized_instrument_id
+                        )
+                    for item in carried_announcements:
+                        if not isinstance(item, Mapping):
+                            carryover_revalidation[
+                                "retained_invalid_announcement"
+                            ] += 1
+                            retained_special_instruments.add(
+                                normalized_instrument_id
+                            )
+                            continue
+                        carried_item = dict(item)
+                        title = str(carried_item.get("title") or "").strip()
+                        carryover_revalidation["evaluated"] += 1
+                        if not title:
+                            carryover_revalidation["retained_missing_title"] += 1
+                            retained_special_instruments.add(
+                                normalized_instrument_id
+                            )
+                            deferred_special_announcements_by_instrument[
+                                normalized_instrument_id
+                            ].append(carried_item)
+                            continue
+                        decision = classify_daily_corporate_action_title(title)
+                        reason = str(decision.get("reason") or "unknown")
+                        if (
+                            decision.get("selected")
+                            and decision.get("requires_semantic_review")
+                        ):
+                            carryover_revalidation["retained_exceptional"] += 1
+                            retained_special_instruments.add(
+                                normalized_instrument_id
+                            )
+                            deferred_special_announcements_by_instrument[
+                                normalized_instrument_id
+                            ].append(carried_item)
+                        elif decision.get("selected"):
+                            carryover_revalidation[
+                                "rerouted_structured"
+                            ] += 1
+                            announcement_ids.add(normalized_instrument_id)
+                            announcement_profiles_by_instrument[
+                                normalized_instrument_id
+                            ].update(
+                                str(profile).strip()
+                                for profile in (
+                                    decision.get("source_profiles") or ()
+                                )
+                                if str(profile).strip()
+                            )
+                        elif (
+                            reason.startswith("deterministic_exclusion:")
+                            or bool(
+                                (decision.get("prefilter") or {}).get(
+                                    "excluded"
+                                )
+                            )
+                        ):
+                            carryover_revalidation["excluded"] += 1
+                            carryover_revalidation[f"excluded:{reason}"] += 1
+                        else:
+                            carryover_revalidation[
+                                "retained_unclassified"
+                            ] += 1
+                            retained_special_instruments.add(
+                                normalized_instrument_id
+                            )
+                            deferred_special_announcements_by_instrument[
+                                normalized_instrument_id
+                            ].append(carried_item)
+                state_pending_reasons = {
+                    str(instrument_id).strip(): str(reason or "").strip()
+                    for instrument_id, reason in (
+                        state_metadata.get("pending_candidate_reasons", {})
+                        or {}
+                    ).items()
+                    if str(instrument_id).strip()
+                }
+                for item in state_metadata.get("pending_candidate_ids", []):
+                    instrument_id = str(item).strip()
+                    if instrument_id not in active_instruments:
                         continue
-                    deferred_semantic_event_keys_by_instrument[
-                        normalized_instrument_id
-                    ].update(
-                        str(item).strip()
-                        for item in event_keys or ()
-                        if str(item).strip()
+                    reason = state_pending_reasons.get(instrument_id)
+                    obsolete_special_only = (
+                        instrument_id in special_instruments
+                        and instrument_id not in retained_special_instruments
+                        and not state_semantic_event_keys.get(instrument_id)
+                        and reason in {"", "unmatched_special_announcement"}
                     )
+                    if obsolete_special_only:
+                        carryover_revalidation[
+                            "cleared_candidate_instruments"
+                        ] += 1
+                        continue
+                    deferred_announcement_ids.add(instrument_id)
             route_result = await asyncio.to_thread(
                 service.acquire,
                 AnnouncementQuery(
@@ -21596,6 +21697,10 @@ class DataManager:
                 ),
                 "reason_counts": dict(sorted(title_filter_reasons.items())),
             },
+            "carryover_revalidation": {
+                "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
+                **dict(sorted(carryover_revalidation.items())),
+            },
             "errors": errors[:50],
             "route_results": route_results,
             "matched_records_by_exchange": matched_records_by_exchange,
@@ -21618,6 +21723,10 @@ class DataManager:
         active_instruments: Dict[str, Dict[str, str]],
     ) -> Dict[str, int]:
         """Persist shared announcement state and deferred candidate queues."""
+        from data_sources.cninfo_corporate_action_incremental import (
+            DAILY_TITLE_TRIGGER_POLICY_VERSION,
+        )
+
         storage = self._require_research_storage()
         scan_states = 0
         audits = 0
@@ -21652,7 +21761,13 @@ class DataManager:
                     "business_domain": "corporate_action",
                     "selection_mode": "instrument_activity_trigger",
                     "selection_policy_version": (
-                        "cninfo_corporate_action_daily_title_trigger_v2"
+                        (discovery.get("title_filter") or {}).get(
+                            "policy_version"
+                        )
+                        or DAILY_TITLE_TRIGGER_POLICY_VERSION
+                    ),
+                    "carryover_revalidation": dict(
+                        discovery.get("carryover_revalidation") or {}
                     ),
                     "pending_candidate_ids": sorted(
                         set(pending_by_exchange.get(exchange) or [])

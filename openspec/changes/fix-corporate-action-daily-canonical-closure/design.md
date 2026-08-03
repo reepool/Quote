@@ -34,6 +34,8 @@ The promoted canonical factor series is current through 2026-07-31, but the dail
 
 6. **Preserve BSE empty-window semantics.** A complete BSE scan with zero matching implementation notices remains `success`; only transport, normalization, document, parse, or persistence failures can make the BSE stage partial.
 
+7. **Revalidate persisted semantic queues on policy upgrades.** Deferred special announcements are state, not immutable source evidence. Each run reclassifies their stored titles with the active policy before carrying them forward. Entries that are now deterministic non-XDXR are removed together with an unmatched-special candidate reason when no other deferred semantic evidence remains. Entries now recognized as ordinary structured distributions are rerouted to the normal refresh candidate path. Missing-title or otherwise unclassified records fail closed and remain queued.
+
 ## Risks / Trade-offs
 
 - **[Compatibility verification is weaker than a producer-written watermark]** -> Require both local quote cutoff and composite path evidence, label the recovery mode, and persist a normal watermark so the exception is not repeated indefinitely.
