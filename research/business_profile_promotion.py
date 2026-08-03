@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import timedelta
 from typing import Any, Mapping, Optional, Sequence
 
 from research.business_profile_review import BusinessProfileReviewService
-from research.business_profile_semantic_schemas import validate_business_profile_artifact
+from research.business_profile_semantic_schemas import (
+    validate_business_profile_artifact,
+)
 from utils.date_utils import get_shanghai_time
 
 
@@ -45,9 +47,7 @@ _MACHINE_REWORK_REASONS = frozenset(
         "stale_catalog",
     }
 )
-_QUICK_REVIEW_REASONS = frozenset(
-    {"entity_ambiguity", "exact_alias_ambiguity"}
-)
+_QUICK_REVIEW_REASONS = frozenset({"entity_ambiguity", "exact_alias_ambiguity"})
 _DEEP_REVIEW_REASONS = frozenset(
     {
         "conflicting_disclosures",
@@ -111,6 +111,7 @@ class PromotionContext:
     exception_reasons: tuple[str, ...] = ()
     ranked_choices: tuple[Mapping[str, Any], ...] = ()
     high_risk_flags: tuple[str, ...] = ()
+    metadata: Mapping[str, Any] = field(default_factory=dict)
 
 
 class BusinessProfilePromotionClassifier:
@@ -140,10 +141,7 @@ class BusinessProfilePromotionClassifier:
         reason_codes.extend(str(item) for item in context.high_risk_flags)
         reason_codes = list(dict.fromkeys(reason_codes))
 
-        simple_reasons = {
-            item.split(":", 1)[-1]
-            for item in reason_codes
-        }
+        simple_reasons = {item.split(":", 1)[-1] for item in reason_codes}
         if not reason_codes:
             classification = "auto_promoted"
         elif simple_reasons & _DEEP_REVIEW_REASONS:
@@ -153,12 +151,12 @@ class BusinessProfilePromotionClassifier:
         elif simple_reasons and simple_reasons.issubset(_QUICK_REVIEW_REASONS):
             classification = "quick_review"
         elif any(
-            item.startswith(("missing_gate:", "unknown_gate:"))
-            for item in reason_codes
+            item.startswith(("missing_gate:", "unknown_gate:")) for item in reason_codes
         ):
             classification = "machine_rework"
         elif any(
-            item in {
+            item
+            in {
                 "failed_gate:artifact_quality",
                 "failed_gate:catalogs_current",
                 "failed_gate:runtime_identity_match",
@@ -282,16 +280,20 @@ class BusinessProfilePromotionService:
                 ).fetchone()
                 retry_count = int(existing["retry_count"] or 0) if existing else 0
                 tier = str(decision["classification"])
+                reason_codes = list(decision["reason_codes"])
                 next_retry_at = None
                 if tier == "machine_rework" and retry_count < self.max_machine_retries:
                     retry_count += 1
                     next_retry_at = (
                         now + timedelta(minutes=2 ** (retry_count - 1))
                     ).isoformat()
+                elif tier == "machine_rework":
+                    reason_codes.append("machine_rework_exhausted")
                 exception_id = (
                     str(existing["exception_id"])
                     if existing is not None
-                    else "bp-exception-" + _stable_hash(
+                    else "bp-exception-"
+                    + _stable_hash(
                         {
                             "target_type": context.target_type,
                             "target_id": context.target_id,
@@ -305,14 +307,16 @@ class BusinessProfilePromotionService:
                     "target_type": context.target_type,
                     "target_id": context.target_id,
                     "tier": tier,
-                    "reason_codes": list(decision["reason_codes"]),
+                    "reason_codes": reason_codes,
                     "retry_count": retry_count,
                     "next_retry_at": next_retry_at,
                     "gate_signature": gate_signature,
                     "resolved_at": None,
                 }
                 validate_business_profile_artifact("exception_record", schema_payload)
-                created_at = str(existing["created_at"]) if existing else now.isoformat()
+                created_at = (
+                    str(existing["created_at"]) if existing else now.isoformat()
+                )
                 conn.execute(
                     """
                     INSERT INTO business_profile_exceptions (
@@ -341,14 +345,22 @@ class BusinessProfilePromotionService:
                         context.instrument_id,
                         context.field_family,
                         tier,
-                        _json(decision["reason_codes"]),
+                        _json(reason_codes),
                         retry_count,
                         next_retry_at,
                         gate_signature,
                         decision["gate_manifest_hash"],
                         _json(context.evidence_references),
                         _json(context.ranked_choices),
-                        _json({"gates": dict(context.gates)}),
+                        _json(
+                            {
+                                "gates": dict(context.gates),
+                                **dict(context.metadata),
+                                "machine_rework_exhausted": (
+                                    "machine_rework_exhausted" in reason_codes
+                                ),
+                            }
+                        ),
                         created_at,
                         now.isoformat(),
                     ),

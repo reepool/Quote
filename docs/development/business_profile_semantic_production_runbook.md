@@ -59,7 +59,9 @@ CLI 支持 `plan`、`select`、`extract`、`verify`、`promote`、`resume`、
 ```
 
 CLI 不接受调用方伪造的阶段结果或 `--input`。它直接读取研究库中的官方公告
-manifest 和本地归档 PDF，实际执行选页、表格解析、语义抽取、验证和晋级。
+manifest 和本地归档 PDF；最小充分计划命中的公告尚未本地归档时，通过公共
+公告发现和附件归档边界自动补齐，然后实际执行选页、表格解析、语义抽取、
+验证和晋级。`network_calls` kill switch 开启时不获取公告，只记录机器返工。
 promotion manifest 文件是按字段族键控的完整对象，或放在 `field_families`
 对象下，例如：
 
@@ -87,8 +89,10 @@ promotion manifest 文件是按字段族键控的完整对象，或放在 `field
 }
 ```
 
-检查点只可在范围哈希和全部运行身份完全一致时恢复。出现 stale checkpoint
-时应重新执行 `plan`，不能修改检查点内容绕过校验。
+检查点只可在范围哈希、全部运行身份和 `source_revision` 完全一致时恢复。
+`source_revision` 绑定最小计划选中的公告 hash、开放异常重试代次以及本地派生
+输入；同一天出现修订公告或到期机器返工时会生成新范围，不会误复用完成态
+检查点。出现 stale checkpoint 时应重新执行 `plan`，不能修改检查点绕过校验。
 
 ## 4. Kill Switch
 
@@ -135,8 +139,11 @@ Kill switch 不删除事实、候选、审核、异常或历史发布版本。
 - 可由本地目录提案聚类解决的未知别名。
 
 机器返工使用有界指数退避和最大重试次数。重试必须复用已有文档和页面制品，
-仅在记录 `missing_context` 后按确定性规则扩展窗口。达到重试上限后，根据
-剩余问题进入 quick review、deep review 或保持未支持状态，不能降低晋级门禁。
+仅在记录 `missing_context` 后读取上一版 section bundle，按确定性规则扩展
+窗口并保留 `previous_bundle_id`。达到机器重试上限后标记
+`machine_rework_exhausted` 并停止无效自动重试；系统输入或运行身份变化后可
+重新进入自动流程，不因纯机器故障制造人工逐行任务。经济判断和口径冲突仍
+直接进入 deep review。
 `promotion_enabled=false` 的 shadow 模式仍会持久化机器返工和例外，但不会
 批准候选事实；否则调度器无法自动发现到期重试。重试耗尽后的记录不再自动
 入队，quick/deep review 也不参与自动重试。
@@ -194,3 +201,15 @@ unsupported output、冲突、漂移、检查点身份和候选估值泄漏数�
 
 人工工作量的目标指标是 quick/deep review 比率，而不是总候选数。异常积压
 优先通过 reason-code 聚类推动 parser、selector、catalog 和规则自动修复。
+
+发布前运行：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/dev_validation/validate_business_profile_rollout_gates.py \
+  --output docs/development/business_profile_rollout_gate_validation_20260803.json
+```
+
+该验证使用临时 `ResearchStorageManager` 实际执行候选写入、系统晋级、不可变
+审核、point-in-time 读取、机器返工恢复、事务回滚和 kill switch；它不写正式
+生产库，报告中的 `isolated_governed_writes_performed` 必须为 `true`。

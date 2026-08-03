@@ -25,9 +25,11 @@ def _task():
 
 
 def test_semantic_maintenance_job_is_disabled_and_not_scheduled(monkeypatch):
-    raw = UnifiedConfigManager("config").get_scheduler_config().jobs[
-        "business_profile_semantic_maintenance"
-    ]
+    raw = (
+        UnifiedConfigManager("config")
+        .get_scheduler_config()
+        .jobs["business_profile_semantic_maintenance"]
+    )
     assert raw["enabled"] is False
     assert raw["parameters"]["mode"] == "resume"
     assert raw["parameters"]["instrument_ids"] == []
@@ -56,7 +58,9 @@ def test_data_manager_disabled_semantic_module_has_no_side_effects():
     manager = DataManager.__new__(DataManager)
     manager.research_config = Mock(
         enabled=True,
-        modules={"business_profile_evidence": {"semantic_production": {"enabled": False}}},
+        modules={
+            "business_profile_evidence": {"semantic_production": {"enabled": False}}
+        },
     )
     manager.research_storage = object()
 
@@ -114,6 +118,19 @@ def test_data_manager_enabled_plan_builds_scope_before_default_checkpoint(tmp_pa
 
     assert result["status"] == "success"
     assert result["completed_stages"] == ["plan"]
+    assert len(list((tmp_path / "checkpoints").glob("*.json"))) == 1
+
+    report = asyncio.run(
+        manager.run_business_profile_semantic_production(
+            mode="report",
+            knowledge_cutoff="2026-08-01",
+            instrument_ids=["601088.SH"],
+            field_families=["derived_value_chain_roles"],
+            runtime_identities={"rules": "rules.v1", "policy": "policy.v1"},
+        )
+    )
+    assert report["pipeline_status"] == "partial"
+    assert report["completed_stages"] == ["plan"]
     assert len(list((tmp_path / "checkpoints").glob("*.json"))) == 1
 
 

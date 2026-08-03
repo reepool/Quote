@@ -12,6 +12,12 @@ from research.business_profile_rollout import (
     run_shadow_backfill_validation,
     select_first_industry_cohort,
 )
+from scripts.dev_validation.validate_business_profile_rollout_gates import (
+    _run_governed_validation,
+    _run_kill_switch_drill,
+    _run_rollback_drill,
+    _storage,
+)
 
 
 def _item(item_id, instrument_id, document_id, family="atomic_activities"):
@@ -62,7 +68,9 @@ def test_frozen_benchmark_keeps_all_issuer_reports_in_one_split():
     )
 
     issuer_splits = {
-        item["split"] for item in benchmark["items"] if item["instrument_id"] == "601088.SH"
+        item["split"]
+        for item in benchmark["items"]
+        if item["instrument_id"] == "601088.SH"
     }
     assert len(issuer_splits) == 1
     assert benchmark["benchmark_hash"]
@@ -171,6 +179,36 @@ def test_bounded_pilot_requires_enabled_manifest_and_drills():
     )
     assert failed["passed"] is False
     assert "rollback_drill_failed" in failed["reason_codes"]
+
+
+def test_shadow_and_pilot_drills_execute_real_governed_components(tmp_path):
+    source = tmp_path / "production-shaped.db"
+    _storage(source).initialize()
+    shadow = run_shadow_backfill_validation(
+        source,
+        lambda path: _run_governed_validation(
+            path,
+            ("601088.SH",),
+            exercise_machine_rework=True,
+        ),
+    )
+    pilot = run_bounded_production_pilot(
+        instrument_ids=["601088.SH", "600362.SH"],
+        enabled_manifests={"structured_segments": {"enabled": True}},
+        runner=lambda instruments: _run_governed_validation(
+            tmp_path / "pilot.db",
+            instruments,
+            exercise_machine_rework=False,
+        ),
+        rollback_drill=lambda: _run_rollback_drill(tmp_path / "rollback.db"),
+        kill_switch_drill=lambda: _run_kill_switch_drill(tmp_path / "kill-switch.json"),
+    )
+
+    assert shadow["passed"] is True
+    assert shadow["first_run"]["audited_system_promotion"] is True
+    assert shadow["first_run"]["machine_rework_recovery_ok"] is True
+    assert pilot["passed"] is True
+    assert pilot["result"]["point_in_time_reads_ok"] is True
 
 
 def test_expansion_and_scheduler_require_quality_capacity_and_backlog_gates():

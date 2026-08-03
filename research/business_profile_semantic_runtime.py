@@ -7,7 +7,8 @@ import hashlib
 import json
 import os
 import re
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -55,6 +56,7 @@ from research.business_profile_semantic_extraction import (
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
 from research.business_profile_temporal import derive_report_observation_interval
 from research.business_profile_unit_conversions import load_unit_conversion_catalog
+from utils.date_utils import get_shanghai_time
 
 
 RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v1"
@@ -71,6 +73,230 @@ DOCUMENT_FAMILIES = {
     "named_relationships",
     "commodity_exposure_facts",
 }
+
+
+def compute_business_profile_semantic_source_revision(
+    repository: BusinessProfileRepository,
+    *,
+    instruments: Sequence[str],
+    field_families: Sequence[str],
+    knowledge_cutoff: str,
+    manifest_loader: Callable[[str], Sequence[Mapping[str, Any]]] | None = None,
+    max_documents: int = 3,
+    max_specialist_documents: int = 1,
+) -> str:
+    """Hash the selected official inputs and retry state bound to a checkpoint."""
+
+    loader = manifest_loader or (
+        lambda instrument_id: _load_source_manifests(repository.storage, instrument_id)
+    )
+    planner = BusinessProfileDisclosurePlanner(
+        coverage_inspector=BusinessProfileCoverageInspector(repository),
+        max_documents=max_documents,
+        max_specialist_documents=max_specialist_documents,
+    )
+    document_families = sorted(set(field_families) & DOCUMENT_FAMILIES)
+    derived_inputs: dict[str, tuple[str, ...]] = {}
+    plans: list[dict[str, Any]] = []
+    exceptions: list[dict[str, Any]] = []
+    for instrument_id in sorted(set(instruments)):
+        manifests = [
+            dict(item)
+            for item in loader(instrument_id)
+            if item.get("schema_version") == "business_profile_source_file_manifest.v1"
+        ]
+        open_exceptions = repository.list_exceptions(
+            instrument_id=instrument_id,
+            status="open",
+            limit=10_000,
+        )
+        for family in document_families:
+            plan = planner.plan(
+                instrument_id=instrument_id,
+                field_family=family,
+                knowledge_cutoff=knowledge_cutoff,
+                manifests=manifests,
+                exceptions=open_exceptions,
+            )
+            plans.append(
+                {
+                    "instrument_id": instrument_id,
+                    "field_family": family,
+                    "plan_hash": plan.plan_hash,
+                    "documents": [
+                        {
+                            "identity": item.get("identity"),
+                            "content_hash": item.get("content_hash"),
+                            "local_status": item.get("local_status"),
+                        }
+                        for item in plan.included
+                    ],
+                }
+            )
+        exceptions.extend(
+            {
+                "exception_id": item.get("exception_id"),
+                "instrument_id": instrument_id,
+                "field_family": item.get("field_family"),
+                "tier": item.get("tier"),
+                "gate_signature": item.get("gate_signature"),
+                "retry_count": item.get("retry_count"),
+                "next_retry_at": item.get("next_retry_at"),
+            }
+            for item in open_exceptions
+            if item.get("field_family") in set(field_families)
+        )
+        if set(field_families) & {
+            "derived_value_chain_roles",
+            "commodity_exposure_facts",
+        }:
+            activities = repository.get_approved_as_of(
+                "activities",
+                instrument_id=instrument_id,
+                cutoff=knowledge_cutoff,
+            )
+            derived_inputs[f"{instrument_id}:activities"] = tuple(
+                sorted(
+                    f"{item.get('activity_id')}:{item.get('updated_at')}"
+                    for item in activities
+                )
+            )
+        if "commodity_exposure_publication" in set(field_families):
+            facts = repository.get_approved_as_of(
+                "exposure_facts",
+                instrument_id=instrument_id,
+                cutoff=knowledge_cutoff,
+            )
+            derived_inputs[f"{instrument_id}:exposure_facts"] = tuple(
+                sorted(
+                    f"{item.get('fact_id')}:{item.get('updated_at')}" for item in facts
+                )
+            )
+    return _stable_hash(
+        {
+            "knowledge_cutoff": knowledge_cutoff,
+            "plans": plans,
+            "open_exceptions": sorted(
+                exceptions,
+                key=lambda item: (
+                    str(item.get("instrument_id") or ""),
+                    str(item.get("field_family") or ""),
+                    str(item.get("exception_id") or ""),
+                ),
+            ),
+            "derived_inputs": derived_inputs,
+        }
+    )
+
+
+class BusinessProfilePlannedDisclosureAcquirer:
+    """Discover and archive only disclosures selected by the minimum planner."""
+
+    def __init__(
+        self,
+        *,
+        coordinator: Any,
+        archive_service: Any,
+        manifest_loader: Callable[[str], Sequence[Mapping[str, Any]]],
+        checkpoint_root: str | Path,
+        page_size: int = 30,
+        max_pages: int = 5,
+    ) -> None:
+        self.coordinator = coordinator
+        self.archive_service = archive_service
+        self.manifest_loader = manifest_loader
+        self.checkpoint_root = Path(checkpoint_root)
+        self.page_size = max(1, int(page_size))
+        self.max_pages = max(1, int(max_pages))
+
+    def acquire(
+        self,
+        *,
+        planner: BusinessProfileDisclosurePlanner,
+        instrument_id: str,
+        field_family: str,
+        knowledge_cutoff: str,
+        manifests: Sequence[Mapping[str, Any]],
+        initial_plan: Any,
+    ) -> Any:
+        """Return a replanned disclosure set after bounded official acquisition."""
+
+        if initial_plan.coverage.complete:
+            return initial_plan
+        instrument = _instrument_identity(instrument_id)
+        resolution = self.coordinator.discover_instrument(
+            instrument,
+            end_date=knowledge_cutoff,
+            page_size=self.page_size,
+            max_pages=self.max_pages,
+            dry_run=True,
+        )
+        candidates = list(resolution.candidates)
+        if not candidates:
+            raise RuntimeError(
+                "planned disclosure discovery returned no official candidates: "
+                f"status={resolution.status} instrument={instrument_id}"
+            )
+        discovered_plan = planner.plan(
+            instrument_id=instrument_id,
+            field_family=field_family,
+            knowledge_cutoff=knowledge_cutoff,
+            manifests=manifests,
+            discovered=candidates,
+        )
+        planner.acquire_missing(
+            discovered_plan,
+            instrument=instrument,
+            candidates=candidates,
+            archive_service=self.archive_service,
+            checkpoint_path=self.checkpoint_root / f"{instrument_id}.json",
+        )
+        refreshed = [
+            dict(item)
+            for item in self.manifest_loader(instrument_id)
+            if item.get("schema_version") == "business_profile_source_file_manifest.v1"
+        ]
+        return planner.plan(
+            instrument_id=instrument_id,
+            field_family=field_family,
+            knowledge_cutoff=knowledge_cutoff,
+            manifests=refreshed,
+        )
+
+
+def build_business_profile_planned_disclosure_acquirer(
+    repository: BusinessProfileRepository,
+    *,
+    research_config: Any,
+    checkpoint_root: str | Path,
+) -> BusinessProfilePlannedDisclosureAcquirer:
+    """Build the production acquirer on the common announcement/archive boundary."""
+
+    from research.business_profile_archive import BusinessProfileDocumentArchiveService
+    from research.business_profile_discovery import (
+        BusinessProfileAnnouncementDiscoveryAdapter,
+    )
+    from research.business_profile_exchange_discovery import (
+        BusinessProfileDiscoveryCoordinator,
+    )
+
+    storage = repository.storage
+    coordinator = BusinessProfileDiscoveryCoordinator.from_research_config(
+        research_config,
+        primary_adapter=BusinessProfileAnnouncementDiscoveryAdapter(storage=storage),
+    )
+    archive_service = BusinessProfileDocumentArchiveService.from_research_config(
+        storage=storage,
+        research_config=research_config,
+    )
+    return BusinessProfilePlannedDisclosureAcquirer(
+        coordinator=coordinator,
+        archive_service=archive_service,
+        manifest_loader=lambda instrument_id: _load_source_manifests(
+            storage, instrument_id
+        ),
+        checkpoint_root=checkpoint_root,
+    )
 
 
 def discover_business_profile_semantic_scope(
@@ -126,8 +352,8 @@ def discover_business_profile_semantic_scope(
         retry_rows = conn.execute(
             "SELECT DISTINCT instrument_id FROM business_profile_exceptions "
             "WHERE status = 'open' AND tier = 'machine_rework' "
-            "AND next_retry_at IS NOT NULL AND substr(next_retry_at, 1, 10) <= ?",
-            (knowledge_cutoff,),
+            "AND next_retry_at IS NOT NULL AND next_retry_at <= ?",
+            (get_shanghai_time().isoformat(),),
         ).fetchall()
     planner = BusinessProfileDisclosurePlanner(
         coverage_inspector=BusinessProfileCoverageInspector(repository)
@@ -256,6 +482,10 @@ class BusinessProfileSemanticRuntime:
             Mapping[str, FieldFamilyPromotionManifest | Mapping[str, Any]] | None
         ) = None,
         counterparty_resolver: GovernedCounterpartyResolver | None = None,
+        planned_disclosure_acquirer: (
+            BusinessProfilePlannedDisclosureAcquirer | None
+        ) = None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository = repository
         self.storage = repository.storage
@@ -276,6 +506,8 @@ class BusinessProfileSemanticRuntime:
         self.counterparty_resolver = (
             counterparty_resolver or GovernedCounterpartyResolver(entities=[])
         )
+        self.planned_disclosure_acquirer = planned_disclosure_acquirer
+        self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
         self.promotion_service = BusinessProfilePromotionService(
             BusinessProfileReviewService(repository)
@@ -301,16 +533,18 @@ class BusinessProfileSemanticRuntime:
 
     def rebuild_publications(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
+        config: SemanticProductionConfig = kwargs["config"]
         if "commodity_exposure_publication" not in scope.field_families:
             raise ValueError(
                 "rebuild-publications requires commodity_exposure_publication scope"
             )
         derived = self._derive_and_publish(scope)
+        effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "rebuild-publications",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "derived": derived,
             },
         )
@@ -323,6 +557,7 @@ class BusinessProfileSemanticRuntime:
                 else "success"
             ),
             "artifact": artifact,
+            "source_revision": effective_scope.source_revision,
             "metrics": {
                 "auto_promoted": sum(
                     item.get("status") == "published" for item in publications
@@ -334,6 +569,7 @@ class BusinessProfileSemanticRuntime:
     def plan(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
         config: SemanticProductionConfig = kwargs["config"]
+        checkpoint = kwargs["checkpoint"]
         planner = BusinessProfileDisclosurePlanner(
             coverage_inspector=BusinessProfileCoverageInspector(self.repository),
             artifact_root=self.artifact_root / "disclosure_plans",
@@ -349,6 +585,11 @@ class BusinessProfileSemanticRuntime:
             ),
         )
         plans: list[dict[str, Any]] = []
+        acquisition_attempts = 0
+        acquired_plans = 0
+        acquisition_errors = 0
+        stage_started_at = self.clock()
+        budget_stop_reason: str | None = None
         for instrument_id in scope.instruments:
             manifests = [
                 dict(item)
@@ -381,12 +622,67 @@ class BusinessProfileSemanticRuntime:
                     manifests=manifests,
                     exceptions=exceptions,
                 )
-                plans.append({"kind": "document", **plan.to_dict()})
+                acquisition_error = None
+                if (
+                    not plan.complete
+                    and self.planned_disclosure_acquirer is not None
+                    and not config.kill_switches["network_calls"]
+                    and not config.kill_switches["scope_widening"]
+                ):
+                    budget_stop_reason = self._network_budget_stop_reason(
+                        config=config,
+                        checkpoint_metrics=checkpoint.get("metrics") or {},
+                        stage_metrics={"errors": acquisition_errors},
+                        stage_started_at=stage_started_at,
+                    )
+                    if budget_stop_reason:
+                        break
+                    acquisition_attempts += 1
+                    try:
+                        plan = self.planned_disclosure_acquirer.acquire(
+                            planner=planner,
+                            instrument_id=instrument_id,
+                            field_family=family,
+                            knowledge_cutoff=scope.knowledge_cutoff,
+                            manifests=manifests,
+                            initial_plan=plan,
+                        )
+                        manifests = [
+                            dict(item)
+                            for item in self.manifest_loader(instrument_id)
+                            if item.get("schema_version")
+                            == "business_profile_source_file_manifest.v1"
+                        ]
+                        acquired_plans += int(
+                            bool(plan.included)
+                            and all(
+                                item.get("local_status") == "verified"
+                                for item in plan.included
+                            )
+                        )
+                    except (OSError, RuntimeError, ValueError) as exc:
+                        acquisition_errors += 1
+                        acquisition_error = str(exc)
+                plans.append(
+                    {
+                        "kind": "document",
+                        **plan.to_dict(),
+                        "acquisition_error": acquisition_error,
+                    }
+                )
+            if budget_stop_reason:
+                break
+        source_revision = scope.source_revision
+        if acquisition_attempts:
+            source_revision = self._revised_scope(
+                scope, config, force=True
+            ).source_revision
+        effective_scope = replace(scope, source_revision=source_revision)
         artifact = self.stage_store.write(
             "plan",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "plans": plans,
             },
         )
@@ -403,9 +699,10 @@ class BusinessProfileSemanticRuntime:
                 reused_results=int(bool((plan.get("coverage") or {}).get("complete"))),
                 completeness_gaps=len(plan.get("completeness_gaps") or []),
             )
-        return {
-            "status": "success",
+        result = {
+            "status": "stopped" if budget_stop_reason else "success",
             "artifact": artifact,
+            "source_revision": source_revision,
             "metrics": {
                 "documents": len(document_ids),
                 "reused_results": sum(
@@ -414,9 +711,15 @@ class BusinessProfileSemanticRuntime:
                 "exception_backlog": len(
                     self.repository.list_exceptions(status="open", limit=10000)
                 ),
+                "acquisition_attempts": acquisition_attempts,
+                "acquired_plans": acquired_plans,
+                "errors": acquisition_errors,
                 "by_field_family": by_field_family,
             },
         }
+        if budget_stop_reason:
+            result["reason"] = budget_stop_reason
+        return result
 
     def select(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -429,12 +732,29 @@ class BusinessProfileSemanticRuntime:
         machine_rework: list[dict[str, Any]] = []
         pages = 0
         characters = 0
+        recovered_rework = 0
         by_field_family: dict[str, dict[str, float]] = {}
         selector = BusinessProfileSectionSelector(
             max_pages=min(12, config.budgets.max_pages)
         )
         for plan in plan_payload["plans"]:
-            if plan.get("kind") == "local_derivation" or not plan.get("included"):
+            if plan.get("kind") == "local_derivation":
+                continue
+            if not plan.get("included"):
+                if plan.get("completeness_gaps"):
+                    unresolved_document = {
+                        "identity": f"unresolved-plan:{plan.get('plan_hash')}",
+                    }
+                    machine_rework.append(
+                        _rework_item(
+                            plan,
+                            unresolved_document,
+                            "planned_document_missing_or_invalid_locally",
+                        )
+                    )
+                    _increment_family_metrics(
+                        by_field_family, plan["field_family"], machine_rework=1
+                    )
                 continue
             for document in plan["included"]:
                 if document.get("local_status") != "verified":
@@ -453,13 +773,37 @@ class BusinessProfileSemanticRuntime:
                     page_result = ensure_archived_pdf_page_artifact(document)
                     pdf_artifact = page_result["artifact"]
                     templates = self._templates_for(document, plan["instrument_id"])
-                    selected = selector.select(
-                        artifact=pdf_artifact,
+                    due_rework = self._due_rework_reasons(
                         instrument_id=plan["instrument_id"],
-                        source_document_id=document["identity"],
                         field_family=plan["field_family"],
-                        templates=templates,
+                        source_document_id=str(document["identity"]),
                     )
+                    prior = (
+                        self._latest_selected_artifact(
+                            instrument_id=plan["instrument_id"],
+                            field_family=plan["field_family"],
+                            source_document_id=str(document["identity"]),
+                        )
+                        if "context_incomplete" in due_rework
+                        else None
+                    )
+                    if prior is None:
+                        selected = selector.select(
+                            artifact=pdf_artifact,
+                            instrument_id=plan["instrument_id"],
+                            source_document_id=document["identity"],
+                            field_family=plan["field_family"],
+                            templates=templates,
+                        )
+                    else:
+                        selected = selector.expand_for_missing_context(
+                            prior=prior,
+                            artifact=pdf_artifact,
+                            instrument_id=plan["instrument_id"],
+                            source_document_id=document["identity"],
+                            field_family=plan["field_family"],
+                            templates=templates,
+                        )
                     selected_path, write_status = self.section_store.write(selected)
                 except (FileNotFoundError, RuntimeError, ValueError) as exc:
                     machine_rework.append(
@@ -469,6 +813,16 @@ class BusinessProfileSemanticRuntime:
                         by_field_family, plan["field_family"], machine_rework=1
                     )
                     continue
+                recovered_rework += self._resolve_runtime_rework(
+                    instrument_id=plan["instrument_id"],
+                    field_family=plan["field_family"],
+                    source_document_id=str(document["identity"]),
+                    reasons=(
+                        "planned_document_missing_or_invalid_locally",
+                        "ocr_required",
+                        "selector_gap",
+                    ),
+                )
                 item_pages = len(selected.sections)
                 item_characters = sum(
                     len(item.normalized_text) for item in selected.sections
@@ -494,6 +848,7 @@ class BusinessProfileSemanticRuntime:
                         "selected_write_status": write_status,
                         "template_ids": [item.template_id for item in templates],
                         "template_scopes": [item.scope.scope_id for item in templates],
+                        "expanded_for_missing_context": prior is not None,
                     }
                 )
         for exception in machine_rework:
@@ -502,25 +857,29 @@ class BusinessProfileSemanticRuntime:
                 str(exception.get("field_family") or "unknown"),
                 str(exception.get("reason_code") or "unknown"),
             )
+        persisted_exceptions = self._persist_stage_exceptions(
+            machine_rework, scope=scope, config=config
+        )
+        effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "select",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "selected": selected_items,
                 "machine_rework": machine_rework,
-                "persisted_exceptions": self._persist_stage_exceptions(
-                    machine_rework, scope=scope, config=config
-                ),
+                "persisted_exceptions": persisted_exceptions,
             },
         )
         return {
             "status": "success",
             "artifact": artifact,
+            "source_revision": effective_scope.source_revision,
             "metrics": {
                 "pages": pages,
                 "characters": characters,
                 "errors": len(machine_rework),
+                "machine_rework_recovered": recovered_rework,
                 "by_field_family": by_field_family,
             },
         }
@@ -542,8 +901,11 @@ class BusinessProfileSemanticRuntime:
             "tokens": 0,
             "cost": 0,
             "errors": 0,
+            "machine_rework_recovered": 0,
             "by_field_family": {},
         }
+        stage_started_at = self.clock()
+        budget_stop_reason: str | None = None
         for item in selected_payload["selected"]:
             selected = _load_selected(
                 self.section_store, item["selected_artifact_path"]
@@ -594,6 +956,14 @@ class BusinessProfileSemanticRuntime:
                         machine_rework=1,
                     )
                     continue
+                budget_stop_reason = self._network_budget_stop_reason(
+                    config=config,
+                    checkpoint_metrics=checkpoint.get("metrics") or {},
+                    stage_metrics=metrics,
+                    stage_started_at=stage_started_at,
+                )
+                if budget_stop_reason:
+                    break
                 extractor = BusinessProfileSemanticExtractor(self.llm_client)
                 try:
                     envelope = self._async_bridge.run(
@@ -687,6 +1057,17 @@ class BusinessProfileSemanticRuntime:
                 reuse = False
             else:
                 reuse = True
+            metrics["machine_rework_recovered"] += self._resolve_runtime_rework(
+                instrument_id=item["instrument_id"],
+                field_family=item["field_family"],
+                source_document_id=str(item["document"]["identity"]),
+                reasons=(
+                    "context_incomplete",
+                    "schema_failure",
+                    "gateway_failure",
+                    "catalog_proposal",
+                ),
+            )
             outputs.append(
                 {
                     **item,
@@ -725,22 +1106,38 @@ class BusinessProfileSemanticRuntime:
                 str(exception.get("field_family") or "unknown"),
                 str(exception.get("reason_code") or "unknown"),
             )
+        persisted_exceptions = self._persist_stage_exceptions(
+            new_stage_exceptions,
+            scope=scope,
+            config=config,
+        )
+        effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "extract",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "outputs": outputs,
                 "machine_rework": machine_rework,
                 "exceptions": exceptions,
-                "persisted_exceptions": self._persist_stage_exceptions(
-                    new_stage_exceptions,
-                    scope=scope,
-                    config=config,
-                ),
+                "budget_stop_reason": budget_stop_reason,
+                "persisted_exceptions": persisted_exceptions,
             },
         )
-        return {"status": "success", "artifact": artifact, "metrics": metrics}
+        if budget_stop_reason:
+            return {
+                "status": "stopped",
+                "reason": budget_stop_reason,
+                "artifact": artifact,
+                "source_revision": effective_scope.source_revision,
+                "metrics": metrics,
+            }
+        return {
+            "status": "success",
+            "artifact": artifact,
+            "source_revision": effective_scope.source_revision,
+            "metrics": metrics,
+        }
 
     def verify(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -754,7 +1151,10 @@ class BusinessProfileSemanticRuntime:
         inherited_rework_count = len(machine_rework)
         llm_calls = 0
         tokens = 0
+        errors = 0
         by_field_family: dict[str, dict[str, float]] = {}
+        stage_started_at = self.clock()
+        budget_stop_reason: str | None = None
         for output in extracted["outputs"]:
             selected = _load_selected(
                 self.section_store, output["selected_artifact_path"]
@@ -786,6 +1186,18 @@ class BusinessProfileSemanticRuntime:
                             by_field_family, output["field_family"], machine_rework=1
                         )
                         continue
+                    budget_stop_reason = self._network_budget_stop_reason(
+                        config=config,
+                        checkpoint_metrics=checkpoint.get("metrics") or {},
+                        stage_metrics={
+                            "tokens": tokens,
+                            "cost": 0,
+                            "errors": errors,
+                        },
+                        stage_started_at=stage_started_at,
+                    )
+                    if budget_stop_reason:
+                        break
                     try:
                         verification, audit = self._async_bridge.run(
                             BusinessProfileSemanticExtractor(
@@ -797,6 +1209,7 @@ class BusinessProfileSemanticRuntime:
                             )
                         )
                     except Exception as exc:
+                        errors += 1
                         machine_rework.append(
                             _rework_item(
                                 output,
@@ -820,36 +1233,87 @@ class BusinessProfileSemanticRuntime:
                         llm_calls=1,
                         tokens=int((audit.usage or {}).get("total_tokens") or 0),
                     )
+                if budget_stop_reason:
+                    break
+            if budget_stop_reason:
+                break
         for exception in machine_rework[inherited_rework_count:]:
             _increment_family_reason(
                 by_field_family,
                 str(exception.get("field_family") or "unknown"),
                 str(exception.get("reason_code") or "unknown"),
             )
+        persisted_exceptions = self._persist_stage_exceptions(
+            machine_rework[inherited_rework_count:],
+            scope=scope,
+            config=config,
+        )
+        effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "verify",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "verifications": verifications,
                 "machine_rework": machine_rework,
                 "exceptions": list(extracted.get("exceptions") or []),
-                "persisted_exceptions": self._persist_stage_exceptions(
-                    machine_rework[inherited_rework_count:],
-                    scope=scope,
-                    config=config,
-                ),
+                "budget_stop_reason": budget_stop_reason,
+                "persisted_exceptions": persisted_exceptions,
             },
         )
+        metrics = {
+            "llm_calls": llm_calls,
+            "tokens": tokens,
+            "errors": errors,
+            "by_field_family": by_field_family,
+        }
+        if budget_stop_reason:
+            return {
+                "status": "stopped",
+                "reason": budget_stop_reason,
+                "artifact": artifact,
+                "source_revision": effective_scope.source_revision,
+                "metrics": metrics,
+            }
         return {
             "status": "success",
             "artifact": artifact,
-            "metrics": {
-                "llm_calls": llm_calls,
-                "tokens": tokens,
-                "by_field_family": by_field_family,
-            },
+            "source_revision": effective_scope.source_revision,
+            "metrics": metrics,
         }
+
+    def _network_budget_stop_reason(
+        self,
+        *,
+        config: SemanticProductionConfig,
+        checkpoint_metrics: Mapping[str, Any],
+        stage_metrics: Mapping[str, Any],
+        stage_started_at: float,
+    ) -> str | None:
+        """Return the consumable budget that forbids the next network request."""
+
+        elapsed = float(checkpoint_metrics.get("elapsed_seconds") or 0) + max(
+            0.0, self.clock() - stage_started_at
+        )
+        consumed = {
+            "tokens": float(checkpoint_metrics.get("tokens") or 0)
+            + float(stage_metrics.get("tokens") or 0),
+            "cost": float(checkpoint_metrics.get("cost") or 0)
+            + float(stage_metrics.get("cost") or 0),
+            "elapsed_seconds": elapsed,
+            "errors": float(checkpoint_metrics.get("errors") or 0)
+            + float(stage_metrics.get("errors") or 0),
+        }
+        limits = {
+            "tokens": config.budgets.max_tokens,
+            "cost": config.budgets.max_cost,
+            "elapsed_seconds": config.budgets.max_elapsed_seconds,
+            "errors": config.budgets.max_errors,
+        }
+        for key in ("tokens", "cost", "elapsed_seconds", "errors"):
+            if consumed[key] >= float(limits[key]):
+                return f"budget_exhausted:{key}"
+        return None
 
     def promote(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -904,11 +1368,12 @@ class BusinessProfileSemanticRuntime:
                         )
                     )
         derived = self._derive_and_publish(scope)
+        effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "promote",
             {
                 "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
-                "scope_hash": scope.scope_hash,
+                "scope_hash": effective_scope.scope_hash,
                 "decisions": decisions,
                 "derived": derived,
                 "machine_rework": verified.get("machine_rework", []),
@@ -955,6 +1420,7 @@ class BusinessProfileSemanticRuntime:
         return {
             "status": "success",
             "artifact": artifact,
+            "source_revision": effective_scope.source_revision,
             "metrics": {
                 "auto_promoted": classifications.count("auto_promoted"),
                 "quick_review": classifications.count("quick_review"),
@@ -968,11 +1434,36 @@ class BusinessProfileSemanticRuntime:
         }
 
     def _load_manifests(self, instrument_id: str) -> Sequence[Mapping[str, Any]]:
-        repository = getattr(self.storage, "financial_statements", None)
-        if repository is not None and hasattr(repository, "get_source_file_manifests"):
-            return repository.get_source_file_manifests(instrument_id=instrument_id)
-        return self.storage.get_financial_source_file_manifests(
-            instrument_id=instrument_id
+        return _load_source_manifests(self.storage, instrument_id)
+
+    def _revised_scope(
+        self,
+        scope: Any,
+        config: SemanticProductionConfig,
+        *,
+        force: bool = False,
+    ) -> Any:
+        if not scope.source_revision and not force:
+            return scope
+        return replace(
+            scope,
+            source_revision=compute_business_profile_semantic_source_revision(
+                self.repository,
+                instruments=scope.instruments,
+                field_families=scope.field_families,
+                knowledge_cutoff=scope.knowledge_cutoff,
+                manifest_loader=self.manifest_loader,
+                max_documents=(
+                    1
+                    if config.kill_switches["scope_widening"]
+                    else config.budgets.max_documents
+                ),
+                max_specialist_documents=(
+                    0
+                    if config.kill_switches["scope_widening"]
+                    else min(1, config.budgets.max_documents - 1)
+                ),
+            ),
         )
 
     def _templates_for(
@@ -1129,15 +1620,7 @@ class BusinessProfileSemanticRuntime:
     ) -> dict[str, Any]:
         reason = str(exception.get("reason_code") or "gateway_failure")
         target_id = str(exception.get("target_id") or "").strip() or (
-            "bp-work-"
-            + _stable_hash(
-                {
-                    "instrument_id": exception.get("instrument_id"),
-                    "field_family": exception.get("field_family"),
-                    "source_document_id": exception.get("source_document_id"),
-                    "reason": reason,
-                }
-            )[:24]
+            _runtime_exception_target_id(exception)
         )
         family = str(exception.get("field_family") or "")
         routing_manifest = manifest or FieldFamilyPromotionManifest(
@@ -1179,6 +1662,15 @@ class BusinessProfileSemanticRuntime:
                     {"entity_id": value}
                     for value in exception.get("ranked_choices") or []
                 ),
+                metadata={
+                    "source_document_id": str(
+                        exception.get("source_document_id") or ""
+                    ),
+                    "selected_artifact_path": str(
+                        exception.get("selected_artifact_path") or ""
+                    ),
+                    "runtime_exception": True,
+                },
             ),
             routing_manifest,
         )
@@ -1373,6 +1865,111 @@ class BusinessProfileSemanticRuntime:
                             }
                         )
         return result
+
+    def _due_rework_reasons(
+        self,
+        *,
+        instrument_id: str,
+        field_family: str,
+        source_document_id: str,
+    ) -> set[str]:
+        retry_cutoff = get_shanghai_time().isoformat()
+        reasons: set[str] = set()
+        for item in self.repository.list_exceptions(
+            instrument_id=instrument_id,
+            status="open",
+            limit=10_000,
+        ):
+            if (
+                item.get("tier") != "machine_rework"
+                or item.get("field_family") != field_family
+            ):
+                continue
+            retry_at = str(item.get("next_retry_at") or "")
+            if not retry_at or retry_at > retry_cutoff:
+                continue
+            metadata_document = str(
+                (item.get("metadata") or {}).get("source_document_id") or ""
+            )
+            if metadata_document and metadata_document != source_document_id:
+                continue
+            reasons.update(str(value) for value in item.get("reason_codes") or [])
+        return reasons
+
+    def _latest_selected_artifact(
+        self,
+        *,
+        instrument_id: str,
+        field_family: str,
+        source_document_id: str,
+    ) -> SelectedSectionArtifact | None:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            exception_rows = conn.execute(
+                "SELECT metadata_json FROM business_profile_exceptions "
+                "WHERE instrument_id = ? AND field_family = ? AND status = 'open' "
+                "ORDER BY updated_at DESC, exception_id DESC",
+                (instrument_id, field_family),
+            ).fetchall()
+            run_rows = conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs "
+                "WHERE instrument_id = ? AND field_family = ? "
+                "AND source_document_id = ? AND status = 'completed' "
+                "ORDER BY updated_at DESC, run_id DESC",
+                (instrument_id, field_family, source_document_id),
+            ).fetchall()
+        for row in (*exception_rows, *run_rows):
+            try:
+                metadata = json.loads(row["metadata_json"] or "{}")
+                metadata_document = str(metadata.get("source_document_id") or "")
+                if metadata_document and metadata_document != source_document_id:
+                    continue
+                path = str(metadata.get("selected_artifact_path") or "")
+                if path:
+                    return _load_selected(self.section_store, path)
+            except (
+                FileNotFoundError,
+                OSError,
+                TypeError,
+                ValueError,
+                json.JSONDecodeError,
+            ):
+                continue
+        return None
+
+    def _resolve_runtime_rework(
+        self,
+        *,
+        instrument_id: str,
+        field_family: str,
+        source_document_id: str,
+        reasons: Sequence[str],
+    ) -> int:
+        target_ids = [
+            _runtime_exception_target_id(
+                {
+                    "instrument_id": instrument_id,
+                    "field_family": field_family,
+                    "source_document_id": source_document_id,
+                    "reason_code": reason,
+                }
+            )
+            for reason in reasons
+        ]
+        if not target_ids:
+            return 0
+        now = get_shanghai_time().isoformat()
+        placeholders = ",".join("?" for _ in target_ids)
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                "UPDATE business_profile_exceptions "
+                "SET status = 'resolved', resolved_at = ?, updated_at = ? "
+                f"WHERE target_id IN ({placeholders}) AND status = 'open'",
+                (now, now, *target_ids),
+            )
+            conn.commit()
+        return max(0, int(cursor.rowcount or 0))
 
     def _semantic_run_exists(self, run_id: str) -> bool:
         with self.storage.get_connection() as conn:
@@ -1804,6 +2401,45 @@ def _rework_item(
         "target_id": target_id,
         "tier": "machine_rework",
         "reason_code": reason,
+        "selected_artifact_path": plan.get("selected_artifact_path"),
+    }
+
+
+def _runtime_exception_target_id(exception: Mapping[str, Any]) -> str:
+    return (
+        "bp-work-"
+        + _stable_hash(
+            {
+                "instrument_id": exception.get("instrument_id"),
+                "field_family": exception.get("field_family"),
+                "source_document_id": exception.get("source_document_id"),
+                "reason": exception.get("reason_code"),
+            }
+        )[:24]
+    )
+
+
+def _load_source_manifests(
+    storage: Any, instrument_id: str
+) -> Sequence[Mapping[str, Any]]:
+    repository = getattr(storage, "financial_statements", None)
+    if repository is not None and hasattr(repository, "get_source_file_manifests"):
+        return repository.get_source_file_manifests(instrument_id=instrument_id)
+    return storage.get_financial_source_file_manifests(instrument_id=instrument_id)
+
+
+def _instrument_identity(instrument_id: str) -> dict[str, str]:
+    normalized = str(instrument_id or "").strip().upper()
+    if "." not in normalized:
+        raise ValueError(f"instrument_id requires exchange suffix: {instrument_id}")
+    symbol, suffix = normalized.rsplit(".", 1)
+    exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(suffix)
+    if not symbol or exchange is None:
+        raise ValueError(f"unsupported A-share instrument: {instrument_id}")
+    return {
+        "instrument_id": normalized,
+        "symbol": symbol,
+        "exchange": exchange,
     }
 
 

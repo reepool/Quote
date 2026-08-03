@@ -43,7 +43,9 @@ class SemanticProductionConfig:
     promotion_enabled: bool = False
     scheduler_enabled: bool = False
     retry_limit: int = 3
-    budgets: SemanticProductionBudgets = field(default_factory=SemanticProductionBudgets)
+    budgets: SemanticProductionBudgets = field(
+        default_factory=SemanticProductionBudgets
+    )
     thresholds: SemanticProductionThresholds = field(
         default_factory=SemanticProductionThresholds
     )
@@ -79,9 +81,13 @@ class SemanticProductionConfig:
         ):
             raise ValueError("semantic production kill switches are incomplete")
         if self.scheduler_enabled and not self.enabled:
-            raise ValueError("semantic scheduler requires semantic production enablement")
+            raise ValueError(
+                "semantic scheduler requires semantic production enablement"
+            )
         if self.promotion_enabled and not self.enabled:
-            raise ValueError("semantic promotion requires semantic production enablement")
+            raise ValueError(
+                "semantic promotion requires semantic production enablement"
+            )
 
 
 @dataclass(frozen=True)
@@ -91,9 +97,12 @@ class SemanticProductionScope:
     knowledge_cutoff: str
     identities: Mapping[str, str]
     promotion_manifest_hashes: Mapping[str, str] = field(default_factory=dict)
+    source_revision: str = ""
 
     def __post_init__(self) -> None:
-        if not self.instruments or not all(str(item).strip() for item in self.instruments):
+        if not self.instruments or not all(
+            str(item).strip() for item in self.instruments
+        ):
             raise ValueError("semantic production scope requires instruments")
         if not self.field_families or not all(
             str(item).strip() for item in self.field_families
@@ -118,6 +127,7 @@ class SemanticProductionScope:
                 "promotion_manifest_hashes": dict(
                     sorted(self.promotion_manifest_hashes.items())
                 ),
+                "source_revision": self.source_revision,
             }
         )
 
@@ -145,6 +155,37 @@ class SemanticProductionCheckpointStore:
         temp_path = self.path.with_name(f".{self.path.name}.{os.getpid()}.tmp")
         temp_path.write_text(encoded, encoding="utf-8")
         temp_path.replace(self.path)
+
+    @classmethod
+    def resolve_path(
+        cls,
+        root: str | Path,
+        scope: SemanticProductionScope,
+        *,
+        latest_logical_scope: bool = False,
+    ) -> Path:
+        """Find a rebound checkpoint by persisted scope before creating one."""
+
+        directory = Path(root)
+        expected = directory / f"{scope.scope_hash[:20]}.json"
+        if expected.is_file() or not directory.is_dir():
+            return expected
+        matches: list[tuple[int, Path]] = []
+        logical_scope = _logical_scope_payload(scope)
+        for path in directory.glob("*.json"):
+            try:
+                payload = cls(path).load()
+                persisted_scope = dict((payload or {}).get("scope") or {})
+                matched = (
+                    _logical_scope_payload(persisted_scope) == logical_scope
+                    if latest_logical_scope
+                    else (payload or {}).get("scope_hash") == scope.scope_hash
+                )
+                if matched:
+                    matches.append((path.stat().st_mtime_ns, path))
+            except (OSError, TypeError, ValueError, json.JSONDecodeError):
+                continue
+        return max(matches, default=(0, expected))[1]
 
 
 class BusinessProfileSemanticPipeline:
@@ -178,14 +219,21 @@ class BusinessProfileSemanticPipeline:
             raise ValueError(f"unsupported semantic production mode: {mode}")
         if not self.config.enabled and normalized_mode != "report":
             return {"status": "disabled", "reason": "semantic_production_disabled"}
+        if normalized_mode == "report" and self.checkpoint_store.load() is None:
+            return {
+                "status": "not_ready",
+                "reason": "semantic_production_checkpoint_missing",
+                "pipeline_status": "not_ready",
+                "completed_stages": [],
+                "stopped_reason": None,
+                "metrics": {},
+            }
         checkpoint = self._load_or_create(scope)
         if normalized_mode == "report":
             return self._report(checkpoint)
         if self.config.kill_switches["all_writes"]:
             return self._stop(checkpoint, "kill_switch:all_writes")
-        existing_stop_reason = self._budget_stop_reason(
-            checkpoint.get("metrics") or {}
-        )
+        existing_stop_reason = self._budget_stop_reason(checkpoint.get("metrics") or {})
         if existing_stop_reason:
             return self._stop(checkpoint, existing_stop_reason)
         if normalized_mode == "rebuild-publications":
@@ -207,7 +255,9 @@ class BusinessProfileSemanticPipeline:
             return self._stop(checkpoint, "cancelled")
         handler = self.handlers.get(stage)
         if handler is None:
-            raise ValueError(f"semantic production stage handler is not configured: {stage}")
+            raise ValueError(
+                f"semantic production stage handler is not configured: {stage}"
+            )
         start = self.clock()
         result = dict(
             handler(
@@ -217,6 +267,7 @@ class BusinessProfileSemanticPipeline:
                 config=self.config,
             )
         )
+        self._rebind_checkpoint_source_revision(checkpoint, scope, result)
         elapsed = max(0.0, self.clock() - start)
         metrics = _merge_metrics(
             checkpoint.get("metrics") or {},
@@ -244,7 +295,9 @@ class BusinessProfileSemanticPipeline:
             dict.fromkeys([*checkpoint["completed_stages"], stage])
         )
         checkpoint["artifacts"][stage] = result.get("artifact")
-        checkpoint["status"] = "completed" if stage == PIPELINE_STAGES[-1] else "partial"
+        checkpoint["status"] = (
+            "completed" if stage == PIPELINE_STAGES[-1] else "partial"
+        )
         checkpoint["stopped_reason"] = None
         self.checkpoint_store.save(checkpoint)
         return {
@@ -274,6 +327,7 @@ class BusinessProfileSemanticPipeline:
                 "knowledge_cutoff": scope.knowledge_cutoff,
                 "identities": dict(scope.identities),
                 "promotion_manifest_hashes": dict(scope.promotion_manifest_hashes),
+                "source_revision": scope.source_revision,
             },
             "budgets_hash": budgets_hash,
             "completed_stages": [],
@@ -289,10 +343,14 @@ class BusinessProfileSemanticPipeline:
     def _resolve_stage(mode: str, checkpoint: Mapping[str, Any]) -> str | None:
         completed = set(checkpoint.get("completed_stages") or [])
         if mode == "resume":
-            return next((stage for stage in PIPELINE_STAGES if stage not in completed), None)
+            return next(
+                (stage for stage in PIPELINE_STAGES if stage not in completed), None
+            )
         if mode in completed:
             return None
-        expected = next((stage for stage in PIPELINE_STAGES if stage not in completed), None)
+        expected = next(
+            (stage for stage in PIPELINE_STAGES if stage not in completed), None
+        )
         if mode != expected:
             raise ValueError(
                 f"semantic production stage order violation: expected={expected} actual={mode}"
@@ -324,6 +382,7 @@ class BusinessProfileSemanticPipeline:
                 config=self.config,
             )
         )
+        self._rebind_checkpoint_source_revision(checkpoint, scope, result)
         elapsed = max(0.0, self.clock() - start)
         checkpoint["metrics"] = _merge_metrics(
             checkpoint.get("metrics") or {},
@@ -347,19 +406,43 @@ class BusinessProfileSemanticPipeline:
             **self._report(checkpoint),
         }
 
+    @staticmethod
+    def _rebind_checkpoint_source_revision(
+        checkpoint: MutableMapping[str, Any],
+        scope: SemanticProductionScope,
+        result: Mapping[str, Any],
+    ) -> None:
+        if "source_revision" not in result:
+            return
+        rebound_scope = SemanticProductionScope(
+            instruments=scope.instruments,
+            field_families=scope.field_families,
+            knowledge_cutoff=scope.knowledge_cutoff,
+            identities=scope.identities,
+            promotion_manifest_hashes=scope.promotion_manifest_hashes,
+            source_revision=str(result["source_revision"] or ""),
+        )
+        checkpoint["scope_hash"] = rebound_scope.scope_hash
+        checkpoint["scope"]["source_revision"] = rebound_scope.source_revision
+
     def _budget_stop_reason(self, metrics: Mapping[str, Any]) -> str | None:
         budgets = self.config.budgets
-        comparisons = (
+        capacity_comparisons = (
             ("documents", budgets.max_documents),
             ("pages", budgets.max_pages),
             ("characters", budgets.max_characters),
+        )
+        for key, maximum in capacity_comparisons:
+            if float(metrics.get(key) or 0) > float(maximum):
+                return f"budget_exhausted:{key}"
+        consumable_comparisons = (
             ("tokens", budgets.max_tokens),
             ("cost", budgets.max_cost),
             ("elapsed_seconds", budgets.max_elapsed_seconds),
             ("errors", budgets.max_errors),
         )
-        for key, maximum in comparisons:
-            if float(metrics.get(key) or 0) > float(maximum):
+        for key, maximum in consumable_comparisons:
+            if float(metrics.get(key) or 0) >= float(maximum):
                 return f"budget_exhausted:{key}"
         thresholds = self.config.thresholds
         for key, maximum in (
@@ -369,11 +452,16 @@ class BusinessProfileSemanticPipeline:
         ):
             if float(metrics.get(key) or 0) > float(maximum):
                 return f"quality_stop:{key}"
-        if int(metrics.get("exception_backlog") or 0) > thresholds.max_exception_backlog:
+        if (
+            int(metrics.get("exception_backlog") or 0)
+            > thresholds.max_exception_backlog
+        ):
             return "quality_stop:exception_backlog"
         return None
 
-    def _stop(self, checkpoint: MutableMapping[str, Any], reason: str) -> dict[str, Any]:
+    def _stop(
+        self, checkpoint: MutableMapping[str, Any], reason: str
+    ) -> dict[str, Any]:
         checkpoint["status"] = "stopped"
         checkpoint["stopped_reason"] = reason
         self.checkpoint_store.save(checkpoint)
@@ -390,6 +478,8 @@ class BusinessProfileSemanticPipeline:
             "metrics": {
                 "reused_results": int(metrics.get("reused_results") or 0),
                 "documents": int(metrics.get("documents") or 0),
+                "acquisition_attempts": int(metrics.get("acquisition_attempts") or 0),
+                "acquired_plans": int(metrics.get("acquired_plans") or 0),
                 "pages": int(metrics.get("pages") or 0),
                 "deterministic_completed": int(
                     metrics.get("deterministic_completed") or 0
@@ -398,6 +488,7 @@ class BusinessProfileSemanticPipeline:
                 "tokens": int(metrics.get("tokens") or 0),
                 "cost": float(metrics.get("cost") or 0),
                 "elapsed_seconds": float(metrics.get("elapsed_seconds") or 0),
+                "errors": int(metrics.get("errors") or 0),
                 "auto_promoted": int(metrics.get("auto_promoted") or 0),
                 "machine_rework_recovered": int(
                     metrics.get("machine_rework_recovered") or 0
@@ -419,7 +510,9 @@ class BusinessProfileSemanticPipeline:
         }
 
 
-def parse_semantic_production_config(value: Mapping[str, Any]) -> SemanticProductionConfig:
+def parse_semantic_production_config(
+    value: Mapping[str, Any]
+) -> SemanticProductionConfig:
     payload = dict(value or {})
     config = SemanticProductionConfig(
         enabled=payload.get("enabled") is True,
@@ -431,8 +524,7 @@ def parse_semantic_production_config(value: Mapping[str, Any]) -> SemanticProduc
             **dict(payload.get("thresholds") or {})
         ),
         kill_switches=dict(
-            payload.get("kill_switches")
-            or SemanticProductionConfig().kill_switches
+            payload.get("kill_switches") or SemanticProductionConfig().kill_switches
         ),
     )
     config.validate()
@@ -454,15 +546,15 @@ def _merge_metrics(
     }
     for key, value in update.items():
         if key == "by_field_family" and isinstance(value, Mapping):
-            output[key] = _merge_field_family_metrics(
-                output.get(key) or {}, value
-            )
+            output[key] = _merge_field_family_metrics(output.get(key) or {}, value)
             continue
         if key in gauges:
             output[key] = value
         elif isinstance(value, (int, float)):
             output[key] = float(output.get(key) or 0) + float(value)
-    output["elapsed_seconds"] = float(output.get("elapsed_seconds") or 0) + elapsed_seconds
+    output["elapsed_seconds"] = (
+        float(output.get("elapsed_seconds") or 0) + elapsed_seconds
+    )
     return output
 
 
@@ -484,9 +576,9 @@ def _merge_field_family_metrics(
                 reasons = values.setdefault(key, {})
                 for reason, count in value.items():
                     if isinstance(count, (int, float)):
-                        reasons[str(reason)] = float(reasons.get(str(reason)) or 0) + float(
-                            count
-                        )
+                        reasons[str(reason)] = float(
+                            reasons.get(str(reason)) or 0
+                        ) + float(count)
                 continue
             if not isinstance(value, (int, float)):
                 continue
@@ -507,20 +599,20 @@ def _field_family_report(value: Mapping[str, Any]) -> dict[str, Any]:
             for key, number in raw.items()
             if isinstance(number, (int, float))
         }
-        selected = max(1, int(row.get("selected_documents") or row.get("documents") or 0))
+        selected = max(
+            1, int(row.get("selected_documents") or row.get("documents") or 0)
+        )
         candidates = max(1, int(row.get("candidates") or 0))
-        exceptions = int(row.get("machine_rework") or 0) + int(
-            row.get("quick_review") or 0
-        ) + int(row.get("deep_review") or 0)
+        exceptions = (
+            int(row.get("machine_rework") or 0)
+            + int(row.get("quick_review") or 0)
+            + int(row.get("deep_review") or 0)
+        )
         row["llm_call_rate"] = float(row.get("llm_calls") or 0) / selected
         row["auto_promotion_rate"] = float(row.get("auto_promoted") or 0) / candidates
-        row["human_exception_rate"] = (
-            float(
-                int(row.get("quick_review") or 0)
-                + int(row.get("deep_review") or 0)
-            )
-            / max(1, candidates + exceptions)
-        )
+        row["human_exception_rate"] = float(
+            int(row.get("quick_review") or 0) + int(row.get("deep_review") or 0)
+        ) / max(1, candidates + exceptions)
         reason_counts = raw.get("reason_code_counts") or {}
         row["reason_code_clusters"] = [
             {"reason_code": str(reason), "count": int(count)}
@@ -543,3 +635,28 @@ def _stable_hash(value: Any) -> str:
             default=str,
         ).encode("utf-8")
     ).hexdigest()
+
+
+def _logical_scope_payload(
+    scope: SemanticProductionScope | Mapping[str, Any],
+) -> dict[str, Any]:
+    value = (
+        {
+            "instruments": scope.instruments,
+            "field_families": scope.field_families,
+            "knowledge_cutoff": scope.knowledge_cutoff,
+            "identities": scope.identities,
+            "promotion_manifest_hashes": scope.promotion_manifest_hashes,
+        }
+        if isinstance(scope, SemanticProductionScope)
+        else scope
+    )
+    return {
+        "instruments": sorted(set(value.get("instruments") or [])),
+        "field_families": sorted(set(value.get("field_families") or [])),
+        "knowledge_cutoff": str(value.get("knowledge_cutoff") or ""),
+        "identities": dict(sorted(dict(value.get("identities") or {}).items())),
+        "promotion_manifest_hashes": dict(
+            sorted(dict(value.get("promotion_manifest_hashes") or {}).items())
+        ),
+    }

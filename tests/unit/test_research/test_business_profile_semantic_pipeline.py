@@ -55,13 +55,18 @@ def _handlers(results=None):
             {"status": "success", "artifact": {"stage": stage}, "metrics": {}},
         )
 
-    return {stage: handler(stage) for stage in ("plan", "select", "extract", "verify", "promote")}
+    return {
+        stage: handler(stage)
+        for stage in ("plan", "select", "extract", "verify", "promote")
+    }
 
 
 def test_exact_stage_order_resume_and_unchanged_replay(tmp_path):
     pipeline = BusinessProfileSemanticPipeline(
         config=_config(),
-        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
         handlers=_handlers(),
     )
     scope = _scope()
@@ -102,11 +107,15 @@ def test_stale_scope_and_budget_checkpoint_are_rejected(tmp_path):
 def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
     config = _config(
         budgets=SemanticProductionBudgets(max_tokens=10),
-        thresholds=SemanticProductionThresholds(max_drift_rate=0.01, max_exception_backlog=2),
+        thresholds=SemanticProductionThresholds(
+            max_drift_rate=0.01, max_exception_backlog=2
+        ),
     )
     pipeline = BusinessProfileSemanticPipeline(
         config=config,
-        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
         handlers=_handlers(
             {
                 "plan": {
@@ -131,10 +140,36 @@ def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
     assert resumed["completed_stages"] == ["plan"]
 
 
+def test_consumable_budget_stops_when_threshold_is_reached(tmp_path):
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(budgets=SemanticProductionBudgets(max_tokens=10)),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
+        handlers=_handlers(
+            {
+                "plan": {
+                    "status": "success",
+                    "artifact": {"plan": "hash"},
+                    "metrics": {"tokens": 10},
+                }
+            }
+        ),
+    )
+
+    result = pipeline.run("plan", scope=_scope())
+
+    assert result["status"] == "stopped"
+    assert result["reason"] == "budget_exhausted:tokens"
+    assert result["completed_stages"] == ["plan"]
+
+
 def test_report_aggregates_denominators_and_rates_by_field_family(tmp_path):
     pipeline = BusinessProfileSemanticPipeline(
         config=_config(),
-        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
         handlers=_handlers(
             {
                 "plan": {
@@ -183,7 +218,13 @@ def test_cancellation_and_interruption_resume_without_duplicate_completion(tmp_p
         config=_config(),
         checkpoint_store=SemanticProductionCheckpointStore(path),
         handlers=_handlers(
-            {"plan": {"status": "interrupted", "reason": "provider_timeout", "artifact": {"partial": True}}}
+            {
+                "plan": {
+                    "status": "interrupted",
+                    "reason": "provider_timeout",
+                    "artifact": {"partial": True},
+                }
+            }
         ),
     )
     interrupted = pipeline.run("plan", scope=_scope())
@@ -246,7 +287,9 @@ def test_publication_rebuild_uses_dedicated_handler_without_prior_stages(tmp_pat
     )
     pipeline = BusinessProfileSemanticPipeline(
         config=_config(),
-        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
         handlers=handlers,
     )
 
@@ -256,3 +299,51 @@ def test_publication_rebuild_uses_dedicated_handler_without_prior_stages(tmp_pat
     assert result["artifact"] == {"publication": "hash"}
     assert result["completed_stages"] == []
     assert len(calls) == 1
+
+
+def test_report_without_checkpoint_is_read_only_and_not_ready(tmp_path):
+    checkpoint = tmp_path / "missing.json"
+    pipeline = BusinessProfileSemanticPipeline(
+        config=SemanticProductionConfig(enabled=False),
+        checkpoint_store=SemanticProductionCheckpointStore(checkpoint),
+    )
+
+    result = pipeline.run("report", scope=_scope())
+
+    assert result["status"] == "not_ready"
+    assert result["reason"] == "semantic_production_checkpoint_missing"
+    assert not checkpoint.exists()
+
+
+def test_checkpoint_path_resolves_rebound_and_latest_logical_scope(tmp_path):
+    original_scope = _scope(source_revision="revision.v1")
+    rebound_scope = _scope(source_revision="revision.v2")
+    original_path = tmp_path / f"{original_scope.scope_hash[:20]}.json"
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(),
+        checkpoint_store=SemanticProductionCheckpointStore(original_path),
+        handlers=_handlers(
+            {
+                "plan": {
+                    "status": "success",
+                    "artifact": {"plan": "hash"},
+                    "source_revision": "revision.v2",
+                    "metrics": {},
+                }
+            }
+        ),
+    )
+    pipeline.run("plan", scope=original_scope)
+
+    assert (
+        SemanticProductionCheckpointStore.resolve_path(tmp_path, rebound_scope)
+        == original_path
+    )
+    assert (
+        SemanticProductionCheckpointStore.resolve_path(
+            tmp_path,
+            _scope(source_revision=""),
+            latest_logical_scope=True,
+        )
+        == original_path
+    )

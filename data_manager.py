@@ -1587,6 +1587,8 @@ class DataManager:
         )
         from research.business_profile_semantic_runtime import (
             BusinessProfileSemanticRuntime,
+            build_business_profile_planned_disclosure_acquirer,
+            compute_business_profile_semantic_source_revision,
             discover_business_profile_semantic_scope,
         )
         from research.business_profile_promotion import FieldFamilyPromotionManifest
@@ -1651,7 +1653,49 @@ class DataManager:
             }
         llm_client = (
             LlmClient(config_manager.get_llm_config())
-            if not config.kill_switches["network_calls"]
+            if mode != "report" and not config.kill_switches["network_calls"]
+            else None
+        )
+        report_checkpoint = (
+            Path(checkpoint_path) if mode == "report" and checkpoint_path else None
+        )
+        source_revision = (
+            str(
+                (
+                    json.loads(report_checkpoint.read_text(encoding="utf-8"))
+                    .get("scope", {})
+                    .get("source_revision", "")
+                )
+            )
+            if report_checkpoint is not None and report_checkpoint.is_file()
+            else (
+                compute_business_profile_semantic_source_revision(
+                    repository,
+                    instruments=instruments,
+                    field_families=families,
+                    knowledge_cutoff=cutoff,
+                    max_documents=(
+                        1
+                        if config.kill_switches["scope_widening"]
+                        else config.budgets.max_documents
+                    ),
+                    max_specialist_documents=(
+                        0
+                        if config.kill_switches["scope_widening"]
+                        else min(1, config.budgets.max_documents - 1)
+                    ),
+                )
+                if mode != "report"
+                else ""
+            )
+        )
+        planned_disclosure_acquirer = (
+            build_business_profile_planned_disclosure_acquirer(
+                repository,
+                research_config=self.research_config,
+                checkpoint_root=checkpoint_root / "acquisition",
+            )
+            if mode != "report" and not config.kill_switches["network_calls"]
             else None
         )
         runtime = BusinessProfileSemanticRuntime(
@@ -1659,6 +1703,7 @@ class DataManager:
             artifact_root=checkpoint_root / "artifacts",
             llm_client=llm_client,
             promotion_manifests=manifests,
+            planned_disclosure_acquirer=planned_disclosure_acquirer,
         )
 
         scope = SemanticProductionScope(
@@ -1667,12 +1712,29 @@ class DataManager:
             knowledge_cutoff=cutoff,
             identities=identities,
             promotion_manifest_hashes=computed_manifest_hashes,
+            source_revision=source_revision,
         )
-        resolved_checkpoint = (
-            Path(checkpoint_path)
-            if checkpoint_path
-            else checkpoint_root / f"{scope.scope_hash[:20]}.json"
-        )
+        if checkpoint_path:
+            resolved_checkpoint = Path(checkpoint_path)
+        elif mode == "report":
+            resolved_checkpoint = SemanticProductionCheckpointStore.resolve_path(
+                checkpoint_root,
+                scope,
+                latest_logical_scope=True,
+            )
+            persisted = SemanticProductionCheckpointStore(resolved_checkpoint).load()
+            if persisted is not None:
+                scope = replace(
+                    scope,
+                    source_revision=str(
+                        (persisted.get("scope") or {}).get("source_revision") or ""
+                    ),
+                )
+        else:
+            resolved_checkpoint = SemanticProductionCheckpointStore.resolve_path(
+                checkpoint_root,
+                scope,
+            )
         pipeline = BusinessProfileSemanticPipeline(
             config=config,
             checkpoint_store=SemanticProductionCheckpointStore(resolved_checkpoint),

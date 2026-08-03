@@ -74,11 +74,21 @@ def test_classifier_auto_promotes_only_complete_current_boolean_gates():
 
     passed = classifier.classify(_context(candidate, manifest), manifest)
     missing = classifier.classify(
-        _context(candidate, manifest, gates={key: value for key, value in _gates().items() if key != "exact_evidence"}),
+        _context(
+            candidate,
+            manifest,
+            gates={
+                key: value for key, value in _gates().items() if key != "exact_evidence"
+            },
+        ),
         manifest,
     )
     stale = classifier.classify(
-        _context(candidate, manifest, runtime_identities={**manifest.identities, "parser": "table.v2"}),
+        _context(
+            candidate,
+            manifest,
+            runtime_identities={**manifest.identities, "parser": "table.v2"},
+        ),
         manifest,
     )
 
@@ -155,11 +165,16 @@ def test_machine_rework_retries_are_bounded_and_clean_recovery_resolves_queue(tm
 
     first = service.process(rework, manifest)
     second = service.process(rework, manifest)
+    exhausted = service.process(rework, manifest)
 
     assert first["exception"]["tier"] == "machine_rework"
     assert first["exception"]["retry_count"] == 1
     assert second["exception"]["retry_count"] == 2
     assert second["exception"]["next_retry_at"] is not None
+    assert exhausted["exception"]["tier"] == "machine_rework"
+    assert exhausted["exception"]["retry_count"] == 2
+    assert exhausted["exception"]["next_retry_at"] is None
+    assert "machine_rework_exhausted" in exhausted["exception"]["reason_codes"]
 
     recovered = service.process(_context(candidate, manifest), manifest)
 

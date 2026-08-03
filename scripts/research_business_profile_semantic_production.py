@@ -22,7 +22,11 @@ from research.business_profile_semantic_pipeline import (
     parse_semantic_production_config,
 )
 from research.business_profile_governance import BusinessProfileRepository
-from research.business_profile_semantic_runtime import BusinessProfileSemanticRuntime
+from research.business_profile_semantic_runtime import (
+    BusinessProfileSemanticRuntime,
+    build_business_profile_planned_disclosure_acquirer,
+    compute_business_profile_semantic_source_revision,
+)
 from research.storage import ResearchStorageManager
 from utils.config_manager import UnifiedConfigManager
 from utils.llm import LlmClient
@@ -62,13 +66,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         identities=_read_json(args.identities),
         promotion_manifest_hashes=manifest_hashes,
     )
-    storage = _build_storage(args.research_db)
+    unified_config = UnifiedConfigManager("config")
+    research_config = unified_config.get_research_config()
+    storage = _build_storage(args.research_db, research_config)
     if args.mode != "report" and config.enabled:
         storage.initialize()
     repository = BusinessProfileRepository(storage)
     llm_client = (
-        LlmClient(UnifiedConfigManager("config").get_llm_config())
-        if config.enabled and not config.kill_switches["network_calls"]
+        LlmClient(unified_config.get_llm_config())
+        if args.mode != "report"
+        and config.enabled
+        and not config.kill_switches["network_calls"]
         else None
     )
     runtime = BusinessProfileSemanticRuntime(
@@ -79,6 +87,55 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         llm_client=llm_client,
         promotion_manifests=promotion_manifests,
+        planned_disclosure_acquirer=(
+            build_business_profile_planned_disclosure_acquirer(
+                repository,
+                research_config=research_config,
+                checkpoint_root=args.checkpoint.parent / "acquisition",
+            )
+            if args.mode != "report"
+            and config.enabled
+            and not config.kill_switches["network_calls"]
+            else None
+        ),
+    )
+    source_revision = (
+        str(
+            (
+                json.loads(args.checkpoint.read_text(encoding="utf-8"))
+                .get("scope", {})
+                .get("source_revision", "")
+            )
+        )
+        if args.mode == "report" and args.checkpoint.is_file()
+        else (
+            compute_business_profile_semantic_source_revision(
+                repository,
+                instruments=scope.instruments,
+                field_families=scope.field_families,
+                knowledge_cutoff=scope.knowledge_cutoff,
+                max_documents=(
+                    1
+                    if config.kill_switches["scope_widening"]
+                    else config.budgets.max_documents
+                ),
+                max_specialist_documents=(
+                    0
+                    if config.kill_switches["scope_widening"]
+                    else min(1, config.budgets.max_documents - 1)
+                ),
+            )
+            if args.mode != "report"
+            else ""
+        )
+    )
+    scope = SemanticProductionScope(
+        instruments=scope.instruments,
+        field_families=scope.field_families,
+        knowledge_cutoff=scope.knowledge_cutoff,
+        identities=scope.identities,
+        promotion_manifest_hashes=scope.promotion_manifest_hashes,
+        source_revision=source_revision,
     )
     pipeline = BusinessProfileSemanticPipeline(
         config=config,
@@ -100,8 +157,8 @@ def _read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
-def _build_storage(path: Path) -> ResearchStorageManager:
-    config = copy.deepcopy(UnifiedConfigManager("config").get_research_config())
+def _build_storage(path: Path, research_config: Any) -> ResearchStorageManager:
+    config = copy.deepcopy(research_config)
     config.storage.db_path = str(path)
     config.storage.attach_quotes_db = False
     return ResearchStorageManager(config)

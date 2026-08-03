@@ -15,9 +15,10 @@
       "min_precision": 0.99
     }
   },
+  "isolated_governed_writes_performed": true,
   "pilot": {
     "enabled_field_families": [
-      "atomic_activities"
+      "structured_segments"
     ],
     "instrument_count": 2,
     "kill_switch_drill_ok": true,
@@ -26,13 +27,27 @@
     "result": {
       "audited_system_promotion": true,
       "bounded_scope": true,
-      "zero_candidate_valuation_leakage": true
+      "bulk_transaction_ok": true,
+      "governed_output": [
+        [
+          "pilot-evidence-600362-SH",
+          "approved"
+        ],
+        [
+          "pilot-evidence-601088-SH",
+          "approved"
+        ]
+      ],
+      "machine_rework_recovery_ok": true,
+      "point_in_time_reads_ok": true,
+      "zero_candidate_valuation_leakage": true,
+      "zero_valuation_leakage": true
     },
     "rollback_drill_ok": true,
     "schema_version": "business_profile_production_pilot.v1"
   },
   "production_writes_performed": false,
-  "report_hash": "58ab1461d75806b38f3905a1ccb69dcf2dd3fb8cf5995e2128cc1dc3abb1bbbd",
+  "report_hash": "663cfa7eb9e327b0af82cd8eb08f10e3ff00a31bb408b67317cba98e38768fd5",
   "scheduler_enabled": false,
   "scheduler_readiness": {
     "available_window_seconds": 3600,
@@ -46,33 +61,47 @@
   "scope": "isolated_temporary_database",
   "shadow": {
     "first_run": {
+      "audited_system_promotion": true,
+      "bounded_scope": true,
       "bulk_transaction_ok": true,
       "governed_output": [
         [
-          "fact-1",
+          "pilot-evidence-601088-SH",
+          "approved"
+        ],
+        [
+          "shadow-machine-rework",
           "approved"
         ]
       ],
       "machine_rework_recovery_ok": true,
       "point_in_time_reads_ok": true,
+      "zero_candidate_valuation_leakage": true,
       "zero_valuation_leakage": true
     },
     "passed": true,
     "reason_codes": [],
-    "replay_hash": "190ea1f0cb280e48d2552efb2af24ed04fb4de752cd972bbea5ec3c893244914",
+    "replay_hash": "6061f2ee20fed85307dc26d915d90dfdb758e1100f81e8544350eac77ce0c99c",
     "schema_version": "business_profile_shadow_backfill_validation.v1",
     "second_run": {
+      "audited_system_promotion": true,
+      "bounded_scope": true,
       "bulk_transaction_ok": true,
       "governed_output": [
         [
-          "fact-1",
+          "pilot-evidence-601088-SH",
+          "approved"
+        ],
+        [
+          "shadow-machine-rework",
           "approved"
         ]
       ],
       "machine_rework_recovery_ok": true,
       "point_in_time_reads_ok": true,
+      "zero_candidate_valuation_leakage": true,
       "zero_valuation_leakage": true
     },
-    "source_database_hash": "0ba5605122861031477df40d028abfcd5616480fcff4ac33917e416862634b94"
+    "source_database_hash": "9151ddcb1927869034256ca83dc963119b17e3f350d40771e757c97ffdba8f3d"
   }
 }
