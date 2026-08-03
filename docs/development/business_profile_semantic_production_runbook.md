@@ -28,7 +28,8 @@
 - 目标字段族 manifest 已通过精度、证据、时点、漂移、成本和异常率门禁。
 - 有界生产试点、回滚演练和 kill-switch 演练已通过。
 - 全市场容量估算和异常积压策略已通过。
-- 调度器参数保持明确的公司、字段族和运行身份范围，不允许空范围扩散。
+- 调度器参数保持明确的字段族和运行身份范围；公司范围可留空，由系统按公告
+  hash、字段族完成状态、运行身份变化和到期机器重做自动发现，不允许全量盲扫。
 
 ## 3. 运行和检查点
 
@@ -38,7 +39,7 @@ CLI 支持 `plan`、`select`、`extract`、`verify`、`promote`、`resume`、
 - 公司范围和字段族范围。
 - 知识截止日。
 - 文档、选择器、解析器、目录、模型、验证器、规则和政策运行身份。
-- 字段族 promotion manifest 哈希。
+- 字段族 promotion manifest 完整内容；运行时自行计算并绑定哈希。
 - 独立检查点路径。
 
 示例命令：
@@ -52,8 +53,38 @@ CLI 支持 `plan`、`select`、`extract`、`verify`、`promote`、`resume`、
   --identities /tmp/business-profile-identities.json \
   --promotion-manifests /tmp/business-profile-manifests.json \
   --config /tmp/business-profile-semantic-config.json \
-  --input /tmp/business-profile-stage-artifacts.json \
+  --research-db /tmp/business-profile-shadow.db \
+  --artifact-root /tmp/business-profile-semantic-artifacts \
   --checkpoint /tmp/business-profile-semantic.checkpoint.json
+```
+
+CLI 不接受调用方伪造的阶段结果或 `--input`。它直接读取研究库中的官方公告
+manifest 和本地归档 PDF，实际执行选页、表格解析、语义抽取、验证和晋级。
+promotion manifest 文件是按字段族键控的完整对象，或放在 `field_families`
+对象下，例如：
+
+```json
+{
+  "field_families": {
+    "atomic_activities": {
+      "field_family": "atomic_activities",
+      "enabled": true,
+      "benchmark_passed": true,
+      "identities": {
+        "document": "document.v1",
+        "section": "section.v1",
+        "selector": "selector.v1",
+        "parser": "parser.v1",
+        "schema": "schema.v1",
+        "catalog": "catalog.v1",
+        "model": "model.v1",
+        "verifier": "verifier.v1",
+        "rules": "rules.v1",
+        "policy": "policy.v1"
+      }
+    }
+  }
+}
 ```
 
 检查点只可在范围哈希和全部运行身份完全一致时恢复。出现 stale checkpoint
@@ -106,6 +137,13 @@ Kill switch 不删除事实、候选、审核、异常或历史发布版本。
 机器返工使用有界指数退避和最大重试次数。重试必须复用已有文档和页面制品，
 仅在记录 `missing_context` 后按确定性规则扩展窗口。达到重试上限后，根据
 剩余问题进入 quick review、deep review 或保持未支持状态，不能降低晋级门禁。
+`promotion_enabled=false` 的 shadow 模式仍会持久化机器返工和例外，但不会
+批准候选事实；否则调度器无法自动发现到期重试。重试耗尽后的记录不再自动
+入队，quick/deep review 也不参与自动重试。
+
+确定性数值解析绑定单位目录 `business_profile_units.2026.2`。其中 `万元`
+固定换算为 `CNY * 10000`，`万吨` 固定换算为 `tonne * 10000`；未知单位在
+bundle 写入前失败关闭，不允许部分事实落库。
 
 ## 7. 例外人工处理
 

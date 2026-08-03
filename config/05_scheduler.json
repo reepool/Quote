@@ -989,8 +989,9 @@
           "field_families": [],
           "runtime_identities": {},
           "promotion_manifest_hashes": {},
+          "promotion_manifests": {},
+          "max_instruments": 30,
           "checkpoint_path": null,
-          "stage_payload": {},
           "max_runtime_seconds": 960
         }
       },

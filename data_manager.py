@@ -1565,10 +1565,11 @@ class DataManager:
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
         promotion_manifest_hashes: Optional[Dict[str, str]] = None,
+        promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
+        max_instruments: int = 30,
         checkpoint_path: Optional[str] = None,
-        stage_payload: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Run one explicitly scoped semantic-production stage or resume step."""
+        """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
             return {"status": "disabled", "reason": "research_config.enabled is false"}
         if self.research_storage is None:
@@ -1577,23 +1578,19 @@ class DataManager:
         production_payload = dict(module.get("semantic_production") or {})
         if production_payload.get("enabled") is not True:
             return {"status": "disabled", "reason": "business profile semantic production is disabled"}
-        instruments = tuple(
-            convert_to_database_format(item) for item in (instrument_ids or []) if item
-        )
-        families = tuple(str(item).strip() for item in (field_families or []) if str(item).strip())
-        identities = dict(runtime_identities or {})
-        if not instruments or not families or not identities:
-            return {
-                "status": "not_ready",
-                "reason": "semantic production requires instruments, field families, and runtime identities",
-            }
-
+        from research.business_profile_governance import BusinessProfileRepository
         from research.business_profile_semantic_pipeline import (
             BusinessProfileSemanticPipeline,
             SemanticProductionCheckpointStore,
             SemanticProductionScope,
             parse_semantic_production_config,
         )
+        from research.business_profile_semantic_runtime import (
+            BusinessProfileSemanticRuntime,
+            discover_business_profile_semantic_scope,
+        )
+        from research.business_profile_promotion import FieldFamilyPromotionManifest
+        from utils.llm import LlmClient
 
         config = parse_semantic_production_config(production_payload)
         cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
@@ -1601,38 +1598,93 @@ class DataManager:
             production_payload.get("checkpoint_root")
             or "data/checkpoints/business_profile_semantic"
         )
-        resolved_checkpoint = Path(checkpoint_path) if checkpoint_path else (
-            checkpoint_root / f"{hashlib.sha256('|'.join(sorted(instruments)).encode()).hexdigest()[:16]}.json"
+        configured_manifests = promotion_manifests or dict(
+            production_payload.get("promotion_manifests") or {}
+        )
+        manifests = {
+            family: FieldFamilyPromotionManifest(**dict(value))
+            for family, value in configured_manifests.items()
+        }
+        computed_manifest_hashes = {
+            family: manifest.manifest_hash for family, manifest in manifests.items()
+        }
+        supplied_manifest_hashes = dict(promotion_manifest_hashes or {})
+        if supplied_manifest_hashes and supplied_manifest_hashes != computed_manifest_hashes:
+            raise ValueError("semantic promotion manifest content/hash mismatch")
+        families = tuple(
+            str(item).strip() for item in (field_families or []) if str(item).strip()
+        ) or tuple(sorted(manifests))
+        identities = dict(
+            runtime_identities or production_payload.get("runtime_identities") or {}
+        )
+        repository = BusinessProfileRepository(self.research_storage)
+        instruments = tuple(
+            convert_to_database_format(item) for item in (instrument_ids or []) if item
+        )
+        if not instruments and mode not in {"report", "rebuild-publications"}:
+            instruments = discover_business_profile_semantic_scope(
+                repository,
+                knowledge_cutoff=cutoff,
+                max_instruments=max_instruments,
+                field_families=families,
+                runtime_identities=identities,
+            )
+            if not instruments:
+                return {
+                    "status": "unchanged",
+                    "reason": "no_changed_or_retry_due_semantic_scope",
+                    "completed_stages": [],
+                    "metrics": {"reused_results": 0, "elapsed_seconds": 0.0},
+                }
+        if not instruments or not families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": (
+                    "semantic production requires discovered or explicit instruments, "
+                    "field families, and runtime identities"
+                ),
+            }
+        if config.promotion_enabled and set(families) - set(manifests):
+            return {
+                "status": "not_ready",
+                "reason": "semantic promotion requires full field-family manifest content",
+            }
+        llm_client = (
+            LlmClient(config_manager.get_llm_config())
+            if not config.kill_switches["network_calls"]
+            else None
+        )
+        runtime = BusinessProfileSemanticRuntime(
+            repository=repository,
+            artifact_root=checkpoint_root / "artifacts",
+            llm_client=llm_client,
+            promotion_manifests=manifests,
         )
 
-        def artifact_handler(stage: str):
-            def run(**kwargs: Any) -> Mapping[str, Any]:
-                payload = dict(kwargs["payload"])
-                stage_result = payload.get(stage)
-                if not isinstance(stage_result, Mapping):
-                    raise ValueError(f"semantic stage payload is missing: {stage}")
-                return dict(stage_result)
-
-            return run
-
-        pipeline = BusinessProfileSemanticPipeline(
-            config=config,
-            checkpoint_store=SemanticProductionCheckpointStore(resolved_checkpoint),
-            handlers={stage: artifact_handler(stage) for stage in ("plan", "select", "extract", "verify", "promote")},
-        )
         scope = SemanticProductionScope(
             instruments=instruments,
             field_families=families,
             knowledge_cutoff=cutoff,
             identities=identities,
-            promotion_manifest_hashes=dict(promotion_manifest_hashes or {}),
+            promotion_manifest_hashes=computed_manifest_hashes,
         )
-        return await asyncio.to_thread(
-            pipeline.run,
-            mode,
-            scope=scope,
-            payload=dict(stage_payload or {}),
+        resolved_checkpoint = (
+            Path(checkpoint_path)
+            if checkpoint_path
+            else checkpoint_root / f"{scope.scope_hash[:20]}.json"
         )
+        pipeline = BusinessProfileSemanticPipeline(
+            config=config,
+            checkpoint_store=SemanticProductionCheckpointStore(resolved_checkpoint),
+            handlers=runtime.handlers(),
+        )
+        def run_pipeline() -> Dict[str, Any]:
+            try:
+                return pipeline.run(mode, scope=scope)
+            finally:
+                runtime.close()
+
+        return await asyncio.to_thread(run_pipeline)
 
     async def get_research_company_profile(
         self,

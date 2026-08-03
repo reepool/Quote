@@ -133,20 +133,13 @@ class BusinessProfileSemanticExtractor:
         instrument_id: str,
         report_period: str,
         selected: SelectedSectionArtifact,
+        candidate_spans: Sequence[Mapping[str, Any]] = (),
     ) -> AtomicExtractionEnvelope:
         if field_family not in {"atomic_activities", "named_relationships"}:
             raise ValueError(
                 "semantic extraction is limited to atomic activities or named relationships"
             )
-        sections = [
-            {
-                "section_id": item.section_id,
-                "page_number": item.page_number,
-                "section_hash": item.section_hash,
-                "text": item.normalized_text,
-            }
-            for item in selected.sections
-        ]
+        sections = _semantic_request_sections(selected, candidate_spans)
         if len(sections) > self.policy.max_sections_per_request:
             raise ValueError("semantic request exceeds max_sections_per_request")
         input_characters = sum(len(item["text"]) for item in sections)
@@ -398,6 +391,59 @@ def deterministic_semantic_verification_decision(
             else "independent_semantic_verification_required"
         ),
     }
+
+
+def _semantic_request_sections(
+    selected: SelectedSectionArtifact,
+    candidate_spans: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Build the smallest prompt payload while retaining original section offsets."""
+
+    if not candidate_spans:
+        return [
+            {
+                "section_id": item.section_id,
+                "page_number": item.page_number,
+                "section_hash": item.section_hash,
+                "text": item.normalized_text,
+                "text_start": 0,
+            }
+            for item in selected.sections
+        ]
+    sections = {item.section_id: item for item in selected.sections}
+    ranges_by_section: dict[str, list[tuple[int, int]]] = {}
+    for raw in candidate_spans:
+        section_id = str(raw.get("section_id") or "")
+        section = sections.get(section_id)
+        if section is None:
+            raise ValueError("candidate span references unknown selected section")
+        absolute_start = int(raw.get("normalized_start") or 0)
+        absolute_end = int(raw.get("normalized_end") or 0)
+        start = absolute_start - section.normalized_start
+        end = absolute_end - section.normalized_start
+        if start < 0 or end <= start or end > len(section.normalized_text):
+            raise ValueError("candidate span offsets fall outside selected section")
+        ranges_by_section.setdefault(section_id, []).append((start, end))
+    output: list[dict[str, Any]] = []
+    for section_id, ranges in sorted(ranges_by_section.items()):
+        section = sections[section_id]
+        merged: list[list[int]] = []
+        for start, end in sorted(set(ranges)):
+            if merged and start <= merged[-1][1] + 20:
+                merged[-1][1] = max(merged[-1][1], end)
+            else:
+                merged.append([start, end])
+        for start, end in merged:
+            output.append(
+                {
+                    "section_id": section.section_id,
+                    "page_number": section.page_number,
+                    "section_hash": section.section_hash,
+                    "text": section.normalized_text[start:end],
+                    "text_start": start,
+                }
+            )
+    return output
 
 
 def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:

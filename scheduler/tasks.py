@@ -7030,8 +7030,9 @@ class ScheduledTasks:
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
         promotion_manifest_hashes: Optional[Dict[str, str]] = None,
+        promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
+        max_instruments: int = 30,
         checkpoint_path: Optional[str] = None,
-        stage_payload: Optional[Dict[str, Any]] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """Run disabled-by-default hash-scoped semantic maintenance."""
@@ -7045,8 +7046,9 @@ class ScheduledTasks:
                 field_families=field_families,
                 runtime_identities=runtime_identities,
                 promotion_manifest_hashes=promotion_manifest_hashes,
+                promotion_manifests=promotion_manifests,
+                max_instruments=max_instruments,
                 checkpoint_path=checkpoint_path,
-                stage_payload=stage_payload,
             )
             status = str(result.get("status") or "failed")
             success = status in {"success", "unchanged", "disabled"}

@@ -123,7 +123,50 @@ def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
     assert result["status"] == "stopped"
     assert result["reason"] == "budget_exhausted:tokens"
     assert checkpoint["artifacts"]["plan"] == {"plan": "hash"}
-    assert checkpoint["completed_stages"] == []
+    assert checkpoint["completed_stages"] == ["plan"]
+
+    resumed = pipeline.run("resume", scope=_scope())
+    assert resumed["status"] == "stopped"
+    assert resumed["reason"] == "budget_exhausted:tokens"
+    assert resumed["completed_stages"] == ["plan"]
+
+
+def test_report_aggregates_denominators_and_rates_by_field_family(tmp_path):
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(),
+        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        handlers=_handlers(
+            {
+                "plan": {
+                    "status": "success",
+                    "artifact": {"plan": "hash"},
+                    "metrics": {
+                        "by_field_family": {
+                            "atomic_activities": {
+                                "documents": 2,
+                                "selected_documents": 2,
+                                "candidates": 4,
+                                "llm_calls": 1,
+                                "auto_promoted": 3,
+                                "quick_review": 1,
+                                "reason_code_counts": {"entity_ambiguity": 1},
+                            }
+                        }
+                    },
+                }
+            }
+        ),
+    )
+
+    result = pipeline.run("plan", scope=_scope())
+    family = result["metrics"]["by_field_family"]["atomic_activities"]
+    assert family["documents"] == 2
+    assert family["llm_call_rate"] == 0.5
+    assert family["auto_promotion_rate"] == 0.75
+    assert family["human_exception_rate"] == 0.2
+    assert family["reason_code_clusters"] == [
+        {"reason_code": "entity_ambiguity", "count": 1}
+    ]
 
 
 def test_cancellation_and_interruption_resume_without_duplicate_completion(tmp_path):
@@ -192,3 +235,24 @@ def test_config_validation_requires_complete_boolean_kill_switches():
         parse_semantic_production_config(
             {"enabled": True, "kill_switches": {"promotion": False}}
         )
+
+
+def test_publication_rebuild_uses_dedicated_handler_without_prior_stages(tmp_path):
+    calls = []
+    handlers = _handlers()
+    handlers["rebuild-publications"] = lambda **kwargs: (
+        calls.append(kwargs)
+        or {"status": "success", "artifact": {"publication": "hash"}, "metrics": {}}
+    )
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(),
+        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        handlers=handlers,
+    )
+
+    result = pipeline.run("rebuild-publications", scope=_scope())
+
+    assert result["stage"] == "rebuild-publications"
+    assert result["artifact"] == {"publication": "hash"}
+    assert result["completed_stages"] == []
+    assert len(calls) == 1

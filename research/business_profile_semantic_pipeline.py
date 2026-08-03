@@ -183,6 +183,17 @@ class BusinessProfileSemanticPipeline:
             return self._report(checkpoint)
         if self.config.kill_switches["all_writes"]:
             return self._stop(checkpoint, "kill_switch:all_writes")
+        existing_stop_reason = self._budget_stop_reason(
+            checkpoint.get("metrics") or {}
+        )
+        if existing_stop_reason:
+            return self._stop(checkpoint, existing_stop_reason)
+        if normalized_mode == "rebuild-publications":
+            return self._run_publication_rebuild(
+                checkpoint=checkpoint,
+                scope=scope,
+                payload=payload,
+            )
         stage = self._resolve_stage(normalized_mode, checkpoint)
         if stage is None:
             return {"status": "unchanged", **self._report(checkpoint)}
@@ -213,11 +224,15 @@ class BusinessProfileSemanticPipeline:
             elapsed_seconds=elapsed,
         )
         checkpoint["metrics"] = metrics
+        result_status = str(result.get("status") or "").strip().lower()
         stop_reason = self._budget_stop_reason(metrics)
         if stop_reason:
             checkpoint["artifacts"][stage] = result.get("artifact")
+            if result_status in {"success", "completed", "unchanged"}:
+                checkpoint["completed_stages"] = list(
+                    dict.fromkeys([*checkpoint["completed_stages"], stage])
+                )
             return self._stop(checkpoint, stop_reason)
-        result_status = str(result.get("status") or "").strip().lower()
         if result_status in {"interrupted", "cancelled", "stopped"}:
             checkpoint["artifacts"][stage] = result.get("artifact")
             return self._stop(checkpoint, str(result.get("reason") or result["status"]))
@@ -275,8 +290,6 @@ class BusinessProfileSemanticPipeline:
         completed = set(checkpoint.get("completed_stages") or [])
         if mode == "resume":
             return next((stage for stage in PIPELINE_STAGES if stage not in completed), None)
-        if mode == "rebuild-publications":
-            return "promote"
         if mode in completed:
             return None
         expected = next((stage for stage in PIPELINE_STAGES if stage not in completed), None)
@@ -285,6 +298,54 @@ class BusinessProfileSemanticPipeline:
                 f"semantic production stage order violation: expected={expected} actual={mode}"
             )
         return mode
+
+    def _run_publication_rebuild(
+        self,
+        *,
+        checkpoint: MutableMapping[str, Any],
+        scope: SemanticProductionScope,
+        payload: Mapping[str, Any] | None,
+    ) -> dict[str, Any]:
+        if (
+            not self.config.promotion_enabled
+            or self.config.kill_switches["promotion"]
+            or not scope.promotion_manifest_hashes
+        ):
+            return self._stop(checkpoint, "promotion_disabled_or_unmanifested")
+        handler = self.handlers.get("rebuild-publications")
+        if handler is None:
+            raise ValueError("semantic publication rebuild handler is not configured")
+        start = self.clock()
+        result = dict(
+            handler(
+                scope=scope,
+                payload=dict(payload or {}),
+                checkpoint=dict(checkpoint),
+                config=self.config,
+            )
+        )
+        elapsed = max(0.0, self.clock() - start)
+        checkpoint["metrics"] = _merge_metrics(
+            checkpoint.get("metrics") or {},
+            result.get("metrics") or {},
+            elapsed_seconds=elapsed,
+        )
+        status = str(result.get("status") or "").lower()
+        if status not in {"success", "completed", "unchanged"}:
+            return self._stop(
+                checkpoint,
+                f"stage_failed:rebuild-publications:{result.get('reason') or status}",
+            )
+        checkpoint["artifacts"]["rebuild-publications"] = result.get("artifact")
+        checkpoint["stopped_reason"] = None
+        self.checkpoint_store.save(checkpoint)
+        return {
+            "status": status,
+            "stage": "rebuild-publications",
+            "artifact": result.get("artifact"),
+            "checkpoint_hash": _stable_hash(checkpoint),
+            **self._report(checkpoint),
+        }
 
     def _budget_stop_reason(self, metrics: Mapping[str, Any]) -> str | None:
         budgets = self.config.budgets
@@ -351,6 +412,9 @@ class BusinessProfileSemanticPipeline:
                 "candidate_valuation_leakage": int(
                     metrics.get("candidate_valuation_leakage") or 0
                 ),
+                "by_field_family": _field_family_report(
+                    metrics.get("by_field_family") or {}
+                ),
             },
         }
 
@@ -389,11 +453,83 @@ def _merge_metrics(
         "exception_backlog",
     }
     for key, value in update.items():
+        if key == "by_field_family" and isinstance(value, Mapping):
+            output[key] = _merge_field_family_metrics(
+                output.get(key) or {}, value
+            )
+            continue
         if key in gauges:
             output[key] = value
         elif isinstance(value, (int, float)):
             output[key] = float(output.get(key) or 0) + float(value)
     output["elapsed_seconds"] = float(output.get("elapsed_seconds") or 0) + elapsed_seconds
+    return output
+
+
+def _merge_field_family_metrics(
+    current: Mapping[str, Any], update: Mapping[str, Any]
+) -> dict[str, Any]:
+    output = {
+        str(family): dict(values)
+        for family, values in current.items()
+        if isinstance(values, Mapping)
+    }
+    gauges = {"unsupported_output_rate", "conflict_rate", "drift_rate"}
+    for family, raw_values in update.items():
+        if not isinstance(raw_values, Mapping):
+            continue
+        values = output.setdefault(str(family), {})
+        for key, value in raw_values.items():
+            if key == "reason_code_counts" and isinstance(value, Mapping):
+                reasons = values.setdefault(key, {})
+                for reason, count in value.items():
+                    if isinstance(count, (int, float)):
+                        reasons[str(reason)] = float(reasons.get(str(reason)) or 0) + float(
+                            count
+                        )
+                continue
+            if not isinstance(value, (int, float)):
+                continue
+            if key in gauges:
+                values[key] = float(value)
+            else:
+                values[key] = float(values.get(key) or 0) + float(value)
+    return output
+
+
+def _field_family_report(value: Mapping[str, Any]) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for family, raw in sorted(value.items()):
+        if not isinstance(raw, Mapping):
+            continue
+        row = {
+            key: (int(number) if float(number).is_integer() else float(number))
+            for key, number in raw.items()
+            if isinstance(number, (int, float))
+        }
+        selected = max(1, int(row.get("selected_documents") or row.get("documents") or 0))
+        candidates = max(1, int(row.get("candidates") or 0))
+        exceptions = int(row.get("machine_rework") or 0) + int(
+            row.get("quick_review") or 0
+        ) + int(row.get("deep_review") or 0)
+        row["llm_call_rate"] = float(row.get("llm_calls") or 0) / selected
+        row["auto_promotion_rate"] = float(row.get("auto_promoted") or 0) / candidates
+        row["human_exception_rate"] = (
+            float(
+                int(row.get("quick_review") or 0)
+                + int(row.get("deep_review") or 0)
+            )
+            / max(1, candidates + exceptions)
+        )
+        reason_counts = raw.get("reason_code_counts") or {}
+        row["reason_code_clusters"] = [
+            {"reason_code": str(reason), "count": int(count)}
+            for reason, count in sorted(
+                reason_counts.items(), key=lambda item: (-float(item[1]), str(item[0]))
+            )[:5]
+            if isinstance(count, (int, float))
+        ]
+        output[str(family)] = row
     return output
 
 

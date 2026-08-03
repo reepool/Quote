@@ -24,11 +24,11 @@ def test_default_unit_catalog_has_canonical_unit_for_each_dimension():
         unit.dimension for unit in catalog.units if unit.canonical_for_dimension
     }
 
-    assert catalog.catalog_version == "business_profile_units.2026.1"
+    assert catalog.catalog_version == "business_profile_units.2026.2"
     assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
     assert dimensions == canonical_dimensions
-    assert len(catalog.units) == 36
-    assert len(catalog.conversions) == 17
+    assert len(catalog.units) == 37
+    assert len(catalog.conversions) == 18
 
 
 def test_unit_catalog_covers_all_business_fact_canonical_units():
@@ -49,6 +49,7 @@ def test_unit_alias_resolution_is_deterministic():
     catalog = load_unit_conversion_catalog()
 
     assert catalog.resolve_unit("万吨").unit_id == "10k_tonne"
+    assert catalog.resolve_unit("万元").unit_id == "10k_CNY"
     assert catalog.resolve_unit("CNY/ton").unit_id == "CNY/tonne"
     assert catalog.resolve_unit("吨每年").unit_id == "tonne/year"
 

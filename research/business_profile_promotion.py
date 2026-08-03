@@ -34,6 +34,7 @@ _REQUIRED_GATES = frozenset(
 _MACHINE_REWORK_REASONS = frozenset(
     {
         "ocr_required",
+        "planned_document_missing_or_invalid_locally",
         "selector_gap",
         "context_incomplete",
         "schema_failure",

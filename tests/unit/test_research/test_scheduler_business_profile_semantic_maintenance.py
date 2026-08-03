@@ -6,7 +6,13 @@ from data_manager import DataManager
 from scheduler.job_config import JobConfig
 from scheduler.scheduler import TaskScheduler
 from scheduler.tasks import ScheduledTasks
-from utils.config_manager import UnifiedConfigManager
+from research.storage import ResearchStorageManager
+from utils.config_manager import (
+    ResearchBudgetConfig,
+    ResearchConfig,
+    ResearchStorageConfig,
+    UnifiedConfigManager,
+)
 
 
 def _task():
@@ -61,6 +67,56 @@ def test_data_manager_disabled_semantic_module_has_no_side_effects():
     }
 
 
+def test_data_manager_enabled_plan_builds_scope_before_default_checkpoint(tmp_path):
+    research_config = ResearchConfig(
+        enabled=True,
+        modules={
+            "business_profile_evidence": {
+                "semantic_production": {
+                    "enabled": True,
+                    "promotion_enabled": False,
+                    "checkpoint_root": str(tmp_path / "checkpoints"),
+                    "kill_switches": {
+                        "all_writes": False,
+                        "network_calls": True,
+                        "promotion": False,
+                        "scope_widening": False,
+                    },
+                }
+            }
+        },
+        storage=ResearchStorageConfig(
+            db_path=str(tmp_path / "research.db"),
+            shadow_mode=True,
+            attach_quotes_db=False,
+            quotes_db_path=str(tmp_path / "quotes.db"),
+            financials_db_path=str(tmp_path / "financials.db"),
+            valuation_db_path=str(tmp_path / "valuation.db"),
+            interests_db_path=str(tmp_path / "interests.db"),
+        ),
+        budget=ResearchBudgetConfig(),
+    )
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    manager = DataManager.__new__(DataManager)
+    manager.research_config = research_config
+    manager.research_storage = storage
+
+    result = asyncio.run(
+        manager.run_business_profile_semantic_production(
+            mode="plan",
+            knowledge_cutoff="2026-08-01",
+            instrument_ids=["601088.SH"],
+            field_families=["derived_value_chain_roles"],
+            runtime_identities={"rules": "rules.v1", "policy": "policy.v1"},
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["completed_stages"] == ["plan"]
+    assert len(list((tmp_path / "checkpoints").glob("*.json"))) == 1
+
+
 def test_scheduler_forwards_exact_scope_and_reports_unchanged(monkeypatch):
     task = _task()
     manager = Mock()
@@ -81,8 +137,9 @@ def test_scheduler_forwards_exact_scope_and_reports_unchanged(monkeypatch):
             field_families=["atomic_activities"],
             runtime_identities={"model": "model.v1"},
             promotion_manifest_hashes={"atomic_activities": "manifest"},
+            promotion_manifests={},
+            max_instruments=17,
             checkpoint_path="data/checkpoints/test.json",
-            stage_payload={},
         )
     )
 
@@ -94,8 +151,9 @@ def test_scheduler_forwards_exact_scope_and_reports_unchanged(monkeypatch):
         field_families=["atomic_activities"],
         runtime_identities={"model": "model.v1"},
         promotion_manifest_hashes={"atomic_activities": "manifest"},
+        promotion_manifests={},
+        max_instruments=17,
         checkpoint_path="data/checkpoints/test.json",
-        stage_payload={},
     )
     assert "business_profile_semantic_maintenance" not in task._active_tasks
     report = task._send_task_report.await_args.kwargs["report_data"]

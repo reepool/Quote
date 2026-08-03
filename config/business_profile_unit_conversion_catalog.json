@@ -1,6 +1,6 @@
 {
   "schema_version": "business_profile_unit_conversion_catalog.v1",
-  "catalog_version": "business_profile_units.2026.1",
+  "catalog_version": "business_profile_units.2026.2",
   "fact_catalog_version": "business_profile_facts.2026.2",
   "released_on": "2026-07-17",
   "period_basis_values": [
@@ -42,6 +42,7 @@
     {"unit_id": "fraction", "dimension": "ratio", "aliases": ["小数"], "canonical_for_dimension": true},
     {"unit_id": "percent", "dimension": "ratio", "aliases": ["%", "百分比"], "canonical_for_dimension": false},
     {"unit_id": "CNY", "dimension": "currency", "aliases": ["人民币", "元"], "canonical_for_dimension": true},
+    {"unit_id": "10k_CNY", "dimension": "currency", "aliases": ["万元", "人民币万元"], "canonical_for_dimension": false},
     {"unit_id": "USD", "dimension": "currency", "aliases": ["美元"], "canonical_for_dimension": false},
     {"unit_id": "HKD", "dimension": "currency", "aliases": ["港元"], "canonical_for_dimension": false},
     {"unit_id": "CNY/tonne", "dimension": "price_per_mass", "aliases": ["CNY/ton", "元/吨", "人民币/吨"], "canonical_for_dimension": true},
@@ -78,6 +79,7 @@
     {"rule_id": "capacity.10k_cubic_meter_to_cubic_meter", "from_unit": "10k_cubic_meter/year", "to_unit": "cubic_meter/year", "conversion_type": "fixed_multiplier", "multiplier": "10000", "required_lineage_fields": []},
     {"rule_id": "capacity.gwh_to_kwh", "from_unit": "gwh/year", "to_unit": "kwh/year", "conversion_type": "fixed_multiplier", "multiplier": "1000000", "required_lineage_fields": []},
     {"rule_id": "capacity.10k_unit_to_unit", "from_unit": "10k_unit/year", "to_unit": "unit/year", "conversion_type": "fixed_multiplier", "multiplier": "10000", "required_lineage_fields": []},
+    {"rule_id": "currency.10k_cny_to_cny", "from_unit": "10k_CNY", "to_unit": "CNY", "conversion_type": "fixed_multiplier", "multiplier": "10000", "required_lineage_fields": []},
     {"rule_id": "currency.cny_to_usd", "from_unit": "CNY", "to_unit": "USD", "conversion_type": "external_rate_required", "multiplier": null, "required_lineage_fields": ["fx_series_id", "fx_observation_date", "fx_rate"]},
     {"rule_id": "currency.cny_to_hkd", "from_unit": "CNY", "to_unit": "HKD", "conversion_type": "external_rate_required", "multiplier": null, "required_lineage_fields": ["fx_series_id", "fx_observation_date", "fx_rate"]},
     {"rule_id": "price.cny_to_usd_per_tonne", "from_unit": "CNY/tonne", "to_unit": "USD/tonne", "conversion_type": "external_rate_required", "multiplier": null, "required_lineage_fields": ["fx_series_id", "fx_observation_date", "fx_rate"]},

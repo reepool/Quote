@@ -903,6 +903,23 @@ class BusinessProfileRepository:
         )
         return page["records"]
 
+    def get_record(self, record_type: str, record_id: str) -> Optional[Dict[str, Any]]:
+        """Return one governed record by its primary key without a history scan."""
+
+        spec = self._TABLES.get(record_type)
+        if spec is None:
+            raise ValueError(f"unsupported business profile record type: {record_type}")
+        key = str(record_id or "").strip()
+        if not key:
+            raise ValueError("business profile record_id is required")
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                f"SELECT * FROM {spec['table']} WHERE {spec['pk']} = ?",
+                (key,),
+            ).fetchone()
+        return None if row is None else self._decode_row(dict(row), spec["json"])
+
     def schema_inventory(self) -> Dict[str, Any]:
         """Compare governed repository column maps with the physical SQLite schema."""
 
