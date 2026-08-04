@@ -66,6 +66,13 @@ NON_PRIMARY_ANNOUNCEMENT_KEYWORDS = (
     "投资者接待日",
     "集体接待日",
     "摘要",
+    "业绩预告",
+    "业绩预增",
+    "业绩预减",
+    "业绩预盈",
+    "业绩预亏",
+    "盈利预告",
+    "业绩快报",
 )
 
 TRADING_RISK_KEYWORDS = (

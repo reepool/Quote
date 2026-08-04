@@ -71,6 +71,44 @@ def test_financial_disclosure_report_includes_blocker_samples():
     assert "blocker样本: 601187.SH@2026-03-31:revenue,equity_parent" in text
 
 
+def test_financial_disclosure_report_includes_expired_pending_and_source_degradation():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "degraded",
+            "db_path": "data/financials.db",
+            "reconciliation": False,
+            "report_periods": ["2026-03-31"],
+            "candidate_count": 1,
+            "pending_recheck_count": 1,
+            "expired_pending_count": 2,
+            "candidate_sources": {
+                "new_event": 1,
+                "pending_state": 0,
+                "accepted_state": 0,
+                "local_gap": 0,
+                "filtered_stale_pending": 0,
+                "expired_pending": 2,
+            },
+            "source_routing": {
+                "cninfo_attempts": 1,
+                "cninfo_successes": 0,
+                "cninfo_batch_successes": 0,
+                "cninfo_missing_or_ambiguous": 1,
+                "fallback_attempts": 1,
+                "fallback_successes": 1,
+                "errors": [
+                    "cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"
+                ],
+            },
+        }
+    )
+
+    assert "过期pending 2" in text
+    assert "补数源警告:" in text
+    assert "官方结构化源降级" in text
+    assert "后续对账需复核官方数据" in text
+
+
 def test_financial_statements_catchup_task_passes_incremental_controls(monkeypatch):
     task = ScheduledTasks.__new__(ScheduledTasks)
     task.config = Mock()

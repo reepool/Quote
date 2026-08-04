@@ -108,7 +108,14 @@ class _FakeStorage:
         yield
 
     def list_financial_disclosure_event_states(self, **kwargs):
-        return list(self.pending_states)
+        statuses = set(kwargs.get("statuses") or [])
+        rows = [
+            row
+            for row in self.pending_states
+            if not statuses or str(row.get("status") or "pending_recheck") in statuses
+        ]
+        limit = kwargs.get("limit")
+        return rows if limit is None else rows[: int(limit)]
 
     def get_announcement_scan_state(self, **kwargs):
         return None
@@ -566,6 +573,260 @@ def test_incremental_sync_marks_stale_pending_noise_when_not_dry_run(tmp_path):
         "filtered_by_current_announcement_rules"
         in storage.states[0]["selection_reasons"]
     )
+
+
+def test_incremental_sync_excludes_accepted_state_from_daily_candidates(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2025-12-31",
+                "announcement_id": "accepted-delay",
+                "status": "accepted_disclosure_gap",
+                "classification": "periodic_report_delayed_or_suspended",
+                "selection_reasons": ["periodic_report_delayed"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["candidate_count"] == 0
+    assert result["accepted_gap_count"] == 0
+    assert result["candidate_sources"]["new_event"] == 0
+
+
+def test_incremental_sync_expires_pending_state_without_retry(tmp_path):
+    first_pending = "2026-07-15T21:47:14+08:00"
+    pending_until = "2026-07-22T21:47:14+08:00"
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-06-30",
+                "announcement_id": "expired-formal-report",
+                "announcement_time": "2026-07-15T16:00:00+08:00",
+                "title": "2026年半年度报告",
+                "status": "pending_recheck",
+                "classification": "periodic_report_available",
+                "selection_reasons": ["periodic_report"],
+                "missing_fields": [{"canonical_fact": "total_assets"}],
+                "first_pending_at": first_pending,
+                "pending_recheck_until": pending_until,
+                "metadata": {"event_count": 1},
+            }
+        ],
+    )
+    rescanned_record = _record(
+        announcement_id="expired-formal-report",
+        title="2026年半年度报告",
+        announcement_time="2026-07-15T16:00:00+08:00",
+        market="SZSE",
+        column="szse",
+        symbols=["002731"],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([rescanned_record]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("expired pending state must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["candidate_count"] == 0
+    assert result["expired_pending_count"] == 1
+    assert result["candidate_sources"]["expired_pending"] == 1
+    assert storage.states[-1]["status"] == "pending_recheck_expired"
+    assert storage.states[-1]["first_pending_at"] == first_pending
+    assert storage.states[-1]["pending_recheck_until"] == pending_until
+    assert storage.states[-1]["metadata"]["terminal_reason"] == (
+        "pending_recheck_horizon_expired"
+    )
+
+
+def test_incremental_sync_keeps_active_pending_state(tmp_path):
+    storage = _FakeStorage(
+        ready=True,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-06-30",
+                "announcement_id": "active-formal-report",
+                "announcement_time": "2026-08-03T16:00:00+08:00",
+                "title": "2026年半年度报告",
+                "status": "pending_recheck",
+                "classification": "periodic_report_available",
+                "selection_reasons": ["periodic_report"],
+                "pending_recheck_until": "2999-08-10T21:45:00+08:00",
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["candidate_count"] == 1
+    assert result["expired_pending_count"] == 0
+    assert result["candidate_sources"]["pending_state"] == 1
+
+
+def test_incremental_candidate_limit_is_not_consumed_by_accepted_states(tmp_path):
+    accepted_states = [
+        {
+            "instrument_id": "002731.SZ",
+            "symbol": "002731",
+            "exchange": "SZSE",
+            "report_period": f"202{i}-12-31",
+            "announcement_id": f"accepted-{i}",
+            "status": "accepted_disclosure_gap",
+            "classification": "pre_listing_period",
+            "selection_reasons": ["lifecycle:pre_listing_period"],
+        }
+        for i in range(1, 6)
+    ]
+    record = _record(
+        announcement_id="new-q2-report",
+        title="2026年半年度报告",
+        announcement_time="2026-08-03",
+        market="SZSE",
+        column="szse",
+        symbols=["002731"],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True, pending_states=accepted_states),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([record]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            max_candidates=1,
+            dry_run=True,
+        )
+    )
+
+    assert result["candidate_count"] == 1
+    assert result["candidate_unlimited_count"] == 1
+    assert result["outcomes"][0]["report_period"] == "2026-06-30"
+    assert result["report_periods"][-1] == "2026-03-31"
+
+
+def test_incremental_sync_is_degraded_when_cninfo_fails_but_fallback_writes(tmp_path):
+    record = _record(
+        announcement_id="fallback-q2-report",
+        title="2026年半年度报告",
+        announcement_time="2026-08-03",
+        market="SZSE",
+        column="szse",
+        symbols=["002731"],
+    )
+    storage = _FakeStorage(ready=False)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([record]),
+    )
+
+    async def _fallback_write(**kwargs):
+        storage.financial_statements.ready = True
+        return {
+            **service.repair_router.default_summary(),
+            "cninfo_attempts": 1,
+            "cninfo_missing_or_ambiguous": 1,
+            "fallback_attempts": 1,
+            "fallback_successes": 1,
+            "errors": ["cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"],
+        }
+
+    service._run_targeted_import = _fallback_write
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["changed_count"] == 1
+    assert result["failed_count"] == 0
+    assert result["source_routing"]["fallback_successes"] == 1
+    assert result["status"] == "degraded"
+
+
+def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):
+    record = _record(
+        announcement_id="pending-q2-report",
+        title="2026年半年度报告",
+        announcement_time="2026-08-03",
+        market="SZSE",
+        column="szse",
+        symbols=["002731"],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=False),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([record]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["pending_recheck_count"] == 1
+    assert result["status"] == "degraded"
 
 
 def test_incremental_sync_keeps_pending_delisting_risk_without_explicit_period(tmp_path):
@@ -1081,3 +1342,43 @@ def test_reconciliation_candidate_limit_is_balanced_across_groups():
     )
 
     assert {candidate.exchange for candidate in limited.values()} == {"SSE", "SZSE"}
+
+
+def test_reconciliation_persisted_states_still_report_balanced_limit(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": period,
+                "announcement_id": f"accepted-{period}",
+                "status": "accepted_disclosure_gap",
+                "classification": "periodic_report_delayed_or_suspended",
+                "selection_reasons": ["periodic_report_delayed"],
+            }
+            for period in ("2025-12-31", "2026-03-31")
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            max_candidates=1,
+            dry_run=True,
+            reconciliation=True,
+        )
+    )
+
+    assert result["candidate_count"] == 1
+    assert result["candidate_unlimited_count"] == 2
+    assert result["candidate_limit"] == 1
+    assert result["candidate_sources"]["accepted_state"] == 1

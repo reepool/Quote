@@ -123,6 +123,7 @@ class FinancialDisclosureIncrementalSyncService:
         self._last_candidate_source_summary: Dict[str, int] = {}
         self._last_candidate_unlimited_count: int = 0
         self._last_candidate_limit: int = 0
+        self._last_expired_pending_count: int = 0
 
     async def sync(
         self,
@@ -270,6 +271,8 @@ class FinancialDisclosureIncrementalSyncService:
                 failed_count=write_result["failed_count"],
                 blocking_count=write_result["blocking_gap_count"],
                 mapping_policy_gap_count=write_result["mapping_policy_gap_count"],
+                pending_recheck_count=write_result["pending_recheck_count"],
+                source_routing=write_result["source_routing"],
                 scan_errors=scan_result["errors"],
             )
             result = {
@@ -311,6 +314,7 @@ class FinancialDisclosureIncrementalSyncService:
                 "candidate_unlimited_count": self._last_candidate_unlimited_count,
                 "candidate_limit": self._last_candidate_limit,
                 "candidate_sources": dict(self._last_candidate_source_summary),
+                "expired_pending_count": self._last_expired_pending_count,
                 "scan_errors": scan_result["errors"][:10],
                 "elapsed_seconds": elapsed,
                 **write_result,
@@ -550,6 +554,8 @@ class FinancialDisclosureIncrementalSyncService:
         }
         candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
         filtered_stale_pending = 0
+        expired_pending = 0
+        self._last_expired_pending_count = 0
         risk_audits_by_instrument = self._load_disclosure_risk_audits_by_instrument(
             instruments_by_id.keys()
         )
@@ -561,15 +567,14 @@ class FinancialDisclosureIncrementalSyncService:
             existing = candidates.setdefault(candidate.key, candidate)
             if existing is not candidate:
                 self._merge_candidate_event(existing, event)
+        persisted_statuses = ["pending_recheck", "pending_delisting_risk"]
+        if report_periods:
+            persisted_statuses.append("accepted_disclosure_gap")
         with self.storage.financial_database_scope():
             pending_states = self.storage.list_financial_disclosure_event_states(
-                statuses=[
-                    "pending_recheck",
-                    "pending_delisting_risk",
-                    "accepted_disclosure_gap",
-                ],
-                limit=max_candidates if max_candidates > 0 else None,
+                statuses=persisted_statuses,
             )
+        now = get_shanghai_time()
         for state in pending_states:
             instrument = instruments_by_id.get(str(state.get("instrument_id") or ""))
             if instrument is None:
@@ -587,13 +592,28 @@ class FinancialDisclosureIncrementalSyncService:
                     dry_run=dry_run,
                 )
                 continue
+            if (
+                state_status in {"pending_recheck", "pending_delisting_risk"}
+                and self._pending_state_is_expired(state, now=now)
+            ):
+                expired_pending += 1
+                self._remove_expired_state_event(candidates, state)
+                self._record_expired_pending_state(
+                    state,
+                    run_id=run_id,
+                    dry_run=dry_run,
+                )
+                continue
+            state_reasons = list(state.get("selection_reasons") or [])
+            if state_status and state_status not in state_reasons:
+                state_reasons.append(state_status)
             event = FinancialDisclosureEvent(
                 instrument_id=str(state.get("instrument_id") or ""),
                 report_period=str(state.get("report_period") or ""),
                 classification=str(
                     state.get("classification") or FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
                 ),
-                reasons=list(state.get("selection_reasons") or ["pending_recheck"]),
+                reasons=state_reasons or ["pending_recheck"],
                 announcement_id=str(state.get("announcement_id") or "pending"),
                 announcement_time=state.get("announcement_time"),
                 title=state.get("title"),
@@ -606,7 +626,7 @@ class FinancialDisclosureIncrementalSyncService:
             for instrument in instruments:
                 for report_period in report_periods:
                     if max_candidates > 0 and len(candidates) >= max_candidates:
-                        return dict(list(candidates.items())[:max_candidates])
+                        break
                     candidate = self._candidate_for_period(instrument, report_period)
                     if candidate.key in candidates:
                         continue
@@ -637,12 +657,16 @@ class FinancialDisclosureIncrementalSyncService:
                         else:
                             candidate.reasons.append("missing_or_incomplete_local_core")
                         candidates[candidate.key] = candidate
+                if max_candidates > 0 and len(candidates) >= max_candidates:
+                    break
         self._last_candidate_unlimited_count = len(candidates)
         self._last_candidate_limit = int(max_candidates)
+        self._last_expired_pending_count = expired_pending
         limited = self._limit_candidates_balanced(candidates, max_candidates)
         self._last_candidate_source_summary = self._summarize_candidate_sources(
             limited.values(),
             filtered_stale_pending=filtered_stale_pending,
+            expired_pending=expired_pending,
         )
         return limited
 
@@ -686,16 +710,24 @@ class FinancialDisclosureIncrementalSyncService:
         candidates: Sequence[FinancialDisclosureMaintenanceCandidate],
         *,
         filtered_stale_pending: int,
+        expired_pending: int,
     ) -> Dict[str, int]:
         summary = {
             "new_event": 0,
             "pending_state": 0,
+            "accepted_state": 0,
             "local_gap": 0,
             "filtered_stale_pending": filtered_stale_pending,
+            "expired_pending": expired_pending,
         }
         for candidate in candidates:
             if candidate.events:
                 if any(
+                    "accepted_disclosure_gap" in event.reasons
+                    for event in candidate.events
+                ):
+                    summary["accepted_state"] += 1
+                elif any(
                     event.announcement_id == "pending"
                     or "pending_recheck" in event.reasons
                     or "pending_delisting_risk" in event.reasons
@@ -707,6 +739,87 @@ class FinancialDisclosureIncrementalSyncService:
             elif "missing_or_incomplete_local_core" in candidate.reasons:
                 summary["local_gap"] += 1
         return summary
+
+    @classmethod
+    def _pending_state_is_expired(
+        cls,
+        state: Mapping[str, Any],
+        *,
+        now: datetime,
+    ) -> bool:
+        deadline = cls._parse_date_text(state.get("pending_recheck_until"))
+        if deadline is None:
+            return False
+        if deadline.tzinfo is None and now.tzinfo is not None:
+            deadline = deadline.replace(tzinfo=now.tzinfo)
+        elif deadline.tzinfo is not None and now.tzinfo is None:
+            now = now.replace(tzinfo=deadline.tzinfo)
+        return deadline < now
+
+    @staticmethod
+    def _remove_expired_state_event(
+        candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate],
+        state: Mapping[str, Any],
+    ) -> None:
+        key = (
+            str(state.get("instrument_id") or ""),
+            str(state.get("report_period") or ""),
+        )
+        candidate = candidates.get(key)
+        if candidate is None:
+            return
+        expired_announcement_id = str(state.get("announcement_id") or "")
+        candidate.events = [
+            event
+            for event in candidate.events
+            if str(event.announcement_id or "") != expired_announcement_id
+        ]
+        if not candidate.events:
+            candidates.pop(key, None)
+            return
+        candidate.reasons = []
+        for event in candidate.events:
+            candidate.reasons.extend(
+                reason for reason in event.reasons if reason not in candidate.reasons
+            )
+
+    def _record_expired_pending_state(
+        self,
+        state: Mapping[str, Any],
+        *,
+        run_id: Optional[int],
+        dry_run: bool,
+    ) -> None:
+        if dry_run:
+            return
+        now = get_shanghai_time().isoformat()
+        reasons = list(state.get("selection_reasons") or [])
+        if "pending_recheck_expired" not in reasons:
+            reasons.append("pending_recheck_expired")
+        with self.storage.financial_database_scope():
+            self.storage.upsert_financial_disclosure_event_state(
+                instrument_id=str(state.get("instrument_id") or ""),
+                report_period=str(state.get("report_period") or ""),
+                announcement_id=str(state.get("announcement_id") or "pending"),
+                symbol=state.get("symbol"),
+                exchange=state.get("exchange"),
+                status="pending_recheck_expired",
+                classification=str(
+                    state.get("classification") or FINANCIAL_PERIODIC_REPORT_CLASSIFICATION
+                ),
+                title=state.get("title"),
+                announcement_time=state.get("announcement_time"),
+                selection_reasons=reasons,
+                missing_fields=list(state.get("missing_fields") or []),
+                first_pending_at=state.get("first_pending_at"),
+                pending_recheck_until=state.get("pending_recheck_until"),
+                processed_at=now,
+                metadata={
+                    **dict(state.get("metadata") or {}),
+                    "terminal_reason": "pending_recheck_horizon_expired",
+                },
+                ingestion_run_id=run_id,
+            )
 
     @staticmethod
     def _is_stale_filtered_pending_state(state: Mapping[str, Any]) -> bool:
@@ -1354,11 +1467,21 @@ class FinancialDisclosureIncrementalSyncService:
         candidate_count: int,
         failed_count: int,
         blocking_count: int,
-        mapping_policy_gap_count: int = 0,
         scan_errors: Sequence[str],
+        mapping_policy_gap_count: int = 0,
+        pending_recheck_count: int = 0,
+        source_routing: Optional[Mapping[str, Any]] = None,
     ) -> str:
         if scan_errors and candidate_count <= 0:
             return "failed"
-        if failed_count or blocking_count or mapping_policy_gap_count or scan_errors:
+        routing_errors = list((source_routing or {}).get("errors") or [])
+        if (
+            failed_count
+            or blocking_count
+            or mapping_policy_gap_count
+            or pending_recheck_count
+            or routing_errors
+            or scan_errors
+        ):
             return "degraded"
         return "success"

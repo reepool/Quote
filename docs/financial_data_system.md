@@ -470,7 +470,10 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 历史 `pending_recheck` 状态每次进入候选前都会重新套用当前公告筛选规则和股票生命周期规则。由旧逻辑留下的说明会预告、英文版、图文版、问询函专项说明等噪声会计入 `filtered_stale_pending`，不再触发补数请求；由旧主数据缺少上市日造成的上市前 pending 会在上市日补齐后转为 accepted lifecycle gap。
 - 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，不触发每日补数重试、不阻断批次，但必须保留公告 ID、公告标题和首次发现时间；后续正式定报主公告出现时再重新触发财务补数。
 - 公告先到而 CNInfo data20 与 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
+- 每日日更只合并新公告与仍在 `pending_recheck_until` 内的 pending 状态，不再把已确认的 `accepted_disclosure_gap` 放回日更候选池；accepted gap 由周度对账按报告期窗口复核。超过固定重试窗口的状态转为 `pending_recheck_expired`，保留首次 pending 时间、截止时间和公告证据，不再由日更重复补数。
+- 业绩预告、业绩预增/预减、业绩快报等结果类公告属于非正式定报噪声，不创建财务补数候选；标题同时包含明确延期披露或退市风险信号时仍保留风险事件。
 - 报告中的 `CNInfo ready` 表示 CNInfo data20 写入后已满足 required canonical facts 的候选数量；`CNInfo 批处理通过` 只表示 CNInfo 批处理未把该 instrument-period 判为失败，不等同于本地核心字段已经修复。
+- CNInfo 官方结构化路由出现错误时，即使 THS/Sina fallback 已成功写入，维护任务也报告 `degraded` 并保留 fallback 成功数，提示后续对账复核官方数据；仍有普通 `pending_recheck` 未解决时同样不报告无条件成功。
 - 周度对账候选达到上限时，按交易所、报表 profile 和报告期做均衡抽样，不再固定取前若干 SSE 标的。报告中的“候选限制”会显示本轮选择数量与总候选数量。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
 - `2026-05-26` 对 `financial_disclosure_reconciliation_sync` 真实结果复核：`ingestion_run_id=405` 的 260 个 blockers 中，256 个为报告期早于上市日的新股历史期；剩余 4 个为 `002731.SZ` 与 `688121.SH` 的 `2025-12-31 / 2026-03-31`，CNInfo data20 返回 HTTP 200 但目标期结构化记录无数值，Sina/THS fallback 也未写入三大核心事实，结合公告与停牌/退市风险上下文按披露异常待补处理，而不是字段映射缺陷。

@@ -89,6 +89,10 @@ def test_financial_disclosure_filter_excludes_non_primary_report_related_titles(
         "会计师事务所关于2025年年度报告信息披露监管问询函回复的专项说明",
         "关于参加山西辖区上市公司2026年投资者网上集体接待日暨年报说明会预告公告",
         "2025年年度报告摘要",
+        "2026年半年报业绩预增公告",
+        "2026年半年度业绩预减公告",
+        "2025年度业绩预告",
+        "2025年度业绩快报",
     ]
     for index, title in enumerate(excluded_titles, start=1):
         record = _record(
@@ -107,6 +111,19 @@ def test_financial_disclosure_filter_keeps_delayed_notice_even_if_title_mentions
     record = _record(
         announcement_id="delay-1",
         title="关于问询函事项导致无法按期披露2025年年度报告的公告",
+        announcement_time="2026-05-20",
+        market="SZSE",
+        column="szse",
+        symbols=["002731"],
+    )
+
+    assert financial_disclosure_event_filter(record) == ["periodic_report_delayed"]
+
+
+def test_financial_disclosure_filter_keeps_risk_notice_even_if_title_mentions_forecast():
+    record = _record(
+        announcement_id="risk-forecast-1",
+        title="关于2025年年报业绩预告及无法按期披露年度报告的风险提示公告",
         announcement_time="2026-05-20",
         market="SZSE",
         column="szse",

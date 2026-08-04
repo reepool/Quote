@@ -2150,7 +2150,8 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             f"写入/修复 {result.get('changed_count', 0)}，"
             f"跳过未变 {result.get('unchanged_count', 0)}，"
             f"pending recheck {result.get('pending_recheck_count', 0)}，"
-            f"待退市风险 {result.get('pending_delisting_risk_count', 0)}"
+            f"待退市风险 {result.get('pending_delisting_risk_count', 0)}，"
+            f"过期pending {result.get('expired_pending_count', 0)}"
         ),
         (
             "质量状态: "
@@ -2177,8 +2178,10 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             "候选来源: "
             f"新公告 {candidate_sources.get('new_event', 0)}，"
             f"历史pending {candidate_sources.get('pending_state', 0)}，"
+            f"历史accepted {candidate_sources.get('accepted_state', 0)}，"
             f"本地缺口 {candidate_sources.get('local_gap', 0)}，"
-            f"旧噪声过滤 {candidate_sources.get('filtered_stale_pending', 0)}"
+            f"旧噪声过滤 {candidate_sources.get('filtered_stale_pending', 0)}，"
+            f"过期pending {candidate_sources.get('expired_pending', 0)}"
         )
     if source_routing:
         lines.append(
@@ -2195,6 +2198,7 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             lines.append(
                 "补数源警告: " + "；".join(str(item) for item in routing_errors[:3])
             )
+            lines.append("说明: 官方结构化源降级，已保留 fallback 结果，后续对账需复核官方数据。")
     scan_errors = result.get("scan_errors") or []
     if scan_errors:
         lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))
