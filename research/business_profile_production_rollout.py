@@ -537,9 +537,12 @@ def evaluate_business_profile_rollout_readiness(
     if not discovery_complete:
         reasons.append("discovery_frontier_incomplete")
     claimable = int(queue_health.get("claimable") or 0)
+    running = int(queue_health.get("running") or 0)
     terminal = int(queue_health.get("terminal") or 0)
     if claimable > int(readiness.get("maximum_claimable_work_items", 0)):
         reasons.append("claimable_work_remaining")
+    if running > 0:
+        reasons.append("running_work_remaining")
     if terminal > int(readiness.get("maximum_terminal_failures", 0)):
         reasons.append("terminal_failures_present")
     report = dict(reconciliation or {})
@@ -584,6 +587,8 @@ def evaluate_business_profile_rollout_readiness(
     )
     if phase.promotion_enabled and manifest_not_ready:
         reasons.append("promotion_manifests_not_ready")
+    phase_reason_codes = list(dict.fromkeys(reasons))
+    phase_ready = not phase_reason_codes
     if phase.name != "daily_incremental":
         reasons.append("daily_phase_not_active")
     if scheduler_enabled and reasons:
@@ -591,11 +596,14 @@ def evaluate_business_profile_rollout_readiness(
     return {
         "schema_version": "business_profile_rollout_readiness.v1",
         "phase": phase.name,
+        "phase_ready": phase_ready,
+        "phase_reason_codes": phase_reason_codes,
         "daily_ready": not reasons,
         "scheduler_enabled": bool(scheduler_enabled),
         "discovery_complete": discovery_complete,
         "current_annual_coverage_ratio": round(coverage, 6),
         "claimable_work_items": claimable,
+        "running_work_items": running,
         "terminal_work_items": terminal,
         "field_family_status": family_status,
         "incomplete_field_families": incomplete_families,

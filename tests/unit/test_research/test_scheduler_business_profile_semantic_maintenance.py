@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import ANY, AsyncMock, Mock
 
 import scheduler.tasks as task_module
 import research.business_profile_semantic_runtime as runtime_module
@@ -9,6 +9,9 @@ from scheduler.job_config import JobConfig
 from scheduler.scheduler import TaskScheduler
 from scheduler.tasks import ScheduledTasks
 from research.storage import ResearchStorageManager
+from research.business_profile_backfill_control import (
+    BusinessProfileBackfillControlStore,
+)
 from utils.config_manager import (
     ResearchBudgetConfig,
     ResearchConfig,
@@ -64,6 +67,10 @@ def test_only_manual_business_profile_backfill_is_enabled_during_bootstrap():
     assert jobs["business_profile_backfill"]["parameters"]["selection_policy"] == (
         "latest_annual_only"
     )
+    assert jobs["business_profile_backfill"]["parameters"]["continuous"] is False
+    assert jobs["business_profile_backfill"]["parameters"]["max_runtime_seconds"] is None
+    assert jobs["business_profile_backfill_control"]["enabled"] is True
+    assert jobs["business_profile_backfill_control"]["manual_only"] is True
     for legacy_job_id in (
         "business_profile_index_discovery_daily",
         "business_profile_semantic_maintenance",
@@ -319,13 +326,18 @@ def test_scheduler_forwards_daily_async_scope(monkeypatch):
     assert report["business_profile_async_production"]["status"] == "success"
 
 
-def test_scheduler_forwards_manual_backfill_scope(monkeypatch):
+def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
     task = _task()
     manager = Mock()
     manager.run_business_profile_backfill = AsyncMock(
         return_value={"status": "success", "enqueue": {"inserted": 1}}
     )
     monkeypatch.setattr(task_module, "data_manager", manager)
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: BusinessProfileBackfillControlStore(tmp_path / "checkpoints"),
+    )
 
     assert asyncio.run(
         task.business_profile_backfill(
@@ -356,4 +368,98 @@ def test_scheduler_forwards_manual_backfill_scope(monkeypatch):
         force=True,
         max_attempts=4,
         stage_budgets={"acquire": {"max_items": 2}},
+        should_stop=ANY,
     )
+
+
+def test_scheduler_continuous_backfill_runs_until_phase_ready(tmp_path, monkeypatch):
+    task = _task()
+    store = BusinessProfileBackfillControlStore(tmp_path / "checkpoints")
+    manager = Mock()
+    manager.run_business_profile_backfill = AsyncMock(
+        side_effect=[
+            {
+                "status": "success",
+                "enqueue": {"inserted": 1},
+                "workers": {"acquire": {"completed": 1}},
+                "queue_health": {"claimable": 1, "running": 0, "terminal": 0},
+                "rollout_readiness": {
+                    "phase_ready": False,
+                    "phase_reason_codes": ["claimable_work_remaining"],
+                },
+            },
+            {
+                "status": "success",
+                "enqueue": {"inserted": 0},
+                "workers": {"acquire": {"completed": 1}},
+                "queue_health": {"claimable": 0, "running": 0, "terminal": 0},
+                "rollout_readiness": {
+                    "phase_ready": True,
+                    "phase_reason_codes": [],
+                },
+            },
+        ]
+    )
+    monkeypatch.setattr(task_module, "data_manager", manager)
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: store,
+    )
+
+    success = asyncio.run(
+        task.business_profile_backfill(
+            continuous=True,
+            continuous_poll_seconds=0,
+            heartbeat_interval_seconds=1,
+        )
+    )
+
+    assert success is True
+    assert manager.run_business_profile_backfill.await_count == 2
+    assert all(
+        callable(call.kwargs["should_stop"])
+        for call in manager.run_business_profile_backfill.await_args_list
+    )
+    progress = store.status()
+    assert progress["state"] == "completed"
+    assert progress["cycle"] == 2
+    assert progress["cumulative_workers"]["acquire"]["completed"] == 2
+
+
+def test_scheduler_rejects_unsafe_continuous_scope_without_active_task(monkeypatch):
+    task = _task()
+    store_factory = Mock()
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        store_factory,
+    )
+
+    assert asyncio.run(
+        task.business_profile_backfill(continuous=True, force=True)
+    ) is False
+    assert "business_profile_backfill" not in task._active_tasks
+    store_factory.assert_not_called()
+
+
+def test_scheduler_backfill_control_requests_stop(tmp_path, monkeypatch):
+    task = _task()
+    store = BusinessProfileBackfillControlStore(tmp_path / "checkpoints")
+    store.begin(
+        run_id="active-run",
+        mode="continuous",
+        phase="structured_shadow",
+        parameters={"continuous": True},
+    )
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: store,
+    )
+
+    assert asyncio.run(
+        task.business_profile_backfill_control(action="stop", reason="test")
+    )
+    assert store.status()["state"] == "stop_requested"
+    assert store.should_stop("active-run")["reason"] == "test"

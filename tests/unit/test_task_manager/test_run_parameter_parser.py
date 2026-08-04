@@ -53,3 +53,27 @@ def test_run_parameter_parser_types_business_profile_scope_lists():
     ]
     assert params["instrument_ids"] == ["600000.SH", "000001.SZ"]
     assert params["selection_policy"] == "latest_annual_only"
+
+
+def test_run_parameter_parser_types_continuous_backfill_controls():
+    handler = TaskManagerHandlers.__new__(TaskManagerHandlers)
+
+    params = handler._parse_run_runtime_parameters(
+        [
+            "continuous=true",
+            "continuous_poll_seconds=15",
+            "continuous_max_idle_cycles=4",
+            "progress_report_interval_seconds=300",
+            "action=stop",
+            "reason=maintenance_window",
+        ]
+    )
+
+    assert params == {
+        "continuous": True,
+        "continuous_poll_seconds": 15,
+        "continuous_max_idle_cycles": 4,
+        "progress_report_interval_seconds": 300,
+        "action": "stop",
+        "reason": "maintenance_window",
+    }

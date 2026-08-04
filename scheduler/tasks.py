@@ -190,6 +190,47 @@ def _financial_vintage_stage_report(
     }
 
 
+def _business_profile_backfill_control_store():
+    from research.business_profile_backfill_control import (
+        BusinessProfileBackfillControlStore,
+    )
+
+    checkpoint_root = config_manager.get_nested(
+        "research_config.modules.business_profile_evidence."
+        "production_operations.checkpoint_root",
+        "data/checkpoints/business_profile_async",
+    )
+    return BusinessProfileBackfillControlStore(str(checkpoint_root))
+
+
+def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
+    queue = dict(progress.get("queue_health") or {})
+    readiness = dict(progress.get("rollout_readiness") or {})
+    cumulative = dict(progress.get("cumulative_workers") or {})
+    worker_text = "，".join(
+        f"{stage}:完成{int(dict(values or {}).get('completed') or 0)}"
+        f"/重试{int(dict(values or {}).get('retried') or 0)}"
+        for stage, values in cumulative.items()
+    ) or "暂无"
+    reasons = list(progress.get("reason_codes") or [])
+    return (
+        f"状态: {progress.get('state', 'unknown')}\n"
+        f"run_id: {progress.get('run_id') or 'N/A'}\n"
+        f"阶段: {progress.get('phase') or 'N/A'}\n"
+        f"循环: {int(progress.get('cycle') or 0)}，空转: "
+        f"{int(progress.get('idle_cycles') or 0)}\n"
+        f"heartbeat_age_seconds: {progress.get('heartbeat_age_seconds')}\n"
+        f"队列: claimable={int(queue.get('claimable') or 0)}，"
+        f"running={int(queue.get('running') or 0)}，"
+        f"terminal={int(queue.get('terminal') or 0)}\n"
+        f"当前年报覆盖率: "
+        f"{float(readiness.get('current_annual_coverage_ratio') or 0):.2%}\n"
+        f"phase_ready: {bool(readiness.get('phase_ready'))}\n"
+        f"累计: {worker_text}\n"
+        f"原因: {','.join(str(item) for item in reasons) or '无'}"
+    )
+
+
 def _apply_hkex_gap_guard(
     gaps: List[Any],
     max_segments_per_instrument: Optional[int],
@@ -7414,13 +7455,58 @@ class ScheduledTasks:
         force: bool = False,
         max_attempts: int = 3,
         stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
+        continuous: bool = False,
+        continuous_poll_seconds: float = 30.0,
+        continuous_max_idle_cycles: int = 3,
+        continuous_max_cycles: Optional[int] = None,
+        heartbeat_interval_seconds: float = 30.0,
+        progress_report_interval_seconds: float = 0.0,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """Run explicit historical or specialist scope through production queues."""
+        """Run one bounded pass or continuously drain durable profile queues."""
         task_id = "business_profile_backfill"
-        self._active_tasks.add(task_id)
-        try:
-            result = await data_manager.run_business_profile_backfill(
+        if continuous and force:
+            scheduler_logger.error(
+                "[Scheduler] Continuous business-profile backfill rejects force=true "
+                "because every cycle would reset finalized work"
+            )
+            return False
+        if continuous and str(selection_policy or "").strip() == "expanded":
+            scheduler_logger.error(
+                "[Scheduler] Continuous business-profile backfill only supports "
+                "the governed latest-annual rollout"
+            )
+            return False
+
+        store = _business_profile_backfill_control_store()
+        run_id = (
+            "business-profile-"
+            + get_shanghai_time().strftime("%Y%m%d%H%M%S%f")
+        )
+        active_phase = str(
+            rollout_phase
+            or config_manager.get_nested(
+                "business_profile_rollout.active_phase",
+                "",
+            )
+            or ""
+        )
+        parameters = {
+            "knowledge_cutoff": knowledge_cutoff,
+            "rollout_phase": rollout_phase,
+            "selection_policy": selection_policy,
+            "instrument_ids": list(instrument_ids or []),
+            "start_date": start_date,
+            "end_date": end_date,
+            "document_types": list(document_types or []),
+            "field_families": list(field_families or []),
+            "force": bool(force),
+            "max_attempts": int(max_attempts),
+            "continuous": bool(continuous),
+        }
+
+        async def run_cycle(should_stop) -> Dict[str, Any]:
+            return await data_manager.run_business_profile_backfill(
                 knowledge_cutoff=knowledge_cutoff,
                 rollout_phase=rollout_phase,
                 selection_policy=selection_policy,
@@ -7433,15 +7519,111 @@ class ScheduledTasks:
                 force=force,
                 max_attempts=max_attempts,
                 stage_budgets=stage_budgets,
+                should_stop=should_stop,
             )
-            success = str(result.get("status") or "failed") in {
-                "success",
-                "degraded",
-                "disabled",
-            }
+
+        self._active_tasks.add(task_id)
+        try:
+            if continuous:
+                from research.business_profile_backfill_control import (
+                    ContinuousBackfillOptions,
+                    ContinuousBusinessProfileBackfillRunner,
+                )
+
+                options = ContinuousBackfillOptions(
+                    poll_interval_seconds=float(continuous_poll_seconds),
+                    max_idle_cycles=int(continuous_max_idle_cycles),
+                    max_cycles=(
+                        int(continuous_max_cycles)
+                        if continuous_max_cycles is not None
+                        else None
+                    ),
+                    heartbeat_interval_seconds=float(heartbeat_interval_seconds),
+                    progress_report_interval_seconds=float(
+                        progress_report_interval_seconds
+                    ),
+                )
+                runner = ContinuousBusinessProfileBackfillRunner(
+                    store,
+                    options=options,
+                )
+
+                async def send_progress(progress: Dict[str, Any]) -> None:
+                    snapshot = store.status()
+                    scheduler_logger.info(
+                        "[Scheduler] Business-profile continuous progress: %s",
+                        _format_business_profile_backfill_progress(snapshot),
+                    )
+                    await self._send_task_report(
+                        report_data={
+                            "name": "业务画像持续回补进度",
+                            "status": "running",
+                            "maintenance_tasks": [
+                                {
+                                    "task_name": task_id,
+                                    "status": snapshot.get("state"),
+                                }
+                            ],
+                            "business_profile_backfill_progress": snapshot,
+                            "detail_messages": [
+                                _format_business_profile_backfill_progress(snapshot)
+                            ],
+                        },
+                        report_type="maintenance_report",
+                        task_name="业务画像持续回补进度",
+                        job_config=job_config,
+                    )
+
+                progress = await runner.run(
+                    run_id=run_id,
+                    phase=active_phase or None,
+                    parameters=parameters,
+                    run_cycle=run_cycle,
+                    on_progress=send_progress,
+                )
+                result = dict(progress.get("latest_result") or {})
+                result["continuous_progress"] = progress
+                success = progress.get("state") in {"completed", "stopped"}
+            else:
+                store.begin(
+                    run_id=run_id,
+                    mode="single_batch",
+                    phase=active_phase or None,
+                    parameters=parameters,
+                )
+                result = await run_cycle(
+                    lambda: store.should_stop(run_id) is not None
+                )
+                result_status = str(result.get("status") or "failed").lower()
+                success = result_status in {
+                    "success",
+                    "degraded",
+                    "disabled",
+                    "stopped",
+                }
+                progress_state = "stopped" if result_status == "stopped" else (
+                    "completed" if success else "failed"
+                )
+                progress = store.finish(
+                    run_id,
+                    state=progress_state,
+                    reason_codes=[
+                        "operator_stop_requested"
+                        if result_status == "stopped"
+                        else "single_batch_complete"
+                        if success
+                        else str(result.get("reason") or result_status)
+                    ],
+                    latest_result=result,
+                )
+                result["continuous_progress"] = progress
             await self._send_task_report(
                 report_data={
-                    "name": "业务画像手工回补报告",
+                    "name": (
+                        "业务画像持续回补报告"
+                        if continuous
+                        else "业务画像手工回补报告"
+                    ),
                     "status": "success" if success else "error",
                     "tasks_completed": (result.get("enqueue") or {}).get("inserted", 0),
                     "duration": "N/A",
@@ -7452,19 +7634,88 @@ class ScheduledTasks:
                         }
                     ],
                     "business_profile_async_production": result,
+                    "detail_messages": [
+                        _format_business_profile_backfill_progress(store.status())
+                    ],
                 },
                 report_type="maintenance_report",
-                task_name="业务画像手工回补",
+                task_name=(
+                    "业务画像持续回补" if continuous else "业务画像手工回补"
+                ),
                 job_config=job_config,
             )
             return success
+        except asyncio.CancelledError:
+            store.finish(
+                run_id,
+                state="interrupted",
+                reason_codes=["task_cancelled"],
+            )
+            raise
         except Exception as exc:
+            store.finish(
+                run_id,
+                state="failed",
+                reason_codes=[f"{type(exc).__name__}: {exc}"],
+            )
             scheduler_logger.exception(
                 "[Scheduler] Business-profile backfill failed: %s", exc
             )
             return False
         finally:
             self._active_tasks.discard(task_id)
+
+    async def business_profile_backfill_control(
+        self,
+        action: str = "status",
+        reason: str = "operator_request",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Read progress or request a cooperative stop for the active backfill."""
+
+        task_id = "business_profile_backfill_control"
+        action_name = str(action or "status").strip().lower()
+        if action_name not in {"status", "stop"}:
+            scheduler_logger.error(
+                "[Scheduler] Unsupported business-profile control action: %s",
+                action_name,
+            )
+            return False
+        try:
+            store = _business_profile_backfill_control_store()
+            control = (
+                store.request_stop(reason=str(reason or "operator_request"))
+                if action_name == "stop"
+                else {"status": "success", "progress": store.status()}
+            )
+            progress = store.status()
+            await self._send_task_report(
+                report_data={
+                    "name": "业务画像回补控制",
+                    "status": control.get("status"),
+                    "maintenance_tasks": [
+                        {
+                            "task_name": task_id,
+                            "status": control.get("status"),
+                        }
+                    ],
+                    "business_profile_backfill_control": control,
+                    "business_profile_backfill_progress": progress,
+                    "detail_messages": [
+                        _format_business_profile_backfill_progress(progress)
+                    ],
+                },
+                report_type="maintenance_report",
+                task_name="业务画像回补控制",
+                job_config=job_config,
+            )
+            return True
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Business-profile backfill control failed: %s",
+                exc,
+            )
+            return False
 
     async def industry_shadow_sync(
         self,

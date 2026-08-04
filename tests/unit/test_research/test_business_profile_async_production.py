@@ -457,6 +457,40 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
     assert report["workers"]["acquire"]["completed"] == 1
 
 
+def test_stage_stop_request_finishes_inflight_batch_before_next_claim():
+    repository = Mock()
+    first = {"work_id": "work-1"}
+    second = {"work_id": "work-2"}
+    repository.claim.side_effect = [[first], [second]]
+    repository.acknowledge.return_value = "completed"
+    stop = False
+
+    async def stage_runner(_stage, _item):
+        nonlocal stop
+        stop = True
+        return {"status": "success"}
+
+    service = BusinessProfileAsyncProductionService(
+        repository=repository,
+        discovery_runner=AsyncMock(),
+        stage_runner=stage_runner,
+        write_coordinator=BusinessProfileWriteCoordinator(inter_write_seconds=0),
+    )
+    result = asyncio.run(
+        service._drain_stage(
+            "acquire",
+            StageBudget(max_items=2, max_concurrency=1),
+            should_stop=lambda: stop,
+        )
+    )
+
+    assert result["status"] == "stopped"
+    assert result["claimed"] == 1
+    assert result["completed"] == 1
+    repository.claim.assert_called_once()
+    repository.acknowledge.assert_called_once()
+
+
 def test_invalid_backfill_scope_fails_before_discovery(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -683,6 +717,9 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_pa
     assert queue_group["stage"] == "publish"
     assert queue_group["status"] == "completed"
     assert queue_group["row_count"] == 1
+    assert result["queue_health"]["terminal"] == 0
+    assert result["queue_health"]["completed"] == 1
+    assert result["queue_health"]["finalized"] == 1
     assert [
         call.kwargs["mode"]
         for call in manager.run_business_profile_semantic_production.await_args_list

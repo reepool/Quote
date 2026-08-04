@@ -428,12 +428,27 @@ class BusinessProfileWorkRepository:
         return {
             "as_of": now,
             "total": sum(int(item["row_count"]) for item in groups),
+            "running": sum(
+                int(item["row_count"])
+                for item in groups
+                if item["status"] == "running"
+            ),
             "claimable": sum(
                 int(item["row_count"])
                 for item in groups
                 if item["status"] in CLAIMABLE_STATUSES
             ),
             "terminal": sum(
+                int(item["row_count"])
+                for item in groups
+                if item["status"] == "terminal_failure"
+            ),
+            "completed": sum(
+                int(item["row_count"])
+                for item in groups
+                if item["status"] == "completed"
+            ),
+            "finalized": sum(
                 int(item["row_count"])
                 for item in groups
                 if item["status"] in TERMINAL_STATUSES
@@ -683,6 +698,7 @@ class BusinessProfileAsyncProductionService:
         max_attempts: int = 3,
         force: bool = False,
         selection_policy: str = "expanded",
+        should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         if not instrument_ids and not start_date:
             raise ValueError(
@@ -732,11 +748,20 @@ class BusinessProfileAsyncProductionService:
                 max_attempts=max_attempts,
                 force=force,
             )
-        workers = await self._run_workers(stage_budgets or {})
+        workers = await self._run_workers(
+            stage_budgets or {},
+            should_stop=should_stop,
+        )
+        stopped = any(
+            str(item.get("status") or "").lower() == "stopped"
+            for item in workers.values()
+        )
         return {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
             "status": (
-                "degraded"
+                "stopped"
+                if stopped
+                else "degraded"
                 if discovery is not None
                 and str(discovery.get("status") or "failed").lower()
                 not in {"success", "unchanged"}
@@ -753,7 +778,10 @@ class BusinessProfileAsyncProductionService:
         }
 
     async def _run_workers(
-        self, stage_budgets: Mapping[str, StageBudget]
+        self,
+        stage_budgets: Mapping[str, StageBudget],
+        *,
+        should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         semantic_depth = await asyncio.to_thread(
             self.repository.claimable_count,
@@ -789,6 +817,7 @@ class BusinessProfileAsyncProductionService:
                     stage,
                     budget,
                     upstream_done=upstream_done,
+                    should_stop=should_stop,
                 )
             finally:
                 stage_done[stage].set()
@@ -802,12 +831,17 @@ class BusinessProfileAsyncProductionService:
         budget: StageBudget,
         *,
         upstream_done: asyncio.Event | None = None,
+        should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         started = time.monotonic()
         claimed = completed = retried = failed = lease_conflicts = 0
         errors: list[dict[str, str]] = []
+        stopped = False
         lease_owner = f"async-{stage}-{get_shanghai_time().strftime('%Y%m%d%H%M%S%f')}"
         while claimed < budget.max_items:
+            if should_stop is not None and should_stop():
+                stopped = True
+                break
             if time.monotonic() - started >= budget.max_elapsed_seconds:
                 break
             batch_limit = min(
@@ -867,8 +901,12 @@ class BusinessProfileAsyncProductionService:
                     )
 
             await asyncio.gather(*(run_one(item) for item in items))
+            if should_stop is not None and should_stop():
+                stopped = True
+                break
         return {
-            "status": "success",
+            "status": "stopped" if stopped else "success",
+            "stop_requested": stopped,
             "claimed": claimed,
             "completed": completed,
             "retried": retried,

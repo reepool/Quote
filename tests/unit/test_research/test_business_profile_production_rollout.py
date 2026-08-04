@@ -227,6 +227,8 @@ def test_daily_readiness_requires_complete_discovery_queue_and_field_families():
         readiness=payload["readiness"],
         scheduler_enabled=False,
     )
+    assert ready["phase_ready"] is True
+    assert ready["phase_reason_codes"] == []
     assert ready["daily_ready"] is True
 
     blocked = evaluate_business_profile_rollout_readiness(
@@ -253,6 +255,7 @@ def test_daily_readiness_requires_complete_discovery_queue_and_field_families():
         readiness=payload["readiness"],
         scheduler_enabled=False,
     )
+    assert blocked["phase_ready"] is False
     assert blocked["daily_ready"] is False
     assert set(blocked["reason_codes"]) >= {
         "discovery_frontier_incomplete",
@@ -261,6 +264,71 @@ def test_daily_readiness_requires_complete_discovery_queue_and_field_families():
         "promotion_manifests_not_ready",
         "machine_rework_backlog_present",
     }
+
+
+def test_structured_phase_can_be_ready_without_daily_phase_activation():
+    payload = _payload()
+    phase = parse_business_profile_rollout_config(payload).phase("structured_shadow")
+    family_status = {
+        family: {"completion_ratio": 1.0, "manifest_ready": False}
+        for family in phase.field_families
+    }
+
+    ready = evaluate_business_profile_rollout_readiness(
+        phase=phase,
+        queue_health={"claimable": 0, "terminal": 0},
+        discovery={"status": "success", "discovery_window_backlog": 0},
+        reconciliation={
+            "active_universe_count": 100,
+            "current_annual_instrument_count": 100,
+            "stalled_frontier_count": 0,
+        },
+        rollout_status={
+            "field_families": family_status,
+            "open_machine_rework": 0,
+            "open_quick_review": 0,
+            "open_deep_review": 0,
+        },
+        readiness=payload["readiness"],
+        scheduler_enabled=False,
+    )
+
+    assert ready["phase_ready"] is True
+    assert ready["phase_reason_codes"] == []
+    assert ready["daily_ready"] is False
+    assert "daily_phase_not_active" in ready["reason_codes"]
+
+
+def test_phase_readiness_waits_for_in_flight_queue_leases():
+    payload = _payload()
+    phase = parse_business_profile_rollout_config(payload).phase("structured_shadow")
+    family_status = {
+        family: {"completion_ratio": 1.0, "manifest_ready": False}
+        for family in phase.field_families
+    }
+
+    readiness = evaluate_business_profile_rollout_readiness(
+        phase=phase,
+        queue_health={"claimable": 0, "running": 1, "terminal": 0},
+        discovery={"status": "success", "discovery_window_backlog": 0},
+        reconciliation={
+            "active_universe_count": 100,
+            "current_annual_instrument_count": 100,
+            "stalled_frontier_count": 0,
+        },
+        rollout_status={
+            "field_families": family_status,
+            "open_machine_rework": 0,
+            "open_quick_review": 0,
+            "open_deep_review": 0,
+        },
+        readiness=payload["readiness"],
+        scheduler_enabled=False,
+    )
+
+    assert readiness["phase_ready"] is False
+    assert readiness["running_work_items"] == 1
+    assert "running_work_remaining" in readiness["phase_reason_codes"]
 
 
 def test_daily_and_disabled_backfill_phase_stop_before_storage_initialization():

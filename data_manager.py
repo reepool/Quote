@@ -1875,6 +1875,7 @@ class DataManager:
         force: bool = False,
         max_attempts: int = 3,
         stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> Dict[str, Any]:
         """Run explicitly scoped historical or specialist work through the same queues."""
 
@@ -2087,6 +2088,7 @@ class DataManager:
             max_attempts=max_attempts,
             force=force,
             selection_policy=policy,
+            should_stop=should_stop,
         )
         try:
             from research.business_profile_production_operations import (

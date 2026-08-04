@@ -60,6 +60,41 @@
 下载或重复调用 LLM。`force=true` 只用于原地重置 terminal work item，不改变处理
 身份，也不会创建一份平行重复工作。
 
+首轮验收无异常后，使用持续模式代替人工重复启动：
+
+```text
+/run business_profile_backfill continuous=true
+```
+
+持续模式仍按同一组有界阶段预算逐轮处理，只是自动启动下一轮。它在当前 rollout
+阶段达到 `phase_ready=true`、收到停止请求、出现 terminal failure，或连续 3 轮无
+可领取工作且没有实质进展时自行退出；不会自动切换 rollout 阶段、开启 promotion
+或启用日更。任务仍保持 `max_instances=1`。
+
+查询持久化进度：
+
+```text
+/run business_profile_backfill_control action=status
+```
+
+请求安全停止：
+
+```text
+/run business_profile_backfill_control action=stop reason=operator_request
+```
+
+停止是协作式的：当前并发小批次及其 SQLite 短事务先正常完成，然后不再领取新
+工作。若直接终止进程，运行中 work item 会在租约到期后恢复。之后重新执行
+`/run business_profile_backfill continuous=true` 会创建新 run id，并复用已有公告
+前沿、队列、PDF、解析产物和检查点；旧 run id 的停止请求不会影响新任务。
+
+进度快照位于
+`data/checkpoints/business_profile_async/control/backfill_progress.json`，包含运行状态、
+心跳、阶段、循环次数、各队列累计处理量、claimable/running/terminal 深度、年报
+覆盖率、字段族 readiness 和停止原因。该文件只用于观测，SQLite 队列始终是续传
+事实源。`progress_report_interval_seconds=0` 默认关闭周期消息；启动时可显式设置
+非零秒数以接收限频进度报告。
+
 需要提前处理少数主营变更或专业公告时，显式切换为 expanded 范围，例如：
 
 ```text

@@ -1029,7 +1029,28 @@
           "force": false,
           "max_attempts": 3,
           "stage_budgets": null,
-          "max_runtime_seconds": 5400
+          "continuous": false,
+          "continuous_poll_seconds": 30,
+          "continuous_max_idle_cycles": 3,
+          "continuous_max_cycles": null,
+          "heartbeat_interval_seconds": 30,
+          "progress_report_interval_seconds": 0,
+          "max_runtime_seconds": null
+        }
+      },
+      "business_profile_backfill_control": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "查询业务画像长程回补进度或请求协作式停止",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "action": "status",
+          "reason": "operator_request",
+          "max_runtime_seconds": 60
         }
       },
       "industry_official_mapping_refresh": {
