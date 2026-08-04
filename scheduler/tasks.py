@@ -32,6 +32,8 @@ from instrument_master_governance import MasterGovernanceRequirement
 from utils.date_utils import DateUtils, get_shanghai_time
 from utils.cache import cache_manager
 from utils.a_share_historical_backfill import (
+    A_SHARE_BACKFILL_DEFAULT_SCOPES,
+    A_SHARE_BACKFILL_OPTIONAL_SCOPES,
     A_SHARE_EXCHANGE_INCEPTION,
     AShareBackfillCheckpointStore,
     coerce_date,
@@ -40,6 +42,152 @@ from utils.a_share_historical_backfill import (
     normalize_string_list,
     serialize_checkpoint_parameters,
 )
+from research.backtest_data.corporate_action_projection import (
+    CanonicalCorporateActionProjector,
+)
+from research.backtest_data.financial_store import FinancialVintageStore
+from research.backtest_data.maintenance import BacktestDataMaintenance
+from research.backtest_data.rollout import BacktestRolloutPolicy
+
+
+def _quote_database_path() -> str:
+    db = getattr(getattr(data_manager, "db_ops", None), "db", None)
+    return str(
+        getattr(db, "db_path", None)
+        or config_manager.get_nested("database_config.db_path", "data/quotes.db")
+    )
+
+
+def _disabled_backtest_stage(name: str) -> Dict[str, Any]:
+    return {
+        "stage": name,
+        "status": "disabled",
+        "reuse_decision": "extend_existing",
+        "provider_usage": [],
+        "network_requests": 0,
+        "blockers": ["rollout_disabled"],
+    }
+
+
+async def _run_backtest_stage(
+    name: str,
+    function: Any,
+    *args: Any,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    policy = BacktestRolloutPolicy.load().stage(name)
+    if not policy.enabled:
+        return _disabled_backtest_stage(name)
+    last_error: Optional[Exception] = None
+    timed_out = False
+    for attempt in range(1, policy.retry_count + 2):
+        try:
+            result = await asyncio.wait_for(
+                asyncio.to_thread(function, *args, **kwargs),
+                timeout=policy.timeout_seconds,
+            )
+            result.setdefault("controls", {})
+            result["controls"].update(
+                {
+                    "attempt": attempt,
+                    "timeout_seconds": policy.timeout_seconds,
+                    "retry_count": policy.retry_count,
+                    "continue_on_error": policy.continue_on_error,
+                    "freshness_hours": policy.freshness_hours,
+                    "max_rows": policy.max_rows,
+                }
+            )
+            return result
+        except asyncio.TimeoutError as exc:
+            last_error = exc
+            timed_out = True
+            break
+        except Exception as exc:
+            last_error = exc
+            if attempt <= policy.retry_count:
+                continue
+    blocker = (
+        "stage_timeout_in_flight_not_retried"
+        if timed_out
+        else str(last_error or "stage_failed")
+    )
+    failure = {
+        "stage": name,
+        "status": "failed",
+        "reuse_decision": "extend_existing",
+        "provider_usage": [],
+        "network_requests": 0,
+        "blockers": [blocker],
+        "controls": {
+            "attempt": attempt,
+            "timeout_seconds": policy.timeout_seconds,
+            "retry_count": policy.retry_count,
+            "continue_on_error": policy.continue_on_error,
+            "freshness_hours": policy.freshness_hours,
+            "max_rows": policy.max_rows,
+        },
+    }
+    if not policy.continue_on_error:
+        raise RuntimeError(f"backtest stage {name} failed: {blocker}")
+    return failure
+
+
+def _financial_vintage_stage_report(
+    db_path: str,
+    *,
+    inherited_scope: Dict[str, Any],
+    dry_run: bool,
+) -> Dict[str, Any]:
+    """Report local filing-vintage state without starting acquisition."""
+    base = {
+        "stage": "financial_filing_vintages",
+        "reuse_decision": "extend_existing",
+        "inherited_scope": inherited_scope,
+        "provider_usage": [],
+        "network_requests": 0,
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "database_id": "financials",
+    }
+    if dry_run:
+        return {
+            **base,
+            "status": "dry_run",
+            "readiness": None,
+            "watermark": None,
+            "blockers": ["dry_run_no_write"],
+        }
+    try:
+        store = FinancialVintageStore(db_path)
+        store.initialize()
+        readiness = store.readiness()
+    except Exception as exc:
+        return {
+            **base,
+            "status": "unavailable",
+            "readiness": None,
+            "watermark": None,
+            "blockers": [f"financial_vintage_readiness_unavailable:{exc}"],
+        }
+    filings = readiness.get("filings") or {}
+    facts = readiness.get("facts") or {}
+    blockers = []
+    if int(filings.get("missing_availability") or 0):
+        blockers.append("filing_availability_missing")
+    if int(filings.get("missing_artifact") or 0):
+        blockers.append("filing_artifact_missing")
+    if int(facts.get("unknown_semantic") or 0):
+        blockers.append("financial_period_semantic_unknown")
+    if int(readiness.get("unresolved_relationships") or 0):
+        blockers.append("filing_relationship_unresolved")
+    return {
+        **base,
+        "status": "degraded" if blockers else "success",
+        "readiness": readiness,
+        "watermark": readiness.get("latest_watermark"),
+        "blockers": blockers,
+    }
 
 
 def _apply_hkex_gap_guard(
@@ -142,6 +290,7 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
     }
     for stage_name in (
         'master', 'calendar', 'quotes', 'dividends', 'factors',
+        'index_composition', 'security_state', 'price_limits', 'corporate_actions',
         'pending_quote_repair', 'completeness',
     ):
         stage = stages.get(stage_name) or {}
@@ -2066,6 +2215,16 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
                 )
             lines.append("blocker样本: " + "；".join(rendered_samples))
         lines.append("后续动作: blocker 按 source missing 或其他数据质量问题补处理，不能并入 accepted gaps。")
+    vintage_stage = (result.get("backtest_stages") or {}).get(
+        "financial_filing_vintages"
+    )
+    if isinstance(vintage_stage, dict):
+        lines.append(
+            "Filing vintage: "
+            f"{vintage_stage.get('status', 'unknown')}，"
+            f"watermark {vintage_stage.get('watermark')}，"
+            f"blockers {len(vintage_stage.get('blockers') or [])}"
+        )
     broker_post = result.get("broker_risk_control_post_task")
     if isinstance(broker_post, dict):
         broker_status = broker_post.get("status", "unknown")
@@ -3585,6 +3744,24 @@ class ScheduledTasks:
                     timeout_sec=timeout_sec,
                 )
             ])
+            stage_policy = BacktestRolloutPolicy.load().stage("security_state_forward")
+            maintenance = BacktestDataMaintenance(_quote_database_path())
+            result.setdefault("backtest_stages", {})[
+                "security_state_forward"
+            ] = await _run_backtest_stage(
+                "security_state_forward",
+                maintenance.sync_security_state_from_instruments,
+                exchanges=normalized_exchanges,
+                max_rows=stage_policy.max_rows,
+            )
+            result["backtest_stages"][
+                "security_state_announcements"
+            ] = await _run_backtest_stage(
+                "security_state_forward",
+                maintenance.sync_security_events_from_announcements,
+                config_manager.get_research_config().storage.db_path,
+                max_rows=stage_policy.max_rows,
+            )
             summary = result.get("summary") or {}
             source_authority = summary.get("source_authority") or {}
             source_authority_text = ", ".join(
@@ -3684,6 +3861,32 @@ class ScheduledTasks:
                     timeout_sec=timeout_sec,
                 )
             ])
+            stage_policy = BacktestRolloutPolicy.load().stage(
+                "index_composition_forward"
+            )
+            parent_snapshots = list(
+                result.get("index_composition_snapshots") or []
+            )
+            if parent_snapshots:
+                index_stage = await _run_backtest_stage(
+                    "index_composition_forward",
+                    BacktestDataMaintenance(_quote_database_path()).ingest_index_snapshots,
+                    parent_snapshots,
+                    max_rows=stage_policy.max_rows,
+                )
+            elif stage_policy.enabled:
+                index_stage = {
+                    **_disabled_backtest_stage("index_composition_forward"),
+                    "status": "unavailable",
+                    "blockers": ["parent_output_has_no_composition_snapshots"],
+                }
+            else:
+                index_stage = _disabled_backtest_stage(
+                    "index_composition_forward"
+                )
+            result.setdefault("backtest_stages", {})[
+                "index_composition_forward"
+            ] = index_stage
             summary = result.get("summary") or {}
             samples = summary.get("samples") or []
             sample_lines = []
@@ -3992,6 +4195,19 @@ class ScheduledTasks:
                 run_factor_audit=run_factor_audit,
                 master_governance_job_name=master_governance_job_name,
             )
+            stage_policy = BacktestRolloutPolicy.load().stage(
+                "daily_price_limits"
+            )
+            update_results.setdefault("backtest_stages", {})[
+                "daily_price_limits"
+            ] = await _run_backtest_stage(
+                "daily_price_limits",
+                BacktestDataMaintenance(_quote_database_path()).sync_source_reported_price_limits,
+                start_date=today.isoformat(),
+                end_date=today.isoformat(),
+                dry_run=False,
+                max_rows=stage_policy.max_rows,
+            )
 
             # 步骤5: 发送报告
             # 判断更新状态
@@ -4142,6 +4358,49 @@ class ScheduledTasks:
                 'errors': [],
                 'failure_samples': [],
             }
+            selected_optional_scopes = sorted(
+                set(parameters['scopes']) & set(A_SHARE_BACKFILL_OPTIONAL_SCOPES)
+            )
+            for optional_scope in selected_optional_scopes:
+                result['stages'][optional_scope] = {
+                    'status': 'unavailable',
+                    'reuse_decision': 'extend_existing',
+                    'inherited_scope': {
+                        'start_date': parameters['start_date'].isoformat(),
+                        'end_date': parameters['end_date'].isoformat(),
+                        'exchanges': list(parameters['exchanges']),
+                        'instrument_ids': list(parameters['instrument_ids']),
+                    },
+                    'provider_usage': [],
+                    'network_requests': 0,
+                    'inserted': 0,
+                    'changed': 0,
+                    'unchanged': 0,
+                    'watermark': None,
+                    'blockers': ['historical_source_not_proven_by_bounded_probe'],
+                }
+            selected_default_scopes = (
+                set(parameters['scopes']) & set(A_SHARE_BACKFILL_DEFAULT_SCOPES)
+            )
+            if selected_optional_scopes and not selected_default_scopes:
+                result['status'] = 'unavailable'
+                result['blockers'] = [
+                    f"{scope}:historical_source_not_proven_by_bounded_probe"
+                    for scope in selected_optional_scopes
+                ]
+                if self.telegram_enabled:
+                    await self._send_task_report(
+                        report_data={
+                            'name': 'A 股历史全量回补',
+                            'status': result['status'],
+                            'content': _format_a_share_historical_backfill_report(result),
+                            'result': result,
+                        },
+                        report_type='maintenance_report',
+                        task_name=task_id,
+                        job_config=job_config,
+                    )
+                return result
 
             # Stage 1: optional current-master refresh. A resumed checkpoint
             # already owns a frozen universe and must not silently replace it.
@@ -4901,6 +5160,13 @@ class ScheduledTasks:
                 )
             ):
                 result['status'] = 'partial'
+            elif any(
+                str((result['stages'].get(name) or {}).get('status')).lower()
+                == 'unavailable'
+                for name in A_SHARE_BACKFILL_OPTIONAL_SCOPES
+                if name in parameters['scopes']
+            ):
+                result['status'] = 'partial'
             else:
                 result['status'] = 'success'
             result['failure_samples'] = result['failure_samples'][:20]
@@ -5344,6 +5610,17 @@ class ScheduledTasks:
                 pipeline=effective_pipeline,
                 sample_limit=int(sample_limit),
             )
+            if not dry_run:
+                result.setdefault("backtest_stages", {})[
+                    "canonical_corporate_actions"
+                ] = await _run_backtest_stage(
+                    "canonical_corporate_actions",
+                    CanonicalCorporateActionProjector(
+                        _quote_database_path()
+                    ).project,
+                    instrument_ids=instrument_ids,
+                    source_event_keys=source_event_keys,
+                )
             scheduler_logger.info(
                 "[Scheduler] CNInfo corporate-action LLM resolution completed: "
                 "status=%s targets=%s processed=%s analyzed=%s validated=%s "
@@ -5564,6 +5841,17 @@ class ScheduledTasks:
                 pipeline=effective_pipeline,
                 sample_limit=int(sample_limit),
             )
+            if not dry_run:
+                result.setdefault("backtest_stages", {})[
+                    "canonical_corporate_actions"
+                ] = await _run_backtest_stage(
+                    "canonical_corporate_actions",
+                    CanonicalCorporateActionProjector(
+                        _quote_database_path()
+                    ).project,
+                    instrument_ids=instrument_ids,
+                    source_event_keys=source_event_keys,
+                )
             if self.telegram_enabled:
                 await self._send_task_report(
                     report_data={
@@ -5683,6 +5971,16 @@ class ScheduledTasks:
                 max_session_shift=int(max_session_shift),
                 sample_limit=int(sample_limit),
             )
+            if not dry_run:
+                result.setdefault("backtest_stages", {})[
+                    "canonical_corporate_actions"
+                ] = await _run_backtest_stage(
+                    "canonical_corporate_actions",
+                    CanonicalCorporateActionProjector(
+                        _quote_database_path()
+                    ).project,
+                    instrument_ids=instrument_ids,
+                )
             if self.telegram_enabled:
                 await self._send_task_report(
                     report_data={
@@ -5848,6 +6146,15 @@ class ScheduledTasks:
                     confirm=bool(confirm),
                 )
             )
+            if not dry_run:
+                result.setdefault("backtest_stages", {})[
+                    "canonical_corporate_actions"
+                ] = await _run_backtest_stage(
+                    "canonical_corporate_actions",
+                    CanonicalCorporateActionProjector(
+                        _quote_database_path()
+                    ).project,
+                )
             if self.telegram_enabled:
                 await self._send_task_report(
                     report_data={
@@ -6067,6 +6374,15 @@ class ScheduledTasks:
                     anomaly_llm_pipeline_progress_interval_seconds
                 ),
             )
+            result.setdefault("backtest_stages", {})[
+                "canonical_corporate_actions"
+            ] = await _run_backtest_stage(
+                "canonical_corporate_actions",
+                CanonicalCorporateActionProjector(
+                    _quote_database_path()
+                ).project,
+                instrument_ids=instrument_ids,
+            )
             if self.telegram_enabled:
                 await self._send_task_report(
                     report_data={
@@ -6126,6 +6442,14 @@ class ScheduledTasks:
                 repair_universe_mode="current_repair",
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 dry_run=False,
+            )
+            result.setdefault("backtest_stages", {})[
+                "canonical_corporate_actions"
+            ] = await _run_backtest_stage(
+                "canonical_corporate_actions",
+                CanonicalCorporateActionProjector(
+                    _quote_database_path()
+                ).project,
             )
             result["refresh_mode"] = "full"
             result["duration_seconds"] = round(
@@ -10123,6 +10447,20 @@ class ScheduledTasks:
                 request_timeout_seconds=request_timeout_seconds,
                 dry_run=dry_run,
             )
+            result.setdefault('backtest_stages', {})[
+                'financial_filing_vintages'
+            ] = await _run_backtest_stage(
+                'financial_filing_vintages',
+                _financial_vintage_stage_report,
+                str(result.get('db_path') or db_path or 'data/financials.db'),
+                inherited_scope={
+                    'exchanges': list(exchanges or result.get('exchanges') or []),
+                    'instrument_ids': list(target_instrument_ids or []),
+                    'symbols': list(target_symbols or []),
+                    'report_periods': list(report_periods or result.get('report_periods') or []),
+                },
+                dry_run=bool(dry_run),
+            )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
             report_data = {
@@ -10206,6 +10544,20 @@ class ScheduledTasks:
                 request_interval_seconds=request_interval_seconds,
                 request_timeout_seconds=request_timeout_seconds,
                 dry_run=dry_run,
+            )
+            result.setdefault('backtest_stages', {})[
+                'financial_filing_vintages'
+            ] = await _run_backtest_stage(
+                'financial_filing_vintages',
+                _financial_vintage_stage_report,
+                str(result.get('db_path') or db_path or 'data/financials.db'),
+                inherited_scope={
+                    'exchanges': list(exchanges or result.get('exchanges') or []),
+                    'instrument_ids': list(target_instrument_ids or []),
+                    'symbols': list(target_symbols or []),
+                    'report_periods': list(report_periods or result.get('report_periods') or []),
+                },
+                dry_run=bool(dry_run),
             )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}

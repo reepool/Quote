@@ -132,12 +132,19 @@ class DatabaseManager:
             self._ensure_change_watermark_schema()
             self._ensure_adjustment_factor_governance_schema()
             self._ensure_corporate_action_governance_schema()
+            self._ensure_backtest_data_schema()
 
             db_logger.info("[Database] Database connection initialized successfully")
 
         except Exception as e:
             db_logger.error(f"[Database] Failed to initialize database: {e}")
             raise
+
+    def _ensure_backtest_data_schema(self) -> None:
+        """Create additive PIT backtest tables without acquiring data."""
+        from research.backtest_data.quote_store import BacktestQuoteStore
+
+        BacktestQuoteStore(self.db_path).initialize()
 
     def _ensure_adjustment_factor_governance_schema(self) -> None:
         """Create additive adjustment-factor governance tables on existing DBs."""

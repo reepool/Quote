@@ -18,6 +18,10 @@ from utils.code_utils import convert_to_database_format
 from utils.validation import QueryValidator, DataValidator
 from utils.date_utils import DateUtils, get_shanghai_time
 from .models import *
+from research.backtest_data.catalog import load_default_catalog
+from research.backtest_data.quote_store import BacktestQuoteStore
+from research.backtest_data.financial_store import FinancialVintageStore
+from utils import config_manager
 
 router = APIRouter()
 
@@ -40,6 +44,188 @@ def _normalize_optional_query(value, default=None):
     if isinstance(value, Param):
         return default
     return value
+
+
+def _backtest_quotes_store() -> BacktestQuoteStore:
+    db = getattr(getattr(data_manager, "db_ops", None), "db", None)
+    db_path = getattr(db, "db_path", None) or config_manager.get_nested(
+        "database_config.db_path", "data/quotes.db"
+    )
+    store = BacktestQuoteStore(db_path)
+    store.initialize()
+    return store
+
+
+def _backtest_financial_store() -> FinancialVintageStore:
+    research_config = config_manager.get_research_config()
+    store = FinancialVintageStore(research_config.storage.financials_db_path)
+    store.initialize()
+    return store
+
+
+@router.get("/backtest-data/capabilities", tags=["Backtest Data"])
+async def get_backtest_data_capabilities(
+    market: Optional[str] = Query(None),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    strict_pit: bool = Query(True),
+):
+    """Return catalog route decisions and scoped local readiness."""
+    try:
+        catalog = load_default_catalog()
+        quote_store = _backtest_quotes_store()
+        financial_store = _backtest_financial_store()
+        return {
+            "catalog_version": catalog.catalog_version,
+            "scope": {
+                "market": market,
+                "start_date": start_date.isoformat() if start_date else None,
+                "end_date": end_date.isoformat() if end_date else None,
+                "strict_pit": strict_pit,
+            },
+            "resources": [item.as_dict() for item in catalog.resources],
+            "readiness": {
+                "quotes": quote_store.readiness(),
+                "financials": financial_store.readiness(),
+            },
+            "discovery": {
+                "industry_membership_as_of": "/api/v1/research/company/{instrument_id}/industry/as-of",
+                "industry_returns": "/api/v1/research/industry/index-analysis",
+                "industry_temporal_contract": "effective_date_only",
+            },
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read backtest capabilities: {exc}")
+
+
+@router.get("/indices/{instrument_id}/constituents", tags=["Backtest Data"])
+async def get_backtest_index_constituents(
+    instrument_id: str,
+    as_of_date: date = Query(...),
+    known_at: Optional[str] = Query(None),
+    strict: bool = Query(True),
+    limit: int = Query(1000, ge=1, le=5000),
+    offset: int = Query(0, ge=0),
+):
+    try:
+        return _backtest_quotes_store().list_index_constituents(
+            instrument_id,
+            as_of_date=as_of_date.isoformat(),
+            known_at=known_at,
+            strict=strict,
+            limit=limit,
+            offset=offset,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read index constituents: {exc}")
+
+
+@router.get("/instruments/{instrument_id}/market-state", tags=["Backtest Data"])
+async def get_backtest_market_state(
+    instrument_id: str,
+    effective_date: date = Query(...),
+    known_at: str = Query(...),
+    strict: bool = Query(True),
+):
+    try:
+        return _backtest_quotes_store().resolve_security_state(
+            instrument_id,
+            effective_date=effective_date.isoformat(),
+            known_at=known_at,
+            strict=strict,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read market state: {exc}")
+
+
+@router.get("/instruments/{instrument_id}/price-limits", tags=["Backtest Data"])
+async def get_backtest_price_limits(
+    instrument_id: str,
+    trade_date: date = Query(...),
+    known_at: str = Query(...),
+    strict: bool = Query(True),
+):
+    try:
+        return _backtest_quotes_store().resolve_price_limit(
+            instrument_id,
+            trade_date=trade_date.isoformat(),
+            known_at=known_at,
+            strict=strict,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read price limits: {exc}")
+
+
+@router.get("/research/company/{instrument_id}/financial-facts/as-of", tags=["Backtest Data"])
+async def get_financial_facts_as_of(
+    instrument_id: str,
+    known_at: str = Query(...),
+    report_period: Optional[date] = Query(None),
+    fact_name: Optional[str] = Query(None),
+    period_semantic: Optional[str] = Query(None),
+    strict: bool = Query(True),
+    availability_policy: str = Query("strict"),
+    limit: int = Query(1000, ge=1, le=5000),
+    offset: int = Query(0, ge=0),
+):
+    try:
+        return _backtest_financial_store().resolve_facts(
+            instrument_id,
+            known_at=known_at,
+            report_period=report_period.isoformat() if report_period else None,
+            fact_name=fact_name,
+            period_semantic=period_semantic,
+            strict=strict,
+            availability_policy=availability_policy,
+            limit=limit,
+            offset=offset,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read financial facts: {exc}")
+
+
+@router.get("/corporate-actions/canonical", tags=["Backtest Data"])
+async def list_canonical_corporate_actions(
+    instrument_id: Optional[str] = Query(None),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    action_type: Optional[str] = Query(None),
+    ready_only: bool = Query(False),
+    known_at: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=5000),
+    offset: int = Query(0, ge=0),
+    cursor: Optional[str] = Query(None),
+):
+    try:
+        store = _backtest_quotes_store()
+        result = store.list_canonical_actions(
+            instrument_id=instrument_id,
+            start_date=start_date.isoformat() if start_date else None,
+            end_date=end_date.isoformat() if end_date else None,
+            action_type=action_type,
+            ready_only=ready_only,
+            known_at=known_at,
+            change_cursor=cursor,
+            limit=limit,
+            offset=offset,
+        )
+        if cursor:
+            result["changes"] = store.read_changes(cursor=cursor, limit=limit)
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read canonical corporate actions: {exc}")
 
 
 # Health Check

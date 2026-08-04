@@ -18,6 +18,7 @@ from .dependencies import (
     JobDependencyConfig,
     parse_job_dependency_config,
     validate_job_dependencies,
+    validate_integrated_backtest_stages,
 )
 
 
@@ -221,7 +222,10 @@ class JobConfigManager:
 
     def validate_dependency_configs(self) -> list[str]:
         """Validate configured scheduler dependency DAGs."""
-        return validate_job_dependencies(self.job_configs)
+        return [
+            *validate_job_dependencies(self.job_configs),
+            *validate_integrated_backtest_stages(self.job_configs),
+        ]
 
     def is_job_enabled(self, job_id: str) -> bool:
         """检查任务是否启用"""

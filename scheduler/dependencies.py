@@ -126,6 +126,37 @@ def validate_job_dependencies(job_configs: Dict[str, Any]) -> List[str]:
     return errors
 
 
+def validate_integrated_backtest_stages(job_configs: Dict[str, Any]) -> List[str]:
+    """Verify integrated stages remain owned by existing scheduler parents."""
+    from research.backtest_data.catalog import load_default_catalog
+    from research.backtest_data.rollout import BacktestRolloutPolicy
+
+    stage_datasets = {
+        "index_composition_forward": "index_composition",
+        "security_state_forward": "security_state",
+        "daily_price_limits": "daily_price_limits",
+        "financial_filing_vintages": "financial_filing_vintages",
+        "canonical_corporate_actions": "canonical_corporate_actions",
+    }
+    catalog = load_default_catalog()
+    rollout = BacktestRolloutPolicy.load()
+    errors: List[str] = []
+    for stage_name, dataset in stage_datasets.items():
+        resource = catalog.get(dataset)
+        stage = rollout.stage(stage_name)
+        if resource.standalone_job:
+            errors.append(f"{stage_name}: standalone backtest job is forbidden")
+        if stage.enabled and resource.parent_job not in job_configs:
+            errors.append(
+                f"{stage_name}: enabled stage parent job {resource.parent_job!r} is not configured"
+            )
+        if stage.timeout_seconds <= 0 or stage.max_rows <= 0:
+            errors.append(f"{stage_name}: timeout and max_rows must be positive")
+    if any(job_id.startswith("backtest_data_") for job_id in job_configs):
+        errors.append("umbrella backtest-data cron is forbidden")
+    return errors
+
+
 def _detect_dependency_cycles(graph: Dict[str, List[str]]) -> List[str]:
     errors: List[str] = []
     visiting: set[str] = set()

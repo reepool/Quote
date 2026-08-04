@@ -1,0 +1,54 @@
+{
+  "schema_version": "backtest-data-rollout.v1",
+  "description": "Integrated backtest stages. Deployment alone must not start downloads or writes.",
+  "stages": {
+    "index_composition_forward": {
+      "enabled": false,
+      "timeout_seconds": 90,
+      "retry_count": 1,
+      "continue_on_error": true,
+      "freshness_hours": 24,
+      "max_rows": 5000
+    },
+    "security_state_forward": {
+      "enabled": false,
+      "timeout_seconds": 60,
+      "retry_count": 0,
+      "continue_on_error": true,
+      "freshness_hours": 24,
+      "max_rows": 10000
+    },
+    "daily_price_limits": {
+      "enabled": false,
+      "timeout_seconds": 60,
+      "retry_count": 0,
+      "continue_on_error": true,
+      "freshness_hours": 24,
+      "max_rows": 10000
+    },
+    "derived_price_limit_rules": {
+      "enabled": false,
+      "timeout_seconds": 60,
+      "retry_count": 0,
+      "continue_on_error": true,
+      "freshness_hours": 24,
+      "max_rows": 10000
+    },
+    "financial_filing_vintages": {
+      "enabled": false,
+      "timeout_seconds": 120,
+      "retry_count": 0,
+      "continue_on_error": false,
+      "freshness_hours": 24,
+      "max_rows": 20000
+    },
+    "canonical_corporate_actions": {
+      "enabled": false,
+      "timeout_seconds": 120,
+      "retry_count": 0,
+      "continue_on_error": true,
+      "freshness_hours": 24,
+      "max_rows": 20000
+    }
+  }
+}

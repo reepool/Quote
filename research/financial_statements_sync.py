@@ -7,7 +7,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict, dataclass, field, replace
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Sequence
 
 from research.empty_support import allows_optional_empty_exchange
@@ -36,6 +36,8 @@ from research.financial_xbrl_parser import (
     FinancialStructuredFilingParserDispatcher,
     FinancialXbrlNumericFactParser,
 )
+from research.backtest_data.financial_store import FinancialVintageStore
+from research.backtest_data.rollout import BacktestRolloutPolicy
 from research.providers import (
     FinancialStatementsProviderRegistry,
     OfficialFinancialFilingProviderRegistry,
@@ -51,6 +53,7 @@ from research.storage import ResearchStorageManager
 from utils import dm_logger
 from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
+from zoneinfo import ZoneInfo
 
 
 _QUARTER_ENDS = {
@@ -672,6 +675,13 @@ class FinancialStatementsShadowSyncService:
                 "core_facts_written": 0,
             }
 
+        if BacktestRolloutPolicy.load().stage("financial_filing_vintages").enabled:
+            self._append_financial_vintage(
+                manifest=manifest,
+                source_file_id=source_file_id,
+                numeric_facts=parse_result.numeric_facts,
+                parser_diagnostics=parse_result.diagnostics,
+            )
         numeric_written = self.storage.financial_statements.upsert_numeric_facts(
             parse_result.numeric_facts,
             ingestion_run_id=run_id,
@@ -716,6 +726,155 @@ class FinancialStatementsShadowSyncService:
             "numeric_facts_written": numeric_written,
             "core_facts_written": core_written,
         }
+
+    def _append_financial_vintage(
+        self,
+        *,
+        manifest: FinancialSourceFileManifest,
+        source_file_id: str,
+        numeric_facts: Sequence[FinancialNumericFactSnapshot],
+        parser_diagnostics: Mapping[str, Any],
+    ) -> None:
+        """Append immutable PIT revisions before latest compatibility writes."""
+        store = FinancialVintageStore(self.storage.financials_db_path)
+        store.initialize()
+        observed_at = get_shanghai_time()
+        published_at, availability_quality = self._normalize_filing_availability(
+            manifest.published_at or manifest.downloaded_at,
+            observed_at=observed_at,
+        )
+        metadata = dict(manifest.metadata_json or {})
+        store.append_filing(
+            {
+                **asdict(manifest),
+                "source_file_id": source_file_id,
+                "published_at": published_at if manifest.published_at else None,
+                "available_at": published_at,
+                "availability_quality": availability_quality,
+                "raw_published_at": manifest.published_at,
+                "raw_available_at": manifest.downloaded_at,
+                "source_profile": metadata.get("source_profile") or manifest.parser_version,
+                "correction_type": metadata.get("correction_type"),
+                "attachment_lineage": metadata.get("attachment_lineage") or {},
+                "artifact_lineage": {
+                    "content_hash": manifest.content_hash,
+                    "archive_path": manifest.archive_path,
+                    "source_url": manifest.source_url,
+                },
+            }
+        )
+        if manifest.supersedes_source_file_id:
+            relationship_material = (
+                f"{manifest.supersedes_source_file_id}|{source_file_id}|{published_at}"
+            ).encode("utf-8")
+            store.append_relationship(
+                {
+                    "decision_id": "frd_" + hashlib.sha256(relationship_material).hexdigest()[:24],
+                    "predecessor_source_file_id": manifest.supersedes_source_file_id,
+                    "successor_source_file_id": source_file_id,
+                    "relation_type": metadata.get("correction_type") or "supersedes",
+                    "status": "confirmed",
+                    "evidence": {"filing_id": manifest.filing_id, "source_url": manifest.source_url},
+                    "decision_available_at": published_at,
+                    "availability_quality": availability_quality,
+                    "source_profile": metadata.get("source_profile") or manifest.parser_version,
+                }
+            )
+        facts = []
+        for item in numeric_facts:
+            fact = asdict(item)
+            if item.canonical_semantic in {
+                "instant", "single_quarter", "ytd", "annual"
+            }:
+                fact["period_semantic"] = item.canonical_semantic
+            fact["available_at"] = observed_at.isoformat()
+            fact["source_profile"] = metadata.get("source_profile") or manifest.parser_version
+            fact["lineage"] = {
+                "taxonomy_namespace": item.taxonomy_namespace,
+                "canonical_version": item.canonical_version,
+                "raw_fact": item.raw_fact_json,
+            }
+            facts.append(fact)
+        facts_hash = hashlib.sha256(
+            json.dumps(facts, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+        ).hexdigest()
+        parse_revision_id = "fpr_" + facts_hash[:24]
+        for fact in facts:
+            identity = "|".join(
+                str(value or "")
+                for value in (
+                    parse_revision_id,
+                    source_file_id,
+                    fact.get("fact_name"),
+                    fact.get("context_id"),
+                    fact.get("unit"),
+                    json.dumps(fact.get("dimensions_json") or {}, sort_keys=True),
+                )
+            )
+            fact["fact_revision_id"] = (
+                "ffr_" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
+            )
+        parser_versions = sorted(
+            {
+                str(item.parser_version).strip()
+                for item in numeric_facts
+                if str(item.parser_version).strip()
+            }
+        )
+        parse_parser_version = (
+            parser_versions[0]
+            if len(parser_versions) == 1
+            else manifest.parser_version
+        )
+        store.append_parse_revision(
+            {
+                "parse_revision_id": parse_revision_id,
+                "source_file_id": source_file_id,
+                "parser_version": parse_parser_version,
+                "mapping_version": MAPPING_VERSION,
+                "catalog_version": metadata.get("catalog_version"),
+                "input_artifact_hash": manifest.content_hash,
+                "parsed_available_at": observed_at.isoformat(),
+                "availability_quality": "local_parse_timestamp",
+                "diagnostics": dict(parser_diagnostics or {}),
+            },
+            facts,
+        )
+
+    @staticmethod
+    def _normalize_filing_availability(
+        value: Optional[str], *, observed_at: Any
+    ) -> tuple[str, str]:
+        if value:
+            text = str(value).strip()
+            if len(text) == 10:
+                try:
+                    parsed_date = date.fromisoformat(text)
+                    parsed = datetime.combine(
+                        parsed_date,
+                        datetime.max.time().replace(microsecond=0),
+                        tzinfo=ZoneInfo("Asia/Shanghai"),
+                    )
+                    return parsed.isoformat(), "source_publication_date_end_of_day"
+                except ValueError:
+                    pass
+            try:
+                parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+                if parsed.tzinfo is None:
+                    parsed = parsed.replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+                return parsed.isoformat(), "source_timestamp"
+            except ValueError:
+                try:
+                    parsed_date = date.fromisoformat(text[:10])
+                    parsed = datetime.combine(
+                        parsed_date,
+                        datetime.max.time().replace(microsecond=0),
+                        tzinfo=ZoneInfo("Asia/Shanghai"),
+                    )
+                    return parsed.isoformat(), "source_publication_date_end_of_day"
+                except ValueError:
+                    pass
+        return observed_at.isoformat(), "local_first_seen_timestamp"
 
     def _write_fallback_bundles(
         self,

@@ -11,7 +11,16 @@ from typing import Any, Dict, Iterable, List, Optional
 
 
 A_SHARE_EXCHANGES = ("SSE", "SZSE", "BSE")
-A_SHARE_BACKFILL_SCOPES = ("master", "calendar", "quotes", "dividends", "factors")
+A_SHARE_BACKFILL_DEFAULT_SCOPES = (
+    "master", "calendar", "quotes", "dividends", "factors"
+)
+A_SHARE_BACKFILL_OPTIONAL_SCOPES = (
+    "index_composition", "security_state", "price_limits", "corporate_actions"
+)
+A_SHARE_BACKFILL_SCOPES = (
+    *A_SHARE_BACKFILL_DEFAULT_SCOPES,
+    *A_SHARE_BACKFILL_OPTIONAL_SCOPES,
+)
 A_SHARE_EXCHANGE_INCEPTION = {
     "SSE": date(1990, 12, 19),
     "SZSE": date(1990, 12, 1),
@@ -76,7 +85,7 @@ def normalize_a_share_backfill_parameters(
         raise ValueError(f"unsupported A-share exchanges: {unsupported_exchanges}")
 
     normalized_scopes = [item.lower() for item in normalize_string_list(scopes)]
-    normalized_scopes = normalized_scopes or list(A_SHARE_BACKFILL_SCOPES)
+    normalized_scopes = normalized_scopes or list(A_SHARE_BACKFILL_DEFAULT_SCOPES)
     unsupported_scopes = sorted(set(normalized_scopes) - set(A_SHARE_BACKFILL_SCOPES))
     if unsupported_scopes:
         raise ValueError(f"unsupported historical backfill scopes: {unsupported_scopes}")
