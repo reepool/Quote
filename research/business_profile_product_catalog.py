@@ -19,7 +19,7 @@ DEFAULT_PRODUCT_CATALOG_PATH = (
 DEFAULT_FUTURES_CONFIG_PATH = (
     Path(__file__).resolve().parents[1] / "config" / "11_futures.json"
 )
-PRODUCT_CATALOG_SCHEMA_VERSION = "business_profile_product_catalog.v2"
+PRODUCT_CATALOG_SCHEMA_VERSION = "business_profile_product_catalog.v3"
 
 INDUSTRY_GROUPS = {
     "coal",
@@ -105,21 +105,25 @@ class CommodityReference:
     reference_type: str
     reference_id: str
     priority: int
+    price_series_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
 class ProductCommodityMapping:
     mapping_id: str
     product_id: str
+    commodity_id: str
     exposure_role: str
     targets: tuple[CommodityReference, ...]
     ambiguity_policy: str
     evidence_requirement: str
     candidate_only: bool
+    promotion_evidence: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["targets"] = [asdict(target) for target in self.targets]
+        payload["promotion_evidence"] = list(self.promotion_evidence)
         return payload
 
 
@@ -210,8 +214,7 @@ class BusinessProductCatalog:
         evidence = str(evidence_requirement or "").strip()
         if evidence and evidence not in EVIDENCE_REQUIREMENTS:
             raise ValueError(
-                "unsupported commodity evidence_requirement: "
-                f"{evidence_requirement}"
+                "unsupported commodity evidence_requirement: " f"{evidence_requirement}"
             )
         return tuple(
             mapping
@@ -245,6 +248,7 @@ def load_business_product_catalog(
     catalog = parse_business_product_catalog(
         payload,
         known_references=load_known_commodity_references(),
+        known_price_series=load_known_commodity_price_series(),
     )
     if version is not None and catalog.catalog_version != str(version):
         raise ValueError(
@@ -281,10 +285,48 @@ def load_known_commodity_references(
     }
 
 
+@lru_cache(maxsize=1)
+def load_known_commodity_price_series(
+    futures_config_path: str | Path = DEFAULT_FUTURES_CONFIG_PATH,
+) -> dict[str, frozenset[str]]:
+    """Return executable series ids keyed by governed market reference."""
+
+    from research.futures_market_data import (
+        DEFAULT_P0_FUTURES_INSTRUMENTS,
+        make_futures_series_id,
+    )
+
+    payload = json.loads(Path(futures_config_path).read_text(encoding="utf-8"))
+    special_series = (
+        payload.get("futures_config", {})
+        .get("special_commodity_market_data", {})
+        .get("series", [])
+    )
+    output: dict[str, set[str]] = {}
+    for item in DEFAULT_P0_FUTURES_INSTRUMENTS:
+        instrument_id = str(item.get("instrument_id") or "").strip()
+        if instrument_id:
+            output.setdefault(instrument_id, set()).add(
+                make_futures_series_id(instrument_id)
+            )
+    for item in special_series:
+        if item.get("active", True) is not True:
+            continue
+        commodity_id = str(item.get("commodity_id") or "").strip()
+        series_id = str(item.get("series_id") or "").strip()
+        if commodity_id and series_id:
+            output.setdefault(commodity_id, set()).add(series_id)
+    return {
+        reference_id: frozenset(sorted(series_ids))
+        for reference_id, series_ids in output.items()
+    }
+
+
 def parse_business_product_catalog(
     payload: Mapping[str, Any],
     *,
     known_references: Optional[Mapping[str, set[str] | frozenset[str]]] = None,
+    known_price_series: Optional[Mapping[str, set[str] | frozenset[str]]] = None,
 ) -> BusinessProductCatalog:
     if not isinstance(payload, Mapping):
         raise ValueError("business product catalog root must be an object")
@@ -320,6 +362,7 @@ def parse_business_product_catalog(
         payload.get("commodity_mappings"),
         product_ids=product_ids,
         known_references=known_references,
+        known_price_series=known_price_series,
     )
     covered_industries = {
         group for product in products for group in product.industry_groups
@@ -461,6 +504,7 @@ def _parse_mappings(
     *,
     product_ids: set[str],
     known_references: Optional[Mapping[str, set[str] | frozenset[str]]],
+    known_price_series: Optional[Mapping[str, set[str] | frozenset[str]]],
 ) -> tuple[ProductCommodityMapping, ...]:
     rows = _non_empty_object_array(value, "commodity_mappings")
     output: list[ProductCommodityMapping] = []
@@ -480,10 +524,16 @@ def _parse_mappings(
         product_id = _required_text(row, "product_id", location)
         if product_id not in product_ids:
             raise ValueError(f"{location} references unknown product_id: {product_id}")
+        commodity_id = _required_text(row, "commodity_id", location)
+        if commodity_id == product_id:
+            raise ValueError(
+                f"{location} commodity_id must be distinct from product_id"
+            )
         targets = _parse_targets(
             row.get("targets"),
             location=location,
             known_references=known_references,
+            known_price_series=known_price_series,
         )
         ambiguity_policy = _enum_text(
             row,
@@ -494,8 +544,27 @@ def _parse_mappings(
         if len(targets) > 1 and ambiguity_policy != "one_to_many_review":
             raise ValueError(f"{location} multiple targets require one_to_many_review")
         candidate_only = row.get("candidate_only")
-        if candidate_only is not True:
-            raise ValueError(f"{location} must remain candidate_only")
+        if not isinstance(candidate_only, bool):
+            raise ValueError(f"{location} candidate_only must be boolean")
+        promotion_evidence = _string_tuple(
+            row.get("promotion_evidence") or [],
+            "promotion_evidence",
+            location,
+            allow_empty=True,
+        )
+        if candidate_only is False:
+            if ambiguity_policy != "single_target" or len(targets) != 1:
+                raise ValueError(
+                    f"{location} promoted mapping requires one single target"
+                )
+            if not targets[0].price_series_id:
+                raise ValueError(
+                    f"{location} promoted mapping requires explicit price_series_id"
+                )
+            if not promotion_evidence:
+                raise ValueError(
+                    f"{location} promoted mapping requires promotion_evidence"
+                )
         exposure_role = _enum_text(
             row,
             "exposure_role",
@@ -517,11 +586,13 @@ def _parse_mappings(
             ProductCommodityMapping(
                 mapping_id=mapping_id,
                 product_id=product_id,
+                commodity_id=commodity_id,
                 exposure_role=exposure_role,
                 targets=targets,
                 ambiguity_policy=ambiguity_policy,
                 evidence_requirement=evidence_requirement,
-                candidate_only=True,
+                candidate_only=candidate_only,
+                promotion_evidence=promotion_evidence,
             )
         )
     return tuple(output)
@@ -532,6 +603,7 @@ def _parse_targets(
     *,
     location: str,
     known_references: Optional[Mapping[str, set[str] | frozenset[str]]],
+    known_price_series: Optional[Mapping[str, set[str] | frozenset[str]]],
 ) -> tuple[CommodityReference, ...]:
     rows = _non_empty_object_array(value, f"{location}.targets")
     output: list[CommodityReference] = []
@@ -564,11 +636,22 @@ def _parse_targets(
                 f"{target_location} references unknown {reference_type}: "
                 f"{reference_id}"
             )
+        price_series_id = str(row.get("price_series_id") or "").strip() or None
+        if (
+            price_series_id
+            and known_price_series is not None
+            and price_series_id not in known_price_series.get(reference_id, set())
+        ):
+            raise ValueError(
+                f"{target_location} references unknown price_series_id: "
+                f"{price_series_id}"
+            )
         output.append(
             CommodityReference(
                 reference_type=reference_type,
                 reference_id=reference_id,
                 priority=priority,
+                price_series_id=price_series_id,
             )
         )
     return tuple(sorted(output, key=lambda item: item.priority))

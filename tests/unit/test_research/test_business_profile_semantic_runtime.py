@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import sqlite3
 from dataclasses import replace
 from io import BytesIO
 from types import SimpleNamespace
@@ -262,6 +263,57 @@ class _RelationshipGateway(_FakeGateway):
         return _response(data, request)
 
 
+class _AnonymousRelationshipGateway(_FakeGateway):
+    async def complete(self, request):
+        self.requests.append(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return _response(
+                {
+                    "decision": "confirmed",
+                    "checks": {
+                        "subject": True,
+                        "action": True,
+                        "object": True,
+                        "scope": True,
+                        "period": True,
+                        "evidence": True,
+                    },
+                },
+                request,
+            )
+        payload = json.loads(request.messages[-1].content)
+        span = payload["sections"][0]
+        quote = "客户A销售占比为25%"
+        local_start = span["text"].index(quote)
+        start = span["text_start"] + local_start
+        return _response(
+            {
+                "schema_version": "business_profile_atomic_extraction.v1",
+                "instrument_id": payload["instrument_id"],
+                "report_period": payload["report_period"],
+                "activities": [],
+                "relationships": [
+                    {
+                        "subject_scope": "issuer",
+                        "relationship_type": "sells_to",
+                        "counterparty_name_raw": "客户A",
+                        "anonymous": True,
+                        "disclosed_share": 0.25,
+                        "object_raw": None,
+                        "evidence": {
+                            "section_id": span["section_id"],
+                            "page_number": span["page_number"],
+                            "quote": quote,
+                            "section_start": start,
+                            "section_end": start + len(quote),
+                        },
+                    }
+                ],
+            },
+            request,
+        )
+
+
 class _ProductionAndSalesGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
@@ -318,7 +370,15 @@ class _ProductionAndSalesGateway(_FakeGateway):
 
 
 def _relationship_runtime(
-    tmp_path, monkeypatch, entities, *, promote, network_disabled=False
+    tmp_path,
+    monkeypatch,
+    entities,
+    *,
+    promote,
+    network_disabled=False,
+    gateway=None,
+    text="主要业务：公司向客户股份有限公司销售动力煤。",
+    counterparty_resolver=None,
 ):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
@@ -326,7 +386,6 @@ def _relationship_runtime(
     pdf = tmp_path / "annual.pdf"
     pdf.write_bytes(content)
     manifest_row = _manifest(pdf, content)
-    text = "主要业务：公司向客户股份有限公司销售动力煤。"
     document_hash = hashlib.sha256(content).hexdigest()
     page_hash = hashlib.sha256(text.encode()).hexdigest()
     monkeypatch.setattr(
@@ -359,14 +418,16 @@ def _relationship_runtime(
         identities=plain_scope.identities,
     )
     scope = _scope("named_relationships", manifest) if promote else plain_scope
-    gateway = _RelationshipGateway()
+    gateway = gateway or _RelationshipGateway()
     runtime = BusinessProfileSemanticRuntime(
         repository=repository,
         artifact_root=tmp_path / "artifacts",
         llm_client=gateway,
         manifest_loader=lambda instrument_id: [manifest_row],
         promotion_manifests={"named_relationships": manifest} if promote else {},
-        counterparty_resolver=GovernedCounterpartyResolver(entities=entities),
+        counterparty_resolver=(
+            counterparty_resolver or GovernedCounterpartyResolver(entities=entities)
+        ),
     )
     pipeline = BusinessProfileSemanticPipeline(
         config=SemanticProductionConfig(
@@ -1502,6 +1563,172 @@ def test_unique_exact_counterparty_is_verified_and_promoted(tmp_path, monkeypatc
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
+def test_anonymous_concentration_bypasses_entity_resolution_and_is_promoted(
+    tmp_path, monkeypatch
+):
+    class FailingResolver:
+        def resolve(self, *_args, **_kwargs):
+            raise AssertionError(
+                "anonymous concentration must bypass entity resolution"
+            )
+
+    repository, pipeline, scope, gateway = _relationship_runtime(
+        tmp_path,
+        monkeypatch,
+        [],
+        promote=True,
+        gateway=_AnonymousRelationshipGateway(),
+        text="主要业务：客户A销售占比为25%。",
+        counterparty_resolver=FailingResolver(),
+    )
+
+    assert pipeline.run("verify", scope=scope)["status"] == "success"
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+
+    facts = repository.list_records("operating_facts", instrument_id="601088.SH")
+    assert len(gateway.requests) == 2
+    assert len(facts) == 1
+    assert facts[0]["fact_type"] == "customer_concentration_share"
+    assert facts[0]["value_normalized"] == 0.25
+    assert facts[0]["review_status"] == "approved"
+    assert repository.list_records("relationships", instrument_id="601088.SH") == []
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
+
+
+def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path):
+    storage = _storage(tmp_path)
+    with sqlite3.connect(storage.quotes_db_path) as conn:
+        conn.execute(
+            "CREATE TABLE instruments ("
+            "instrument_id TEXT PRIMARY KEY, name TEXT, type TEXT, exchange TEXT, "
+            "listed_date TEXT, delisted_date TEXT)"
+        )
+        conn.executemany(
+            "INSERT INTO instruments VALUES (?, ?, ?, ?, ?, ?)",
+            [
+                (
+                    "600000.SH",
+                    "浦发银行股份有限公司",
+                    "stock",
+                    "SSE",
+                    "1999-11-10",
+                    None,
+                ),
+                ("00700.HK", "腾讯控股有限公司", "stock", "HKEX", None, None),
+            ],
+        )
+
+    resolver = runtime_module.build_business_profile_counterparty_resolver(storage)
+
+    resolved = resolver.resolve("浦发银行股份有限公司", knowledge_cutoff="2026-01-01")
+    assert resolved.status == "resolved"
+    assert resolved.entity_id == "600000.SH"
+    assert resolver.resolve("腾讯控股有限公司").status == "unresolved"
+
+
+def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_path):
+    storage = _storage(tmp_path)
+    with sqlite3.connect(storage.quotes_db_path) as conn:
+        conn.execute(
+            "CREATE TABLE instruments ("
+            "instrument_id TEXT PRIMARY KEY, name TEXT, type TEXT, exchange TEXT, "
+            "listed_date TEXT, delisted_date TEXT)"
+        )
+        conn.executemany(
+            "INSERT INTO instruments VALUES (?, ?, ?, ?, ?, ?)",
+            [
+                (
+                    "600000.SH",
+                    "上海浦东发展银行股份有限公司",
+                    "stock",
+                    "SSE",
+                    "1999-11-10",
+                    None,
+                ),
+                (
+                    "600001.SH",
+                    "示例银行股份有限公司",
+                    "stock",
+                    "SSE",
+                    "2000-01-01",
+                    None,
+                ),
+                (
+                    "600002.SH",
+                    "唯一示例股份有限公司",
+                    "stock",
+                    "SSE",
+                    "2000-01-01",
+                    None,
+                ),
+            ],
+        )
+        conn.commit()
+    with storage.get_connection() as conn:
+        now = "2026-08-04T00:00:00+08:00"
+        conn.executemany(
+            "INSERT INTO company_profiles ("
+            "instrument_id, symbol, company_name, short_name, exchange, market, "
+            "status, source, source_mode, data_as_of, profile_json, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, ?)",
+            [
+                (
+                    "600000.SH",
+                    "600000",
+                    "上海浦东发展银行股份有限公司",
+                    "浦发银行",
+                    "SSE",
+                    "A股",
+                    "active",
+                    "official",
+                    "direct",
+                    "2026-08-04",
+                    now,
+                    now,
+                ),
+                (
+                    "600001.SH",
+                    "600001",
+                    "示例银行股份有限公司",
+                    "浦发银行",
+                    "SSE",
+                    "A股",
+                    "active",
+                    "official",
+                    "direct",
+                    "2026-08-04",
+                    now,
+                    now,
+                ),
+                (
+                    "600002.SH",
+                    "600002",
+                    "唯一示例股份有限公司",
+                    "唯一示例",
+                    "SSE",
+                    "A股",
+                    "active",
+                    "official",
+                    "direct",
+                    "2026-08-04",
+                    now,
+                    now,
+                ),
+            ],
+        )
+        conn.commit()
+
+    resolver = runtime_module.build_business_profile_counterparty_resolver(
+        storage,
+        knowledge_cutoff="2026-08-04",
+    )
+
+    assert {item["alias"] for item in resolver.aliases} == {"唯一示例"}
+    assert resolver.resolve("浦发银行").status == "unresolved"
+    assert resolver.resolve("唯一示例").entity_id == "600002.SH"
+    assert resolver.resolve("上海浦东发展银行股份有限公司").entity_id == "600000.SH"
+
+
 def test_unresolved_counterparty_is_machine_rework_without_orphan_evidence(
     tmp_path, monkeypatch
 ):
@@ -1674,6 +1901,13 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         "ambiguous_or_unsupported_exposure_direction",
         "ambiguous_or_unpromoted_product_commodity_mapping",
     }
+    exceptions = repository.list_exceptions(instrument_id="601088.SH")
+    assert {item["reason_codes"][0] for item in exceptions} == {
+        "ambiguous_or_unsupported_exposure_direction",
+        "ambiguous_or_unpromoted_product_commodity_mapping",
+    }
+    runtime._derive_and_publish(scope)
+    assert len(repository.list_exceptions(instrument_id="601088.SH")) == 2
     report = pipeline.run("report", scope=scope)["metrics"]["by_field_family"]
     assert report["atomic_activities"]["llm_calls"] == 3
     assert report["atomic_activities"]["candidates"] == 2

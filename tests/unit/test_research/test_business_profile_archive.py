@@ -61,11 +61,21 @@ def _candidate(announcement_id, title, *, content_url=None):
     )
 
 
-def _instrument():
-    return {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"}
+def _instrument(instrument_id="600309.SH", symbol="600309", exchange="SSE"):
+    return {"instrument_id": instrument_id, "symbol": symbol, "exchange": exchange}
 
 
-def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
+@pytest.mark.parametrize(
+    ("instrument", "expected_market", "expected_stem"),
+    [
+        (_instrument(), "SSE", "600309_SH"),
+        (_instrument("000001.SZ", "000001", "SZSE"), "SZSE", "000001_SZ"),
+        (_instrument("920001.BJ", "920001", "BSE"), "BSE", "920001_BJ"),
+    ],
+)
+def test_archive_writes_immutable_hash_path_and_manifest(
+    tmp_path, instrument, expected_market, expected_stem
+):
     storage = _Storage()
     service = BusinessProfileDocumentArchiveService(
         storage=storage,
@@ -75,7 +85,7 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
     content = b"%PDF-1.7\nfixture"
 
     record = service.archive_content(
-        _instrument(),
+        instrument,
         candidate,
         content,
         manifest_ingestion_run_id=7,
@@ -86,8 +96,8 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
     assert record.status == "archived"
     assert record.report_period == "2025-12-31"
     assert record.content_hash in record.archive_path
-    assert path.parent == tmp_path / "filings" / "2025" / "SSE"
-    assert path.name == (f"600309_SH_2025Q4_annual-1_{record.content_hash}.pdf")
+    assert path.parent == tmp_path / "filings" / "2025" / expected_market
+    assert path.name == (f"{expected_stem}_2025Q4_annual-1_{record.content_hash}.pdf")
     assert path.read_bytes() == content
     assert storage.rows[0]["schema_version"] == BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
     assert storage.rows[0]["source_tier"] == "official_primary"
@@ -185,6 +195,7 @@ def test_exchange_backup_download_uses_common_retrieval_service():
                 (),
                 {"status": "success", "content": b"%PDF-1.7\nsse", "errors": ()},
             )()
+
     candidate = _candidate(
         "sse-annual",
         "万华化学2025年年度报告",

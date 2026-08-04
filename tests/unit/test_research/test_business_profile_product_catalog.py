@@ -8,6 +8,7 @@ from research.business_profile_product_catalog import (
     INDUSTRY_GROUPS,
     load_business_product_catalog,
     load_known_commodity_references,
+    load_known_commodity_price_series,
     parse_business_product_catalog,
 )
 
@@ -20,10 +21,14 @@ def _known_references():
     return load_known_commodity_references()
 
 
+def _known_price_series():
+    return load_known_commodity_price_series()
+
+
 def test_default_product_catalog_covers_first_wave_industries():
     catalog = load_business_product_catalog()
 
-    assert catalog.catalog_version == "business_profile_products.2026.2"
+    assert catalog.catalog_version == "business_profile_products.2026.3"
     assert len(catalog.products) == 40
     assert len(catalog.aliases) == 48
     assert len(catalog.commodity_mappings) == 44
@@ -105,14 +110,25 @@ def test_same_product_supports_role_specific_revenue_and_cost_candidates():
     } == {"revenue"}
 
 
-def test_all_mapping_targets_exist_and_remain_candidate_only():
+def test_all_mapping_targets_exist_and_starter_cohort_is_bounded():
     catalog = load_business_product_catalog()
     references = _known_references()
 
-    assert all(mapping.candidate_only for mapping in catalog.commodity_mappings)
+    promoted = [
+        mapping for mapping in catalog.commodity_mappings if not mapping.candidate_only
+    ]
+    assert 1 <= len(promoted) <= 6
+    assert all(mapping.promotion_evidence for mapping in promoted)
     for mapping in catalog.commodity_mappings:
+        assert mapping.commodity_id != mapping.product_id
         for target in mapping.targets:
             assert target.reference_id in references[target.reference_type]
+    for mapping in promoted:
+        assert len(mapping.targets) == 1
+        assert (
+            mapping.targets[0].price_series_id
+            in _known_price_series()[mapping.targets[0].reference_id]
+        )
 
 
 def test_loader_accepts_historical_supported_document_date():
@@ -132,6 +148,7 @@ def test_parser_rejects_unknown_commodity_reference():
         parse_business_product_catalog(
             payload,
             known_references=_known_references(),
+            known_price_series=_known_price_series(),
         )
 
 
@@ -144,17 +161,24 @@ def test_parser_rejects_ambiguous_alias_without_review():
         parse_business_product_catalog(
             payload,
             known_references=_known_references(),
+            known_price_series=_known_price_series(),
         )
 
 
-def test_parser_rejects_non_candidate_mapping():
+def test_parser_rejects_promoted_mapping_without_evidence():
     payload = _payload()
-    payload["commodity_mappings"][0]["candidate_only"] = False
+    mapping = next(
+        item for item in payload["commodity_mappings"] if item["candidate_only"]
+    )
+    mapping["candidate_only"] = False
 
-    with pytest.raises(ValueError, match="must remain candidate_only"):
+    with pytest.raises(
+        ValueError, match="one single target|price_series_id|promotion_evidence"
+    ):
         parse_business_product_catalog(
             payload,
             known_references=_known_references(),
+            known_price_series=_known_price_series(),
         )
 
 
@@ -166,4 +190,5 @@ def test_parser_rejects_duplicate_product():
         parse_business_product_catalog(
             payload,
             known_references=_known_references(),
+            known_price_series=_known_price_series(),
         )

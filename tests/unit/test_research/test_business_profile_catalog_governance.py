@@ -270,9 +270,9 @@ def test_alias_promotion_builds_valid_new_catalog_and_manifest(tmp_path):
     )
     output, manifest = build_product_alias_promotion(
         _catalog_payload(),
-        expected_catalog_version="business_profile_products.2026.2",
-        new_catalog_version="business_profile_products.2026.3",
-        released_on="2026-07-19",
+        expected_catalog_version="business_profile_products.2026.3",
+        new_catalog_version="business_profile_products.2026.4",
+        released_on="2026-08-05",
         alias="premium thermal coal",
         product_ids=["coal.thermal_coal"],
         industry_groups=["coal"],
@@ -280,13 +280,13 @@ def test_alias_promotion_builds_valid_new_catalog_and_manifest(tmp_path):
         reason="Official annual report uses this exact product label",
         official_evidence=evidence,
         financials_db=financials_db,
-        promoted_at="2026-07-19T00:00:00+00:00",
+        promoted_at="2026-08-05T00:00:00+00:00",
     )
 
     catalog = parse_business_product_catalog(output)
     resolution = catalog.resolve_alias("premium thermal coal", industry_group="coal")
     assert resolution.product_ids == ("coal.thermal_coal",)
-    assert manifest["source_catalog_version"] == ("business_profile_products.2026.2")
+    assert manifest["source_catalog_version"] == ("business_profile_products.2026.3")
     assert manifest["output_catalog_hash"]
     assert manifest["official_evidence_hash"]
     assert manifest["official_evidence"]["official_page_numbers"] == [1]
@@ -339,8 +339,8 @@ def test_alias_promotion_fails_on_stale_version_or_overlapping_alias(tmp_path):
     )
     payload = _catalog_payload()
     common = {
-        "new_catalog_version": "business_profile_products.2026.3",
-        "released_on": "2026-07-19",
+        "new_catalog_version": "business_profile_products.2026.4",
+        "released_on": "2026-08-05",
         "product_ids": ["coal.thermal_coal"],
         "industry_groups": ["coal"],
         "operator": "reviewer",
@@ -358,7 +358,7 @@ def test_alias_promotion_fails_on_stale_version_or_overlapping_alias(tmp_path):
     with pytest.raises(ValueError, match="exact alias already exists"):
         build_product_alias_promotion(
             payload,
-            expected_catalog_version="business_profile_products.2026.2",
+            expected_catalog_version="business_profile_products.2026.3",
             alias="动力煤",
             **common,
         )
@@ -376,15 +376,15 @@ def test_promotion_writer_does_not_overwrite_source_or_existing_output(tmp_path)
     output = tmp_path / "next.json"
     manifest = tmp_path / "promotion.json"
     promotion = {
-        "expected_catalog_version": "business_profile_products.2026.2",
-        "new_catalog_version": "business_profile_products.2026.3",
-        "released_on": "2026-07-19",
+        "expected_catalog_version": "business_profile_products.2026.3",
+        "new_catalog_version": "business_profile_products.2026.4",
+        "released_on": "2026-08-05",
         "alias": "premium thermal coal",
         "product_ids": ["coal.thermal_coal"],
         "industry_groups": ["coal"],
         "operator": "reviewer",
         "reason": "reviewed",
-        "promoted_at": "2026-07-19T00:00:00+00:00",
+        "promoted_at": "2026-08-05T00:00:00+00:00",
     }
 
     written = write_product_alias_promotion(
@@ -398,7 +398,7 @@ def test_promotion_writer_does_not_overwrite_source_or_existing_output(tmp_path)
 
     assert output.exists()
     assert manifest.exists()
-    assert written["output_catalog_version"] == ("business_profile_products.2026.3")
+    assert written["output_catalog_version"] == ("business_profile_products.2026.4")
     with pytest.raises(FileExistsError):
         write_product_alias_promotion(
             source_path=source,
@@ -480,9 +480,9 @@ def test_official_evidence_rejects_invalid_pages_and_archive_tampering(tmp_path)
     with pytest.raises(ValueError, match="hash-validated manifest"):
         build_product_alias_promotion(
             _catalog_payload(),
-            expected_catalog_version="business_profile_products.2026.2",
-            new_catalog_version="business_profile_products.2026.3",
-            released_on="2026-07-19",
+            expected_catalog_version="business_profile_products.2026.3",
+            new_catalog_version="business_profile_products.2026.4",
+            released_on="2026-08-05",
             alias="premium thermal coal",
             product_ids=["coal.thermal_coal"],
             industry_groups=["coal"],
@@ -526,14 +526,14 @@ def test_alias_promotion_rejects_review_after_promotion(tmp_path):
     financials_db, _evidence_path, _pdf_path, evidence = _official_promotion_fixture(
         tmp_path
     )
-    evidence["reviewed_at"] = "2026-07-20T00:00:00+00:00"
+    evidence["reviewed_at"] = "2026-08-06T00:00:00+00:00"
 
     with pytest.raises(ValueError, match="later than promoted_at"):
         build_product_alias_promotion(
             _catalog_payload(),
-            expected_catalog_version="business_profile_products.2026.2",
-            new_catalog_version="business_profile_products.2026.3",
-            released_on="2026-07-19",
+            expected_catalog_version="business_profile_products.2026.3",
+            new_catalog_version="business_profile_products.2026.4",
+            released_on="2026-08-05",
             alias="premium thermal coal",
             product_ids=["coal.thermal_coal"],
             industry_groups=["coal"],
@@ -541,7 +541,7 @@ def test_alias_promotion_rejects_review_after_promotion(tmp_path):
             reason="reviewed",
             official_evidence=evidence,
             financials_db=financials_db,
-            promoted_at="2026-07-19T00:00:00+00:00",
+            promoted_at="2026-08-05T00:00:00+00:00",
         )
 
 
@@ -575,9 +575,9 @@ def test_promotion_writer_rolls_back_catalog_when_manifest_publish_fails(
             manifest_path=manifest,
             financials_db=financials_db,
             official_evidence_path=evidence_path,
-            expected_catalog_version="business_profile_products.2026.2",
-            new_catalog_version="business_profile_products.2026.3",
-            released_on="2026-07-19",
+            expected_catalog_version="business_profile_products.2026.3",
+            new_catalog_version="business_profile_products.2026.4",
+            released_on="2026-08-05",
             alias="premium thermal coal",
             product_ids=["coal.thermal_coal"],
             industry_groups=["coal"],

@@ -31,6 +31,9 @@ from utils.config_manager import config_manager
 BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION = "business_profile_source_file_manifest.v1"
 BUSINESS_PROFILE_ARCHIVE_VERSION = "business_profile_pdf_archive.v2"
 BUSINESS_PROFILE_SOURCE_TIER = "official_primary"
+BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES = frozenset(
+    {"archived", "archived_unchanged_content", "verified", "success"}
+)
 DEFAULT_BUSINESS_PROFILE_ARCHIVE_ROOT = "data/filings/business_profile"
 DEFAULT_BUSINESS_PROFILE_DIRECTORY_TEMPLATE = "{year}/{market}"
 DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE = (
@@ -82,8 +85,7 @@ def download_business_profile_candidate(
     )
     if result.status != "success":
         raise RuntimeError(
-            "business-profile attachment retrieval failed: "
-            + "; ".join(result.errors)
+            "business-profile attachment retrieval failed: " + "; ".join(result.errors)
         )
     return result.content
 

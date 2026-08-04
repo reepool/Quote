@@ -18,6 +18,7 @@ from research.business_profile_precision_review import (
 from research.business_profile_product_catalog import (
     ALIAS_REVIEW_POLICIES,
     INDUSTRY_GROUPS,
+    load_known_commodity_price_series,
     load_known_commodity_references,
     normalize_product_alias,
     parse_business_product_catalog,
@@ -194,6 +195,7 @@ def build_product_alias_promotion(
     source_catalog = parse_business_product_catalog(
         source_payload,
         known_references=load_known_commodity_references(),
+        known_price_series=load_known_commodity_price_series(),
     )
     expected = _required_text(expected_catalog_version, "expected_catalog_version")
     new_version = _required_text(new_catalog_version, "new_catalog_version")
@@ -293,6 +295,7 @@ def build_product_alias_promotion(
     promoted_catalog = parse_business_product_catalog(
         output,
         known_references=load_known_commodity_references(),
+        known_price_series=load_known_commodity_price_series(),
     )
     manifest = {
         "schema_version": "business_profile_product_catalog_promotion.v1",

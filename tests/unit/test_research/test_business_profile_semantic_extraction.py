@@ -2,7 +2,9 @@ import hashlib
 
 import pytest
 
-from research.business_profile_disclosure_templates import load_disclosure_template_catalog
+from research.business_profile_disclosure_templates import (
+    load_disclosure_template_catalog,
+)
 from research.business_profile_section_selection import BusinessProfileSectionSelector
 from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
@@ -20,7 +22,9 @@ def _selected(text="主要业务：公司生产动力煤并销售动力煤。"):
                 "page_number": 1,
                 "text": text,
                 "text_hash": hashlib.sha256(text.encode()).hexdigest(),
-                "page_artifact_hash": hashlib.sha256(f"page:{text}".encode()).hexdigest(),
+                "page_artifact_hash": hashlib.sha256(
+                    f"page:{text}".encode()
+                ).hexdigest(),
                 "native_text_status": "extracted",
                 "ocr_required": False,
             }
@@ -170,7 +174,7 @@ async def test_model_supplied_governed_id_is_rejected_by_local_closed_schema():
 
 
 @pytest.mark.asyncio
-async def test_anonymous_relationship_and_mixed_partial_response_are_rejected():
+async def test_anonymous_relationship_requires_disclosed_share():
     selected = _selected("主要业务：公司向客户A销售动力煤。")
     section = selected.sections[0]
     quote = "公司向客户A销售动力煤"
@@ -196,23 +200,89 @@ async def test_anonymous_relationship_and_mixed_partial_response_are_rejected():
             }
         ],
     }
-    with pytest.raises(ValueError, match="anonymous counterparty"):
-        await BusinessProfileSemanticExtractor(_FakeGateway([relationship])).extract_async(
+    with pytest.raises(ValueError, match="requires disclosed_share"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([relationship])
+        ).extract_async(
             field_family="named_relationships",
             instrument_id="601088.SH",
             report_period="2025-12-31",
             selected=selected,
         )
 
-    mixed_selected = _selected()
-    mixed = _activity_response(mixed_selected)
-    mixed["relationships"] = relationship["relationships"]
+
+@pytest.mark.asyncio
+async def test_anonymous_concentration_with_explicit_share_is_normalized():
+    selected = _selected("主要业务：客户A销售占比为25%。")
+    section = selected.sections[0]
+    quote = "客户A销售占比为25%"
+    start = section.normalized_text.index(quote)
+    response = {
+        "schema_version": "business_profile_atomic_extraction.v1",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "activities": [],
+        "relationships": [
+            {
+                "subject_scope": "issuer",
+                "relationship_type": "sells_to",
+                "counterparty_name_raw": "客户A",
+                "anonymous": True,
+                "disclosed_share": 0.25,
+                "object_raw": None,
+                "evidence": {
+                    "section_id": section.section_id,
+                    "page_number": 1,
+                    "quote": quote,
+                    "section_start": start,
+                    "section_end": start + len(quote),
+                },
+            }
+        ],
+    }
+
+    envelope = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_async(
+        field_family="named_relationships",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert envelope.relationships[0]["anonymous"] is True
+    assert envelope.relationships[0]["disclosed_share"] == 0.25
+
+
+@pytest.mark.asyncio
+async def test_mixed_partial_response_is_rejected():
+    selected = _selected()
+    relationship_selected = _selected("主要业务：公司向客户股份有限公司销售动力煤。")
+    relationship_section = relationship_selected.sections[0]
+    quote = "公司向客户股份有限公司销售动力煤"
+    start = relationship_section.normalized_text.index(quote)
+    relationship = {
+        "subject_scope": "issuer",
+        "relationship_type": "sells_to",
+        "counterparty_name_raw": "客户股份有限公司",
+        "object_raw": "动力煤",
+        "evidence": {
+            "section_id": relationship_section.section_id,
+            "page_number": 1,
+            "quote": quote,
+            "section_start": start,
+            "section_end": start + len(quote),
+        },
+    }
+
+    mixed = _activity_response(selected)
+    mixed["relationships"] = [relationship]
     with pytest.raises(ValueError, match="expected to be empty|incompatible"):
         await BusinessProfileSemanticExtractor(_FakeGateway([mixed])).extract_async(
             field_family="atomic_activities",
             instrument_id="601088.SH",
             report_period="2025-12-31",
-            selected=mixed_selected,
+            selected=selected,
         )
 
 

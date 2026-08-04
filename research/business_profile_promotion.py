@@ -45,6 +45,12 @@ _MACHINE_REWORK_REASONS = frozenset(
         "runtime_identity_mismatch",
         "manifest_not_promoted",
         "stale_catalog",
+        "transformation_lineage_missing",
+        "product_mapping_required",
+        "ambiguous_or_unsupported_exposure_direction",
+        "ambiguous_or_unpromoted_product_commodity_mapping",
+        "ambiguous_product_commodity_mapping",
+        "stale_product_commodity_catalog",
     }
 )
 _QUICK_REVIEW_REASONS = frozenset({"entity_ambiguity", "exact_alias_ambiguity"})

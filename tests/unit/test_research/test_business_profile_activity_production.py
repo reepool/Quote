@@ -79,9 +79,7 @@ def test_activity_candidate_is_atomic_and_role_is_derived_locally():
     assert activity["action"] == "produces"
     assert "role" not in activity
     assert roles[0]["role"] == "producer"
-    assert roles[0]["metadata"]["supporting_activity_ids"] == [
-        activity["activity_id"]
-    ]
+    assert roles[0]["metadata"]["supporting_activity_ids"] == [activity["activity_id"]]
     assert roles[0]["metadata"]["valuation_effects"] == {}
 
 
@@ -110,13 +108,61 @@ def test_multiple_segment_roles_are_preserved_and_scope_ambiguity_fails_closed()
             extraction_method="native_text",
         )
         activities.append({**candidate, "review_status": "approved"})
-    roles = producer.derive_role_candidates(activities)
+    linked_activities = []
+    for action, object_raw in (("purchases", "原煤"), ("sells", "洗选煤")):
+        linked = producer.build_activity_candidate(
+            {
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": action,
+                "object_type": "product",
+                "object_raw": object_raw,
+                "segment_id": "washing",
+                "confidence": 1.0,
+            },
+            evidence_id="evidence-2025-ar",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+            extraction_method="native_text",
+        )
+        linked_activities.append({**linked, "review_status": "approved"})
+    processor_activity = next(
+        item for item in activities if item["action"] == "processes"
+    )
+    processor_activity["metadata"].update(
+        {
+            "transformation_input_activity_ids": [linked_activities[0]["activity_id"]],
+            "transformation_input_fact_ids": ["fact-raw-coal-volume"],
+            "transformation_output_activity_ids": [linked_activities[1]["activity_id"]],
+        }
+    )
+    supporting_facts = [
+        {
+            "record_id": "fact-raw-coal-volume",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "segment_id": "washing",
+            "review_status": "approved",
+        }
+    ]
+    activities.extend(linked_activities)
+    roles = producer.derive_role_candidates(
+        activities,
+        supporting_facts=supporting_facts,
+    )
     assert {(item["segment_id"], item["role"]) for item in roles} == {
         ("mine", "producer"),
         ("washing", "processor"),
         ("trading", "trader"),
     }
     assert all(item["metadata"]["valuation_effects"] == {} for item in roles)
+    processor = next(item for item in roles if item["role"] == "processor")
+    assert set(processor["metadata"]["supporting_activity_ids"]) >= {
+        linked_activities[0]["activity_id"],
+        linked_activities[1]["activity_id"],
+    }
+    assert processor["metadata"]["supporting_fact_ids"] == ["fact-raw-coal-volume"]
 
     with pytest.raises(ValueError, match="issuer scope is unresolved"):
         producer.build_activity_candidate(
@@ -133,6 +179,70 @@ def test_multiple_segment_roles_are_preserved_and_scope_ambiguity_fails_closed()
             data_available_date="2026-03-28",
             extraction_method="semantic",
         )
+
+
+def test_standalone_processes_activity_does_not_create_processor_role():
+    producer = BusinessProfileActivityProducer(_Repository())
+    candidate = producer.build_activity_candidate(
+        {
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "subject_scope": "issuer",
+            "action": "processes",
+            "object_type": "product",
+            "object_raw": "洗选煤",
+            "segment_id": "washing",
+            "confidence": 1.0,
+        },
+        evidence_id="evidence-2025-ar",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+        extraction_method="native_text",
+    )
+    approved = {**candidate, "review_status": "approved"}
+
+    assert producer.derive_role_candidates([approved]) == []
+    assert producer.role_derivation_gap(approved) == "transformation_lineage_missing"
+
+
+def test_processor_links_must_resolve_to_approved_same_scope_inputs_and_outputs():
+    producer = BusinessProfileActivityProducer(_Repository())
+
+    def activity(action, object_raw, segment_id):
+        candidate = producer.build_activity_candidate(
+            {
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": action,
+                "object_type": "product",
+                "object_raw": object_raw,
+                "segment_id": segment_id,
+                "confidence": 1.0,
+            },
+            evidence_id="evidence-2025-ar",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+            extraction_method="native_text",
+        )
+        return {**candidate, "review_status": "approved"}
+
+    input_activity = activity("purchases", "原煤", "mine")
+    output_activity = activity("sells", "洗选煤", "washing")
+    processor = activity("processes", "洗选煤", "washing")
+    processor["metadata"].update(
+        {
+            "transformation_input_activity_ids": [input_activity["activity_id"]],
+            "transformation_output_activity_ids": [output_activity["activity_id"]],
+        }
+    )
+    rows = [input_activity, output_activity, processor]
+
+    assert producer.derive_role_candidates(rows) == []
+    assert (
+        producer.role_derivation_gap(processor, activities=rows)
+        == "transformation_lineage_missing"
+    )
 
 
 def test_named_relationship_requires_resolved_entity_and_preserves_direction():

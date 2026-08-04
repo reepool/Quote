@@ -152,7 +152,7 @@ SEMANTIC_VERIFICATION_SCHEMA = _closed_object(
     {
         "schema_version": {"const": "business_profile_semantic_verification.v1"},
         "verification_id": {"type": "string", "minLength": 1},
-        "target_type": {"enum": ["activity", "relationship"]},
+        "target_type": {"enum": ["activity", "relationship", "concentration"]},
         "target_id": {"type": "string", "minLength": 1},
         "decision": {"enum": ["confirmed", "conflict", "insufficient_evidence"]},
         "checks": _closed_object(

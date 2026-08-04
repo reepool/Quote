@@ -122,10 +122,14 @@ class BusinessProfileExposureFactProducer:
         }
 
     def persist_from_activity_id(self, activity_id: str) -> dict[str, Any]:
-        activity = _find_record(self.repository, "activities", "activity_id", activity_id)
+        activity = _find_record(
+            self.repository, "activities", "activity_id", activity_id
+        )
         fact = self.build_from_activity(activity)
         self.repository.upsert("exposure_facts", fact)
-        return _find_record(self.repository, "exposure_facts", "fact_id", fact["fact_id"])
+        return _find_record(
+            self.repository, "exposure_facts", "fact_id", fact["fact_id"]
+        )
 
 
 class GovernedCommodityMappingResolver:
@@ -164,8 +168,8 @@ class GovernedCommodityMappingResolver:
             catalog_version=self.catalog.catalog_version,
             product_id=product_id,
             exposure_role=exposure_role,
-            commodity_id=product_id,
-            price_series_id=target.reference_id,
+            commodity_id=mapping.commodity_id,
+            price_series_id=str(target.price_series_id),
             reference_type=target.reference_type,
         )
 
@@ -306,19 +310,25 @@ class BusinessProfileExposurePublisher:
         )
         normalized_consumer_id = str(consumer_id or "").strip() or None
         if assumptions and not normalized_consumer_id:
-            raise ValueError("consumer_id is required for assumption-bearing publication")
+            raise ValueError(
+                "consumer_id is required for assumption-bearing publication"
+            )
         assumption_ids = [item["assumption_id"] for item in assumptions]
         assumption_values = {
             _ASSUMPTION_TYPES[item["assumption_type"]]: item["assumption_value"]
             for item in assumptions
             if _ASSUMPTION_TYPES[item["assumption_type"]] is not None
         }
-        direction_rule_id = f"{DIRECTION_RULE_VERSION}:{action}:{exposure_role}:{direction}"
+        direction_rule_id = (
+            f"{DIRECTION_RULE_VERSION}:{action}:{exposure_role}:{direction}"
+        )
         component_lineage = {
             "fact_ids": [fact_id],
             "mapping_ids": [mapping.mapping_id],
             "assumption_ids": assumption_ids,
-            "assumption_lineage_hashes": [item.get("lineage_hash") for item in assumptions],
+            "assumption_lineage_hashes": [
+                item.get("lineage_hash") for item in assumptions
+            ],
             "direction_rule_id": direction_rule_id,
             "fact_lineage_hash": fact.get("lineage_hash"),
             "catalog_version": mapping.catalog_version,
@@ -412,11 +422,11 @@ class BusinessProfileExposurePublisher:
         payload["supersedes_exposure_id"] = (
             predecessor.get("exposure_id") if predecessor else None
         )
-        payload["version"] = int(predecessor.get("version") or 1) + 1 if predecessor else 1
-        self.repository.upsert("exposures", payload)
-        current = _find_record(
-            self.repository, "exposures", "exposure_id", exposure_id
+        payload["version"] = (
+            int(predecessor.get("version") or 1) + 1 if predecessor else 1
         )
+        self.repository.upsert("exposures", payload)
+        current = _find_record(self.repository, "exposures", "exposure_id", exposure_id)
         audit = self.review_service.system_promote_record(
             "exposures",
             exposure_id,
@@ -455,7 +465,9 @@ class BusinessProfileExposurePublisher:
             raise ValueError(f"unsupported required exposure assumptions: {unknown}")
         if not requested:
             return []
-        valid_scopes = {str(item).strip() for item in scope_ids if str(item or "").strip()}
+        valid_scopes = {
+            str(item).strip() for item in scope_ids if str(item or "").strip()
+        }
         approved = self.repository.get_approved_as_of(
             "exposure_assumptions",
             instrument_id=instrument_id,
@@ -510,7 +522,9 @@ def _fact_type(action: str, *, value: Any, unit: str | None) -> str:
         return "production_volume" if value is not None else "production_activity"
     if action == "hedges":
         return "hedge_notional" if value is not None else "hedge_activity"
-    prefix = {"sells": "sales", "purchases": "purchase", "consumes": "consumption"}[action]
+    prefix = {"sells": "sales", "purchases": "purchase", "consumes": "consumption"}[
+        action
+    ]
     if value is None:
         return f"{prefix}_activity"
     if unit in {"CNY", "HKD", "USD"}:
@@ -537,7 +551,9 @@ def _find_approved_as_of(
     raise ValueError(f"approved component unavailable at cutoff: {record_type}:{value}")
 
 
-def _find_record(repository: Any, record_type: str, pk: str, value: str) -> dict[str, Any]:
+def _find_record(
+    repository: Any, record_type: str, pk: str, value: str
+) -> dict[str, Any]:
     item = _find_optional_record(repository, record_type, pk, value)
     if item is None:
         raise ValueError(f"business profile record not found: {record_type}:{value}")
@@ -569,7 +585,9 @@ def _contains_model_origin(value: Any) -> bool:
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
         return any(_contains_model_origin(item) for item in value)
     normalized = str(value or "").strip().lower()
-    return any(token in normalized for token in ("llm", "language_model", "model_generated"))
+    return any(
+        token in normalized for token in ("llm", "language_model", "model_generated")
+    )
 
 
 def _stable_hash(value: Any) -> str:

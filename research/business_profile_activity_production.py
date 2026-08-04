@@ -15,7 +15,6 @@ ACTIVITY_ROLE_RULES = {
     "extracts": "producer",
     "cultivates": "producer",
     "produces": "producer",
-    "processes": "processor",
     "transports": "logistics_provider",
     "stores": "storage_provider",
     "trades": "trader",
@@ -118,9 +117,12 @@ class BusinessProfileActivityProducer:
         data_available_date: str,
         extraction_method: str,
     ) -> dict[str, Any]:
-        action = _required_choice(assertion, "action", set(ACTIVITY_ROLE_RULES) | {
-            "purchases", "consumes", "sells", "hedges"
-        })
+        action = _required_choice(
+            assertion,
+            "action",
+            set(ACTIVITY_ROLE_RULES)
+            | {"processes", "purchases", "consumes", "sells", "hedges"},
+        )
         instrument_id = _required_text(assertion, "instrument_id")
         report_period = _required_text(assertion, "report_period")
         object_raw = _required_text(assertion, "object_raw")
@@ -281,19 +283,46 @@ class BusinessProfileActivityProducer:
     def derive_role_candidates(
         self,
         activities: Iterable[Mapping[str, Any]],
+        *,
+        supporting_facts: Iterable[Mapping[str, Any]] = (),
     ) -> list[dict[str, Any]]:
+        activity_rows = tuple(activities)
+        activities_by_id, facts_by_id = _governed_support_indexes(
+            activity_rows,
+            supporting_facts,
+        )
         output: list[dict[str, Any]] = []
-        for activity in activities:
+        for activity in activity_rows:
             if activity.get("review_status") != "approved":
                 continue
-            role = ACTIVITY_ROLE_RULES.get(str(activity.get("action") or ""))
+            action = str(activity.get("action") or "")
+            transformation = _transformation_support(
+                activity,
+                activities_by_id=activities_by_id,
+                facts_by_id=facts_by_id,
+            )
+            role = (
+                "processor"
+                if action == "processes" and transformation is not None
+                else ACTIVITY_ROLE_RULES.get(action)
+            )
             if role is None:
                 continue
             activity_id = _required_text(activity, "activity_id")
+            supporting_activity_ids = list(
+                dict.fromkeys(
+                    (
+                        activity_id,
+                        *(transformation[0] if transformation else ()),
+                    )
+                )
+            )
+            supporting_fact_ids = list(transformation[1] if transformation else ())
             record_id = _stable_id(
                 "value-chain-role",
                 {
-                    "activity_id": activity_id,
+                    "supporting_activity_ids": supporting_activity_ids,
+                    "supporting_fact_ids": supporting_fact_ids,
                     "role": role,
                     "segment_id": activity.get("segment_id"),
                     "rule_version": ROLE_RULE_VERSION,
@@ -320,13 +349,61 @@ class BusinessProfileActivityProducer:
                     "knowledge_to": activity.get("knowledge_to"),
                     "version": 1,
                     "metadata": {
-                        "supporting_activity_ids": [activity_id],
+                        "supporting_activity_ids": supporting_activity_ids,
+                        "supporting_fact_ids": supporting_fact_ids,
                         "role_rule_version": ROLE_RULE_VERSION,
                         "valuation_effects": {},
                     },
                 }
             )
         return output
+
+    @staticmethod
+    def role_derivation_gap(
+        activity: Mapping[str, Any],
+        *,
+        activities: Iterable[Mapping[str, Any]] = (),
+        supporting_facts: Iterable[Mapping[str, Any]] = (),
+    ) -> str | None:
+        activity_rows = list(activities)
+        activity_id = str(activity.get("activity_id") or "")
+        if activity_id and all(
+            str(item.get("activity_id") or "") != activity_id for item in activity_rows
+        ):
+            activity_rows.append(activity)
+        return BusinessProfileActivityProducer.role_derivation_gaps(
+            activity_rows,
+            supporting_facts=supporting_facts,
+        ).get(activity_id)
+
+    @staticmethod
+    def role_derivation_gaps(
+        activities: Iterable[Mapping[str, Any]],
+        *,
+        supporting_facts: Iterable[Mapping[str, Any]] = (),
+    ) -> dict[str, str]:
+        activity_rows = tuple(activities)
+        activities_by_id, facts_by_id = _governed_support_indexes(
+            activity_rows,
+            supporting_facts,
+        )
+        gaps: dict[str, str] = {}
+        for activity in activity_rows:
+            activity_id = str(activity.get("activity_id") or "")
+            if not activity_id:
+                continue
+            if (
+                activity.get("review_status") == "approved"
+                and str(activity.get("action") or "") == "processes"
+                and _transformation_support(
+                    activity,
+                    activities_by_id=activities_by_id,
+                    facts_by_id=facts_by_id,
+                )
+                is None
+            ):
+                gaps[activity_id] = "transformation_lineage_missing"
+        return gaps
 
 
 def classify_entity_resolution_exception(
@@ -349,7 +426,13 @@ def classify_entity_resolution_exception(
 
 def _resolution(matches: Sequence[Mapping[str, Any]], basis: str) -> EntityResolution:
     entity_ids = tuple(
-        sorted({str(item.get("entity_id") or "").strip() for item in matches if item.get("entity_id")})
+        sorted(
+            {
+                str(item.get("entity_id") or "").strip()
+                for item in matches
+                if item.get("entity_id")
+            }
+        )
     )
     if len(entity_ids) != 1:
         return EntityResolution(
@@ -359,7 +442,9 @@ def _resolution(matches: Sequence[Mapping[str, Any]], basis: str) -> EntityResol
             None,
             entity_ids,
         )
-    entity = next(item for item in matches if str(item.get("entity_id")) == entity_ids[0])
+    entity = next(
+        item for item in matches if str(item.get("entity_id")) == entity_ids[0]
+    )
     return EntityResolution(
         "resolved",
         entity_ids[0],
@@ -375,6 +460,99 @@ def _date_eligible(value: Mapping[str, Any], cutoff: str | None) -> bool:
     start = str(value.get("valid_from") or "")[:10]
     end = str(value.get("valid_to") or "")[:10]
     return (not start or start <= cutoff) and (not end or cutoff < end)
+
+
+def _transformation_support(
+    activity: Mapping[str, Any],
+    *,
+    activities_by_id: Mapping[str, Mapping[str, Any]] | None = None,
+    facts_by_id: Mapping[str, Mapping[str, Any]] | None = None,
+) -> tuple[tuple[str, ...], tuple[str, ...]] | None:
+    metadata = activity.get("metadata")
+    if not isinstance(metadata, Mapping):
+        return None
+    input_activity_ids = _metadata_id_tuple(
+        metadata, "transformation_input_activity_ids"
+    )
+    output_activity_ids = _metadata_id_tuple(
+        metadata, "transformation_output_activity_ids"
+    )
+    input_fact_ids = _metadata_id_tuple(metadata, "transformation_input_fact_ids")
+    output_fact_ids = _metadata_id_tuple(metadata, "transformation_output_fact_ids")
+    if not (input_activity_ids or input_fact_ids) or not (
+        output_activity_ids or output_fact_ids
+    ):
+        return None
+    if not _governed_links_match_scope(
+        activity,
+        activity_ids=(*input_activity_ids, *output_activity_ids),
+        fact_ids=(*input_fact_ids, *output_fact_ids),
+        activities_by_id=activities_by_id or {},
+        facts_by_id=facts_by_id or {},
+    ):
+        return None
+    return (
+        tuple(dict.fromkeys((*input_activity_ids, *output_activity_ids))),
+        tuple(dict.fromkeys((*input_fact_ids, *output_fact_ids))),
+    )
+
+
+def _governed_support_indexes(
+    activities: Iterable[Mapping[str, Any]],
+    supporting_facts: Iterable[Mapping[str, Any]],
+) -> tuple[dict[str, Mapping[str, Any]], dict[str, Mapping[str, Any]]]:
+    activities_by_id = {
+        str(item.get("activity_id") or ""): item
+        for item in activities
+        if item.get("review_status") == "approved" and item.get("activity_id")
+    }
+    facts_by_id: dict[str, Mapping[str, Any]] = {}
+    for item in supporting_facts:
+        if item.get("review_status") != "approved":
+            continue
+        record_id = str(item.get("record_id") or item.get("fact_id") or "")
+        if record_id:
+            facts_by_id[record_id] = item
+    return activities_by_id, facts_by_id
+
+
+def _governed_links_match_scope(
+    activity: Mapping[str, Any],
+    *,
+    activity_ids: Sequence[str],
+    fact_ids: Sequence[str],
+    activities_by_id: Mapping[str, Mapping[str, Any]],
+    facts_by_id: Mapping[str, Mapping[str, Any]],
+) -> bool:
+    source_activity_id = str(activity.get("activity_id") or "")
+    linked_rows: list[Mapping[str, Any]] = []
+    for activity_id in activity_ids:
+        if activity_id == source_activity_id or activity_id not in activities_by_id:
+            return False
+        linked_rows.append(activities_by_id[activity_id])
+    for fact_id in fact_ids:
+        if fact_id not in facts_by_id:
+            return False
+        linked_rows.append(facts_by_id[fact_id])
+    return bool(linked_rows) and all(
+        str(item.get("instrument_id") or "") == str(activity.get("instrument_id") or "")
+        and str(item.get("report_period") or "")
+        == str(activity.get("report_period") or "")
+        and (item.get("segment_id") or None) == (activity.get("segment_id") or None)
+        for item in linked_rows
+    )
+
+
+def _metadata_id_tuple(metadata: Mapping[str, Any], *keys: str) -> tuple[str, ...]:
+    output: list[str] = []
+    for key in keys:
+        values = metadata.get(key)
+        if not isinstance(values, Sequence) or isinstance(
+            values, (str, bytes, bytearray)
+        ):
+            continue
+        output.extend(str(item).strip() for item in values if str(item).strip())
+    return tuple(dict.fromkeys(output))
 
 
 def _required_text(value: Mapping[str, Any], key: str) -> str:

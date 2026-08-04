@@ -140,6 +140,21 @@
             "scope_widening": false
           },
           "note": "Disabled until frozen field-family manifests, bounded cohort validation, rollback drills, and exception-backlog gates pass."
+        },
+        "production_operations": {
+          "discovery_enabled": false,
+          "reconciliation_enabled": false,
+          "filing_season_months": [1, 2, 3, 4, 5, 7, 8, 9, 10],
+          "offseason_index_discovery": "weekdays",
+          "index_lookback_days": 10,
+          "index_overlap_days": 3,
+          "retry_policy": {
+            "machine_rework_max_attempts": 3,
+            "initial_backoff_hours": 24,
+            "max_backoff_days": 30
+          },
+          "rollback": "Disable discovery and semantic scheduler jobs; preserve frontier, manifests, immutable PDFs, candidates, approvals, and audit history.",
+          "note": "Index discovery runs on workdays year-round so off-season corrections remain visible; it performs no PDF download or LLM call. Weekly semantic work consumes a rotating bounded cohort; monthly, semiannual, and annual jobs are read-only reconciliations."
         }
       },
       "industry": {

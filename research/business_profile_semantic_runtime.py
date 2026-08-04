@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import sqlite3
 import time
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -14,8 +15,13 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from research.business_profile_activity_production import (
     BusinessProfileActivityProducer,
+    EntityResolution,
     GovernedCounterpartyResolver,
     classify_entity_resolution_exception,
+)
+from research.business_profile_archive import (
+    BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
+    BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES,
 )
 from research.business_profile_deterministic_extraction import (
     locate_action_object_spans,
@@ -306,8 +312,15 @@ def discover_business_profile_semantic_scope(
     max_instruments: int,
     field_families: Sequence[str],
     runtime_identities: Mapping[str, str],
+    active_universe_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
+    advance_rotation: bool = True,
 ) -> tuple[str, ...]:
-    """Find changed, incomplete, or retry-due instruments from persisted identities."""
+    """Find frontier changes, coverage gaps, stale facts, and retry-due issuers."""
+
+    from research.business_profile_production_operations import (
+        BusinessProfileAnnouncementFrontierRepository,
+        load_active_a_share_universe,
+    )
 
     storage = repository.storage
     manifest_repository = getattr(storage, "financial_statements", None)
@@ -320,9 +333,10 @@ def discover_business_profile_semantic_scope(
     manifests_by_instrument: dict[str, list[dict[str, Any]]] = {}
     for row in manifests:
         if (
-            row.get("schema_version") != "business_profile_source_file_manifest.v1"
+            row.get("schema_version") != BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
             or str(row.get("published_at") or "")[:10] > knowledge_cutoff
-            or str(row.get("status") or "") not in {"verified", "archived", "success"}
+            or str(row.get("status") or "")
+            not in BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES
             or not row.get("content_hash")
         ):
             continue
@@ -384,8 +398,143 @@ def discover_business_profile_semantic_scope(
             ):
                 changed.add(instrument_id)
                 break
-    changed.update(str(row["instrument_id"]) for row in retry_rows)
-    return tuple(sorted(changed)[: max(1, int(max_instruments))])
+    retry_due = {str(row["instrument_id"]) for row in retry_rows}
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    pending_frontier = set(
+        frontier.pending_instruments(knowledge_cutoff=knowledge_cutoff)
+    )
+    if active_universe_loader is not None:
+        universe_rows = tuple(active_universe_loader())
+    else:
+        quotes_path = Path(str(getattr(storage, "quotes_db_path", "") or ""))
+        universe_rows = (
+            load_active_a_share_universe(
+                storage,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            if quotes_path.is_file()
+            else ()
+        )
+    active_ids = {
+        str(item.get("instrument_id") or "").strip()
+        for item in universe_rows
+        if str(item.get("instrument_id") or "").strip()
+    }
+    known_scope_ids = pending_frontier | retry_due | changed
+    if not active_ids:
+        active_ids = set(manifests_by_instrument) | known_scope_ids
+    prioritized = sorted(known_scope_ids & active_ids)
+    limit = max(1, int(max_instruments))
+    selected = prioritized[:limit]
+    remaining = limit - len(selected)
+    missing_manifest = sorted(active_ids - set(manifests_by_instrument) - set(selected))
+    if remaining > 0 and missing_manifest:
+        state_key = "semantic_scope_rotation"
+        state = frontier.get_state(state_key)
+        offset = int(state.get("offset") or 0) % len(missing_manifest)
+        rotated = missing_manifest[offset:] + missing_manifest[:offset]
+        cohort = rotated[:remaining]
+        selected.extend(cohort)
+        if advance_rotation:
+            frontier.set_state(
+                state_key,
+                {
+                    "offset": (offset + len(cohort)) % len(missing_manifest),
+                    "universe_size": len(active_ids),
+                    "missing_manifest_count": len(missing_manifest),
+                    "updated_for_cutoff": knowledge_cutoff,
+                },
+            )
+    return tuple(selected)
+
+
+def build_business_profile_counterparty_resolver(
+    storage: Any,
+    *,
+    knowledge_cutoff: str | None = None,
+) -> GovernedCounterpartyResolver:
+    """Build an exact-match resolver from the governed local A-share master."""
+
+    quotes_db_path = Path(str(getattr(storage, "quotes_db_path", "") or ""))
+    if not quotes_db_path.is_file():
+        raise ValueError(
+            "named relationship production requires a readable quotes database"
+        )
+    with sqlite3.connect(f"file:{quotes_db_path.resolve()}?mode=ro", uri=True) as conn:
+        conn.row_factory = sqlite3.Row
+        table = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'instruments'"
+        ).fetchone()
+        if table is None:
+            raise ValueError(
+                "named relationship production requires the instruments table"
+            )
+        rows = conn.execute(
+            "SELECT instrument_id, name, listed_date, delisted_date "
+            "FROM instruments WHERE type = 'stock' "
+            "AND exchange IN ('SSE', 'SZSE', 'BSE') "
+            "AND instrument_id IS NOT NULL AND TRIM(name) <> ''"
+        ).fetchall()
+    entities_by_id = {
+        str(row["instrument_id"]): {
+            "entity_id": str(row["instrument_id"]),
+            "official_identifier": str(row["instrument_id"]),
+            "legal_name": str(row["name"]).strip(),
+            "valid_from": str(row["listed_date"] or "")[:10] or None,
+            "valid_to": str(row["delisted_date"] or "")[:10] or None,
+        }
+        for row in rows
+    }
+    aliases: list[dict[str, Any]] = []
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        profile_table = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+            "AND name = 'company_profiles'"
+        ).fetchone()
+        profile_rows = (
+            conn.execute(
+                "SELECT instrument_id, company_name, short_name, listed_date, "
+                "status, data_as_of FROM company_profiles"
+            ).fetchall()
+            if profile_table is not None
+            else ()
+        )
+    alias_owners: dict[str, set[str]] = {}
+    for row in profile_rows:
+        instrument_id = str(row["instrument_id"] or "")
+        entity = entities_by_id.get(instrument_id)
+        if entity is None:
+            continue
+        data_as_of = str(row["data_as_of"] or "")[:10]
+        if knowledge_cutoff and data_as_of and data_as_of > knowledge_cutoff:
+            continue
+        original_legal_name = str(entity["legal_name"] or "").strip()
+        company_name = str(row["company_name"] or "").strip()
+        if company_name:
+            entity["legal_name"] = company_name
+        if original_legal_name and original_legal_name != entity["legal_name"]:
+            alias_owners.setdefault(original_legal_name, set()).add(instrument_id)
+        short_name = str(row["short_name"] or "").strip()
+        if short_name and short_name != entity["legal_name"]:
+            alias_owners.setdefault(short_name, set()).add(instrument_id)
+    aliases.extend(
+        {
+            "entity_id": next(iter(owners)),
+            "alias": alias,
+            "review_status": "approved",
+            "valid_from": entities_by_id[next(iter(owners))].get("valid_from"),
+            "valid_to": entities_by_id[next(iter(owners))].get("valid_to"),
+        }
+        for alias, owners in alias_owners.items()
+        if len(owners) == 1
+    )
+    entities = list(entities_by_id.values())
+    if not entities:
+        raise ValueError(
+            "named relationship production requires governed A-share identities"
+        )
+    return GovernedCounterpartyResolver(entities=entities, aliases=aliases)
 
 
 class ContentAddressedStageArtifactStore:
@@ -1159,10 +1308,12 @@ class BusinessProfileSemanticRuntime:
             selected = _load_selected(
                 self.section_store, output["selected_artifact_path"]
             )
-            for record_type in ("activities", "relationships"):
-                target_type = (
-                    "activity" if record_type == "activities" else "relationship"
-                )
+            for record_type in ("activities", "relationships", "operating_facts"):
+                target_type = {
+                    "activities": "activity",
+                    "relationships": "relationship",
+                    "operating_facts": "concentration",
+                }[record_type]
                 for target_id in output["record_ids"].get(record_type, []):
                     target = self._find_record(record_type, target_id)
                     bypass = deterministic_semantic_verification_decision(target)
@@ -1566,30 +1717,36 @@ class BusinessProfileSemanticRuntime:
                 _bind_promotion_validation(record, evidence)
                 output.append(("activities", record))
             else:
-                resolution = self.counterparty_resolver.resolve(
-                    str(assertion["counterparty_name_raw"]),
-                    knowledge_cutoff=str(item["document"]["published_at"])[:10],
+                anonymous = assertion.get("anonymous") is True
+                resolution = (
+                    EntityResolution("unresolved", None, None, None)
+                    if anonymous
+                    else self.counterparty_resolver.resolve(
+                        str(assertion["counterparty_name_raw"]),
+                        knowledge_cutoff=str(item["document"]["published_at"])[:10],
+                    )
                 )
-                exception = classify_entity_resolution_exception(resolution)
-                if exception is not None:
-                    reason = (
-                        "entity_ambiguity"
-                        if exception["tier"] == "quick_review"
-                        else "catalog_proposal"
-                    )
-                    exceptions.append(
-                        {
-                            "instrument_id": item["instrument_id"],
-                            "field_family": item["field_family"],
-                            "source_document_id": item["document"]["identity"],
-                            "target_id": str(assertion["relationship_id"]),
-                            "tier": exception["tier"],
-                            "reason_code": reason,
-                            "ranked_choices": exception["ranked_local_choices"],
-                            "evidence_reference": evidence["evidence_id"],
-                        }
-                    )
-                    continue
+                if not anonymous:
+                    exception = classify_entity_resolution_exception(resolution)
+                    if exception is not None:
+                        reason = (
+                            "entity_ambiguity"
+                            if exception["tier"] == "quick_review"
+                            else "catalog_proposal"
+                        )
+                        exceptions.append(
+                            {
+                                "instrument_id": item["instrument_id"],
+                                "field_family": item["field_family"],
+                                "source_document_id": item["document"]["identity"],
+                                "target_id": str(assertion["relationship_id"]),
+                                "tier": exception["tier"],
+                                "reason_code": reason,
+                                "ranked_choices": exception["ranked_local_choices"],
+                                "evidence_reference": evidence["evidence_id"],
+                            }
+                        )
+                        continue
                 records["evidence"].append(evidence)
                 record_type, record = (
                     self.activity_producer.build_relationship_or_concentration_candidate(
@@ -1788,8 +1945,36 @@ class BusinessProfileSemanticRuntime:
                 "activities", instrument_id=instrument_id, cutoff=scope.knowledge_cutoff
             )
             if "derived_value_chain_roles" in scope.field_families:
+                operating_facts = self.repository.get_approved_as_of(
+                    "operating_facts",
+                    instrument_id=instrument_id,
+                    cutoff=scope.knowledge_cutoff,
+                )
                 manifest = self.promotion_manifests.get("derived_value_chain_roles")
-                for role in self.activity_producer.derive_role_candidates(activities):
+                gap_reasons = self.activity_producer.role_derivation_gaps(
+                    activities,
+                    supporting_facts=operating_facts,
+                )
+                for activity in activities:
+                    gap_reason = gap_reasons.get(str(activity.get("activity_id") or ""))
+                    if gap_reason:
+                        self._persist_runtime_exception(
+                            {
+                                "instrument_id": instrument_id,
+                                "field_family": "derived_value_chain_roles",
+                                "source_document_id": activity.get("evidence_id"),
+                                "target_id": activity.get("activity_id"),
+                                "tier": "machine_rework",
+                                "reason_code": gap_reason,
+                                "evidence_reference": activity.get("evidence_id"),
+                            },
+                            scope=scope,
+                            manifest=manifest,
+                        )
+                for role in self.activity_producer.derive_role_candidates(
+                    activities,
+                    supporting_facts=operating_facts,
+                ):
                     evidence = self.repository.get_record(
                         "evidence", str(role.get("evidence_id") or "")
                     )
@@ -1857,11 +2042,28 @@ class BusinessProfileSemanticRuntime:
                             )
                         )
                     except ValueError as exc:
+                        reason = _publication_gap_reason(exc)
+                        persisted = self._persist_runtime_exception(
+                            {
+                                "instrument_id": instrument_id,
+                                "field_family": "commodity_exposure_publication",
+                                "source_document_id": fact.get("evidence_id"),
+                                "target_id": fact["fact_id"],
+                                "tier": "machine_rework",
+                                "reason_code": reason,
+                                "evidence_reference": fact.get("evidence_id"),
+                            },
+                            scope=scope,
+                            manifest=self.promotion_manifests.get(
+                                "commodity_exposure_publication"
+                            ),
+                        )
                         result["publications"].append(
                             {
                                 "status": "input_gap",
                                 "fact_id": fact["fact_id"],
-                                "reason": str(exc),
+                                "reason": reason,
+                                "exception": persisted,
                             }
                         )
         return result
@@ -2417,6 +2619,18 @@ def _runtime_exception_target_id(exception: Mapping[str, Any]) -> str:
             }
         )[:24]
     )
+
+
+def _publication_gap_reason(exc: ValueError) -> str:
+    reason = str(exc).split(":", 1)[0].strip()
+    supported = {
+        "product_mapping_required",
+        "ambiguous_or_unsupported_exposure_direction",
+        "ambiguous_or_unpromoted_product_commodity_mapping",
+        "ambiguous_product_commodity_mapping",
+        "stale_product_commodity_catalog",
+    }
+    return reason if reason in supported else "catalog_proposal"
 
 
 def _load_source_manifests(

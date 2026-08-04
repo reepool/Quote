@@ -11830,6 +11830,41 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_business_profile_exceptions_target
             ON business_profile_exceptions(instrument_id, target_type, target_id);
 
+            CREATE TABLE IF NOT EXISTS business_profile_announcement_frontier (
+                frontier_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                source TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                title TEXT NOT NULL,
+                published_at TEXT,
+                report_period TEXT,
+                document_type TEXT NOT NULL,
+                index_payload_hash TEXT NOT NULL,
+                source_url TEXT,
+                status TEXT NOT NULL,
+                supersedes_frontier_id TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                first_seen_at TEXT NOT NULL,
+                last_seen_at TEXT NOT NULL,
+                processed_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(source, announcement_id, instrument_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_frontier_queue
+            ON business_profile_announcement_frontier(
+                status, published_at, exchange, instrument_id
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_operation_state (
+                state_key TEXT PRIMARY KEY,
+                state_value_json TEXT NOT NULL DEFAULT '{}',
+                updated_at TEXT NOT NULL
+            );
+
             CREATE TABLE IF NOT EXISTS company_profiles (
                 instrument_id TEXT PRIMARY KEY,
                 symbol TEXT NOT NULL,

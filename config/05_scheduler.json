@@ -995,6 +995,103 @@
           "max_runtime_seconds": 960
         }
       },
+      "business_profile_index_discovery_daily": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股业务画像公告索引发现（日更，仅元数据，不下载PDF、不调用LLM）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "month": "1-12",
+          "day_of_week": "mon-fri",
+          "hour": 6,
+          "minute": 20,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "start_date": null,
+          "end_date": null,
+          "lookback_days": 10,
+          "overlap_days": 3,
+          "page_size": 30,
+          "max_pages_per_market": 20,
+          "dry_run": false,
+          "max_runtime_seconds": 900
+        }
+      },
+      "business_profile_monthly_reconciliation": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股业务画像 manifest、归档、事实和停滞前沿月度对账",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_month": 1,
+          "hour": 12,
+          "minute": 10,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "knowledge_cutoff": null,
+          "include_archive_audit": true,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "business_profile_semiannual_freshness": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股业务画像半年报季后 freshness 对账（不强制全量重跑）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "month": "5,9",
+          "day_of_month": 15,
+          "hour": 12,
+          "minute": 20,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "knowledge_cutoff": null,
+          "include_archive_audit": false,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "business_profile_annual_coverage_reconciliation": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股业务画像年报季后全市场覆盖与轮换补齐对账",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "month": 5,
+          "day_of_month": 31,
+          "hour": 13,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 7200,
+        "coalesce": true,
+        "parameters": {
+          "knowledge_cutoff": null,
+          "include_archive_audit": true,
+          "max_runtime_seconds": 3600
+        }
+      },
       "industry_official_mapping_refresh": {
         "enabled": false,
         "description": "研究域申万官方历史分类映射审计缓存刷新（非 current membership 前置）",

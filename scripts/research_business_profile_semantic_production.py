@@ -24,6 +24,7 @@ from research.business_profile_semantic_pipeline import (
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
+    build_business_profile_counterparty_resolver,
     build_business_profile_planned_disclosure_acquirer,
     compute_business_profile_semantic_source_revision,
 )
@@ -87,6 +88,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         llm_client=llm_client,
         promotion_manifests=promotion_manifests,
+        counterparty_resolver=(
+            build_business_profile_counterparty_resolver(storage)
+            if args.mode != "report" and "named_relationships" in scope.field_families
+            else None
+        ),
         planned_disclosure_acquirer=(
             build_business_profile_planned_disclosure_acquirer(
                 repository,

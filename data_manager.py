@@ -1556,6 +1556,97 @@ class DataManager:
             resume=resume,
         )
 
+    async def run_business_profile_index_discovery(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        lookback_days: int = 10,
+        overlap_days: int = 3,
+        page_size: int = 30,
+        max_pages_per_market: int = 20,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run metadata-only official index discovery for business profiles."""
+
+        if not self.research_config.enabled:
+            return {"status": "disabled", "reason": "research_config.enabled is false"}
+        if self.research_storage is None:
+            return {"status": "unavailable", "reason": "research storage is not initialized"}
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        operations = dict(module.get("production_operations") or {})
+        if module.get("enabled") is not True or operations.get("discovery_enabled") is not True:
+            return {
+                "status": "disabled",
+                "reason": "business profile index discovery is disabled",
+            }
+        from research.business_profile_production_operations import (
+            BusinessProfileIndexDiscoveryService,
+        )
+
+        await asyncio.to_thread(self.research_storage.initialize)
+        service = BusinessProfileIndexDiscoveryService(
+            storage=self.research_storage,
+            announcement_service=self._build_official_announcement_acquisition_service(),
+        )
+        return await asyncio.to_thread(
+            service.discover,
+            exchanges=exchanges or ["SSE", "SZSE", "BSE"],
+            start_date=start_date,
+            end_date=end_date,
+            lookback_days=lookback_days,
+            overlap_days=overlap_days,
+            page_size=page_size,
+            max_pages_per_market=max_pages_per_market,
+            dry_run=dry_run,
+        )
+
+    async def run_business_profile_reconciliation(
+        self,
+        *,
+        frequency: str,
+        knowledge_cutoff: Optional[str] = None,
+        include_archive_audit: bool = False,
+    ) -> Dict[str, Any]:
+        """Run read-only profile coverage and optional archive reconciliation."""
+
+        if self.research_config is None or self.research_storage is None:
+            return {"status": "unavailable", "reason": "research storage is not initialized"}
+        if not self.research_config.enabled:
+            return {"status": "disabled", "reason": "research_config.enabled is false"}
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        operations = dict(module.get("production_operations") or {})
+        if (
+            module.get("enabled") is not True
+            or operations.get("reconciliation_enabled") is not True
+        ):
+            return {
+                "status": "disabled",
+                "reason": "business profile reconciliation is disabled",
+            }
+        from research.business_profile_production_operations import (
+            audit_business_profile_archive,
+            build_business_profile_reconciliation_report,
+        )
+
+        report = await asyncio.to_thread(
+            build_business_profile_reconciliation_report,
+            self.research_storage,
+            frequency=frequency,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        if include_archive_audit:
+            archive = dict(module.get("archive") or {})
+            report["archive_audit"] = await asyncio.to_thread(
+                audit_business_profile_archive,
+                self.research_storage,
+                archive_root=archive.get(
+                    "archive_root", "data/filings/business_profile"
+                ),
+            )
+        return report
+
     async def run_business_profile_semantic_production(
         self,
         *,
@@ -1578,6 +1669,7 @@ class DataManager:
         production_payload = dict(module.get("semantic_production") or {})
         if production_payload.get("enabled") is not True:
             return {"status": "disabled", "reason": "business profile semantic production is disabled"}
+        await asyncio.to_thread(self.research_storage.initialize)
         from research.business_profile_governance import BusinessProfileRepository
         from research.business_profile_semantic_pipeline import (
             BusinessProfileSemanticPipeline,
@@ -1587,6 +1679,7 @@ class DataManager:
         )
         from research.business_profile_semantic_runtime import (
             BusinessProfileSemanticRuntime,
+            build_business_profile_counterparty_resolver,
             build_business_profile_planned_disclosure_acquirer,
             compute_business_profile_semantic_source_revision,
             discover_business_profile_semantic_scope,
@@ -1619,6 +1712,14 @@ class DataManager:
         identities = dict(
             runtime_identities or production_payload.get("runtime_identities") or {}
         )
+        if not families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": (
+                    "semantic production requires non-empty field families and "
+                    "runtime identities"
+                ),
+            }
         repository = BusinessProfileRepository(self.research_storage)
         instruments = tuple(
             convert_to_database_format(item) for item in (instrument_ids or []) if item
@@ -1638,12 +1739,11 @@ class DataManager:
                     "completed_stages": [],
                     "metrics": {"reused_results": 0, "elapsed_seconds": 0.0},
                 }
-        if not instruments or not families or not identities:
+        if not instruments:
             return {
                 "status": "not_ready",
                 "reason": (
-                    "semantic production requires discovered or explicit instruments, "
-                    "field families, and runtime identities"
+                    "semantic production requires discovered or explicit instruments"
                 ),
             }
         if config.promotion_enabled and set(families) - set(manifests):
@@ -1703,6 +1803,14 @@ class DataManager:
             artifact_root=checkpoint_root / "artifacts",
             llm_client=llm_client,
             promotion_manifests=manifests,
+            counterparty_resolver=(
+                build_business_profile_counterparty_resolver(
+                    self.research_storage,
+                    knowledge_cutoff=cutoff,
+                )
+                if mode != "report" and "named_relationships" in families
+                else None
+            ),
             planned_disclosure_acquirer=planned_disclosure_acquirer,
         )
 
@@ -1742,7 +1850,16 @@ class DataManager:
         )
         def run_pipeline() -> Dict[str, Any]:
             try:
-                return pipeline.run(mode, scope=scope)
+                result = pipeline.run(mode, scope=scope)
+                if result.get("pipeline_status") == "completed":
+                    from research.business_profile_production_operations import (
+                        BusinessProfileAnnouncementFrontierRepository,
+                    )
+
+                    BusinessProfileAnnouncementFrontierRepository(
+                        self.research_storage
+                    ).mark_manifested_processed(scope.instruments)
+                return result
             finally:
                 runtime.close()
 

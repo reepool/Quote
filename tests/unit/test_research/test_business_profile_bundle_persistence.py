@@ -39,7 +39,7 @@ def _run(run_id="run-1"):
         "field_family": "atomic_activities",
         "bundle_hash": "bundle-hash",
         "fact_catalog_version": "business_profile_facts.2026.2",
-        "product_catalog_version": "business_profile_products.2026.2",
+        "product_catalog_version": "business_profile_products.2026.3",
         "metadata": {"document_hash": "document-hash"},
     }
 
@@ -123,9 +123,12 @@ def _assert_empty(repository, storage):
     assert repository.list_records("relationships") == []
     with storage.get_connection() as conn:
         storage._apply_pragmas(conn)
-        assert conn.execute(
-            "SELECT COUNT(*) FROM business_profile_semantic_runs"
-        ).fetchone()[0] == 0
+        assert (
+            conn.execute(
+                "SELECT COUNT(*) FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+            == 0
+        )
 
 
 def test_valid_document_field_family_bundle_commits_once(tmp_path):
@@ -164,9 +167,7 @@ def test_valid_document_field_family_bundle_commits_once(tmp_path):
     [
         (lambda run, rows: run.update(fact_catalog_version="stale"), "catalog"),
         (
-            lambda run, rows: rows["evidence"][0].update(
-                instrument_id="600000.SH"
-            ),
+            lambda run, rows: rows["evidence"][0].update(instrument_id="600000.SH"),
             "evidence instrument mismatch",
         ),
         (
