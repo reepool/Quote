@@ -7302,12 +7302,28 @@ class ResearchStorageManager:
                 and scan_result.provider_cursor is not None
                 else prior_cursor
             )
+            if (
+                committed_cursor is not None
+                and prior_cursor is not None
+                and committed_cursor.kind == prior_cursor.kind == "published_at"
+                and committed_cursor.value < prior_cursor.value
+            ):
+                committed_cursor = prior_cursor
             committed_max_published_at = (
                 scan_result.max_published_at
                 if scan_result.cursor_commit_allowed
                 and scan_result.max_published_at is not None
                 else (None if prior is None else prior["max_published_at"])
             )
+            if (
+                committed_max_published_at is not None
+                and prior is not None
+                and prior["max_published_at"] is not None
+            ):
+                committed_max_published_at = max(
+                    str(committed_max_published_at),
+                    str(prior["max_published_at"]),
+                )
             merged_metadata = {
                 **(metadata or {}),
                 "cursor_commit_allowed": scan_result.cursor_commit_allowed,
@@ -11863,6 +11879,42 @@ class ResearchStorageManager:
                 state_key TEXT PRIMARY KEY,
                 state_value_json TEXT NOT NULL DEFAULT '{}',
                 updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_work_items (
+                work_id TEXT PRIMARY KEY,
+                frontier_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                source TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                document_type TEXT NOT NULL,
+                policy TEXT NOT NULL,
+                processing_identity_hash TEXT NOT NULL,
+                stage TEXT NOT NULL,
+                status TEXT NOT NULL,
+                attempt_count INTEGER NOT NULL DEFAULT 0,
+                max_attempts INTEGER NOT NULL DEFAULT 3,
+                next_attempt_at TEXT,
+                lease_owner TEXT,
+                lease_expires_at TEXT,
+                checkpoint_path TEXT NOT NULL,
+                last_error TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                completed_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(frontier_id, policy, processing_identity_hash)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_work_queue
+            ON business_profile_work_items(
+                stage, status, next_attempt_at, lease_expires_at, created_at
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_work_instrument
+            ON business_profile_work_items(
+                instrument_id, report_period, policy, status, updated_at
             );
 
             CREATE TABLE IF NOT EXISTS company_profiles (

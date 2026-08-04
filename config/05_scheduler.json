@@ -966,45 +966,15 @@
           "max_runtime_seconds": 960
         }
       },
-      "business_profile_semantic_maintenance": {
+      "business_profile_daily_incremental": {
         "enabled": false,
         "manual_only": false,
-        "description": "A股业务画像语义增量生产（默认关闭，仅处理哈希变化、覆盖缺口和到期机器重试）",
-        "report": true,
-        "pre_run_notify": false,
-        "trigger": {
-          "type": "cron",
-          "day_of_week": "sun",
-          "hour": 11,
-          "minute": 0,
-          "second": 0
-        },
-        "max_instances": 1,
-        "misfire_grace_time": 1800,
-        "coalesce": true,
-        "parameters": {
-          "mode": "resume",
-          "knowledge_cutoff": null,
-          "instrument_ids": [],
-          "field_families": [],
-          "runtime_identities": {},
-          "promotion_manifest_hashes": {},
-          "promotion_manifests": {},
-          "max_instruments": 30,
-          "checkpoint_path": null,
-          "max_runtime_seconds": 960
-        }
-      },
-      "business_profile_index_discovery_daily": {
-        "enabled": false,
-        "manual_only": false,
-        "description": "A股业务画像公告索引发现（日更，仅元数据，不下载PDF、不调用LLM）",
+        "description": "A股业务画像异步日更（发现优先，latest annual only，分阶段有界推进）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
           "month": "1-12",
-          "day_of_week": "mon-fri",
           "hour": 6,
           "minute": 20,
           "second": 0
@@ -1013,83 +983,53 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "knowledge_cutoff": null,
           "exchanges": ["SSE", "SZSE", "BSE"],
-          "start_date": null,
-          "end_date": null,
-          "lookback_days": 10,
-          "overlap_days": 3,
-          "page_size": 30,
-          "max_pages_per_market": 20,
-          "dry_run": false,
-          "max_runtime_seconds": 900
+          "field_families": [],
+          "runtime_identities": {},
+          "max_attempts": 3,
+          "discovery_kwargs": {
+            "lookback_days": 10,
+            "overlap_days": 3,
+            "page_size": 30,
+            "max_pages_per_market": 240,
+            "max_windows_per_market": 2
+          },
+          "stage_budgets": {
+            "acquire": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 300, "high_water_mark": 1000},
+            "parse": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000},
+            "semantic": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 500},
+            "publish": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000}
+          },
+          "max_runtime_seconds": 2700
         }
       },
-      "business_profile_monthly_reconciliation": {
+      "business_profile_backfill": {
         "enabled": false,
-        "manual_only": false,
-        "description": "A股业务画像 manifest、归档、事实和停滞前沿月度对账",
-        "report": true,
-        "pre_run_notify": false,
-        "trigger": {
-          "type": "cron",
-          "day_of_month": 1,
-          "hour": 12,
-          "minute": 10,
-          "second": 0
-        },
-        "max_instances": 1,
-        "misfire_grace_time": 3600,
-        "coalesce": true,
-        "parameters": {
-          "knowledge_cutoff": null,
-          "include_archive_audit": true,
-          "max_runtime_seconds": 1800
-        }
-      },
-      "business_profile_semiannual_freshness": {
-        "enabled": false,
-        "manual_only": false,
-        "description": "A股业务画像半年报季后 freshness 对账（不强制全量重跑）",
-        "report": true,
-        "pre_run_notify": false,
-        "trigger": {
-          "type": "cron",
-          "month": "5,9",
-          "day_of_month": 15,
-          "hour": 12,
-          "minute": 20,
-          "second": 0
-        },
-        "max_instances": 1,
-        "misfire_grace_time": 3600,
-        "coalesce": true,
-        "parameters": {
-          "knowledge_cutoff": null,
-          "include_archive_audit": false,
-          "max_runtime_seconds": 1800
-        }
-      },
-      "business_profile_annual_coverage_reconciliation": {
-        "enabled": false,
-        "manual_only": false,
-        "description": "A股业务画像年报季后全市场覆盖与轮换补齐对账",
+        "manual_only": true,
+        "description": "A股业务画像历史或特殊公告手工回补（必须显式公司或日期范围）",
         "report": true,
         "pre_run_notify": true,
-        "trigger": {
-          "type": "cron",
-          "month": 5,
-          "day_of_month": 31,
-          "hour": 13,
-          "minute": 0,
-          "second": 0
-        },
         "max_instances": 1,
-        "misfire_grace_time": 7200,
+        "misfire_grace_time": 3600,
         "coalesce": true,
         "parameters": {
           "knowledge_cutoff": null,
-          "include_archive_audit": true,
-          "max_runtime_seconds": 3600
+          "instrument_ids": [],
+          "start_date": null,
+          "end_date": null,
+          "document_types": [],
+          "field_families": [],
+          "runtime_identities": {},
+          "force": false,
+          "max_attempts": 3,
+          "stage_budgets": {
+            "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+            "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+            "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+            "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+          },
+          "max_runtime_seconds": 5400
         }
       },
       "industry_official_mapping_refresh": {

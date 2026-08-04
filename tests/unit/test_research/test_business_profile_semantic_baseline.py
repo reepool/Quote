@@ -85,7 +85,7 @@ def test_baseline_is_read_only_hash_bound_and_counts_governed_inputs(tmp_path):
                         "enabled": False,
                         "manual_only": False,
                     },
-                    "business_profile_semantic_maintenance": {
+                    "business_profile_daily_incremental": {
                         "enabled": False,
                         "manual_only": False,
                     },

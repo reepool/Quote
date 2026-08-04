@@ -24,7 +24,8 @@ from research.business_profile_temporal import get_business_profile_temporal_pol
 
 
 DISCLOSURE_PLAN_SCHEMA_VERSION = "business_profile_disclosure_plan.v1"
-DISCLOSURE_PLANNER_POLICY_VERSION = "business_profile_minimum_disclosure.v1"
+DISCLOSURE_PLANNER_POLICY_VERSION = "business_profile_latest_annual.v2"
+DISCLOSURE_SELECTION_POLICIES = {"latest_annual_only", "expanded"}
 
 _SPECIALIST_FAMILY_RULES: dict[str, frozenset[str]] = {
     "operating_data": frozenset(
@@ -232,6 +233,7 @@ class BusinessProfileDisclosurePlanner:
         artifact_root: Optional[str | Path] = None,
         max_documents: int = 3,
         max_specialist_documents: int = 1,
+        selection_policy: str = "latest_annual_only",
     ) -> None:
         if max_documents < 1:
             raise ValueError("max_documents must be positive")
@@ -243,6 +245,12 @@ class BusinessProfileDisclosurePlanner:
         self.artifact_root = None if artifact_root is None else Path(artifact_root)
         self.max_documents = int(max_documents)
         self.max_specialist_documents = int(max_specialist_documents)
+        normalized_policy = str(selection_policy or "").strip().lower()
+        if normalized_policy not in DISCLOSURE_SELECTION_POLICIES:
+            raise ValueError(
+                f"unsupported business-profile disclosure policy: {selection_policy}"
+            )
+        self.selection_policy = normalized_policy
 
     def plan(
         self,
@@ -283,24 +291,25 @@ class BusinessProfileDisclosurePlanner:
                 included.append((annual, "latest_active_annual_baseline"))
 
             semis = _active_periodic_documents(eligible, "semiannual_report")
-            semi = max(semis, key=_document_sort_key) if semis else None
-            if (
-                semi is not None
-                and family in _SEMIANNUAL_FAMILIES
-                and (annual is None or semi.report_period > annual.report_period)
-                and _semiannual_needed(coverage, semi)
-            ):
-                included.append((semi, "newer_time_sensitive_semiannual"))
+            if self.selection_policy == "expanded":
+                semi = max(semis, key=_document_sort_key) if semis else None
+                if (
+                    semi is not None
+                    and family in _SEMIANNUAL_FAMILIES
+                    and (annual is None or semi.report_period > annual.report_period)
+                    and _semiannual_needed(coverage, semi)
+                ):
+                    included.append((semi, "newer_time_sensitive_semiannual"))
 
-            specialist = [
-                item
-                for item in eligible
-                if family in _SPECIALIST_FAMILY_RULES.get(item.document_family, ())
-                and _specialist_is_material(item)
-            ]
-            specialist.sort(key=_document_sort_key, reverse=True)
-            for item in specialist[: self.max_specialist_documents]:
-                included.append((item, f"governed_specialist:{item.document_family}"))
+                specialist = [
+                    item
+                    for item in eligible
+                    if family in _SPECIALIST_FAMILY_RULES.get(item.document_family, ())
+                    and _specialist_is_material(item)
+                ]
+                specialist.sort(key=_document_sort_key, reverse=True)
+                for item in specialist[: self.max_specialist_documents]:
+                    included.append((item, f"governed_specialist:{item.document_family}"))
 
             included_ids = {item.identity for item, _ in included}
             active_ids = {
@@ -354,6 +363,7 @@ class BusinessProfileDisclosurePlanner:
             "bounds": {
                 "max_documents": self.max_documents,
                 "max_specialist_documents": self.max_specialist_documents,
+                "selection_policy": self.selection_policy,
             },
             "complete": complete,
             "completeness_gaps": gaps,

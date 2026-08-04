@@ -1567,6 +1567,8 @@ class DataManager:
         page_size: int = 30,
         max_pages_per_market: int = 20,
         dry_run: bool = False,
+        resumable_windows: bool = False,
+        max_windows_per_market: int = 2,
     ) -> Dict[str, Any]:
         """Run metadata-only official index discovery for business profiles."""
 
@@ -1600,7 +1602,349 @@ class DataManager:
             page_size=page_size,
             max_pages_per_market=max_pages_per_market,
             dry_run=dry_run,
+            resumable_windows=resumable_windows,
+            max_windows_per_market=max_windows_per_market,
         )
+
+    async def run_business_profile_daily_incremental(
+        self,
+        *,
+        knowledge_cutoff: Optional[str] = None,
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        field_families: Optional[List[str]] = None,
+        runtime_identities: Optional[Dict[str, str]] = None,
+        max_attempts: int = 3,
+        discovery_kwargs: Optional[Dict[str, Any]] = None,
+        stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Run discovery-first business-profile production without draining queues."""
+
+        if not self.research_config.enabled:
+            return {"status": "disabled", "reason": "research_config.enabled is false"}
+        if self.research_storage is None:
+            return {"status": "unavailable", "reason": "research storage is not initialized"}
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        operations = dict(module.get("production_operations") or {})
+        semantic = dict(module.get("semantic_production") or {})
+        if (
+            module.get("enabled") is not True
+            or operations.get("async_production_enabled") is not True
+        ):
+            return {
+                "status": "disabled",
+                "reason": "business profile async production is disabled",
+            }
+        await asyncio.to_thread(self.research_storage.initialize)
+        from research.business_profile_async_production import parse_stage_budgets
+
+        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
+        configured_families = tuple(
+            str(item).strip()
+            for item in (field_families or operations.get("field_families") or [])
+            if str(item).strip()
+        )
+        identities = dict(
+            runtime_identities
+            or operations.get("runtime_identities")
+            or semantic.get("runtime_identities")
+            or {}
+        )
+        if not configured_families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": "async production requires field_families and runtime_identities",
+            }
+        service, processing_identity = self._build_business_profile_async_service(
+            cutoff=cutoff,
+            configured_families=configured_families,
+            identities=identities,
+            operations=operations,
+            semantic=semantic,
+            default_exchanges=exchanges or ["SSE", "SZSE", "BSE"],
+        )
+        budgets = parse_stage_budgets(
+            stage_budgets
+            or operations.get("stage_budgets")
+            or {
+                "acquire": {
+                    "max_items": 4,
+                    "max_concurrency": 2,
+                    "max_elapsed_seconds": 300,
+                    "high_water_mark": 1000,
+                },
+                "parse": {
+                    "max_items": 8,
+                    "max_concurrency": 2,
+                    "max_elapsed_seconds": 300,
+                    "high_water_mark": 1000,
+                },
+                "semantic": {
+                    "max_items": 4,
+                    "max_concurrency": 2,
+                    "max_elapsed_seconds": 600,
+                    "high_water_mark": 1000,
+                },
+                "publish": {
+                    "max_items": 8,
+                    "max_concurrency": 2,
+                    "max_elapsed_seconds": 300,
+                    "high_water_mark": 1000,
+                },
+            }
+        )
+        discovery_parameters = {
+            "exchanges": exchanges or ["SSE", "SZSE", "BSE"],
+            "lookback_days": int(
+                (discovery_kwargs or {}).get(
+                    "lookback_days",
+                    operations.get("index_lookback_days", 10),
+                )
+            ),
+            "overlap_days": int(
+                (discovery_kwargs or {}).get(
+                    "overlap_days",
+                    operations.get("index_overlap_days", 3),
+                )
+            ),
+            "page_size": int((discovery_kwargs or {}).get("page_size", 30)),
+            "max_pages_per_market": int(
+                (discovery_kwargs or {}).get(
+                    "max_pages_per_market",
+                    operations.get("peak_max_pages_per_market", 240),
+                )
+            ),
+            "max_windows_per_market": int(
+                (discovery_kwargs or {}).get(
+                    "max_windows_per_market",
+                    operations.get("max_windows_per_market", 2),
+                )
+            ),
+        }
+        result = await service.run_daily(
+            knowledge_cutoff=cutoff,
+            processing_identity=processing_identity,
+            discovery_kwargs=discovery_parameters,
+            stage_budgets=budgets,
+            max_attempts=max_attempts,
+        )
+        try:
+            from research.business_profile_production_operations import (
+                build_business_profile_reconciliation_report,
+            )
+
+            result["reconciliation"] = await asyncio.to_thread(
+                build_business_profile_reconciliation_report,
+                self.research_storage,
+                frequency="annual",
+                knowledge_cutoff=cutoff,
+            )
+        except Exception as exc:
+            result["reconciliation"] = {
+                "status": "degraded",
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+        if instrument_ids:
+            result["scope_note"] = (
+                "daily discovery remains market-wide; instrument_ids are reserved "
+                "for manual backfill"
+            )
+        return result
+
+    async def run_business_profile_backfill(
+        self,
+        *,
+        knowledge_cutoff: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        document_types: Optional[List[str]] = None,
+        field_families: Optional[List[str]] = None,
+        runtime_identities: Optional[Dict[str, str]] = None,
+        force: bool = False,
+        max_attempts: int = 3,
+        stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Run explicitly scoped historical or specialist work through the same queues."""
+
+        if not instrument_ids and not start_date:
+            raise ValueError("business-profile backfill requires instrument_ids or start_date")
+        if not self.research_config.enabled or self.research_storage is None:
+            return {
+                "status": "disabled",
+                "reason": "research business-profile storage is disabled",
+            }
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        operations = dict(module.get("production_operations") or {})
+        if (
+            module.get("enabled") is not True
+            or operations.get("async_production_enabled") is not True
+        ):
+            return {
+                "status": "disabled",
+                "reason": "business profile async production is disabled",
+            }
+        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
+        configured_families = tuple(
+            str(item).strip()
+            for item in (field_families or operations.get("field_families") or [])
+            if str(item).strip()
+        )
+        identities = dict(
+            runtime_identities or operations.get("runtime_identities") or {}
+        )
+        if not configured_families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": "backfill requires field_families and runtime_identities",
+            }
+        from research.business_profile_async_production import parse_stage_budgets
+
+        backfill_exchanges = sorted(
+            {
+                {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
+                    str(item).rsplit(".", 1)[-1].upper(),
+                    "",
+                )
+                for item in (instrument_ids or [])
+            }
+            - {""}
+        ) or ["SSE", "SZSE", "BSE"]
+        semantic = dict(module.get("semantic_production") or {})
+        service, processing_identity = self._build_business_profile_async_service(
+            cutoff=cutoff,
+            configured_families=configured_families,
+            identities=identities,
+            operations=operations,
+            semantic=semantic,
+            default_exchanges=backfill_exchanges,
+        )
+        budgets = parse_stage_budgets(
+            stage_budgets
+            or operations.get("stage_budgets")
+            or {
+                stage: {
+                    "max_items": 10,
+                    "max_concurrency": 2,
+                    "max_elapsed_seconds": 600,
+                    "high_water_mark": 1000,
+                }
+                for stage in ("acquire", "parse", "semantic", "publish")
+            }
+        )
+        discovery_kwargs = {
+            "start_date": start_date,
+            "end_date": end_date or cutoff,
+            "exchanges": backfill_exchanges,
+        }
+        return await service.run_backfill(
+            knowledge_cutoff=cutoff,
+            processing_identity=processing_identity,
+            instrument_ids=instrument_ids or (),
+            start_date=start_date,
+            end_date=end_date,
+            document_types=document_types or (),
+            discovery_kwargs=discovery_kwargs,
+            stage_budgets=budgets,
+            max_attempts=max_attempts,
+            force=force,
+        )
+
+    def _build_business_profile_async_service(
+        self,
+        *,
+        cutoff: str,
+        configured_families: Sequence[str],
+        identities: Mapping[str, str],
+        operations: Mapping[str, Any],
+        semantic: Mapping[str, Any],
+        default_exchanges: Sequence[str],
+    ) -> tuple[Any, Dict[str, Any]]:
+        """Build the shared discovery and stage runtime for daily and backfill."""
+        from research.business_profile_async_production import (
+            BusinessProfileAsyncProductionService,
+            BusinessProfileWorkRepository,
+        )
+
+        async def discovery_runner(**kwargs: Any) -> Mapping[str, Any]:
+            return await self.run_business_profile_index_discovery(
+                exchanges=kwargs.get("exchanges") or list(default_exchanges),
+                start_date=kwargs.get("start_date"),
+                end_date=kwargs.get("end_date"),
+                lookback_days=int(kwargs.get("lookback_days", 10)),
+                overlap_days=int(kwargs.get("overlap_days", 3)),
+                page_size=int(kwargs.get("page_size", 30)),
+                max_pages_per_market=int(kwargs.get("max_pages_per_market", 240)),
+                dry_run=False,
+                resumable_windows=True,
+                max_windows_per_market=int(kwargs.get("max_windows_per_market", 2)),
+            )
+
+        async def stage_runner(
+            stage: str,
+            item: Mapping[str, Any],
+        ) -> Mapping[str, Any]:
+            mode = {
+                "acquire": "plan",
+                "parse": "select",
+                "semantic": "extract",
+                "publish": "verify",
+            }[stage]
+            selection_policy = str(item.get("policy") or "latest_annual_only")
+            call_kwargs = {
+                "knowledge_cutoff": cutoff,
+                "instrument_ids": [str(item["instrument_id"])],
+                "field_families": list(configured_families),
+                "runtime_identities": dict(identities),
+                "max_instruments": 1,
+                "checkpoint_path": str(item["checkpoint_path"]),
+                "selection_policy": selection_policy,
+            }
+            result = await self.run_business_profile_semantic_production(
+                mode=mode,
+                **call_kwargs,
+            )
+            if (
+                stage != "publish"
+                or not bool(semantic.get("promotion_enabled"))
+                or result.get("status") not in {"success", "completed", "unchanged"}
+            ):
+                return result
+            promotion = await self.run_business_profile_semantic_production(
+                mode="promote",
+                **call_kwargs,
+            )
+            if promotion.get("status") not in {"success", "completed", "unchanged"}:
+                return {
+                    "status": "failed",
+                    "reason": "business_profile_promotion_failed",
+                    "verification": result,
+                    "promotion": promotion,
+                }
+            return {**result, "promotion": promotion}
+
+        checkpoint_root = Path(
+            operations.get("checkpoint_root")
+            or semantic.get("checkpoint_root")
+            or "data/checkpoints/business_profile_async"
+        )
+        repository = BusinessProfileWorkRepository(
+            self.research_storage,
+            checkpoint_root=checkpoint_root,
+        )
+        service = BusinessProfileAsyncProductionService(
+            repository=repository,
+            discovery_runner=discovery_runner,
+            stage_runner=stage_runner,
+            lease_seconds=int(operations.get("lease_seconds", 900)),
+            retry_backoff_seconds=int(operations.get("retry_backoff_seconds", 300)),
+        )
+        return service, {
+            "field_families": tuple(configured_families),
+            "runtime_identities": dict(identities),
+            "semantic_policy": semantic.get("policy_version")
+            or "business_profile_async.v1",
+        }
 
     async def run_business_profile_reconciliation(
         self,
@@ -1659,6 +2003,7 @@ class DataManager:
         promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
         max_instruments: int = 30,
         checkpoint_path: Optional[str] = None,
+        selection_policy: str = "latest_annual_only",
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -1668,7 +2013,10 @@ class DataManager:
         module = self.research_config.modules.get("business_profile_evidence", {})
         production_payload = dict(module.get("semantic_production") or {})
         if production_payload.get("enabled") is not True:
-            return {"status": "disabled", "reason": "business profile semantic production is disabled"}
+            return {
+                "status": "disabled",
+                "reason": "business profile semantic production is disabled",
+            }
         await asyncio.to_thread(self.research_storage.initialize)
         from research.business_profile_governance import BusinessProfileRepository
         from research.business_profile_semantic_pipeline import (
@@ -1784,6 +2132,7 @@ class DataManager:
                         if config.kill_switches["scope_widening"]
                         else min(1, config.budgets.max_documents - 1)
                     ),
+                    selection_policy=selection_policy,
                 )
                 if mode != "report"
                 else ""
@@ -1812,6 +2161,7 @@ class DataManager:
                 else None
             ),
             planned_disclosure_acquirer=planned_disclosure_acquirer,
+            selection_policy=selection_policy,
         )
 
         scope = SemanticProductionScope(

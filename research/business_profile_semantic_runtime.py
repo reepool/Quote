@@ -90,6 +90,7 @@ def compute_business_profile_semantic_source_revision(
     manifest_loader: Callable[[str], Sequence[Mapping[str, Any]]] | None = None,
     max_documents: int = 3,
     max_specialist_documents: int = 1,
+    selection_policy: str = "latest_annual_only",
 ) -> str:
     """Hash the selected official inputs and retry state bound to a checkpoint."""
 
@@ -100,6 +101,7 @@ def compute_business_profile_semantic_source_revision(
         coverage_inspector=BusinessProfileCoverageInspector(repository),
         max_documents=max_documents,
         max_specialist_documents=max_specialist_documents,
+        selection_policy=selection_policy,
     )
     document_families = sorted(set(field_families) & DOCUMENT_FAMILIES)
     derived_inputs: dict[str, tuple[str, ...]] = {}
@@ -634,6 +636,7 @@ class BusinessProfileSemanticRuntime:
         planned_disclosure_acquirer: (
             BusinessProfilePlannedDisclosureAcquirer | None
         ) = None,
+        selection_policy: str = "latest_annual_only",
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository = repository
@@ -656,6 +659,7 @@ class BusinessProfileSemanticRuntime:
             counterparty_resolver or GovernedCounterpartyResolver(entities=[])
         )
         self.planned_disclosure_acquirer = planned_disclosure_acquirer
+        self.selection_policy = str(selection_policy or "latest_annual_only")
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
         self.promotion_service = BusinessProfilePromotionService(
@@ -732,6 +736,7 @@ class BusinessProfileSemanticRuntime:
                 if config.kill_switches["scope_widening"]
                 else min(1, config.budgets.max_documents - 1)
             ),
+            selection_policy=self.selection_policy,
         )
         plans: list[dict[str, Any]] = []
         acquisition_attempts = 0
@@ -1614,6 +1619,7 @@ class BusinessProfileSemanticRuntime:
                     if config.kill_switches["scope_widening"]
                     else min(1, config.budgets.max_documents - 1)
                 ),
+                selection_policy=self.selection_policy,
             ),
         )
 

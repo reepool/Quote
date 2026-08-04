@@ -1914,3 +1914,30 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     assert report["derived_value_chain_roles"]["auto_promoted"] == 1
     assert report["commodity_exposure_facts"]["auto_promoted"] == 2
     assert report["commodity_exposure_publication"]["auto_promoted"] == 0
+
+
+def test_revised_scope_preserves_expanded_selection_policy(tmp_path, monkeypatch):
+    storage = _storage(tmp_path)
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(storage),
+        artifact_root=tmp_path / "artifacts",
+        selection_policy="expanded",
+    )
+    captured = {}
+
+    def compute_revision(_repository, **kwargs):
+        captured.update(kwargs)
+        return "expanded-revision"
+
+    monkeypatch.setattr(
+        runtime_module,
+        "compute_business_profile_semantic_source_revision",
+        compute_revision,
+    )
+    revised = runtime._revised_scope(
+        replace(_scope("atomic_activities"), source_revision="initial"),
+        SemanticProductionConfig(enabled=True),
+    )
+
+    assert revised.source_revision == "expanded-revision"
+    assert captured["selection_policy"] == "expanded"

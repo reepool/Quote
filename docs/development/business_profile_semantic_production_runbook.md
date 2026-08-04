@@ -6,9 +6,15 @@
 实体歧义、披露冲突、复杂合并范围变化和高风险经济判断，不作为清洁事实的
 例行审批步骤。
 
-生产顺序固定为：复用已批准结构化事实、选择最小充分公告、解析原生 PDF
-文本和表格、关键词定位小段证据、对未解决字段调用 LLM、独立验证、审计式
-系统晋级。任一门禁缺失或版本不一致都失败关闭。
+自动生产默认只使用每家公司知识截止日可获取的最新完整年报及其更正/替换稿。
+生产顺序固定为：公告索引发现、持久入队、PDF 获取、原生 PDF 文本和表格解析、
+关键词定位小段证据、对未解决字段调用 LLM、独立验证、审计式系统晋级。各阶段
+使用独立持久队列和预算；下载、解析或 LLM 积压不得阻止下一次公告发现。
+
+半年报、经营数据、资源储量、产能、合同、套保、重组等专业公告不会自动进入
+生产。少数年度中主营变化默认等待下一份年报；确需提前更新时，通过显式公司、
+日期和文档类型范围的 `business_profile_backfill` 手工任务入队。这里的“手工”
+只指启动和指定范围，后续下载、解析、验证、重试及符合门禁的晋级仍自动完成。
 
 ## 2. 默认状态和启用前提
 
@@ -17,9 +23,11 @@
 - `business_profile_evidence.semantic_production.enabled`
 - `business_profile_evidence.semantic_production.promotion_enabled`
 - `business_profile_evidence.semantic_production.scheduler_enabled`
-- `scheduler_config.jobs.business_profile_semantic_maintenance.enabled`
+- `business_profile_evidence.production_operations.async_production_enabled`
+- `scheduler_config.jobs.business_profile_daily_incremental.enabled`
 
-启用顺序必须是：影子收集、字段族晋级、有限行业批次、增量调度。不得同时
+`business_profile_backfill` 永远为 `manual_only=true`，没有 cron trigger。
+启用顺序必须是：影子收集、字段族晋级、有限行业批次、异步日更。不得同时
 跳过多个阶段。字段族只有在冻结 benchmark、运行身份和 promotion manifest
 全部匹配时才允许自动晋级。
 
@@ -31,9 +39,13 @@
 - 调度器参数保持明确的字段族和运行身份范围；公司范围可留空，由系统按公告
   hash、字段族完成状态、运行身份变化和到期机器重做自动发现，不允许全量盲扫。
 
+不再设置单独的周更、月更、半年更和年更任务。日更先提交公告前沿，再按
+`acquire -> parse -> semantic -> publish` 有界推进队列并输出覆盖/队列对账。
+历史回补、专业公告和强制重放只通过手工回补入口处理。
+
 ## 3. 运行和检查点
 
-CLI 支持 `plan`、`select`、`extract`、`verify`、`promote`、`resume`、
+底层兼容 CLI 支持 `plan`、`select`、`extract`、`verify`、`promote`、`resume`、
 `report` 和 `rebuild-publications`。每次运行必须提供：
 
 - 公司范围和字段族范围。
@@ -88,6 +100,12 @@ promotion manifest 文件是按字段族键控的完整对象，或放在 `field
   }
 }
 ```
+
+日更调度不直接使用上述 CLI 串行清空全市场范围，而是为每个公告创建稳定
+`work_id` 和检查点路径。工作项阶段为 `acquire`、`parse`、`semantic`、
+`publish`；任务在短事务中领取租约，在事务外执行网络或 CPU 工作，成功后再
+确认阶段。进程中断后仅在租约到期后重领，同一源公告、策略和处理身份不会
+重复建项。
 
 检查点只可在范围哈希、全部运行身份和 `source_revision` 完全一致时恢复。
 `source_revision` 绑定最小计划选中的公告 hash、开放异常重试代次以及本地派生
@@ -177,14 +195,26 @@ signature 和排序后的本地候选。
 - 已解决异常不重新打开，除非运行身份或源事实发生变化。
 - 发布输出和 lineage hash 保持一致。
 
-网络中断或主动取消后使用 `resume`。如果目录、模型、规则或 policy 已变化，
-应创建新范围并重新 `plan`，不能在旧检查点上混合身份。
+网络中断或主动取消后由队列按指数退避自动重领并复用检查点。如果目录、模型、
+规则或 policy 已变化，应以新处理身份创建新工作项，不能在旧检查点上混合身份。
+
+## 8.1 年报季容量与背压
+
+公告发现使用稳定市场 scope 和完整性标记。若一个日期窗口达到页数上限但来源
+尚未确认完成，不提交该次观察水位，而是把窗口拆成不重叠子窗口持久化；后续
+日更优先扫描最近 overlap 窗口，同时有界消费历史子窗口。单日仍超过上限时保留
+`unsplittable` 状态并明确告警，不得伪报全覆盖。
+
+各阶段分别配置 `max_items`、`max_concurrency`、`max_elapsed_seconds` 和
+`high_water_mark`。语义队列达到高水位时暂停新的 PDF 获取，但公告发现和已下载
+内容的语义消费继续。一次日更在预算结束时正常退出，剩余工作保留至以后运行；
+“日更成功”表示发现已提交且队列状态一致，不表示当日积压已经清零。
 
 ## 9. 回滚
 
 回滚是停止新行为并切回先前接受版本，不删除历史数据：
 
-1. 关闭受影响字段族 promotion 和 scheduler gate。
+1. 关闭受影响字段族 promotion 和 `business_profile_daily_incremental`。
 2. 必要时开启 `all_writes`，保留只读诊断。
 3. 让估值消费者固定到最后接受的 build policy 和发布版本。
 4. 将错误发布通过新的 governed supersession 记录替代，禁止直接更新历史行。
@@ -195,7 +225,9 @@ signature 和排序后的本地候选。
 
 ## 10. 日常报告
 
-每批报告至少包含字段族分母以及：复用率、选择的公告和页数、确定性完成率、
+每批报告至少包含发现窗口完整性、拆窗积压、各阶段/状态队列深度、最老工作年龄、
+租约、重试、terminal failure、superseded 和背压原因，以及字段族分母、复用率、
+选择的公告和页数、确定性完成率、
 LLM 调用和 token、成本、延迟、自动晋级、机器返工恢复、quick/deep review、
 unsupported output、冲突、漂移、检查点身份和候选估值泄漏数。
 

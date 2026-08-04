@@ -2,7 +2,11 @@ import hashlib
 import sqlite3
 from types import SimpleNamespace
 
-from research.announcements import AnnouncementAttachment, AnnouncementRecord
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementRecord,
+    AnnouncementScanResult,
+)
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_production_operations import (
     BusinessProfileAnnouncementFrontierRepository,
@@ -225,6 +229,79 @@ def test_historical_discovery_end_date_drives_default_start_date(tmp_path):
     assert report["end_date"] == "2024-04-30"
     assert announcement_service.query.scope.start_date == "2024-04-20"
     assert announcement_service.query.scope.end_date == "2024-04-30"
+
+
+def test_page_bound_discovery_splits_and_persists_date_windows(tmp_path):
+    storage = _storage(tmp_path)
+    _quotes(
+        storage,
+        [
+            (
+                "600000.SH",
+                "600000",
+                "浦发银行",
+                "SSE",
+                "stock",
+                "1999-11-10",
+                None,
+                "active",
+                1,
+            )
+        ],
+    )
+
+    class _Config:
+        @staticmethod
+        def route_for(_purpose_key, _exchange):
+            return SimpleNamespace(sources=())
+
+    class _AnnouncementService:
+        config = _Config()
+
+        @staticmethod
+        def acquire(query, *, selectors, provider_cursors):
+            assert selectors
+            assert provider_cursors == {}
+            scan = AnnouncementScanResult(
+                source="fake",
+                query=query,
+                status="degraded",
+                pages_scanned=query.scope.max_pages,
+                is_complete=False,
+                stop_reason="max_pages_reached",
+            )
+            return SimpleNamespace(scan_result=scan, attempts=())
+
+    report = BusinessProfileIndexDiscoveryService(
+        storage=storage,
+        announcement_service=_AnnouncementService(),
+    ).discover(
+        exchanges=("SSE",),
+        start_date="2026-04-01",
+        end_date="2026-04-30",
+        max_pages_per_market=2,
+        resumable_windows=True,
+        max_windows_per_market=1,
+    )
+
+    assert report["status"] == "degraded"
+    assert report["discovery_window_backlog"] == 2
+    assert report["incomplete_windows"] == [
+        {
+            "exchange": "SSE",
+            "start_date": "2026-04-01",
+            "end_date": "2026-04-30",
+            "stop_reason": "max_pages_reached",
+            "splittable": True,
+        }
+    ]
+    state = BusinessProfileAnnouncementFrontierRepository(storage).get_state(
+        "business_profile_discovery_windows:SSE"
+    )
+    assert {
+        (item["start_date"], item["end_date"])
+        for item in state["pending_windows"]
+    } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
 
 
 def test_reconciliation_does_not_require_prior_year_annual_before_may(tmp_path):

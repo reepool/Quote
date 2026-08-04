@@ -105,7 +105,7 @@ def test_newer_semiannual_is_added_only_for_unresolved_time_sensitive_family(tmp
     semi = _manifest(
         tmp_path, "sf-h", "semi", "某公司2025年半年度报告", "2025-06-30", "2025-08-30"
     )
-    plan = _planner(tmp_path).plan(
+    plan = _planner(tmp_path, selection_policy="expanded").plan(
         instrument_id="600000.SH",
         field_family="tabular_operating_facts",
         knowledge_cutoff="2025-12-01",
@@ -144,7 +144,12 @@ def test_specialist_rules_are_field_family_specific_and_bounded(tmp_path):
     capacity = _manifest(
         tmp_path, "sf-p", "capacity", "关于项目建成投产的公告", "2026-04-02", "2026-04-02"
     )
-    plan = _planner(tmp_path, max_documents=2, max_specialist_documents=1).plan(
+    plan = _planner(
+        tmp_path,
+        max_documents=2,
+        max_specialist_documents=1,
+        selection_policy="expanded",
+    ).plan(
         instrument_id="600000.SH",
         field_family="named_relationships",
         knowledge_cutoff="2026-05-01",
@@ -242,7 +247,12 @@ def test_document_bound_exhaustion_is_fail_closed(tmp_path):
     specialist = _manifest(
         tmp_path, "sf-r", "resource", "关于矿产资源储量更新的公告", "2026-09-01", "2026-09-01"
     )
-    plan = _planner(tmp_path, max_documents=2, max_specialist_documents=1).plan(
+    plan = _planner(
+        tmp_path,
+        max_documents=2,
+        max_specialist_documents=1,
+        selection_policy="expanded",
+    ).plan(
         instrument_id="600000.SH",
         field_family="commodity_exposure_facts",
         knowledge_cutoff="2026-10-01",
@@ -253,3 +263,42 @@ def test_document_bound_exhaustion_is_fail_closed(tmp_path):
     assert plan.complete is False
     assert "document_bound_exhausted" in plan.completeness_gaps
     assert any(item["decision_reason"] == "document_bound_exhausted" for item in plan.omitted)
+
+
+def test_default_policy_omits_newer_semiannual_and_specialist_documents(tmp_path):
+    annual = _manifest(
+        tmp_path,
+        "sf-a",
+        "annual",
+        "某公司2025年年度报告",
+        "2025-12-31",
+        "2026-03-20",
+    )
+    semi = _manifest(
+        tmp_path,
+        "sf-h",
+        "semi",
+        "某公司2026年半年度报告",
+        "2026-06-30",
+        "2026-08-20",
+    )
+    contract = _manifest(
+        tmp_path,
+        "sf-c",
+        "contract",
+        "关于签署重大销售合同的公告",
+        "2026-09-01",
+        "2026-09-01",
+    )
+
+    plan = _planner(tmp_path).plan(
+        instrument_id="600000.SH",
+        field_family="named_relationships",
+        knowledge_cutoff="2026-10-01",
+        manifests=[annual, semi, contract],
+    )
+
+    assert [item["announcement_id"] for item in plan.included] == ["annual"]
+    omitted = {item["announcement_id"]: item["decision_reason"] for item in plan.omitted}
+    assert omitted["semi"] == "supplement_not_required"
+    assert omitted["contract"] == "specialist_not_required_or_out_of_bound"

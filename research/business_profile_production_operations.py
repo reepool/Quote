@@ -345,6 +345,9 @@ class BusinessProfileIndexDiscoveryService:
         page_size: int = 30,
         max_pages_per_market: int = 20,
         dry_run: bool = False,
+        resumable_windows: bool = False,
+        max_windows_per_market: int = 2,
+        use_committed_cursors: bool = True,
     ) -> dict[str, Any]:
         now = get_shanghai_time()
         cutoff = str(end_date or now.date().isoformat())[:10]
@@ -355,6 +358,18 @@ class BusinessProfileIndexDiscoveryService:
                 cutoff_date - timedelta(days=max(lookback_days, overlap_days))
             ).isoformat()
         )[:10]
+        if resumable_windows:
+            return self._discover_resumable_windows(
+                exchanges=exchanges,
+                start_date=start,
+                end_date=cutoff,
+                lookback_days=lookback_days,
+                overlap_days=overlap_days,
+                page_size=page_size,
+                max_pages_per_market=max_pages_per_market,
+                max_windows_per_market=max_windows_per_market,
+                dry_run=dry_run,
+            )
         universe = load_active_a_share_universe(self.storage, knowledge_cutoff=cutoff)
         by_exchange_symbol = {
             (str(item["exchange"]).upper(), str(item["symbol"]).zfill(6)): item
@@ -393,18 +408,19 @@ class BusinessProfileIndexDiscoveryService:
                 exchange,
             )
             cursors: dict[str, ProviderCursor] = {}
-            for source in route.sources:
-                state = self.storage.get_announcement_scan_state(
-                    purpose_key=BUSINESS_PROFILE_INDEX_PURPOSE,
-                    source=source,
-                    scope_key=scope.scope_key,
-                )
-                if state and state.get("committed_cursor"):
-                    cursor = state["committed_cursor"]
-                    cursors[source] = ProviderCursor(
-                        kind=str(cursor["kind"]),
-                        value=str(cursor["value"]),
+            if use_committed_cursors:
+                for source in route.sources:
+                    state = self.storage.get_announcement_scan_state(
+                        purpose_key=BUSINESS_PROFILE_INDEX_PURPOSE,
+                        source=source,
+                        scope_key=scope.scope_key,
                     )
+                    if state and state.get("committed_cursor"):
+                        cursor = state["committed_cursor"]
+                        cursors[source] = ProviderCursor(
+                            kind=str(cursor["kind"]),
+                            value=str(cursor["value"]),
+                        )
             route_result = self.announcement_service.acquire(
                 AnnouncementQuery(
                     purpose_key=BUSINESS_PROFILE_INDEX_PURPOSE,
@@ -431,6 +447,8 @@ class BusinessProfileIndexDiscoveryService:
                 "pages_scanned": scan.pages_scanned,
                 "announcements_seen": scan.announcements_seen,
                 "selected_announcements": len(scan.selected_records),
+                "is_complete": bool(getattr(scan, "is_complete", True)),
+                "stop_reason": getattr(scan, "stop_reason", None),
             }
             report["exchanges"].append(exchange_report)
             if dry_run:
@@ -465,6 +483,127 @@ class BusinessProfileIndexDiscoveryService:
                         report["frontier_changed"] += 1
         report["unmatched_symbols"] = report["unmatched_symbols"][:100]
         if report["errors"]:
+            report["status"] = "degraded"
+        return report
+
+    def _discover_resumable_windows(
+        self,
+        *,
+        exchanges: Sequence[str],
+        start_date: str,
+        end_date: str,
+        lookback_days: int,
+        overlap_days: int,
+        page_size: int,
+        max_pages_per_market: int,
+        max_windows_per_market: int,
+        dry_run: bool,
+    ) -> dict[str, Any]:
+        """Scan the newest window first and persist split partial windows."""
+
+        report = {
+            "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
+            "status": "success",
+            "operation": "index_discovery_resumable",
+            "start_date": start_date,
+            "end_date": end_date,
+            "dry_run": bool(dry_run),
+            "pages_scanned": 0,
+            "announcements_seen": 0,
+            "selected_announcements": 0,
+            "frontier_inserted": 0,
+            "frontier_changed": 0,
+            "unmatched_symbols": [],
+            "errors": [],
+            "exchanges": [],
+            "discovery_window_backlog": 0,
+            "incomplete_windows": [],
+        }
+        for raw_exchange in exchanges:
+            exchange = str(raw_exchange).upper()
+            state_key = f"business_profile_discovery_windows:{exchange}"
+            state = self.frontier.get_state(state_key)
+            pending = [
+                dict(item)
+                for item in state.get("pending_windows", [])
+                if isinstance(item, Mapping)
+            ]
+            fresh_start = start_date
+            if pending:
+                fresh_start = max(
+                    date.fromisoformat(start_date),
+                    date.fromisoformat(end_date)
+                    - timedelta(days=max(0, int(overlap_days))),
+                ).isoformat()
+            fresh = {
+                "start_date": fresh_start,
+                "end_date": end_date,
+                "kind": "fresh",
+            }
+            windows = _deduplicate_discovery_windows([fresh, *pending])
+            selected = windows[: max(1, int(max_windows_per_market))]
+            remaining = windows[len(selected) :]
+            for window in selected:
+                subreport = self.discover(
+                    exchanges=(exchange,),
+                    start_date=str(window["start_date"]),
+                    end_date=str(window["end_date"]),
+                    lookback_days=lookback_days,
+                    overlap_days=overlap_days,
+                    page_size=page_size,
+                    max_pages_per_market=max_pages_per_market,
+                    dry_run=dry_run,
+                    resumable_windows=False,
+                    use_committed_cursors=window.get("kind") == "fresh",
+                )
+                for key in (
+                    "pages_scanned",
+                    "announcements_seen",
+                    "selected_announcements",
+                    "frontier_inserted",
+                    "frontier_changed",
+                ):
+                    report[key] += int(subreport.get(key) or 0)
+                report["unmatched_symbols"].extend(
+                    subreport.get("unmatched_symbols") or []
+                )
+                report["errors"].extend(subreport.get("errors") or [])
+                exchange_result = next(
+                    iter(subreport.get("exchanges") or []), {}
+                )
+                complete = bool(exchange_result.get("is_complete"))
+                window_result = {
+                    **dict(exchange_result),
+                    "window_start_date": window["start_date"],
+                    "window_end_date": window["end_date"],
+                    "window_kind": window.get("kind"),
+                }
+                report["exchanges"].append(window_result)
+                if complete:
+                    continue
+                children = _split_discovery_window(window)
+                remaining.extend(children)
+                report["incomplete_windows"].append(
+                    {
+                        "exchange": exchange,
+                        "start_date": window["start_date"],
+                        "end_date": window["end_date"],
+                        "stop_reason": exchange_result.get("stop_reason"),
+                        "splittable": len(children) > 1,
+                    }
+                )
+            remaining = _deduplicate_discovery_windows(remaining)
+            report["discovery_window_backlog"] += len(remaining)
+            if not dry_run:
+                self.frontier.set_state(
+                    state_key,
+                    {
+                        "pending_windows": remaining,
+                        "updated_for_end_date": end_date,
+                    },
+                )
+        report["unmatched_symbols"] = report["unmatched_symbols"][:100]
+        if report["errors"] or report["incomplete_windows"]:
             report["status"] = "degraded"
         return report
 
@@ -757,6 +896,60 @@ def _required_text(value: Mapping[str, Any], key: str) -> str:
     if not text:
         raise ValueError(f"business-profile operation missing {key}")
     return text
+
+
+def _deduplicate_discovery_windows(
+    windows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    unique: dict[tuple[str, str], dict[str, Any]] = {}
+    for item in windows:
+        start = str(item.get("start_date") or "")[:10]
+        end = str(item.get("end_date") or "")[:10]
+        if not start or not end or start > end:
+            continue
+        key = (start, end)
+        candidate = {
+            "start_date": start,
+            "end_date": end,
+            "kind": str(item.get("kind") or "backlog"),
+        }
+        if key not in unique or candidate["kind"] == "fresh":
+            unique[key] = candidate
+    return sorted(
+        unique.values(),
+        key=lambda item: (
+            0 if item["kind"] == "fresh" else 1,
+            str(item["end_date"]),
+            str(item["start_date"]),
+        ),
+        reverse=False,
+    )
+
+
+def _split_discovery_window(window: Mapping[str, Any]) -> list[dict[str, Any]]:
+    start = date.fromisoformat(str(window["start_date"])[:10])
+    end = date.fromisoformat(str(window["end_date"])[:10])
+    if start >= end:
+        return [
+            {
+                "start_date": start.isoformat(),
+                "end_date": end.isoformat(),
+                "kind": "unsplittable",
+            }
+        ]
+    midpoint = start + timedelta(days=(end - start).days // 2)
+    return [
+        {
+            "start_date": (midpoint + timedelta(days=1)).isoformat(),
+            "end_date": end.isoformat(),
+            "kind": "backlog",
+        },
+        {
+            "start_date": start.isoformat(),
+            "end_date": midpoint.isoformat(),
+            "kind": "backlog",
+        },
+    ]
 
 
 def _canonical_json(value: Mapping[str, Any]) -> str:

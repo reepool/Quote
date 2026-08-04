@@ -250,7 +250,7 @@ def _audit_enablement(
     )
     jobs = scheduler_root.get("jobs", {})
     structured_job = jobs.get("business_profile_structured_sync", {})
-    semantic_job = jobs.get("business_profile_semantic_maintenance", {})
+    semantic_job = jobs.get("business_profile_daily_incremental", {})
     llm = module.get("llm_extraction", {}) if isinstance(module, Mapping) else {}
     semantic = (
         module.get("semantic_production", {})

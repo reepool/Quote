@@ -7022,202 +7022,113 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_id)
 
-    async def business_profile_semantic_maintenance(
+    async def business_profile_daily_incremental(
         self,
-        mode: str = "resume",
         knowledge_cutoff: Optional[str] = None,
-        instrument_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
-        promotion_manifest_hashes: Optional[Dict[str, str]] = None,
-        promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
-        max_instruments: int = 30,
-        checkpoint_path: Optional[str] = None,
+        max_attempts: int = 3,
+        discovery_kwargs: Optional[Dict[str, Any]] = None,
+        stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """Run disabled-by-default hash-scoped semantic maintenance."""
-        task_id = "business_profile_semantic_maintenance"
+        """Discover first, then advance bounded durable business-profile queues."""
+        task_id = "business_profile_daily_incremental"
         self._active_tasks.add(task_id)
         try:
-            result = await data_manager.run_business_profile_semantic_production(
-                mode=mode,
+            result = await data_manager.run_business_profile_daily_incremental(
                 knowledge_cutoff=knowledge_cutoff,
-                instrument_ids=instrument_ids,
+                exchanges=exchanges,
                 field_families=field_families,
                 runtime_identities=runtime_identities,
-                promotion_manifest_hashes=promotion_manifest_hashes,
-                promotion_manifests=promotion_manifests,
-                max_instruments=max_instruments,
-                checkpoint_path=checkpoint_path,
-            )
-            status = str(result.get("status") or "failed")
-            success = status in {"success", "unchanged", "disabled"}
-            await self._send_task_report(
-                report_data={
-                    "name": "业务画像语义增量生产报告",
-                    "status": "success" if success else "error",
-                    "tasks_completed": len(result.get("completed_stages") or []),
-                    "duration": f"{(result.get('metrics') or {}).get('elapsed_seconds', 0):.2f}s",
-                    "maintenance_tasks": [
-                        {
-                            "task_name": task_id,
-                            "status": result.get("reason") or status,
-                        }
-                    ],
-                    "business_profile_semantic_production": result,
-                },
-                report_type="maintenance_report",
-                task_name="业务画像语义增量生产",
-                job_config=job_config,
-            )
-            return success
-        except Exception as exc:
-            scheduler_logger.exception(
-                "[Scheduler] Business-profile semantic maintenance failed: %s",
-                exc,
-            )
-            return False
-        finally:
-            self._active_tasks.discard(task_id)
-
-    async def business_profile_index_discovery_daily(
-        self,
-        exchanges: Optional[List[str]] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        lookback_days: int = 10,
-        overlap_days: int = 3,
-        page_size: int = 30,
-        max_pages_per_market: int = 20,
-        dry_run: bool = False,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        """Scan official indexes without downloading PDFs or invoking the LLM."""
-
-        task_id = "business_profile_index_discovery_daily"
-        self._active_tasks.add(task_id)
-        try:
-            result = await data_manager.run_business_profile_index_discovery(
-                exchanges=exchanges,
-                start_date=start_date,
-                end_date=end_date,
-                lookback_days=lookback_days,
-                overlap_days=overlap_days,
-                page_size=page_size,
-                max_pages_per_market=max_pages_per_market,
-                dry_run=dry_run,
+                max_attempts=max_attempts,
+                discovery_kwargs=discovery_kwargs,
+                stage_budgets=stage_budgets,
             )
             status = str(result.get("status") or "failed")
             success = status in {"success", "degraded", "disabled"}
             await self._send_task_report(
                 report_data={
-                    "name": "业务画像公告索引发现报告",
+                    "name": "业务画像异步日更报告",
                     "status": "success" if success else "error",
-                    "tasks_completed": result.get("selected_announcements", 0),
-                    "duration": "N/A",
+                    "tasks_completed": (result.get("enqueue") or {}).get("inserted", 0),
+                    "duration": f"{float(result.get('elapsed_seconds') or 0):.2f}s",
                     "maintenance_tasks": [
-                        {
-                            "task_name": task_id,
-                            "status": result.get("reason") or status,
-                        }
+                        {"task_name": task_id, "status": result.get("reason") or status}
                     ],
-                    "business_profile_index_discovery": result,
+                    "business_profile_async_production": result,
                 },
                 report_type="maintenance_report",
-                task_name="业务画像公告索引发现",
+                task_name="业务画像异步日更",
                 job_config=job_config,
             )
             return success
         except Exception as exc:
             scheduler_logger.exception(
-                "[Scheduler] Business-profile index discovery failed: %s", exc
+                "[Scheduler] Business-profile daily incremental failed: %s", exc
             )
             return False
         finally:
             self._active_tasks.discard(task_id)
 
-    async def business_profile_monthly_reconciliation(
+    async def business_profile_backfill(
         self,
         knowledge_cutoff: Optional[str] = None,
-        include_archive_audit: bool = True,
+        instrument_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        document_types: Optional[List[str]] = None,
+        field_families: Optional[List[str]] = None,
+        runtime_identities: Optional[Dict[str, str]] = None,
+        force: bool = False,
+        max_attempts: int = 3,
+        stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        return await self._run_business_profile_reconciliation_task(
-            task_id="business_profile_monthly_reconciliation",
-            frequency="monthly",
-            knowledge_cutoff=knowledge_cutoff,
-            include_archive_audit=include_archive_audit,
-            job_config=job_config,
-        )
-
-    async def business_profile_semiannual_freshness(
-        self,
-        knowledge_cutoff: Optional[str] = None,
-        include_archive_audit: bool = False,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        return await self._run_business_profile_reconciliation_task(
-            task_id="business_profile_semiannual_freshness",
-            frequency="semiannual",
-            knowledge_cutoff=knowledge_cutoff,
-            include_archive_audit=include_archive_audit,
-            job_config=job_config,
-        )
-
-    async def business_profile_annual_coverage_reconciliation(
-        self,
-        knowledge_cutoff: Optional[str] = None,
-        include_archive_audit: bool = True,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        return await self._run_business_profile_reconciliation_task(
-            task_id="business_profile_annual_coverage_reconciliation",
-            frequency="annual",
-            knowledge_cutoff=knowledge_cutoff,
-            include_archive_audit=include_archive_audit,
-            job_config=job_config,
-        )
-
-    async def _run_business_profile_reconciliation_task(
-        self,
-        *,
-        task_id: str,
-        frequency: str,
-        knowledge_cutoff: Optional[str],
-        include_archive_audit: bool,
-        job_config: Optional[JobConfig],
-    ) -> bool:
+        """Run explicit historical or specialist scope through production queues."""
+        task_id = "business_profile_backfill"
         self._active_tasks.add(task_id)
         try:
-            result = await data_manager.run_business_profile_reconciliation(
-                frequency=frequency,
+            result = await data_manager.run_business_profile_backfill(
                 knowledge_cutoff=knowledge_cutoff,
-                include_archive_audit=include_archive_audit,
+                instrument_ids=instrument_ids,
+                start_date=start_date,
+                end_date=end_date,
+                document_types=document_types,
+                field_families=field_families,
+                runtime_identities=runtime_identities,
+                force=force,
+                max_attempts=max_attempts,
+                stage_budgets=stage_budgets,
             )
-            status = str(result.get("status") or "failed")
-            success = status in {"ready", "success", "degraded", "disabled"}
+            success = str(result.get("status") or "failed") in {
+                "success",
+                "degraded",
+                "disabled",
+            }
             await self._send_task_report(
                 report_data={
-                    "name": "业务画像生产对账报告",
+                    "name": "业务画像手工回补报告",
                     "status": "success" if success else "error",
-                    "tasks_completed": result.get("manifest_instrument_count", 0),
+                    "tasks_completed": (result.get("enqueue") or {}).get("inserted", 0),
                     "duration": "N/A",
                     "maintenance_tasks": [
                         {
                             "task_name": task_id,
-                            "status": result.get("reason") or status,
+                            "status": result.get("reason") or result.get("status"),
                         }
                     ],
-                    "business_profile_reconciliation": result,
+                    "business_profile_async_production": result,
                 },
                 report_type="maintenance_report",
-                task_name="业务画像生产对账",
+                task_name="业务画像手工回补",
                 job_config=job_config,
             )
             return success
         except Exception as exc:
             scheduler_logger.exception(
-                "[Scheduler] Business-profile reconciliation failed: %s", exc
+                "[Scheduler] Business-profile backfill failed: %s", exc
             )
             return False
         finally:

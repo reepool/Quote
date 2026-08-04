@@ -26,20 +26,19 @@ def _task():
     return task
 
 
-def test_semantic_maintenance_job_is_disabled_and_not_scheduled(monkeypatch):
+def test_daily_incremental_job_is_disabled_and_not_scheduled(monkeypatch):
     raw = (
         UnifiedConfigManager("config")
         .get_scheduler_config()
-        .jobs["business_profile_semantic_maintenance"]
+        .jobs["business_profile_daily_incremental"]
     )
     assert raw["enabled"] is False
-    assert raw["parameters"]["mode"] == "resume"
-    assert raw["parameters"]["instrument_ids"] == []
+    assert raw["parameters"]["discovery_kwargs"]["max_pages_per_market"] == 240
 
     scheduler = TaskScheduler()
     scheduler.job_configs = {
-        "business_profile_semantic_maintenance": JobConfig(
-            job_id="business_profile_semantic_maintenance",
+        "business_profile_daily_incremental": JobConfig(
+            job_id="business_profile_daily_incremental",
             enabled=False,
             manual_only=False,
             description=raw["description"],
@@ -58,15 +57,18 @@ def test_semantic_maintenance_job_is_disabled_and_not_scheduled(monkeypatch):
 
 def test_all_business_profile_production_jobs_are_disabled_by_default():
     jobs = UnifiedConfigManager("config").get_scheduler_config().jobs
-    for job_id in (
+    assert jobs["business_profile_daily_incremental"]["enabled"] is False
+    assert jobs["business_profile_daily_incremental"]["trigger"]["month"] == "1-12"
+    assert jobs["business_profile_backfill"]["enabled"] is False
+    assert jobs["business_profile_backfill"]["manual_only"] is True
+    for legacy_job_id in (
         "business_profile_index_discovery_daily",
         "business_profile_semantic_maintenance",
         "business_profile_monthly_reconciliation",
         "business_profile_semiannual_freshness",
         "business_profile_annual_coverage_reconciliation",
     ):
-        assert jobs[job_id]["enabled"] is False
-    assert jobs["business_profile_index_discovery_daily"]["trigger"]["month"] == "1-12"
+        assert legacy_job_id not in jobs
 
 
 def test_data_manager_disabled_semantic_module_has_no_side_effects():
@@ -275,89 +277,76 @@ def test_unchanged_complete_scope_builds_no_pdf_acquirer_or_llm_client(
     llm_client.assert_not_called()
 
 
-def test_scheduler_forwards_exact_scope_and_reports_unchanged(monkeypatch):
+def test_scheduler_forwards_daily_async_scope(monkeypatch):
     task = _task()
     manager = Mock()
-    manager.run_business_profile_semantic_production = AsyncMock(
+    manager.run_business_profile_daily_incremental = AsyncMock(
         return_value={
-            "status": "unchanged",
-            "completed_stages": ["plan", "select", "extract", "verify", "promote"],
-            "metrics": {"reused_results": 1, "elapsed_seconds": 0.01},
+            "status": "success",
+            "enqueue": {"inserted": 2},
+            "elapsed_seconds": 0.01,
         }
     )
     monkeypatch.setattr(task_module, "data_manager", manager)
 
     result = asyncio.run(
-        task.business_profile_semantic_maintenance(
-            mode="resume",
+        task.business_profile_daily_incremental(
             knowledge_cutoff="2026-08-01",
-            instrument_ids=["601088.SH"],
+            exchanges=["SSE"],
             field_families=["atomic_activities"],
             runtime_identities={"model": "model.v1"},
-            promotion_manifest_hashes={"atomic_activities": "manifest"},
-            promotion_manifests={},
-            max_instruments=17,
-            checkpoint_path="data/checkpoints/test.json",
+            max_attempts=4,
+            discovery_kwargs={"lookback_days": 7},
+            stage_budgets={"semantic": {"max_items": 2}},
         )
     )
 
     assert result is True
-    manager.run_business_profile_semantic_production.assert_awaited_once_with(
-        mode="resume",
+    manager.run_business_profile_daily_incremental.assert_awaited_once_with(
         knowledge_cutoff="2026-08-01",
-        instrument_ids=["601088.SH"],
+        exchanges=["SSE"],
         field_families=["atomic_activities"],
         runtime_identities={"model": "model.v1"},
-        promotion_manifest_hashes={"atomic_activities": "manifest"},
-        promotion_manifests={},
-        max_instruments=17,
-        checkpoint_path="data/checkpoints/test.json",
+        max_attempts=4,
+        discovery_kwargs={"lookback_days": 7},
+        stage_budgets={"semantic": {"max_items": 2}},
     )
-    assert "business_profile_semantic_maintenance" not in task._active_tasks
+    assert "business_profile_daily_incremental" not in task._active_tasks
     report = task._send_task_report.await_args.kwargs["report_data"]
-    assert report["business_profile_semantic_production"]["status"] == "unchanged"
+    assert report["business_profile_async_production"]["status"] == "success"
 
 
-def test_scheduler_forwards_index_discovery_and_reconciliation(monkeypatch):
+def test_scheduler_forwards_manual_backfill_scope(monkeypatch):
     task = _task()
     manager = Mock()
-    manager.run_business_profile_index_discovery = AsyncMock(
-        return_value={"status": "success", "selected_announcements": 2}
-    )
-    manager.run_business_profile_reconciliation = AsyncMock(
-        return_value={"status": "ready", "manifest_instrument_count": 3}
+    manager.run_business_profile_backfill = AsyncMock(
+        return_value={"status": "success", "enqueue": {"inserted": 1}}
     )
     monkeypatch.setattr(task_module, "data_manager", manager)
 
     assert asyncio.run(
-        task.business_profile_index_discovery_daily(
-            exchanges=["SSE"],
-            lookback_days=7,
-            overlap_days=2,
-            page_size=20,
-            max_pages_per_market=4,
-            dry_run=True,
+        task.business_profile_backfill(
+            knowledge_cutoff="2026-08-01",
+            instrument_ids=["601088.SH"],
+            start_date="2025-01-01",
+            end_date="2026-08-01",
+            document_types=["resource_report"],
+            field_families=["commodity_exposure_facts"],
+            runtime_identities={"rules": "v1"},
+            force=True,
+            max_attempts=4,
+            stage_budgets={"acquire": {"max_items": 2}},
         )
     )
-    manager.run_business_profile_index_discovery.assert_awaited_once_with(
-        exchanges=["SSE"],
-        start_date=None,
-        end_date=None,
-        lookback_days=7,
-        overlap_days=2,
-        page_size=20,
-        max_pages_per_market=4,
-        dry_run=True,
-    )
-
-    assert asyncio.run(
-        task.business_profile_annual_coverage_reconciliation(
-            knowledge_cutoff="2026-05-31",
-            include_archive_audit=True,
-        )
-    )
-    manager.run_business_profile_reconciliation.assert_awaited_once_with(
-        frequency="annual",
-        knowledge_cutoff="2026-05-31",
-        include_archive_audit=True,
+    manager.run_business_profile_backfill.assert_awaited_once_with(
+        knowledge_cutoff="2026-08-01",
+        instrument_ids=["601088.SH"],
+        start_date="2025-01-01",
+        end_date="2026-08-01",
+        document_types=["resource_report"],
+        field_families=["commodity_exposure_facts"],
+        runtime_identities={"rules": "v1"},
+        force=True,
+        max_attempts=4,
+        stage_budgets={"acquire": {"max_items": 2}},
     )
