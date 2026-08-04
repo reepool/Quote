@@ -94,3 +94,44 @@ Each automatic or manual run SHALL report discovery completeness, enqueue decisi
 - **WHEN** bounded work remains after a run
 - **THEN** the run SHALL complete successfully with deferred queue counts and oldest age
 - **AND** deferred work SHALL remain automatically claimable by later daily runs
+
+### Requirement: Concurrent Compute With Cooperative Single Writer
+The system SHALL allow bounded parse and semantic computation to run concurrently while permitting at most one business-profile SQLite write transaction at a time within the production process.
+
+#### Scenario: Parse or semantic workers overlap
+- **WHEN** multiple parse or semantic items are claimed with concurrency greater than one
+- **THEN** their file parsing, deterministic extraction, and LLM work MAY overlap
+- **AND** one worker waiting to persist SHALL NOT hold the writer gate during its computation or network calls
+
+#### Scenario: Concurrent workers persist results
+- **WHEN** queue state, manifests, candidates, exceptions, reviews, or publications are persisted by concurrent workers
+- **THEN** each mutating transaction SHALL pass through the same single-writer gate
+- **AND** the maximum observed concurrent local writers SHALL remain one
+
+#### Scenario: Other SQLite clients need access
+- **WHEN** successive local writes are waiting
+- **THEN** the writer gate SHALL release the database transaction between units of work
+- **AND** it SHALL support a bounded configurable inter-write interval and report writer wait and duration metrics
+
+### Requirement: Reusable Annual Report Asset Catalog
+The system SHALL expose downloaded annual-report PDFs as a reusable catalog derived from the canonical immutable source-file manifest.
+
+#### Scenario: Another module requests an annual report
+- **WHEN** a caller queries by instrument and optional report period, filing id, or knowledge cutoff
+- **THEN** the catalog SHALL return matching manifest identity, report metadata, immutable path, content hash, version lineage, and derived active status
+- **AND** it SHALL support validating that the local PDF exists and matches its registered size and hash
+
+#### Scenario: Acquisition sees an existing valid filing
+- **WHEN** an annual-report candidate has a source-qualified filing identity already registered with a valid local PDF
+- **THEN** acquisition SHALL reuse that asset before making a network request
+- **AND** it SHALL NOT create a duplicate manifest or PDF
+
+#### Scenario: A corrected annual report is archived
+- **WHEN** a correction or replacement for an existing report period is downloaded
+- **THEN** the catalog SHALL identify the correction as the active version through manifest lineage
+- **AND** prior versions SHALL remain queryable for point-in-time and audit use
+
+#### Scenario: A registered file fails validation
+- **WHEN** the catalog path is missing, not a PDF, or disagrees with registered length or hash
+- **THEN** the entry SHALL not satisfy a verified reuse request
+- **AND** acquisition MAY reacquire the filing without silently deleting the historical manifest

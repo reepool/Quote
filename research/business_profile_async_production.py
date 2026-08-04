@@ -5,7 +5,9 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import threading
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -20,6 +22,7 @@ WORK_STAGES = ("acquire", "parse", "semantic", "publish")
 CLAIMABLE_STATUSES = ("pending", "retry_due")
 TERMINAL_STATUSES = ("completed", "superseded", "terminal_failure")
 AUTOMATIC_DOCUMENT_TYPES = ("annual_report", "annual_report_correction")
+_WRITE_COORDINATOR_CREATION_LOCK = threading.Lock()
 
 
 @dataclass(frozen=True)
@@ -30,13 +33,130 @@ class StageBudget:
     high_water_mark: int = 1000
 
     def __post_init__(self) -> None:
-        if min(
-            self.max_items,
-            self.max_concurrency,
-            self.max_elapsed_seconds,
-            self.high_water_mark,
-        ) <= 0:
+        if (
+            min(
+                self.max_items,
+                self.max_concurrency,
+                self.max_elapsed_seconds,
+                self.high_water_mark,
+            )
+            <= 0
+        ):
             raise ValueError("business-profile stage budgets must be positive")
+
+
+class BusinessProfileWriteCoordinator:
+    """Serialize short SQLite transactions without serializing worker computation."""
+
+    def __init__(self, *, inter_write_seconds: float = 0.01) -> None:
+        if inter_write_seconds < 0:
+            raise ValueError(
+                "business-profile inter_write_seconds must not be negative"
+            )
+        self.inter_write_seconds = float(inter_write_seconds)
+        self._writer_lock = threading.RLock()
+        self._metrics_lock = threading.Lock()
+        self._local = threading.local()
+        self._pending_writers = 0
+        self._active_writers = 0
+        self._max_pending_writers = 0
+        self._max_active_writers = 0
+        self._write_transactions = 0
+        self._wait_seconds = 0.0
+        self._write_seconds = 0.0
+        self._last_release_monotonic = 0.0
+
+    @contextmanager
+    def write_scope(self):
+        """Hold the single-writer gate for one transaction, with reentrant safety."""
+
+        depth = int(getattr(self._local, "depth", 0))
+        if depth:
+            self._local.depth = depth + 1
+            try:
+                yield
+            finally:
+                self._local.depth -= 1
+            return
+
+        wait_started = time.monotonic()
+        with self._metrics_lock:
+            self._pending_writers += 1
+            self._max_pending_writers = max(
+                self._max_pending_writers,
+                self._pending_writers,
+            )
+        self._writer_lock.acquire()
+        acquired_at = time.monotonic()
+        with self._metrics_lock:
+            self._pending_writers -= 1
+            self._active_writers += 1
+            self._max_active_writers = max(
+                self._max_active_writers,
+                self._active_writers,
+            )
+            last_release = self._last_release_monotonic
+        remaining_yield = self.inter_write_seconds - max(
+            0.0, acquired_at - last_release
+        )
+        if last_release and remaining_yield > 0:
+            time.sleep(remaining_yield)
+        write_started = time.monotonic()
+        self._local.depth = 1
+        try:
+            yield
+        finally:
+            finished_at = time.monotonic()
+            self._local.depth = 0
+            with self._metrics_lock:
+                self._active_writers -= 1
+                self._write_transactions += 1
+                self._wait_seconds += max(0.0, acquired_at - wait_started)
+                self._write_seconds += max(0.0, finished_at - write_started)
+                self._last_release_monotonic = finished_at
+            self._writer_lock.release()
+
+    async def run(self, func: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Any:
+        """Run one short synchronous write unit outside the event-loop thread."""
+
+        def invoke() -> Any:
+            with self.write_scope():
+                return func(*args, **kwargs)
+
+        return await asyncio.to_thread(invoke)
+
+    def snapshot(self) -> dict[str, Any]:
+        with self._metrics_lock:
+            return {
+                "pending_writers": self._pending_writers,
+                "active_writers": self._active_writers,
+                "max_pending_writers": self._max_pending_writers,
+                "max_active_writers": self._max_active_writers,
+                "write_transactions": self._write_transactions,
+                "wait_seconds": round(self._wait_seconds, 6),
+                "write_seconds": round(self._write_seconds, 6),
+                "inter_write_seconds": self.inter_write_seconds,
+            }
+
+
+def get_business_profile_write_coordinator(
+    storage: Any,
+    *,
+    inter_write_seconds: float = 0.01,
+) -> BusinessProfileWriteCoordinator:
+    """Return the process-local single writer shared by one storage manager."""
+
+    coordinator = getattr(storage, "_business_profile_write_coordinator", None)
+    if coordinator is not None:
+        return coordinator
+    with _WRITE_COORDINATOR_CREATION_LOCK:
+        coordinator = getattr(storage, "_business_profile_write_coordinator", None)
+        if coordinator is None:
+            coordinator = BusinessProfileWriteCoordinator(
+                inter_write_seconds=inter_write_seconds
+            )
+            setattr(storage, "_business_profile_write_coordinator", coordinator)
+    return coordinator
 
 
 class BusinessProfileWorkRepository:
@@ -61,9 +181,9 @@ class BusinessProfileWorkRepository:
         latest: dict[str, Mapping[str, Any]] = {}
         for row in rows:
             instrument_id = str(row["instrument_id"])
-            if instrument_id not in latest or _frontier_sort_key(row) > _frontier_sort_key(
-                latest[instrument_id]
-            ):
+            if instrument_id not in latest or _frontier_sort_key(
+                row
+            ) > _frontier_sort_key(latest[instrument_id]):
                 latest[instrument_id] = row
         return self._enqueue_rows(
             tuple(latest.values()),
@@ -96,12 +216,12 @@ class BusinessProfileWorkRepository:
             raise ValueError(
                 "business-profile backfill requires instruments or a bounded start date"
             )
-        normalized_start = (
-            _date_text(start_date, "start_date") if start_date else None
-        )
+        normalized_start = _date_text(start_date, "start_date") if start_date else None
         normalized_end = _date_text(end_date, "end_date") if end_date else None
         if normalized_start and normalized_end and normalized_start > normalized_end:
-            raise ValueError("business-profile backfill start_date must not exceed end_date")
+            raise ValueError(
+                "business-profile backfill start_date must not exceed end_date"
+            )
         rows = self._frontier_rows(
             knowledge_cutoff=cutoff,
             start_date=normalized_start,
@@ -203,7 +323,9 @@ class BusinessProfileWorkRepository:
             )
             conn.commit()
         if int(cursor.rowcount or 0) != 1:
-            raise RuntimeError(f"business-profile work acknowledgement conflict: {work_id}")
+            raise RuntimeError(
+                f"business-profile work acknowledgement conflict: {work_id}"
+            )
 
     def fail(
         self,
@@ -224,7 +346,8 @@ class BusinessProfileWorkRepository:
             else (
                 now
                 + timedelta(
-                    seconds=max(1, initial_backoff_seconds) * (2 ** max(attempts - 1, 0))
+                    seconds=max(1, initial_backoff_seconds)
+                    * (2 ** max(attempts - 1, 0))
                 )
             ).isoformat()
         )
@@ -369,13 +492,16 @@ class BusinessProfileWorkRepository:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
             for row in rows:
-                work_id = "bp-work-" + _stable_hash(
-                    {
-                        "frontier_id": row["frontier_id"],
-                        "policy": policy,
-                        "processing_identity_hash": identity_hash,
-                    }
-                )[:24]
+                work_id = (
+                    "bp-work-"
+                    + _stable_hash(
+                        {
+                            "frontier_id": row["frontier_id"],
+                            "policy": policy,
+                            "processing_identity_hash": identity_hash,
+                        }
+                    )[:24]
+                )
                 checkpoint = self.checkpoint_root / f"{work_id}.json"
                 existing = conn.execute(
                     "SELECT status FROM business_profile_work_items WHERE work_id = ?",
@@ -472,12 +598,17 @@ class BusinessProfileAsyncProductionService:
         stage_runner: Callable[[str, Mapping[str, Any]], Awaitable[Mapping[str, Any]]],
         lease_seconds: int = 900,
         retry_backoff_seconds: int = 300,
+        write_coordinator: BusinessProfileWriteCoordinator | None = None,
     ) -> None:
         self.repository = repository
         self.discovery_runner = discovery_runner
         self.stage_runner = stage_runner
         self.lease_seconds = max(1, int(lease_seconds))
         self.retry_backoff_seconds = max(1, int(retry_backoff_seconds))
+        self.write_coordinator = (
+            write_coordinator
+            or get_business_profile_write_coordinator(repository.storage)
+        )
 
     async def run_daily(
         self,
@@ -496,7 +627,7 @@ class BusinessProfileAsyncProductionService:
                 "status": "failed",
                 "errors": [f"{type(exc).__name__}: {exc}"],
             }
-        enqueue = await asyncio.to_thread(
+        enqueue = await self.write_coordinator.run(
             self.repository.enqueue_latest_annual,
             knowledge_cutoff=knowledge_cutoff,
             processing_identity=processing_identity,
@@ -518,6 +649,7 @@ class BusinessProfileAsyncProductionService:
             "enqueue": enqueue,
             "workers": workers,
             "queue_health": health,
+            "writer": self.write_coordinator.snapshot(),
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
 
@@ -542,15 +674,13 @@ class BusinessProfileAsyncProductionService:
         discovery = None
         if discovery_kwargs is not None:
             try:
-                discovery = dict(
-                    await self.discovery_runner(**dict(discovery_kwargs))
-                )
+                discovery = dict(await self.discovery_runner(**dict(discovery_kwargs)))
             except Exception as exc:
                 discovery = {
                     "status": "failed",
                     "errors": [f"{type(exc).__name__}: {exc}"],
                 }
-        enqueue = await asyncio.to_thread(
+        enqueue = await self.write_coordinator.run(
             self.repository.enqueue_scoped,
             knowledge_cutoff=knowledge_cutoff,
             processing_identity=processing_identity,
@@ -577,6 +707,7 @@ class BusinessProfileAsyncProductionService:
             "enqueue": enqueue,
             "workers": workers,
             "queue_health": await asyncio.to_thread(self.repository.health),
+            "writer": self.write_coordinator.snapshot(),
         }
 
     async def _run_workers(
@@ -608,7 +739,9 @@ class BusinessProfileAsyncProductionService:
                     }
                 stage_index = WORK_STAGES.index(stage)
                 upstream_done = (
-                    None if stage_index == 0 else stage_done[WORK_STAGES[stage_index - 1]]
+                    None
+                    if stage_index == 0
+                    else stage_done[WORK_STAGES[stage_index - 1]]
                 )
                 return stage, await self._drain_stage(
                     stage,
@@ -639,7 +772,7 @@ class BusinessProfileAsyncProductionService:
                 budget.max_concurrency,
                 budget.max_items - claimed,
             )
-            items = await asyncio.to_thread(
+            items = await self.write_coordinator.run(
                 self.repository.claim,
                 stage,
                 limit=batch_limit,
@@ -662,7 +795,7 @@ class BusinessProfileAsyncProductionService:
                         raise RuntimeError(
                             str(result.get("reason") or status or "stage_failed")
                         )
-                    await asyncio.to_thread(
+                    await self.write_coordinator.run(
                         self.repository.acknowledge,
                         str(item["work_id"]),
                         lease_owner=lease_owner,
@@ -670,7 +803,7 @@ class BusinessProfileAsyncProductionService:
                     )
                     completed += 1
                 except Exception as exc:
-                    terminal_status = await asyncio.to_thread(
+                    terminal_status = await self.write_coordinator.run(
                         self.repository.fail,
                         str(item["work_id"]),
                         lease_owner=lease_owner,
@@ -701,6 +834,7 @@ class BusinessProfileAsyncProductionService:
             "lease_conflicts": lease_conflicts,
             "errors": errors[:20],
             "elapsed_seconds": round(time.monotonic() - started, 3),
+            "writer": self.write_coordinator.snapshot(),
         }
 
 

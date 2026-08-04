@@ -14,6 +14,8 @@ The operating policy is now narrower: unattended production normally needs only 
 - Automatically coalesce an issuer to its latest active annual report and correction.
 - Drain annual-report-season load through configurable budgets and resumable date windows.
 - Provide one automatic daily entry point and one manual backfill entry point.
+- Preserve parallel parse and semantic computation without allowing concurrent business-profile SQLite writers.
+- Make verified annual-report PDFs discoverable and reusable by other modules without duplicate downloads.
 
 **Non-Goals:**
 
@@ -21,6 +23,7 @@ The operating policy is now narrower: unattended production normally needs only 
 - Automatically analyzing semiannual reports, specialist announcements, or prospectuses.
 - Deleting old PDFs, manifests, facts, or point-in-time history.
 - Running unbounded background processes outside the existing scheduler lifecycle.
+- Maintaining a second annual-report inventory that can drift from the immutable source-file manifest.
 
 ## Decisions
 
@@ -56,6 +59,18 @@ The manual-only scheduler task accepts explicit instruments, dates/report years,
 
 Configuration supplies per-stage concurrency, item/time budgets, lease duration, retry limit/backoff, queue high-water marks, and filing-season multipliers. High backlog reduces or pauses new slow-stage claims but does not disable metadata discovery. Queue reports include depth and oldest age by stage/status, leased/retry/terminal counts, discovery-window backlog, throughput, and reasons for skipped or superseded work.
 
+### Serialize only SQLite write transactions
+
+Parse and semantic work items retain their independent task concurrency. PDF parsing, deterministic extraction, and LLM requests run outside a process-local writer gate. The gate is acquired lazily by a database connection at its first mutating statement and released on commit, rollback, or close, so reads and expensive computation remain concurrent. Queue claims and acknowledgements use the same gate.
+
+The gate records pending writers, maximum observed concurrent writers, wait time, and transaction duration. A configurable short inter-write interval can reserve opportunities for other SQLite clients between local transactions. Wrapping an entire parse or semantic stage in a global lock was rejected because it would serialize slow computation and model latency; allowing each worker to write independently was rejected because it creates avoidable SQLite contention.
+
+### Project a shared annual-report asset catalog from manifests
+
+`financial_source_files` remains the canonical inventory for downloaded reports. A stable catalog service filters immutable business-profile PDF manifests, derives active-version state from `supersedes_source_file_id`, and supports instrument, report period, filing id, knowledge-cutoff, and latest-version queries. Optional validation checks local file existence, PDF signature, size, and SHA-256 before returning an asset.
+
+Acquisition checks the catalog by source-qualified filing identity before network retrieval. A valid hit is returned as an unchanged archive record. Corrections create a new immutable asset and supersede the prior active version without deleting it. A separate mutable annual-report table was rejected because it would duplicate manifest lineage and eventually drift.
+
 ## Risks / Trade-offs
 
 - [A single publication date can still exceed a bounded provider scan] -> Report an unsplittable window explicitly, retry with a configurable peak cap, and never label the window complete merely because a page limit was reached.
@@ -64,6 +79,8 @@ Configuration supplies per-stage concurrency, item/time budgets, lease duration,
 - [Existing semantic plan currently performs acquisition] -> Keep acquisition isolated in the `acquire` worker and run later stages only from the same checkpoint after successful acknowledgement.
 - [LLM backlog may span many days] -> Deterministic parsing completes independently, semantic work is token/time bounded, and the daily report exposes oldest age and high-water status.
 - [Latest-annual-only reduces freshness for rare midyear restructurings] -> Accept this as explicit policy; urgent cases use bounded manual specialist backfill.
+- [A slow writer queue can increase lease age] -> Keep transactions short, expose writer wait metrics, size leases above bounded compute plus write wait, and retry lease conflicts idempotently.
+- [A catalog row can outlive or disagree with its local file] -> Treat validation failure as a cache miss, preserve diagnostics, and reacquire without deleting historical metadata automatically.
 
 ## Migration Plan
 
@@ -73,6 +90,7 @@ Configuration supplies per-stage concurrency, item/time budgets, lease duration,
 4. Replace old automatic business-profile scheduler entries with the new two-task configuration; leave legacy callable methods temporarily available for compatibility but unscheduled.
 5. Validate in temporary databases with fake discovery/stage handlers, then run read-only reconciliation and rollout-gate checks.
 6. Roll back operationally by disabling the daily task. Queue, frontier, manifests, immutable PDFs, and audit history remain recoverable and are not deleted.
+7. Add the writer gate and catalog projection without migrating or rewriting existing manifests; existing archived PDFs become immediately queryable.
 
 ## Open Questions
 

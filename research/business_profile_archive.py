@@ -18,6 +18,7 @@ from research.announcements import (
     AnnouncementAttachmentRetriever,
     load_announcement_acquisition_config,
 )
+from research.annual_report_assets import AnnualReportAssetCatalog
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import (
     business_profile_document_family,
@@ -187,6 +188,7 @@ class BusinessProfileDocumentArchiveService:
                 "business-profile archive layout must include {content_hash}"
             )
         self.downloader = downloader or download_business_profile_candidate
+        self.asset_catalog = AnnualReportAssetCatalog(storage)
 
     @classmethod
     def from_research_config(
@@ -264,14 +266,16 @@ class BusinessProfileDocumentArchiveService:
                     break
                 result.attempted += 1
                 try:
-                    content = self.downloader(candidate)
-                    record = self.archive_content(
-                        instrument,
-                        candidate,
-                        content,
-                        manifest_ingestion_run_id=manifest_ingestion_run_id,
-                        parent_ingestion_run_id=parent_ingestion_run_id,
-                    )
+                    record = self._reuse_annual_report_asset(instrument, candidate)
+                    if record is None:
+                        content = self.downloader(candidate)
+                        record = self.archive_content(
+                            instrument,
+                            candidate,
+                            content,
+                            manifest_ingestion_run_id=manifest_ingestion_run_id,
+                            parent_ingestion_run_id=parent_ingestion_run_id,
+                        )
                 except Exception as exc:
                     result.failed += 1
                     result.errors.append(
@@ -316,6 +320,40 @@ class BusinessProfileDocumentArchiveService:
                     result,
                     interrupted_error=interrupted_error,
                 )
+
+    def _reuse_annual_report_asset(
+        self,
+        instrument: Mapping[str, Any],
+        candidate: BusinessProfileDocumentCandidate,
+    ) -> BusinessProfileArchiveRecord | None:
+        document_type = candidate.classification.document_type
+        if document_type not in {"annual_report", "annual_report_correction"}:
+            return None
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        if not instrument_id:
+            return None
+        report_period = infer_business_profile_report_period(
+            candidate.title,
+            candidate.announcement_time,
+        )
+        asset = self.asset_catalog.find_reusable_filing(
+            instrument_id=instrument_id,
+            report_period=report_period,
+            source=str(candidate.source or "cninfo").strip().lower(),
+            filing_id=candidate.announcement_id,
+        )
+        if asset is None:
+            return None
+        return BusinessProfileArchiveRecord(
+            announcement_id=candidate.announcement_id,
+            report_period=report_period,
+            document_type=document_type,
+            content_hash=str(asset["content_hash"]),
+            archive_path=str(asset["archive_path"]),
+            source_file_id=str(asset["source_file_id"]),
+            status="unchanged",
+            supersedes_source_file_id=asset.get("supersedes_source_file_id"),
+        )
 
     def archive_content(
         self,

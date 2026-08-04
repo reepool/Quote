@@ -107,6 +107,19 @@ promotion manifest 文件是按字段族键控的完整对象，或放在 `field
 确认阶段。进程中断后仅在租约到期后重领，同一源公告、策略和处理身份不会
 重复建项。
 
+`parse` 和 `semantic` 的 `max_concurrency` 控制文件解析、确定性计算和 LLM 请求
+并发，允许多个公司同时处理。SQLite 入库不使用该并发度：队列状态、PDF manifest、
+候选、异常、审核和发布事务统一通过单写入门控，门控只在首个写语句到提交/回滚
+之间持有，不覆盖解析或网络等待。`production_operations.writer_yield_seconds` 默认
+为 `0.01`，在本进程连续事务之间留出短暂窗口给其他 SQLite 客户端。运行报告的
+`writer` 字段应保持 `max_active_writers=1`，并提供等待数、累计等待和事务耗时。
+
+已下载年报的唯一目录仍是 `financial_source_files`。跨模块通过
+`AnnualReportAssetCatalog` 或 DataManager 的 `get_annual_report_assets`、
+`get_annual_report_asset` 查询股票、报告期、公告 ID、知识截止日、活动修订版本和
+本地路径。需要直接复用时启用文件校验；系统验证 PDF 头、长度和 SHA-256 后才跳过
+下载。更正稿切换为活动版本，旧文件和 manifest 保留，不自动覆盖或删除。
+
 检查点只可在范围哈希、全部运行身份和 `source_revision` 完全一致时恢复。
 `source_revision` 绑定最小计划选中的公告 hash、开放异常重试代次以及本地派生
 输入；同一天出现修订公告或到期机器返工时会生成新范围，不会误复用完成态

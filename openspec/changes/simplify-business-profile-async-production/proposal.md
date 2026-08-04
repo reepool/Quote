@@ -10,6 +10,8 @@ Business-profile production currently spreads discovery, semantic maintenance, a
 - Change the default automatic disclosure policy to each issuer's latest available annual report and its corrections or replacements; keep prior annual artifacts immutable for point-in-time use.
 - Keep specialist disclosures, prospectuses, explicit historical periods, and forced reprocessing behind the manual backfill entry point.
 - Add bounded worker budgets, leases, retries, coalescing, supersession, queue health, and peak-season backpressure controls.
+- Keep parse and semantic computation concurrent while routing every business-profile SQLite transaction through one observable, cooperative writer gate.
+- Expose downloaded annual-report PDFs as a reusable asset catalog backed by the existing immutable source-file manifest, and reuse a verified catalog hit before downloading.
 
 ## Capabilities
 
@@ -24,6 +26,6 @@ Business-profile production currently spreads discovery, semantic maintenance, a
 ## Impact
 
 - Affected code: business-profile disclosure planning, production operations, semantic runtime orchestration, scheduler task registration, configuration, and focused tests.
-- Affected storage: additive durable work-item and discovery-cursor state in `research.db`; existing immutable PDF, manifest, evidence, fact, role, exposure, and LLM audit tables remain authoritative.
+- Affected storage: additive durable work-item and discovery-cursor state in `research.db`; existing immutable PDF, manifest, evidence, fact, role, exposure, and LLM audit tables remain authoritative. The annual-report catalog is a query projection over `financial_source_files`, not a second source of truth.
 - Affected operations: old business-profile automatic reconciliation schedules are removed; their checks run incrementally inside the daily workflow, while historical and specialist scope is explicit manual work.
 - No new provider, model SDK, or manual-review dependency is introduced. Existing feature switches remain disabled by default until production rollout gates are met.

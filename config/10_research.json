@@ -157,6 +157,7 @@
           "max_windows_per_market": 2,
           "lease_seconds": 900,
           "retry_backoff_seconds": 300,
+          "writer_yield_seconds": 0.01,
           "stage_budgets": {
             "acquire": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 300, "high_water_mark": 1000},
             "parse": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000},

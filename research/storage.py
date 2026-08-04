@@ -17,7 +17,7 @@ import threading
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, List, Optional, Sequence
 
 from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.announcements.models import (
@@ -63,6 +63,142 @@ from research.providers.base import (
     ValuationHistorySnapshot,
     ValuationInputSnapshot,
 )
+
+
+_SQLITE_MUTATING_PREFIXES = (
+    "ALTER",
+    "CREATE",
+    "DELETE",
+    "DROP",
+    "INSERT",
+    "REINDEX",
+    "REPLACE",
+    "UPDATE",
+    "VACUUM",
+)
+
+
+def _sqlite_statement_requires_writer(sql: Any) -> bool:
+    statement = str(sql or "").lstrip()
+    if not statement:
+        return False
+    upper = statement.upper()
+    if upper.startswith("BEGIN IMMEDIATE") or upper.startswith("BEGIN EXCLUSIVE"):
+        return True
+    return upper.startswith(_SQLITE_MUTATING_PREFIXES)
+
+
+class _CoordinatedSQLiteCursor:
+    """Delegate a cursor while preserving lazy write-gate acquisition."""
+
+    def __init__(
+        self, connection: "_CoordinatedSQLiteConnection", cursor: sqlite3.Cursor
+    ):
+        self._connection = connection
+        self._cursor = cursor
+
+    def execute(self, sql: Any, parameters: Any = ()) -> "_CoordinatedSQLiteCursor":
+        self._connection._ensure_writer(sql)
+        self._cursor.execute(sql, parameters)
+        return self
+
+    def executemany(self, sql: Any, parameters: Any) -> "_CoordinatedSQLiteCursor":
+        self._connection._ensure_writer(sql)
+        self._cursor.executemany(sql, parameters)
+        return self
+
+    def executescript(self, sql_script: str) -> "_CoordinatedSQLiteCursor":
+        self._connection._ensure_writer("CREATE" if sql_script.strip() else "")
+        self._cursor.executescript(sql_script)
+        return self
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+    def __enter__(self) -> "_CoordinatedSQLiteCursor":
+        return self
+
+    def __exit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
+        self._cursor.close()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._cursor, name)
+
+
+class _CoordinatedSQLiteConnection:
+    """Acquire one shared writer gate only for the transaction's write phase."""
+
+    def __init__(self, connection: sqlite3.Connection, coordinator: Any):
+        self._connection = connection
+        self._coordinator = coordinator
+        self._writer_scope: Any = None
+
+    def _ensure_writer(self, sql: Any) -> None:
+        if self._writer_scope is not None or not _sqlite_statement_requires_writer(sql):
+            return
+        scope = self._coordinator.write_scope()
+        scope.__enter__()
+        self._writer_scope = scope
+
+    def _release_writer(self, exc_info: Any = (None, None, None)) -> None:
+        scope = self._writer_scope
+        self._writer_scope = None
+        if scope is not None:
+            scope.__exit__(*exc_info)
+
+    def execute(self, sql: Any, parameters: Any = ()) -> _CoordinatedSQLiteCursor:
+        self._ensure_writer(sql)
+        return _CoordinatedSQLiteCursor(
+            self,
+            self._connection.execute(sql, parameters),
+        )
+
+    def executemany(self, sql: Any, parameters: Any) -> _CoordinatedSQLiteCursor:
+        self._ensure_writer(sql)
+        return _CoordinatedSQLiteCursor(
+            self,
+            self._connection.executemany(sql, parameters),
+        )
+
+    def executescript(self, sql_script: str) -> _CoordinatedSQLiteCursor:
+        self._ensure_writer("CREATE" if sql_script.strip() else "")
+        return _CoordinatedSQLiteCursor(
+            self,
+            self._connection.executescript(sql_script),
+        )
+
+    def cursor(self, *args: Any, **kwargs: Any) -> _CoordinatedSQLiteCursor:
+        return _CoordinatedSQLiteCursor(
+            self,
+            self._connection.cursor(*args, **kwargs),
+        )
+
+    def commit(self) -> None:
+        try:
+            self._connection.commit()
+        except Exception:
+            try:
+                self._connection.rollback()
+            finally:
+                self._release_writer()
+            raise
+        else:
+            self._release_writer()
+
+    def rollback(self) -> None:
+        try:
+            self._connection.rollback()
+        finally:
+            self._release_writer()
+
+    def close(self) -> None:
+        try:
+            self._connection.close()
+        finally:
+            self._release_writer()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._connection, name)
 
 VALUATION_HISTORY_DETAILS_COMPACT_VERSION = 2
 
@@ -127,6 +263,11 @@ class FinancialStatementStorageRepository:
         exchange: Optional[str] = None,
         report_period: Optional[str] = None,
         source: Optional[str] = None,
+        report_types: Optional[Sequence[str]] = None,
+        filing_id: Optional[str] = None,
+        schema_version: Optional[str] = None,
+        statuses: Optional[Sequence[str]] = None,
+        published_before: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         with self._storage.financial_database_scope():
             return self._storage.get_financial_source_file_manifests(
@@ -134,6 +275,11 @@ class FinancialStatementStorageRepository:
                 exchange=exchange,
                 report_period=report_period,
                 source=source,
+                report_types=report_types,
+                filing_id=filing_id,
+                schema_version=schema_version,
+                statuses=statuses,
+                published_before=published_before,
             )
 
     def upsert_numeric_facts(
@@ -473,12 +619,29 @@ class ResearchStorageManager:
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
         """Yield a sqlite3 connection for the research database."""
-        conn = sqlite3.connect(self._active_db_path or self.db_path)
-        conn.row_factory = sqlite3.Row
+        raw_conn = sqlite3.connect(self._active_db_path or self.db_path)
+        raw_conn.row_factory = sqlite3.Row
+        coordinator = getattr(self._db_route_state, "write_coordinator", None)
+        conn: Any = (
+            _CoordinatedSQLiteConnection(raw_conn, coordinator)
+            if coordinator is not None
+            else raw_conn
+        )
         try:
             yield conn
         finally:
             conn.close()
+
+    @contextmanager
+    def coordinated_writes(self, coordinator: Any) -> Generator[None, None, None]:
+        """Route writes in the current worker through a shared transaction gate."""
+
+        previous = getattr(self._db_route_state, "write_coordinator", None)
+        self._db_route_state.write_coordinator = coordinator
+        try:
+            yield
+        finally:
+            self._db_route_state.write_coordinator = previous
 
     @contextmanager
     def financial_database_scope(self) -> Generator[None, None, None]:
@@ -1693,6 +1856,11 @@ class ResearchStorageManager:
         exchange: Optional[str] = None,
         report_period: Optional[str] = None,
         source: Optional[str] = None,
+        report_types: Optional[Sequence[str]] = None,
+        filing_id: Optional[str] = None,
+        schema_version: Optional[str] = None,
+        statuses: Optional[Sequence[str]] = None,
+        published_before: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Fetch financial source-file manifests with optional filters."""
         filters = []
@@ -1709,6 +1877,40 @@ class ResearchStorageManager:
         if source:
             filters.append("source = ?")
             params.append(source)
+        normalized_report_types = tuple(
+            sorted(
+                {
+                    str(item).strip()
+                    for item in (report_types or ())
+                    if str(item).strip()
+                }
+            )
+        )
+        if normalized_report_types:
+            placeholders = ",".join("?" for _ in normalized_report_types)
+            filters.append(f"report_type IN ({placeholders})")
+            params.extend(normalized_report_types)
+        if filing_id:
+            filters.append("filing_id = ?")
+            params.append(filing_id)
+        if schema_version:
+            filters.append("schema_version = ?")
+            params.append(schema_version)
+        normalized_statuses = tuple(
+            sorted(
+                {str(item).strip() for item in (statuses or ()) if str(item).strip()}
+            )
+        )
+        if normalized_statuses:
+            placeholders = ",".join("?" for _ in normalized_statuses)
+            filters.append(f"status IN ({placeholders})")
+            params.extend(normalized_statuses)
+        if published_before:
+            filters.append(
+                "COALESCE(substr(published_at, 1, 10), "
+                "substr(downloaded_at, 1, 10), substr(created_at, 1, 10)) <= ?"
+            )
+            params.append(str(published_before)[:10])
         where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
 
         with self.get_connection() as conn:
@@ -12724,6 +12926,11 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_financial_source_files_period
             ON financial_source_files(exchange, report_period, source, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_financial_source_files_annual_asset
+            ON financial_source_files(
+                instrument_id, report_period, report_type, published_at, filing_id
+            );
 
             CREATE TABLE IF NOT EXISTS financial_source_field_mappings (
                 mapping_version TEXT NOT NULL,

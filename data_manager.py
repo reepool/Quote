@@ -1569,6 +1569,7 @@ class DataManager:
         dry_run: bool = False,
         resumable_windows: bool = False,
         max_windows_per_market: int = 2,
+        write_coordinator: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Run metadata-only official index discovery for business profiles."""
 
@@ -1587,24 +1588,36 @@ class DataManager:
             BusinessProfileIndexDiscoveryService,
         )
 
-        await asyncio.to_thread(self.research_storage.initialize)
-        service = BusinessProfileIndexDiscoveryService(
-            storage=self.research_storage,
-            announcement_service=self._build_official_announcement_acquisition_service(),
-        )
-        return await asyncio.to_thread(
-            service.discover,
-            exchanges=exchanges or ["SSE", "SZSE", "BSE"],
-            start_date=start_date,
-            end_date=end_date,
-            lookback_days=lookback_days,
-            overlap_days=overlap_days,
-            page_size=page_size,
-            max_pages_per_market=max_pages_per_market,
-            dry_run=dry_run,
-            resumable_windows=resumable_windows,
-            max_windows_per_market=max_windows_per_market,
-        )
+        def run_discovery() -> Dict[str, Any]:
+            from contextlib import nullcontext
+
+            write_scope = (
+                self.research_storage.coordinated_writes(write_coordinator)
+                if write_coordinator is not None
+                else nullcontext()
+            )
+            with write_scope:
+                self.research_storage.initialize()
+                service = BusinessProfileIndexDiscoveryService(
+                    storage=self.research_storage,
+                    announcement_service=(
+                        self._build_official_announcement_acquisition_service()
+                    ),
+                )
+                return service.discover(
+                    exchanges=exchanges or ["SSE", "SZSE", "BSE"],
+                    start_date=start_date,
+                    end_date=end_date,
+                    lookback_days=lookback_days,
+                    overlap_days=overlap_days,
+                    page_size=page_size,
+                    max_pages_per_market=max_pages_per_market,
+                    dry_run=dry_run,
+                    resumable_windows=resumable_windows,
+                    max_windows_per_market=max_windows_per_market,
+                )
+
+        return await asyncio.to_thread(run_discovery)
 
     async def run_business_profile_daily_incremental(
         self,
@@ -1635,8 +1648,21 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile async production is disabled",
             }
-        await asyncio.to_thread(self.research_storage.initialize)
-        from research.business_profile_async_production import parse_stage_budgets
+        from research.business_profile_async_production import (
+            get_business_profile_write_coordinator,
+            parse_stage_budgets,
+        )
+
+        write_coordinator = get_business_profile_write_coordinator(
+            self.research_storage,
+            inter_write_seconds=float(operations.get("writer_yield_seconds", 0.01)),
+        )
+
+        def initialize_with_coordinated_writes() -> None:
+            with self.research_storage.coordinated_writes(write_coordinator):
+                self.research_storage.initialize()
+
+        await asyncio.to_thread(initialize_with_coordinated_writes)
 
         cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
         configured_families = tuple(
@@ -1784,6 +1810,20 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile async production is disabled",
             }
+        from research.business_profile_async_production import (
+            get_business_profile_write_coordinator,
+        )
+
+        write_coordinator = get_business_profile_write_coordinator(
+            self.research_storage,
+            inter_write_seconds=float(operations.get("writer_yield_seconds", 0.01)),
+        )
+
+        def initialize_with_coordinated_writes() -> None:
+            with self.research_storage.coordinated_writes(write_coordinator):
+                self.research_storage.initialize()
+
+        await asyncio.to_thread(initialize_with_coordinated_writes)
         cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
         configured_families = tuple(
             str(item).strip()
@@ -1864,6 +1904,12 @@ class DataManager:
         from research.business_profile_async_production import (
             BusinessProfileAsyncProductionService,
             BusinessProfileWorkRepository,
+            get_business_profile_write_coordinator,
+        )
+
+        write_coordinator = get_business_profile_write_coordinator(
+            self.research_storage,
+            inter_write_seconds=float(operations.get("writer_yield_seconds", 0.01)),
         )
 
         async def discovery_runner(**kwargs: Any) -> Mapping[str, Any]:
@@ -1878,6 +1924,7 @@ class DataManager:
                 dry_run=False,
                 resumable_windows=True,
                 max_windows_per_market=int(kwargs.get("max_windows_per_market", 2)),
+                write_coordinator=write_coordinator,
             )
 
         async def stage_runner(
@@ -1902,6 +1949,7 @@ class DataManager:
             }
             result = await self.run_business_profile_semantic_production(
                 mode=mode,
+                write_coordinator=write_coordinator,
                 **call_kwargs,
             )
             if (
@@ -1912,6 +1960,7 @@ class DataManager:
                 return result
             promotion = await self.run_business_profile_semantic_production(
                 mode="promote",
+                write_coordinator=write_coordinator,
                 **call_kwargs,
             )
             if promotion.get("status") not in {"success", "completed", "unchanged"}:
@@ -1938,6 +1987,7 @@ class DataManager:
             stage_runner=stage_runner,
             lease_seconds=int(operations.get("lease_seconds", 900)),
             retry_backoff_seconds=int(operations.get("retry_backoff_seconds", 300)),
+            write_coordinator=write_coordinator,
         )
         return service, {
             "field_families": tuple(configured_families),
@@ -2004,6 +2054,7 @@ class DataManager:
         max_instruments: int = 30,
         checkpoint_path: Optional[str] = None,
         selection_policy: str = "latest_annual_only",
+        write_coordinator: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -2017,7 +2068,14 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile semantic production is disabled",
             }
-        await asyncio.to_thread(self.research_storage.initialize)
+        if write_coordinator is None:
+            await asyncio.to_thread(self.research_storage.initialize)
+        else:
+            def initialize_with_coordinated_writes() -> None:
+                with self.research_storage.coordinated_writes(write_coordinator):
+                    self.research_storage.initialize()
+
+            await asyncio.to_thread(initialize_with_coordinated_writes)
         from research.business_profile_governance import BusinessProfileRepository
         from research.business_profile_semantic_pipeline import (
             BusinessProfileSemanticPipeline,
@@ -2199,21 +2257,80 @@ class DataManager:
             handlers=runtime.handlers(),
         )
         def run_pipeline() -> Dict[str, Any]:
-            try:
-                result = pipeline.run(mode, scope=scope)
-                if result.get("pipeline_status") == "completed":
-                    from research.business_profile_production_operations import (
-                        BusinessProfileAnnouncementFrontierRepository,
-                    )
+            from contextlib import nullcontext
 
-                    BusinessProfileAnnouncementFrontierRepository(
-                        self.research_storage
-                    ).mark_manifested_processed(scope.instruments)
-                return result
-            finally:
-                runtime.close()
+            write_scope = (
+                self.research_storage.coordinated_writes(write_coordinator)
+                if write_coordinator is not None
+                else nullcontext()
+            )
+            with write_scope:
+                try:
+                    result = pipeline.run(mode, scope=scope)
+                    if result.get("pipeline_status") == "completed":
+                        from research.business_profile_production_operations import (
+                            BusinessProfileAnnouncementFrontierRepository,
+                        )
+
+                        BusinessProfileAnnouncementFrontierRepository(
+                            self.research_storage
+                        ).mark_manifested_processed(scope.instruments)
+                    return result
+                finally:
+                    runtime.close()
 
         return await asyncio.to_thread(run_pipeline)
+
+    async def get_annual_report_assets(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        report_period: Optional[str] = None,
+        filing_id: Optional[str] = None,
+        source: Optional[str] = None,
+        knowledge_cutoff: Optional[str] = None,
+        active_only: bool = False,
+        validate_files: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """List reusable annual-report PDFs from the canonical manifest catalog."""
+
+        storage = self._require_research_storage()
+        from research.annual_report_assets import AnnualReportAssetCatalog
+
+        normalized_id = (
+            convert_to_database_format(instrument_id) if instrument_id else None
+        )
+        return await asyncio.to_thread(
+            AnnualReportAssetCatalog(storage).list_assets,
+            instrument_id=normalized_id,
+            report_period=report_period,
+            filing_id=filing_id,
+            source=source,
+            knowledge_cutoff=knowledge_cutoff,
+            active_only=active_only,
+            validate_files=validate_files,
+        )
+
+    async def get_annual_report_asset(
+        self,
+        instrument_id: str,
+        *,
+        report_period: Optional[str] = None,
+        knowledge_cutoff: Optional[str] = None,
+        validate_file: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Return one latest reusable annual report, optionally for one period."""
+
+        storage = self._require_research_storage()
+        from research.annual_report_assets import AnnualReportAssetCatalog
+
+        return await asyncio.to_thread(
+            AnnualReportAssetCatalog(storage).get_asset,
+            convert_to_database_format(instrument_id),
+            report_period=report_period,
+            knowledge_cutoff=knowledge_cutoff,
+            validate_file=validate_file,
+        )
 
     async def get_research_company_profile(
         self,

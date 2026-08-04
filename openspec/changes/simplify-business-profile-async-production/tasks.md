@@ -22,3 +22,12 @@
 - [x] 4.2 Add discovery tests for partial-window splitting and tests proving backlog/failure does not block later discovery or independent work
 - [x] 4.3 Add scheduler/DataManager tests for the consolidated daily and manual-only tasks and removal of legacy schedules
 - [x] 4.4 Run focused business-profile and scheduler tests, strict OpenSpec validation, static checks, rollout/read-only validation, and review the complete uncommitted diff
+
+## 5. Single Writer And Shared Annual Reports
+
+- [x] 5.1 Add an observable cooperative single-writer gate that serializes queue and semantic-pipeline SQLite transactions without serializing parse or LLM computation
+- [x] 5.2 Add configuration and operations reporting for inter-write yield, pending writers, write wait, and transaction duration
+- [x] 5.3 Add a stable annual-report asset catalog over `financial_source_files` with instrument, period, filing, cutoff, active-version, and integrity filters
+- [x] 5.4 Reuse a verified source-qualified annual-report asset before network download while retaining correction history and immutable paths
+- [x] 5.5 Add concurrency, writer serialization, asset reuse, correction lineage, integrity, and DataManager access tests
+- [x] 5.6 Run focused business-profile tests, strict OpenSpec validation, static checks, rollout/read-only validation, and review the complete uncommitted diff

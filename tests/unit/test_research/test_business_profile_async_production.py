@@ -1,4 +1,6 @@
 import asyncio
+import threading
+import time
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -7,7 +9,9 @@ from data_manager import DataManager
 from research.business_profile_async_production import (
     BusinessProfileAsyncProductionService,
     BusinessProfileWorkRepository,
+    BusinessProfileWriteCoordinator,
     StageBudget,
+    get_business_profile_write_coordinator,
 )
 from research.business_profile_production_operations import (
     BusinessProfileAnnouncementFrontierRepository,
@@ -169,9 +173,7 @@ def test_claim_acknowledge_and_retry_are_durable(tmp_path):
         == "retry_due"
     )
     with storage.get_connection() as conn:
-        conn.execute(
-            "UPDATE business_profile_work_items SET next_attempt_at = NULL"
-        )
+        conn.execute("UPDATE business_profile_work_items SET next_attempt_at = NULL")
         conn.commit()
     retried = queue.claim(
         "parse",
@@ -282,6 +284,7 @@ def test_daily_discovery_runs_before_semantic_backpressure(tmp_path):
         discovery_runner=discover,
         stage_runner=stage_runner,
     )
+
     report = asyncio.run(
         service.run_daily(
             knowledge_cutoff="2026-08-30",
@@ -391,6 +394,85 @@ def test_stage_consumers_run_independently_without_download_blocking_parse(tmp_p
     assert result["parse"]["completed"] == 1
 
 
+def test_parse_compute_overlaps_while_sqlite_writes_remain_serial(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    for identity in ("first", "second"):
+        queue.enqueue_latest_annual(
+            knowledge_cutoff="2026-08-30",
+            processing_identity={"rules": identity},
+        )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'parse', status = 'pending'"
+        )
+        conn.commit()
+
+    coordinator = BusinessProfileWriteCoordinator(inter_write_seconds=0)
+    compute_lock = threading.Lock()
+    active_compute = 0
+    max_active_compute = 0
+
+    async def stage_runner(_stage, item):
+        nonlocal active_compute, max_active_compute
+        with compute_lock:
+            active_compute += 1
+            max_active_compute = max(max_active_compute, active_compute)
+        await asyncio.sleep(0.03)
+        with compute_lock:
+            active_compute -= 1
+
+        def persist_result():
+            with storage.coordinated_writes(coordinator):
+                with storage.get_connection() as conn:
+                    conn.execute("BEGIN IMMEDIATE")
+                    conn.execute(
+                        "UPDATE business_profile_work_items SET last_error = ? "
+                        "WHERE work_id = ?",
+                        ("parsed", item["work_id"]),
+                    )
+                    time.sleep(0.02)
+                    conn.commit()
+
+        await asyncio.to_thread(persist_result)
+        return {"status": "success"}
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+        write_coordinator=coordinator,
+    )
+    report = asyncio.run(
+        service._run_workers({"parse": StageBudget(max_items=2, max_concurrency=2)})
+    )
+
+    assert report["parse"]["completed"] == 2
+    assert max_active_compute == 2
+    assert coordinator.snapshot()["max_active_writers"] == 1
+    assert coordinator.snapshot()["write_transactions"] >= 5
+
+
+def test_write_coordinator_is_shared_per_storage_manager(tmp_path):
+    storage = _storage(tmp_path)
+
+    first = get_business_profile_write_coordinator(
+        storage,
+        inter_write_seconds=0.01,
+    )
+    second = get_business_profile_write_coordinator(
+        storage,
+        inter_write_seconds=0.5,
+    )
+
+    assert first is second
+    assert second.inter_write_seconds == 0.01
+
+
 def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_path):
     storage = _storage(tmp_path)
     _quotes(
@@ -460,6 +542,9 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_pa
         for call in manager.run_business_profile_semantic_production.await_args_list
     ] == ["plan", "select", "extract", "verify"]
     manager.run_business_profile_index_discovery.assert_awaited_once()
+    assert manager.run_business_profile_index_discovery.await_args.kwargs[
+        "write_coordinator"
+    ] is get_business_profile_write_coordinator(storage)
 
 
 def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
