@@ -16,16 +16,26 @@ import time
 from calendar import monthrange
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, time as datetime_time, timedelta
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 from research.change_watermarks import (
     append_change_record,
     ensure_change_log_schema,
     ensure_row_version_column,
+)
+from research.temporal_data_availability import (
+    AvailabilityEvidence,
+    ReleaseException,
+    ReleaseExceptionKind,
+    ReleaseLifecycleStatus,
+    ReleasePlan,
+    evaluate_release,
+    require_aware,
 )
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
@@ -608,7 +618,41 @@ class SpecialCommodityStorageManager:
                 "commodity_policy_candidates",
             ):
                 ensure_row_version_column(conn, table_name)
+            self._ensure_publication_calendar_columns(conn)
             ensure_change_log_schema(conn)
+
+    @staticmethod
+    def _ensure_publication_calendar_columns(conn: sqlite3.Connection) -> None:
+        existing = {
+            str(row[1])
+            for row in conn.execute(
+                "PRAGMA table_info(commodity_publication_calendar)"
+            ).fetchall()
+        }
+        definitions = {
+            "observation_period_start": "TEXT",
+            "observation_period_end": "TEXT",
+            "expected_release_at": "TEXT",
+            "grace_deadline_at": "TEXT",
+            "actual_published_at": "TEXT",
+            "first_seen_at": "TEXT",
+            "available_at": "TEXT",
+            "availability_quality": "TEXT",
+            "release_status": "TEXT",
+            "evidence_url": "TEXT",
+        }
+        for column, definition in definitions.items():
+            if column not in existing:
+                conn.execute(
+                    f"ALTER TABLE commodity_publication_calendar "
+                    f"ADD COLUMN {column} {definition}"
+                )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_commodity_publication_available
+            ON commodity_publication_calendar(series_id, available_at)
+            """
+        )
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
@@ -782,6 +826,16 @@ class SpecialCommodityStorageManager:
             observed INTEGER NOT NULL,
             status TEXT NOT NULL,
             quality_flag TEXT NOT NULL,
+            observation_period_start TEXT,
+            observation_period_end TEXT,
+            expected_release_at TEXT,
+            grace_deadline_at TEXT,
+            actual_published_at TEXT,
+            first_seen_at TEXT,
+            available_at TEXT,
+            availability_quality TEXT,
+            release_status TEXT,
+            evidence_url TEXT,
             metadata_json TEXT NOT NULL,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
@@ -2001,20 +2055,45 @@ class SpecialCommodityStorageManager:
         series_id: str,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
+        available_at_lte: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        clauses = ["series_id = ?"]
+        clauses = ["o.series_id = ?"]
         params: List[Any] = [series_id]
         if start_date:
-            clauses.append("observation_date >= ?")
+            clauses.append("o.observation_date >= ?")
             params.append(start_date)
         if end_date:
-            clauses.append("observation_date <= ?")
+            clauses.append("o.observation_date <= ?")
             params.append(end_date)
+        join = ""
+        select = "o.*"
+        if available_at_lte is not None:
+            cutoff = datetime.fromisoformat(str(available_at_lte).replace("Z", "+00:00"))
+            require_aware(cutoff, field_name="available_at_lte")
+            join = """
+                JOIN commodity_publication_calendar c
+                  ON c.series_id = o.series_id
+                 AND c.observation_date = o.observation_date
+                 AND c.source_profile = o.source_profile
+            """
+            clauses.extend(
+                [
+                    "c.available_at IS NOT NULL",
+                    "julianday(c.available_at) <= julianday(?)",
+                ]
+            )
+            params.append(cutoff.isoformat())
+            select = (
+                "o.*, c.available_at, c.availability_quality, "
+                "c.release_status"
+            )
         with self.get_connection() as conn:
             return [
                 _row_to_dict(row)
                 for row in conn.execute(
-                    f"SELECT * FROM commodity_price_observations WHERE {' AND '.join(clauses)} ORDER BY observation_date",
+                    f"SELECT {select} FROM commodity_price_observations o "
+                    f"{join} WHERE {' AND '.join(clauses)} "
+                    "ORDER BY o.observation_date",
                     params,
                 )
             ]
@@ -2075,14 +2154,76 @@ class SpecialCommodityStorageManager:
                     INSERT INTO commodity_publication_calendar (
                         series_id, observation_date, source_profile, frequency,
                         expected_observation, observed, status, quality_flag,
+                        observation_period_start, observation_period_end,
+                        expected_release_at, grace_deadline_at,
+                        actual_published_at, first_seen_at, available_at,
+                        availability_quality, release_status, evidence_url,
                         metadata_json, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(series_id, observation_date, source_profile) DO UPDATE SET
                         frequency=excluded.frequency,
                         expected_observation=excluded.expected_observation,
                         observed=excluded.observed,
                         status=excluded.status,
                         quality_flag=excluded.quality_flag,
+                        observation_period_start=COALESCE(
+                            excluded.observation_period_start,
+                            commodity_publication_calendar.observation_period_start
+                        ),
+                        observation_period_end=COALESCE(
+                            excluded.observation_period_end,
+                            commodity_publication_calendar.observation_period_end
+                        ),
+                        expected_release_at=COALESCE(
+                            excluded.expected_release_at,
+                            commodity_publication_calendar.expected_release_at
+                        ),
+                        grace_deadline_at=COALESCE(
+                            excluded.grace_deadline_at,
+                            commodity_publication_calendar.grace_deadline_at
+                        ),
+                        actual_published_at=COALESCE(
+                            excluded.actual_published_at,
+                            commodity_publication_calendar.actual_published_at
+                        ),
+                        first_seen_at=CASE
+                            WHEN commodity_publication_calendar.first_seen_at IS NULL
+                                THEN excluded.first_seen_at
+                            WHEN excluded.first_seen_at IS NULL
+                                THEN commodity_publication_calendar.first_seen_at
+                            WHEN julianday(excluded.first_seen_at) < julianday(
+                                commodity_publication_calendar.first_seen_at
+                            ) THEN excluded.first_seen_at
+                            ELSE commodity_publication_calendar.first_seen_at
+                        END,
+                        available_at=CASE
+                            WHEN commodity_publication_calendar.available_at IS NULL
+                                THEN excluded.available_at
+                            WHEN excluded.available_at IS NULL
+                                THEN commodity_publication_calendar.available_at
+                            WHEN julianday(excluded.available_at) < julianday(
+                                commodity_publication_calendar.available_at
+                            ) THEN excluded.available_at
+                            ELSE commodity_publication_calendar.available_at
+                        END,
+                        availability_quality=CASE
+                            WHEN commodity_publication_calendar.available_at IS NULL
+                                THEN excluded.availability_quality
+                            WHEN excluded.available_at IS NULL
+                                THEN commodity_publication_calendar.availability_quality
+                            WHEN julianday(excluded.available_at) < julianday(
+                                commodity_publication_calendar.available_at
+                            ) THEN excluded.availability_quality
+                            ELSE commodity_publication_calendar.availability_quality
+                        END,
+                        release_status=COALESCE(
+                            excluded.release_status,
+                            commodity_publication_calendar.release_status
+                        ),
+                        evidence_url=COALESCE(
+                            excluded.evidence_url,
+                            commodity_publication_calendar.evidence_url
+                        ),
                         metadata_json=excluded.metadata_json,
                         updated_at=excluded.updated_at
                     """,
@@ -2095,6 +2236,16 @@ class SpecialCommodityStorageManager:
                         1 if row.get("observed") else 0,
                         row["status"],
                         row.get("quality_flag") or "calendar_governed",
+                        row.get("observation_period_start"),
+                        row.get("observation_period_end"),
+                        row.get("expected_release_at"),
+                        row.get("grace_deadline_at"),
+                        row.get("actual_published_at"),
+                        row.get("first_seen_at"),
+                        row.get("available_at"),
+                        row.get("availability_quality"),
+                        row.get("release_status"),
+                        row.get("evidence_url"),
                         _json_dumps(dict(row.get("metadata") or {})),
                         now,
                         now,
@@ -4568,6 +4719,78 @@ class NbsProductionMaterialsProvider:
             )
         return rows
 
+    def _release_policy(self) -> Dict[str, Any]:
+        raw = self.source_cfg.get("release_policy") or {}
+        if not isinstance(raw, Mapping):
+            raise ValueError("NBS release_policy must be an object")
+        timezone_name = str(raw.get("timezone") or "Asia/Shanghai")
+        try:
+            timezone = ZoneInfo(timezone_name)
+        except Exception as exc:
+            raise ValueError(f"invalid NBS release timezone: {timezone_name}") from exc
+        release_time_text = str(raw.get("release_time") or "10:00")
+        try:
+            release_time = datetime_time.fromisoformat(release_time_text)
+        except ValueError as exc:
+            raise ValueError(
+                f"invalid NBS release_time: {release_time_text}"
+            ) from exc
+        grace_hours = float(raw.get("grace_hours", 8))
+        if grace_hours < 0:
+            raise ValueError("NBS release grace_hours must be non-negative")
+        release_days = {
+            "upper": int(raw.get("upper_period_release_day", 14)),
+            "middle": int(raw.get("middle_period_release_day", 24)),
+            "lower": int(raw.get("lower_period_release_day", 4)),
+        }
+        if release_days != {"upper": 14, "middle": 24, "lower": 4}:
+            raise ValueError("NBS ten-day release days must follow the 14/24/4 convention")
+        return {
+            "timezone_name": timezone_name,
+            "timezone": timezone,
+            "release_time": release_time,
+            "grace_hours": grace_hours,
+            "release_days": release_days,
+        }
+
+    def _release_plan(self, period: Mapping[str, str]) -> ReleasePlan:
+        policy = self._release_policy()
+        period_start = date.fromisoformat(str(period["period_start"]))
+        period_end = date.fromisoformat(str(period["period_end"]))
+        if period_end.day == 10:
+            release_date = date(period_end.year, period_end.month, 14)
+        elif period_end.day == 20:
+            release_date = date(period_end.year, period_end.month, 24)
+        else:
+            release_date = (
+                date(period_end.year + 1, 1, 4)
+                if period_end.month == 12
+                else date(period_end.year, period_end.month + 1, 4)
+            )
+        expected_release_at = datetime.combine(
+            release_date,
+            policy["release_time"],
+            tzinfo=policy["timezone"],
+        )
+        return ReleasePlan(
+            observation_start=period_start,
+            observation_end=period_end,
+            expected_release_at=expected_release_at,
+            grace_deadline_at=expected_release_at
+            + timedelta(hours=policy["grace_hours"]),
+        )
+
+    def _publication_datetime(self, value: Any) -> Optional[datetime]:
+        published = _parse_date(value)
+        if published is None:
+            return None
+        policy = self._release_policy()
+        return datetime.combine(
+            published,
+            policy["release_time"],
+            tzinfo=policy["timezone"],
+        )
+
     def _exact_search_query(self, period: Mapping[str, str]) -> str:
         start = date.fromisoformat(str(period["period_start"]))
         end = date.fromisoformat(str(period["period_end"]))
@@ -4581,24 +4804,107 @@ class NbsProductionMaterialsProvider:
 
     def _configured_observation_exceptions(
         self, start: date, end: date
-    ) -> Dict[str, Dict[str, str]]:
-        exceptions: Dict[str, Dict[str, str]] = {}
+    ) -> Dict[str, ReleaseException]:
+        exceptions: Dict[str, ReleaseException] = {}
         for raw in self.source_cfg.get("observation_exceptions", []):
             if not isinstance(raw, Mapping):
-                continue
+                raise ValueError("NBS observation exception must be an object")
             observed = _parse_date(raw.get("observation_date"))
             reason = str(raw.get("reason") or "").strip()
             evidence_url = str(raw.get("evidence_url") or "").strip()
-            if observed is None or not (start <= observed <= end):
-                continue
-            if not reason or not evidence_url:
-                continue
-            exceptions[observed.isoformat()] = {
-                "observation_date": observed.isoformat(),
-                "reason": reason,
-                "evidence_url": evidence_url,
+            if observed is None:
+                raise ValueError("NBS observation exception requires observation_date")
+            valid_period_ends = {
+                10,
+                20,
+                min(30, monthrange(observed.year, observed.month)[1]),
             }
+            if observed.day not in valid_period_ends:
+                raise ValueError(
+                    "NBS observation exception must target a governed ten-day period end"
+                )
+            kind = ReleaseExceptionKind(
+                str(raw.get("kind") or ReleaseExceptionKind.CANCELLED.value)
+            )
+            replacement = raw.get("replacement_release_at")
+            replacement_release_at = None
+            if replacement:
+                replacement_release_at = datetime.fromisoformat(str(replacement))
+            exception = ReleaseException(
+                kind=kind,
+                reason=reason,
+                evidence_url=evidence_url,
+                replacement_release_at=replacement_release_at,
+            )
+            if start <= observed <= end:
+                exceptions[observed.isoformat()] = exception
         return exceptions
+
+    @staticmethod
+    def _exception_samples(
+        exceptions: Mapping[str, ReleaseException],
+    ) -> List[Dict[str, Any]]:
+        return [
+            {
+                "observation_date": observation_date,
+                "kind": exception.kind.value,
+                "reason": exception.reason,
+                "evidence_url": exception.evidence_url,
+                "replacement_release_at": (
+                    exception.replacement_release_at.isoformat()
+                    if exception.replacement_release_at
+                    else None
+                ),
+            }
+            for observation_date, exception in sorted(exceptions.items())[:20]
+        ]
+
+    @staticmethod
+    def _grace_period_count(
+        release_plans: Mapping[str, tuple[ReleasePlan, Any]],
+        evaluated_at: datetime,
+    ) -> int:
+        return sum(
+            decision.expected_release_at <= evaluated_at <= decision.grace_deadline_at
+            for _, decision in release_plans.values()
+            if decision.status != ReleaseLifecycleStatus.CANCELLED
+        )
+
+    @staticmethod
+    def _not_due_period_count(
+        release_plans: Mapping[str, tuple[ReleasePlan, Any]],
+        evaluated_at: datetime,
+    ) -> int:
+        return sum(
+            decision.expected_release_at > evaluated_at
+            for _, decision in release_plans.values()
+            if decision.status != ReleaseLifecycleStatus.CANCELLED
+        )
+
+    @staticmethod
+    def _release_plan_rows(
+        periods: Sequence[Mapping[str, str]],
+        release_plans: Mapping[str, tuple[ReleasePlan, Any]],
+        exceptions: Mapping[str, ReleaseException],
+    ) -> List[Dict[str, Any]]:
+        rows: List[Dict[str, Any]] = []
+        for period in periods:
+            observation_date = str(period["observation_date"])
+            plan, decision = release_plans[observation_date]
+            exception = exceptions.get(observation_date)
+            rows.append(
+                {
+                    **dict(period),
+                    "expected_release_at": decision.expected_release_at.isoformat(),
+                    "grace_deadline_at": decision.grace_deadline_at.isoformat(),
+                    "release_status": decision.status.value,
+                    "exception_kind": exception.kind.value if exception else None,
+                    "exception_reason": exception.reason if exception else None,
+                    "evidence_url": exception.evidence_url if exception else None,
+                    "planned_release_at": plan.expected_release_at.isoformat(),
+                }
+            )
+        return rows
 
     def _discover_articles(
         self, start: date, end: date
@@ -4612,18 +4918,41 @@ class NbsProductionMaterialsProvider:
         warnings: List[Dict[str, Any]] = []
         request_count = 0
         search_access_blocked = False
-        publication_lag_days = max(
-            0, int(self.source_cfg.get("publication_lag_days") or 4)
-        )
-        today = get_shanghai_time().date()
-        eligible_end = min(end, today - timedelta(days=publication_lag_days))
-        all_expected_periods = self._expected_periods(start, eligible_end)
-        governed_exceptions = self._configured_observation_exceptions(start, eligible_end)
+        exact_failure_dates: set[str] = set()
+        evaluated_at = get_shanghai_time()
+        all_expected_periods = self._expected_periods(start, end)
+        governed_exceptions = self._configured_observation_exceptions(start, end)
+        release_plans: Dict[str, tuple[ReleasePlan, Any]] = {}
+        for period in all_expected_periods:
+            observation_date = period["observation_date"]
+            plan = self._release_plan(period)
+            release_plans[observation_date] = (
+                plan,
+                evaluate_release(
+                    plan,
+                    evaluated_at=evaluated_at,
+                    exception=governed_exceptions.get(observation_date),
+                ),
+            )
         expected_periods = [
             period
             for period in all_expected_periods
-            if period["observation_date"] not in governed_exceptions
+            if governed_exceptions.get(period["observation_date"], None) is None
+            or governed_exceptions[period["observation_date"]].kind
+            != ReleaseExceptionKind.CANCELLED
         ]
+        expected_periods = [
+            period
+            for period in expected_periods
+            if release_plans[period["observation_date"]][1].expected_release_at
+            <= evaluated_at
+        ]
+        expected_date_keys = {
+            period["observation_date"] for period in expected_periods
+        }
+        publication_eligible_end = (
+            max(expected_date_keys) if expected_date_keys else None
+        )
         short_range_limit = max(1, int(self.source_cfg.get("exact_only_max_periods") or 12))
         if len(expected_periods) > short_range_limit:
             for sort in ("dateAsc", "dateDesc"):
@@ -4659,7 +4988,10 @@ class NbsProductionMaterialsProvider:
                     previous_signature = signature
                     for row in rows:
                         observed = date.fromisoformat(row["observation_date"])
-                        if start <= observed <= end:
+                        if (
+                            start <= observed <= end
+                            and row["observation_date"] in expected_date_keys
+                        ):
                             discovered[row["observation_date"]] = row
                     logger.info(
                         "[NbsProductionMaterials] discovery progress sort=%s page=%s/%s candidates=%s range=%s..%s",
@@ -4681,7 +5013,7 @@ class NbsProductionMaterialsProvider:
                         "message": "both official broad-search passes returned no parseable articles",
                     }
                 )
-                missing_periods = [
+                source_failure_periods = [
                     period["observation_date"] for period in expected_periods
                 ]
                 diagnostics = {
@@ -4690,10 +5022,25 @@ class NbsProductionMaterialsProvider:
                     "search_expected_periods": len(expected_periods),
                     "discovered_periods": 0,
                     "governed_exception_dates": len(governed_exceptions),
-                    "governed_exception_samples": list(governed_exceptions.values())[:20],
-                    "unresolved_dates": len(missing_periods),
-                    "unresolved_samples": missing_periods[:50],
-                    "publication_eligible_end": eligible_end.isoformat(),
+                    "governed_exception_samples": self._exception_samples(
+                        governed_exceptions
+                    ),
+                    "not_due_periods": self._not_due_period_count(
+                        release_plans, evaluated_at
+                    ),
+                    "grace_periods": self._grace_period_count(
+                        release_plans, evaluated_at
+                    ),
+                    "unresolved_dates": 0,
+                    "unresolved_samples": [],
+                    "source_failure_dates": len(source_failure_periods),
+                    "source_failure_samples": source_failure_periods[:50],
+                    "publication_eligible_end": publication_eligible_end,
+                    "release_plans": self._release_plan_rows(
+                        all_expected_periods,
+                        release_plans,
+                        governed_exceptions,
+                    ),
                 }
                 logger.error(
                     "[NbsProductionMaterials] broad discovery empty; exact discovery aborted expected=%s governed_exceptions=%s range=%s..%s",
@@ -4732,6 +5079,7 @@ class NbsProductionMaterialsProvider:
                             }
                         )
                         search_access_blocked = True
+                        exact_failure_dates.add(observation_date)
                         break
                     except Exception as exc:
                         warnings.append(
@@ -4742,6 +5090,7 @@ class NbsProductionMaterialsProvider:
                                 "error": str(exc),
                             }
                         )
+                        exact_failure_dates.add(observation_date)
                         break
                     request_count += 1
                     match = next(
@@ -4766,15 +5115,27 @@ class NbsProductionMaterialsProvider:
             for period in expected_periods
             if period["observation_date"] not in discovered
         ]
-        if missing_periods:
+        source_failure_periods = [
+            observation_date
+            for observation_date in missing_periods
+            if search_access_blocked or observation_date in exact_failure_dates
+        ]
+        unresolved_periods = [
+            observation_date
+            for observation_date in missing_periods
+            if observation_date not in source_failure_periods
+            and evaluated_at
+            > release_plans[observation_date][1].grace_deadline_at
+        ]
+        if unresolved_periods:
             warnings.append(
                 {
                     "reason": "nbs_unresolved_observation_periods",
                     "expected_periods": len(expected_periods),
                     "discovered_periods": len(discovered),
-                    "missing_periods": len(missing_periods),
-                    "missing_samples": missing_periods[:50],
-                    "publication_eligible_end": eligible_end.isoformat(),
+                    "missing_periods": len(unresolved_periods),
+                    "missing_samples": unresolved_periods[:50],
+                    "publication_eligible_end": publication_eligible_end,
                 }
             )
         logger.info(
@@ -4783,10 +5144,10 @@ class NbsProductionMaterialsProvider:
             len(discovered),
             len(all_expected_periods),
             len(governed_exceptions),
-            len(missing_periods),
+            len(unresolved_periods),
             start,
             end,
-            eligible_end,
+            publication_eligible_end,
         )
         diagnostics = {
             "enabled": True,
@@ -4794,10 +5155,25 @@ class NbsProductionMaterialsProvider:
             "search_expected_periods": len(expected_periods),
             "discovered_periods": len(discovered),
             "governed_exception_dates": len(governed_exceptions),
-            "governed_exception_samples": list(governed_exceptions.values())[:20],
-            "unresolved_dates": len(missing_periods),
-            "unresolved_samples": missing_periods[:50],
-            "publication_eligible_end": eligible_end.isoformat(),
+            "governed_exception_samples": self._exception_samples(
+                governed_exceptions
+            ),
+            "not_due_periods": self._not_due_period_count(
+                release_plans, evaluated_at
+            ),
+            "grace_periods": self._grace_period_count(
+                release_plans, evaluated_at
+            ),
+            "unresolved_dates": len(unresolved_periods),
+            "unresolved_samples": unresolved_periods[:50],
+            "source_failure_dates": len(source_failure_periods),
+            "source_failure_samples": source_failure_periods[:50],
+            "publication_eligible_end": publication_eligible_end,
+            "release_plans": self._release_plan_rows(
+                all_expected_periods,
+                release_plans,
+                governed_exceptions,
+            ),
         }
         return (
             sorted(discovered.values(), key=lambda row: row["observation_date"]),
@@ -4867,6 +5243,7 @@ class NbsProductionMaterialsProvider:
                 "observation_period_start": article["period_start"],
                 "observation_period_end": article["period_end"],
                 "publication_date": article.get("publication_date"),
+                "first_seen_at": get_shanghai_time().isoformat(),
                 "price_semantics": "wholesale_and_sales_market_price",
             },
         )
@@ -4927,8 +5304,13 @@ class NbsProductionMaterialsProvider:
                     len(warnings),
                 )
         if not articles and not (
-            discovery_diagnostics.get("expected_periods") == 0
+            discovery_diagnostics.get(
+                "search_expected_periods",
+                discovery_diagnostics.get("expected_periods"),
+            )
+            == 0
             and discovery_diagnostics.get("unresolved_dates") == 0
+            and discovery_diagnostics.get("source_failure_dates", 0) == 0
         ):
             warnings.append(
                 {
@@ -6302,8 +6684,10 @@ def _is_governed_empty_provider_window(result: CommodityProviderResult) -> bool:
     if not isinstance(diagnostics, Mapping):
         return False
     return (
-        diagnostics.get("expected_periods") == 0
+        diagnostics.get("search_expected_periods", diagnostics.get("expected_periods"))
+        == 0
         and diagnostics.get("unresolved_dates") == 0
+        and diagnostics.get("source_failure_dates", 0) == 0
     )
 
 
@@ -6331,6 +6715,7 @@ class SourceObservedDateGovernanceAdapter:
         observations_by_series: Dict[str, List[CommodityObservation]] = {
             item.series_id: [] for item in series
         }
+        first_seen_at = get_shanghai_time().isoformat()
         for observation in observations:
             observations_by_series.setdefault(observation.series_id, []).append(observation)
         for item in series:
@@ -6360,6 +6745,13 @@ class SourceObservedDateGovernanceAdapter:
                         "observed": True,
                         "status": "source_observed",
                         "quality_flag": quality_flag,
+                        "observation_period_start": observation.observation_date,
+                        "observation_period_end": observation.observation_date,
+                        "first_seen_at": first_seen_at,
+                        "available_at": first_seen_at,
+                        "availability_quality": "local_first_seen_timestamp",
+                        "release_status": "available",
+                        "evidence_url": observation.source_url,
                         "metadata": {
                             "venue": item.venue,
                             "source_symbol": item.source_symbol,
@@ -6975,6 +7367,10 @@ class AssociationPublicPriceGovernanceAdapter(SourceObservedDateGovernanceAdapte
 class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     """Govern NBS product identity and ten-day observation periods from source rows."""
 
+    def __init__(self, source_cfg: Mapping[str, Any]):
+        super().__init__(source_cfg)
+        self._provider_result: Optional[CommodityProviderResult] = None
+
     def govern_master(
         self,
         series: Sequence[CommoditySeries],
@@ -6985,6 +7381,7 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
         prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         result = provider.fetch(series, start_date=start_date, end_date=end_date)
+        self._provider_result = result
         records: List[Dict[str, Any]] = []
         blockers = list(result.blockers)
         observations_by_series = {
@@ -7001,12 +7398,45 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
             if (
                 not missing
                 and not source_rows
-                and _is_governed_empty_provider_window(result)
                 and prior
                 and prior.get("governance_status") == "success"
                 and prior.get("source_profile") == item.source_profile
             ):
                 records.append(_reused_master_governance_record(prior))
+                continue
+            if (
+                not missing
+                and not source_rows
+                and _is_governed_empty_provider_window(result)
+            ):
+                records.append(
+                    _master_governance_record(
+                        item,
+                        quality_flag="configured_master_pending_source_evidence",
+                        source_name=str(
+                            item.metadata.get("source_product_names", [item.source_symbol])[0]
+                        ),
+                        source_frequency=item.frequency,
+                        source_currency=item.currency,
+                        source_unit=item.unit,
+                        lifecycle_start=str(
+                            item.metadata.get("source_available_from") or ""
+                        ),
+                        lifecycle_end=None,
+                        evidence_url=str(
+                            self.source_cfg.get("listing_url") or ""
+                        ),
+                        evidence_payload={
+                            "release_window": "not_due_or_governed_exception",
+                            "source_specification": item.metadata.get(
+                                "source_specification"
+                            ),
+                        },
+                        metadata={
+                            "source_observation_evidence_pending": True,
+                        },
+                    )
+                )
                 continue
             if missing or not source_rows:
                 reason = "nbs_master_mapping_incomplete" if missing else "nbs_master_evidence_unavailable"
@@ -7054,6 +7484,203 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
             records=records,
             blockers=blockers,
             prefetched_result=result,
+        )
+
+    def govern_dates(
+        self,
+        series: Sequence[CommoditySeries],
+        observations: Sequence[CommodityObservation],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityDateGovernanceResult:
+        provider_result = self._provider_result
+        diagnostics = (
+            dict(provider_result.metadata.get("date_gap_fill") or {})
+            if provider_result is not None
+            else {}
+        )
+        plan_rows = diagnostics.get("release_plans")
+        if not isinstance(plan_rows, list):
+            return super().govern_dates(
+                series,
+                observations,
+                start_date=start_date,
+                end_date=end_date,
+            )
+
+        observations_by_key = {
+            (item.series_id, item.observation_date): item
+            for item in observations
+        }
+        source_failure_dates = {
+            str(item)
+            for item in diagnostics.get("source_failure_samples", [])
+            if item
+        }
+        if provider_result is not None:
+            source_failure_dates.update(
+                str(item.get("observation_date"))
+                for item in provider_result.warnings
+                if item.get("observation_date")
+                and item.get("reason")
+                in {
+                    "nbs_article_access_blocked",
+                    "nbs_article_parse_failed",
+                    "nbs_exact_article_search_access_blocked",
+                    "nbs_exact_article_search_failed",
+                }
+            )
+        evaluated_at = get_shanghai_time()
+        rows: List[Dict[str, Any]] = []
+        for item in series:
+            for raw_plan in plan_rows:
+                if not isinstance(raw_plan, Mapping):
+                    continue
+                observation_date = str(raw_plan.get("observation_date") or "")
+                if not observation_date:
+                    continue
+                expected_release_at = datetime.fromisoformat(
+                    str(raw_plan["expected_release_at"])
+                )
+                grace_deadline_at = datetime.fromisoformat(
+                    str(raw_plan["grace_deadline_at"])
+                )
+                plan = ReleasePlan(
+                    observation_start=date.fromisoformat(
+                        str(raw_plan["period_start"])
+                    ),
+                    observation_end=date.fromisoformat(str(raw_plan["period_end"])),
+                    expected_release_at=expected_release_at,
+                    grace_deadline_at=grace_deadline_at,
+                )
+                exception = None
+                if raw_plan.get("exception_kind"):
+                    exception = ReleaseException(
+                        kind=ReleaseExceptionKind(str(raw_plan["exception_kind"])),
+                        reason=str(raw_plan.get("exception_reason") or ""),
+                        evidence_url=str(raw_plan.get("evidence_url") or ""),
+                        replacement_release_at=(
+                            expected_release_at
+                            if raw_plan.get("exception_kind")
+                            == ReleaseExceptionKind.RESCHEDULED.value
+                            else None
+                        ),
+                    )
+                observation = observations_by_key.get(
+                    (item.series_id, observation_date)
+                )
+                actual_published_at = None
+                first_seen_at = None
+                if observation is not None:
+                    published = _parse_date(
+                        observation.metadata.get("publication_date")
+                    )
+                    if published is not None:
+                        actual_published_at = datetime.combine(
+                            published,
+                            expected_release_at.timetz(),
+                        )
+                    raw_first_seen = observation.metadata.get("first_seen_at")
+                    if raw_first_seen:
+                        first_seen_at = datetime.fromisoformat(str(raw_first_seen))
+                evidence = AvailabilityEvidence(
+                    actual_published_at=actual_published_at,
+                    first_seen_at=first_seen_at,
+                    quality=(
+                        "official_publication_date"
+                        if actual_published_at is not None
+                        else (
+                            "local_first_seen_timestamp"
+                            if first_seen_at is not None
+                            else None
+                        )
+                    ),
+                    evidence_url=(
+                        observation.source_url if observation is not None else None
+                    ),
+                    source_failure=(
+                        "nbs_source_request_or_parse_failed"
+                        if observation_date in source_failure_dates
+                        else None
+                    ),
+                )
+                decision = evaluate_release(
+                    plan,
+                    evaluated_at=evaluated_at,
+                    evidence=evidence,
+                    exception=exception,
+                )
+                rows.append(
+                    {
+                        "series_id": item.series_id,
+                        "observation_date": observation_date,
+                        "source_profile": item.source_profile,
+                        "frequency": item.frequency,
+                        "expected_observation": decision.status
+                        != ReleaseLifecycleStatus.CANCELLED,
+                        "observed": observation is not None,
+                        "status": (
+                            "source_observed"
+                            if observation is not None
+                            else decision.status.value
+                        ),
+                        "quality_flag": str(
+                            self.source_cfg.get("calendar_quality_flag")
+                            or "official_period_observed"
+                        ),
+                        "observation_period_start": raw_plan["period_start"],
+                        "observation_period_end": raw_plan["period_end"],
+                        "expected_release_at": decision.expected_release_at.isoformat(),
+                        "grace_deadline_at": decision.grace_deadline_at.isoformat(),
+                        "actual_published_at": (
+                            actual_published_at.isoformat()
+                            if actual_published_at
+                            else None
+                        ),
+                        "first_seen_at": (
+                            first_seen_at.isoformat() if first_seen_at else None
+                        ),
+                        "available_at": (
+                            decision.available_at.isoformat()
+                            if decision.available_at
+                            else None
+                        ),
+                        "availability_quality": decision.availability_quality,
+                        "release_status": decision.status.value,
+                        "evidence_url": (
+                            observation.source_url
+                            if observation is not None
+                            else raw_plan.get("evidence_url")
+                        ),
+                        "metadata": {
+                            "calendar_type": "schedule_aware_ten_day_release",
+                            "planned_release_at": raw_plan.get(
+                                "planned_release_at"
+                            ),
+                            "exception_kind": raw_plan.get("exception_kind"),
+                            "exception_reason": raw_plan.get(
+                                "exception_reason"
+                            ),
+                        },
+                    }
+                )
+        return CommodityDateGovernanceResult(
+            calendar_rows=rows,
+            metadata={
+                "calendar_type": "schedule_aware_ten_day_release",
+                "expected_observations": len(rows),
+                "source_observed_dates": sum(
+                    bool(row["observed"]) for row in rows
+                ),
+                "lifecycle_counts": {
+                    status.value: sum(
+                        row["release_status"] == status.value for row in rows
+                    )
+                    for status in ReleaseLifecycleStatus
+                },
+                "weekday_inference_used": False,
+            },
         )
 
 
@@ -7717,6 +8344,19 @@ class SpecialCommodityGovernancePipeline:
             date_series = [
                 item for item in eligible_series if item.series_id not in provider_blocked_series
             ]
+            if (
+                isinstance(governance, NbsProductionMaterialsGovernanceAdapter)
+                and not provider_result.observations
+                and isinstance(
+                    (provider_result.metadata.get("date_gap_fill") or {}).get(
+                        "release_plans"
+                    ),
+                    list,
+                )
+            ):
+                # Calendar incidents remain auditable even when source evidence is
+                # insufficient to pass the independent master-data persistence gate.
+                date_series = source_series
             source_observations = [
                 item
                 for item in provider_result.observations
@@ -7724,6 +8364,14 @@ class SpecialCommodityGovernancePipeline:
             ]
             if not source_observations and _is_governed_empty_provider_window(
                 provider_result
+            ) and not (
+                isinstance(governance, NbsProductionMaterialsGovernanceAdapter)
+                and isinstance(
+                    (provider_result.metadata.get("date_gap_fill") or {}).get(
+                        "release_plans"
+                    ),
+                    list,
+                )
             ):
                 date_result = CommodityDateGovernanceResult(
                     metadata={

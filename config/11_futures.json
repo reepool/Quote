@@ -1006,7 +1006,14 @@
           "exact_only_max_periods": 12,
           "exact_search_max_pages": 3,
           "exact_gap_discovery_enabled": true,
-          "publication_lag_days": 4,
+          "release_policy": {
+            "timezone": "Asia/Shanghai",
+            "release_time": "10:00",
+            "grace_hours": 8,
+            "upper_period_release_day": 14,
+            "middle_period_release_day": 24,
+            "lower_period_release_day": 4
+          },
           "observation_exceptions": [
             {
               "observation_date": "2015-02-20",

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import date
+from datetime import date, datetime
 import json
 from pathlib import Path
 import sys
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import pytest
@@ -183,6 +184,211 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
         "CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY",
     }
+
+
+def test_publication_calendar_schema_migrates_legacy_rows_without_inventing_availability(
+    tmp_path,
+):
+    cfg = _research_config(tmp_path)
+    database = Path(
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"][
+            "storage"
+        ]["database"]
+    )
+    import sqlite3
+
+    with sqlite3.connect(database) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE commodity_publication_calendar (
+                series_id TEXT NOT NULL,
+                observation_date TEXT NOT NULL,
+                source_profile TEXT NOT NULL,
+                frequency TEXT NOT NULL,
+                expected_observation INTEGER NOT NULL,
+                observed INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                quality_flag TEXT NOT NULL,
+                metadata_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (series_id, observation_date, source_profile)
+            );
+            INSERT INTO commodity_publication_calendar VALUES (
+                'LEGACY.SERIES', '2026-07-30', 'legacy', 'ten_day',
+                1, 1, 'source_observed', 'legacy_quality', '{}',
+                '2026-08-04T10:00:00+08:00', '2026-08-04T10:00:00+08:00'
+            );
+            """
+        )
+
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    storage.initialize()
+
+    row = storage.read_publication_calendar(series_id="LEGACY.SERIES")[0]
+    assert row["status"] == "source_observed"
+    assert row["available_at"] is None
+    assert row["expected_release_at"] is None
+    with storage.get_connection() as conn:
+        columns = {
+            item[1]
+            for item in conn.execute(
+                "PRAGMA table_info(commodity_publication_calendar)"
+            )
+        }
+    assert {
+        "observation_period_start",
+        "expected_release_at",
+        "grace_deadline_at",
+        "actual_published_at",
+        "first_seen_at",
+        "available_at",
+        "availability_quality",
+        "release_status",
+        "evidence_url",
+    } <= columns
+
+
+def test_publication_calendar_temporal_fields_round_trip(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(
+        storage,
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"],
+    ).sync()
+    series = CommodityUniverseSelector(
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    ).resolve()[0]
+
+    result = storage.upsert_publication_calendar(
+        [
+            {
+                "series_id": series.series_id,
+                "observation_date": "2026-07-30",
+                "source_profile": series.source_profile,
+                "frequency": "ten_day",
+                "expected_observation": True,
+                "observed": True,
+                "status": "source_observed",
+                "quality_flag": "official_period_observed",
+                "observation_period_start": "2026-07-21",
+                "observation_period_end": "2026-07-30",
+                "expected_release_at": "2026-08-04T10:00:00+08:00",
+                "grace_deadline_at": "2026-08-04T16:00:00+08:00",
+                "actual_published_at": "2026-08-04T10:00:00+08:00",
+                "first_seen_at": "2026-08-04T11:00:00+08:00",
+                "available_at": "2026-08-04T10:00:00+08:00",
+                "availability_quality": "official_publication_date",
+                "release_status": "available",
+                "evidence_url": "https://www.stats.gov.cn/example.html",
+            }
+        ],
+        dry_run=False,
+    )
+
+    row = storage.read_publication_calendar(series_id=series.series_id)[0]
+    assert result == {"written": 1, "would_write": 0}
+    assert row["available_at"] == "2026-08-04T10:00:00+08:00"
+    assert row["release_status"] == "available"
+
+    later = {
+        "series_id": series.series_id,
+        "observation_date": "2026-07-30",
+        "source_profile": series.source_profile,
+        "frequency": "ten_day",
+        "expected_observation": True,
+        "observed": True,
+        "status": "source_observed",
+        "quality_flag": "official_period_observed",
+        "first_seen_at": "2026-08-06T11:00:00+08:00",
+        "available_at": "2026-08-06T11:00:00+08:00",
+        "availability_quality": "local_first_seen_timestamp",
+        "release_status": "available",
+    }
+    storage.upsert_publication_calendar([later], dry_run=False)
+    preserved = storage.read_publication_calendar(series_id=series.series_id)[0]
+    assert preserved["first_seen_at"] == "2026-08-04T11:00:00+08:00"
+    assert preserved["available_at"] == "2026-08-04T10:00:00+08:00"
+    assert preserved["availability_quality"] == "official_publication_date"
+
+
+def test_point_in_time_observation_read_filters_unknown_and_future_availability(
+    tmp_path,
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    series = CommodityUniverseSelector(module_cfg).resolve()[0]
+    observations = [
+        CommodityObservation(
+            series_id=series.series_id,
+            observation_date=observed_date,
+            value=value,
+            currency=series.currency,
+            unit=series.unit,
+            raw_value=value,
+            raw_currency=series.currency,
+            raw_unit=series.unit,
+            source_profile=series.source_profile,
+            source_url=f"https://example.test/{observed_date}",
+            quality_flag="unit_test",
+            source_symbol=series.source_symbol,
+            parser_version="unit-test",
+            raw_payload_hash=f"pit-{observed_date}",
+        )
+        for observed_date, value in (
+            ("2026-07-10", 100.0),
+            ("2026-07-20", 110.0),
+            ("2026-07-30", 120.0),
+        )
+    ]
+    storage.upsert_observations(
+        observations, ingestion_run_id=None, dry_run=False
+    )
+    calendar_rows = []
+    for observation, available_at in zip(
+        observations,
+        (
+            "2026-07-14T10:00:00+08:00",
+            "2026-08-01T10:00:00+08:00",
+            None,
+        ),
+    ):
+        calendar_rows.append(
+            {
+                "series_id": series.series_id,
+                "observation_date": observation.observation_date,
+                "source_profile": series.source_profile,
+                "frequency": series.frequency,
+                "expected_observation": True,
+                "observed": True,
+                "status": "source_observed",
+                "quality_flag": "unit_test",
+                "available_at": available_at,
+                "availability_quality": (
+                    "official_publication_timestamp" if available_at else None
+                ),
+                "release_status": "available" if available_at else "unresolved_gap",
+            }
+        )
+    storage.upsert_publication_calendar(calendar_rows, dry_run=False)
+
+    rows = storage.read_observations(
+        series_id=series.series_id,
+        available_at_lte="2026-07-31T23:59:59+08:00",
+    )
+
+    assert [row["observation_date"] for row in rows] == ["2026-07-10"]
+    assert rows[0]["available_at"] == "2026-07-14T10:00:00+08:00"
+    with pytest.raises(ValueError, match="timezone-aware"):
+        storage.read_observations(
+            series_id=series.series_id,
+            available_at_lte="2026-07-31T23:59:59",
+        )
 
 
 def test_special_commodity_observation_watermarks_and_dry_run(tmp_path):
@@ -504,6 +710,214 @@ def test_nbs_ten_day_title_period_parsing():
         "period_start": "2017-12-21",
         "period_end": "2017-12-30",
     }
+
+
+def test_nbs_lower_period_release_plan_uses_following_month_fourth():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price",
+        cfg["source_profiles"]["nbs_production_material_market_price"],
+    )
+
+    plan = provider._release_plan(
+        {
+            "observation_date": "2026-07-30",
+            "period_start": "2026-07-21",
+            "period_end": "2026-07-30",
+        }
+    )
+
+    assert plan.expected_release_at.isoformat() == "2026-08-04T10:00:00+08:00"
+    assert plan.grace_deadline_at.isoformat() == "2026-08-04T18:00:00+08:00"
+
+
+def test_nbs_not_due_period_does_not_fetch_or_report_gap(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price",
+        cfg["source_profiles"]["nbs_production_material_market_price"],
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.get_shanghai_time",
+        lambda: datetime(2026, 8, 3, 12, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_search_page",
+        lambda **kwargs: (_ for _ in ()).throw(
+            AssertionError("not-due period must not be fetched")
+        ),
+    )
+
+    articles, warnings, diagnostics = provider._discover_articles(
+        date(2026, 7, 30), date(2026, 7, 30)
+    )
+
+    assert articles == []
+    assert warnings == []
+    assert diagnostics["search_expected_periods"] == 0
+    assert diagnostics["not_due_periods"] == 1
+    assert diagnostics["unresolved_dates"] == 0
+
+    result = provider.fetch(
+        CommodityUniverseSelector(cfg).resolve(scope_id="cn_nbs_thermal_coal"),
+        start_date="2026-07-30",
+        end_date="2026-07-30",
+    )
+    assert result.warnings == []
+    assert result.metadata["date_gap_fill"]["not_due_periods"] == 1
+
+
+def test_nbs_due_period_in_grace_fetches_without_reporting_gap(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price",
+        cfg["source_profiles"]["nbs_production_material_market_price"],
+    )
+    calls = []
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.get_shanghai_time",
+        lambda: datetime(2026, 8, 4, 12, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_search_page",
+        lambda **kwargs: calls.append(kwargs) or [],
+    )
+
+    _, warnings, diagnostics = provider._discover_articles(
+        date(2026, 7, 30), date(2026, 7, 30)
+    )
+
+    assert calls
+    assert diagnostics["search_expected_periods"] == 1
+    assert diagnostics["grace_periods"] == 1
+    assert diagnostics["unresolved_dates"] == 0
+    assert not any(
+        item.get("reason") == "nbs_unresolved_observation_periods"
+        for item in warnings
+    )
+
+
+def test_nbs_reschedule_and_cancellation_configuration_is_evidence_gated(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(
+        cfg["source_profiles"]["nbs_production_material_market_price"]
+    )
+    source_cfg["observation_exceptions"] = [
+        {
+            "observation_date": "2026-07-30",
+            "kind": "rescheduled",
+            "replacement_release_at": "2026-08-06T10:00:00+08:00",
+            "reason": "official reschedule",
+            "evidence_url": "https://www.stats.gov.cn/reschedule.html",
+        }
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.get_shanghai_time",
+        lambda: datetime(2026, 8, 5, 12, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    _, _, diagnostics = provider._discover_articles(
+        date(2026, 7, 30), date(2026, 7, 30)
+    )
+    assert diagnostics["search_expected_periods"] == 0
+    assert diagnostics["not_due_periods"] == 1
+    assert diagnostics["release_plans"][0]["release_status"] == "rescheduled"
+
+    source_cfg["observation_exceptions"] = [
+        {"observation_date": "2026-07-30", "reason": "missing evidence"}
+    ]
+    invalid_provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    with pytest.raises(ValueError, match="reason and evidence_url"):
+        invalid_provider._discover_articles(
+            date(2026, 7, 30), date(2026, 7, 30)
+        )
+
+
+def test_nbs_calendar_reconciles_delayed_availability_and_source_failure(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["nbs_production_material_market_price"]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_nbs_thermal_coal")[0]
+    adapter = NbsProductionMaterialsGovernanceAdapter(source_cfg)
+    plan_row = {
+        "observation_date": "2026-07-30",
+        "period_start": "2026-07-21",
+        "period_end": "2026-07-30",
+        "planned_release_at": "2026-08-04T10:00:00+08:00",
+        "expected_release_at": "2026-08-04T10:00:00+08:00",
+        "grace_deadline_at": "2026-08-04T18:00:00+08:00",
+        "release_status": "unresolved_gap",
+        "exception_kind": None,
+        "exception_reason": None,
+        "evidence_url": None,
+    }
+    observation = CommodityObservation(
+        series_id=item.series_id,
+        observation_date="2026-07-30",
+        value=824.8,
+        currency="CNY",
+        unit="CNY/ton",
+        raw_value=824.8,
+        raw_currency="CNY",
+        raw_unit="CNY/ton",
+        source_profile=item.source_profile,
+        source_url="https://www.stats.gov.cn/release.html",
+        quality_flag="official_public_web",
+        source_symbol=item.source_symbol,
+        parser_version="unit-test",
+        raw_payload_hash="nbs-delayed",
+        metadata={
+            "publication_date": "2026-08-05",
+            "first_seen_at": "2026-08-05T11:00:00+08:00",
+        },
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.get_shanghai_time",
+        lambda: datetime(2026, 8, 5, 12, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    adapter._provider_result = CommodityProviderResult(
+        observations=[observation],
+        metadata={"date_gap_fill": {"release_plans": [plan_row]}},
+    )
+    delayed = adapter.govern_dates(
+        [item], [observation], start_date="2026-07-30", end_date="2026-07-30"
+    ).calendar_rows[0]
+    assert delayed["release_status"] == "delayed_available"
+    assert delayed["available_at"] == "2026-08-05T10:00:00+08:00"
+    assert delayed["availability_quality"] == "official_publication_date"
+
+    adapter._provider_result = CommodityProviderResult(
+        metadata={
+            "date_gap_fill": {
+                "release_plans": [plan_row],
+                "source_failure_samples": ["2026-07-30"],
+            }
+        }
+    )
+    failed = adapter.govern_dates(
+        [item], [], start_date="2026-07-30", end_date="2026-07-30"
+    ).calendar_rows[0]
+    assert failed["release_status"] == "source_failure"
+    assert failed["available_at"] is None
 
 
 def test_nbs_monthly_output_title_period_parsing():
@@ -1058,7 +1472,8 @@ def test_nbs_long_range_empty_broad_search_aborts_exact_scan(monkeypatch):
         item.get("reason") == "nbs_broad_discovery_empty_anomaly"
         for item in warnings
     )
-    assert diagnostics["unresolved_dates"] == 2
+    assert diagnostics["unresolved_dates"] == 0
+    assert diagnostics["source_failure_dates"] == 2
 
 
 def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):

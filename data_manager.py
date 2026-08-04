@@ -8658,9 +8658,23 @@ class DataManager:
         ]
         if not mappings:
             return None
-        target_date = str(
+        raw_valuation_time = str(
             valuation_date or get_shanghai_time().date().isoformat()
-        )[:10]
+        )
+        target_date = raw_valuation_time[:10]
+        if "T" in raw_valuation_time or " " in raw_valuation_time:
+            valuation_cutoff = datetime.fromisoformat(
+                raw_valuation_time.replace("Z", "+00:00")
+            )
+            if valuation_cutoff.tzinfo is None or valuation_cutoff.utcoffset() is None:
+                raise ValueError("commodity valuation timestamp must be timezone-aware")
+        else:
+            valuation_cutoff = datetime.combine(
+                date.fromisoformat(target_date),
+                datetime.max.time(),
+                tzinfo=get_shanghai_time().tzinfo,
+            )
+        valuation_cutoff_iso = valuation_cutoff.isoformat()
         selected_series_ids = sorted(
             {
                 str(series_id)
@@ -8673,7 +8687,7 @@ class DataManager:
             }
         )
         blockers: List[str] = []
-        warnings: List[str] = ["availability_quality_observation_date_only"]
+        warnings: List[str] = []
         if len(selected_series_ids) != 1:
             blockers.append("multiple_company_special_commodity_series_require_spread")
         if len(mappings) != 1:
@@ -8728,6 +8742,7 @@ class DataManager:
                     series_id=series_id,
                     start_date=start_date,
                     end_date=target_date,
+                    available_at_lte=valuation_cutoff_iso,
                 )
                 numeric: List[Dict[str, Any]] = []
                 for item in observations:
@@ -8743,7 +8758,9 @@ class DataManager:
                         continue
                     numeric.append(item)
                 if not numeric:
-                    local_blockers.append(f"as_of_observation_missing:{series_id}")
+                    local_blockers.append(
+                        f"temporal_availability_missing:{series_id}"
+                    )
                     continue
                 latest = max(
                     numeric,
@@ -8797,6 +8814,9 @@ class DataManager:
                         "quality_flag",
                         "raw_payload_hash",
                         "row_version",
+                        "available_at",
+                        "availability_quality",
+                        "release_status",
                     )
                 }
                 output[series_id] = {
@@ -8824,7 +8844,10 @@ class DataManager:
                             1.0,
                             count / expected_count if expected_count else 0.0,
                         ),
-                        "availability_quality": "observation_date_only",
+                        "availability_quality": latest.get(
+                            "availability_quality"
+                        ),
+                        "available_at": latest.get("available_at"),
                     },
                 }
             return output, local_blockers

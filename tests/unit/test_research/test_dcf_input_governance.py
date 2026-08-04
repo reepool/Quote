@@ -237,10 +237,18 @@ async def test_special_commodity_dcf_context_is_company_and_valuation_date_bound
                 "active": True,
             }
 
-        def read_observations(self, *, series_id, end_date=None, start_date=None):
+        def read_observations(
+            self,
+            *,
+            series_id,
+            end_date=None,
+            start_date=None,
+            available_at_lte=None,
+        ):
             assert series_id == "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
             assert end_date == "2025-12-31"
             assert start_date == "2023-01-01"
+            assert available_at_lte == "2025-12-31T23:59:59.999999+08:00"
             return [
                 {
                     "series_id": series_id,
@@ -249,6 +257,8 @@ async def test_special_commodity_dcf_context_is_company_and_valuation_date_bound
                     "currency": "CNY",
                     "unit": "CNY/ton",
                     "source_profile": "100ppi",
+                    "available_at": "2025-07-01T10:00:00+08:00",
+                    "availability_quality": "local_first_seen_timestamp",
                 },
                 {
                     "series_id": series_id,
@@ -257,6 +267,8 @@ async def test_special_commodity_dcf_context_is_company_and_valuation_date_bound
                     "currency": "CNY",
                     "unit": "CNY/ton",
                     "source_profile": "100ppi",
+                    "available_at": "2025-12-31T10:00:00+08:00",
+                    "availability_quality": "local_first_seen_timestamp",
                 },
                 {
                     "series_id": series_id,
@@ -309,7 +321,69 @@ async def test_special_commodity_dcf_context_is_company_and_valuation_date_bound
     assert context["commodity_price_assumption"] == 1200.0
     assert context["diagnostic"]["observation_count"] == 2
     assert context["diagnostic"]["percentile"] == 1.0
+    assert context["diagnostic"]["availability_quality"] == (
+        "local_first_seen_timestamp"
+    )
     assert context["lineage_hash"]
+
+
+@pytest.mark.asyncio
+async def test_special_commodity_dcf_context_blocks_without_governed_availability(
+    monkeypatch,
+):
+    async def sync_to_thread(function, /, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("data_manager.asyncio.to_thread", sync_to_thread)
+
+    class Storage:
+        def get_series(self, series_id):
+            return {
+                "series_id": series_id,
+                "currency": "CNY",
+                "unit": "CNY/ton",
+                "active": True,
+            }
+
+        def read_observations(self, **kwargs):
+            assert kwargs["available_at_lte"].startswith("2025-12-31T23:59:59")
+            return []
+
+    manager = object.__new__(DataManager)
+    manager.research_config = type(
+        "Config",
+        (),
+        {
+            "modules": {
+                "commodity_market_data": {
+                    "special_commodity_market_data": {"enabled": True}
+                }
+            }
+        },
+    )()
+    manager._require_special_commodity_storage = lambda: Storage()
+
+    context = await manager._get_dcf_special_commodity_context(
+        valuation_date="2025-12-31",
+        target_currency="CNY",
+        business_profile_context={
+            "instrument_id": "600001.SH",
+            "executable_exposure_mappings": [
+                {
+                    "source": "approved_company_business_profile",
+                    "market_data_family": "special_commodity",
+                    "exposure_role": "revenue",
+                    "direction": "positive",
+                    "revenue_series_id": "CMD.TEST.PIT",
+                    "cost_series_ids": [],
+                }
+            ],
+        },
+    )
+
+    assert context["status"] == "blocked"
+    assert "temporal_availability_missing:CMD.TEST.PIT" in context["blockers"]
+    assert context["commodity_price_assumption"] is None
 
 
 @pytest.mark.asyncio

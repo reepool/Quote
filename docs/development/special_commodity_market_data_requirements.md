@@ -303,6 +303,22 @@ validate_observations(normalized_rows)
 - LME 当前采用来源观测交易日治理：只有选定主/备源实际返回的日期可进入日历和行情落库；缺日先标记 source gap，未来接入可靠官方闭市公告后再增强为完整开闭市日历。
 - 政策价和长协价使用生效期，不应派生虚构的逐日行情。
 
+#### 时间可得性治理
+
+`observation_date` 只表示经济观测所属期间，不表示研究系统在当时已经获得数据。来源发布型数据统一区分以下时间字段：
+
+- `observation_period_start / observation_period_end`：来源观测期；
+- `expected_release_at / grace_deadline_at`：带来源时区的计划发布时间和宽限截止时间；
+- `actual_published_at / first_seen_at`：官方发布证据和本地首次发现证据；
+- `available_at / availability_quality`：PIT 查询使用的有效可得时间及证据质量；
+- `release_status`：`not_due`、`due_in_grace`、`available`、`delayed_available`、`cancelled`、`rescheduled`、`unresolved_gap` 或 `source_failure`。
+
+国家统计局生产资料旬价按 Asia/Shanghai 时区治理：上旬、中旬、下旬通常分别在当月14日、24日和次月4日发布，具体发布时间和宽限小时数由 `release_policy` 配置。任务可在计划时间后、宽限期内尝试获取，但宽限结束前不形成 unresolved warning；取消或改期必须提供原因和官方证据 URL。上游业务拒绝、传输失败或异常空搜索属于 `source_failure`，不能伪装成合法空数据。
+
+`commodity_publication_calendar` 通过增量列迁移保存上述字段。旧行不根据观测日或固定滞后反推 `available_at`，因此历史 PIT 使用前必须从官方文档或本地首次发现记录补齐证据。普通运维读取在不传 availability cutoff 时保持既有行为；DCF 等历史估值必须传入带时区的截止时点，数据库只返回 `available_at <= cutoff` 的观测，缺失证据时 fail closed。
+
+共享时间契约位于 research 层，负责计划、状态转换和 PIT 资格，不接管来源抓取。FX 发布日历和期货交易日历仍分别维护其领域证据与存储；本阶段不迁移二者，只为后续按显式映射接入共享状态语义保留边界。
+
 ### 6.1.3 Master Data Governance
 
 每一个启用的 `series_id` 都必须有来源级主数据治理，静态配置只能作为治理候选，不能单独视为“已验证”：
