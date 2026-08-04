@@ -825,7 +825,14 @@ async def test_subset_quote_update_does_not_advance_aggregate_watermark():
                 "SSE": {"failure_count": 0},
             },
             "factor_stats": {
-                "SSE": {"status": "success", "failed": 0},
+                "SSE": {
+                    "status": "success",
+                    "failed": 0,
+                    "diagnostics": {
+                        "selected_instrument_count": 1,
+                        "excluded_out_of_window_count": 7,
+                    },
+                },
             },
         },
     )
@@ -841,6 +848,128 @@ async def test_subset_quote_update_does_not_advance_aggregate_watermark():
     )
     assert calls[1].kwargs["status"] == "partial"
     assert result["status"] == "partial"
+    assert calls[0].kwargs["metadata"]["factor_stats"]["diagnostics"] == {
+        "selected_instrument_count": 1,
+        "excluded_out_of_window_count": 7,
+    }
+
+
+@pytest.mark.asyncio
+async def test_real_factor_failure_keeps_exchange_watermark_partial():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 7, 31)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SZSE": date(2026, 7, 31)}
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 7, 31),
+        exchanges=["SZSE"],
+        update_results={
+            "exchange_stats": {"SZSE": {"failure_count": 0}},
+            "factor_stats": {
+                "SZSE": {
+                    "status": "partial",
+                    "failed": 1,
+                    "reason": "factor_download_failures",
+                    "diagnostics": {
+                        "known_event_empty_count": 1,
+                    },
+                },
+            },
+        },
+    )
+
+    first_call = manager.db_ops.upsert_operational_watermark.await_args_list[0]
+    assert first_call.kwargs["status"] == "partial"
+    assert first_call.kwargs["metadata"]["failure_reasons"] == [
+        "SZSE:factor_factor_download_failures"
+    ]
+    assert first_call.kwargs["metadata"]["factor_stats"]["diagnostics"] == {
+        "known_event_empty_count": 1,
+    }
+    assert result["status"] == "partial"
+
+
+@pytest.mark.asyncio
+async def test_predecessor_reports_factor_failure_diagnostics():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_operational_watermark = AsyncMock(return_value={
+        "successful_through": date(2026, 7, 30),
+        "metadata": {
+            "failure_reasons": [
+                "SZSE:factor_factor_download_failures",
+            ],
+            "factor_stats": {
+                "diagnostics": {
+                    "known_event_empty_count": 1,
+                },
+            },
+        },
+    })
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SZSE"],
+    )
+
+    assert readiness["eligible"] is False
+    assert readiness["factor_diagnostics_by_exchange"] == {
+        "SZSE": {"known_event_empty_count": 1},
+    }
+    assert readiness["failure_reasons_by_exchange"] == {
+        "SZSE": ["SZSE:factor_factor_download_failures"],
+    }
+
+
+@pytest.mark.asyncio
+async def test_predecessor_reads_legacy_aggregate_factor_diagnostics():
+    manager = DataManager()
+    manager.db_ops = Mock()
+
+    async def load_watermark(name):
+        if name != "a_share_quote_baostock_sina":
+            return None
+        return {
+            "successful_through": date(2026, 7, 30),
+            "metadata": {
+                "exchanges": ["SSE", "SZSE"],
+                "failure_reasons": [
+                    "SZSE:factor_factor_download_failures",
+                ],
+                "factor_stats": {
+                    "SSE": {"diagnostics": {"failed": 0}},
+                    "SZSE": {
+                        "diagnostics": {"known_event_empty_count": 1},
+                    },
+                },
+            },
+        }
+
+    manager.db_ops.get_operational_watermark = AsyncMock(
+        side_effect=load_watermark
+    )
+
+    readiness = await manager._canonical_predecessor_readiness(
+        date(2026, 7, 31),
+        exchanges=["SSE", "SZSE"],
+    )
+
+    assert readiness["factor_diagnostics_by_exchange"] == {
+        "SSE": {"failed": 0},
+        "SZSE": {"known_event_empty_count": 1},
+    }
+    assert readiness["failure_reasons_by_exchange"] == {
+        "SSE": [],
+        "SZSE": ["SZSE:factor_factor_download_failures"],
+    }
 
 
 @pytest.mark.asyncio

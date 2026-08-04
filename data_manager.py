@@ -12793,6 +12793,12 @@ class DataManager:
             changelog_stats = update_results.get('changelog_stats')
             if not isinstance(changelog_stats, dict):
                 changelog_stats = {}
+            factor_stats = update_results.get('factor_stats')
+            if not isinstance(factor_stats, dict):
+                factor_stats = {}
+            quote_composite_watermark = update_results.get(
+                'quote_composite_watermark'
+            )
 
             report = {
                 'summary': {
@@ -12811,6 +12817,8 @@ class DataManager:
                 'index_master_governance': index_master_governance,
                 'catchup_stats': catchup_stats,
                 'changelog_stats': changelog_stats,
+                'factor_stats': factor_stats,
+                'quote_composite_watermark': quote_composite_watermark,
                 'errors': []
             }
 
@@ -12847,6 +12855,9 @@ class DataManager:
                                 'quotes_count': quotes_count,
                                 'catchup_stats': stats.get('catchup_stats', {}),
                                 'changelog_stats': stats.get('changelog_stats', {}),
+                                'factor_stats': dict(
+                                    factor_stats.get(exchange) or {}
+                                ),
                             }
                             report['summary']['total_instruments_checked'] += total_count
                             report['summary']['updated_instruments'] += success_count
@@ -12904,6 +12915,10 @@ class DataManager:
                 'instrument_master_governance': update_results.get('instrument_master_governance'),
                 'index_master_governance': update_results.get('index_master_governance'),
                 'changelog_stats': update_results.get('changelog_stats', {}),
+                'factor_stats': update_results.get('factor_stats', {}),
+                'quote_composite_watermark': update_results.get(
+                    'quote_composite_watermark'
+                ),
                 'errors': [str(e)]
             }
 
@@ -16726,8 +16741,52 @@ class DataManager:
             'skipped': 0,
             'failed': 0,
             'filtered_total': total,
+            'diagnostics': {
+                'discovered_symbol_count': 0,
+                'discovered_event_count': 0,
+                'selected_instrument_count': 0,
+                'excluded_out_of_window_count': 0,
+                'known_event_empty_count': 0,
+                'missing_event_coverage_count': 0,
+                'source_failure_count': 0,
+                'persistence_failure_count': 0,
+                'invalid_window_count': 0,
+                'samples': {
+                    'selected': [],
+                    'excluded_out_of_window': [],
+                    'known_event_empty': [],
+                    'failures': [],
+                },
+            },
         }
-        discovered_event_symbols: Optional[set[str]] = None
+        discovered_events: Optional[Dict[str, set[date]]] = None
+        selected_event_dates: Dict[str, set[date]] = {}
+        diagnostics = result['diagnostics']
+        diagnostic_samples = diagnostics['samples']
+
+        def _stock_sample(
+            stock: Mapping[str, Any],
+            *,
+            event_dates: Iterable[date] = (),
+            failure_class: Optional[str] = None,
+        ) -> Dict[str, Any]:
+            sample = {
+                'instrument_id': str(stock.get('instrument_id') or ''),
+                'symbol': str(stock.get('symbol') or ''),
+                'request_start': self._date_text(stock.get('start_date')),
+                'request_end': self._date_text(stock.get('end_date')),
+                'discovered_dates': sorted(
+                    event_date.isoformat() for event_date in event_dates
+                ),
+            }
+            if failure_class:
+                sample['failure_class'] = failure_class
+            return sample
+
+        def _append_sample(bucket: str, sample: Dict[str, Any]) -> None:
+            values = diagnostic_samples[bucket]
+            if len(values) < 10:
+                values.append(sample)
 
         daily_sync_enabled = self.config.get_nested(
             f'routing.factor.{exchange}.daily_sync_enabled',
@@ -16757,32 +16816,127 @@ class DataManager:
 
         if not skip_filter:
             # ★ 精准筛选：查询当天有除权除息的股票代码，仅对这些股票同步因子
+            valid_window_stocks: List[Dict[str, Any]] = []
+            for stock in stocks:
+                start = self._date_from_any(stock.get('start_date'))
+                end = self._date_from_any(stock.get('end_date'))
+                if start is None or end is None or end < start:
+                    result['failed'] += 1
+                    diagnostics['invalid_window_count'] += 1
+                    _append_sample(
+                        'failures',
+                        _stock_sample(
+                            stock,
+                            failure_class='invalid_factor_window',
+                        ),
+                    )
+                    continue
+                valid_window_stocks.append({
+                    **stock,
+                    'start_date': start,
+                    'end_date': end,
+                })
+            if not valid_window_stocks:
+                result['filtered_total'] = 0
+                result['status'] = 'partial'
+                result['reason'] = 'invalid_factor_windows'
+                return result
+            stocks = valid_window_stocks
             target_dates = self._build_factor_target_dates(stocks)
 
-            ex_div_symbols = await self._query_ex_dividend_symbols(target_dates)
+            raw_discovery = await self._query_ex_dividend_symbols(target_dates)
 
-            if ex_div_symbols is not None:
-                discovered_event_symbols = {
-                    str(symbol) for symbol in ex_div_symbols
-                }
-                # 精准模式：仅同步有除权除息事件的品种
-                filtered_stocks = [
-                    s for s in stocks if s['symbol'] in ex_div_symbols
-                ]
+            if raw_discovery is not None:
+                try:
+                    discovered_events = self._normalize_ex_dividend_discovery(
+                        raw_discovery,
+                        target_dates=target_dates,
+                    )
+                except ValueError as exc:
+                    dm_logger.warning(
+                        "[DataManager] Phase 2: invalid ex-dividend discovery "
+                        "for %s: %s",
+                        exchange,
+                        exc,
+                    )
+                    result['status'] = 'partial'
+                    result['reason'] = 'ex_dividend_discovery_invalid'
+                    diagnostics['source_failure_count'] += 1
+                    _append_sample(
+                        'failures',
+                        {'failure_class': 'invalid_discovery', 'detail': str(exc)},
+                    )
+                    return result
+
+                diagnostics['discovered_symbol_count'] = len(discovered_events)
+                diagnostics['discovered_event_count'] = sum(
+                    len(event_dates)
+                    for event_dates in discovered_events.values()
+                )
+                filtered_stocks: List[Dict[str, Any]] = []
+                undiscovered_count = 0
+                for stock in stocks:
+                    symbol = str(stock.get('symbol') or '')
+                    event_dates = discovered_events.get(symbol, set())
+                    if not event_dates:
+                        undiscovered_count += 1
+                        continue
+                    start = self._date_from_any(stock.get('start_date'))
+                    end = self._date_from_any(stock.get('end_date'))
+                    if start is None or end is None or end < start:
+                        result['failed'] += 1
+                        diagnostics['invalid_window_count'] += 1
+                        _append_sample(
+                            'failures',
+                            _stock_sample(
+                                stock,
+                                event_dates=event_dates,
+                                failure_class='invalid_factor_window',
+                            ),
+                        )
+                        continue
+                    in_window_dates = {
+                        event_date for event_date in event_dates
+                        if start <= event_date <= end
+                    }
+                    if not in_window_dates:
+                        diagnostics['excluded_out_of_window_count'] += 1
+                        _append_sample(
+                            'excluded_out_of_window',
+                            _stock_sample(stock, event_dates=event_dates),
+                        )
+                        continue
+                    filtered_stocks.append(stock)
+                    selected_event_dates[
+                        str(stock.get('instrument_id') or symbol)
+                    ] = in_window_dates
+                    _append_sample(
+                        'selected',
+                        _stock_sample(stock, event_dates=in_window_dates),
+                    )
+
+                result['skipped'] = undiscovered_count
+                diagnostics['selected_instrument_count'] = len(filtered_stocks)
+                result['filtered_total'] = len(filtered_stocks)
                 dm_logger.info(
-                    "[DataManager] Phase 2: %s ex-dividend filter: %d/%d stocks have events on %s",
+                    "[DataManager] Phase 2: %s ex-dividend filter: "
+                    "selected=%d/%d, out_of_window=%d, events=%d on %s",
                     exchange, len(filtered_stocks), total,
+                    diagnostics['excluded_out_of_window_count'],
+                    diagnostics['discovered_event_count'],
                     ','.join(str(d) for d in sorted(target_dates))
                 )
                 if not filtered_stocks:
                     dm_logger.info(
-                        "[DataManager] %s factor sync skipped: no ex-dividend events today",
-                        exchange
+                        "[DataManager] %s factor sync has no in-window "
+                        "ex-dividend events",
+                        exchange,
                     )
-                    result['skipped'] = total
+                    if result['failed']:
+                        result['status'] = 'partial'
+                        result['reason'] = 'invalid_factor_windows'
                     return result
                 stocks = filtered_stocks
-                result['filtered_total'] = len(stocks)
             else:
                 # AkShare 查询失败，跳过本次因子同步，由周维护补充
                 dm_logger.warning(
@@ -16792,6 +16946,11 @@ class DataManager:
                 result['skipped'] = total
                 result['status'] = 'partial'
                 result['reason'] = 'ex_dividend_discovery_failed'
+                diagnostics['source_failure_count'] += 1
+                _append_sample(
+                    'failures',
+                    {'failure_class': 'discovery_source_failure'},
+                )
                 return result
 
         dm_logger.info(
@@ -16800,6 +16959,11 @@ class DataManager:
         )
 
         for idx, stock in enumerate(stocks, start=1):
+            symbol = str(stock.get('symbol') or '')
+            known_dates = selected_event_dates.get(
+                str(stock.get('instrument_id') or symbol),
+                set(),
+            )
             try:
                 factors = await self.source_factory.get_adjustment_factors(
                     exchange,
@@ -16809,25 +16973,85 @@ class DataManager:
                     datetime.combine(stock['end_date'], datetime.max.time()),
                 )
                 if factors:
-                    await self._persist_adjustment_factor_batch(exchange, factors)
-                    result['synced'] += 1
-                elif (
-                    discovered_event_symbols is not None
-                    and stock['symbol'] in discovered_event_symbols
-                ):
+                    factor_dates = {
+                        factor_date
+                        for factor in factors
+                        if (
+                            factor_date := self._date_from_any(
+                                factor.get('ex_date')
+                            )
+                        ) is not None
+                    }
+                    if known_dates and not (factor_dates & known_dates):
+                        result['failed'] += 1
+                        diagnostics['missing_event_coverage_count'] += 1
+                        _append_sample(
+                            'failures',
+                            _stock_sample(
+                                stock,
+                                event_dates=known_dates,
+                                failure_class='missing_event_coverage',
+                            ),
+                        )
+                        dm_logger.warning(
+                            "[DataManager] Factor source rows do not cover "
+                            "known ex-dividend dates for %s (%s): known=%s rows=%s",
+                            symbol,
+                            stock['instrument_id'],
+                            sorted(known_dates),
+                            sorted(factor_dates),
+                        )
+                        continue
+                    try:
+                        await self._persist_adjustment_factor_batch(
+                            exchange, factors
+                        )
+                    except Exception as exc:
+                        result['failed'] += 1
+                        diagnostics['persistence_failure_count'] += 1
+                        _append_sample(
+                            'failures',
+                            _stock_sample(
+                                stock,
+                                event_dates=known_dates,
+                                failure_class='persistence_failure',
+                            ),
+                        )
+                        dm_logger.warning(
+                            "[DataManager] Factor persistence failed for %s: %s",
+                            symbol,
+                            exc,
+                        )
+                    else:
+                        result['synced'] += 1
+                elif known_dates:
                     result['failed'] += 1
+                    diagnostics['known_event_empty_count'] += 1
+                    _append_sample(
+                        'known_event_empty',
+                        _stock_sample(stock, event_dates=known_dates),
+                    )
                     dm_logger.warning(
                         "[DataManager] Factor source returned no rows for known "
                         "ex-dividend event: %s (%s)",
-                        stock['symbol'], stock['instrument_id'],
+                        symbol, stock['instrument_id'],
                     )
                 else:
                     result['skipped'] += 1
             except Exception as e:
                 result['failed'] += 1
-                dm_logger.debug(
+                diagnostics['source_failure_count'] += 1
+                _append_sample(
+                    'failures',
+                    _stock_sample(
+                        stock,
+                        event_dates=known_dates,
+                        failure_class='source_failure',
+                    ),
+                )
+                dm_logger.warning(
                     "[DataManager] Factor sync failed for %s: %s",
-                    stock['symbol'], e
+                    symbol, e
                 )
 
             if progress_log_every and idx % progress_log_every == 0:
@@ -16947,7 +17171,7 @@ class DataManager:
                     for key, value in dict(factor_stats.get(exchange) or {}).items()
                     if key in {
                         'status', 'synced', 'skipped', 'failed',
-                        'filtered_total', 'reason',
+                        'filtered_total', 'reason', 'diagnostics',
                     }
                 }
                 for exchange in governed_exchanges
@@ -17206,6 +17430,28 @@ class DataManager:
             min(successful_dates.values())
             if eligible and successful_dates else None
         )
+        factor_diagnostics_by_exchange: Dict[str, Dict[str, Any]] = {}
+        predecessor_failure_reasons_by_exchange: Dict[str, List[str]] = {}
+        for exchange, row in rows.items():
+            if not isinstance(row, Mapping):
+                continue
+            row_metadata = row.get('metadata') or {}
+            factor_payload = row_metadata.get('factor_stats') or {}
+            if isinstance(factor_payload.get(exchange), Mapping):
+                factor_payload = factor_payload[exchange]
+            factor_diagnostics_by_exchange[exchange] = dict(
+                factor_payload.get('diagnostics') or {}
+            )
+            all_failure_reasons = list(
+                row_metadata.get('failure_reasons') or []
+            )
+            exchange_failure_reasons = [
+                reason for reason in all_failure_reasons
+                if str(reason).startswith(f'{exchange}:')
+            ]
+            predecessor_failure_reasons_by_exchange[exchange] = (
+                exchange_failure_reasons[:20]
+            )
         return {
             'eligible': eligible,
             'reason': (
@@ -17231,23 +17477,27 @@ class DataManager:
                 successful_through.isoformat()
                 if successful_through is not None else None
             ),
+            'factor_diagnostics_by_exchange': (
+                factor_diagnostics_by_exchange
+            ),
+            'failure_reasons_by_exchange': (
+                predecessor_failure_reasons_by_exchange
+            ),
             'recovery': recovery,
         }
 
     @staticmethod
-    def _build_factor_target_dates(stocks: List[Dict[str, Any]]) -> set:
+    def _build_factor_target_dates(
+        stocks: List[Dict[str, Any]],
+    ) -> set[date]:
         """Build the ex-dividend dates covered by a factor sync request."""
-        target_dates = set()
+        target_dates: set[date] = set()
         min_start: Optional[date] = None
         max_end: Optional[date] = None
 
         for stock in stocks:
-            start = stock.get('start_date')
-            end = stock.get('end_date')
-            if isinstance(start, datetime):
-                start = start.date()
-            if isinstance(end, datetime):
-                end = end.date()
+            start = DataManager._date_from_any(stock.get('start_date'))
+            end = DataManager._date_from_any(stock.get('end_date'))
             if start is not None:
                 min_start = start if min_start is None else min(min_start, start)
             if end is not None:
@@ -17261,7 +17511,7 @@ class DataManager:
 
     async def _query_ex_dividend_symbols(
         self, target_dates: set
-    ) -> Optional[set]:
+    ) -> Optional[Dict[str, set[date]]]:
         """通过 AkShare 批量查询指定日期有除权除息的股票代码
 
         使用 stock_fhps_em 接口获取全市场分红方案，筛选除权除息日
@@ -17271,7 +17521,7 @@ class DataManager:
             target_dates: 需要检查的日期集合
 
         Returns:
-            匹配的股票代码集合(纯数字), 或 None 表示查询失败
+            股票代码到匹配除权日集合的映射，或 None 表示查询失败
         """
         try:
             import akshare as ak
@@ -17283,7 +17533,7 @@ class DataManager:
                 for d in target_dates if d is not None
             }
             if not target_date_strs:
-                return set()
+                return {}
 
             # 根据目标日期推算需查询的报告期。区间补数可能跨年，不能只取
             # 一个 sample date，否则会漏掉另一年的分红方案。
@@ -17298,37 +17548,87 @@ class DataManager:
             })
 
             all_records = []
+            successful_responses = 0
+            failed_periods: List[str] = []
             for period in report_periods:
                 try:
                     df = await asyncio.to_thread(ak.stock_fhps_em, date=period)
-                    if df is not None and '除权除息日' in df.columns:
-                        valid = df[df['除权除息日'].notna()][['代码', '除权除息日']]
-                        all_records.append(valid)
-                        dm_logger.debug(
-                            "[DataManager] stock_fhps_em(%s): %d records with ex-dividend dates",
-                            period, len(valid)
+                    if df is None:
+                        failed_periods.append(f'{period}:empty_response')
+                        continue
+                    if not {'代码', '除权除息日'} <= set(df.columns):
+                        dm_logger.warning(
+                            "[DataManager] stock_fhps_em(%s) missing required columns",
+                            period,
                         )
+                        failed_periods.append(f'{period}:missing_columns')
+                        continue
+                    successful_responses += 1
+                    all_records.append(df[['代码', '除权除息日']].copy())
+                    dm_logger.debug(
+                        "[DataManager] stock_fhps_em(%s): %d distribution rows",
+                        period, len(df)
+                    )
                 except Exception as e:
+                    failed_periods.append(f'{period}:request_failed')
                     dm_logger.debug(
                         "[DataManager] stock_fhps_em(%s) failed: %s", period, e
                     )
 
-            if not all_records:
-                dm_logger.warning("[DataManager] No ex-dividend data available from AkShare")
+            if failed_periods or successful_responses != len(report_periods):
+                dm_logger.warning(
+                    "[DataManager] Ex-dividend discovery incomplete: %s",
+                    failed_periods,
+                )
                 return None
+            if not all_records or all(frame.empty for frame in all_records):
+                return {}
 
             merged = pd.concat(all_records, ignore_index=True)
-            merged['除权除息日'] = pd.to_datetime(merged['除权除息日']).dt.strftime('%Y-%m-%d')
+            raw_dates = merged['除权除息日']
+            nonempty_dates = raw_dates.notna() & raw_dates.astype(str).str.strip().ne('')
+            parsed_dates = pd.to_datetime(raw_dates, errors='coerce')
+            invalid_dates = nonempty_dates & parsed_dates.isna()
+            if invalid_dates.any():
+                dm_logger.warning(
+                    "[DataManager] Ex-dividend discovery contains %d invalid dates",
+                    int(invalid_dates.sum()),
+                )
+                return None
+            merged = merged.loc[parsed_dates.notna()].copy()
+            if merged.empty:
+                return {}
+            merged['event_date'] = parsed_dates.loc[merged.index].dt.date
 
             # 筛选匹配目标日期的股票
-            matched = merged[merged['除权除息日'].isin(target_date_strs)]
-            symbols = set(matched['代码'].tolist())
+            target_date_values = {
+                datetime.fromisoformat(value).date()
+                for value in target_date_strs
+            }
+            matched = merged[merged['event_date'].isin(target_date_values)]
+            if matched['代码'].isna().any():
+                dm_logger.warning(
+                    "[DataManager] Ex-dividend discovery matched rows without symbols"
+                )
+                return None
+            events_by_symbol: Dict[str, set[date]] = defaultdict(set)
+            for row in matched.to_dict('records'):
+                raw_symbol = str(row.get('代码') or '').strip()
+                if raw_symbol.endswith('.0'):
+                    raw_symbol = raw_symbol[:-2]
+                if not raw_symbol:
+                    return None
+                symbol = raw_symbol.zfill(6)
+                events_by_symbol[symbol].add(row['event_date'])
 
             dm_logger.info(
-                "[DataManager] Ex-dividend query: %d stocks matched for dates %s (from %d total records)",
-                len(symbols), target_date_strs, len(merged)
+                "[DataManager] Ex-dividend query: %d stocks/%d events "
+                "matched for dates %s (from %d total records)",
+                len(events_by_symbol),
+                sum(len(values) for values in events_by_symbol.values()),
+                target_date_strs, len(merged)
             )
-            return symbols
+            return dict(events_by_symbol)
 
         except ImportError:
             dm_logger.warning("[DataManager] AkShare not available for ex-dividend query")
@@ -17336,6 +17636,61 @@ class DataManager:
         except Exception as e:
             dm_logger.warning("[DataManager] Ex-dividend query failed: %s", e)
             return None
+
+    @staticmethod
+    def _normalize_ex_dividend_discovery(
+        discovery: Any,
+        *,
+        target_dates: Iterable[Any],
+    ) -> Dict[str, set[date]]:
+        """Normalize dated discovery evidence at the internal compatibility edge."""
+
+        normalized_targets: set[date] = set()
+        for raw_date in target_dates:
+            normalized_date = DataManager._date_from_any(raw_date)
+            if normalized_date is None:
+                raise ValueError(f"invalid target date: {raw_date!r}")
+            normalized_targets.add(normalized_date)
+
+        if isinstance(discovery, Mapping):
+            normalized: Dict[str, set[date]] = {}
+            for raw_symbol, raw_dates in discovery.items():
+                symbol = str(raw_symbol or '').strip()
+                if not symbol:
+                    raise ValueError("discovery contains an empty symbol")
+                if isinstance(raw_dates, (date, datetime, str)):
+                    date_values = [raw_dates]
+                else:
+                    try:
+                        date_values = list(raw_dates)
+                    except TypeError as exc:
+                        raise ValueError(
+                            f"invalid event dates for {symbol}: {raw_dates!r}"
+                        ) from exc
+                if not date_values:
+                    raise ValueError(f"discovery contains no event date for {symbol}")
+                normalized_dates: set[date] = set()
+                for raw_date in date_values:
+                    normalized_date = DataManager._date_from_any(raw_date)
+                    if normalized_date is None:
+                        raise ValueError(
+                            f"invalid event date for {symbol}: {raw_date!r}"
+                        )
+                    normalized_dates.add(normalized_date)
+                normalized[symbol] = normalized_dates
+            return normalized
+
+        if isinstance(discovery, (set, frozenset, list, tuple)):
+            # One-release compatibility for legacy internal tests/callers. The
+            # production discovery function always returns dated evidence.
+            return {
+                str(raw_symbol).strip(): set(normalized_targets)
+                for raw_symbol in discovery
+                if str(raw_symbol).strip()
+            }
+        raise ValueError(
+            f"unsupported ex-dividend discovery payload: {type(discovery).__name__}"
+        )
 
     async def _tdx_factor_audit(
         self,

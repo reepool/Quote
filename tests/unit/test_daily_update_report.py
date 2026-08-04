@@ -172,6 +172,49 @@ async def test_generate_daily_update_report_includes_changelog_stats():
 
 
 @pytest.mark.asyncio
+async def test_generate_daily_update_report_includes_factor_diagnostics():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    factor_stats = {
+        'SZSE': {
+            'status': 'success',
+            'failed': 0,
+            'diagnostics': {
+                'selected_instrument_count': 1,
+                'excluded_out_of_window_count': 7,
+            },
+        },
+    }
+    watermark = {
+        'status': 'partial',
+        'per_exchange': {'SZSE': {'status': 'success'}},
+    }
+    report = await manager._generate_daily_update_report(
+        ['SZSE'],
+        date(2026, 8, 3),
+        {
+            'exchange_stats': {
+                'SZSE': {
+                    'success_count': 8,
+                    'failure_count': 0,
+                    'quotes_added': 8,
+                    'total_instruments': 8,
+                },
+            },
+            'factor_stats': factor_stats,
+            'quote_composite_watermark': watermark,
+        },
+    )
+
+    assert report['factor_stats'] == factor_stats
+    assert report['exchange_stats']['SZSE']['factor_stats'] == (
+        factor_stats['SZSE']
+    )
+    assert report['quote_composite_watermark'] == watermark
+
+
+@pytest.mark.asyncio
 async def test_daily_update_report_shows_overlap_unchanged_without_advancing_watermark(tmp_path):
     db_manager, ops = await _ops_for_tmp_db(tmp_path)
     try:

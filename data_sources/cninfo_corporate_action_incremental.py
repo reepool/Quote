@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v3"
+    "cninfo_corporate_action_daily_title_trigger_v4"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -115,6 +115,18 @@ _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS = (
 )
 
 
+def _has_convertible_bond_conversion_price_language(
+    normalized_title: str,
+) -> bool:
+    return (
+        (
+            "可转债" in normalized_title
+            or "可转换公司债券" in normalized_title
+        )
+        and "转股价格" in normalized_title
+    )
+
+
 def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
     """Return a deterministic non-XDXR reason, preserving real distributions."""
     if any(
@@ -122,6 +134,16 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
         for marker in _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS
     ):
         return None
+    if (
+        _has_convertible_bond_conversion_price_language(normalized_title)
+        and "回购" in normalized_title
+        and "注销" in normalized_title
+        and any(
+            marker in normalized_title
+            for marker in ("调整", "修正", "下调")
+        )
+    ):
+        return "convertible_bond_conversion_price_adjustment"
     if (
         "向特定对象发行" in normalized_title
         and "不存在" in normalized_title
@@ -257,6 +279,12 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
     exceptional_markers = [
         marker for marker in _DAILY_EXCEPTIONAL_ACTION_MARKERS
         if marker in normalized_title
+        and not (
+            marker == "债转股"
+            and _has_convertible_bond_conversion_price_language(
+                normalized_title
+            )
+        )
     ]
     selected = bool(subject_markers and implementation_markers)
     source_profiles: list[str] = []

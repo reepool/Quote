@@ -107,6 +107,8 @@ def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
         "库存股注销完成暨股份变动公告",
         "关于减少注册资本实施完成的公告",
         "关于权益分派后调整限制性股票回购价格的公告",
+        "关于回购股份注销完成调整可转债转股价格的公告",
+        "关于回购股份注销完成调整可转换公司债券转股价格的公告",
     ],
 )
 def test_daily_title_trigger_rejects_unrelated_disclosures(title):
@@ -120,6 +122,25 @@ def test_distribution_implementation_takes_precedence_over_exclusion_words():
 
     assert decision["selected"] is True
     assert decision["source_profiles"] == ["cninfo_dividend"]
+
+
+def test_distribution_implementation_precedes_convertible_price_exclusion():
+    decision = classify_daily_corporate_action_title(
+        "2025年度权益分派实施暨回购股份注销完成调整可转债转股价格的公告"
+    )
+
+    assert decision["selected"] is True
+    assert decision["source_profiles"] == ["cninfo_dividend"]
+
+
+def test_actual_debt_to_equity_notice_remains_exceptional():
+    decision = classify_daily_corporate_action_title(
+        "重整计划债转股实施暨股份到账公告"
+    )
+
+    assert decision["selected"] is True
+    assert decision["requires_semantic_review"] is True
+    assert "债转股" in decision["exceptional_markers"]
 
 
 def test_exceptional_title_requires_semantic_review():
@@ -722,6 +743,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                 "600004.SH",
                 "600005.SH",
                 "600006.SH",
+                "300707.SZ",
             ],
             "pending_candidate_reasons": {
                 "600001.SH": "unmatched_special_announcement",
@@ -730,6 +752,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                 "600004.SH": "semantic_anomaly_deferred",
                 "600005.SH": "unmatched_special_announcement",
                 "600006.SH": "unmatched_special_announcement",
+                "300707.SZ": "unmatched_special_announcement",
             },
             "pending_special_announcements_by_instrument": {
                 "600001.SH": [{
@@ -758,6 +781,12 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                     "title": "2025年度权益分派实施公告",
                 }],
                 "600006.SH": [],
+                "300707.SZ": [{
+                    "announcement_key": "convertible-price-1",
+                    "title": (
+                        "关于回购股份注销完成调整可转债转股价格的公告"
+                    ),
+                }],
             },
         },
     }
@@ -776,6 +805,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
             "600004.SH",
             "600005.SH",
             "600006.SH",
+            "300707.SZ",
         )
     }
 
@@ -832,11 +862,11 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
     assert result["announcement_source_profiles"] == {
         "600005.SH": ["cninfo_dividend"],
     }
-    assert result["carryover_revalidation"]["evaluated"] == 5
-    assert result["carryover_revalidation"]["excluded"] == 2
+    assert result["carryover_revalidation"]["evaluated"] == 6
+    assert result["carryover_revalidation"]["excluded"] == 3
     assert result["carryover_revalidation"][
         "cleared_candidate_instruments"
-    ] == 2
+    ] == 3
     assert result["carryover_revalidation"]["rerouted_structured"] == 1
     assert result["carryover_revalidation"]["retained_exceptional"] == 1
     assert result["carryover_revalidation"]["retained_missing_title"] == 1
