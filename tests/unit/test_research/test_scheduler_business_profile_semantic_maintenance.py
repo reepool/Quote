@@ -55,12 +55,15 @@ def test_daily_incremental_job_is_disabled_and_not_scheduled(monkeypatch):
     add_job.assert_not_awaited()
 
 
-def test_all_business_profile_production_jobs_are_disabled_by_default():
+def test_only_manual_business_profile_backfill_is_enabled_during_bootstrap():
     jobs = UnifiedConfigManager("config").get_scheduler_config().jobs
     assert jobs["business_profile_daily_incremental"]["enabled"] is False
     assert jobs["business_profile_daily_incremental"]["trigger"]["month"] == "1-12"
-    assert jobs["business_profile_backfill"]["enabled"] is False
+    assert jobs["business_profile_backfill"]["enabled"] is True
     assert jobs["business_profile_backfill"]["manual_only"] is True
+    assert jobs["business_profile_backfill"]["parameters"]["selection_policy"] == (
+        "latest_annual_only"
+    )
     for legacy_job_id in (
         "business_profile_index_discovery_daily",
         "business_profile_semantic_maintenance",
@@ -327,6 +330,8 @@ def test_scheduler_forwards_manual_backfill_scope(monkeypatch):
     assert asyncio.run(
         task.business_profile_backfill(
             knowledge_cutoff="2026-08-01",
+            rollout_phase="structured_shadow",
+            selection_policy="expanded",
             instrument_ids=["601088.SH"],
             start_date="2025-01-01",
             end_date="2026-08-01",
@@ -340,6 +345,8 @@ def test_scheduler_forwards_manual_backfill_scope(monkeypatch):
     )
     manager.run_business_profile_backfill.assert_awaited_once_with(
         knowledge_cutoff="2026-08-01",
+        rollout_phase="structured_shadow",
+        selection_policy="expanded",
         instrument_ids=["601088.SH"],
         start_date="2025-01-01",
         end_date="2026-08-01",

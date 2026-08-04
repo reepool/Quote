@@ -47,7 +47,7 @@
         ]
       },
       "business_profile_evidence": {
-        "enabled": false,
+        "enabled": true,
         "archive": {
           "archive_root": "data/filings/business_profile",
           "checkpoint_root": "data/checkpoints/business_profile_official_archive",
@@ -112,7 +112,7 @@
           "note": "Legacy selected-section adapter compatibility switch only. Production extraction and verification use the common LLM gateway profile from config/11_llm.json; provider connection settings are not owned here."
         },
         "semantic_production": {
-          "enabled": false,
+          "enabled": true,
           "promotion_enabled": false,
           "scheduler_enabled": false,
           "retry_limit": 3,
@@ -139,15 +139,20 @@
             "promotion": false,
             "scope_widening": false
           },
-          "note": "Disabled until frozen field-family manifests, bounded cohort validation, rollback drills, and exception-backlog gates pass."
+          "note": "Semantic runtime is enabled for bounded shadow processing. Promotion and cron remain disabled until frozen field-family manifests, bounded validation, rollback drills, and exception-backlog gates pass."
         },
         "production_operations": {
-          "discovery_enabled": false,
-          "reconciliation_enabled": false,
-          "async_production_enabled": false,
+          "discovery_enabled": true,
+          "reconciliation_enabled": true,
+          "async_production_enabled": true,
           "automatic_selection_policy": "latest_annual_only",
           "checkpoint_root": "data/checkpoints/business_profile_async",
-          "field_families": [],
+          "use_rollout_config": true,
+          "runtime_identity_mode": "derived",
+          "field_families": [
+            "structured_segments",
+            "tabular_operating_facts"
+          ],
           "runtime_identities": {},
           "filing_season_months": [1, 2, 3, 4, 5, 7, 8, 9, 10],
           "offseason_index_discovery": "daily",
@@ -170,7 +175,7 @@
             "max_backoff_days": 30
           },
           "rollback": "Disable the daily incremental scheduler job; preserve discovery windows, work queue, frontier, manifests, immutable PDFs, candidates, approvals, and audit history.",
-          "note": "One daily discovery-first workflow persists latest-annual work and advances independent bounded queues. Semiannual and specialist disclosures remain frontier-only unless an operator starts an explicitly scoped backfill."
+          "note": "The versioned rollout config controls active field families and stage budgets. The manual latest-annual bootstrap advances independent bounded queues; semiannual and specialist disclosures require an explicitly scoped expanded backfill."
         }
       },
       "industry": {

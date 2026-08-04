@@ -7075,6 +7075,8 @@ class ScheduledTasks:
     async def business_profile_backfill(
         self,
         knowledge_cutoff: Optional[str] = None,
+        rollout_phase: Optional[str] = None,
+        selection_policy: Optional[str] = None,
         instrument_ids: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
@@ -7092,6 +7094,8 @@ class ScheduledTasks:
         try:
             result = await data_manager.run_business_profile_backfill(
                 knowledge_cutoff=knowledge_cutoff,
+                rollout_phase=rollout_phase,
+                selection_policy=selection_policy,
                 instrument_ids=instrument_ids,
                 start_date=start_date,
                 end_date=end_date,

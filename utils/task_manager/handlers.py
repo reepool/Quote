@@ -3184,6 +3184,8 @@ class TaskManagerHandlers:
             'venues',
             'commodity_ids',
             'frequencies',
+            'field_families',
+            'document_types',
         }
         aliases = {
             'end': 'end_date',

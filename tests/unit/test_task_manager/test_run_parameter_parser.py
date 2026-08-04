@@ -29,3 +29,27 @@ def test_run_parameter_parser_splits_source_event_keys():
     )
 
     assert params["source_event_keys"] == ["event-1", "event-2"]
+
+
+def test_run_parameter_parser_types_business_profile_scope_lists():
+    handler = TaskManagerHandlers.__new__(TaskManagerHandlers)
+
+    params = handler._parse_run_runtime_parameters(
+        [
+            "field_families=structured_segments,tabular_operating_facts",
+            "document_types=annual_report,annual_report_correction",
+            "instrument_ids=600000.SH,000001.SZ",
+            "selection_policy=latest_annual_only",
+        ]
+    )
+
+    assert params["field_families"] == [
+        "structured_segments",
+        "tabular_operating_facts",
+    ]
+    assert params["document_types"] == [
+        "annual_report",
+        "annual_report_correction",
+    ]
+    assert params["instrument_ids"] == ["600000.SH", "000001.SZ"]
+    assert params["selection_policy"] == "latest_annual_only"

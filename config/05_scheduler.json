@@ -985,7 +985,15 @@
         "parameters": {
           "knowledge_cutoff": null,
           "exchanges": ["SSE", "SZSE", "BSE"],
-          "field_families": [],
+          "field_families": [
+            "structured_segments",
+            "tabular_operating_facts",
+            "atomic_activities",
+            "named_relationships",
+            "derived_value_chain_roles",
+            "commodity_exposure_facts",
+            "commodity_exposure_publication"
+          ],
           "runtime_identities": {},
           "max_attempts": 3,
           "discovery_kwargs": {
@@ -995,19 +1003,14 @@
             "max_pages_per_market": 240,
             "max_windows_per_market": 2
           },
-          "stage_budgets": {
-            "acquire": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 300, "high_water_mark": 1000},
-            "parse": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000},
-            "semantic": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 500},
-            "publish": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000}
-          },
+          "stage_budgets": null,
           "max_runtime_seconds": 2700
         }
       },
       "business_profile_backfill": {
-        "enabled": false,
+        "enabled": true,
         "manual_only": true,
-        "description": "A股业务画像历史或特殊公告手工回补（必须显式公司或日期范围）",
+        "description": "A股业务画像全市场 latest-annual 启动及特殊公告手工回补",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -1015,6 +1018,8 @@
         "coalesce": true,
         "parameters": {
           "knowledge_cutoff": null,
+          "rollout_phase": null,
+          "selection_policy": "latest_annual_only",
           "instrument_ids": [],
           "start_date": null,
           "end_date": null,
@@ -1023,12 +1028,7 @@
           "runtime_identities": {},
           "force": false,
           "max_attempts": 3,
-          "stage_budgets": {
-            "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
-            "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
-            "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
-            "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
-          },
+          "stage_budgets": null,
           "max_runtime_seconds": 5400
         }
       },

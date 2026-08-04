@@ -1648,6 +1648,76 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile async production is disabled",
             }
+        rollout = None
+        phase = None
+        manifests: Dict[str, Dict[str, Any]] = {}
+        activation_manifests: Dict[str, Dict[str, Any]] = {}
+        if operations.get("use_rollout_config") is True:
+            from research.business_profile_production_rollout import (
+                parse_business_profile_rollout_config,
+            )
+
+            rollout = parse_business_profile_rollout_config(
+                config_manager.get_nested("business_profile_rollout", {})
+            )
+            try:
+                phase = rollout.phase()
+                manifests = rollout.manifests_for(phase)
+                activation_manifests = rollout.activation_manifests_for(phase)
+            except ValueError as exc:
+                return {"status": "not_ready", "reason": str(exc)}
+            if phase.name != "daily_incremental":
+                return {
+                    "status": "not_ready",
+                    "reason": "business-profile daily rollout phase is not active",
+                    "active_phase": phase.name,
+                }
+            semantic["promotion_enabled"] = phase.promotion_enabled
+            semantic["promotion_manifests"] = manifests
+            semantic["rollout_phase"] = phase.name
+            field_families = list(phase.field_families)
+        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
+        configured_families = tuple(
+            str(item).strip()
+            for item in (field_families or operations.get("field_families") or [])
+            if str(item).strip()
+        )
+        configured_identities = dict(
+            runtime_identities
+            or operations.get("runtime_identities")
+            or semantic.get("runtime_identities")
+            or {}
+        )
+        identity_mode = str(operations.get("runtime_identity_mode") or "").strip()
+        try:
+            if identity_mode:
+                from research.business_profile_production_rollout import (
+                    resolve_business_profile_runtime_identities,
+                )
+
+                identities = resolve_business_profile_runtime_identities(
+                    llm_config=config_manager.get_llm_config(),
+                    mode=identity_mode,
+                    explicit=configured_identities,
+                )
+            else:
+                identities = configured_identities
+            if activation_manifests:
+                from research.business_profile_production_rollout import (
+                    validate_business_profile_promotion_manifests,
+                )
+
+                validate_business_profile_promotion_manifests(
+                    activation_manifests,
+                    runtime_identities=identities,
+                )
+        except ValueError as exc:
+            return {"status": "not_ready", "reason": str(exc)}
+        if not configured_families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": "async production requires field_families and runtime_identities",
+            }
         from research.business_profile_async_production import (
             get_business_profile_write_coordinator,
             parse_stage_budgets,
@@ -1663,24 +1733,6 @@ class DataManager:
                 self.research_storage.initialize()
 
         await asyncio.to_thread(initialize_with_coordinated_writes)
-
-        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
-        configured_families = tuple(
-            str(item).strip()
-            for item in (field_families or operations.get("field_families") or [])
-            if str(item).strip()
-        )
-        identities = dict(
-            runtime_identities
-            or operations.get("runtime_identities")
-            or semantic.get("runtime_identities")
-            or {}
-        )
-        if not configured_families or not identities:
-            return {
-                "status": "not_ready",
-                "reason": "async production requires field_families and runtime_identities",
-            }
         service, processing_identity = self._build_business_profile_async_service(
             cutoff=cutoff,
             configured_families=configured_families,
@@ -1691,6 +1743,7 @@ class DataManager:
         )
         budgets = parse_stage_budgets(
             stage_budgets
+            or (phase.stage_budgets if phase is not None else None)
             or operations.get("stage_budgets")
             or {
                 "acquire": {
@@ -1775,12 +1828,44 @@ class DataManager:
                 "daily discovery remains market-wide; instrument_ids are reserved "
                 "for manual backfill"
             )
+        if rollout is not None and phase is not None:
+            from research.business_profile_production_rollout import (
+                build_business_profile_rollout_status,
+                evaluate_business_profile_rollout_readiness,
+            )
+
+            rollout_status = await asyncio.to_thread(
+                build_business_profile_rollout_status,
+                self.research_storage,
+                phase=phase,
+                active_universe_count=int(
+                    (result.get("reconciliation") or {}).get("active_universe_count") or 0
+                ),
+                manifests=manifests,
+                runtime_identities=identities,
+            )
+            result["rollout_readiness"] = evaluate_business_profile_rollout_readiness(
+                phase=phase,
+                queue_health=result.get("queue_health") or {},
+                discovery=result.get("discovery") or {},
+                reconciliation=result.get("reconciliation") or {},
+                rollout_status=rollout_status,
+                readiness=rollout.readiness,
+                scheduler_enabled=bool(
+                    config_manager.get_nested(
+                        "scheduler_config.jobs.business_profile_daily_incremental.enabled",
+                        False,
+                    )
+                ),
+            )
         return result
 
     async def run_business_profile_backfill(
         self,
         *,
         knowledge_cutoff: Optional[str] = None,
+        rollout_phase: Optional[str] = None,
+        selection_policy: Optional[str] = None,
         instrument_ids: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
@@ -1793,8 +1878,6 @@ class DataManager:
     ) -> Dict[str, Any]:
         """Run explicitly scoped historical or specialist work through the same queues."""
 
-        if not instrument_ids and not start_date:
-            raise ValueError("business-profile backfill requires instrument_ids or start_date")
         if not self.research_config.enabled or self.research_storage is None:
             return {
                 "status": "disabled",
@@ -1810,8 +1893,115 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile async production is disabled",
             }
+        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
+        semantic = dict(module.get("semantic_production") or {})
+        phase_name = str(rollout_phase or "").strip()
+        requested_policy = str(selection_policy or "").strip()
+        use_rollout = bool(phase_name) or (
+            operations.get("use_rollout_config") is True
+            and requested_policy != "expanded"
+        )
+        rollout = None
+        phase = None
+        manifests: Dict[str, Dict[str, Any]] = {}
+        activation_manifests: Dict[str, Dict[str, Any]] = {}
+        if use_rollout:
+            from research.business_profile_production_rollout import (
+                parse_business_profile_rollout_config,
+            )
+
+            try:
+                rollout = parse_business_profile_rollout_config(
+                    config_manager.get_nested("business_profile_rollout", {})
+                )
+                phase = rollout.phase(phase_name or None)
+                manifests = rollout.manifests_for(phase)
+                activation_manifests = rollout.activation_manifests_for(phase)
+            except ValueError as exc:
+                return {"status": "not_ready", "reason": str(exc)}
+            selection_policy = str(
+                selection_policy
+                or rollout.bootstrap.get("selection_policy")
+                or "latest_annual_only"
+            )
+        policy = str(selection_policy or "expanded").strip()
+        if policy == "expanded" and not phase_name:
+            rollout = None
+            phase = None
+            manifests = {}
+            activation_manifests = {}
+            semantic = dict(module.get("semantic_production") or {})
+        elif rollout is not None and phase is not None:
+            start_date = start_date or rollout.bootstrap.get("start_date")
+            end_date = end_date or rollout.bootstrap.get("end_date")
+            if not document_types:
+                document_types = list(rollout.bootstrap.get("document_types") or [])
+            if not field_families:
+                field_families = list(phase.field_families)
+            semantic["promotion_enabled"] = phase.promotion_enabled
+            semantic["promotion_manifests"] = manifests
+            semantic["rollout_phase"] = phase.name
+        if phase is not None and field_families:
+            unsupported_families = sorted(
+                set(str(item) for item in field_families) - set(phase.field_families)
+            )
+            if unsupported_families:
+                return {
+                    "status": "not_ready",
+                    "reason": "business-profile field families are outside rollout phase: "
+                    + ",".join(unsupported_families),
+                }
+        if policy == "expanded" and (not document_types or not field_families):
+            raise ValueError(
+                "expanded business-profile backfill requires document_types and field_families"
+            )
+        if not instrument_ids and not start_date:
+            raise ValueError("business-profile backfill requires instrument_ids or start_date")
+        configured_families = tuple(
+            str(item).strip()
+            for item in (field_families or operations.get("field_families") or [])
+            if str(item).strip()
+        )
+        configured_identities = dict(
+            runtime_identities or operations.get("runtime_identities") or {}
+        )
+        identity_mode = str(
+            (rollout.runtime_identity_mode if rollout else None)
+            or operations.get("runtime_identity_mode")
+            or ""
+        ).strip()
+        try:
+            if identity_mode:
+                from research.business_profile_production_rollout import (
+                    resolve_business_profile_runtime_identities,
+                )
+
+                identities = resolve_business_profile_runtime_identities(
+                    llm_config=config_manager.get_llm_config(),
+                    mode=identity_mode,
+                    explicit=configured_identities,
+                )
+            else:
+                identities = configured_identities
+            if activation_manifests:
+                from research.business_profile_production_rollout import (
+                    validate_business_profile_promotion_manifests,
+                )
+
+                validate_business_profile_promotion_manifests(
+                    activation_manifests,
+                    runtime_identities=identities,
+                )
+        except ValueError as exc:
+            return {"status": "not_ready", "reason": str(exc)}
+        if not configured_families or not identities:
+            return {
+                "status": "not_ready",
+                "reason": "backfill requires field_families and runtime_identities",
+            }
         from research.business_profile_async_production import (
             get_business_profile_write_coordinator,
+            parse_stage_budgets,
         )
 
         write_coordinator = get_business_profile_write_coordinator(
@@ -1824,23 +2014,8 @@ class DataManager:
                 self.research_storage.initialize()
 
         await asyncio.to_thread(initialize_with_coordinated_writes)
-        cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
-        configured_families = tuple(
-            str(item).strip()
-            for item in (field_families or operations.get("field_families") or [])
-            if str(item).strip()
-        )
-        identities = dict(
-            runtime_identities or operations.get("runtime_identities") or {}
-        )
-        if not configured_families or not identities:
-            return {
-                "status": "not_ready",
-                "reason": "backfill requires field_families and runtime_identities",
-            }
-        from research.business_profile_async_production import parse_stage_budgets
 
-        backfill_exchanges = sorted(
+        scoped_exchanges = sorted(
             {
                 {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
                     str(item).rsplit(".", 1)[-1].upper(),
@@ -1849,8 +2024,11 @@ class DataManager:
                 for item in (instrument_ids or [])
             }
             - {""}
-        ) or ["SSE", "SZSE", "BSE"]
-        semantic = dict(module.get("semantic_production") or {})
+        )
+        backfill_exchanges = scoped_exchanges or list(
+            (rollout.bootstrap.get("exchanges") if rollout else None)
+            or ["SSE", "SZSE", "BSE"]
+        )
         service, processing_identity = self._build_business_profile_async_service(
             cutoff=cutoff,
             configured_families=configured_families,
@@ -1861,6 +2039,7 @@ class DataManager:
         )
         budgets = parse_stage_budgets(
             stage_budgets
+            or (phase.stage_budgets if phase is not None else None)
             or operations.get("stage_budgets")
             or {
                 stage: {
@@ -1876,8 +2055,27 @@ class DataManager:
             "start_date": start_date,
             "end_date": end_date or cutoff,
             "exchanges": backfill_exchanges,
+            "page_size": int(
+                (rollout.bootstrap.get("page_size") if rollout else None) or 30
+            ),
+            "max_pages_per_market": int(
+                (
+                    rollout.bootstrap.get("max_pages_per_market")
+                    if rollout
+                    else None
+                )
+                or operations.get("peak_max_pages_per_market", 240)
+            ),
+            "max_windows_per_market": int(
+                (
+                    rollout.bootstrap.get("max_windows_per_market")
+                    if rollout
+                    else None
+                )
+                or operations.get("max_windows_per_market", 2)
+            ),
         }
-        return await service.run_backfill(
+        result = await service.run_backfill(
             knowledge_cutoff=cutoff,
             processing_identity=processing_identity,
             instrument_ids=instrument_ids or (),
@@ -1888,7 +2086,61 @@ class DataManager:
             stage_budgets=budgets,
             max_attempts=max_attempts,
             force=force,
+            selection_policy=policy,
         )
+        try:
+            from research.business_profile_production_operations import (
+                build_business_profile_reconciliation_report,
+            )
+
+            result["reconciliation"] = await asyncio.to_thread(
+                build_business_profile_reconciliation_report,
+                self.research_storage,
+                frequency="annual",
+                knowledge_cutoff=cutoff,
+            )
+        except Exception as exc:
+            result["reconciliation"] = {
+                "status": "degraded",
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+        if rollout is not None and phase is not None:
+            from research.business_profile_production_rollout import (
+                build_business_profile_rollout_status,
+                evaluate_business_profile_rollout_readiness,
+            )
+
+            result["rollout"] = {
+                "phase": phase.name,
+                "field_families": list(phase.field_families),
+                "promotion_enabled": phase.promotion_enabled,
+                "runtime_identities": identities,
+            }
+            rollout_status = await asyncio.to_thread(
+                build_business_profile_rollout_status,
+                self.research_storage,
+                phase=phase,
+                active_universe_count=int(
+                    (result.get("reconciliation") or {}).get("active_universe_count") or 0
+                ),
+                manifests=manifests,
+                runtime_identities=identities,
+            )
+            result["rollout_readiness"] = evaluate_business_profile_rollout_readiness(
+                phase=phase,
+                queue_health=result.get("queue_health") or {},
+                discovery=result.get("discovery") or {},
+                reconciliation=result.get("reconciliation") or {},
+                rollout_status=rollout_status,
+                readiness=rollout.readiness,
+                scheduler_enabled=bool(
+                    config_manager.get_nested(
+                        "scheduler_config.jobs.business_profile_daily_incremental.enabled",
+                        False,
+                    )
+                ),
+            )
+        return result
 
     def _build_business_profile_async_service(
         self,
@@ -1946,6 +2198,10 @@ class DataManager:
                 "max_instruments": 1,
                 "checkpoint_path": str(item["checkpoint_path"]),
                 "selection_policy": selection_policy,
+                "promotion_enabled": semantic.get("promotion_enabled") is True,
+                "promotion_manifests": dict(
+                    semantic.get("promotion_manifests") or {}
+                ),
             }
             result = await self.run_business_profile_semantic_production(
                 mode=mode,
@@ -1989,11 +2245,20 @@ class DataManager:
             retry_backoff_seconds=int(operations.get("retry_backoff_seconds", 300)),
             write_coordinator=write_coordinator,
         )
+        from research.business_profile_promotion import FieldFamilyPromotionManifest
+
+        promotion_manifest_hashes = {
+            family: FieldFamilyPromotionManifest(**dict(value)).manifest_hash
+            for family, value in dict(semantic.get("promotion_manifests") or {}).items()
+        }
         return service, {
             "field_families": tuple(configured_families),
             "runtime_identities": dict(identities),
             "semantic_policy": semantic.get("policy_version")
             or "business_profile_async.v1",
+            "rollout_phase": semantic.get("rollout_phase"),
+            "promotion_enabled": semantic.get("promotion_enabled") is True,
+            "promotion_manifest_hashes": promotion_manifest_hashes,
         }
 
     async def run_business_profile_reconciliation(
@@ -2051,6 +2316,7 @@ class DataManager:
         runtime_identities: Optional[Dict[str, str]] = None,
         promotion_manifest_hashes: Optional[Dict[str, str]] = None,
         promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
+        promotion_enabled: Optional[bool] = None,
         max_instruments: int = 30,
         checkpoint_path: Optional[str] = None,
         selection_policy: str = "latest_annual_only",
@@ -2063,6 +2329,8 @@ class DataManager:
             return {"status": "unavailable", "reason": "research storage is not initialized"}
         module = self.research_config.modules.get("business_profile_evidence", {})
         production_payload = dict(module.get("semantic_production") or {})
+        if promotion_enabled is not None:
+            production_payload["promotion_enabled"] = bool(promotion_enabled)
         if production_payload.get("enabled") is not True:
             return {
                 "status": "disabled",

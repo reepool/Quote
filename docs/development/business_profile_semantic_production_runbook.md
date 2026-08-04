@@ -16,15 +16,17 @@
 日期和文档类型范围的 `business_profile_backfill` 手工任务入队。这里的“手工”
 只指启动和指定范围，后续下载、解析、验证、重试及符合门禁的晋级仍自动完成。
 
-## 2. 默认状态和启用前提
+## 2. 当前生产状态和启用前提
 
-以下配置默认关闭：
+当前配置已经进入 `structured_shadow`，可手工启动首轮全市场回补：
 
-- `business_profile_evidence.semantic_production.enabled`
-- `business_profile_evidence.semantic_production.promotion_enabled`
-- `business_profile_evidence.semantic_production.scheduler_enabled`
-- `business_profile_evidence.production_operations.async_production_enabled`
-- `scheduler_config.jobs.business_profile_daily_incremental.enabled`
+- 公告发现、年报资产复用、语义运行时、异步队列和 reconciliation 已开启。
+- `business_profile_backfill.enabled=true` 且保持 `manual_only=true`。
+- 当前只处理 `structured_segments` 和 `tabular_operating_facts`。
+- promotion、语义 cron 和 `business_profile_daily_incremental` 仍关闭，因此影子结果
+  只能形成候选、机器返工和例外，不能形成 approved 记录。
+- rollout 阶段、发现边界、阶段预算和 readiness 阈值统一由
+  `config/business_profile_production_rollout.json` 管理；调度配置不再复制阶段预算。
 
 `business_profile_backfill` 永远为 `manual_only=true`，没有 cron trigger。
 启用顺序必须是：影子收集、字段族晋级、有限行业批次、异步日更。不得同时
@@ -42,6 +44,86 @@
 不再设置单独的周更、月更、半年更和年更任务。日更先提交公告前沿，再按
 `acquire -> parse -> semantic -> publish` 有界推进队列并输出覆盖/队列对账。
 历史回补、专业公告和强制重放只通过手工回补入口处理。
+
+## 2.1 首轮全市场回补
+
+稳定启动命令是：
+
+```text
+/run business_profile_backfill
+```
+
+任务使用 `2024-01-01` 至知识截止日的官方公告发现窗口，但只对每家公司入队一份
+最新有效完整年报或其活动更正稿，不会下载公告窗口内的全部历史年报。每次运行只
+消费当前阶段预算；任务退出时未处理工作仍保存在 SQLite 队列和拆分发现窗口中。
+重复执行同一命令会复用已验证 PDF、已完成工作项和检查点，不会因重复启动而重复
+下载或重复调用 LLM。`force=true` 只用于原地重置 terminal work item，不改变处理
+身份，也不会创建一份平行重复工作。
+
+需要提前处理少数主营变更或专业公告时，显式切换为 expanded 范围，例如：
+
+```text
+/run business_profile_backfill selection_policy=expanded instrument_ids=601088.SH start_date=2026-01-01 document_types=resource_report field_families=commodity_exposure_facts
+```
+
+该入口的“手工”仅指启动和指定异常范围，后续流程仍自动运行。`expanded` 不继承
+全市场 bootstrap 的开始日期、文档类型或字段族，必须显式提供公司或日期范围和
+所需字段族，避免把专业公告回补误扩成全市场多年度扫描。
+
+## 2.2 阶段推进
+
+阶段顺序固定为：
+
+```text
+structured_shadow -> structured_promotion -> semantic_shadow ->
+semantic_promotion -> derived_publication -> daily_incremental
+```
+
+阶段切换只修改 `config/business_profile_production_rollout.json`，不再同步改研究配置
+或任务参数。先为需要晋级的字段族生成真实 benchmark promotion manifest，再把下一
+阶段的 `enabled` 改为 `true`，最后把 `active_phase` 指向该阶段。所有前置阶段必须继续
+保持 enabled；缺少前置阶段、完整运行身份或真实 passed manifest 时，任务在数据库
+初始化、公告发现和网络访问前返回 `not_ready`。不能用占位 manifest 跳过 shadow。
+
+切换后仍重复运行同一条 `/run business_profile_backfill` 命令。处理身份包含阶段、
+字段族、parser/catalog/model 等运行身份、promotion 状态和 manifest hash，因此新阶段
+会形成可审计的新工作身份，同时继续复用不可变年报资产。
+
+## 2.3 最终切换日更
+
+最终切换分两步执行：先在 scheduler 仍关闭时激活 `daily_incremental`，用同一条手工
+backfill 运行完成最后一轮全字段族对账；确认 `rollout_readiness.daily_ready=true`
+后再打开 cron。门禁同时要求：
+
+- 公告拆分窗口无积压、无 incomplete/unsplittable 窗口。
+- latest annual 覆盖率和每个字段族完成率达到配置阈值。
+- 队列无 claimable work 和 terminal failure。
+- 无未解决的 machine rework；quick/deep review 积压未超阈值。
+- 全部字段族 manifest 已通过 benchmark 且身份与当前运行时完全一致。
+
+满足后，只需把 `config/05_scheduler.json` 的
+`business_profile_daily_incremental.enabled` 改为 `true`。历史回补仍保留为
+manual-only，不新增周更、月更、半年更或年更任务。
+
+可用以下只读 SQL 查看长周期进度：
+
+```sql
+SELECT stage, status, COUNT(*) AS work_count
+FROM business_profile_work_items
+GROUP BY stage, status
+ORDER BY stage, status;
+
+SELECT field_family, status, COUNT(DISTINCT instrument_id) AS instrument_count
+FROM business_profile_semantic_runs
+GROUP BY field_family, status
+ORDER BY field_family, status;
+
+SELECT field_family, tier, COUNT(*) AS open_count
+FROM business_profile_exceptions
+WHERE status = 'open'
+GROUP BY field_family, tier
+ORDER BY field_family, tier;
+```
 
 ## 3. 运行和检查点
 

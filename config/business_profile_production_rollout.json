@@ -1,0 +1,143 @@
+{
+  "business_profile_rollout": {
+    "schema_version": "business_profile_production_rollout.v1",
+    "enabled": true,
+    "active_phase": "structured_shadow",
+    "runtime_identity_mode": "derived",
+    "bootstrap": {
+      "selection_policy": "latest_annual_only",
+      "start_date": "2024-01-01",
+      "end_date": null,
+      "document_types": [
+        "annual_report",
+        "annual_report_correction"
+      ],
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "max_attempts": 3,
+      "page_size": 30,
+      "max_pages_per_market": 240,
+      "max_windows_per_market": 2
+    },
+    "readiness": {
+      "minimum_current_annual_coverage_ratio": 0.98,
+      "minimum_field_family_completion_ratio": 0.98,
+      "maximum_claimable_work_items": 0,
+      "maximum_terminal_failures": 0,
+      "maximum_open_machine_rework": 0,
+      "maximum_open_quick_review": 100,
+      "maximum_open_deep_review": 50,
+      "maximum_stalled_frontier": 0
+    },
+    "promotion_manifests": {},
+    "phases": {
+      "structured_shadow": {
+        "enabled": true,
+        "order": 10,
+        "field_families": [
+          "structured_segments",
+          "tabular_operating_facts"
+        ],
+        "promotion_enabled": false,
+        "requires_passed_manifests": false,
+        "prerequisites": [],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "structured_promotion": {
+        "enabled": false,
+        "order": 20,
+        "field_families": [
+          "structured_segments",
+          "tabular_operating_facts"
+        ],
+        "promotion_enabled": true,
+        "requires_passed_manifests": true,
+        "prerequisites": ["structured_shadow"],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "semantic_shadow": {
+        "enabled": false,
+        "order": 30,
+        "field_families": [
+          "atomic_activities",
+          "named_relationships"
+        ],
+        "promotion_enabled": false,
+        "requires_passed_manifests": false,
+        "prerequisites": ["structured_promotion"],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "semantic_promotion": {
+        "enabled": false,
+        "order": 40,
+        "field_families": [
+          "atomic_activities",
+          "named_relationships"
+        ],
+        "promotion_enabled": true,
+        "requires_passed_manifests": true,
+        "prerequisites": ["semantic_shadow"],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "derived_publication": {
+        "enabled": false,
+        "order": 50,
+        "field_families": [
+          "derived_value_chain_roles",
+          "commodity_exposure_facts",
+          "commodity_exposure_publication"
+        ],
+        "promotion_enabled": true,
+        "requires_passed_manifests": true,
+        "prerequisites": ["semantic_promotion"],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "daily_incremental": {
+        "enabled": false,
+        "order": 60,
+        "field_families": [
+          "structured_segments",
+          "tabular_operating_facts",
+          "atomic_activities",
+          "named_relationships",
+          "derived_value_chain_roles",
+          "commodity_exposure_facts",
+          "commodity_exposure_publication"
+        ],
+        "promotion_enabled": true,
+        "requires_passed_manifests": true,
+        "prerequisites": ["derived_publication"],
+        "stage_budgets": {
+          "acquire": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 300, "high_water_mark": 1000},
+          "parse": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000},
+          "semantic": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 500},
+          "publish": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000}
+        }
+      }
+    }
+  }
+}

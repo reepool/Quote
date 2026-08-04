@@ -171,11 +171,24 @@ class BusinessProfileWorkRepository:
         *,
         knowledge_cutoff: str,
         processing_identity: Mapping[str, Any],
+        instrument_ids: Sequence[str] = (),
+        start_date: str | None = None,
+        end_date: str | None = None,
         max_attempts: int = 3,
+        force: bool = False,
     ) -> dict[str, int]:
         cutoff = _date_text(knowledge_cutoff, "knowledge_cutoff")
+        normalized_start = _date_text(start_date, "start_date") if start_date else None
+        normalized_end = _date_text(end_date, "end_date") if end_date else None
+        if normalized_start and normalized_end and normalized_start > normalized_end:
+            raise ValueError(
+                "business-profile backfill start_date must not exceed end_date"
+            )
         rows = self._frontier_rows(
             knowledge_cutoff=cutoff,
+            start_date=normalized_start,
+            end_date=normalized_end,
+            instrument_ids=instrument_ids,
             document_types=AUTOMATIC_DOCUMENT_TYPES,
         )
         latest: dict[str, Mapping[str, Any]] = {}
@@ -190,6 +203,7 @@ class BusinessProfileWorkRepository:
             policy="latest_annual_only",
             processing_identity=processing_identity,
             max_attempts=max_attempts,
+            force=force,
             supersede_older=True,
         )
 
@@ -232,7 +246,7 @@ class BusinessProfileWorkRepository:
         return self._enqueue_rows(
             rows,
             policy="expanded",
-            processing_identity={**dict(processing_identity), "force": bool(force)},
+            processing_identity=processing_identity,
             max_attempts=max_attempts,
             force=force,
             supersede_older=False,
@@ -449,7 +463,9 @@ class BusinessProfileWorkRepository:
     ) -> tuple[Mapping[str, Any], ...]:
         clauses = [
             "status <> 'superseded'",
-            "(published_at IS NULL OR substr(published_at, 1, 10) <= ?)",
+            "published_at IS NOT NULL",
+            "report_period IS NOT NULL",
+            "substr(published_at, 1, 10) <= ?",
         ]
         params: list[Any] = [knowledge_cutoff]
         if start_date:
@@ -666,11 +682,24 @@ class BusinessProfileAsyncProductionService:
         stage_budgets: Mapping[str, StageBudget] | None = None,
         max_attempts: int = 3,
         force: bool = False,
+        selection_policy: str = "expanded",
     ) -> dict[str, Any]:
         if not instrument_ids and not start_date:
             raise ValueError(
                 "business-profile backfill requires instruments or a bounded start date"
             )
+        policy = str(selection_policy or "expanded").strip()
+        if policy not in {"latest_annual_only", "expanded"}:
+            raise ValueError(f"unsupported business-profile backfill policy: {policy}")
+        if policy == "latest_annual_only":
+            unsupported_types = sorted(
+                set(str(item) for item in document_types) - set(AUTOMATIC_DOCUMENT_TYPES)
+            )
+            if unsupported_types:
+                raise ValueError(
+                    "latest-annual backfill does not accept specialist document types: "
+                    + ",".join(unsupported_types)
+                )
         discovery = None
         if discovery_kwargs is not None:
             try:
@@ -680,17 +709,29 @@ class BusinessProfileAsyncProductionService:
                     "status": "failed",
                     "errors": [f"{type(exc).__name__}: {exc}"],
                 }
-        enqueue = await self.write_coordinator.run(
-            self.repository.enqueue_scoped,
-            knowledge_cutoff=knowledge_cutoff,
-            processing_identity=processing_identity,
-            instrument_ids=instrument_ids,
-            start_date=start_date,
-            end_date=end_date,
-            document_types=document_types,
-            max_attempts=max_attempts,
-            force=force,
-        )
+        if policy == "latest_annual_only":
+            enqueue = await self.write_coordinator.run(
+                self.repository.enqueue_latest_annual,
+                knowledge_cutoff=knowledge_cutoff,
+                processing_identity=processing_identity,
+                instrument_ids=instrument_ids,
+                start_date=start_date,
+                end_date=end_date,
+                max_attempts=max_attempts,
+                force=force,
+            )
+        elif policy == "expanded":
+            enqueue = await self.write_coordinator.run(
+                self.repository.enqueue_scoped,
+                knowledge_cutoff=knowledge_cutoff,
+                processing_identity=processing_identity,
+                instrument_ids=instrument_ids,
+                start_date=start_date,
+                end_date=end_date,
+                document_types=document_types,
+                max_attempts=max_attempts,
+                force=force,
+            )
         workers = await self._run_workers(stage_budgets or {})
         return {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
@@ -702,6 +743,7 @@ class BusinessProfileAsyncProductionService:
                 else "success"
             ),
             "operation": "business_profile_backfill",
+            "selection_policy": policy,
             "knowledge_cutoff": knowledge_cutoff,
             "discovery": discovery,
             "enqueue": enqueue,

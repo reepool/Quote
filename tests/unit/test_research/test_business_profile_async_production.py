@@ -91,6 +91,124 @@ def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
     ]
 
 
+def test_latest_annual_enqueue_applies_company_and_date_scope(tmp_path):
+    storage = _storage(tmp_path)
+    frontier, _instrument = _frontier(storage)
+    second = {
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "exchange": "SZSE",
+    }
+    frontier.upsert_record(
+        instrument=second,
+        record=_announcement(
+            "second-2024",
+            "第二公司2024年年度报告",
+            published_at="2025-04-10T08:00:00+08:00",
+        ),
+    )
+    frontier.upsert_record(
+        instrument=second,
+        record=_announcement(
+            "second-2025",
+            "第二公司2025年年度报告",
+            published_at="2026-04-10T08:00:00+08:00",
+        ),
+    )
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        instrument_ids=("600000.SH",),
+        start_date="2025-01-01",
+        end_date="2025-12-31",
+    )
+
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT instrument_id, announcement_id FROM business_profile_work_items"
+        ).fetchone()
+    assert dict(row) == {
+        "instrument_id": "600000.SH",
+        "announcement_id": "annual-2024",
+    }
+
+
+def test_latest_annual_excludes_records_without_a_known_availability_date(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_announcement_frontier SET published_at = NULL "
+            "WHERE announcement_id = 'annual-2025'"
+        )
+        conn.commit()
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        announcement_id = conn.execute(
+            "SELECT announcement_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    assert announcement_id == "annual-2024"
+
+
+def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        max_attempts=1,
+    )
+    claimed = queue.claim(
+        "acquire",
+        limit=1,
+        lease_owner="worker",
+        lease_seconds=30,
+    )[0]
+    queue.fail(
+        claimed["work_id"],
+        lease_owner="worker",
+        error="permanent",
+        retryable=False,
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        max_attempts=1,
+        force=True,
+    )
+
+    assert result["reset"] == 1
+    assert result["inserted"] == 0
+    with storage.get_connection() as conn:
+        rows = conn.execute(
+            "SELECT work_id, stage, status FROM business_profile_work_items"
+        ).fetchall()
+    assert [dict(row) for row in rows] == [
+        {"work_id": claimed["work_id"], "stage": "acquire", "status": "pending"}
+    ]
+
+
 def test_correction_supersedes_unstarted_original_work(tmp_path):
     storage = _storage(tmp_path)
     frontier, instrument = _frontier(storage)
@@ -337,6 +455,34 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
     assert report["status"] == "degraded"
     assert report["discovery"]["status"] == "failed"
     assert report["workers"]["acquire"]["completed"] == 1
+
+
+def test_invalid_backfill_scope_fails_before_discovery(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    discover = AsyncMock(return_value={"status": "success"})
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=discover,
+        stage_runner=AsyncMock(return_value={"status": "success"}),
+    )
+
+    with pytest.raises(ValueError, match="specialist document types"):
+        asyncio.run(
+            service.run_backfill(
+                knowledge_cutoff="2026-08-30",
+                processing_identity={"rules": "v1"},
+                start_date="2026-01-01",
+                document_types=("resource_report",),
+                discovery_kwargs={"start_date": "2026-01-01"},
+                selection_policy="latest_annual_only",
+            )
+        )
+    discover.assert_not_awaited()
 
 
 def test_stage_consumers_run_independently_without_download_blocking_parse(tmp_path):
