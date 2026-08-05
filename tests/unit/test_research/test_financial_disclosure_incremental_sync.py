@@ -757,7 +757,7 @@ def test_incremental_candidate_limit_is_not_consumed_by_accepted_states(tmp_path
     assert result["report_periods"][-1] == "2026-03-31"
 
 
-def test_incremental_sync_is_degraded_when_cninfo_fails_but_fallback_writes(tmp_path):
+def test_incremental_sync_succeeds_when_cninfo_fails_but_fallback_writes(tmp_path):
     record = _record(
         announcement_id="fallback-q2-report",
         title="2026年半年度报告",
@@ -782,6 +782,9 @@ def test_incremental_sync_is_degraded_when_cninfo_fails_but_fallback_writes(tmp_
             "cninfo_missing_or_ambiguous": 1,
             "fallback_attempts": 1,
             "fallback_successes": 1,
+            "final_source": "fallback",
+            "final_source_counts": {"cninfo": 0, "fallback": 1},
+            "source_collection_complete": True,
             "errors": ["cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"],
         }
 
@@ -798,7 +801,59 @@ def test_incremental_sync_is_degraded_when_cninfo_fails_but_fallback_writes(tmp_
     assert result["changed_count"] == 1
     assert result["failed_count"] == 0
     assert result["source_routing"]["fallback_successes"] == 1
-    assert result["status"] == "degraded"
+    assert result["source_routing"]["final_source"] == "fallback"
+    assert result["status"] == "success"
+
+
+def test_incremental_sync_remains_degraded_when_fallback_is_incomplete(tmp_path):
+    source_routing = {
+        "cninfo_attempts": 1,
+        "cninfo_successes": 0,
+        "fallback_attempts": 1,
+        "fallback_successes": 0,
+        "errors": ["cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"],
+    }
+
+    assert (
+        FinancialDisclosureIncrementalSyncService._derive_status(
+            candidate_count=1,
+            failed_count=0,
+            blocking_count=0,
+            mapping_policy_gap_count=0,
+            pending_recheck_count=0,
+            source_routing=source_routing,
+            scan_errors=[],
+        )
+        == "degraded"
+    )
+
+
+def test_repair_summary_classifies_cninfo_and_mixed_sources(tmp_path):
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    cninfo_only = service.repair_router.default_summary()
+    cninfo_only.update({"cninfo_attempts": 2, "cninfo_successes": 2})
+    service.repair_router._finalize_source_summary(cninfo_only)
+    assert cninfo_only["final_source"] == "cninfo"
+    assert cninfo_only["source_collection_complete"] is True
+
+    mixed = service.repair_router.default_summary()
+    mixed.update(
+        {
+            "cninfo_attempts": 2,
+            "cninfo_successes": 1,
+            "fallback_attempts": 1,
+            "fallback_successes": 1,
+        }
+    )
+    service.repair_router._finalize_source_summary(mixed)
+    assert mixed["final_source"] == "mixed"
+    assert mixed["source_collection_complete"] is True
 
 
 def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):

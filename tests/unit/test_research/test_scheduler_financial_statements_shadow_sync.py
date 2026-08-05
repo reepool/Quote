@@ -107,6 +107,32 @@ def test_financial_disclosure_report_includes_expired_pending_and_source_degrada
     assert "补数源警告:" in text
     assert "官方结构化源降级" in text
     assert "后续对账需复核官方数据" in text
+    assert "数据来源: fallback（Sina/THS，非 CNInfo）" in text
+
+
+def test_financial_disclosure_report_marks_successful_fallback_collection():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "success",
+            "db_path": "data/financials.db",
+            "reconciliation": False,
+            "report_periods": ["2026-06-30"],
+            "candidate_count": 1,
+            "source_routing": {
+                "cninfo_attempts": 1,
+                "cninfo_successes": 0,
+                "fallback_attempts": 1,
+                "fallback_successes": 1,
+                "final_source": "fallback",
+                "source_collection_complete": True,
+                "errors": ["cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"],
+            },
+        }
+    )
+
+    assert "结论: ✅ *成功*" in text
+    assert "数据来源: fallback（Sina/THS，非 CNInfo）" in text
+    assert "最终数据采集已完成" in text
 
 
 def test_financial_statements_catchup_task_passes_incremental_controls(monkeypatch):

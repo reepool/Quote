@@ -2234,12 +2234,39 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             f"Sina/THS fallback尝试 {source_routing.get('fallback_attempts', 0)}，"
             f"成功 {source_routing.get('fallback_successes', 0)}"
         )
+        final_source = str(source_routing.get("final_source") or "").lower()
+        if not final_source:
+            cninfo_successes = int(source_routing.get("cninfo_successes", 0) or 0)
+            fallback_successes = int(source_routing.get("fallback_successes", 0) or 0)
+            if cninfo_successes and fallback_successes:
+                final_source = "mixed"
+            elif cninfo_successes:
+                final_source = "cninfo"
+            elif fallback_successes:
+                final_source = "fallback"
+            else:
+                final_source = "none"
+        source_labels = {
+            "cninfo": "CNInfo",
+            "fallback": "fallback（Sina/THS，非 CNInfo）",
+            "mixed": "CNInfo + fallback（Sina/THS）",
+            "none": "未发生补数",
+        }
+        lines.append(f"数据来源: {source_labels.get(final_source, final_source)}")
         routing_errors = source_routing.get("errors") or []
         if routing_errors:
             lines.append(
                 "补数源警告: " + "；".join(str(item) for item in routing_errors[:3])
             )
-            lines.append("说明: 官方结构化源降级，已保留 fallback 结果，后续对账需复核官方数据。")
+            if status == "success":
+                lines.append(
+                    "说明: 官方结构化源未完全就绪，但最终数据采集已完成；"
+                    "本次结果以 fallback 数据为准，后续可对账官方数据。"
+                )
+            else:
+                lines.append(
+                    "说明: 官方结构化源降级，已保留 fallback 结果，后续对账需复核官方数据。"
+                )
     scan_errors = result.get("scan_errors") or []
     if scan_errors:
         lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))

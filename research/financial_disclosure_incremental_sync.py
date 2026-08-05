@@ -1345,6 +1345,26 @@ class FinancialDisclosureIncrementalSyncService:
         merged["fallback_sources"] = list(
             right.get("fallback_sources") or merged.get("fallback_sources") or []
         )
+        cninfo_successes = int(merged.get("cninfo_successes", 0) or 0)
+        fallback_successes = int(merged.get("fallback_successes", 0) or 0)
+        cninfo_attempts = int(merged.get("cninfo_attempts", 0) or 0)
+        fallback_attempts = int(merged.get("fallback_attempts", 0) or 0)
+        completed = cninfo_successes + fallback_successes
+        attempted = max(cninfo_attempts, fallback_attempts)
+        if completed <= 0:
+            final_source = "none"
+        elif cninfo_successes and fallback_successes:
+            final_source = "mixed"
+        elif cninfo_successes:
+            final_source = "cninfo"
+        else:
+            final_source = "fallback"
+        merged["final_source"] = final_source
+        merged["final_source_counts"] = {
+            "cninfo": cninfo_successes,
+            "fallback": fallback_successes,
+        }
+        merged["source_collection_complete"] = completed >= attempted
         return merged
 
     @staticmethod
@@ -1475,13 +1495,25 @@ class FinancialDisclosureIncrementalSyncService:
         if scan_errors and candidate_count <= 0:
             return "failed"
         routing_errors = list((source_routing or {}).get("errors") or [])
+        source_collection_complete = (source_routing or {}).get(
+            "source_collection_complete"
+        )
+        if source_collection_complete is None:
+            completed = int((source_routing or {}).get("cninfo_successes", 0) or 0)
+            completed += int((source_routing or {}).get("fallback_successes", 0) or 0)
+            attempted = max(
+                int((source_routing or {}).get("cninfo_attempts", 0) or 0),
+                int((source_routing or {}).get("fallback_attempts", 0) or 0),
+            )
+            source_collection_complete = completed >= attempted
         if (
             failed_count
             or blocking_count
             or mapping_policy_gap_count
             or pending_recheck_count
-            or routing_errors
             or scan_errors
         ):
+            return "degraded"
+        if routing_errors and source_collection_complete is not True:
             return "degraded"
         return "success"

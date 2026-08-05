@@ -78,6 +78,9 @@ class FinancialMaintenanceRepairRouter:
             "cninfo_missing_or_ambiguous": 0,
             "fallback_attempts": 0,
             "fallback_successes": 0,
+            "final_source": "none",
+            "final_source_counts": {"cninfo": 0, "fallback": 0},
+            "source_collection_complete": True,
             "fallback_sources": self.fallback_statement_sources(),
             "errors": [],
         }
@@ -150,6 +153,7 @@ class FinancialMaintenanceRepairRouter:
         ]
         summary["fallback_attempts"] = len(fallback_targets)
         if not fallback_targets or not fallback_sources:
+            self._finalize_source_summary(summary)
             return summary
 
         grouped: Dict[str, List[FinancialMaintenanceRepairTarget]] = {}
@@ -191,7 +195,32 @@ class FinancialMaintenanceRepairRouter:
             mapping_version=mapping_version,
         )
         summary["fallback_successes"] = len(ready_keys_after_fallback)
+        self._finalize_source_summary(summary)
         return summary
+
+    @staticmethod
+    def _finalize_source_summary(summary: Dict[str, Any]) -> None:
+        """Derive final collection state independently from source health."""
+        cninfo_successes = int(summary.get("cninfo_successes", 0) or 0)
+        fallback_successes = int(summary.get("fallback_successes", 0) or 0)
+        cninfo_attempts = int(summary.get("cninfo_attempts", 0) or 0)
+        fallback_attempts = int(summary.get("fallback_attempts", 0) or 0)
+        completed = cninfo_successes + fallback_successes
+        attempted = max(cninfo_attempts, fallback_attempts)
+        if completed <= 0:
+            final_source = "none"
+        elif cninfo_successes and fallback_successes:
+            final_source = "mixed"
+        elif cninfo_successes:
+            final_source = "cninfo"
+        else:
+            final_source = "fallback"
+        summary["final_source"] = final_source
+        summary["final_source_counts"] = {
+            "cninfo": cninfo_successes,
+            "fallback": fallback_successes,
+        }
+        summary["source_collection_complete"] = completed >= attempted
 
     def _ready_target_keys(
         self,
