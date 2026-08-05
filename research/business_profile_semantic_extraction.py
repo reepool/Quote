@@ -141,12 +141,12 @@ class BusinessProfileSemanticExtractor:
             raise ValueError(
                 "semantic extraction is limited to atomic activities or named relationships"
             )
-        sections = _semantic_request_sections(selected, candidate_spans)
-        if len(sections) > self.policy.max_sections_per_request:
-            raise ValueError("semantic request exceeds max_sections_per_request")
-        input_characters = sum(len(item["text"]) for item in sections)
-        if input_characters > self.policy.max_input_characters:
-            raise ValueError("semantic request exceeds max_input_characters")
+        sections = _semantic_request_sections(
+            selected,
+            candidate_spans,
+            max_sections=self.policy.max_sections_per_request,
+            max_characters=self.policy.max_input_characters,
+        )
         request_payload = {
             "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
             "field_family": field_family,
@@ -412,11 +412,21 @@ def deterministic_semantic_verification_decision(
 def _semantic_request_sections(
     selected: SelectedSectionArtifact,
     candidate_spans: Sequence[Mapping[str, Any]],
+    *,
+    max_sections: int,
+    max_characters: int,
 ) -> list[dict[str, Any]]:
     """Build the smallest prompt payload while retaining original section offsets."""
 
     if not candidate_spans:
-        return [
+        ranked_sections = sorted(
+            selected.sections,
+            key=lambda item: (
+                -_semantic_section_score(item.selector_reasons),
+                item.page_number,
+            ),
+        )
+        candidates = [
             {
                 "section_id": item.section_id,
                 "page_number": item.page_number,
@@ -424,42 +434,88 @@ def _semantic_request_sections(
                 "text": item.normalized_text,
                 "text_start": 0,
             }
-            for item in selected.sections
+            for item in ranked_sections
         ]
-    sections = {item.section_id: item for item in selected.sections}
-    ranges_by_section: dict[str, list[tuple[int, int]]] = {}
-    for raw in candidate_spans:
-        section_id = str(raw.get("section_id") or "")
-        section = sections.get(section_id)
-        if section is None:
-            raise ValueError("candidate span references unknown selected section")
-        absolute_start = int(raw.get("normalized_start") or 0)
-        absolute_end = int(raw.get("normalized_end") or 0)
-        start = absolute_start - section.normalized_start
-        end = absolute_end - section.normalized_start
-        if start < 0 or end <= start or end > len(section.normalized_text):
-            raise ValueError("candidate span offsets fall outside selected section")
-        ranges_by_section.setdefault(section_id, []).append((start, end))
+    else:
+        sections = {item.section_id: item for item in selected.sections}
+        ranges_by_section: dict[str, list[tuple[int, int]]] = {}
+        for raw in candidate_spans:
+            section_id = str(raw.get("section_id") or "")
+            section = sections.get(section_id)
+            if section is None:
+                raise ValueError("candidate span references unknown selected section")
+            absolute_start = int(raw.get("normalized_start") or 0)
+            absolute_end = int(raw.get("normalized_end") or 0)
+            start = absolute_start - section.normalized_start
+            end = absolute_end - section.normalized_start
+            if start < 0 or end <= start or end > len(section.normalized_text):
+                raise ValueError("candidate span offsets fall outside selected section")
+            ranges_by_section.setdefault(section_id, []).append((start, end))
+        candidates = []
+        for section in selected.sections:
+            ranges = ranges_by_section.get(section.section_id) or []
+            merged: list[list[int]] = []
+            for start, end in sorted(set(ranges)):
+                if merged and start <= merged[-1][1] + 20:
+                    merged[-1][1] = max(merged[-1][1], end)
+                else:
+                    merged.append([start, end])
+            for start, end in merged:
+                candidates.append(
+                    {
+                        "section_id": section.section_id,
+                        "page_number": section.page_number,
+                        "section_hash": section.section_hash,
+                        "text": section.normalized_text[start:end],
+                        "text_start": start,
+                    }
+                )
+    return _fit_semantic_sections(
+        candidates,
+        max_sections=max_sections,
+        max_characters=max_characters,
+    )
+
+
+def _fit_semantic_sections(
+    candidates: Sequence[Mapping[str, Any]],
+    *,
+    max_sections: int,
+    max_characters: int,
+) -> list[dict[str, Any]]:
+    if max_characters < 32:
+        raise ValueError("semantic request exceeds max_input_characters")
     output: list[dict[str, Any]] = []
-    for section_id, ranges in sorted(ranges_by_section.items()):
-        section = sections[section_id]
-        merged: list[list[int]] = []
-        for start, end in sorted(set(ranges)):
-            if merged and start <= merged[-1][1] + 20:
-                merged[-1][1] = max(merged[-1][1], end)
-            else:
-                merged.append([start, end])
-        for start, end in merged:
-            output.append(
-                {
-                    "section_id": section.section_id,
-                    "page_number": section.page_number,
-                    "section_hash": section.section_hash,
-                    "text": section.normalized_text[start:end],
-                    "text_start": start,
-                }
-            )
+    remaining = max_characters
+    for raw in candidates:
+        if len(output) >= max_sections or remaining <= 0:
+            break
+        item = dict(raw)
+        text = str(item.get("text") or "")
+        if not text:
+            continue
+        item["text"] = text[:remaining]
+        output.append(item)
+        remaining -= len(item["text"])
+    if not output:
+        raise ValueError("semantic request has no bounded evidence sections")
     return output
+
+
+def _semantic_section_score(reasons: Sequence[str]) -> int:
+    score = 0
+    for reason in reasons:
+        if reason.startswith("table_signature:"):
+            score += 100
+        elif reason.startswith("heading_alias:principal_business"):
+            score += 80
+        elif reason.startswith("heading_alias:business_model"):
+            score += 70
+        elif reason.startswith("heading_alias:"):
+            score += 20
+        elif reason.startswith("structured_hint:"):
+            score += 40
+    return score
 
 
 def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:

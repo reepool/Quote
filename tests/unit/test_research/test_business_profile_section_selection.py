@@ -119,6 +119,111 @@ def test_table_parser_preserves_header_unit_and_removes_footnote_marker():
     assert segment.rows[0]["row_label"] == "煤炭"
 
 
+def test_flattened_segment_table_recovers_only_governed_revenue_cost_columns():
+    artifact = _artifact(
+        "主营业务分析\n单位：元\n营业收入 营业成本 毛利率 营业收入同比增减",
+        "分产品\n原料系列产品 476,921,691.93 355,165,336.42 25.53% -9.87%",
+    )
+    selected = BusinessProfileSectionSelector(context_pages=1).select(
+        artifact=artifact,
+        instrument_id="000952.SZ",
+        source_document_id="report-flat",
+        field_family="structured_segments",
+        templates=_templates(),
+    )
+
+    tables, diagnostics = parse_selected_tables(selected, templates=_templates())
+    segment = next(item for item in tables if item.signature_id == "common.segment_revenue_cost.v1")
+
+    assert diagnostics == []
+    assert segment.unit == "元"
+    assert segment.rows[0]["segment_dimension"] == "分产品"
+    assert segment.rows[0]["cells"] == {
+        "分产品": "原料系列产品",
+        "营业收入": "476,921,691.93",
+        "营业成本": "355,165,336.42",
+        "毛利率": "25.53%",
+    }
+
+
+def test_flattened_segment_table_rejects_numeric_narrative_without_margin_shape():
+    artifact = _artifact(
+        "主营业务分析\n单位：元\n营业收入 营业成本 毛利率 营业收入同比增减",
+        "分产品\n报告期内公司于2023年投入100万元并新增20个项目",
+    )
+    selected = BusinessProfileSectionSelector(context_pages=1).select(
+        artifact=artifact,
+        instrument_id="000952.SZ",
+        source_document_id="report-flat-narrative",
+        field_family="structured_segments",
+        templates=_templates(),
+    )
+
+    tables, diagnostics = parse_selected_tables(selected, templates=_templates())
+
+    assert tables == []
+    assert diagnostics == []
+
+
+def test_page_scope_excludes_toc_and_out_of_chapter_context():
+    artifact = _artifact(
+        "目录 主要业务 主营业务分析",
+        "公司治理 主要业务",
+        "主要业务：公司生产煤炭",
+        "主营业务分析 营业收入 营业成本 毛利率",
+        "财务附注 主要业务",
+    )
+    selected = BusinessProfileSectionSelector(context_pages=1, max_pages=4).select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-scoped",
+        field_family="atomic_activities",
+        templates=_templates(),
+        page_scope=(3, 4),
+    )
+
+    assert [item.page_number for item in selected.sections] == [3, 4]
+
+
+def test_explicit_pages_cannot_escape_page_scope():
+    artifact = _artifact(
+        "目录 主要业务 主营业务分析",
+        "管理层讨论与分析",
+        "主要业务：公司生产煤炭",
+    )
+
+    with pytest.raises(ValueError, match="outside selected chapter scope"):
+        BusinessProfileSectionSelector(context_pages=1).select(
+            artifact=artifact,
+            instrument_id="601088.SH",
+            source_document_id="report-scoped-explicit",
+            field_family="atomic_activities",
+            templates=_templates(),
+            explicit_pages=(1,),
+            page_scope=(2, 3),
+        )
+
+
+def test_explicit_page_context_remains_inside_page_scope():
+    artifact = _artifact(
+        "目录",
+        "管理层讨论与分析",
+        "主要业务：公司生产煤炭",
+        "财务附注",
+    )
+    selected = BusinessProfileSectionSelector(context_pages=1).select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-scoped-explicit",
+        field_family="atomic_activities",
+        templates=_templates(),
+        explicit_pages=(3,),
+        page_scope=(2, 3),
+    )
+
+    assert [item.page_number for item in selected.sections] == [2, 3]
+
+
 def test_conflicting_duplicate_rows_fail_closed():
     artifact = _artifact(
         "煤炭产销量\n|项目|原煤产量|商品煤产量|商品煤销量|\n|一矿|10|8|7|",
@@ -225,17 +330,17 @@ def test_selector_rejects_empty_field_family_match():
         )
 
 
-def test_selector_reports_page_bound_exhaustion_without_silent_truncation():
+def test_selector_ranks_dense_hits_within_page_budget():
     artifact = _artifact(
         "主要业务：生产煤炭",
         "主要业务：销售煤炭",
         "主要业务：采购设备",
     )
-    with pytest.raises(ValueError, match="page bound exhausted"):
-        BusinessProfileSectionSelector(context_pages=0, max_pages=2).select(
-            artifact=artifact,
-            instrument_id="601088.SH",
-            source_document_id="report-1",
-            field_family="atomic_activities",
-            templates=_templates(),
-        )
+    selected = BusinessProfileSectionSelector(context_pages=0, max_pages=2).select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-1",
+        field_family="atomic_activities",
+        templates=_templates(),
+    )
+    assert [item.page_number for item in selected.sections] == [1, 2]

@@ -2,6 +2,7 @@ import asyncio
 import json
 import threading
 import time
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -302,6 +303,184 @@ def test_recovery_requeues_only_empty_completion_and_is_idempotent(tmp_path):
     assert recovered_metadata["recovery_history"][0][
         "from_checkpoint_path"
     ].endswith(".json")
+
+
+def test_evidence_free_recovery_reuses_manifest_and_resumes_from_parse(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(storage, checkpoint_root=tmp_path / "checkpoints")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"%PDF-1.4\nreusable\n%%EOF",
+        ),
+    ).acquire(item)
+    manifest_before = queue.get_usable_bound_manifest(item)
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "completed_stages": ["plan", "select", "extract", "verify"],
+                "artifacts": {
+                    "plan": "plan.json.gz",
+                    "select": "select.json.gz",
+                    "extract": "extract.json.gz",
+                    "verify": "verify.json.gz",
+                },
+                "metrics": {"errors": 2, "pages": 0},
+                "status": "completed",
+                "stopped_reason": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', status = 'completed', "
+            "completed_at = ?, metadata_json = ?",
+            (
+                "2026-08-30T13:00:00+08:00",
+                json.dumps(
+                    {
+                        "stage_results": {
+                            "acquire": {"status": "success"},
+                            "parse": {
+                                "status": "success",
+                                "pipeline_status": "partial",
+                                "metrics": {"pages": 0, "errors": 2},
+                            },
+                        }
+                    }
+                ),
+            ),
+        )
+        conn.commit()
+
+    first = queue.recover_completed_without_evidence()
+    second = queue.recover_completed_without_evidence()
+    recovered = queue.get(item["work_id"])
+    recovered_checkpoint = json.loads(Path(recovered["checkpoint_path"]).read_text())
+
+    assert first["requeued"] == 1
+    assert second["requeued"] == 0
+    assert recovered["stage"] == "parse"
+    assert recovered["status"] == "pending"
+    assert recovered_checkpoint["completed_stages"] == ["plan"]
+    assert recovered_checkpoint["artifacts"] == {"plan": "plan.json.gz"}
+    assert recovered["metadata"]["stage_results"] == {"acquire": {"status": "success"}}
+    manifest_after = queue.get_usable_bound_manifest(recovered)
+    assert manifest_after["content_hash"] == manifest_before["content_hash"]
+    assert manifest_after["archive_path"] == manifest_before["archive_path"]
+
+
+def test_evidence_free_recovery_requires_positive_defect_history(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(storage, checkpoint_root=tmp_path / "checkpoints")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"%PDF-1.4\nreusable\n%%EOF",
+        ),
+    ).acquire(item)
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', status = 'completed', "
+            "completed_at = ?, metadata_json = ?",
+            (
+                "2026-08-30T13:00:00+08:00",
+                json.dumps({"stage_results": {"acquire": {"status": "success"}}}),
+            ),
+        )
+        conn.commit()
+
+    recovered = queue.recover_completed_without_evidence()
+
+    assert recovered["eligible_completed"] == 1
+    assert recovered["valid_manifest_candidates"] == 0
+    assert recovered["requeued"] == 0
+    assert queue.get(item["work_id"])["status"] == "completed"
+
+
+def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(storage, checkpoint_root=tmp_path / "checkpoints")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        conn.execute("UPDATE business_profile_work_items SET stage = 'parse'")
+        conn.commit()
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(),
+        stage_runner=AsyncMock(
+            return_value={
+                "status": "success",
+                "quality": {
+                    "stage_ready": False,
+                    "blocking_machine_rework": 1,
+                    "selected_documents": 0,
+                    "outline_pages_scoped": 18,
+                    "outline_sources": {"table_of_contents": 1},
+                    "outline_confidences": {"high": 1},
+                    "empty_output_documents": 1,
+                    "empty_output_reasons": {"ambiguous_table_layout": 1},
+                },
+            }
+        ),
+        retry_backoff_seconds=1,
+    )
+
+    report = asyncio.run(
+        service._run_workers({"parse": StageBudget(max_items=1, max_concurrency=1)})
+    )
+
+    assert report["parse"]["completed"] == 0
+    assert report["parse"]["retried"] == 1
+    assert report["parse"]["quality"] == {
+        "blocking_machine_rework": 1,
+        "selected_documents": 0,
+        "selected_pages": 0,
+        "outline_pages_scoped": 18,
+        "evidence_records": 0,
+        "record_count": 0,
+        "verified_records": 0,
+        "empty_output_documents": 1,
+        "outline_sources": {"table_of_contents": 1},
+        "outline_confidences": {"high": 1},
+        "empty_output_reasons": {"ambiguous_table_layout": 1},
+    }
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT stage, status FROM business_profile_work_items"
+        ).fetchone()
+    assert dict(row) == {"stage": "parse", "status": "retry_due"}
 
 
 def test_latest_annual_enqueue_applies_company_and_date_scope(tmp_path):

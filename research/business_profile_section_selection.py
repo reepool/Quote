@@ -136,11 +136,20 @@ class BusinessProfileSectionSelector:
         templates: Sequence[ResolvedDisclosureTemplate],
         hint_terms: Iterable[str] = (),
         explicit_pages: Iterable[int] = (),
+        page_scope: Iterable[int] = (),
         previous_bundle_id: Optional[str] = None,
         expansion_reason: Optional[str] = None,
     ) -> SelectedSectionArtifact:
         family = BusinessProfileFieldFamily(field_family).value
-        pages = _artifact_pages(artifact)
+        all_pages = _artifact_pages(artifact)
+        scope = {int(value) for value in page_scope if int(value) > 0}
+        pages_by_number = {int(page["page_number"]): page for page in all_pages}
+        selection_pages_by_number = {
+            number: page
+            for number, page in pages_by_number.items()
+            if not scope or number in scope
+        }
+        pages = list(selection_pages_by_number.values())
         document_hash = str(_artifact_value(artifact, "source_content_hash") or "")
         if not re.fullmatch(r"[0-9a-f]{64}", document_hash):
             raise ValueError("PDF artifact requires a valid source content hash")
@@ -179,16 +188,28 @@ class BusinessProfileSectionSelector:
                     section_key_by_page.setdefault(page_number, "structured_hint")
         for value in explicit_pages:
             page_number = int(value)
-            if page_number < 1 or page_number > len(pages):
+            if page_number not in pages_by_number:
                 raise ValueError(f"explicit page is outside PDF bounds: {page_number}")
+            if scope and page_number not in scope:
+                raise ValueError(
+                    f"explicit page is outside selected chapter scope: {page_number}"
+                )
             reasons_by_page.setdefault(page_number, set()).add("explicit_page")
             section_key_by_page.setdefault(page_number, "explicit_page")
 
-        selected_pages = _expand_pages(
-            reasons_by_page,
-            page_count=len(pages),
-            context_pages=self.context_pages,
-        )
+        if explicit_pages:
+            selected_pages = _expand_pages(
+                reasons_by_page,
+                page_numbers=selection_pages_by_number,
+                context_pages=self.context_pages,
+            )
+        else:
+            selected_pages = _ranked_bounded_pages(
+                reasons_by_page,
+                pages_by_number=selection_pages_by_number,
+                context_pages=self.context_pages,
+                max_pages=self.max_pages,
+            )
         if len(selected_pages) > self.max_pages:
             raise ValueError(
                 "selected page bound exhausted: "
@@ -199,7 +220,7 @@ class BusinessProfileSectionSelector:
         sections: list[SelectedSection] = []
         cursor = 0
         for page_number in selected_pages:
-            page = pages[page_number - 1]
+            page = pages_by_number[page_number]
             text = str(page.get("text") or "")
             normalized = _normalize_with_spaces(text)
             start = cursor
@@ -304,18 +325,24 @@ class BusinessProfileSectionSelector:
         field_family: str | BusinessProfileFieldFamily,
         templates: Sequence[ResolvedDisclosureTemplate],
         expansion_pages: int = 1,
+        page_scope: Iterable[int] = (),
     ) -> SelectedSectionArtifact:
         if expansion_pages < 1:
             raise ValueError("expansion_pages must be positive")
         prior_pages = {item.page_number for item in prior.sections}
-        page_count = len(_artifact_pages(artifact))
+        artifact_pages = _artifact_pages(artifact)
+        available_pages = {int(item["page_number"]) for item in artifact_pages}
+        scope = {int(value) for value in page_scope if int(value) > 0}
+        allowed_pages = available_pages.intersection(scope) if scope else available_pages
         expanded = set(prior_pages)
         for page_number in prior_pages:
             expanded.update(
-                range(
-                    max(1, page_number - expansion_pages),
-                    min(page_count, page_number + expansion_pages) + 1,
+                value
+                for value in range(
+                    page_number - expansion_pages,
+                    page_number + expansion_pages + 1,
                 )
+                if value in allowed_pages
             )
         if expanded == prior_pages:
             raise ValueError("missing-context expansion cannot widen page bounds")
@@ -331,6 +358,7 @@ class BusinessProfileSectionSelector:
             field_family=field_family,
             templates=templates,
             explicit_pages=sorted(expanded),
+            page_scope=sorted(allowed_pages),
             previous_bundle_id=str(prior.bundle["bundle_id"]),
             expansion_reason="governed_missing_context",
         )
@@ -445,15 +473,109 @@ def _template_rules(
 def _expand_pages(
     reasons_by_page: Mapping[int, set[str]],
     *,
-    page_count: int,
+    page_numbers: Mapping[int, Mapping[str, Any]],
     context_pages: int,
 ) -> list[int]:
+    if not page_numbers:
+        return []
+    first_page = min(page_numbers)
+    last_page = max(page_numbers)
     selected = set(reasons_by_page)
     for page in reasons_by_page:
         selected.update(
-            range(max(1, page - context_pages), min(page_count, page + context_pages) + 1)
+            range(
+                max(first_page, page - context_pages),
+                min(last_page, page + context_pages) + 1,
+            )
         )
-    return sorted(selected)
+    return sorted(page for page in selected if page in page_numbers)
+
+
+def _ranked_bounded_pages(
+    reasons_by_page: Mapping[int, set[str]],
+    *,
+    pages_by_number: Mapping[int, Mapping[str, Any]],
+    context_pages: int,
+    max_pages: int,
+) -> list[int]:
+    """Select high-value adjacent hit clusters without whole-document fan-out."""
+
+    anchors = sorted(reasons_by_page)
+    if not anchors:
+        return []
+    gap = max(1, context_pages * 2 + 1)
+    clusters: list[list[int]] = []
+    for anchor in anchors:
+        if not clusters or anchor - clusters[-1][-1] > gap:
+            clusters.append([anchor])
+        else:
+            clusters[-1].append(anchor)
+
+    ranked_clusters = sorted(
+        clusters,
+        key=lambda cluster: (
+            -sum(_page_score(page, reasons_by_page[page], pages_by_number[page]) for page in cluster),
+            cluster[0],
+        ),
+    )
+    selected: set[int] = set()
+    for cluster in ranked_clusters:
+        candidate = set()
+        for page in range(
+            min(cluster) - context_pages,
+            max(cluster) + context_pages + 1,
+        ):
+            if page in pages_by_number:
+                candidate.add(page)
+        available = max_pages - len(selected)
+        if available <= 0:
+            break
+        if len(candidate) <= available:
+            selected.update(candidate)
+            continue
+        # A dense cluster can still exceed the budget. Keep its strongest anchors
+        # and their immediate context rather than failing the whole document.
+        for anchor in sorted(
+            cluster,
+            key=lambda page: (
+                -_page_score(page, reasons_by_page[page], pages_by_number[page]),
+                page,
+            ),
+        ):
+            window = [
+                page
+                for page in range(anchor - context_pages, anchor + context_pages + 1)
+                if page in pages_by_number
+            ]
+            additions = [page for page in window if page not in selected]
+            selected.update(additions[: max(0, max_pages - len(selected))])
+            if len(selected) >= max_pages:
+                break
+    return sorted(selected)[:max_pages]
+
+
+def _page_score(
+    page_number: int,
+    reasons: Iterable[str],
+    page: Mapping[str, Any],
+) -> int:
+    score = 0
+    for reason in reasons:
+        if reason.startswith("table_signature:"):
+            score += 100
+        elif reason.startswith("structured_hint:"):
+            score += 40
+        elif reason.startswith("heading_alias:"):
+            score += 20
+        elif reason == "explicit_page":
+            score += 200
+        else:
+            score += 1
+    text = str(page.get("text") or "")
+    if "目录" in text[:120] or "......" in text[:400] or "……" in text[:400]:
+        score -= 50
+    score += min(10, len(text) // 500)
+    return score
 
 
 def _page_ranges(pages: Sequence[int]) -> list[dict[str, int]]:

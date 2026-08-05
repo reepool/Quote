@@ -1,4 +1,5 @@
 import hashlib
+import json
 
 import pytest
 
@@ -396,3 +397,32 @@ async def test_timeout_and_request_bounds_are_fail_closed_and_audited():
             report_period="2025-12-31",
             selected=selected,
         )
+
+
+@pytest.mark.asyncio
+async def test_no_keyword_spans_use_ranked_bounded_selected_sections():
+    selected = _selected("主要业务：" + "公司提供行业解决方案。" * 50)
+    response = {
+        "schema_version": "business_profile_atomic_extraction.v1",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "activities": [],
+        "relationships": [],
+    }
+    gateway = _FakeGateway([response])
+    extractor = BusinessProfileSemanticExtractor(
+        gateway,
+        policy=BusinessProfileSemanticPolicy(max_input_characters=120),
+    )
+
+    await extractor.extract_async(
+        field_family="atomic_activities",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+        candidate_spans=(),
+    )
+
+    payload = json.loads(gateway.requests[0].messages[-1].content)
+    assert payload["sections"]
+    assert sum(len(item["text"]) for item in payload["sections"]) <= 120

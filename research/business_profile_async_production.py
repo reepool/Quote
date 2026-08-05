@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import threading
 import time
 from contextlib import contextmanager
@@ -569,6 +570,101 @@ class BusinessProfileWorkRepository:
             "work_ids": recovered_ids,
         }
 
+    def recover_completed_without_evidence(self) -> dict[str, Any]:
+        """Requeue completed work whose stage history proves it produced no evidence."""
+
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM business_profile_work_items "
+                "WHERE status = 'completed' AND policy = 'latest_annual_only' "
+                "ORDER BY work_id"
+            ).fetchall()
+        candidates: list[tuple[dict[str, Any], str]] = []
+        for row in rows:
+            item = _decode_work_row(row)
+            metadata = dict(item.get("metadata") or {})
+            stage_results = dict(metadata.get("stage_results") or {})
+            affected_stage = _evidence_free_stage(stage_results)
+            if affected_stage is None:
+                continue
+            if self.get_usable_bound_manifest(item) is not None:
+                candidates.append((item, affected_stage))
+        now = get_shanghai_time().isoformat()
+        recovery_token = hashlib.sha256(
+            f"evidence:{now}".encode("utf-8")
+        ).hexdigest()[:12]
+        recovered_ids: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for item, affected_stage in candidates:
+                metadata = dict(item.get("metadata") or {})
+                previous_stage_results = dict(metadata.get("stage_results") or {})
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "completed_without_evidence_backed_output",
+                        "recovered_at": now,
+                        "from_stage": item.get("stage"),
+                        "from_status": item.get("status"),
+                        "from_completed_at": item.get("completed_at"),
+                        "from_attempt_count": item.get("attempt_count"),
+                        "from_checkpoint_path": item.get("checkpoint_path"),
+                        "affected_stage": affected_stage,
+                        "invalidated_stage_results": previous_stage_results,
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                checkpoint = Path(str(item["checkpoint_path"]))
+                recovered_checkpoint = checkpoint.with_name(
+                    f"{checkpoint.stem}.evidence-recovery-{recovery_token}{checkpoint.suffix}"
+                )
+                if not _write_recovery_checkpoint(
+                    checkpoint,
+                    recovered_checkpoint,
+                    affected_stage=affected_stage,
+                ):
+                    affected_stage = "acquire"
+                affected_index = WORK_STAGES.index(affected_stage)
+                preserved_results = {
+                    stage: previous_stage_results[stage]
+                    for stage in WORK_STAGES[:affected_index]
+                    if stage in previous_stage_results
+                }
+                if preserved_results:
+                    metadata["stage_results"] = preserved_results
+                else:
+                    metadata.pop("stage_results", None)
+                cursor = conn.execute(
+                    """
+                    UPDATE business_profile_work_items
+                    SET stage = ?, status = 'pending', attempt_count = 0,
+                        next_attempt_at = NULL, lease_owner = NULL,
+                        lease_expires_at = NULL, checkpoint_path = ?,
+                        last_error = NULL, metadata_json = ?, completed_at = NULL,
+                        updated_at = ?
+                    WHERE work_id = ? AND status = 'completed'
+                      AND policy = 'latest_annual_only'
+                    """,
+                    (
+                        affected_stage,
+                        str(recovered_checkpoint),
+                        _canonical_json(metadata),
+                        now,
+                        item["work_id"],
+                    ),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered_ids.append(str(item["work_id"]))
+            conn.commit()
+        return {
+            "eligible_completed": len(rows),
+            "valid_manifest_candidates": len(candidates),
+            "requeued": len(recovered_ids),
+            "work_ids": recovered_ids,
+        }
+
     def resolve_missing_document_exceptions(
         self,
         work: str | Mapping[str, Any],
@@ -960,6 +1056,9 @@ class BusinessProfileAsyncProductionService:
         max_attempts: int = 3,
     ) -> dict[str, Any]:
         started = time.monotonic()
+        recovery = await self.write_coordinator.run(
+            self.repository.recover_completed_without_evidence
+        )
         try:
             discovery = dict(await self.discovery_runner(**dict(discovery_kwargs)))
         except Exception as exc:
@@ -987,6 +1086,7 @@ class BusinessProfileAsyncProductionService:
             "operation": "business_profile_daily_incremental",
             "knowledge_cutoff": knowledge_cutoff,
             "discovery": discovery,
+            "recovery": recovery,
             "enqueue": enqueue,
             "workers": workers,
             "throughput": throughput,
@@ -1027,6 +1127,9 @@ class BusinessProfileAsyncProductionService:
                     "latest-annual backfill does not accept specialist document types: "
                     + ",".join(unsupported_types)
                 )
+        recovery = await self.write_coordinator.run(
+            self.repository.recover_completed_without_evidence
+        )
         discovery = None
         if discovery_kwargs is not None:
             try:
@@ -1083,6 +1186,7 @@ class BusinessProfileAsyncProductionService:
             "selection_policy": policy,
             "knowledge_cutoff": knowledge_cutoff,
             "discovery": discovery,
+            "recovery": recovery,
             "enqueue": enqueue,
             "workers": workers,
             "throughput": throughput,
@@ -1148,6 +1252,7 @@ class BusinessProfileAsyncProductionService:
     ) -> dict[str, Any]:
         started = time.monotonic()
         claimed = completed = retried = failed = lease_conflicts = 0
+        quality_totals: dict[str, Any] = {}
         errors: list[dict[str, str]] = []
         stopped = False
         lease_owner = f"async-{stage}-{get_shanghai_time().strftime('%Y%m%d%H%M%S%f')}"
@@ -1179,10 +1284,43 @@ class BusinessProfileAsyncProductionService:
                 nonlocal completed, retried, failed, lease_conflicts
                 try:
                     result = dict(await self.stage_runner(stage, item))
+                    quality = dict(result.get("quality") or {})
+                    for key in (
+                        "blocking_machine_rework",
+                        "selected_documents",
+                        "selected_pages",
+                        "outline_pages_scoped",
+                        "evidence_records",
+                        "record_count",
+                        "verified_records",
+                        "empty_output_documents",
+                    ):
+                        quality_totals[key] = quality_totals.get(key, 0) + int(
+                            quality.get(key) or 0
+                        )
+                    for counter_name in (
+                        "outline_sources",
+                        "outline_confidences",
+                        "empty_output_reasons",
+                    ):
+                        target = quality_totals.setdefault(counter_name, {})
+                        for label, count in dict(
+                            quality.get(counter_name) or {}
+                        ).items():
+                            target[str(label)] = target.get(str(label), 0) + int(
+                                count or 0
+                            )
                     status = str(result.get("status") or "").lower()
                     if status not in {"success", "completed", "unchanged"}:
                         raise RuntimeError(
                             str(result.get("reason") or status or "stage_failed")
+                        )
+                    if quality and not bool(quality.get("stage_ready", True)):
+                        raise RuntimeError(
+                            "business-profile stage quality gate failed: "
+                            f"stage={stage} "
+                            f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)} "
+                            f"selected_documents={int(quality.get('selected_documents') or 0)}"
                         )
                     await self.write_coordinator.run(
                         self.repository.acknowledge,
@@ -1226,6 +1364,7 @@ class BusinessProfileAsyncProductionService:
             "terminal_failures": failed,
             "lease_conflicts": lease_conflicts,
             "errors": errors[:20],
+            "quality": quality_totals,
             "elapsed_seconds": round(time.monotonic() - started, 3),
             "writer": self.write_coordinator.snapshot(),
         }
@@ -1282,6 +1421,74 @@ def _date_text(value: Any, field_name: str) -> str:
 
 def _retryable(exc: Exception) -> bool:
     return isinstance(exc, (OSError, RuntimeError, TimeoutError, asyncio.TimeoutError))
+
+
+def _evidence_free_stage(stage_results: Mapping[str, Any]) -> str | None:
+    """Return the earliest stage proven to have blocked evidence production."""
+
+    for stage in ("parse", "semantic", "publish"):
+        raw_result = stage_results.get(stage)
+        if not isinstance(raw_result, Mapping) or not raw_result:
+            continue
+        result = dict(raw_result)
+        quality = dict(result.get("quality") or {})
+        if quality and not bool(quality.get("stage_ready", True)):
+            return stage
+        metrics = dict(result.get("metrics") or {})
+        if int(metrics.get("errors") or 0) > 0:
+            return stage
+        if stage == "parse" and "pages" in metrics:
+            if int(metrics.get("pages") or 0) == 0:
+                return stage
+    return None
+
+
+def _write_recovery_checkpoint(
+    source: Path,
+    target: Path,
+    *,
+    affected_stage: str,
+) -> bool:
+    """Create a retry checkpoint that retains only valid upstream artifacts."""
+
+    pipeline_stage = {
+        "parse": "select",
+        "semantic": "extract",
+        "publish": "verify",
+    }.get(affected_stage)
+    if pipeline_stage is None or not source.is_file():
+        return False
+    try:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return False
+    if not isinstance(payload, Mapping):
+        return False
+    pipeline_stages = ("plan", "select", "extract", "verify", "promote")
+    affected_index = pipeline_stages.index(pipeline_stage)
+    completed = set(payload.get("completed_stages") or [])
+    required = set(pipeline_stages[:affected_index])
+    if not required.issubset(completed):
+        return False
+    recovered = dict(payload)
+    recovered["completed_stages"] = list(pipeline_stages[:affected_index])
+    recovered["artifacts"] = {
+        stage: artifact
+        for stage, artifact in dict(payload.get("artifacts") or {}).items()
+        if stage in required
+    }
+    recovered["metrics"] = {}
+    recovered["status"] = "partial" if required else "pending"
+    recovered["stopped_reason"] = None
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_suffix(target.suffix + ".part")
+    try:
+        temporary.write_text(_canonical_json(recovered), encoding="utf-8")
+        os.replace(temporary, target)
+    except OSError:
+        temporary.unlink(missing_ok=True)
+        return False
+    return True
 
 
 def _business_profile_throughput(

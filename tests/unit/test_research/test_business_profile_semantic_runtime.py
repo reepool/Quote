@@ -446,7 +446,7 @@ def _relationship_runtime(
         handlers=runtime.handlers(),
     )
     for stage in ("plan", "select", "extract"):
-        assert pipeline.run(stage, scope=scope)["status"] == "success"
+        assert pipeline.run(stage, scope=scope)["status"] in {"success", "stopped"}
     return repository, pipeline, scope, gateway
 
 
@@ -812,7 +812,10 @@ def test_due_context_rework_expands_lineaged_pages_and_recovers(tmp_path, monkey
         handlers=runtime.handlers(),
     )
     for stage in ("plan", "select", "extract"):
-        assert first_pipeline.run(stage, scope=first_scope)["status"] == "success"
+        assert first_pipeline.run(stage, scope=first_scope)["status"] in {
+            "success",
+            "stopped",
+        }
     first_checkpoint = first_pipeline.checkpoint_store.load()
     persisted_retry_revision = compute_business_profile_semantic_source_revision(
         repository,
@@ -912,6 +915,27 @@ def test_deterministic_segment_table_persists_and_promotes_normalized_currency(
     assert segments[0]["gross_margin"] == 0.4
     assert segments[0]["review_status"] == "approved"
     assert evidence[0]["review_status"] == "approved"
+
+
+def test_structured_empty_output_reports_expected_non_disclosure(tmp_path, monkeypatch):
+    _repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text="分部信息\n公司未按产品披露收入成本明细。",
+    )
+    assert pipeline.run("plan", scope=scope)["status"] == "success"
+    selected = pipeline.run("select", scope=scope)
+    assert selected["status"] == "success"
+    assert selected["quality"]["outline_confidences"] == {"low": 1}
+
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["quality"]["empty_output_documents"] == 1
+    assert extracted["quality"]["empty_output_reasons"] == {
+        "expected_non_disclosure": 1
+    }
 
 
 def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
@@ -1400,7 +1424,8 @@ def test_shadow_selection_failure_persists_machine_rework_without_promotion_mani
     assert pipeline.run("plan", scope=scope)["status"] == "success"
     selected = pipeline.run("select", scope=scope)
 
-    assert selected["status"] == "success"
+    assert selected["status"] == "stopped"
+    assert selected["reason"].startswith("quality_gate:select:")
     exception = repository.list_exceptions(instrument_id="601088.SH")[0]
     assert exception["tier"] == "machine_rework"
     assert exception["reason_codes"] == ["planned_document_missing_or_invalid_locally"]

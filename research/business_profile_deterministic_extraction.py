@@ -27,6 +27,13 @@ _ACTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("hedges", re.compile(r"(?:套期保值|开展套保)(?P<object>[\u4e00-\u9fffA-Za-z0-9·-]{0,24})")),
 )
 
+_FLATTENED_SEGMENT_DIMENSIONS = ("分行业", "分产品", "分地区", "分销售模式")
+_FLATTENED_NUMBER_RE = re.compile(
+    r"(?<![\w\u4e00-\u9fff])"
+    r"(?P<value>(?:\([-+]?\d[\d,]*(?:\.\d+)?\)|[-+]?\d[\d,]*(?:\.\d+)?)(?:[%％])?)"
+    r"(?![\w\u4e00-\u9fff])"
+)
+
 
 @dataclass(frozen=True)
 class ParsedTable:
@@ -143,29 +150,36 @@ def _parse_signature_sections(signature: Any, sections: Sequence[Any]) -> Parsed
     page_numbers: set[int] = set()
     source_ids: list[str] = []
     unit: str | None = None
+    flattened_dimension: str | None = None
     for section in sections:
         lines = [line.strip() for line in section.text.splitlines() if line.strip()]
-        local_unit = next(
-            (
-                match.group(1).strip()
-                for line in lines[:4]
-                for match in [re.search(r"单位\s*[:：]\s*([^\s|]+)", line)]
-                if match
-            ),
-            None,
-        )
-        if local_unit:
-            if unit is not None and unit != local_unit:
-                raise ValueError(f"conflicting table units: {unit} vs {local_unit}")
-            unit = local_unit
+        pending_unit: str | None = None
         for index, line in enumerate(lines):
-            cells = _split_cells(line)
-            if len(cells) < 2:
+            if flattened_dimension and (
+                re.match(r"^[（(]\d+[）)]", line)
+                or line.startswith("公司主营业务数据统计口径")
+                or line.startswith("公司实物销售收入")
+            ):
+                flattened_dimension = None
+            unit_match = re.search(r"单位\s*[:：]\s*([^\s|]+)", line)
+            if unit_match:
+                pending_unit = unit_match.group(1).strip()
                 continue
-            required_matches = _header_match_count(" ".join(cells), signature.required_headers)
+            cells = _split_cells(line)
+            required_matches = _header_match_count(line, signature.required_headers)
             if required_matches >= signature.min_required_header_matches:
+                if pending_unit:
+                    if unit is not None and unit != pending_unit:
+                        raise ValueError(
+                            f"conflicting table units: {unit} vs {pending_unit}"
+                        )
+                    unit = pending_unit
                 if headers is None:
-                    headers = cells
+                    headers = (
+                        cells
+                        if len(cells) >= 2
+                        else ["分项", *signature.required_headers]
+                    )
                     header_unit = _header_unit(cells)
                     if header_unit:
                         if unit is not None and unit != header_unit:
@@ -173,10 +187,43 @@ def _parse_signature_sections(signature: Any, sections: Sequence[Any]) -> Parsed
                                 f"conflicting table units: {unit} vs {header_unit}"
                             )
                         unit = header_unit
-                elif [_normalize(item) for item in headers] != [
+                elif len(cells) >= 2 and [_normalize(item) for item in headers] != [
                     _normalize(item) for item in cells
                 ]:
                     raise ValueError("cross-page table header changed")
+                continue
+            if signature.signature_id == "common.segment_revenue_cost.v1":
+                dimension = next(
+                    (
+                        value
+                        for value in _FLATTENED_SEGMENT_DIMENSIONS
+                        if _normalize(line) == _normalize(value)
+                    ),
+                    None,
+                )
+                if dimension is not None:
+                    flattened_dimension = dimension
+                    continue
+                flattened = _flattened_segment_row(
+                    line,
+                    dimension=flattened_dimension,
+                    section=section,
+                    signature=signature,
+                )
+                if headers is not None and flattened is not None:
+                    key = f"{flattened_dimension}:{_normalize(flattened['row_label'])}"
+                    previous = rows_by_key.get(key)
+                    if previous is not None:
+                        if previous["cells"] != flattened["cells"]:
+                            raise ValueError(
+                                f"conflicting duplicate table row: {flattened['row_label']}"
+                            )
+                        continue
+                    rows_by_key[key] = flattened
+                    page_numbers.add(section.page_number)
+                    source_ids.append(section.section_id)
+                    continue
+            if len(cells) < 2:
                 continue
             if headers is None or len(cells) != len(headers):
                 continue
@@ -230,6 +277,43 @@ def _parse_signature_sections(signature: Any, sections: Sequence[Any]) -> Parsed
         rows=tuple(core["rows"]),
         source_section_ids=tuple(core["source_section_ids"]),
     )
+
+
+def _flattened_segment_row(
+    line: str,
+    *,
+    dimension: str | None,
+    section: Any,
+    signature: Any,
+) -> dict[str, Any] | None:
+    """Recover only the unambiguous first three values of a flattened segment row."""
+
+    if dimension is None:
+        return None
+    matches = list(_FLATTENED_NUMBER_RE.finditer(line))
+    if len(matches) < 3:
+        return None
+    label = _strip_footnote(line[: matches[0].start()].strip())
+    if not label or len(label) > 80:
+        return None
+    values = [match.group("value") for match in matches[:3]]
+    if any(value.endswith(("%", "％")) for value in values[:2]):
+        return None
+    if not values[2].endswith(("%", "％")):
+        return None
+    required_headers = list(signature.required_headers)
+    cells = {
+        dimension: label,
+        **{header: value for header, value in zip(required_headers, values)},
+    }
+    return {
+        "row_label": label,
+        "row_role": _row_role(label, signature.row_role_markers),
+        "segment_dimension": dimension,
+        "cells": cells,
+        "page_number": section.page_number,
+        "section_id": section.section_id,
+    }
 
 
 def _split_cells(line: str) -> list[str]:

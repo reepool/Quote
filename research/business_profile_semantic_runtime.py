@@ -55,6 +55,7 @@ from research.business_profile_section_selection import (
     SelectedSection,
     SelectedSectionArtifact,
 )
+from research.business_profile_report_outline import locate_business_profile_outline
 from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
     deterministic_semantic_verification_decision,
@@ -888,6 +889,10 @@ class BusinessProfileSemanticRuntime:
         characters = 0
         recovered_rework = 0
         by_field_family: dict[str, dict[str, float]] = {}
+        outline_sources: dict[str, int] = {}
+        outline_confidences: dict[str, int] = {}
+        outline_pages_scoped = 0
+        planned_documents = 0
         selector = BusinessProfileSectionSelector(
             max_pages=min(12, config.budgets.max_pages)
         )
@@ -911,6 +916,7 @@ class BusinessProfileSemanticRuntime:
                     )
                 continue
             for document in plan["included"]:
+                planned_documents += 1
                 if document.get("local_status") != "verified":
                     machine_rework.append(
                         _rework_item(
@@ -926,6 +932,12 @@ class BusinessProfileSemanticRuntime:
                 try:
                     page_result = ensure_archived_pdf_page_artifact(document)
                     pdf_artifact = page_result["artifact"]
+                    outline = locate_business_profile_outline(pdf_artifact)
+                    outline_sources[outline.source] = outline_sources.get(outline.source, 0) + 1
+                    outline_confidences[outline.confidence] = (
+                        outline_confidences.get(outline.confidence, 0) + 1
+                    )
+                    outline_pages_scoped += outline.end_page - outline.start_page + 1
                     templates = self._templates_for(document, plan["instrument_id"])
                     due_rework = self._due_rework_reasons(
                         instrument_id=plan["instrument_id"],
@@ -948,6 +960,7 @@ class BusinessProfileSemanticRuntime:
                             source_document_id=document["identity"],
                             field_family=plan["field_family"],
                             templates=templates,
+                            page_scope=outline.page_numbers,
                         )
                     else:
                         selected = selector.expand_for_missing_context(
@@ -957,6 +970,7 @@ class BusinessProfileSemanticRuntime:
                             source_document_id=document["identity"],
                             field_family=plan["field_family"],
                             templates=templates,
+                            page_scope=outline.page_numbers,
                         )
                     selected_path, write_status = self.section_store.write(selected)
                 except (FileNotFoundError, RuntimeError, ValueError) as exc:
@@ -1003,6 +1017,7 @@ class BusinessProfileSemanticRuntime:
                         "template_ids": [item.template_id for item in templates],
                         "template_scopes": [item.scope.scope_id for item in templates],
                         "expanded_for_missing_context": prior is not None,
+                        "outline": outline.to_dict(),
                     }
                 )
         for exception in machine_rework:
@@ -1029,10 +1044,23 @@ class BusinessProfileSemanticRuntime:
             "status": "success",
             "artifact": artifact,
             "source_revision": effective_scope.source_revision,
+            "quality": {
+                "stage": "select",
+                "stage_ready": bool(planned_documents == len(selected_items) and not machine_rework),
+                "blocking_machine_rework": len(machine_rework),
+                "selected_documents": len(selected_items),
+                "selected_pages": pages,
+                "outline_sources": outline_sources,
+                "outline_confidences": outline_confidences,
+                "outline_pages_scoped": outline_pages_scoped,
+            },
             "metrics": {
                 "pages": pages,
                 "characters": characters,
                 "errors": len(machine_rework),
+                "selected_documents": len(selected_items),
+                "selected_pages": pages,
+                "blocking_machine_rework": len(machine_rework),
                 "machine_rework_recovered": recovered_rework,
                 "by_field_family": by_field_family,
             },
@@ -1060,6 +1088,7 @@ class BusinessProfileSemanticRuntime:
         }
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
+        empty_output_reasons: dict[str, int] = {}
         for item in selected_payload["selected"]:
             selected = _load_selected(
                 self.section_store, item["selected_artifact_path"]
@@ -1090,16 +1119,6 @@ class BusinessProfileSemanticRuntime:
                     ),
                 )
             elif item["field_family"] in {"atomic_activities", "named_relationships"}:
-                if not spans:
-                    machine_rework.append(
-                        _rework_item(item, item["document"], "selector_gap")
-                    )
-                    _increment_family_metrics(
-                        metrics["by_field_family"],
-                        item["field_family"],
-                        machine_rework=1,
-                    )
-                    continue
                 if config.kill_switches["network_calls"] or self.llm_client is None:
                     machine_rework.append(
                         _rework_item(item, item["document"], "gateway_failure")
@@ -1181,6 +1200,32 @@ class BusinessProfileSemanticRuntime:
             )
             for record_type, record in semantic_records:
                 records_by_type.setdefault(record_type, []).append(record)
+            item_record_count = sum(
+                len(rows)
+                for key, rows in records_by_type.items()
+                if key != "evidence"
+            )
+            if item_record_count == 0:
+                if item["field_family"] in {"atomic_activities", "named_relationships"}:
+                    empty_reason = "semantic_no_explicit_facts"
+                elif diagnostics:
+                    empty_reason = "deterministic_parser_failure"
+                elif any(
+                    reason.startswith("table_signature:")
+                    for section in selected.sections
+                    for reason in section.selector_reasons
+                ):
+                    empty_reason = "ambiguous_table_layout"
+                else:
+                    empty_reason = "expected_non_disclosure"
+                empty_output_reasons[empty_reason] = (
+                    empty_output_reasons.get(empty_reason, 0) + 1
+                )
+                _increment_family_reason(
+                    metrics["by_field_family"],
+                    item["field_family"],
+                    empty_reason,
+                )
             if not self._semantic_run_exists(run_id):
                 for record_type in ("activities", "relationships"):
                     for record in records_by_type.get(record_type, []):
@@ -1265,6 +1310,16 @@ class BusinessProfileSemanticRuntime:
             scope=scope,
             config=config,
         )
+        evidence_records = sum(len(item.get("evidence_ids") or []) for item in outputs)
+        record_count = sum(
+            len(record_ids)
+            for item in outputs
+            for record_ids in (item.get("record_ids") or {}).values()
+        )
+        metrics["evidence_records"] = evidence_records
+        metrics["record_count"] = record_count
+        metrics["selected_documents"] = len(outputs)
+        metrics["empty_output_documents"] = sum(empty_output_reasons.values())
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "extract",
@@ -1284,12 +1339,32 @@ class BusinessProfileSemanticRuntime:
                 "reason": budget_stop_reason,
                 "artifact": artifact,
                 "source_revision": effective_scope.source_revision,
+                "quality": {
+                    "stage": "extract",
+                    "stage_ready": False,
+                    "blocking_machine_rework": len(machine_rework),
+                    "selected_documents": len(outputs),
+                    "evidence_records": evidence_records,
+                    "record_count": record_count,
+                    "empty_output_documents": sum(empty_output_reasons.values()),
+                    "empty_output_reasons": empty_output_reasons,
+                },
                 "metrics": metrics,
             }
         return {
             "status": "success",
             "artifact": artifact,
             "source_revision": effective_scope.source_revision,
+            "quality": {
+                "stage": "extract",
+                "stage_ready": bool(outputs and not machine_rework and evidence_records),
+                "blocking_machine_rework": len(machine_rework),
+                "selected_documents": len(outputs),
+                "evidence_records": evidence_records,
+                "record_count": record_count,
+                "empty_output_documents": sum(empty_output_reasons.values()),
+                "empty_output_reasons": empty_output_reasons,
+            },
             "metrics": metrics,
         }
 
@@ -1321,7 +1396,10 @@ class BusinessProfileSemanticRuntime:
                 }[record_type]
                 for target_id in output["record_ids"].get(record_type, []):
                     target = self._find_record(record_type, target_id)
-                    bypass = deterministic_semantic_verification_decision(target)
+                    verification_target = _verification_target(target)
+                    bypass = deterministic_semantic_verification_decision(
+                        verification_target
+                    )
                     if bypass["skip_semantic_verifier"]:
                         verifications.append(
                             {
@@ -1360,7 +1438,7 @@ class BusinessProfileSemanticRuntime:
                                 self.llm_client
                             ).verify_async(
                                 target_type=target_type,
-                                target=_verification_target(target),
+                                target=verification_target,
                                 selected=selected,
                             )
                         )
@@ -1421,7 +1499,16 @@ class BusinessProfileSemanticRuntime:
             "llm_calls": llm_calls,
             "tokens": tokens,
             "errors": errors,
+            "verified_records": len(verifications),
+            "blocking_machine_rework": len(machine_rework),
             "by_field_family": by_field_family,
+        }
+        quality = {
+            "stage": "verify",
+            "stage_ready": bool(extracted["outputs"] and not machine_rework and not errors),
+            "blocking_machine_rework": len(machine_rework),
+            "verified_records": len(verifications),
+            "selected_documents": len(extracted["outputs"]),
         }
         if budget_stop_reason:
             return {
@@ -1429,12 +1516,14 @@ class BusinessProfileSemanticRuntime:
                 "reason": budget_stop_reason,
                 "artifact": artifact,
                 "source_revision": effective_scope.source_revision,
+                "quality": quality,
                 "metrics": metrics,
             }
         return {
             "status": "success",
             "artifact": artifact,
             "source_revision": effective_scope.source_revision,
+            "quality": quality,
             "metrics": metrics,
         }
 
@@ -2368,6 +2457,12 @@ def _segment_record(
             }
         )[:24]
     )
+    segment_type = {
+        "分行业": "industry",
+        "分产品": "product",
+        "分地区": "geography",
+        "分销售模式": "sales_model",
+    }.get(str(row.get("segment_dimension") or ""), "product")
     return {
         "record_id": record_id,
         "instrument_id": item["instrument_id"],
@@ -2375,7 +2470,7 @@ def _segment_record(
         "segment_id": "segment-" + _stable_hash(row["row_label"])[:16],
         "segment_name_raw": row["row_label"],
         "segment_name_normalized": None,
-        "segment_type": "product",
+        "segment_type": segment_type,
         "revenue": revenue,
         "segment_cost": cost,
         "gross_margin": margin,
@@ -2452,6 +2547,7 @@ def _operating_records(
                 "knowledge_from": str(item["document"]["published_at"])[:10],
                 "version": 1,
                 "metadata": {
+                    "derivation_method": "deterministic_parser",
                     "table_id": table.table_id,
                     "signature_id": table.signature_id,
                     "source_header": header,
@@ -2466,9 +2562,30 @@ def _operating_records(
 
 def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:
     metadata = record.get("metadata") or {}
+    validation = dict(metadata.get("promotion_validation") or {})
     target = dict(record)
+    target["derivation_method"] = str(
+        record.get("derivation_method")
+        or record.get("extraction_method")
+        or metadata.get("derivation_method")
+        or "semantic_extraction"
+    )
+    target["exact_evidence_valid"] = bool(
+        record.get("exact_evidence_valid")
+        or metadata.get("exact_evidence_valid")
+        or validation.get("exact_evidence_verified")
+    )
+    target["numeric_reconciliation_valid"] = bool(
+        record.get("numeric_reconciliation_valid")
+        or metadata.get("numeric_reconciliation_valid")
+        or validation.get("numeric_reconciliation_valid")
+    )
+    target["parser_manifest_promoted"] = bool(
+        record.get("parser_manifest_promoted")
+        or metadata.get("parser_manifest_promoted")
+        or validation.get("parser_manifest_promoted")
+    )
     target["evidence"] = metadata.get("exact_evidence")
-    target["derivation_method"] = "semantic_extraction"
     return target
 
 

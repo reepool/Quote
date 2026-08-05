@@ -277,6 +277,21 @@ class BusinessProfileSemanticPipeline:
         checkpoint["metrics"] = metrics
         result_status = str(result.get("status") or "").strip().lower()
         stop_reason = self._budget_stop_reason(metrics)
+        if result_status in {"interrupted", "cancelled", "stopped"}:
+            checkpoint["artifacts"][stage] = result.get("artifact")
+            return self._stop(
+                checkpoint,
+                str(result.get("reason") or stop_reason or result["status"]),
+            )
+        quality = dict(result.get("quality") or {})
+        if quality and not bool(quality.get("stage_ready", True)):
+            checkpoint["artifacts"][stage] = result.get("artifact")
+            reason = (
+                f"quality_gate:{stage}:"
+                f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)}"
+            )
+            stopped = self._stop(checkpoint, reason)
+            return {**stopped, "quality": quality}
         if stop_reason:
             checkpoint["artifacts"][stage] = result.get("artifact")
             if result_status in {"success", "completed", "unchanged"}:
@@ -284,9 +299,6 @@ class BusinessProfileSemanticPipeline:
                     dict.fromkeys([*checkpoint["completed_stages"], stage])
                 )
             return self._stop(checkpoint, stop_reason)
-        if result_status in {"interrupted", "cancelled", "stopped"}:
-            checkpoint["artifacts"][stage] = result.get("artifact")
-            return self._stop(checkpoint, str(result.get("reason") or result["status"]))
         if result_status not in {"success", "completed", "unchanged"}:
             checkpoint["artifacts"][stage] = result.get("artifact")
             reason = str(result.get("reason") or result_status or "missing_status")
@@ -304,6 +316,7 @@ class BusinessProfileSemanticPipeline:
             "status": "success",
             "stage": stage,
             "artifact": result.get("artifact"),
+            "quality": result.get("quality"),
             "checkpoint_hash": _stable_hash(checkpoint),
             **self._report(checkpoint),
         }
@@ -481,6 +494,14 @@ class BusinessProfileSemanticPipeline:
                 "acquisition_attempts": int(metrics.get("acquisition_attempts") or 0),
                 "acquired_plans": int(metrics.get("acquired_plans") or 0),
                 "pages": int(metrics.get("pages") or 0),
+                "selected_documents": int(metrics.get("selected_documents") or 0),
+                "selected_pages": int(metrics.get("selected_pages") or 0),
+                "evidence_records": int(metrics.get("evidence_records") or 0),
+                "record_count": int(metrics.get("record_count") or 0),
+                "verified_records": int(metrics.get("verified_records") or 0),
+                "blocking_machine_rework": int(
+                    metrics.get("blocking_machine_rework") or 0
+                ),
                 "deterministic_completed": int(
                     metrics.get("deterministic_completed") or 0
                 ),
