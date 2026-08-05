@@ -400,6 +400,223 @@ class BusinessProfileWorkRepository:
             raise KeyError(f"business-profile work item not found: {work_id}")
         return _decode_work_row(row)
 
+    def get_bound_frontier(
+        self,
+        work: str | Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Load the active frontier row whose identity was frozen into the work item."""
+
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        frontier_id = str(item.get("frontier_id") or "").strip()
+        if not frontier_id:
+            raise ValueError("business-profile work item has no frontier_id")
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                "SELECT * FROM business_profile_announcement_frontier "
+                "WHERE frontier_id = ?",
+                (frontier_id,),
+            ).fetchone()
+        if row is None:
+            raise RuntimeError(
+                f"business-profile bound frontier is missing: {frontier_id}"
+            )
+        frontier = dict(row)
+        if str(frontier.get("status") or "") == "superseded":
+            raise RuntimeError(
+                f"business-profile bound frontier is superseded: {frontier_id}"
+            )
+        identity_fields = (
+            "frontier_id",
+            "instrument_id",
+            "source",
+            "announcement_id",
+            "report_period",
+            "document_type",
+        )
+        mismatches = [
+            field
+            for field in identity_fields
+            if str(item.get(field) or "") != str(frontier.get(field) or "")
+        ]
+        if mismatches:
+            raise RuntimeError(
+                "business-profile work/frontier identity mismatch: "
+                + ",".join(mismatches)
+            )
+        if not str(frontier.get("source_url") or "").strip():
+            raise RuntimeError(
+                f"business-profile bound frontier has no source URL: {frontier_id}"
+            )
+        try:
+            metadata = json.loads(frontier.pop("metadata_json") or "{}")
+        except (TypeError, json.JSONDecodeError):
+            metadata = {}
+        frontier["metadata"] = metadata if isinstance(metadata, Mapping) else {}
+        return frontier
+
+    def get_usable_bound_manifest(
+        self,
+        work: str | Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        """Return an integrity-verified annual-report asset matching the work identity."""
+
+        from research.annual_report_assets import AnnualReportAssetCatalog
+
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        asset = AnnualReportAssetCatalog(self.storage).find_reusable_filing(
+            instrument_id=str(item.get("instrument_id") or ""),
+            report_period=str(item.get("report_period") or ""),
+            source=str(item.get("source") or "").strip().lower(),
+            filing_id=str(item.get("announcement_id") or ""),
+        )
+        if asset is None:
+            return None
+        if str(asset.get("report_type") or "") != str(
+            item.get("document_type") or ""
+        ):
+            return None
+        return asset
+
+    def recover_completed_without_bound_manifest(
+        self,
+        *,
+        work_ids: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        """Requeue positively identified empty completions without touching valid work."""
+
+        clauses = [
+            "work.status = 'completed'",
+            "work.policy = 'latest_annual_only'",
+            "frontier.status <> 'superseded'",
+        ]
+        params: list[Any] = []
+        normalized_ids = tuple(
+            sorted({str(item).strip() for item in work_ids if str(item).strip()})
+        )
+        if normalized_ids:
+            placeholders = ",".join("?" for _ in normalized_ids)
+            clauses.append(f"work.work_id IN ({placeholders})")
+            params.extend(normalized_ids)
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT work.* FROM business_profile_work_items AS work "
+                "JOIN business_profile_announcement_frontier AS frontier "
+                "ON frontier.frontier_id = work.frontier_id WHERE "
+                + " AND ".join(clauses)
+                + " ORDER BY work.work_id",
+                tuple(params),
+            ).fetchall()
+        candidates = [_decode_work_row(row) for row in rows]
+        defective = [
+            item
+            for item in candidates
+            if self.get_usable_bound_manifest(item) is None
+        ]
+        now = get_shanghai_time().isoformat()
+        recovery_token = hashlib.sha256(now.encode("utf-8")).hexdigest()[:12]
+        recovered_ids: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for item in defective:
+                metadata = dict(item.get("metadata") or {})
+                previous_stage_results = metadata.pop("stage_results", {})
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "completed_without_usable_bound_manifest",
+                        "recovered_at": now,
+                        "from_stage": item.get("stage"),
+                        "from_status": item.get("status"),
+                        "from_completed_at": item.get("completed_at"),
+                        "from_attempt_count": item.get("attempt_count"),
+                        "from_checkpoint_path": item.get("checkpoint_path"),
+                        "invalidated_stage_results": previous_stage_results,
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                checkpoint = Path(str(item["checkpoint_path"]))
+                recovered_checkpoint = checkpoint.with_name(
+                    f"{checkpoint.stem}.recovery-{recovery_token}{checkpoint.suffix}"
+                )
+                cursor = conn.execute(
+                    """
+                    UPDATE business_profile_work_items
+                    SET stage = 'acquire', status = 'pending', attempt_count = 0,
+                        next_attempt_at = NULL, lease_owner = NULL,
+                        lease_expires_at = NULL, checkpoint_path = ?,
+                        last_error = NULL, metadata_json = ?, completed_at = NULL,
+                        updated_at = ?
+                    WHERE work_id = ? AND status = 'completed'
+                      AND policy = 'latest_annual_only'
+                    """,
+                    (
+                        str(recovered_checkpoint),
+                        _canonical_json(metadata),
+                        now,
+                        item["work_id"],
+                    ),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered_ids.append(str(item["work_id"]))
+            conn.commit()
+        return {
+            "eligible_completed": len(candidates),
+            "valid_manifest_preserved": len(candidates) - len(defective),
+            "requeued": len(recovered_ids),
+            "work_ids": recovered_ids,
+        }
+
+    def resolve_missing_document_exceptions(
+        self,
+        work: str | Mapping[str, Any],
+    ) -> int:
+        """Resolve only runtime exceptions caused by the now-repaired missing document."""
+
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        if self.get_usable_bound_manifest(item) is None:
+            return 0
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT exception_id, reason_codes_json, metadata_json "
+                "FROM business_profile_exceptions "
+                "WHERE instrument_id = ? AND status = 'open' "
+                "AND tier = 'machine_rework' "
+                "AND target_type = 'document_field_family'",
+                (str(item["instrument_id"]),),
+            ).fetchall()
+        exception_ids: list[str] = []
+        for row in rows:
+            try:
+                reasons = set(json.loads(row["reason_codes_json"] or "[]"))
+                metadata = json.loads(row["metadata_json"] or "{}")
+            except (TypeError, json.JSONDecodeError):
+                continue
+            source_document_id = str(metadata.get("source_document_id") or "")
+            if (
+                "planned_document_missing_or_invalid_locally" in reasons
+                and bool(metadata.get("runtime_exception"))
+                and source_document_id.startswith("unresolved-plan:")
+            ):
+                exception_ids.append(str(row["exception_id"]))
+        if not exception_ids:
+            return 0
+        placeholders = ",".join("?" for _ in exception_ids)
+        now = get_shanghai_time().isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                "UPDATE business_profile_exceptions "
+                "SET status = 'resolved', resolved_at = ?, updated_at = ? "
+                f"WHERE exception_id IN ({placeholders}) AND status = 'open'",
+                (now, now, *exception_ids),
+            )
+            conn.commit()
+        return max(0, int(cursor.rowcount or 0))
+
     def health(self) -> dict[str, Any]:
         now = get_shanghai_time().isoformat()
         with self.storage.get_connection() as conn:
@@ -627,6 +844,89 @@ class BusinessProfileWorkRepository:
         }
 
 
+class BusinessProfileFrontierBoundAcquirer:
+    """Archive the exact official document selected into durable work."""
+
+    def __init__(self, *, repository: BusinessProfileWorkRepository, archive_service: Any):
+        self.repository = repository
+        self.archive_service = archive_service
+
+    def acquire(self, work: Mapping[str, Any]) -> dict[str, Any]:
+        from research.business_profile_discovery import BusinessProfileDocumentCandidate
+        from research.business_profile_documents import classify_business_profile_document
+
+        frontier = self.repository.get_bound_frontier(work)
+        existing = self.repository.get_usable_bound_manifest(work)
+        if existing is not None:
+            resolved = self.repository.resolve_missing_document_exceptions(work)
+            return {
+                "status": "unchanged",
+                "frontier_id": frontier["frontier_id"],
+                "source_file_id": existing["source_file_id"],
+                "archive_path": existing["archive_path"],
+                "resolved_missing_document_exceptions": resolved,
+            }
+        title = str(frontier["title"])
+        classification = classify_business_profile_document(title, adjunct_type="PDF")
+        if (
+            not classification.selected
+            or classification.document_type != str(work.get("document_type") or "")
+        ):
+            raise RuntimeError(
+                "business-profile bound frontier classification mismatch: "
+                f"{frontier['frontier_id']}"
+            )
+        metadata = dict(frontier.get("metadata") or {})
+        candidate = BusinessProfileDocumentCandidate(
+            announcement_id=str(frontier["announcement_id"]),
+            title=title,
+            announcement_time=frontier.get("published_at"),
+            symbols=[str(frontier["symbol"])],
+            adjunct_url=str(frontier["source_url"]),
+            adjunct_type="PDF",
+            classification=classification,
+            selection_reasons=list(metadata.get("selection_reasons") or []),
+            source=str(frontier["source"]).strip().lower(),
+            source_tier=(
+                "official_primary"
+                if str(frontier["source"]).strip().lower() == "cninfo"
+                else "official_backup"
+            ),
+            raw_payload={"frontier_id": str(frontier["frontier_id"])},
+        )
+        instrument = {
+            "instrument_id": str(frontier["instrument_id"]),
+            "symbol": str(frontier["symbol"]),
+            "exchange": str(frontier["exchange"]),
+        }
+        archive = self.archive_service.archive_candidates(
+            instrument,
+            [candidate],
+            max_documents=1,
+            checkpoint_path=Path(str(work["checkpoint_path"])).with_suffix(
+                ".acquire.json"
+            ),
+        )
+        manifest = self.repository.get_usable_bound_manifest(work)
+        if manifest is None:
+            errors = "; ".join(
+                str(item.get("error") or "") for item in archive.errors
+            )
+            raise RuntimeError(
+                "business-profile bound acquisition produced no usable manifest: "
+                f"frontier_id={frontier['frontier_id']} errors={errors or 'unknown'}"
+            )
+        resolved = self.repository.resolve_missing_document_exceptions(work)
+        return {
+            "status": "success",
+            "frontier_id": frontier["frontier_id"],
+            "source_file_id": manifest["source_file_id"],
+            "archive_path": manifest["archive_path"],
+            "archive": archive.to_dict(),
+            "resolved_missing_document_exceptions": resolved,
+        }
+
+
 class BusinessProfileAsyncProductionService:
     """Run discovery first, then independently bounded asynchronous workers."""
 
@@ -675,6 +975,7 @@ class BusinessProfileAsyncProductionService:
         )
         workers = await self._run_workers(stage_budgets)
         health = await asyncio.to_thread(self.repository.health)
+        throughput = _business_profile_throughput(enqueue, workers)
         discovery_status = str(discovery.get("status") or "failed").lower()
         return {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
@@ -688,6 +989,7 @@ class BusinessProfileAsyncProductionService:
             "discovery": discovery,
             "enqueue": enqueue,
             "workers": workers,
+            "throughput": throughput,
             "queue_health": health,
             "writer": self.write_coordinator.snapshot(),
             "elapsed_seconds": round(time.monotonic() - started, 3),
@@ -761,6 +1063,7 @@ class BusinessProfileAsyncProductionService:
             stage_budgets or {},
             should_stop=should_stop,
         )
+        throughput = _business_profile_throughput(enqueue, workers)
         stopped = any(
             str(item.get("status") or "").lower() == "stopped"
             for item in workers.values()
@@ -782,6 +1085,7 @@ class BusinessProfileAsyncProductionService:
             "discovery": discovery,
             "enqueue": enqueue,
             "workers": workers,
+            "throughput": throughput,
             "queue_health": await asyncio.to_thread(self.repository.health),
             "writer": self.write_coordinator.snapshot(),
         }
@@ -978,6 +1282,23 @@ def _date_text(value: Any, field_name: str) -> str:
 
 def _retryable(exc: Exception) -> bool:
     return isinstance(exc, (OSError, RuntimeError, TimeoutError, asyncio.TimeoutError))
+
+
+def _business_profile_throughput(
+    enqueue: Mapping[str, Any],
+    workers: Mapping[str, Any],
+) -> dict[str, Any]:
+    stage_completed = {
+        stage: int(dict(result or {}).get("completed") or 0)
+        for stage, result in workers.items()
+    }
+    return {
+        "enqueued": int(enqueue.get("inserted") or 0),
+        "requeued": int(enqueue.get("reset") or 0),
+        "superseded": int(enqueue.get("superseded") or 0),
+        "worker_completed": int(stage_completed.get("publish") or 0),
+        "stage_completed": stage_completed,
+    }
 
 
 def _canonical_json(value: Any) -> str:

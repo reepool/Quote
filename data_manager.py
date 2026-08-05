@@ -2223,6 +2223,7 @@ class DataManager:
         """Build the shared discovery and stage runtime for daily and backfill."""
         from research.business_profile_async_production import (
             BusinessProfileAsyncProductionService,
+            BusinessProfileFrontierBoundAcquirer,
             BusinessProfileWorkRepository,
             get_business_profile_write_coordinator,
         )
@@ -2279,11 +2280,20 @@ class DataManager:
                     semantic.get("promotion_manifests") or {}
                 ),
             }
+            acquisition = None
+            if stage == "acquire":
+                def acquire_bound_frontier() -> Mapping[str, Any]:
+                    with self.research_storage.coordinated_writes(write_coordinator):
+                        return frontier_acquirer.acquire(item)
+
+                acquisition = await asyncio.to_thread(acquire_bound_frontier)
             result = await self.run_business_profile_semantic_production(
                 mode=mode,
                 write_coordinator=write_coordinator,
                 **call_kwargs,
             )
+            if acquisition is not None:
+                result = {**result, "bound_acquisition": dict(acquisition)}
             if (
                 stage != "publish"
                 or not bool(semantic.get("promotion_enabled"))
@@ -2312,6 +2322,17 @@ class DataManager:
         repository = BusinessProfileWorkRepository(
             self.research_storage,
             checkpoint_root=checkpoint_root,
+        )
+        from research.business_profile_archive import (
+            BusinessProfileDocumentArchiveService,
+        )
+
+        frontier_acquirer = BusinessProfileFrontierBoundAcquirer(
+            repository=repository,
+            archive_service=BusinessProfileDocumentArchiveService.from_research_config(
+                storage=self.research_storage,
+                research_config=self.research_config,
+            ),
         )
         service = BusinessProfileAsyncProductionService(
             repository=repository,

@@ -500,6 +500,7 @@ def _compact_cycle_result(result: Mapping[str, Any]) -> dict[str, Any]:
         "discovery",
         "enqueue",
         "workers",
+        "throughput",
         "queue_health",
         "reconciliation",
         "rollout",

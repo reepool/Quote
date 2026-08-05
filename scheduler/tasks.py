@@ -204,9 +204,18 @@ def _business_profile_backfill_control_store():
 
 
 def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
-    queue = dict(progress.get("queue_health") or {})
-    readiness = dict(progress.get("rollout_readiness") or {})
-    cumulative = dict(progress.get("cumulative_workers") or {})
+    latest = dict(progress.get("latest_result") or {})
+    queue = dict(progress.get("queue_health") or latest.get("queue_health") or {})
+    readiness = dict(
+        progress.get("rollout_readiness")
+        or latest.get("rollout_readiness")
+        or {}
+    )
+    cumulative = dict(
+        progress.get("cumulative_workers") or latest.get("workers") or {}
+    )
+    throughput = dict(latest.get("throughput") or {})
+    enqueue = dict(latest.get("enqueue") or {})
     worker_text = "，".join(
         f"{stage}:完成{int(dict(values or {}).get('completed') or 0)}"
         f"/重试{int(dict(values or {}).get('retried') or 0)}"
@@ -226,9 +235,19 @@ def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
         f"当前年报覆盖率: "
         f"{float(readiness.get('current_annual_coverage_ratio') or 0):.2%}\n"
         f"phase_ready: {bool(readiness.get('phase_ready'))}\n"
+        f"本批: 入队{int(throughput.get('enqueued') or enqueue.get('inserted') or 0)}，"
+        f"完整完成{int(throughput.get('worker_completed') or 0)}\n"
         f"累计: {worker_text}\n"
         f"原因: {','.join(str(item) for item in reasons) or '无'}"
     )
+
+
+def _business_profile_completed_items(result: Dict[str, Any]) -> int:
+    progress = dict(result.get("continuous_progress") or {})
+    cumulative = dict(progress.get("cumulative_workers") or {})
+    if cumulative:
+        return int(dict(cumulative.get("publish") or {}).get("completed") or 0)
+    return int((result.get("throughput") or {}).get("worker_completed") or 0)
 
 
 def _apply_hkex_gap_guard(
@@ -7448,7 +7467,7 @@ class ScheduledTasks:
                 report_data={
                     "name": "业务画像异步日更报告",
                     "status": "success" if success else "error",
-                    "tasks_completed": (result.get("enqueue") or {}).get("inserted", 0),
+                    "tasks_completed": _business_profile_completed_items(result),
                     "duration": f"{float(result.get('elapsed_seconds') or 0):.2f}s",
                     "maintenance_tasks": [
                         {"task_name": task_id, "status": result.get("reason") or status}
@@ -7652,7 +7671,7 @@ class ScheduledTasks:
                         else "业务画像手工回补报告"
                     ),
                     "status": "success" if success else "error",
-                    "tasks_completed": (result.get("enqueue") or {}).get("inserted", 0),
+                    "tasks_completed": _business_profile_completed_items(result),
                     "duration": "N/A",
                     "maintenance_tasks": [
                         {

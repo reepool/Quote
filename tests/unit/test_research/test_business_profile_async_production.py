@@ -1,4 +1,5 @@
 import asyncio
+import json
 import threading
 import time
 from unittest.mock import AsyncMock, Mock
@@ -8,11 +9,13 @@ import pytest
 from data_manager import DataManager, _derive_business_profile_bootstrap_start
 from research.business_profile_async_production import (
     BusinessProfileAsyncProductionService,
+    BusinessProfileFrontierBoundAcquirer,
     BusinessProfileWorkRepository,
     BusinessProfileWriteCoordinator,
     StageBudget,
     get_business_profile_write_coordinator,
 )
+from research.business_profile_archive import BusinessProfileDocumentArchiveService
 from research.business_profile_production_operations import (
     BusinessProfileAnnouncementFrontierRepository,
 )
@@ -89,6 +92,216 @@ def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
             "status": "pending",
         }
     ]
+
+
+def test_frontier_bound_acquisition_archives_exact_pdf_and_resolves_only_missing(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    item = queue.claim(
+        "acquire", limit=1, lease_owner="worker", lease_seconds=30
+    )[0]
+    downloads = []
+
+    def download(candidate):
+        downloads.append(candidate)
+        return b"%PDF-1.4\nfrontier-bound\n%%EOF"
+
+    now = "2026-08-30T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        for exception_id, reason in (
+            ("missing", "planned_document_missing_or_invalid_locally"),
+            ("other", "gateway_failure"),
+        ):
+            conn.execute(
+                """
+                INSERT INTO business_profile_exceptions (
+                    exception_id, target_type, target_id, instrument_id,
+                    field_family, tier, reason_codes_json, retry_count,
+                    next_retry_at, gate_signature, gate_manifest_hash,
+                    evidence_references_json, ranked_choices_json, status,
+                    resolved_at, metadata_json, created_at, updated_at
+                ) VALUES (?, 'document_field_family', ?, '600000.SH',
+                          'structured_segments', 'machine_rework', ?, 1,
+                          NULL, ?, 'manifest', '[]', '[]', 'open', NULL, ?, ?, ?)
+                """,
+                (
+                    exception_id,
+                    f"target-{exception_id}",
+                    json.dumps([reason]),
+                    f"gate-{exception_id}",
+                    json.dumps(
+                        {
+                            "runtime_exception": True,
+                            "source_document_id": "unresolved-plan:test",
+                        }
+                    ),
+                    now,
+                    now,
+                ),
+            )
+        conn.commit()
+    acquirer = BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=download,
+        ),
+    )
+
+    result = acquirer.acquire(item)
+
+    assert result["status"] == "success"
+    assert result["resolved_missing_document_exceptions"] == 1
+    assert len(downloads) == 1
+    assert downloads[0].announcement_id == item["announcement_id"]
+    assert downloads[0].adjunct_url.endswith(f"/{item['announcement_id']}.PDF")
+    assert queue.get_usable_bound_manifest(item)["integrity_status"] == "valid"
+    with storage.get_connection() as conn:
+        statuses = dict(
+            conn.execute(
+                "SELECT exception_id, status FROM business_profile_exceptions"
+            ).fetchall()
+        )
+    assert statuses == {"missing": "resolved", "other": "open"}
+
+
+def test_acquire_worker_retries_when_bound_pdf_has_no_usable_manifest(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    acquirer = BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"not-a-pdf",
+        ),
+    )
+
+    async def stage_runner(_stage, item):
+        return await asyncio.to_thread(acquirer.acquire, item)
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+        retry_backoff_seconds=1,
+    )
+    workers = asyncio.run(
+        service._run_workers(
+            {"acquire": StageBudget(max_items=1, max_concurrency=1)}
+        )
+    )
+
+    assert workers["acquire"]["completed"] == 0
+    assert workers["acquire"]["retried"] == 1
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT stage, status, last_error FROM business_profile_work_items"
+        ).fetchone()
+    assert row["stage"] == "acquire"
+    assert row["status"] == "retry_due"
+    assert "produced no usable manifest" in row["last_error"]
+
+
+def test_recovery_requeues_only_empty_completion_and_is_idempotent(tmp_path):
+    storage = _storage(tmp_path)
+    frontier, _instrument = _frontier(storage)
+    second = {
+        "instrument_id": "000001.SZ",
+        "symbol": "000001",
+        "exchange": "SZSE",
+    }
+    frontier.upsert_record(
+        instrument=second,
+        record=_announcement(
+            "second-2025",
+            "第二公司2025年年度报告",
+            published_at="2026-04-10T08:00:00+08:00",
+        ),
+    )
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    items = []
+    for instrument_id in ("600000.SH", "000001.SZ"):
+        with storage.get_connection() as conn:
+            row = conn.execute(
+                "SELECT work_id FROM business_profile_work_items "
+                "WHERE instrument_id = ?",
+                (instrument_id,),
+            ).fetchone()
+        items.append(queue.get(row["work_id"]))
+    valid_item = next(
+        item for item in items if item["instrument_id"] == "600000.SH"
+    )
+    BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"%PDF-1.4\nvalid\n%%EOF",
+        ),
+    ).acquire(valid_item)
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', "
+            "status = 'completed', completed_at = ?, metadata_json = ?",
+            (
+                "2026-08-30T13:00:00+08:00",
+                json.dumps({"stage_results": {"publish": {"status": "success"}}}),
+            ),
+        )
+        conn.commit()
+
+    first = queue.recover_completed_without_bound_manifest()
+    second_run = queue.recover_completed_without_bound_manifest()
+
+    assert first["eligible_completed"] == 2
+    assert first["valid_manifest_preserved"] == 1
+    assert first["requeued"] == 1
+    assert second_run["requeued"] == 0
+    with storage.get_connection() as conn:
+        rows = {
+            row["instrument_id"]: dict(row)
+            for row in conn.execute(
+                "SELECT instrument_id, stage, status, checkpoint_path, "
+                "metadata_json FROM business_profile_work_items"
+            ).fetchall()
+        }
+    assert rows["600000.SH"]["status"] == "completed"
+    assert rows["000001.SZ"]["stage"] == "acquire"
+    assert rows["000001.SZ"]["status"] == "pending"
+    assert ".recovery-" in rows["000001.SZ"]["checkpoint_path"]
+    recovered_metadata = json.loads(rows["000001.SZ"]["metadata_json"])
+    assert "stage_results" not in recovered_metadata
+    assert len(recovered_metadata["recovery_history"]) == 1
+    assert recovered_metadata["recovery_history"][0][
+        "from_checkpoint_path"
+    ].endswith(".json")
 
 
 def test_latest_annual_enqueue_applies_company_and_date_scope(tmp_path):
@@ -512,6 +725,14 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
     assert report["status"] == "degraded"
     assert report["discovery"]["status"] == "failed"
     assert report["workers"]["acquire"]["completed"] == 1
+    assert report["throughput"]["enqueued"] == report["enqueue"]["inserted"] == 3
+    assert report["throughput"]["worker_completed"] == 0
+    assert report["throughput"]["stage_completed"] == {
+        "acquire": 1,
+        "parse": 0,
+        "semantic": 0,
+        "publish": 0,
+    }
 
 
 def test_stage_stop_request_finishes_inflight_batch_before_next_claim():
@@ -710,7 +931,9 @@ def test_write_coordinator_is_shared_per_storage_manager(tmp_path):
     assert second.inter_write_seconds == 0.01
 
 
-def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_path):
+def test_data_manager_daily_advances_each_stage_without_draining_globally(
+    tmp_path, monkeypatch
+):
     storage = _storage(tmp_path)
     _quotes(
         storage,
@@ -751,6 +974,14 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_pa
     manager.run_business_profile_semantic_production = AsyncMock(
         return_value={"status": "success"}
     )
+    bound_acquire = Mock(
+        return_value={"status": "success", "source_file_id": "source-1"}
+    )
+    monkeypatch.setattr(
+        BusinessProfileFrontierBoundAcquirer,
+        "acquire",
+        bound_acquire,
+    )
 
     result = asyncio.run(
         manager.run_business_profile_daily_incremental(
@@ -777,6 +1008,7 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_pa
     assert result["queue_health"]["terminal"] == 0
     assert result["queue_health"]["completed"] == 1
     assert result["queue_health"]["finalized"] == 1
+    bound_acquire.assert_called_once()
     assert [
         call.kwargs["mode"]
         for call in manager.run_business_profile_semantic_production.await_args_list
@@ -806,6 +1038,7 @@ def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
     storage = _storage(tmp_path)
     manager = DataManager.__new__(DataManager)
     manager.research_storage = storage
+    manager.research_config = Mock(modules={"business_profile_evidence": {}})
     manager.run_business_profile_semantic_production = AsyncMock(
         side_effect=[
             {"status": "success", "pipeline_status": "completed"},

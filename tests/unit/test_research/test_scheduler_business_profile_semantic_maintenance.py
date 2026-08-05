@@ -29,6 +29,44 @@ def _task():
     return task
 
 
+def test_single_batch_progress_uses_nested_authoritative_queue_and_readiness():
+    text = task_module._format_business_profile_backfill_progress(
+        {
+            "state": "completed",
+            "run_id": "run-1",
+            "queue_health": {},
+            "rollout_readiness": {},
+            "latest_result": {
+                "enqueue": {"inserted": 3188},
+                "workers": {"publish": {"completed": 0, "retried": 0}},
+                "throughput": {"enqueued": 3188, "worker_completed": 0},
+                "queue_health": {
+                    "claimable": 3168,
+                    "running": 0,
+                    "terminal": 0,
+                },
+                "rollout_readiness": {
+                    "current_annual_coverage_ratio": 0.25,
+                    "phase_ready": False,
+                },
+            },
+            "reason_codes": ["single_batch_complete"],
+        }
+    )
+
+    assert "claimable=3168" in text
+    assert "当前年报覆盖率: 25.00%" in text
+    assert "本批: 入队3188，完整完成0" in text
+    assert task_module._business_profile_completed_items(
+        {
+            "throughput": {"worker_completed": 0},
+            "continuous_progress": {
+                "cumulative_workers": {"publish": {"completed": 7}}
+            },
+        }
+    ) == 7
+
+
 def test_daily_incremental_job_is_disabled_and_not_scheduled(monkeypatch):
     raw = (
         UnifiedConfigManager("config")
@@ -370,6 +408,9 @@ def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
         stage_budgets={"acquire": {"max_items": 2}},
         should_stop=ANY,
     )
+    assert task._send_task_report.await_args.kwargs["report_data"][
+        "tasks_completed"
+    ] == 0
 
 
 def test_scheduler_continuous_backfill_runs_until_phase_ready(tmp_path, monkeypatch):
