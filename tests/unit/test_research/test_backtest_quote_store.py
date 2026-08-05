@@ -384,6 +384,35 @@ def test_canonical_actions_are_changed_only_and_point_in_time(store):
     assert after["items"][0]["projection_revision_id"] == "ca-r2"
 
 
+def test_canonical_action_batch_is_atomic(store):
+    base = {
+        "canonical_event_id": "ca-batch",
+        "projection_revision_id": "ca-batch-r1",
+        "instrument_id": "000001.SZ",
+        "action_type": "cash_dividend",
+        "effective_date": "2026-01-20",
+        "cash_dividend_per_share": 0.1,
+        "factor_effect": True,
+        "backtest_ready": True,
+        "lifecycle_applicability": "applicable",
+        "coverage_state": "complete",
+        "quality_state": "accepted",
+        "decision_available_at": T1,
+    }
+    conflicting = {**base, "cash_dividend_per_share": 0.2}
+
+    with pytest.raises(ValueError, match="immutable canonical projection revision"):
+        store.append_canonical_actions([base, conflicting])
+
+    with sqlite3.connect(store.db_path) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM canonical_corporate_action_revisions"
+        ).fetchone()[0] == 0
+        assert connection.execute(
+            "SELECT COUNT(*) FROM data_change_log WHERE domain = 'backtest'"
+        ).fetchone()[0] == 0
+
+
 def test_canonical_change_cursor_filters_business_events(store):
     first = {
         "canonical_event_id": "ca-1",

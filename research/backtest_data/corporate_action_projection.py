@@ -5,9 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from collections import Counter
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Callable, Iterator, Mapping, Optional, Sequence
 from zoneinfo import ZoneInfo
 
 from research.backtest_data.quote_store import BacktestQuoteStore, semantic_hash
@@ -54,6 +56,31 @@ class CanonicalCorporateActionProjector:
         self.db_path = Path(db_path)
         self.store = BacktestQuoteStore(self.db_path)
 
+    @contextmanager
+    def _read_connection(self) -> Iterator[sqlite3.Connection]:
+        """Open an existing database without allowing SQLite to create it."""
+        uri = f"{self.db_path.expanduser().resolve().as_uri()}?mode=ro"
+        connection = sqlite3.connect(uri, uri=True)
+        connection.row_factory = sqlite3.Row
+        try:
+            yield connection
+        finally:
+            connection.close()
+
+    def read_latest_watermark(self) -> Optional[int]:
+        """Read the quote-domain watermark without initializing or migrating storage."""
+        try:
+            with self._read_connection() as connection:
+                if not self._table_exists(connection, "data_change_log"):
+                    return 0
+                row = connection.execute(
+                    "SELECT MAX(sequence_id) AS sequence FROM data_change_log "
+                    "WHERE domain = 'backtest'"
+                ).fetchone()
+                return int(row["sequence"] or 0)
+        except sqlite3.OperationalError:
+            return None
+
     def _table_exists(self, connection: sqlite3.Connection, table: str) -> bool:
         return connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
@@ -78,15 +105,99 @@ class CanonicalCorporateActionProjector:
         ).fetchone()
         return dict(row) if row else None
 
+    def select_source_universe(
+        self,
+        *,
+        instrument_ids: Optional[Sequence[str]] = None,
+        source_event_keys: Optional[Sequence[str]] = None,
+        should_stop: Optional[Callable[[], bool]] = None,
+    ) -> dict[str, Any]:
+        """Return ordered observation identities plus their governed evidence hash."""
+        clauses = ["1=1"]
+        params: list[Any] = []
+        normalized_instruments = sorted(
+            {str(item).strip() for item in instrument_ids or () if str(item).strip()}
+        )
+        normalized_events = sorted(
+            {str(item).strip() for item in source_event_keys or () if str(item).strip()}
+        )
+        if normalized_instruments:
+            placeholders = ",".join("?" for _ in normalized_instruments)
+            clauses.append(f"instrument_id IN ({placeholders})")
+            params.extend(normalized_instruments)
+        if normalized_events:
+            placeholders = ",".join("?" for _ in normalized_events)
+            clauses.append(f"source_event_key IN ({placeholders})")
+            params.extend(normalized_events)
+        try:
+            connection_context = self._read_connection()
+            connection = connection_context.__enter__()
+        except sqlite3.OperationalError:
+            return {
+                "available": False,
+                "stopped": False,
+                "items": [],
+                "source_universe_hash": semantic_hash({"items": []}),
+            }
+        try:
+            if not self._table_exists(connection, "corporate_action_observations"):
+                return {
+                    "available": False,
+                    "stopped": False,
+                    "items": [],
+                    "source_universe_hash": semantic_hash({"items": []}),
+                }
+            observation_columns = {
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(corporate_action_observations)"
+                ).fetchall()
+            }
+            if "is_current" in observation_columns:
+                clauses.append("is_current = 1")
+            row_hash_expression = "row_hash" if "row_hash" in observation_columns else "NULL"
+            rows = connection.execute(
+                "SELECT *, "
+                f"{row_hash_expression} AS selected_row_hash "
+                "FROM corporate_action_observations WHERE "
+                + " AND ".join(clauses)
+                + " ORDER BY instrument_id, source_event_key, id",
+                params,
+            ).fetchall()
+            items = []
+            for row in rows:
+                if should_stop is not None and should_stop():
+                    return {
+                        "available": True,
+                        "stopped": True,
+                        "items": [],
+                        "source_universe_hash": semantic_hash({"items": []}),
+                    }
+                observation = dict(row)
+                projection = self._build_projection(connection, observation)
+                items.append(self._source_item(observation, projection))
+        finally:
+            connection_context.__exit__(None, None, None)
+        return {
+            "available": True,
+            "stopped": False,
+            "items": items,
+            "source_universe_hash": semantic_hash({"items": items}),
+        }
+
     def project(
         self,
         *,
         instrument_ids: Optional[Sequence[str]] = None,
         source_event_keys: Optional[Sequence[str]] = None,
+        observation_ids: Optional[Sequence[int]] = None,
+        expected_source_items: Optional[Sequence[Mapping[str, Any]]] = None,
+        batch_commit: Optional[Mapping[str, Any]] = None,
         dry_run: bool = False,
     ) -> dict[str, Any]:
         """Rebuild changed events from local evidence under an explicit scope."""
-        self.store.initialize()
+        if not dry_run:
+            self.store.initialize()
         clauses = ["1=1"]
         params: list[Any] = []
         if instrument_ids:
@@ -97,9 +208,53 @@ class CanonicalCorporateActionProjector:
             placeholders = ",".join("?" for _ in source_event_keys)
             clauses.append(f"source_event_key IN ({placeholders})")
             params.extend(str(item) for item in source_event_keys)
-        with self.store.connection() as connection:
+        if observation_ids is not None:
+            normalized_observation_ids = sorted({int(item) for item in observation_ids})
+            if not normalized_observation_ids:
+                return self._report(
+                    considered=0,
+                    inserted=0,
+                    unchanged=0,
+                    ready=0,
+                    blocked=0,
+                    blocker_reasons={},
+                    blockers=[],
+                    dry_run=dry_run,
+                    would_change=0,
+                )
+            placeholders = ",".join("?" for _ in normalized_observation_ids)
+            clauses.append(f"id IN ({placeholders})")
+            params.extend(normalized_observation_ids)
+        try:
+            connection_context = (
+                self._read_connection() if dry_run else self.store.connection()
+            )
+            connection = connection_context.__enter__()
+        except sqlite3.OperationalError:
+            return self._report(
+                considered=0,
+                inserted=0,
+                unchanged=0,
+                ready=0,
+                blocked=0,
+                blocker_reasons={},
+                blockers=["corporate_action_observations_missing"],
+                dry_run=dry_run,
+                would_change=0,
+            )
+        try:
             if not self._table_exists(connection, "corporate_action_observations"):
-                return self._report(0, 0, 0, 0, ["corporate_action_observations_missing"], dry_run)
+                return self._report(
+                    considered=0,
+                    inserted=0,
+                    unchanged=0,
+                    ready=0,
+                    blocked=0,
+                    blocker_reasons={},
+                    blockers=["corporate_action_observations_missing"],
+                    dry_run=dry_run,
+                    would_change=0,
+                )
             observation_columns = {
                 row[1]
                 for row in connection.execute(
@@ -114,27 +269,123 @@ class CanonicalCorporateActionProjector:
                 params,
             ).fetchall()
             projected = [self._build_projection(connection, dict(row)) for row in observations]
-        inserted = unchanged = blocked = 0
-        for row in projected:
-            if not row["backtest_ready"]:
-                blocked += 1
-            if dry_run:
-                continue
-            result = self.store.append_canonical_action(row)
-            if result["status"] == "inserted":
-                inserted += 1
-            else:
-                unchanged += 1
-        return self._report(len(projected), inserted, unchanged, blocked, [], dry_run)
+            if expected_source_items is not None:
+                actual_source_items = [
+                    self._source_item(dict(observation), projection)
+                    for observation, projection in zip(observations, projected)
+                ]
+                expected_items = [dict(item) for item in expected_source_items]
+                if actual_source_items != expected_items:
+                    raise ValueError(
+                        "source universe changed during batch projection; restart with a new checkpoint"
+                    )
+            existing_revisions: dict[tuple[str, str], str] = {}
+            current_hashes: dict[str, str] = {}
+            if dry_run and self._table_exists(
+                connection, "canonical_corporate_action_revisions"
+            ):
+                event_ids = sorted(
+                    {str(row["canonical_event_id"]) for row in projected}
+                )
+                for offset in range(0, len(event_ids), 800):
+                    event_chunk = event_ids[offset : offset + 800]
+                    placeholders = ",".join("?" for _ in event_chunk)
+                    existing_revisions.update(
+                        {
+                            (
+                                str(row["canonical_event_id"]),
+                                str(row["projection_revision_id"]),
+                            ): str(row["input_hash"])
+                            for row in connection.execute(
+                                "SELECT canonical_event_id, projection_revision_id, input_hash "
+                                "FROM canonical_corporate_action_revisions "
+                                f"WHERE canonical_event_id IN ({placeholders})",
+                                event_chunk,
+                            ).fetchall()
+                        }
+                    )
+                    if self._table_exists(
+                        connection, "canonical_corporate_action_current"
+                    ):
+                        current_hashes.update(
+                            {
+                                str(row["canonical_event_id"]): str(row["input_hash"])
+                                for row in connection.execute(
+                                    "SELECT c.canonical_event_id, r.input_hash "
+                                    "FROM canonical_corporate_action_current c "
+                                    "JOIN canonical_corporate_action_revisions r "
+                                    "ON r.canonical_event_id = c.canonical_event_id "
+                                    "AND r.projection_revision_id = c.projection_revision_id "
+                                    f"WHERE c.canonical_event_id IN ({placeholders})",
+                                    event_chunk,
+                                ).fetchall()
+                            }
+                        )
+        finally:
+            connection_context.__exit__(None, None, None)
+        inserted = unchanged = 0
+        blocked_rows = [row for row in projected if not row["backtest_ready"]]
+        blocker_counts = Counter(
+            reason
+            for row in blocked_rows
+            for reason in row.get("blocking_reasons", [])
+        )
+        would_change = 0
+        if dry_run:
+            for row in projected:
+                key = (row["canonical_event_id"], row["projection_revision_id"])
+                existing_hash = existing_revisions.get(key)
+                if existing_hash is not None and existing_hash != row["input_hash"]:
+                    raise ValueError(
+                        "immutable canonical projection revision has different content"
+                    )
+                if existing_hash == row["input_hash"] or current_hashes.get(
+                    row["canonical_event_id"]
+                ) == row["input_hash"]:
+                    unchanged += 1
+                else:
+                    would_change += 1
+        elif projected:
+            batch_result = self.store.append_canonical_actions(
+                projected, batch_commit=batch_commit
+            )
+            inserted = int(batch_result["inserted"])
+            unchanged = int(batch_result["unchanged"])
+        return self._report(
+            considered=len(projected),
+            inserted=inserted,
+            unchanged=unchanged,
+            ready=len(projected) - len(blocked_rows),
+            blocked=len(blocked_rows),
+            blocker_reasons=dict(sorted(blocker_counts.items())),
+            blockers=[],
+            dry_run=dry_run,
+            would_change=would_change,
+        )
+
+    @staticmethod
+    def _source_item(
+        observation: Mapping[str, Any], projection: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        return {
+            "observation_id": int(observation["id"]),
+            "instrument_id": str(observation["instrument_id"]),
+            "source_event_key": str(observation["source_event_key"]),
+            "row_hash": observation.get("selected_row_hash", observation.get("row_hash")),
+            "projection_input_hash": projection["input_hash"],
+        }
 
     def _report(
         self,
         considered: int,
         inserted: int,
         unchanged: int,
+        ready: int,
         blocked: int,
+        blocker_reasons: Mapping[str, int],
         blockers: list[str],
         dry_run: bool,
+        would_change: int,
     ) -> dict[str, Any]:
         status = (
             "dry_run"
@@ -153,10 +404,12 @@ class CanonicalCorporateActionProjector:
             "network_requests": 0,
             "dry_run": dry_run,
             "considered": considered,
+            "ready": ready,
             "inserted": inserted,
             "unchanged": unchanged,
-            "would_change": considered if dry_run else 0,
+            "would_change": would_change if dry_run else 0,
             "blocked": blocked,
+            "blocker_reasons": dict(blocker_reasons),
             "blockers": blockers,
             "database_id": "quotes",
             "watermark": self.store.readiness().get("latest_watermark") if not dry_run else None,

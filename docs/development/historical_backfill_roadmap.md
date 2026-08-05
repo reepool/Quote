@@ -15,7 +15,7 @@
 | 证券状态事件 | 0 | BaoStock/交易所/公告证据已验证，尚未投影 |
 | 证券状态区间 | 0 | 需要从有序事件构建，尚未生成 |
 | 每日涨跌停修订 | 0 | 存储和基础规则引擎存在，历史规则尚未完成 |
-| canonical 公司行为 | 0 | 本地已有 56,802 条公司行为观察，可直接投影 |
+| canonical 公司行为 | 56,802 | 已完成历史投影；54,584 ready，2,218 blocked |
 | 财务源文件 | 61,853 | 只有 317 行具备本地附件路径，历史版本仍不完整 |
 | 申万行业分类历史 | 12,884 | 已有历史有效期数据，需补知识时点血缘后再宣称严格 PIT |
 | 申万行业成员关系 | 5,540 | 已有历史成员关系，可复用现有接口 |
@@ -25,13 +25,26 @@
 
 ### 1. 公司行为 canonical 历史投影
 
-- 计划 change：`backfill-canonical-corporate-actions-history`
+- change：`backfill-canonical-corporate-actions-history`
+- 状态：已完成生产回补与幂等验收。
 - 来源：本地 CNInfo/TDX 公司行为观察、解析条款、生效日期证据和覆盖状态。
 - 网络请求：无。
 - 现有能力：`CanonicalCorporateActionProjector`、append-only canonical 表、PIT 查询和单测均已存在。
 - 工作内容：dry-run/临时库执行、阻塞原因审计、幂等重跑、生产分批投影和 API 验收。
 - 验收：可回测事件和阻塞事件数量可解释；证据表不改变；第二次执行不产生新 revision 或 watermark；`known_at` 不能读取未来投影。
 - 预计结果：合格事件进入 canonical；缺少生效日期、条款或覆盖证据的事件保留 blocked，不伪造日期。
+
+生产执行记录（2026-08-05）：
+
+- 冻结观测 universe：56,802，hash `2aad488fb2127a29bfa5d6b7973572e9b3a44bd8a421ec52a9683f45ea9c4def`。
+- 执行 checkpoint：`canonical_ca_99a986a589c3eaec4f94`，114/114 批完成，每批 500 条，网络请求 0。
+- canonical revisions/current：56,802/56,802；ready 54,584；blocked 2,218；重复 revision 0。
+- 阻塞原因：`event_not_accepted=2,218`、`effective_date_missing=1,442`、`effective_date_conflict=53`；同一事件可同时命中多个原因。
+- 原始证据行数保持不变：observations 56,802、resolved terms 265、effective-date evidence 7,808、resolution states 381、instrument coverage 107,837。
+- 写前恢复点：`data/backups/quotes_pre_canonical_ca_history_20260805_1315.db`；SHA-256 `7acd993166766643417434c1f94fbf778744f130bf4bdfde777f93bb52560575`；`quick_check=ok`。
+- NFS 首次备份因挂载无响应被中断，数据库与 journal 已一起保留在 `data/PVE-Bak/QuoteBak/quotes_pre_canonical_ca_history_20260805_1300.incomplete/`，明确不作为恢复点。
+- 生产 API 验收：ready-only 54,584；blocked 样本严格查询为 0；分页无重叠；早于 decision time 的 `known_at` 不返回未来 revision；change cursor 可继续读取。
+- 幂等重跑：inserted 0、unchanged 56,802、watermark 保持 364,574 不变。
 
 ### 2. 核心指数历史成分
 

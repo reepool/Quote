@@ -281,6 +281,25 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_canonical_corporate_action_history_backfill": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股公司行为 canonical 历史投影（仅复用本地证据，手工触发，默认 dry-run）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "dry_run": true,
+          "batch_size": 500,
+          "resume": true,
+          "checkpoint_id": null,
+          "instrument_ids": [],
+          "source_event_keys": [],
+          "max_runtime_seconds": 86400
+        }
+      },
       "a_share_cninfo_adjustment_factor_rebuild": {
         "enabled": true,
         "manual_only": true,

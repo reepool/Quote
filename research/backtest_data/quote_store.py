@@ -203,6 +203,16 @@ CREATE TABLE IF NOT EXISTS canonical_corporate_action_current (
     payload_json TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS canonical_corporate_action_backfill_commits (
+    checkpoint_id TEXT NOT NULL,
+    batch_id TEXT NOT NULL,
+    source_universe_hash TEXT NOT NULL,
+    batch_identity_hash TEXT NOT NULL,
+    report_json TEXT NOT NULL,
+    committed_at TEXT NOT NULL,
+    PRIMARY KEY(checkpoint_id, batch_id)
+);
 """
 
 
@@ -872,7 +882,7 @@ class BacktestQuoteStore:
             return {"status": "unavailable", "reason": "price_limit_quality_blocked", "evidence": result}
         return {"status": "success", "instrument_id": instrument_id, "trade_date": trade, "known_at": cutoff, "evidence": result}
 
-    def append_canonical_action(self, row: Mapping[str, Any]) -> dict[str, Any]:
+    def _canonical_action_payload(self, row: Mapping[str, Any]) -> dict[str, Any]:
         event_id = str(row.get("canonical_event_id") or "").strip()
         revision_id = str(row.get("projection_revision_id") or "").strip()
         if not event_id or not revision_id:
@@ -897,44 +907,122 @@ class BacktestQuoteStore:
         payload["source_lineage"] = row.get("source_lineage") or {}
         payload["input_hash"] = str(row.get("input_hash") or semantic_hash({key: value for key, value in payload.items() if key not in {"projection_revision_id", "created_at"}}))
         payload["projection_version"] = str(row.get("projection_version") or "canonical-corporate-action.v1")
-        with self.connection() as connection:
-            existing = connection.execute("SELECT input_hash FROM canonical_corporate_action_revisions WHERE canonical_event_id = ? AND projection_revision_id = ?", (event_id, revision_id)).fetchone()
-            if existing:
-                if existing["input_hash"] != payload["input_hash"]:
-                    raise ValueError("immutable canonical projection revision has different content")
-                return {"status": "unchanged", "canonical_event_id": event_id, "projection_revision_id": revision_id}
-            current = connection.execute(
-                "SELECT r.input_hash FROM canonical_corporate_action_current c "
-                "JOIN canonical_corporate_action_revisions r "
-                "ON r.canonical_event_id = c.canonical_event_id "
-                "AND r.projection_revision_id = c.projection_revision_id "
-                "WHERE c.canonical_event_id = ?",
-                (event_id,),
-            ).fetchone()
-            if current and current["input_hash"] == payload["input_hash"]:
-                return {"status": "unchanged", "canonical_event_id": event_id, "projection_revision_id": revision_id}
-            connection.execute(
-                "INSERT INTO canonical_corporate_action_revisions (canonical_event_id, projection_revision_id, instrument_id, source_event_key, action_type, announcement_date, record_date, effective_date, payment_date, share_arrival_date, cash_dividend_per_share, bonus_shares_per_share, capitalization_shares_per_share, rights_shares_per_share, rights_price, currency, factor_effect, backtest_ready, lifecycle_applicability, coverage_state, quality_state, blocking_reasons_json, source_lineage_json, input_hash, projection_version, decision_available_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    event_id, revision_id, payload["instrument_id"], payload.get("source_event_key"), payload["action_type"], payload["announcement_date"], payload["record_date"], payload["effective_date"], payload["payment_date"], payload["share_arrival_date"],
-                    payload.get("cash_dividend_per_share"), payload.get("bonus_shares_per_share"), payload.get("capitalization_shares_per_share"), payload.get("rights_shares_per_share"), payload.get("rights_price"), payload.get("currency"), int(payload["factor_effect"]), int(payload["backtest_ready"]), payload["lifecycle_applicability"], payload["coverage_state"], payload["quality_state"], _json(payload["blocking_reasons"]), _json(payload["source_lineage"]), payload["input_hash"], payload["projection_version"], payload["decision_available_at"], get_shanghai_time().isoformat(),
-                ),
-            )
-            connection.execute(
-                "INSERT OR REPLACE INTO canonical_corporate_action_current (canonical_event_id, projection_revision_id, payload_json, updated_at) VALUES (?, ?, ?, ?)",
-                (event_id, revision_id, _json(payload), get_shanghai_time().isoformat()),
-            )
-            self._append_change(
-                connection,
-                dataset="canonical_corporate_actions",
-                change_type="insert",
-                business_key={"canonical_event_id": event_id, "projection_revision_id": revision_id},
-                new_hash=payload["input_hash"],
-                instrument_id=payload["instrument_id"],
-                observation_date=payload["effective_date"],
-            )
-            connection.commit()
+        return payload
+
+    def _append_canonical_action_in_connection(
+        self,
+        connection: sqlite3.Connection,
+        payload: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        event_id = str(payload["canonical_event_id"])
+        revision_id = str(payload["projection_revision_id"])
+        existing = connection.execute("SELECT input_hash FROM canonical_corporate_action_revisions WHERE canonical_event_id = ? AND projection_revision_id = ?", (event_id, revision_id)).fetchone()
+        if existing:
+            if existing["input_hash"] != payload["input_hash"]:
+                raise ValueError("immutable canonical projection revision has different content")
+            return {"status": "unchanged", "canonical_event_id": event_id, "projection_revision_id": revision_id}
+        current = connection.execute(
+            "SELECT r.input_hash FROM canonical_corporate_action_current c "
+            "JOIN canonical_corporate_action_revisions r "
+            "ON r.canonical_event_id = c.canonical_event_id "
+            "AND r.projection_revision_id = c.projection_revision_id "
+            "WHERE c.canonical_event_id = ?",
+            (event_id,),
+        ).fetchone()
+        if current and current["input_hash"] == payload["input_hash"]:
+            return {"status": "unchanged", "canonical_event_id": event_id, "projection_revision_id": revision_id}
+        connection.execute(
+            "INSERT INTO canonical_corporate_action_revisions (canonical_event_id, projection_revision_id, instrument_id, source_event_key, action_type, announcement_date, record_date, effective_date, payment_date, share_arrival_date, cash_dividend_per_share, bonus_shares_per_share, capitalization_shares_per_share, rights_shares_per_share, rights_price, currency, factor_effect, backtest_ready, lifecycle_applicability, coverage_state, quality_state, blocking_reasons_json, source_lineage_json, input_hash, projection_version, decision_available_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                event_id, revision_id, payload["instrument_id"], payload.get("source_event_key"), payload["action_type"], payload["announcement_date"], payload["record_date"], payload["effective_date"], payload["payment_date"], payload["share_arrival_date"],
+                payload.get("cash_dividend_per_share"), payload.get("bonus_shares_per_share"), payload.get("capitalization_shares_per_share"), payload.get("rights_shares_per_share"), payload.get("rights_price"), payload.get("currency"), int(payload["factor_effect"]), int(payload["backtest_ready"]), payload["lifecycle_applicability"], payload["coverage_state"], payload["quality_state"], _json(payload["blocking_reasons"]), _json(payload["source_lineage"]), payload["input_hash"], payload["projection_version"], payload["decision_available_at"], get_shanghai_time().isoformat(),
+            ),
+        )
+        connection.execute(
+            "INSERT OR REPLACE INTO canonical_corporate_action_current (canonical_event_id, projection_revision_id, payload_json, updated_at) VALUES (?, ?, ?, ?)",
+            (event_id, revision_id, _json(payload), get_shanghai_time().isoformat()),
+        )
+        self._append_change(
+            connection,
+            dataset="canonical_corporate_actions",
+            change_type="insert",
+            business_key={"canonical_event_id": event_id, "projection_revision_id": revision_id},
+            new_hash=str(payload["input_hash"]),
+            instrument_id=str(payload["instrument_id"]),
+            observation_date=payload["effective_date"],
+        )
         return {"status": "inserted", "canonical_event_id": event_id, "projection_revision_id": revision_id}
+
+    def append_canonical_action(self, row: Mapping[str, Any]) -> dict[str, Any]:
+        payload = self._canonical_action_payload(row)
+        with self.connection() as connection:
+            result = self._append_canonical_action_in_connection(connection, payload)
+            connection.commit()
+        return result
+
+    def append_canonical_actions(
+        self,
+        rows: Iterable[Mapping[str, Any]],
+        *,
+        batch_commit: Optional[Mapping[str, Any]] = None,
+    ) -> dict[str, Any]:
+        """Append a bounded canonical batch and optional recovery marker atomically."""
+        payloads = [self._canonical_action_payload(row) for row in rows]
+        results: list[dict[str, Any]] = []
+        with self.connection() as connection:
+            if batch_commit:
+                checkpoint_id = str(batch_commit["checkpoint_id"])
+                batch_id = str(batch_commit["batch_id"])
+                source_universe_hash = str(batch_commit["source_universe_hash"])
+                batch_identity_hash = str(batch_commit["batch_identity_hash"])
+                existing_commit = connection.execute(
+                    "SELECT source_universe_hash, batch_identity_hash, report_json "
+                    "FROM canonical_corporate_action_backfill_commits "
+                    "WHERE checkpoint_id = ? AND batch_id = ?",
+                    (checkpoint_id, batch_id),
+                ).fetchone()
+                if existing_commit:
+                    if (
+                        str(existing_commit["source_universe_hash"])
+                        != source_universe_hash
+                        or str(existing_commit["batch_identity_hash"])
+                        != batch_identity_hash
+                    ):
+                        raise ValueError(
+                            "canonical backfill batch commit identity does not match"
+                        )
+                    recovered = json.loads(str(existing_commit["report_json"]))
+                    recovered["recovered_commit"] = True
+                    return recovered
+            for payload in payloads:
+                results.append(
+                    self._append_canonical_action_in_connection(connection, payload)
+                )
+            report = {
+                "status": "success",
+                "considered": len(results),
+                "inserted": sum(item["status"] == "inserted" for item in results),
+                "unchanged": sum(item["status"] == "unchanged" for item in results),
+                "items": results,
+                "recovered_commit": False,
+            }
+            if batch_commit:
+                connection.execute(
+                    "INSERT INTO canonical_corporate_action_backfill_commits "
+                    "(checkpoint_id, batch_id, source_universe_hash, "
+                    "batch_identity_hash, report_json, committed_at) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        checkpoint_id,
+                        batch_id,
+                        source_universe_hash,
+                        batch_identity_hash,
+                        _json(report),
+                        get_shanghai_time().isoformat(),
+                    ),
+                )
+            connection.commit()
+        return report
 
     def list_canonical_actions(self, *, instrument_id: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, action_type: Optional[str] = None, ready_only: bool = False, known_at: Optional[str] = None, change_cursor: Optional[str] = None, limit: int = 100, offset: int = 0) -> dict[str, Any]:
         if limit < 1 or limit > 5000:

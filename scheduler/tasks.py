@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import json
 import os
+import threading
 import time as time_module
 from datetime import datetime, date, timedelta, time
 from typing import List, Dict, Any, Optional, Union
@@ -44,6 +45,9 @@ from utils.a_share_historical_backfill import (
 )
 from research.backtest_data.corporate_action_projection import (
     CanonicalCorporateActionProjector,
+)
+from research.backtest_data.corporate_action_history_backfill import (
+    CanonicalCorporateActionHistoryBackfill,
 )
 from research.backtest_data.financial_store import FinancialVintageStore
 from research.backtest_data.maintenance import BacktestDataMaintenance
@@ -590,6 +594,33 @@ def _format_a_share_cninfo_corporate_action_report(
     if error_lines:
         lines.extend(["", "异常样本:", "```text", *error_lines, "```"])
     return "\n".join(lines)
+
+
+def _format_canonical_corporate_action_history_report(
+    result: Dict[str, Any],
+) -> str:
+    """Keep the Telegram summary bounded while the full result stays authoritative."""
+    blocker_reasons = result.get("blocker_reasons") or {}
+    blocker_summary = ", ".join(
+        f"{name}={count}"
+        for name, count in sorted(
+            blocker_reasons.items(), key=lambda item: (-int(item[1]), str(item[0]))
+        )[:8]
+    ) or "none"
+    return "\n".join(
+        [
+            "*Canonical corporate-action history projection*",
+            f"status: `{result.get('status')}`; dry_run: `{result.get('dry_run')}`",
+            f"selected/considered: `{result.get('selected', 0)}/{result.get('considered', 0)}`",
+            f"ready/blocked: `{result.get('ready', 0)}/{result.get('blocked', 0)}`",
+            f"inserted/unchanged/would_change: `{result.get('inserted', 0)}/{result.get('unchanged', 0)}/{result.get('would_change', 0)}`",
+            f"batches: `{result.get('completed_batches', 0)}/{result.get('total_batches', 0)}`; failed: `{len(result.get('failed_batches') or [])}`",
+            f"blocker reasons: `{blocker_summary}`",
+            f"checkpoint: `{result.get('checkpoint_id')}`",
+            f"database/watermark: `{result.get('database_id')}` / `{result.get('watermark')}`",
+            "provider/network requests: `0`",
+        ]
+    )
 
 
 def _format_cninfo_special_action_discovery_report(
@@ -5506,6 +5537,94 @@ class ScheduledTasks:
                         "name": "A 股巨潮官方公司行动回补",
                         "status": "failed",
                         "content": _format_a_share_cninfo_corporate_action_report(
+                            failure
+                        ),
+                        "result": failure,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_canonical_corporate_action_history_backfill(
+        self,
+        dry_run: bool = True,
+        batch_size: int = 500,
+        resume: bool = True,
+        checkpoint_id: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        source_event_keys: Optional[List[str]] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Project existing historical evidence without provider acquisition."""
+        task_id = "a_share_canonical_corporate_action_history_backfill"
+        self._active_tasks.add(task_id)
+        try:
+            executor = CanonicalCorporateActionHistoryBackfill(
+                _quote_database_path(), logger=scheduler_logger
+            )
+            stop_requested = threading.Event()
+            worker = asyncio.create_task(
+                asyncio.to_thread(
+                    executor.run,
+                    dry_run=bool(dry_run),
+                    batch_size=int(batch_size),
+                    resume=bool(resume),
+                    checkpoint_id=checkpoint_id,
+                    instrument_ids=instrument_ids,
+                    source_event_keys=source_event_keys,
+                    should_stop=stop_requested.is_set,
+                )
+            )
+            try:
+                result = await asyncio.shield(worker)
+            except asyncio.CancelledError:
+                stop_requested.set()
+                try:
+                    await worker
+                except Exception:
+                    scheduler_logger.exception(
+                        "[Scheduler] Canonical history worker failed while stopping"
+                    )
+                raise
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "Canonical corporate-action history projection",
+                        "status": result.get("status"),
+                        "content": _format_canonical_corporate_action_history_report(
+                            result
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Canonical corporate-action history backfill failed: %s",
+                exc,
+            )
+            failure = {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "provider_usage": [],
+                "network_requests": 0,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "Canonical corporate-action history projection",
+                        "status": "failed",
+                        "content": _format_canonical_corporate_action_history_report(
                             failure
                         ),
                         "result": failure,

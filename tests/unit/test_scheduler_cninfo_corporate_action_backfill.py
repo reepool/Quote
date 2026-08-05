@@ -1,16 +1,144 @@
+import asyncio
 import json
+import threading
+import time
 from pathlib import Path
 from unittest.mock import AsyncMock
 
 import pytest
+import scheduler.tasks as scheduler_tasks
 
 from scheduler.tasks import (
     ScheduledTasks,
     _format_a_share_cninfo_corporate_action_report,
+    _format_canonical_corporate_action_history_report,
     _format_cninfo_problem_detail_messages,
     _format_cninfo_special_action_discovery_report,
     data_manager,
 )
+
+
+def test_canonical_history_projection_job_is_manual_dry_run_first_and_local_only():
+    config = json.loads(Path("config/05_scheduler.json").read_text(encoding="utf-8"))
+    job = config["scheduler_config"]["jobs"][
+        "a_share_canonical_corporate_action_history_backfill"
+    ]
+
+    assert job["enabled"] is True
+    assert job["manual_only"] is True
+    assert "trigger" not in job
+    assert job["parameters"]["dry_run"] is True
+    assert job["parameters"]["resume"] is True
+    assert job["parameters"]["batch_size"] == 500
+    assert "source" not in job["parameters"]
+    assert "request_interval_seconds" not in job["parameters"]
+    assert job["max_instances"] == 1
+
+
+def test_canonical_history_projection_report_is_bounded_and_exposes_blockers():
+    report = _format_canonical_corporate_action_history_report(
+        {
+            "status": "dry_run",
+            "dry_run": True,
+            "selected": 56802,
+            "considered": 56802,
+            "ready": 100,
+            "blocked": 56702,
+            "would_change": 56802,
+            "blocker_reasons": {f"reason_{index}": index for index in range(30)},
+            "total_batches": 114,
+            "completed_batches": 114,
+            "failed_batches": [],
+            "checkpoint_id": "unit",
+            "database_id": "quotes",
+            "watermark": None,
+        }
+    )
+
+    assert "ready/blocked: `100/56702`" in report
+    assert "provider/network requests: `0`" in report
+    assert "reason_29=29" in report
+    assert "reason_0=0" not in report
+    assert len(report) < 1500
+
+
+@pytest.mark.asyncio
+async def test_scheduler_canonical_history_projection_uses_bounded_executor(monkeypatch):
+    calls = []
+
+    class FakeBackfill:
+        def __init__(self, db_path, *, logger):
+            calls.append(("init", str(db_path), logger))
+
+        def run(self, **kwargs):
+            calls.append(("run", kwargs))
+            return {
+                "status": "dry_run",
+                "dry_run": True,
+                "network_requests": 0,
+            }
+
+    monkeypatch.setattr(
+        scheduler_tasks, "CanonicalCorporateActionHistoryBackfill", FakeBackfill
+    )
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+
+    result = await task.a_share_canonical_corporate_action_history_backfill(
+        dry_run=True,
+        batch_size=10,
+        resume=True,
+        checkpoint_id="unit",
+        instrument_ids=["000001.SZ"],
+        source_event_keys=["evt-1"],
+    )
+
+    assert result["status"] == "dry_run"
+    run_parameters = calls[1][1]
+    assert callable(run_parameters.pop("should_stop"))
+    assert run_parameters == {
+        "dry_run": True,
+        "batch_size": 10,
+        "resume": True,
+        "checkpoint_id": "unit",
+        "instrument_ids": ["000001.SZ"],
+        "source_event_keys": ["evt-1"],
+    }
+    assert "a_share_canonical_corporate_action_history_backfill" not in task._active_tasks
+
+
+@pytest.mark.asyncio
+async def test_scheduler_cancellation_stops_history_worker_before_return(monkeypatch):
+    started = threading.Event()
+    stopped = threading.Event()
+
+    class FakeBackfill:
+        def __init__(self, _db_path, *, logger):
+            assert logger is not None
+
+        def run(self, *, should_stop, **_kwargs):
+            started.set()
+            while not should_stop():
+                time.sleep(0.005)
+            stopped.set()
+            return {"status": "stopped"}
+
+    monkeypatch.setattr(
+        scheduler_tasks, "CanonicalCorporateActionHistoryBackfill", FakeBackfill
+    )
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    running = asyncio.create_task(
+        task.a_share_canonical_corporate_action_history_backfill()
+    )
+    await asyncio.to_thread(started.wait, 1)
+
+    running.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await running
+
+    assert stopped.is_set()
+    assert "a_share_canonical_corporate_action_history_backfill" not in task._active_tasks
 
 
 def test_cninfo_backfill_scheduler_config_is_manual_and_conservative():

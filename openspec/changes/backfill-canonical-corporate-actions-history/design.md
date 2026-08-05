@@ -53,6 +53,13 @@ the request parameters, universe hash, completed batch identities and last
 report. A changed source universe produces a new checkpoint identity instead of
 silently reusing old progress.
 
+Each batch SHALL revalidate its observation identities and governed projection
+hashes immediately before append. Resumable writes also store a batch commit
+record in the same SQLite transaction as the canonical rows. If the process
+stops after the database commit but before the JSON checkpoint is replaced, the
+next run recovers the original inserted/unchanged counters from that commit
+record and then advances the file checkpoint.
+
 ### 3. Make dry-run and temporary-database validation mandatory
 
 Dry-run SHALL execute projection and readiness calculation without calling any
