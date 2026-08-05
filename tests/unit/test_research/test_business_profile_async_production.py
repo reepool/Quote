@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from data_manager import DataManager
+from data_manager import DataManager, _derive_business_profile_bootstrap_start
 from research.business_profile_async_production import (
     BusinessProfileAsyncProductionService,
     BusinessProfileWorkRepository,
@@ -247,6 +247,63 @@ def test_correction_supersedes_unstarted_original_work(tmp_path):
         "annual-2025": "superseded",
         "annual-2025-corrected": "pending",
     }
+
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'retry_due' "
+            "WHERE announcement_id = 'annual-2025'"
+        )
+        conn.commit()
+    repeated = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-04-03",
+        processing_identity={"rules": "v1"},
+    )
+    assert repeated["reused"] == 1
+    assert repeated["superseded"] == 1
+
+
+def test_known_correction_prevents_later_original_from_being_enqueued(tmp_path):
+    storage = _storage(tmp_path)
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    instrument = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+    }
+    frontier.upsert_record(
+        instrument=instrument,
+        record=_announcement(
+            "annual-2025-corrected",
+            "某公司2025年年度报告（修订版）",
+            published_at="2026-04-02T08:00:00+08:00",
+        ),
+    )
+    frontier.upsert_record(
+        instrument=instrument,
+        record=_announcement(
+            "annual-2025",
+            "某公司2025年年度报告",
+            published_at="2026-04-03T08:00:00+08:00",
+        ),
+    )
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-04-04",
+        processing_identity={"rules": "v1"},
+    )
+
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        rows = conn.execute(
+            "SELECT announcement_id, status FROM business_profile_work_items"
+        ).fetchall()
+    assert [dict(row) for row in rows] == [
+        {"announcement_id": "annual-2025-corrected", "status": "pending"}
+    ]
 
 
 def test_claim_acknowledge_and_retry_are_durable(tmp_path):
@@ -728,6 +785,21 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(tmp_pa
     assert manager.run_business_profile_index_discovery.await_args.kwargs[
         "write_coordinator"
     ] is get_business_profile_write_coordinator(storage)
+
+
+def test_latest_annual_bootstrap_derives_current_filing_year_only_when_unscoped():
+    assert _derive_business_profile_bootstrap_start(
+        knowledge_cutoff="2026-08-05",
+        selection_policy="latest_annual_only",
+        instrument_ids=(),
+        start_date=None,
+    ) == ("2026-01-01", True)
+    assert _derive_business_profile_bootstrap_start(
+        knowledge_cutoff="2026-08-05",
+        selection_policy="latest_annual_only",
+        instrument_ids=(),
+        start_date="2025-01-01",
+    ) == ("2025-01-01", False)
 
 
 def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):

@@ -126,6 +126,7 @@ class _Provider:
     result_status: str
     records: tuple[AnnouncementRecord, ...] = ()
     last_query: AnnouncementQuery | None = None
+    stop_reason: str = "fixture"
 
     capabilities = AnnouncementProviderCapabilities(
         exchanges=frozenset({"SSE"}),
@@ -147,7 +148,7 @@ class _Provider:
             records=self.records,
             announcements_seen=len(self.records),
             is_complete=self.result_status in {"success", "success_empty"},
-            stop_reason="fixture",
+            stop_reason=self.stop_reason,
         )
 
 
@@ -180,6 +181,32 @@ def test_routing_falls_back_only_for_configured_status_and_keeps_attempts(caplog
     assert "announcement route resolved" in caplog.text
     assert "announcement source attempt completed" in caplog.text
     assert "fallback_used=True" in caplog.text
+
+
+def test_routing_preserves_page_bound_partial_result_without_fallback():
+    primary = _Provider(
+        "primary",
+        "degraded",
+        (_record(),),
+        stop_reason="max_pages_exhausted",
+    )
+    backup = _Provider("backup", "success_empty")
+    service = AnnouncementAcquisitionService(
+        registry=AnnouncementProviderRegistry([primary, backup]),
+        config=AnnouncementAcquisitionConfig(
+            provider_configs={"primary": {}, "backup": {}},
+            default_route=AnnouncementRouteConfig(
+                sources=("primary", "backup"),
+                fallback_on=frozenset({"degraded"}),
+            ),
+        ),
+    )
+
+    result = service.acquire(_query())
+
+    assert result.selected_source == "primary"
+    assert result.fallback_used is False
+    assert [attempt.source for attempt in result.attempts] == ["primary"]
 
 
 def test_routing_uses_independent_provider_cursors_for_fallback_sources():
@@ -419,6 +446,15 @@ def test_cninfo_provider_resolves_identity_caps_page_size_and_normalizes_attachm
     assert record.attachments[0].resolved_url == (
         "https://static.cninfo.com.cn/finalpage/report.PDF"
     )
+
+
+def test_cninfo_provider_maps_source_neutral_periodic_categories():
+    session = _Session(payloads=[{"announcements": []}])
+
+    result = _cninfo_provider(session).discover(_query(category="annual_report"))
+
+    assert result.status == "success_empty"
+    assert session.calls[0]["data"]["category"] == "category_ndbg_szsh"
 
 
 def test_cninfo_provider_distinguishes_identity_failure_and_partial_scan():
@@ -673,6 +709,30 @@ def test_sse_provider_normalizes_without_business_classification():
     assert session.calls[0]["params"]["productId"] == "600028"
 
 
+def test_sse_market_scope_uses_official_annual_category_parameters():
+    session = _ExchangeSession(
+        [_ExchangeResponse({"result": [], "pageHelp": {"pageCount": 0}})]
+    )
+
+    result = _exchange_provider("SSE", session).discover(
+        AnnouncementQuery(
+            purpose_key="business_profile_evidence:index",
+            source="sse",
+            scope=AnnouncementScope(
+                exchange="SSE",
+                start_date="2026-01-01",
+                end_date="2026-04-30",
+                category="annual_report",
+            ),
+        )
+    )
+
+    assert result.status == "success_empty"
+    assert session.calls[0]["params"]["productId"] is None
+    assert session.calls[0]["params"]["reportType2"] == "DQBG"
+    assert session.calls[0]["params"]["reportType"] == "YEARLY"
+
+
 def test_sse_provider_applies_declared_keyword_filter_locally():
     session = _ExchangeSession(
         [
@@ -779,6 +839,30 @@ def test_szse_provider_preserves_official_id_and_json_request():
     assert result.records[0].identity_is_derived is False
     assert session.calls[0]["json"]["stock"] == ["000983"]
     assert session.calls[0]["json"]["keyword"] == "年度报告"
+
+
+def test_szse_market_scope_uses_official_annual_category_parameters():
+    session = _ExchangeSession(
+        [_ExchangeResponse({"announceCount": 0, "data": []})]
+    )
+
+    result = _exchange_provider("SZSE", session).discover(
+        AnnouncementQuery(
+            purpose_key="business_profile_evidence:index",
+            source="szse",
+            scope=AnnouncementScope(
+                exchange="SZSE",
+                start_date="2026-01-01",
+                end_date="2026-04-30",
+                category="annual_report",
+            ),
+        )
+    )
+
+    assert result.status == "success_empty"
+    assert session.calls[0]["json"]["stock"] == []
+    assert session.calls[0]["json"]["channelCode"] == ["fixed_disc"]
+    assert session.calls[0]["json"]["bigCategoryId"] == ["010301"]
 
 
 def test_bse_provider_parses_jsonp_and_continues_full_unbounded_page():

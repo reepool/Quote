@@ -9,6 +9,8 @@ from datetime import date, datetime, timezone
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple
 from zoneinfo import ZoneInfo
 
+from .categories import normalize_announcement_category
+
 
 SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 SUCCESSFUL_SCAN_STATUSES = frozenset({"success", "success_empty"})
@@ -158,7 +160,11 @@ class AnnouncementScope:
         object.__setattr__(self, "start_date", _clean_text(self.start_date))
         object.__setattr__(self, "end_date", _clean_text(self.end_date))
         object.__setattr__(self, "keyword", _clean_text(self.keyword))
-        object.__setattr__(self, "category", _clean_text(self.category))
+        object.__setattr__(
+            self,
+            "category",
+            normalize_announcement_category(self.category),
+        )
         object.__setattr__(self, "page_size", max(1, int(self.page_size)))
         object.__setattr__(self, "max_pages", max(1, int(self.max_pages)))
         object.__setattr__(self, "overlap_days", max(0, int(self.overlap_days)))

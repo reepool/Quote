@@ -229,6 +229,7 @@ def test_historical_discovery_end_date_drives_default_start_date(tmp_path):
     assert report["end_date"] == "2024-04-30"
     assert announcement_service.query.scope.start_date == "2024-04-20"
     assert announcement_service.query.scope.end_date == "2024-04-30"
+    assert announcement_service.query.scope.category == "annual_report"
 
 
 def test_page_bound_discovery_splits_and_persists_date_windows(tmp_path):
@@ -302,6 +303,82 @@ def test_page_bound_discovery_splits_and_persists_date_windows(tmp_path):
         (item["start_date"], item["end_date"])
         for item in state["pending_windows"]
     } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
+
+
+def test_complete_market_scan_runs_bounded_rotating_missing_company_repair(tmp_path):
+    storage = _storage(tmp_path)
+    _quotes(
+        storage,
+        [
+            (
+                "600000.SH",
+                "600000",
+                "浦发银行",
+                "SSE",
+                "stock",
+                "1999-11-10",
+                None,
+                "active",
+                1,
+            )
+        ],
+    )
+
+    class _Config:
+        @staticmethod
+        def route_for(_purpose_key, _exchange):
+            return SimpleNamespace(sources=())
+
+    class _AnnouncementService:
+        config = _Config()
+
+        def __init__(self):
+            self.queries = []
+
+        def acquire(
+            self,
+            query,
+            *,
+            selectors,
+            provider_cursors=None,
+        ):
+            assert selectors
+            self.queries.append(query)
+            scan = AnnouncementScanResult(
+                source="fake",
+                query=query,
+                status="success_empty",
+                pages_scanned=1,
+                is_complete=True,
+                stop_reason="empty_page",
+            )
+            return SimpleNamespace(scan_result=scan, attempts=())
+
+    announcement_service = _AnnouncementService()
+    report = BusinessProfileIndexDiscoveryService(
+        storage=storage,
+        announcement_service=announcement_service,
+    ).discover(
+        exchanges=("SSE",),
+        start_date="2026-01-01",
+        end_date="2026-05-01",
+        resumable_windows=True,
+        max_windows_per_market=1,
+        max_targeted_repairs=1,
+        targeted_repair_lookback_years=3,
+        targeted_repair_max_pages=4,
+    )
+
+    assert report["targeted_repair"]["attempted"] == 1
+    assert report["targeted_repair"]["expected_annual_period"] == "2025-12-31"
+    assert len(announcement_service.queries) == 2
+    market_scope, repair_scope = [item.scope for item in announcement_service.queries]
+    assert market_scope.symbol is None
+    assert market_scope.category == "annual_report"
+    assert repair_scope.symbol == "600000"
+    assert repair_scope.category == "annual_report"
+    assert repair_scope.start_date == "2023-01-01"
+    assert repair_scope.max_pages == 4
 
 
 def test_reconciliation_does_not_require_prior_year_annual_before_may(tmp_path):
@@ -388,6 +465,47 @@ def test_correction_frontier_supersedes_prior_annual_report(tmp_path):
     assert rows[0]["status"] == "superseded"
     assert rows[1]["status"] == "pending"
     assert rows[1]["supersedes_frontier_id"] == rows[0]["frontier_id"]
+
+
+def test_correction_frontier_converges_when_source_returns_newest_first(tmp_path):
+    storage = _storage(tmp_path)
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    instrument = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+    }
+    frontier.upsert_record(
+        instrument=instrument,
+        record=_announcement(
+            "annual-correction",
+            "浦发银行2025年年度报告（修订版）",
+            published_at="2026-04-02T08:00:00+08:00",
+        ),
+    )
+    status = frontier.upsert_record(
+        instrument=instrument,
+        record=_announcement(
+            "annual-original",
+            "浦发银行2025年年度报告",
+            published_at="2026-03-30T08:00:00+08:00",
+        ),
+    )
+
+    assert status == "superseded"
+    with storage.get_connection() as conn:
+        rows = {
+            row["announcement_id"]: dict(row)
+            for row in conn.execute(
+                "SELECT announcement_id, frontier_id, status, "
+                "supersedes_frontier_id FROM business_profile_announcement_frontier"
+            ).fetchall()
+        }
+    assert rows["annual-original"]["status"] == "superseded"
+    assert rows["annual-correction"]["status"] == "pending"
+    assert rows["annual-correction"]["supersedes_frontier_id"] == (
+        rows["annual-original"]["frontier_id"]
+    )
 
 
 def test_frontier_marks_only_manifested_announcements_processed(tmp_path):

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from research.announcements import AnnouncementQuery, AnnouncementScope, ProviderCursor
+from research.announcements.categories import ANNUAL_REPORT_CATEGORY
 from research.business_profile_archive import (
     BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
     BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES,
@@ -79,23 +80,12 @@ class BusinessProfileAnnouncementFrontierRepository:
             }
         )
         now = get_shanghai_time().isoformat()
-        supersedes = (
-            self._superseded_frontier_id(
-                instrument_id=instrument_id,
-                report_period=report_period,
-                document_family=business_profile_document_family(
-                    classification.document_type
-                ),
-                published_at=record.published_at,
-            )
-            if classification.is_correction
-            else None
+        document_family = business_profile_document_family(
+            classification.document_type
         )
         metadata = {
             "schema_version": BUSINESS_PROFILE_FRONTIER_SCHEMA_VERSION,
-            "document_family": business_profile_document_family(
-                classification.document_type
-            ),
+            "document_family": document_family,
             "is_correction": classification.is_correction,
             "profile_event_hints": list(classification.profile_event_hints),
             "selection_reasons": list(record.selection_reasons),
@@ -159,7 +149,7 @@ class BusinessProfileAnnouncementFrontierRepository:
                         else None
                     ),
                     status,
-                    supersedes,
+                    None,
                     _canonical_json(metadata),
                     now,
                     now,
@@ -167,13 +157,15 @@ class BusinessProfileAnnouncementFrontierRepository:
                     now,
                 ),
             )
-            if supersedes:
-                conn.execute(
-                    "UPDATE business_profile_announcement_frontier "
-                    "SET status = 'superseded', updated_at = ? "
-                    "WHERE frontier_id = ? AND status <> 'superseded'",
-                    (now, supersedes),
-                )
+            winner_id = self._converge_frontier_versions(
+                conn,
+                instrument_id=instrument_id,
+                report_period=report_period,
+                document_family=document_family,
+                now=now,
+            )
+            if winner_id != frontier_id:
+                status = "superseded"
             conn.commit()
         return status
 
@@ -288,25 +280,26 @@ class BusinessProfileAnnouncementFrontierRepository:
             )
             conn.commit()
 
-    def _superseded_frontier_id(
-        self,
+    @staticmethod
+    def _converge_frontier_versions(
+        conn: sqlite3.Connection,
         *,
         instrument_id: str,
         report_period: str,
         document_family: str,
-        published_at: str | None,
-    ) -> str | None:
-        with self.storage.get_connection() as conn:
-            self.storage._apply_pragmas(conn)
-            rows = conn.execute(
-                """
-                SELECT frontier_id, published_at, metadata_json
-                FROM business_profile_announcement_frontier
-                WHERE instrument_id = ? AND report_period = ?
-                """,
-                (instrument_id, report_period),
-            ).fetchall()
-        eligible = []
+        now: str,
+    ) -> str:
+        """Select one active full-report version independent of arrival order."""
+
+        rows = conn.execute(
+            """
+            SELECT frontier_id, published_at, status, metadata_json
+            FROM business_profile_announcement_frontier
+            WHERE instrument_id = ? AND report_period = ?
+            """,
+            (instrument_id, report_period),
+        ).fetchall()
+        eligible: list[tuple[Any, Mapping[str, Any]]] = []
         for row in rows:
             try:
                 metadata = json.loads(row["metadata_json"] or "{}")
@@ -314,16 +307,48 @@ class BusinessProfileAnnouncementFrontierRepository:
                 continue
             if metadata.get("document_family") != document_family:
                 continue
-            if published_at and str(row["published_at"] or "") >= published_at:
-                continue
-            eligible.append(row)
+            eligible.append((row, metadata))
         if not eligible:
-            return None
-        return str(
-            max(eligible, key=lambda item: str(item["published_at"] or ""))[
-                "frontier_id"
-            ]
+            raise RuntimeError("frontier convergence found no inserted document")
+        ordered = sorted(
+            eligible,
+            key=lambda item: (
+                int(bool(item[1].get("is_correction"))),
+                str(item[0]["published_at"] or ""),
+                str(item[0]["frontier_id"]),
+            ),
         )
+        winner = ordered[-1][0]
+        winner_id = str(winner["frontier_id"])
+        predecessor_id = (
+            str(
+                max(
+                    (item[0] for item in ordered[:-1]),
+                    key=lambda item: (
+                        str(item["published_at"] or ""),
+                        str(item["frontier_id"]),
+                    ),
+                )["frontier_id"]
+            )
+            if len(ordered) > 1
+            else None
+        )
+        loser_ids = [str(item[0]["frontier_id"]) for item in ordered[:-1]]
+        if loser_ids:
+            placeholders = ",".join("?" for _ in loser_ids)
+            conn.execute(
+                "UPDATE business_profile_announcement_frontier "
+                "SET status = 'superseded', updated_at = ? "
+                f"WHERE frontier_id IN ({placeholders}) AND status <> 'superseded'",
+                (now, *loser_ids),
+            )
+        conn.execute(
+            "UPDATE business_profile_announcement_frontier "
+            "SET status = CASE WHEN status = 'superseded' THEN 'pending' ELSE status END, "
+            "supersedes_frontier_id = ?, updated_at = ? WHERE frontier_id = ?",
+            (predecessor_id, now, winner_id),
+        )
+        return winner_id
 
 
 class BusinessProfileIndexDiscoveryService:
@@ -348,6 +373,10 @@ class BusinessProfileIndexDiscoveryService:
         resumable_windows: bool = False,
         max_windows_per_market: int = 2,
         use_committed_cursors: bool = True,
+        category: str = ANNUAL_REPORT_CATEGORY,
+        max_targeted_repairs: int = 0,
+        targeted_repair_lookback_years: int = 3,
+        targeted_repair_max_pages: int = 8,
     ) -> dict[str, Any]:
         now = get_shanghai_time()
         cutoff = str(end_date or now.date().isoformat())[:10]
@@ -369,6 +398,10 @@ class BusinessProfileIndexDiscoveryService:
                 max_pages_per_market=max_pages_per_market,
                 max_windows_per_market=max_windows_per_market,
                 dry_run=dry_run,
+                category=category,
+                max_targeted_repairs=max_targeted_repairs,
+                targeted_repair_lookback_years=targeted_repair_lookback_years,
+                targeted_repair_max_pages=targeted_repair_max_pages,
             )
         universe = load_active_a_share_universe(self.storage, knowledge_cutoff=cutoff)
         by_exchange_symbol = {
@@ -381,6 +414,8 @@ class BusinessProfileIndexDiscoveryService:
             "operation": "index_discovery",
             "start_date": start,
             "end_date": cutoff,
+            "category": category,
+            "filter_mode": "upstream_category_and_local_full_report",
             "dry_run": bool(dry_run),
             "pages_scanned": 0,
             "announcements_seen": 0,
@@ -399,6 +434,7 @@ class BusinessProfileIndexDiscoveryService:
                 market=exchange,
                 start_date=start,
                 end_date=cutoff,
+                category=category,
                 page_size=page_size,
                 max_pages=max_pages_per_market,
                 overlap_days=overlap_days,
@@ -498,6 +534,10 @@ class BusinessProfileIndexDiscoveryService:
         max_pages_per_market: int,
         max_windows_per_market: int,
         dry_run: bool,
+        category: str,
+        max_targeted_repairs: int,
+        targeted_repair_lookback_years: int,
+        targeted_repair_max_pages: int,
     ) -> dict[str, Any]:
         """Scan the newest window first and persist split partial windows."""
 
@@ -507,6 +547,8 @@ class BusinessProfileIndexDiscoveryService:
             "operation": "index_discovery_resumable",
             "start_date": start_date,
             "end_date": end_date,
+            "category": category,
+            "filter_mode": "upstream_category_and_local_full_report",
             "dry_run": bool(dry_run),
             "pages_scanned": 0,
             "announcements_seen": 0,
@@ -518,6 +560,11 @@ class BusinessProfileIndexDiscoveryService:
             "exchanges": [],
             "discovery_window_backlog": 0,
             "incomplete_windows": [],
+            "targeted_repair": {
+                "status": "disabled",
+                "attempted": 0,
+                "selected_announcements": 0,
+            },
         }
         for raw_exchange in exchanges:
             exchange = str(raw_exchange).upper()
@@ -555,6 +602,7 @@ class BusinessProfileIndexDiscoveryService:
                     dry_run=dry_run,
                     resumable_windows=False,
                     use_committed_cursors=window.get("kind") == "fresh",
+                    category=category,
                 )
                 for key in (
                     "pages_scanned",
@@ -602,8 +650,182 @@ class BusinessProfileIndexDiscoveryService:
                         "updated_for_end_date": end_date,
                     },
                 )
+        if max_targeted_repairs > 0:
+            if report["discovery_window_backlog"]:
+                report["targeted_repair"] = {
+                    "status": "deferred",
+                    "reason": "discovery_window_backlog",
+                    "attempted": 0,
+                    "selected_announcements": 0,
+                }
+            else:
+                repair = self._repair_missing_latest_annual(
+                    exchanges=exchanges,
+                    knowledge_cutoff=end_date,
+                    category=category,
+                    limit=max_targeted_repairs,
+                    lookback_years=targeted_repair_lookback_years,
+                    page_size=page_size,
+                    max_pages=targeted_repair_max_pages,
+                    dry_run=dry_run,
+                )
+                report["targeted_repair"] = repair
+                for key in (
+                    "pages_scanned",
+                    "announcements_seen",
+                    "selected_announcements",
+                    "frontier_inserted",
+                    "frontier_changed",
+                ):
+                    report[key] += int(repair.get(key) or 0)
+                report["errors"].extend(repair.get("errors") or [])
         report["unmatched_symbols"] = report["unmatched_symbols"][:100]
         if report["errors"] or report["incomplete_windows"]:
+            report["status"] = "degraded"
+        return report
+
+    def _repair_missing_latest_annual(
+        self,
+        *,
+        exchanges: Sequence[str],
+        knowledge_cutoff: str,
+        category: str,
+        limit: int,
+        lookback_years: int,
+        page_size: int,
+        max_pages: int,
+        dry_run: bool,
+    ) -> dict[str, Any]:
+        """Rotate through issuers missing the expected annual frontier period."""
+
+        cutoff = str(knowledge_cutoff)[:10]
+        expected_period = expected_business_profile_annual_period(cutoff)
+        normalized_exchanges = {str(item).upper() for item in exchanges}
+        universe = tuple(
+            item
+            for item in load_active_a_share_universe(
+                self.storage,
+                knowledge_cutoff=cutoff,
+            )
+            if str(item.get("exchange") or "").upper() in normalized_exchanges
+        )
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            covered = {
+                str(row["instrument_id"])
+                for row in conn.execute(
+                    "SELECT DISTINCT instrument_id "
+                    "FROM business_profile_announcement_frontier "
+                    "WHERE report_period = ? AND status <> 'superseded' "
+                    "AND document_type IN ('annual_report', 'annual_report_correction')",
+                    (expected_period,),
+                ).fetchall()
+            }
+        missing = sorted(
+            (item for item in universe if str(item["instrument_id"]) not in covered),
+            key=lambda item: str(item["instrument_id"]),
+        )
+        state_key = "business_profile_missing_annual_repair"
+        state = self.frontier.get_state(state_key)
+        cursor = str(state.get("last_instrument_id") or "")
+        after = [item for item in missing if str(item["instrument_id"]) > cursor]
+        before = [item for item in missing if str(item["instrument_id"]) <= cursor]
+        cohort = (after + before)[: max(0, int(limit))]
+        cutoff_year = int(cutoff[:4])
+        start_date = f"{cutoff_year - max(1, int(lookback_years))}-01-01"
+        report = {
+            "status": "success" if cohort else "unchanged",
+            "expected_annual_period": expected_period,
+            "missing_before": len(missing),
+            "cohort_size": len(cohort),
+            "attempted": 0,
+            "successful": 0,
+            "pages_scanned": 0,
+            "announcements_seen": 0,
+            "selected_announcements": 0,
+            "frontier_inserted": 0,
+            "frontier_changed": 0,
+            "errors": [],
+            "start_date": start_date,
+            "end_date": cutoff,
+            "category": category,
+        }
+        for instrument in cohort:
+            exchange = str(instrument["exchange"]).upper()
+            scope = AnnouncementScope(
+                exchange=exchange,
+                market=exchange,
+                instrument_id=str(instrument["instrument_id"]),
+                symbol=str(instrument["symbol"]).zfill(6),
+                start_date=start_date,
+                end_date=cutoff,
+                category=category,
+                page_size=page_size,
+                max_pages=max_pages,
+            )
+            report["attempted"] += 1
+            try:
+                route_result = self.announcement_service.acquire(
+                    AnnouncementQuery(
+                        purpose_key=BUSINESS_PROFILE_INDEX_PURPOSE,
+                        scope=scope,
+                    ),
+                    selectors=[business_profile_announcement_filter],
+                )
+            except Exception as exc:
+                report["errors"].append(
+                    f"{instrument['instrument_id']}:{type(exc).__name__}:{exc}"
+                )
+                continue
+            scan = route_result.scan_result
+            if scan is None:
+                report["errors"].append(
+                    f"{instrument['instrument_id']}:announcement_route_returned_no_result"
+                )
+                continue
+            report["pages_scanned"] += int(scan.pages_scanned)
+            report["announcements_seen"] += int(scan.announcements_seen)
+            report["selected_announcements"] += len(scan.selected_records)
+            report["errors"].extend(
+                f"{instrument['instrument_id']}:{item}" for item in scan.errors
+            )
+            if scan.status in {"success", "success_empty"}:
+                report["successful"] += 1
+            if dry_run:
+                continue
+            self.storage.upsert_announcement_scan_state(
+                scan_result=scan,
+                selected_announcements=len(scan.selected_records),
+                attempts=[item.__dict__ for item in route_result.attempts],
+                metadata={
+                    "operation": "business_profile_missing_annual_repair",
+                    "pdf_downloads": 0,
+                    "llm_calls": 0,
+                },
+            )
+            for record in scan.selected_records:
+                status = self.frontier.upsert_record(
+                    instrument=instrument,
+                    record=record,
+                )
+                if status == "pending":
+                    report["frontier_inserted"] += 1
+                elif status == "changed":
+                    report["frontier_changed"] += 1
+        if cohort and not dry_run:
+            self.frontier.set_state(
+                state_key,
+                {
+                    "last_instrument_id": str(cohort[-1]["instrument_id"]),
+                    "expected_annual_period": expected_period,
+                    "updated_at": get_shanghai_time().isoformat(),
+                },
+            )
+        report["remaining_missing_estimate"] = max(
+            0,
+            len(missing) - int(report["frontier_inserted"]),
+        )
+        if report["errors"]:
             report["status"] = "degraded"
         return report
 
@@ -721,9 +943,7 @@ def build_business_profile_reconciliation_report(
         for item in business_manifests
         if str(item.get("instrument_id") or "")
     }
-    report_year = int(cutoff[:4])
-    latest_due_annual_year = report_year - (1 if cutoff[5:10] >= "05-01" else 2)
-    expected_annual_period = f"{latest_due_annual_year}-12-31"
+    expected_annual_period = expected_business_profile_annual_period(cutoff)
     current_annual_ids = {
         str(item.get("instrument_id") or "")
         for item in business_manifests
@@ -782,6 +1002,15 @@ def build_business_profile_reconciliation_report(
         "production_table_counts": table_counts,
         "full_reprocessing_requested": False,
     }
+
+
+def expected_business_profile_annual_period(knowledge_cutoff: str) -> str:
+    """Return the latest annual period considered due at the cutoff."""
+
+    cutoff = date.fromisoformat(str(knowledge_cutoff)[:10]).isoformat()
+    report_year = int(cutoff[:4])
+    latest_due_annual_year = report_year - (1 if cutoff[5:10] >= "05-01" else 2)
+    return f"{latest_due_annual_year}-12-31"
 
 
 def audit_business_profile_archive(

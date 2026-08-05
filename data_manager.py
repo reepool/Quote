@@ -159,6 +159,24 @@ class DataGapInfo:
     instrument_type: Optional[str] = None
 
 
+def _derive_business_profile_bootstrap_start(
+    *,
+    knowledge_cutoff: str,
+    selection_policy: str,
+    instrument_ids: Sequence[str],
+    start_date: Optional[str],
+) -> tuple[Optional[str], bool]:
+    """Derive the current filing-season start only for unscoped latest-annual runs."""
+
+    if (
+        str(selection_policy or "").strip() == "latest_annual_only"
+        and not instrument_ids
+        and not start_date
+    ):
+        return f"{str(knowledge_cutoff)[:4]}-01-01", True
+    return start_date, False
+
+
 class DataManager:
     """标准数据管理器"""
 
@@ -1569,6 +1587,10 @@ class DataManager:
         dry_run: bool = False,
         resumable_windows: bool = False,
         max_windows_per_market: int = 2,
+        category: str = "annual_report",
+        max_targeted_repairs: int = 0,
+        targeted_repair_lookback_years: int = 3,
+        targeted_repair_max_pages: int = 8,
         write_coordinator: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Run metadata-only official index discovery for business profiles."""
@@ -1615,6 +1637,10 @@ class DataManager:
                     dry_run=dry_run,
                     resumable_windows=resumable_windows,
                     max_windows_per_market=max_windows_per_market,
+                    category=category,
+                    max_targeted_repairs=max_targeted_repairs,
+                    targeted_repair_lookback_years=targeted_repair_lookback_years,
+                    targeted_repair_max_pages=targeted_repair_max_pages,
                 )
 
         return await asyncio.to_thread(run_discovery)
@@ -1799,6 +1825,25 @@ class DataManager:
                     operations.get("max_windows_per_market", 2),
                 )
             ),
+            "category": "annual_report",
+            "max_targeted_repairs": int(
+                (discovery_kwargs or {}).get(
+                    "max_targeted_repairs",
+                    operations.get("max_targeted_repairs_per_cycle", 25),
+                )
+            ),
+            "targeted_repair_lookback_years": int(
+                (discovery_kwargs or {}).get(
+                    "targeted_repair_lookback_years",
+                    operations.get("targeted_repair_lookback_years", 3),
+                )
+            ),
+            "targeted_repair_max_pages": int(
+                (discovery_kwargs or {}).get(
+                    "targeted_repair_max_pages",
+                    operations.get("targeted_repair_max_pages", 8),
+                )
+            ),
         }
         result = await service.run_daily(
             knowledge_cutoff=cutoff,
@@ -1942,6 +1987,12 @@ class DataManager:
             semantic["promotion_enabled"] = phase.promotion_enabled
             semantic["promotion_manifests"] = manifests
             semantic["rollout_phase"] = phase.name
+        start_date, derived_bootstrap_start = _derive_business_profile_bootstrap_start(
+            knowledge_cutoff=cutoff,
+            selection_policy=policy,
+            instrument_ids=instrument_ids or (),
+            start_date=start_date,
+        )
         if phase is not None and field_families:
             unsupported_families = sorted(
                 set(str(item) for item in field_families) - set(phase.field_families)
@@ -2075,6 +2126,16 @@ class DataManager:
                 )
                 or operations.get("max_windows_per_market", 2)
             ),
+            "category": "annual_report",
+            "max_targeted_repairs": int(
+                operations.get("max_targeted_repairs_per_cycle", 25)
+            ),
+            "targeted_repair_lookback_years": int(
+                operations.get("targeted_repair_lookback_years", 3)
+            ),
+            "targeted_repair_max_pages": int(
+                operations.get("targeted_repair_max_pages", 8)
+            ),
         }
         result = await service.run_backfill(
             knowledge_cutoff=cutoff,
@@ -2090,6 +2151,11 @@ class DataManager:
             selection_policy=policy,
             should_stop=should_stop,
         )
+        if derived_bootstrap_start:
+            result["bootstrap_start"] = {
+                "mode": "current_filing_season",
+                "start_date": start_date,
+            }
         try:
             from research.business_profile_production_operations import (
                 build_business_profile_reconciliation_report,
@@ -2178,6 +2244,14 @@ class DataManager:
                 dry_run=False,
                 resumable_windows=True,
                 max_windows_per_market=int(kwargs.get("max_windows_per_market", 2)),
+                category=str(kwargs.get("category") or "annual_report"),
+                max_targeted_repairs=int(kwargs.get("max_targeted_repairs", 0)),
+                targeted_repair_lookback_years=int(
+                    kwargs.get("targeted_repair_lookback_years", 3)
+                ),
+                targeted_repair_max_pages=int(
+                    kwargs.get("targeted_repair_max_pages", 8)
+                ),
                 write_coordinator=write_coordinator,
             )
 

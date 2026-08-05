@@ -14,6 +14,7 @@ from urllib.parse import urljoin
 import requests
 
 from research.announcements.base import AnnouncementProviderCapabilities
+from research.announcements.categories import cninfo_category_value
 from research.announcements.models import (
     AnnouncementAttachment,
     AnnouncementQuery,
@@ -671,7 +672,7 @@ class CninfoAnnouncementProvider:
                 column=str(market_config.get("column") or "").strip(),
                 plate=self._text(market_config.get("plate")),
                 tab_name=str(market_config.get("tab_name") or "fulltext"),
-                category=scope.category,
+                category=cninfo_category_value(scope.category),
                 search_key=scope.keyword,
                 stock=None if identity is None else identity.get("stock"),
                 org_id=None if identity is None else identity.get("org_id"),

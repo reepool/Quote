@@ -37,6 +37,15 @@ def test_production_rollout_starts_in_structured_shadow_with_bounded_budgets():
     assert set(phase.stage_budgets) == {"acquire", "parse", "semantic", "publish"}
     assert rollout.phases["daily_incremental"].enabled is False
     assert rollout.bootstrap["selection_policy"] == "latest_annual_only"
+    assert rollout.bootstrap["start_date"] is None
+
+
+def test_expanded_rollout_bootstrap_still_requires_start_date():
+    payload = _payload()
+    payload["bootstrap"]["selection_policy"] = "expanded"
+
+    with pytest.raises(ValueError, match="bootstrap start_date is required"):
+        parse_business_profile_rollout_config(payload)
 
 
 def test_disabled_phase_and_unpassed_promotion_manifest_fail_closed():

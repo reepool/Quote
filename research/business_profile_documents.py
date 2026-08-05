@@ -11,7 +11,7 @@ _SPACE_RE = re.compile(r"\s+")
 _TAG_RE = re.compile(r"<[^>]+>")
 _PERIODIC_REPORT_TITLE_RE = re.compile(
     r"(?P<year>20\d{2})(?:"
-    r"年年度报告|年度报告|年半年度报告|年度半年度报告|年中期报告|年半年报"
+    r"年年度报告|年度报告|年年报|年报|年半年度报告|年度半年度报告|年中期报告|年半年报"
     r")"
 )
 _FULL_REPORT_SUFFIX_RE = re.compile(
@@ -88,7 +88,7 @@ def infer_business_profile_report_period(
         or "半年报" in normalized
     ):
         return f"{match.group('year')}-06-30"
-    if match and "年度报告" in normalized:
+    if match and ("年度报告" in normalized or "年报" in normalized):
         return f"{match.group('year')}-12-31"
     published = str(announcement_time or "").strip()
     if len(published) >= 10 and published[4] == "-" and published[7] == "-":
@@ -246,7 +246,7 @@ def _classify_periodic_report(
         or "半年报" in normalized
     ):
         report_type = "semiannual_report"
-    elif "年度报告" in normalized:
+    elif "年度报告" in normalized or "年报" in normalized:
         report_type = "annual_report"
     if report_type is None:
         return None

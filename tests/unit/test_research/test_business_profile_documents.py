@@ -21,6 +21,23 @@ def test_classifies_full_periodic_reports_and_excludes_summaries():
     assert corrected.is_correction is True
 
 
+def test_classifies_bse_abbreviated_annual_report_without_admitting_summary():
+    annual = classify_business_profile_document("2025年年报", adjunct_type="PDF")
+    summary = classify_business_profile_document(
+        "2025年年报摘要",
+        adjunct_type="PDF",
+    )
+
+    assert annual.document_type == "annual_report"
+    assert annual.selected is True
+    assert annual.is_full_report is True
+    assert infer_business_profile_report_period("2025年年报", "2026-04-30") == (
+        "2025-12-31"
+    )
+    assert summary.document_type == "annual_report_summary"
+    assert summary.selected is False
+
+
 def test_periodic_report_keyword_in_governance_policy_is_not_a_full_report():
     result = classify_business_profile_document(
         "年度报告信息披露重大差错责任追究管理办法（2025年修订）"

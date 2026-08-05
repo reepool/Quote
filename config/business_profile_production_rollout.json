@@ -6,7 +6,7 @@
     "runtime_identity_mode": "derived",
     "bootstrap": {
       "selection_policy": "latest_annual_only",
-      "start_date": "2024-01-01",
+      "start_date": null,
       "end_date": null,
       "document_types": [
         "annual_report",

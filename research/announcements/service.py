@@ -20,6 +20,9 @@ from .models import (
 
 
 LOGGER = logging.getLogger(__name__)
+_RESUMABLE_PAGE_BOUND_REASONS = frozenset(
+    {"max_pages_exhausted", "max_pages_reached"}
+)
 AnnouncementSelector = Callable[[AnnouncementRecord], Sequence[str]]
 
 
@@ -145,9 +148,13 @@ class AnnouncementAcquisitionService:
                 len(result.errors),
             )
             selected_result = result
-            if index == 0 and result.status in route.fallback_on:
+            page_bound_partial = (
+                not result.is_complete
+                and str(result.stop_reason or "") in _RESUMABLE_PAGE_BOUND_REASONS
+            )
+            if index == 0 and result.status in route.fallback_on and not page_bound_partial:
                 fallback_reason = result.status
-            if result.status not in route.fallback_on:
+            if result.status not in route.fallback_on or page_bound_partial:
                 break
 
         elapsed = time.monotonic() - started

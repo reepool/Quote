@@ -14,7 +14,11 @@ from urllib.parse import urljoin
 
 import requests
 
-from research.announcements.base import AnnouncementProviderCapabilities
+from research.announcements.base import (
+    AnnouncementProviderCapabilities,
+    AnnouncementQueryNotSupported,
+)
+from research.announcements.categories import exchange_category_options
 from research.announcements.models import (
     AnnouncementAttachment,
     AnnouncementQuery,
@@ -123,7 +127,7 @@ class OfficialExchangeAnnouncementProvider:
                 "official announcement endpoint_mode must be instrument or "
                 "recent_market"
             )
-        supports_market_scope = (
+        supports_market_scope = config.exchange in {"SSE", "SZSE"} or (
             config.exchange == "BSE" and self.endpoint_mode == "recent_market"
         )
         self.capabilities = AnnouncementProviderCapabilities(
@@ -132,7 +136,7 @@ class OfficialExchangeAnnouncementProvider:
             supports_instrument_scope=True,
             supports_date_filter=True,
             supports_keyword_filter=True,
-            supports_category_filter=False,
+            supports_category_filter=config.exchange in {"SSE", "SZSE"},
             cursor_kind="published_at",
             max_page_size=config.max_page_size,
             supports_attachment_retrieval=True,
@@ -181,6 +185,7 @@ class OfficialExchangeAnnouncementProvider:
                     start_date=scope.start_date,
                     end_date=scope.end_date,
                     keyword=scope.keyword,
+                    category=scope.category,
                 )
             except Exception as exc:
                 errors.append(
@@ -340,6 +345,7 @@ class OfficialExchangeAnnouncementProvider:
         start_date: Optional[str],
         end_date: Optional[str],
         keyword: Optional[str],
+        category: Optional[str],
     ) -> Dict[str, Any]:
         kwargs = self._request_kwargs(
             symbol=symbol,
@@ -348,6 +354,7 @@ class OfficialExchangeAnnouncementProvider:
             start_date=start_date,
             end_date=end_date,
             keyword=keyword,
+            category=category,
         )
         last_exc: Optional[Exception] = None
         for attempt in range(self.config.retry_attempts + 1):
@@ -377,7 +384,14 @@ class OfficialExchangeAnnouncementProvider:
         start_date: Optional[str],
         end_date: Optional[str],
         keyword: Optional[str],
+        category: Optional[str],
     ) -> Dict[str, Any]:
+        category_options = exchange_category_options(self.config.exchange, category)
+        if category and category_options is None:
+            raise AnnouncementQueryNotSupported(
+                f"{self.source_name} does not support announcement category {category}"
+            )
+        category_options = category_options or {}
         if self.config.exchange == "SSE":
             return {
                 "params": {
@@ -392,15 +406,21 @@ class OfficialExchangeAnnouncementProvider:
                         "security_type",
                         "0101,120100,020100,020200,120200",
                     ),
-                    "reportType2": self.config.options.get("report_type2", "DQBG"),
-                    "reportType": self.config.options.get("report_type", "ALL"),
+                    "reportType2": category_options.get(
+                        "report_type2",
+                        self.config.options.get("report_type2", "DQBG"),
+                    ),
+                    "reportType": category_options.get(
+                        "report_type",
+                        self.config.options.get("report_type", "ALL"),
+                    ),
                     "beginDate": start_date or "",
                     "endDate": end_date or "",
                 }
             }
         if self.config.exchange == "SZSE":
             body: Dict[str, Any] = {
-                "stock": [symbol],
+                "stock": [symbol] if symbol else [],
                 "channelCode": [self.config.options.get("channel_code", "fixed_disc")],
                 "pageSize": page_size,
                 "pageNum": page_num,
@@ -409,6 +429,8 @@ class OfficialExchangeAnnouncementProvider:
                 body["seDate"] = [start_date, end_date]
             if keyword:
                 body["keyword"] = keyword
+            if category_options.get("big_category_id"):
+                body["bigCategoryId"] = list(category_options["big_category_id"])
             return {"json": body}
         if self.config.exchange == "BSE":
             if self.endpoint_mode == "recent_market":

@@ -539,7 +539,8 @@ class BusinessProfileWorkRepository:
                     (work_id,),
                 ).fetchone()
                 if existing is not None:
-                    if force and str(existing["status"]) in TERMINAL_STATUSES:
+                    existing_status = str(existing["status"])
+                    if force and existing_status in TERMINAL_STATUSES:
                         conn.execute(
                             "UPDATE business_profile_work_items SET stage = 'acquire', "
                             "status = 'pending', attempt_count = 0, next_attempt_at = NULL, "
@@ -550,64 +551,72 @@ class BusinessProfileWorkRepository:
                         reset += 1
                     else:
                         reused += 1
-                    continue
-                metadata = {
-                    "schema_version": WORK_SCHEMA_VERSION,
-                    "title": row.get("title"),
-                    "published_at": row.get("published_at"),
-                    "processing_identity": dict(processing_identity),
-                }
-                conn.execute(
-                    """
-                    INSERT INTO business_profile_work_items (
-                        work_id, frontier_id, instrument_id, source,
-                        announcement_id, report_period, document_type, policy,
-                        processing_identity_hash, stage, status, attempt_count,
-                        max_attempts, next_attempt_at, lease_owner, lease_expires_at,
-                        checkpoint_path, last_error, metadata_json, completed_at,
-                        created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'acquire', 'pending', 0,
-                              ?, NULL, NULL, NULL, ?, NULL, ?, NULL, ?, ?)
-                    """,
-                    (
-                        work_id,
-                        row["frontier_id"],
-                        row["instrument_id"],
-                        row["source"],
-                        row["announcement_id"],
-                        row["report_period"],
-                        row["document_type"],
-                        policy,
-                        identity_hash,
-                        max(1, int(max_attempts)),
-                        str(checkpoint),
-                        _canonical_json(metadata),
-                        now,
-                        now,
-                    ),
-                )
-                inserted += 1
-                if supersede_older:
-                    cursor = conn.execute(
+                else:
+                    metadata = {
+                        "schema_version": WORK_SCHEMA_VERSION,
+                        "title": row.get("title"),
+                        "published_at": row.get("published_at"),
+                        "processing_identity": dict(processing_identity),
+                    }
+                    conn.execute(
                         """
-                        UPDATE business_profile_work_items
-                        SET status = 'superseded', updated_at = ?
-                        WHERE instrument_id = ? AND policy = ? AND work_id <> ?
-                          AND status IN ('pending', 'retry_due')
-                          AND (report_period < ? OR
-                               (report_period = ? AND created_at < ?))
+                        INSERT INTO business_profile_work_items (
+                            work_id, frontier_id, instrument_id, source,
+                            announcement_id, report_period, document_type, policy,
+                            processing_identity_hash, stage, status, attempt_count,
+                            max_attempts, next_attempt_at, lease_owner, lease_expires_at,
+                            checkpoint_path, last_error, metadata_json, completed_at,
+                            created_at, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'acquire', 'pending', 0,
+                                  ?, NULL, NULL, NULL, ?, NULL, ?, NULL, ?, ?)
                         """,
                         (
-                            now,
-                            row["instrument_id"],
-                            policy,
                             work_id,
+                            row["frontier_id"],
+                            row["instrument_id"],
+                            row["source"],
+                            row["announcement_id"],
                             row["report_period"],
-                            row["report_period"],
+                            row["document_type"],
+                            policy,
+                            identity_hash,
+                            max(1, int(max_attempts)),
+                            str(checkpoint),
+                            _canonical_json(metadata),
+                            now,
                             now,
                         ),
                     )
-                    superseded += int(cursor.rowcount or 0)
+                    inserted += 1
+                if supersede_older:
+                    candidates = conn.execute(
+                        """
+                        SELECT work.work_id, frontier.report_period,
+                               frontier.published_at, frontier.document_type,
+                               frontier.frontier_id
+                        FROM business_profile_work_items AS work
+                        JOIN business_profile_announcement_frontier AS frontier
+                          ON frontier.frontier_id = work.frontier_id
+                        WHERE work.instrument_id = ? AND work.policy = ?
+                          AND work.work_id <> ?
+                          AND work.status IN ('pending', 'retry_due')
+                        """,
+                        (row["instrument_id"], policy, work_id),
+                    ).fetchall()
+                    obsolete_ids = [
+                        str(item["work_id"])
+                        for item in candidates
+                        if _frontier_sort_key(dict(item)) < _frontier_sort_key(row)
+                    ]
+                    if obsolete_ids:
+                        placeholders = ",".join("?" for _ in obsolete_ids)
+                        cursor = conn.execute(
+                            "UPDATE business_profile_work_items "
+                            "SET status = 'superseded', updated_at = ? "
+                            f"WHERE work_id IN ({placeholders})",
+                            (now, *obsolete_ids),
+                        )
+                        superseded += int(cursor.rowcount or 0)
             conn.commit()
         return {
             "eligible": len(rows),
@@ -942,12 +951,12 @@ def _decode_work_row(row: Mapping[str, Any]) -> dict[str, Any]:
     return item
 
 
-def _frontier_sort_key(row: Mapping[str, Any]) -> tuple[str, str, int, str]:
+def _frontier_sort_key(row: Mapping[str, Any]) -> tuple[str, int, str, str]:
     document_type = str(row.get("document_type") or "")
     return (
         str(row.get("report_period") or ""),
-        str(row.get("published_at") or ""),
         int(document_type.endswith("_correction")),
+        str(row.get("published_at") or ""),
         str(row.get("frontier_id") or ""),
     )
 

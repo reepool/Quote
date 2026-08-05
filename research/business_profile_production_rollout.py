@@ -261,7 +261,7 @@ def parse_business_profile_rollout_config(
     selection_policy = str(bootstrap.get("selection_policy") or "").strip()
     if selection_policy not in SELECTION_POLICIES:
         raise ValueError("invalid business-profile bootstrap selection policy")
-    if not bootstrap.get("start_date"):
+    if not bootstrap.get("start_date") and selection_policy != "latest_annual_only":
         raise ValueError("business-profile bootstrap start_date is required")
     bootstrap_types = {
         str(item).strip() for item in bootstrap.get("document_types", ()) if str(item).strip()
