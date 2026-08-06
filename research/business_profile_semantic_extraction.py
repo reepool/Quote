@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from jsonschema import Draft202012Validator
@@ -23,6 +23,8 @@ SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v1"
 SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v1"
 STRUCTURED_EXTRACTION_SCHEMA_VERSION = "business_profile_structured_extraction.v1"
 STRUCTURED_EXTRACTION_PROMPT_VERSION = "business_profile_structured_extraction.v1"
+MAX_STRUCTURED_ROW_DIAGNOSTICS = 10
+MAX_DIAGNOSTIC_MESSAGE_CHARACTERS = 240
 
 _ACTIVITY_ACTIONS = (
     "extracts",
@@ -108,12 +110,16 @@ class SemanticRunAudit:
     validation_gates: Mapping[str, bool]
     failure_category: Optional[str]
     warning_codes: tuple[str, ...]
+    provider_request_id: Optional[str] = None
+    finish_reason: Optional[str] = None
+    diagnostics: Mapping[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["usage"] = dict(self.usage)
         payload["validation_gates"] = dict(self.validation_gates)
         payload["warning_codes"] = list(self.warning_codes)
+        payload["diagnostics"] = dict(self.diagnostics)
         return payload
 
 
@@ -135,7 +141,31 @@ class StructuredExtractionEnvelope:
     report_period: str
     bundle_id: str
     rows: tuple[Mapping[str, Any], ...]
+    rejected_rows: tuple[Mapping[str, Any], ...]
+    rejected_row_count: int
     audit: SemanticRunAudit
+
+
+class StructuredRowsRejectedError(ValueError):
+    """All model rows failed deterministic local evidence validation."""
+
+    def __init__(
+        self,
+        diagnostics: Sequence[Mapping[str, Any]],
+        *,
+        rejected_count: Optional[int] = None,
+    ) -> None:
+        self.diagnostics = tuple(dict(item) for item in diagnostics)
+        self.rejected_count = max(
+            len(self.diagnostics),
+            int(rejected_count or 0),
+        )
+        detail = (
+            str(self.diagnostics[0].get("message") or "local row validation failed")
+            if self.diagnostics
+            else "local row validation failed"
+        )
+        super().__init__(f"structured semantic rows rejected: {detail}")
 
 
 class BusinessProfileSemanticExtractor:
@@ -265,6 +295,7 @@ class BusinessProfileSemanticExtractor:
                 prompt_version=SEMANTIC_EXTRACTION_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),
+                diagnostics=_exception_diagnostics(exc),
             )
             self._persist_audit(audit)
             raise
@@ -341,14 +372,22 @@ class BusinessProfileSemanticExtractor:
                     content_is_untrusted=True,
                 )
             )
-            rows = _validate_structured_extraction_response(
-                response.data,
-                field_family=field_family,
-                instrument_id=instrument_id,
-                report_period=report_period,
-                selected=selected,
-                max_items=self.policy.max_items_per_response,
+            rows, rejected_rows, rejected_row_count = (
+                _validate_structured_extraction_response(
+                    response.data,
+                    field_family=field_family,
+                    instrument_id=instrument_id,
+                    report_period=report_period,
+                    selected=selected,
+                    max_items=self.policy.max_items_per_response,
+                )
             )
+            if rejected_rows and not rows:
+                raise StructuredRowsRejectedError(
+                    rejected_rows,
+                    rejected_count=rejected_row_count,
+                )
+            partial = rejected_row_count > 0
             audit = _success_audit(
                 response,
                 stage="structured_semantic_extraction",
@@ -361,7 +400,15 @@ class BusinessProfileSemanticExtractor:
                     "exact_evidence": True,
                     "numeric_values_local": True,
                     "units_source_supported": True,
-                    "complete_batch": True,
+                    "complete_batch": not partial,
+                },
+                status="partial" if partial else "completed",
+                extra_warnings=("partial_row_rejection",) if partial else (),
+                diagnostics={
+                    "rows_received": len(rows) + rejected_row_count,
+                    "rows_accepted": len(rows),
+                    "rows_rejected": rejected_row_count,
+                    "row_rejections": list(rejected_rows),
                 },
             )
             self._persist_audit(audit)
@@ -371,6 +418,8 @@ class BusinessProfileSemanticExtractor:
                 report_period=report_period,
                 bundle_id=str(selected.bundle["bundle_id"]),
                 rows=tuple(rows),
+                rejected_rows=tuple(rejected_rows),
+                rejected_row_count=rejected_row_count,
                 audit=audit,
             )
         except Exception as exc:
@@ -381,6 +430,7 @@ class BusinessProfileSemanticExtractor:
                 prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),
+                diagnostics=_exception_diagnostics(exc),
             )
             self._persist_audit(audit)
             raise
@@ -519,6 +569,7 @@ class BusinessProfileSemanticExtractor:
                 prompt_version=SEMANTIC_VERIFIER_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),
+                diagnostics=_exception_diagnostics(exc),
             )
             self._persist_audit(audit)
             raise
@@ -938,7 +989,7 @@ def _validate_structured_extraction_response(
     report_period: str,
     selected: SelectedSectionArtifact,
     max_items: int,
-) -> list[Mapping[str, Any]]:
+) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], int]:
     if not isinstance(data, Mapping):
         raise ValueError("structured semantic response must be an object")
     _validate_closed_schema(
@@ -959,65 +1010,87 @@ def _validate_structured_extraction_response(
         raise ValueError("structured semantic response exceeds item bound")
     sections = {item.section_id: item for item in selected.sections}
     normalized: list[Mapping[str, Any]] = []
-    for raw in raw_rows:
-        item = dict(raw)
-        evidence = _exact_evidence(
-            item.get("evidence"),
-            str(selected.bundle["source_document_id"]),
-            sections,
+    rejected: list[Mapping[str, Any]] = []
+    rejected_count = 0
+    for row_index, raw in enumerate(raw_rows):
+        try:
+            normalized.append(
+                _validate_structured_row(
+                    raw,
+                    field_family=field_family,
+                    source_document_id=str(selected.bundle["source_document_id"]),
+                    sections=sections,
+                )
+            )
+        except (TypeError, ValueError, KeyError) as exc:
+            rejected_count += 1
+            if len(rejected) < MAX_STRUCTURED_ROW_DIAGNOSTICS:
+                rejected.append(_row_rejection_diagnostic(row_index, exc))
+    return normalized, rejected, rejected_count
+
+
+def _validate_structured_row(
+    raw: Mapping[str, Any],
+    *,
+    field_family: str,
+    source_document_id: str,
+    sections: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    item = dict(raw)
+    evidence = _exact_evidence(item.get("evidence"), source_document_id, sections)
+    section = sections[str(item["evidence"]["section_id"])]
+    quote = str(item["evidence"]["quote"])
+    segment_name = str(item.get("segment_name_raw") or "").strip()
+    if segment_name not in quote:
+        raise ValueError("structured semantic segment name is absent from exact quote")
+    if field_family == "structured_segments":
+        values = (
+            item.get("revenue"),
+            item.get("segment_cost"),
+            item.get("gross_margin"),
         )
-        section = sections[str(item["evidence"]["section_id"])]
-        quote = str(item["evidence"]["quote"])
-        segment_name = str(item.get("segment_name_raw") or "").strip()
-        if segment_name not in quote:
-            raise ValueError(
-                "structured semantic segment name is absent from exact quote"
-            )
-        if field_family == "structured_segments":
-            values = (
-                item.get("revenue"),
-                item.get("segment_cost"),
-                item.get("gross_margin"),
-            )
-            if all(value is None for value in values):
-                raise ValueError("structured segment row has no explicit numeric value")
-            for key in ("revenue", "segment_cost", "gross_margin"):
-                value = item.get(key)
-                if value is not None:
-                    _validate_finite_number(value, key)
-                    if not _number_supported_by_quote(
-                        value,
-                        quote,
-                        percentage=key == "gross_margin",
-                    ):
-                        raise ValueError(
-                            f"structured segment {key} is absent from exact quote"
-                        )
-            margin = item.get("gross_margin")
-            if margin is not None and not -1 <= float(margin) <= 1:
-                raise ValueError(
-                    "structured segment gross_margin must be a decimal fraction"
-                )
-            currency_unit = str(item.get("currency_unit") or "").strip()
-            if (
-                item.get("revenue") is not None or item.get("segment_cost") is not None
-            ) and not currency_unit:
-                raise ValueError("structured segment currency_unit is required")
-            if currency_unit and currency_unit not in section.normalized_text:
-                raise ValueError("structured segment unit is absent from evidence section")
-        else:
-            _validate_finite_number(item["value"], "value")
-            if not _number_supported_by_quote(item["value"], quote):
-                raise ValueError(
-                    "structured operating value is absent from exact quote"
-                )
-            unit = str(item.get("unit_raw") or "").strip()
-            if unit not in section.normalized_text:
-                raise ValueError("structured operating unit is absent from evidence section")
-        item["evidence"] = evidence
-        item["evidence"]["quote"] = quote
-        normalized.append(item)
-    return normalized
+        if all(value is None for value in values):
+            raise ValueError("structured segment row has no explicit numeric value")
+        for key in ("revenue", "segment_cost", "gross_margin"):
+            value = item.get(key)
+            if value is not None:
+                _validate_finite_number(value, key)
+                if not _number_supported_by_quote(
+                    value,
+                    quote,
+                    percentage=key == "gross_margin",
+                ):
+                    raise ValueError(
+                        f"structured segment {key} is absent from exact quote"
+                    )
+        margin = item.get("gross_margin")
+        if margin is not None and not -1 <= float(margin) <= 1:
+            raise ValueError("structured segment gross_margin must be a decimal fraction")
+        currency_unit = str(item.get("currency_unit") or "").strip()
+        if (
+            item.get("revenue") is not None or item.get("segment_cost") is not None
+        ) and not currency_unit:
+            raise ValueError("structured segment currency_unit is required")
+        if currency_unit and currency_unit not in section.normalized_text:
+            raise ValueError("structured segment unit is absent from evidence section")
+    else:
+        _validate_finite_number(item["value"], "value")
+        if not _number_supported_by_quote(item["value"], quote):
+            raise ValueError("structured operating value is absent from exact quote")
+        unit = str(item.get("unit_raw") or "").strip()
+        if unit not in section.normalized_text:
+            raise ValueError("structured operating unit is absent from evidence section")
+    item["evidence"] = evidence
+    item["evidence"]["quote"] = quote
+    return item
+
+
+def _row_rejection_diagnostic(row_index: int, exc: Exception) -> Mapping[str, Any]:
+    return {
+        "row_index": row_index,
+        "failure_category": _failure_category(exc),
+        "message": _safe_diagnostic_message(exc),
+    }
 
 
 def _validate_finite_number(value: Any, label: str) -> None:
@@ -1157,11 +1230,14 @@ def _success_audit(
     prompt_version: str,
     input_hash: str,
     gates: Mapping[str, bool],
+    status: str = "completed",
+    extra_warnings: Sequence[str] = (),
+    diagnostics: Optional[Mapping[str, Any]] = None,
 ) -> SemanticRunAudit:
     usage = response.usage
     return SemanticRunAudit(
         stage=stage,
-        status="completed",
+        status=status,
         provider=response.provider,
         actual_model=response.model,
         profile=profile,
@@ -1178,7 +1254,10 @@ def _success_audit(
         attempts=response.attempt_count,
         validation_gates=dict(gates),
         failure_category=None,
-        warning_codes=tuple(response.warnings),
+        warning_codes=tuple(dict.fromkeys((*response.warnings, *extra_warnings))),
+        provider_request_id=response.provider_request_id,
+        finish_reason=response.finish_reason,
+        diagnostics=dict(diagnostics or {}),
     )
 
 
@@ -1190,7 +1269,9 @@ def _failure_audit(
     prompt_version: str,
     input_hash: str,
     failure_category: str,
+    diagnostics: Optional[Mapping[str, Any]] = None,
 ) -> SemanticRunAudit:
+    usage = None if response is None else response.usage
     return SemanticRunAudit(
         stage=stage,
         status="failed",
@@ -1201,13 +1282,48 @@ def _failure_audit(
         request_hash=None if response is None else response.request_hash,
         response_hash=None if response is None else response.response_hash,
         input_hash=input_hash,
-        usage={"input_tokens": None, "output_tokens": None, "total_tokens": None},
+        usage={
+            "input_tokens": None if usage is None else usage.input_tokens,
+            "output_tokens": None if usage is None else usage.output_tokens,
+            "total_tokens": None if usage is None else usage.total_tokens,
+        },
         latency_ms=None if response is None else response.latency_ms,
         attempts=0 if response is None else response.attempt_count,
         validation_gates={},
         failure_category=failure_category,
-        warning_codes=(),
+        warning_codes=tuple(() if response is None else response.warnings),
+        provider_request_id=(
+            None if response is None else response.provider_request_id
+        ),
+        finish_reason=None if response is None else response.finish_reason,
+        diagnostics=dict(diagnostics or {}),
     )
+
+
+def _exception_diagnostics(exc: Exception) -> Mapping[str, Any]:
+    diagnostics: dict[str, Any] = {
+        "error_type": type(exc).__name__,
+        "error_code": str(getattr(exc, "code", "") or "") or None,
+        "error_message": _safe_diagnostic_message(exc),
+        "request_id": str(getattr(exc, "request_id", "") or "") or None,
+        "request_hash": str(getattr(exc, "request_hash", "") or "") or None,
+        "attempt_count": int(getattr(exc, "attempt_count", 0) or 0),
+        "retryable": bool(getattr(exc, "retryable", False)),
+    }
+    row_diagnostics = getattr(exc, "diagnostics", ())
+    if row_diagnostics:
+        diagnostics["row_rejections"] = [
+            dict(item) for item in row_diagnostics[:MAX_STRUCTURED_ROW_DIAGNOSTICS]
+        ]
+        diagnostics["rows_rejected"] = max(
+            len(row_diagnostics),
+            int(getattr(exc, "rejected_count", 0) or 0),
+        )
+    return diagnostics
+
+
+def _safe_diagnostic_message(exc: Exception) -> str:
+    return str(exc).replace("\n", " ")[:MAX_DIAGNOSTIC_MESSAGE_CHARACTERS]
 
 
 def _failure_category(exc: Exception) -> str:
@@ -1217,6 +1333,14 @@ def _failure_category(exc: Exception) -> str:
         return "gateway_timeout"
     if "schema" in name or "schema" in message:
         return "schema_validation_failed"
+    if "unit" in message:
+        return "unit_validation_failed"
+    if (
+        "numeric" in message
+        or "finite" in message
+        or "decimal fraction" in message
+    ):
+        return "numeric_validation_failed"
     if "evidence" in message or "offset" in message or "quote" in message:
         return "invalid_exact_evidence"
     if "anonymous" in message or "scope" in message or "id" in message:
@@ -1232,7 +1356,15 @@ def _validate_closed_schema(value: Any, schema: Mapping[str, Any], label: str) -
     if errors:
         error = errors[0]
         location = ".".join(str(part) for part in error.absolute_path) or "$"
-        raise ValueError(f"{label} schema error at {location}: {error.message}")
+        validator_name = str(error.validator or "unknown")
+        safe_detail = {
+            "additionalProperties": "Additional properties are not allowed",
+            "maxItems": "array expected to be empty or within item bound",
+        }.get(validator_name)
+        suffix = f": {safe_detail}" if safe_detail else ""
+        raise ValueError(
+            f"{label} schema error at {location} ({validator_name}){suffix}"
+        )
 
 
 def _canonical_json(value: Any) -> str:

@@ -280,6 +280,62 @@ class _StructuredOperatingGateway(_FakeGateway):
         )
 
 
+class _PartialStructuredSegmentGateway(_StructuredSegmentGateway):
+    async def complete(self, request):
+        response = await super().complete(request)
+        data = json.loads(json.dumps(response.data, ensure_ascii=False))
+        invalid = dict(data["rows"][0])
+        invalid["revenue"] = 999.0
+        data["rows"].append(invalid)
+        raw = json.dumps(data, ensure_ascii=False)
+        return replace(
+            response,
+            data=data,
+            raw_content=raw,
+            response_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+
+
+class _RecoveringStructuredSegmentGateway(_StructuredSegmentGateway):
+    async def complete(self, request):
+        response = await super().complete(request)
+        data = json.loads(json.dumps(response.data, ensure_ascii=False))
+        if len(self.requests) == 1:
+            invalid = dict(data["rows"][0])
+            invalid["revenue"] = 999.0
+            data["rows"].append(invalid)
+        else:
+            payload = json.loads(request.messages[-1].content)
+            span = payload["sections"][0]
+            quote = "焦煤 80 50 37.5%"
+            local_start = span["text"].index(quote)
+            start = span["text_start"] + local_start
+            recovered = dict(data["rows"][0])
+            recovered.update(
+                {
+                    "segment_name_raw": "焦煤",
+                    "revenue": 80.0,
+                    "segment_cost": 50.0,
+                    "gross_margin": 0.375,
+                    "evidence": {
+                        "section_id": span["section_id"],
+                        "page_number": span["page_number"],
+                        "quote": quote,
+                        "section_start": start,
+                        "section_end": start + len(quote),
+                    },
+                }
+            )
+            data["rows"].append(recovered)
+        raw = json.dumps(data, ensure_ascii=False)
+        return replace(
+            response,
+            data=data,
+            raw_content=raw,
+            response_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+
+
 class _EmptyStructuredGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
@@ -1059,6 +1115,80 @@ def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
     assert segment["revenue"] == 1_000_000
     assert segment["extraction_method"] == "semantic_structured_fallback"
     assert segment["metadata"]["numeric_reconciliation_valid"] is False
+
+
+def test_partial_structured_fallback_persists_valid_rows_and_rework_diagnostics(
+    tmp_path, monkeypatch
+):
+    gateway = _PartialStructuredSegmentGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["quality"]["stage_ready"] is False
+    assert extracted["quality"]["structured_fallback_rejected_rows"] == 1
+    assert len(repository.list_records("segments", instrument_id="601088.SH")) == 1
+    exceptions = repository.list_exceptions(instrument_id="601088.SH")
+    assert exceptions[-1]["reason_codes"] == ["partial_row_rejection"]
+    assert exceptions[-1]["metadata"]["diagnostics"]["row_rejections"][0][
+        "row_index"
+    ] == 1
+
+
+def test_partial_structured_fallback_retry_persists_newly_recovered_rows(
+    tmp_path, monkeypatch
+):
+    gateway = _RecoveringStructuredSegmentGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%\n"
+            "焦煤 80 50 37.5%"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    first = pipeline.run("extract", scope=scope)
+    second = pipeline.run("extract", scope=scope)
+
+    assert first["status"] == "stopped"
+    assert second["status"] == "success"
+    assert second["quality"]["stage_ready"] is True
+    segments = repository.list_records("segments", instrument_id="601088.SH")
+    assert {row["segment_name_raw"] for row in segments} == {"煤炭", "焦煤"}
+    assert not repository.list_exceptions(
+        instrument_id="601088.SH",
+        status="open",
+    )
 
 
 def test_ambiguous_operating_table_uses_bounded_semantic_fallback(

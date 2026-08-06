@@ -1085,6 +1085,7 @@ class BusinessProfileSemanticRuntime:
             "structured_fallback_calls": 0,
             "structured_fallback_accepted_records": 0,
             "structured_fallback_rejected": 0,
+            "structured_fallback_rejected_rows": 0,
             "configuration_blocked_documents": 0,
             "expected_non_disclosure_documents": 0,
             "tokens": 0,
@@ -1161,7 +1162,11 @@ class BusinessProfileSemanticRuntime:
                     )
                     if budget_stop_reason:
                         break
-                    extractor = BusinessProfileSemanticExtractor(self.llm_client)
+                    semantic_audits: list[Mapping[str, Any]] = []
+                    extractor = BusinessProfileSemanticExtractor(
+                        self.llm_client,
+                        audit_sink=semantic_audits.append,
+                    )
                     try:
                         envelope = self._async_bridge.run(
                             extractor.extract_structured_async(
@@ -1173,6 +1178,8 @@ class BusinessProfileSemanticRuntime:
                         )
                         structured_fallback_used = True
                         semantic_audit = envelope.audit.to_dict()
+                        rejected_rows = list(envelope.rejected_rows)
+                        rejected_row_count = envelope.rejected_row_count
                         records_by_type = self._structured_semantic_records(
                             item,
                             selected,
@@ -1186,6 +1193,9 @@ class BusinessProfileSemanticRuntime:
                         metrics["llm_calls"] += 1
                         metrics["structured_fallback_calls"] += 1
                         metrics["structured_fallback_accepted_records"] += accepted
+                        metrics["structured_fallback_rejected_rows"] += (
+                            rejected_row_count
+                        )
                         metrics["tokens"] += float(
                             (semantic_audit.get("usage") or {}).get("total_tokens") or 0
                         )
@@ -1195,6 +1205,7 @@ class BusinessProfileSemanticRuntime:
                             llm_calls=1,
                             structured_fallback_calls=1,
                             structured_fallback_accepted_records=accepted,
+                            structured_fallback_rejected_rows=rejected_row_count,
                             tokens=float(
                                 (semantic_audit.get("usage") or {}).get("total_tokens")
                                 or 0
@@ -1205,7 +1216,27 @@ class BusinessProfileSemanticRuntime:
                                 "context incomplete: structured semantic response "
                                 "has no explicit rows for a governed table"
                             )
+                        if rejected_rows:
+                            machine_rework.append(
+                                _rework_item(
+                                    item,
+                                    item["document"],
+                                    "partial_row_rejection",
+                                    diagnostics={
+                                        "semantic_audit": semantic_audit,
+                                        "rows_rejected": rejected_row_count,
+                                        "row_rejections": rejected_rows,
+                                    },
+                                )
+                            )
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                machine_rework=1,
+                            )
                     except Exception as exc:
+                        if semantic_audits:
+                            semantic_audit = dict(semantic_audits[-1])
                         reason = _semantic_failure_reason(exc)
                         if reason == "blocked_configuration":
                             blocker = _semantic_configuration_reason(exc)
@@ -1222,7 +1253,14 @@ class BusinessProfileSemanticRuntime:
                             metrics["errors"] += 1
                             metrics["structured_fallback_rejected"] += 1
                             machine_rework.append(
-                                _rework_item(item, item["document"], reason)
+                                _rework_item(
+                                    item,
+                                    item["document"],
+                                    reason,
+                                    diagnostics={"semantic_audit": semantic_audit}
+                                    if semantic_audit
+                                    else None,
+                                )
                             )
                             _increment_family_metrics(
                                 metrics["by_field_family"],
@@ -1315,6 +1353,11 @@ class BusinessProfileSemanticRuntime:
                             if structured_fallback_used
                             else None
                         ),
+                        "semantic_response_hash": (
+                            semantic_audit.get("response_hash")
+                            if semantic_audit is not None
+                            else None
+                        ),
                     }
                 )[:24]
             )
@@ -1400,6 +1443,7 @@ class BusinessProfileSemanticRuntime:
                     "context_incomplete",
                     "schema_failure",
                     "gateway_failure",
+                    "partial_row_rejection",
                     "catalog_proposal",
                 ),
             )
@@ -1418,6 +1462,7 @@ class BusinessProfileSemanticRuntime:
                         for row in records_by_type.get("evidence", [])
                     ],
                     "semantic": semantic_audit is not None,
+                    "semantic_audit": semantic_audit,
                     "expected_non_disclosure": expected_non_disclosure,
                 }
             )
@@ -1534,6 +1579,9 @@ class BusinessProfileSemanticRuntime:
                 ),
                 "structured_fallback_rejected": int(
                     metrics["structured_fallback_rejected"]
+                ),
+                "structured_fallback_rejected_rows": int(
+                    metrics["structured_fallback_rejected_rows"]
                 ),
             },
             "metrics": metrics,
@@ -2145,6 +2193,7 @@ class BusinessProfileSemanticRuntime:
                         exception.get("selected_artifact_path") or ""
                     ),
                     "runtime_exception": True,
+                    "diagnostics": dict(exception.get("diagnostics") or {}),
                 },
             ),
             routing_manifest,
@@ -3060,6 +3109,7 @@ def _rework_item(
     document: Mapping[str, Any],
     reason: str,
     target_id: str | None = None,
+    diagnostics: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "instrument_id": plan.get("instrument_id"),
@@ -3069,6 +3119,7 @@ def _rework_item(
         "tier": "machine_rework",
         "reason_code": reason,
         "selected_artifact_path": plan.get("selected_artifact_path"),
+        "diagnostics": dict(diagnostics or {}),
     }
 
 
@@ -3134,11 +3185,29 @@ def _selection_failure_reason(exc: Exception) -> str:
 def _semantic_failure_reason(exc: Exception) -> str:
     text = str(exc).lower()
     code = str(getattr(exc, "code", "") or "").lower()
+    row_categories = {
+        str(item.get("failure_category") or "")
+        for item in (getattr(exc, "diagnostics", ()) or ())
+        if isinstance(item, Mapping)
+    }
     if code in {"authentication_error", "configuration_error"}:
         return "blocked_configuration"
-    if "schema" in text:
+    if "schema" in text or "schema_validation_failed" in row_categories:
         return "schema_failure"
-    if "context" in text or "offset" in text:
+    if (
+        "context" in text
+        or "offset" in text
+        or "evidence" in text
+        or "quote" in text
+        or "unit" in text
+        or "numeric" in text
+        or row_categories
+        & {
+            "invalid_exact_evidence",
+            "numeric_validation_failed",
+            "unit_validation_failed",
+        }
+    ):
         return "context_incomplete"
     return "gateway_failure"
 

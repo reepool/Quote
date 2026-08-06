@@ -1,5 +1,6 @@
 import hashlib
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -85,6 +86,8 @@ class _FakeGateway:
         value = self.responses.pop(0)
         if isinstance(value, BaseException):
             raise value
+        if isinstance(value, LlmResponse):
+            return value
         return _response(value)
 
 
@@ -202,6 +205,140 @@ async def test_structured_extraction_accepts_exact_evidence_and_bounded_numbers(
     assert request_payload["field_family"] == "structured_segments"
     assert request_payload["sections"]
     assert gateway.requests[0].metadata["stage"] == "structured_semantic_extraction"
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_isolates_invalid_rows_and_audits_partial_result():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected)
+    invalid = dict(response["rows"][0])
+    invalid["revenue"] = 999.0
+    response["rows"].append(invalid)
+    audits = []
+
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response]), audit_sink=audits.append
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rows) == 1
+    assert result.rejected_rows[0]["row_index"] == 1
+    assert result.rejected_row_count == 1
+    assert result.audit.status == "partial"
+    assert result.audit.validation_gates["complete_batch"] is False
+    assert "partial_row_rejection" in result.audit.warning_codes
+    assert audits[-1]["diagnostics"]["rows_rejected"] == 1
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_bounds_details_without_truncating_rejection_count():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected)
+    invalid = dict(response["rows"][0])
+    invalid["revenue"] = 999.0
+    response["rows"].extend(dict(invalid) for _ in range(12))
+
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rejected_rows) == 10
+    assert result.rejected_row_count == 12
+    assert result.audit.diagnostics["rows_rejected"] == 12
+
+
+@pytest.mark.asyncio
+async def test_structured_schema_failure_diagnostics_do_not_persist_invalid_values():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected)
+    response["rows"][0]["segment_type"] = "raw-model-value-must-not-persist"
+    audits = []
+
+    with pytest.raises(ValueError, match=r"schema error at rows\.0\.segment_type"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([response]),
+            audit_sink=audits.append,
+        ).extract_structured_async(
+            field_family="structured_segments",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
+
+    diagnostic = audits[-1]["diagnostics"]["error_message"]
+    assert "raw-model-value-must-not-persist" not in diagnostic
+    assert diagnostic.endswith("(enum)")
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_audits_provider_budget_warning():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _response(_structured_response(selected))
+    response = replace(
+        response,
+        finish_reason="length",
+        usage=LlmUsage(input_tokens=100, output_tokens=6000, total_tokens=6100),
+        warnings=("provider_output_budget_exceeded",),
+    )
+    audits = []
+
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response]), audit_sink=audits.append
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rows) == 1
+    assert result.audit.finish_reason == "length"
+    assert "provider_output_budget_exceeded" in result.audit.warning_codes
+
+
+@pytest.mark.asyncio
+async def test_structured_failure_audit_keeps_response_usage_and_diagnostics():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    audits = []
+
+    with pytest.raises(ValueError, match="rows rejected"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([_structured_response(selected, revenue=999.0)]),
+            audit_sink=audits.append,
+        ).extract_structured_async(
+            field_family="structured_segments",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
+
+    assert audits[-1]["usage"]["output_tokens"] == 20
+    assert audits[-1]["provider_request_id"] == "provider-request-1"
+    assert audits[-1]["diagnostics"]["row_rejections"][0]["row_index"] == 0
 
 
 @pytest.mark.asyncio
