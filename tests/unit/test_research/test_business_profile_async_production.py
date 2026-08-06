@@ -469,6 +469,44 @@ def test_structured_semantic_retry_recovery_is_idempotent_and_preserves_attempts
     assert queue.get(work_id)["status"] == "retry_due"
 
 
+def test_stale_scope_recovery_requeues_terminal_items_without_content_attempts(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', "
+            "status = 'terminal_failure', attempt_count = 3, last_error = ? "
+            "WHERE work_id = ?",
+            ("ValueError: stale semantic production checkpoint scope", work_id),
+        )
+        conn.commit()
+
+    first = queue.recover_stale_scope_items()
+    second = queue.recover_stale_scope_items()
+    recovered = queue.get(work_id)
+
+    assert first["requeued"] == 1
+    assert second["requeued"] == 0
+    assert recovered["status"] == "pending"
+    assert recovered["stage"] == "publish"
+    assert recovered["attempt_count"] == 0
+    assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
+        "stale_scope_source_revision_recovered"
+    )
+
+
 def test_configuration_blocked_stage_does_not_consume_attempt(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)

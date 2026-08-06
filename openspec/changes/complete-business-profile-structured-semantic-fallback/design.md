@@ -77,3 +77,13 @@ Add an idempotent recovery operation for semantic `retry_due` or terminal work w
 ## Open Questions
 
 None. The existing common `semantic_extraction` gateway profile and SQLite write coordinator remain authoritative.
+
+## Production Follow-up (2026-08-06)
+
+The first rollout exposed two implementation gaps. `source_revision` is derived from
+mutable retry and publication state, so it may change between queue stages; only the
+logical scope (instrument, field family, cutoff, runtime identities, and promotion
+manifests) is immutable. Existing terminal items with the old stale-scope error are
+recoverable infrastructure failures and must be requeued with their attempt count
+reset. Missing LLM credentials or other explicit client configuration errors are
+operator-blocked configuration, not content failures, and must remain resumable.

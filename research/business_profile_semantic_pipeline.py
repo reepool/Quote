@@ -332,7 +332,16 @@ class BusinessProfileSemanticPipeline:
         budgets_hash = _stable_hash(asdict(self.config.budgets))
         if existing is not None:
             if existing.get("scope_hash") != scope.scope_hash:
-                raise ValueError("stale semantic production checkpoint scope")
+                # source_revision is derived from retry state and published facts;
+                # it can legitimately change after each upstream stage writes.
+                # The immutable logical scope must still match exactly.
+                if _logical_scope_payload(existing.get("scope") or {}) != _logical_scope_payload(scope):
+                    raise ValueError("stale semantic production checkpoint scope")
+                existing["scope_hash"] = scope.scope_hash
+                existing_scope = dict(existing.get("scope") or {})
+                existing_scope["source_revision"] = scope.source_revision
+                existing["scope"] = existing_scope
+                self.checkpoint_store.save(existing)
             if existing.get("budgets_hash") != budgets_hash:
                 raise ValueError("stale semantic production checkpoint budgets")
             return existing

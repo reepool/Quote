@@ -770,6 +770,64 @@ class BusinessProfileWorkRepository:
             "work_ids": recovered_ids,
         }
 
+    def recover_stale_scope_items(self) -> dict[str, Any]:
+        """Requeue work stopped by the pre-fix volatile-scope check.
+
+        A source revision is intentionally mutable while a work item advances
+        through plan/select/extract/verify. These failures are infrastructure
+        bookkeeping errors, so they must not consume content attempts.
+        """
+
+        marker = "stale semantic production checkpoint scope"
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT work_id, stage, status, attempt_count, metadata_json, "
+                "checkpoint_path FROM business_profile_work_items "
+                "WHERE status IN ('retry_due', 'terminal_failure') "
+                "AND last_error LIKE ? ORDER BY work_id",
+                (f"%{marker}%",),
+            ).fetchall()
+        now = get_shanghai_time().isoformat()
+        recovered_ids: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for row in rows:
+                try:
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                except (TypeError, json.JSONDecodeError):
+                    metadata = {}
+                metadata = dict(metadata) if isinstance(metadata, Mapping) else {}
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "stale_scope_source_revision_recovered",
+                        "recovered_at": now,
+                        "from_stage": row["stage"],
+                        "from_status": row["status"],
+                        "from_attempt_count": row["attempt_count"],
+                        "from_checkpoint_path": row["checkpoint_path"],
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                cursor = conn.execute(
+                    "UPDATE business_profile_work_items SET status = 'pending', "
+                    "attempt_count = 0, next_attempt_at = NULL, "
+                    "lease_owner = NULL, lease_expires_at = NULL, last_error = NULL, "
+                    "completed_at = NULL, metadata_json = ?, updated_at = ? "
+                    "WHERE work_id = ? AND status IN ('retry_due', 'terminal_failure')",
+                    (_canonical_json(metadata), now, row["work_id"]),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered_ids.append(str(row["work_id"]))
+            conn.commit()
+        return {
+            "eligible_stale_scope_items": len(rows),
+            "requeued": len(recovered_ids),
+            "work_ids": recovered_ids,
+        }
+
     def resolve_missing_document_exceptions(
         self,
         work: str | Mapping[str, Any],
@@ -1164,17 +1222,22 @@ class BusinessProfileAsyncProductionService:
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
         )
+        stale_scope_recovery = await self.write_coordinator.run(
+            self.repository.recover_stale_scope_items
+        )
         structured_recovery = await self.write_coordinator.run(
             self.repository.recover_structured_semantic_retries
         )
+        recovery["stale_scope"] = stale_scope_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
-        )
+        ) + int(stale_scope_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
                 *list(recovery.get("work_ids") or []),
                 *list(structured_recovery.get("work_ids") or []),
+                *list(stale_scope_recovery.get("work_ids") or []),
             }
         )
         try:
@@ -1248,17 +1311,22 @@ class BusinessProfileAsyncProductionService:
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
         )
+        stale_scope_recovery = await self.write_coordinator.run(
+            self.repository.recover_stale_scope_items
+        )
         structured_recovery = await self.write_coordinator.run(
             self.repository.recover_structured_semantic_retries
         )
+        recovery["stale_scope"] = stale_scope_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
-        )
+        ) + int(stale_scope_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
                 *list(recovery.get("work_ids") or []),
                 *list(structured_recovery.get("work_ids") or []),
+                *list(stale_scope_recovery.get("work_ids") or []),
             }
         )
         discovery = None

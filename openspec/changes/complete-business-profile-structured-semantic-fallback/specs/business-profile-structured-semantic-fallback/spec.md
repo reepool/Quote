@@ -73,3 +73,15 @@ The system SHALL report structured semantic fallback requirements, calls, accept
 - **WHEN** a batch processes ambiguous structured tables
 - **THEN** the report exposes fallback-required documents, LLM calls, accepted evidence records, rejected outputs, and remaining blockers
 - **AND** effective publication increases only for accepted evidence-backed output or governed non-disclosure completion
+
+#### Scenario: Stage source revision changes during resumable processing
+- **WHEN** a work item resumes a later stage with the same logical instrument, field-family, cutoff, runtime identities, and promotion manifests
+- **AND** only the derived source revision has changed after an upstream write
+- **THEN** the pipeline rebinds the checkpoint to the new source revision
+- **AND** it does not classify the item as stale scope
+
+#### Scenario: LLM credentials are unavailable
+- **WHEN** a required structured fallback raises an explicit LLM authentication or configuration error
+- **THEN** the semantic stage reports `blocked_configuration`
+- **AND** it creates no content machine-rework exception and consumes no content retry
+- **AND** the item remains resumable after the operator supplies valid configuration

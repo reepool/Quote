@@ -37,7 +37,7 @@ from utils.config_manager import (
     ResearchConfig,
     ResearchStorageConfig,
 )
-from utils.llm import LlmResponse, LlmUsage
+from utils.llm import LlmAuthenticationError, LlmResponse, LlmUsage
 
 
 def _storage(tmp_path):
@@ -1193,6 +1193,44 @@ def test_ambiguous_structured_table_reports_configuration_blocker(
         "semantic_network_disabled": 1
     }
     assert gateway.requests == []
+
+
+def test_llm_authentication_failure_is_a_resumable_configuration_blocker(
+    tmp_path, monkeypatch
+):
+    class _AuthGateway:
+        requests = []
+
+        async def complete(self, request):
+            self.requests.append(request)
+            raise LlmAuthenticationError("LLM API key environment variable is missing")
+
+    gateway = _AuthGateway()
+    _repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], [])
+    )
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["quality"]["blocked_configuration"] is True
+    assert extracted["quality"]["blocked_configuration_reasons"] == {
+        "llm_authentication_error": 1
+    }
+    assert extracted["quality"]["blocking_machine_rework"] == 0
 
 
 def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(

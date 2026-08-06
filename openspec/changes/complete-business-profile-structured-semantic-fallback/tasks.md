@@ -22,3 +22,10 @@
 - [x] 4.2 Add recovery idempotency and async attempt-accounting tests.
 - [x] 4.3 Run semantic, async production, backfill-control, and scheduler regression suites plus compile and OpenSpec strict validation.
 - [x] 4.4 Review the complete diff, run a bounded recovery/readiness check without PDF redownload, and document operator restart criteria.
+
+## 5. Production Follow-up
+
+- [x] 5.1 Treat `source_revision` as a mutable stage input while preserving strict logical-scope and budget validation.
+- [x] 5.2 Recover work items terminalized by the pre-fix volatile-scope check without consuming content attempts.
+- [x] 5.3 Classify LLM authentication/configuration failures as resumable `blocked_configuration` outcomes and add regression coverage.
+- [x] 5.4 Run the production-focused regression suite and perform a read-only queue readiness check.

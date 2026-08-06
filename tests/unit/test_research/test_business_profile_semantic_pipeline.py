@@ -104,6 +104,22 @@ def test_stale_scope_and_budget_checkpoint_are_rejected(tmp_path):
         changed_budget.run("resume", scope=_scope())
 
 
+def test_source_revision_drift_is_rebound_but_logical_scope_remains_strict(tmp_path):
+    path = tmp_path / "checkpoint.json"
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(),
+        checkpoint_store=SemanticProductionCheckpointStore(path),
+        handlers=_handlers(),
+    )
+    pipeline.run("plan", scope=_scope(source_revision="revision.v1"))
+
+    resumed = pipeline.run("resume", scope=_scope(source_revision="revision.v2"))
+
+    assert resumed["stage"] == "select"
+    checkpoint = json.loads(path.read_text())
+    assert checkpoint["scope"]["source_revision"] == "revision.v2"
+
+
 def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
     config = _config(
         budgets=SemanticProductionBudgets(max_tokens=10),

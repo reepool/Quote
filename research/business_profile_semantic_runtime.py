@@ -1206,19 +1206,30 @@ class BusinessProfileSemanticRuntime:
                                 "has no explicit rows for a governed table"
                             )
                     except Exception as exc:
-                        metrics["errors"] += 1
-                        metrics["structured_fallback_rejected"] += 1
-                        machine_rework.append(
-                            _rework_item(
-                                item, item["document"], _semantic_failure_reason(exc)
+                        reason = _semantic_failure_reason(exc)
+                        if reason == "blocked_configuration":
+                            blocker = _semantic_configuration_reason(exc)
+                            blocked_configuration_reasons[blocker] = (
+                                blocked_configuration_reasons.get(blocker, 0) + 1
                             )
-                        )
-                        _increment_family_metrics(
-                            metrics["by_field_family"],
-                            item["field_family"],
-                            machine_rework=1,
-                            structured_fallback_rejected=1,
-                        )
+                            metrics["configuration_blocked_documents"] += 1
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                configuration_blocked=1,
+                            )
+                        else:
+                            metrics["errors"] += 1
+                            metrics["structured_fallback_rejected"] += 1
+                            machine_rework.append(
+                                _rework_item(item, item["document"], reason)
+                            )
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                machine_rework=1,
+                                structured_fallback_rejected=1,
+                            )
                         continue
                 elif deterministic_count == 0:
                     expected_non_disclosure = True
@@ -3122,11 +3133,22 @@ def _selection_failure_reason(exc: Exception) -> str:
 
 def _semantic_failure_reason(exc: Exception) -> str:
     text = str(exc).lower()
+    code = str(getattr(exc, "code", "") or "").lower()
+    if code in {"authentication_error", "configuration_error"}:
+        return "blocked_configuration"
     if "schema" in text:
         return "schema_failure"
     if "context" in text or "offset" in text:
         return "context_incomplete"
     return "gateway_failure"
+
+
+def _semantic_configuration_reason(exc: Exception) -> str:
+    code = str(getattr(exc, "code", "") or "").lower()
+    return {
+        "authentication_error": "llm_authentication_error",
+        "configuration_error": "llm_configuration_error",
+    }.get(code, "semantic_gateway_unavailable")
 
 
 class _RuntimeAsyncBridge:
