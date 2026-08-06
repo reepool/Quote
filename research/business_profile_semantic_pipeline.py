@@ -286,10 +286,16 @@ class BusinessProfileSemanticPipeline:
         quality = dict(result.get("quality") or {})
         if quality and not bool(quality.get("stage_ready", True)):
             checkpoint["artifacts"][stage] = result.get("artifact")
-            reason = (
-                f"quality_gate:{stage}:"
-                f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)}"
-            )
+            if quality.get("blocked_configuration") is True:
+                reasons = ",".join(
+                    sorted(dict(quality.get("blocked_configuration_reasons") or {}))
+                )
+                reason = f"blocked_configuration:{stage}:{reasons or 'unknown'}"
+            else:
+                reason = (
+                    f"quality_gate:{stage}:"
+                    f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)}"
+                )
             stopped = self._stop(checkpoint, reason)
             return {**stopped, "quality": quality}
         if stop_reason:

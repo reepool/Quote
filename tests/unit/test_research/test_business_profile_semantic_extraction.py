@@ -15,7 +15,11 @@ from research.business_profile_semantic_extraction import (
 from utils.llm import LlmResponse, LlmUsage
 
 
-def _selected(text="主要业务：公司生产动力煤并销售动力煤。"):
+def _selected(
+    text="主要业务：公司生产动力煤并销售动力煤。",
+    *,
+    field_family="atomic_activities",
+):
     artifact = {
         "source_content_hash": hashlib.sha256(b"document").hexdigest(),
         "pages": [
@@ -42,7 +46,7 @@ def _selected(text="主要业务：公司生产动力煤并销售动力煤。"):
         artifact=artifact,
         instrument_id="601088.SH",
         source_document_id="report-1",
-        field_family="atomic_activities",
+        field_family=field_family,
         templates=templates,
     )
 
@@ -82,6 +86,42 @@ class _FakeGateway:
         if isinstance(value, BaseException):
             raise value
         return _response(value)
+
+
+def _structured_response(
+    selected,
+    *,
+    revenue=100.0,
+    gross_margin=0.4,
+    segment_name="煤炭",
+    quote=None,
+):
+    section = selected.sections[0]
+    exact_quote = quote or "煤炭 100 60 40%"
+    start = section.normalized_text.index(exact_quote)
+    return {
+        "schema_version": "business_profile_structured_extraction.v1",
+        "field_family": "structured_segments",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "rows": [
+            {
+                "segment_type": "product",
+                "segment_name_raw": segment_name,
+                "revenue": revenue,
+                "segment_cost": 60.0,
+                "gross_margin": gross_margin,
+                "currency_unit": "万元",
+                "evidence": {
+                    "section_id": section.section_id,
+                    "page_number": section.page_number,
+                    "quote": exact_quote,
+                    "section_start": start,
+                    "section_end": start + len(exact_quote),
+                },
+            }
+        ],
+    }
 
 
 def _activity_response(selected, *, quote=None, start=None, end=None, extra=None):
@@ -137,6 +177,78 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     assert result.audit.actual_model == "provider-model-v2"
     assert result.audit.usage["total_tokens"] == 120
     assert audits[0]["response_hash"]
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_accepts_exact_evidence_and_bounded_numbers():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    gateway = _FakeGateway([_structured_response(selected)])
+
+    result = await BusinessProfileSemanticExtractor(
+        gateway
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rows) == 1
+    assert result.rows[0]["evidence"]["quote_hash"]
+    request_payload = json.loads(gateway.requests[0].messages[-1].content)
+    assert request_payload["field_family"] == "structured_segments"
+    assert request_payload["sections"]
+    assert gateway.requests[0].metadata["stage"] == "structured_semantic_extraction"
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_rejects_unsupported_numeric_quote_atomically():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected, revenue=999.0)
+
+    with pytest.raises(ValueError, match="revenue is absent from exact quote"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([response])
+        ).extract_structured_async(
+            field_family="structured_segments",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
+
+
+@pytest.mark.asyncio
+async def test_structured_extraction_rejects_percentage_scale_and_name_mismatch():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+
+    with pytest.raises(ValueError, match="decimal fraction"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([_structured_response(selected, gross_margin=40.0)])
+        ).extract_structured_async(
+            field_family="structured_segments",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
+
+    with pytest.raises(ValueError, match="segment name is absent"):
+        await BusinessProfileSemanticExtractor(
+            _FakeGateway([_structured_response(selected, segment_name="焦炭")])
+        ).extract_structured_async(
+            field_family="structured_segments",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
 
 
 @pytest.mark.asyncio

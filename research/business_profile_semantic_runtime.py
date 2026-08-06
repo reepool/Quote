@@ -58,6 +58,7 @@ from research.business_profile_section_selection import (
 from research.business_profile_report_outline import locate_business_profile_outline
 from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
     deterministic_semantic_verification_decision,
 )
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
@@ -1080,6 +1081,12 @@ class BusinessProfileSemanticRuntime:
         metrics: dict[str, Any] = {
             "deterministic_completed": 0,
             "llm_calls": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "configuration_blocked_documents": 0,
+            "expected_non_disclosure_documents": 0,
             "tokens": 0,
             "cost": 0,
             "errors": 0,
@@ -1089,6 +1096,7 @@ class BusinessProfileSemanticRuntime:
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
         empty_output_reasons: dict[str, int] = {}
+        blocked_configuration_reasons: dict[str, int] = {}
         for item in selected_payload["selected"]:
             selected = _load_selected(
                 self.section_store, item["selected_artifact_path"]
@@ -1099,25 +1107,121 @@ class BusinessProfileSemanticRuntime:
             records_by_type: dict[str, list[dict[str, Any]]] = {}
             semantic_audit: Mapping[str, Any] | None = None
             semantic_records: list[tuple[str, dict[str, Any]]] = []
+            structured_fallback_used = False
+            expected_non_disclosure = False
             if item["field_family"] in {
                 "structured_segments",
                 "tabular_operating_facts",
             }:
                 records_by_type = self._deterministic_records(item, selected, tables)
-                metrics["deterministic_completed"] += sum(
+                deterministic_count = sum(
                     len(rows)
                     for key, rows in records_by_type.items()
                     if key != "evidence"
                 )
+                metrics["deterministic_completed"] += deterministic_count
                 _increment_family_metrics(
                     metrics["by_field_family"],
                     item["field_family"],
-                    deterministic_completed=sum(
-                        len(rows)
-                        for key, rows in records_by_type.items()
-                        if key != "evidence"
-                    ),
+                    deterministic_completed=deterministic_count,
                 )
+                fallback_reason = (
+                    _structured_fallback_reason(selected, diagnostics)
+                    if deterministic_count == 0
+                    else None
+                )
+                if fallback_reason is not None:
+                    metrics["structured_fallback_required"] += 1
+                    _increment_family_metrics(
+                        metrics["by_field_family"],
+                        item["field_family"],
+                        structured_fallback_required=1,
+                    )
+                    if config.kill_switches["network_calls"] or self.llm_client is None:
+                        reason = (
+                            "semantic_network_disabled"
+                            if config.kill_switches["network_calls"]
+                            else "semantic_gateway_unavailable"
+                        )
+                        blocked_configuration_reasons[reason] = (
+                            blocked_configuration_reasons.get(reason, 0) + 1
+                        )
+                        metrics["configuration_blocked_documents"] += 1
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            configuration_blocked=1,
+                        )
+                        continue
+                    budget_stop_reason = self._network_budget_stop_reason(
+                        config=config,
+                        checkpoint_metrics=checkpoint.get("metrics") or {},
+                        stage_metrics=metrics,
+                        stage_started_at=stage_started_at,
+                    )
+                    if budget_stop_reason:
+                        break
+                    extractor = BusinessProfileSemanticExtractor(self.llm_client)
+                    try:
+                        envelope = self._async_bridge.run(
+                            extractor.extract_structured_async(
+                                field_family=item["field_family"],
+                                instrument_id=item["instrument_id"],
+                                report_period=str(item["document"]["report_period"]),
+                                selected=selected,
+                            )
+                        )
+                        structured_fallback_used = True
+                        semantic_audit = envelope.audit.to_dict()
+                        records_by_type = self._structured_semantic_records(
+                            item,
+                            selected,
+                            envelope.rows,
+                        )
+                        accepted = sum(
+                            len(rows)
+                            for key, rows in records_by_type.items()
+                            if key != "evidence"
+                        )
+                        metrics["llm_calls"] += 1
+                        metrics["structured_fallback_calls"] += 1
+                        metrics["structured_fallback_accepted_records"] += accepted
+                        metrics["tokens"] += float(
+                            (semantic_audit.get("usage") or {}).get("total_tokens") or 0
+                        )
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            llm_calls=1,
+                            structured_fallback_calls=1,
+                            structured_fallback_accepted_records=accepted,
+                            tokens=float(
+                                (semantic_audit.get("usage") or {}).get("total_tokens")
+                                or 0
+                            ),
+                        )
+                        if accepted == 0:
+                            raise ValueError(
+                                "context incomplete: structured semantic response "
+                                "has no explicit rows for a governed table"
+                            )
+                    except Exception as exc:
+                        metrics["errors"] += 1
+                        metrics["structured_fallback_rejected"] += 1
+                        machine_rework.append(
+                            _rework_item(
+                                item, item["document"], _semantic_failure_reason(exc)
+                            )
+                        )
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            machine_rework=1,
+                            structured_fallback_rejected=1,
+                        )
+                        continue
+                elif deterministic_count == 0:
+                    expected_non_disclosure = True
             elif item["field_family"] in {"atomic_activities", "named_relationships"}:
                 if config.kill_switches["network_calls"] or self.llm_client is None:
                     machine_rework.append(
@@ -1195,6 +1299,11 @@ class BusinessProfileSemanticRuntime:
                         "document_hash": item["document"].get("content_hash"),
                         "selected_hash": item["selected_artifact_hash"],
                         "runtime_identities": dict(scope.identities),
+                        "structured_semantic_schema": (
+                            STRUCTURED_EXTRACTION_SCHEMA_VERSION
+                            if structured_fallback_used
+                            else None
+                        ),
                     }
                 )[:24]
             )
@@ -1206,7 +1315,19 @@ class BusinessProfileSemanticRuntime:
                 if key != "evidence"
             )
             if item_record_count == 0:
-                if item["field_family"] in {"atomic_activities", "named_relationships"}:
+                if expected_non_disclosure:
+                    empty_reason = (
+                        "semantic_no_explicit_facts"
+                        if structured_fallback_used
+                        else "expected_non_disclosure"
+                    )
+                    metrics["expected_non_disclosure_documents"] += 1
+                    _increment_family_metrics(
+                        metrics["by_field_family"],
+                        item["field_family"],
+                        expected_non_disclosure=1,
+                    )
+                elif item["field_family"] in {"atomic_activities", "named_relationships"}:
                     empty_reason = "semantic_no_explicit_facts"
                 elif diagnostics:
                     empty_reason = "deterministic_parser_failure"
@@ -1249,6 +1370,10 @@ class BusinessProfileSemanticRuntime:
                                 value.to_dict() for value in diagnostics
                             ],
                             "semantic_audit": semantic_audit,
+                            "expected_non_disclosure": expected_non_disclosure,
+                            "empty_output_reason": (
+                                empty_reason if item_record_count == 0 else None
+                            ),
                         },
                     },
                     records_by_type=records_by_type,
@@ -1282,6 +1407,7 @@ class BusinessProfileSemanticRuntime:
                         for row in records_by_type.get("evidence", [])
                     ],
                     "semantic": semantic_audit is not None,
+                    "expected_non_disclosure": expected_non_disclosure,
                 }
             )
             _increment_family_metrics(
@@ -1320,6 +1446,18 @@ class BusinessProfileSemanticRuntime:
         metrics["record_count"] = record_count
         metrics["selected_documents"] = len(outputs)
         metrics["empty_output_documents"] = sum(empty_output_reasons.values())
+        metrics["blocked_configuration_reasons"] = blocked_configuration_reasons
+        expected_non_disclosure_documents = sum(
+            1 for item in outputs if item.get("expected_non_disclosure") is True
+        )
+        stage_has_usable_outcome = bool(
+            outputs
+            and (
+                evidence_records > 0
+                or expected_non_disclosure_documents == len(outputs)
+            )
+        )
+        blocked_configuration = bool(blocked_configuration_reasons)
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "extract",
@@ -1348,6 +1486,9 @@ class BusinessProfileSemanticRuntime:
                     "record_count": record_count,
                     "empty_output_documents": sum(empty_output_reasons.values()),
                     "empty_output_reasons": empty_output_reasons,
+                    "expected_non_disclosure_documents": expected_non_disclosure_documents,
+                    "blocked_configuration": blocked_configuration,
+                    "blocked_configuration_reasons": blocked_configuration_reasons,
                 },
                 "metrics": metrics,
             }
@@ -1357,13 +1498,32 @@ class BusinessProfileSemanticRuntime:
             "source_revision": effective_scope.source_revision,
             "quality": {
                 "stage": "extract",
-                "stage_ready": bool(outputs and not machine_rework and evidence_records),
+                "stage_ready": bool(
+                    stage_has_usable_outcome
+                    and not machine_rework
+                    and not blocked_configuration
+                ),
                 "blocking_machine_rework": len(machine_rework),
                 "selected_documents": len(outputs),
                 "evidence_records": evidence_records,
                 "record_count": record_count,
                 "empty_output_documents": sum(empty_output_reasons.values()),
                 "empty_output_reasons": empty_output_reasons,
+                "expected_non_disclosure_documents": expected_non_disclosure_documents,
+                "blocked_configuration": blocked_configuration,
+                "blocked_configuration_reasons": blocked_configuration_reasons,
+                "structured_fallback_required": int(
+                    metrics["structured_fallback_required"]
+                ),
+                "structured_fallback_calls": int(
+                    metrics["structured_fallback_calls"]
+                ),
+                "structured_fallback_accepted_records": int(
+                    metrics["structured_fallback_accepted_records"]
+                ),
+                "structured_fallback_rejected": int(
+                    metrics["structured_fallback_rejected"]
+                ),
             },
             "metrics": metrics,
         }
@@ -1397,6 +1557,25 @@ class BusinessProfileSemanticRuntime:
                 for target_id in output["record_ids"].get(record_type, []):
                     target = self._find_record(record_type, target_id)
                     verification_target = _verification_target(target)
+                    if (
+                        record_type == "operating_facts"
+                        and verification_target.get("derivation_method")
+                        == "semantic_structured_fallback"
+                        and verification_target.get("exact_evidence_valid") is True
+                    ):
+                        verifications.append(
+                            {
+                                "target_type": target_type,
+                                "target_id": target_id,
+                                "decision": "confirmed",
+                                "proof": {
+                                    "skip_semantic_verifier": True,
+                                    "reason": "validated_structured_semantic_candidate",
+                                    "canonical_promotion_allowed": False,
+                                },
+                            }
+                        )
+                        continue
                     bypass = deterministic_semantic_verification_decision(
                         verification_target
                     )
@@ -1760,6 +1939,39 @@ class BusinessProfileSemanticRuntime:
                     for record in records:
                         _bind_promotion_validation(record, evidence_row)
                     output.setdefault("operating_facts", []).extend(records)
+        return output
+
+    def _structured_semantic_records(
+        self,
+        item: Mapping[str, Any],
+        selected: SelectedSectionArtifact,
+        rows: Sequence[Mapping[str, Any]],
+    ) -> dict[str, list[dict[str, Any]]]:
+        evidence_by_id: dict[str, dict[str, Any]] = {}
+        output: dict[str, list[dict[str, Any]]] = {"evidence": []}
+        for raw in rows:
+            row = dict(raw)
+            evidence = _semantic_evidence(item, selected, row)
+            validation = evidence.setdefault("metadata", {}).setdefault(
+                "promotion_validation", {}
+            )
+            validation["numeric_reconciliation_valid"] = False
+            evidence_by_id[evidence["evidence_id"]] = evidence
+            if item["field_family"] == "structured_segments":
+                record = _semantic_segment_record(
+                    item, row, evidence["evidence_id"]
+                )
+                output.setdefault("segments", []).append(record)
+            elif item["field_family"] == "tabular_operating_facts":
+                record = _semantic_operating_record(
+                    item, row, evidence["evidence_id"]
+                )
+                output.setdefault("operating_facts", []).append(record)
+            else:
+                raise ValueError("unsupported structured semantic field family")
+            record.setdefault("metadata", {})["exact_evidence"] = row["evidence"]
+            _bind_promotion_validation(record, evidence)
+        output["evidence"] = list(evidence_by_id.values())
         return output
 
     def _semantic_records(
@@ -2318,6 +2530,20 @@ def _load_selected(
     )
 
 
+def _structured_fallback_reason(
+    selected: SelectedSectionArtifact, diagnostics: Sequence[Any]
+) -> str | None:
+    if diagnostics:
+        return "deterministic_parser_failure"
+    if any(
+        reason.startswith("table_signature:")
+        for section in selected.sections
+        for reason in section.selector_reasons
+    ):
+        return "ambiguous_table_layout"
+    return None
+
+
 def _market_scope(instrument_id: str, document: Mapping[str, Any]) -> tuple[str, str]:
     suffix = instrument_id.rsplit(".", 1)[-1].upper()
     exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(suffix)
@@ -2496,6 +2722,64 @@ def _segment_record(
     }
 
 
+def _semantic_segment_record(
+    item: Mapping[str, Any], row: Mapping[str, Any], evidence_id: str
+) -> dict[str, Any]:
+    revenue = row.get("revenue")
+    cost = row.get("segment_cost")
+    raw_unit = str(row.get("currency_unit") or "").strip()
+    currency = None
+    if revenue is not None:
+        revenue, currency = _normalized_value(float(revenue), raw_unit, "currency")
+    if cost is not None:
+        cost, cost_currency = _normalized_value(float(cost), raw_unit, "currency")
+        if currency is not None and cost_currency != currency:
+            raise ValueError("semantic segment revenue and cost currency mismatch")
+        currency = currency or cost_currency
+    margin = row.get("gross_margin")
+    start, end = derive_report_observation_interval(item["document"]["report_period"])
+    record_id = "bp-segment-" + _stable_hash(
+        {
+            "document": item["document"]["identity"],
+            "segment_type": row["segment_type"],
+            "segment_name_raw": row["segment_name_raw"],
+            "evidence": row["evidence"],
+            "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+        }
+    )[:24]
+    return {
+        "record_id": record_id,
+        "instrument_id": item["instrument_id"],
+        "report_period": item["document"]["report_period"],
+        "segment_id": "segment-" + _stable_hash(row["segment_name_raw"])[:16],
+        "segment_name_raw": row["segment_name_raw"],
+        "segment_name_normalized": None,
+        "segment_type": row["segment_type"],
+        "revenue": revenue,
+        "segment_cost": cost,
+        "gross_margin": None if margin is None else float(margin),
+        "currency": currency,
+        "consolidation_scope": "source_reported_unknown",
+        "source_document_id": item["document"]["identity"],
+        "evidence_id": evidence_id,
+        "data_available_date": str(item["document"]["published_at"])[:10],
+        "extraction_method": "semantic_structured_fallback",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": start,
+        "valid_to": end,
+        "knowledge_from": str(item["document"]["published_at"])[:10],
+        "version": 1,
+        "metadata": {
+            "derivation_method": "semantic_structured_fallback",
+            "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            "numeric_reconciliation_valid": False,
+            "parser_manifest_promoted": False,
+            "exact_evidence_valid": True,
+        },
+    }
+
+
 def _operating_records(
     item: Mapping[str, Any], table: Any, row: Mapping[str, Any], evidence_id: str
 ) -> list[dict[str, Any]]:
@@ -2558,6 +2842,53 @@ def _operating_records(
             }
         )
     return output
+
+
+def _semantic_operating_record(
+    item: Mapping[str, Any], row: Mapping[str, Any], evidence_id: str
+) -> dict[str, Any]:
+    value = float(row["value"])
+    raw_unit = str(row["unit_raw"])
+    normalized_value, normalized_unit = _normalized_value(value, raw_unit)
+    start, end = derive_report_observation_interval(item["document"]["report_period"])
+    record_id = "bp-operating-" + _stable_hash(
+        {
+            "document": item["document"]["identity"],
+            "segment_name_raw": row["segment_name_raw"],
+            "fact_type": row["fact_type"],
+            "fact_scope": row["fact_scope"],
+            "evidence": row["evidence"],
+            "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+        }
+    )[:24]
+    return {
+        "record_id": record_id,
+        "instrument_id": item["instrument_id"],
+        "report_period": item["document"]["report_period"],
+        "segment_id": "segment-" + _stable_hash(row["segment_name_raw"])[:16],
+        "fact_type": row["fact_type"],
+        "value_raw": value,
+        "unit_raw": raw_unit,
+        "value_normalized": normalized_value,
+        "unit_normalized": normalized_unit,
+        "fact_scope": row["fact_scope"],
+        "equity_basis": "source_reported_unknown",
+        "evidence_id": evidence_id,
+        "data_available_date": str(item["document"]["published_at"])[:10],
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": start,
+        "valid_to": end,
+        "knowledge_from": str(item["document"]["published_at"])[:10],
+        "version": 1,
+        "metadata": {
+            "derivation_method": "semantic_structured_fallback",
+            "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            "numeric_reconciliation_valid": False,
+            "parser_manifest_promoted": False,
+            "exact_evidence_valid": True,
+        },
+    }
 
 
 def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:

@@ -385,6 +385,145 @@ def test_evidence_free_recovery_reuses_manifest_and_resumes_from_parse(tmp_path)
     assert manifest_after["archive_path"] == manifest_before["archive_path"]
 
 
+def test_structured_semantic_retry_recovery_is_idempotent_and_preserves_attempts(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"%PDF-1.4\nreusable\n%%EOF",
+        ),
+    ).acquire(item)
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "completed_stages": ["plan", "select"],
+                "metrics": {
+                    "selected_pages": 12,
+                    "evidence_records": 0,
+                    "record_count": 0,
+                    "by_field_family": {
+                        "structured_segments": {
+                            "reason_code_counts": {
+                                "ambiguous_table_layout": 1
+                            }
+                        }
+                    },
+                },
+                "status": "stopped",
+            }
+        ),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'retry_due', attempt_count = 2, last_error = ?",
+            ("RuntimeError: quality_gate:extract:blocking_machine_rework=0",),
+        )
+        conn.commit()
+
+    first = queue.recover_structured_semantic_retries()
+    second = queue.recover_structured_semantic_retries()
+    recovered = queue.get(work_id)
+
+    assert first["requeued"] == 1
+    assert second["requeued"] == 0
+    assert recovered["stage"] == "semantic"
+    assert recovered["status"] == "pending"
+    assert recovered["attempt_count"] == 2
+    assert recovered["checkpoint_path"] == str(checkpoint)
+    assert recovered["metadata"]["recovery_history"][-1]["zero_output_reasons"] == [
+        "ambiguous_table_layout"
+    ]
+    assert queue.get_usable_bound_manifest(recovered) is not None
+
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'retry_due', "
+            "last_error = 'RuntimeError: database locked' WHERE work_id = ?",
+            (work_id,),
+        )
+        conn.commit()
+    unrelated = queue.recover_structured_semantic_retries()
+
+    assert unrelated["requeued"] == 0
+    assert queue.get(work_id)["status"] == "retry_due"
+
+
+def test_configuration_blocked_stage_does_not_consume_attempt(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', status = 'pending'"
+        )
+        conn.commit()
+
+    async def stage_runner(_stage, _item):
+        return {
+            "status": "stopped",
+            "reason": "blocked_configuration:extract:semantic_network_disabled",
+            "quality": {
+                "stage_ready": False,
+                "blocked_configuration": True,
+                "blocked_configuration_reasons": {
+                    "semantic_network_disabled": 1
+                },
+            },
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+        retry_backoff_seconds=1,
+    )
+    semantic = asyncio.run(
+        service._drain_stage(
+            "semantic",
+            StageBudget(max_items=1, max_concurrency=1),
+        )
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+
+    assert semantic["configuration_blocked"] == 1
+    assert semantic["retried"] == 0
+    assert semantic["terminal_failures"] == 0
+    assert item["status"] == "retry_due"
+    assert item["attempt_count"] == 0
+    assert item["last_error"].startswith("blocked_configuration:")
+
+
 def test_evidence_free_recovery_requires_positive_defect_history(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -475,6 +614,12 @@ def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
         "outline_sources": {"table_of_contents": 1},
         "outline_confidences": {"high": 1},
         "empty_output_reasons": {"ambiguous_table_layout": 1},
+        "expected_non_disclosure_documents": 0,
+        "structured_fallback_required": 0,
+        "structured_fallback_calls": 0,
+        "structured_fallback_accepted_records": 0,
+        "structured_fallback_rejected": 0,
+        "blocked_configuration_reasons": {},
     }
     with storage.get_connection() as conn:
         row = conn.execute(

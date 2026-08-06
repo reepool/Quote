@@ -390,6 +390,44 @@ class BusinessProfileWorkRepository:
             return "lease_lost"
         return status
 
+    def defer_configuration(
+        self,
+        work_id: str,
+        *,
+        lease_owner: str,
+        reason: str,
+        retry_after_seconds: int = 300,
+    ) -> str:
+        """Release a configuration-blocked lease without consuming an attempt."""
+
+        now = get_shanghai_time()
+        next_attempt_at = (
+            now + timedelta(seconds=max(1, int(retry_after_seconds)))
+        ).isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                """
+                UPDATE business_profile_work_items
+                SET status = 'retry_due',
+                    attempt_count = CASE
+                        WHEN attempt_count > 0 THEN attempt_count - 1 ELSE 0
+                    END,
+                    next_attempt_at = ?, lease_owner = NULL,
+                    lease_expires_at = NULL, last_error = ?, updated_at = ?
+                WHERE work_id = ? AND status = 'running' AND lease_owner = ?
+                """,
+                (
+                    next_attempt_at,
+                    str(reason)[:4000],
+                    now.isoformat(),
+                    work_id,
+                    str(lease_owner),
+                ),
+            )
+            conn.commit()
+        return "configuration_blocked" if int(cursor.rowcount or 0) == 1 else "lease_lost"
+
     def get(self, work_id: str) -> dict[str, Any]:
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -660,6 +698,73 @@ class BusinessProfileWorkRepository:
             conn.commit()
         return {
             "eligible_completed": len(rows),
+            "valid_manifest_candidates": len(candidates),
+            "requeued": len(recovered_ids),
+            "work_ids": recovered_ids,
+        }
+
+    def recover_structured_semantic_retries(self) -> dict[str, Any]:
+        """Resume only structured semantic retries proven to lack usable evidence."""
+
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM business_profile_work_items "
+                "WHERE stage = 'semantic' "
+                "AND status IN ('retry_due', 'terminal_failure') "
+                "ORDER BY work_id"
+            ).fetchall()
+        candidates: list[tuple[dict[str, Any], tuple[str, ...]]] = []
+        for row in rows:
+            item = _decode_work_row(row)
+            if not _is_structured_semantic_quality_failure(item.get("last_error")):
+                continue
+            reasons = _structured_semantic_checkpoint_reasons(
+                Path(str(item.get("checkpoint_path") or ""))
+            )
+            if not reasons or self.get_usable_bound_manifest(item) is None:
+                continue
+            candidates.append((item, reasons))
+        now = get_shanghai_time().isoformat()
+        recovered_ids: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for item, reasons in candidates:
+                metadata = dict(item.get("metadata") or {})
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "structured_semantic_fallback_activated",
+                        "recovered_at": now,
+                        "from_stage": item.get("stage"),
+                        "from_status": item.get("status"),
+                        "from_attempt_count": item.get("attempt_count"),
+                        "checkpoint_path": item.get("checkpoint_path"),
+                        "zero_output_reasons": list(reasons),
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                cursor = conn.execute(
+                    """
+                    UPDATE business_profile_work_items
+                    SET status = 'pending', next_attempt_at = NULL,
+                        lease_owner = NULL, lease_expires_at = NULL,
+                        last_error = NULL, metadata_json = ?, updated_at = ?
+                    WHERE work_id = ? AND stage = 'semantic'
+                      AND status IN ('retry_due', 'terminal_failure')
+                    """,
+                    (
+                        _canonical_json(metadata),
+                        now,
+                        item["work_id"],
+                    ),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered_ids.append(str(item["work_id"]))
+            conn.commit()
+        return {
+            "eligible_semantic_retries": len(rows),
             "valid_manifest_candidates": len(candidates),
             "requeued": len(recovered_ids),
             "work_ids": recovered_ids,
@@ -1059,6 +1164,19 @@ class BusinessProfileAsyncProductionService:
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
         )
+        structured_recovery = await self.write_coordinator.run(
+            self.repository.recover_structured_semantic_retries
+        )
+        recovery["structured_semantic"] = structured_recovery
+        recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
+            structured_recovery.get("requeued") or 0
+        )
+        recovery["work_ids"] = sorted(
+            {
+                *list(recovery.get("work_ids") or []),
+                *list(structured_recovery.get("work_ids") or []),
+            }
+        )
         try:
             discovery = dict(await self.discovery_runner(**dict(discovery_kwargs)))
         except Exception as exc:
@@ -1129,6 +1247,19 @@ class BusinessProfileAsyncProductionService:
                 )
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
+        )
+        structured_recovery = await self.write_coordinator.run(
+            self.repository.recover_structured_semantic_retries
+        )
+        recovery["structured_semantic"] = structured_recovery
+        recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
+            structured_recovery.get("requeued") or 0
+        )
+        recovery["work_ids"] = sorted(
+            {
+                *list(recovery.get("work_ids") or []),
+                *list(structured_recovery.get("work_ids") or []),
+            }
         )
         discovery = None
         if discovery_kwargs is not None:
@@ -1252,6 +1383,7 @@ class BusinessProfileAsyncProductionService:
     ) -> dict[str, Any]:
         started = time.monotonic()
         claimed = completed = retried = failed = lease_conflicts = 0
+        configuration_blocked = 0
         quality_totals: dict[str, Any] = {}
         errors: list[dict[str, str]] = []
         stopped = False
@@ -1282,6 +1414,7 @@ class BusinessProfileAsyncProductionService:
 
             async def run_one(item: Mapping[str, Any]) -> None:
                 nonlocal completed, retried, failed, lease_conflicts
+                nonlocal configuration_blocked
                 try:
                     result = dict(await self.stage_runner(stage, item))
                     quality = dict(result.get("quality") or {})
@@ -1294,6 +1427,11 @@ class BusinessProfileAsyncProductionService:
                         "record_count",
                         "verified_records",
                         "empty_output_documents",
+                        "expected_non_disclosure_documents",
+                        "structured_fallback_required",
+                        "structured_fallback_calls",
+                        "structured_fallback_accepted_records",
+                        "structured_fallback_rejected",
                     ):
                         quality_totals[key] = quality_totals.get(key, 0) + int(
                             quality.get(key) or 0
@@ -1302,6 +1440,7 @@ class BusinessProfileAsyncProductionService:
                         "outline_sources",
                         "outline_confidences",
                         "empty_output_reasons",
+                        "blocked_configuration_reasons",
                     ):
                         target = quality_totals.setdefault(counter_name, {})
                         for label, count in dict(
@@ -1310,6 +1449,29 @@ class BusinessProfileAsyncProductionService:
                             target[str(label)] = target.get(str(label), 0) + int(
                                 count or 0
                             )
+                    if quality.get("blocked_configuration") is True:
+                        reasons = ",".join(
+                            sorted(
+                                dict(
+                                    quality.get("blocked_configuration_reasons") or {}
+                                )
+                            )
+                        )
+                        deferred_status = await self.write_coordinator.run(
+                            self.repository.defer_configuration,
+                            str(item["work_id"]),
+                            lease_owner=lease_owner,
+                            reason=(
+                                "blocked_configuration:"
+                                + (reasons or "semantic_gateway_unavailable")
+                            ),
+                            retry_after_seconds=self.retry_backoff_seconds,
+                        )
+                        if deferred_status == "configuration_blocked":
+                            configuration_blocked += 1
+                        else:
+                            lease_conflicts += 1
+                        return
                     status = str(result.get("status") or "").lower()
                     if status not in {"success", "completed", "unchanged"}:
                         raise RuntimeError(
@@ -1363,6 +1525,7 @@ class BusinessProfileAsyncProductionService:
             "retried": retried,
             "terminal_failures": failed,
             "lease_conflicts": lease_conflicts,
+            "configuration_blocked": configuration_blocked,
             "errors": errors[:20],
             "quality": quality_totals,
             "elapsed_seconds": round(time.monotonic() - started, 3),
@@ -1489,6 +1652,39 @@ def _write_recovery_checkpoint(
         temporary.unlink(missing_ok=True)
         return False
     return True
+
+
+def _structured_semantic_checkpoint_reasons(path: Path) -> tuple[str, ...]:
+    if not path.is_file():
+        return ()
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return ()
+    if not isinstance(payload, Mapping):
+        return ()
+    metrics = dict(payload.get("metrics") or {})
+    if (
+        int(metrics.get("selected_pages") or metrics.get("pages") or 0) <= 0
+        or int(metrics.get("evidence_records") or 0) != 0
+        or int(metrics.get("record_count") or 0) != 0
+    ):
+        return ()
+    reasons = set(dict(metrics.get("empty_output_reasons") or {}))
+    for raw in dict(metrics.get("by_field_family") or {}).values():
+        family = dict(raw or {})
+        reasons.update(dict(family.get("reason_code_counts") or {}))
+    affected = reasons.intersection(
+        {"ambiguous_table_layout", "deterministic_parser_failure"}
+    )
+    return tuple(sorted(affected))
+
+
+def _is_structured_semantic_quality_failure(error: Any) -> bool:
+    normalized = str(error or "").strip().lower()
+    return "quality_gate:extract" in normalized or (
+        "stage quality gate failed" in normalized and "stage=semantic" in normalized
+    )
 
 
 def _business_profile_throughput(

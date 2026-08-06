@@ -209,6 +209,93 @@ class _FakeGateway:
         self.closed = True
 
 
+class _StructuredSegmentGateway(_FakeGateway):
+    async def complete(self, request):
+        self.requests.append(request)
+        payload = json.loads(request.messages[-1].content)
+        span = payload["sections"][0]
+        quote = "煤炭 100 60 40%"
+        local_start = span["text"].index(quote)
+        start = span["text_start"] + local_start
+        return _response(
+            {
+                "schema_version": "business_profile_structured_extraction.v1",
+                "field_family": payload["field_family"],
+                "instrument_id": payload["instrument_id"],
+                "report_period": payload["report_period"],
+                "rows": [
+                    {
+                        "segment_type": "product",
+                        "segment_name_raw": "煤炭",
+                        "revenue": 100.0,
+                        "segment_cost": 60.0,
+                        "gross_margin": 0.4,
+                        "currency_unit": "万元",
+                        "evidence": {
+                            "section_id": span["section_id"],
+                            "page_number": span["page_number"],
+                            "quote": quote,
+                            "section_start": start,
+                            "section_end": start + len(quote),
+                        },
+                    }
+                ],
+            },
+            request,
+        )
+
+
+class _StructuredOperatingGateway(_FakeGateway):
+    async def complete(self, request):
+        self.requests.append(request)
+        payload = json.loads(request.messages[-1].content)
+        span = payload["sections"][0]
+        quote = "煤炭 200 210 50"
+        local_start = span["text"].index(quote)
+        start = span["text_start"] + local_start
+        return _response(
+            {
+                "schema_version": "business_profile_structured_extraction.v1",
+                "field_family": payload["field_family"],
+                "instrument_id": payload["instrument_id"],
+                "report_period": payload["report_period"],
+                "rows": [
+                    {
+                        "segment_name_raw": "煤炭",
+                        "fact_type": "production_volume",
+                        "value": 210.0,
+                        "unit_raw": "万吨",
+                        "fact_scope": "煤炭:产量",
+                        "evidence": {
+                            "section_id": span["section_id"],
+                            "page_number": span["page_number"],
+                            "quote": quote,
+                            "section_start": start,
+                            "section_end": start + len(quote),
+                        },
+                    }
+                ],
+            },
+            request,
+        )
+
+
+class _EmptyStructuredGateway(_FakeGateway):
+    async def complete(self, request):
+        self.requests.append(request)
+        payload = json.loads(request.messages[-1].content)
+        return _response(
+            {
+                "schema_version": "business_profile_structured_extraction.v1",
+                "field_family": payload["field_family"],
+                "instrument_id": payload["instrument_id"],
+                "report_period": payload["report_period"],
+                "rows": [],
+            },
+            request,
+        )
+
+
 class _OneContextRetryGateway(_FakeGateway):
     async def complete(self, request):
         if request.metadata["stage"] == "semantic_extraction" and not self.requests:
@@ -450,7 +537,9 @@ def _relationship_runtime(
     return repository, pipeline, scope, gateway
 
 
-def _deterministic_runtime(tmp_path, monkeypatch, *, family, text, config=None):
+def _deterministic_runtime(
+    tmp_path, monkeypatch, *, family, text, config=None, gateway=None
+):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     content = b"%PDF-1.7 deterministic table source"
@@ -493,6 +582,7 @@ def _deterministic_runtime(tmp_path, monkeypatch, *, family, text, config=None):
     runtime = BusinessProfileSemanticRuntime(
         repository=repository,
         artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
         manifest_loader=lambda instrument_id: [manifest_row],
         promotion_manifests={family: manifest},
     )
@@ -931,11 +1021,178 @@ def test_structured_empty_output_reports_expected_non_disclosure(tmp_path, monke
 
     extracted = pipeline.run("extract", scope=scope)
 
-    assert extracted["status"] == "stopped"
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["stage_ready"] is True
+    assert extracted["quality"]["expected_non_disclosure_documents"] == 1
     assert extracted["quality"]["empty_output_documents"] == 1
     assert extracted["quality"]["empty_output_reasons"] == {
         "expected_non_disclosure": 1
     }
+
+
+def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
+    tmp_path, monkeypatch
+):
+    gateway = _StructuredSegmentGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], []))
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["structured_fallback_calls"] == 1
+    assert extracted["quality"]["structured_fallback_accepted_records"] == 1
+    assert len(gateway.requests) == 1
+    segment = repository.list_records("segments", instrument_id="601088.SH")[0]
+    assert segment["revenue"] == 1_000_000
+    assert segment["extraction_method"] == "semantic_structured_fallback"
+    assert segment["metadata"]["numeric_reconciliation_valid"] is False
+
+
+def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
+    tmp_path, monkeypatch
+):
+    gateway = _StructuredOperatingGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="tabular_operating_facts",
+        text=(
+            "主要产品产销情况 单位：万吨\n"
+            "产品 销售量 生产量 库存量\n"
+            "煤炭 200 210 50"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["structured_fallback_calls"] == 1
+    assert extracted["quality"]["structured_fallback_accepted_records"] == 1
+    fact = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )[0]
+    assert fact["fact_type"] == "production_volume"
+    assert fact["value_raw"] == 210.0
+    assert fact["unit_raw"] == "万吨"
+    assert fact["metadata"]["derivation_method"] == "semantic_structured_fallback"
+    assert fact["metadata"]["numeric_reconciliation_valid"] is False
+    verified = pipeline.run("verify", scope=scope)
+    assert verified["status"] == "success"
+    assert verified["quality"]["verified_records"] == 1
+    assert len(gateway.requests) == 1
+
+
+def test_ambiguous_structured_table_empty_model_output_remains_machine_rework(
+    tmp_path, monkeypatch
+):
+    gateway = _EmptyStructuredGateway()
+    _repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["quality"]["blocking_machine_rework"] == 1
+    assert extracted["quality"]["expected_non_disclosure_documents"] == 0
+    assert extracted["quality"]["structured_fallback_rejected"] == 1
+
+
+def test_deterministic_structured_rows_bypass_semantic_fallback(tmp_path, monkeypatch):
+    gateway = _StructuredSegmentGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息\n"
+            "|分产品|营业收入（万元）|营业成本（万元）|毛利率|\n"
+            "|煤炭|100|60|40%|"
+        ),
+        gateway=gateway,
+    )
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    assert gateway.requests == []
+    assert len(repository.list_records("segments", instrument_id="601088.SH")) == 1
+
+
+def test_ambiguous_structured_table_reports_configuration_blocker(
+    tmp_path, monkeypatch
+):
+    gateway = _StructuredSegmentGateway()
+    config = SemanticProductionConfig(
+        enabled=True,
+        promotion_enabled=False,
+        kill_switches={
+            "all_writes": False,
+            "network_calls": True,
+            "promotion": False,
+            "scope_widening": False,
+        },
+    )
+    _repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息 单位：万元\n"
+            "分产品 营业收入 营业成本 毛利率\n"
+            "煤炭 100 60 40%"
+        ),
+        config=config,
+        gateway=gateway,
+    )
+    monkeypatch.setattr(runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], []))
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["reason"].startswith("blocked_configuration:extract:")
+    assert extracted["quality"]["blocked_configuration"] is True
+    assert extracted["quality"]["blocked_configuration_reasons"] == {
+        "semantic_network_disabled": 1
+    }
+    assert gateway.requests == []
 
 
 def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
