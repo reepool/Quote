@@ -91,6 +91,32 @@ active pool work. Because the source was still unstable, the provider-backed
 10-concurrency gate was not rerun and the 25/50 stages remained blocked by the
 required lower-stage gate.
 
+Later on 2026-08-07, a successful Luna single-source probe established that the
+provider-stability prerequisite had recovered, so the provider-backed
+10-concurrency gate was rerun with the reproducible staged validator. All 10
+logical requests succeeded: primary dispatch and result counts were 8 Grok and
+2 Luna, exactly matching the deterministic 3:1 small-batch schedule; there were
+no 429, provider 5xx, timeout, parse, schema, or exhausted-failover outcomes.
+First-event latency ranged from 1.312 to 117.715 seconds and total request
+latency from 3.936 to 119.840 seconds; total stage time was 120.064 seconds.
+Peak transport concurrency was 10, Python traced peak memory was 9,841,236
+bytes, maximum RSS was 146,368 KiB, and shutdown took 1.765 ms. The transport
+had zero active calls after shutdown, `fd_delta=0`, all 10 request IDs and
+hashes were unique, both circuits were closed, and the pool registry was empty.
+Grok returned valid structured candidates with
+`provider_output_budget_exceeded` warnings on several requests; these warnings
+were retained in result lineage and did not hide a transport, parse, or schema
+failure.
+
+The checked-in provider resources remain conservatively limited to hard
+concurrency 10 and 10 RPM per source. The requirements prohibit guessing quota
+ownership or bypassing provider-resource controls, and no authoritative
+confirmation currently establishes the per-Key concurrency/RPM needed for the
+25- and 50-concurrency provider-backed stages or whether both Keys share one
+account bucket. Therefore the successful 10 stage does not authorize raising
+those limits: 25 and 50 remain gated pending explicit quota confirmation, and
+task 6.5 remains incomplete.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
@@ -117,10 +143,10 @@ required lower-stage gate.
   outbound DNS is unavailable; this did not affect the local validation result.
 - `git diff --check` and Python compilation checks passed for the implementation
   and test files in this change.
-- The repository `codex review --uncommitted` attempt was started, but the review
-  service could not refresh its model because its authentication token was
-  invalidated. The review process was stopped after it failed to produce a
-  final finding set.
+- The repository `codex review --uncommitted` attempt was retried with a bounded
+  180-second window. Its authentication token remained invalidated; it inspected
+  both change-owned and unrelated baseline files but timed out without a final
+  finding set. Findings from unrelated baseline changes were excluded.
 - An equivalent manual review of the change-owned routing, lifecycle, lineage,
   logging, configuration, and application-boundary diff found one confirmed
   transparency issue: the controlled live-validation CLI inspected concrete
@@ -130,8 +156,16 @@ required lower-stage gate.
   after the fix; no remaining confirmed correctness, leakage, or permit/lifecycle
   issue was found. Existing baseline modifications outside this change were
   excluded from that assessment.
-- Because Luna's controlled smoke still returns HTTP 503, this review does not
-  mark the live rollout gates complete.
+- A follow-up manual review of the reproducible staged validator found that
+  explicit concurrency/RPM confirmation alone did not establish whether the two
+  Keys own independent quota buckets or share one account bucket. The validator
+  now requires `--confirmed-quota-scope`, rejects a scope inconsistent with the
+  configured provider-resource mapping, enforces strictly increasing stages,
+  and stops immediately after a failed gate. Eleven focused tests pass after
+  this fix.
+- Luna recovered and the latest provider-backed 10-concurrency runtime gate
+  passed. Live rollout still remains incomplete because authoritative quota
+  ownership and limits have not been supplied for the gated 25/50 stages.
 
 ## Requirements Coverage
 
@@ -145,4 +179,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because the provider-backed 10-concurrency gate failed |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because quota ownership/limits are unconfirmed and provider-backed 25/50 remain gated |
