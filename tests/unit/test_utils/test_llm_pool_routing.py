@@ -1,14 +1,18 @@
 import asyncio
+from dataclasses import replace
+import logging
 import time
 
 import pytest
 
 from utils.llm import (
     LlmConfig,
+    LlmConfigurationError,
     LlmDeadlineExceededError,
     LlmPoolCoordinatorRegistry,
     LlmRateLimitError,
 )
+from utils.llm.orchestration import ProviderCoordinator
 
 
 class _FakeClock:
@@ -166,6 +170,26 @@ async def test_registry_shares_pool_cap_across_clients_and_logical_profiles():
 
 
 @pytest.mark.asyncio
+async def test_registry_rejects_same_pool_name_with_conflicting_configuration():
+    registry = LlmPoolCoordinatorRegistry()
+    config = _config(total=2)
+    first = registry.get(config, "shared")
+    conflicting = replace(
+        config,
+        pools={"shared": replace(config.pools["shared"], total_concurrency=3)},
+    )
+
+    with pytest.raises(LlmConfigurationError, match="conflicting LLM pool"):
+        registry.get(conflicting, "shared")
+
+    await registry.close_all()
+    replacement = registry.get(conflicting, "shared")
+    assert replacement is not first
+    assert replacement.config.total_concurrency == 3
+    await registry.close_all()
+
+
+@pytest.mark.asyncio
 async def test_deterministic_three_to_one_fairness_and_low_weight_non_starvation():
     config = _config(total=1)
     coordinator = LlmPoolCoordinatorRegistry().get(config, "shared")
@@ -244,6 +268,98 @@ async def test_admission_queue_limit_cancellation_and_cleanup():
     assert snapshot.waiting == 0
     assert snapshot.queue_full == 1
     assert snapshot.cancelled == 1
+
+
+@pytest.mark.asyncio
+async def test_total_latency_includes_queue_wait_and_execution_time():
+    clock = _FakeClock()
+    coordinator = LlmPoolCoordinatorRegistry(clock=clock).get(
+        _config(total=1), "shared"
+    )
+    first = await coordinator.acquire(deadline=clock() + 100)
+    queued = asyncio.create_task(
+        coordinator.acquire(deadline=clock() + 100)
+    )
+    await asyncio.sleep(0)
+    clock.advance(2)
+    await first.close()
+    second = await queued
+    assert second.queue_wait_ms == 2000
+    clock.advance(3)
+    await second.close()
+
+    latency = coordinator.snapshot().latency_ms
+    assert latency["queue"] == 2000
+    assert latency["execution"] == 5000
+    assert latency["total"] == 7000
+
+
+def test_snapshot_reports_provider_adaptive_cooldown_and_rpm_bottlenecks():
+    coordinator = LlmPoolCoordinatorRegistry().get(_config(total=8), "shared")
+    base = {
+        "configured_requests_per_minute": 0,
+        "rpm_window_requests": 0,
+        "rpm_next_admission_seconds": 0.0,
+        "cooldown_remaining_seconds": 0.0,
+    }
+    coordinator.update_provider_snapshots({
+        "grok-resource": {**base, "effective_bulk_concurrency": 1},
+        "luna-resource": {**base, "effective_bulk_concurrency": 1},
+    })
+    adaptive = coordinator.snapshot()
+    assert adaptive.effective_total_concurrency == 2
+    assert adaptive.active_bottleneck == "provider_adaptive"
+
+    coordinator.update_provider_snapshots({
+        "grok-resource": {
+            **base,
+            "effective_bulk_concurrency": 4,
+            "cooldown_remaining_seconds": 5.0,
+        },
+        "luna-resource": {**base, "effective_bulk_concurrency": 1},
+    })
+    cooldown = coordinator.snapshot()
+    assert cooldown.effective_total_concurrency == 1
+    assert cooldown.active_bottleneck == "provider_cooldown"
+
+    coordinator.update_provider_snapshots({
+        "grok-resource": {
+            **base,
+            "effective_bulk_concurrency": 4,
+            "configured_requests_per_minute": 2,
+            "rpm_window_requests": 2,
+            "rpm_next_admission_seconds": 10.0,
+        },
+        "luna-resource": {**base, "effective_bulk_concurrency": 1},
+    })
+    rpm = coordinator.snapshot()
+    assert rpm.effective_total_concurrency == 1
+    assert rpm.active_bottleneck == "provider_rpm"
+
+
+@pytest.mark.asyncio
+async def test_provider_coordination_logs_use_llm_domain(caplog):
+    logger = logging.getLogger("LLM")
+    previous_level = logger.level
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(caplog.handler)
+    try:
+        coordinator = ProviderCoordinator(
+            _config().provider_resources["grok-resource"]
+        )
+        await coordinator.report_retryable_failure(
+            error_code="rate_limit_error", status_code=429
+        )
+    finally:
+        logger.removeHandler(caplog.handler)
+        logger.setLevel(previous_level)
+
+    provider_records = [
+        record for record in caplog.records
+        if record.getMessage().startswith("event=llm.provider.")
+    ]
+    assert provider_records
+    assert {record.name for record in provider_records} == {"LLM"}
 
 
 @pytest.mark.asyncio

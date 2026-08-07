@@ -81,6 +81,16 @@ the evidence for pool concurrency and weighted fairness. OpenSpec task 6.5
 therefore remains incomplete: live rollout cannot be declared complete until a
 provider-backed 10-concurrency rerun passes and the gated 25/50 stages also pass.
 
+On 2026-08-07, the provider-stability prerequisite was checked again with the
+controlled Luna-only validator and the same synthetic non-sensitive Chinese
+input. Both bounded attempts returned HTTP 503 and were classified as
+`transient_transport_error`. The gateway recorded the two failures, reduced the
+provider adaptive bulk limit from 8 to 6 after the configured soft-failure
+threshold, failed closed with redacted route lineage, and shut down with zero
+active pool work. Because the source was still unstable, the provider-backed
+10-concurrency gate was not rerun and the 25/50 stages remained blocked by the
+required lower-stage gate.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports

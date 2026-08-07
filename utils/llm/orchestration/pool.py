@@ -370,15 +370,17 @@ class LlmPoolCoordinator:
                 raise RuntimeError("LLM pool release without active route lease")
             self._active -= 1
             self._completed += 1
-            elapsed_ms = max(0, round((self._clock() - lease.admitted_at) * 1000))
-            self._latency_totals["total"] += elapsed_ms
-            self._latency_totals["execution"] += elapsed_ms
+            execution_ms = max(
+                0, round((self._clock() - lease.admitted_at) * 1000)
+            )
+            self._latency_totals["execution"] += execution_ms
+            self._latency_totals["total"] += lease.queue_wait_ms + execution_ms
             self._dispatch_admission_locked()
             LOGGER.debug(
                 "event=llm.pool.lease.released pool=%s active=%s elapsed_ms=%s",
                 self.config.name,
                 self._active,
-                elapsed_ms,
+                execution_ms,
             )
 
     def _dispatch_admission_locked(self) -> None:
@@ -710,6 +712,110 @@ class LlmPoolCoordinator:
             str(name): dict(snapshot) for name, snapshot in snapshots.items()
         }
 
+    def _member_local_limit(self, member: LlmPoolMember) -> tuple[int, str]:
+        profiles = tuple(
+            self.llm_config.profiles[name] for name in member.profiles.values()
+        )
+        profile_limit = min(profile.max_concurrency for profile in profiles)
+        if member.max_concurrency and member.max_concurrency <= profile_limit:
+            return member.max_concurrency, "member"
+        return profile_limit, "profile"
+
+    def _provider_runtime_limit(self, resource_name: str) -> tuple[int, str]:
+        resource = self.llm_config.provider_resources[resource_name]
+        snapshot = self._provider_snapshots.get(resource_name, {})
+        if float(snapshot.get("cooldown_remaining_seconds") or 0.0) > 0:
+            return 0, "provider_cooldown"
+        configured_rpm = int(
+            snapshot.get("configured_requests_per_minute")
+            or resource.requests_per_minute
+            or 0
+        )
+        if (
+            configured_rpm > 0
+            and int(snapshot.get("rpm_window_requests") or 0) >= configured_rpm
+            and float(snapshot.get("rpm_next_admission_seconds") or 0.0) > 0
+        ):
+            return 0, "provider_rpm"
+        adaptive_limit = int(
+            snapshot.get("effective_bulk_concurrency")
+            or resource.default_bulk_concurrency
+        )
+        candidates = (
+            (resource.hard_max_concurrency, "provider"),
+            (resource.http_max_connections, "http"),
+            (adaptive_limit, "provider_adaptive"),
+        )
+        return min(candidates, key=lambda item: item[0])
+
+    def _snapshot_capacity(self) -> tuple[int, str, Mapping[str, int]]:
+        grouped: dict[str, list[tuple[int, str]]] = {}
+        mixed_members: list[tuple[int, str]] = []
+        member_limits: dict[str, int] = {}
+        constraints: list[str] = []
+        for member in self.config.members:
+            local_limit, local_layer = self._member_local_limit(member)
+            resource_names = {
+                self.llm_config.profiles[name].provider_resource
+                or self.llm_config.default_resource_name(
+                    self.llm_config.profiles[name]
+                )
+                for name in member.profiles.values()
+            }
+            runtime_limits = tuple(
+                self._provider_runtime_limit(name) for name in resource_names
+            )
+            runtime_limit, runtime_layer = min(
+                runtime_limits, key=lambda item: item[0]
+            )
+            member_limits[member.source_label] = min(local_limit, runtime_limit)
+            if len(resource_names) == 1:
+                resource_name = next(iter(resource_names))
+                grouped.setdefault(resource_name, []).append(
+                    (local_limit, local_layer)
+                )
+            else:
+                limit = min(local_limit, runtime_limit)
+                mixed_members.append(
+                    (
+                        limit,
+                        runtime_layer
+                        if runtime_limit < local_limit
+                        else local_layer,
+                    )
+                )
+
+        capacity = sum(limit for limit, _ in mixed_members)
+        constraints.extend(layer for _, layer in mixed_members)
+        for resource_name, local_limits in grouped.items():
+            local_capacity = sum(limit for limit, _ in local_limits)
+            provider_capacity, provider_layer = self._provider_runtime_limit(
+                resource_name
+            )
+            capacity += min(local_capacity, provider_capacity)
+            if provider_capacity < local_capacity:
+                constraints.append(provider_layer)
+            else:
+                constraints.extend(layer for _, layer in local_limits)
+
+        effective = min(self.config.total_concurrency, capacity)
+        if effective == self.config.total_concurrency:
+            return effective, "pool", member_limits
+        priority = (
+            "provider_cooldown",
+            "provider_rpm",
+            "provider_adaptive",
+            "http",
+            "provider",
+            "member",
+            "profile",
+        )
+        bottleneck = next(
+            (layer for layer in priority if layer in constraints),
+            "member_or_profile",
+        )
+        return effective, bottleneck, member_limits
+
     def snapshot(self) -> LlmPoolSnapshot:
         now = self._clock()
         total_dispatches = sum(state.dispatches for state in self._members.values())
@@ -718,12 +824,17 @@ class LlmPoolCoordinator:
             if self._admission_queue
             else 0.0
         )
+        effective_total, bottleneck, runtime_member_limits = (
+            self._snapshot_capacity()
+        )
         member_snapshots = tuple(
             LlmPoolMemberSnapshot(
                 source_label=member.source_label,
                 weight=member.weight,
                 configured_max_concurrency=member.max_concurrency,
-                effective_max_concurrency=self._member_limit(member),
+                effective_max_concurrency=runtime_member_limits[
+                    member.source_label
+                ],
                 active=state.active,
                 waiting=state.waiting,
                 dispatches=state.dispatches,
@@ -745,15 +856,6 @@ class LlmPoolCoordinator:
             )
             for member in self.config.members
             for state in (self._members[member.source_label],)
-        )
-        effective_total = min(
-            self.config.total_concurrency,
-            sum(member.effective_max_concurrency for member in member_snapshots),
-        )
-        bottleneck = (
-            "pool"
-            if effective_total == self.config.total_concurrency
-            else "member_or_profile"
         )
         return LlmPoolSnapshot(
             name=self.config.name,
@@ -831,6 +933,7 @@ class LlmPoolCoordinatorRegistry:
     ) -> None:
         self._clock = clock
         self._coordinators: dict[str, LlmPoolCoordinator] = {}
+        self._pool_identities: dict[str, str] = {}
 
     @staticmethod
     def identity_for(config: LlmConfig, pool: LlmPoolConfig) -> str:
@@ -859,6 +962,11 @@ class LlmPoolCoordinatorRegistry:
         except KeyError as exc:
             raise LlmConfigurationError(f"unknown LLM pool: {pool_name}") from exc
         identity = self.identity_for(config, pool)
+        registered_identity = self._pool_identities.get(pool_name)
+        if registered_identity is not None and registered_identity != identity:
+            raise LlmConfigurationError(
+                f"conflicting LLM pool configuration: {pool_name}"
+            )
         coordinator = self._coordinators.get(identity)
         if coordinator is None:
             coordinator = LlmPoolCoordinator(
@@ -868,6 +976,7 @@ class LlmPoolCoordinatorRegistry:
                 clock=self._clock,
             )
             self._coordinators[identity] = coordinator
+        self._pool_identities[pool_name] = identity
         return coordinator
 
     def snapshots(self) -> Mapping[str, LlmPoolSnapshot]:
@@ -879,6 +988,7 @@ class LlmPoolCoordinatorRegistry:
     async def close_all(self) -> None:
         coordinators = tuple(self._coordinators.values())
         self._coordinators.clear()
+        self._pool_identities.clear()
         for coordinator in coordinators:
             await coordinator.close()
 

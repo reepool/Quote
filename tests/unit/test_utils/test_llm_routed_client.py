@@ -59,7 +59,13 @@ def _profile(source_label, key_env, model, resource, **overrides):
     return profile
 
 
-def _config(*, allow_auth_failover=False, failure_threshold=3, **profile_overrides):
+def _config(
+    *,
+    allow_auth_failover=False,
+    failure_threshold=3,
+    max_hops=1,
+    **profile_overrides,
+):
     return LlmConfig.from_mapping({
         "enabled": True,
         "provider_resources": {
@@ -117,7 +123,7 @@ def _config(*, allow_auth_failover=False, failure_threshold=3, **profile_overrid
                 ],
                 "failover": {
                     "enabled": True,
-                    "max_hops": 1,
+                    "max_hops": max_hops,
                     "failure_threshold": failure_threshold,
                     "open_seconds": 1,
                     "half_open_max_probes": 1,
@@ -172,10 +178,49 @@ def _client(config, transport):
     return LlmClient(
         config,
         transport=transport,
-        environment={"TEST_GROK_KEY": "grok-secret", "TEST_LUNA_KEY": "luna-secret"},
+        environment={
+            "TEST_GROK_KEY": "grok-secret",
+            "TEST_LUNA_KEY": "luna-secret",
+            "TEST_THIRD_KEY": "third-secret",
+        },
         limiter_registry=ProfileLimiterRegistry(),
         provider_coordinator_registry=ProviderCoordinatorRegistry(),
         pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+    )
+
+
+def _three_source_config():
+    config = _config(max_hops=2)
+    luna_resource = config.provider_resources["luna-resource"]
+    third_resource = replace(luna_resource, name="third-resource")
+    luna_profile = config.profiles["semantic__luna"]
+    third_profile = replace(
+        luna_profile,
+        name="semantic__third",
+        provider_resource="third-resource",
+        source_label="pipio:third",
+        api_key_env="TEST_THIRD_KEY",
+        model="third-model",
+    )
+    pool = config.pools["semantic-pool"]
+    third_member = replace(
+        pool.members[1],
+        source_label="pipio:third",
+        profiles={"semantic": "semantic__third"},
+    )
+    return replace(
+        config,
+        provider_resources={
+            **config.provider_resources,
+            "third-resource": third_resource,
+        },
+        profiles={**config.profiles, "semantic__third": third_profile},
+        pools={
+            "semantic-pool": replace(
+                pool,
+                members=(*pool.members, third_member),
+            )
+        },
     )
 
 
@@ -217,6 +262,56 @@ async def test_rate_limit_fails_over_from_grok_to_luna_with_safe_lineage():
     }
     assert snapshot.failover_succeeded == 1
     assert snapshot.latency_ms["failover"] >= 0
+
+
+@pytest.mark.asyncio
+async def test_streaming_idempotency_header_is_stable_across_failover():
+    transport = ScriptedTransport([
+        {"status_code": 429, "data": {}},
+        _success("ok", "gpt-5.6-luna"),
+    ])
+    response = await _client(_config(stream=True), transport).complete(_request())
+
+    assert response.failover_count == 1
+    keys = [call["headers"]["Idempotency-Key"] for call in transport.calls]
+    assert len(set(keys)) == 1
+    assert keys[0] != "business-idempotency-key"
+    assert len(keys[0]) == 64
+
+
+@pytest.mark.asyncio
+async def test_failed_attempt_lineage_uses_request_model_override():
+    transport = ScriptedTransport([
+        {"status_code": 429, "data": {}},
+        _success("ok", "served-model"),
+    ])
+    response = await _client(_config(), transport).complete(
+        _request(model="request-model-override")
+    )
+    assert response.attempts[0]["model"] == "request-model-override"
+
+
+@pytest.mark.asyncio
+async def test_multihop_failover_metrics_keep_initial_trigger_category():
+    config = _three_source_config()
+    transport = ScriptedTransport([
+        {"status_code": 429, "data": {}},
+        {"status_code": 503, "data": {}},
+        _success("ok", "third-model"),
+    ])
+    client = _client(config, transport)
+    response = await client.complete(_request())
+
+    assert response.source_label == "pipio:third"
+    assert response.failover_count == 2
+    assert [attempt.get("error_code") for attempt in response.attempts[:2]] == [
+        "rate_limit_error",
+        "transient_transport_error",
+    ]
+    snapshot = client.pool_coordinator_registry.get(
+        config, "semantic-pool"
+    ).snapshot()
+    assert snapshot.failover_by_error == {"rate_limit_error": 1}
 
 
 @pytest.mark.asyncio

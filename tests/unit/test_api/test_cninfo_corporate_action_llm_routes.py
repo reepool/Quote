@@ -10,7 +10,15 @@ import api.routes as routes
 async def test_cninfo_llm_lineage_routes_are_read_only_and_forward_filters(monkeypatch):
     page = {
         "total": 1, "limit": 10, "offset": 0, "returned": 1,
-        "has_more": False, "items": [{"source_event_key": "event-1"}],
+        "has_more": False, "items": [{
+            "source_event_key": "event-1",
+            "source_label": "pipio:grok-4.5",
+            "selected_profile": "semantic_extraction__pipio_grok",
+            "route_lineage": {
+                "pool": "shared_semantic",
+                "failover_count": 0,
+            },
+        }],
     }
     db_ops = SimpleNamespace(
         get_corporate_action_document_bundle=AsyncMock(return_value=page.copy()),
@@ -47,6 +55,14 @@ async def test_cninfo_llm_lineage_routes_are_read_only_and_forward_filters(monke
     assert queue.dataset == "corporate_action_resolution_review_queue"
     assert reviews.dataset == "corporate_action_resolution_reviews"
     assert terms.dataset == "corporate_action_resolved_terms"
+    assert analyses.items[0]["source_label"] == "pipio:grok-4.5"
+    assert analyses.items[0]["selected_profile"] == (
+        "semantic_extraction__pipio_grok"
+    )
+    assert analyses.items[0]["route_lineage"] == {
+        "pool": "shared_semantic",
+        "failover_count": 0,
+    }
     assert db_ops.get_corporate_action_llm_analyses.await_args.kwargs["instrument_id"] == "000001.SZ"
     queue_kwargs = db_ops.get_corporate_action_review_queue.await_args.kwargs
     assert queue_kwargs["review_tier"] == "quick_review"

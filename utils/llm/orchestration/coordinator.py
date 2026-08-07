@@ -17,7 +17,7 @@ from ..models import ProviderResourceConfig
 from .models import ProviderSnapshot, ResourceLeaseError, ResourceSnapshot
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("LLM")
 
 
 @dataclass

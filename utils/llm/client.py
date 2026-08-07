@@ -277,7 +277,7 @@ class LlmClient:
                     attempt = {
                         "source_label": selected_source,
                         "selected_profile": selected_profile,
-                        "model": profile.model,
+                        "model": request.model or profile.model,
                         "attempt_sequence": len(attempts) + 1,
                         "request_id": exc.request_id,
                         "error_code": exc.code,
@@ -315,8 +315,9 @@ class LlmClient:
                             )
                             failover_recorded = True
                         break
-                    pending_failover_error = exc.code
-                    failover_started_at = time.monotonic()
+                    if pending_failover_error is None:
+                        pending_failover_error = exc.code
+                        failover_started_at = time.monotonic()
                     if exc.code == "authentication_error":
                         llm_logger.warning(
                             "event=llm.route.auth_failover pool=%s "
@@ -1102,7 +1103,6 @@ class LlmClient:
                     headers,
                     profile=profile,
                     idempotency_key=idempotency_key,
-                    payload=payload,
                 ),
                 payload,
                 attempt_timeout,
@@ -1195,13 +1195,11 @@ class LlmClient:
         *,
         profile: LlmProfile,
         idempotency_key: Optional[str],
-        payload: Mapping[str, Any],
     ) -> dict[str, str]:
         attempt_headers = dict(headers)
         if profile.stream and idempotency_key and profile.idempotency_header:
             attempt_headers[profile.idempotency_header] = stable_hash({
                 "caller_key": idempotency_key,
-                "payload": payload,
             })
         return attempt_headers
 
