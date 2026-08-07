@@ -302,6 +302,17 @@ provider-seconds. No 10/25/50 load stage was started, both validation processes
 exited through the bounded cancellation path, and no matching Python process
 remained.
 
+A third controlled window began at 01:05:37 on 2026-08-08. Both sources again
+passed local admission and selected their expected independent resource and
+concrete profile. Neither source produced a first event; Grok and Luna both
+reached the first 300-second attempt limit at 01:10:37 with HTTP 408 /
+`transient_transport_error`. The external 360-second validation-process bound
+then expired with exit code 124 before another full retry could be spent. No
+matching validation Python process remained. This is the third consecutive
+controlled window blocked by the same provider-response failure, so external
+provider stability is now the sole unresolved prerequisite for task 6.5. The
+10/25/50 provider-backed stages remain correctly withheld.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
