@@ -207,6 +207,35 @@ took 1.796 ms, transport active count returned to zero, `fd_delta=0`, and the
 pool registry was empty. Task 6.5 remains incomplete until a clean 10 stage is
 followed by clean gated 25 and 50 stages.
 
+### Independent-Quota Low-Cap Stability Rerun (2026-08-07)
+
+The deployment owner confirmed again that the Grok and Luna API Keys have
+independent quota. The validator therefore retained separate `pipio:grok` and
+`pipio:luna` provider resources even though both profiles use the same Base
+URL. The process-local validation caps remained `pipio:grok=2` and
+`pipio:luna=1`; production `config/13_llm.json` was not modified.
+
+The gated 10-concurrency stage completed all 10 logical requests successfully
+in 265.104 seconds, with all final responses returned by Grok. Luna received
+four source executions and every one exhausted two bounded attempts with HTTP
+503, producing eight concrete provider 5xx events. All four Luna-to-Grok
+failovers succeeded, with zero 429, timeout, parse, schema, or exhausted-
+failover outcomes. The Luna member circuit opened independently while the Grok
+member circuit remained closed, directly exercising separation of the two Key
+quota/health resources.
+
+Total dispatches were ten Grok and four Luna. Three Luna dispatches borrowed
+idle capacity, leaving non-borrowed normal dispatch counts of ten Grok and one
+Luna. Because the provider failures made the normal ratio materially different
+from the configured weights, the gate reported `nonzero_provider_5xx` and
+dispatch-ratio failures for both source labels. First-event latency ranged from
+2.397 to 56.797 seconds and successful total latency from 21.240 to 86.600
+seconds. Peak transport concurrency was 2 against the validation aggregate cap
+of 3; provider limits and identities matched, shutdown took 1.823 ms, transport
+active count returned to zero, `fd_delta=0`, and the pool registry was empty.
+The staged command stopped after 10 and did not execute 25 or 50. Task 6.5
+remains incomplete pending a clean provider window.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
