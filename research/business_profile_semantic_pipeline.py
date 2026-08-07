@@ -696,3 +696,11 @@ def _logical_scope_payload(
             sorted(dict(value.get("promotion_manifest_hashes") or {}).items())
         ),
     }
+
+
+def semantic_production_logical_scope_payload(
+    scope: SemanticProductionScope | Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return the immutable checkpoint scope used for resume compatibility."""
+
+    return _logical_scope_payload(scope)

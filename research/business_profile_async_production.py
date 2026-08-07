@@ -264,6 +264,7 @@ class BusinessProfileWorkRepository:
         limit: int,
         lease_owner: str,
         lease_seconds: int,
+        processing_identity_hash: str | None = None,
     ) -> tuple[dict[str, Any], ...]:
         normalized_stage = _stage(stage)
         now = get_shanghai_time()
@@ -272,8 +273,17 @@ class BusinessProfileWorkRepository:
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
+            identity_clause = (
+                "AND processing_identity_hash = ?"
+                if processing_identity_hash
+                else ""
+            )
+            params: list[Any] = [normalized_stage, now_text, now_text]
+            if processing_identity_hash:
+                params.append(str(processing_identity_hash))
+            params.append(max(1, int(limit)))
             rows = conn.execute(
-                """
+                f"""
                 SELECT * FROM business_profile_work_items
                 WHERE stage = ?
                   AND (
@@ -281,10 +291,11 @@ class BusinessProfileWorkRepository:
                      AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
                     OR (status = 'running' AND lease_expires_at <= ?)
                   )
-                ORDER BY report_period DESC, created_at, work_id
+                  {identity_clause}
+                ORDER BY report_period DESC, updated_at, created_at, work_id
                 LIMIT ?
                 """,
-                (normalized_stage, now_text, now_text, max(1, int(limit))),
+                tuple(params),
             ).fetchall()
             work_ids = [str(row["work_id"]) for row in rows]
             if work_ids:
@@ -774,18 +785,32 @@ class BusinessProfileWorkRepository:
             "work_ids": recovered_ids,
         }
 
-    def recover_stale_scope_items(self) -> dict[str, Any]:
+    def recover_stale_scope_items(
+        self,
+        *,
+        processing_identity: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Repair stale semantic checkpoints without consuming content attempts."""
 
         marker = "stale semantic production checkpoint scope"
+        identity_hash = (
+            _stable_hash(processing_identity) if processing_identity is not None else None
+        )
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             rows = conn.execute(
-                "SELECT work_id, stage, status, attempt_count, metadata_json, "
-                "checkpoint_path FROM business_profile_work_items "
+                "SELECT work_id, instrument_id, stage, status, attempt_count, "
+                "processing_identity_hash, metadata_json, checkpoint_path "
+                "FROM business_profile_work_items "
                 "WHERE status IN ('retry_due', 'terminal_failure') "
-                "AND last_error LIKE ? ORDER BY work_id",
-                (f"%{marker}%",),
+                "AND last_error LIKE ? "
+                + ("AND processing_identity_hash = ? " if identity_hash else "")
+                + "ORDER BY work_id",
+                (
+                    (f"%{marker}%", identity_hash)
+                    if identity_hash
+                    else (f"%{marker}%",)
+                ),
             ).fetchall()
         now = get_shanghai_time().isoformat()
         recovery_token = hashlib.sha256(
@@ -805,7 +830,26 @@ class BusinessProfileWorkRepository:
                 checkpoint = Path(str(row["checkpoint_path"] or ""))
                 checkpoint_cutoff = _checkpoint_knowledge_cutoff(checkpoint)
                 previous_stage_results = dict(metadata.get("stage_results") or {})
-                if checkpoint_cutoff is not None:
+                bound_identity = (
+                    dict(processing_identity)
+                    if processing_identity is not None
+                    else dict(metadata.get("processing_identity") or {})
+                )
+                repeated_preserved_recovery = _was_preserved_scope_recovery(
+                    metadata,
+                    checkpoint_path=checkpoint,
+                )
+                checkpoint_compatible = bool(
+                    checkpoint_cutoff
+                    and not repeated_preserved_recovery
+                    and _checkpoint_matches_work_scope(
+                        checkpoint,
+                        instrument_id=str(row["instrument_id"]),
+                        knowledge_cutoff=checkpoint_cutoff,
+                        processing_identity=bound_identity,
+                    )
+                )
+                if checkpoint_compatible:
                     metadata["knowledge_cutoff"] = checkpoint_cutoff
                     recovered_stage = str(row["stage"])
                     recovered_checkpoint = checkpoint
@@ -853,7 +897,7 @@ class BusinessProfileWorkRepository:
                 )
                 if int(cursor.rowcount or 0) == 1:
                     recovered_ids.append(str(row["work_id"]))
-                    if checkpoint_cutoff is not None:
+                    if checkpoint_compatible:
                         preserved += 1
                     else:
                         rotated += 1
@@ -863,6 +907,7 @@ class BusinessProfileWorkRepository:
             "requeued": len(recovered_ids),
             "checkpoint_preserved": preserved,
             "checkpoint_rotated": rotated,
+            "processing_identity_filtered": processing_identity is not None,
             "work_ids": recovered_ids,
         }
 
@@ -1005,14 +1050,30 @@ class BusinessProfileWorkRepository:
             "groups": groups,
         }
 
-    def claimable_count(self, stage: str) -> int:
+    def claimable_count(
+        self,
+        stage: str,
+        *,
+        processing_identity_hash: str | None = None,
+    ) -> int:
+        identity_clause = (
+            " AND processing_identity_hash = ?"
+            if processing_identity_hash
+            else ""
+        )
+        params: tuple[Any, ...] = (
+            (_stage(stage), str(processing_identity_hash))
+            if processing_identity_hash
+            else (_stage(stage),)
+        )
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             return int(
                 conn.execute(
                     "SELECT COUNT(*) FROM business_profile_work_items "
-                    "WHERE stage = ? AND status IN ('pending', 'retry_due')",
-                    (_stage(stage),),
+                    "WHERE stage = ? AND status IN ('pending', 'retry_due')"
+                    + identity_clause,
+                    params,
                 ).fetchone()[0]
             )
 
@@ -1068,7 +1129,7 @@ class BusinessProfileWorkRepository:
     ) -> dict[str, int]:
         identity_hash = _stable_hash(processing_identity)
         now = get_shanghai_time().isoformat()
-        inserted = reused = superseded = reset = 0
+        inserted = reused = superseded = identity_superseded = reset = 0
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -1168,6 +1229,26 @@ class BusinessProfileWorkRepository:
                         ),
                     )
                     inserted += 1
+                cursor = conn.execute(
+                    "UPDATE business_profile_work_items "
+                    "SET status = 'superseded', next_attempt_at = NULL, "
+                    "lease_owner = NULL, lease_expires_at = NULL, updated_at = ? "
+                    "WHERE frontier_id = ? AND policy = ? AND work_id <> ? "
+                    "AND processing_identity_hash <> ? "
+                    "AND (status IN ('pending', 'retry_due', 'terminal_failure') "
+                    "OR (status = 'running' AND lease_expires_at <= ?))",
+                    (
+                        now,
+                        row["frontier_id"],
+                        policy,
+                        work_id,
+                        identity_hash,
+                        now,
+                    ),
+                )
+                retired = int(cursor.rowcount or 0)
+                identity_superseded += retired
+                superseded += retired
                 if supersede_older:
                     candidates = conn.execute(
                         """
@@ -1204,6 +1285,7 @@ class BusinessProfileWorkRepository:
             "reused": reused,
             "reset": reset,
             "superseded": superseded,
+            "identity_superseded": identity_superseded,
         }
 
 
@@ -1336,7 +1418,8 @@ class BusinessProfileAsyncProductionService:
             self.repository.recover_completed_without_evidence
         )
         stale_scope_recovery = await self.write_coordinator.run(
-            self.repository.recover_stale_scope_items
+            self.repository.recover_stale_scope_items,
+            processing_identity=processing_identity,
         )
         structured_recovery = await self.write_coordinator.run(
             self.repository.recover_structured_semantic_retries
@@ -1388,17 +1471,20 @@ class BusinessProfileAsyncProductionService:
             int(enqueue.get("reset") or 0),
             int(enqueue.get("superseded") or 0),
         )
-        workers = await self._run_workers(stage_budgets)
+        workers = await self._run_workers(
+            stage_budgets,
+            processing_identity=processing_identity,
+        )
         health = await asyncio.to_thread(self.repository.health)
         throughput = _business_profile_throughput(enqueue, workers)
-        discovery_status = str(discovery.get("status") or "failed").lower()
+        status, reason_codes = _business_profile_operation_status(
+            discovery=discovery,
+            workers=workers,
+        )
         report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
-            "status": (
-                "success"
-                if discovery_status in {"success", "unchanged"}
-                else "degraded"
-            ),
+            "status": status,
+            "reason_codes": reason_codes,
             "operation": "business_profile_daily_incremental",
             "knowledge_cutoff": knowledge_cutoff,
             "discovery": discovery,
@@ -1461,7 +1547,8 @@ class BusinessProfileAsyncProductionService:
             self.repository.recover_completed_without_evidence
         )
         stale_scope_recovery = await self.write_coordinator.run(
-            self.repository.recover_stale_scope_items
+            self.repository.recover_stale_scope_items,
+            processing_identity=processing_identity,
         )
         structured_recovery = await self.write_coordinator.run(
             self.repository.recover_structured_semantic_retries
@@ -1534,24 +1621,18 @@ class BusinessProfileAsyncProductionService:
         )
         workers = await self._run_workers(
             stage_budgets or {},
+            processing_identity=processing_identity,
             should_stop=should_stop,
         )
         throughput = _business_profile_throughput(enqueue, workers)
-        stopped = any(
-            str(item.get("status") or "").lower() == "stopped"
-            for item in workers.values()
+        status, reason_codes = _business_profile_operation_status(
+            discovery=discovery,
+            workers=workers,
         )
         report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
-            "status": (
-                "stopped"
-                if stopped
-                else "degraded"
-                if discovery is not None
-                and str(discovery.get("status") or "failed").lower()
-                not in {"success", "unchanged"}
-                else "success"
-            ),
+            "status": status,
+            "reason_codes": reason_codes,
             "operation": "business_profile_backfill",
             "selection_policy": policy,
             "knowledge_cutoff": knowledge_cutoff,
@@ -1678,11 +1759,16 @@ class BusinessProfileAsyncProductionService:
         self,
         stage_budgets: Mapping[str, StageBudget],
         *,
+        processing_identity: Mapping[str, Any] | None = None,
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
+        processing_identity_hash = (
+            _stable_hash(processing_identity) if processing_identity is not None else None
+        )
         semantic_depth = await asyncio.to_thread(
             self.repository.claimable_count,
             "semantic",
+            processing_identity_hash=processing_identity_hash,
         )
         semantic_limit = stage_budgets.get("semantic")
         acquire_backpressured = bool(
@@ -1728,6 +1814,7 @@ class BusinessProfileAsyncProductionService:
                 return stage, await self._drain_stage(
                     stage,
                     budget,
+                    processing_identity_hash=processing_identity_hash,
                     upstream_done=upstream_done,
                     should_stop=should_stop,
                 )
@@ -1760,6 +1847,7 @@ class BusinessProfileAsyncProductionService:
         stage: str,
         budget: StageBudget,
         *,
+        processing_identity_hash: str | None = None,
         upstream_done: asyncio.Event | None = None,
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
@@ -1795,6 +1883,7 @@ class BusinessProfileAsyncProductionService:
                 limit=batch_limit,
                 lease_owner=lease_owner,
                 lease_seconds=self.lease_seconds,
+                processing_identity_hash=processing_identity_hash,
             )
             if not items:
                 if upstream_done is None or upstream_done.is_set():
@@ -2016,6 +2105,39 @@ class BusinessProfileAsyncProductionService:
         await asyncio.gather(*(run_one(item) for item in items))
 
 
+def _business_profile_operation_status(
+    *,
+    discovery: Mapping[str, Any] | None,
+    workers: Mapping[str, Mapping[str, Any]],
+) -> tuple[str, list[str]]:
+    reason_codes: list[str] = []
+    stopped = any(
+        str(result.get("status") or "").lower() == "stopped"
+        for result in workers.values()
+    )
+    if discovery is not None:
+        discovery_status = str(discovery.get("status") or "failed").lower()
+        resumable_backlog = bool(
+            discovery_status == "degraded"
+            and int(discovery.get("discovery_window_backlog") or 0) > 0
+            and not discovery.get("errors")
+        )
+        if discovery_status not in {"success", "unchanged"} and not resumable_backlog:
+            reason_codes.append("discovery_failed")
+    counter_reasons = (
+        ("retried", "worker_retries"),
+        ("terminal_failures", "worker_terminal_failures"),
+        ("configuration_blocked", "worker_configuration_blocked"),
+        ("lease_conflicts", "worker_lease_conflicts"),
+    )
+    for counter, reason in counter_reasons:
+        if any(int(result.get(counter) or 0) > 0 for result in workers.values()):
+            reason_codes.append(reason)
+    if stopped:
+        return "stopped", ["stop_requested", *reason_codes]
+    return ("degraded" if reason_codes else "success"), reason_codes
+
+
 def parse_stage_budgets(value: Mapping[str, Any] | None) -> dict[str, StageBudget]:
     output = {}
     for stage, raw in dict(value or {}).items():
@@ -2072,6 +2194,73 @@ def _normalized_optional_date(value: Any) -> str | None:
         return _date_text(value, "knowledge_cutoff")
     except ValueError:
         return None
+
+
+def _checkpoint_matches_work_scope(
+    path: Path,
+    *,
+    instrument_id: str,
+    knowledge_cutoff: str,
+    processing_identity: Mapping[str, Any],
+) -> bool:
+    if not path.is_file() or not processing_identity:
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return False
+    scope = payload.get("scope") if isinstance(payload, Mapping) else None
+    if not isinstance(scope, Mapping):
+        return False
+    required_scope_fields = {
+        "instruments",
+        "field_families",
+        "knowledge_cutoff",
+        "identities",
+        "promotion_manifest_hashes",
+    }
+    if not required_scope_fields.issubset(scope):
+        return False
+    field_families = tuple(processing_identity.get("field_families") or ())
+    identities = dict(processing_identity.get("runtime_identities") or {})
+    if not field_families or not identities:
+        return False
+    expected = {
+        "instruments": (instrument_id,),
+        "field_families": field_families,
+        "knowledge_cutoff": knowledge_cutoff,
+        "identities": identities,
+        "promotion_manifest_hashes": dict(
+            processing_identity.get("promotion_manifest_hashes") or {}
+        ),
+    }
+    from research.business_profile_semantic_pipeline import (
+        semantic_production_logical_scope_payload,
+    )
+
+    return semantic_production_logical_scope_payload(
+        scope
+    ) == semantic_production_logical_scope_payload(expected)
+
+
+def _was_preserved_scope_recovery(
+    metadata: Mapping[str, Any],
+    *,
+    checkpoint_path: Path,
+) -> bool:
+    history = metadata.get("recovery_history")
+    if not isinstance(history, Sequence) or isinstance(history, (str, bytes)):
+        return False
+    for raw in reversed(history):
+        if not isinstance(raw, Mapping):
+            continue
+        if str(raw.get("reason") or "") != "stale_scope_cutoff_restored":
+            return False
+        recovered_path = str(
+            raw.get("from_checkpoint_path") or raw.get("checkpoint_path") or ""
+        )
+        return recovered_path == str(checkpoint_path)
+    return False
 
 
 def _checkpoint_knowledge_cutoff(path: Path) -> str | None:

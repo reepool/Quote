@@ -14,6 +14,7 @@ from research.business_profile_async_production import (
     BusinessProfileWorkRepository,
     BusinessProfileWriteCoordinator,
     StageBudget,
+    _business_profile_operation_status,
     get_business_profile_write_coordinator,
 )
 from research.business_profile_archive import BusinessProfileDocumentArchiveService
@@ -61,6 +62,18 @@ def _frontier(storage):
     return repository, instrument
 
 
+def _processing_identity(model: str = "model-v1"):
+    return {
+        "field_families": ("structured_segments", "tabular_operating_facts"),
+        "runtime_identities": {
+            "model": model,
+            "parser": "parser-v1",
+            "rules": "rules-v1",
+        },
+        "promotion_manifest_hashes": {},
+    }
+
+
 def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -99,6 +112,206 @@ def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
         ).fetchone()[0]
     item = queue.get(work_id)
     assert item["metadata"]["knowledge_cutoff"] == "2026-08-30"
+
+
+def test_enqueue_current_identity_supersedes_obsolete_failed_work(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    obsolete = _processing_identity("model-obsolete")
+    current = _processing_identity("model-current")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=obsolete,
+    )
+    with storage.get_connection() as conn:
+        obsolete_work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'terminal_failure', last_error = ? WHERE work_id = ?",
+            ("ValueError: stale semantic production checkpoint scope", obsolete_work_id),
+        )
+        conn.commit()
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=current,
+    )
+
+    assert result["inserted"] == 1
+    assert result["identity_superseded"] == 1
+    assert queue.get(obsolete_work_id)["status"] == "superseded"
+    with storage.get_connection() as conn:
+        groups = conn.execute(
+            "SELECT status, COUNT(*) FROM business_profile_work_items "
+            "GROUP BY status ORDER BY status"
+        ).fetchall()
+    assert [tuple(row) for row in groups] == [("pending", 1), ("superseded", 1)]
+
+
+def test_enqueue_current_identity_does_not_supersede_running_work(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-obsolete"),
+    )
+    running = queue.claim(
+        "acquire", limit=1, lease_owner="worker-old", lease_seconds=300
+    )[0]
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-current"),
+    )
+
+    assert result["identity_superseded"] == 0
+    assert queue.get(running["work_id"])["status"] == "running"
+
+
+def test_enqueue_current_identity_supersedes_expired_obsolete_lease(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-obsolete"),
+    )
+    running = queue.claim(
+        "acquire", limit=1, lease_owner="worker-old", lease_seconds=300
+    )[0]
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items "
+            "SET lease_expires_at = '2020-01-01T00:00:00+08:00' WHERE work_id = ?",
+            (running["work_id"],),
+        )
+        conn.commit()
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-current"),
+    )
+
+    assert result["identity_superseded"] == 1
+    assert queue.get(running["work_id"])["status"] == "superseded"
+
+
+def test_claim_filters_work_by_processing_identity(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    current = _processing_identity("model-current")
+    obsolete = _processing_identity("model-obsolete")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=obsolete,
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=current,
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
+    with storage.get_connection() as conn:
+        current_hash = conn.execute(
+            "SELECT processing_identity_hash FROM business_profile_work_items "
+            "WHERE policy = 'expanded'"
+        ).fetchone()[0]
+
+    claimed = queue.claim(
+        "acquire",
+        limit=3,
+        lease_owner="worker",
+        lease_seconds=30,
+        processing_identity_hash=current_hash,
+    )
+
+    assert len(claimed) == 2
+    assert {item["policy"] for item in claimed} == {"expanded"}
+
+
+def test_claimable_depth_filters_obsolete_processing_identity(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-obsolete"),
+    )
+    current = _processing_identity("model-current")
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=current,
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
+    with storage.get_connection() as conn:
+        conn.execute("UPDATE business_profile_work_items SET stage = 'semantic'")
+        current_hash = conn.execute(
+            "SELECT processing_identity_hash FROM business_profile_work_items "
+            "WHERE policy = 'expanded'"
+        ).fetchone()[0]
+        conn.commit()
+
+    assert queue.claimable_count("semantic") == 3
+    assert (
+        queue.claimable_count(
+            "semantic", processing_identity_hash=current_hash
+        )
+        == 2
+    )
+
+
+def test_claim_prioritizes_work_waiting_in_stage_before_fresh_recovery(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("ordinary"),
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("recovered"),
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'pending', updated_at = CASE policy "
+            "WHEN 'latest_annual_only' THEN '2026-08-01T00:00:00+08:00' "
+            "ELSE '2026-08-02T00:00:00+08:00' END"
+        )
+        conn.commit()
+
+    claimed = queue.claim(
+        "semantic", limit=1, lease_owner="worker", lease_seconds=30
+    )
+
+    assert claimed[0]["policy"] == "latest_annual_only"
 
 
 def test_frontier_bound_acquisition_archives_exact_pdf_and_resolves_only_missing(
@@ -521,9 +734,10 @@ def test_stale_scope_recovery_preserves_checkpoint_cutoff_and_stage(tmp_path):
     queue = BusinessProfileWorkRepository(
         storage, checkpoint_root=tmp_path / "checkpoints"
     )
+    identity = _processing_identity()
     queue.enqueue_latest_annual(
         knowledge_cutoff="2026-08-30",
-        processing_identity={"rules": "v1"},
+        processing_identity=identity,
     )
     item = queue.claim("acquire", limit=1, lease_owner="worker", lease_seconds=30)[0]
     checkpoint = Path(item["checkpoint_path"])
@@ -531,7 +745,13 @@ def test_stale_scope_recovery_preserves_checkpoint_cutoff_and_stage(tmp_path):
     checkpoint.write_text(
         json.dumps(
             {
-                "scope": {"knowledge_cutoff": "2026-08-01"},
+                "scope": {
+                    "instruments": ["600000.SH"],
+                    "field_families": list(identity["field_families"]),
+                    "knowledge_cutoff": "2026-08-01",
+                    "identities": identity["runtime_identities"],
+                    "promotion_manifest_hashes": {},
+                },
                 "completed_stages": ["plan", "select", "extract", "verify"],
                 "artifacts": {"plan": "plan.json"},
             }
@@ -551,7 +771,7 @@ def test_stale_scope_recovery_preserves_checkpoint_cutoff_and_stage(tmp_path):
         )
         conn.commit()
 
-    result = queue.recover_stale_scope_items()
+    result = queue.recover_stale_scope_items(processing_identity=identity)
     recovered = queue.get(item["work_id"])
 
     assert result["checkpoint_preserved"] == 1
@@ -560,6 +780,149 @@ def test_stale_scope_recovery_preserves_checkpoint_cutoff_and_stage(tmp_path):
     assert recovered["checkpoint_path"] == str(checkpoint)
     assert recovered["metadata"]["knowledge_cutoff"] == "2026-08-01"
     assert recovered["metadata"]["stage_results"]["parse"]["status"] == "success"
+
+
+def test_stale_scope_recovery_rotates_complete_but_incompatible_scope(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    identity = _processing_identity("model-current")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    item = queue.claim("acquire", limit=1, lease_owner="worker", lease_seconds=30)[0]
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "scope": {
+                    "instruments": ["600000.SH"],
+                    "field_families": list(identity["field_families"]),
+                    "knowledge_cutoff": "2026-08-01",
+                    "identities": {
+                        **identity["runtime_identities"],
+                        "model": "model-obsolete",
+                    },
+                    "promotion_manifest_hashes": {},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'terminal_failure', attempt_count = 3, last_error = ? "
+            "WHERE work_id = ?",
+            ("ValueError: stale semantic production checkpoint scope", item["work_id"]),
+        )
+        conn.commit()
+
+    result = queue.recover_stale_scope_items(processing_identity=identity)
+    recovered = queue.get(item["work_id"])
+
+    assert result["checkpoint_preserved"] == 0
+    assert result["checkpoint_rotated"] == 1
+    assert recovered["stage"] == "acquire"
+    assert recovered["checkpoint_path"] != str(checkpoint)
+    assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
+        "stale_scope_checkpoint_rotated"
+    )
+
+
+def test_stale_scope_recovery_does_not_requeue_obsolete_processing_identity(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    obsolete = _processing_identity("model-obsolete")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=obsolete,
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'terminal_failure', last_error = ? WHERE work_id = ?",
+            ("ValueError: stale semantic production checkpoint scope", work_id),
+        )
+        conn.commit()
+
+    result = queue.recover_stale_scope_items(
+        processing_identity=_processing_identity("model-current")
+    )
+
+    assert result["eligible_stale_scope_items"] == 0
+    assert result["requeued"] == 0
+    assert queue.get(work_id)["status"] == "terminal_failure"
+
+
+def test_repeated_preserved_scope_failure_rotates_checkpoint(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    identity = _processing_identity()
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    item = queue.claim("acquire", limit=1, lease_owner="worker", lease_seconds=30)[0]
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "scope": {
+                    "instruments": ["600000.SH"],
+                    "field_families": list(identity["field_families"]),
+                    "knowledge_cutoff": "2026-08-01",
+                    "identities": identity["runtime_identities"],
+                    "promotion_manifest_hashes": {},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = {
+        **item["metadata"],
+        "recovery_history": [
+            {
+                "reason": "stale_scope_cutoff_restored",
+                "from_checkpoint_path": str(checkpoint),
+            }
+        ],
+    }
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'terminal_failure', metadata_json = ?, last_error = ? "
+            "WHERE work_id = ?",
+            (
+                json.dumps(metadata),
+                "ValueError: stale semantic production checkpoint scope",
+                item["work_id"],
+            ),
+        )
+        conn.commit()
+
+    result = queue.recover_stale_scope_items(processing_identity=identity)
+    recovered = queue.get(item["work_id"])
+
+    assert result["checkpoint_rotated"] == 1
+    assert recovered["stage"] == "acquire"
+    assert recovered["checkpoint_path"] != str(checkpoint)
 
 
 def test_reused_work_backfills_cutoff_from_checkpoint(tmp_path):
@@ -1184,6 +1547,73 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
     }
 
 
+def test_backfill_worker_terminal_failure_degrades_top_level_status(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+
+    async def stage_runner(_stage, _item):
+        raise ValueError("invalid checkpoint scope")
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+    )
+    report = asyncio.run(
+        asyncio.wait_for(
+            service.run_backfill(
+                knowledge_cutoff="2026-08-30",
+                processing_identity=_processing_identity(),
+                instrument_ids=("600000.SH",),
+                stage_budgets={
+                    "acquire": StageBudget(max_items=1, max_concurrency=1),
+                },
+            ),
+            timeout=5,
+        )
+    )
+
+    assert report["workers"]["acquire"]["terminal_failures"] == 1
+    assert report["status"] == "degraded"
+    assert report["reason_codes"] == ["worker_terminal_failures"]
+
+
+@pytest.mark.parametrize(
+    ("counter", "reason"),
+    [
+        ("retried", "worker_retries"),
+        ("configuration_blocked", "worker_configuration_blocked"),
+        ("lease_conflicts", "worker_lease_conflicts"),
+    ],
+)
+def test_operation_status_reports_nonterminal_worker_health(counter, reason):
+    status, reason_codes = _business_profile_operation_status(
+        discovery={"status": "success"},
+        workers={"semantic": {"status": "success", counter: 1}},
+    )
+
+    assert status == "degraded"
+    assert reason_codes == [reason]
+
+
+def test_operation_status_allows_healthy_bounded_backlog():
+    status, reason_codes = _business_profile_operation_status(
+        discovery={
+            "status": "degraded",
+            "discovery_window_backlog": 3,
+            "errors": [],
+        },
+        workers={"acquire": {"status": "success", "completed": 20}},
+    )
+
+    assert status == "success"
+    assert reason_codes == []
+
+
 def test_backfill_emits_lifecycle_and_inflight_progress_logs(tmp_path, caplog):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -1225,7 +1655,7 @@ def test_backfill_emits_lifecycle_and_inflight_progress_logs(tmp_path, caplog):
     )
 
     messages = [record.getMessage() for record in caplog.records]
-    assert report["status"] == "degraded"
+    assert report["status"] == "success"
     assert any("business-profile backfill start" in message for message in messages)
     assert any(
         "business-profile discovery heartbeat" in message for message in messages
@@ -1433,11 +1863,16 @@ def test_parse_compute_overlaps_while_sqlite_writes_remain_serial(tmp_path):
         storage,
         checkpoint_root=tmp_path / "checkpoints",
     )
-    for identity in ("first", "second"):
-        queue.enqueue_latest_annual(
-            knowledge_cutoff="2026-08-30",
-            processing_identity={"rules": identity},
-        )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "first"},
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "second"},
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
     with storage.get_connection() as conn:
         conn.execute(
             "UPDATE business_profile_work_items SET stage = 'parse', status = 'pending'"
