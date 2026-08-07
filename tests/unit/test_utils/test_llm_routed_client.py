@@ -265,6 +265,73 @@ async def test_rate_limit_fails_over_from_grok_to_luna_with_safe_lineage():
 
 
 @pytest.mark.asyncio
+async def test_same_source_retry_success_records_rate_limit_without_health_failure():
+    transport = ScriptedTransport([
+        {"status_code": 429, "data": {}},
+        _success("ok", "grok-4.5"),
+    ])
+    config = _config(max_retries=1)
+    client = _client(config, transport)
+
+    response = await client.complete(_request())
+
+    assert response.source_label == "pipio:grok-4.5"
+    assert response.attempts[0]["attempt_failures"] == [{
+        "attempt_sequence": 1,
+        "error_code": "rate_limit_error",
+        "status_code": 429,
+    }]
+    member = client.pool_coordinator_registry.get(
+        config, "semantic-pool"
+    ).snapshot().members[0]
+    assert member.rate_limits == 1
+    assert member.provider_5xx == 0
+    assert member.timeouts == 0
+    assert member.successes == 1
+    assert member.failures == 0
+    assert member.consecutive_failures == 0
+    assert member.circuit_state == "closed"
+
+
+@pytest.mark.asyncio
+async def test_http_503_is_counted_only_as_provider_5xx():
+    transport = ScriptedTransport([
+        {"status_code": 503, "data": {}},
+        _success("ok", "gpt-5.6-luna"),
+    ])
+    config = _config()
+    client = _client(config, transport)
+
+    await client.complete(_request())
+
+    member = client.pool_coordinator_registry.get(
+        config, "semantic-pool"
+    ).snapshot().members[0]
+    assert member.rate_limits == 0
+    assert member.provider_5xx == 1
+    assert member.timeouts == 0
+
+
+@pytest.mark.asyncio
+async def test_transport_failure_without_http_status_is_counted_only_as_timeout():
+    transport = ScriptedTransport([
+        LlmTransientTransportError("synthetic timeout"),
+        _success("ok", "gpt-5.6-luna"),
+    ])
+    config = _config()
+    client = _client(config, transport)
+
+    await client.complete(_request())
+
+    member = client.pool_coordinator_registry.get(
+        config, "semantic-pool"
+    ).snapshot().members[0]
+    assert member.rate_limits == 0
+    assert member.provider_5xx == 0
+    assert member.timeouts == 1
+
+
+@pytest.mark.asyncio
 async def test_streaming_idempotency_header_is_stable_across_failover():
     transport = ScriptedTransport([
         {"status_code": 429, "data": {}},

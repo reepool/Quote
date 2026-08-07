@@ -162,6 +162,7 @@ class LlmPoolLease:
         success: bool,
         error_code: Optional[str] = None,
         status_code: Optional[int] = None,
+        attempt_failures: Sequence[Mapping[str, Any]] = (),
     ) -> None:
         selection = self._selection
         if selection is None:
@@ -172,6 +173,7 @@ class LlmPoolLease:
             success=success,
             error_code=error_code,
             status_code=status_code,
+            attempt_failures=attempt_failures,
             correlation=self.correlation,
         )
 
@@ -199,6 +201,7 @@ class LlmPoolLease:
                 success=False,
                 error_code="cancelled",
                 status_code=None,
+                attempt_failures=(),
                 correlation=self.correlation,
                 affect_health=False,
             )
@@ -560,6 +563,7 @@ class LlmPoolCoordinator:
         success: bool,
         error_code: Optional[str],
         status_code: Optional[int],
+        attempt_failures: Sequence[Mapping[str, Any]],
         correlation: Mapping[str, str],
         affect_health: bool = True,
     ) -> None:
@@ -591,7 +595,6 @@ class LlmPoolCoordinator:
                     )
             else:
                 state.failures += 1
-                self._classify_failure_locked(state, error_code, status_code)
                 if affect_health and self._health_failure(error_code):
                     state.consecutive_failures += 1
                     if (
@@ -611,6 +614,22 @@ class LlmPoolCoordinator:
                             error_code,
                             self.config.failover.open_seconds,
                         )
+            if attempt_failures:
+                for failure in attempt_failures:
+                    raw_status_code = failure.get("status_code")
+                    status_code_value = (
+                        raw_status_code
+                        if isinstance(raw_status_code, int)
+                        and not isinstance(raw_status_code, bool)
+                        else None
+                    )
+                    self._classify_failure_locked(
+                        state,
+                        str(failure.get("error_code") or "") or None,
+                        status_code_value,
+                    )
+            elif not success:
+                self._classify_failure_locked(state, error_code, status_code)
             self._wake_member_waiters_locked()
             LOGGER.debug(
                 "event=llm.pool.member.released pool=%s source_label=%s success=%s "
@@ -649,13 +668,13 @@ class LlmPoolCoordinator:
     ) -> None:
         if error_code == "rate_limit_error" or status_code == 429:
             state.rate_limits += 1
-        if status_code is not None and 500 <= status_code <= 599:
+        elif status_code is not None and 500 <= status_code <= 599:
             state.provider_5xx += 1
-        if error_code in {"transient_transport_error", "deadline_exceeded"}:
+        elif error_code in {"transient_transport_error", "deadline_exceeded"}:
             state.timeouts += 1
-        if error_code == "response_parse_error":
+        elif error_code == "response_parse_error":
             state.parse_failures += 1
-        if error_code == "schema_validation_error":
+        elif error_code == "schema_validation_error":
             state.schema_failures += 1
 
     @staticmethod

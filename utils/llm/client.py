@@ -261,11 +261,13 @@ class LlmClient:
                 selected_source = selection.source_label
                 profile = self.config.profiles[selected_profile]
                 source_attempt_started = time.monotonic()
+                source_attempt_failures: list[dict[str, Any]] = []
                 try:
                     response = await self._complete_concrete(
                         request,
                         profile_override=profile,
                         budget=budget,
+                        attempt_failures=source_attempt_failures,
                     )
                 except LlmError as exc:
                     last_error = exc
@@ -273,6 +275,7 @@ class LlmClient:
                         success=False,
                         error_code=exc.code,
                         status_code=exc.status_code,
+                        attempt_failures=source_attempt_failures,
                     )
                     attempt = {
                         "source_label": selected_source,
@@ -283,6 +286,7 @@ class LlmClient:
                         "error_code": exc.code,
                         "status_code": exc.status_code,
                         "attempt_count": exc.attempt_count,
+                        "attempt_failures": list(source_attempt_failures),
                         "latency_ms": self._elapsed_ms(source_attempt_started),
                     }
                     attempts.append(attempt)
@@ -340,7 +344,10 @@ class LlmClient:
                     )
                     continue
 
-                await lease.finish_member(success=True)
+                await lease.finish_member(
+                    success=True,
+                    attempt_failures=source_attempt_failures,
+                )
                 attempt = {
                     "source_label": selected_source,
                     "selected_profile": selected_profile,
@@ -350,6 +357,7 @@ class LlmClient:
                     "provider_request_id": response.provider_request_id,
                     "status": "success",
                     "attempt_count": response.attempt_count,
+                    "attempt_failures": list(source_attempt_failures),
                     "latency_ms": self._elapsed_ms(source_attempt_started),
                 }
                 attempts.append(attempt)
@@ -499,6 +507,7 @@ class LlmClient:
         *,
         profile_override: Optional[LlmProfile] = None,
         budget: Optional[_ExecutionBudget] = None,
+        attempt_failures: Optional[list[dict[str, Any]]] = None,
     ) -> LlmResponse:
         if self._closed:
             raise LlmConfigurationError("LLM client is closed")
@@ -944,6 +953,11 @@ class LlmClient:
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
                         max(0.0, active_deadline - time.monotonic()),
                     )
+                    self._record_attempt_failure(
+                        attempt_failures,
+                        attempt_sequence=attempt_count,
+                        error=last_error,
+                    )
                     if isinstance(last_error, LlmDeadlineExceededError):
                         raise last_error from exc
                     if (
@@ -960,6 +974,11 @@ class LlmClient:
                     if time.monotonic() >= execution_deadline:
                         raise LlmDeadlineExceededError() from exc
                     last_error = exc
+                    self._record_attempt_failure(
+                        attempt_failures,
+                        attempt_sequence=attempt_count,
+                        error=exc,
+                    )
                     llm_logger.warning(
                         "event=llm.response.validation_failed profile=%s request_id=%s "
                         "attempt=%s/%s code=%s repair_used=%s",
@@ -982,6 +1001,11 @@ class LlmClient:
                         raise exc
                 except LlmError as exc:
                     last_error = exc
+                    self._record_attempt_failure(
+                        attempt_failures,
+                        attempt_sequence=attempt_count,
+                        error=exc,
+                    )
                     if (
                         provider_coordinator is not None
                         and exc.retryable
@@ -1052,6 +1076,11 @@ class LlmClient:
                 lineage=lineage,
             ) from exc
         except LlmError as exc:
+            self._record_attempt_failure(
+                attempt_failures,
+                attempt_sequence=attempt_count,
+                error=exc,
+            )
             contextual = exc.with_context(
                 request_id=request_id,
                 attempt_count=attempt_count,
@@ -1067,6 +1096,24 @@ class LlmClient:
                 attempt_count,
             )
             raise contextual from exc
+
+    @staticmethod
+    def _record_attempt_failure(
+        target: Optional[list[dict[str, Any]]],
+        *,
+        attempt_sequence: int,
+        error: LlmError,
+    ) -> None:
+        if target is None or attempt_sequence <= 0:
+            return
+        failure = {
+            "attempt_sequence": attempt_sequence,
+            "error_code": error.code,
+            "status_code": error.status_code,
+        }
+        if target and target[-1] == failure:
+            return
+        target.append(failure)
 
     async def _send_attempt(
         self,

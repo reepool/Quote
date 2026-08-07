@@ -105,15 +105,13 @@ def build_controlled_config(
     confirmed_provider_rpm: int,
     timeout_seconds: float,
 ) -> LlmConfig:
-    """Enable one route in memory within explicitly confirmed provider limits."""
+    """Enable one logical stage while preserving explicit provider limits."""
     if concurrency < 1:
         raise ValueError("concurrency must be positive")
-    if confirmed_per_source_concurrency < concurrency:
-        raise ValueError(
-            "confirmed per-source concurrency must cover full pool borrowing"
-        )
-    if confirmed_provider_rpm < concurrency:
-        raise ValueError("confirmed provider RPM must cover one full stage")
+    if confirmed_per_source_concurrency < 1:
+        raise ValueError("confirmed per-source concurrency must be positive")
+    if confirmed_provider_rpm < 1:
+        raise ValueError("confirmed provider RPM must be positive")
     if timeout_seconds <= 0:
         raise ValueError("timeout_seconds must be positive")
 
@@ -231,6 +229,12 @@ def acceptance_reasons(result: Mapping[str, Any]) -> list[str]:
         reasons.append("transport_activity_leaked")
     if int(result.get("fd_delta", 0)) > 0:
         reasons.append("file_descriptors_leaked")
+    if not result.get("provider_limits_ok"):
+        reasons.append("provider_limits_mismatch")
+    if int(result.get("transport_peak", 0)) > int(
+        result.get("confirmed_aggregate_provider_concurrency", 0)
+    ):
+        reasons.append("provider_concurrency_exceeded")
 
     dispatches = result.get("dispatch_counts") or {}
     total_dispatches = sum(int(value) for value in dispatches.values())
@@ -388,11 +392,35 @@ async def run_stage(
         member["source_label"]: member["dispatches"] for member in members
     }
     weight_total = sum(member.weight for member in pool.members)
+    configured_resource_names = {
+        config.resource_for_profile(
+            config.profiles[member.profiles[logical_profile]]
+        ).name
+        for member in pool.members
+    }
+    aggregate_provider_concurrency = (
+        confirmed_per_source_concurrency * len(configured_resource_names)
+    )
+    provider_limits_ok = (
+        len(provider_snapshots) == len(configured_resource_names)
+        and all(
+            int(snapshot["configured_requests_per_minute"])
+            == confirmed_provider_rpm
+            and int(snapshot["configured_bulk_concurrency"])
+            <= confirmed_per_source_concurrency
+            for snapshot in provider_snapshots
+        )
+    )
     result: dict[str, Any] = {
         "concurrency": concurrency,
         "confirmed_quota_scope": confirmed_quota_scope,
         "confirmed_per_source_concurrency": confirmed_per_source_concurrency,
         "confirmed_provider_rpm": confirmed_provider_rpm,
+        "confirmed_aggregate_provider_concurrency": (
+            aggregate_provider_concurrency
+        ),
+        "provider_resource_names": sorted(configured_resource_names),
+        "provider_limits_ok": provider_limits_ok,
         "successes": len(successes),
         "failures": failures,
         "elapsed_seconds": round(elapsed_seconds, 3),
@@ -514,14 +542,32 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--confirmed-provider-rpm", type=int, default=10)
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
+    parser.add_argument(
+        "--output-json",
+        type=Path,
+        help="write the complete non-secret validation result to this path",
+    )
     parser.add_argument("--confirm-live", action="store_true")
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     load_project_environment(override=False)
-    result = asyncio.run(run_stages(parse_args(argv)))
-    print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+    args = parse_args(argv)
+    result = asyncio.run(run_stages(args))
+    rendered = json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True)
+    if args.output_json is not None:
+        args.output_json.parent.mkdir(parents=True, exist_ok=True)
+        args.output_json.write_text(f"{rendered}\n", encoding="utf-8")
+        print(json.dumps({
+            "all_executed_stages_accepted": result[
+                "all_executed_stages_accepted"
+            ],
+            "executed_stages": result["executed_stages"],
+            "output_json": str(args.output_json),
+        }, ensure_ascii=False, sort_keys=True))
+    else:
+        print(rendered)
     return 0 if result["all_executed_stages_accepted"] else 1
 
 

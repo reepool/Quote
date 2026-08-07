@@ -283,7 +283,12 @@ pool 快照扩展为可运维合同：报告 pool 配置/有效上限及当前�
 
 ## Open Questions
 
-- 两个 Pipio Key 的 hard concurrency 和 RPM 是独立 quota 还是共享账号 quota？必须在真实放量前确认。
 - 首次生产权重采用 1:1、3:1 还是基于单源质量/吞吐基准确定？实现只提供可配置能力，不在代码中写死。
 - `gpt-5.6-luna` 是否与 Grok 一样稳定支持当前 `json_object`、stream usage 和 `max_completion_tokens`？必须通过单源 capability smoke。
 - 公司行动数据库来源字段采用独立列加 route lineage JSON，还是复用现有 JSON 并新增索引列？实施时应优先满足可查询性和历史兼容，不能只考虑最小迁移。
+
+## Resolved Questions
+
+- 部署方已确认两个 Pipio API Key 的 quota 相互独立。因此 Grok 与
+  Luna 使用两个独立 provider resource，各自执行并发、RPM、cooldown
+  和自适应拥塞控制；相同 Base URL 不合并额度。

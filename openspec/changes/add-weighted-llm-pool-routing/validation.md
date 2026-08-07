@@ -140,14 +140,39 @@ Grok returned valid structured candidates with
 were retained in result lineage and did not hide a transport, parse, or schema
 failure.
 
-The checked-in provider resources remain conservatively limited to hard
-concurrency 10 and 10 RPM per source. The requirements prohibit guessing quota
-ownership or bypassing provider-resource controls, and no authoritative
-confirmation currently establishes the per-Key concurrency/RPM needed for the
-25- and 50-concurrency provider-backed stages or whether both Keys share one
-account bucket. Therefore the successful 10 stage does not authorize raising
-those limits: 25 and 50 remain gated pending explicit quota confirmation, and
-task 6.5 remains incomplete.
+At the time of that run, the checked-in provider resources remained
+conservatively limited to hard concurrency 10 and 10 RPM per source, and quota
+ownership had not yet been confirmed. The later deployment confirmation and
+rerun below supersede that quota-ownership uncertainty without raising either
+provider limit.
+
+### Independent-Quota Staged Rerun (2026-08-07)
+
+The deployment owner confirmed that the Grok and Luna API Keys have independent
+quota. The controlled staged validator therefore kept two provider resources,
+each with hard concurrency 10 and 10 RPM, while requesting logical pool stages
+10, 25, and 50. Higher logical stages were allowed to queue behind those
+provider caps; the validator did not increase or bypass either source limit.
+
+The 10-concurrency gate completed all 10 logical requests successfully in
+111.807 seconds, with nine final Grok results and one final Luna result. Primary
+dispatches were nine Grok and two Luna because one Luna source execution failed
+over successfully to Grok. Luna returned HTTP 503 twice during its bounded
+same-source attempts; one Grok execution returned HTTP 503 once and then
+succeeded on same-source retry. The corrected concrete-attempt accounting
+reported exactly three provider 5xx failures, zero rate limits, and zero
+timeouts; HTTP 503 was no longer double-counted as a timeout, and retry failures
+were retained even when the source later succeeded.
+
+The stage otherwise remained clean: both circuits were closed, transport peak
+was 10 against aggregate confirmed provider capacity 20, provider configuration
+matched the confirmed per-source limits, first-event latency ranged from 1.702
+to 109.329 seconds, total latency ranged from 4.582 to 111.535 seconds,
+`fd_delta=0`, shutdown took 1.907 ms, transport active count returned to zero,
+and the pool registry was empty. The acceptance gate failed only for
+`nonzero_provider_5xx`, so the required gate correctly did not start the 25- or
+50-concurrency stages. Task 6.5 remains incomplete pending a stable provider
+window in which 10 passes before 25 and 50 are attempted.
 
 ## Candidate-Only Rollout Controls
 
@@ -161,11 +186,12 @@ task 6.5 remains incomplete.
   staged as: single-source smoke, controlled failover, offline 10/25/50 load,
   then operator-approved production route activation. Rollback disables the
   route/pool and leaves stored source lineage untouched.
-- `pipio:grok` and `pipio:luna` remain independent provider resources until
-  quota validation proves otherwise. Pool snapshots/logs expose concurrency,
-  RPM, cooldown, circuit, failover, latency, and source-ratio fields for
-  operational alerts. Both models currently share the Pipio URL, so this is
-  model/key redundancy rather than cross-provider disaster recovery.
+- `pipio:grok` and `pipio:luna` are independent provider resources, matching
+  the deployment owner's confirmed independent Key quotas. Pool snapshots/logs
+  expose concurrency, RPM, cooldown, circuit, failover, latency, and
+  source-ratio fields for operational alerts. Both models currently share the
+  Pipio URL, so this is model/key redundancy rather than cross-provider
+  disaster recovery.
 
 ## Final Review
 
@@ -195,9 +221,11 @@ task 6.5 remains incomplete.
   configured provider-resource mapping, enforces strictly increasing stages,
   and stops immediately after a failed gate. Eleven focused tests pass after
   this fix.
-- Luna recovered and the latest provider-backed 10-concurrency runtime gate
-  passed. Live rollout still remains incomplete because authoritative quota
-  ownership and limits have not been supplied for the gated 25/50 stages.
+- Independent quota ownership is now confirmed and the staged validator keeps
+  each resource capped at hard concurrency 10 and 10 RPM. The latest 10-stage
+  rerun nevertheless failed provider stability because of three HTTP 503
+  responses, so the gate correctly withheld 25/50 and live rollout remains
+  incomplete.
 
 ## Requirements Coverage
 
@@ -211,4 +239,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because quota ownership/limits are unconfirmed and provider-backed 25/50 remain gated |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because the post-confirmation 10-stage run encountered provider 503 responses and therefore gated provider-backed 25/50 |

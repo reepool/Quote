@@ -26,6 +26,9 @@ def _accepted_result():
         "identity_ok": True,
         "registry_empty_after_shutdown": True,
         "transport_active_after_shutdown": 0,
+        "transport_peak": 10,
+        "confirmed_aggregate_provider_concurrency": 20,
+        "provider_limits_ok": True,
         "fd_delta": 0,
         "dispatch_counts": {
             "pipio:grok-4.5": 8,
@@ -57,6 +60,19 @@ def test_live_acceptance_gate_rejects_missing_measurements_and_identity():
     assert acceptance_reasons(failed) == [
         "missing_first_event_measurements",
         "request_identity_mismatch",
+    ]
+
+
+def test_live_acceptance_gate_rejects_provider_limit_mismatch_or_overrun():
+    failed = {
+        **_accepted_result(),
+        "provider_limits_ok": False,
+        "transport_peak": 21,
+    }
+
+    assert acceptance_reasons(failed) == [
+        "provider_limits_mismatch",
+        "provider_concurrency_exceeded",
     ]
 
 
@@ -97,11 +113,33 @@ def test_controlled_live_config_is_in_memory_and_quota_bounded():
     assert asdict(base) == original
 
 
+def test_pool_stage_can_exceed_provider_caps_without_overriding_them():
+    controlled = build_controlled_config(
+        config_manager.get_llm_config(),
+        logical_profile="semantic_extraction",
+        concurrency=50,
+        confirmed_quota_scope="independent",
+        confirmed_per_source_concurrency=10,
+        confirmed_provider_rpm=10,
+        timeout_seconds=620,
+    )
+
+    assert controlled.pools["shared_semantic"].total_concurrency == 50
+    assert {
+        resource.hard_max_concurrency
+        for resource in controlled.provider_resources.values()
+    } == {10}
+    assert {
+        resource.requests_per_minute
+        for resource in controlled.provider_resources.values()
+    } == {10}
+
+
 @pytest.mark.parametrize(
     ("source_limit", "rpm", "message"),
     [
-        (9, 10, "full pool borrowing"),
-        (10, 9, "full stage"),
+        (0, 10, "concurrency must be positive"),
+        (10, 0, "RPM must be positive"),
     ],
 )
 def test_controlled_live_config_rejects_unconfirmed_capacity(
@@ -195,3 +233,22 @@ def test_staged_live_gate_rejects_unsafe_invocation(
 
     with pytest.raises(ValueError, match=message):
         asyncio.run(benchmark.run_stages(args))
+
+
+def test_live_cli_accepts_explicit_result_path(tmp_path):
+    output_path = tmp_path / "live-result.json"
+
+    args = benchmark.parse_args([
+        "--confirm-live",
+        "--confirmed-quota-scope",
+        "independent",
+        "--concurrency",
+        "10",
+        "25",
+        "50",
+        "--output-json",
+        str(output_path),
+    ])
+
+    assert args.concurrency == [10, 25, 50]
+    assert args.output_json == output_path
