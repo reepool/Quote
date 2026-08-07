@@ -18,12 +18,12 @@ Business, research, scheduler, API, and CLI modules MUST obtain enablement, non-
 - **THEN** it uses the public logical-profile facade and its route fingerprint without accessing `llm_config.profiles`
 
 ### Requirement: A pool SHALL enforce total logical concurrency and deterministic weighted fairness
-Each configured pool SHALL enforce a hard process-local `max_concurrency` across all logical profiles routed to it. The pool SHALL use a deterministic weighted-fair scheduler, such as weighted deficit round robin, with strictly positive integer member weights. Weight SHALL define long-run dispatch share among eligible healthy members, not a permanent per-member semaphore reservation.
+Each configured pool SHALL enforce a hard process-local `total_concurrency` across all logical profiles routed to it. The pool SHALL use a deterministic weighted-fair scheduler, such as weighted deficit round robin, with strictly positive integer member weights. Weight SHALL define long-run dispatch share among eligible healthy members, not a permanent per-member semaphore reservation.
 
 When `borrow_idle_capacity=true`, a pool MAY dispatch to another eligible healthy member when weighted candidates are unavailable; this MUST NOT exceed pool total concurrency or a concrete member/profile limit. Scheduler state, dispatch counters, active counts, borrowing, queue wait, and member eligibility SHALL be observable in a non-secret pool snapshot. Waiting, cancellation, and shutdown SHALL not leak capacity permits.
 
 #### Scenario: Shared pool cap spans two business profiles
-- **WHEN** title classification and semantic extraction are routed to a pool with `max_concurrency=10`
+- **WHEN** title classification and semantic extraction are routed to a pool with `total_concurrency=10`
 - **THEN** at most ten logical LLM executions are active in that pool even if both profiles submit requests concurrently
 
 #### Scenario: Weighted members receive proportional dispatches
@@ -39,6 +39,8 @@ Pool routing SHALL not replace concrete profile or provider-resource concurrency
 
 Provider resources SHALL be configured from verified quota buckets rather than inferred from matching Base URLs. The Pipio Grok and Luna profiles SHALL use explicit non-secret resources that can be configured as shared or independent after controlled validation.
 
+Effective in-flight capacity SHALL remain the minimum of business-stage worker capacity, pool `total_concurrency`, selected concrete-profile concurrency, current provider-resource adaptive concurrency, and HTTP connection-pool capacity. Pool member weight SHALL remain separate from existing provider `workload_weights`; history backfill, daily work, title classification, body extraction, and semantic verification SHALL retain their workload identity and existing fair admission within a shared provider resource. Runtime snapshots SHALL identify the active limiting layer.
+
 #### Scenario: Shared URL does not force a shared quota resource
 - **WHEN** two concrete profiles use the same Pipio Base URL but quota validation shows independent keys
 - **THEN** configuration may assign distinct provider resources and each resource maintains its own limits
@@ -47,8 +49,12 @@ Provider resources SHALL be configured from verified quota buckets rather than i
 - **WHEN** a request changes from one concrete member to another after a classified failure
 - **THEN** it retains its original pool execution permit until the final success or terminal error
 
+#### Scenario: Pool weight does not replace workload fairness
+- **WHEN** multiple business workloads share one provider resource through a weighted LLM pool
+- **THEN** source selection uses pool member weight while provider admission independently uses the existing workload identity and workload weights
+
 ### Requirement: Failover SHALL be bounded by one logical execution deadline
-The gateway SHALL attempt bounded same-source retries and schema repair before cross-source failover. A route SHALL use one absolute execution deadline after its first transport-send admission; it SHALL apply to same-source retry, backoff, repair, member selection, failover, and all subsequent concrete attempts. A new attempt MUST NOT begin when remaining execution budget is below configured minimum attempt budget.
+The gateway SHALL attempt bounded same-source retries and schema repair before cross-source failover. A route SHALL use one absolute execution deadline after its first transport-send admission; it SHALL apply to same-source retry, backoff, repair, member selection, failover, and all subsequent concrete attempts. Each transport attempt timeout SHALL be the minimum of the selected concrete profile attempt timeout, request override, and remaining route budget. A new attempt MUST NOT begin when remaining execution budget is below configured minimum attempt budget.
 
 Failover SHALL require a terminal classified error in configured `failover.on`, an untried eligible member, remaining deadline, and an unused `max_hops` budget. Configuration, route validation, cancellation, and deadline failures MUST NOT fail over. Authentication failures MUST NOT fail over unless `allow_auth_failover=true`; that exceptional path SHALL emit a high-priority operational signal.
 
@@ -59,6 +65,25 @@ Failover SHALL require a terminal classified error in configured `failover.on`, 
 #### Scenario: No eligible source yields a classified terminal error
 - **WHEN** all compatible members are unavailable, open, already attempted, or have exhausted the hop/deadline budget
 - **THEN** the gateway returns or raises a classified fail-closed route error with safe attempt lineage and no business data
+
+### Requirement: Logical identity and idempotency SHALL remain stable across source selection
+The logical request identity SHALL include business input, logical profile, route fingerprint, prompt/schema/parser versions, and caller metadata used by the existing runtime identity contract. It MUST NOT include the concrete source selected for one execution. The actual-attempt identity SHALL additionally include selected profile, source label, actual model, and attempt sequence.
+
+The deterministic route fingerprint SHALL cover normalized pool/route configuration, member source labels, logical-to-concrete mappings, and output-contract-relevant concrete-profile capabilities. It MUST exclude API-key values, current health/circuit state, runtime counters, and the random/current source selection. Changing route capability or revision SHALL change the fingerprint; changing only ephemeral runtime state SHALL not.
+
+The caller idempotency key SHALL remain unchanged across same-source retry and cross-source failover. Local and provider request IDs SHALL remain distinct for every actual attempt, and the gateway MUST NOT claim persistent idempotency across providers or credentials.
+
+#### Scenario: Failover does not create a new business input identity
+- **WHEN** equivalent business input succeeds once on Grok and once after failover to Luna under the same route configuration
+- **THEN** both executions have the same logical input/runtime identity while their actual-attempt identities and source lineage differ
+
+#### Scenario: Route capability change invalidates reusable runtime identity
+- **WHEN** member mappings or output-contract capabilities change while ephemeral health and counters do not participate
+- **THEN** the route fingerprint and dependent runtime identity change so old checkpoints are not silently reused
+
+#### Scenario: Idempotency key is preserved across attempts
+- **WHEN** one logical request retries and fails over between concrete members
+- **THEN** every attempt retains the caller idempotency key while recording its own local and provider request IDs
 
 ### Requirement: Pool member health SHALL use a circuit breaker separate from quota control
 Each pool member SHALL maintain `closed`, `open`, and `half_open` circuit states. Configured classified failures SHALL open the circuit after its threshold; after cooldown, only the configured bounded half-open probe capacity may be admitted. A successful probe SHALL close and reset the circuit; a failed probe SHALL reopen it. Circuit state SHALL be testable with an injected fake clock and observable without secrets.
@@ -109,3 +134,75 @@ Controlled live smoke tests, when credentials are explicitly supplied, SHALL tes
 #### Scenario: Static scan prevents configuration leakage
 - **WHEN** release validation scans application-layer modules
 - **THEN** no production business module directly reads `llm_config.profiles` or concrete provider/model/key configuration
+
+### Requirement: Route configuration SHALL be validated completely and fail closed
+Pool and route names SHALL be non-empty and unique in their scopes. `total_concurrency`, `queue_size`, and member `weight` SHALL accept only non-boolean positive integers, and the initial implementation SHALL accept only `weighted_fair` strategy. Source labels SHALL be non-secret and unique within a pool. A route SHALL reference an enabled pool, and every pool member SHALL map that logical profile to an existing enabled concrete profile whose source label matches the member.
+
+Every selectable concrete profile SHALL explicitly retain its structured-output, stream, timeout, retry, output-token, local concurrency, RPM, API-key environment, model, URL, and provider-resource settings. All members for a logical profile SHALL satisfy its required structured-output contract. Pool total concurrency MUST NOT exceed the project hard limit. Routing MUST preserve provider-resource/profile/workload RPM inheritance, and configuration MUST NOT use multiple resource names to bypass one verified shared quota bucket. A route/concrete-profile name collision and multiple project JSON owners of the top-level `llm` key SHALL fail configuration validation before network or scheduler startup.
+
+#### Scenario: Boolean and fractional limits are rejected
+- **WHEN** `total_concurrency`, `queue_size`, or `weight` is a boolean, zero, negative, or fractional value
+- **THEN** configuration loading fails with a classified non-secret validation error
+
+#### Scenario: Incompatible concrete member is rejected
+- **WHEN** a member profile is missing, disabled, has a mismatched source label, or lacks the logical profile's required structured-output capability
+- **THEN** the route fails validation before it can accept a request
+
+#### Scenario: Shared quota cannot be split to evade limits
+- **WHEN** two credentials are verified to consume one upstream quota bucket but configuration maps them to independent resource names
+- **THEN** configuration validation fails rather than allowing aggregate concurrency or RPM to exceed that bucket
+
+### Requirement: LLM observability and logs SHALL use the system logging architecture
+All common LLM client, transport, pool, circuit, and provider-coordination logging SHALL use the existing `LLM` logger managed by `utils/logging_manager.py` and `config/01_log.json`. The implementation SHALL reuse system formatting, console behavior, task-domain file routing, module-level controls, and configured rotation; it MUST NOT create a separate handler, log directory, or rotation subsystem. The `LLM` logger SHALL be explicitly configurable in the system module logging configuration.
+
+Detailed process events SHALL use `DEBUG`, including queue operations, member eligibility/exclusion and weighted scheduler state, borrowing, lease waits/releases, retry/repair/backoff planning, remaining deadline, half-open probe details, snapshot collection, and shutdown cleanup. Important lifecycle and routing nodes SHALL use `INFO`, including pool/registry startup and shutdown, route admission, source selection, first provider attempt, failover selection, route completion/exhaustion, and circuit open/half-open/recovery. Recoverable provider/schema/deadline and degraded-source conditions SHALL use `WARNING`; terminal configuration, all-source, lifecycle, lease/state-integrity, and internal-contract failures SHALL use `ERROR` with safe exception context.
+
+Logs SHALL use stable event names and parameterized non-secret fields. As available, events SHALL include logical profile, pool, source label, selected profile, local/provider request ID, request hash, workload, run/stage/business item, attempt/failover count, queue/elapsed/remaining timing, and classified error code. Logs MUST NOT include API keys, Authorization, Cookie, complete document text, complete prompts/responses, or raw provider error bodies.
+
+The pool snapshot SHALL report configured and effective concurrency plus the active bottleneck; active/waiting/oldest wait; per-source weight, dispatch, active, waiting, ratio, success, error, 429, 5xx, timeout, parse, and schema counts; circuit/cooldown/probe state; failover requested/succeeded/exhausted by category; queue/execution/failover/total latency; logical/workload/run/stage/business-item correlation; and provider-resource concurrency/RPM/cooldown state.
+
+#### Scenario: Process detail is available only at debug level
+- **WHEN** an eligible request waits, is evaluated by the weighted scheduler, borrows capacity, retries, or releases a lease
+- **THEN** the `LLM` logger emits parameterized `DEBUG` events and does not promote those routine details to `INFO`
+
+#### Scenario: Important route nodes are visible at info level
+- **WHEN** a route is admitted, selects or changes source, completes or exhausts, or a circuit changes state
+- **THEN** the `LLM` logger emits an `INFO` event carrying safe correlation and source fields
+
+#### Scenario: Logs remain redacted
+- **WHEN** configuration, a prompt, or a provider response contains credentials or document text and the route succeeds or fails
+- **THEN** captured DEBUG/INFO/WARNING/ERROR records contain none of those secrets or complete content
+
+### Requirement: Business compatibility SHALL preserve each existing workflow contract
+CNInfo announcement-title regression SHALL preserve stable logical profile use, batch chunking, isolated retry, out-of-order item identity, per-event source lineage, failover without item cross-wiring, business schema, and applicability validation. Corporate-action extraction and independent verification SHALL preserve distinct source lineage joined by the same `source_event_key`, route-fingerprint input identity, resume/completed-result reuse without duplicate analysis, deterministic evidence gates, unchanged automatic-promotion rules, and compatible database/audit queries.
+
+Business-profile regression SHALL cover atomic activity/relationship extraction, structured-table extraction, and independent verification through logical profiles. It SHALL preserve route-fingerprint runtime identity, `SemanticRunAudit`/artifact source, checkpoint/resume, rework, promotion manifest, source revision, network kill switch, scope/candidate/release gates, and the distinction between business structured-source fallback and LLM source failover. The legacy adapter SHALL preserve synchronous and asynchronous APIs, injected fake clients, source envelope, shutdown behavior, and no independent provider configuration.
+
+Application lifecycle validation SHALL prove one shared pool/coordinator in one application lifetime, `load_project_environment(override=False)` precedence, logical-profile selection and source reporting in live validation, benchmark redaction, and shutdown with no waiting tasks, permits, sockets, HTTP clients, or coordinator/circuit state leaked.
+
+#### Scenario: Title routing preserves item identity
+- **WHEN** title chunks complete out of order and one item fails over
+- **THEN** each event retains its own result, applicability decision, and actual-source lineage without cross-wiring
+
+#### Scenario: Corporate-action resume remains idempotent across sources
+- **WHEN** an extraction or verifier resumes after a different concrete source was previously selected
+- **THEN** route-fingerprint identity reuses the correct completed candidate and does not create a duplicate analysis or relax promotion gates
+
+#### Scenario: Structured business fallback is not model failover
+- **WHEN** business-profile structured-source fallback and an LLM member failover occur in the same run
+- **THEN** runtime audit records them as separate mechanisms and all existing scope, evidence, and release gates remain enforced
+
+### Requirement: Data migration, rollback, and live rollout SHALL be gated and non-destructive
+Source-lineage database and artifact migrations SHALL be idempotent, repeatable, backward-readable, and rollback-tested. They MUST NOT overwrite or delete existing analyses. Historical missing source values SHALL remain null or `legacy_unknown`. Disabling or rolling back a route/pool SHALL preserve already stored source and attempt lineage, and APIs, task reports, and audit queries that expose an LLM result SHALL include its source label.
+
+Controlled live validation SHALL be explicitly enabled and SHALL use the same synthetic non-sensitive Chinese input for single-source comparison. Each source SHALL first verify authentication, actual model, streaming/first-event behavior, usage, structured output, timeout, and quota-resource mapping. A two-source test SHALL then exercise logical routing and explicit member disablement/failure before staged 10, 25, and 50 concurrency levels.
+
+Each level SHALL record success, 429/5xx, first-event and total latency, dispatch ratio, failover, memory, connection count, and shutdown duration. A level MUST NOT proceed when the preceding level fails its acceptance thresholds. Live outputs SHALL remain candidates and MUST NOT bypass quality holdout, evidence, or promotion gates.
+
+#### Scenario: Reapplying and rolling back a migration preserves history
+- **WHEN** the source-lineage migration is applied twice and then its rollback path is exercised against legacy and new records
+- **THEN** no existing analysis or lineage is overwritten or deleted and all historical records remain readable
+
+#### Scenario: Failed load stage stops promotion
+- **WHEN** the 10- or 25-concurrency stage violates its configured success, quota, latency, resource, or shutdown thresholds
+- **THEN** validation records the failure and does not start the next concurrency stage

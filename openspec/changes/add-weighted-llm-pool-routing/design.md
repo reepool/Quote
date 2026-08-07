@@ -213,6 +213,45 @@ CNInfo 标题 lineage、公司行动主要抽取和独立 verifier 分别记录�
 
 公共 fake transport 测试先完成，再运行业务回归。真实 Key 测试必须是显式受控 smoke，不进入普通单元测试。
 
+### 16. 配置校验使用显式 fail-closed 契约
+
+配置模型不得只校验字段存在。`total_concurrency`、`queue_size` 和成员 `weight` 必须是非布尔正整数，首期 strategy 只允许 `weighted_fair`。pool、route 和 source label 必须非空且在各自作用域唯一；route 必须引用启用的 pool；每个成员必须为 route 映射存在且启用的实际 profile，且成员/实际 profile 的 source label 一致。
+
+配置加载还需要验证：
+
+- 每个实际 profile 显式声明 structured output、stream、timeout、retry、token、局部并发和 RPM 等既有能力字段；
+- 所有可选成员满足逻辑 profile 的 structured-output 契约；
+- pool 总并发不突破项目硬上限；
+- provider resource、profile 和 workload RPM 的继承关系不因 route 改变；
+- 已确认共享的 quota bucket 不得通过不同 resource 名称绕过总限制；
+- route 名称不得与实际 profile 名称产生歧义；
+- 正式配置文件中只能有一个顶层 `llm` 所有者，避免配置管理器的浅合并覆盖。
+
+所有分支都使用离线配置测试覆盖，包括未知引用、重复标签、布尔/小数数值、能力不兼容、独立/共享 quota 和无 route 兼容路径。
+
+### 17. LLM 日志复用系统日志架构并按事件重要性分级
+
+LLM 不创建独立 handler、日志目录或轮转机制。公共模块继续使用 `logging.getLogger("LLM")`，由 `utils/logging_manager.py` 将其路由到 task-domain 文件，格式、console、模块级别和 size/time rotation 由 `config/01_log.json` 统一管理。实施需在该配置的 `modules` 中加入可配置的 `LLM` 条目；生产默认可保持 `INFO`，诊断时切换为 `DEBUG`。
+
+日志事件采用稳定事件名和参数化字段，不拼接完整 prompt/response：
+
+- `DEBUG`：入队/出队、候选成员及排除原因、weight/deficit 游标、借用判断、provider/profile lease 等待与释放、attempt payload 非敏感摘要、retry/repair/backoff 计划、剩余 deadline、half-open probe 细节、快照采样和关闭清理细节；
+- `INFO`：route admitted、source selected、首次 provider attempt 开始、failover selected、route completed、route exhausted、circuit opened/half-open/recovered、pool/registry 启动与正常关闭；
+- `WARNING`：可恢复 429/5xx/timeout、parse/schema failure、认证 failover、成员熔断、deadline 接近耗尽、回退或部分来源不可用；
+- `ERROR`：配置无法启动、全部来源终态失败、生命周期关闭失败、状态/租约泄漏或破坏公共契约的内部异常，并保留 `exc_info` 供非业务敏感异常诊断。
+
+每条相关日志按可用范围携带 logical profile、pool、source label、selected profile、local/provider request ID、request hash、workload、run/stage、business item、attempt、failover count、queue/elapsed/remaining 时间和分类错误码。日志禁止 API Key、Authorization、Cookie、完整正文、完整 prompt/response 和原始 provider 错误体；测试通过捕获 logger 验证级别、字段和脱敏。
+
+pool 快照扩展为可运维合同：报告 pool 配置/有效上限及当前瓶颈、active/waiting/oldest wait；各来源 weight/dispatch/active/waiting/ratio、success/error/429/5xx/timeout/parse/schema；circuit/cooldown/probe；failover requested/succeeded/exhausted 和错误分类；queue/execution/failover/total latency；logical profile/workload/run/stage/business item 关联；provider resource concurrency/RPM/cooldown。日志用于过程诊断，快照计数用于聚合观测，二者不能相互替代。
+
+### 18. 数据迁移、业务回归和分级放量使用显式门禁
+
+来源字段数据库迁移必须幂等、可重复执行并具备回滚验证；不得覆盖既有分析结果。历史记录使用 `null`/`legacy_unknown`，route 回滚不得删除已保存 lineage。API、任务报告和审计查询返回 LLM 结果时均要保留来源标签。
+
+业务回归必须逐项验证需求文档第 14 节的既有契约，不能只验证模块可导入或请求成功：标题分类保留分块/隔离重试/乱序身份/schema/applicability；公司行动保留 `source_event_key`、resume 去重、确定性证据和 promotion gate；公司画像保留 runtime identity、checkpoint/rework/promotion manifest/source revision、network/scope/candidate gate，并区分业务 structured-source fallback 和模型 failover；legacy adapter 保留同步/异步、fake client、来源 envelope 和关闭行为。
+
+真实验证必须使用合成非敏感中文输入。先逐个来源验证认证、实际 model、stream、usage、structured output、timeout 和 quota；再运行小批量逻辑路由并显式禁用/模拟一个成员验证 failover；最后按 10、25、50 并发逐级放量。每一级记录成功率、429/5xx、首事件/总耗时、权重比例、failover、内存、连接数和关闭耗时，低一级未通过不得进入高一级。所有 live 结果仍只作为候选，不绕过 holdout 或 promotion gate。
+
 ## Risks / Trade-offs
 
 - [相同 Base URL 是共同故障域] → 将本变更定位为模型/Key 冗余而非跨供应商灾备；lineage 披露实际来源，未来可加入不同 provider。

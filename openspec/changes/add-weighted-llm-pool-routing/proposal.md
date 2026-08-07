@@ -9,6 +9,7 @@ Quote 的公告解析和公司画像已经统一使用公共 LLM 网关，但一
 - 增加成员健康状态、熔断、半开探测和同一逻辑 deadline 内的有界故障转移；全部成员失败时保持 fail closed。
 - 扩展公共响应和分类失败 lineage，返回稳定 `source_label`、逻辑/实际 profile、route fingerprint 和完整脱敏尝试记录。
 - 增加公共逻辑 profile 查询接口，迁移应用代码中对 `llm_config.profiles`、单一 model identity 和实际 provider 配置的直接访问。
+- 复用 `utils/logging_manager.py`、`config/01_log.json` 和 `LLM` domain logger，为路由、排队、调度、attempt、retry、failover、熔断、完成和关闭过程增加脱敏日志；过程细节使用 `DEBUG`，重要运行节点使用 `INFO`，异常按 `WARNING`/`ERROR` 分级。
 - 将 CNInfo 标题分类、公司行动正文抽取/独立复核、公司画像语义抽取/复核、旧画像适配器和应用生命周期纳入兼容性检查及回归验收。
 - **BREAKING**：部署配置从 `config/11_llm.json` 迁移到 `config/13_llm.json`，并以 `QUOTE_LLM_PIPIO_GROK_API_KEY`、`QUOTE_LLM_PIPIO_LUNA_API_KEY` 替代通用 `QUOTE_LLM_API_KEY`；业务 `LlmRequest.profile` 和提示词/schema 契约保持兼容。
 
@@ -30,3 +31,4 @@ Quote 的公告解析和公司画像已经统一使用公共 LLM 网关，但一
 - 公司画像：语义抽取、结构化抽取、独立复核、runtime identity、checkpoint/artifact、旧适配器和生产脚本。
 - 数据：公司行动 LLM 分析与公司画像审计需要兼容持久化实际来源和路由 lineage；历史缺失来源不得猜测。
 - 测试与运维：扩展公共网关/编排单测，运行所有现有 LLM 业务回归、静态调用扫描和受控双模型 smoke/分级并发验证。
+- 日志与可观测性：沿用系统 task-domain handler、格式、轮转和模块级日志配置，扩展 `LLM` 日志事件、pool/provider 快照和脱敏测试，不新增独立日志后端。
