@@ -35,15 +35,17 @@ header, full prompt, or raw provider body was recorded in this artifact.
   timeout governance, and clean pool shutdown. The provider reported 587 output
   tokens against a requested 500-token budget, which the gateway surfaced as
   `provider_output_budget_exceeded` without rejecting the otherwise valid result.
-- `pipio:gpt-5.6-luna`: did not pass. Both bounded same-source attempts returned
+- `pipio:gpt-5.6-luna`: did not pass in this initial round. Both bounded
+  same-source attempts returned
   HTTP 503 and were classified as `transient_transport_error`; the route failed
   closed and released all pool/provider state. Authentication, actual model,
   structured output, and usage could not be proven from this run.
 
-The first controlled run for each source passed the single-source smoke gate.
-Luna subsequently returned intermittent HTTP 503 responses; those failures are
-recorded as provider instability and were handled by retry/cooldown/fail-closed
-logic rather than hidden.
+Grok passed the initial single-source smoke gate. A later successful Luna run,
+recorded below, completed Luna's single-source capability evidence. Luna also
+returned intermittent HTTP 503 responses in subsequent probes; those failures
+are recorded as provider instability and were handled by
+retry/cooldown/fail-closed logic rather than hidden.
 
 ## Latest Controlled Routing Validation
 
@@ -75,7 +77,9 @@ shutdown took 3.194 ms, and the pool registry was empty afterward. Because the
 10-concurrency stage failed success/provider-stability thresholds, the required
 gate blocked 25- and 50-concurrency provider-backed stages. This is a rollout
 failure, not an implementation-test omission; the offline 25/50 stages remain
-the evidence for pool concurrency and weighted fairness.
+the evidence for pool concurrency and weighted fairness. OpenSpec task 6.5
+therefore remains incomplete: live rollout cannot be declared complete until a
+provider-backed 10-concurrency rerun passes and the gated 25/50 stages also pass.
 
 ## Candidate-Only Rollout Controls
 
@@ -131,4 +135,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.5 |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because the provider-backed 10-concurrency gate failed |
