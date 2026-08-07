@@ -365,6 +365,8 @@ def test_scheduler_forwards_daily_async_scope(monkeypatch):
 
 
 def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
+    log_info = Mock()
+    monkeypatch.setattr(task_module.scheduler_logger, "info", log_info)
     task = _task()
     manager = Mock()
     manager.run_business_profile_backfill = AsyncMock(
@@ -408,9 +410,15 @@ def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
         stage_budgets={"acquire": {"max_items": 2}},
         should_stop=ANY,
     )
-    assert task._send_task_report.await_args.kwargs["report_data"][
-        "tasks_completed"
-    ] == 0
+    assert (
+        task._send_task_report.await_args.kwargs["report_data"]["tasks_completed"] == 0
+    )
+    formats = [str(call.args[0]) for call in log_info.call_args_list]
+    assert any("Business-profile backfill start" in message for message in formats)
+    assert any("Business-profile backfill end" in message for message in formats)
+    assert (
+        "N/A" not in task._send_task_report.await_args.kwargs["report_data"]["duration"]
+    )
 
 
 def test_scheduler_continuous_backfill_runs_until_phase_ready(tmp_path, monkeypatch):

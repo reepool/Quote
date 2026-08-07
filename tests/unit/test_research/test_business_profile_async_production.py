@@ -93,6 +93,12 @@ def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
             "status": "pending",
         }
     ]
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    assert item["metadata"]["knowledge_cutoff"] == "2026-08-30"
 
 
 def test_frontier_bound_acquisition_archives_exact_pdf_and_resolves_only_missing(
@@ -500,11 +506,92 @@ def test_stale_scope_recovery_requeues_terminal_items_without_content_attempts(
     assert first["requeued"] == 1
     assert second["requeued"] == 0
     assert recovered["status"] == "pending"
-    assert recovered["stage"] == "publish"
+    assert recovered["stage"] == "acquire"
     assert recovered["attempt_count"] == 0
+    assert ".scope-recovery-" in recovered["checkpoint_path"]
+    assert "stage_results" not in recovered["metadata"]
     assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
-        "stale_scope_source_revision_recovered"
+        "stale_scope_checkpoint_rotated"
     )
+
+
+def test_stale_scope_recovery_preserves_checkpoint_cutoff_and_stage(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    item = queue.claim("acquire", limit=1, lease_owner="worker", lease_seconds=30)[0]
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "scope": {"knowledge_cutoff": "2026-08-01"},
+                "completed_stages": ["plan", "select", "extract", "verify"],
+                "artifacts": {"plan": "plan.json"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', "
+            "status = 'terminal_failure', attempt_count = 3, "
+            "metadata_json = ?, last_error = ? WHERE work_id = ?",
+            (
+                json.dumps({"stage_results": {"parse": {"status": "success"}}}),
+                "ValueError: stale semantic production checkpoint scope",
+                item["work_id"],
+            ),
+        )
+        conn.commit()
+
+    result = queue.recover_stale_scope_items()
+    recovered = queue.get(item["work_id"])
+
+    assert result["checkpoint_preserved"] == 1
+    assert result["checkpoint_rotated"] == 0
+    assert recovered["stage"] == "publish"
+    assert recovered["checkpoint_path"] == str(checkpoint)
+    assert recovered["metadata"]["knowledge_cutoff"] == "2026-08-01"
+    assert recovered["metadata"]["stage_results"]["parse"]["status"] == "success"
+
+
+def test_reused_work_backfills_cutoff_from_checkpoint(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    item = queue.claim("acquire", limit=1, lease_owner="worker", lease_seconds=30)[0]
+    checkpoint = Path(item["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps({"scope": {"knowledge_cutoff": "2026-08-01"}}),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET metadata_json = ? WHERE work_id = ?",
+            (json.dumps({}), item["work_id"]),
+        )
+        conn.commit()
+
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+
+    assert queue.get(item["work_id"])["metadata"]["knowledge_cutoff"] == "2026-08-01"
 
 
 def test_configuration_blocked_stage_does_not_consume_attempt(tmp_path):
@@ -1097,6 +1184,131 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
     }
 
 
+def test_backfill_emits_lifecycle_and_inflight_progress_logs(tmp_path, caplog):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+
+    async def discover(**_kwargs):
+        await asyncio.sleep(0.15)
+        return {
+            "status": "degraded",
+            "pages_scanned": 2,
+            "discovery_window_backlog": 1,
+            "incomplete_windows": [{"exchange": "SZSE"}],
+        }
+
+    async def stage_runner(_stage, _item):
+        await asyncio.sleep(0.15)
+        return {"status": "success"}
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=discover,
+        stage_runner=stage_runner,
+        progress_log_interval_seconds=0.1,
+    )
+    caplog.set_level("INFO", logger="research.business_profile_async_production")
+
+    report = asyncio.run(
+        service.run_backfill(
+            knowledge_cutoff="2026-08-30",
+            processing_identity={"rules": "logs"},
+            instrument_ids=("600000.SH",),
+            discovery_kwargs={"start_date": "2026-01-01"},
+            stage_budgets={
+                "acquire": StageBudget(max_items=1, max_concurrency=1),
+            },
+        )
+    )
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert report["status"] == "degraded"
+    assert any("business-profile backfill start" in message for message in messages)
+    assert any(
+        "business-profile discovery heartbeat" in message for message in messages
+    )
+    assert any("business-profile discovery end" in message for message in messages)
+    assert any("business-profile stage heartbeat" in message for message in messages)
+    assert any("business-profile stage end" in message for message in messages)
+    assert any("business-profile run end" in message for message in messages)
+
+
+def test_discovery_heartbeat_does_not_leave_task_running_after_cancel(tmp_path):
+    storage = _storage(tmp_path)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    cancelled = asyncio.Event()
+
+    async def discover(**_kwargs):
+        try:
+            await asyncio.Event().wait()
+        finally:
+            cancelled.set()
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=discover,
+        stage_runner=AsyncMock(),
+        progress_log_interval_seconds=0.1,
+    )
+
+    async def run_and_cancel():
+        task = asyncio.create_task(
+            service._run_discovery_with_heartbeat(
+                operation="backfill",
+                discovery_kwargs={},
+            )
+        )
+        await asyncio.sleep(0)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert cancelled.is_set()
+
+    asyncio.run(run_and_cancel())
+
+
+def test_stage_heartbeat_does_not_leave_batch_running_after_cancel():
+    repository = Mock()
+    repository.claim.return_value = [{"work_id": "work-1"}]
+    started = asyncio.Event()
+    cancelled = asyncio.Event()
+
+    async def stage_runner(_stage, _item):
+        try:
+            started.set()
+            await asyncio.Event().wait()
+        finally:
+            cancelled.set()
+
+    service = BusinessProfileAsyncProductionService(
+        repository=repository,
+        discovery_runner=AsyncMock(),
+        stage_runner=stage_runner,
+        progress_log_interval_seconds=0.1,
+        write_coordinator=BusinessProfileWriteCoordinator(inter_write_seconds=0),
+    )
+
+    async def run_and_cancel():
+        task = asyncio.create_task(
+            service._drain_stage(
+                "semantic",
+                StageBudget(max_items=1, max_concurrency=1),
+            )
+        )
+        await started.wait()
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert cancelled.is_set()
+
+    asyncio.run(run_and_cancel())
+
+
 def test_stage_stop_request_finishes_inflight_batch_before_next_claim():
     repository = Mock()
     first = {"work_id": "work-1"}
@@ -1430,3 +1642,38 @@ def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
     assert result["status"] == "failed"
     assert result["reason"] == "business_profile_promotion_failed"
     assert result["promotion"]["reason"] == "manifest_mismatch"
+
+
+def test_data_manager_stage_runner_uses_work_bound_cutoff(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = storage
+    manager.research_config = Mock(modules={"business_profile_evidence": {}})
+    manager.run_business_profile_semantic_production = AsyncMock(
+        return_value={"status": "success"}
+    )
+    service, identity = manager._build_business_profile_async_service(
+        cutoff="2026-08-30",
+        configured_families=("atomic_activities",),
+        identities={"rules": "v1"},
+        operations={"checkpoint_root": str(tmp_path / "checkpoints")},
+        semantic={"promotion_enabled": False},
+        default_exchanges=("SSE",),
+    )
+    service.repository.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-01",
+        processing_identity=identity,
+    )
+    item = service.repository.claim(
+        "acquire", limit=1, lease_owner="worker", lease_seconds=30
+    )[0]
+
+    asyncio.run(service.stage_runner("parse", item))
+
+    assert (
+        manager.run_business_profile_semantic_production.await_args.kwargs[
+            "knowledge_cutoff"
+        ]
+        == "2026-08-01"
+    )

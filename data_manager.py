@@ -2267,8 +2267,19 @@ class DataManager:
                 "publish": "verify",
             }[stage]
             selection_policy = str(item.get("policy") or "latest_annual_only")
+            if item.get("work_id"):
+                work_cutoff = await write_coordinator.run(
+                    repository.ensure_work_knowledge_cutoff,
+                    item,
+                    fallback=cutoff,
+                )
+            else:
+                work_cutoff = str(
+                    dict(item.get("metadata") or {}).get("knowledge_cutoff")
+                    or cutoff
+                )[:10]
             call_kwargs = {
-                "knowledge_cutoff": cutoff,
+                "knowledge_cutoff": work_cutoff,
                 "instrument_ids": [str(item["instrument_id"])],
                 "field_families": list(configured_families),
                 "runtime_identities": dict(identities),
@@ -2340,6 +2351,9 @@ class DataManager:
             stage_runner=stage_runner,
             lease_seconds=int(operations.get("lease_seconds", 900)),
             retry_backoff_seconds=int(operations.get("retry_backoff_seconds", 300)),
+            progress_log_interval_seconds=float(
+                operations.get("progress_log_interval_seconds", 30.0)
+            ),
             write_coordinator=write_coordinator,
         )
         from research.business_profile_promotion import FieldFamilyPromotionManifest

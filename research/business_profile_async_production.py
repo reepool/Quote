@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import threading
 import time
@@ -24,6 +25,7 @@ CLAIMABLE_STATUSES = ("pending", "retry_due")
 TERMINAL_STATUSES = ("completed", "superseded", "terminal_failure")
 AUTOMATIC_DOCUMENT_TYPES = ("annual_report", "annual_report_correction")
 _WRITE_COORDINATOR_CREATION_LOCK = threading.Lock()
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -202,6 +204,7 @@ class BusinessProfileWorkRepository:
         return self._enqueue_rows(
             tuple(latest.values()),
             policy="latest_annual_only",
+            knowledge_cutoff=cutoff,
             processing_identity=processing_identity,
             max_attempts=max_attempts,
             force=force,
@@ -247,6 +250,7 @@ class BusinessProfileWorkRepository:
         return self._enqueue_rows(
             rows,
             policy="expanded",
+            knowledge_cutoff=cutoff,
             processing_identity=processing_identity,
             max_attempts=max_attempts,
             force=force,
@@ -771,12 +775,7 @@ class BusinessProfileWorkRepository:
         }
 
     def recover_stale_scope_items(self) -> dict[str, Any]:
-        """Requeue work stopped by the pre-fix volatile-scope check.
-
-        A source revision is intentionally mutable while a work item advances
-        through plan/select/extract/verify. These failures are infrastructure
-        bookkeeping errors, so they must not consume content attempts.
-        """
+        """Repair stale semantic checkpoints without consuming content attempts."""
 
         marker = "stale semantic production checkpoint scope"
         with self.storage.get_connection() as conn:
@@ -789,7 +788,11 @@ class BusinessProfileWorkRepository:
                 (f"%{marker}%",),
             ).fetchall()
         now = get_shanghai_time().isoformat()
+        recovery_token = hashlib.sha256(
+            f"stale-scope:{now}".encode("utf-8")
+        ).hexdigest()[:12]
         recovered_ids: list[str] = []
+        preserved = rotated = 0
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -799,34 +802,104 @@ class BusinessProfileWorkRepository:
                 except (TypeError, json.JSONDecodeError):
                     metadata = {}
                 metadata = dict(metadata) if isinstance(metadata, Mapping) else {}
+                checkpoint = Path(str(row["checkpoint_path"] or ""))
+                checkpoint_cutoff = _checkpoint_knowledge_cutoff(checkpoint)
+                previous_stage_results = dict(metadata.get("stage_results") or {})
+                if checkpoint_cutoff is not None:
+                    metadata["knowledge_cutoff"] = checkpoint_cutoff
+                    recovered_stage = str(row["stage"])
+                    recovered_checkpoint = checkpoint
+                    recovery_reason = "stale_scope_cutoff_restored"
+                else:
+                    metadata.pop("stage_results", None)
+                    recovered_stage = "acquire"
+                    recovered_checkpoint = _rotated_checkpoint_path(
+                        checkpoint,
+                        checkpoint_root=self.checkpoint_root,
+                        work_id=str(row["work_id"]),
+                        token=f"scope-recovery-{recovery_token}",
+                    )
+                    recovery_reason = "stale_scope_checkpoint_rotated"
                 history = list(metadata.get("recovery_history") or [])
                 history.append(
                     {
-                        "reason": "stale_scope_source_revision_recovered",
+                        "reason": recovery_reason,
                         "recovered_at": now,
                         "from_stage": row["stage"],
                         "from_status": row["status"],
                         "from_attempt_count": row["attempt_count"],
                         "from_checkpoint_path": row["checkpoint_path"],
+                        "knowledge_cutoff": checkpoint_cutoff,
+                        "invalidated_stage_results": (
+                            previous_stage_results if checkpoint_cutoff is None else {}
+                        ),
                     }
                 )
                 metadata["recovery_history"] = history[-10:]
                 cursor = conn.execute(
-                    "UPDATE business_profile_work_items SET status = 'pending', "
+                    "UPDATE business_profile_work_items SET stage = ?, status = 'pending', "
                     "attempt_count = 0, next_attempt_at = NULL, "
                     "lease_owner = NULL, lease_expires_at = NULL, last_error = NULL, "
-                    "completed_at = NULL, metadata_json = ?, updated_at = ? "
+                    "completed_at = NULL, checkpoint_path = ?, metadata_json = ?, "
+                    "updated_at = ? "
                     "WHERE work_id = ? AND status IN ('retry_due', 'terminal_failure')",
-                    (_canonical_json(metadata), now, row["work_id"]),
+                    (
+                        recovered_stage,
+                        str(recovered_checkpoint),
+                        _canonical_json(metadata),
+                        now,
+                        row["work_id"],
+                    ),
                 )
                 if int(cursor.rowcount or 0) == 1:
                     recovered_ids.append(str(row["work_id"]))
+                    if checkpoint_cutoff is not None:
+                        preserved += 1
+                    else:
+                        rotated += 1
             conn.commit()
         return {
             "eligible_stale_scope_items": len(rows),
             "requeued": len(recovered_ids),
+            "checkpoint_preserved": preserved,
+            "checkpoint_rotated": rotated,
             "work_ids": recovered_ids,
         }
+
+    def ensure_work_knowledge_cutoff(
+        self,
+        work: str | Mapping[str, Any],
+        *,
+        fallback: str,
+    ) -> str:
+        """Return and durably bind the cutoff used by one work item."""
+
+        if isinstance(work, str):
+            item = self.get(work)
+        else:
+            work_id = str(work.get("work_id") or "")
+            item = self.get(work_id) if work_id else dict(work)
+        metadata = dict(item.get("metadata") or {})
+        bound = _normalized_optional_date(metadata.get("knowledge_cutoff"))
+        if bound is None:
+            bound = _checkpoint_knowledge_cutoff(
+                Path(str(item.get("checkpoint_path") or ""))
+            )
+        if bound is None:
+            bound = _date_text(fallback, "knowledge_cutoff")
+        if metadata.get("knowledge_cutoff") == bound:
+            return bound
+        metadata["knowledge_cutoff"] = bound
+        now = get_shanghai_time().isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute(
+                "UPDATE business_profile_work_items SET metadata_json = ?, "
+                "updated_at = ? WHERE work_id = ?",
+                (_canonical_json(metadata), now, str(item["work_id"])),
+            )
+            conn.commit()
+        return bound
 
     def resolve_missing_document_exceptions(
         self,
@@ -987,6 +1060,7 @@ class BusinessProfileWorkRepository:
         rows: Sequence[Mapping[str, Any]],
         *,
         policy: str,
+        knowledge_cutoff: str,
         processing_identity: Mapping[str, Any],
         max_attempts: int,
         force: bool = False,
@@ -1011,11 +1085,40 @@ class BusinessProfileWorkRepository:
                 )
                 checkpoint = self.checkpoint_root / f"{work_id}.json"
                 existing = conn.execute(
-                    "SELECT status FROM business_profile_work_items WHERE work_id = ?",
+                    "SELECT status, metadata_json, checkpoint_path "
+                    "FROM business_profile_work_items WHERE work_id = ?",
                     (work_id,),
                 ).fetchone()
                 if existing is not None:
                     existing_status = str(existing["status"])
+                    try:
+                        existing_metadata = json.loads(
+                            existing["metadata_json"] or "{}"
+                        )
+                    except (TypeError, json.JSONDecodeError):
+                        existing_metadata = {}
+                    existing_metadata = (
+                        dict(existing_metadata)
+                        if isinstance(existing_metadata, Mapping)
+                        else {}
+                    )
+                    if (
+                        _normalized_optional_date(
+                            existing_metadata.get("knowledge_cutoff")
+                        )
+                        is None
+                    ):
+                        existing_metadata["knowledge_cutoff"] = (
+                            _checkpoint_knowledge_cutoff(
+                                Path(str(existing["checkpoint_path"] or ""))
+                            )
+                            or knowledge_cutoff
+                        )
+                        conn.execute(
+                            "UPDATE business_profile_work_items SET metadata_json = ?, "
+                            "updated_at = ? WHERE work_id = ?",
+                            (_canonical_json(existing_metadata), now, work_id),
+                        )
                     if force and existing_status in TERMINAL_STATUSES:
                         conn.execute(
                             "UPDATE business_profile_work_items SET stage = 'acquire', "
@@ -1032,6 +1135,7 @@ class BusinessProfileWorkRepository:
                         "schema_version": WORK_SCHEMA_VERSION,
                         "title": row.get("title"),
                         "published_at": row.get("published_at"),
+                        "knowledge_cutoff": knowledge_cutoff,
                         "processing_identity": dict(processing_identity),
                     }
                     conn.execute(
@@ -1197,6 +1301,7 @@ class BusinessProfileAsyncProductionService:
         stage_runner: Callable[[str, Mapping[str, Any]], Awaitable[Mapping[str, Any]]],
         lease_seconds: int = 900,
         retry_backoff_seconds: int = 300,
+        progress_log_interval_seconds: float = 30.0,
         write_coordinator: BusinessProfileWriteCoordinator | None = None,
     ) -> None:
         self.repository = repository
@@ -1204,6 +1309,9 @@ class BusinessProfileAsyncProductionService:
         self.stage_runner = stage_runner
         self.lease_seconds = max(1, int(lease_seconds))
         self.retry_backoff_seconds = max(1, int(retry_backoff_seconds))
+        self.progress_log_interval_seconds = max(
+            0.1, float(progress_log_interval_seconds)
+        )
         self.write_coordinator = (
             write_coordinator
             or get_business_profile_write_coordinator(repository.storage)
@@ -1219,6 +1327,11 @@ class BusinessProfileAsyncProductionService:
         max_attempts: int = 3,
     ) -> dict[str, Any]:
         started = time.monotonic()
+        logger.info(
+            "business-profile daily start cutoff=%s stages=%s",
+            knowledge_cutoff,
+            _stage_budget_log_value(stage_budgets),
+        )
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
         )
@@ -1240,24 +1353,46 @@ class BusinessProfileAsyncProductionService:
                 *list(stale_scope_recovery.get("work_ids") or []),
             }
         )
+        self._log_recovery(recovery)
+        logger.info(
+            "business-profile discovery start operation=daily scope=%s",
+            _safe_discovery_scope(discovery_kwargs),
+        )
         try:
-            discovery = dict(await self.discovery_runner(**dict(discovery_kwargs)))
+            discovery = await self._run_discovery_with_heartbeat(
+                operation="daily",
+                discovery_kwargs=discovery_kwargs,
+            )
         except Exception as exc:
+            logger.warning(
+                "business-profile discovery failed operation=daily category=%s",
+                type(exc).__name__,
+            )
             discovery = {
                 "status": "failed",
                 "errors": [f"{type(exc).__name__}: {exc}"],
             }
+        self._log_discovery(discovery)
         enqueue = await self.write_coordinator.run(
             self.repository.enqueue_latest_annual,
             knowledge_cutoff=knowledge_cutoff,
             processing_identity=processing_identity,
             max_attempts=max_attempts,
         )
+        logger.info(
+            "business-profile enqueue eligible=%s inserted=%s reused=%s reset=%s "
+            "superseded=%s",
+            int(enqueue.get("eligible") or 0),
+            int(enqueue.get("inserted") or 0),
+            int(enqueue.get("reused") or 0),
+            int(enqueue.get("reset") or 0),
+            int(enqueue.get("superseded") or 0),
+        )
         workers = await self._run_workers(stage_budgets)
         health = await asyncio.to_thread(self.repository.health)
         throughput = _business_profile_throughput(enqueue, workers)
         discovery_status = str(discovery.get("status") or "failed").lower()
-        return {
+        report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
             "status": (
                 "success"
@@ -1275,6 +1410,8 @@ class BusinessProfileAsyncProductionService:
             "writer": self.write_coordinator.snapshot(),
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
+        self._log_completion(report)
+        return report
 
     async def run_backfill(
         self,
@@ -1292,6 +1429,7 @@ class BusinessProfileAsyncProductionService:
         selection_policy: str = "expanded",
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
+        started = time.monotonic()
         if not instrument_ids and not start_date:
             raise ValueError(
                 "business-profile backfill requires instruments or a bounded start date"
@@ -1308,6 +1446,17 @@ class BusinessProfileAsyncProductionService:
                     "latest-annual backfill does not accept specialist document types: "
                     + ",".join(unsupported_types)
                 )
+        logger.info(
+            "business-profile backfill start cutoff=%s policy=%s instruments=%s "
+            "start_date=%s end_date=%s document_types=%s stages=%s",
+            knowledge_cutoff,
+            policy,
+            len(instrument_ids),
+            start_date,
+            end_date,
+            tuple(document_types),
+            _stage_budget_log_value(stage_budgets or {}),
+        )
         recovery = await self.write_coordinator.run(
             self.repository.recover_completed_without_evidence
         )
@@ -1329,15 +1478,28 @@ class BusinessProfileAsyncProductionService:
                 *list(stale_scope_recovery.get("work_ids") or []),
             }
         )
+        self._log_recovery(recovery)
         discovery = None
         if discovery_kwargs is not None:
+            logger.info(
+                "business-profile discovery start operation=backfill scope=%s",
+                _safe_discovery_scope(discovery_kwargs),
+            )
             try:
-                discovery = dict(await self.discovery_runner(**dict(discovery_kwargs)))
+                discovery = await self._run_discovery_with_heartbeat(
+                    operation="backfill",
+                    discovery_kwargs=discovery_kwargs,
+                )
             except Exception as exc:
+                logger.warning(
+                    "business-profile discovery failed operation=backfill category=%s",
+                    type(exc).__name__,
+                )
                 discovery = {
                     "status": "failed",
                     "errors": [f"{type(exc).__name__}: {exc}"],
                 }
+            self._log_discovery(discovery)
         if policy == "latest_annual_only":
             enqueue = await self.write_coordinator.run(
                 self.repository.enqueue_latest_annual,
@@ -1361,6 +1523,15 @@ class BusinessProfileAsyncProductionService:
                 max_attempts=max_attempts,
                 force=force,
             )
+        logger.info(
+            "business-profile enqueue eligible=%s inserted=%s reused=%s reset=%s "
+            "superseded=%s",
+            int(enqueue.get("eligible") or 0),
+            int(enqueue.get("inserted") or 0),
+            int(enqueue.get("reused") or 0),
+            int(enqueue.get("reset") or 0),
+            int(enqueue.get("superseded") or 0),
+        )
         workers = await self._run_workers(
             stage_budgets or {},
             should_stop=should_stop,
@@ -1370,7 +1541,7 @@ class BusinessProfileAsyncProductionService:
             str(item.get("status") or "").lower() == "stopped"
             for item in workers.values()
         )
-        return {
+        report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
             "status": (
                 "stopped"
@@ -1391,7 +1562,117 @@ class BusinessProfileAsyncProductionService:
             "throughput": throughput,
             "queue_health": await asyncio.to_thread(self.repository.health),
             "writer": self.write_coordinator.snapshot(),
+            "elapsed_seconds": round(time.monotonic() - started, 3),
         }
+        self._log_completion(report)
+        return report
+
+    async def _run_discovery_with_heartbeat(
+        self,
+        *,
+        operation: str,
+        discovery_kwargs: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        started = time.monotonic()
+        task = asyncio.ensure_future(self.discovery_runner(**dict(discovery_kwargs)))
+        try:
+            while not task.done():
+                try:
+                    await asyncio.wait_for(
+                        asyncio.shield(task),
+                        timeout=self.progress_log_interval_seconds,
+                    )
+                except asyncio.TimeoutError:
+                    logger.info(
+                        "business-profile discovery heartbeat operation=%s "
+                        "elapsed_seconds=%.3f scope=%s",
+                        operation,
+                        time.monotonic() - started,
+                        _safe_discovery_scope(discovery_kwargs),
+                    )
+            return dict(await task)
+        except asyncio.CancelledError:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+            raise
+
+    @staticmethod
+    def _log_recovery(recovery: Mapping[str, Any]) -> None:
+        stale = dict(recovery.get("stale_scope") or {})
+        structured = dict(recovery.get("structured_semantic") or {})
+        logger.info(
+            "business-profile recovery requeued=%s stale_requeued=%s "
+            "checkpoint_preserved=%s checkpoint_rotated=%s structured_requeued=%s",
+            int(recovery.get("requeued") or 0),
+            int(stale.get("requeued") or 0),
+            int(stale.get("checkpoint_preserved") or 0),
+            int(stale.get("checkpoint_rotated") or 0),
+            int(structured.get("requeued") or 0),
+        )
+
+    @staticmethod
+    def _log_discovery(discovery: Mapping[str, Any]) -> None:
+        backlog = int(discovery.get("discovery_window_backlog") or 0)
+        log = (
+            logger.warning
+            if backlog or str(discovery.get("status")) == "failed"
+            else logger.info
+        )
+        log(
+            "business-profile discovery end status=%s pages=%s announcements=%s "
+            "selected=%s frontier_inserted=%s frontier_changed=%s backlog=%s "
+            "incomplete_windows=%s windows=%s errors=%s",
+            discovery.get("status"),
+            int(discovery.get("pages_scanned") or 0),
+            int(discovery.get("announcements_seen") or 0),
+            int(discovery.get("selected_announcements") or 0),
+            int(discovery.get("frontier_inserted") or 0),
+            int(discovery.get("frontier_changed") or 0),
+            backlog,
+            len(discovery.get("incomplete_windows") or ()),
+            [
+                {
+                    key: window.get(key)
+                    for key in (
+                        "exchange",
+                        "start_date",
+                        "end_date",
+                        "stop_reason",
+                        "splittable",
+                    )
+                }
+                for window in discovery.get("incomplete_windows") or ()
+                if isinstance(window, Mapping)
+            ][:10],
+            len(discovery.get("errors") or ()),
+        )
+
+    def _log_completion(self, report: Mapping[str, Any]) -> None:
+        health = dict(report.get("queue_health") or {})
+        writer = dict(report.get("writer") or {})
+        log = (
+            logger.warning
+            if str(report.get("status")) == "degraded"
+            else logger.info
+        )
+        log(
+            "business-profile run end operation=%s status=%s elapsed_seconds=%s "
+            "claimable=%s running=%s terminal=%s completed=%s "
+            "writer_pending=%s writer_max_pending=%s writer_transactions=%s",
+            report.get("operation"),
+            report.get("status"),
+            report.get("elapsed_seconds"),
+            int(health.get("claimable") or 0),
+            int(health.get("running") or 0),
+            int(health.get("terminal") or 0),
+            int(health.get("completed") or 0),
+            int(writer.get("pending_writers") or 0),
+            int(writer.get("max_pending_writers") or 0),
+            int(writer.get("write_transactions") or 0),
+        )
 
     async def _run_workers(
         self,
@@ -1408,16 +1689,31 @@ class BusinessProfileAsyncProductionService:
             semantic_limit and semantic_depth >= semantic_limit.high_water_mark
         )
         stage_done = {stage: asyncio.Event() for stage in WORK_STAGES}
+        logger.info(
+            "business-profile workers start semantic_depth=%s acquire_backpressured=%s",
+            semantic_depth,
+            acquire_backpressured,
+        )
 
         async def run_stage(stage: str) -> tuple[str, dict[str, Any]]:
             budget = stage_budgets.get(stage)
             try:
                 if budget is None:
+                    logger.info(
+                        "business-profile stage deferred stage=%s reason=no_stage_budget",
+                        stage,
+                    )
                     return stage, {
                         "status": "deferred",
                         "reason": "no_stage_budget",
                     }
                 if stage == "acquire" and acquire_backpressured:
+                    logger.warning(
+                        "business-profile stage backpressured stage=acquire "
+                        "semantic_depth=%s high_water_mark=%s",
+                        semantic_depth,
+                        semantic_limit.high_water_mark if semantic_limit else None,
+                    )
                     return stage, {
                         "status": "backpressured",
                         "reason": "semantic_high_water_mark",
@@ -1439,7 +1735,25 @@ class BusinessProfileAsyncProductionService:
                 stage_done[stage].set()
 
         results = await asyncio.gather(*(run_stage(stage) for stage in WORK_STAGES))
-        return dict(results)
+        workers = dict(results)
+        logger.info(
+            "business-profile workers end stages=%s writer=%s",
+            {
+                stage: {
+                    key: result.get(key)
+                    for key in (
+                        "status",
+                        "claimed",
+                        "completed",
+                        "retried",
+                        "terminal_failures",
+                    )
+                }
+                for stage, result in workers.items()
+            },
+            self.write_coordinator.snapshot(),
+        )
+        return workers
 
     async def _drain_stage(
         self,
@@ -1456,6 +1770,15 @@ class BusinessProfileAsyncProductionService:
         errors: list[dict[str, str]] = []
         stopped = False
         lease_owner = f"async-{stage}-{get_shanghai_time().strftime('%Y%m%d%H%M%S%f')}"
+        logger.info(
+            "business-profile stage start stage=%s max_items=%s concurrency=%s "
+            "max_elapsed_seconds=%s high_water_mark=%s",
+            stage,
+            budget.max_items,
+            budget.max_concurrency,
+            budget.max_elapsed_seconds,
+            budget.high_water_mark,
+        )
         while claimed < budget.max_items:
             if should_stop is not None and should_stop():
                 stopped = True
@@ -1580,12 +1903,76 @@ class BusinessProfileAsyncProductionService:
                             "error": f"{type(exc).__name__}: {exc}"[:1000],
                         }
                     )
+                    logger.warning(
+                        "business-profile work failed work_id=%s instrument_id=%s "
+                        "stage=%s disposition=%s category=%s",
+                        item.get("work_id"),
+                        item.get("instrument_id"),
+                        stage,
+                        terminal_status,
+                        type(exc).__name__,
+                    )
 
-            await asyncio.gather(*(run_one(item) for item in items))
+            batch_task = asyncio.create_task(self._run_stage_batch(items, run_one))
+            batch_started = time.monotonic()
+            try:
+                while not batch_task.done():
+                    try:
+                        await asyncio.wait_for(
+                            asyncio.shield(batch_task),
+                            timeout=self.progress_log_interval_seconds,
+                        )
+                    except asyncio.TimeoutError:
+                        logger.info(
+                            "business-profile stage heartbeat stage=%s "
+                            "elapsed_seconds=%.3f batch_elapsed_seconds=%.3f "
+                            "in_flight=%s claimed=%s completed=%s retried=%s "
+                            "terminal_failures=%s configuration_blocked=%s writer=%s",
+                            stage,
+                            time.monotonic() - started,
+                            time.monotonic() - batch_started,
+                            max(
+                                0,
+                                claimed
+                                - completed
+                                - retried
+                                - failed
+                                - configuration_blocked
+                                - lease_conflicts,
+                            ),
+                            claimed,
+                            completed,
+                            retried,
+                            failed,
+                            configuration_blocked,
+                            self.write_coordinator.snapshot(),
+                        )
+                await batch_task
+            except asyncio.CancelledError:
+                batch_task.cancel()
+                try:
+                    await batch_task
+                except asyncio.CancelledError:
+                    pass
+                raise
+            logger.info(
+                "business-profile stage batch stage=%s batch_size=%s claimed=%s "
+                "completed=%s retried=%s terminal_failures=%s "
+                "configuration_blocked=%s lease_conflicts=%s elapsed_seconds=%.3f",
+                stage,
+                len(items),
+                claimed,
+                completed,
+                retried,
+                failed,
+                configuration_blocked,
+                lease_conflicts,
+                time.monotonic() - started,
+            )
             if should_stop is not None and should_stop():
                 stopped = True
                 break
-        return {
+        result = {
             "status": "stopped" if stopped else "success",
             "stop_requested": stopped,
             "claimed": claimed,
@@ -1599,6 +1986,34 @@ class BusinessProfileAsyncProductionService:
             "elapsed_seconds": round(time.monotonic() - started, 3),
             "writer": self.write_coordinator.snapshot(),
         }
+        log = (
+            logger.warning
+            if failed or retried or configuration_blocked
+            else logger.info
+        )
+        log(
+            "business-profile stage end stage=%s status=%s claimed=%s completed=%s "
+            "retried=%s terminal_failures=%s configuration_blocked=%s "
+            "lease_conflicts=%s elapsed_seconds=%s writer=%s",
+            stage,
+            result["status"],
+            claimed,
+            completed,
+            retried,
+            failed,
+            configuration_blocked,
+            lease_conflicts,
+            result["elapsed_seconds"],
+            result["writer"],
+        )
+        return result
+
+    @staticmethod
+    async def _run_stage_batch(
+        items: Sequence[Mapping[str, Any]],
+        run_one: Callable[[Mapping[str, Any]], Awaitable[None]],
+    ) -> None:
+        await asyncio.gather(*(run_one(item) for item in items))
 
 
 def parse_stage_budgets(value: Mapping[str, Any] | None) -> dict[str, StageBudget]:
@@ -1648,6 +2063,71 @@ def _date_text(value: Any, field_name: str) -> str:
         return datetime.fromisoformat(text).date().isoformat()
     except ValueError as exc:
         raise ValueError(f"invalid {field_name}: {value}") from exc
+
+
+def _normalized_optional_date(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    try:
+        return _date_text(value, "knowledge_cutoff")
+    except ValueError:
+        return None
+
+
+def _checkpoint_knowledge_cutoff(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, Mapping):
+        return None
+    scope = payload.get("scope")
+    if not isinstance(scope, Mapping):
+        return None
+    return _normalized_optional_date(scope.get("knowledge_cutoff"))
+
+
+def _rotated_checkpoint_path(
+    checkpoint: Path,
+    *,
+    checkpoint_root: Path,
+    work_id: str,
+    token: str,
+) -> Path:
+    base = checkpoint if checkpoint.name else checkpoint_root / f"{work_id}.json"
+    suffix = base.suffix or ".json"
+    return base.with_name(f"{base.stem}.{token}{suffix}")
+
+
+def _stage_budget_log_value(
+    budgets: Mapping[str, StageBudget],
+) -> dict[str, dict[str, Any]]:
+    return {
+        stage: {
+            "max_items": budget.max_items,
+            "max_concurrency": budget.max_concurrency,
+            "max_elapsed_seconds": budget.max_elapsed_seconds,
+            "high_water_mark": budget.high_water_mark,
+        }
+        for stage, budget in budgets.items()
+    }
+
+
+def _safe_discovery_scope(value: Mapping[str, Any]) -> dict[str, Any]:
+    safe_keys = (
+        "exchanges",
+        "start_date",
+        "end_date",
+        "lookback_days",
+        "overlap_days",
+        "page_size",
+        "max_pages_per_market",
+        "max_windows_per_market",
+        "category",
+    )
+    return {key: value.get(key) for key in safe_keys if key in value}
 
 
 def _retryable(exc: Exception) -> bool:

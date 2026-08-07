@@ -7687,6 +7687,20 @@ class ScheduledTasks:
                 should_stop=should_stop,
             )
 
+        started_monotonic = time_module.monotonic()
+        outcome = "running"
+        scheduler_logger.info(
+            "[Scheduler] Business-profile backfill start run_id=%s mode=%s "
+            "phase=%s cutoff=%s policy=%s instruments=%s start_date=%s end_date=%s",
+            run_id,
+            "continuous" if continuous else "single_batch",
+            active_phase or None,
+            knowledge_cutoff,
+            selection_policy,
+            len(instrument_ids or ()),
+            start_date,
+            end_date,
+        )
         self._active_tasks.add(task_id)
         try:
             if continuous:
@@ -7782,6 +7796,7 @@ class ScheduledTasks:
                     latest_result=result,
                 )
                 result["continuous_progress"] = progress
+            outcome = str(result.get("status") or progress.get("state") or "unknown")
             await self._send_task_report(
                 report_data={
                     "name": (
@@ -7791,7 +7806,9 @@ class ScheduledTasks:
                     ),
                     "status": "success" if success else "error",
                     "tasks_completed": _business_profile_completed_items(result),
-                    "duration": "N/A",
+                    "duration": (
+                        f"{time_module.monotonic() - started_monotonic:.3f}s"
+                    ),
                     "maintenance_tasks": [
                         {
                             "task_name": task_id,
@@ -7811,6 +7828,7 @@ class ScheduledTasks:
             )
             return success
         except asyncio.CancelledError:
+            outcome = "interrupted"
             store.finish(
                 run_id,
                 state="interrupted",
@@ -7818,6 +7836,7 @@ class ScheduledTasks:
             )
             raise
         except Exception as exc:
+            outcome = "failed"
             store.finish(
                 run_id,
                 state="failed",
@@ -7828,6 +7847,14 @@ class ScheduledTasks:
             )
             return False
         finally:
+            scheduler_logger.info(
+                "[Scheduler] Business-profile backfill end run_id=%s mode=%s "
+                "outcome=%s elapsed_seconds=%.3f",
+                run_id,
+                "continuous" if continuous else "single_batch",
+                outcome,
+                time_module.monotonic() - started_monotonic,
+            )
             self._active_tasks.discard(task_id)
 
     async def business_profile_backfill_control(
