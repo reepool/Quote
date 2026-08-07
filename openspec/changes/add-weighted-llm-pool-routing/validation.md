@@ -236,6 +236,36 @@ active count returned to zero, `fd_delta=0`, and the pool registry was empty.
 The staged command stopped after 10 and did not execute 25 or 50. Task 6.5
 remains incomplete pending a clean provider window.
 
+### Completion and Provider-Stability Rerun (2026-08-07)
+
+The current committed implementation was rerun against the requirement-level
+offline matrix. The common gateway/configuration/orchestration/pool/routed-
+client/staged-validator and source-lineage group passed 160 tests. CNInfo title,
+semantic resolution, pipeline, audit/storage/incremental, scheduler, API, and
+migration groups passed 13, 102, 17, and 75 tests respectively. The business-
+profile adapter, semantic extraction, runtime, async production, maintenance,
+and rollout groups passed 9, 19, 35, 49, 12, and 13 tests respectively, for 504
+passing tests in this rerun. Files affected by the repository's session-scoped
+asyncio fixture interaction were executed in separate bounded processes; every
+individual process exited successfully.
+
+The offline staged benchmark also passed again at 10, 25, and 50 logical
+requests. Its 3:1 dispatch counts were 8:2, 19:6, and 38:12; peak transport and
+connection counts were exactly 10, 25, and 50. All stages reported unique
+request/hash/business identities, `fd_delta=0`, and an empty pool registry after
+shutdown.
+
+Before spending another provider-backed batch, controlled single-source Grok
+and Luna probes were run with the same synthetic non-sensitive Chinese input.
+Both sources exhausted two bounded 300-second attempts. Each attempt was
+classified as a retryable HTTP 408/transient transport timeout, each provider
+resource independently entered adaptive congestion handling, and both routes
+failed closed after the second attempt. Both pool lifecycles stopped with zero
+active work. Since neither source produced a clean single-source response in
+this provider window, the 10-concurrency gate was not started and the required
+25/50 promotion remained blocked. Task 6.5 remains incomplete; the acceptance
+thresholds were not weakened.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
@@ -284,10 +314,10 @@ remains incomplete pending a clean provider window.
   and stops immediately after a failed gate. Eleven focused tests pass after
   this fix.
 - Independent quota ownership is now confirmed and the staged validator keeps
-  each resource capped at hard concurrency 10 and 10 RPM. The latest 10-stage
-  rerun nevertheless failed provider stability because of three HTTP 503
-  responses, so the gate correctly withheld 25/50 and live rollout remains
-  incomplete.
+  each resource capped at hard concurrency 10 and 10 RPM. Provider-backed
+  10-stage reruns encountered HTTP 503 responses, and the latest single-source
+  preflight encountered bounded HTTP 408/timeouts on both sources. The gate
+  correctly withheld 25/50 and live rollout remains incomplete.
 - A later validation-only low-cap rerun kept the independent resources at Grok
   2 and Luna 1 concurrent attempts. It confirmed that borrowed dispatches must
   be excluded from the normal weighted-fairness ratio, but Luna still produced
@@ -303,6 +333,12 @@ remains incomplete pending a clean provider window.
   per-source failover-dispatch counter was classified as a future observability
   enhancement: every current failover-triggering error already independently
   fails the strict live gate, so it cannot authorize a higher stage.
+- The completion/provider-stability rerun made another bounded review attempt.
+  Authentication again failed with HTTP 401, after which the process inspected
+  unrelated baseline BaoStock changes. Those findings were excluded. Manual
+  review of the only change-owned diff confirmed that the recorded test counts,
+  provider timeouts, gate decision, and still-open task 6.5 are consistent and
+  contain no secret values.
 
 ## Requirements Coverage
 
@@ -316,4 +352,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because the post-confirmation 10-stage run encountered provider 503 responses and therefore gated provider-backed 25/50 |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because provider-backed runs encountered 503 responses and the latest single-source preflight encountered 408/timeouts, therefore provider-backed 25/50 remain gated |
