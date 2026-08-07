@@ -1260,7 +1260,9 @@ class BusinessProfileWorkRepository:
                           ON frontier.frontier_id = work.frontier_id
                         WHERE work.instrument_id = ? AND work.policy = ?
                           AND work.work_id <> ?
-                          AND work.status IN ('pending', 'retry_due')
+                          AND work.status IN (
+                              'pending', 'retry_due', 'terminal_failure'
+                          )
                         """,
                         (row["instrument_id"], policy, work_id),
                     ).fetchall()

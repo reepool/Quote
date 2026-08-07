@@ -22,6 +22,10 @@ The system SHALL keep only the current processing-identity work claimable for a 
 - **WHEN** current-identity work is inserted or reused for a frontier and an obsolete-identity row for the same policy is pending, retryable, or terminally failed
 - **THEN** the obsolete row SHALL become superseded and SHALL no longer contribute to claimable or terminal health counts
 
+#### Scenario: Newer annual report replaces failed older frontier
+- **WHEN** latest-annual selection binds a newer report or correction and an older frontier for the instrument has terminally failed
+- **THEN** the older terminal row SHALL become superseded and SHALL no longer block rollout readiness
+
 #### Scenario: Obsolete work holds an active lease
 - **WHEN** an obsolete-identity row is running with an active lease
 - **THEN** enqueueing SHALL NOT supersede it underneath the worker

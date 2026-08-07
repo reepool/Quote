@@ -154,6 +154,39 @@ def test_enqueue_current_identity_supersedes_obsolete_failed_work(tmp_path):
     assert [tuple(row) for row in groups] == [("pending", 1), ("superseded", 1)]
 
 
+def test_newer_latest_annual_supersedes_older_terminal_work(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    obsolete = _processing_identity("model-obsolete")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2025-12-31",
+        processing_identity=obsolete,
+    )
+    with storage.get_connection() as conn:
+        old_work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'terminal_failure', "
+            "last_error = 'obsolete annual report failed' WHERE work_id = ?",
+            (old_work_id,),
+        )
+        conn.commit()
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-current"),
+    )
+
+    assert result["inserted"] == 1
+    assert result["superseded"] == 1
+    assert queue.get(old_work_id)["status"] == "superseded"
+
+
 def test_enqueue_current_identity_does_not_supersede_running_work(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
