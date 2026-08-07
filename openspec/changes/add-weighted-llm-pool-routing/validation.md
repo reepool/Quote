@@ -292,6 +292,16 @@ source prerequisites failed, the provider-backed 10-concurrency gate was not
 started; 25 and 50 were consequently withheld. Production configuration and the
 real `.env` were unchanged, and task 6.5 remains incomplete.
 
+A second independent-quota preflight window began at 00:46:18 on 2026-08-08.
+Grok and Luna again entered their expected separate resources and concrete
+profiles, but both first attempts reached the 300-second limit at 00:51:18 and
+were classified as HTTP 408 / `transient_transport_error`. Because any timeout
+already makes the strict preflight window ineligible for promotion, the
+remaining same-source retries were cancelled rather than spending another 600
+provider-seconds. No 10/25/50 load stage was started, both validation processes
+exited through the bounded cancellation path, and no matching Python process
+remained.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
