@@ -160,7 +160,15 @@ def _activity_response(selected, *, quote=None, start=None, end=None, extra=None
 async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     selected = _selected()
     audits = []
-    gateway = _FakeGateway([_activity_response(selected)])
+    gateway = _FakeGateway([replace(
+        _response(_activity_response(selected)),
+        source_label="pipio:grok-4.5",
+        logical_profile="semantic_extraction",
+        selected_profile="semantic__pipio_grok",
+        route_fingerprint="route-v1",
+        failover_count=1,
+        attempts=({"source_label": "pipio:grok-4.5", "status": "success"},),
+    )])
     extractor = BusinessProfileSemanticExtractor(gateway, audit_sink=audits.append)
 
     result = await extractor.extract_async(
@@ -178,6 +186,11 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     assert gateway.requests[0].content_is_untrusted is True
     assert "base_url" not in gateway.requests[0].metadata
     assert result.audit.actual_model == "provider-model-v2"
+    assert result.audit.source_label == "pipio:grok-4.5"
+    assert result.audit.logical_profile == "semantic_extraction"
+    assert result.audit.selected_profile == "semantic__pipio_grok"
+    assert result.audit.route_fingerprint == "route-v1"
+    assert result.audit.failover_count == 1
     assert result.audit.usage["total_tokens"] == 120
     assert audits[0]["response_hash"]
 

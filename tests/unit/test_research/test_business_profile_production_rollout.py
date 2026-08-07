@@ -69,8 +69,8 @@ def test_runtime_identity_is_derived_and_explicit_values_must_match():
 
     assert first == second
     assert set(first) == RUNTIME_IDENTITY_KEYS
-    assert "semantic_extraction" in first["model"]
-    assert llm_config.profiles["semantic_extraction"].endpoint in first["model"]
+    assert "logical_profile=semantic_extraction" in first["model"]
+    assert llm_config.route_fingerprint("semantic_extraction") in first["model"]
     assert (
         resolve_business_profile_runtime_identities(
             llm_config=llm_config,

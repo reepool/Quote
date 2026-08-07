@@ -93,7 +93,7 @@ utils/llm/
         "provider": "openai_compatible",
         "base_url": "",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_API_KEY",
+        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "timeout_seconds": 620,

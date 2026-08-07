@@ -245,15 +245,14 @@ class DataManager:
         profile_name: str,
         business_override: int = 0,
     ) -> Optional[int]:
-        profile = llm_config.profiles.get(profile_name)
-        if profile is None:
+        try:
+            effective = llm_config.effective_route_limits(profile_name)
+        except (AttributeError, ValueError):
             return None
-        resource = llm_config.resource_for_profile(profile)
         limits = [
             value
             for value in (
-                resource.requests_per_minute,
-                profile.requests_per_minute,
+                effective.get("requests_per_minute", 0),
                 business_override,
             )
             if value > 0
@@ -11217,6 +11216,17 @@ class DataManager:
                 dm_logger.error(f"[DataManager] Error closing LLM client: {e}")
             finally:
                 self._llm_client = None
+
+        # The client owns only its transport. Shared pool/provider registries
+        # are application-owned and must be drained once the data manager is
+        # the lifecycle owner, after all LLM work has stopped.
+        try:
+            from utils.llm import shutdown_shared_llm_resources
+
+            await shutdown_shared_llm_resources()
+            dm_logger.info("[DataManager] Shared LLM coordinators closed safely.")
+        except Exception as e:
+            dm_logger.error(f"[DataManager] Error closing shared LLM coordinators: {e}")
 
         if hasattr(self, 'source_factory') and self.source_factory:
             try:
@@ -29331,14 +29341,19 @@ class DataManager:
 
         if classify_titles_with_llm and classification_items:
             llm_config = self.config.get_llm_config()
-            configured_profile = llm_config.profiles.get(
+            logical_profile_enabled = llm_config.is_logical_profile_enabled(
                 title_classification_profile
             )
+            try:
+                title_route_fingerprint = llm_config.route_fingerprint(
+                    title_classification_profile
+                )
+            except (AttributeError, ValueError):
+                title_route_fingerprint = None
             if title_llm_client is None:
                 if (
                     not llm_config.enabled
-                    or configured_profile is None
-                    or not configured_profile.enabled
+                    or not logical_profile_enabled
                 ):
                     title_classification_error = "title_classification_llm_disabled"
                 else:
@@ -29347,9 +29362,7 @@ class DataManager:
                 title_classifier = CninfoAnnouncementTitleClassifier(
                     title_llm_client,
                     profile=title_classification_profile,
-                    model_identity=(
-                        configured_profile.model if configured_profile else None
-                    ),
+                    model_identity=title_route_fingerprint,
                     max_titles_per_request=title_max_titles_per_request,
                     max_concurrency=effective_title_max_concurrency,
                 )
@@ -30227,6 +30240,11 @@ class DataManager:
             "validation_status": analysis.get("validation_status"),
             "profile": analysis.get("profile") or fallback_profile,
             "model": analysis.get("model"),
+            "source_label": analysis.get("source_label"),
+            "selected_profile": analysis.get("selected_profile"),
+            "route_fingerprint": analysis.get("route_fingerprint"),
+            "lineage": analysis.get("lineage") or {},
+            "failover_count": analysis.get("failover_count") or 0,
             "schema_version": analysis.get("schema_version"),
             "prompt_version": analysis.get("prompt_version"),
             "parser_version": analysis.get("parser_version"),
@@ -30771,9 +30789,28 @@ class DataManager:
                             "analysis_status": "manual_required",
                             "validation_status": "failed",
                             "profile": profile,
-                            "model": (
-                                configured_profile.model
-                                if configured_profile else None
+                            "model": None,
+                            "source_label": (
+                                (getattr(analysis_error, "lineage", None) or {}).get(
+                                    "llm_source"
+                                )
+                            ),
+                            "selected_profile": (
+                                (getattr(analysis_error, "lineage", None) or {}).get(
+                                    "selected_profile"
+                                )
+                            ),
+                            "route_fingerprint": (
+                                (getattr(analysis_error, "lineage", None) or {}).get(
+                                    "route_fingerprint"
+                                )
+                            ),
+                            "lineage": getattr(analysis_error, "lineage", None) or {},
+                            "failover_count": (
+                                (getattr(analysis_error, "lineage", None) or {}).get(
+                                    "failover_count"
+                                )
+                                or 0
                             ),
                             "schema_version": SCHEMA_VERSION,
                             "prompt_version": PROMPT_VERSION,
@@ -30810,6 +30847,21 @@ class DataManager:
                         "validation_status": analysis.validation_status,
                         "profile": profile,
                         "model": analysis.model,
+                        "source_label": analysis.source_label,
+                        "selected_profile": analysis.selected_profile,
+                        "route_fingerprint": analysis.route_fingerprint,
+                        "lineage": {
+                            "logical_profile": analysis.logical_profile,
+                            "selected_profile": analysis.selected_profile,
+                            "llm_source": analysis.source_label,
+                            "route_fingerprint": analysis.route_fingerprint,
+                            "failover_count": analysis.failover_count,
+                            "attempts": [dict(item) for item in analysis.attempts],
+                            "verifier_source_label": analysis.verifier_source_label,
+                            "verifier_selected_profile": analysis.verifier_selected_profile,
+                            "verifier_route_fingerprint": analysis.verifier_route_fingerprint,
+                        },
+                        "failover_count": analysis.failover_count,
                         "schema_version": SCHEMA_VERSION,
                         "prompt_version": PROMPT_VERSION,
                         "parser_version": PARSER_VERSION,
@@ -30844,6 +30896,11 @@ class DataManager:
                     "warnings": list(analysis.warnings),
                     "latency_ms": analysis.latency_ms,
                     "attempt_count": analysis.attempt_count,
+                    "source_label": analysis.source_label,
+                    "selected_profile": analysis.selected_profile,
+                    "route_fingerprint": analysis.route_fingerprint,
+                    "failover_count": analysis.failover_count,
+                    "verifier_source_label": analysis.verifier_source_label,
                 }
                 summary["promotion"] = (
                     await self._maybe_auto_promote_cninfo_analysis(
@@ -31436,20 +31493,24 @@ class DataManager:
             for code in dict.fromkeys(codes):
                 counts[code] = int(counts.get(code, 0)) + 1
         llm_config = self.config.get_llm_config()
+        logical_profile_enabled = llm_config.is_logical_profile_enabled(profile)
+        try:
+            route_fingerprint = llm_config.route_fingerprint(profile)
+        except (AttributeError, ValueError):
+            route_fingerprint = None
         if llm_client is None:
-            if not llm_config.enabled or not (llm_config.profiles.get(profile) and llm_config.profiles[profile].enabled):
+            if not llm_config.enabled or not logical_profile_enabled:
                 dm_logger.warning(
                     "[DataManager] CNInfo LLM resolution stopped before analysis: "
                     "profile=%s gateway_enabled=%s profile_enabled=%s",
                     profile,
                     llm_config.enabled,
-                    bool(llm_config.profiles.get(profile) and llm_config.profiles[profile].enabled),
+                    logical_profile_enabled,
                 )
                 result["counts"]["llm_disabled"] = len(batch)
                 result["status"] = "partial" if batch else result["status"]
                 return result
             llm_client = self._get_or_create_llm_client()
-        configured_profile = llm_config.profiles.get(profile)
         effective_rpm = self._effective_llm_requests_per_minute(
             llm_config,
             profile_name=profile,
@@ -31460,19 +31521,17 @@ class DataManager:
                 "effective_llm_requests_per_minute"
             ] = effective_rpm
         dm_logger.info(
-            "[DataManager] CNInfo LLM profile ready: run_id=%s profile=%s model=%s "
-            "deadline_seconds=%s attempt_timeout_seconds=%s max_attempts=%s",
+            "[DataManager] CNInfo LLM logical profile ready: run_id=%s profile=%s "
+            "route_fingerprint=%s effective_rpm=%s",
             run_id,
             profile,
-            configured_profile.model if configured_profile else "injected_client",
-            configured_profile.timeout_seconds if configured_profile else None,
-            configured_profile.attempt_timeout_seconds if configured_profile else None,
-            configured_profile.max_retries + 1 if configured_profile else None,
+            route_fingerprint,
+            effective_rpm,
         )
         resolver = CninfoCorporateActionLlmResolver(
             llm_client,
             profile=profile,
-            model_identity=configured_profile.model if configured_profile else None,
+            model_identity=route_fingerprint,
             requests_per_minute=pipeline_config.llm_requests_per_minute,
         )
 
@@ -31485,7 +31544,7 @@ class DataManager:
                 normalized_start=normalized_start,
                 normalized_end=normalized_end,
                 profile=profile,
-                configured_profile=configured_profile,
+                configured_profile=route_fingerprint,
                 resume=bool(resume),
                 dry_run=bool(dry_run),
                 download_documents=bool(download_documents),
@@ -32028,6 +32087,21 @@ class DataManager:
                             "instrument_id": event["instrument_id"], "source_event_key": event["source_event_key"],
                             "analysis_status": analysis.result.get("analysis_status"), "validation_status": analysis.validation_status,
                             "profile": profile, "model": analysis.model, "schema_version": SCHEMA_VERSION,
+                            "source_label": analysis.source_label,
+                            "selected_profile": analysis.selected_profile,
+                            "route_fingerprint": analysis.route_fingerprint,
+                            "lineage": {
+                                "logical_profile": analysis.logical_profile,
+                                "selected_profile": analysis.selected_profile,
+                                "llm_source": analysis.source_label,
+                                "route_fingerprint": analysis.route_fingerprint,
+                                "failover_count": analysis.failover_count,
+                                "attempts": [dict(item) for item in analysis.attempts],
+                                "verifier_source_label": analysis.verifier_source_label,
+                                "verifier_selected_profile": analysis.verifier_selected_profile,
+                                "verifier_route_fingerprint": analysis.verifier_route_fingerprint,
+                            },
+                            "failover_count": analysis.failover_count,
                             "prompt_version": PROMPT_VERSION, "parser_version": PARSER_VERSION, "input_hash": analysis.input_hash,
                             "response_hash": analysis.response_hash, "request_id": analysis.request_id, "artifact_ids": artifact_ids,
                             "result": analysis.result, "gate_results": analysis.gate_results,
@@ -32131,7 +32205,27 @@ class DataManager:
                                 "analysis_status": "manual_required",
                                 "validation_status": "failed",
                                 "profile": profile,
-                                "model": configured_profile.model if configured_profile else None,
+                                "model": None,
+                                "source_label": (
+                                    (getattr(exc, "lineage", None) or {}).get("llm_source")
+                                ),
+                                "selected_profile": (
+                                    (getattr(exc, "lineage", None) or {}).get(
+                                        "selected_profile"
+                                    )
+                                ),
+                                "route_fingerprint": (
+                                    (getattr(exc, "lineage", None) or {}).get(
+                                        "route_fingerprint"
+                                    )
+                                ),
+                                "lineage": getattr(exc, "lineage", None) or {},
+                                "failover_count": (
+                                    (getattr(exc, "lineage", None) or {}).get(
+                                        "failover_count"
+                                    )
+                                    or 0
+                                ),
                                 "schema_version": SCHEMA_VERSION,
                                 "prompt_version": PROMPT_VERSION,
                                 "parser_version": PARSER_VERSION,

@@ -1,0 +1,254 @@
+{
+  "llm": {
+    "enabled": false,
+    "provider_resources": {
+      "pipio:grok": {
+        "provider": "openai_compatible",
+        "quota_bucket": "pipio:grok-key",
+        "hard_max_concurrency": 10,
+        "default_bulk_concurrency": 8,
+        "reserved_concurrency": 2,
+        "http_max_connections": 12,
+        "http_max_keepalive_connections": 10,
+        "requests_per_minute": 10,
+        "adaptive_concurrency_enabled": true,
+        "adaptive_min_bulk_concurrency": 2,
+        "adaptive_recovery_successes": 6,
+        "adaptive_failure_coalescing_seconds": 10.0,
+        "adaptive_outcome_window_size": 30,
+        "adaptive_soft_failure_min_count": 2,
+        "adaptive_soft_failure_rate_threshold": 0.08,
+        "adaptive_soft_decrease_ratio": 0.8,
+        "adaptive_hard_decrease_ratio": 0.5,
+        "adaptive_recovery_quiet_seconds": 30.0,
+        "adaptive_recovery_probe_interval_seconds": 30.0,
+        "adaptive_recovery_growth_factor": 1.3333333333333333,
+        "rate_limit_cooldown_seconds": 10.0,
+        "transient_cooldown_seconds": 2.0,
+        "workload_weights": {
+          "corporate_action_title_classification": 1,
+          "corporate_action_semantic_extraction": 1,
+          "corporate_action_semantic_verification": 1,
+          "business_profile_extraction": 1,
+          "business_profile_semantic_verification": 1,
+          "direct": 1
+        }
+      },
+      "pipio:luna": {
+        "provider": "openai_compatible",
+        "quota_bucket": "pipio:luna-key",
+        "hard_max_concurrency": 10,
+        "default_bulk_concurrency": 8,
+        "reserved_concurrency": 2,
+        "http_max_connections": 12,
+        "http_max_keepalive_connections": 10,
+        "requests_per_minute": 10,
+        "adaptive_concurrency_enabled": true,
+        "adaptive_min_bulk_concurrency": 2,
+        "adaptive_recovery_successes": 6,
+        "adaptive_failure_coalescing_seconds": 10.0,
+        "adaptive_outcome_window_size": 30,
+        "adaptive_soft_failure_min_count": 2,
+        "adaptive_soft_failure_rate_threshold": 0.08,
+        "adaptive_soft_decrease_ratio": 0.8,
+        "adaptive_hard_decrease_ratio": 0.5,
+        "adaptive_recovery_quiet_seconds": 30.0,
+        "adaptive_recovery_probe_interval_seconds": 30.0,
+        "adaptive_recovery_growth_factor": 1.3333333333333333,
+        "rate_limit_cooldown_seconds": 10.0,
+        "transient_cooldown_seconds": 2.0,
+        "workload_weights": {
+          "corporate_action_title_classification": 1,
+          "corporate_action_semantic_extraction": 1,
+          "corporate_action_semantic_verification": 1,
+          "business_profile_extraction": 1,
+          "business_profile_semantic_verification": 1,
+          "direct": 1
+        }
+      }
+    },
+    "orchestration": {
+      "enabled": true,
+      "default_queue_size": 200,
+      "progress_interval_seconds": 30,
+      "resource_limits": {
+        "document_download": 8,
+        "document_parse": 8,
+        "sqlite_writer": 1
+      }
+    },
+    "pools": {
+      "shared_semantic": {
+        "enabled": false,
+        "total_concurrency": 10,
+        "queue_size": 200,
+        "strategy": "weighted_fair",
+        "borrow_idle_capacity": true,
+        "members": [
+          {
+            "source_label": "pipio:grok-4.5",
+            "weight": 3,
+            "profiles": {
+              "semantic_extraction": "semantic_extraction__pipio_grok",
+              "corporate_action_title_classification": "corporate_action_title_classification__pipio_grok"
+            }
+          },
+          {
+            "source_label": "pipio:gpt-5.6-luna",
+            "weight": 1,
+            "profiles": {
+              "semantic_extraction": "semantic_extraction__pipio_luna",
+              "corporate_action_title_classification": "corporate_action_title_classification__pipio_luna"
+            }
+          }
+        ],
+        "failover": {
+          "enabled": true,
+          "max_hops": 1,
+          "failure_threshold": 3,
+          "open_seconds": 60,
+          "half_open_max_probes": 1,
+          "min_attempt_seconds": 5,
+          "allow_auth_failover": false,
+          "on": [
+            "rate_limit_error",
+            "transient_transport_error",
+            "provider_error",
+            "response_parse_error",
+            "schema_validation_error"
+          ]
+        }
+      }
+    },
+    "routes": {
+      "semantic_extraction": {
+        "pool": "shared_semantic",
+        "required_structured_output_modes": ["json_object"],
+        "revision": "v1-disabled"
+      },
+      "corporate_action_title_classification": {
+        "pool": "shared_semantic",
+        "required_structured_output_modes": ["json_object"],
+        "revision": "v1-disabled"
+      }
+    },
+    "profiles": {
+      "semantic_extraction__pipio_grok": {
+        "provider": "openai_compatible",
+        "provider_resource": "pipio:grok",
+        "source_label": "pipio:grok-4.5",
+        "default_workload": "corporate_action_semantic_extraction",
+        "enabled": false,
+        "base_url": "https://pipio.io/v1",
+        "endpoint": "/v1/chat/completions",
+        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "model": "grok-4.5",
+        "structured_output_mode": "auto",
+        "supported_structured_output_modes": ["json_object"],
+        "allow_prompt_only": false,
+        "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
+        "attempt_timeout_seconds": 300,
+        "max_retries": 1,
+        "max_schema_repair_attempts": 1,
+        "max_concurrency": 8,
+        "requests_per_minute": 0,
+        "temperature": 0.0,
+        "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
+        "max_retry_after_seconds": 30,
+        "retry_backoff_seconds": 0.5,
+        "retry_jitter_ratio": 0.2,
+        "idempotency_header": "Idempotency-Key"
+      },
+      "semantic_extraction__pipio_luna": {
+        "provider": "openai_compatible",
+        "provider_resource": "pipio:luna",
+        "source_label": "pipio:gpt-5.6-luna",
+        "default_workload": "corporate_action_semantic_extraction",
+        "enabled": false,
+        "base_url": "https://pipio.io/v1",
+        "endpoint": "/v1/chat/completions",
+        "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
+        "model": "gpt-5.6-luna",
+        "structured_output_mode": "auto",
+        "supported_structured_output_modes": ["json_object"],
+        "allow_prompt_only": false,
+        "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
+        "attempt_timeout_seconds": 300,
+        "max_retries": 1,
+        "max_schema_repair_attempts": 1,
+        "max_concurrency": 8,
+        "requests_per_minute": 0,
+        "temperature": 0.0,
+        "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
+        "max_retry_after_seconds": 30,
+        "retry_backoff_seconds": 0.5,
+        "retry_jitter_ratio": 0.2,
+        "idempotency_header": "Idempotency-Key"
+      },
+      "corporate_action_title_classification__pipio_grok": {
+        "provider": "openai_compatible",
+        "provider_resource": "pipio:grok",
+        "source_label": "pipio:grok-4.5",
+        "default_workload": "corporate_action_title_classification",
+        "enabled": false,
+        "base_url": "https://pipio.io/v1",
+        "endpoint": "/v1/chat/completions",
+        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "model": "grok-4.5",
+        "structured_output_mode": "auto",
+        "supported_structured_output_modes": ["json_object"],
+        "allow_prompt_only": false,
+        "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
+        "attempt_timeout_seconds": 300,
+        "max_retries": 1,
+        "max_schema_repair_attempts": 1,
+        "max_concurrency": 8,
+        "requests_per_minute": 0,
+        "temperature": 0.0,
+        "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
+        "max_retry_after_seconds": 30,
+        "retry_backoff_seconds": 2.0,
+        "retry_jitter_ratio": 0.5,
+        "idempotency_header": "Idempotency-Key"
+      },
+      "corporate_action_title_classification__pipio_luna": {
+        "provider": "openai_compatible",
+        "provider_resource": "pipio:luna",
+        "source_label": "pipio:gpt-5.6-luna",
+        "default_workload": "corporate_action_title_classification",
+        "enabled": false,
+        "base_url": "https://pipio.io/v1",
+        "endpoint": "/v1/chat/completions",
+        "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
+        "model": "gpt-5.6-luna",
+        "structured_output_mode": "auto",
+        "supported_structured_output_modes": ["json_object"],
+        "allow_prompt_only": false,
+        "timeout_seconds": 620,
+        "queue_timeout_seconds": 3600,
+        "attempt_timeout_seconds": 300,
+        "max_retries": 1,
+        "max_schema_repair_attempts": 1,
+        "max_concurrency": 8,
+        "requests_per_minute": 0,
+        "temperature": 0.0,
+        "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
+        "max_retry_after_seconds": 30,
+        "retry_backoff_seconds": 2.0,
+        "retry_jitter_ratio": 0.5,
+        "idempotency_header": "Idempotency-Key"
+      }
+    }
+  }
+}

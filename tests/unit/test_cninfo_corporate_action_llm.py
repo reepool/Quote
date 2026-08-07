@@ -180,7 +180,7 @@ def _v3_result(page, *, include_verification=True, **overrides):
 
 
 def _gateway_response(
-    data, *, suffix="1", latency_ms=10, usage=None, warnings=(),
+    data, *, suffix="1", latency_ms=10, usage=None, warnings=(), **lineage,
 ):
     return SimpleNamespace(
         data=data,
@@ -191,6 +191,7 @@ def _gateway_response(
         attempt_count=1,
         usage=usage,
         warnings=warnings,
+        **lineage,
     )
 
 
@@ -1763,9 +1764,24 @@ async def test_truncated_event_context_cannot_be_validated():
     ]
     extraction = _v3_result(first_page, include_verification=False)
     client = SimpleNamespace(complete=AsyncMock(side_effect=[
-        _gateway_response(extraction, suffix="extract"),
         _gateway_response(
-            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+            extraction,
+            suffix="extract",
+            source_label="pipio:grok-4.5",
+            logical_profile="semantic_extraction",
+            selected_profile="semantic__pipio_grok",
+            route_fingerprint="route-v1",
+            failover_count=1,
+            attempts=({"source_label": "pipio:grok-4.5", "status": "success"},),
+        ),
+        _gateway_response(
+            _semantic_verification(extraction),
+            suffix="verify",
+            latency_ms=5,
+            source_label="pipio:gpt-5.6-luna",
+            logical_profile="semantic_extraction",
+            selected_profile="semantic__pipio_luna",
+            route_fingerprint="route-v1",
         ),
     ]))
     analysis = await CninfoCorporateActionLlmResolver(client).analyze(
@@ -1782,9 +1798,24 @@ async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
     page = _page()
     extraction = _v3_result(page, include_verification=False)
     client = SimpleNamespace(complete=AsyncMock(side_effect=[
-        _gateway_response(extraction, suffix="extract"),
         _gateway_response(
-            _semantic_verification(extraction), suffix="verify", latency_ms=5,
+            extraction,
+            suffix="extract",
+            source_label="pipio:grok-4.5",
+            logical_profile="semantic_extraction",
+            selected_profile="semantic__pipio_grok",
+            route_fingerprint="route-v1",
+            failover_count=1,
+            attempts=({"source_label": "pipio:grok-4.5", "status": "success"},),
+        ),
+        _gateway_response(
+            _semantic_verification(extraction),
+            suffix="verify",
+            latency_ms=5,
+            source_label="pipio:gpt-5.6-luna",
+            logical_profile="semantic_extraction",
+            selected_profile="semantic__pipio_luna",
+            route_fingerprint="route-v1",
         ),
     ]))
     analysis = await CninfoCorporateActionLlmResolver(
@@ -1808,6 +1839,12 @@ async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
     assert analysis.validation_status == "validated_candidate"
     assert analysis.latency_ms == 15
     assert analysis.attempt_count == 2
+    assert analysis.source_label == "pipio:grok-4.5"
+    assert analysis.selected_profile == "semantic__pipio_grok"
+    assert analysis.route_fingerprint == "route-v1"
+    assert analysis.failover_count == 1
+    assert analysis.verifier_source_label == "pipio:gpt-5.6-luna"
+    assert analysis.verifier_selected_profile == "semantic__pipio_luna"
 
 
 @pytest.mark.asyncio

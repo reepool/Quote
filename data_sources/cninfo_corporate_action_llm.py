@@ -623,6 +623,15 @@ class CorporateActionAnalysis:
     attempt_count: int
     usage: Optional[dict[str, Any]]
     warnings: tuple[str, ...] = ()
+    source_label: Optional[str] = None
+    logical_profile: Optional[str] = None
+    selected_profile: Optional[str] = None
+    route_fingerprint: Optional[str] = None
+    failover_count: int = 0
+    attempts: tuple[Mapping[str, Any], ...] = ()
+    verifier_source_label: Optional[str] = None
+    verifier_selected_profile: Optional[str] = None
+    verifier_route_fingerprint: Optional[str] = None
 
 
 def _date_patterns(value: Optional[str]) -> tuple[str, ...]:
@@ -3535,4 +3544,23 @@ class CninfoCorporateActionLlmResolver:
             attempt_count=attempt_count,
             usage=usage,
             warnings=warnings,
+            source_label=getattr(response, "source_label", None),
+            logical_profile=(
+                getattr(response, "logical_profile", None) or self.profile
+            ),
+            selected_profile=getattr(response, "selected_profile", None),
+            route_fingerprint=getattr(response, "route_fingerprint", None),
+            failover_count=getattr(response, "failover_count", 0),
+            attempts=tuple(
+                dict(item) for item in getattr(response, "attempts", ())
+            ),
+            verifier_source_label=getattr(
+                verification_response, "source_label", None
+            ),
+            verifier_selected_profile=getattr(
+                verification_response, "selected_profile", None
+            ),
+            verifier_route_fingerprint=getattr(
+                verification_response, "route_fingerprint", None
+            ),
         )

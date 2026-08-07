@@ -366,7 +366,7 @@ class AggregateProgressLogger:
                 return
             except asyncio.TimeoutError:
                 self.logger.info(
-                    "LLM orchestration progress label=%s snapshot=%s",
+                    "event=llm.orchestration.progress label=%s snapshot=%s",
                     self.label,
                     self.snapshot(),
                 )

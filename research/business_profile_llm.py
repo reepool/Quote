@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import asyncio
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any, Callable, Mapping, Optional, Sequence
@@ -27,6 +27,7 @@ from utils.llm import (
     LlmClientProtocol,
     CallableTransport,
 )
+from utils.config_manager import UnifiedConfigManager
 
 
 LLM_REPORT_SCHEMA_VERSION = "business_profile_llm_report.v1"
@@ -170,6 +171,11 @@ class LlmExtractionEnvelope:
     request_hash: str
     response_hash: str
     report: dict[str, Any]
+    source_label: Optional[str] = None
+    logical_profile: Optional[str] = None
+    selected_profile: Optional[str] = None
+    route_fingerprint: Optional[str] = None
+    lineage: Mapping[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -197,11 +203,17 @@ class OpenAICompatibleBusinessProfileExtractor:
         self.config = config
         if transport is not None and llm_client is not None:
             raise ValueError("provide either transport or llm_client, not both")
-        gateway_config = LlmConfig.from_mapping(
-            {
+        self._logical_profile = "semantic_extraction"
+        self._legacy_transport = transport is not None
+        if llm_client is not None:
+            self._gateway = llm_client
+        elif transport is not None:
+            # Retain the injectable offline adapter contract without allowing
+            # production code to own a second provider configuration.
+            gateway_config = LlmConfig.from_mapping({
                 "enabled": config.enabled,
                 "profiles": {
-                    "business_profile": {
+                    self._logical_profile: {
                         "enabled": config.enabled,
                         "provider": "openai_compatible",
                         "base_url": config.base_url,
@@ -220,12 +232,16 @@ class OpenAICompatibleBusinessProfileExtractor:
                         "temperature": config.temperature,
                     }
                 },
-            }
-        )
-        self._gateway = llm_client or LlmClient(
-            gateway_config,
-            transport=CallableTransport(transport) if transport is not None else None,
-        )
+            })
+            self._gateway = LlmClient(
+                gateway_config,
+                transport=CallableTransport(transport),
+            )
+        else:
+            # Production lifecycle uses the shared logical profile and its
+            # process-wide pool/coordinator registries.
+            gateway_config = UnifiedConfigManager("config").get_llm_config()
+            self._gateway = LlmClient(gateway_config)
         self._owns_gateway = llm_client is None
         self.fact_catalog = fact_catalog or load_business_fact_catalog()
         self.unit_catalog = unit_catalog or load_unit_conversion_catalog()
@@ -274,11 +290,11 @@ class OpenAICompatibleBusinessProfileExtractor:
     ) -> LlmExtractionEnvelope:
         if not self.config.enabled:
             raise RuntimeError("business-profile LLM extraction is disabled")
-        if not self.config.base_url:
+        if self._legacy_transport and not self.config.base_url:
             raise ValueError("enabled LLM extraction requires base_url")
-        if not self.config.model:
+        if self._legacy_transport and not self.config.model:
             raise ValueError("enabled LLM extraction requires model")
-        if not self.config.endpoint.startswith("/"):
+        if self._legacy_transport and not self.config.endpoint.startswith("/"):
             raise ValueError("enabled LLM extraction endpoint must be an absolute path")
         if not sections:
             raise ValueError("LLM extraction requires at least one selected section")
@@ -300,7 +316,7 @@ class OpenAICompatibleBusinessProfileExtractor:
         )
         response = await self._gateway.complete(
             LlmRequest(
-                profile="business_profile",
+                profile=self._logical_profile,
                 messages=(
                     LlmMessage(
                         role="system",
@@ -354,6 +370,14 @@ class OpenAICompatibleBusinessProfileExtractor:
             request_hash=response.request_hash,
             response_hash=response.response_hash,
             report=report,
+            source_label=getattr(response, "source_label", None),
+            logical_profile=(
+                getattr(response, "logical_profile", None)
+                or self._logical_profile
+            ),
+            selected_profile=getattr(response, "selected_profile", None),
+            route_fingerprint=getattr(response, "route_fingerprint", None),
+            lineage=dict(response.lineage),
         )
 
     def _input_payload(

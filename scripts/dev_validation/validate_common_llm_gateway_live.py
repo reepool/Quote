@@ -6,7 +6,6 @@ import argparse
 import asyncio
 import json
 import sys
-from dataclasses import replace
 from pathlib import Path
 from typing import Sequence
 
@@ -15,7 +14,13 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from utils.config_manager import config_manager
-from utils.llm import LlmClient, LlmConfig, LlmMessage, LlmRequest, load_project_environment
+from utils.llm import (
+    LlmClient,
+    LlmMessage,
+    LlmRequest,
+    load_project_environment,
+    shutdown_shared_llm_resources,
+)
 
 
 SEMANTIC_ANALYSIS_SCHEMA = {
@@ -36,16 +41,20 @@ async def run_live_validation(
     timeout_seconds: float,
     *,
     text_only: bool = False,
+    controlled_source_label: str | None = None,
 ) -> dict[str, object]:
     configured = config_manager.get_llm_config()
-    profile = configured.profiles.get(profile_name)
-    if profile is None:
-        raise ValueError(f"unknown LLM profile: {profile_name}")
-    live_config = LlmConfig(
-        enabled=True,
-        profiles={profile_name: replace(profile, enabled=True)},
-    )
-    client = LlmClient(live_config)
+    if controlled_source_label:
+        configured = configured.controlled_source_config(
+            profile_name,
+            controlled_source_label,
+        )
+    if not configured.is_logical_profile_enabled(profile_name):
+        raise ValueError(
+            f"logical LLM profile is disabled or unavailable: {profile_name}; "
+            "enable a controlled route before live validation"
+        )
+    client = LlmClient(configured)
     try:
         response = await client.complete(
             LlmRequest(
@@ -81,6 +90,12 @@ async def run_live_validation(
             "status": response.status,
             "provider": response.provider,
             "model": response.model,
+            "source_label": response.source_label,
+            "logical_profile": response.logical_profile,
+            "selected_profile": response.selected_profile,
+            "route_fingerprint": response.route_fingerprint,
+            "failover_count": response.failover_count,
+            "attempts": [dict(item) for item in response.attempts],
             "finish_reason": response.finish_reason,
             "structured_output_mode": response.structured_output_mode,
             "latency_ms": response.latency_ms,
@@ -102,6 +117,7 @@ async def run_live_validation(
         }
     finally:
         await client.close()
+        await shutdown_shared_llm_resources()
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -113,13 +129,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="skip local JSON Schema validation when the optional dependency is unavailable",
     )
+    parser.add_argument(
+        "--controlled-source-label",
+        help=(
+            "temporarily enable exactly one configured source for a bounded "
+            "controlled smoke; does not persist configuration"
+        ),
+    )
     args = parser.parse_args(argv)
-    load_project_environment()
+    load_project_environment(override=False)
     result = asyncio.run(
         run_live_validation(
             args.profile,
             args.timeout_seconds,
             text_only=args.text_only,
+            controlled_source_label=args.controlled_source_label,
         )
     )
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

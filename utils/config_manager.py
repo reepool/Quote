@@ -327,6 +327,7 @@ class UnifiedConfigManager:
                     ErrorCodes.CONFIG_FILE_NOT_FOUND
                 )
 
+            llm_owner: Optional[Path] = None
             for config_file in config_files:
                 # 跳过旧的模板文件和合并后的文件，以防万一
                 if config_file.name in ["config-template.json", "config.merged.json"]:
@@ -334,6 +335,14 @@ class UnifiedConfigManager:
                 try:
                     with open(config_file, 'r', encoding='utf-8') as f:
                         data = json.load(f)
+                        if "llm" in data:
+                            if llm_owner is not None:
+                                raise ConfigurationError(
+                                    "Top-level llm configuration has multiple owners: "
+                                    f"{llm_owner.name}, {config_file.name}",
+                                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                                )
+                            llm_owner = config_file
                         merged_config.update(data)
                     config_logger.debug(f"Loaded and merged: {config_file.name}")
                 except json.JSONDecodeError as e:

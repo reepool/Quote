@@ -63,7 +63,7 @@ flowchart LR
 
 ## 3. 配置与密钥
 
-非敏感配置位于 `config/11_llm.json`。以下保守示例使用关闭状态；当前仓库运维值可因
+非敏感配置位于 `config/13_llm.json`。以下保守示例使用关闭状态；当前仓库运维值可因
 已批准业务显式开启，不应把 profile 开启解释为任何业务 candidate writer 已开启：
 
 ```json
@@ -94,7 +94,7 @@ flowchart LR
         "enabled": false,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_API_KEY",
+        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -137,7 +137,8 @@ flowchart LR
 本地开发可以在项目根目录 `.env` 中设置：
 
 ```dotenv
-QUOTE_LLM_API_KEY=...
+QUOTE_LLM_PIPIO_GROK_API_KEY=...
+QUOTE_LLM_PIPIO_LUNA_API_KEY=...
 ```
 
 `load_project_environment()` 使用 `override=False`，进程环境优先。`.env` 已被 gitignore，权限应限制为用户可读。systemd、容器、cron 和多 worker 服务不应依赖 `.bashrc`，应通过权限受控的 `EnvironmentFile`、容器 secret 或部署平台 secret store 注入环境变量。
@@ -340,7 +341,7 @@ client = LlmClient(config, transport=transport, environment={"TEST_LLM_KEY": "un
 
 启用 profile 前完成以下检查：
 
-1. 在部署环境注入 `QUOTE_LLM_API_KEY`，确认日志和配置快照不包含密钥。
+1. 在部署环境注入两个来源专用 Key，确认日志和配置快照不包含密钥。
 2. 用 `scripts/dev_validation/validate_common_llm_gateway_live.py` 完成一次人工批准的 pipio 合同 smoke。
 3. 确认服务端实际模型、structured-output 能力、usage、request ID 和错误响应格式。
 4. 运行业务 holdout，检查证据引用、数值单位、可得日和 candidate gate；不能只看模型返回 HTTP 200。

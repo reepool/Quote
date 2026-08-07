@@ -50,6 +50,10 @@
         "level": "DEBUG",
         "enabled": true
       },
+      "LLM": {
+        "level": "INFO",
+        "enabled": true
+      },
       "TelegramBot": {
         "level": "DEBUG",
         "enabled": true

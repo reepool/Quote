@@ -467,6 +467,13 @@ class DatabaseManager:
                 ("row_hash", "VARCHAR(64)"),
                 ("row_version", "INTEGER NOT NULL DEFAULT 1"),
             ],
+            "corporate_action_llm_analyses": [
+                ("source_label", "VARCHAR(128)"),
+                ("selected_profile", "VARCHAR(128)"),
+                ("route_fingerprint", "VARCHAR(64)"),
+                ("lineage_json", "TEXT"),
+                ("failover_count", "INTEGER NOT NULL DEFAULT 0"),
+            ],
         }
 
         with self.sync_engine.connect() as conn:

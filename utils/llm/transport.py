@@ -164,7 +164,7 @@ class HttpxOpenAICompatibleTransport:
                     )
 
                 llm_logger.info(
-                    "LLM streaming response opened status_code=%s provider_request_id=%s "
+                    "event=llm.stream.opened status_code=%s provider_request_id=%s "
                     "elapsed_ms=%s",
                     response.status_code,
                     provider_request_id,
@@ -229,7 +229,7 @@ async def _collect_openai_stream(
         event_count += 1
         if event_count == 1:
             llm_logger.info(
-                "LLM streaming first event received provider_request_id=%s elapsed_ms=%s",
+                "event=llm.stream.first_event provider_request_id=%s elapsed_ms=%s",
                 provider_request_id,
                 max(0, round((time.monotonic() - started) * 1000)),
             )

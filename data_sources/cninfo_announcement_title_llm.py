@@ -570,6 +570,20 @@ class CninfoAnnouncementTitleClassifier:
                     "chunk_index": chunk_index,
                     "profile": self.profile,
                     "model": response.model,
+                    "source_label": getattr(response, "source_label", None),
+                    "logical_profile": (
+                        getattr(response, "logical_profile", None) or self.profile
+                    ),
+                    "selected_profile": getattr(
+                        response, "selected_profile", None
+                    ),
+                    "route_fingerprint": getattr(
+                        response, "route_fingerprint", None
+                    ),
+                    "failover_count": getattr(response, "failover_count", 0),
+                    "attempts": [
+                        dict(item) for item in getattr(response, "attempts", ())
+                    ],
                     "prompt_version": TITLE_CLASSIFICATION_PROMPT_VERSION,
                     "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
                     "request_hash": response.request_hash,

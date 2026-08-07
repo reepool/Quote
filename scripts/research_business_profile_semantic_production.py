@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import copy
 import json
 import sys
@@ -30,7 +31,7 @@ from research.business_profile_semantic_runtime import (
 )
 from research.storage import ResearchStorageManager
 from utils.config_manager import UnifiedConfigManager
-from utils.llm import LlmClient
+from utils.llm import LlmClient, shutdown_shared_llm_resources
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -152,6 +153,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = pipeline.run(args.mode, scope=scope)
     finally:
         runtime.close()
+        # The runtime closes its client transport; the process-level pool and
+        # provider registries are drained explicitly at application shutdown.
+        asyncio.run(shutdown_shared_llm_resources())
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     return 0 if result.get("status") not in {"stopped"} else 2
 

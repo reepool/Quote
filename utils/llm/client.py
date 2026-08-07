@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from contextlib import AsyncExitStack
+from dataclasses import asdict, dataclass, replace
 import hashlib
 import json
 import logging
@@ -26,7 +27,7 @@ from .errors import (
     safe_provider_error,
 )
 from .models import LlmConfig, LlmMessage, LlmProfile, LlmRequest, LlmResponse, LlmUsage
-from .orchestration import ProviderCoordinatorRegistry
+from .orchestration import LlmPoolCoordinatorRegistry, ProviderCoordinatorRegistry
 from .rate_limit import ProfileLimiterRegistry
 from .schema import compact_schema_instruction, normalize_schema, validate_data
 from .transport import AsyncTransport, HttpxOpenAICompatibleTransport, TransportResponse
@@ -35,6 +36,7 @@ from .transport import AsyncTransport, HttpxOpenAICompatibleTransport, Transport
 llm_logger = logging.getLogger("LLM")
 _GLOBAL_LIMITERS = ProfileLimiterRegistry()
 _GLOBAL_PROVIDER_COORDINATORS = ProviderCoordinatorRegistry()
+_GLOBAL_POOL_COORDINATORS = LlmPoolCoordinatorRegistry()
 _LINEAGE_METADATA_KEYS = {
     "workload",
     "run_id",
@@ -43,6 +45,23 @@ _LINEAGE_METADATA_KEYS = {
     "business_item_key",
     "input_hash",
 }
+
+
+@dataclass
+class _ExecutionBudget:
+    execution_deadline: Optional[float] = None
+    execution_started: Optional[float] = None
+
+    def start(self, *, now: float, timeout_seconds: float) -> float:
+        if self.execution_deadline is None:
+            self.execution_started = now
+            self.execution_deadline = now + timeout_seconds
+        return self.execution_deadline
+
+    def remaining(self, now: float) -> Optional[float]:
+        if self.execution_deadline is None:
+            return None
+        return self.execution_deadline - now
 
 
 class LlmClientProtocol(Protocol):
@@ -62,6 +81,7 @@ class LlmClient:
         provider_coordinator_registry: Optional[
             ProviderCoordinatorRegistry
         ] = None,
+        pool_coordinator_registry: Optional[LlmPoolCoordinatorRegistry] = None,
         owns_transport: Optional[bool] = None,
         random_source: Callable[[], float] = random.random,
     ) -> None:
@@ -92,23 +112,408 @@ class LlmClient:
         self.provider_coordinator_registry = (
             provider_coordinator_registry or _GLOBAL_PROVIDER_COORDINATORS
         )
+        self.pool_coordinator_registry = (
+            pool_coordinator_registry or _GLOBAL_POOL_COORDINATORS
+        )
         self._owns_transport = transport is None or bool(owns_transport)
         self._random_source = random_source
         self._closed = False
 
     async def complete(self, request: LlmRequest) -> LlmResponse:
+        """Execute a stable logical profile through a route or direct fallback."""
+        if self._closed:
+            raise LlmConfigurationError("LLM client is closed")
+        if not self.config.enabled:
+            raise LlmConfigurationError("LLM gateway is disabled")
+        logical_profile = str(request.profile or "").strip()
+        route = self.config.route_for_profile(logical_profile)
+        budget = _ExecutionBudget()
+        if route is None:
+            response = await self._complete_concrete(request, budget=budget)
+            profile = self.config.profiles[logical_profile]
+            source_label = profile.source_label or f"{profile.provider}:{response.model}"
+            route_fingerprint = self.config.route_fingerprint(logical_profile)
+            attempt = {
+                "source_label": source_label,
+                "selected_profile": profile.name,
+                "model": response.model,
+                "attempt_sequence": 1,
+                "request_id": response.request_id,
+                "provider_request_id": response.provider_request_id,
+                "status": "success",
+                "attempt_count": response.attempt_count,
+                "latency_ms": response.latency_ms,
+            }
+            lineage = dict(response.lineage)
+            lineage.update({
+                "logical_profile": logical_profile,
+                "selected_profile": profile.name,
+                "llm_source": source_label,
+                "route_fingerprint": route_fingerprint,
+                "failover_count": 0,
+                "attempts": [attempt],
+            })
+            return replace(
+                response,
+                source_label=source_label,
+                logical_profile=logical_profile,
+                selected_profile=profile.name,
+                route_fingerprint=route_fingerprint,
+                failover_count=0,
+                attempts=(attempt,),
+                lineage=lineage,
+            )
+        return await self._complete_routed(
+            request,
+            logical_profile=logical_profile,
+            pool_name=route.pool,
+            budget=budget,
+        )
+
+    async def _complete_routed(
+        self,
+        request: LlmRequest,
+        *,
+        logical_profile: str,
+        pool_name: str,
+        budget: _ExecutionBudget,
+    ) -> LlmResponse:
+        route_request_id = uuid.uuid4().hex
+        pool = self.config.pools[pool_name]
+        concrete_profiles = self.config.concrete_profiles_for(logical_profile)
+        queue_timeout = (
+            float(request.queue_timeout_seconds)
+            if request.queue_timeout_seconds is not None
+            else min(profile.queue_timeout_seconds for profile in concrete_profiles)
+        )
+        if not math.isfinite(queue_timeout) or queue_timeout <= 0:
+            raise LlmConfigurationError(
+                "queue_timeout_seconds must be finite and positive"
+            )
+        route_fingerprint = self.config.route_fingerprint(logical_profile)
+        logical_request_hash = stable_hash({
+            "logical_profile": logical_profile,
+            "route_fingerprint": route_fingerprint,
+            "messages": [
+                LlmMessage.from_value(message).to_provider()
+                for message in request.messages
+            ],
+            "response_schema": request.response_schema,
+            "schema_name": request.schema_name,
+            "schema_version": request.schema_version,
+            "temperature": request.temperature,
+            "max_output_tokens": request.max_output_tokens,
+            "metadata": self._lineage_metadata(request.metadata),
+        })
+        correlation = self._lineage_metadata(request.metadata)
+        correlation.update({
+            "logical_profile": logical_profile,
+            "request_hash": logical_request_hash,
+        })
+        coordinator = self.pool_coordinator_registry.get(self.config, pool_name)
+        lease = await coordinator.acquire(
+            deadline=time.monotonic() + queue_timeout,
+            correlation=correlation,
+        )
+        attempts: list[dict[str, Any]] = []
+        excluded_sources: set[str] = set()
+        failover_count = 0
+        pending_failover_error: Optional[str] = None
+        failover_started_at: Optional[float] = None
+        failover_recorded = False
+        last_error: Optional[LlmError] = None
+        selected_profile: Optional[str] = None
+        selected_source: Optional[str] = None
+        try:
+            while True:
+                try:
+                    selection_deadline = budget.execution_deadline or (
+                        time.monotonic() + queue_timeout
+                    )
+                    if (
+                        budget.execution_deadline is not None
+                        and budget.execution_deadline - time.monotonic()
+                        < pool.failover.min_attempt_seconds
+                    ):
+                        raise LlmDeadlineExceededError()
+                    selection = await lease.select_member(
+                        logical_profile=logical_profile,
+                        deadline=selection_deadline,
+                        excluded_sources=tuple(excluded_sources),
+                        failover=bool(excluded_sources),
+                    )
+                except LlmError as exc:
+                    # A failed source may leave no eligible member. Preserve
+                    # that source's classified terminal error instead of
+                    # replacing a provider 429/503/timeout with the scheduler's
+                    # generic "no eligible member" error. Deadline, cancel,
+                    # and configuration errors remain authoritative.
+                    if last_error is None or exc.code in {
+                        "deadline_exceeded",
+                        "cancelled",
+                        "configuration_error",
+                    }:
+                        last_error = exc
+                    break
+                if excluded_sources:
+                    failover_count += 1
+                selected_profile = selection.selected_profile
+                selected_source = selection.source_label
+                profile = self.config.profiles[selected_profile]
+                source_attempt_started = time.monotonic()
+                try:
+                    response = await self._complete_concrete(
+                        request,
+                        profile_override=profile,
+                        budget=budget,
+                    )
+                except LlmError as exc:
+                    last_error = exc
+                    await lease.finish_member(
+                        success=False,
+                        error_code=exc.code,
+                        status_code=exc.status_code,
+                    )
+                    attempt = {
+                        "source_label": selected_source,
+                        "selected_profile": selected_profile,
+                        "model": profile.model,
+                        "attempt_sequence": len(attempts) + 1,
+                        "request_id": exc.request_id,
+                        "error_code": exc.code,
+                        "status_code": exc.status_code,
+                        "attempt_count": exc.attempt_count,
+                        "latency_ms": self._elapsed_ms(source_attempt_started),
+                    }
+                    attempts.append(attempt)
+                    excluded_sources.add(selected_source)
+                    llm_logger.warning(
+                        "event=llm.route.source_failed pool=%s logical_profile=%s "
+                        "source_label=%s selected_profile=%s route_request_id=%s "
+                        "error_code=%s attempt_count=%s failover_count=%s",
+                        pool_name,
+                        logical_profile,
+                        selected_source,
+                        selected_profile,
+                        route_request_id,
+                        exc.code,
+                        exc.attempt_count,
+                        failover_count,
+                    )
+                    can_failover = self._can_failover(
+                        error=exc,
+                        pool=pool,
+                        failover_count=failover_count,
+                        budget=budget,
+                    )
+                    if not can_failover:
+                        if pending_failover_error is not None:
+                            await lease.record_failover(
+                                error_code=pending_failover_error,
+                                succeeded=False,
+                                latency_ms=self._elapsed_ms(failover_started_at),
+                            )
+                            failover_recorded = True
+                        break
+                    pending_failover_error = exc.code
+                    failover_started_at = time.monotonic()
+                    if exc.code == "authentication_error":
+                        llm_logger.warning(
+                            "event=llm.route.auth_failover pool=%s "
+                            "logical_profile=%s source_label=%s request_id=%s",
+                            pool_name,
+                            logical_profile,
+                            selected_source,
+                            exc.request_id,
+                        )
+                    llm_logger.info(
+                        "event=llm.route.failover_selected pool=%s "
+                        "logical_profile=%s failed_source=%s error_code=%s "
+                        "failover_count=%s remaining_seconds=%s",
+                        pool_name,
+                        logical_profile,
+                        selected_source,
+                        exc.code,
+                        failover_count,
+                        budget.remaining(time.monotonic()),
+                    )
+                    continue
+
+                await lease.finish_member(success=True)
+                attempt = {
+                    "source_label": selected_source,
+                    "selected_profile": selected_profile,
+                    "model": response.model,
+                    "attempt_sequence": len(attempts) + 1,
+                    "request_id": response.request_id,
+                    "provider_request_id": response.provider_request_id,
+                    "status": "success",
+                    "attempt_count": response.attempt_count,
+                    "latency_ms": self._elapsed_ms(source_attempt_started),
+                }
+                attempts.append(attempt)
+                if pending_failover_error is not None:
+                    await lease.record_failover(
+                        error_code=pending_failover_error,
+                        succeeded=True,
+                        latency_ms=self._elapsed_ms(failover_started_at),
+                    )
+                    failover_recorded = True
+                lineage = dict(response.lineage)
+                lineage.update({
+                    "pool": pool_name,
+                    "logical_profile": logical_profile,
+                    "selected_profile": selected_profile,
+                    "llm_source": selected_source,
+                    "route_fingerprint": route_fingerprint,
+                    "logical_request_hash": logical_request_hash,
+                    "route_request_id": route_request_id,
+                    "failover_count": failover_count,
+                    "attempts": list(attempts),
+                })
+                llm_logger.info(
+                    "event=llm.route.completed pool=%s logical_profile=%s "
+                    "source_label=%s selected_profile=%s route_request_id=%s "
+                    "failover_count=%s",
+                    pool_name,
+                    logical_profile,
+                    selected_source,
+                    selected_profile,
+                    route_request_id,
+                    failover_count,
+                )
+                return replace(
+                    response,
+                    source_label=selected_source,
+                    logical_profile=logical_profile,
+                    selected_profile=selected_profile,
+                    route_fingerprint=route_fingerprint,
+                    failover_count=failover_count,
+                    attempts=tuple(attempts),
+                    lineage=lineage,
+                )
+        except asyncio.CancelledError as exc:
+            last_error = LlmCancelledError().with_context(
+                request_id=route_request_id,
+                attempt_count=sum(
+                    int(attempt.get("attempt_count") or 0) for attempt in attempts
+                ),
+                request_hash=logical_request_hash,
+                lineage=correlation,
+            )
+            raise last_error from exc
+        finally:
+            self._update_pool_provider_snapshots(coordinator)
+            await lease.close()
+
+        if pending_failover_error is not None and not failover_recorded:
+            await lease.record_failover(
+                error_code=pending_failover_error,
+                succeeded=False,
+                latency_ms=self._elapsed_ms(failover_started_at),
+            )
+
+        assert last_error is not None
+        failure_lineage = dict(last_error.lineage or {})
+        failure_lineage.update({
+            "pool": pool_name,
+            "logical_profile": logical_profile,
+            "selected_profile": selected_profile,
+            "llm_source": selected_source,
+            "route_fingerprint": route_fingerprint,
+            "logical_request_hash": logical_request_hash,
+            "route_request_id": route_request_id,
+            "failover_count": failover_count,
+            "attempts": list(attempts),
+        })
+        last_error.with_context(
+            request_id=last_error.request_id or route_request_id,
+            attempt_count=sum(
+                int(attempt.get("attempt_count") or 0) for attempt in attempts
+            ),
+            request_hash=logical_request_hash,
+            lineage=failure_lineage,
+        )
+        llm_logger.error(
+            "event=llm.route.all_sources_failed pool=%s logical_profile=%s "
+            "route_request_id=%s failover_count=%s error_code=%s",
+            pool_name,
+            logical_profile,
+            route_request_id,
+            failover_count,
+            last_error.code,
+            exc_info=(
+                type(last_error),
+                LlmError(last_error.code, "terminal LLM route failure"),
+                None,
+            ),
+        )
+        llm_logger.info(
+            "event=llm.route.exhausted pool=%s logical_profile=%s "
+            "route_request_id=%s failover_count=%s error_code=%s",
+            pool_name,
+            logical_profile,
+            route_request_id,
+            failover_count,
+            last_error.code,
+        )
+        raise last_error
+
+    @staticmethod
+    def _elapsed_ms(started_at: Optional[float]) -> int:
+        if started_at is None:
+            return 0
+        return max(0, round((time.monotonic() - started_at) * 1000))
+
+    def _update_pool_provider_snapshots(self, coordinator: Any) -> None:
+        coordinator.update_provider_snapshots({
+            snapshot.resource_name: asdict(snapshot)
+            for snapshot in self.provider_coordinator_registry.snapshots()
+        })
+
+    @staticmethod
+    def _can_failover(
+        *,
+        error: LlmError,
+        pool: Any,
+        failover_count: int,
+        budget: _ExecutionBudget,
+    ) -> bool:
+        config = pool.failover
+        if not config.enabled or failover_count >= config.max_hops:
+            return False
+        if error.code == "authentication_error":
+            if not config.allow_auth_failover:
+                return False
+        elif error.code not in config.on:
+            return False
+        if error.code == "provider_error" and not error.retryable:
+            return False
+        remaining = budget.remaining(time.monotonic())
+        return remaining is None or remaining >= config.min_attempt_seconds
+
+    async def _complete_concrete(
+        self,
+        request: LlmRequest,
+        *,
+        profile_override: Optional[LlmProfile] = None,
+        budget: Optional[_ExecutionBudget] = None,
+    ) -> LlmResponse:
         if self._closed:
             raise LlmConfigurationError("LLM client is closed")
         request_id = uuid.uuid4().hex
         started = time.monotonic()
         attempt_count = 0
         request_hash: Optional[str] = None
-        execution_started: Optional[float] = None
-        execution_deadline: Optional[float] = None
+        shared_budget = budget or _ExecutionBudget()
+        execution_started: Optional[float] = shared_budget.execution_started
+        execution_deadline: Optional[float] = shared_budget.execution_deadline
         total_admission_wait_ms = 0
         lineage = self._lineage_metadata(request.metadata)
         try:
-            profile = self._resolve_profile(request.profile)
+            profile = profile_override or self._resolve_profile(request.profile)
+            if profile_override is not None:
+                self._validate_profile(profile)
             provider_resource = self.config.resource_for_profile(profile)
             provider_coordinator = (
                 self.provider_coordinator_registry.get(provider_resource)
@@ -230,8 +635,8 @@ class LlmClient:
             last_error: Optional[LlmError] = None
             max_attempts = profile.max_retries + 1
             current_payload = payload
-            llm_logger.info(
-                "LLM request prepared profile=%s request_id=%s request_hash=%s "
+            llm_logger.debug(
+                "event=llm.request.prepared profile=%s request_id=%s request_hash=%s "
                 "model=%s mode=%s attempts_max=%s execution_timeout_seconds=%.1f "
                 "queue_timeout_seconds=%.1f "
                 "attempt_timeout_seconds=%.1f payload_bytes=%s max_output_tokens=%s "
@@ -268,6 +673,15 @@ class LlmClient:
                 if admission_deadline - time.monotonic() <= 0:
                     raise LlmDeadlineExceededError()
                 try:
+                    llm_logger.debug(
+                        "event=llm.attempt.admission_wait profile=%s request_id=%s "
+                        "attempt=%s/%s workload=%s",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        workload,
+                    )
                     async with AsyncExitStack() as limiter_stack:
                         await limiter_stack.enter_async_context(
                             profile_limiter.slot(admission_deadline)
@@ -299,13 +713,18 @@ class LlmClient:
                                 ),
                             )
                             total_admission_wait_ms += admission_wait_ms
-                            if execution_deadline is None:
-                                execution_started = admitted_at
-                                execution_deadline = (
-                                    execution_started + timeout_seconds
-                                )
+                            first_execution_admission = (
+                                shared_budget.execution_deadline is None
+                            )
+                            execution_deadline = shared_budget.start(
+                                now=admitted_at,
+                                timeout_seconds=timeout_seconds,
+                            )
+                            execution_started = shared_budget.execution_started
+                            if first_execution_admission:
                                 llm_logger.info(
-                                    "LLM request admitted profile=%s request_id=%s "
+                                    "event=llm.attempt.first_admitted profile=%s "
+                                    "request_id=%s "
                                     "initial_queue_wait_ms=%s "
                                     "execution_timeout_seconds=%.1f",
                                     profile.name,
@@ -314,8 +733,8 @@ class LlmClient:
                                     timeout_seconds,
                                 )
                             else:
-                                llm_logger.info(
-                                    "LLM retry admitted profile=%s request_id=%s "
+                                llm_logger.debug(
+                                    "event=llm.attempt.admitted profile=%s request_id=%s "
                                     "attempt=%s/%s queue_wait_ms=%s "
                                     "execution_remaining_seconds=%.1f",
                                     profile.name,
@@ -398,8 +817,18 @@ class LlmClient:
                                     workload=workload,
                                     bulk=bulk,
                                 )
-                    llm_logger.info(
-                        "LLM attempt response profile=%s request_id=%s attempt=%s/%s "
+                    llm_logger.debug(
+                        "event=llm.attempt.leases_released profile=%s request_id=%s "
+                        "attempt=%s/%s workload=%s",
+                        profile.name,
+                        request_id,
+                        attempt_count,
+                        max_attempts,
+                        workload,
+                    )
+                    llm_logger.debug(
+                        "event=llm.attempt.response profile=%s request_id=%s "
+                        "attempt=%s/%s "
                         "status_code=%s elapsed_ms=%s",
                         profile.name,
                         request_id,
@@ -429,7 +858,7 @@ class LlmClient:
                     ):
                         warnings.append("provider_output_budget_exceeded")
                         llm_logger.warning(
-                            "LLM provider output budget exceeded profile=%s "
+                            "event=llm.response.output_budget_exceeded profile=%s "
                             "request_id=%s request_hash=%s field=%s requested=%s observed=%s",
                             profile.name,
                             request_id,
@@ -459,7 +888,7 @@ class LlmClient:
                         ),
                     )
                     llm_logger.info(
-                        "LLM request completed profile=%s request_id=%s "
+                        "event=llm.request.completed profile=%s request_id=%s "
                         "request_hash=%s attempts=%s latency_ms=%s "
                         "admission_wait_ms=%s execution_elapsed_ms=%s "
                         "input_tokens=%s output_tokens=%s total_tokens=%s",
@@ -504,7 +933,7 @@ class LlmClient:
                         else safe_provider_error(408)
                     )
                     llm_logger.warning(
-                        "LLM attempt timed out profile=%s request_id=%s attempt=%s/%s "
+                        "event=llm.attempt.timeout profile=%s request_id=%s attempt=%s/%s "
                         "code=%s elapsed_ms=%s remaining_seconds=%.1f",
                         profile.name,
                         request_id,
@@ -531,7 +960,7 @@ class LlmClient:
                         raise LlmDeadlineExceededError() from exc
                     last_error = exc
                     llm_logger.warning(
-                        "LLM response validation failed profile=%s request_id=%s "
+                        "event=llm.response.validation_failed profile=%s request_id=%s "
                         "attempt=%s/%s code=%s repair_used=%s",
                         profile.name,
                         request_id,
@@ -563,8 +992,8 @@ class LlmClient:
                         )
                         provider_failure_reported = True
                     llm_logger.warning(
-                        "LLM attempt failed profile=%s request_id=%s attempt=%s/%s "
-                        "code=%s retryable=%s detail=%s elapsed_ms=%s "
+                        "event=llm.attempt.failed profile=%s request_id=%s attempt=%s/%s "
+                        "code=%s retryable=%s elapsed_ms=%s "
                         "phase=%s remaining_seconds=%.1f",
                         profile.name,
                         request_id,
@@ -572,7 +1001,6 @@ class LlmClient:
                         max_attempts,
                         exc.code,
                         exc.retryable,
-                        exc.message,
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
                         "queue" if execution_deadline is None else "execution",
                         max(
@@ -588,8 +1016,9 @@ class LlmClient:
                     if last_error is not None:
                         raise last_error
                     raise LlmError("provider_error", "LLM request failed")
-                llm_logger.info(
-                    "LLM retry pending profile=%s request_id=%s next_attempt=%s/%s "
+                llm_logger.debug(
+                    "event=llm.retry.pending profile=%s request_id=%s "
+                    "next_attempt=%s/%s "
                     "last_code=%s remaining_seconds=%.1f",
                     profile.name,
                     request_id,
@@ -629,7 +1058,8 @@ class LlmClient:
                 lineage=lineage,
             )
             llm_logger.warning(
-                "LLM request failed request_id=%s request_hash=%s code=%s attempts=%s",
+                "event=llm.request.failed request_id=%s request_hash=%s "
+                "code=%s attempts=%s",
                 request_id,
                 request_hash or "unavailable",
                 contextual.code,
@@ -654,8 +1084,9 @@ class LlmClient:
         if remaining <= 0:
             raise LlmDeadlineExceededError()
         attempt_timeout = min(profile.attempt_timeout_seconds, remaining)
-        llm_logger.info(
-            "LLM attempt started profile=%s request_id=%s attempt=%s/%s "
+        log = llm_logger.info if attempt_count == 1 else llm_logger.debug
+        log(
+            "event=llm.attempt.started profile=%s request_id=%s attempt=%s/%s "
             "timeout_seconds=%.1f remaining_seconds=%.1f",
             profile.name,
             request_id,
@@ -691,6 +1122,13 @@ class LlmClient:
         if profile.provider != "openai_compatible":
             raise LlmConfigurationError(f"unsupported LLM provider: {profile.provider}")
         return profile
+
+    def _validate_profile(self, profile: LlmProfile) -> None:
+        configured = self._resolve_profile(profile.name)
+        if configured != profile:
+            raise LlmConfigurationError(
+                f"LLM profile does not match validated configuration: {profile.name}"
+            )
 
     @staticmethod
     def _resolve_business_rpm(
@@ -945,6 +1383,18 @@ class LlmClient:
 
     async def __aexit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
         await self.close()
+
+
+async def shutdown_shared_llm_resources() -> None:
+    """Close process-local LLM coordination state during application shutdown.
+
+    Individual clients intentionally do not call this function: several clients
+    may share one pool/provider registry during an application lifetime. The
+    application owner invokes it after all clients and work pipelines stop.
+    """
+    await _GLOBAL_POOL_COORDINATORS.close_all()
+    await _GLOBAL_PROVIDER_COORDINATORS.close_all()
+    _GLOBAL_LIMITERS.clear()
 
 
 def normalize_openai_url(base_url: str, endpoint: str) -> str:

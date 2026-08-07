@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+import hashlib
+import json
 import math
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
@@ -14,11 +16,103 @@ ALLOWED_ROLES = {"system", "developer", "user", "assistant", "tool"}
 MAX_PROVIDER_CONCURRENCY = 60
 DEFAULT_PROVIDER_REQUESTS_PER_MINUTE = 58
 DEFAULT_QUEUE_TIMEOUT_SECONDS = 3600.0
+ALLOWED_POOL_STRATEGIES = {"weighted_fair"}
+DEFAULT_FAILOVER_CODES = (
+    "rate_limit_error",
+    "transient_transport_error",
+    "provider_error",
+    "response_parse_error",
+    "schema_validation_error",
+)
+_SENSITIVE_LABEL_MARKERS = (
+    "api_key",
+    "authorization",
+    "bearer",
+    "cookie",
+    "secret",
+    "token",
+)
+_ROUTED_PROFILE_REQUIRED_FIELDS = {
+    "api_key_env",
+    "base_url",
+    "endpoint",
+    "max_concurrency",
+    "max_output_tokens_field",
+    "max_retries",
+    "max_schema_repair_attempts",
+    "model",
+    "provider",
+    "provider_resource",
+    "queue_timeout_seconds",
+    "requests_per_minute",
+    "source_label",
+    "stream",
+    "stream_include_usage",
+    "structured_output_mode",
+    "supported_structured_output_modes",
+    "timeout_seconds",
+    "attempt_timeout_seconds",
+}
 
 
 def _configured(value: Mapping[str, Any], name: str, default: Any) -> Any:
     raw = value.get(name)
     return default if raw is None or raw == "" else raw
+
+
+def _strict_int(
+    value: Any,
+    *,
+    field_name: str,
+    minimum: int = 1,
+    maximum: Optional[int] = None,
+) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{field_name} must be an integer")
+    if value < minimum or (maximum is not None and value > maximum):
+        bounds = f"at least {minimum}"
+        if maximum is not None:
+            bounds += f" and at most {maximum}"
+        raise ValueError(f"{field_name} must be {bounds}")
+    return value
+
+
+def _non_empty_name(value: Any, *, field_name: str) -> str:
+    name = str(value or "").strip()
+    if not name:
+        raise ValueError(f"{field_name} must not be empty")
+    return name
+
+
+def _strict_bool(
+    value: Mapping[str, Any], name: str, *, field_name: str, default: bool
+) -> bool:
+    if name not in value:
+        return default
+    raw = value[name]
+    if not isinstance(raw, bool):
+        raise ValueError(f"{field_name} must be a boolean")
+    return raw
+
+
+def _source_label(value: Any, *, field_name: str) -> str:
+    label = _non_empty_name(value, field_name=field_name)
+    lowered = label.lower()
+    if len(label) > 128 or any(character.isspace() for character in label):
+        raise ValueError(f"{field_name} must be a compact non-secret label")
+    if any(marker in lowered for marker in _SENSITIVE_LABEL_MARKERS):
+        raise ValueError(f"{field_name} contains a sensitive marker")
+    return label
+
+
+def _stable_config_hash(value: Mapping[str, Any]) -> str:
+    payload = json.dumps(
+        value,
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -111,6 +205,7 @@ class LlmProfile:
     idempotency_header: str = "Idempotency-Key"
     provider_resource: str = ""
     default_workload: str = "direct"
+    source_label: str = ""
 
     @classmethod
     def from_mapping(cls, name: str, value: Mapping[str, Any]) -> "LlmProfile":
@@ -170,12 +265,26 @@ class LlmProfile:
             timeout_seconds=timeout_seconds,
             queue_timeout_seconds=queue_timeout_seconds,
             attempt_timeout_seconds=attempt_timeout_seconds,
-            max_retries=max(0, int(_configured(value, "max_retries", 2))),
-            max_schema_repair_attempts=max(
-                0, int(_configured(value, "max_schema_repair_attempts", 1))
+            max_retries=_strict_int(
+                _configured(value, "max_retries", 2),
+                field_name=f"LLM profile {name} max_retries",
+                minimum=0,
             ),
-            max_concurrency=max(1, int(_configured(value, "max_concurrency", 1))),
-            requests_per_minute=max(0, int(_configured(value, "requests_per_minute", 0))),
+            max_schema_repair_attempts=_strict_int(
+                _configured(value, "max_schema_repair_attempts", 1),
+                field_name=f"LLM profile {name} max_schema_repair_attempts",
+                minimum=0,
+            ),
+            max_concurrency=_strict_int(
+                _configured(value, "max_concurrency", 1),
+                field_name=f"LLM profile {name} max_concurrency",
+                maximum=MAX_PROVIDER_CONCURRENCY,
+            ),
+            requests_per_minute=_strict_int(
+                _configured(value, "requests_per_minute", 0),
+                field_name=f"LLM profile {name} requests_per_minute",
+                minimum=0,
+            ),
             temperature=float(_configured(value, "temperature", 0.0)),
             max_output_tokens_field=max_output_tokens_field,
             stream=value.get("stream") is True,
@@ -197,6 +306,7 @@ class LlmProfile:
             default_workload=str(
                 _configured(value, "default_workload", name)
             ).strip() or str(name).strip(),
+            source_label=str(value.get("source_label") or "").strip(),
         )
 
     def safe_dict(self) -> dict[str, Any]:
@@ -225,6 +335,7 @@ class LlmProfile:
             "retry_jitter_ratio": self.retry_jitter_ratio,
             "provider_resource": self.provider_resource,
             "default_workload": self.default_workload,
+            "source_label": self.source_label,
         }
 
 
@@ -253,41 +364,44 @@ class ProviderResourceConfig:
     rate_limit_cooldown_seconds: float = 0.0
     transient_cooldown_seconds: float = 0.0
     workload_weights: Mapping[str, int] = field(default_factory=dict)
+    quota_bucket: str = ""
 
     @classmethod
     def from_mapping(
         cls, name: str, value: Mapping[str, Any]
     ) -> "ProviderResourceConfig":
-        hard_max = int(_configured(
-            value, "hard_max_concurrency", MAX_PROVIDER_CONCURRENCY
-        ))
-        if hard_max < 1 or hard_max > MAX_PROVIDER_CONCURRENCY:
-            raise ValueError(
-                f"provider resource {name} hard_max_concurrency must be between "
-                f"1 and {MAX_PROVIDER_CONCURRENCY}"
-            )
-        bulk_max = int(_configured(
-            value, "default_bulk_concurrency", min(50, hard_max)
-        ))
+        hard_max = _strict_int(
+            _configured(value, "hard_max_concurrency", MAX_PROVIDER_CONCURRENCY),
+            field_name=f"provider resource {name} hard_max_concurrency",
+            maximum=MAX_PROVIDER_CONCURRENCY,
+        )
+        bulk_max = _strict_int(
+            _configured(value, "default_bulk_concurrency", min(50, hard_max)),
+            field_name=f"provider resource {name} default_bulk_concurrency",
+        )
         if bulk_max < 1 or bulk_max > hard_max:
             raise ValueError(
                 f"provider resource {name} default_bulk_concurrency must be "
                 "positive and no greater than hard_max_concurrency"
             )
-        reserved = int(_configured(
-            value, "reserved_concurrency", max(0, hard_max - bulk_max)
-        ))
+        reserved = _strict_int(
+            _configured(value, "reserved_concurrency", max(0, hard_max - bulk_max)),
+            field_name=f"provider resource {name} reserved_concurrency",
+            minimum=0,
+        )
         if reserved < 0 or bulk_max + reserved > hard_max:
             raise ValueError(
                 f"provider resource {name} reserved_concurrency is inconsistent "
                 "with the bulk and hard concurrency limits"
             )
-        http_max = int(_configured(
-            value, "http_max_connections", max(hard_max, hard_max + 10)
-        ))
-        http_keepalive = int(_configured(
-            value, "http_max_keepalive_connections", hard_max
-        ))
+        http_max = _strict_int(
+            _configured(value, "http_max_connections", hard_max + 10),
+            field_name=f"provider resource {name} http_max_connections",
+        )
+        http_keepalive = _strict_int(
+            _configured(value, "http_max_keepalive_connections", hard_max),
+            field_name=f"provider resource {name} http_max_keepalive_connections",
+        )
         if http_max < hard_max:
             raise ValueError(
                 f"provider resource {name} http_max_connections must be at least "
@@ -298,44 +412,50 @@ class ProviderResourceConfig:
                 f"provider resource {name} http_max_keepalive_connections must be "
                 "between 1 and http_max_connections"
             )
-        requests_per_minute = int(_configured(
+        requests_per_minute = _strict_int(
+            _configured(
+                value,
+                "requests_per_minute",
+                DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
+            ),
+            field_name=f"provider resource {name} requests_per_minute",
+            minimum=0,
+        )
+        adaptive_enabled = _strict_bool(
             value,
-            "requests_per_minute",
-            DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
-        ))
-        if requests_per_minute < 0:
-            raise ValueError(
-                f"provider resource {name} requests_per_minute must not be negative"
-            )
-        adaptive_enabled = bool(_configured(
-            value, "adaptive_concurrency_enabled", True
-        ))
-        adaptive_min = int(_configured(
-            value,
-            "adaptive_min_bulk_concurrency",
-            min(5, bulk_max),
-        ))
+            "adaptive_concurrency_enabled",
+            field_name=f"provider resource {name} adaptive_concurrency_enabled",
+            default=True,
+        )
+        adaptive_min = _strict_int(
+            _configured(
+                value,
+                "adaptive_min_bulk_concurrency",
+                min(5, bulk_max),
+            ),
+            field_name=f"provider resource {name} adaptive_min_bulk_concurrency",
+        )
         if adaptive_min < 1 or adaptive_min > bulk_max:
             raise ValueError(
                 f"provider resource {name} adaptive_min_bulk_concurrency must "
                 "be positive and no greater than default_bulk_concurrency"
             )
-        recovery_successes = int(_configured(
-            value, "adaptive_recovery_successes", 6
-        ))
-        if recovery_successes < 1:
-            raise ValueError(
-                f"provider resource {name} adaptive_recovery_successes must be positive"
-            )
+        recovery_successes = _strict_int(
+            _configured(value, "adaptive_recovery_successes", 6),
+            field_name=f"provider resource {name} adaptive_recovery_successes",
+        )
         coalescing_seconds = float(_configured(
             value, "adaptive_failure_coalescing_seconds", 10.0
         ))
-        outcome_window_size = int(_configured(
-            value, "adaptive_outcome_window_size", 30
-        ))
-        soft_failure_min_count = int(_configured(
-            value, "adaptive_soft_failure_min_count", 2
-        ))
+        outcome_window_size = _strict_int(
+            _configured(value, "adaptive_outcome_window_size", 30),
+            field_name=f"provider resource {name} adaptive_outcome_window_size",
+            minimum=2,
+        )
+        soft_failure_min_count = _strict_int(
+            _configured(value, "adaptive_soft_failure_min_count", 2),
+            field_name=f"provider resource {name} adaptive_soft_failure_min_count",
+        )
         soft_failure_rate_threshold = float(_configured(
             value, "adaptive_soft_failure_rate_threshold", 0.08
         ))
@@ -411,13 +531,16 @@ class ProviderResourceConfig:
         weights: dict[str, int] = {}
         if isinstance(raw_weights, Mapping):
             for workload, raw_weight in raw_weights.items():
-                weight = int(raw_weight)
-                if weight < 1:
-                    raise ValueError(
-                        f"provider resource {name} workload weight must be positive: "
-                        f"{workload}"
-                    )
-                weights[str(workload).strip()] = weight
+                workload_name = _non_empty_name(
+                    workload,
+                    field_name=f"provider resource {name} workload name",
+                )
+                weights[workload_name] = _strict_int(
+                    raw_weight,
+                    field_name=(
+                        f"provider resource {name} workload weight: {workload_name}"
+                    ),
+                )
         return cls(
             name=str(name).strip(),
             provider=str(value.get("provider") or "openai_compatible").strip(),
@@ -444,6 +567,7 @@ class ProviderResourceConfig:
             rate_limit_cooldown_seconds=rate_limit_cooldown,
             transient_cooldown_seconds=transient_cooldown,
             workload_weights=weights,
+            quota_bucket=str(value.get("quota_bucket") or name).strip(),
         )
 
     def safe_dict(self) -> dict[str, Any]:
@@ -479,6 +603,296 @@ class ProviderResourceConfig:
             "rate_limit_cooldown_seconds": self.rate_limit_cooldown_seconds,
             "transient_cooldown_seconds": self.transient_cooldown_seconds,
             "workload_weights": dict(self.workload_weights),
+            "quota_bucket": self.quota_bucket,
+        }
+
+
+@dataclass(frozen=True)
+class LlmFailoverConfig:
+    enabled: bool = True
+    max_hops: int = 1
+    failure_threshold: int = 3
+    open_seconds: float = 60.0
+    half_open_max_probes: int = 1
+    min_attempt_seconds: float = 1.0
+    allow_auth_failover: bool = False
+    on: tuple[str, ...] = DEFAULT_FAILOVER_CODES
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any] | None) -> "LlmFailoverConfig":
+        raw = value if isinstance(value, Mapping) else {}
+        max_hops = _strict_int(
+            _configured(raw, "max_hops", 1),
+            field_name="LLM failover max_hops",
+            minimum=0,
+        )
+        failure_threshold = _strict_int(
+            _configured(raw, "failure_threshold", 3),
+            field_name="LLM failover failure_threshold",
+        )
+        half_open_max_probes = _strict_int(
+            _configured(raw, "half_open_max_probes", 1),
+            field_name="LLM failover half_open_max_probes",
+        )
+        open_seconds = float(_configured(raw, "open_seconds", 60.0))
+        min_attempt_seconds = float(_configured(raw, "min_attempt_seconds", 1.0))
+        if not math.isfinite(open_seconds) or open_seconds <= 0:
+            raise ValueError("LLM failover open_seconds must be finite and positive")
+        if not math.isfinite(min_attempt_seconds) or min_attempt_seconds <= 0:
+            raise ValueError(
+                "LLM failover min_attempt_seconds must be finite and positive"
+            )
+        raw_codes = raw.get("on", DEFAULT_FAILOVER_CODES)
+        if isinstance(raw_codes, str) or not isinstance(raw_codes, Sequence):
+            raise ValueError("LLM failover on must be a sequence")
+        codes = tuple(
+            dict.fromkeys(
+                _non_empty_name(code, field_name="LLM failover error code")
+                for code in raw_codes
+            )
+        )
+        unsupported = set(codes) - set(DEFAULT_FAILOVER_CODES)
+        if unsupported:
+            raise ValueError(
+                f"unsupported LLM failover error codes: {sorted(unsupported)}"
+            )
+        return cls(
+            enabled=_strict_bool(
+                raw,
+                "enabled",
+                field_name="LLM failover enabled",
+                default=True,
+            ),
+            max_hops=max_hops,
+            failure_threshold=failure_threshold,
+            open_seconds=open_seconds,
+            half_open_max_probes=half_open_max_probes,
+            min_attempt_seconds=min_attempt_seconds,
+            allow_auth_failover=_strict_bool(
+                raw,
+                "allow_auth_failover",
+                field_name="LLM failover allow_auth_failover",
+                default=False,
+            ),
+            on=codes,
+        )
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "enabled": self.enabled,
+            "max_hops": self.max_hops,
+            "failure_threshold": self.failure_threshold,
+            "open_seconds": self.open_seconds,
+            "half_open_max_probes": self.half_open_max_probes,
+            "min_attempt_seconds": self.min_attempt_seconds,
+            "allow_auth_failover": self.allow_auth_failover,
+            "on": list(self.on),
+        }
+
+
+@dataclass(frozen=True)
+class LlmPoolMember:
+    source_label: str
+    weight: int
+    profiles: Mapping[str, str]
+    max_concurrency: int = 0
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "LlmPoolMember":
+        source_label = _source_label(
+            value.get("source_label"), field_name="LLM pool member source_label"
+        )
+        weight = _strict_int(
+            _configured(value, "weight", 1),
+            field_name=f"LLM pool member {source_label} weight",
+        )
+        raw_profiles = value.get("profiles")
+        if not isinstance(raw_profiles, Mapping) or not raw_profiles:
+            raise ValueError(
+                f"LLM pool member {source_label} profiles must not be empty"
+            )
+        profiles: dict[str, str] = {}
+        for logical_name, concrete_name in raw_profiles.items():
+            logical = _non_empty_name(
+                logical_name, field_name="LLM pool member logical profile"
+            )
+            concrete = _non_empty_name(
+                concrete_name, field_name="LLM pool member concrete profile"
+            )
+            if logical in profiles:
+                raise ValueError(
+                    f"duplicate LLM pool member logical profile: {logical}"
+                )
+            profiles[logical] = concrete
+        raw_limit = value.get("max_concurrency", 0)
+        max_concurrency = _strict_int(
+            raw_limit,
+            field_name=f"LLM pool member {source_label} max_concurrency",
+            minimum=0,
+            maximum=MAX_PROVIDER_CONCURRENCY,
+        )
+        return cls(
+            source_label=source_label,
+            weight=weight,
+            profiles=profiles,
+            max_concurrency=max_concurrency,
+        )
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "source_label": self.source_label,
+            "weight": self.weight,
+            "profiles": dict(sorted(self.profiles.items())),
+            "max_concurrency": self.max_concurrency,
+        }
+
+
+@dataclass(frozen=True)
+class LlmPoolConfig:
+    name: str
+    enabled: bool
+    total_concurrency: int
+    queue_size: int
+    strategy: str
+    borrow_idle_capacity: bool
+    members: tuple[LlmPoolMember, ...]
+    failover: LlmFailoverConfig
+
+    @classmethod
+    def from_mapping(cls, name: str, value: Mapping[str, Any]) -> "LlmPoolConfig":
+        pool_name = _non_empty_name(name, field_name="LLM pool name")
+        total_concurrency = _strict_int(
+            _configured(value, "total_concurrency", 1),
+            field_name=f"LLM pool {pool_name} total_concurrency",
+            maximum=MAX_PROVIDER_CONCURRENCY,
+        )
+        queue_size = _strict_int(
+            _configured(value, "queue_size", 200),
+            field_name=f"LLM pool {pool_name} queue_size",
+        )
+        strategy = str(
+            _configured(value, "strategy", "weighted_fair")
+        ).strip().lower()
+        if strategy not in ALLOWED_POOL_STRATEGIES:
+            raise ValueError(f"unsupported LLM pool strategy: {strategy}")
+        raw_members = value.get("members")
+        if (
+            not isinstance(raw_members, Sequence)
+            or isinstance(raw_members, (str, bytes))
+            or not raw_members
+        ):
+            raise ValueError(f"LLM pool {pool_name} members must be a non-empty sequence")
+        members: list[LlmPoolMember] = []
+        for member in raw_members:
+            if not isinstance(member, Mapping):
+                raise ValueError(f"LLM pool {pool_name} member must be a mapping")
+            members.append(LlmPoolMember.from_mapping(member))
+        labels = [member.source_label for member in members]
+        if len(set(labels)) != len(labels):
+            raise ValueError(f"LLM pool {pool_name} source labels must be unique")
+        return cls(
+            name=pool_name,
+            enabled=_strict_bool(
+                value,
+                "enabled",
+                field_name=f"LLM pool {pool_name} enabled",
+                default=False,
+            ),
+            total_concurrency=total_concurrency,
+            queue_size=queue_size,
+            strategy=strategy,
+            borrow_idle_capacity=_strict_bool(
+                value,
+                "borrow_idle_capacity",
+                field_name=f"LLM pool {pool_name} borrow_idle_capacity",
+                default=True,
+            ),
+            members=tuple(members),
+            failover=LlmFailoverConfig.from_mapping(value.get("failover")),
+        )
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "enabled": self.enabled,
+            "total_concurrency": self.total_concurrency,
+            "queue_size": self.queue_size,
+            "strategy": self.strategy,
+            "borrow_idle_capacity": self.borrow_idle_capacity,
+            "members": [member.safe_dict() for member in self.members],
+            "failover": self.failover.safe_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class LlmRouteConfig:
+    logical_profile: str
+    pool: str
+    required_structured_output_modes: tuple[str, ...] = ()
+    revision: str = ""
+
+    @classmethod
+    def from_mapping(
+        cls, logical_profile: str, value: Mapping[str, Any]
+    ) -> "LlmRouteConfig":
+        raw_modes = value.get("required_structured_output_modes", ()) or ()
+        if isinstance(raw_modes, str):
+            raw_modes = (raw_modes,)
+        if not isinstance(raw_modes, Sequence):
+            raise ValueError("LLM route required_structured_output_modes must be a sequence")
+        modes = tuple(
+            dict.fromkeys(str(mode).strip().lower() for mode in raw_modes if str(mode).strip())
+        )
+        unsupported = set(modes) - {"json_schema", "json_object", "prompt_only"}
+        if unsupported:
+            raise ValueError(
+                f"unsupported LLM route structured output modes: {sorted(unsupported)}"
+            )
+        return cls(
+            logical_profile=_non_empty_name(
+                logical_profile, field_name="LLM route logical profile"
+            ),
+            pool=_non_empty_name(value.get("pool"), field_name="LLM route pool"),
+            required_structured_output_modes=modes,
+            revision=str(value.get("revision") or "").strip(),
+        )
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "logical_profile": self.logical_profile,
+            "pool": self.pool,
+            "required_structured_output_modes": list(
+                self.required_structured_output_modes
+            ),
+            "revision": self.revision,
+        }
+
+
+@dataclass(frozen=True)
+class LogicalProfileDescription:
+    name: str
+    enabled: bool
+    routed: bool
+    pool: Optional[str]
+    route_fingerprint: str
+    source_labels: tuple[str, ...]
+    effective_max_concurrency: int
+    effective_requests_per_minute: int
+    supported_structured_output_modes: tuple[str, ...]
+
+    def safe_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "enabled": self.enabled,
+            "routed": self.routed,
+            "pool": self.pool,
+            "route_fingerprint": self.route_fingerprint,
+            "source_labels": list(self.source_labels),
+            "effective_max_concurrency": self.effective_max_concurrency,
+            "effective_requests_per_minute": self.effective_requests_per_minute,
+            "supported_structured_output_modes": list(
+                self.supported_structured_output_modes
+            ),
         }
 
 
@@ -544,6 +958,8 @@ class LlmConfig:
     provider_resources: Mapping[str, ProviderResourceConfig] = field(
         default_factory=dict
     )
+    pools: Mapping[str, LlmPoolConfig] = field(default_factory=dict)
+    routes: Mapping[str, LlmRouteConfig] = field(default_factory=dict)
     orchestration: OrchestrationConfig = field(default_factory=OrchestrationConfig)
 
     @classmethod
@@ -551,18 +967,69 @@ class LlmConfig:
         raw = value if isinstance(value, Mapping) else {}
         profiles_raw = raw.get("profiles", {})
         profiles: dict[str, LlmProfile] = {}
-        if isinstance(profiles_raw, Mapping):
-            for name, profile in profiles_raw.items():
-                if isinstance(profile, Mapping):
-                    profiles[str(name)] = LlmProfile.from_mapping(str(name), profile)
+        normalized_profile_names: set[str] = set()
+        if not isinstance(profiles_raw, Mapping):
+            raise ValueError("LLM profiles configuration must be a mapping")
+        for name, profile in profiles_raw.items():
+            profile_name = _non_empty_name(name, field_name="LLM profile name")
+            if profile_name in normalized_profile_names:
+                raise ValueError(f"duplicate normalized LLM profile name: {profile_name}")
+            if not isinstance(profile, Mapping):
+                raise ValueError(
+                    f"LLM profile configuration must be a mapping: {profile_name}"
+                )
+            normalized_profile_names.add(profile_name)
+            profiles[profile_name] = LlmProfile.from_mapping(profile_name, profile)
         resources_raw = raw.get("provider_resources", {})
         resources: dict[str, ProviderResourceConfig] = {}
-        if isinstance(resources_raw, Mapping):
-            for name, resource in resources_raw.items():
-                if isinstance(resource, Mapping):
-                    resources[str(name)] = ProviderResourceConfig.from_mapping(
-                        str(name), resource
-                    )
+        normalized_resource_names: set[str] = set()
+        if not isinstance(resources_raw, Mapping):
+            raise ValueError("LLM provider_resources configuration must be a mapping")
+        for name, resource in resources_raw.items():
+            resource_name = _non_empty_name(
+                name, field_name="LLM provider resource name"
+            )
+            if resource_name in normalized_resource_names:
+                raise ValueError(
+                    f"duplicate normalized LLM provider resource name: {resource_name}"
+                )
+            if not isinstance(resource, Mapping):
+                raise ValueError(
+                    f"LLM provider resource configuration must be a mapping: "
+                    f"{resource_name}"
+                )
+            normalized_resource_names.add(resource_name)
+            resources[resource_name] = ProviderResourceConfig.from_mapping(
+                resource_name, resource
+            )
+        pools_raw = raw.get("pools", {})
+        pools: dict[str, LlmPoolConfig] = {}
+        normalized_pool_names: set[str] = set()
+        if not isinstance(pools_raw, Mapping):
+            raise ValueError("LLM pools configuration must be a mapping")
+        for name, pool in pools_raw.items():
+            pool_name = _non_empty_name(name, field_name="LLM pool name")
+            if pool_name in normalized_pool_names:
+                raise ValueError(f"duplicate normalized LLM pool name: {pool_name}")
+            if not isinstance(pool, Mapping):
+                raise ValueError(f"LLM pool configuration must be a mapping: {pool_name}")
+            normalized_pool_names.add(pool_name)
+            pools[pool_name] = LlmPoolConfig.from_mapping(pool_name, pool)
+        routes_raw = raw.get("routes", {})
+        routes: dict[str, LlmRouteConfig] = {}
+        normalized_route_names: set[str] = set()
+        if not isinstance(routes_raw, Mapping):
+            raise ValueError("LLM routes configuration must be a mapping")
+        for name, route in routes_raw.items():
+            logical_name = _non_empty_name(name, field_name="LLM route name")
+            if logical_name in normalized_route_names:
+                raise ValueError(f"duplicate normalized LLM route name: {logical_name}")
+            if not isinstance(route, Mapping):
+                raise ValueError(
+                    f"LLM route configuration must be a mapping: {logical_name}"
+                )
+            normalized_route_names.add(logical_name)
+            routes[logical_name] = LlmRouteConfig.from_mapping(logical_name, route)
         for profile in profiles.values():
             resource_name = profile.provider_resource or cls.default_resource_name(
                 profile
@@ -571,6 +1038,7 @@ class LlmConfig:
                 resources[resource_name] = ProviderResourceConfig(
                     name=resource_name,
                     provider=profile.provider,
+                    quota_bucket=resource_name,
                 )
             resource = resources[resource_name]
             if resource.provider != profile.provider:
@@ -591,10 +1059,84 @@ class LlmConfig:
                     f"LLM profile {profile.name} requests_per_minute exceeds provider "
                     f"resource {resource_name} limit"
                 )
+        quota_owners: dict[str, str] = {}
+        for resource_name, resource in resources.items():
+            bucket = _non_empty_name(
+                resource.quota_bucket, field_name="LLM provider quota_bucket"
+            )
+            prior_owner = quota_owners.get(bucket)
+            if prior_owner is not None and prior_owner != resource_name:
+                raise ValueError(
+                    f"LLM provider resources {prior_owner} and {resource_name} split "
+                    f"shared quota bucket: {bucket}"
+                )
+            quota_owners[bucket] = resource_name
+        globally_enabled = raw.get("enabled") is True
+        for logical_name, route in routes.items():
+            if logical_name in profiles:
+                raise ValueError(
+                    f"LLM route name conflicts with concrete profile: {logical_name}"
+                )
+            pool = pools.get(route.pool)
+            if pool is None:
+                raise ValueError(
+                    f"LLM route {logical_name} references unknown pool: {route.pool}"
+                )
+            if not pool.enabled and globally_enabled:
+                raise ValueError(
+                    f"LLM route {logical_name} references disabled pool: {route.pool}"
+                )
+            routed_profiles: list[LlmProfile] = []
+            for member in pool.members:
+                concrete_name = member.profiles.get(logical_name)
+                if concrete_name is None:
+                    raise ValueError(
+                        f"LLM pool member {member.source_label} has no mapping for "
+                        f"route {logical_name}"
+                    )
+                concrete = profiles.get(concrete_name)
+                if concrete is None:
+                    raise ValueError(
+                        f"LLM route {logical_name} references unknown concrete profile: "
+                        f"{concrete_name}"
+                    )
+                if not concrete.enabled and globally_enabled:
+                    raise ValueError(
+                        f"LLM route {logical_name} references disabled concrete profile: "
+                        f"{concrete_name}"
+                    )
+                if concrete.source_label != member.source_label:
+                    raise ValueError(
+                        f"LLM route {logical_name} source label mismatch for "
+                        f"{concrete_name}"
+                    )
+                profile_mapping = profiles_raw[concrete_name]
+                missing_fields = sorted(
+                    _ROUTED_PROFILE_REQUIRED_FIELDS - set(profile_mapping)
+                )
+                if missing_fields:
+                    raise ValueError(
+                        f"LLM routed profile {concrete_name} must explicitly declare: "
+                        f"{missing_fields}"
+                    )
+                routed_profiles.append(concrete)
+            common_modes = set(routed_profiles[0].supported_structured_output_modes)
+            for concrete in routed_profiles[1:]:
+                common_modes.intersection_update(
+                    concrete.supported_structured_output_modes
+                )
+            required_modes = set(route.required_structured_output_modes)
+            if not common_modes or not required_modes.issubset(common_modes):
+                raise ValueError(
+                    f"LLM route {logical_name} members do not satisfy the required "
+                    "structured output capability"
+                )
         return cls(
             enabled=raw.get("enabled") is True,
             profiles=profiles,
             provider_resources=resources,
+            pools=pools,
+            routes=routes,
             orchestration=OrchestrationConfig.from_mapping(
                 raw.get("orchestration")
             ),
@@ -612,6 +1154,204 @@ class LlmConfig:
             raise ValueError(
                 f"LLM profile {profile.name} references unknown provider resource: {name}"
             ) from exc
+
+    def route_for_profile(self, name: str) -> Optional[LlmRouteConfig]:
+        return self.routes.get(str(name or "").strip())
+
+    def pool_for_profile(self, name: str) -> Optional[LlmPoolConfig]:
+        route = self.route_for_profile(name)
+        return self.pools.get(route.pool) if route is not None else None
+
+    def concrete_profiles_for(self, name: str) -> tuple[LlmProfile, ...]:
+        logical_name = str(name or "").strip()
+        route = self.routes.get(logical_name)
+        if route is None:
+            profile = self.profiles.get(logical_name)
+            return (profile,) if profile is not None else ()
+        pool = self.pools[route.pool]
+        return tuple(
+            self.profiles[member.profiles[logical_name]] for member in pool.members
+        )
+
+    @staticmethod
+    def _profile_contract(profile: LlmProfile) -> dict[str, Any]:
+        return {
+            "name": profile.name,
+            "provider": profile.provider,
+            "model": profile.model,
+            "source_label": profile.source_label,
+            "structured_output_mode": profile.structured_output_mode,
+            "supported_structured_output_modes": list(
+                profile.supported_structured_output_modes
+            ),
+            "allow_prompt_only": profile.allow_prompt_only,
+            "max_output_tokens_field": profile.max_output_tokens_field,
+            "stream": profile.stream,
+            "stream_include_usage": profile.stream_include_usage,
+        }
+
+    def route_fingerprint(self, name: str) -> str:
+        logical_name = str(name or "").strip()
+        route = self.routes.get(logical_name)
+        if route is None:
+            profile = self.profiles.get(logical_name)
+            if profile is None:
+                raise ValueError(f"unknown LLM logical profile: {logical_name}")
+            return _stable_config_hash({
+                "logical_profile": logical_name,
+                "direct_profile": self._profile_contract(profile),
+            })
+        pool = self.pools[route.pool]
+        members = []
+        for member in pool.members:
+            concrete = self.profiles[member.profiles[logical_name]]
+            members.append({
+                "source_label": member.source_label,
+                "weight": member.weight,
+                "max_concurrency": member.max_concurrency,
+                "concrete_profile": concrete.name,
+                "contract": self._profile_contract(concrete),
+            })
+        return _stable_config_hash({
+            "logical_profile": logical_name,
+            "route": route.safe_dict(),
+            "pool": {
+                "name": pool.name,
+                "total_concurrency": pool.total_concurrency,
+                "queue_size": pool.queue_size,
+                "strategy": pool.strategy,
+                "borrow_idle_capacity": pool.borrow_idle_capacity,
+                "failover": pool.failover.safe_dict(),
+                "members": members,
+            },
+        })
+
+    def _effective_capacity(self, profiles: tuple[LlmProfile, ...]) -> int:
+        by_resource: dict[str, int] = {}
+        for profile in profiles:
+            resource = self.resource_for_profile(profile)
+            resource_name = profile.provider_resource or self.default_resource_name(profile)
+            by_resource[resource_name] = by_resource.get(resource_name, 0) + min(
+                profile.max_concurrency,
+                resource.hard_max_concurrency,
+            )
+        return sum(
+            min(self.provider_resources[name].hard_max_concurrency, limit)
+            for name, limit in by_resource.items()
+        )
+
+    def _effective_rpm(self, profiles: tuple[LlmProfile, ...]) -> int:
+        by_resource: dict[str, list[LlmProfile]] = {}
+        for profile in profiles:
+            resource_name = profile.provider_resource or self.default_resource_name(profile)
+            by_resource.setdefault(resource_name, []).append(profile)
+        total = 0
+        for resource_name, grouped_profiles in by_resource.items():
+            resource_limit = self.provider_resources[resource_name].requests_per_minute
+            profile_limits = [
+                profile.requests_per_minute
+                for profile in grouped_profiles
+                if profile.requests_per_minute > 0
+            ]
+            if resource_limit > 0:
+                total += min(resource_limit, sum(profile_limits) or resource_limit)
+            elif profile_limits:
+                total += sum(profile_limits)
+        return total
+
+    def describe_logical_profile(self, name: str) -> LogicalProfileDescription:
+        logical_name = str(name or "").strip()
+        profiles = self.concrete_profiles_for(logical_name)
+        if not profiles:
+            raise ValueError(f"unknown LLM logical profile: {logical_name}")
+        route = self.routes.get(logical_name)
+        pool = self.pools[route.pool] if route is not None else None
+        common_modes = set(profiles[0].supported_structured_output_modes)
+        for profile in profiles[1:]:
+            common_modes.intersection_update(profile.supported_structured_output_modes)
+        capacity = self._effective_capacity(profiles)
+        if pool is not None:
+            member_capacity = sum(
+                min(
+                    profile.max_concurrency,
+                    member.max_concurrency or profile.max_concurrency,
+                )
+                for profile, member in zip(profiles, pool.members)
+            )
+            capacity = min(pool.total_concurrency, member_capacity, capacity)
+        return LogicalProfileDescription(
+            name=logical_name,
+            enabled=(
+                self.enabled
+                and (pool is None or pool.enabled)
+                and all(profile.enabled for profile in profiles)
+            ),
+            routed=route is not None,
+            pool=pool.name if pool is not None else None,
+            route_fingerprint=self.route_fingerprint(logical_name),
+            source_labels=tuple(
+                profile.source_label or f"{profile.provider}:{profile.model}"
+                for profile in profiles
+            ),
+            effective_max_concurrency=capacity,
+            effective_requests_per_minute=self._effective_rpm(profiles),
+            supported_structured_output_modes=tuple(sorted(common_modes)),
+        )
+
+    def is_logical_profile_enabled(self, name: str) -> bool:
+        try:
+            return self.describe_logical_profile(name).enabled
+        except ValueError:
+            return False
+
+    def effective_route_limits(self, name: str) -> dict[str, int]:
+        description = self.describe_logical_profile(name)
+        return {
+            "max_concurrency": description.effective_max_concurrency,
+            "requests_per_minute": description.effective_requests_per_minute,
+        }
+
+    def controlled_source_config(self, name: str, source_label: str) -> "LlmConfig":
+        """Return an ephemeral single-source config for controlled smoke tests.
+
+        Source-to-concrete-profile resolution stays inside the public LLM
+        configuration facade so validation scripts do not inspect concrete
+        profile mappings or credentials themselves. The returned config is
+        process-local and must not be persisted.
+        """
+        logical_name = str(name or "").strip()
+        requested_label = str(source_label or "").strip()
+        if not logical_name or not requested_label:
+            raise ValueError("logical profile and source label are required")
+        route = self.routes.get(logical_name)
+        if route is None:
+            raise ValueError(
+                "controlled source selection requires a routed logical profile"
+            )
+        pool = self.pools[route.pool]
+        members = tuple(
+            member for member in pool.members if member.source_label == requested_label
+        )
+        if len(members) != 1:
+            raise ValueError(
+                f"unknown or duplicate controlled source label: {requested_label}"
+            )
+        member = members[0]
+        concrete_name = member.profiles.get(logical_name)
+        if not concrete_name or concrete_name not in self.profiles:
+            raise ValueError(
+                f"controlled source has no concrete mapping for {logical_name}"
+            )
+        profiles = dict(self.profiles)
+        profiles[concrete_name] = replace(profiles[concrete_name], enabled=True)
+        pools = dict(self.pools)
+        pools[pool.name] = replace(
+            pool,
+            enabled=True,
+            total_concurrency=1,
+            members=(member,),
+        )
+        return replace(self, enabled=True, profiles=profiles, pools=pools)
 
 
 @dataclass(frozen=True)
@@ -653,6 +1393,12 @@ class LlmResponse:
     attempt_count: int
     warnings: tuple[str, ...] = ()
     lineage: Mapping[str, Any] = field(default_factory=dict)
+    source_label: Optional[str] = None
+    logical_profile: Optional[str] = None
+    selected_profile: Optional[str] = None
+    route_fingerprint: Optional[str] = None
+    failover_count: int = 0
+    attempts: tuple[Mapping[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -662,6 +1408,13 @@ class LlmFailureEnvelope:
     request_id: str
     request_hash: Optional[str]
     attempt_count: int
+    lineage: Mapping[str, Any] = field(default_factory=dict)
+    source_label: Optional[str] = None
+    logical_profile: Optional[str] = None
+    selected_profile: Optional[str] = None
+    route_fingerprint: Optional[str] = None
+    failover_count: int = 0
+    attempts: tuple[Mapping[str, Any], ...] = ()
 
 
 def project_root() -> Path:

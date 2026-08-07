@@ -24,6 +24,14 @@ from .pipeline import (
     PipelineController,
     StageRunner,
 )
+from .pool import (
+    LlmPoolCoordinator,
+    LlmPoolCoordinatorRegistry,
+    LlmPoolLease,
+    LlmPoolMemberSnapshot,
+    LlmPoolSelection,
+    LlmPoolSnapshot,
+)
 
 __all__ = [
     "AggregateProgressLogger",
@@ -33,6 +41,12 @@ __all__ = [
     "OutcomeLedger",
     "OutcomeStatus",
     "PipelineController",
+    "LlmPoolCoordinator",
+    "LlmPoolCoordinatorRegistry",
+    "LlmPoolLease",
+    "LlmPoolMemberSnapshot",
+    "LlmPoolSelection",
+    "LlmPoolSnapshot",
     "ProviderCoordinator",
     "ProviderCoordinatorRegistry",
     "ProviderSnapshot",

@@ -27,6 +27,7 @@ from utils.llm import (
     StageQueueClosedError,
     StageRunner,
     WorkItem,
+    shutdown_shared_llm_resources,
 )
 
 
@@ -1062,6 +1063,23 @@ async def test_client_created_transport_is_always_client_owned(monkeypatch):
     await client.close()
 
     assert transport.close_count == 1
+
+
+@pytest.mark.asyncio
+async def test_application_shutdown_closes_shared_llm_coordinators():
+    from utils.llm import client as llm_client_module
+
+    client = LlmClient(
+        _multi_profile_config(),
+        transport=CallableTransport(lambda *args: _provider_response()),
+        environment={"TEST_LLM_KEY": "secret"},
+    )
+    await client.complete(_request("one", "shutdown"))
+    await client.close()
+
+    assert llm_client_module._GLOBAL_PROVIDER_COORDINATORS.snapshots()
+    await shutdown_shared_llm_resources()
+    assert llm_client_module._GLOBAL_PROVIDER_COORDINATORS.snapshots() == ()
 
 
 @pytest.mark.asyncio

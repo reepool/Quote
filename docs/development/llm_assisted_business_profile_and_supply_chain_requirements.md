@@ -160,7 +160,7 @@ explicit named customer/supplier disclosure
 
 ### 5.1 公共配置
 
-连接配置只来自 `config/11_llm.json` 的 `semantic_extraction` profile，包括 provider、
+连接配置只来自 `config/13_llm.json` 的 `semantic_extraction` 逻辑 profile，包括 provider、
 URL、endpoint、model、structured-output 能力、deadline、重试、并发和 RPM。密钥只从
 该 profile 指定的环境变量读取。
 

@@ -12,7 +12,11 @@ def load_llm_config(value: Mapping[str, Any] | None) -> LlmConfig:
     return LlmConfig.from_mapping(value)
 
 
-def load_project_environment(root: Path | None = None) -> bool:
+def load_project_environment(
+    root: Path | None = None,
+    *,
+    override: bool = False,
+) -> bool:
     """Explicitly load the ignored project `.env` for an application entrypoint.
 
     This function is intentionally not called at import time. Existing environment
@@ -26,4 +30,6 @@ def load_project_environment(root: Path | None = None) -> bool:
         from dotenv import load_dotenv
     except ImportError:
         return False
+    if override:
+        raise ValueError("project environment loading must not override process values")
     return bool(load_dotenv(dotenv_path=dotenv_path, override=False))

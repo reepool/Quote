@@ -229,9 +229,14 @@ async def test_profile_selects_max_completion_tokens_and_warns_on_usage_overrun(
 async def test_attempt_timeout_retries_within_total_deadline(monkeypatch):
     calls = []
     info_messages = []
+    debug_messages = []
     monkeypatch.setattr(
         "utils.llm.client.llm_logger.info",
         lambda message, *args: info_messages.append(message),
+    )
+    monkeypatch.setattr(
+        "utils.llm.client.llm_logger.debug",
+        lambda message, *args: debug_messages.append(message),
     )
 
     async def slow_once(url, headers, payload, timeout):
@@ -255,8 +260,8 @@ async def test_attempt_timeout_retries_within_total_deadline(monkeypatch):
     assert response.attempt_count == 2
     assert len(calls) == 2
     assert calls[0] == pytest.approx(0.01)
-    assert any("LLM attempt started" in message for message in info_messages)
-    assert any("LLM retry pending" in message for message in info_messages)
+    assert any("event=llm.attempt.started" in message for message in info_messages)
+    assert any("event=llm.retry.pending" in message for message in debug_messages)
 
 
 @pytest.mark.asyncio

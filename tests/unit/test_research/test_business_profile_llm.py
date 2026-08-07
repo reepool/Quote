@@ -1,7 +1,10 @@
 import json
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 
+from utils.llm import LlmResponse, LlmUsage
 from utils.llm.errors import LlmSchemaValidationError
 
 from research.business_profile_llm import (
@@ -325,3 +328,62 @@ def test_llm_interface_rejects_unknown_units_and_model_supplied_governed_ids():
             report_period="2025-12-31",
             sections=[_section()],
         )
+
+
+@pytest.mark.asyncio
+async def test_injected_gateway_uses_logical_profile_and_propagates_source_lineage():
+    report = {
+        "schema_version": "business_profile_llm_report.v1",
+        "fact_catalog_version": "business_profile_facts.2026.2",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "facts": [],
+        "relationships": [],
+        "warnings": [],
+    }
+    raw = json.dumps(report)
+    response = LlmResponse(
+        status="success",
+        data=report,
+        raw_content=raw,
+        provider="openai_compatible",
+        model="grok-4.5",
+        finish_reason="stop",
+        usage=LlmUsage(input_tokens=10, output_tokens=5, total_tokens=15),
+        request_id="request-1",
+        provider_request_id="provider-1",
+        request_hash="request-hash",
+        response_hash="response-hash",
+        schema_name="business_profile_llm_report",
+        schema_version="business_profile_llm_report.v1",
+        structured_output_mode="json_object",
+        latency_ms=10,
+        attempt_count=1,
+        source_label="pipio:grok-4.5",
+        logical_profile="semantic_extraction",
+        selected_profile="semantic_extraction__pipio_grok",
+        route_fingerprint="route-v1",
+        lineage={"pool": "shared_semantic"},
+    )
+    gateway = SimpleNamespace(
+        complete=AsyncMock(return_value=response),
+        close=AsyncMock(),
+    )
+    extractor = OpenAICompatibleBusinessProfileExtractor(
+        OpenAICompatibleLlmConfig(enabled=True),
+        llm_client=gateway,
+    )
+
+    envelope = await extractor.extract_async(
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        sections=[_section()],
+    )
+    await extractor.close()
+
+    assert gateway.complete.await_args.args[0].profile == "semantic_extraction"
+    assert envelope.source_label == "pipio:grok-4.5"
+    assert envelope.selected_profile == "semantic_extraction__pipio_grok"
+    assert envelope.route_fingerprint == "route-v1"
+    assert envelope.lineage == {"pool": "shared_semantic"}
+    gateway.close.assert_awaited_once()

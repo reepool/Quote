@@ -113,6 +113,12 @@ class SemanticRunAudit:
     provider_request_id: Optional[str] = None
     finish_reason: Optional[str] = None
     diagnostics: Mapping[str, Any] = field(default_factory=dict)
+    source_label: Optional[str] = None
+    logical_profile: Optional[str] = None
+    selected_profile: Optional[str] = None
+    route_fingerprint: Optional[str] = None
+    failover_count: int = 0
+    attempt_lineage: tuple[Mapping[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -1258,6 +1264,14 @@ def _success_audit(
         provider_request_id=response.provider_request_id,
         finish_reason=response.finish_reason,
         diagnostics=dict(diagnostics or {}),
+        source_label=getattr(response, "source_label", None),
+        logical_profile=getattr(response, "logical_profile", None) or profile,
+        selected_profile=getattr(response, "selected_profile", None),
+        route_fingerprint=getattr(response, "route_fingerprint", None),
+        failover_count=getattr(response, "failover_count", 0),
+        attempt_lineage=tuple(
+            dict(item) for item in getattr(response, "attempts", ())
+        ),
     )
 
 
@@ -1297,6 +1311,22 @@ def _failure_audit(
         ),
         finish_reason=None if response is None else response.finish_reason,
         diagnostics=dict(diagnostics or {}),
+        source_label=None if response is None else getattr(response, "source_label", None),
+        logical_profile=(
+            None if response is None else (getattr(response, "logical_profile", None) or profile)
+        ),
+        selected_profile=(
+            None if response is None else getattr(response, "selected_profile", None)
+        ),
+        route_fingerprint=(
+            None if response is None else getattr(response, "route_fingerprint", None)
+        ),
+        failover_count=0 if response is None else getattr(response, "failover_count", 0),
+        attempt_lineage=tuple(
+            () if response is None else (
+                dict(item) for item in getattr(response, "attempts", ())
+            )
+        ),
     )
 
 

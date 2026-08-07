@@ -11,7 +11,7 @@ from data_sources.cninfo_announcement_title_llm import (
 )
 
 
-def _response(events, *, request_id="request-id"):
+def _response(events, *, request_id="request-id", **lineage):
     return SimpleNamespace(
         data={
             "schema_version": TITLE_CLASSIFICATION_SCHEMA_VERSION,
@@ -23,6 +23,7 @@ def _response(events, *, request_id="request-id"):
         request_id=request_id,
         latency_ms=12,
         attempt_count=1,
+        **lineage,
     )
 
 
@@ -53,7 +54,14 @@ async def test_title_classifier_accepts_compensation_share_implementation():
             "confidence": 0.97,
             "reason": "The title explicitly describes share compensation implementation",
         }],
-    }])))
+    }],
+        source_label="pipio:grok-4.5",
+        logical_profile="corporate_action_title_classification",
+        selected_profile="title__pipio_grok",
+        route_fingerprint="route-fingerprint",
+        failover_count=1,
+        attempts=({"source_label": "pipio:gpt-5.6-luna", "status": "failed"},),
+    )))
     classifier = CninfoAnnouncementTitleClassifier(client)
 
     result = await classifier.classify([_event([{
@@ -68,6 +76,11 @@ async def test_title_classifier_accepts_compensation_share_implementation():
     request = client.complete.await_args.args[0]
     assert request.content_is_untrusted is True
     assert request.response_schema["additionalProperties"] is False
+    lineage = result.lineage_by_event["event-1"][0]
+    assert lineage["source_label"] == "pipio:grok-4.5"
+    assert lineage["selected_profile"] == "title__pipio_grok"
+    assert lineage["route_fingerprint"] == "route-fingerprint"
+    assert lineage["failover_count"] == 1
 
 
 @pytest.mark.asyncio

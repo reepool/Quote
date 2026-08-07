@@ -297,9 +297,10 @@ def parse_business_profile_rollout_config(
 
 
 def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str]:
-    profile = llm_config.profiles.get("semantic_extraction")
-    if profile is None or not profile.enabled or not profile.model:
-        raise ValueError("enabled semantic_extraction LLM profile is required")
+    try:
+        description = llm_config.describe_logical_profile("semantic_extraction")
+    except (AttributeError, ValueError) as exc:
+        raise ValueError("semantic_extraction logical LLM profile is required") from exc
     fact_catalog = load_business_fact_catalog()
     product_catalog = load_business_product_catalog()
     unit_catalog = load_unit_conversion_catalog()
@@ -328,17 +329,9 @@ def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str
         ),
         "model": "|".join(
             (
-                profile.name,
-                profile.provider,
-                profile.provider_resource,
-                profile.base_url,
-                profile.endpoint,
-                profile.model,
-                profile.structured_output_mode,
-                ",".join(profile.supported_structured_output_modes),
-                str(profile.allow_prompt_only),
-                str(profile.temperature),
-                profile.max_output_tokens_field,
+                "logical_profile=semantic_extraction",
+                f"route_fingerprint={description.route_fingerprint}",
+                f"structured_output_modes={','.join(description.supported_structured_output_modes)}",
             )
         ),
         "verifier": SEMANTIC_VERIFIER_PROMPT_VERSION,

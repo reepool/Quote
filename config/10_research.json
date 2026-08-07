@@ -109,7 +109,7 @@
           "candidate_only": true,
           "deprecated": true,
           "common_llm_profile": "semantic_extraction",
-          "note": "Legacy selected-section adapter compatibility switch only. Production extraction and verification use the common LLM gateway profile from config/11_llm.json; provider connection settings are not owned here."
+          "note": "Legacy selected-section adapter compatibility switch only. Production extraction and verification use the common LLM gateway profile from config/13_llm.json; provider connection settings are not owned here."
         },
         "semantic_production": {
           "enabled": true,

@@ -238,7 +238,7 @@ python scripts/research_business_profile_catalog_governance.py promote-alias \
 ### 6.1 当前状态
 
 公共 LLM 网关已由 `utils/llm/` 提供，画像适配器通过
-`LlmClient.complete(LlmRequest)` 调用 `config/11_llm.json` 中的公共 profile。
+`LlmClient.complete(LlmRequest)` 调用 `config/13_llm.json` 中的公共逻辑 profile。
 公共 profile 即使因其他业务启用，也不代表画像业务自动启用。画像抽取、candidate
 writer 和 scheduler 仍分别默认关闭，不写 DCF 输入。画像业务边界配置位于：
 

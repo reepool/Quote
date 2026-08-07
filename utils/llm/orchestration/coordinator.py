@@ -278,7 +278,7 @@ class ProviderCoordinator:
                         self._adaptive_episode_until,
                     )
                     LOGGER.warning(
-                        "LLM provider congestion episode escalated resource=%s "
+                        "event=llm.provider.congestion_escalated resource=%s "
                         "class=%s code=%s status=%s base_limit=%s "
                         "bulk_limit=%s->%s ratio=%.3f cooldown_seconds=%.1f "
                         "episode_seconds=%.1f events=%s raw_failures=%s",
@@ -297,8 +297,8 @@ class ProviderCoordinator:
                     )
                     return
                 self._adaptive_coalesced_failures += 1
-                LOGGER.info(
-                    "LLM provider congestion failure coalesced resource=%s "
+                LOGGER.debug(
+                    "event=llm.provider.failure_coalesced resource=%s "
                     "class=%s code=%s status=%s episode_remaining_seconds=%.1f "
                     "raw_failures=%s coalesced=%s",
                     self.config.name,
@@ -320,8 +320,8 @@ class ProviderCoordinator:
                 >= self.config.adaptive_soft_failure_rate_threshold
             )
             if not should_decrease:
-                LOGGER.info(
-                    "LLM provider transient failure observed resource=%s code=%s "
+                LOGGER.warning(
+                    "event=llm.provider.transient_failure resource=%s code=%s "
                     "status=%s window_requests=%s soft_failures=%s "
                     "failure_rate=%.3f threshold_count=%s threshold_rate=%.3f",
                     self.config.name,
@@ -365,7 +365,7 @@ class ProviderCoordinator:
                     0, episode_failures - 1
                 )
             LOGGER.warning(
-                "LLM provider congestion episode resource=%s class=%s "
+                "event=llm.provider.congestion_started resource=%s class=%s "
                 "code=%s status=%s bulk_limit=%s->%s ratio=%.3f "
                 "cooldown_seconds=%.1f episode_seconds=%.1f "
                 "window_requests=%s soft_failures=%s failure_rate=%.3f "
@@ -424,7 +424,7 @@ class ProviderCoordinator:
             self._adaptive_recovery_probes += 1
             self._adaptive_last_recovery_probe_at = now
             LOGGER.info(
-                "LLM provider recovery probe resource=%s bulk_limit=%s->%s "
+                "event=llm.provider.recovery_probe resource=%s bulk_limit=%s->%s "
                 "growth_factor=%.3f probes=%s",
                 self.config.name,
                 prior_limit,
@@ -762,6 +762,14 @@ class ProviderCoordinatorRegistry:
     def clear(self) -> None:
         self._coordinators.clear()
         self._loop_id = None
+
+    async def close_all(self) -> None:
+        """Cancel provider waiters and release event-loop-owned state."""
+        coordinators = tuple(self._coordinators.values())
+        self._coordinators.clear()
+        self._loop_id = None
+        for coordinator in coordinators:
+            await coordinator.close()
 
 
 _HELD_RESOURCES: ContextVar[tuple[str, ...]] = ContextVar(

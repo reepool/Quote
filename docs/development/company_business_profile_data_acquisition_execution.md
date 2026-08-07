@@ -300,7 +300,7 @@ BSE 暂只路由 CNInfo；这些是可变运维路由，不应硬编码为画像
 
 ## 8. LLM 接口实施边界
 
-公共连接配置位于 `config/11_llm.json`，画像业务只引用公共 profile，不再重复维护
+公共连接配置位于 `config/13_llm.json`，画像业务只引用公共逻辑 profile，不再重复维护
 provider、base URL、model、key、重试或流式设置。画像业务配置保留如下边界字段：
 
 ```json

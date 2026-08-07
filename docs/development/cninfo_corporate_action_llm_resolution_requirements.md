@@ -352,7 +352,7 @@ refresh_documents
 ## 12. 操作命令
 
 公共 LLM 网关和 `semantic_extraction` profile 默认关闭。启用前必须由运维在受控环境
-配置 `QUOTE_LLM_API_KEY`，并在 `config/11_llm.json` 中显式打开全局和 profile；日志和
+配置来源专用 API Key，并在 `config/13_llm.json` 中显式打开全局、pool、route 和 profile；日志和
 报告不得输出 key。
 
 先做小范围预演，确认公告下载、页级文本和模型门禁结果：

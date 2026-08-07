@@ -7,20 +7,20 @@
 
 ## 配置与密钥
 
-项目配置 `config/11_llm.json` 只包含非敏感 profile。当前仓库已因受控 LLM 业务显式
-开启全局和 `semantic_extraction` profile；是否能够调用仍取决于运行环境 key，且各业务
-必须使用自己的独立 enable/write gate，公共 profile 开启不代表画像等业务自动开启：
+项目配置 `config/13_llm.json` 只包含非敏感 route、pool 和实际 profile。首期配置默认
+关闭，必须先完成单源能力与 quota 验证再显式开启；各业务仍必须使用自己的独立
+enable/write gate，公共路由开启不代表画像等业务自动开启：
 
-- profile：`semantic_extraction`
+- 逻辑 profile：`semantic_extraction`
 - provider：`openai_compatible`
 - base URL：`https://pipio.io/v1`
-- model：`grok-4.5`
-- key 环境变量：`QUOTE_LLM_API_KEY`
-- provider quota bucket：默认 `58 RPM`，由该资源下所有 profile、业务和重试共享
+- models：`grok-4.5`、`gpt-5.6-luna`
+- key 环境变量：`QUOTE_LLM_PIPIO_GROK_API_KEY`、`QUOTE_LLM_PIPIO_LUNA_API_KEY`
+- provider quota bucket：必须通过受控验证确认共享或独立后配置
 
 本地开发时，将真实值放在项目根目录 `.env`，该文件已被 gitignore 忽略。应用入口显式调用 `load_project_environment()`，且 `override=False`，所以进程已经注入的变量优先。`.env` 不应被提交、写入日志或复制到报告中。
 
-常驻服务不要依赖 `.bashrc`：systemd、cron、容器和多 worker 进程不一定读取交互 shell 配置。生产环境应使用权限受控的 systemd `EnvironmentFile`、容器 secret 或部署平台 secret store，并把 `QUOTE_LLM_API_KEY` 注入进程环境。
+常驻服务不要依赖 `.bashrc`：systemd、cron、容器和多 worker 进程不一定读取交互 shell 配置。生产环境应使用权限受控的 systemd `EnvironmentFile`、容器 secret 或部署平台 secret store，并注入两个来源专用环境变量。
 
 网关只从环境中读取 key。即使 `.env` 存在，profile 仍必须显式启用；缺少 key、错误 URL 或无能力声明时，网络请求前直接失败。
 
