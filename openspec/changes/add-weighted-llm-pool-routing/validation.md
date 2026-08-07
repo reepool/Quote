@@ -266,6 +266,32 @@ this provider window, the 10-concurrency gate was not started and the required
 25/50 promotion remained blocked. Task 6.5 remains incomplete; the acceptance
 thresholds were not weakened.
 
+### Independent-Quota Resumed Preflight (2026-08-08)
+
+The deployment owner supplied a Pipio usage-console screenshot showing successful
+`grok-4.5` streaming requests under the Grok credential on 2026-08-07. The records
+included first-response and total latency plus input/output token counts. This
+corroborates that the Grok Key was accepted and used by the intended model, but it
+does not by itself establish Luna health, current provider stability, structured-
+output correctness, or any staged-concurrency acceptance result.
+
+With the owner-confirmed independent quota mapping, controlled Grok and Luna
+single-source probes were then started concurrently against the same synthetic,
+non-sensitive Chinese input. Both requests passed local configuration validation,
+entered separate `pipio:grok` and `pipio:luna` provider resources, selected the
+expected concrete profile/source label, and began their first provider attempt.
+Neither source returned a first event before its 300-second attempt limit. Both
+sources exhausted a second bounded 300-second attempt and classified both attempts
+as HTTP 408 / `transient_transport_error`.
+
+The two provider resources independently entered adaptive congestion handling,
+demonstrating that the same Base URL did not merge their runtime quota state. Each
+controlled route failed closed with no business result, stopped its pool lifecycle
+at `active=0`, and left no matching validation Python process. Since both single-
+source prerequisites failed, the provider-backed 10-concurrency gate was not
+started; 25 and 50 were consequently withheld. Production configuration and the
+real `.env` were unchanged, and task 6.5 remains incomplete.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
