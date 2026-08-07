@@ -21,6 +21,7 @@ Business, research, scheduler, API, and CLI modules MUST obtain enablement, non-
 Each configured pool SHALL enforce a hard process-local `total_concurrency` across all logical profiles routed to it. The pool SHALL use a deterministic weighted-fair scheduler, such as weighted deficit round robin, with strictly positive integer member weights. Weight SHALL define long-run dispatch share among eligible healthy members, not a permanent per-member semaphore reservation.
 
 When `borrow_idle_capacity=true`, a pool MAY dispatch to another eligible healthy member when weighted candidates are unavailable; this MUST NOT exceed pool total concurrency or a concrete member/profile limit. Scheduler state, dispatch counters, active counts, borrowing, queue wait, and member eligibility SHALL be observable in a non-secret pool snapshot. Waiting, cancellation, and shutdown SHALL not leak capacity permits.
+Weight acceptance SHALL use non-borrowed normal dispatch counts. Total dispatches and per-source borrowed dispatch counts SHALL be recorded separately and MUST NOT cause borrowed capacity to be misclassified as a weighted-fairness violation.
 
 #### Scenario: Shared pool cap spans two business profiles
 - **WHEN** title classification and semantic extraction are routed to a pool with `total_concurrency=10`
@@ -37,7 +38,7 @@ When `borrow_idle_capacity=true`, a pool MAY dispatch to another eligible health
 ### Requirement: Provider quota coordination SHALL remain independent from routing
 Pool routing SHALL not replace concrete profile or provider-resource concurrency, RPM, cooldown, or adaptive congestion controls. A pool admission covers one logical execution, including retry, repair, and failover; a provider coordinator lease SHALL cover only one concrete transport attempt. The pool SHALL not report schema-validation failures as provider congestion, and each concrete failure SHALL be reported to provider coordination at most once.
 
-Provider resources SHALL be configured from verified quota buckets rather than inferred from matching Base URLs. The Pipio Grok and Luna profiles SHALL use explicit non-secret resources that can be configured as shared or independent after controlled validation.
+Provider resources SHALL be configured from verified quota buckets rather than inferred from matching Base URLs. The deployment owner has confirmed that the Pipio Grok and Luna API Keys have independent quota, so the initial profiles SHALL use two explicit non-secret provider resources with independent concurrency, RPM, cooldown, and adaptive congestion state. The configuration model SHALL retain support for verified shared quota mappings for future credentials, but the initial Grok/Luna deployment MUST NOT merge its two resources merely because their Base URL matches.
 
 Effective in-flight capacity SHALL remain the minimum of business-stage worker capacity, pool `total_concurrency`, selected concrete-profile concurrency, current provider-resource adaptive concurrency, and HTTP connection-pool capacity. Pool member weight SHALL remain separate from existing provider `workload_weights`; history backfill, daily work, title classification, body extraction, and semantic verification SHALL retain their workload identity and existing fair admission within a shared provider resource. Runtime snapshots SHALL identify the active limiting layer.
 

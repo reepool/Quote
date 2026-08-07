@@ -174,6 +174,39 @@ and the pool registry was empty. The acceptance gate failed only for
 50-concurrency stages. Task 6.5 remains incomplete pending a stable provider
 window in which 10 passes before 25 and 50 are attempted.
 
+### Independent-Quota Low-Cap Rerun (2026-08-07)
+
+The deployment owner reconfirmed that the two API Keys have independent quota.
+To avoid assuming equal usable concurrency during validation, the staged
+validator was extended with repeatable validation-only per-resource caps. These
+caps modify only the process-local controlled configuration and do not change
+`config/13_llm.json` or claim a new upstream quota limit. Focused tests cover
+valid lower caps, unknown resources, non-positive/excessive values, duplicate
+CLI assignments, and effective provider-limit reporting.
+
+The 10-concurrency stage was rerun with `pipio:grok=2` and `pipio:luna=1`,
+keeping the resources independent and their configured RPM at 10 each. All 10
+logical requests eventually succeeded. Luna had two failed logical source
+executions, each with two bounded HTTP 503 attempts, for four provider 5xx
+events; both cross-source failovers to Grok succeeded. There were zero 429,
+timeout, parse, schema, or exhausted-failover outcomes. Both circuits remained
+closed.
+
+Total dispatches were five Grok and seven Luna. Six Luna dispatches were
+explicit borrowed-capacity dispatches, so the non-borrowed normal counts were
+five Grok and one Luna. The validator now records total, borrowed, and normal
+dispatch counts separately and applies the configured-weight gate only to
+normal dispatches. This removed the prior false weight-ratio rejection while
+preserving the strict provider-failure gate. The stage failed only for
+`nonzero_provider_5xx`; therefore 25 and 50 were not started.
+
+The stage took 86.950 seconds. First-event latency ranged from 1.183 to 21.417
+seconds and successful total latency from 3.916 to 37.741 seconds. Peak
+transport concurrency was 2 against the validation aggregate cap of 3, shutdown
+took 1.796 ms, transport active count returned to zero, `fd_delta=0`, and the
+pool registry was empty. Task 6.5 remains incomplete until a clean 10 stage is
+followed by clean gated 25 and 50 stages.
+
 ## Candidate-Only Rollout Controls
 
 - The live validator only returns an outer candidate envelope and never imports
@@ -226,6 +259,21 @@ window in which 10 passes before 25 and 50 are attempted.
   rerun nevertheless failed provider stability because of three HTTP 503
   responses, so the gate correctly withheld 25/50 and live rollout remains
   incomplete.
+- A later validation-only low-cap rerun kept the independent resources at Grok
+  2 and Luna 1 concurrent attempts. It confirmed that borrowed dispatches must
+  be excluded from the normal weighted-fairness ratio, but Luna still produced
+  four HTTP 503 attempt failures. The strict gate again withheld 25/50; this is
+  a provider-stability blocker, not grounds to weaken the acceptance criteria.
+- The repository-required `codex review --uncommitted` was retried for this
+  follow-up with a bounded 180-second window. The review token was still
+  invalidated, the process spent most of the run inspecting unrelated baseline
+  changes, and it timed out without a final finding set. An equivalent manual
+  review was therefore limited to the staged validator, its tests, and the
+  OpenSpec/requirements updates. No confirmed correctness, secret-leakage,
+  resource-lifecycle, or gate-weakening issue remained. A possible separate
+  per-source failover-dispatch counter was classified as a future observability
+  enhancement: every current failover-triggering error already independently
+  fails the strict live gate, so it cannot authorize a higher stage.
 
 ## Requirements Coverage
 

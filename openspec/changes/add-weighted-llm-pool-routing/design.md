@@ -96,6 +96,8 @@ client 关闭不默认关闭全局 registry；应用 shutdown 通过公共 regis
 - 达到成员/actual profile 明确并发上限。
 
 `borrow_idle_capacity=true` 时，正常权重候选不可用后可选择其他健康成员，pool 总并发仍是硬上限。成员恢复后 credit 算法逐步回到长期比例，不做瞬时抢占。
+权重验收使用扣除 `borrowed_dispatches` 后的正常 dispatch 计数；总 dispatch
+和按来源借用计数仍需完整记录，用于解释实际容量利用和最终来源分布。
 
 替代方案：无状态随机权重。拒绝，因为小批次波动大、难以测试并可能饿死低权重成员。
 
@@ -173,9 +175,9 @@ resource_for_profile(logical_profile)
 
 ### 12. provider resource 按真实 quota 建模
 
-首期为 Grok/Luna 配置显式 resource 名，不再依赖 `provider:api_key_env` 自动名字。两个 Key 是否映射同一 resource 取决于供应商确认和受控 quota 验证，而不是 Base URL。
+首期为 Grok/Luna 配置显式 resource 名，不再依赖 `provider:api_key_env` 自动名字。部署方已确认两个 Key 的 quota 相互独立，因此首期必须映射到 `pipio:grok` 和 `pipio:luna` 两个 resource，各自协调并发、RPM、cooldown 和自适应拥塞控制；相同 Base URL 不得作为合并 quota bucket 的依据。
 
-若额度独立：两个 resource 各自协调。若共享：两个 actual profile 映射同一 resource，确保合计并发/RPM不超限。配置文档和 smoke 报告必须披露该判断。
+配置模型仍保留共享 quota 的通用表达和校验能力，以支持未来其他凭据映射；已确认共享的实际 quota bucket 必须映射到同一 resource，确保合计并发/RPM 不超限。配置文档和 smoke 报告必须披露真实映射判断。
 
 ### 13. 配置文件和密钥迁移
 

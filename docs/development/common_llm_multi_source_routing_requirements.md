@@ -54,8 +54,8 @@ docs/development/cninfo_corporate_action_llm_resolution_requirements.md
 - 配置文件只保存 `api_key_env` 名称；
 - 两个模型使用相同 Base URL 不代表共享或独立 quota；
 - provider resource 必须按真实 quota bucket 建模；
-- 若两个 Key 的额度独立，应配置两个 provider resource；
-- 若供应商确认两个 Key 共享账号并发/RPM，应让两个实际 profile 映射到同一个 provider resource；
+- 部署方已确认首期两个 Key 的 quota 相互独立，因此 Grok 和 Luna 必须配置为两个 provider resource，各自管理并发、RPM、cooldown 和自适应拥塞状态；
+- 配置模型仍需支持未来其他凭据的共享 quota 映射；若供应商确认两个 Key 共享账号并发/RPM，应让对应实际 profile 映射到同一个 provider resource；
 - 启用前必须通过受控验证确认各 Key 的模型权限、structured-output 能力、并发/RPM 和实际返回 model 字段。
 
 ## 4. 目标与非目标
@@ -650,7 +650,7 @@ scripts/dev_validation/benchmark_llm_orchestration.py
 
 - 两个 Pipio 环境变量名正确解析，不读取真实 `.env`；
 - 同 Base URL、不同 Key 和 model 可形成两个实际 profile；
-- 独立 quota 和共享 quota 两种 provider-resource 映射均可表达；
+- 独立 quota 和共享 quota 两种 provider-resource 映射均可表达，首期 Grok/Luna 固定验证为独立映射；
 - 未知 pool、未知实际 profile、重复来源标签、缺失逻辑映射和非法权重 fail closed；
 - route/实际 profile 同名歧义被拒绝；
 - 无 route 的旧配置保持兼容；

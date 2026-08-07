@@ -34,6 +34,10 @@ def _accepted_result():
             "pipio:grok-4.5": 8,
             "pipio:gpt-5.6-luna": 2,
         },
+        "normal_dispatch_counts": {
+            "pipio:grok-4.5": 8,
+            "pipio:gpt-5.6-luna": 2,
+        },
         "configured_weight_ratio": {
             "pipio:grok-4.5": 0.75,
             "pipio:gpt-5.6-luna": 0.25,
@@ -73,6 +77,51 @@ def test_live_acceptance_gate_rejects_provider_limit_mismatch_or_overrun():
     assert acceptance_reasons(failed) == [
         "provider_limits_mismatch",
         "provider_concurrency_exceeded",
+    ]
+
+
+def test_live_acceptance_gate_checks_normal_not_borrowed_dispatch_ratio():
+    borrowed = {
+        **_accepted_result(),
+        "dispatch_counts": {
+            "pipio:grok-4.5": 3,
+            "pipio:gpt-5.6-luna": 7,
+        },
+        "normal_dispatch_counts": {
+            "pipio:grok-4.5": 3,
+            "pipio:gpt-5.6-luna": 1,
+        },
+        "borrowed_dispatch_counts": {
+            "pipio:grok-4.5": 0,
+            "pipio:gpt-5.6-luna": 6,
+        },
+        "borrowed_dispatches": 6,
+    }
+
+    assert acceptance_reasons(borrowed) == []
+
+
+def test_live_acceptance_gate_rejects_biased_normal_dispatch_ratio():
+    biased = {
+        **_accepted_result(),
+        "dispatch_counts": {
+            "pipio:grok-4.5": 3,
+            "pipio:gpt-5.6-luna": 7,
+        },
+        "normal_dispatch_counts": {
+            "pipio:grok-4.5": 1,
+            "pipio:gpt-5.6-luna": 3,
+        },
+        "borrowed_dispatch_counts": {
+            "pipio:grok-4.5": 2,
+            "pipio:gpt-5.6-luna": 4,
+        },
+        "borrowed_dispatches": 6,
+    }
+
+    assert acceptance_reasons(biased) == [
+        "dispatch_ratio_out_of_tolerance:pipio:grok-4.5",
+        "dispatch_ratio_out_of_tolerance:pipio:gpt-5.6-luna",
     ]
 
 
@@ -133,6 +182,54 @@ def test_pool_stage_can_exceed_provider_caps_without_overriding_them():
         resource.requests_per_minute
         for resource in controlled.provider_resources.values()
     } == {10}
+
+
+def test_controlled_live_config_supports_lower_per_resource_caps():
+    controlled = build_controlled_config(
+        config_manager.get_llm_config(),
+        logical_profile="semantic_extraction",
+        concurrency=50,
+        confirmed_quota_scope="independent",
+        confirmed_per_source_concurrency=10,
+        confirmed_provider_rpm=10,
+        timeout_seconds=620,
+        resource_concurrency_limits={
+            "pipio:grok": 8,
+            "pipio:luna": 1,
+        },
+    )
+
+    assert controlled.provider_resources["pipio:grok"].hard_max_concurrency == 8
+    assert controlled.provider_resources["pipio:luna"].hard_max_concurrency == 1
+    assert controlled.provider_resources["pipio:luna"].default_bulk_concurrency == 1
+    assert controlled.profiles[
+        "semantic_extraction__pipio_grok"
+    ].max_concurrency == 8
+    assert controlled.profiles[
+        "semantic_extraction__pipio_luna"
+    ].max_concurrency == 1
+
+
+@pytest.mark.parametrize(
+    ("limits", "message"),
+    [
+        ({"unknown": 1}, "unknown routed provider resource"),
+        ({"pipio:luna": 0}, "positive integer"),
+        ({"pipio:luna": 11}, "cannot exceed confirmed"),
+    ],
+)
+def test_controlled_live_config_rejects_invalid_resource_caps(limits, message):
+    with pytest.raises(ValueError, match=message):
+        build_controlled_config(
+            config_manager.get_llm_config(),
+            logical_profile="semantic_extraction",
+            concurrency=10,
+            confirmed_quota_scope="independent",
+            confirmed_per_source_concurrency=10,
+            confirmed_provider_rpm=10,
+            timeout_seconds=120,
+            resource_concurrency_limits=limits,
+        )
 
 
 @pytest.mark.parametrize(
@@ -248,7 +345,37 @@ def test_live_cli_accepts_explicit_result_path(tmp_path):
         "50",
         "--output-json",
         str(output_path),
+        "--resource-concurrency-limit",
+        "pipio:grok=8",
+        "--resource-concurrency-limit",
+        "pipio:luna=1",
     ])
 
     assert args.concurrency == [10, 25, 50]
     assert args.output_json == output_path
+    assert args.resource_concurrency_limits == {
+        "pipio:grok": 8,
+        "pipio:luna": 1,
+    }
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        ["invalid"],
+        ["pipio:luna=zero"],
+        ["pipio:luna=0"],
+        ["pipio:luna=1", "pipio:luna=2"],
+    ],
+)
+def test_live_cli_rejects_invalid_resource_limit(values):
+    argv = [
+        "--confirm-live",
+        "--confirmed-quota-scope",
+        "independent",
+    ]
+    for value in values:
+        argv.extend(("--resource-concurrency-limit", value))
+
+    with pytest.raises(SystemExit):
+        benchmark.parse_args(argv)

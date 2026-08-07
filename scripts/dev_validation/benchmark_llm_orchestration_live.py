@@ -104,6 +104,7 @@ def build_controlled_config(
     confirmed_per_source_concurrency: int,
     confirmed_provider_rpm: int,
     timeout_seconds: float,
+    resource_concurrency_limits: Mapping[str, int] | None = None,
 ) -> LlmConfig:
     """Enable one logical stage while preserving explicit provider limits."""
     if concurrency < 1:
@@ -142,26 +143,43 @@ def build_controlled_config(
             )
     else:
         raise ValueError("confirmed quota scope must be independent or shared")
+    concurrency_limits = {
+        name: confirmed_per_source_concurrency for name in resource_names
+    }
+    for name, value in (resource_concurrency_limits or {}).items():
+        if name not in resource_names:
+            raise ValueError(f"unknown routed provider resource: {name}")
+        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+            raise ValueError(
+                f"resource concurrency limit must be a positive integer: {name}"
+            )
+        if value > confirmed_per_source_concurrency:
+            raise ValueError(
+                "resource concurrency limit cannot exceed confirmed per-source "
+                f"concurrency: {name}"
+            )
+        concurrency_limits[name] = value
     for profile_name in concrete_names:
         profile = profiles[profile_name]
         resource = base.resource_for_profile(profile)
+        resource_concurrency = concurrency_limits[resource.name]
         reserved = min(
             resource.reserved_concurrency,
-            max(0, confirmed_per_source_concurrency - 1),
+            max(0, resource_concurrency - 1),
         )
-        bulk_limit = confirmed_per_source_concurrency - reserved
+        bulk_limit = resource_concurrency - reserved
         resources[resource.name] = replace(
             resource,
-            hard_max_concurrency=confirmed_per_source_concurrency,
+            hard_max_concurrency=resource_concurrency,
             default_bulk_concurrency=bulk_limit,
             reserved_concurrency=reserved,
             http_max_connections=max(
                 resource.http_max_connections,
-                confirmed_per_source_concurrency,
+                resource_concurrency,
             ),
             http_max_keepalive_connections=max(
                 resource.http_max_keepalive_connections,
-                confirmed_per_source_concurrency,
+                resource_concurrency,
             ),
             requests_per_minute=confirmed_provider_rpm,
             adaptive_min_bulk_concurrency=min(
@@ -177,7 +195,7 @@ def build_controlled_config(
                 profile.attempt_timeout_seconds,
                 timeout_seconds,
             ),
-            max_concurrency=confirmed_per_source_concurrency,
+            max_concurrency=resource_concurrency,
             requests_per_minute=0,
         )
 
@@ -236,7 +254,11 @@ def acceptance_reasons(result: Mapping[str, Any]) -> list[str]:
     ):
         reasons.append("provider_concurrency_exceeded")
 
-    dispatches = result.get("dispatch_counts") or {}
+    dispatches = (
+        result.get("normal_dispatch_counts")
+        or result.get("dispatch_counts")
+        or {}
+    )
     total_dispatches = sum(int(value) for value in dispatches.values())
     if total_dispatches:
         expected = result.get("configured_weight_ratio") or {}
@@ -280,6 +302,7 @@ async def run_stage(
     confirmed_per_source_concurrency: int,
     confirmed_provider_rpm: int,
     timeout_seconds: float,
+    resource_concurrency_limits: Mapping[str, int] | None = None,
 ) -> dict[str, Any]:
     config = build_controlled_config(
         base,
@@ -289,6 +312,7 @@ async def run_stage(
         confirmed_per_source_concurrency=confirmed_per_source_concurrency,
         confirmed_provider_rpm=confirmed_provider_rpm,
         timeout_seconds=timeout_seconds,
+        resource_concurrency_limits=resource_concurrency_limits,
     )
     route = config.routes[logical_profile]
     pool = config.pools[route.pool]
@@ -391,6 +415,14 @@ async def run_stage(
     dispatch_counts = {
         member["source_label"]: member["dispatches"] for member in members
     }
+    borrowed_dispatch_counts = {
+        member["source_label"]: member["borrowed_dispatches"]
+        for member in members
+    }
+    normal_dispatch_counts = {
+        source_label: dispatches - borrowed_dispatch_counts[source_label]
+        for source_label, dispatches in dispatch_counts.items()
+    }
     weight_total = sum(member.weight for member in pool.members)
     configured_resource_names = {
         config.resource_for_profile(
@@ -398,17 +430,25 @@ async def run_stage(
         ).name
         for member in pool.members
     }
-    aggregate_provider_concurrency = (
-        confirmed_per_source_concurrency * len(configured_resource_names)
+    effective_resource_concurrency = {
+        name: config.provider_resources[name].hard_max_concurrency
+        for name in configured_resource_names
+    }
+    aggregate_provider_concurrency = sum(
+        effective_resource_concurrency.values()
     )
+    snapshots_by_resource = {
+        str(snapshot["resource_name"]): snapshot
+        for snapshot in provider_snapshots
+    }
     provider_limits_ok = (
-        len(provider_snapshots) == len(configured_resource_names)
+        set(snapshots_by_resource) == configured_resource_names
         and all(
-            int(snapshot["configured_requests_per_minute"])
+            int(snapshots_by_resource[name]["configured_requests_per_minute"])
             == confirmed_provider_rpm
-            and int(snapshot["configured_bulk_concurrency"])
-            <= confirmed_per_source_concurrency
-            for snapshot in provider_snapshots
+            and int(snapshots_by_resource[name]["configured_bulk_concurrency"])
+            <= effective_resource_concurrency[name]
+            for name in configured_resource_names
         )
     )
     result: dict[str, Any] = {
@@ -416,6 +456,9 @@ async def run_stage(
         "confirmed_quota_scope": confirmed_quota_scope,
         "confirmed_per_source_concurrency": confirmed_per_source_concurrency,
         "confirmed_provider_rpm": confirmed_provider_rpm,
+        "resource_concurrency_limits": dict(sorted(
+            effective_resource_concurrency.items()
+        )),
         "confirmed_aggregate_provider_concurrency": (
             aggregate_provider_concurrency
         ),
@@ -440,6 +483,8 @@ async def run_stage(
             for member in pool.members
         },
         "dispatch_counts": dispatch_counts,
+        "normal_dispatch_counts": normal_dispatch_counts,
+        "borrowed_dispatch_counts": borrowed_dispatch_counts,
         "configured_weight_ratio": {
             member.source_label: member.weight / weight_total
             for member in pool.members
@@ -511,6 +556,9 @@ async def run_stages(args: argparse.Namespace) -> dict[str, Any]:
             confirmed_per_source_concurrency=args.confirmed_per_source_concurrency,
             confirmed_provider_rpm=args.confirmed_provider_rpm,
             timeout_seconds=args.timeout_seconds,
+            resource_concurrency_limits=getattr(
+                args, "resource_concurrency_limits", None
+            ),
         )
         results.append(result)
         if not result["accepted"]:
@@ -540,6 +588,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--confirmed-per-source-concurrency", type=int, default=10
     )
+    parser.add_argument(
+        "--resource-concurrency-limit",
+        action="append",
+        default=[],
+        metavar="RESOURCE=LIMIT",
+        help=(
+            "apply a lower validation-only concurrency cap to one provider "
+            "resource; may be repeated"
+        ),
+    )
     parser.add_argument("--confirmed-provider-rpm", type=int, default=10)
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
     parser.add_argument(
@@ -548,7 +606,30 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="write the complete non-secret validation result to this path",
     )
     parser.add_argument("--confirm-live", action="store_true")
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    resource_limits: dict[str, int] = {}
+    for raw_value in args.resource_concurrency_limit:
+        name, separator, raw_limit = raw_value.partition("=")
+        name = name.strip()
+        if not separator or not name:
+            parser.error(
+                "--resource-concurrency-limit must use RESOURCE=LIMIT"
+            )
+        if name in resource_limits:
+            parser.error(f"duplicate resource concurrency limit: {name}")
+        try:
+            limit = int(raw_limit)
+        except ValueError:
+            parser.error(
+                "--resource-concurrency-limit LIMIT must be an integer"
+            )
+        if limit < 1:
+            parser.error(
+                "--resource-concurrency-limit LIMIT must be positive"
+            )
+        resource_limits[name] = limit
+    args.resource_concurrency_limits = resource_limits
+    return args
 
 
 def main(argv: Sequence[str] | None = None) -> int:
