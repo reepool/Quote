@@ -147,6 +147,8 @@ class AnnouncementScope:
     page_size: int = 30
     max_pages: int = 20
     overlap_days: int = 0
+    start_page: int = 1
+    preflight_page_bound: bool = False
     source_options: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -168,6 +170,12 @@ class AnnouncementScope:
         object.__setattr__(self, "page_size", max(1, int(self.page_size)))
         object.__setattr__(self, "max_pages", max(1, int(self.max_pages)))
         object.__setattr__(self, "overlap_days", max(0, int(self.overlap_days)))
+        object.__setattr__(self, "start_page", max(1, int(self.start_page)))
+        object.__setattr__(
+            self,
+            "preflight_page_bound",
+            bool(self.preflight_page_bound),
+        )
         object.__setattr__(self, "source_options", dict(self.source_options or {}))
         if bool(self.start_date) != bool(self.end_date):
             raise ValueError("start_date and end_date must be provided together")

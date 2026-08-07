@@ -305,6 +305,285 @@ def test_page_bound_discovery_splits_and_persists_date_windows(tmp_path):
     } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
 
 
+def test_dense_window_preflight_splits_after_first_page(tmp_path):
+    storage = _storage(tmp_path)
+    _quotes(
+        storage,
+        [
+            (
+                "600000.SH",
+                "600000",
+                "浦发银行",
+                "SSE",
+                "stock",
+                "1999-11-10",
+                None,
+                "active",
+                1,
+            )
+        ],
+    )
+
+    class _Config:
+        @staticmethod
+        def route_for(_purpose_key, _exchange):
+            return SimpleNamespace(sources=())
+
+    class _AnnouncementService:
+        config = _Config()
+        query = None
+
+        def acquire(self, query, *, selectors, provider_cursors):
+            self.query = query
+            assert selectors
+            assert provider_cursors == {}
+            assert query.scope.preflight_page_bound is True
+            scan = AnnouncementScanResult(
+                source="fake",
+                query=query,
+                status="degraded",
+                pages_scanned=1,
+                is_complete=False,
+                stop_reason="estimated_pages_exceed_bound",
+                diagnostics={
+                    "total_pages": 500,
+                    "start_page": 1,
+                    "last_page_scanned": 1,
+                    "next_page": 2,
+                    "preflight_page_bound": True,
+                },
+            )
+            return SimpleNamespace(scan_result=scan, attempts=())
+
+    announcement_service = _AnnouncementService()
+    report = BusinessProfileIndexDiscoveryService(
+        storage=storage,
+        announcement_service=announcement_service,
+    ).discover(
+        exchanges=("SSE",),
+        start_date="2026-04-01",
+        end_date="2026-04-30",
+        max_pages_per_market=240,
+        resumable_windows=True,
+        max_windows_per_market=1,
+    )
+
+    assert report["pages_scanned"] == 1
+    assert report["preflight_splits"] == 1
+    assert report["incomplete_windows"][0]["total_pages"] == 500
+    state = BusinessProfileAnnouncementFrontierRepository(storage).get_state(
+        "business_profile_discovery_windows:SSE"
+    )
+    assert {
+        (item["start_date"], item["end_date"])
+        for item in state["pending_windows"]
+    } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
+    assert all("next_page" not in item for item in state["pending_windows"])
+
+
+def test_closed_single_day_checkpoint_resumes_and_completes(tmp_path):
+    storage = _storage(tmp_path)
+    _quotes(
+        storage,
+        [
+            (
+                "600000.SH",
+                "600000",
+                "浦发银行",
+                "SSE",
+                "stock",
+                "1999-11-10",
+                None,
+                "active",
+                1,
+            )
+        ],
+    )
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    frontier.set_state(
+        "business_profile_discovery_windows:SSE",
+        {
+            "pending_windows": [
+                {
+                    "start_date": "2026-04-30",
+                    "end_date": "2026-04-30",
+                    "kind": "unsplittable",
+                }
+            ]
+        },
+    )
+
+    class _Config:
+        @staticmethod
+        def route_for(_purpose_key, _exchange):
+            return SimpleNamespace(sources=())
+
+    class _AnnouncementService:
+        config = _Config()
+
+        def __init__(self):
+            self.queries = []
+
+        def acquire(self, query, *, selectors, provider_cursors):
+            self.queries.append(query)
+            assert selectors
+            if query.scope.start_date != query.scope.end_date:
+                scan = AnnouncementScanResult(
+                    source="fake",
+                    query=query,
+                    status="success_empty",
+                    pages_scanned=1,
+                    is_complete=True,
+                    stop_reason="empty_page",
+                )
+            elif query.scope.start_page == 1:
+                scan = AnnouncementScanResult(
+                    source="fake",
+                    query=query,
+                    status="degraded",
+                    pages_scanned=2,
+                    is_complete=False,
+                    stop_reason="max_pages_exhausted",
+                    diagnostics={
+                        "total_pages": 3,
+                        "start_page": 1,
+                        "last_page_scanned": 2,
+                        "next_page": 3,
+                    },
+                )
+            else:
+                scan = AnnouncementScanResult(
+                    source="fake",
+                    query=query,
+                    status="success",
+                    pages_scanned=1,
+                    is_complete=True,
+                    stop_reason="reported_last_page",
+                    diagnostics={
+                        "total_pages": 3,
+                        "start_page": 3,
+                        "last_page_scanned": 3,
+                        "next_page": None,
+                    },
+                )
+            return SimpleNamespace(scan_result=scan, attempts=())
+
+    announcement_service = _AnnouncementService()
+    discovery = BusinessProfileIndexDiscoveryService(
+        storage=storage,
+        announcement_service=announcement_service,
+    )
+    kwargs = {
+        "exchanges": ("SSE",),
+        "start_date": "2026-01-01",
+        "end_date": "2026-08-07",
+        "max_pages_per_market": 2,
+        "resumable_windows": True,
+        "max_windows_per_market": 2,
+    }
+
+    first = discovery.discover(**kwargs)
+    first_state = frontier.get_state("business_profile_discovery_windows:SSE")
+    assert first["incomplete_windows"][0]["page_checkpointed"] is True
+    assert first_state["pending_windows"] == [
+        {
+            "end_date": "2026-04-30",
+            "kind": "unsplittable",
+            "next_page": 3,
+            "start_date": "2026-04-30",
+        }
+    ]
+
+    second = discovery.discover(**kwargs)
+    second_state = frontier.get_state("business_profile_discovery_windows:SSE")
+    assert second["page_resumes"] == 1
+    assert second_state["pending_windows"] == []
+    single_day_queries = [
+        query
+        for query in announcement_service.queries
+        if query.scope.start_date == query.scope.end_date == "2026-04-30"
+    ]
+    assert [query.scope.start_page for query in single_day_queries] == [1, 3]
+    assert all(
+        query.scope.preflight_page_bound is False
+        for query in single_day_queries
+    )
+
+
+def test_current_day_window_ignores_persisted_page_offset(tmp_path):
+    storage = _storage(tmp_path)
+    _quotes(
+        storage,
+        [
+            (
+                "600000.SH",
+                "600000",
+                "浦发银行",
+                "SSE",
+                "stock",
+                "1999-11-10",
+                None,
+                "active",
+                1,
+            )
+        ],
+    )
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    frontier.set_state(
+        "business_profile_discovery_windows:SSE",
+        {
+            "pending_windows": [
+                {
+                    "start_date": "2026-08-07",
+                    "end_date": "2026-08-07",
+                    "kind": "unsplittable",
+                    "next_page": 241,
+                }
+            ]
+        },
+    )
+
+    class _Config:
+        @staticmethod
+        def route_for(_purpose_key, _exchange):
+            return SimpleNamespace(sources=())
+
+    class _AnnouncementService:
+        config = _Config()
+        query = None
+
+        def acquire(self, query, *, selectors, provider_cursors):
+            self.query = query
+            scan = AnnouncementScanResult(
+                source="fake",
+                query=query,
+                status="success_empty",
+                pages_scanned=1,
+                is_complete=True,
+                stop_reason="empty_page",
+            )
+            return SimpleNamespace(scan_result=scan, attempts=())
+
+    announcement_service = _AnnouncementService()
+    report = BusinessProfileIndexDiscoveryService(
+        storage=storage,
+        announcement_service=announcement_service,
+    ).discover(
+        exchanges=("SSE",),
+        start_date="2026-08-07",
+        end_date="2026-08-07",
+        overlap_days=0,
+        resumable_windows=True,
+        max_windows_per_market=1,
+    )
+
+    assert announcement_service.query.scope.start_page == 1
+    assert report["page_resumes"] == 0
+    assert frontier.get_state("business_profile_discovery_windows:SSE")[
+        "pending_windows"
+    ] == []
+
+
 def test_complete_market_scan_runs_bounded_rotating_missing_company_repair(tmp_path):
     storage = _storage(tmp_path)
     _quotes(

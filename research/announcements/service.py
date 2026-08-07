@@ -21,7 +21,11 @@ from .models import (
 
 LOGGER = logging.getLogger(__name__)
 _RESUMABLE_PAGE_BOUND_REASONS = frozenset(
-    {"max_pages_exhausted", "max_pages_reached"}
+    {
+        "estimated_pages_exceed_bound",
+        "max_pages_exhausted",
+        "max_pages_reached",
+    }
 )
 AnnouncementSelector = Callable[[AnnouncementRecord], Sequence[str]]
 

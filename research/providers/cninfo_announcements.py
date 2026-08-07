@@ -5,6 +5,7 @@ Reusable CNInfo announcement metadata scanner.
 from __future__ import annotations
 
 import logging
+import math
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -81,6 +82,8 @@ class _CninfoRequest:
     end_date: Optional[str] = None
     page_size: int = 30
     max_pages: int = 20
+    start_page: int = 1
+    preflight_page_bound: bool = False
     stop_at_watermark: Optional[str] = None
 
 
@@ -94,6 +97,10 @@ class _CninfoRawScanResult:
     pages_scanned: int
     announcements_seen: int
     max_announcement_time: Optional[str]
+    total_pages: Optional[int] = None
+    start_page: int = 1
+    last_page_scanned: Optional[int] = None
+    next_page: Optional[int] = None
     stopped_at_watermark: bool = False
     is_complete: bool = False
     stop_reason: Optional[str] = None
@@ -213,10 +220,16 @@ class _CninfoTransport:
         filter_list = list(filters or [])
         pages_scanned = 0
         effective_page_size = self._effective_page_size(config.page_size)
+        start_page = max(1, int(config.start_page))
+        total_pages: Optional[int] = None
+        last_page_scanned: Optional[int] = None
         is_complete = False
         stop_reason = "max_pages_exhausted"
 
-        for page_num in range(1, max(1, config.max_pages) + 1):
+        for page_num in range(
+            start_page,
+            start_page + max(1, int(config.max_pages)),
+        ):
             payload: Optional[Dict[str, Any]] = None
             page_started = time.monotonic()
             LOGGER.info(
@@ -241,6 +254,12 @@ class _CninfoTransport:
                     exc,
                 )
                 break
+            observed_total_pages = self._extract_total_pages(
+                payload,
+                page_size=effective_page_size,
+            )
+            if observed_total_pages is not None:
+                total_pages = observed_total_pages
 
             try:
                 raw_records = self._extract_records(payload)
@@ -275,6 +294,7 @@ class _CninfoTransport:
                 )
                 break
             pages_scanned += 1
+            last_page_scanned = page_num
             LOGGER.info(
                 "CNInfo announcement page completed: purpose=%s market=%s page=%s records=%s elapsed=%.3f",
                 config.purpose_key,
@@ -329,9 +349,37 @@ class _CninfoTransport:
                 is_complete = True
                 stop_reason = "last_page"
                 break
+            if total_pages is not None and page_num >= total_pages:
+                is_complete = True
+                stop_reason = "reported_last_page"
+                break
+            if (
+                config.preflight_page_bound
+                and page_num == start_page == 1
+                and total_pages is not None
+                and total_pages > max(1, int(config.max_pages))
+            ):
+                stop_reason = "estimated_pages_exceed_bound"
+                LOGGER.info(
+                    "CNInfo announcement preflight exceeded page bound: purpose=%s market=%s total_pages=%s max_pages=%s",
+                    config.purpose_key,
+                    config.market,
+                    total_pages,
+                    max(1, int(config.max_pages)),
+                )
+                break
             if self.request_interval_seconds > 0:
                 time.sleep(self.request_interval_seconds)
 
+        resumable_stop = stop_reason in {
+            "estimated_pages_exceed_bound",
+            "max_pages_exhausted",
+        }
+        next_page = (
+            last_page_scanned + 1
+            if not is_complete and resumable_stop and last_page_scanned is not None
+            else None
+        )
         return _CninfoRawScanResult(
             config=config,
             records=records,
@@ -339,6 +387,10 @@ class _CninfoTransport:
             pages_scanned=pages_scanned,
             announcements_seen=len(records),
             max_announcement_time=max_time,
+            total_pages=total_pages,
+            start_page=start_page,
+            last_page_scanned=last_page_scanned,
+            next_page=next_page,
             stopped_at_watermark=stopped_at_watermark,
             is_complete=is_complete,
             stop_reason=stop_reason,
@@ -396,6 +448,33 @@ class _CninfoTransport:
     def _effective_page_size(page_size: int) -> int:
         """Respect CNInfo's effective 30-row page limit."""
         return min(_CNINFO_MAX_PAGE_SIZE, max(1, int(page_size)))
+
+    @classmethod
+    def _extract_total_pages(
+        cls,
+        payload: Mapping[str, Any],
+        *,
+        page_size: int,
+    ) -> Optional[int]:
+        """Return a validated provider total, deriving it from row counts if needed."""
+        reported = cls._positive_int(payload.get("totalpages"))
+        if reported is not None:
+            return reported
+        for key in ("totalAnnouncement", "totalRecordNum"):
+            total_records = cls._positive_int(payload.get(key))
+            if total_records is not None:
+                return int(math.ceil(total_records / max(1, int(page_size))))
+        return None
+
+    @staticmethod
+    def _positive_int(value: Any) -> Optional[int]:
+        if value is None or isinstance(value, bool):
+            return None
+        try:
+            parsed = int(str(value).strip())
+        except (TypeError, ValueError):
+            return None
+        return parsed if parsed > 0 else None
 
     @classmethod
     def _extract_records(cls, payload: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -680,6 +759,8 @@ class CninfoAnnouncementProvider:
                 end_date=scope.end_date,
                 page_size=min(scope.page_size, self.capabilities.max_page_size),
                 max_pages=scope.max_pages,
+                start_page=scope.start_page,
+                preflight_page_bound=scope.preflight_page_bound,
                 stop_at_watermark=(
                     None if scope.cursor is None else scope.cursor.value
                 ),
@@ -726,6 +807,11 @@ class CninfoAnnouncementProvider:
                     scope.page_size,
                     self.capabilities.max_page_size,
                 ),
+                "total_pages": raw_result.total_pages,
+                "start_page": raw_result.start_page,
+                "last_page_scanned": raw_result.last_page_scanned,
+                "next_page": raw_result.next_page,
+                "preflight_page_bound": scope.preflight_page_bound,
                 "market_config": dict(market_config),
                 "identity": identity or {},
             },

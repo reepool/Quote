@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import sqlite3
 from datetime import date, timedelta
 from pathlib import Path
@@ -27,6 +28,7 @@ BUSINESS_PROFILE_INDEX_PURPOSE = "business_profile_evidence:index"
 BUSINESS_PROFILE_FRONTIER_SCHEMA_VERSION = "business_profile_announcement_frontier.v1"
 BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION = "business_profile_operations_report.v1"
 DEFAULT_EXCHANGES = ("SSE", "SZSE", "BSE")
+LOGGER = logging.getLogger(__name__)
 
 
 class BusinessProfileAnnouncementFrontierRepository:
@@ -373,6 +375,8 @@ class BusinessProfileIndexDiscoveryService:
         resumable_windows: bool = False,
         max_windows_per_market: int = 2,
         use_committed_cursors: bool = True,
+        start_page: int = 1,
+        preflight_page_bound: bool = False,
         category: str = ANNUAL_REPORT_CATEGORY,
         max_targeted_repairs: int = 0,
         targeted_repair_lookback_years: int = 3,
@@ -438,6 +442,8 @@ class BusinessProfileIndexDiscoveryService:
                 page_size=page_size,
                 max_pages=max_pages_per_market,
                 overlap_days=overlap_days,
+                start_page=start_page,
+                preflight_page_bound=preflight_page_bound,
             )
             route = self.announcement_service.config.route_for(
                 BUSINESS_PROFILE_INDEX_PURPOSE,
@@ -486,6 +492,16 @@ class BusinessProfileIndexDiscoveryService:
                 "is_complete": bool(getattr(scan, "is_complete", True)),
                 "stop_reason": getattr(scan, "stop_reason", None),
             }
+            diagnostics = dict(getattr(scan, "diagnostics", {}) or {})
+            for key in (
+                "total_pages",
+                "start_page",
+                "last_page_scanned",
+                "next_page",
+                "preflight_page_bound",
+            ):
+                if diagnostics.get(key) is not None:
+                    exchange_report[key] = diagnostics[key]
             report["exchanges"].append(exchange_report)
             if dry_run:
                 continue
@@ -559,6 +575,8 @@ class BusinessProfileIndexDiscoveryService:
             "errors": [],
             "exchanges": [],
             "discovery_window_backlog": 0,
+            "preflight_splits": 0,
+            "page_resumes": 0,
             "incomplete_windows": [],
             "targeted_repair": {
                 "status": "disabled",
@@ -591,17 +609,45 @@ class BusinessProfileIndexDiscoveryService:
             selected = windows[: max(1, int(max_windows_per_market))]
             remaining = windows[len(selected) :]
             for window in selected:
+                window_start = str(window["start_date"])
+                window_end = str(window["end_date"])
+                splittable = window_start < window_end
+                closed_single_day = (
+                    window_start == window_end
+                    and window_end < end_date
+                    and str(window.get("kind") or "") != "fresh"
+                )
+                resume_page = (
+                    max(1, int(window.get("next_page") or 1))
+                    if closed_single_day
+                    else 1
+                )
+                if resume_page > 1:
+                    report["page_resumes"] += 1
+                LOGGER.info(
+                    "business-profile discovery window started: exchange=%s start=%s end=%s kind=%s start_page=%s preflight=%s",
+                    exchange,
+                    window_start,
+                    window_end,
+                    window.get("kind"),
+                    resume_page,
+                    splittable,
+                )
                 subreport = self.discover(
                     exchanges=(exchange,),
-                    start_date=str(window["start_date"]),
-                    end_date=str(window["end_date"]),
+                    start_date=window_start,
+                    end_date=window_end,
                     lookback_days=lookback_days,
                     overlap_days=overlap_days,
                     page_size=page_size,
                     max_pages_per_market=max_pages_per_market,
                     dry_run=dry_run,
                     resumable_windows=False,
-                    use_committed_cursors=window.get("kind") == "fresh",
+                    use_committed_cursors=(
+                        window.get("kind") == "fresh" and resume_page == 1
+                    ),
+                    start_page=resume_page,
+                    preflight_page_bound=splittable,
                     category=category,
                 )
                 for key in (
@@ -627,18 +673,73 @@ class BusinessProfileIndexDiscoveryService:
                     "window_kind": window.get("kind"),
                 }
                 report["exchanges"].append(window_result)
+                LOGGER.info(
+                    "business-profile discovery window completed: exchange=%s start=%s end=%s status=%s pages=%s page_range=%s-%s total_pages=%s stop_reason=%s complete=%s",
+                    exchange,
+                    window_start,
+                    window_end,
+                    exchange_result.get("status"),
+                    exchange_result.get("pages_scanned"),
+                    exchange_result.get("start_page"),
+                    exchange_result.get("last_page_scanned"),
+                    exchange_result.get("total_pages"),
+                    exchange_result.get("stop_reason"),
+                    complete,
+                )
                 if complete:
                     continue
                 children = _split_discovery_window(window)
+                next_page = _positive_page(exchange_result.get("next_page"))
+                page_checkpointed = False
+                if (
+                    len(children) == 1
+                    and closed_single_day
+                    and next_page is not None
+                    and str(exchange_result.get("stop_reason") or "")
+                    in {"max_pages_exhausted", "max_pages_reached"}
+                ):
+                    children[0]["next_page"] = next_page
+                    page_checkpointed = True
+                if (
+                    len(children) > 1
+                    and exchange_result.get("stop_reason")
+                    == "estimated_pages_exceed_bound"
+                ):
+                    report["preflight_splits"] += 1
                 remaining.extend(children)
-                report["incomplete_windows"].append(
-                    {
-                        "exchange": exchange,
-                        "start_date": window["start_date"],
-                        "end_date": window["end_date"],
-                        "stop_reason": exchange_result.get("stop_reason"),
-                        "splittable": len(children) > 1,
-                    }
+                incomplete = {
+                    "exchange": exchange,
+                    "start_date": window_start,
+                    "end_date": window_end,
+                    "stop_reason": exchange_result.get("stop_reason"),
+                    "splittable": len(children) > 1,
+                }
+                for key in (
+                    "total_pages",
+                    "start_page",
+                    "last_page_scanned",
+                    "next_page",
+                ):
+                    if exchange_result.get(key) is not None:
+                        incomplete[key] = exchange_result[key]
+                if page_checkpointed:
+                    incomplete["page_checkpointed"] = True
+                report["incomplete_windows"].append(incomplete)
+                LOGGER.info(
+                    "business-profile discovery window deferred: exchange=%s start=%s end=%s stop_reason=%s child_windows=%s next_page=%s page_checkpointed=%s",
+                    exchange,
+                    window_start,
+                    window_end,
+                    exchange_result.get("stop_reason"),
+                    [
+                        {
+                            "start_date": child.get("start_date"),
+                            "end_date": child.get("end_date"),
+                        }
+                        for child in children
+                    ],
+                    next_page,
+                    page_checkpointed,
                 )
             remaining = _deduplicate_discovery_windows(remaining)
             report["discovery_window_backlog"] += len(remaining)
@@ -1142,6 +1243,9 @@ def _deduplicate_discovery_windows(
             "end_date": end,
             "kind": str(item.get("kind") or "backlog"),
         }
+        next_page = _positive_page(item.get("next_page"))
+        if next_page is not None:
+            candidate["next_page"] = next_page
         if key not in unique or candidate["kind"] == "fresh":
             unique[key] = candidate
     return sorted(
@@ -1179,6 +1283,16 @@ def _split_discovery_window(window: Mapping[str, Any]) -> list[dict[str, Any]]:
             "kind": "backlog",
         },
     ]
+
+
+def _positive_page(value: Any) -> int | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        page = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return page if page > 1 else None
 
 
 def _canonical_json(value: Mapping[str, Any]) -> str:

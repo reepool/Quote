@@ -78,6 +78,8 @@ def test_scope_key_excludes_run_window_and_bounds_but_includes_stream_identity()
         end_date="2026-03-01",
         page_size=30,
         max_pages=10,
+        start_page=241,
+        preflight_page_bound=True,
         keyword="年度报告",
     )
     different = AnnouncementScope(
@@ -189,6 +191,32 @@ def test_routing_preserves_page_bound_partial_result_without_fallback():
         "degraded",
         (_record(),),
         stop_reason="max_pages_exhausted",
+    )
+    backup = _Provider("backup", "success_empty")
+    service = AnnouncementAcquisitionService(
+        registry=AnnouncementProviderRegistry([primary, backup]),
+        config=AnnouncementAcquisitionConfig(
+            provider_configs={"primary": {}, "backup": {}},
+            default_route=AnnouncementRouteConfig(
+                sources=("primary", "backup"),
+                fallback_on=frozenset({"degraded"}),
+            ),
+        ),
+    )
+
+    result = service.acquire(_query())
+
+    assert result.selected_source == "primary"
+    assert result.fallback_used is False
+    assert [attempt.source for attempt in result.attempts] == ["primary"]
+
+
+def test_routing_preserves_estimated_page_bound_without_fallback():
+    primary = _Provider(
+        "primary",
+        "degraded",
+        (_record(),),
+        stop_reason="estimated_pages_exceed_bound",
     )
     backup = _Provider("backup", "success_empty")
     service = AnnouncementAcquisitionService(
@@ -568,6 +596,135 @@ def test_cninfo_provider_reports_page_bound_as_incomplete():
     assert bounded.is_complete is False
     assert bounded.status == "degraded"
     assert bounded.stop_reason == "max_pages_exhausted"
+    assert bounded.diagnostics["total_pages"] is None
+    assert bounded.diagnostics["next_page"] == 2
+
+
+def test_cninfo_provider_preflights_reported_total_before_page_bound():
+    full_page = [
+        {
+            "announcementId": f"preflight-{index}",
+            "announcementTitle": f"公告{index}",
+            "announcementTime": 1777392000000 - index,
+        }
+        for index in range(30)
+    ]
+    session = _Session(
+        payloads=[{"announcements": full_page, "totalpages": "500"}]
+    )
+
+    result = _cninfo_provider(session).discover(
+        _query(
+            page_size=30,
+            max_pages=240,
+            preflight_page_bound=True,
+        )
+    )
+
+    assert result.status == "degraded"
+    assert result.stop_reason == "estimated_pages_exceed_bound"
+    assert result.pages_scanned == 1
+    assert result.announcements_seen == 30
+    assert result.diagnostics["total_pages"] == 500
+    assert result.diagnostics["start_page"] == 1
+    assert result.diagnostics["last_page_scanned"] == 1
+    assert result.diagnostics["next_page"] == 2
+    assert len(session.calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("payload_totals", "expected_total"),
+    [
+        ({"totalAnnouncement": "60"}, 2),
+        ({"totalpages": "bad", "totalRecordNum": 90}, 3),
+    ],
+)
+def test_cninfo_provider_derives_total_pages_from_record_counts(
+    payload_totals,
+    expected_total,
+):
+    full_page = [
+        {"announcementId": f"derived-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+
+    result = _cninfo_provider(
+        _Session(payloads=[{"announcements": full_page, **payload_totals}])
+    ).discover(
+        _query(page_size=30, max_pages=1, preflight_page_bound=True)
+    )
+
+    assert result.stop_reason == "estimated_pages_exceed_bound"
+    assert result.diagnostics["total_pages"] == expected_total
+
+
+@pytest.mark.parametrize(
+    "invalid_total",
+    [None, "bad", -1, 0, False],
+)
+def test_cninfo_provider_ignores_invalid_total_page_hints(invalid_total):
+    full_page = [
+        {"announcementId": f"invalid-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+
+    result = _cninfo_provider(
+        _Session(
+            payloads=[
+                {"announcements": full_page, "totalpages": invalid_total}
+            ]
+        )
+    ).discover(
+        _query(page_size=30, max_pages=1, preflight_page_bound=True)
+    )
+
+    assert result.stop_reason == "max_pages_exhausted"
+    assert result.diagnostics["total_pages"] is None
+
+
+def test_cninfo_provider_completes_at_reported_last_page():
+    full_page = [
+        {"announcementId": f"last-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+
+    result = _cninfo_provider(
+        _Session(payloads=[{"announcements": full_page, "totalpages": 1}])
+    ).discover(_query(page_size=30, max_pages=2, preflight_page_bound=True))
+
+    assert result.status == "success"
+    assert result.is_complete is True
+    assert result.stop_reason == "reported_last_page"
+    assert result.diagnostics["next_page"] is None
+
+
+def test_cninfo_provider_resumes_from_bounded_start_page():
+    page_241 = [
+        {"announcementId": f"p241-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+    page_242 = [
+        {"announcementId": f"p242-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+    session = _Session(
+        payloads=[
+            {"announcements": page_241, "totalpages": 242},
+            {"announcements": page_242, "totalpages": 242},
+        ]
+    )
+
+    result = _cninfo_provider(session).discover(
+        _query(page_size=30, max_pages=2, start_page=241)
+    )
+
+    assert result.status == "success"
+    assert result.stop_reason == "reported_last_page"
+    assert result.pages_scanned == 2
+    assert result.diagnostics["start_page"] == 241
+    assert result.diagnostics["last_page_scanned"] == 242
+    assert result.diagnostics["next_page"] is None
+    assert [call["data"]["pageNum"] for call in session.calls] == ["241", "242"]
 
 
 def test_cninfo_provider_reports_successful_empty_only_for_complete_scan():
