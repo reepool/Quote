@@ -25,6 +25,38 @@
   `fd_delta=0`, unique logical identities, zero 429/5xx/timeout/parse/schema
   failures, and an empty pool registry after shutdown.
 
+### Completion Audit Rerun (2026-08-07)
+
+The current `master` implementation was rerun rather than relying only on the
+earlier validation record:
+
+- Common gateway, orchestration, weighted pool, routed client, routing config,
+  source-lineage persistence, logging separation, and staged-validator tests:
+  148 passed.
+- CNInfo corporate-action semantic processing: 102 passed; scheduler: 6 passed;
+  title classification: 13 passed; read-only lineage/API routes: 4 passed.
+- Business-profile legacy adapter: 9 passed; semantic extraction: 19 passed;
+  semantic runtime: 35 passed; async production: 49 passed; maintenance
+  scheduler: 12 passed; production rollout: 13 passed.
+- Source-lineage apply-twice/rollback compatibility and corporate-action schema
+  migration: 3 passed.
+- The first combined cross-file CNInfo run stopped producing output after 93
+  cases because of the repository session-scoped asyncio fixture behavior. Each
+  affected file was then run in a separate bounded process and passed with the
+  counts above; the interrupted aggregate run is not counted as a pass.
+- The offline 10/25/50 benchmark passed again with 8:2, 19:6, and 38:12 source
+  counts, peak transport concurrency 10/25/50, unique request/hash/business
+  identities, `fd_delta=0`, and an empty pool registry after every shutdown.
+- `scripts/research_business_profile_semantic_production.py plan` completed
+  against an isolated `/tmp` database/artifact/checkpoint configuration with
+  the network kill switch enabled. It reported `llm_calls=0`, wrote only the
+  temporary plan artifact/checkpoint, and shut down shared LLM resources.
+- `validate_common_llm_gateway_live.py` failed closed before transport when the
+  route remained disabled. Repository static scans found no business-layer
+  `llm_config.profiles` or `resource_for_profile()` access, and
+  `config/13_llm.json` remained the sole project JSON owner of the top-level
+  `llm` key.
+
 ## Controlled Live Validation
 
 Synthetic non-sensitive Chinese business text was used. No key value, request
