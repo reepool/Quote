@@ -265,7 +265,7 @@ JSON 解析失败或 schema 校验失败时，网关最多执行配置允许的�
 
 网关日志分别输出首次 `initial_queue_wait_ms`、累计 `admission_wait_ms`、`execution_elapsed_ms` 和总 `latency_ms`。历史批处理应以队列耗时判断容量压力，以执行耗时判断模型长尾，不能再把两者混为一种 provider latency。scheduler 或业务流水线仍需保留更外层的任务 deadline 和 kill switch。
 
-限额优先级为 provider resource -> profile -> business request。provider resource 是账号、模型或商业计划定义的 quota bucket；当前 Grok 4.5 的两个 profile 映射到同一个资源并共享 `58 RPM`。如果同一 API key 下其他模型拥有不同配额，应建立独立 provider resource 并让相应 profile 显式引用。子级只能收紧，不能把 `58` 提高为更大的值，也不能通过设置 `0` 关闭父级。
+限额优先级为 provider resource -> profile -> business request。provider resource 是账号、模型或商业计划定义的 quota bucket；当前 Scorpio 的 Grok 与 Luna Key quota 相互独立，分别映射到 `scorpio:grok` 和 `scorpio:luna`，每个资源配置 `10 RPM`。同一模型的多个业务 profile 仍共享其对应资源。若未来多个 profile 共享同一供应商 quota，必须显式映射到同一个 provider resource。子级只能收紧，不能提高父级上限，也不能通过设置 `0` 关闭父级。
 
 同一 provider resource 下相同的业务 `rate_limit_scope` 只允许一个正 RPM 配置。不同阶段如传入冲突值，网关必须在发起网络请求前返回 `configuration_error`，不能拆成多个独立窗口。RPM 配置必须是精确整数，小数和布尔值均拒绝。
 
@@ -273,7 +273,7 @@ provider 快照同时输出 `configured_requests_per_minute`、`rpm_window_reque
 
 业务任务报告必须区分业务 override 和最终有效 RPM。业务值为 `0` 时应显示继承后的 provider/profile 上限，不能把 `0` 报告成实际无限制。
 
-当前共享 RPM 是单进程治理。多个应用 worker 或主机如果共用同一个供应商 quota bucket，需要在扩容前引入 Redis 等分布式限流器，不能把每个进程的 `58 RPM` 简单相加。
+当前共享 RPM 是单进程治理。多个应用 worker 或主机如果共用同一个供应商 quota bucket，需要在扩容前引入 Redis 等分布式限流器，不能把每个进程配置的 RPM 简单相加。
 
 ### 7.1 智能控流状态
 

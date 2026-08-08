@@ -407,13 +407,12 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     }
     assert config.pools["shared_semantic"].enabled is True
     assert config.is_logical_profile_enabled("semantic_extraction") is True
-    assert [
-        (member.source_label, member.weight)
-        for member in config.pools["shared_semantic"].members
-    ] == [
-        ("scorpio:grok-4.5", 3),
-        ("scorpio:gpt-5.6-luna", 1),
+    members = config.pools["shared_semantic"].members
+    assert [member.source_label for member in members] == [
+        "scorpio:grok-4.5",
+        "scorpio:gpt-5.6-luna",
     ]
+    assert all(member.weight > 0 for member in members)
     profiles = config.profiles
     assert profiles["semantic_extraction__scorpio_grok"].api_key_env == (
         "QUOTE_LLM_SCORPIO_GROK_API_KEY"

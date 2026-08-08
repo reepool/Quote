@@ -8,7 +8,7 @@ The gateway SHALL load named logical and concrete profiles from the project conf
 - **THEN** the gateway raises a classified configuration/disabled error before calling the transport
 
 #### Scenario: Missing key fails closed
-- **WHEN** an enabled selected concrete profile names `QUOTE_LLM_PIPIO_GROK_API_KEY` but that environment variable is absent or empty
+- **WHEN** an enabled selected concrete profile names `QUOTE_LLM_SCORPIO_GROK_API_KEY` but that environment variable is absent or empty
 - **THEN** the gateway raises `authentication_error` before calling the transport
 
 #### Scenario: URL normalization avoids duplicate version paths

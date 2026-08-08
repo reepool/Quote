@@ -16,7 +16,7 @@
 - base URL：`https://scorpio.reepool.com`
 - models：`grok-4.5`、`gpt-5.6-luna`
 - key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`
-- provider quota bucket：必须通过受控验证确认共享或独立后配置
+- provider quota bucket：两个 Key 的 quota 已确认相互独立，分别使用 `scorpio:grok` 和 `scorpio:luna`
 
 本地开发时，将真实值放在项目根目录 `.env`，该文件已被 gitignore 忽略。应用入口显式调用 `load_project_environment()`，且 `override=False`，所以进程已经注入的变量优先。`.env` 不应被提交、写入日志或复制到报告中。
 
@@ -27,12 +27,13 @@
 ## 路由、权重和单模型配置
 
 业务只使用 `routes` 中的逻辑 profile；`routes` 指向 pool，pool 的 `members` 再映射到
-实际 profile。负载均衡权重配置在 `llm.pools.shared_semantic.members[*].weight`。当前 Grok
-和 Luna 分别为 `3`、`1`，在两个成员都健康、有容量且不发生借用时，长期正常调度比例约为
-75% 和 25%。权重必须是正整数，不能用 `0` 禁用成员。
+实际 profile。负载均衡权重配置在 `llm.pools.shared_semantic.members[*].weight`，运行时比例
+始终以该配置中的当前值为准。例如 Grok/Luna 配置为 `3`、`1` 时，在两个成员都健康、
+有容量且不发生借用的持续流量下，长期正常调度比例约为 75% 和 25%；配置为 `1`、`1`
+时目标比例约为 50% 和 50%。权重必须是正整数，不能用 `0` 禁用成员。
 
 `borrow_idle_capacity=true` 表示首选成员繁忙、熔断或不可用时，健康成员可以借用空闲容量，
-因此短时间实际比例可能偏离 3:1。若更重视严格比例而不是吞吐，可关闭借用，但故障成员可能
+因此短时间实际比例可能偏离配置权重。若更重视严格比例而不是吞吐，可关闭借用，但故障成员可能
 导致容量闲置。
 
 只使用一个模型时，应从 `members` 删除另一个成员，并可将其两个实际 profile 的 `enabled`

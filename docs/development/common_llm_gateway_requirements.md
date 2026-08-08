@@ -3,7 +3,9 @@
 > 状态说明（2026-07-22）：本文继续定义单次 LLM 请求、结构化输出和网关安全契约。
 > 多 profile/多业务的 provider 全局并发、异步队列、资源池、生命周期和批处理调度由
 > `docs/development/common_llm_work_orchestration_requirements.md` 补充定义；如并发治理表述
-> 不一致，以新文档为准。
+> 不一致，以新文档为准。多模型加权路由、独立 quota resource 和当前 Scorpio 部署配置由
+> `docs/development/common_llm_multi_source_routing_requirements.md` 补充定义；如单模型示例与
+> 当前多源配置冲突，以多源需求和 `config/13_llm.json` 为准。
 
 ## 1. 文档定位
 
