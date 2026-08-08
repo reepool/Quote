@@ -8,7 +8,7 @@ import os
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping, MutableMapping, Sequence
+from typing import Any, Callable, Mapping, MutableMapping
 
 
 PIPELINE_SCHEMA_VERSION = "business_profile_semantic_pipeline.v1"
@@ -464,7 +464,9 @@ class BusinessProfileSemanticPipeline:
             if float(metrics.get(key) or 0) > float(maximum):
                 return f"budget_exhausted:{key}"
         consumable_comparisons = (
-            ("tokens", budgets.max_tokens),
+            # Token limits are enforced by the runtime before each field-family
+            # request. The checkpoint keeps cumulative usage for observability,
+            # but one completed family must not block another unfinished family.
             ("cost", budgets.max_cost),
             ("elapsed_seconds", budgets.max_elapsed_seconds),
             ("errors", budgets.max_errors),

@@ -5,13 +5,14 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import re
 import sqlite3
 import time
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from research.business_profile_activity_production import (
     BusinessProfileActivityProducer,
@@ -67,7 +68,9 @@ from research.business_profile_unit_conversions import load_unit_conversion_cata
 from utils.date_utils import get_shanghai_time
 
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v1"
+logger = logging.getLogger(__name__)
+
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v2"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
@@ -1088,6 +1091,7 @@ class BusinessProfileSemanticRuntime:
             "structured_fallback_rejected_rows": 0,
             "semantic_rows_accepted": 0,
             "semantic_rows_rejected": 0,
+            "semantic_field_families_reused": 0,
             "evidence_spans_offered": 0,
             "evidence_spans_referenced": 0,
             "evidence_spans_resolved": 0,
@@ -1107,6 +1111,31 @@ class BusinessProfileSemanticRuntime:
             selected = _load_selected(
                 self.section_store, item["selected_artifact_path"]
             )
+            reusable = self._reusable_semantic_family(
+                item=item,
+                runtime_identities=scope.identities,
+            )
+            if reusable is not None:
+                metrics["semantic_field_families_reused"] += 1
+                _increment_family_metrics(
+                    metrics["by_field_family"],
+                    item["field_family"],
+                    semantic_field_families_reused=1,
+                )
+                outputs.append({**item, **reusable, "reused": True})
+                logger.info(
+                    "business-profile semantic family reused instrument_id=%s "
+                    "field_family=%s source_document_id=%s run_id=%s records=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    (item.get("document") or {}).get("identity"),
+                    reusable.get("run_id"),
+                    sum(
+                        len(values)
+                        for values in dict(reusable.get("record_ids") or {}).values()
+                    ),
+                )
+                continue
             templates = self._templates_for(item["document"], item["instrument_id"])
             tables, diagnostics = parse_selected_tables(selected, templates=templates)
             spans = locate_action_object_spans(selected)
@@ -1115,6 +1144,7 @@ class BusinessProfileSemanticRuntime:
             semantic_records: list[tuple[str, dict[str, Any]]] = []
             structured_fallback_used = False
             expected_non_disclosure = False
+            semantic_family_complete = True
             if item["field_family"] in {
                 "structured_segments",
                 "tabular_operating_facts",
@@ -1158,12 +1188,13 @@ class BusinessProfileSemanticRuntime:
                             item["field_family"],
                             configuration_blocked=1,
                         )
-                        continue
+                        break
                     budget_stop_reason = self._network_budget_stop_reason(
                         config=config,
                         checkpoint_metrics=checkpoint.get("metrics") or {},
                         stage_metrics=metrics,
                         stage_started_at=stage_started_at,
+                        field_family=item["field_family"],
                     )
                     if budget_stop_reason:
                         break
@@ -1233,6 +1264,7 @@ class BusinessProfileSemanticRuntime:
                                 "has no explicit rows for a governed table"
                             )
                         if rejected_rows:
+                            semantic_family_complete = False
                             machine_rework.append(
                                 _rework_item(
                                     item,
@@ -1280,18 +1312,28 @@ class BusinessProfileSemanticRuntime:
                                 item["field_family"],
                                 configuration_blocked=1,
                             )
+                            break
                         else:
                             metrics["errors"] += 1
                             metrics["structured_fallback_rejected"] += 1
+                            failure_diagnostics = _runtime_failure_diagnostics(
+                                exc,
+                                transformation_stage="structured_record_conversion",
+                                semantic_audit=semantic_audit,
+                            )
                             machine_rework.append(
                                 _rework_item(
                                     item,
                                     item["document"],
                                     reason,
-                                    diagnostics={"semantic_audit": semantic_audit}
-                                    if semantic_audit
-                                    else None,
+                                    diagnostics=failure_diagnostics,
                                 )
+                            )
+                            _log_runtime_semantic_failure(
+                                item,
+                                reason=reason,
+                                exc=exc,
+                                diagnostics=failure_diagnostics,
                             )
                             _increment_family_metrics(
                                 metrics["by_field_family"],
@@ -1299,25 +1341,32 @@ class BusinessProfileSemanticRuntime:
                                 machine_rework=1,
                                 structured_fallback_rejected=1,
                             )
-                        continue
+                            continue
                 elif deterministic_count == 0:
                     expected_non_disclosure = True
             elif item["field_family"] in {"atomic_activities", "named_relationships"}:
                 if config.kill_switches["network_calls"] or self.llm_client is None:
-                    machine_rework.append(
-                        _rework_item(item, item["document"], "gateway_failure")
+                    reason = (
+                        "semantic_network_disabled"
+                        if config.kill_switches["network_calls"]
+                        else "semantic_gateway_unavailable"
                     )
+                    blocked_configuration_reasons[reason] = (
+                        blocked_configuration_reasons.get(reason, 0) + 1
+                    )
+                    metrics["configuration_blocked_documents"] += 1
                     _increment_family_metrics(
                         metrics["by_field_family"],
                         item["field_family"],
-                        machine_rework=1,
+                        configuration_blocked=1,
                     )
-                    continue
+                    break
                 budget_stop_reason = self._network_budget_stop_reason(
                     config=config,
                     checkpoint_metrics=checkpoint.get("metrics") or {},
                     stage_metrics=metrics,
                     stage_started_at=stage_started_at,
+                    field_family=item["field_family"],
                 )
                 if budget_stop_reason:
                     break
@@ -1347,6 +1396,7 @@ class BusinessProfileSemanticRuntime:
                     records_by_type, semantic_records, semantic_exceptions = (
                         self._semantic_records(item, selected, envelope)
                     )
+                    semantic_family_complete = not semantic_exceptions
                     exceptions.extend(semantic_exceptions)
                     metrics["tokens"] += float(
                         (semantic_audit.get("usage") or {}).get("total_tokens") or 0
@@ -1386,16 +1436,38 @@ class BusinessProfileSemanticRuntime:
                             item["field_family"],
                             llm_calls=-1,
                         )
+                    reason = _semantic_failure_reason(exc)
+                    if reason == "blocked_configuration":
+                        blocker = _semantic_configuration_reason(exc)
+                        blocked_configuration_reasons[blocker] = (
+                            blocked_configuration_reasons.get(blocker, 0) + 1
+                        )
+                        metrics["configuration_blocked_documents"] += 1
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            configuration_blocked=1,
+                        )
+                        break
                     metrics["errors"] += 1
+                    failure_diagnostics = _runtime_failure_diagnostics(
+                        exc,
+                        transformation_stage="atomic_record_conversion",
+                        semantic_audit=semantic_audit,
+                    )
                     machine_rework.append(
                         _rework_item(
                             item,
                             item["document"],
-                            _semantic_failure_reason(exc),
-                            diagnostics={"semantic_audit": semantic_audit}
-                            if semantic_audit
-                            else None,
+                            reason,
+                            diagnostics=failure_diagnostics,
                         )
+                    )
+                    _log_runtime_semantic_failure(
+                        item,
+                        reason=reason,
+                        exc=exc,
+                        diagnostics=failure_diagnostics,
                     )
                     _increment_family_metrics(
                         metrics["by_field_family"],
@@ -1449,6 +1521,36 @@ class BusinessProfileSemanticRuntime:
                     )
                 elif item["field_family"] in {"atomic_activities", "named_relationships"}:
                     empty_reason = "semantic_no_explicit_facts"
+                    if item["field_family"] == "named_relationships":
+                        # Named counterparties are not disclosed by every issuer.
+                        # A schema-valid empty result is a reusable non-disclosure.
+                        expected_non_disclosure = True
+                        metrics["expected_non_disclosure_documents"] += 1
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            expected_non_disclosure=1,
+                        )
+                    else:
+                        # An annual report should disclose at least one issuer
+                        # activity. Expand selected context on the automated retry.
+                        semantic_family_complete = False
+                        machine_rework.append(
+                            _rework_item(
+                                item,
+                                item["document"],
+                                "context_incomplete",
+                                diagnostics={
+                                    "semantic_audit": semantic_audit,
+                                    "empty_output_reason": empty_reason,
+                                },
+                            )
+                        )
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            machine_rework=1,
+                        )
                 elif diagnostics:
                     empty_reason = "deterministic_parser_failure"
                 elif any(
@@ -1490,7 +1592,17 @@ class BusinessProfileSemanticRuntime:
                                 value.to_dict() for value in diagnostics
                             ],
                             "semantic_audit": semantic_audit,
+                            "record_ids": {
+                                key: [_record_id(key, row) for row in rows]
+                                for key, rows in records_by_type.items()
+                                if key != "evidence"
+                            },
+                            "evidence_ids": [
+                                row["evidence_id"]
+                                for row in records_by_type.get("evidence", [])
+                            ],
                             "expected_non_disclosure": expected_non_disclosure,
+                            "semantic_family_complete": semantic_family_complete,
                             "empty_output_reason": (
                                 empty_reason if item_record_count == 0 else None
                             ),
@@ -1498,21 +1610,50 @@ class BusinessProfileSemanticRuntime:
                     },
                     records_by_type=records_by_type,
                 )
+                logger.info(
+                    "business-profile semantic family persisted instrument_id=%s "
+                    "field_family=%s run_id=%s records=%s evidence=%s semantic=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    run_id,
+                    item_record_count,
+                    len(records_by_type.get("evidence", [])),
+                    semantic_audit is not None,
+                )
+                logger.debug(
+                    "business-profile semantic persistence detail instrument_id=%s "
+                    "field_family=%s run_id=%s semantic_audit=%s record_ids=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    run_id,
+                    _runtime_debug_json(semantic_audit or {}),
+                    _runtime_debug_json(
+                        {
+                            key: [_record_id(key, row) for row in rows]
+                            for key, rows in records_by_type.items()
+                            if key != "evidence"
+                        }
+                    ),
+                )
                 reuse = False
             else:
                 reuse = True
-            metrics["machine_rework_recovered"] += self._resolve_runtime_rework(
-                instrument_id=item["instrument_id"],
-                field_family=item["field_family"],
-                source_document_id=str(item["document"]["identity"]),
-                reasons=(
-                    "context_incomplete",
-                    "schema_failure",
-                    "gateway_failure",
-                    "partial_row_rejection",
-                    "catalog_proposal",
-                ),
-            )
+            if semantic_family_complete:
+                metrics["machine_rework_recovered"] += self._resolve_runtime_rework(
+                    instrument_id=item["instrument_id"],
+                    field_family=item["field_family"],
+                    source_document_id=str(item["document"]["identity"]),
+                    reasons=(
+                        "context_incomplete",
+                        "evidence_provenance_failed",
+                        "unit_normalization_failed",
+                        "numeric_validation_failed",
+                        "schema_failure",
+                        "gateway_failure",
+                        "partial_row_rejection",
+                        "catalog_proposal",
+                    ),
+                )
             outputs.append(
                 {
                     **item,
@@ -1530,6 +1671,7 @@ class BusinessProfileSemanticRuntime:
                     "semantic": semantic_audit is not None,
                     "semantic_audit": semantic_audit,
                     "expected_non_disclosure": expected_non_disclosure,
+                    "semantic_family_complete": semantic_family_complete,
                 }
             )
             _increment_family_metrics(
@@ -1667,26 +1809,36 @@ class BusinessProfileSemanticRuntime:
         tokens = 0
         errors = 0
         by_field_family: dict[str, dict[str, float]] = {}
+        blocked_configuration_reasons: dict[str, int] = {}
+        configuration_stop_requested = False
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
         for output in extracted["outputs"]:
             selected = _load_selected(
                 self.section_store, output["selected_artifact_path"]
             )
-            for record_type in ("activities", "relationships", "operating_facts"):
+            for record_type in (
+                "activities",
+                "relationships",
+                "segments",
+                "operating_facts",
+            ):
                 target_type = {
                     "activities": "activity",
                     "relationships": "relationship",
+                    "segments": "segment",
                     "operating_facts": "concentration",
                 }[record_type]
                 for target_id in output["record_ids"].get(record_type, []):
                     target = self._find_record(record_type, target_id)
                     verification_target = _verification_target(target)
                     if (
-                        record_type == "operating_facts"
+                        record_type in {"segments", "operating_facts"}
                         and verification_target.get("derivation_method")
-                        == "semantic_structured_fallback"
+                        == "semantic_synthesis"
                         and verification_target.get("exact_evidence_valid") is True
+                        and verification_target.get("numeric_reconciliation_valid")
+                        is True
                     ):
                         verifications.append(
                             {
@@ -1696,7 +1848,7 @@ class BusinessProfileSemanticRuntime:
                                 "proof": {
                                     "skip_semantic_verifier": True,
                                     "reason": "validated_structured_semantic_candidate",
-                                    "canonical_promotion_allowed": False,
+                                    "canonical_promotion_allowed": True,
                                 },
                             }
                         )
@@ -1715,31 +1867,42 @@ class BusinessProfileSemanticRuntime:
                         )
                         continue
                     if config.kill_switches["network_calls"] or self.llm_client is None:
-                        machine_rework.append(
-                            _rework_item(
-                                output, output["document"], "gateway_failure", target_id
-                            )
+                        reason = (
+                            "semantic_network_disabled"
+                            if config.kill_switches["network_calls"]
+                            else "semantic_gateway_unavailable"
+                        )
+                        blocked_configuration_reasons[reason] = (
+                            blocked_configuration_reasons.get(reason, 0) + 1
                         )
                         _increment_family_metrics(
-                            by_field_family, output["field_family"], machine_rework=1
+                            by_field_family,
+                            output["field_family"],
+                            configuration_blocked=1,
                         )
-                        continue
+                        configuration_stop_requested = True
+                        break
                     budget_stop_reason = self._network_budget_stop_reason(
                         config=config,
                         checkpoint_metrics=checkpoint.get("metrics") or {},
-                        stage_metrics={
-                            "tokens": tokens,
-                            "cost": 0,
-                            "errors": errors,
-                        },
+                        stage_metrics=by_field_family.get(
+                            output["field_family"], {}
+                        ),
                         stage_started_at=stage_started_at,
+                        field_family=output["field_family"],
                     )
                     if budget_stop_reason:
                         break
+                    semantic_audits: list[Mapping[str, Any]] = []
+                    llm_calls += 1
+                    _increment_family_metrics(
+                        by_field_family, output["field_family"], llm_calls=1
+                    )
                     try:
                         verification, audit = self._async_bridge.run(
                             BusinessProfileSemanticExtractor(
-                                self.llm_client
+                                self.llm_client,
+                                audit_sink=semantic_audits.append,
                             ).verify_async(
                                 target_type=target_type,
                                 target=verification_target,
@@ -1747,14 +1910,54 @@ class BusinessProfileSemanticRuntime:
                             )
                         )
                     except Exception as exc:
+                        semantic_audit = (
+                            dict(semantic_audits[-1]) if semantic_audits else None
+                        )
+                        failed_tokens = int(
+                            ((semantic_audit or {}).get("usage") or {}).get(
+                                "total_tokens"
+                            )
+                            or 0
+                        )
+                        tokens += failed_tokens
+                        _increment_family_metrics(
+                            by_field_family,
+                            output["field_family"],
+                            tokens=failed_tokens,
+                        )
+                        reason = _semantic_failure_reason(exc)
+                        if reason == "blocked_configuration":
+                            blocker = _semantic_configuration_reason(exc)
+                            blocked_configuration_reasons[blocker] = (
+                                blocked_configuration_reasons.get(blocker, 0) + 1
+                            )
+                            _increment_family_metrics(
+                                by_field_family,
+                                output["field_family"],
+                                configuration_blocked=1,
+                            )
+                            configuration_stop_requested = True
+                            break
                         errors += 1
+                        failure_diagnostics = _runtime_failure_diagnostics(
+                            exc,
+                            transformation_stage="semantic_verification",
+                            semantic_audit=semantic_audit,
+                        )
                         machine_rework.append(
                             _rework_item(
                                 output,
                                 output["document"],
-                                _semantic_failure_reason(exc),
+                                reason,
                                 target_id,
+                                diagnostics=failure_diagnostics,
                             )
+                        )
+                        _log_runtime_semantic_failure(
+                            output,
+                            reason=reason,
+                            exc=exc,
+                            diagnostics=failure_diagnostics,
                         )
                         _increment_family_metrics(
                             by_field_family, output["field_family"], machine_rework=1
@@ -1763,17 +1966,15 @@ class BusinessProfileSemanticRuntime:
                     verifications.append(
                         {**dict(verification), "audit": audit.to_dict()}
                     )
-                    llm_calls += 1
                     tokens += int((audit.usage or {}).get("total_tokens") or 0)
                     _increment_family_metrics(
                         by_field_family,
                         output["field_family"],
-                        llm_calls=1,
                         tokens=int((audit.usage or {}).get("total_tokens") or 0),
                     )
-                if budget_stop_reason:
+                if budget_stop_reason or configuration_stop_requested:
                     break
-            if budget_stop_reason:
+            if budget_stop_reason or configuration_stop_requested:
                 break
         for exception in machine_rework[inherited_rework_count:]:
             _increment_family_reason(
@@ -1805,14 +2006,26 @@ class BusinessProfileSemanticRuntime:
             "errors": errors,
             "verified_records": len(verifications),
             "blocking_machine_rework": len(machine_rework),
+            "configuration_blocked_documents": sum(
+                blocked_configuration_reasons.values()
+            ),
+            "blocked_configuration_reasons": blocked_configuration_reasons,
             "by_field_family": by_field_family,
         }
+        blocked_configuration = bool(blocked_configuration_reasons)
         quality = {
             "stage": "verify",
-            "stage_ready": bool(extracted["outputs"] and not machine_rework and not errors),
+            "stage_ready": bool(
+                extracted["outputs"]
+                and not machine_rework
+                and not errors
+                and not blocked_configuration
+            ),
             "blocking_machine_rework": len(machine_rework),
             "verified_records": len(verifications),
             "selected_documents": len(extracted["outputs"]),
+            "blocked_configuration": blocked_configuration,
+            "blocked_configuration_reasons": blocked_configuration_reasons,
         }
         if budget_stop_reason:
             return {
@@ -1838,20 +2051,26 @@ class BusinessProfileSemanticRuntime:
         checkpoint_metrics: Mapping[str, Any],
         stage_metrics: Mapping[str, Any],
         stage_started_at: float,
+        field_family: str | None = None,
     ) -> str | None:
         """Return the consumable budget that forbids the next network request."""
 
         elapsed = float(checkpoint_metrics.get("elapsed_seconds") or 0) + max(
             0.0, self.clock() - stage_started_at
         )
+        family_metrics = (
+            dict((stage_metrics.get("by_field_family") or {}).get(field_family) or {})
+            if field_family and "by_field_family" in stage_metrics
+            else dict(stage_metrics)
+        )
         consumed = {
-            "tokens": float(checkpoint_metrics.get("tokens") or 0)
-            + float(stage_metrics.get("tokens") or 0),
-            "cost": float(checkpoint_metrics.get("cost") or 0)
-            + float(stage_metrics.get("cost") or 0),
+            # Tokens and model errors are bounded per field-family request. Prior
+            # checkpoint usage remains observable but must not block unfinished
+            # families after another family completed successfully.
+            "tokens": float(family_metrics.get("tokens") or 0),
+            "cost": float(family_metrics.get("cost") or 0),
             "elapsed_seconds": elapsed,
-            "errors": float(checkpoint_metrics.get("errors") or 0)
-            + float(stage_metrics.get("errors") or 0),
+            "errors": float(family_metrics.get("errors") or 0),
         }
         limits = {
             "tokens": config.budgets.max_tokens,
@@ -2080,7 +2299,9 @@ class BusinessProfileSemanticRuntime:
             validation = evidence.setdefault("metadata", {}).setdefault(
                 "promotion_validation", {}
             )
-            validation["numeric_reconciliation_valid"] = False
+            # Schema/range checks run before conversion, and conversion below
+            # must resolve through the governed unit catalog.
+            validation["numeric_reconciliation_valid"] = True
             evidence_by_id[evidence["evidence_id"]] = evidence
             if item["field_family"] == "structured_segments":
                 record = _semantic_segment_record(
@@ -2096,6 +2317,22 @@ class BusinessProfileSemanticRuntime:
                 raise ValueError("unsupported structured semantic field family")
             record.setdefault("metadata", {})["exact_evidence"] = row["evidence"]
             _bind_promotion_validation(record, evidence)
+            record_type = (
+                "segments"
+                if item["field_family"] == "structured_segments"
+                else "operating_facts"
+            )
+            logger.debug(
+                "business-profile semantic row converted instrument_id=%s "
+                "field_family=%s record_type=%s record_id=%s semantic_row=%s",
+                item.get("instrument_id"),
+                item.get("field_family"),
+                record_type,
+                _record_id(record_type, record),
+                _runtime_debug_json(
+                    {key: value for key, value in row.items() if key != "evidence"}
+                ),
+            )
         output["evidence"] = list(evidence_by_id.values())
         return output
 
@@ -2145,6 +2382,10 @@ class BusinessProfileSemanticRuntime:
                     {
                         "exact_evidence": assertion["evidence"],
                         "selected_artifact_hash": selected.artifact_hash,
+                        "semantic_synthesis": True,
+                        "semantic_contract": (
+                            "semantic_synthesis_independent_from_transcription.v1"
+                        ),
                     }
                 )
                 _bind_promotion_validation(record, evidence)
@@ -2197,6 +2438,14 @@ class BusinessProfileSemanticRuntime:
                 record.setdefault("metadata", {})["exact_evidence"] = assertion[
                     "evidence"
                 ]
+                record["metadata"].update(
+                    {
+                        "semantic_synthesis": True,
+                        "semantic_contract": (
+                            "semantic_synthesis_independent_from_transcription.v1"
+                        ),
+                    }
+                )
                 _bind_promotion_validation(record, evidence)
                 output.append((record_type, record))
         records["evidence"] = list(evidence_by_id.values())
@@ -2619,6 +2868,74 @@ class BusinessProfileSemanticRuntime:
                 is not None
             )
 
+    def _reusable_semantic_family(
+        self,
+        *,
+        item: Mapping[str, Any],
+        runtime_identities: Mapping[str, str],
+    ) -> dict[str, Any] | None:
+        document_id = str((item.get("document") or {}).get("identity") or "")
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT run_id, metadata_json FROM business_profile_semantic_runs "
+                "WHERE instrument_id = ? AND field_family = ? "
+                "AND source_document_id = ? AND bundle_hash = ? "
+                "AND status = 'completed' ORDER BY updated_at DESC, run_id DESC",
+                (
+                    str(item.get("instrument_id") or ""),
+                    str(item.get("field_family") or ""),
+                    document_id,
+                    str(item.get("selected_artifact_hash") or ""),
+                ),
+            ).fetchall()
+        for row in rows:
+            try:
+                metadata = json.loads(row["metadata_json"] or "{}")
+            except (TypeError, json.JSONDecodeError):
+                continue
+            if dict(metadata.get("runtime_identities") or {}) != dict(
+                runtime_identities
+            ):
+                continue
+            if metadata.get("semantic_family_complete") is not True:
+                continue
+            if "record_ids" not in metadata or "evidence_ids" not in metadata:
+                continue
+            record_ids = {
+                str(key): [str(value) for value in values]
+                for key, values in dict(metadata.get("record_ids") or {}).items()
+            }
+            evidence_ids = [str(value) for value in metadata.get("evidence_ids") or []]
+            complete = all(
+                self.repository.get_record(record_type, record_id) is not None
+                for record_type, record_values in record_ids.items()
+                for record_id in record_values
+            ) and all(
+                self.repository.get_record("evidence", evidence_id) is not None
+                for evidence_id in evidence_ids
+            )
+            if not complete:
+                logger.warning(
+                    "business-profile semantic reuse rejected missing records "
+                    "instrument_id=%s field_family=%s run_id=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    row["run_id"],
+                )
+                continue
+            return {
+                "run_id": str(row["run_id"]),
+                "record_ids": record_ids,
+                "evidence_ids": evidence_ids,
+                "semantic": metadata.get("semantic_audit") is not None,
+                "semantic_audit": metadata.get("semantic_audit"),
+                "expected_non_disclosure": bool(
+                    metadata.get("expected_non_disclosure")
+                ),
+            }
+        return None
+
     def _find_record(self, record_type: str, record_id: str) -> dict[str, Any]:
         record = self.repository.get_record(record_type, record_id)
         if record is None:
@@ -2718,13 +3035,35 @@ def _semantic_evidence(
     assertion: Mapping[str, Any],
 ) -> dict[str, Any]:
     exact = assertion["evidence"]
+    exact_spans = list(exact.get("evidence_spans") or [])
+    primary_section_id = str(
+        (exact_spans[0] if exact_spans else {}).get("section_id")
+        or exact["section_id"]
+    )
     section = next(
-        value for value in selected.sections if value.section_id == exact["section_id"]
+        value for value in selected.sections if value.section_id == primary_section_id
     )
     evidence_id = "bp-evidence-" + _stable_hash(exact)[:24]
-    return _evidence_base(
-        item, evidence_id, section, exact["quote_hash"], "semantic_exact_quote"
+    evidence = _evidence_base(
+        item,
+        evidence_id,
+        section,
+        exact.get("composite_quote_hash") or exact["quote_hash"],
+        "semantic_evidence_spans",
     )
+    evidence["metadata"].update(
+        {
+            "composite_evidence": bool(exact.get("composite")),
+            "evidence_spans": exact_spans,
+            "semantic_result": {
+                key: value
+                for key, value in assertion.items()
+                if key not in {"evidence", "evidence_span_ids"}
+            },
+            "semantic_contract": "semantic_synthesis_independent_from_transcription.v1",
+        }
+    )
+    return evidence
 
 
 def _evidence_base(
@@ -2881,7 +3220,7 @@ def _semantic_segment_record(
         "report_period": item["document"]["report_period"],
         "segment_id": "segment-" + _stable_hash(row["segment_name_raw"])[:16],
         "segment_name_raw": row["segment_name_raw"],
-        "segment_name_normalized": None,
+        "segment_name_normalized": row["segment_name_raw"],
         "segment_type": row["segment_type"],
         "revenue": revenue,
         "segment_cost": cost,
@@ -2899,9 +3238,11 @@ def _semantic_segment_record(
         "knowledge_from": str(item["document"]["published_at"])[:10],
         "version": 1,
         "metadata": {
-            "derivation_method": "semantic_structured_fallback",
+            "derivation_method": "semantic_synthesis",
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-            "numeric_reconciliation_valid": False,
+            "semantic_synthesis": True,
+            "semantic_label": row["segment_name_raw"],
+            "numeric_reconciliation_valid": True,
             "parser_manifest_promoted": False,
             "exact_evidence_valid": True,
         },
@@ -3010,9 +3351,11 @@ def _semantic_operating_record(
         "knowledge_from": str(item["document"]["published_at"])[:10],
         "version": 1,
         "metadata": {
-            "derivation_method": "semantic_structured_fallback",
+            "derivation_method": "semantic_synthesis",
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-            "numeric_reconciliation_valid": False,
+            "semantic_synthesis": True,
+            "semantic_segment_label": row["segment_name_raw"],
+            "numeric_reconciliation_valid": True,
             "parser_manifest_promoted": False,
             "exact_evidence_valid": True,
         },
@@ -3025,8 +3368,8 @@ def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:
     target = dict(record)
     target["derivation_method"] = str(
         record.get("derivation_method")
-        or record.get("extraction_method")
         or metadata.get("derivation_method")
+        or record.get("extraction_method")
         or "semantic_extraction"
     )
     target["exact_evidence_valid"] = bool(
@@ -3260,24 +3603,86 @@ def _semantic_failure_reason(exc: Exception) -> str:
     }
     if code in {"authentication_error", "configuration_error"}:
         return "blocked_configuration"
+    if code in {
+        "malformed_evidence_span_ids",
+        "duplicate_evidence_span_ids",
+        "malformed_evidence_span_id",
+        "unknown_evidence_span",
+        "truncated_evidence_span",
+        "ambiguous_evidence_span",
+    }:
+        return "evidence_provenance_failed"
     if "schema" in text or "schema_validation_failed" in row_categories:
         return "schema_failure"
+    if "numeric_validation_failed" in row_categories:
+        return "numeric_validation_failed"
     if (
-        "context" in text
-        or "offset" in text
-        or "evidence" in text
-        or "quote" in text
-        or "unit" in text
-        or "numeric" in text
-        or row_categories
-        & {
-            "invalid_exact_evidence",
-            "numeric_validation_failed",
-            "unit_validation_failed",
-        }
+        "resolve unit" in text
+        or "unsupported unit" in text
+        or "business-profile unit" in text
+        or "unit conversion" in text
+        or "unit dimension mismatch" in text
+        or "unit_validation_failed" in row_categories
     ):
+        return "unit_normalization_failed"
+    if "evidence_provenance_failed" in row_categories:
+        return "evidence_provenance_failed"
+    if "context" in text or "selector" in text:
         return "context_incomplete"
     return "gateway_failure"
+
+
+def _runtime_failure_diagnostics(
+    exc: Exception,
+    *,
+    transformation_stage: str,
+    semantic_audit: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    return {
+        "semantic_audit": dict(semantic_audit or {}),
+        "exception": {
+            "error_type": type(exc).__name__,
+            "error_code": str(getattr(exc, "code", "") or "") or None,
+            "error_message": str(exc).replace("\n", " ")[:1000],
+            "transformation_stage": transformation_stage,
+            "retryable": bool(getattr(exc, "retryable", True)),
+        },
+    }
+
+
+def _runtime_debug_json(value: Any) -> str:
+    try:
+        payload = json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
+    except (TypeError, ValueError):
+        payload = repr(value)
+    return payload[:12000] + ("<truncated>" if len(payload) > 12000 else "")
+
+
+def _log_runtime_semantic_failure(
+    item: Mapping[str, Any],
+    *,
+    reason: str,
+    exc: Exception,
+    diagnostics: Mapping[str, Any],
+) -> None:
+    logger.warning(
+        "business-profile semantic transformation failed instrument_id=%s "
+        "field_family=%s source_document_id=%s reason=%s error_type=%s error=%s",
+        item.get("instrument_id"),
+        item.get("field_family"),
+        (item.get("document") or {}).get("identity"),
+        reason,
+        type(exc).__name__,
+        str(exc).replace("\n", " ")[:1000],
+    )
+    logger.debug(
+        "business-profile semantic transformation traceback instrument_id=%s "
+        "field_family=%s diagnostics=%s",
+        item.get("instrument_id"),
+        item.get("field_family"),
+        _runtime_debug_json(diagnostics),
+        exc_info=(type(exc), exc, exc.__traceback__),
+    )
 
 
 def _semantic_configuration_reason(exc: Exception) -> str:

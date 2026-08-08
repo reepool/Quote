@@ -120,7 +120,7 @@ def test_source_revision_drift_is_rebound_but_logical_scope_remains_strict(tmp_p
     assert checkpoint["scope"]["source_revision"] == "revision.v2"
 
 
-def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
+def test_quality_drift_stops_at_checkpoint(tmp_path):
     config = _config(
         budgets=SemanticProductionBudgets(max_tokens=10),
         thresholds=SemanticProductionThresholds(
@@ -137,7 +137,7 @@ def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
                 "plan": {
                     "status": "success",
                     "artifact": {"plan": "hash"},
-                    "metrics": {"tokens": 11, "drift_rate": 0.0},
+                    "metrics": {"tokens": 11, "drift_rate": 0.02},
                 }
             }
         ),
@@ -146,17 +146,17 @@ def test_budget_drift_and_exception_backlog_stop_at_checkpoint(tmp_path):
     result = pipeline.run("plan", scope=_scope())
     checkpoint = json.loads((tmp_path / "checkpoint.json").read_text())
     assert result["status"] == "stopped"
-    assert result["reason"] == "budget_exhausted:tokens"
+    assert result["reason"] == "quality_stop:drift_rate"
     assert checkpoint["artifacts"]["plan"] == {"plan": "hash"}
     assert checkpoint["completed_stages"] == ["plan"]
 
     resumed = pipeline.run("resume", scope=_scope())
     assert resumed["status"] == "stopped"
-    assert resumed["reason"] == "budget_exhausted:tokens"
+    assert resumed["reason"] == "quality_stop:drift_rate"
     assert resumed["completed_stages"] == ["plan"]
 
 
-def test_consumable_budget_stops_when_threshold_is_reached(tmp_path):
+def test_cumulative_tokens_remain_observable_without_pipeline_stop(tmp_path):
     pipeline = BusinessProfileSemanticPipeline(
         config=_config(budgets=SemanticProductionBudgets(max_tokens=10)),
         checkpoint_store=SemanticProductionCheckpointStore(
@@ -175,8 +175,8 @@ def test_consumable_budget_stops_when_threshold_is_reached(tmp_path):
 
     result = pipeline.run("plan", scope=_scope())
 
-    assert result["status"] == "stopped"
-    assert result["reason"] == "budget_exhausted:tokens"
+    assert result["status"] == "success"
+    assert result["metrics"]["tokens"] == 10
     assert result["completed_stages"] == ["plan"]
 
 

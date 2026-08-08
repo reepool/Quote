@@ -54,6 +54,18 @@
         "level": "INFO",
         "enabled": true
       },
+      "research.business_profile_semantic_extraction": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "research.business_profile_semantic_runtime": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "research.business_profile_async_production": {
+        "level": "DEBUG",
+        "enabled": true
+      },
       "TelegramBot": {
         "level": "DEBUG",
         "enabled": true

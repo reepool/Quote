@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 from dataclasses import replace
 
 import pytest
@@ -13,6 +14,7 @@ from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticPolicy,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    _bounded_semantic_result,
     _build_evidence_span_catalog,
     deterministic_semantic_verification_decision,
 )
@@ -177,6 +179,22 @@ def _evidence_span_ids(selected, *, contains):
     return ids[:1]
 
 
+def test_persisted_semantic_result_has_row_string_and_total_bounds():
+    bounded = _bounded_semantic_result(
+        {
+            "rows": [
+                {f"field_{field}": "x" * 1000 for field in range(80)}
+                for _ in range(60)
+            ]
+        }
+    )
+
+    assert bounded["truncated"] is True
+    assert len(bounded["payload_hash"]) == 64
+    assert len(json.dumps(bounded, ensure_ascii=False, sort_keys=True)) <= 100_000
+    assert bounded["preview"]
+
+
 @pytest.mark.asyncio
 async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     selected = _selected()
@@ -214,6 +232,57 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     assert result.audit.failover_count == 1
     assert result.audit.usage["total_tokens"] == 120
     assert audits[0]["response_hash"]
+    assert audits[0]["diagnostics"]["semantic_result"]["activities"][0][
+        "object_raw"
+    ] == "动力煤"
+    assert audits[0]["diagnostics"]["evidence_span_catalog"][0][
+        "evidence_span_id"
+    ].startswith("span-")
+    assert "公司生产动力煤" in audits[0]["diagnostics"][
+        "evidence_span_catalog"
+    ][0]["text_excerpt"]
+    assert len(
+        json.dumps(
+            audits[0]["diagnostics"],
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    ) <= 100_000
+    assert "公司生产动力煤" in audits[0]["diagnostics"]["resolved_evidence"][0][
+        "quote"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_semantic_lifecycle_and_bounded_result_are_logged(caplog, monkeypatch):
+    selected = _selected()
+    logger = logging.getLogger("research.business_profile_semantic_extraction")
+    monkeypatch.setattr(logger, "propagate", True)
+    caplog.set_level(
+        logging.DEBUG,
+        logger=logger.name,
+    )
+
+    await BusinessProfileSemanticExtractor(
+        _FakeGateway([_activity_response(selected)])
+    ).extract_async(
+        field_family="atomic_activities",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("business-profile llm start" in message for message in messages)
+    assert any("status=completed" in message for message in messages)
+    assert any(
+        "llm semantic result" in message and "动力煤" in message
+        for message in messages
+    )
+    assert any(
+        "llm evidence catalog" in message and "公司生产动力煤" in message
+        for message in messages
+    )
 
 
 @pytest.mark.asyncio
@@ -247,10 +316,23 @@ async def test_structured_extraction_accepts_exact_evidence_and_bounded_numbers(
 
 @pytest.mark.asyncio
 async def test_multi_span_table_header_and_row_are_bound_locally():
-    selected = _selected(
-        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+    first = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率",
         field_family="structured_segments",
     )
+    second_text = "主营业务分析\n煤炭 100 60 40%"
+    second = replace(
+        first.sections[0],
+        section_id="section-second",
+        page_number=2,
+        text=second_text,
+        normalized_text=second_text,
+        normalized_start=0,
+        normalized_end=len(second_text),
+        page_hash=hashlib.sha256(second_text.encode()).hexdigest(),
+        section_hash=hashlib.sha256(second_text.encode()).hexdigest(),
+    )
+    selected = replace(first, sections=(*first.sections, second))
 
     def response_factory(request):
         payload = json.loads(request.messages[-1].content)
@@ -291,8 +373,12 @@ async def test_multi_span_table_header_and_row_are_bound_locally():
 
     evidence = result.rows[0]["evidence"]
     assert "万元" in evidence["quote"]
-    assert "煤炭 100 60 40%" in evidence["quote"]
-    assert evidence["normalized_end"] > evidence["normalized_start"]
+    assert evidence["composite"] is True
+    assert "煤炭 100 60 40%" in evidence["composite_quote"]
+    assert {item["section_id"] for item in evidence["evidence_spans"]} == {
+        first.sections[0].section_id,
+        "section-second",
+    }
 
 
 @pytest.mark.asyncio
@@ -344,7 +430,7 @@ async def test_structured_extraction_isolates_invalid_rows_and_audits_partial_re
     )
     response = _structured_response(selected)
     invalid = dict(response["rows"][0])
-    invalid["revenue"] = 999.0
+    invalid["gross_margin"] = 40.0
     response["rows"].append(invalid)
     audits = []
 
@@ -390,7 +476,7 @@ async def test_structured_unknown_span_is_row_local_with_stable_code():
     assert result.rejected_rows == (
         {
             "row_index": 1,
-            "failure_category": "invalid_exact_evidence",
+            "failure_category": "evidence_provenance_failed",
             "failure_code": "unknown_evidence_span",
             "message": "semantic evidence span identifier is unknown",
         },
@@ -405,7 +491,7 @@ async def test_structured_extraction_bounds_details_without_truncating_rejection
     )
     response = _structured_response(selected)
     invalid = dict(response["rows"][0])
-    invalid["revenue"] = 999.0
+    invalid["gross_margin"] = 40.0
     response["rows"].extend(dict(invalid) for _ in range(12))
 
     result = await BusinessProfileSemanticExtractor(
@@ -487,7 +573,7 @@ async def test_structured_failure_audit_keeps_response_usage_and_diagnostics():
 
     with pytest.raises(ValueError, match="rows rejected"):
         await BusinessProfileSemanticExtractor(
-            _FakeGateway([_structured_response(selected, revenue=999.0)]),
+            _FakeGateway([_structured_response(selected, gross_margin=40.0)]),
             audit_sink=audits.append,
         ).extract_structured_async(
             field_family="structured_segments",
@@ -502,26 +588,28 @@ async def test_structured_failure_audit_keeps_response_usage_and_diagnostics():
 
 
 @pytest.mark.asyncio
-async def test_structured_extraction_rejects_unsupported_numeric_quote_atomically():
+async def test_structured_extraction_accepts_semantic_value_absent_from_quote():
     selected = _selected(
         "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
         field_family="structured_segments",
     )
     response = _structured_response(selected, revenue=999.0)
 
-    with pytest.raises(ValueError, match="revenue is absent from exact quote"):
-        await BusinessProfileSemanticExtractor(
-            _FakeGateway([response])
-        ).extract_structured_async(
-            field_family="structured_segments",
-            instrument_id="601088.SH",
-            report_period="2025-12-31",
-            selected=selected,
-        )
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert result.rows[0]["revenue"] == 999.0
+    assert result.rows[0]["semantic_synthesis"] is True
 
 
 @pytest.mark.asyncio
-async def test_structured_extraction_rejects_percentage_scale_and_name_mismatch():
+async def test_structured_extraction_rejects_percentage_scale_but_accepts_summary_name():
     selected = _selected(
         "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
         field_family="structured_segments",
@@ -537,15 +625,16 @@ async def test_structured_extraction_rejects_percentage_scale_and_name_mismatch(
             selected=selected,
         )
 
-    with pytest.raises(ValueError, match="segment name is absent"):
-        await BusinessProfileSemanticExtractor(
-            _FakeGateway([_structured_response(selected, segment_name="焦炭")])
-        ).extract_structured_async(
-            field_family="structured_segments",
-            instrument_id="601088.SH",
-            report_period="2025-12-31",
-            selected=selected,
-        )
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([_structured_response(selected, segment_name="固体燃料业务")])
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert result.rows[0]["segment_name_raw"] == "固体燃料业务"
 
 
 @pytest.mark.asyncio
@@ -564,7 +653,7 @@ async def test_unknown_span_fails_whole_batch_and_records_stable_failure():
         )
 
     assert audits[-1]["status"] == "failed"
-    assert audits[-1]["failure_category"] == "invalid_exact_evidence"
+    assert audits[-1]["failure_category"] == "evidence_provenance_failed"
     assert audits[-1]["diagnostics"]["error_code"] == "unknown_evidence_span"
 
 
@@ -724,7 +813,8 @@ async def test_independent_verifier_agreement_and_conflict_are_lineaged():
             {"decision": "conflict", "checks": {**checks, "object": False}},
         ]
     )
-    extractor = BusinessProfileSemanticExtractor(gateway)
+    audits = []
+    extractor = BusinessProfileSemanticExtractor(gateway, audit_sink=audits.append)
 
     confirmed, _ = await extractor.verify_async(
         target_type="activity", target=target, selected=selected
@@ -737,6 +827,8 @@ async def test_independent_verifier_agreement_and_conflict_are_lineaged():
     assert conflict["decision"] == "conflict"
     assert confirmed["actual_model"] == "provider-model-v2"
     assert confirmed["request_hash"]
+    assert audits[0]["diagnostics"]["semantic_result"]["decision"] == "confirmed"
+    assert audits[0]["diagnostics"]["isolated_evidence"][0]["text"]
 
 
 def test_deterministic_parser_proof_skips_semantic_verifier_only_when_complete():

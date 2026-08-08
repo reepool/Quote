@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import threading
 import time
 from pathlib import Path
@@ -1149,6 +1150,59 @@ def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
     assert dict(row) == {"stage": "parse", "status": "retry_due"}
 
 
+def test_stage_worker_claims_retryable_work_once_per_invocation(tmp_path):
+    class RetryRepository:
+        def __init__(self):
+            self.status = "pending"
+            self.attempt_count = 0
+            self.claim_exclusions = []
+
+        def claim(self, _stage, *, exclude_work_ids=(), lease_owner, **_kwargs):
+            excluded = tuple(exclude_work_ids)
+            self.claim_exclusions.append(excluded)
+            if "work-1" in excluded or self.status not in {"pending", "retry_due"}:
+                return ()
+            self.status = "running"
+            self.lease_owner = lease_owner
+            self.attempt_count += 1
+            return ({"work_id": "work-1", "instrument_id": "601088.SH"},)
+
+        def fail(self, work_id, *, lease_owner, **_kwargs):
+            assert work_id == "work-1"
+            assert lease_owner == self.lease_owner
+            self.status = "retry_due"
+            return "retry_due"
+
+    queue = RetryRepository()
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(),
+        stage_runner=AsyncMock(side_effect=TimeoutError("retryable")),
+        retry_backoff_seconds=1,
+        write_coordinator=BusinessProfileWriteCoordinator(inter_write_seconds=0),
+    )
+
+    first = asyncio.run(
+        service._drain_stage(
+            "parse",
+            StageBudget(max_items=2, max_concurrency=1),
+        )
+    )
+    second = asyncio.run(
+        service._drain_stage(
+            "parse",
+            StageBudget(max_items=1, max_concurrency=1),
+        )
+    )
+
+    assert first["claimed"] == 1
+    assert first["retried"] == 1
+    assert first["claim_exclusions"] == 1
+    assert second["claimed"] == 1
+    assert queue.attempt_count == 2
+    assert queue.claim_exclusions == [(), ("work-1",), ()]
+
+
 def test_latest_annual_enqueue_applies_company_and_date_scope(tmp_path):
     storage = _storage(tmp_path)
     frontier, _instrument = _frontier(storage)
@@ -1647,7 +1701,9 @@ def test_operation_status_allows_healthy_bounded_backlog():
     assert reason_codes == []
 
 
-def test_backfill_emits_lifecycle_and_inflight_progress_logs(tmp_path, caplog):
+def test_backfill_emits_lifecycle_and_inflight_progress_logs(
+    tmp_path, caplog, monkeypatch
+):
     storage = _storage(tmp_path)
     _frontier(storage)
     queue = BusinessProfileWorkRepository(
@@ -1673,7 +1729,9 @@ def test_backfill_emits_lifecycle_and_inflight_progress_logs(tmp_path, caplog):
         stage_runner=stage_runner,
         progress_log_interval_seconds=0.1,
     )
-    caplog.set_level("INFO", logger="research.business_profile_async_production")
+    logger = logging.getLogger("research.business_profile_async_production")
+    monkeypatch.setattr(logger, "propagate", True)
+    caplog.set_level("INFO", logger=logger.name)
 
     report = asyncio.run(
         service.run_backfill(

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Mapping, Optional
 
 from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_semantic_schemas import (
@@ -39,6 +39,11 @@ _MACHINE_REWORK_REASONS = frozenset(
         "planned_document_missing_or_invalid_locally",
         "selector_gap",
         "context_incomplete",
+        "evidence_provenance_failed",
+        "unit_normalization_failed",
+        "numeric_validation_failed",
+        "partial_row_rejection",
+        "blocked_configuration",
         "schema_failure",
         "gateway_failure",
         "catalog_proposal",

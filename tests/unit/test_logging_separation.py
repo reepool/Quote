@@ -113,13 +113,23 @@ def test_known_direct_loggers_are_classified(tmp_path):
     )
 
     logging.getLogger("tdx_source").info("direct task logger marker")
+    logging.getLogger("research.business_profile_semantic_runtime").info(
+        "business profile semantic marker"
+    )
     logging.getLogger("proxy_patch_runtime").info("direct system logger marker")
-    _flush_handlers("", "tdx_source", "proxy_patch_runtime")
+    _flush_handlers(
+        "",
+        "tdx_source",
+        "research.business_profile_semantic_runtime",
+        "proxy_patch_runtime",
+    )
 
     sys_log = (tmp_path / "sys.log").read_text(encoding="utf-8")
     task_log = (tmp_path / "task.log").read_text(encoding="utf-8")
 
     assert "direct task logger marker" in task_log
     assert "direct task logger marker" not in sys_log
+    assert "business profile semantic marker" in task_log
+    assert "business profile semantic marker" not in sys_log
     assert "direct system logger marker" in sys_log
     assert logging.getLogger("tdx_source").propagate is False

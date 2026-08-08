@@ -8,7 +8,7 @@ from typing import Any, Mapping
 from jsonschema import Draft202012Validator
 
 
-BUSINESS_PROFILE_SEMANTIC_SCHEMA_SET_VERSION = "business_profile_semantic_schemas.v1"
+BUSINESS_PROFILE_SEMANTIC_SCHEMA_SET_VERSION = "business_profile_semantic_schemas.v2"
 
 _HASH = {"type": "string", "pattern": "^[0-9a-f]{64}$"}
 _DATE = {"type": "string", "format": "date"}
@@ -78,6 +78,29 @@ SELECTED_SECTION_BUNDLE_SCHEMA = _closed_object(
     ),
 )
 
+EVIDENCE_SPAN_SCHEMA = _closed_object(
+    {
+        "evidence_span_id": {"type": "string", "pattern": "^span-[0-9a-f]{24}$"},
+        "page_number": {"type": "integer", "minimum": 1},
+        "section_id": {"type": "string", "minLength": 1},
+        "quote": {"type": "string", "minLength": 1},
+        "normalized_start": {"type": "integer", "minimum": 0},
+        "normalized_end": {"type": "integer", "minimum": 1},
+        "quote_hash": _HASH,
+        "section_hash": _HASH,
+    },
+    (
+        "evidence_span_id",
+        "page_number",
+        "section_id",
+        "quote",
+        "normalized_start",
+        "normalized_end",
+        "quote_hash",
+        "section_hash",
+    ),
+)
+
 EXACT_EVIDENCE_SCHEMA = _closed_object(
     {
         "source_document_id": {"type": "string", "minLength": 1},
@@ -88,6 +111,15 @@ EXACT_EVIDENCE_SCHEMA = _closed_object(
         "normalized_end": {"type": "integer", "minimum": 1},
         "quote_hash": _HASH,
         "section_hash": _HASH,
+        "evidence_spans": {
+            "type": "array",
+            "items": EVIDENCE_SPAN_SCHEMA,
+            "minItems": 1,
+            "uniqueItems": True,
+        },
+        "composite": {"type": "boolean"},
+        "composite_quote": {"type": "string", "minLength": 1},
+        "composite_quote_hash": _HASH,
     },
     (
         "source_document_id",
@@ -129,6 +161,7 @@ ATOMIC_ACTIVITY_SCHEMA = _closed_object(
         "value": {"type": ["number", "null"]},
         "unit": {"type": ["string", "null"]},
         "evidence": EXACT_EVIDENCE_SCHEMA,
+        "semantic_synthesis": {"const": True},
         "review_status": {"const": "candidate"},
     },
     (
@@ -152,7 +185,9 @@ SEMANTIC_VERIFICATION_SCHEMA = _closed_object(
     {
         "schema_version": {"const": "business_profile_semantic_verification.v1"},
         "verification_id": {"type": "string", "minLength": 1},
-        "target_type": {"enum": ["activity", "relationship", "concentration"]},
+        "target_type": {
+            "enum": ["activity", "relationship", "segment", "concentration"]
+        },
         "target_id": {"type": "string", "minLength": 1},
         "decision": {"enum": ["confirmed", "conflict", "insufficient_evidence"]},
         "checks": _closed_object(

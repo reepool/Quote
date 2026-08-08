@@ -91,6 +91,22 @@ def test_classifier_auto_promotes_only_complete_current_boolean_gates():
         ),
         manifest,
     )
+    partial = classifier.classify(
+        _context(
+            candidate,
+            manifest,
+            exception_reasons=("partial_row_rejection",),
+        ),
+        manifest,
+    )
+    blocked = classifier.classify(
+        _context(
+            candidate,
+            manifest,
+            exception_reasons=("blocked_configuration",),
+        ),
+        manifest,
+    )
 
     assert passed["classification"] == "auto_promoted"
     assert passed["reason_codes"] == []
@@ -98,6 +114,8 @@ def test_classifier_auto_promotes_only_complete_current_boolean_gates():
     assert "missing_gate:exact_evidence" in missing["reason_codes"]
     assert stale["classification"] == "machine_rework"
     assert "runtime_identity_mismatch" in stale["reason_codes"]
+    assert partial["classification"] == "machine_rework"
+    assert blocked["classification"] == "machine_rework"
 
 
 @pytest.mark.parametrize(

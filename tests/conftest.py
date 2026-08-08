@@ -3,7 +3,6 @@ pytest configuration and fixtures for Quote System tests
 """
 
 import pytest
-import asyncio
 import tempfile
 import shutil
 from pathlib import Path
@@ -43,14 +42,6 @@ LoggingManager().configure(
 def pytest_sessionfinish(session, exitstatus):
     """Remove temporary test logs so pytest never pollutes production log files."""
     shutil.rmtree(_TEST_LOG_DIR, ignore_errors=True)
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -292,7 +283,7 @@ def pytest_configure(config):
 
 
 @pytest.fixture(autouse=True)
-async def cleanup_cache():
+def cleanup_cache():
     """Cleanup cache after each test"""
     yield
     # Add any cleanup logic here if needed

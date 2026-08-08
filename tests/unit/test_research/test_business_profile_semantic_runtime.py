@@ -276,12 +276,40 @@ class _StructuredOperatingGateway(_FakeGateway):
         )
 
 
+class _NormalizedUnitOperatingGateway(_StructuredOperatingGateway):
+    async def complete(self, request):
+        response = await super().complete(request)
+        data = json.loads(json.dumps(response.data, ensure_ascii=False))
+        data["rows"][0]["unit_raw"] = "万公吨"
+        raw = json.dumps(data, ensure_ascii=False)
+        return replace(
+            response,
+            data=data,
+            raw_content=raw,
+            response_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+
+
+class _UnsupportedUnitOperatingGateway(_StructuredOperatingGateway):
+    async def complete(self, request):
+        response = await super().complete(request)
+        data = json.loads(json.dumps(response.data, ensure_ascii=False))
+        data["rows"][0]["unit_raw"] = "未治理质量单位"
+        raw = json.dumps(data, ensure_ascii=False)
+        return replace(
+            response,
+            data=data,
+            raw_content=raw,
+            response_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+
+
 class _PartialStructuredSegmentGateway(_StructuredSegmentGateway):
     async def complete(self, request):
         response = await super().complete(request)
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         invalid = dict(data["rows"][0])
-        invalid["revenue"] = 999.0
+        invalid["gross_margin"] = 40.0
         data["rows"].append(invalid)
         raw = json.dumps(data, ensure_ascii=False)
         return replace(
@@ -298,7 +326,7 @@ class _RecoveringStructuredSegmentGateway(_StructuredSegmentGateway):
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         if len(self.requests) == 1:
             invalid = dict(data["rows"][0])
-            invalid["revenue"] = 999.0
+            invalid["gross_margin"] = 40.0
             data["rows"].append(invalid)
         else:
             payload = json.loads(request.messages[-1].content)
@@ -334,6 +362,22 @@ class _EmptyStructuredGateway(_FakeGateway):
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
                 "rows": [],
+            },
+            request,
+        )
+
+
+class _EmptyAtomicGateway(_FakeGateway):
+    async def complete(self, request):
+        self.requests.append(request)
+        payload = json.loads(request.messages[-1].content)
+        return _response(
+            {
+                "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+                "instrument_id": payload["instrument_id"],
+                "report_period": payload["report_period"],
+                "activities": [],
+                "relationships": [],
             },
             request,
         )
@@ -470,6 +514,22 @@ class _ProductionAndSalesGateway(_FakeGateway):
             },
             request,
         )
+
+
+class _VerifierFailureGateway(_FakeGateway):
+    async def complete(self, request):
+        if request.metadata["stage"] == "semantic_verification":
+            self.requests.append(request)
+            raise ValueError("verifier provider returned malformed content")
+        return await super().complete(request)
+
+
+class _VerifierAuthenticationGateway(_ProductionAndSalesGateway):
+    async def complete(self, request):
+        if request.metadata["stage"] == "semantic_verification":
+            self.requests.append(request)
+            raise LlmAuthenticationError("LLM authentication failed")
+        return await super().complete(request)
 
 
 def _relationship_runtime(
@@ -1074,7 +1134,15 @@ def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
     segment = repository.list_records("segments", instrument_id="601088.SH")[0]
     assert segment["revenue"] == 1_000_000
     assert segment["extraction_method"] == "semantic_structured_fallback"
-    assert segment["metadata"]["numeric_reconciliation_valid"] is False
+    assert segment["metadata"]["numeric_reconciliation_valid"] is True
+
+    verified = pipeline.run("verify", scope=scope)
+    assert verified["status"] == "success"
+    assert verified["quality"]["verified_records"] == 1
+    assert len(gateway.requests) == 1
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+    segment = repository.list_records("segments", instrument_id="601088.SH")[0]
+    assert segment["review_status"] == "approved"
 
 
 def test_partial_structured_fallback_persists_valid_rows_and_rework_diagnostics(
@@ -1185,12 +1253,164 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
     assert fact["fact_type"] == "production_volume"
     assert fact["value_raw"] == 210.0
     assert fact["unit_raw"] == "万吨"
-    assert fact["metadata"]["derivation_method"] == "semantic_structured_fallback"
-    assert fact["metadata"]["numeric_reconciliation_valid"] is False
+    assert fact["metadata"]["derivation_method"] == "semantic_synthesis"
+    assert fact["metadata"]["semantic_synthesis"] is True
+    assert fact["metadata"]["numeric_reconciliation_valid"] is True
+    with repository.storage.get_connection() as conn:
+        semantic_run = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+        )
+    assert semantic_run["semantic_family_complete"] is True
+    assert semantic_run["record_ids"]["operating_facts"] == [fact["record_id"]]
+    assert semantic_run["evidence_ids"]
+    assert semantic_run["semantic_audit"]["diagnostics"]["semantic_result"][
+        "rows"
+    ][0]["unit_raw"] == "万吨"
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
     assert verified["quality"]["verified_records"] == 1
     assert len(gateway.requests) == 1
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+    fact = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )[0]
+    assert fact["review_status"] == "approved"
+
+
+def test_semantic_unit_alias_absent_from_source_is_normalized(tmp_path, monkeypatch):
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="tabular_operating_facts",
+        text=(
+            "主要产品产销情况 单位：万吨\n"
+            "产品 销售量 生产量 库存量\n"
+            "煤炭 200 210 50"
+        ),
+        gateway=_NormalizedUnitOperatingGateway(),
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "success"
+    fact = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )[0]
+    assert fact["unit_raw"] == "万公吨"
+    assert fact["unit_normalized"] == "tonne"
+
+
+def test_unit_conversion_failure_persists_semantic_output_and_stage(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="tabular_operating_facts",
+        text=(
+            "主要产品产销情况 单位：万吨\n"
+            "产品 销售量 生产量 库存量\n"
+            "煤炭 200 210 50"
+        ),
+        gateway=_UnsupportedUnitOperatingGateway(),
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
+    assert exception["reason_codes"] == ["unit_normalization_failed"]
+    diagnostics = exception["metadata"]["diagnostics"]
+    assert diagnostics["exception"]["transformation_stage"] == (
+        "structured_record_conversion"
+    )
+    assert diagnostics["semantic_audit"]["diagnostics"]["semantic_result"][
+        "rows"
+    ][0]["unit_raw"] == "未治理质量单位"
+    assert "煤炭 200 210 50" in diagnostics["semantic_audit"]["diagnostics"][
+        "resolved_evidence"
+    ][0]["quote"]
+
+
+def test_semantic_row_failure_categories_are_not_collapsed_to_context():
+    numeric = ValueError("structured rows rejected")
+    numeric.diagnostics = ({"failure_category": "numeric_validation_failed"},)
+    evidence = ValueError("structured rows rejected")
+    evidence.diagnostics = ({"failure_category": "evidence_provenance_failed"},)
+
+    assert runtime_module._semantic_failure_reason(numeric) == (
+        "numeric_validation_failed"
+    )
+    assert runtime_module._semantic_failure_reason(evidence) == (
+        "evidence_provenance_failed"
+    )
+
+
+def test_composite_semantic_evidence_uses_complete_bundle_hash():
+    primary_hash = hashlib.sha256(b"primary").hexdigest()
+    composite_hash = hashlib.sha256(b"primary-secondary").hexdigest()
+    selected = SimpleNamespace(
+        sections=(
+            SimpleNamespace(
+                section_id="section-primary",
+                page_number=1,
+                quality="native",
+                section_hash=hashlib.sha256(b"section-primary").hexdigest(),
+            ),
+        )
+    )
+    item = {
+        "instrument_id": "601088.SH",
+        "selected_artifact_hash": hashlib.sha256(b"selected").hexdigest(),
+        "document": {
+            "identity": "source-2025",
+            "source": "cninfo",
+            "source_tier": "official_primary",
+            "document_type": "annual_report",
+            "title": "2025 Annual Report",
+            "content_hash": hashlib.sha256(b"document").hexdigest(),
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-30T10:00:00+08:00",
+            "metadata": {"source_url": "https://example.invalid/annual.pdf"},
+        },
+    }
+    assertion = {
+        "object_raw": "综合能源业务",
+        "evidence": {
+            "section_id": "section-primary",
+            "quote_hash": primary_hash,
+            "composite": True,
+            "composite_quote_hash": composite_hash,
+            "evidence_spans": [
+                {"section_id": "section-primary", "quote": "第一段"},
+                {"section_id": "section-secondary", "quote": "第二段"},
+            ],
+        },
+    }
+
+    evidence = runtime_module._semantic_evidence(item, selected, assertion)
+
+    assert evidence["evidence_text_hash"] == composite_hash
+    assert evidence["metadata"]["composite_evidence"] is True
+    assert evidence["metadata"]["semantic_result"]["object_raw"] == (
+        "综合能源业务"
+    )
 
 
 def test_ambiguous_structured_table_empty_model_output_remains_machine_rework(
@@ -1222,6 +1442,71 @@ def test_ambiguous_structured_table_empty_model_output_remains_machine_rework(
     assert extracted["quality"]["blocking_machine_rework"] == 1
     assert extracted["quality"]["expected_non_disclosure_documents"] == 0
     assert extracted["quality"]["structured_fallback_rejected"] == 1
+
+
+def test_empty_atomic_activity_stays_resumable_with_semantic_audit(
+    tmp_path, monkeypatch
+):
+    gateway = _EmptyAtomicGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="主要业务：公司生产动力煤。公司销售动力煤。",
+        gateway=gateway,
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["quality"]["blocking_machine_rework"] == 1
+    assert extracted["quality"]["empty_output_reasons"] == {
+        "semantic_no_explicit_facts": 1
+    }
+    exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
+    assert exception["reason_codes"] == ["context_incomplete"]
+    assert exception["metadata"]["diagnostics"]["semantic_audit"][
+        "diagnostics"
+    ]["semantic_result"]["activities"] == []
+    with repository.storage.get_connection() as conn:
+        run_metadata = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+        )
+    assert run_metadata["semantic_family_complete"] is False
+
+
+def test_empty_named_relationships_are_reusable_non_disclosure(
+    tmp_path, monkeypatch
+):
+    gateway = _EmptyAtomicGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="named_relationships",
+        text="主要业务：公司向客户销售动力煤，但未披露客户名称。",
+        gateway=gateway,
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["stage_ready"] is True
+    assert extracted["quality"]["expected_non_disclosure_documents"] == 1
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
+    with repository.storage.get_connection() as conn:
+        run_metadata = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+        )
+    assert run_metadata["semantic_family_complete"] is True
+    assert run_metadata["expected_non_disclosure"] is True
 
 
 def test_deterministic_structured_rows_bypass_semantic_fallback(tmp_path, monkeypatch):
@@ -1323,6 +1608,66 @@ def test_llm_authentication_failure_is_a_resumable_configuration_blocker(
     assert extracted["quality"]["blocking_machine_rework"] == 0
     assert extracted["metrics"]["llm_calls"] == 1
     assert extracted["metrics"]["evidence_spans_offered"] >= 1
+
+
+def test_atomic_llm_authentication_failure_is_a_configuration_blocker(
+    tmp_path, monkeypatch
+):
+    class _AuthGateway:
+        requests = []
+
+        async def complete(self, request):
+            self.requests.append(request)
+            raise LlmAuthenticationError("LLM authentication failed")
+
+    gateway = _AuthGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="主要业务：公司生产并销售动力煤。",
+        gateway=gateway,
+    )
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    extracted = pipeline.run("extract", scope=scope)
+
+    assert extracted["status"] == "stopped"
+    assert extracted["reason"].startswith("blocked_configuration:extract:")
+    assert extracted["quality"]["blocked_configuration_reasons"] == {
+        "llm_authentication_error": 1
+    }
+    assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["metrics"]["errors"] == 0
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
+
+
+def test_verifier_authentication_failure_is_a_configuration_blocker(
+    tmp_path, monkeypatch
+):
+    gateway = _VerifierAuthenticationGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="主要业务：公司生产动力煤。公司销售动力煤。",
+        gateway=gateway,
+    )
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    verified = pipeline.run("verify", scope=scope)
+
+    assert verified["status"] == "stopped"
+    assert verified["reason"].startswith("blocked_configuration:verify:")
+    assert verified["quality"]["blocked_configuration_reasons"] == {
+        "llm_authentication_error": 1
+    }
+    assert verified["quality"]["blocking_machine_rework"] == 0
+    assert verified["metrics"]["errors"] == 0
+    assert len(gateway.requests) == 2
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
 def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
@@ -1514,7 +1859,7 @@ def test_extract_stops_new_network_calls_when_token_budget_is_reached(
     assert len(payload["outputs"]) == 1
 
 
-def test_verify_stops_new_network_calls_when_token_budget_is_reached(
+def test_verify_uses_an_independent_field_family_token_budget(
     tmp_path, monkeypatch
 ):
     storage = _storage(tmp_path)
@@ -1570,15 +1915,63 @@ def test_verify_stops_new_network_calls_when_token_budget_is_reached(
         assert pipeline.run(stage, scope=scope)["status"] == "success"
     result = pipeline.run("verify", scope=scope)
 
-    assert result["status"] == "stopped"
-    assert result["reason"] == "budget_exhausted:tokens"
-    assert result["metrics"]["llm_calls"] == 2
-    assert len(gateway.requests) == 2
-    assert "verify" not in result["completed_stages"]
+    assert result["status"] == "success"
+    assert result["metrics"]["llm_calls"] == 3
+    assert len(gateway.requests) == 3
+    assert "verify" in result["completed_stages"]
     artifact = pipeline.checkpoint_store.load()["artifacts"]["verify"]
     payload = runtime.stage_store.read(artifact, expected_stage="verify")
-    assert payload["budget_stop_reason"] == "budget_exhausted:tokens"
-    assert len(payload["verifications"]) == 1
+    assert payload["budget_stop_reason"] is None
+    assert len(payload["verifications"]) == 2
+    verifier_payload = json.loads(gateway.requests[1].messages[-1].content)
+    assert set(verifier_payload) == {
+        "target_type",
+        "target_id",
+        "instrument_id",
+        "report_period",
+        "claim",
+        "isolated_evidence",
+    }
+    assert verifier_payload["claim"] == {
+        "subject_scope": "issuer",
+        "action": "produces",
+        "object_raw": "动力煤",
+        "value": None,
+        "unit": None,
+    }
+
+
+def test_verify_failure_persists_llm_audit_and_counts_failed_call(
+    tmp_path, monkeypatch
+):
+    gateway = _VerifierFailureGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="主要业务：公司生产动力煤。",
+        gateway=gateway,
+    )
+
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    result = pipeline.run("verify", scope=scope)
+
+    assert result["status"] == "stopped"
+    assert result["metrics"]["llm_calls"] == 2
+    assert result["metrics"]["errors"] == 1
+    assert len(gateway.requests) == 2
+    exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
+    assert exception["reason_codes"] == ["gateway_failure"]
+    diagnostics = exception["metadata"]["diagnostics"]
+    assert diagnostics["exception"]["transformation_stage"] == (
+        "semantic_verification"
+    )
+    assert diagnostics["exception"]["error_type"] == "ValueError"
+    assert diagnostics["semantic_audit"]["stage"] == "semantic_verification"
+    assert diagnostics["semantic_audit"]["failure_category"] == (
+        "gateway_or_validation_failure"
+    )
 
 
 def test_real_local_pdf_plan_select_and_hash_incremental_discovery(tmp_path):
@@ -2157,10 +2550,10 @@ def test_unresolved_counterparty_is_machine_rework_without_orphan_evidence(
     assert repository.list_records("evidence", instrument_id="601088.SH") == []
 
 
-def test_network_kill_switch_makes_zero_gateway_calls_and_persists_rework(
+def test_network_kill_switch_makes_zero_gateway_calls_without_business_rework(
     tmp_path, monkeypatch
 ):
-    repository, _, _, gateway = _relationship_runtime(
+    repository, pipeline, _, gateway = _relationship_runtime(
         tmp_path,
         monkeypatch,
         [],
@@ -2169,10 +2562,11 @@ def test_network_kill_switch_makes_zero_gateway_calls_and_persists_rework(
     )
 
     assert gateway.requests == []
-    exception = repository.list_exceptions(instrument_id="601088.SH")[0]
-    assert exception["tier"] == "machine_rework"
-    assert exception["reason_codes"] == ["gateway_failure"]
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
     assert repository.list_records("relationships", instrument_id="601088.SH") == []
+    assert pipeline.checkpoint_store.load()["stopped_reason"] == (
+        "blocked_configuration:extract:semantic_network_disabled"
+    )
 
 
 def test_multiple_exact_counterparties_enter_quick_review_without_fabricated_id(

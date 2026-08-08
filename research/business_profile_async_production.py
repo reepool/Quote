@@ -265,6 +265,7 @@ class BusinessProfileWorkRepository:
         lease_owner: str,
         lease_seconds: int,
         processing_identity_hash: str | None = None,
+        exclude_work_ids: Sequence[str] = (),
     ) -> tuple[dict[str, Any], ...]:
         normalized_stage = _stage(stage)
         now = get_shanghai_time()
@@ -278,9 +279,20 @@ class BusinessProfileWorkRepository:
                 if processing_identity_hash
                 else ""
             )
+            excluded = tuple(
+                sorted({str(value) for value in exclude_work_ids if str(value)})
+            )
+            exclusion_clause = (
+                "AND work_id NOT IN ("
+                + ",".join("?" for _ in excluded)
+                + ")"
+                if excluded
+                else ""
+            )
             params: list[Any] = [normalized_stage, now_text, now_text]
             if processing_identity_hash:
                 params.append(str(processing_identity_hash))
+            params.extend(excluded)
             params.append(max(1, int(limit)))
             rows = conn.execute(
                 f"""
@@ -292,6 +304,7 @@ class BusinessProfileWorkRepository:
                     OR (status = 'running' AND lease_expires_at <= ?)
                   )
                   {identity_clause}
+                  {exclusion_clause}
                 ORDER BY report_period DESC, updated_at, created_at, work_id
                 LIMIT ?
                 """,
@@ -1856,6 +1869,7 @@ class BusinessProfileAsyncProductionService:
         started = time.monotonic()
         claimed = completed = retried = failed = lease_conflicts = 0
         configuration_blocked = 0
+        claimed_work_ids: set[str] = set()
         quality_totals: dict[str, Any] = {}
         errors: list[dict[str, str]] = []
         stopped = False
@@ -1886,6 +1900,7 @@ class BusinessProfileAsyncProductionService:
                 lease_owner=lease_owner,
                 lease_seconds=self.lease_seconds,
                 processing_identity_hash=processing_identity_hash,
+                exclude_work_ids=tuple(claimed_work_ids),
             )
             if not items:
                 if upstream_done is None or upstream_done.is_set():
@@ -1893,6 +1908,7 @@ class BusinessProfileAsyncProductionService:
                 await asyncio.sleep(0.05)
                 continue
             claimed += len(items)
+            claimed_work_ids.update(str(item["work_id"]) for item in items)
 
             async def run_one(item: Mapping[str, Any]) -> None:
                 nonlocal completed, retried, failed, lease_conflicts
@@ -1996,12 +2012,21 @@ class BusinessProfileAsyncProductionService:
                     )
                     logger.warning(
                         "business-profile work failed work_id=%s instrument_id=%s "
-                        "stage=%s disposition=%s category=%s",
+                        "stage=%s disposition=%s category=%s error=%s",
                         item.get("work_id"),
                         item.get("instrument_id"),
                         stage,
                         terminal_status,
                         type(exc).__name__,
+                        str(exc).replace("\n", " ")[:1000],
+                    )
+                    logger.debug(
+                        "business-profile work failure traceback work_id=%s "
+                        "instrument_id=%s stage=%s",
+                        item.get("work_id"),
+                        item.get("instrument_id"),
+                        stage,
+                        exc_info=True,
                     )
 
             batch_task = asyncio.create_task(self._run_stage_batch(items, run_one))
@@ -2018,7 +2043,8 @@ class BusinessProfileAsyncProductionService:
                             "business-profile stage heartbeat stage=%s "
                             "elapsed_seconds=%.3f batch_elapsed_seconds=%.3f "
                             "in_flight=%s claimed=%s completed=%s retried=%s "
-                            "terminal_failures=%s configuration_blocked=%s writer=%s",
+                            "terminal_failures=%s configuration_blocked=%s "
+                            "claim_exclusions=%s writer=%s",
                             stage,
                             time.monotonic() - started,
                             time.monotonic() - batch_started,
@@ -2036,6 +2062,7 @@ class BusinessProfileAsyncProductionService:
                             retried,
                             failed,
                             configuration_blocked,
+                            len(claimed_work_ids),
                             self.write_coordinator.snapshot(),
                         )
                 await batch_task
@@ -2072,6 +2099,7 @@ class BusinessProfileAsyncProductionService:
             "terminal_failures": failed,
             "lease_conflicts": lease_conflicts,
             "configuration_blocked": configuration_blocked,
+            "claim_exclusions": len(claimed_work_ids),
             "errors": errors[:20],
             "quality": quality_totals,
             "elapsed_seconds": round(time.monotonic() - started, 3),
@@ -2085,7 +2113,7 @@ class BusinessProfileAsyncProductionService:
         log(
             "business-profile stage end stage=%s status=%s claimed=%s completed=%s "
             "retried=%s terminal_failures=%s configuration_blocked=%s "
-            "lease_conflicts=%s elapsed_seconds=%s writer=%s",
+            "lease_conflicts=%s claim_exclusions=%s elapsed_seconds=%s writer=%s",
             stage,
             result["status"],
             claimed,
@@ -2094,6 +2122,7 @@ class BusinessProfileAsyncProductionService:
             failed,
             configuration_blocked,
             lease_conflicts,
+            result["claim_exclusions"],
             result["elapsed_seconds"],
             result["writer"],
         )
