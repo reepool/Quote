@@ -86,14 +86,6 @@
         "borrow_idle_capacity": true,
         "members": [
           {
-            "source_label": "scorpio:grok-4.5",
-            "weight": 3,
-            "profiles": {
-              "semantic_extraction": "semantic_extraction__scorpio_grok",
-              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_grok"
-            }
-          },
-          {
             "source_label": "scorpio:gpt-5.6-luna",
             "weight": 1,
             "profiles": {
@@ -103,7 +95,7 @@
           }
         ],
         "failover": {
-          "enabled": true,
+          "enabled": false,
           "max_hops": 1,
           "failure_threshold": 3,
           "open_seconds": 60,
@@ -138,7 +130,7 @@
         "provider_resource": "scorpio:grok",
         "source_label": "scorpio:grok-4.5",
         "default_workload": "corporate_action_semantic_extraction",
-        "enabled": true,
+        "enabled": false,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
@@ -196,7 +188,7 @@
         "provider_resource": "scorpio:grok",
         "source_label": "scorpio:grok-4.5",
         "default_workload": "corporate_action_title_classification",
-        "enabled": true,
+        "enabled": false,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",

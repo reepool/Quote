@@ -408,12 +408,19 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert config.pools["shared_semantic"].enabled is True
     assert config.is_logical_profile_enabled("semantic_extraction") is True
     members = config.pools["shared_semantic"].members
-    assert [member.source_label for member in members] == [
-        "scorpio:grok-4.5",
-        "scorpio:gpt-5.6-luna",
-    ]
+    assert [member.source_label for member in members] == ["scorpio:gpt-5.6-luna"]
+    assert config.pools["shared_semantic"].failover.enabled is False
     assert all(member.weight > 0 for member in members)
     profiles = config.profiles
+    assert profiles["semantic_extraction__scorpio_grok"].enabled is False
+    assert (
+        profiles["corporate_action_title_classification__scorpio_grok"].enabled
+        is False
+    )
+    assert profiles["semantic_extraction__scorpio_luna"].enabled is True
+    assert (
+        profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
+    )
     assert profiles["semantic_extraction__scorpio_grok"].api_key_env == (
         "QUOTE_LLM_SCORPIO_GROK_API_KEY"
     )
@@ -427,22 +434,14 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_supports_single_grok_member():
+def test_repository_llm_config_supports_single_luna_member():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
-    pool["members"] = [
-        member
-        for member in pool["members"]
-        if member["source_label"] == "scorpio:grok-4.5"
-    ]
-    pool["failover"]["enabled"] = False
-    for name, profile in raw["profiles"].items():
-        if name.endswith("__scorpio_luna"):
-            profile["enabled"] = False
 
     config = LlmConfig.from_mapping(raw)
 
     assert config.is_logical_profile_enabled("semantic_extraction") is True
+    assert pool["failover"]["enabled"] is False
     assert [
         profile.name for profile in config.concrete_profiles_for("semantic_extraction")
-    ] == ["semantic_extraction__scorpio_grok"]
+    ] == ["semantic_extraction__scorpio_luna"]

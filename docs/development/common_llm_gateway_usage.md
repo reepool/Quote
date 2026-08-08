@@ -8,13 +8,13 @@
 ## 配置与密钥
 
 项目配置 `config/13_llm.json` 只包含非敏感 route、pool 和实际 profile。当前 Scorpio
-配置以保守限额启用；各业务仍必须使用自己的独立 enable/write gate，公共路由开启不代表
-画像等业务自动开启：
+配置以保守限额启用，路由池暂时只启用 Luna，Grok profile 保留但停用；各业务仍必须使用
+自己的独立 enable/write gate，公共路由开启不代表画像等业务自动开启：
 
 - 逻辑 profile：`semantic_extraction`
 - provider：`openai_compatible`
 - base URL：`https://scorpio.reepool.com`
-- models：`grok-4.5`、`gpt-5.6-luna`
+- profiles：`grok-4.5`（暂时停用）、`gpt-5.6-luna`（当前唯一池成员）
 - key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`
 - provider quota bucket：两个 Key 的 quota 已确认相互独立，分别使用 `scorpio:grok` 和 `scorpio:luna`
 
