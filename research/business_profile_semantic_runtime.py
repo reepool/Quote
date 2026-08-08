@@ -1086,6 +1086,11 @@ class BusinessProfileSemanticRuntime:
             "structured_fallback_accepted_records": 0,
             "structured_fallback_rejected": 0,
             "structured_fallback_rejected_rows": 0,
+            "semantic_rows_accepted": 0,
+            "semantic_rows_rejected": 0,
+            "evidence_spans_offered": 0,
+            "evidence_spans_referenced": 0,
+            "evidence_spans_resolved": 0,
             "configuration_blocked_documents": 0,
             "expected_non_disclosure_documents": 0,
             "tokens": 0,
@@ -1163,9 +1168,18 @@ class BusinessProfileSemanticRuntime:
                     if budget_stop_reason:
                         break
                     semantic_audits: list[Mapping[str, Any]] = []
+                    semantic_metrics_recorded = False
                     extractor = BusinessProfileSemanticExtractor(
                         self.llm_client,
                         audit_sink=semantic_audits.append,
+                    )
+                    metrics["llm_calls"] += 1
+                    metrics["structured_fallback_calls"] += 1
+                    _increment_family_metrics(
+                        metrics["by_field_family"],
+                        item["field_family"],
+                        llm_calls=1,
+                        structured_fallback_calls=1,
                     )
                     try:
                         envelope = self._async_bridge.run(
@@ -1190,8 +1204,6 @@ class BusinessProfileSemanticRuntime:
                             for key, rows in records_by_type.items()
                             if key != "evidence"
                         )
-                        metrics["llm_calls"] += 1
-                        metrics["structured_fallback_calls"] += 1
                         metrics["structured_fallback_accepted_records"] += accepted
                         metrics["structured_fallback_rejected_rows"] += (
                             rejected_row_count
@@ -1202,8 +1214,6 @@ class BusinessProfileSemanticRuntime:
                         _increment_family_metrics(
                             metrics["by_field_family"],
                             item["field_family"],
-                            llm_calls=1,
-                            structured_fallback_calls=1,
                             structured_fallback_accepted_records=accepted,
                             structured_fallback_rejected_rows=rejected_row_count,
                             tokens=float(
@@ -1211,6 +1221,12 @@ class BusinessProfileSemanticRuntime:
                                 or 0
                             ),
                         )
+                        _accumulate_span_metrics(
+                            metrics,
+                            item["field_family"],
+                            semantic_audit,
+                        )
+                        semantic_metrics_recorded = True
                         if accepted == 0:
                             raise ValueError(
                                 "context incomplete: structured semantic response "
@@ -1237,6 +1253,21 @@ class BusinessProfileSemanticRuntime:
                     except Exception as exc:
                         if semantic_audits:
                             semantic_audit = dict(semantic_audits[-1])
+                            if not semantic_metrics_recorded:
+                                _accumulate_semantic_usage_and_spans(
+                                    metrics,
+                                    item["field_family"],
+                                    semantic_audit,
+                                )
+                        else:
+                            metrics["llm_calls"] -= 1
+                            metrics["structured_fallback_calls"] -= 1
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                llm_calls=-1,
+                                structured_fallback_calls=-1,
+                            )
                         reason = _semantic_failure_reason(exc)
                         if reason == "blocked_configuration":
                             blocker = _semantic_configuration_reason(exc)
@@ -1290,7 +1321,18 @@ class BusinessProfileSemanticRuntime:
                 )
                 if budget_stop_reason:
                     break
-                extractor = BusinessProfileSemanticExtractor(self.llm_client)
+                semantic_audits = []
+                semantic_metrics_recorded = False
+                extractor = BusinessProfileSemanticExtractor(
+                    self.llm_client,
+                    audit_sink=semantic_audits.append,
+                )
+                metrics["llm_calls"] += 1
+                _increment_family_metrics(
+                    metrics["by_field_family"],
+                    item["field_family"],
+                    llm_calls=1,
+                )
                 try:
                     envelope = self._async_bridge.run(
                         extractor.extract_async(
@@ -1306,18 +1348,22 @@ class BusinessProfileSemanticRuntime:
                         self._semantic_records(item, selected, envelope)
                     )
                     exceptions.extend(semantic_exceptions)
-                    metrics["llm_calls"] += 1
                     metrics["tokens"] += float(
                         (semantic_audit.get("usage") or {}).get("total_tokens") or 0
                     )
                     _increment_family_metrics(
                         metrics["by_field_family"],
                         item["field_family"],
-                        llm_calls=1,
                         tokens=float(
                             (semantic_audit.get("usage") or {}).get("total_tokens") or 0
                         ),
                     )
+                    _accumulate_span_metrics(
+                        metrics,
+                        item["field_family"],
+                        semantic_audit,
+                    )
+                    semantic_metrics_recorded = True
                     for exception in semantic_exceptions:
                         _increment_family_metrics(
                             metrics["by_field_family"],
@@ -1325,10 +1371,30 @@ class BusinessProfileSemanticRuntime:
                             **{str(exception["tier"]): 1},
                         )
                 except Exception as exc:
+                    if semantic_audits:
+                        semantic_audit = dict(semantic_audits[-1])
+                        if not semantic_metrics_recorded:
+                            _accumulate_semantic_usage_and_spans(
+                                metrics,
+                                item["field_family"],
+                                semantic_audit,
+                            )
+                    else:
+                        metrics["llm_calls"] -= 1
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            llm_calls=-1,
+                        )
                     metrics["errors"] += 1
                     machine_rework.append(
                         _rework_item(
-                            item, item["document"], _semantic_failure_reason(exc)
+                            item,
+                            item["document"],
+                            _semantic_failure_reason(exc),
+                            diagnostics={"semantic_audit": semantic_audit}
+                            if semantic_audit
+                            else None,
                         )
                     )
                     _increment_family_metrics(
@@ -2044,6 +2110,7 @@ class BusinessProfileSemanticRuntime:
         list[dict[str, Any]],
     ]:
         records: dict[str, list[dict[str, Any]]] = {"evidence": []}
+        evidence_by_id: dict[str, dict[str, Any]] = {}
         output: list[tuple[str, dict[str, Any]]] = []
         exceptions: list[dict[str, Any]] = []
         product_catalog = load_business_product_catalog()
@@ -2054,7 +2121,7 @@ class BusinessProfileSemanticRuntime:
             assertion = dict(raw)
             evidence = _semantic_evidence(item, selected, assertion)
             if record_type == "activities":
-                records["evidence"].append(evidence)
+                evidence_by_id[evidence["evidence_id"]] = evidence
                 resolution = product_catalog.resolve_alias(assertion["object_raw"])
                 assertion.update(
                     {
@@ -2113,7 +2180,7 @@ class BusinessProfileSemanticRuntime:
                             }
                         )
                         continue
-                records["evidence"].append(evidence)
+                evidence_by_id[evidence["evidence_id"]] = evidence
                 record_type, record = (
                     self.activity_producer.build_relationship_or_concentration_candidate(
                         {
@@ -2132,6 +2199,7 @@ class BusinessProfileSemanticRuntime:
                 ]
                 _bind_promotion_validation(record, evidence)
                 output.append((record_type, record))
+        records["evidence"] = list(evidence_by_id.values())
         return records, output, exceptions
 
     def _persist_runtime_exception(
@@ -3254,6 +3322,42 @@ def _increment_family_metrics(
     row = metrics.setdefault(str(family), {})
     for key, value in values.items():
         row[key] = float(row.get(key) or 0) + float(value)
+
+
+def _accumulate_span_metrics(
+    metrics: dict[str, Any],
+    family: str,
+    audit: Mapping[str, Any],
+) -> None:
+    diagnostics = audit.get("diagnostics") or {}
+    values = {
+        key: int(diagnostics.get(key) or 0)
+        for key in (
+            "semantic_rows_accepted",
+            "semantic_rows_rejected",
+            "evidence_spans_offered",
+            "evidence_spans_referenced",
+            "evidence_spans_resolved",
+        )
+    }
+    for key, value in values.items():
+        metrics[key] = int(metrics.get(key) or 0) + value
+    _increment_family_metrics(metrics["by_field_family"], family, **values)
+
+
+def _accumulate_semantic_usage_and_spans(
+    metrics: dict[str, Any],
+    family: str,
+    audit: Mapping[str, Any],
+) -> None:
+    tokens = float((audit.get("usage") or {}).get("total_tokens") or 0)
+    metrics["tokens"] += tokens
+    _increment_family_metrics(
+        metrics["by_field_family"],
+        family,
+        tokens=tokens,
+    )
+    _accumulate_span_metrics(metrics, family, audit)
 
 
 def _increment_family_reason(

@@ -11,6 +11,9 @@ from research.business_profile_section_selection import BusinessProfileSectionSe
 from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
     BusinessProfileSemanticPolicy,
+    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    _build_evidence_span_catalog,
     deterministic_semantic_verification_decision,
 )
 from utils.llm import LlmResponse, LlmUsage
@@ -91,6 +94,16 @@ class _FakeGateway:
         return _response(value)
 
 
+class _RequestAwareGateway:
+    def __init__(self, response_factory):
+        self.response_factory = response_factory
+        self.requests = []
+
+    async def complete(self, request):
+        self.requests.append(request)
+        return _response(self.response_factory(request))
+
+
 def _structured_response(
     selected,
     *,
@@ -99,11 +112,10 @@ def _structured_response(
     segment_name="煤炭",
     quote=None,
 ):
-    section = selected.sections[0]
     exact_quote = quote or "煤炭 100 60 40%"
-    start = section.normalized_text.index(exact_quote)
+    span_ids = _evidence_span_ids(selected, contains=exact_quote)
     return {
-        "schema_version": "business_profile_structured_extraction.v1",
+        "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
         "field_family": "structured_segments",
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
@@ -115,45 +127,54 @@ def _structured_response(
                 "segment_cost": 60.0,
                 "gross_margin": gross_margin,
                 "currency_unit": "万元",
-                "evidence": {
-                    "section_id": section.section_id,
-                    "page_number": section.page_number,
-                    "quote": exact_quote,
-                    "section_start": start,
-                    "section_end": start + len(exact_quote),
-                },
+                "evidence_span_ids": span_ids,
             }
         ],
     }
 
 
-def _activity_response(selected, *, quote=None, start=None, end=None, extra=None):
-    section = selected.sections[0]
+def _activity_response(selected, *, quote=None, span_ids=None, extra=None):
     exact_quote = quote or "公司生产动力煤"
-    exact_start = section.normalized_text.index(exact_quote) if start is None else start
-    exact_end = exact_start + len(exact_quote) if end is None else end
     item = {
         "subject_scope": "issuer",
         "action": "produces",
         "object_raw": "动力煤",
         "value": None,
         "unit": None,
-        "evidence": {
-            "section_id": section.section_id,
-            "page_number": section.page_number,
-            "quote": exact_quote,
-            "section_start": exact_start,
-            "section_end": exact_end,
-        },
+        "evidence_span_ids": span_ids or _evidence_span_ids(
+            selected,
+            contains=exact_quote,
+        ),
     }
     item.update(extra or {})
     return {
-        "schema_version": "business_profile_atomic_extraction.v1",
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "activities": [item],
         "relationships": [],
     }
+
+
+def _evidence_spans(selected, *, max_characters=24000, max_span_characters=1200):
+    return _build_evidence_span_catalog(
+        selected,
+        (),
+        max_sections=12,
+        max_characters=max_characters,
+        max_span_characters=max_span_characters,
+        max_spans=96,
+    )
+
+
+def _evidence_span_ids(selected, *, contains):
+    ids = [
+        span.evidence_span_id
+        for span in _evidence_spans(selected)
+        if contains in span.text
+    ]
+    assert ids
+    return ids[:1]
 
 
 @pytest.mark.asyncio
@@ -181,7 +202,7 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     activity = result.activities[0]
     assert activity["review_status"] == "candidate"
     assert activity["object_id"] is None
-    assert activity["evidence"]["quote"] == "公司生产动力煤"
+    assert "公司生产动力煤" in activity["evidence"]["quote"]
     assert gateway.requests[0].profile == "semantic_extraction"
     assert gateway.requests[0].content_is_untrusted is True
     assert "base_url" not in gateway.requests[0].metadata
@@ -216,8 +237,103 @@ async def test_structured_extraction_accepts_exact_evidence_and_bounded_numbers(
     assert result.rows[0]["evidence"]["quote_hash"]
     request_payload = json.loads(gateway.requests[0].messages[-1].content)
     assert request_payload["field_family"] == "structured_segments"
-    assert request_payload["sections"]
+    assert request_payload["evidence_spans"]
+    assert set(request_payload["evidence_spans"][0]) == {
+        "evidence_span_id",
+        "text",
+    }
     assert gateway.requests[0].metadata["stage"] == "structured_semantic_extraction"
+
+
+@pytest.mark.asyncio
+async def test_multi_span_table_header_and_row_are_bound_locally():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+
+    def response_factory(request):
+        payload = json.loads(request.messages[-1].content)
+        spans = payload["evidence_spans"]
+        evidence_span_ids = [
+            item["evidence_span_id"]
+            for item in spans
+            if "万元" in item["text"] or "煤炭" in item["text"]
+        ]
+        assert len(evidence_span_ids) == 2
+        return {
+            "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            "field_family": "structured_segments",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "rows": [
+                {
+                    "segment_type": "product",
+                    "segment_name_raw": "煤炭",
+                    "revenue": 100.0,
+                    "segment_cost": 60.0,
+                    "gross_margin": 0.4,
+                    "currency_unit": "万元",
+                    "evidence_span_ids": evidence_span_ids,
+                }
+            ],
+        }
+
+    result = await BusinessProfileSemanticExtractor(
+        _RequestAwareGateway(response_factory),
+        policy=BusinessProfileSemanticPolicy(max_evidence_span_characters=32),
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    evidence = result.rows[0]["evidence"]
+    assert "万元" in evidence["quote"]
+    assert "煤炭 100 60 40%" in evidence["quote"]
+    assert evidence["normalized_end"] > evidence["normalized_start"]
+
+
+@pytest.mark.asyncio
+async def test_normalized_whitespace_offsets_are_derived_without_model_coordinates():
+    selected = _selected("主要业务：公司从事\n动力煤生产。")
+
+    def response_factory(request):
+        span_id = json.loads(request.messages[-1].content)["evidence_spans"][0][
+            "evidence_span_id"
+        ]
+        return {
+            "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "activities": [
+                {
+                    "subject_scope": "issuer",
+                    "action": "produces",
+                    "object_raw": "动力煤",
+                    "value": None,
+                    "unit": None,
+                    "evidence_span_ids": [span_id],
+                }
+            ],
+            "relationships": [],
+        }
+
+    result = await BusinessProfileSemanticExtractor(
+        _RequestAwareGateway(response_factory)
+    ).extract_async(
+        field_family="atomic_activities",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    evidence = result.activities[0]["evidence"]
+    assert evidence["quote"] == "主要业务：公司从事 动力煤生产。"
+    assert evidence["normalized_end"] - evidence["normalized_start"] == len(
+        evidence["quote"]
+    )
 
 
 @pytest.mark.asyncio
@@ -248,6 +364,37 @@ async def test_structured_extraction_isolates_invalid_rows_and_audits_partial_re
     assert result.audit.validation_gates["complete_batch"] is False
     assert "partial_row_rejection" in result.audit.warning_codes
     assert audits[-1]["diagnostics"]["rows_rejected"] == 1
+
+
+@pytest.mark.asyncio
+async def test_structured_unknown_span_is_row_local_with_stable_code():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected)
+    invalid = dict(response["rows"][0])
+    invalid["evidence_span_ids"] = ["span-" + "f" * 24]
+    response["rows"].append(invalid)
+
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rows) == 1
+    assert result.rejected_rows == (
+        {
+            "row_index": 1,
+            "failure_category": "invalid_exact_evidence",
+            "failure_code": "unknown_evidence_span",
+            "message": "semantic evidence span identifier is unknown",
+        },
+    )
 
 
 @pytest.mark.asyncio
@@ -402,15 +549,13 @@ async def test_structured_extraction_rejects_percentage_scale_and_name_mismatch(
 
 
 @pytest.mark.asyncio
-async def test_invalid_quote_fails_whole_batch_and_records_stable_failure():
+async def test_unknown_span_fails_whole_batch_and_records_stable_failure():
     selected = _selected()
     audits = []
-    gateway = _FakeGateway(
-        [_activity_response(selected, quote="公司生产焦煤", start=5, end=11)]
-    )
+    gateway = _FakeGateway([_activity_response(selected, span_ids=["span-" + "0" * 24])])
     extractor = BusinessProfileSemanticExtractor(gateway, audit_sink=audits.append)
 
-    with pytest.raises(ValueError, match="quote does not match"):
+    with pytest.raises(ValueError, match="identifier is unknown"):
         await extractor.extract_async(
             field_family="atomic_activities",
             instrument_id="601088.SH",
@@ -420,6 +565,7 @@ async def test_invalid_quote_fails_whole_batch_and_records_stable_failure():
 
     assert audits[-1]["status"] == "failed"
     assert audits[-1]["failure_category"] == "invalid_exact_evidence"
+    assert audits[-1]["diagnostics"]["error_code"] == "unknown_evidence_span"
 
 
 @pytest.mark.asyncio
@@ -439,11 +585,9 @@ async def test_model_supplied_governed_id_is_rejected_by_local_closed_schema():
 @pytest.mark.asyncio
 async def test_anonymous_relationship_requires_disclosed_share():
     selected = _selected("主要业务：公司向客户A销售动力煤。")
-    section = selected.sections[0]
     quote = "公司向客户A销售动力煤"
-    start = section.normalized_text.index(quote)
     relationship = {
-        "schema_version": "business_profile_atomic_extraction.v1",
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "activities": [],
@@ -453,13 +597,10 @@ async def test_anonymous_relationship_requires_disclosed_share():
                 "relationship_type": "sells_to",
                 "counterparty_name_raw": "客户A",
                 "object_raw": "动力煤",
-                "evidence": {
-                    "section_id": section.section_id,
-                    "page_number": 1,
-                    "quote": quote,
-                    "section_start": start,
-                    "section_end": start + len(quote),
-                },
+                "evidence_span_ids": _evidence_span_ids(
+                    selected,
+                    contains=quote,
+                ),
             }
         ],
     }
@@ -477,11 +618,9 @@ async def test_anonymous_relationship_requires_disclosed_share():
 @pytest.mark.asyncio
 async def test_anonymous_concentration_with_explicit_share_is_normalized():
     selected = _selected("主要业务：客户A销售占比为25%。")
-    section = selected.sections[0]
     quote = "客户A销售占比为25%"
-    start = section.normalized_text.index(quote)
     response = {
-        "schema_version": "business_profile_atomic_extraction.v1",
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "activities": [],
@@ -493,13 +632,10 @@ async def test_anonymous_concentration_with_explicit_share_is_normalized():
                 "anonymous": True,
                 "disclosed_share": 0.25,
                 "object_raw": None,
-                "evidence": {
-                    "section_id": section.section_id,
-                    "page_number": 1,
-                    "quote": quote,
-                    "section_start": start,
-                    "section_end": start + len(quote),
-                },
+                "evidence_span_ids": _evidence_span_ids(
+                    selected,
+                    contains=quote,
+                ),
             }
         ],
     }
@@ -521,21 +657,16 @@ async def test_anonymous_concentration_with_explicit_share_is_normalized():
 async def test_mixed_partial_response_is_rejected():
     selected = _selected()
     relationship_selected = _selected("主要业务：公司向客户股份有限公司销售动力煤。")
-    relationship_section = relationship_selected.sections[0]
     quote = "公司向客户股份有限公司销售动力煤"
-    start = relationship_section.normalized_text.index(quote)
     relationship = {
         "subject_scope": "issuer",
         "relationship_type": "sells_to",
         "counterparty_name_raw": "客户股份有限公司",
         "object_raw": "动力煤",
-        "evidence": {
-            "section_id": relationship_section.section_id,
-            "page_number": 1,
-            "quote": quote,
-            "section_start": start,
-            "section_end": start + len(quote),
-        },
+        "evidence_span_ids": _evidence_span_ids(
+            relationship_selected,
+            contains=quote,
+        ),
     }
 
     mixed = _activity_response(selected)
@@ -665,7 +796,7 @@ async def test_timeout_and_request_bounds_are_fail_closed_and_audited():
 async def test_no_keyword_spans_use_ranked_bounded_selected_sections():
     selected = _selected("主要业务：" + "公司提供行业解决方案。" * 50)
     response = {
-        "schema_version": "business_profile_atomic_extraction.v1",
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "activities": [],
@@ -686,5 +817,5 @@ async def test_no_keyword_spans_use_ranked_bounded_selected_sections():
     )
 
     payload = json.loads(gateway.requests[0].messages[-1].content)
-    assert payload["sections"]
-    assert sum(len(item["text"]) for item in payload["sections"]) <= 120
+    assert payload["evidence_spans"]
+    assert sum(len(item["text"]) for item in payload["evidence_spans"]) <= 120

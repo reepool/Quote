@@ -23,6 +23,10 @@ from research.business_profile_semantic_pipeline import (
     SemanticProductionConfig,
     SemanticProductionScope,
 )
+from research.business_profile_semantic_extraction import (
+    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+)
 from research.business_profile_semantic_runtime import (
     BusinessProfilePlannedDisclosureAcquirer,
     BusinessProfileSemanticRuntime,
@@ -150,6 +154,17 @@ def _response(data, request):
     )
 
 
+def _request_span_ids(payload, *required_texts):
+    spans = payload["evidence_spans"]
+    ids = [
+        item["evidence_span_id"]
+        for item in spans
+        if any(text in item["text"] for text in required_texts)
+    ]
+    assert ids
+    return ids
+
+
 class _FakeGateway:
     def __init__(self):
         self.requests = []
@@ -176,12 +191,9 @@ class _FakeGateway:
             }
             return _response(data, request)
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         quote = "公司生产动力煤"
-        local_start = span["text"].index(quote)
-        start = span["text_start"] + local_start
         data = {
-            "schema_version": "business_profile_atomic_extraction.v1",
+            "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
             "instrument_id": payload["instrument_id"],
             "report_period": payload["report_period"],
             "activities": [
@@ -191,13 +203,7 @@ class _FakeGateway:
                     "object_raw": "动力煤",
                     "value": None,
                     "unit": None,
-                    "evidence": {
-                        "section_id": span["section_id"],
-                        "page_number": span["page_number"],
-                        "quote": quote,
-                        "section_start": start,
-                        "section_end": start + len(quote),
-                    },
+                    "evidence_span_ids": _request_span_ids(payload, quote),
                 }
             ],
             "relationships": [],
@@ -213,13 +219,10 @@ class _StructuredSegmentGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         quote = "煤炭 100 60 40%"
-        local_start = span["text"].index(quote)
-        start = span["text_start"] + local_start
         return _response(
             {
-                "schema_version": "business_profile_structured_extraction.v1",
+                "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
                 "field_family": payload["field_family"],
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
@@ -231,13 +234,11 @@ class _StructuredSegmentGateway(_FakeGateway):
                         "segment_cost": 60.0,
                         "gross_margin": 0.4,
                         "currency_unit": "万元",
-                        "evidence": {
-                            "section_id": span["section_id"],
-                            "page_number": span["page_number"],
-                            "quote": quote,
-                            "section_start": start,
-                            "section_end": start + len(quote),
-                        },
+                        "evidence_span_ids": _request_span_ids(
+                            payload,
+                            "万元",
+                            quote,
+                        ),
                     }
                 ],
             },
@@ -249,13 +250,10 @@ class _StructuredOperatingGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         quote = "煤炭 200 210 50"
-        local_start = span["text"].index(quote)
-        start = span["text_start"] + local_start
         return _response(
             {
-                "schema_version": "business_profile_structured_extraction.v1",
+                "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
                 "field_family": payload["field_family"],
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
@@ -266,13 +264,11 @@ class _StructuredOperatingGateway(_FakeGateway):
                         "value": 210.0,
                         "unit_raw": "万吨",
                         "fact_scope": "煤炭:产量",
-                        "evidence": {
-                            "section_id": span["section_id"],
-                            "page_number": span["page_number"],
-                            "quote": quote,
-                            "section_start": start,
-                            "section_end": start + len(quote),
-                        },
+                        "evidence_span_ids": _request_span_ids(
+                            payload,
+                            "万吨",
+                            quote,
+                        ),
                     }
                 ],
             },
@@ -306,10 +302,7 @@ class _RecoveringStructuredSegmentGateway(_StructuredSegmentGateway):
             data["rows"].append(invalid)
         else:
             payload = json.loads(request.messages[-1].content)
-            span = payload["sections"][0]
             quote = "焦煤 80 50 37.5%"
-            local_start = span["text"].index(quote)
-            start = span["text_start"] + local_start
             recovered = dict(data["rows"][0])
             recovered.update(
                 {
@@ -317,13 +310,7 @@ class _RecoveringStructuredSegmentGateway(_StructuredSegmentGateway):
                     "revenue": 80.0,
                     "segment_cost": 50.0,
                     "gross_margin": 0.375,
-                    "evidence": {
-                        "section_id": span["section_id"],
-                        "page_number": span["page_number"],
-                        "quote": quote,
-                        "section_start": start,
-                        "section_end": start + len(quote),
-                    },
+                    "evidence_span_ids": _request_span_ids(payload, quote),
                 }
             )
             data["rows"].append(recovered)
@@ -342,7 +329,7 @@ class _EmptyStructuredGateway(_FakeGateway):
         payload = json.loads(request.messages[-1].content)
         return _response(
             {
-                "schema_version": "business_profile_structured_extraction.v1",
+                "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
                 "field_family": payload["field_family"],
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
@@ -378,12 +365,9 @@ class _RelationshipGateway(_FakeGateway):
             }
             return _response(data, request)
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         quote = "公司向客户股份有限公司销售动力煤"
-        local_start = span["text"].index(quote)
-        start = span["text_start"] + local_start
         data = {
-            "schema_version": "business_profile_atomic_extraction.v1",
+            "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
             "instrument_id": payload["instrument_id"],
             "report_period": payload["report_period"],
             "activities": [],
@@ -393,13 +377,7 @@ class _RelationshipGateway(_FakeGateway):
                     "relationship_type": "sells_to",
                     "counterparty_name_raw": "客户股份有限公司",
                     "object_raw": "动力煤",
-                    "evidence": {
-                        "section_id": span["section_id"],
-                        "page_number": span["page_number"],
-                        "quote": quote,
-                        "section_start": start,
-                        "section_end": start + len(quote),
-                    },
+                    "evidence_span_ids": _request_span_ids(payload, quote),
                 }
             ],
         }
@@ -425,13 +403,10 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                 request,
             )
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         quote = "客户A销售占比为25%"
-        local_start = span["text"].index(quote)
-        start = span["text_start"] + local_start
         return _response(
             {
-                "schema_version": "business_profile_atomic_extraction.v1",
+                "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
                 "activities": [],
@@ -443,13 +418,7 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                         "anonymous": True,
                         "disclosed_share": 0.25,
                         "object_raw": None,
-                        "evidence": {
-                            "section_id": span["section_id"],
-                            "page_number": span["page_number"],
-                            "quote": quote,
-                            "section_start": start,
-                            "section_end": start + len(quote),
-                        },
+                        "evidence_span_ids": _request_span_ids(payload, quote),
                     }
                 ],
             },
@@ -476,14 +445,11 @@ class _ProductionAndSalesGateway(_FakeGateway):
                 request,
             )
         payload = json.loads(request.messages[-1].content)
-        span = payload["sections"][0]
         activities = []
         for action, quote in (
             ("produces", "公司生产动力煤"),
             ("sells", "公司销售动力煤"),
         ):
-            local_start = span["text"].index(quote)
-            start = span["text_start"] + local_start
             activities.append(
                 {
                     "subject_scope": "issuer",
@@ -491,18 +457,12 @@ class _ProductionAndSalesGateway(_FakeGateway):
                     "object_raw": "动力煤",
                     "value": None,
                     "unit": None,
-                    "evidence": {
-                        "section_id": span["section_id"],
-                        "page_number": span["page_number"],
-                        "quote": quote,
-                        "section_start": start,
-                        "section_end": start + len(quote),
-                    },
+                    "evidence_span_ids": _request_span_ids(payload, quote),
                 }
             )
         return _response(
             {
-                "schema_version": "business_profile_atomic_extraction.v1",
+                "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
                 "instrument_id": payload["instrument_id"],
                 "report_period": payload["report_period"],
                 "activities": activities,
@@ -1361,6 +1321,8 @@ def test_llm_authentication_failure_is_a_resumable_configuration_blocker(
         "llm_authentication_error": 1
     }
     assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["metrics"]["llm_calls"] == 1
+    assert extracted["metrics"]["evidence_spans_offered"] >= 1
 
 
 def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
@@ -1933,7 +1895,7 @@ def test_semantic_runtime_promotes_only_after_independent_verification(
     )
     assert len(gateway.requests) == 2
     extraction_payload = json.loads(gateway.requests[0].messages[-1].content)
-    assert len(extraction_payload["sections"][0]["text"]) < len(text) / 2
+    assert len(extraction_payload["evidence_spans"][0]["text"]) < len(text) / 2
     assert len(activities) == len(evidence) == len(approved) == 1
     assert activities[0]["review_status"] == "approved"
     assert evidence[0]["review_status"] == "approved"

@@ -521,6 +521,21 @@ class BusinessProfileSemanticPipeline:
                     metrics.get("deterministic_completed") or 0
                 ),
                 "llm_calls": int(metrics.get("llm_calls") or 0),
+                "semantic_rows_accepted": int(
+                    metrics.get("semantic_rows_accepted") or 0
+                ),
+                "semantic_rows_rejected": int(
+                    metrics.get("semantic_rows_rejected") or 0
+                ),
+                "evidence_spans_offered": int(
+                    metrics.get("evidence_spans_offered") or 0
+                ),
+                "evidence_spans_referenced": int(
+                    metrics.get("evidence_spans_referenced") or 0
+                ),
+                "evidence_spans_resolved": int(
+                    metrics.get("evidence_spans_resolved") or 0
+                ),
                 "tokens": int(metrics.get("tokens") or 0),
                 "cost": float(metrics.get("cost") or 0),
                 "elapsed_seconds": float(metrics.get("elapsed_seconds") or 0),

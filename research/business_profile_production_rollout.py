@@ -41,8 +41,11 @@ from research.business_profile_section_selection import (
     SELECTOR_VERSION,
 )
 from research.business_profile_semantic_extraction import (
+    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     SEMANTIC_EXTRACTION_PROMPT_VERSION,
     SEMANTIC_VERIFIER_PROMPT_VERSION,
+    STRUCTURED_EXTRACTION_PROMPT_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
 )
 from research.business_profile_semantic_runtime import RUNTIME_SCHEMA_VERSION
 from research.business_profile_semantic_schemas import (
@@ -318,7 +321,13 @@ def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str
         ),
         "selector": "|".join((SELECTOR_VERSION, KEYWORD_SELECTOR_VERSION)),
         "parser": "|".join((PARSER_VERSION, TABLE_PARSER_VERSION, RUNTIME_SCHEMA_VERSION)),
-        "schema": BUSINESS_PROFILE_SEMANTIC_SCHEMA_SET_VERSION,
+        "schema": "|".join(
+            (
+                BUSINESS_PROFILE_SEMANTIC_SCHEMA_SET_VERSION,
+                SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+                STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            )
+        ),
         "catalog": "|".join(
             (
                 fact_catalog.catalog_version,
@@ -347,6 +356,7 @@ def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str
             (
                 DISCLOSURE_PLANNER_POLICY_VERSION,
                 SEMANTIC_EXTRACTION_PROMPT_VERSION,
+                STRUCTURED_EXTRACTION_PROMPT_VERSION,
                 PROMOTION_POLICY_VERSION,
                 PUBLICATION_POLICY_VERSION,
             )

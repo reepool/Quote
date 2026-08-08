@@ -14,17 +14,21 @@ from jsonschema import Draft202012Validator
 from research.business_profile_semantic_schemas import (
     validate_business_profile_artifact,
 )
-from research.business_profile_section_selection import SelectedSectionArtifact
+from research.business_profile_section_selection import (
+    SelectedSection,
+    SelectedSectionArtifact,
+)
 from utils.llm import LlmClientProtocol, LlmMessage, LlmRequest
 
 
-SEMANTIC_EXTRACTION_SCHEMA_VERSION = "business_profile_atomic_extraction.v1"
-SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v1"
+SEMANTIC_EXTRACTION_SCHEMA_VERSION = "business_profile_atomic_extraction.v2"
+SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v2"
 SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v1"
-STRUCTURED_EXTRACTION_SCHEMA_VERSION = "business_profile_structured_extraction.v1"
-STRUCTURED_EXTRACTION_PROMPT_VERSION = "business_profile_structured_extraction.v1"
+STRUCTURED_EXTRACTION_SCHEMA_VERSION = "business_profile_structured_extraction.v2"
+STRUCTURED_EXTRACTION_PROMPT_VERSION = "business_profile_structured_extraction.v2"
 MAX_STRUCTURED_ROW_DIAGNOSTICS = 10
 MAX_DIAGNOSTIC_MESSAGE_CHARACTERS = 240
+MAX_EVIDENCE_SPAN_IDS_PER_ITEM = 4
 
 _ACTIVITY_ACTIONS = (
     "extracts",
@@ -78,6 +82,8 @@ class BusinessProfileSemanticPolicy:
     verification_profile: str = "semantic_extraction"
     max_input_characters: int = 24000
     max_sections_per_request: int = 12
+    max_evidence_spans_per_request: int = 96
+    max_evidence_span_characters: int = 1200
     max_items_per_response: int = 50
     max_output_tokens: int = 5000
     timeout_seconds: float = 620.0
@@ -87,6 +93,11 @@ class BusinessProfileSemanticPolicy:
             raise ValueError("semantic LLM profiles are required")
         if self.max_input_characters < 1 or self.max_sections_per_request < 1:
             raise ValueError("semantic request bounds must be positive")
+        if (
+            self.max_evidence_spans_per_request < 1
+            or self.max_evidence_span_characters < 32
+        ):
+            raise ValueError("semantic evidence-span bounds must be positive")
         if self.max_items_per_response < 1 or self.max_output_tokens < 1:
             raise ValueError("semantic output bounds must be positive")
         if not math.isfinite(self.timeout_seconds) or self.timeout_seconds <= 0:
@@ -174,6 +185,34 @@ class StructuredRowsRejectedError(ValueError):
         super().__init__(f"structured semantic rows rejected: {detail}")
 
 
+class EvidenceSpanResolutionError(ValueError):
+    """A model-selected evidence identifier cannot be bound exactly."""
+
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        super().__init__(message)
+
+
+@dataclass(frozen=True)
+class EvidenceSpan:
+    evidence_span_id: str
+    section_id: str
+    page_number: int
+    text: str
+    section_start: int
+    section_end: int
+    normalized_start: int
+    normalized_end: int
+    section_hash: str
+    section_text: str = field(repr=False)
+
+    def request_dict(self) -> dict[str, str]:
+        return {
+            "evidence_span_id": self.evidence_span_id,
+            "text": self.text,
+        }
+
+
 class BusinessProfileSemanticExtractor:
     """Production adapter using only the configured common LLM gateway."""
 
@@ -201,11 +240,13 @@ class BusinessProfileSemanticExtractor:
             raise ValueError(
                 "semantic extraction is limited to atomic activities or named relationships"
             )
-        sections = _semantic_request_sections(
+        evidence_spans = _build_evidence_span_catalog(
             selected,
             candidate_spans,
             max_sections=self.policy.max_sections_per_request,
             max_characters=self.policy.max_input_characters,
+            max_span_characters=self.policy.max_evidence_span_characters,
+            max_spans=self.policy.max_evidence_spans_per_request,
         )
         request_payload = {
             "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
@@ -213,7 +254,7 @@ class BusinessProfileSemanticExtractor:
             "instrument_id": instrument_id,
             "report_period": report_period,
             "bundle_id": selected.bundle["bundle_id"],
-            "sections": sections,
+            "evidence_spans": [item.request_dict() for item in evidence_spans],
         }
         input_hash = _stable_hash(request_payload)
         response = None
@@ -233,7 +274,9 @@ class BusinessProfileSemanticExtractor:
                                 "value-chain roles, direction, materiality, pass-through, hedge "
                                 "effectiveness, valuation values, governed ids, or anonymous entity edges. "
                                 "Anonymous concentration facts require an explicitly disclosed fraction. "
-                                "Every item must quote an exact substring with section-local offsets."
+                                "For every item select one or more supplied evidence_span_ids that "
+                                "jointly support every returned field. Never calculate or return quotes, "
+                                "pages, offsets, hashes, or other governed identifiers."
                             ),
                         ),
                         LlmMessage(
@@ -267,6 +310,7 @@ class BusinessProfileSemanticExtractor:
                 instrument_id=instrument_id,
                 report_period=report_period,
                 selected=selected,
+                evidence_spans=evidence_spans,
                 max_items=self.policy.max_items_per_response,
             )
             audit = _success_audit(
@@ -282,6 +326,14 @@ class BusinessProfileSemanticExtractor:
                     "governed_ids_local_only": True,
                     "complete_batch": True,
                 },
+                diagnostics=_span_audit_diagnostics(
+                    response.data,
+                    evidence_spans=evidence_spans,
+                    accepted_rows=(
+                        len(normalized["activities"])
+                        + len(normalized["relationships"])
+                    ),
+                ),
             )
             self._persist_audit(audit)
             return AtomicExtractionEnvelope(
@@ -301,7 +353,14 @@ class BusinessProfileSemanticExtractor:
                 prompt_version=SEMANTIC_EXTRACTION_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),
-                diagnostics=_exception_diagnostics(exc),
+                diagnostics={
+                    **_span_audit_diagnostics(
+                        None if response is None else response.data,
+                        evidence_spans=evidence_spans,
+                        rejected_rows=int(getattr(exc, "rejected_count", 0) or 0),
+                    ),
+                    **_exception_diagnostics(exc),
+                },
             )
             self._persist_audit(audit)
             raise
@@ -318,11 +377,13 @@ class BusinessProfileSemanticExtractor:
 
         if field_family not in _STRUCTURED_FIELD_FAMILIES:
             raise ValueError("unsupported structured semantic field family")
-        sections = _semantic_request_sections(
+        evidence_spans = _build_evidence_span_catalog(
             selected,
             (),
             max_sections=self.policy.max_sections_per_request,
             max_characters=self.policy.max_input_characters,
+            max_span_characters=self.policy.max_evidence_span_characters,
+            max_spans=self.policy.max_evidence_spans_per_request,
         )
         request_payload = {
             "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
@@ -330,7 +391,7 @@ class BusinessProfileSemanticExtractor:
             "instrument_id": instrument_id,
             "report_period": report_period,
             "bundle_id": selected.bundle["bundle_id"],
-            "sections": sections,
+            "evidence_spans": [item.request_dict() for item in evidence_spans],
         }
         input_hash = _stable_hash(request_payload)
         response = None
@@ -349,8 +410,9 @@ class BusinessProfileSemanticExtractor:
                                 "values and units; gross_margin must be a decimal fraction. Do not "
                                 "infer missing rows, totals, units, periods, zero values, or governed "
                                 "identifiers. Return an empty rows array when no explicit row is "
-                                "recoverable. Every row must quote one exact substring with "
-                                "section-local offsets."
+                                "recoverable. For every row select one or more supplied "
+                                "evidence_span_ids that jointly support every returned field. Never "
+                                "calculate or return quotes, pages, offsets, or hashes."
                             ),
                         ),
                         LlmMessage(
@@ -385,6 +447,7 @@ class BusinessProfileSemanticExtractor:
                     instrument_id=instrument_id,
                     report_period=report_period,
                     selected=selected,
+                    evidence_spans=evidence_spans,
                     max_items=self.policy.max_items_per_response,
                 )
             )
@@ -415,6 +478,12 @@ class BusinessProfileSemanticExtractor:
                     "rows_accepted": len(rows),
                     "rows_rejected": rejected_row_count,
                     "row_rejections": list(rejected_rows),
+                    **_span_audit_diagnostics(
+                        response.data,
+                        evidence_spans=evidence_spans,
+                        accepted_rows=len(rows),
+                        rejected_rows=rejected_row_count,
+                    ),
                 },
             )
             self._persist_audit(audit)
@@ -436,7 +505,14 @@ class BusinessProfileSemanticExtractor:
                 prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),
-                diagnostics=_exception_diagnostics(exc),
+                diagnostics={
+                    **_span_audit_diagnostics(
+                        None if response is None else response.data,
+                        evidence_spans=evidence_spans,
+                        rejected_rows=int(getattr(exc, "rejected_count", 0) or 0),
+                    ),
+                    **_exception_diagnostics(exc),
+                },
             )
             self._persist_audit(audit)
             raise
@@ -606,97 +682,231 @@ def deterministic_semantic_verification_decision(
     }
 
 
-def _semantic_request_sections(
+def _build_evidence_span_catalog(
     selected: SelectedSectionArtifact,
     candidate_spans: Sequence[Mapping[str, Any]],
     *,
     max_sections: int,
     max_characters: int,
-) -> list[dict[str, Any]]:
-    """Build the smallest prompt payload while retaining original section offsets."""
+    max_span_characters: int,
+    max_spans: int,
+) -> tuple[EvidenceSpan, ...]:
+    """Create immutable request-local evidence handles without truncating text."""
 
-    if not candidate_spans:
-        ranked_sections = sorted(
-            selected.sections,
-            key=lambda item: (
-                -_semantic_section_score(item.selector_reasons),
-                item.page_number,
-            ),
-        )
-        candidates = [
-            {
-                "section_id": item.section_id,
-                "page_number": item.page_number,
-                "section_hash": item.section_hash,
-                "text": item.normalized_text,
-                "text_start": 0,
-            }
-            for item in ranked_sections
-        ]
-    else:
-        sections = {item.section_id: item for item in selected.sections}
-        ranges_by_section: dict[str, list[tuple[int, int]]] = {}
-        for raw in candidate_spans:
-            section_id = str(raw.get("section_id") or "")
-            section = sections.get(section_id)
-            if section is None:
-                raise ValueError("candidate span references unknown selected section")
-            absolute_start = int(raw.get("normalized_start") or 0)
-            absolute_end = int(raw.get("normalized_end") or 0)
-            start = absolute_start - section.normalized_start
-            end = absolute_end - section.normalized_start
-            if start < 0 or end <= start or end > len(section.normalized_text):
-                raise ValueError("candidate span offsets fall outside selected section")
-            ranges_by_section.setdefault(section_id, []).append((start, end))
-        candidates = []
-        for section in selected.sections:
-            ranges = ranges_by_section.get(section.section_id) or []
-            merged: list[list[int]] = []
-            for start, end in sorted(set(ranges)):
-                if merged and start <= merged[-1][1] + 20:
-                    merged[-1][1] = max(merged[-1][1], end)
-                else:
-                    merged.append([start, end])
-            for start, end in merged:
-                candidates.append(
-                    {
-                        "section_id": section.section_id,
-                        "page_number": section.page_number,
-                        "section_hash": section.section_hash,
-                        "text": section.normalized_text[start:end],
-                        "text_start": start,
-                    }
-                )
-    return _fit_semantic_sections(
-        candidates,
-        max_sections=max_sections,
-        max_characters=max_characters,
-    )
-
-
-def _fit_semantic_sections(
-    candidates: Sequence[Mapping[str, Any]],
-    *,
-    max_sections: int,
-    max_characters: int,
-) -> list[dict[str, Any]]:
     if max_characters < 32:
         raise ValueError("semantic request exceeds max_input_characters")
-    output: list[dict[str, Any]] = []
+    ranked_sections = sorted(
+        selected.sections,
+        key=lambda item: (
+            -_semantic_section_score(item.selector_reasons),
+            item.page_number,
+            item.section_id,
+        ),
+    )
+    if candidate_spans:
+        referenced_sections = {
+            str(item.get("section_id") or "") for item in candidate_spans
+        }
+        ranked_sections = [
+            item for item in ranked_sections if item.section_id in referenced_sections
+        ]
+    ranked_sections = ranked_sections[:max_sections]
+    ranges_by_section = _candidate_ranges_by_section(
+        ranked_sections,
+        candidate_spans,
+    )
+    source_document_id = str(selected.bundle["source_document_id"])
+    output: list[EvidenceSpan] = []
+    seen_ids: set[str] = set()
     remaining = max_characters
-    for raw in candidates:
-        if len(output) >= max_sections or remaining <= 0:
+    effective_span_characters = min(max_span_characters, max_characters)
+    for section in ranked_sections:
+        ranges = ranges_by_section.get(section.section_id)
+        if ranges is None:
+            ranges = _bounded_section_ranges(
+                section,
+                max_characters=effective_span_characters,
+            )
+        for start, end in ranges:
+            if len(output) >= max_spans:
+                break
+            for bounded_start, bounded_end in _split_normalized_range(
+                section.normalized_text,
+                start,
+                end,
+                max_characters=effective_span_characters,
+            ):
+                text = section.normalized_text[bounded_start:bounded_end]
+                if not text or len(text) > remaining or len(output) >= max_spans:
+                    continue
+                identity = {
+                    "source_document_id": source_document_id,
+                    "section_hash": section.section_hash,
+                    "section_start": bounded_start,
+                    "section_end": bounded_end,
+                    "text": text,
+                }
+                span_id = f"span-{_stable_hash(identity)[:24]}"
+                if span_id in seen_ids:
+                    raise ValueError("evidence span catalog contains ambiguous identifier")
+                seen_ids.add(span_id)
+                output.append(
+                    EvidenceSpan(
+                        evidence_span_id=span_id,
+                        section_id=section.section_id,
+                        page_number=section.page_number,
+                        text=text,
+                        section_start=bounded_start,
+                        section_end=bounded_end,
+                        normalized_start=section.normalized_start + bounded_start,
+                        normalized_end=section.normalized_start + bounded_end,
+                        section_hash=section.section_hash,
+                        section_text=section.normalized_text,
+                    )
+                )
+                remaining -= len(text)
+        if len(output) >= max_spans:
             break
-        item = dict(raw)
-        text = str(item.get("text") or "")
-        if not text:
-            continue
-        item["text"] = text[:remaining]
-        output.append(item)
-        remaining -= len(item["text"])
     if not output:
-        raise ValueError("semantic request has no bounded evidence sections")
+        raise ValueError("semantic request has no complete bounded evidence spans")
+    return tuple(output)
+
+
+def _candidate_ranges_by_section(
+    sections: Sequence[SelectedSection],
+    candidate_spans: Sequence[Mapping[str, Any]],
+) -> dict[str, list[tuple[int, int]]]:
+    if not candidate_spans:
+        return {}
+    sections_by_id = {item.section_id: item for item in sections}
+    ranges: dict[str, list[tuple[int, int]]] = {}
+    for raw in candidate_spans:
+        section_id = str(raw.get("section_id") or "")
+        section = sections_by_id.get(section_id)
+        if section is None:
+            raise ValueError("candidate span references unknown selected section")
+        absolute_start = int(raw.get("normalized_start") or 0)
+        absolute_end = int(raw.get("normalized_end") or 0)
+        start = absolute_start - section.normalized_start
+        end = absolute_end - section.normalized_start
+        if start < 0 or end <= start or end > len(section.normalized_text):
+            raise ValueError("candidate span offsets fall outside selected section")
+        ranges.setdefault(section_id, []).append((start, end))
+    return {
+        section_id: _merge_ranges(values, gap=0)
+        for section_id, values in ranges.items()
+    }
+
+
+def _bounded_section_ranges(
+    section: SelectedSection,
+    *,
+    max_characters: int,
+) -> list[tuple[int, int]]:
+    """Prefer PDF text lines, preserving table rows and normalized coordinates."""
+
+    normalized = section.normalized_text
+    line_ranges: list[tuple[int, int]] = []
+    cursor = 0
+    for raw_line in section.text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line).strip()
+        if not line:
+            continue
+        start = normalized.find(line, cursor)
+        if start < 0:
+            return _split_normalized_range(
+                normalized,
+                0,
+                len(normalized),
+                max_characters=max_characters,
+            )
+        line_ranges.append((start, start + len(line)))
+        cursor = start + len(line)
+    if not line_ranges:
+        return _split_normalized_range(
+            normalized,
+            0,
+            len(normalized),
+            max_characters=max_characters,
+        )
+
+    grouped: list[tuple[int, int]] = []
+    group_start, group_end = line_ranges[0]
+    for start, end in line_ranges[1:]:
+        candidate_length = end - group_start
+        if candidate_length > max_characters:
+            grouped.extend(
+                _split_normalized_range(
+                    normalized,
+                    group_start,
+                    group_end,
+                    max_characters=max_characters,
+                )
+            )
+            group_start, group_end = start, end
+        else:
+            group_end = end
+    grouped.extend(
+        _split_normalized_range(
+            normalized,
+            group_start,
+            group_end,
+            max_characters=max_characters,
+        )
+    )
+    return grouped
+
+
+def _split_normalized_range(
+    text: str,
+    start: int,
+    end: int,
+    *,
+    max_characters: int,
+) -> list[tuple[int, int]]:
+    output: list[tuple[int, int]] = []
+    cursor = start
+    while cursor < end:
+        while cursor < end and text[cursor].isspace():
+            cursor += 1
+        if cursor >= end:
+            break
+        limit = min(cursor + max_characters, end)
+        split = limit
+        if limit < end:
+            floor = cursor + max(1, max_characters // 2)
+            punctuation = [
+                match.end()
+                for match in re.finditer(r"[。！？；]", text[cursor:limit])
+                if cursor + match.end() >= floor
+            ]
+            if punctuation:
+                split = cursor + punctuation[-1]
+            else:
+                whitespace = text.rfind(" ", floor, limit)
+                if whitespace > cursor:
+                    split = whitespace
+        while split > cursor and text[split - 1].isspace():
+            split -= 1
+        if split <= cursor:
+            split = limit
+        output.append((cursor, split))
+        cursor = split
     return output
+
+
+def _merge_ranges(
+    ranges: Sequence[tuple[int, int]],
+    *,
+    gap: int,
+) -> list[tuple[int, int]]:
+    merged: list[list[int]] = []
+    for start, end in sorted(set(ranges)):
+        if merged and start <= merged[-1][1] + gap:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return [(start, end) for start, end in merged]
 
 
 def _semantic_section_score(reasons: Sequence[str]) -> int:
@@ -716,24 +926,7 @@ def _semantic_section_score(reasons: Sequence[str]) -> int:
 
 
 def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
-    evidence = {
-        "type": "object",
-        "required": [
-            "section_id",
-            "page_number",
-            "quote",
-            "section_start",
-            "section_end",
-        ],
-        "properties": {
-            "section_id": {"type": "string", "minLength": 1},
-            "page_number": {"type": "integer", "minimum": 1},
-            "quote": {"type": "string", "minLength": 1},
-            "section_start": {"type": "integer", "minimum": 0},
-            "section_end": {"type": "integer", "minimum": 1},
-        },
-        "additionalProperties": False,
-    }
+    evidence_span_ids = _evidence_span_ids_schema()
     activity = {
         "type": "object",
         "required": [
@@ -742,7 +935,7 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "object_raw",
             "value",
             "unit",
-            "evidence",
+            "evidence_span_ids",
         ],
         "properties": {
             "subject_scope": {"enum": ["issuer", "consolidated_group"]},
@@ -750,7 +943,7 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "object_raw": {"type": "string", "minLength": 1},
             "value": {"type": ["number", "null"]},
             "unit": {"type": ["string", "null"]},
-            "evidence": evidence,
+            "evidence_span_ids": evidence_span_ids,
         },
         "additionalProperties": False,
     }
@@ -761,7 +954,7 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "relationship_type",
             "counterparty_name_raw",
             "object_raw",
-            "evidence",
+            "evidence_span_ids",
         ],
         "properties": {
             "subject_scope": {"enum": ["issuer", "consolidated_group"]},
@@ -774,7 +967,7 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
                 "maximum": 1,
             },
             "object_raw": {"type": ["string", "null"]},
-            "evidence": evidence,
+            "evidence_span_ids": evidence_span_ids,
         },
         "additionalProperties": False,
     }
@@ -811,24 +1004,7 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
 def _structured_extraction_schema(
     field_family: str, *, max_items: int
 ) -> dict[str, Any]:
-    evidence = {
-        "type": "object",
-        "required": [
-            "section_id",
-            "page_number",
-            "quote",
-            "section_start",
-            "section_end",
-        ],
-        "properties": {
-            "section_id": {"type": "string", "minLength": 1},
-            "page_number": {"type": "integer", "minimum": 1},
-            "quote": {"type": "string", "minLength": 1},
-            "section_start": {"type": "integer", "minimum": 0},
-            "section_end": {"type": "integer", "minimum": 1},
-        },
-        "additionalProperties": False,
-    }
+    evidence_span_ids = _evidence_span_ids_schema()
     if field_family == "structured_segments":
         row = {
             "type": "object",
@@ -839,7 +1015,7 @@ def _structured_extraction_schema(
                 "segment_cost",
                 "gross_margin",
                 "currency_unit",
-                "evidence",
+                "evidence_span_ids",
             ],
             "properties": {
                 "segment_type": {"enum": list(_SEGMENT_TYPES)},
@@ -848,7 +1024,7 @@ def _structured_extraction_schema(
                 "segment_cost": {"type": ["number", "null"]},
                 "gross_margin": {"type": ["number", "null"]},
                 "currency_unit": {"type": ["string", "null"]},
-                "evidence": evidence,
+                "evidence_span_ids": evidence_span_ids,
             },
             "additionalProperties": False,
         }
@@ -861,7 +1037,7 @@ def _structured_extraction_schema(
                 "value",
                 "unit_raw",
                 "fact_scope",
-                "evidence",
+                "evidence_span_ids",
             ],
             "properties": {
                 "segment_name_raw": {"type": "string", "minLength": 1},
@@ -869,7 +1045,7 @@ def _structured_extraction_schema(
                 "value": {"type": "number"},
                 "unit_raw": {"type": "string", "minLength": 1},
                 "fact_scope": {"type": "string", "minLength": 1},
-                "evidence": evidence,
+                "evidence_span_ids": evidence_span_ids,
             },
             "additionalProperties": False,
         }
@@ -892,6 +1068,15 @@ def _structured_extraction_schema(
             "rows": {"type": "array", "items": row, "maxItems": max_items},
         },
         "additionalProperties": False,
+    }
+
+
+def _evidence_span_ids_schema() -> dict[str, Any]:
+    return {
+        "type": "array",
+        "items": {"type": "string", "minLength": 1},
+        "minItems": 1,
+        "maxItems": MAX_EVIDENCE_SPAN_IDS_PER_ITEM,
     }
 
 
@@ -936,6 +1121,7 @@ def _validate_extraction_response(
     instrument_id: str,
     report_period: str,
     selected: SelectedSectionArtifact,
+    evidence_spans: Sequence[EvidenceSpan],
     max_items: int,
 ) -> dict[str, list[Mapping[str, Any]]]:
     if not isinstance(data, Mapping):
@@ -963,14 +1149,14 @@ def _validate_extraction_response(
         raise ValueError(
             "relationship response contains partial incompatible activities"
         )
-    sections = {item.section_id: item for item in selected.sections}
+    catalog = _evidence_catalog(evidence_spans)
     activities = [
         _normalize_activity(
             item,
             instrument_id=instrument_id,
             report_period=report_period,
             source_document_id=str(selected.bundle["source_document_id"]),
-            sections=sections,
+            catalog=catalog,
         )
         for item in raw_activities
     ]
@@ -980,7 +1166,7 @@ def _validate_extraction_response(
             instrument_id=instrument_id,
             report_period=report_period,
             source_document_id=str(selected.bundle["source_document_id"]),
-            sections=sections,
+            catalog=catalog,
         )
         for item in raw_relationships
     ]
@@ -994,6 +1180,7 @@ def _validate_structured_extraction_response(
     instrument_id: str,
     report_period: str,
     selected: SelectedSectionArtifact,
+    evidence_spans: Sequence[EvidenceSpan],
     max_items: int,
 ) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], int]:
     if not isinstance(data, Mapping):
@@ -1014,7 +1201,7 @@ def _validate_structured_extraction_response(
     raw_rows = list(data.get("rows") or [])
     if len(raw_rows) > max_items:
         raise ValueError("structured semantic response exceeds item bound")
-    sections = {item.section_id: item for item in selected.sections}
+    catalog = _evidence_catalog(evidence_spans)
     normalized: list[Mapping[str, Any]] = []
     rejected: list[Mapping[str, Any]] = []
     rejected_count = 0
@@ -1025,7 +1212,7 @@ def _validate_structured_extraction_response(
                     raw,
                     field_family=field_family,
                     source_document_id=str(selected.bundle["source_document_id"]),
-                    sections=sections,
+                    catalog=catalog,
                 )
             )
         except (TypeError, ValueError, KeyError) as exc:
@@ -1040,12 +1227,15 @@ def _validate_structured_row(
     *,
     field_family: str,
     source_document_id: str,
-    sections: Mapping[str, Any],
+    catalog: Mapping[str, EvidenceSpan],
 ) -> Mapping[str, Any]:
     item = dict(raw)
-    evidence = _exact_evidence(item.get("evidence"), source_document_id, sections)
-    section = sections[str(item["evidence"]["section_id"])]
-    quote = str(item["evidence"]["quote"])
+    evidence = _resolve_exact_evidence(
+        item.pop("evidence_span_ids", None),
+        source_document_id,
+        catalog,
+    )
+    quote = str(evidence["quote"])
     segment_name = str(item.get("segment_name_raw") or "").strip()
     if segment_name not in quote:
         raise ValueError("structured semantic segment name is absent from exact quote")
@@ -1077,17 +1267,16 @@ def _validate_structured_row(
             item.get("revenue") is not None or item.get("segment_cost") is not None
         ) and not currency_unit:
             raise ValueError("structured segment currency_unit is required")
-        if currency_unit and currency_unit not in section.normalized_text:
-            raise ValueError("structured segment unit is absent from evidence section")
+        if currency_unit and currency_unit not in quote:
+            raise ValueError("structured segment unit is absent from exact evidence")
     else:
         _validate_finite_number(item["value"], "value")
         if not _number_supported_by_quote(item["value"], quote):
             raise ValueError("structured operating value is absent from exact quote")
         unit = str(item.get("unit_raw") or "").strip()
-        if unit not in section.normalized_text:
-            raise ValueError("structured operating unit is absent from evidence section")
+        if unit not in quote:
+            raise ValueError("structured operating unit is absent from exact evidence")
     item["evidence"] = evidence
-    item["evidence"]["quote"] = quote
     return item
 
 
@@ -1095,6 +1284,7 @@ def _row_rejection_diagnostic(row_index: int, exc: Exception) -> Mapping[str, An
     return {
         "row_index": row_index,
         "failure_category": _failure_category(exc),
+        "failure_code": str(getattr(exc, "code", "") or "") or None,
         "message": _safe_diagnostic_message(exc),
     }
 
@@ -1132,14 +1322,37 @@ def _normalize_activity(
     instrument_id: str,
     report_period: str,
     source_document_id: str,
-    sections: Mapping[str, Any],
+    catalog: Mapping[str, EvidenceSpan],
 ) -> Mapping[str, Any]:
-    evidence = _exact_evidence(raw.get("evidence"), source_document_id, sections)
+    evidence = _resolve_exact_evidence(
+        raw.get("evidence_span_ids"),
+        source_document_id,
+        catalog,
+    )
+    quote = str(evidence["quote"])
+    object_raw = str(raw["object_raw"]).strip()
+    if object_raw not in quote:
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "activity object is absent from exact evidence",
+        )
+    if raw.get("value") is not None:
+        _validate_finite_number(raw["value"], "activity value")
+        if not _number_supported_by_quote(raw["value"], quote):
+            raise EvidenceSpanResolutionError(
+                "incompatible_evidence_spans",
+                "activity value is absent from exact evidence",
+            )
+    if raw.get("unit") and str(raw["unit"]).strip() not in quote:
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "activity unit is absent from exact evidence",
+        )
     core = {
         "instrument_id": instrument_id,
         "subject_scope": str(raw["subject_scope"]),
         "action": str(raw["action"]),
-        "object_raw": str(raw["object_raw"]).strip(),
+        "object_raw": object_raw,
         "report_period": report_period,
         "value": raw.get("value"),
         "unit": raw.get("unit"),
@@ -1163,7 +1376,7 @@ def _normalize_relationship(
     instrument_id: str,
     report_period: str,
     source_document_id: str,
-    sections: Mapping[str, Any],
+    catalog: Mapping[str, EvidenceSpan],
 ) -> Mapping[str, Any]:
     counterparty = str(raw.get("counterparty_name_raw") or "").strip()
     normalized_counterparty = counterparty.lower().replace(" ", "")
@@ -1176,7 +1389,32 @@ def _normalize_relationship(
         raise ValueError("counterparty label is required")
     if anonymous and disclosed_share is None:
         raise ValueError("anonymous concentration requires disclosed_share")
-    evidence = _exact_evidence(raw.get("evidence"), source_document_id, sections)
+    evidence = _resolve_exact_evidence(
+        raw.get("evidence_span_ids"),
+        source_document_id,
+        catalog,
+    )
+    quote = str(evidence["quote"])
+    if counterparty not in quote:
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "relationship counterparty is absent from exact evidence",
+        )
+    object_raw = str(raw.get("object_raw") or "").strip()
+    if object_raw and object_raw not in quote:
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "relationship object is absent from exact evidence",
+        )
+    if disclosed_share is not None and not _number_supported_by_quote(
+        disclosed_share,
+        quote,
+        percentage=True,
+    ):
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "relationship disclosed_share is absent from exact evidence",
+        )
     core = {
         "instrument_id": instrument_id,
         "report_period": report_period,
@@ -1196,33 +1434,81 @@ def _normalize_relationship(
     }
 
 
-def _exact_evidence(
-    raw: Any,
+def _evidence_catalog(
+    evidence_spans: Sequence[EvidenceSpan],
+) -> dict[str, EvidenceSpan]:
+    catalog: dict[str, EvidenceSpan] = {}
+    for span in evidence_spans:
+        if span.evidence_span_id in catalog:
+            raise ValueError("evidence span catalog contains duplicate identifier")
+        catalog[span.evidence_span_id] = span
+    return catalog
+
+
+def _resolve_exact_evidence(
+    raw_ids: Any,
     source_document_id: str,
-    sections: Mapping[str, Any],
+    catalog: Mapping[str, EvidenceSpan],
 ) -> Mapping[str, Any]:
-    if not isinstance(raw, Mapping):
-        raise ValueError("semantic item requires exact evidence")
-    section_id = str(raw.get("section_id") or "")
-    section = sections.get(section_id)
-    if section is None:
-        raise ValueError("semantic evidence references unknown section")
-    if int(raw.get("page_number") or 0) != section.page_number:
-        raise ValueError("semantic evidence page mismatch")
-    start = int(raw.get("section_start"))
-    end = int(raw.get("section_end"))
-    quote = str(raw.get("quote") or "")
-    if start < 0 or end <= start or end > len(section.normalized_text):
-        raise ValueError("semantic evidence offsets are invalid")
-    if section.normalized_text[start:end] != quote:
-        raise ValueError("semantic evidence quote does not match exact offsets")
+    if not isinstance(raw_ids, Sequence) or isinstance(raw_ids, (str, bytes)):
+        raise EvidenceSpanResolutionError(
+            "malformed_evidence_span_ids",
+            "semantic item requires evidence_span_ids",
+        )
+    ids = [str(item).strip() for item in raw_ids]
+    if not ids or any(not item for item in ids):
+        raise EvidenceSpanResolutionError(
+            "malformed_evidence_span_ids",
+            "semantic item requires non-empty evidence_span_ids",
+        )
+    if len(ids) != len(set(ids)):
+        raise EvidenceSpanResolutionError(
+            "duplicate_evidence_span_ids",
+            "semantic evidence_span_ids contain duplicates",
+        )
+    spans: list[EvidenceSpan] = []
+    for span_id in ids:
+        if not re.fullmatch(r"span-[0-9a-f]{24}", span_id):
+            raise EvidenceSpanResolutionError(
+                "malformed_evidence_span_id",
+                "semantic evidence span identifier is malformed",
+            )
+        span = catalog.get(span_id)
+        if span is None:
+            raise EvidenceSpanResolutionError(
+                "unknown_evidence_span",
+                "semantic evidence span identifier is unknown",
+            )
+        spans.append(span)
+    section_ids = {span.section_id for span in spans}
+    if len(section_ids) != 1:
+        raise EvidenceSpanResolutionError(
+            "incompatible_evidence_spans",
+            "semantic evidence spans cross selected sections",
+        )
+    section = spans[0]
+    start = min(span.section_start for span in spans)
+    end = max(span.section_end for span in spans)
+    if start < 0 or end <= start:
+        raise EvidenceSpanResolutionError(
+            "truncated_evidence_span",
+            "semantic evidence span range is invalid",
+        )
+    # The catalog is generated from this exact normalized text, so this merge
+    # retains deterministic source coordinates without trusting model offsets.
+    if any(span.section_text != section.section_text for span in spans):
+        raise EvidenceSpanResolutionError(
+            "ambiguous_evidence_span",
+            "semantic evidence spans do not share immutable section text",
+        )
+    quote = section.section_text[start:end]
     return {
         "source_document_id": source_document_id,
         "page_number": section.page_number,
-        "section_id": section_id,
+        "section_id": section.section_id,
         "quote": quote,
-        "normalized_start": section.normalized_start + start,
-        "normalized_end": section.normalized_start + end,
+        "normalized_start": min(span.normalized_start for span in spans),
+        "normalized_end": max(span.normalized_end for span in spans),
         "quote_hash": hashlib.sha256(quote.encode("utf-8")).hexdigest(),
         "section_hash": section.section_hash,
     }
@@ -1273,6 +1559,40 @@ def _success_audit(
             dict(item) for item in getattr(response, "attempts", ())
         ),
     )
+
+
+def _span_audit_diagnostics(
+    data: Any,
+    *,
+    evidence_spans: Sequence[EvidenceSpan],
+    accepted_rows: int = 0,
+    rejected_rows: int = 0,
+) -> Mapping[str, Any]:
+    references: list[str] = []
+    if isinstance(data, Mapping):
+        for collection_name in ("activities", "relationships", "rows"):
+            collection = data.get(collection_name)
+            if not isinstance(collection, Sequence) or isinstance(
+                collection, (str, bytes)
+            ):
+                continue
+            for item in collection:
+                if not isinstance(item, Mapping):
+                    continue
+                raw_ids = item.get("evidence_span_ids")
+                if isinstance(raw_ids, Sequence) and not isinstance(
+                    raw_ids, (str, bytes)
+                ):
+                    references.extend(str(value) for value in raw_ids)
+    offered = {span.evidence_span_id for span in evidence_spans}
+    return {
+        "evidence_spans_offered": len(evidence_spans),
+        "evidence_span_references": len(references),
+        "evidence_spans_referenced": len(set(references)),
+        "evidence_spans_resolved": len({item for item in references if item in offered}),
+        "semantic_rows_accepted": int(accepted_rows),
+        "semantic_rows_rejected": int(rejected_rows),
+    }
 
 
 def _failure_audit(
