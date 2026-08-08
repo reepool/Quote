@@ -387,6 +387,108 @@ provider stability is now the sole unresolved prerequisite for task 6.5. The
   provider timeouts, gate decision, and still-open task 6.5 are consistent and
   contain no secret values.
 
+### Facade Boundary Follow-up and Resumed Live Windows (2026-08-08)
+
+The release-gate static scan found that the controlled live benchmark still
+inspected `config.profiles` and called `resource_for_profile()` while constructing
+its ephemeral provider-stage configuration. This was a confirmed application
+boundary issue, so concrete profile/resource mutation was moved into the public
+`LlmConfig.controlled_stage_config()` facade. The benchmark now consumes only
+the logical profile, source/resource summaries, and non-secret runtime limits
+from `describe_logical_profile()`. The follow-up facade/benchmark tests passed
+54 cases, Python compilation and `git diff --check` passed, and the repository-
+wide static scan returned no application-layer concrete-profile access.
+
+The provider windows used the same synthetic non-sensitive Chinese input:
+
+- Grok single-source smoke passed at 10:28:57-10:29:11 with HTTP 200,
+  streaming first event, structured output, usage, request IDs, and
+  `pipio:grok-4.5` lineage. Luna returned two HTTP 503 responses in that
+  window.
+- Luna single-source smoke recovered at 10:40:20-10:40:25 with HTTP 200,
+  first event, structured output, usage, request IDs, and
+  `pipio:gpt-5.6-luna` lineage.
+- The first post-fix provider-backed 10-stage process completed provider calls
+  but exposed a validator result-aggregation `NameError` before writing a valid
+  gate result. The stale `pool` reference was corrected to facade-provided
+  source weights, and the live validator tests passed before retrying.
+- The corrected independent-quota 10-stage run completed all 10 logical
+  requests, but the strict gate rejected it for one 429 and three provider 5xx
+  events. One Luna failure successfully failed over to Grok; all resources were
+  released and the registry was empty. Per-source cap and identity checks passed,
+  but 25/50 were withheld as required.
+- A validation-only low-cap rerun (`pipio:grok=2`, `pipio:luna=1`) completed all
+  10 logical requests and three successful failovers, but still recorded seven
+  Luna provider 5xx events. It was rejected for `nonzero_provider_5xx` and did
+  not start 25/50. These caps changed only the ephemeral validation config and
+  did not modify production `config/13_llm.json` or quota claims.
+
+At that point task 6.5 remained incomplete: a clean provider-backed 10 stage
+followed by clean gated 25 and 50 stages had not yet been observed. The
+acceptance thresholds and stage gating remained strict.
+
+### Continuation Gate Attempt (2026-08-08 10:56-10:57)
+
+The formal independent-quota run was repeated with the unchanged controlled
+configuration (`10` logical concurrency, `10` confirmed per-source concurrency,
+and `10` confirmed provider RPM). All `10` logical requests completed and all
+`10` produced streaming first-event measurements. The strict gate rejected the
+stage for one provider rate limit and four provider 5xx events; two source
+failovers succeeded. No timeout, parse, schema, identity, provider-limit,
+transport, file-descriptor, or shutdown/registry leak was observed. The staged
+runner therefore executed only stage `10` and correctly withheld stages `25` and
+`50`.
+
+The non-secret result is retained at:
+
+```text
+/tmp/quote_llm_live_10_25_50_20260808_continuation.json
+```
+
+Immediately afterward, a bounded single-source Luna smoke made two attempts and
+received HTTP `503` on both. This confirms that the remaining failure is an
+external provider-stability condition rather than URL construction, routing
+identity, or local pool cleanup. Production configuration was not changed.
+
+### Offline Completion Audit Rerun (2026-08-08)
+
+- Common gateway, orchestration, pool, routed client, routing config, live-stage
+  validator, logging, and source-lineage migration tests: `162 passed`.
+- CNInfo title/corporate-action/pipeline/scheduler/API/lineage compatibility:
+  `144 passed`.
+- Business-profile legacy adapter, extraction, runtime, async production,
+  rollout, and maintenance scheduler: `137 passed`.
+- Corporate-action document storage, incremental compatibility, and schema
+  migration: `65 passed`.
+- Python compilation, `git diff --check`, repository application-boundary scan,
+  and `openspec validate add-weighted-llm-pool-routing --type change --strict
+  --no-interactive`: passed.
+- `codex review --uncommitted` was attempted again but the review service
+  returned `HTTP 401 token_invalidated` and the bounded command timed out while
+  inspecting unrelated baseline changes. An equivalent manual review of the
+  change-owned files found no confirmed bug or regression; baseline
+  BaoStock/backtest changes were not modified or included.
+
+### Deployment-Owner Live-Capacity Deferral (2026-08-08)
+
+The deployment owner explicitly accepted deferring provider-backed high-
+concurrency validation because repeated controlled windows continued to return
+provider 429/503 responses. This closes the implementation task on the existing
+offline and controlled-failure evidence; it does not convert any failed or
+unexecuted live stage into a pass.
+
+The implementation evidence includes deterministic offline 10/25/50 load,
+bounded same-source retry, cross-source failover, circuit open/half-open/recovery,
+provider adaptive concurrency decrease/recovery, RPM/cooldown governance, and
+resource-clean shutdown tests. The failed live result and single-source 503
+evidence remain retained above. Production `config/13_llm.json` continues to
+set both the global LLM switch and `shared_semantic` pool to disabled.
+
+Provider-backed 10 -> 25 -> 50 remains an unpassed production-enablement
+runbook gate. After provider recovery, operations must start again at 10 and
+may proceed to 25/50 only when the preceding stage passes. Until then, no live
+rollout certification is claimed.
+
 ## Requirements Coverage
 
 The change artifacts cover the requirements document as follows:
@@ -399,4 +501,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; task 6.5 remains open because provider-backed runs encountered 503 responses and the latest single-source preflight encountered 408/timeouts, therefore provider-backed 25/50 remain gated |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; repeated provider-backed failures are retained, and the deployment owner explicitly deferred unpassed 10/25/50 production-capacity certification while keeping the production route/pool disabled |

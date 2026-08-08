@@ -713,10 +713,15 @@ tests/unit/test_research/test_scheduler_business_profile_semantic_maintenance.py
 2. 对同一合成非敏感中文文本分别运行单源 smoke；
 3. 以逻辑 profile 运行小批量加权分流；
 4. 在测试环境模拟或临时禁用一个成员，验证故障转移；
-5. 分级验证 10、25、50 总并发；
+5. 供应商稳定且准备生产放量时，分级验证 10、25、50 总并发；
 6. 记录成功率、429/5xx、首字/总耗时、权重实际比例、failover、内存、连接数和关闭耗时；
 7. 未通过低并发等级不得进入更高等级；
 8. 线上结果仍只作为候选，不跳过业务质量 holdout 和 promotion gate。
+
+供应商持续返回 429/5xx、导致结果不能代表稳定容量时，部署负责人可以明确延期
+10/25/50 provider-backed 高并发验证。延期不是通过：必须保留失败证据、保持生产 route/pool
+关闭，并将 10 -> 25 -> 50 严格门禁留作供应商恢复后的生产启用前运维验收。实现完成仍需
+通过离线 10/25/50 并发、重试、故障转移、熔断、自适应降档/恢复和资源清理测试。
 
 ## 16. 数据和兼容迁移
 
@@ -749,6 +754,9 @@ tests/unit/test_research/test_scheduler_business_profile_semantic_maintenance.py
 13. 受控 live smoke 披露实际来源、权重和 failover 结果；
 14. client、transport、queue、coordinator 和 circuit 状态在关闭后无泄漏。
 
+Provider-backed 10/25/50 高并发是生产启用门禁，不是供应商不稳定期间的实现完成门禁；
+如明确延期，不得将未执行阶段标记为通过，也不得据此启用生产 route/pool。
+
 ## 18. 实施顺序
 
 1. 增加配置模型、逻辑 profile 查询和 source label，不启用路由；
@@ -762,7 +770,8 @@ tests/unit/test_research/test_scheduler_business_profile_semantic_maintenance.py
 9. 重命名 LLM 配置文件并完成 Key 名称迁移说明；
 10. 运行公共模块、全部现有 LLM 业务回归、静态调用扫描和 OpenSpec 校验；
 11. 通过受控单源 smoke 后启用双源低并发；
-12. 按 10、25、50 并发逐级放量，并保留单源配置回滚路径。
+12. 供应商恢复后按 10、25、50 并发逐级完成生产放量验收，并保留单源配置回滚路径；
+    如因供应商不稳定延期，开发变更可以在完整离线验收后收尾，但生产 route/pool 保持关闭。
 
 ## 19. 风险与限制
 

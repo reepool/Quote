@@ -196,9 +196,11 @@ Application lifecycle validation SHALL prove one shared pool/coordinator in one 
 ### Requirement: Data migration, rollback, and live rollout SHALL be gated and non-destructive
 Source-lineage database and artifact migrations SHALL be idempotent, repeatable, backward-readable, and rollback-tested. They MUST NOT overwrite or delete existing analyses. Historical missing source values SHALL remain null or `legacy_unknown`. Disabling or rolling back a route/pool SHALL preserve already stored source and attempt lineage, and APIs, task reports, and audit queries that expose an LLM result SHALL include its source label.
 
-Controlled live validation SHALL be explicitly enabled and SHALL use the same synthetic non-sensitive Chinese input for single-source comparison. Each source SHALL first verify authentication, actual model, streaming/first-event behavior, usage, structured output, timeout, and quota-resource mapping. A two-source test SHALL then exercise logical routing and explicit member disablement/failure before staged 10, 25, and 50 concurrency levels.
+Controlled live validation SHALL be explicitly enabled and SHALL use the same synthetic non-sensitive Chinese input for single-source comparison. Each source SHALL first verify authentication, actual model, streaming/first-event behavior, usage, structured output, timeout, and quota-resource mapping. A two-source test SHALL then exercise logical routing and explicit member disablement/failure before staged 10, 25, and 50 concurrency levels when the provider is stable and production rollout is being considered.
 
 Each level SHALL record success, 429/5xx, first-event and total latency, dispatch ratio, failover, memory, connection count, and shutdown duration. A level MUST NOT proceed when the preceding level fails its acceptance thresholds. Live outputs SHALL remain candidates and MUST NOT bypass quality holdout, evidence, or promotion gates.
+
+When persistent provider 429/5xx responses make capacity evidence non-representative, the deployment owner MAY explicitly defer the provider-backed 10/25/50 stages. Deferral MUST retain failed-run evidence, MUST NOT be recorded as a passed stage, and MUST keep the production route/pool disabled. The deferred stages SHALL remain a production-enablement gate and SHALL restart at 10 after provider recovery. Implementation completion during the deferral SHALL require passing offline 10/25/50 concurrency plus retry, failover, circuit-breaker, adaptive concurrency decrease/recovery, and resource-cleanup tests.
 
 #### Scenario: Reapplying and rolling back a migration preserves history
 - **WHEN** the source-lineage migration is applied twice and then its rollback path is exercised against legacy and new records
@@ -207,3 +209,7 @@ Each level SHALL record success, 429/5xx, first-event and total latency, dispatc
 #### Scenario: Failed load stage stops promotion
 - **WHEN** the 10- or 25-concurrency stage violates its configured success, quota, latency, resource, or shutdown thresholds
 - **THEN** validation records the failure and does not start the next concurrency stage
+
+#### Scenario: Provider instability defers production capacity certification
+- **WHEN** repeated controlled runs encounter provider 429/5xx responses and the deployment owner explicitly defers high-concurrency validation
+- **THEN** implementation may close on complete offline evidence while 10/25/50 remain unpassed production-enablement gates and the production route/pool remains disabled

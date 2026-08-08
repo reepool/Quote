@@ -879,6 +879,13 @@ class LogicalProfileDescription:
     effective_max_concurrency: int
     effective_requests_per_minute: int
     supported_structured_output_modes: tuple[str, ...]
+    source_resources: tuple[tuple[str, str], ...] = ()
+    source_weights: tuple[tuple[str, int], ...] = ()
+    transport_max_connections: int = 0
+    transport_max_keepalive_connections: int = 0
+    provider_resource_limits: Mapping[str, Mapping[str, int]] = field(
+        default_factory=dict
+    )
 
     def safe_dict(self) -> dict[str, Any]:
         return {
@@ -893,6 +900,22 @@ class LogicalProfileDescription:
             "supported_structured_output_modes": list(
                 self.supported_structured_output_modes
             ),
+            "source_resources": [
+                {"source_label": label, "provider_resource": resource}
+                for label, resource in self.source_resources
+            ],
+            "source_weights": [
+                {"source_label": label, "weight": weight}
+                for label, weight in self.source_weights
+            ],
+            "transport_max_connections": self.transport_max_connections,
+            "transport_max_keepalive_connections": (
+                self.transport_max_keepalive_connections
+            ),
+            "provider_resource_limits": {
+                name: dict(limits)
+                for name, limits in self.provider_resource_limits.items()
+            },
         }
 
 
@@ -1279,6 +1302,45 @@ class LlmConfig:
                 for profile, member in zip(profiles, pool.members)
             )
             capacity = min(pool.total_concurrency, member_capacity, capacity)
+        source_resources = tuple(
+            (
+                (member.source_label if pool is not None else profile.source_label)
+                or f"{profile.provider}:{profile.model}",
+                self.resource_for_profile(profile).name,
+            )
+            for profile, member in (
+                zip(profiles, pool.members)
+                if pool is not None
+                else ((profiles[0], None),)
+            )
+        )
+        source_weights = tuple(
+            (
+                (member.source_label or f"{profile.provider}:{profile.model}"),
+                member.weight,
+            )
+            for profile, member in (
+                zip(profiles, pool.members)
+                if pool is not None
+                else ()
+            )
+        )
+        provider_resource_limits: dict[str, dict[str, int]] = {}
+        transport_max_connections = 0
+        transport_max_keepalive_connections = 0
+        for profile in profiles:
+            resource = self.resource_for_profile(profile)
+            provider_resource_limits[resource.name] = {
+                "hard_max_concurrency": resource.hard_max_concurrency,
+                "requests_per_minute": resource.requests_per_minute,
+            }
+            transport_max_connections = max(
+                transport_max_connections, resource.http_max_connections
+            )
+            transport_max_keepalive_connections = max(
+                transport_max_keepalive_connections,
+                resource.http_max_keepalive_connections,
+            )
         return LogicalProfileDescription(
             name=logical_name,
             enabled=(
@@ -1296,6 +1358,11 @@ class LlmConfig:
             effective_max_concurrency=capacity,
             effective_requests_per_minute=self._effective_rpm(profiles),
             supported_structured_output_modes=tuple(sorted(common_modes)),
+            source_resources=source_resources,
+            source_weights=source_weights,
+            transport_max_connections=transport_max_connections,
+            transport_max_keepalive_connections=transport_max_keepalive_connections,
+            provider_resource_limits=provider_resource_limits,
         )
 
     def is_logical_profile_enabled(self, name: str) -> bool:
@@ -1352,6 +1419,153 @@ class LlmConfig:
             members=(member,),
         )
         return replace(self, enabled=True, profiles=profiles, pools=pools)
+
+    def controlled_stage_config(
+        self,
+        name: str,
+        *,
+        concurrency: int,
+        confirmed_quota_scope: str,
+        confirmed_per_source_concurrency: int,
+        confirmed_provider_rpm: int,
+        timeout_seconds: float,
+        resource_concurrency_limits: Mapping[str, int] | None = None,
+    ) -> "LlmConfig":
+        """Build an ephemeral provider-backed stage config for validation.
+
+        This keeps concrete profile and provider-resource selection inside the
+        public configuration facade. Callers provide only a logical profile and
+        non-secret quota confirmations; the returned config is process-local and
+        must never be persisted.
+        """
+        if (
+            isinstance(concurrency, bool)
+            or not isinstance(concurrency, int)
+            or concurrency < 1
+        ):
+            raise ValueError("concurrency must be positive")
+        if (
+            isinstance(confirmed_per_source_concurrency, bool)
+            or not isinstance(confirmed_per_source_concurrency, int)
+            or confirmed_per_source_concurrency < 1
+        ):
+            raise ValueError("confirmed per-source concurrency must be positive")
+        if (
+            isinstance(confirmed_provider_rpm, bool)
+            or not isinstance(confirmed_provider_rpm, int)
+            or confirmed_provider_rpm < 1
+        ):
+            raise ValueError("confirmed provider RPM must be positive")
+        if timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive")
+
+        logical_name = str(name or "").strip()
+        route = self.routes.get(logical_name)
+        if route is None:
+            raise ValueError(f"logical profile has no configured route: {logical_name}")
+        pool = self.pools[route.pool]
+        concrete_names = {
+            member.profiles[logical_name] for member in pool.members
+        }
+        profiles = dict(self.profiles)
+        resources = dict(self.provider_resources)
+        resource_names = {
+            self.resource_for_profile(profiles[profile_name]).name
+            for profile_name in concrete_names
+        }
+        if confirmed_quota_scope == "independent":
+            if len(resource_names) != len(concrete_names):
+                raise ValueError(
+                    "independent quota confirmation requires one provider resource "
+                    "per concrete source"
+                )
+        elif confirmed_quota_scope == "shared":
+            if len(resource_names) != 1:
+                raise ValueError(
+                    "shared quota confirmation requires all concrete sources to use "
+                    "one provider resource"
+                )
+        else:
+            raise ValueError("confirmed quota scope must be independent or shared")
+
+        concurrency_limits = {
+            name: confirmed_per_source_concurrency for name in resource_names
+        }
+        for resource_name, value in (resource_concurrency_limits or {}).items():
+            if resource_name not in resource_names:
+                raise ValueError(f"unknown routed provider resource: {resource_name}")
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise ValueError(
+                    "resource concurrency limit must be a positive integer: "
+                    f"{resource_name}"
+                )
+            if value > confirmed_per_source_concurrency:
+                raise ValueError(
+                    "resource concurrency limit cannot exceed confirmed per-source "
+                    f"concurrency: {resource_name}"
+                )
+            concurrency_limits[resource_name] = value
+
+        for profile_name in concrete_names:
+            profile = profiles[profile_name]
+            resource = self.resource_for_profile(profile)
+            resource_concurrency = concurrency_limits[resource.name]
+            reserved = min(
+                resource.reserved_concurrency,
+                max(0, resource_concurrency - 1),
+            )
+            bulk_limit = resource_concurrency - reserved
+            resources[resource.name] = replace(
+                resource,
+                hard_max_concurrency=resource_concurrency,
+                default_bulk_concurrency=bulk_limit,
+                reserved_concurrency=reserved,
+                http_max_connections=max(
+                    resource.http_max_connections,
+                    resource_concurrency,
+                ),
+                http_max_keepalive_connections=max(
+                    resource.http_max_keepalive_connections,
+                    resource_concurrency,
+                ),
+                requests_per_minute=confirmed_provider_rpm,
+                adaptive_min_bulk_concurrency=min(
+                    resource.adaptive_min_bulk_concurrency,
+                    bulk_limit,
+                ),
+            )
+            profiles[profile_name] = replace(
+                profile,
+                enabled=True,
+                timeout_seconds=timeout_seconds,
+                attempt_timeout_seconds=min(
+                    profile.attempt_timeout_seconds,
+                    timeout_seconds,
+                ),
+                max_concurrency=resource_concurrency,
+                requests_per_minute=0,
+            )
+
+        pools = dict(self.pools)
+        pools[pool.name] = replace(
+            pool,
+            enabled=True,
+            total_concurrency=concurrency,
+            queue_size=max(pool.queue_size, concurrency * 2),
+        )
+        routes = dict(self.routes)
+        routes[logical_name] = replace(
+            route,
+            revision=f"{route.revision}-provider-stage-{concurrency}",
+        )
+        return replace(
+            self,
+            enabled=True,
+            profiles=profiles,
+            provider_resources=resources,
+            pools=pools,
+            routes=routes,
+        )
 
 
 @dataclass(frozen=True)

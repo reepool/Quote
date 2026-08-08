@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from dataclasses import asdict, replace
+from dataclasses import asdict
 import json
 import logging
 import os
@@ -107,117 +107,14 @@ def build_controlled_config(
     resource_concurrency_limits: Mapping[str, int] | None = None,
 ) -> LlmConfig:
     """Enable one logical stage while preserving explicit provider limits."""
-    if concurrency < 1:
-        raise ValueError("concurrency must be positive")
-    if confirmed_per_source_concurrency < 1:
-        raise ValueError("confirmed per-source concurrency must be positive")
-    if confirmed_provider_rpm < 1:
-        raise ValueError("confirmed provider RPM must be positive")
-    if timeout_seconds <= 0:
-        raise ValueError("timeout_seconds must be positive")
-
-    route = base.route_for_profile(logical_profile)
-    if route is None:
-        raise ValueError(f"logical profile has no configured route: {logical_profile}")
-    pool = base.pools[route.pool]
-    concrete_names = {
-        member.profiles[logical_profile] for member in pool.members
-    }
-    profiles = dict(base.profiles)
-    resources = dict(base.provider_resources)
-    resource_names = {
-        base.resource_for_profile(profiles[name]).name
-        for name in concrete_names
-    }
-    if confirmed_quota_scope == "independent":
-        if len(resource_names) != len(concrete_names):
-            raise ValueError(
-                "independent quota confirmation requires one provider resource "
-                "per concrete source"
-            )
-    elif confirmed_quota_scope == "shared":
-        if len(resource_names) != 1:
-            raise ValueError(
-                "shared quota confirmation requires all concrete sources to use "
-                "one provider resource"
-            )
-    else:
-        raise ValueError("confirmed quota scope must be independent or shared")
-    concurrency_limits = {
-        name: confirmed_per_source_concurrency for name in resource_names
-    }
-    for name, value in (resource_concurrency_limits or {}).items():
-        if name not in resource_names:
-            raise ValueError(f"unknown routed provider resource: {name}")
-        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-            raise ValueError(
-                f"resource concurrency limit must be a positive integer: {name}"
-            )
-        if value > confirmed_per_source_concurrency:
-            raise ValueError(
-                "resource concurrency limit cannot exceed confirmed per-source "
-                f"concurrency: {name}"
-            )
-        concurrency_limits[name] = value
-    for profile_name in concrete_names:
-        profile = profiles[profile_name]
-        resource = base.resource_for_profile(profile)
-        resource_concurrency = concurrency_limits[resource.name]
-        reserved = min(
-            resource.reserved_concurrency,
-            max(0, resource_concurrency - 1),
-        )
-        bulk_limit = resource_concurrency - reserved
-        resources[resource.name] = replace(
-            resource,
-            hard_max_concurrency=resource_concurrency,
-            default_bulk_concurrency=bulk_limit,
-            reserved_concurrency=reserved,
-            http_max_connections=max(
-                resource.http_max_connections,
-                resource_concurrency,
-            ),
-            http_max_keepalive_connections=max(
-                resource.http_max_keepalive_connections,
-                resource_concurrency,
-            ),
-            requests_per_minute=confirmed_provider_rpm,
-            adaptive_min_bulk_concurrency=min(
-                resource.adaptive_min_bulk_concurrency,
-                bulk_limit,
-            ),
-        )
-        profiles[profile_name] = replace(
-            profile,
-            enabled=True,
-            timeout_seconds=timeout_seconds,
-            attempt_timeout_seconds=min(
-                profile.attempt_timeout_seconds,
-                timeout_seconds,
-            ),
-            max_concurrency=resource_concurrency,
-            requests_per_minute=0,
-        )
-
-    pools = dict(base.pools)
-    pools[pool.name] = replace(
-        pool,
-        enabled=True,
-        total_concurrency=concurrency,
-        queue_size=max(pool.queue_size, concurrency * 2),
-    )
-    routes = dict(base.routes)
-    routes[logical_profile] = replace(
-        route,
-        revision=f"{route.revision}-provider-stage-{concurrency}",
-    )
-    return replace(
-        base,
-        enabled=True,
-        profiles=profiles,
-        provider_resources=resources,
-        pools=pools,
-        routes=routes,
+    return base.controlled_stage_config(
+        logical_profile,
+        concurrency=concurrency,
+        confirmed_quota_scope=confirmed_quota_scope,
+        confirmed_per_source_concurrency=confirmed_per_source_concurrency,
+        confirmed_provider_rpm=confirmed_provider_rpm,
+        timeout_seconds=timeout_seconds,
+        resource_concurrency_limits=resource_concurrency_limits,
     )
 
 
@@ -314,16 +211,12 @@ async def run_stage(
         timeout_seconds=timeout_seconds,
         resource_concurrency_limits=resource_concurrency_limits,
     )
-    route = config.routes[logical_profile]
-    pool = config.pools[route.pool]
-    max_http = max(
-        resource.http_max_connections
-        for resource in config.provider_resources.values()
-    )
-    max_keepalive = max(
-        resource.http_max_keepalive_connections
-        for resource in config.provider_resources.values()
-    )
+    description = config.describe_logical_profile(logical_profile)
+    if not description.pool:
+        raise ValueError(f"logical profile has no configured pool: {logical_profile}")
+    pool_name = description.pool
+    max_http = description.transport_max_connections
+    max_keepalive = description.transport_max_keepalive_connections
     transport = _ObservedTransport(HttpxOpenAICompatibleTransport(
         max_connections=max_http,
         max_keepalive_connections=max_keepalive,
@@ -387,7 +280,7 @@ async def run_stage(
             ))
             for index in range(concurrency)
         ), return_exceptions=True)
-        pool_snapshot = pool_registry.get(config, pool.name).snapshot()
+        pool_snapshot = pool_registry.get(config, pool_name).snapshot()
         provider_snapshots = [
             asdict(snapshot) for snapshot in provider_registry.snapshots()
         ]
@@ -423,15 +316,13 @@ async def run_stage(
         source_label: dispatches - borrowed_dispatch_counts[source_label]
         for source_label, dispatches in dispatch_counts.items()
     }
-    weight_total = sum(member.weight for member in pool.members)
+    source_weights = dict(description.source_weights)
+    weight_total = sum(source_weights.values())
     configured_resource_names = {
-        config.resource_for_profile(
-            config.profiles[member.profiles[logical_profile]]
-        ).name
-        for member in pool.members
+        resource for _, resource in description.source_resources
     }
     effective_resource_concurrency = {
-        name: config.provider_resources[name].hard_max_concurrency
+        name: int(description.provider_resource_limits[name]["hard_max_concurrency"])
         for name in configured_resource_names
     }
     aggregate_provider_concurrency = sum(
@@ -477,17 +368,17 @@ async def run_stage(
             "max": max((item.latency_ms for item in successes), default=None),
         },
         "source_counts": {
-            member.source_label: sum(
-                item.source_label == member.source_label for item in successes
+            source_label: sum(
+                item.source_label == source_label for item in successes
             )
-            for member in pool.members
+            for source_label in source_weights
         },
         "dispatch_counts": dispatch_counts,
         "normal_dispatch_counts": normal_dispatch_counts,
         "borrowed_dispatch_counts": borrowed_dispatch_counts,
         "configured_weight_ratio": {
-            member.source_label: member.weight / weight_total
-            for member in pool.members
+            source_label: weight / weight_total
+            for source_label, weight in source_weights.items()
         },
         "borrowed_dispatches": sum(
             member["borrowed_dispatches"] for member in members

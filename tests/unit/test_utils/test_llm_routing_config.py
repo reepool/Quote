@@ -168,6 +168,24 @@ def test_shared_quota_uses_one_resource_and_facade_hides_concrete_profiles():
     }
 
 
+def test_facade_exposes_independent_source_resources_and_weights():
+    description = LlmConfig.from_mapping(
+        _routed_config(shared_resource=False)
+    ).describe_logical_profile("semantic")
+
+    assert dict(description.source_resources) == {
+        "pipio:grok-4.5": "pipio:grok",
+        "pipio:gpt-5.6-luna": "pipio:luna",
+    }
+    assert dict(description.source_weights) == {
+        "pipio:grok-4.5": 3,
+        "pipio:gpt-5.6-luna": 1,
+    }
+    assert description.provider_resource_limits["pipio:grok"][
+        "hard_max_concurrency"
+    ] == 4
+
+
 def test_controlled_source_config_keeps_concrete_selection_inside_facade():
     config = LlmConfig.from_mapping(_routed_config())
     controlled = config.controlled_source_config("semantic", "pipio:gpt-5.6-luna")

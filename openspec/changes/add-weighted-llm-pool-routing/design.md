@@ -252,7 +252,9 @@ pool 快照扩展为可运维合同：报告 pool 配置/有效上限及当前�
 
 业务回归必须逐项验证需求文档第 14 节的既有契约，不能只验证模块可导入或请求成功：标题分类保留分块/隔离重试/乱序身份/schema/applicability；公司行动保留 `source_event_key`、resume 去重、确定性证据和 promotion gate；公司画像保留 runtime identity、checkpoint/rework/promotion manifest/source revision、network/scope/candidate gate，并区分业务 structured-source fallback 和模型 failover；legacy adapter 保留同步/异步、fake client、来源 envelope 和关闭行为。
 
-真实验证必须使用合成非敏感中文输入。先逐个来源验证认证、实际 model、stream、usage、structured output、timeout 和 quota；再运行小批量逻辑路由并显式禁用/模拟一个成员验证 failover；最后按 10、25、50 并发逐级放量。每一级记录成功率、429/5xx、首事件/总耗时、权重比例、failover、内存、连接数和关闭耗时，低一级未通过不得进入高一级。所有 live 结果仍只作为候选，不绕过 holdout 或 promotion gate。
+真实验证必须使用合成非敏感中文输入。先逐个来源验证认证、实际 model、stream、usage、structured output、timeout 和 quota；再运行小批量逻辑路由并显式禁用/模拟一个成员验证 failover；供应商稳定且准备生产放量时，最后按 10、25、50 并发逐级验收。每一级记录成功率、429/5xx、首事件/总耗时、权重比例、failover、内存、连接数和关闭耗时，低一级未通过不得进入高一级。所有 live 结果仍只作为候选，不绕过 holdout 或 promotion gate。
+
+若供应商持续返回 429/5xx，部署负责人可以明确将 provider-backed 10/25/50 延期到供应商恢复后。延期只解除开发变更的外部容量依赖，不表示高并发通过或允许生产启用：失败证据必须保留，生产 route/pool 保持关闭，且恢复后仍须从 10 开始按门禁执行 25/50。实现本身以离线 10/25/50、重试、failover、circuit、自适应降档/恢复和资源清理测试作为完成证据。
 
 ## Risks / Trade-offs
 
@@ -279,7 +281,7 @@ pool 快照扩展为可运维合同：报告 pool 配置/有效上限及当前�
 7. 将 LLM 配置重命名为 `13_llm.json`，增加两个实际 profile 和部署变量说明；默认 pool/新成员在未验证时保持保守关闭或低并发。
 8. 运行公共测试、完整业务测试矩阵、静态调用扫描、OpenSpec validate 和未提交 diff 审核。
 9. 分别对 Grok/Luna 做单源受控 smoke，确认 structured output、stream、usage、model 和 quota 映射。
-10. 开启双源 10 并发，验证权重和故障转移，再分级到 25、50。
+10. 供应商稳定后开启双源 10 并发，验证权重和故障转移，再分级到 25、50；供应商不稳定时可由部署负责人延期此生产启用门禁，但不得把延期记录为通过。
 
 回滚策略：关闭 route/pool，将逻辑 profile 重新映射到一个已验证实际 profile或兼容单 profile；保留已写入的 source/route lineage和数据库迁移，不删除历史分析，不回退 Key 或覆盖业务结果。若新配置文件导致启动失败，可恢复上一版本 `11_llm.json` 配置引用和旧部署变量，但不得通过禁用配置校验绕过错误。
 
