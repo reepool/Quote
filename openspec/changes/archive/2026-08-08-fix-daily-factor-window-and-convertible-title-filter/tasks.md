@@ -31,4 +31,4 @@
 - [x] 5.2 Validate the OpenSpec change and perform an equivalent dry-run diagnostic proving the observed SZSE stage would be successful with no false factor failures.
 - [x] 5.3 Run `codex review --uncommitted`, evaluate findings for real defects versus over-strict suggestions, fix confirmed defects, and rerun focused tests.
 - [x] 5.4 Commit and push only this change's isolated code, tests, and OpenSpec files, leaving all pre-existing business-profile work untouched.
-- [ ] 5.5 After deployment, run the normal `daily_data_update` and then `a_share_cninfo_corporate_action_daily_sync`; verify the SZSE predecessor watermark advances, Canonical is no longer blocked by the old cutoff, and `300707.SZ` is absent from the unmatched anomaly queue.
+- [x] 5.5 After deployment, run the normal `daily_data_update` and then `a_share_cninfo_corporate_action_daily_sync`; verify the SZSE predecessor watermark advances, Canonical is no longer blocked by the old cutoff, and `300707.SZ` is absent from the unmatched anomaly queue.
