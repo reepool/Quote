@@ -44,12 +44,12 @@ Weight acceptance SHALL use non-borrowed normal dispatch counts. Total dispatche
 ### Requirement: Provider quota coordination SHALL remain independent from routing
 Pool routing SHALL not replace concrete profile or provider-resource concurrency, RPM, cooldown, or adaptive congestion controls. A pool admission covers one logical execution, including retry, repair, and failover; a provider coordinator lease SHALL cover only one concrete transport attempt. The pool SHALL not report schema-validation failures as provider congestion, and each concrete failure SHALL be reported to provider coordination at most once.
 
-Provider resources SHALL be configured from verified quota buckets rather than inferred from matching Base URLs. The deployment owner has confirmed that the Pipio Grok and Luna API Keys have independent quota, so the initial profiles SHALL use two explicit non-secret provider resources with independent concurrency, RPM, cooldown, and adaptive congestion state. The configuration model SHALL retain support for verified shared quota mappings for future credentials, but the initial Grok/Luna deployment MUST NOT merge its two resources merely because their Base URL matches.
+Provider resources SHALL be configured from verified quota buckets rather than inferred from matching Base URLs. The deployment owner has confirmed that the Scorpio Grok and Luna API Keys have independent quota, so the initial profiles SHALL use two explicit non-secret provider resources with independent concurrency, RPM, cooldown, and adaptive congestion state. The configuration model SHALL retain support for verified shared quota mappings for future credentials, but the initial Grok/Luna deployment MUST NOT merge its two resources merely because their Base URL matches.
 
 Effective in-flight capacity SHALL remain the minimum of business-stage worker capacity, pool `total_concurrency`, selected concrete-profile concurrency, current provider-resource adaptive concurrency, and HTTP connection-pool capacity. Pool member weight SHALL remain separate from existing provider `workload_weights`; history backfill, daily work, title classification, body extraction, and semantic verification SHALL retain their workload identity and existing fair admission within a shared provider resource. Runtime snapshots SHALL identify the active limiting layer.
 
 #### Scenario: Shared URL does not force a shared quota resource
-- **WHEN** two concrete profiles use the same Pipio Base URL but quota validation shows independent keys
+- **WHEN** two concrete profiles use the same Scorpio Base URL but quota validation shows independent keys
 - **THEN** configuration may assign distinct provider resources and each resource maintains its own limits
 
 #### Scenario: One logical request does not double count a pool permit on failover
@@ -110,7 +110,7 @@ The gateway SHALL NOT inject source metadata into `response.data` or a business 
 
 #### Scenario: Successful response names the actual LLM source
 - **WHEN** a logical semantic request is served by the Grok member
-- **THEN** the public response has `logical_profile="semantic_extraction"`, the configured concrete profile, and `source_label="pipio:grok-4.5"`
+- **THEN** the public response has `logical_profile="semantic_extraction"`, the configured concrete profile, and `source_label="scorpio:grok-4.5"`
 
 #### Scenario: Source data is absent from validated business JSON
 - **WHEN** a business adapter validates an LLM JSON payload against its versioned schema
@@ -119,7 +119,7 @@ The gateway SHALL NOT inject source metadata into `response.data` or a business 
 ### Requirement: Configuration and environment migration SHALL be explicit and non-secret
 The LLM configuration file SHALL be renamed from `config/11_llm.json` to `config/13_llm.json`; all repository documentation, templates, tests, and tooling references SHALL be updated. The JSON configuration SHALL name only environment-variable identifiers, never API-key values.
 
-The initial Pipio concrete profiles SHALL use `QUOTE_LLM_PIPIO_GROK_API_KEY` for `grok-4.5` and `QUOTE_LLM_PIPIO_LUNA_API_KEY` for `gpt-5.6-luna`. Deployment migration SHALL inject both variables before enabling the route and SHALL preserve `load_project_environment(override=False)` behavior. The former generic key MAY be removed only after configured routes and controlled smoke validation succeed.
+The initial Scorpio concrete profiles SHALL use `QUOTE_LLM_SCORPIO_GROK_API_KEY` for `grok-4.5` and `QUOTE_LLM_SCORPIO_LUNA_API_KEY` for `gpt-5.6-luna`. Deployment migration SHALL inject both variables before enabling the route and SHALL preserve `load_project_environment(override=False)` behavior. The former generic key MAY be removed only after configured routes and controlled smoke validation succeed.
 
 #### Scenario: Missing one concrete key fails only its member
 - **WHEN** the Luna environment variable is absent while the Grok member is configured and healthy

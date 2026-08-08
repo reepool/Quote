@@ -41,12 +41,12 @@ docs/development/cninfo_corporate_action_llm_resolution_requirements.md
 
 ## 3. 首期部署条件
 
-首期配置两个 Pipio OpenAI-compatible 模型：
+首期配置两个 Scorpio OpenAI-compatible 模型：
 
 | 来源标签 | 模型 | API Key 环境变量 | Base URL |
 | --- | --- | --- | --- |
-| `pipio:grok-4.5` | `grok-4.5` | `QUOTE_LLM_PIPIO_GROK_API_KEY` | 与 Pipio 当前地址相同 |
-| `pipio:gpt-5.6-luna` | `gpt-5.6-luna` | `QUOTE_LLM_PIPIO_LUNA_API_KEY` | 与 Grok profile 相同 |
+| `scorpio:grok-4.5` | `grok-4.5` | `QUOTE_LLM_SCORPIO_GROK_API_KEY` | `https://scorpio.reepool.com` |
+| `scorpio:gpt-5.6-luna` | `gpt-5.6-luna` | `QUOTE_LLM_SCORPIO_LUNA_API_KEY` | `https://scorpio.reepool.com` |
 
 要求：
 
@@ -103,10 +103,10 @@ business_profile_semantic_verification
 绑定具体 provider、Base URL、API Key 环境变量、模型、structured-output 能力、timeout、重试和局部限额的配置，例如：
 
 ```text
-semantic_extraction__pipio_grok
-semantic_extraction__pipio_luna
-corporate_action_title_classification__pipio_grok
-corporate_action_title_classification__pipio_luna
+semantic_extraction__scorpio_grok
+semantic_extraction__scorpio_luna
+corporate_action_title_classification__scorpio_grok
+corporate_action_title_classification__scorpio_luna
 ```
 
 实际 profile 只能由公共 LLM 模块解析和调用，业务模块不得直接依赖其名称。
@@ -128,7 +128,7 @@ corporate_action_title_classification__pipio_luna
 
 ### 5.5 来源标签
 
-`source_label` 是运维配置的稳定、非敏感标识，例如 `pipio:grok-4.5`。它不能包含 API Key、账号 Cookie 或其他秘密，也不能只依赖供应商响应中的可变 model 名称。
+`source_label` 是运维配置的稳定、非敏感标识，例如 `scorpio:grok-4.5`。它不能包含 API Key、账号 Cookie 或其他秘密，也不能只依赖供应商响应中的可变 model 名称。
 
 ## 6. 总体架构
 
@@ -147,7 +147,7 @@ LLM Pool Coordinator
           +-----------------------------+
           |                             |
           v                             v
-实际 profile: Pipio Grok       实际 profile: Pipio Luna
+实际 profile: Scorpio Grok       实际 profile: Scorpio Luna
           |                             |
           v                             v
 现有 profile limiter + provider/account coordinator
@@ -194,13 +194,13 @@ config/13_llm.json
   "llm": {
     "enabled": true,
     "provider_resources": {
-      "pipio:grok": {
+      "scorpio:grok": {
         "provider": "openai_compatible",
         "hard_max_concurrency": 60,
         "default_bulk_concurrency": 50,
         "requests_per_minute": 58
       },
-      "pipio:luna": {
+      "scorpio:luna": {
         "provider": "openai_compatible",
         "hard_max_concurrency": 60,
         "default_bulk_concurrency": 50,
@@ -216,19 +216,19 @@ config/13_llm.json
         "borrow_idle_capacity": true,
         "members": [
           {
-            "source_label": "pipio:grok-4.5",
+            "source_label": "scorpio:grok-4.5",
             "weight": 3,
             "profiles": {
-              "semantic_extraction": "semantic_extraction__pipio_grok",
-              "corporate_action_title_classification": "corporate_action_title_classification__pipio_grok"
+              "semantic_extraction": "semantic_extraction__scorpio_grok",
+              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_grok"
             }
           },
           {
-            "source_label": "pipio:gpt-5.6-luna",
+            "source_label": "scorpio:gpt-5.6-luna",
             "weight": 1,
             "profiles": {
-              "semantic_extraction": "semantic_extraction__pipio_luna",
-              "corporate_action_title_classification": "corporate_action_title_classification__pipio_luna"
+              "semantic_extraction": "semantic_extraction__scorpio_luna",
+              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_luna"
             }
           }
         ],
@@ -253,24 +253,24 @@ config/13_llm.json
       "corporate_action_title_classification": {"pool": "shared_semantic"}
     },
     "profiles": {
-      "semantic_extraction__pipio_grok": {
+      "semantic_extraction__scorpio_grok": {
         "enabled": true,
         "provider": "openai_compatible",
-        "provider_resource": "pipio:grok",
-        "source_label": "pipio:grok-4.5",
-        "base_url": "https://pipio.io/v1",
+        "provider_resource": "scorpio:grok",
+        "source_label": "scorpio:grok-4.5",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
         "model": "grok-4.5"
       },
-      "semantic_extraction__pipio_luna": {
+      "semantic_extraction__scorpio_luna": {
         "enabled": true,
         "provider": "openai_compatible",
-        "provider_resource": "pipio:luna",
-        "source_label": "pipio:gpt-5.6-luna",
-        "base_url": "https://pipio.io/v1",
+        "provider_resource": "scorpio:luna",
+        "source_label": "scorpio:gpt-5.6-luna",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
         "model": "gpt-5.6-luna"
       }
     }
@@ -445,21 +445,21 @@ selected_profile: str
 {
   "pool": "shared_semantic",
   "logical_profile": "semantic_extraction",
-  "selected_profile": "semantic_extraction__pipio_luna",
-  "llm_source": "pipio:gpt-5.6-luna",
+  "selected_profile": "semantic_extraction__scorpio_luna",
+  "llm_source": "scorpio:gpt-5.6-luna",
   "route_fingerprint": "...",
   "failover_count": 1,
   "attempts": [
     {
-      "source_label": "pipio:grok-4.5",
-      "selected_profile": "semantic_extraction__pipio_grok",
+      "source_label": "scorpio:grok-4.5",
+      "selected_profile": "semantic_extraction__scorpio_grok",
       "request_id": "...",
       "error_code": "rate_limit_error",
       "attempt_count": 2
     },
     {
-      "source_label": "pipio:gpt-5.6-luna",
-      "selected_profile": "semantic_extraction__pipio_luna",
+      "source_label": "scorpio:gpt-5.6-luna",
+      "selected_profile": "semantic_extraction__scorpio_luna",
       "request_id": "...",
       "status": "success",
       "attempt_count": 1
@@ -648,7 +648,7 @@ scripts/dev_validation/benchmark_llm_orchestration.py
 
 ### 15.1 配置单元测试
 
-- 两个 Pipio 环境变量名正确解析，不读取真实 `.env`；
+- 两个 Scorpio 环境变量名正确解析，不读取真实 `.env`；
 - 同 Base URL、不同 Key 和 model 可形成两个实际 profile；
 - 独立 quota 和共享 quota 两种 provider-resource 映射均可表达，首期 Grok/Luna 固定验证为独立映射；
 - 未知 pool、未知实际 profile、重复来源标签、缺失逻辑映射和非法权重 fail closed；
@@ -743,7 +743,7 @@ tests/unit/test_research/test_scheduler_business_profile_semantic_maintenance.py
 
 1. 业务调用仍只使用逻辑 profile；
 2. 应用业务模块不再直接访问 `llm_config.profiles`；
-3. 两个 Pipio 模型可在同一 Base URL 下使用各自环境变量 Key；
+3. 两个 Scorpio 模型可在同一 Base URL 下使用各自环境变量 Key；
 4. pool 总并发和成员权重可配置且通过确定性测试；
 5. 任一成员的允许故障可切换到另一成员；
 6. 全部失败时 fail closed；

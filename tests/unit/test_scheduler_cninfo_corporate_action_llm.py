@@ -70,16 +70,16 @@ def test_cninfo_corporate_action_llm_job_is_manual_governed_resolution():
     assert incremental["parameters"]["classify_titles_with_llm"] is True
     llm_config = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))
     title_profile = llm_config["llm"]["profiles"][
-        "corporate_action_title_classification__pipio_grok"
+        "corporate_action_title_classification__scorpio_grok"
     ]
     assert title_profile["max_concurrency"] == 8
     assert title_profile["requests_per_minute"] == 0
-    resource = llm_config["llm"]["provider_resources"]["pipio:grok"]
+    resource = llm_config["llm"]["provider_resources"]["scorpio:grok"]
     assert resource["requests_per_minute"] == 10
     assert title_profile["max_retries"] == 1
     assert title_profile["retry_backoff_seconds"] == 2.0
     assert title_profile["retry_jitter_ratio"] == 0.5
-    assert llm_config["llm"]["profiles"]["semantic_extraction__pipio_grok"][
+    assert llm_config["llm"]["profiles"]["semantic_extraction__scorpio_grok"][
         "max_concurrency"
     ] == 8
     assert "高置信结果可写入受治理的 resolved 层" in _format_cninfo_corporate_action_llm_report({

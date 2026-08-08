@@ -92,9 +92,9 @@ flowchart LR
       "semantic_extraction": {
         "provider": "openai_compatible",
         "enabled": false,
-        "base_url": "https://pipio.io/v1",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -137,8 +137,8 @@ flowchart LR
 本地开发可以在项目根目录 `.env` 中设置：
 
 ```dotenv
-QUOTE_LLM_PIPIO_GROK_API_KEY=...
-QUOTE_LLM_PIPIO_LUNA_API_KEY=...
+QUOTE_LLM_SCORPIO_GROK_API_KEY=...
+QUOTE_LLM_SCORPIO_LUNA_API_KEY=...
 ```
 
 `load_project_environment()` 使用 `override=False`，进程环境优先。`.env` 已被 gitignore，权限应限制为用户可读。systemd、容器、cron 和多 worker 服务不应依赖 `.bashrc`，应通过权限受控的 `EnvironmentFile`、容器 secret 或部署平台 secret store 注入环境变量。
@@ -239,7 +239,7 @@ finally:
 | 模式 | provider payload | 本地校验 | 使用条件 |
 | --- | --- | --- | --- |
 | `json_schema` | 原生 `response_format.type=json_schema`，带 strict schema | 必须 | provider 已确认支持 strict schema |
-| `json_object` | `response_format.type=json_object`，并在 system message 注入紧凑 schema | 必须 | 当前 pipio profile 的默认能力 |
+| `json_object` | `response_format.type=json_object`，并在 system message 注入紧凑 schema | 必须 | 当前 scorpio profile 的默认能力 |
 | `prompt_only` | 仅注入 schema 指令，不设置 response_format | 必须 | profile 显式 `allow_prompt_only=true` |
 | `auto` | 从显式 capability 列表按优先级选择 | 必须 | 不执行线上盲目试错 |
 
@@ -342,7 +342,7 @@ client = LlmClient(config, transport=transport, environment={"TEST_LLM_KEY": "un
 启用 profile 前完成以下检查：
 
 1. 在部署环境注入两个来源专用 Key，确认日志和配置快照不包含密钥。
-2. 用 `scripts/dev_validation/validate_common_llm_gateway_live.py` 完成一次人工批准的 pipio 合同 smoke。
+2. 用 `scripts/dev_validation/validate_common_llm_gateway_live.py` 完成一次人工批准的 scorpio 合同 smoke。
 3. 确认服务端实际模型、structured-output 能力、usage、request ID 和错误响应格式。
 4. 运行业务 holdout，检查证据引用、数值单位、可得日和 candidate gate；不能只看模型返回 HTTP 200。
 5. 评估 token 成本、RPM、并发、超时和重试预算。

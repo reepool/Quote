@@ -1,5 +1,6 @@
 import copy
 import json
+from pathlib import Path
 
 import pytest
 
@@ -406,15 +407,43 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     }
     assert config.pools["shared_semantic"].enabled is True
     assert config.is_logical_profile_enabled("semantic_extraction") is True
+    assert [
+        (member.source_label, member.weight)
+        for member in config.pools["shared_semantic"].members
+    ] == [
+        ("scorpio:grok-4.5", 3),
+        ("scorpio:gpt-5.6-luna", 1),
+    ]
     profiles = config.profiles
-    assert profiles["semantic_extraction__pipio_grok"].api_key_env == (
-        "QUOTE_LLM_PIPIO_GROK_API_KEY"
+    assert profiles["semantic_extraction__scorpio_grok"].api_key_env == (
+        "QUOTE_LLM_SCORPIO_GROK_API_KEY"
     )
-    assert profiles["semantic_extraction__pipio_luna"].api_key_env == (
-        "QUOTE_LLM_PIPIO_LUNA_API_KEY"
+    assert profiles["semantic_extraction__scorpio_luna"].api_key_env == (
+        "QUOTE_LLM_SCORPIO_LUNA_API_KEY"
     )
     serialized = json.dumps(
         {name: profile.safe_dict() for name, profile in profiles.items()}
     )
     assert "Bearer " not in serialized
     assert "unit-test-key" not in serialized
+
+
+def test_repository_llm_config_supports_single_grok_member():
+    raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
+    pool = raw["pools"]["shared_semantic"]
+    pool["members"] = [
+        member
+        for member in pool["members"]
+        if member["source_label"] == "scorpio:grok-4.5"
+    ]
+    pool["failover"]["enabled"] = False
+    for name, profile in raw["profiles"].items():
+        if name.endswith("__scorpio_luna"):
+            profile["enabled"] = False
+
+    config = LlmConfig.from_mapping(raw)
+
+    assert config.is_logical_profile_enabled("semantic_extraction") is True
+    assert [
+        profile.name for profile in config.concrete_profiles_for("semantic_extraction")
+    ] == ["semantic_extraction__scorpio_grok"]

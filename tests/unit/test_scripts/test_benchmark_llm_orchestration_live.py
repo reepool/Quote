@@ -31,16 +31,16 @@ def _accepted_result():
         "provider_limits_ok": True,
         "fd_delta": 0,
         "dispatch_counts": {
-            "pipio:grok-4.5": 8,
-            "pipio:gpt-5.6-luna": 2,
+            "scorpio:grok-4.5": 8,
+            "scorpio:gpt-5.6-luna": 2,
         },
         "normal_dispatch_counts": {
-            "pipio:grok-4.5": 8,
-            "pipio:gpt-5.6-luna": 2,
+            "scorpio:grok-4.5": 8,
+            "scorpio:gpt-5.6-luna": 2,
         },
         "configured_weight_ratio": {
-            "pipio:grok-4.5": 0.75,
-            "pipio:gpt-5.6-luna": 0.25,
+            "scorpio:grok-4.5": 0.75,
+            "scorpio:gpt-5.6-luna": 0.25,
         },
     }
 
@@ -84,16 +84,16 @@ def test_live_acceptance_gate_checks_normal_not_borrowed_dispatch_ratio():
     borrowed = {
         **_accepted_result(),
         "dispatch_counts": {
-            "pipio:grok-4.5": 3,
-            "pipio:gpt-5.6-luna": 7,
+            "scorpio:grok-4.5": 3,
+            "scorpio:gpt-5.6-luna": 7,
         },
         "normal_dispatch_counts": {
-            "pipio:grok-4.5": 3,
-            "pipio:gpt-5.6-luna": 1,
+            "scorpio:grok-4.5": 3,
+            "scorpio:gpt-5.6-luna": 1,
         },
         "borrowed_dispatch_counts": {
-            "pipio:grok-4.5": 0,
-            "pipio:gpt-5.6-luna": 6,
+            "scorpio:grok-4.5": 0,
+            "scorpio:gpt-5.6-luna": 6,
         },
         "borrowed_dispatches": 6,
     }
@@ -105,23 +105,23 @@ def test_live_acceptance_gate_rejects_biased_normal_dispatch_ratio():
     biased = {
         **_accepted_result(),
         "dispatch_counts": {
-            "pipio:grok-4.5": 3,
-            "pipio:gpt-5.6-luna": 7,
+            "scorpio:grok-4.5": 3,
+            "scorpio:gpt-5.6-luna": 7,
         },
         "normal_dispatch_counts": {
-            "pipio:grok-4.5": 1,
-            "pipio:gpt-5.6-luna": 3,
+            "scorpio:grok-4.5": 1,
+            "scorpio:gpt-5.6-luna": 3,
         },
         "borrowed_dispatch_counts": {
-            "pipio:grok-4.5": 2,
-            "pipio:gpt-5.6-luna": 4,
+            "scorpio:grok-4.5": 2,
+            "scorpio:gpt-5.6-luna": 4,
         },
         "borrowed_dispatches": 6,
     }
 
     assert acceptance_reasons(biased) == [
-        "dispatch_ratio_out_of_tolerance:pipio:grok-4.5",
-        "dispatch_ratio_out_of_tolerance:pipio:gpt-5.6-luna",
+        "dispatch_ratio_out_of_tolerance:scorpio:grok-4.5",
+        "dispatch_ratio_out_of_tolerance:scorpio:gpt-5.6-luna",
     ]
 
 
@@ -144,17 +144,17 @@ def test_controlled_live_config_is_in_memory_and_quota_bounded():
     assert all(
         controlled.profiles[name].enabled
         for name in (
-            "semantic_extraction__pipio_grok",
-            "semantic_extraction__pipio_luna",
+            "semantic_extraction__scorpio_grok",
+            "semantic_extraction__scorpio_luna",
         )
     )
-    for resource_name in ("pipio:grok", "pipio:luna"):
+    for resource_name in ("scorpio:grok", "scorpio:luna"):
         resource = controlled.provider_resources[resource_name]
         assert resource.hard_max_concurrency == 10
         assert resource.requests_per_minute == 10
     for profile_name in (
-        "semantic_extraction__pipio_grok",
-        "semantic_extraction__pipio_luna",
+        "semantic_extraction__scorpio_grok",
+        "semantic_extraction__scorpio_luna",
     ):
         profile = controlled.profiles[profile_name]
         assert profile.max_concurrency == 10
@@ -194,19 +194,19 @@ def test_controlled_live_config_supports_lower_per_resource_caps():
         confirmed_provider_rpm=10,
         timeout_seconds=620,
         resource_concurrency_limits={
-            "pipio:grok": 8,
-            "pipio:luna": 1,
+            "scorpio:grok": 8,
+            "scorpio:luna": 1,
         },
     )
 
-    assert controlled.provider_resources["pipio:grok"].hard_max_concurrency == 8
-    assert controlled.provider_resources["pipio:luna"].hard_max_concurrency == 1
-    assert controlled.provider_resources["pipio:luna"].default_bulk_concurrency == 1
+    assert controlled.provider_resources["scorpio:grok"].hard_max_concurrency == 8
+    assert controlled.provider_resources["scorpio:luna"].hard_max_concurrency == 1
+    assert controlled.provider_resources["scorpio:luna"].default_bulk_concurrency == 1
     assert controlled.profiles[
-        "semantic_extraction__pipio_grok"
+        "semantic_extraction__scorpio_grok"
     ].max_concurrency == 8
     assert controlled.profiles[
-        "semantic_extraction__pipio_luna"
+        "semantic_extraction__scorpio_luna"
     ].max_concurrency == 1
 
 
@@ -214,8 +214,8 @@ def test_controlled_live_config_supports_lower_per_resource_caps():
     ("limits", "message"),
     [
         ({"unknown": 1}, "unknown routed provider resource"),
-        ({"pipio:luna": 0}, "positive integer"),
-        ({"pipio:luna": 11}, "cannot exceed confirmed"),
+        ({"scorpio:luna": 0}, "positive integer"),
+        ({"scorpio:luna": 11}, "cannot exceed confirmed"),
     ],
 )
 def test_controlled_live_config_rejects_invalid_resource_caps(limits, message):
@@ -346,16 +346,16 @@ def test_live_cli_accepts_explicit_result_path(tmp_path):
         "--output-json",
         str(output_path),
         "--resource-concurrency-limit",
-        "pipio:grok=8",
+        "scorpio:grok=8",
         "--resource-concurrency-limit",
-        "pipio:luna=1",
+        "scorpio:luna=1",
     ])
 
     assert args.concurrency == [10, 25, 50]
     assert args.output_json == output_path
     assert args.resource_concurrency_limits == {
-        "pipio:grok": 8,
-        "pipio:luna": 1,
+        "scorpio:grok": 8,
+        "scorpio:luna": 1,
     }
 
 
@@ -363,9 +363,9 @@ def test_live_cli_accepts_explicit_result_path(tmp_path):
     "values",
     [
         ["invalid"],
-        ["pipio:luna=zero"],
-        ["pipio:luna=0"],
-        ["pipio:luna=1", "pipio:luna=2"],
+        ["scorpio:luna=zero"],
+        ["scorpio:luna=0"],
+        ["scorpio:luna=1", "scorpio:luna=2"],
     ],
 )
 def test_live_cli_rejects_invalid_resource_limit(values):

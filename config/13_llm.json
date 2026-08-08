@@ -2,9 +2,9 @@
   "llm": {
     "enabled": true,
     "provider_resources": {
-      "pipio:grok": {
+      "scorpio:grok": {
         "provider": "openai_compatible",
-        "quota_bucket": "pipio:grok-key",
+        "quota_bucket": "scorpio:grok-key",
         "hard_max_concurrency": 10,
         "default_bulk_concurrency": 8,
         "reserved_concurrency": 2,
@@ -34,9 +34,9 @@
           "direct": 1
         }
       },
-      "pipio:luna": {
+      "scorpio:luna": {
         "provider": "openai_compatible",
-        "quota_bucket": "pipio:luna-key",
+        "quota_bucket": "scorpio:luna-key",
         "hard_max_concurrency": 10,
         "default_bulk_concurrency": 8,
         "reserved_concurrency": 2,
@@ -86,19 +86,19 @@
         "borrow_idle_capacity": true,
         "members": [
           {
-            "source_label": "pipio:grok-4.5",
+            "source_label": "scorpio:grok-4.5",
             "weight": 3,
             "profiles": {
-              "semantic_extraction": "semantic_extraction__pipio_grok",
-              "corporate_action_title_classification": "corporate_action_title_classification__pipio_grok"
+              "semantic_extraction": "semantic_extraction__scorpio_grok",
+              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_grok"
             }
           },
           {
-            "source_label": "pipio:gpt-5.6-luna",
+            "source_label": "scorpio:gpt-5.6-luna",
             "weight": 1,
             "profiles": {
-              "semantic_extraction": "semantic_extraction__pipio_luna",
-              "corporate_action_title_classification": "corporate_action_title_classification__pipio_luna"
+              "semantic_extraction": "semantic_extraction__scorpio_luna",
+              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_luna"
             }
           }
         ],
@@ -124,24 +124,24 @@
       "semantic_extraction": {
         "pool": "shared_semantic",
         "required_structured_output_modes": ["json_object"],
-        "revision": "v1-enabled-conservative"
+        "revision": "v2-scorpio-enabled-conservative"
       },
       "corporate_action_title_classification": {
         "pool": "shared_semantic",
         "required_structured_output_modes": ["json_object"],
-        "revision": "v1-enabled-conservative"
+        "revision": "v2-scorpio-enabled-conservative"
       }
     },
     "profiles": {
-      "semantic_extraction__pipio_grok": {
+      "semantic_extraction__scorpio_grok": {
         "provider": "openai_compatible",
-        "provider_resource": "pipio:grok",
-        "source_label": "pipio:grok-4.5",
+        "provider_resource": "scorpio:grok",
+        "source_label": "scorpio:grok-4.5",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
-        "base_url": "https://pipio.io/v1",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -162,15 +162,15 @@
         "retry_jitter_ratio": 0.2,
         "idempotency_header": "Idempotency-Key"
       },
-      "semantic_extraction__pipio_luna": {
+      "semantic_extraction__scorpio_luna": {
         "provider": "openai_compatible",
-        "provider_resource": "pipio:luna",
-        "source_label": "pipio:gpt-5.6-luna",
+        "provider_resource": "scorpio:luna",
+        "source_label": "scorpio:gpt-5.6-luna",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
-        "base_url": "https://pipio.io/v1",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
         "model": "gpt-5.6-luna",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -191,15 +191,15 @@
         "retry_jitter_ratio": 0.2,
         "idempotency_header": "Idempotency-Key"
       },
-      "corporate_action_title_classification__pipio_grok": {
+      "corporate_action_title_classification__scorpio_grok": {
         "provider": "openai_compatible",
-        "provider_resource": "pipio:grok",
-        "source_label": "pipio:grok-4.5",
+        "provider_resource": "scorpio:grok",
+        "source_label": "scorpio:grok-4.5",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
-        "base_url": "https://pipio.io/v1",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
         "model": "grok-4.5",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -220,15 +220,15 @@
         "retry_jitter_ratio": 0.5,
         "idempotency_header": "Idempotency-Key"
       },
-      "corporate_action_title_classification__pipio_luna": {
+      "corporate_action_title_classification__scorpio_luna": {
         "provider": "openai_compatible",
-        "provider_resource": "pipio:luna",
-        "source_label": "pipio:gpt-5.6-luna",
+        "provider_resource": "scorpio:luna",
+        "source_label": "scorpio:gpt-5.6-luna",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
-        "base_url": "https://pipio.io/v1",
+        "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
+        "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
         "model": "gpt-5.6-luna",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
