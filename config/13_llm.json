@@ -1,6 +1,6 @@
 {
   "llm": {
-    "enabled": false,
+    "enabled": true,
     "provider_resources": {
       "pipio:grok": {
         "provider": "openai_compatible",
@@ -79,7 +79,7 @@
     },
     "pools": {
       "shared_semantic": {
-        "enabled": false,
+        "enabled": true,
         "total_concurrency": 10,
         "queue_size": 200,
         "strategy": "weighted_fair",
@@ -124,12 +124,12 @@
       "semantic_extraction": {
         "pool": "shared_semantic",
         "required_structured_output_modes": ["json_object"],
-        "revision": "v1-disabled"
+        "revision": "v1-enabled-conservative"
       },
       "corporate_action_title_classification": {
         "pool": "shared_semantic",
         "required_structured_output_modes": ["json_object"],
-        "revision": "v1-disabled"
+        "revision": "v1-enabled-conservative"
       }
     },
     "profiles": {
@@ -138,7 +138,7 @@
         "provider_resource": "pipio:grok",
         "source_label": "pipio:grok-4.5",
         "default_workload": "corporate_action_semantic_extraction",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
@@ -167,7 +167,7 @@
         "provider_resource": "pipio:luna",
         "source_label": "pipio:gpt-5.6-luna",
         "default_workload": "corporate_action_semantic_extraction",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",
@@ -196,7 +196,7 @@
         "provider_resource": "pipio:grok",
         "source_label": "pipio:grok-4.5",
         "default_workload": "corporate_action_title_classification",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_PIPIO_GROK_API_KEY",
@@ -225,7 +225,7 @@
         "provider_resource": "pipio:luna",
         "source_label": "pipio:gpt-5.6-luna",
         "default_workload": "corporate_action_title_classification",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://pipio.io/v1",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_PIPIO_LUNA_API_KEY",

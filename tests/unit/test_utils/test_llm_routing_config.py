@@ -396,16 +396,16 @@ def test_config_manager_rejects_duplicate_top_level_llm_owners(tmp_path):
         UnifiedConfigManager(str(tmp_path))
 
 
-def test_repository_llm_config_is_disabled_non_secret_and_has_one_owner():
+def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     manager = UnifiedConfigManager("config")
     config = manager.get_llm_config()
-    assert config.enabled is False
+    assert config.enabled is True
     assert set(config.routes) == {
         "corporate_action_title_classification",
         "semantic_extraction",
     }
-    assert config.pools["shared_semantic"].enabled is False
-    assert config.is_logical_profile_enabled("semantic_extraction") is False
+    assert config.pools["shared_semantic"].enabled is True
+    assert config.is_logical_profile_enabled("semantic_extraction") is True
     profiles = config.profiles
     assert profiles["semantic_extraction__pipio_grok"].api_key_env == (
         "QUOTE_LLM_PIPIO_GROK_API_KEY"

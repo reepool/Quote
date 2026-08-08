@@ -321,10 +321,11 @@ provider stability is now the sole unresolved prerequisite for task 6.5. The
 - CNInfo/company-action/company-profile regression suites continue to enforce
   schema, evidence, candidate-only, review, and promotion gates; source lineage
   is persisted separately from business JSON.
-- Rollout remains disabled by default in `config/13_llm.json`. Enablement is
-  staged as: single-source smoke, controlled failover, offline 10/25/50 load,
-  then operator-approved production route activation. Rollback disables the
-  route/pool and leaves stored source lineage untouched.
+- At this validation snapshot, rollout remained disabled in
+  `config/13_llm.json`. Enablement was staged as: single-source smoke,
+  controlled failover, offline 10/25/50 load, then operator-approved route
+  activation. Rollback disables the route/pool and leaves stored source
+  lineage untouched.
 - `pipio:grok` and `pipio:luna` are independent provider resources, matching
   the deployment owner's confirmed independent Key quotas. Pool snapshots/logs
   expose concurrency, RPM, cooldown, circuit, failover, latency, and
@@ -481,13 +482,44 @@ The implementation evidence includes deterministic offline 10/25/50 load,
 bounded same-source retry, cross-source failover, circuit open/half-open/recovery,
 provider adaptive concurrency decrease/recovery, RPM/cooldown governance, and
 resource-clean shutdown tests. The failed live result and single-source 503
-evidence remain retained above. Production `config/13_llm.json` continues to
-set both the global LLM switch and `shared_semantic` pool to disabled.
+evidence remain retained above. At the time of this deferral decision,
+production `config/13_llm.json` still set both the global LLM switch and
+`shared_semantic` pool to disabled.
 
-Provider-backed 10 -> 25 -> 50 remains an unpassed production-enablement
-runbook gate. After provider recovery, operations must start again at 10 and
+Provider-backed 10 -> 25 -> 50 remains an unpassed capacity-certification and
+expansion gate. After provider recovery, operations must start again at 10 and
 may proceed to 25/50 only when the preceding stage passes. Until then, no live
-rollout certification is claimed.
+capacity certification is claimed.
+
+### Deployment-Owner Conservative Activation (2026-08-08)
+
+After reviewing the complete offline evidence and all migrated business
+callers, the deployment owner explicitly accepted the remaining provider-
+capacity risk and authorized conservative activation before provider-backed
+10/25/50 certification. `config/13_llm.json` now enables the global LLM switch,
+the `shared_semantic` pool, and all four Grok/Luna concrete profiles. Both route
+revisions are `v1-enabled-conservative`; existing pool, profile, provider RPM,
+retry, circuit, cooldown, and adaptive-concurrency limits were not increased.
+
+This activation does not convert any failed or unexecuted live stage into a
+pass. Provider recovery still requires a new 10 stage before 25/50, and no
+concurrency or RPM expansion is authorized until those gates pass. Rollback
+remains the non-destructive switch-off path and preserves stored source lineage.
+
+The final application-boundary scan found no browser/frontend direct LLM
+integration and no application-layer concrete-profile access. All current LLM
+business consumers use stable logical profiles through the common gateway:
+CNInfo title classification, corporate-action extraction/verification and
+pipeline persistence, business-profile extraction/verification and rollout,
+DataManager lifecycle, scheduler, API reporting, and production scripts.
+
+A single combined pytest command exposed an existing cross-module
+`pytest-asyncio` fixture issue after `161` passing common-LLM tests: the next
+async module failed before business code because the main thread had no current
+event loop. Running the affected CNInfo title module in an isolated pytest
+process passed all `13` cases. Existing independently executed compatibility
+evidence (`144` CNInfo and `137` business-profile cases) remains the acceptance
+record; the combined-run fixture failure is not a production LLM failure.
 
 ## Requirements Coverage
 
@@ -501,4 +533,4 @@ The change artifacts cover the requirements document as follows:
 | Source labels, response lineage, persistence and rollback | `common-llm-gateway` response contract plus `weighted-llm-pool-routing` envelopes/migration; tasks 4.3-4.7 |
 | Application transparency and existing business callers | logical-profile boundary and business-compatibility requirements; tasks 4.1-4.2 and 5.1-5.7 |
 | System logging and observability | `weighted-llm-pool-routing`: LLM logger architecture, level mapping, redaction, snapshots; tasks 2.7-2.9 |
-| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; repeated provider-backed failures are retained, and the deployment owner explicitly deferred unpassed 10/25/50 production-capacity certification while keeping the production route/pool disabled |
+| Offline regression, controlled smoke, staged rollout and gates | business compatibility and data migration/live rollout requirements; tasks 6.1-6.7; repeated provider-backed failures are retained, and the deployment owner explicitly accepted conservative activation while unpassed 10/25/50 remain capacity-certification and expansion gates |
