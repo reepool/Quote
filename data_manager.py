@@ -22921,6 +22921,10 @@ class DataManager:
             build_symbol_index,
             classify_daily_corporate_action_title,
         )
+        from data_sources.cninfo_non_xdxr_announcements import (
+            POLICY_VERSION as NON_XDXR_DECISION_POLICY_VERSION,
+            resolve_non_xdxr_announcement_decision,
+        )
         from research.announcements import (
             AnnouncementQuery,
             AnnouncementScope,
@@ -22954,6 +22958,8 @@ class DataManager:
         title_records_selected = 0
         title_filter_reasons: Counter[str] = Counter()
         carryover_revalidation: Counter[str] = Counter()
+        operator_decision_counts: Counter[str] = Counter()
+        operator_decision_samples: List[Dict[str, Any]] = []
         normalized_run_at = run_at or get_shanghai_time()
         if normalized_run_at.tzinfo is None:
             normalized_run_at = normalized_run_at.replace(
@@ -23049,6 +23055,47 @@ class DataManager:
                         carried_item = dict(item)
                         title = str(carried_item.get("title") or "").strip()
                         carryover_revalidation["evaluated"] += 1
+                        operator_decision = (
+                            resolve_non_xdxr_announcement_decision(
+                                announcement_key=carried_item.get(
+                                    "announcement_key"
+                                ),
+                                instrument_id=normalized_instrument_id,
+                                title=title,
+                            )
+                        )
+                        if operator_decision["matched"]:
+                            carryover_revalidation["excluded"] += 1
+                            carryover_revalidation[
+                                "excluded:operator_verified_non_xdxr"
+                            ] += 1
+                            operator_decision_counts[
+                                "carryover_excluded"
+                            ] += 1
+                            if len(operator_decision_samples) < 20:
+                                operator_decision_samples.append({
+                                    "announcement_key": carried_item.get(
+                                        "announcement_key"
+                                    ),
+                                    "instrument_id": normalized_instrument_id,
+                                    "reason": operator_decision["reason"],
+                                })
+                            continue
+                        if operator_decision["decision_found"]:
+                            operator_decision_counts[
+                                "identity_mismatch"
+                            ] += 1
+                            if len(operator_decision_samples) < 20:
+                                operator_decision_samples.append({
+                                    "announcement_key": carried_item.get(
+                                        "announcement_key"
+                                    ),
+                                    "instrument_id": normalized_instrument_id,
+                                    "reason": operator_decision["reason"],
+                                    "mismatches": operator_decision[
+                                        "mismatches"
+                                    ],
+                                })
                         if not title:
                             carryover_revalidation["retained_missing_title"] += 1
                             retained_special_instruments.add(
@@ -23177,13 +23224,46 @@ class DataManager:
                 if published_after_run_at:
                     title_filter_reasons["published_after_run_at"] += 1
                     continue
+                eligible_ids = set()
+                for instrument_id in matched_ids:
+                    operator_decision = (
+                        resolve_non_xdxr_announcement_decision(
+                            announcement_key=record.announcement_key,
+                            instrument_id=instrument_id,
+                            title=record.title,
+                        )
+                    )
+                    if operator_decision["matched"]:
+                        operator_decision_counts["current_excluded"] += 1
+                        if len(operator_decision_samples) < 20:
+                            operator_decision_samples.append({
+                                "announcement_key": record.announcement_key,
+                                "instrument_id": instrument_id,
+                                "reason": operator_decision["reason"],
+                            })
+                        continue
+                    if operator_decision["decision_found"]:
+                        operator_decision_counts["identity_mismatch"] += 1
+                        if len(operator_decision_samples) < 20:
+                            operator_decision_samples.append({
+                                "announcement_key": record.announcement_key,
+                                "instrument_id": instrument_id,
+                                "reason": operator_decision["reason"],
+                                "mismatches": operator_decision["mismatches"],
+                            })
+                    eligible_ids.add(instrument_id)
+                if not eligible_ids:
+                    title_filter_reasons[
+                        "operator_verified_non_xdxr"
+                    ] += 1
+                    continue
                 title_decision = classify_daily_corporate_action_title(record.title)
                 title_filter_reasons[str(title_decision["reason"])] += 1
                 if not title_decision["selected"]:
                     continue
                 title_records_selected += 1
-                announcement_ids.update(matched_ids)
-                for instrument_id in matched_ids:
+                announcement_ids.update(eligible_ids)
+                for instrument_id in eligible_ids:
                     announcement_profiles_by_instrument[instrument_id].update(
                         str(item).strip()
                         for item in title_decision.get("source_profiles") or ()
@@ -23195,7 +23275,7 @@ class DataManager:
                 matched_records_by_exchange[exchange].append(matched_record)
                 matched_instruments_by_record[
                     matched_record.announcement_key
-                ].update(matched_ids)
+                ].update(eligible_ids)
             if (
                 records_published_after_run_at
                 and scan_result.cursor_commit_allowed
@@ -23289,6 +23369,11 @@ class DataManager:
             "carryover_revalidation": {
                 "policy_version": DAILY_TITLE_TRIGGER_POLICY_VERSION,
                 **dict(sorted(carryover_revalidation.items())),
+            },
+            "operator_non_xdxr_decisions": {
+                "policy_version": NON_XDXR_DECISION_POLICY_VERSION,
+                "counts": dict(sorted(operator_decision_counts.items())),
+                "samples": operator_decision_samples,
             },
             "errors": errors[:50],
             "route_results": route_results,

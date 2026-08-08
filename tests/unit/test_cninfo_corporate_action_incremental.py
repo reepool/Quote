@@ -728,6 +728,104 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
 
 
 @pytest.mark.asyncio
+async def test_scan_excludes_exact_operator_verified_non_xdxr_announcements():
+    manager = DataManager()
+    storage = Mock()
+    storage.get_announcement_scan_state.return_value = {
+        "metadata": {
+            "pending_candidate_ids": ["000652.SZ"],
+            "pending_candidate_reasons": {
+                "000652.SZ": "unmatched_special_announcement",
+            },
+            "pending_factor_instrument_ids": [],
+            "pending_semantic_event_keys_by_instrument": {},
+            "pending_special_announcements_by_instrument": {
+                "000652.SZ": [{
+                    "announcement_key": "cninfo:1225459113",
+                    "announcement_date": "2026-08-06",
+                    "title": (
+                        "关于控股子公司泰达环保实施市场化债转股的进展公告"
+                    ),
+                    "exceptional_markers": ["债转股"],
+                }],
+            },
+        },
+    }
+    manager.research_config = Mock(enabled=True)
+    manager.research_storage = storage
+    active_instruments = {
+        "000652.SZ": {
+            "instrument_id": "000652.SZ",
+            "symbol": "000652",
+            "exchange": "SZSE",
+        },
+    }
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="1225459113",
+        announcement_key="cninfo:1225459113",
+        title="关于控股子公司泰达环保实施市场化债转股的进展公告",
+        published_at="2026-08-05T16:00:00+00:00",
+        exchange="SZSE",
+        market="SZSE",
+        symbols=("000652",),
+    )
+
+    def acquire(query: AnnouncementQuery):
+        scan = AnnouncementScanResult(
+            source="cninfo",
+            query=query,
+            status="success",
+            records=(record,),
+            pages_scanned=1,
+            requests_made=1,
+            announcements_seen=1,
+            max_published_at=record.published_at,
+            is_complete=True,
+            stop_reason="last_page",
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status="success",
+            selected_source="cninfo",
+            scan_result=scan,
+            attempts=(),
+        )
+
+    manager._build_official_announcement_acquisition_service = Mock(
+        return_value=Mock(acquire=acquire)
+    )
+
+    result = await manager._scan_cninfo_daily_announcement_activity(
+        active_instruments=active_instruments,
+        exchanges=["SZSE"],
+        start_date=date(2026, 8, 1),
+        end_date=date(2026, 8, 6),
+        run_at=datetime(
+            2026, 8, 6, 3, 30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+        overlap_days=2,
+        page_size=30,
+        max_pages=60,
+        request_interval_seconds=0,
+    )
+
+    assert result["announcement_instrument_ids"] == []
+    assert result["deferred_announcement_instrument_ids"] == []
+    assert result["deferred_special_announcements_by_instrument"] == {}
+    assert result["matched_announcements"] == 0
+    assert result["carryover_revalidation"]["excluded"] == 1
+    assert result["carryover_revalidation"][
+        "cleared_candidate_instruments"
+    ] == 1
+    assert result["operator_non_xdxr_decisions"]["counts"] == {
+        "carryover_excluded": 1,
+        "current_excluded": 1,
+    }
+
+
+@pytest.mark.asyncio
 async def test_scan_revalidates_legacy_special_announcement_carryovers():
     manager = DataManager()
     storage = Mock()
