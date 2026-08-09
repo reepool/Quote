@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import sqlite3
 import threading
 import time
 from pathlib import Path
@@ -313,6 +314,49 @@ def test_claimable_depth_filters_obsolete_processing_identity(tmp_path):
         )
         == 2
     )
+
+
+def test_claimable_probe_obeys_due_time_expired_lease_and_exclusions(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "probe"},
+    )
+    claimed = queue.claim(
+        "acquire",
+        limit=1,
+        lease_owner="probe-worker",
+        lease_seconds=300,
+    )[0]
+
+    assert queue.has_claimable(
+        "acquire",
+        exclude_work_ids=(claimed["work_id"],),
+    ) is False
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET "
+            "status = 'retry_due', next_attempt_at = '2999-01-01T00:00:00+08:00'"
+        )
+        conn.commit()
+    assert queue.has_claimable("acquire") is False
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'running', "
+            "lease_expires_at = '2020-01-01T00:00:00+08:00' WHERE work_id = ?",
+            (claimed["work_id"],),
+        )
+        conn.commit()
+    assert queue.has_claimable("acquire") is True
+    assert queue.has_claimable(
+        "acquire",
+        exclude_work_ids=(claimed["work_id"],),
+    ) is False
 
 
 def test_claim_prioritizes_work_waiting_in_stage_before_fresh_recovery(tmp_path):
@@ -1046,6 +1090,131 @@ def test_configuration_blocked_stage_does_not_consume_attempt(tmp_path):
     assert item["last_error"].startswith("blocked_configuration:")
 
 
+@pytest.mark.parametrize(
+    ("stage", "reason", "pipeline_status"),
+    [
+        ("parse", "selector_gap", "success"),
+        ("semantic", "numeric_reconciliation_failed", "stopped"),
+    ],
+)
+def test_machine_rework_is_finalized_without_content_retry(
+    tmp_path, stage, reason, pipeline_status
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = ?, status = 'pending'",
+            (stage,),
+        )
+        conn.commit()
+
+    async def stage_runner(_stage, _item):
+        return {
+            "status": pipeline_status,
+            "quality": {
+                "stage_ready": False,
+                "blocking_machine_rework": 1,
+                "selected_documents": 1,
+                "machine_rework_reasons": {reason: 1},
+            },
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+    )
+    stage_result = asyncio.run(
+        service._drain_stage(
+            stage,
+            StageBudget(max_items=1, max_concurrency=1),
+        )
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+
+    assert stage_result["machine_rework_deferred"] == 1
+    assert stage_result["retried"] == 0
+    assert stage_result["terminal_failures"] == 0
+    assert item["status"] == "machine_rework"
+    assert item["attempt_count"] == 1
+    assert item["last_error"] == f"machine_rework:{reason}"
+    assert item["metadata"]["stage_results"][stage]["status"] == pipeline_status
+    assert queue.health()["machine_rework"] == 1
+    assert queue.health()["terminal"] == 0
+
+    reset = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        force=True,
+    )
+    assert reset["reset"] == 1
+    assert queue.get(work_id)["status"] == "pending"
+    assert queue.get(work_id)["stage"] == "acquire"
+
+
+def test_auto_approved_unit_rule_defers_artifact_replay_without_attempt_cost(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', status = 'pending'"
+        )
+        conn.commit()
+
+    async def stage_runner(_stage, _item):
+        return {
+            "status": "success",
+            "quality": {
+                "stage_ready": False,
+                "blocking_machine_rework": 1,
+                "machine_rework_reasons": {"unit_normalization_failed": 1},
+            },
+            "metrics": {"unit_rule_auto_approved": 1},
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+    )
+    result = asyncio.run(
+        service._drain_stage(
+            "semantic", StageBudget(max_items=1, max_concurrency=1)
+        )
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+
+    assert result["artifact_replay_deferred"] == 1
+    assert result["machine_rework_deferred"] == 0
+    assert result["retried"] == 0
+    assert item["status"] == "retry_due"
+    assert item["attempt_count"] == 0
+    assert item["completed_at"] is None
+
+
 def test_evidence_free_recovery_requires_positive_defect_history(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -1086,7 +1255,7 @@ def test_evidence_free_recovery_requires_positive_defect_history(tmp_path):
     assert queue.get(item["work_id"])["status"] == "completed"
 
 
-def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
+def test_stage_quality_gate_finalizes_machine_rework_without_acknowledging(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
     queue = BusinessProfileWorkRepository(storage, checkpoint_root=tmp_path / "checkpoints")
@@ -1123,7 +1292,9 @@ def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
     )
 
     assert report["parse"]["completed"] == 0
-    assert report["parse"]["retried"] == 1
+    assert report["parse"]["retried"] == 0
+    assert report["parse"]["terminal_failures"] == 0
+    assert report["parse"]["machine_rework_deferred"] == 1
     assert report["parse"]["quality"] == {
         "blocking_machine_rework": 1,
         "selected_documents": 0,
@@ -1142,12 +1313,13 @@ def test_stage_quality_gate_retries_without_acknowledging(tmp_path):
         "structured_fallback_accepted_records": 0,
         "structured_fallback_rejected": 0,
         "blocked_configuration_reasons": {},
+        "machine_rework_reasons": {},
     }
     with storage.get_connection() as conn:
         row = conn.execute(
             "SELECT stage, status FROM business_profile_work_items"
         ).fetchone()
-    assert dict(row) == {"stage": "parse", "status": "retry_due"}
+    assert dict(row) == {"stage": "parse", "status": "machine_rework"}
 
 
 def test_stage_worker_claims_retryable_work_once_per_invocation(tmp_path):
@@ -1864,6 +2036,63 @@ def test_stage_stop_request_finishes_inflight_batch_before_next_claim():
     repository.acknowledge.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    (
+        "reason_code",
+        "expected_events",
+        "expected_effective_concurrency",
+        "expected_deferred",
+        "expected_retried",
+    ),
+    [
+        ("numeric_reconciliation_failed", 0, 2, 1, 0),
+        ("gateway_failure", 1, 1, 0, 1),
+    ],
+)
+def test_semantic_adaptive_concurrency_only_reacts_to_provider_pressure(
+    reason_code,
+    expected_events,
+    expected_effective_concurrency,
+    expected_deferred,
+    expected_retried,
+):
+    repository = Mock()
+    repository.claim.return_value = [{"work_id": "work-1", "instrument_id": "600000.SH"}]
+    repository.finalize_machine_rework.return_value = "machine_rework"
+    repository.fail.return_value = "retry_due"
+
+    async def stage_runner(_stage, _item):
+        return {
+            "status": "success",
+            "quality": {
+                "stage_ready": False,
+                "blocking_machine_rework": 1,
+                "selected_documents": 1,
+                "machine_rework_reasons": {reason_code: 1},
+            },
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=repository,
+        discovery_runner=AsyncMock(),
+        stage_runner=stage_runner,
+        write_coordinator=BusinessProfileWriteCoordinator(inter_write_seconds=0),
+    )
+
+    result = asyncio.run(
+        service._drain_stage(
+            "semantic",
+            StageBudget(max_items=1, max_concurrency=2),
+        )
+    )
+
+    gateway = result["gateway_admission"]
+    assert result["machine_rework_deferred"] == expected_deferred
+    assert result["retried"] == expected_retried
+    assert gateway["provider_congestion_events"] == expected_events
+    assert gateway["effective_concurrency"] == expected_effective_concurrency
+
+
 def test_invalid_backfill_scope_fails_before_discovery(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -1947,72 +2176,165 @@ def test_stage_consumers_run_independently_without_download_blocking_parse(tmp_p
     assert result["parse"]["completed"] == 1
 
 
-def test_parse_compute_overlaps_while_sqlite_writes_remain_serial(tmp_path):
+def test_empty_downstream_poll_does_not_take_writer_and_claims_new_work(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
     queue = BusinessProfileWorkRepository(
         storage,
         checkpoint_root=tmp_path / "checkpoints",
     )
-    queue.enqueue_latest_annual(
-        knowledge_cutoff="2026-08-30",
-        processing_identity={"rules": "first"},
+    coordinator = BusinessProfileWriteCoordinator(inter_write_seconds=0)
+    upstream_done = asyncio.Event()
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=AsyncMock(return_value={"status": "success"}),
+        write_coordinator=coordinator,
     )
-    queue.enqueue_scoped(
-        knowledge_cutoff="2026-08-30",
-        processing_identity={"rules": "second"},
-        instrument_ids=("600000.SH",),
-        document_types=("annual_report",),
-    )
-    with storage.get_connection() as conn:
-        conn.execute(
-            "UPDATE business_profile_work_items SET stage = 'parse', status = 'pending'"
-        )
-        conn.commit()
 
+    async def run_poll_then_enqueue():
+        task = asyncio.create_task(
+            service._drain_stage(
+                "parse",
+                StageBudget(
+                    max_items=1,
+                    max_concurrency=1,
+                    max_elapsed_seconds=2,
+                ),
+                upstream_done=upstream_done,
+            )
+        )
+        await asyncio.sleep(0.12)
+        assert coordinator.snapshot()["write_transactions"] == 0
+        queue.enqueue_latest_annual(
+            knowledge_cutoff="2026-08-30",
+            processing_identity={"rules": "late-parse"},
+        )
+        with storage.get_connection() as conn:
+            conn.execute(
+                "UPDATE business_profile_work_items SET stage = 'parse'"
+            )
+            conn.commit()
+        return await asyncio.wait_for(task, timeout=2)
+
+    result = asyncio.run(run_poll_then_enqueue())
+
+    assert result["completed"] == 1
+    assert result["empty_polls"] >= 1
+    assert coordinator.snapshot()["write_transactions"] == 2
+
+
+def test_storage_operation_coordinates_each_transaction_not_whole_function(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    coordinator = BusinessProfileWriteCoordinator(inter_write_seconds=0)
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(),
+        stage_runner=AsyncMock(),
+        write_coordinator=coordinator,
+    )
+
+    def mixed_operation():
+        with storage.get_connection() as conn:
+            conn.execute("SELECT COUNT(*) FROM business_profile_work_items").fetchone()
+        with storage.get_connection() as conn:
+            conn.execute(
+                "INSERT INTO business_profile_operation_state "
+                "(state_key, state_value_json, updated_at) VALUES "
+                "('first', '{}', '2026-08-09T12:00:00+08:00')"
+            )
+            conn.commit()
+        with storage.get_connection() as conn:
+            conn.execute("SELECT COUNT(*) FROM business_profile_work_items").fetchone()
+        with storage.get_connection() as conn:
+            conn.execute(
+                "INSERT INTO business_profile_operation_state "
+                "(state_key, state_value_json, updated_at) VALUES "
+                "('second', '{}', '2026-08-09T12:00:01+08:00')"
+            )
+            conn.commit()
+
+    asyncio.run(service._run_storage_operation(mixed_operation))
+
+    writer = coordinator.snapshot()
+    assert writer["write_transactions"] == 2
+    assert writer["max_active_writers"] == 1
+
+
+def test_parse_and_semantic_compute_parallel_without_blocking_sqlite(tmp_path):
+    storage = _storage(tmp_path)
     coordinator = BusinessProfileWriteCoordinator(inter_write_seconds=0)
     compute_lock = threading.Lock()
     active_compute = 0
     max_active_compute = 0
+    compute_barrier = threading.Barrier(5)
+    release_compute = threading.Event()
+    worker_errors = []
 
-    async def stage_runner(_stage, item):
+    def worker(stage, index):
         nonlocal active_compute, max_active_compute
-        with compute_lock:
-            active_compute += 1
-            max_active_compute = max(max_active_compute, active_compute)
-        await asyncio.sleep(0.03)
-        with compute_lock:
-            active_compute -= 1
-
-        def persist_result():
+        try:
+            with compute_lock:
+                active_compute += 1
+                max_active_compute = max(max_active_compute, active_compute)
+            compute_barrier.wait(timeout=1)
+            assert release_compute.wait(timeout=1)
+            with compute_lock:
+                active_compute -= 1
             with storage.coordinated_writes(coordinator):
                 with storage.get_connection() as conn:
                     conn.execute("BEGIN IMMEDIATE")
                     conn.execute(
-                        "UPDATE business_profile_work_items SET last_error = ? "
-                        "WHERE work_id = ?",
-                        ("parsed", item["work_id"]),
+                        "INSERT INTO business_profile_operation_state "
+                        "(state_key, state_value_json, updated_at) VALUES (?, '{}', ?)",
+                        (
+                            f"{stage}-{index}",
+                            "2026-08-09T12:00:00+08:00",
+                        ),
                     )
                     time.sleep(0.02)
                     conn.commit()
+        except Exception as exc:
+            worker_errors.append(exc)
 
-        await asyncio.to_thread(persist_result)
-        return {"status": "success"}
+    threads = [
+        threading.Thread(target=worker, args=(stage, index))
+        for stage in ("parse", "semantic")
+        for index in range(2)
+    ]
+    for thread in threads:
+        thread.start()
+    compute_barrier.wait(timeout=1)
 
-    service = BusinessProfileAsyncProductionService(
-        repository=queue,
-        discovery_runner=AsyncMock(return_value={"status": "success"}),
-        stage_runner=stage_runner,
-        write_coordinator=coordinator,
-    )
-    report = asyncio.run(
-        service._run_workers({"parse": StageBudget(max_items=2, max_concurrency=2)})
-    )
+    with sqlite3.connect(storage.db_path, timeout=0.25) as conn:
+        conn.execute("PRAGMA busy_timeout = 250")
+        conn.execute(
+            "INSERT INTO business_profile_operation_state "
+            "(state_key, state_value_json, updated_at) VALUES "
+            "('external-client', '{}', '2026-08-09T12:00:00+08:00')"
+        )
+        conn.commit()
 
-    assert report["parse"]["completed"] == 2
-    assert max_active_compute == 2
+    release_compute.set()
+    for thread in threads:
+        thread.join(timeout=2)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert worker_errors == []
+    assert max_active_compute == 4
     assert coordinator.snapshot()["max_active_writers"] == 1
-    assert coordinator.snapshot()["write_transactions"] >= 5
+    assert coordinator.snapshot()["write_transactions"] == 4
+    with storage.get_connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_operation_state WHERE "
+            "state_key = 'external-client' OR state_key LIKE 'parse-%' "
+            "OR state_key LIKE 'semantic-%'"
+        ).fetchone()[0] == 5
 
 
 def test_write_coordinator_is_shared_per_storage_manager(tmp_path):

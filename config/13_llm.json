@@ -30,6 +30,7 @@
           "corporate_action_semantic_extraction": 1,
           "corporate_action_semantic_verification": 1,
           "business_profile_extraction": 1,
+          "business_profile_unit_proposal": 1,
           "business_profile_semantic_verification": 1,
           "direct": 1
         }
@@ -62,6 +63,7 @@
           "corporate_action_semantic_extraction": 1,
           "corporate_action_semantic_verification": 1,
           "business_profile_extraction": 1,
+          "business_profile_unit_proposal": 1,
           "business_profile_semantic_verification": 1,
           "direct": 1
         }
@@ -143,7 +145,7 @@
         "attempt_timeout_seconds": 300,
         "max_retries": 1,
         "max_schema_repair_attempts": 1,
-        "max_concurrency": 8,
+        "max_concurrency": 10,
         "requests_per_minute": 0,
         "temperature": 0.0,
         "max_output_tokens_field": "max_completion_tokens",
@@ -172,7 +174,7 @@
         "attempt_timeout_seconds": 300,
         "max_retries": 1,
         "max_schema_repair_attempts": 1,
-        "max_concurrency": 8,
+        "max_concurrency": 10,
         "requests_per_minute": 0,
         "temperature": 0.0,
         "max_output_tokens_field": "max_completion_tokens",

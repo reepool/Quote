@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -191,6 +192,11 @@ class BusinessProfileActivityProducer:
             share = assertion.get("disclosed_share")
             if share is None:
                 raise ValueError("anonymous relationship requires disclosed_share")
+            normalized_share = float(share)
+            if not math.isfinite(normalized_share) or not 0 <= normalized_share <= 1:
+                raise ValueError(
+                    "anonymous relationship disclosed_share must be a finite fraction"
+                )
             record = {
                 "record_id": _stable_id(
                     "anonymous-concentration",
@@ -211,9 +217,9 @@ class BusinessProfileActivityProducer:
                     if RELATIONSHIP_DIRECTIONS[relationship_type] == "outbound"
                     else "supplier_concentration_share"
                 ),
-                "value_raw": float(share),
+                "value_raw": normalized_share,
                 "unit_raw": "fraction",
-                "value_normalized": float(share),
+                "value_normalized": normalized_share,
                 "unit_normalized": "fraction",
                 "fact_scope": str(assertion.get("scope_id") or "company"),
                 "currency": None,
@@ -228,6 +234,18 @@ class BusinessProfileActivityProducer:
                     "run_id": run_id,
                     "anonymous_label": assertion.get("counterparty_name_raw"),
                     "no_relationship_edge_created": True,
+                    "numeric_reconciliation": {
+                        "schema_version": "business_profile_ratio_validation.v1",
+                        "status": "passed",
+                        "source_value": str(share),
+                        "source_unit": "fraction",
+                        "normalized_value": str(normalized_share),
+                        "normalized_unit": "fraction",
+                        "rule": "finite_fraction_inclusive_range_0_1",
+                    },
+                    "numeric_reconciliation_status": "passed",
+                    "numeric_reconciliation_executed": True,
+                    "numeric_reconciliation_valid": True,
                 },
             }
             return "operating_facts", record

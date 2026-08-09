@@ -450,6 +450,121 @@ def build_business_profile_rollout_status(
             "GROUP BY field_family, tier",
             families,
         ).fetchall()
+        blocker_rows = conn.execute(
+            "SELECT blocker_type, COUNT(*) AS row_count "
+            "FROM business_profile_readiness_blockers WHERE status = 'open' "
+            "GROUP BY blocker_type"
+        ).fetchall()
+        numeric_failure_count = 0
+        for table_name in ("company_business_segments", "company_operating_facts"):
+            numeric_failure_count += int(
+                conn.execute(
+                    f"SELECT COUNT(*) FROM {table_name} "
+                    "WHERE review_status IN ('candidate', 'held') AND ("
+                    "json_extract(metadata_json, '$.numeric_reconciliation_executed') IS NOT 1 "
+                    "OR json_extract(metadata_json, '$.numeric_reconciliation_valid') IS NOT 1 "
+                    "OR json_extract(metadata_json, '$.numeric_reconciliation_status') = 'failed' "
+                    "OR json_extract(metadata_json, '$.publication_blocker') = "
+                    "'numeric_reconciliation_failed')"
+                ).fetchone()[0]
+                or 0
+            )
+        numeric_failure_count += int(
+            conn.execute(
+                "SELECT COUNT(*) FROM business_profile_exceptions e "
+                "WHERE e.status = 'open' "
+                f"AND e.field_family IN ({placeholders}) AND ("
+                "EXISTS (SELECT 1 FROM json_each(e.reason_codes_json) "
+                "WHERE json_each.value = 'numeric_reconciliation_failed') "
+                "OR e.metadata_json LIKE '%numeric_reconciliation_failed%')",
+                families,
+            ).fetchone()[0]
+            or 0
+        )
+        language_violation_count = 0
+        for table_name in ("company_business_segments", "company_operating_facts"):
+            language_violation_count += int(
+                conn.execute(
+                    f"SELECT COUNT(*) FROM {table_name} "
+                    "WHERE review_status IN ('candidate', 'held') "
+                    "AND json_extract(metadata_json, '$.semantic_synthesis') IS 1 "
+                    "AND TRIM(COALESCE("
+                    "json_extract(metadata_json, '$.semantic_summary_zh'), '')) <> '' "
+                    "AND NOT CAST(json_extract("
+                    "metadata_json, '$.semantic_summary_zh') AS TEXT) "
+                    "GLOB ('*[' || char(13312) || '-' || char(40959) || ']*')"
+                ).fetchone()[0]
+                or 0
+            )
+        language_violation_count += int(
+            conn.execute(
+                "SELECT COUNT(*) FROM business_profile_exceptions e "
+                "WHERE e.status = 'open' "
+                f"AND e.field_family IN ({placeholders}) AND ("
+                "EXISTS (SELECT 1 FROM json_each(e.reason_codes_json) "
+                "WHERE json_each.value = 'language_contract_invalid') "
+                "OR e.metadata_json LIKE '%language_contract_invalid%')",
+                families,
+            ).fetchone()[0]
+            or 0
+        )
+        unit_rule_rows = conn.execute(
+            "SELECT r.rule_id, r.status FROM business_profile_unit_rules r "
+            "WHERE r.rowid = (SELECT latest.rowid FROM business_profile_unit_rules latest "
+            "WHERE latest.rule_id = r.rule_id "
+            "ORDER BY latest.created_at DESC, latest.rowid DESC LIMIT 1) "
+            "ORDER BY r.created_at, r.rowid"
+        ).fetchall()
+        repeated_conversion_llm_calls = conn.execute(
+            """
+            WITH conversion_pending_identities AS (
+                SELECT DISTINCT
+                    a.instrument_id, a.source_document_id, a.document_hash,
+                    a.report_period, a.field_family, a.evidence_scope_hash,
+                    a.input_hash, a.prompt_version, a.schema_version
+                FROM business_profile_semantic_artifacts a
+                JOIN business_profile_semantic_artifact_events e
+                  ON e.artifact_id = a.artifact_id
+                WHERE e.status = 'conversion_pending'
+                  AND a.prompt_version = ? AND a.schema_version = ?
+            ), repeated AS (
+                SELECT COUNT(DISTINCT a.artifact_id) - 1 AS repeated_calls
+                FROM business_profile_semantic_artifacts a
+                JOIN conversion_pending_identities p
+                  ON p.instrument_id = a.instrument_id
+                 AND p.source_document_id = a.source_document_id
+                 AND p.document_hash = a.document_hash
+                 AND p.report_period = a.report_period
+                 AND p.field_family = a.field_family
+                 AND p.evidence_scope_hash = a.evidence_scope_hash
+                 AND p.input_hash = a.input_hash
+                 AND p.prompt_version = a.prompt_version
+                 AND p.schema_version = a.schema_version
+                WHERE COALESCE(
+                    json_extract(a.authority_json, '$.recovered_from_audit'), 0
+                ) IS NOT 1
+                GROUP BY
+                    a.instrument_id, a.source_document_id, a.document_hash,
+                    a.report_period, a.field_family, a.evidence_scope_hash,
+                    a.input_hash, a.prompt_version, a.schema_version
+                HAVING COUNT(DISTINCT a.artifact_id) > 1
+            )
+            SELECT COALESCE(SUM(repeated_calls), 0) FROM repeated
+            """,
+            (
+                STRUCTURED_EXTRACTION_PROMPT_VERSION,
+                STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            ),
+        ).fetchone()[0]
+        approved_unit_metadata_rows = []
+        for table_name in ("company_business_segments", "company_operating_facts"):
+            approved_unit_metadata_rows.extend(
+                conn.execute(
+                    f"SELECT metadata_json FROM {table_name} "
+                    "WHERE review_status = 'approved' "
+                    "AND metadata_json LIKE '%runtime_rule_id%'"
+                ).fetchall()
+            )
     family_status = {
         family: {
             "completed_instrument_count": 0,
@@ -502,7 +617,7 @@ def build_business_profile_rollout_status(
             and str(manifest.get("field_family") or "") == family
             and dict(manifest.get("identities") or {}) == dict(runtime_identities)
         )
-    return {
+    status = {
         "field_families": family_status,
         "open_quick_review": sum(
             int(item["open_exception_counts"].get("quick_review") or 0)
@@ -517,6 +632,45 @@ def build_business_profile_rollout_status(
             for item in family_status.values()
         ),
     }
+    status["approved_history_blockers"] = sum(
+        int(row["row_count"] or 0)
+        for row in blocker_rows
+        if str(row["blocker_type"]) == "approved_history_conflict"
+    )
+    status["numeric_reconciliation_failures"] = int(numeric_failure_count or 0)
+    status["language_contract_violations"] = int(language_violation_count or 0)
+    unit_rule_statuses: dict[str, str] = {}
+    unit_rule_counts: dict[str, int] = {}
+    for row in unit_rule_rows:
+        rule_status = str(row["status"])
+        unit_rule_statuses[str(row["rule_id"])] = rule_status
+        unit_rule_counts[rule_status] = unit_rule_counts.get(rule_status, 0) + 1
+    status["unit_rules"] = unit_rule_counts
+    unproved_publications = 0
+    for row in approved_unit_metadata_rows:
+        try:
+            metadata = json.loads(row["metadata_json"] or "{}")
+        except (TypeError, json.JSONDecodeError):
+            unproved_publications += 1
+            continue
+        resolutions = list(dict(metadata.get("unit_resolutions") or {}).values())
+        if isinstance(metadata.get("unit_resolution"), Mapping):
+            resolutions.append(metadata["unit_resolution"])
+        for resolution in resolutions:
+            runtime_rule_id = str(
+                dict(resolution or {}).get("runtime_rule_id") or ""
+            )
+            if (
+                runtime_rule_id
+                and unit_rule_statuses.get(runtime_rule_id) != "auto_approved"
+            ):
+                unproved_publications += 1
+                break
+    status["unproved_unit_publications"] = unproved_publications
+    status["repeated_conversion_llm_calls"] = int(
+        repeated_conversion_llm_calls or 0
+    )
+    return status
 
 
 def evaluate_business_profile_rollout_readiness(
@@ -571,6 +725,66 @@ def evaluate_business_profile_rollout_readiness(
         readiness.get("maximum_open_deep_review", 0)
     ):
         reasons.append("deep_review_backlog_exceeded")
+    blocker_thresholds = (
+        (
+            "language_contract_violations",
+            "maximum_language_contract_violations",
+            "language_contract_violations_present",
+        ),
+        (
+            "unproved_unit_publications",
+            "maximum_unproved_unit_publications",
+            "unproved_unit_publication_present",
+        ),
+        (
+            "numeric_reconciliation_failures",
+            "maximum_numeric_reconciliation_failures",
+            "numeric_reconciliation_failures_present",
+        ),
+        (
+            "repeated_conversion_llm_calls",
+            "maximum_repeated_conversion_llm_calls",
+            "conversion_repeated_llm_call_present",
+        ),
+        (
+            "approved_history_blockers",
+            "maximum_approved_history_blockers",
+            "approved_history_blocker_present",
+        ),
+    )
+    for observed_key, threshold_key, reason_code in blocker_thresholds:
+        if int(status.get(observed_key) or 0) > int(readiness.get(threshold_key, 0)):
+            reasons.append(reason_code)
+    writer = dict(status.get("writer") or {})
+    if float(writer.get("writer_lock_duty") or 0) > float(
+        readiness.get("maximum_writer_lock_duty", 1.0)
+    ):
+        reasons.append("writer_lock_duty_exceeded")
+    if float(writer.get("transaction_p95_seconds") or 0) > float(
+        readiness.get("maximum_writer_p95_seconds", float("inf"))
+    ):
+        reasons.append("writer_p95_exceeded")
+    gateway = dict(status.get("gateway_admission") or {})
+    if "admitted_requests" not in gateway:
+        aggregated: dict[str, int] = {}
+        for value in gateway.values():
+            if not isinstance(value, Mapping):
+                continue
+            for key in (
+                "admitted_requests",
+                "throttled_requests",
+                "provider_congestion_events",
+            ):
+                aggregated[key] = aggregated.get(key, 0) + int(value.get(key) or 0)
+        gateway = {**aggregated, "by_stage": gateway}
+    admitted = int(gateway.get("admitted_requests") or 0)
+    congestion_rate = int(gateway.get("provider_congestion_events") or 0) / max(
+        1, admitted
+    )
+    if congestion_rate > float(
+        readiness.get("maximum_gateway_congestion_rate", 1.0)
+    ):
+        reasons.append("gateway_congestion_exceeded")
     minimum_family_ratio = float(
         readiness.get("minimum_field_family_completion_ratio", 1.0)
     )
@@ -614,6 +828,13 @@ def evaluate_business_profile_rollout_readiness(
         "open_quick_review": int(status.get("open_quick_review") or 0),
         "open_deep_review": int(status.get("open_deep_review") or 0),
         "open_machine_rework": int(status.get("open_machine_rework") or 0),
+        "production_blockers": {
+            key: int(status.get(key) or 0)
+            for key, _, _ in blocker_thresholds
+        },
+        "writer": writer,
+        "gateway_admission": gateway,
+        "gateway_congestion_rate": round(congestion_rate, 6),
         "reason_codes": list(dict.fromkeys(reasons)),
     }
 

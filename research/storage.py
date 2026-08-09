@@ -12018,6 +12018,138 @@ class ResearchStorageManager:
                 instrument_id, source_document_id, field_family, status, updated_at
             );
 
+            CREATE TABLE IF NOT EXISTS business_profile_semantic_artifacts (
+                artifact_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                source_document_id TEXT NOT NULL,
+                document_hash TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                field_family TEXT NOT NULL,
+                evidence_scope_hash TEXT NOT NULL,
+                input_hash TEXT NOT NULL,
+                response_hash TEXT NOT NULL,
+                prompt_version TEXT NOT NULL,
+                schema_version TEXT NOT NULL,
+                model_profile TEXT,
+                actual_model TEXT,
+                response_json TEXT NOT NULL,
+                evidence_ids_json TEXT NOT NULL DEFAULT '[]',
+                usage_json TEXT NOT NULL DEFAULT '{}',
+                authority_json TEXT NOT NULL DEFAULT '{}',
+                received_at TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                UNIQUE(
+                    instrument_id, source_document_id, field_family, input_hash,
+                    prompt_version, schema_version, response_hash
+                )
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_semantic_artifacts_replay
+            ON business_profile_semantic_artifacts(
+                instrument_id, source_document_id, field_family, input_hash,
+                prompt_version, schema_version, received_at
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_semantic_artifact_events (
+                event_id TEXT PRIMARY KEY,
+                artifact_id TEXT NOT NULL,
+                status TEXT NOT NULL,
+                unit_catalog_version TEXT,
+                runtime_version TEXT,
+                reason_code TEXT,
+                saved_input_tokens INTEGER NOT NULL DEFAULT 0,
+                saved_output_tokens INTEGER NOT NULL DEFAULT 0,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (artifact_id)
+                    REFERENCES business_profile_semantic_artifacts(artifact_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_semantic_artifact_events
+            ON business_profile_semantic_artifact_events(artifact_id, created_at);
+
+            CREATE TABLE IF NOT EXISTS business_profile_unit_catalog_versions (
+                catalog_version TEXT PRIMARY KEY,
+                parent_catalog_version TEXT,
+                reason TEXT NOT NULL,
+                rule_ids_json TEXT NOT NULL DEFAULT '[]',
+                committed_at TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_unit_rules (
+                rule_event_id TEXT PRIMARY KEY,
+                rule_id TEXT NOT NULL,
+                normalized_lexeme TEXT NOT NULL,
+                source_unit TEXT NOT NULL,
+                status TEXT NOT NULL,
+                dimension TEXT,
+                canonical_unit TEXT,
+                multiplier TEXT,
+                numerator_json TEXT NOT NULL DEFAULT '[]',
+                denominator_json TEXT NOT NULL DEFAULT '[]',
+                primitive_rule_ids_json TEXT NOT NULL DEFAULT '[]',
+                proposal_json TEXT NOT NULL DEFAULT '{}',
+                proof_json TEXT NOT NULL DEFAULT '{}',
+                proposal_input_hash TEXT NOT NULL,
+                proof_hash TEXT,
+                catalog_version TEXT,
+                supersedes_rule_id TEXT,
+                observation_count INTEGER NOT NULL DEFAULT 1,
+                independent_model_count INTEGER NOT NULL DEFAULT 0,
+                reconciliation_pass_count INTEGER NOT NULL DEFAULT 0,
+                affected_fact_count INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                UNIQUE(rule_id, status, proposal_input_hash)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_unit_rules_lookup
+            ON business_profile_unit_rules(
+                normalized_lexeme, status, created_at
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_unit_rule_observations (
+                observation_id TEXT PRIMARY KEY,
+                rule_id TEXT NOT NULL,
+                artifact_id TEXT,
+                source_document_id TEXT,
+                context_hash TEXT NOT NULL,
+                model_identity TEXT,
+                reconciliation_status TEXT,
+                created_at TEXT NOT NULL,
+                UNIQUE(rule_id, context_hash),
+                FOREIGN KEY (artifact_id)
+                    REFERENCES business_profile_semantic_artifacts(artifact_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_unit_rule_notifications (
+                notification_id TEXT PRIMARY KEY,
+                rule_id TEXT NOT NULL,
+                lifecycle_status TEXT NOT NULL,
+                impact_window TEXT NOT NULL,
+                payload_hash TEXT NOT NULL,
+                delivery_status TEXT NOT NULL,
+                telegram_message_id TEXT,
+                attempt_count INTEGER NOT NULL DEFAULT 0,
+                last_error TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(rule_id, lifecycle_status, impact_window, payload_hash)
+            );
+
+            CREATE TABLE IF NOT EXISTS business_profile_readiness_blockers (
+                blocker_id TEXT PRIMARY KEY,
+                blocker_type TEXT NOT NULL,
+                instrument_id TEXT,
+                target_type TEXT,
+                target_id TEXT,
+                status TEXT NOT NULL DEFAULT 'open',
+                details_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(blocker_type, target_type, target_id, status)
+            );
+
             CREATE TABLE IF NOT EXISTS business_profile_exceptions (
                 exception_id TEXT PRIMARY KEY,
                 target_type TEXT NOT NULL,

@@ -595,17 +595,33 @@ class BusinessProfileRepository:
                     (run_id,),
                 ).fetchone():
                     raise ValueError(f"business profile semantic run already exists: {run_id}")
-                database_evidence = {
-                    str(row["evidence_id"]): dict(row)
-                    for row in conn.execute(
-                        "SELECT evidence_id, instrument_id, source_document_id "
-                        "FROM business_profile_evidence"
-                    ).fetchall()
-                }
                 bundle_evidence = {
                     item["pk_value"]: item["payload"]
                     for item in prepared_by_type.get("evidence", [])
                 }
+                referenced_evidence_ids = sorted(
+                    {
+                        str(item["payload"].get("evidence_id") or "")
+                        for record_type, prepared in prepared_by_type.items()
+                        if record_type != "evidence"
+                        for item in prepared
+                        if item["payload"].get("evidence_id")
+                    }
+                    - set(bundle_evidence)
+                )
+                database_evidence: Dict[str, Dict[str, Any]] = {}
+                for offset in range(0, len(referenced_evidence_ids), 500):
+                    chunk = referenced_evidence_ids[offset : offset + 500]
+                    placeholders = ", ".join("?" for _ in chunk)
+                    rows = conn.execute(
+                        "SELECT evidence_id, instrument_id, source_document_id "
+                        "FROM business_profile_evidence "
+                        f"WHERE evidence_id IN ({placeholders})",
+                        chunk,
+                    ).fetchall()
+                    database_evidence.update(
+                        {str(row["evidence_id"]): dict(row) for row in rows}
+                    )
                 for record_type, prepared in prepared_by_type.items():
                     spec = self._TABLES[record_type]
                     prepared_by_pk = {

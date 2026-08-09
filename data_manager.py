@@ -774,9 +774,12 @@ class DataManager:
 
         try:
             from research.storage import ResearchStorageManager
+            from research.business_profile_async_production import (
+                ensure_business_profile_storage_ready,
+            )
 
             self.research_storage = ResearchStorageManager(self.research_config)
-            self.research_storage.initialize()
+            ensure_business_profile_storage_ready(self.research_storage)
             dm_logger.info(
                 "[DataManager] Research storage initialized: %s",
                 self.research_config.storage.db_path,
@@ -1618,7 +1621,11 @@ class DataManager:
                 else nullcontext()
             )
             with write_scope:
-                self.research_storage.initialize()
+                from research.business_profile_async_production import (
+                    ensure_business_profile_storage_ready,
+                )
+
+                ensure_business_profile_storage_ready(self.research_storage)
                 service = BusinessProfileIndexDiscoveryService(
                     storage=self.research_storage,
                     announcement_service=(
@@ -1754,8 +1761,12 @@ class DataManager:
         )
 
         def initialize_with_coordinated_writes() -> None:
+            from research.business_profile_async_production import (
+                ensure_business_profile_storage_ready,
+            )
+
             with self.research_storage.coordinated_writes(write_coordinator):
-                self.research_storage.initialize()
+                ensure_business_profile_storage_ready(self.research_storage)
 
         await asyncio.to_thread(initialize_with_coordinated_writes)
         service, processing_identity = self._build_business_profile_async_service(
@@ -1888,6 +1899,13 @@ class DataManager:
                 manifests=manifests,
                 runtime_identities=identities,
             )
+            rollout_status["writer"] = result.get("writer") or {}
+            rollout_status["gateway_admission"] = {
+                stage: (result.get("workers") or {}).get(stage, {}).get(
+                    "gateway_admission", {}
+                )
+                for stage in (result.get("workers") or {})
+            }
             result["rollout_readiness"] = evaluate_business_profile_rollout_readiness(
                 phase=phase,
                 queue_health=result.get("queue_health") or {},
@@ -1902,6 +1920,9 @@ class DataManager:
                     )
                 ),
             )
+        result["unit_rule_notifications"] = (
+            await self._dispatch_business_profile_unit_rule_notifications()
+        )
         return result
 
     async def run_business_profile_backfill(
@@ -2061,8 +2082,12 @@ class DataManager:
         )
 
         def initialize_with_coordinated_writes() -> None:
+            from research.business_profile_async_production import (
+                ensure_business_profile_storage_ready,
+            )
+
             with self.research_storage.coordinated_writes(write_coordinator):
-                self.research_storage.initialize()
+                ensure_business_profile_storage_ready(self.research_storage)
 
         await asyncio.to_thread(initialize_with_coordinated_writes)
 
@@ -2193,6 +2218,13 @@ class DataManager:
                 manifests=manifests,
                 runtime_identities=identities,
             )
+            rollout_status["writer"] = result.get("writer") or {}
+            rollout_status["gateway_admission"] = {
+                stage: (result.get("workers") or {}).get(stage, {}).get(
+                    "gateway_admission", {}
+                )
+                for stage in (result.get("workers") or {})
+            }
             result["rollout_readiness"] = evaluate_business_profile_rollout_readiness(
                 phase=phase,
                 queue_health=result.get("queue_health") or {},
@@ -2207,7 +2239,56 @@ class DataManager:
                     )
                 ),
             )
+        result["unit_rule_notifications"] = (
+            await self._dispatch_business_profile_unit_rule_notifications()
+        )
         return result
+
+    async def _dispatch_business_profile_unit_rule_notifications(self) -> Dict[str, Any]:
+        """Deliver deduplicated unit-rule lifecycle notices without blocking work."""
+
+        unit_cfg = dict(
+            (
+                self.research_config.modules.get("business_profile_evidence", {})
+                .get("production_operations", {})
+                .get("unit_rule_governance", {})
+            )
+            or {}
+        )
+        if unit_cfg.get("telegram_notifications") is not True:
+            return {"status": "disabled", "delivered": 0}
+        try:
+            telegram = config_manager.get_telegram_config()
+            if not telegram.enabled:
+                return {"status": "disabled", "delivered": 0}
+            from research.business_profile_unit_registry import (
+                BusinessProfileUnitRuleRegistry,
+            )
+            from utils import TelegramBot
+
+            bot = TelegramBot()
+
+            async def notify(message: str) -> Any:
+                return await bot.send_task_notification(
+                    message,
+                    "business_profile_unit_rule",
+                    "warning",
+                )
+
+            delivered = await BusinessProfileUnitRuleRegistry(
+                self.research_storage
+            ).dispatch_notifications(notify)
+            return {"status": "success", "delivered": delivered}
+        except Exception as exc:
+            dm_logger.warning(
+                "[DataManager] Business-profile unit-rule notification failed: %s",
+                type(exc).__name__,
+            )
+            return {
+                "status": "degraded",
+                "delivered": 0,
+                "error_type": type(exc).__name__,
+            }
 
     def _build_business_profile_async_service(
         self,
@@ -2354,6 +2435,23 @@ class DataManager:
                 operations.get("progress_log_interval_seconds", 30.0)
             ),
             write_coordinator=write_coordinator,
+            storage_readiness=getattr(
+                self.research_storage,
+                "_business_profile_storage_readiness",
+                None,
+            ),
+            writer_duty_degraded_threshold=float(
+                operations.get("writer_duty_degraded_threshold", 0.60)
+            ),
+            writer_p95_degraded_seconds=float(
+                operations.get("writer_p95_degraded_seconds", 0.50)
+            ),
+            writer_health_min_transactions=int(
+                operations.get("writer_health_min_transactions", 5)
+            ),
+            writer_health_min_observation_seconds=float(
+                operations.get("writer_health_min_observation_seconds", 5.0)
+            ),
         )
         from research.business_profile_promotion import FieldFamilyPromotionManifest
 
@@ -2446,12 +2544,19 @@ class DataManager:
                 "status": "disabled",
                 "reason": "business profile semantic production is disabled",
             }
+        from research.business_profile_async_production import (
+            ensure_business_profile_storage_ready,
+        )
+
         if write_coordinator is None:
-            await asyncio.to_thread(self.research_storage.initialize)
+            await asyncio.to_thread(
+                ensure_business_profile_storage_ready,
+                self.research_storage,
+            )
         else:
             def initialize_with_coordinated_writes() -> None:
                 with self.research_storage.coordinated_writes(write_coordinator):
-                    self.research_storage.initialize()
+                    ensure_business_profile_storage_ready(self.research_storage)
 
             await asyncio.to_thread(initialize_with_coordinated_writes)
         from research.business_profile_governance import BusinessProfileRepository

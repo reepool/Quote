@@ -10,6 +10,7 @@ import os
 import re
 import sqlite3
 import time
+import unicodedata
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -43,7 +44,15 @@ from research.business_profile_exposure_production import (
 from research.business_profile_fact_catalog import load_business_fact_catalog
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
-from research.business_profile_product_catalog import load_business_product_catalog
+from research.business_profile_product_catalog import (
+    load_business_product_catalog,
+    normalize_product_alias,
+)
+from research.business_profile_numeric_reconciliation import (
+    NUMERIC_RECONCILIATION_VERSION,
+    normalize_ratio,
+    reconcile_gross_margin,
+)
 from research.business_profile_promotion import (
     BusinessProfilePromotionService,
     FieldFamilyPromotionManifest,
@@ -59,18 +68,31 @@ from research.business_profile_section_selection import (
 from research.business_profile_report_outline import locate_business_profile_outline
 from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
+    STRUCTURED_EXTRACTION_PROMPT_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
     deterministic_semantic_verification_decision,
 )
+from research.business_profile_semantic_artifacts import (
+    BusinessProfileSemanticArtifactRepository,
+    SemanticArtifactIdentity,
+)
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
 from research.business_profile_temporal import derive_report_observation_interval
-from research.business_profile_unit_conversions import load_unit_conversion_catalog
+from research.business_profile_unit_conversions import (
+    UnitResolutionPendingError,
+    governed_primitive_multipliers,
+    load_unit_conversion_catalog,
+)
+from research.business_profile_unit_registry import (
+    BusinessProfileUnitRuleRegistry,
+    propose_unknown_unit,
+)
 from utils.date_utils import get_shanghai_time
 
 
 logger = logging.getLogger(__name__)
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v2"
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v4"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
@@ -667,6 +689,11 @@ class BusinessProfileSemanticRuntime:
         self.selection_policy = str(selection_policy or "latest_annual_only")
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
+        self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(self.storage)
+        self.unit_rule_registry = BusinessProfileUnitRuleRegistry(
+            self.storage,
+            primitive_multipliers=governed_primitive_multipliers(),
+        )
         self.promotion_service = BusinessProfilePromotionService(
             BusinessProfileReviewService(repository)
         )
@@ -1142,6 +1169,7 @@ class BusinessProfileSemanticRuntime:
             records_by_type: dict[str, list[dict[str, Any]]] = {}
             semantic_audit: Mapping[str, Any] | None = None
             semantic_records: list[tuple[str, dict[str, Any]]] = []
+            semantic_artifact_id: str | None = None
             structured_fallback_used = False
             expected_non_disclosure = False
             semantic_family_complete = True
@@ -1161,6 +1189,117 @@ class BusinessProfileSemanticRuntime:
                     item["field_family"],
                     deterministic_completed=deterministic_count,
                 )
+                artifact_identity = _structured_artifact_identity(item, selected)
+                replay = (
+                    self.semantic_artifacts.find_replay(artifact_identity)
+                    if deterministic_count == 0
+                    else None
+                )
+                if replay is not None:
+                    semantic_artifact_id = str(replay["artifact_id"])
+                    replay_payload = dict(replay.get("response") or {})
+                    structured_fallback_used = True
+                    semantic_audit = {
+                        "status": "replayed",
+                        "prompt_version": artifact_identity.prompt_version,
+                        "input_hash": artifact_identity.input_hash,
+                        "response_hash": replay.get("response_hash"),
+                        "usage": {
+                            "input_tokens": 0,
+                            "output_tokens": 0,
+                            "total_tokens": 0,
+                        },
+                        "semantic_artifact_id": semantic_artifact_id,
+                        "saved_tokens": dict(replay.get("usage") or {}),
+                    }
+                    try:
+                        records_by_type = self._structured_semantic_records(
+                            item,
+                            selected,
+                            tuple(replay_payload.get("rows") or ()),
+                        )
+                        deterministic_count = sum(
+                            len(rows)
+                            for key, rows in records_by_type.items()
+                            if key != "evidence"
+                        )
+                    except Exception as exc:
+                        reason = _semantic_failure_reason(exc)
+                        self.semantic_artifacts.mark(
+                            semantic_artifact_id,
+                            "conversion_pending",
+                            unit_catalog_version=(
+                                load_unit_conversion_catalog().catalog_version
+                            ),
+                            runtime_version=RUNTIME_SCHEMA_VERSION,
+                            reason_code=reason,
+                            metadata={
+                                "error_type": type(exc).__name__,
+                                "replay_conversion_failed": True,
+                            },
+                        )
+                        metrics["semantic_artifact_conversion_pending"] = int(
+                            metrics.get("semantic_artifact_conversion_pending") or 0
+                        ) + 1
+                        metrics["semantic_artifact_replay_failures"] = int(
+                            metrics.get("semantic_artifact_replay_failures") or 0
+                        ) + 1
+                        metrics["errors"] += 1
+                        metrics["structured_fallback_rejected"] += 1
+                        diagnostics_payload = _runtime_failure_diagnostics(
+                            exc,
+                            transformation_stage="semantic_artifact_replay_conversion",
+                            semantic_audit=semantic_audit,
+                        )
+                        machine_rework.append(
+                            _rework_item(
+                                item,
+                                item["document"],
+                                reason,
+                                diagnostics=diagnostics_payload,
+                            )
+                        )
+                        _increment_family_metrics(
+                            metrics["by_field_family"],
+                            item["field_family"],
+                            machine_rework=1,
+                            structured_fallback_rejected=1,
+                        )
+                        _log_runtime_semantic_failure(
+                            item,
+                            reason=reason,
+                            exc=exc,
+                            diagnostics=diagnostics_payload,
+                        )
+                        continue
+                    else:
+                        self.semantic_artifacts.mark(
+                            semantic_artifact_id,
+                            "replayed",
+                            unit_catalog_version=(
+                                load_unit_conversion_catalog().catalog_version
+                            ),
+                            runtime_version=RUNTIME_SCHEMA_VERSION,
+                            saved_tokens=dict(replay.get("usage") or {}),
+                        )
+                        metrics["semantic_artifact_replays"] = int(
+                            metrics.get("semantic_artifact_replays") or 0
+                        ) + 1
+                        metrics["semantic_replay_saved_tokens"] = int(
+                            metrics.get("semantic_replay_saved_tokens") or 0
+                        ) + int(
+                            (replay.get("usage") or {}).get("total_tokens") or 0
+                        )
+                        logger.info(
+                            "business-profile semantic artifact replay "
+                            "artifact_id=%s instrument_id=%s field_family=%s "
+                            "rows=%s saved_tokens=%s",
+                            semantic_artifact_id,
+                            item.get("instrument_id"),
+                            item.get("field_family"),
+                            deterministic_count,
+                            int((replay.get("usage") or {}).get("total_tokens") or 0),
+                        )
                 fallback_reason = (
                     _structured_fallback_reason(selected, diagnostics)
                     if deterministic_count == 0
@@ -1223,12 +1362,58 @@ class BusinessProfileSemanticRuntime:
                         )
                         structured_fallback_used = True
                         semantic_audit = envelope.audit.to_dict()
+                        artifact_identity = _structured_artifact_identity(item, selected)
+                        artifact = self.semantic_artifacts.receive(
+                            artifact_identity,
+                            response=envelope.validated_response,
+                            response_hash=str(semantic_audit.get("response_hash") or ""),
+                            evidence_ids=[
+                                str(span.get("evidence_span_id"))
+                                for row in envelope.validated_response.get("rows", [])
+                                for span in (
+                                    (row.get("evidence") or {}).get("evidence_spans")
+                                    or []
+                                )
+                                if span.get("evidence_span_id")
+                            ],
+                            model_profile=str(semantic_audit.get("profile") or "")
+                            or None,
+                            actual_model=str(semantic_audit.get("actual_model") or "")
+                            or None,
+                            usage=dict(semantic_audit.get("usage") or {}),
+                            authority={
+                                "source_fields": "authoritative",
+                                "model_derived_hints": "diagnostic_only",
+                            },
+                        )
+                        semantic_artifact_id = str(artifact["artifact_id"])
+                        semantic_audit = {
+                            **dict(semantic_audit),
+                            "semantic_artifact_id": semantic_artifact_id,
+                        }
+                        metrics["semantic_artifact_receipts"] = int(
+                            metrics.get("semantic_artifact_receipts") or 0
+                        ) + 1
+                        logger.info(
+                            "business-profile semantic artifact received artifact_id=%s "
+                            "instrument_id=%s field_family=%s response_hash=%s",
+                            semantic_artifact_id,
+                            item.get("instrument_id"),
+                            item.get("field_family"),
+                            artifact.get("response_hash"),
+                        )
                         rejected_rows = list(envelope.rejected_rows)
                         rejected_row_count = envelope.rejected_row_count
                         records_by_type = self._structured_semantic_records(
                             item,
                             selected,
                             envelope.rows,
+                        )
+                        self.semantic_artifacts.mark(
+                            semantic_artifact_id,
+                            "converted",
+                            unit_catalog_version=load_unit_conversion_catalog().catalog_version,
+                            runtime_version=RUNTIME_SCHEMA_VERSION,
                         )
                         accepted = sum(
                             len(rows)
@@ -1301,6 +1486,97 @@ class BusinessProfileSemanticRuntime:
                                 structured_fallback_calls=-1,
                             )
                         reason = _semantic_failure_reason(exc)
+                        unit_rule = None
+                        if isinstance(exc, UnitResolutionPendingError):
+                            resolution = exc.resolution
+                            proposal_input_hash = _stable_hash(
+                                {
+                                    "source_unit": resolution.source_unit,
+                                    "artifact_id": semantic_artifact_id,
+                                    "evidence_scope": artifact_identity.evidence_scope_hash,
+                                }
+                            )
+                            try:
+                                if self.llm_client is None:
+                                    raise RuntimeError("unit proposal gateway unavailable")
+                                proposal = self._async_bridge.run(
+                                    propose_unknown_unit(
+                                        self.llm_client,
+                                        source_unit=resolution.source_unit,
+                                        context_zh="\n".join(
+                                            section.text for section in selected.sections
+                                        )[:1200],
+                                        primitive_multipliers=(
+                                            self.unit_rule_registry.proof_primitives()
+                                        ),
+                                    )
+                                )
+                                metrics["unit_proposal_llm_calls"] = int(
+                                    metrics.get("unit_proposal_llm_calls") or 0
+                                ) + 1
+                            except Exception as proposal_exc:
+                                proposal = {
+                                    "source_unit": resolution.source_unit,
+                                    "normalized_lexeme": resolution.normalized_lexeme,
+                                    "dimension": resolution.dimension or "unknown",
+                                    "canonical_unit": resolution.canonical_unit
+                                    or "unknown",
+                                    "numerator": [],
+                                    "denominator": [],
+                                    "primitive_rule_ids": [],
+                                    "factors": [],
+                                    "transformation_type": "unknown",
+                                    "round_trip_vectors": [],
+                                    "semantic_summary_zh": "单位尚未能由自动规则证明",
+                                }
+                                logger.warning(
+                                    "business-profile unit proposal fallback unit=%s "
+                                    "error_type=%s",
+                                    resolution.source_unit,
+                                    type(proposal_exc).__name__,
+                                )
+                            unit_rule = self.unit_rule_registry.register_proposal(
+                                proposal,
+                                proposal_input_hash=proposal_input_hash,
+                                artifact_id=semantic_artifact_id,
+                                source_document_id=str(item["document"]["identity"]),
+                                context_hash=artifact_identity.evidence_scope_hash,
+                                model_identity=str(
+                                    (semantic_audit or {}).get("actual_model") or ""
+                                )
+                                or None,
+                            )
+                            metrics["unit_rule_proposals"] = int(
+                                metrics.get("unit_rule_proposals") or 0
+                            ) + 1
+                            rule_status = str(unit_rule.get("status") or "unknown")
+                            metric_name = f"unit_rule_{rule_status}"
+                            metrics[metric_name] = int(metrics.get(metric_name) or 0) + 1
+                            logger.info(
+                                "business-profile unit rule persisted rule_id=%s "
+                                "unit=%s status=%s artifact_id=%s",
+                                unit_rule.get("rule_id"),
+                                resolution.source_unit,
+                                unit_rule.get("status"),
+                                semantic_artifact_id,
+                            )
+                        if semantic_artifact_id is not None:
+                            self.semantic_artifacts.mark(
+                                semantic_artifact_id,
+                                "conversion_pending",
+                                unit_catalog_version=load_unit_conversion_catalog().catalog_version,
+                                runtime_version=RUNTIME_SCHEMA_VERSION,
+                                reason_code=reason,
+                                metadata={
+                                    "error_type": type(exc).__name__,
+                                    "unit_rule_id": (
+                                        unit_rule.get("rule_id") if unit_rule else None
+                                    ),
+                                },
+                            )
+                            metrics["semantic_artifact_conversion_pending"] = int(
+                                metrics.get("semantic_artifact_conversion_pending") or 0
+                            ) + 1
                         if reason == "blocked_configuration":
                             blocker = _semantic_configuration_reason(exc)
                             blocked_configuration_reasons[blocker] = (
@@ -1722,6 +1998,10 @@ class BusinessProfileSemanticRuntime:
             )
         )
         blocked_configuration = bool(blocked_configuration_reasons)
+        machine_rework_reasons: dict[str, int] = {}
+        for rework in machine_rework:
+            reason = str(rework.get("reason_code") or "unknown")
+            machine_rework_reasons[reason] = machine_rework_reasons.get(reason, 0) + 1
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "extract",
@@ -1753,6 +2033,7 @@ class BusinessProfileSemanticRuntime:
                     "expected_non_disclosure_documents": expected_non_disclosure_documents,
                     "blocked_configuration": blocked_configuration,
                     "blocked_configuration_reasons": blocked_configuration_reasons,
+                    "machine_rework_reasons": machine_rework_reasons,
                 },
                 "metrics": metrics,
             }
@@ -1776,6 +2057,7 @@ class BusinessProfileSemanticRuntime:
                 "expected_non_disclosure_documents": expected_non_disclosure_documents,
                 "blocked_configuration": blocked_configuration,
                 "blocked_configuration_reasons": blocked_configuration_reasons,
+                "machine_rework_reasons": machine_rework_reasons,
                 "structured_fallback_required": int(
                     metrics["structured_fallback_required"]
                 ),
@@ -1837,6 +2119,8 @@ class BusinessProfileSemanticRuntime:
                         and verification_target.get("derivation_method")
                         == "semantic_synthesis"
                         and verification_target.get("exact_evidence_valid") is True
+                        and verification_target.get("numeric_reconciliation_executed")
+                        is True
                         and verification_target.get("numeric_reconciliation_valid")
                         is True
                     ):
@@ -2293,24 +2577,40 @@ class BusinessProfileSemanticRuntime:
     ) -> dict[str, list[dict[str, Any]]]:
         evidence_by_id: dict[str, dict[str, Any]] = {}
         output: dict[str, list[dict[str, Any]]] = {"evidence": []}
+        runtime_unit_rules = self.unit_rule_registry.overlay_rules()
         for raw in rows:
             row = dict(raw)
             evidence = _semantic_evidence(item, selected, row)
             validation = evidence.setdefault("metadata", {}).setdefault(
                 "promotion_validation", {}
             )
-            # Schema/range checks run before conversion, and conversion below
-            # must resolve through the governed unit catalog.
-            validation["numeric_reconciliation_valid"] = True
+            # Evidence itself has no numeric identity; row-level conversion and
+            # reconciliation are bound to the candidate record below.
+            validation.setdefault("numeric_reconciliation_status", "not_applicable")
             evidence_by_id[evidence["evidence_id"]] = evidence
             if item["field_family"] == "structured_segments":
                 record = _semantic_segment_record(
-                    item, row, evidence["evidence_id"]
+                    item,
+                    row,
+                    evidence["evidence_id"],
+                    runtime_unit_rules=runtime_unit_rules,
                 )
+                reconciliation = dict(
+                    (record.get("metadata") or {}).get("numeric_reconciliation")
+                    or {}
+                )
+                if reconciliation.get("status") == "failed":
+                    raise ValueError(
+                        "numeric_reconciliation_failed: "
+                        + _runtime_debug_json(reconciliation)
+                    )
                 output.setdefault("segments", []).append(record)
             elif item["field_family"] == "tabular_operating_facts":
                 record = _semantic_operating_record(
-                    item, row, evidence["evidence_id"]
+                    item,
+                    row,
+                    evidence["evidence_id"],
+                    runtime_unit_rules=runtime_unit_rules,
                 )
                 output.setdefault("operating_facts", []).append(record)
             else:
@@ -2566,6 +2866,10 @@ class BusinessProfileSemanticRuntime:
         evidence_approved = record_type == "evidence" or (
             evidence is not None and evidence.get("review_status") == "approved"
         )
+        numeric_reconciliation_required = record_type in {
+            "segments",
+            "operating_facts",
+        }
         gates = {
             "official_identity": bool(
                 evidence
@@ -2592,8 +2896,13 @@ class BusinessProfileSemanticRuntime:
                 validation.get("temporal_scope_valid") is True
                 and _temporal_scope_is_current(record, scope.knowledge_cutoff)
             ),
-            "numeric_reconciliation": validation.get("numeric_reconciliation_valid")
-            is True,
+            "numeric_reconciliation": bool(
+                not numeric_reconciliation_required
+                or (
+                    validation.get("numeric_reconciliation_executed") is True
+                    and validation.get("numeric_reconciliation_valid") is True
+                )
+            ),
             "no_conflicts": validation.get("no_conflicts") is True,
             "field_family_manifest": bool(
                 manifest.field_family == family
@@ -2945,6 +3254,39 @@ class BusinessProfileSemanticRuntime:
         return record
 
 
+def _structured_artifact_identity(
+    item: Mapping[str, Any], selected: SelectedSectionArtifact
+) -> SemanticArtifactIdentity:
+    evidence_scope = [
+        {
+            "section_id": section.section_id,
+            "page_number": section.page_number,
+            "section_hash": section.section_hash,
+        }
+        for section in selected.sections
+    ]
+    input_scope = {
+        "bundle_id": selected.bundle.get("bundle_id"),
+        "field_family": item.get("field_family"),
+        "instrument_id": item.get("instrument_id"),
+        "report_period": (item.get("document") or {}).get("report_period"),
+        "evidence_scope": evidence_scope,
+        "schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    }
+    document = item["document"]
+    return SemanticArtifactIdentity(
+        instrument_id=str(item["instrument_id"]),
+        source_document_id=str(document["identity"]),
+        document_hash=str(document.get("content_hash") or ""),
+        report_period=str(document["report_period"]),
+        field_family=str(item["field_family"]),
+        evidence_scope_hash=_stable_hash(evidence_scope),
+        input_hash=_stable_hash(input_scope),
+        prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
+        schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    )
+
+
 def _load_selected(
     store: BusinessProfileSelectedSectionStore, path: str | Path
 ) -> SelectedSectionArtifact:
@@ -3116,7 +3458,9 @@ def _evidence_base(
                 ),
                 "catalog_versions": _current_catalog_versions(),
                 "temporal_scope_valid": bool(document.get("published_at")),
-                "numeric_reconciliation_valid": True,
+                "numeric_reconciliation_status": "not_applicable",
+                "numeric_reconciliation_valid": bool(text_hash),
+                "numeric_reconciliation_executed": bool(text_hash),
                 "no_conflicts": True,
             },
         },
@@ -3147,6 +3491,7 @@ def _segment_record(
                 "table_id": table.table_id,
                 "row": row,
                 "document": item["document"]["identity"],
+                "processing_contract": _structured_record_contract_identity(),
             }
         )[:24]
     )
@@ -3156,13 +3501,16 @@ def _segment_record(
         "分地区": "geography",
         "分销售模式": "sales_model",
     }.get(str(row.get("segment_dimension") or ""), "product")
-    return {
+    segment_id, canonical_name = _canonical_segment_identity(
+        str(row["row_label"]), segment_type
+    )
+    record = {
         "record_id": record_id,
         "instrument_id": item["instrument_id"],
         "report_period": item["document"]["report_period"],
-        "segment_id": "segment-" + _stable_hash(row["row_label"])[:16],
+        "segment_id": segment_id,
         "segment_name_raw": row["row_label"],
-        "segment_name_normalized": None,
+        "segment_name_normalized": canonical_name,
         "segment_type": segment_type,
         "revenue": revenue,
         "segment_cost": cost,
@@ -3182,28 +3530,50 @@ def _segment_record(
         "metadata": {
             "table_id": table.table_id,
             "signature_id": table.signature_id,
-            "numeric_reconciliation_valid": True,
             "parser_manifest_promoted": True,
             "exact_evidence_valid": True,
         },
     }
+    _apply_segment_reconciliation(record, reported_margin_unit="fraction")
+    return record
 
 
 def _semantic_segment_record(
-    item: Mapping[str, Any], row: Mapping[str, Any], evidence_id: str
+    item: Mapping[str, Any],
+    row: Mapping[str, Any],
+    evidence_id: str,
+    *,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     revenue = row.get("revenue")
     cost = row.get("segment_cost")
     raw_unit = str(row.get("currency_unit") or "").strip()
     currency = None
+    unit_resolutions: dict[str, Any] = {}
     if revenue is not None:
-        revenue, currency = _normalized_value(float(revenue), raw_unit, "currency")
+        revenue, currency, resolution = _normalized_value_with_resolution(
+            float(revenue),
+            raw_unit,
+            "currency",
+            runtime_rules=runtime_unit_rules,
+        )
+        unit_resolutions["revenue"] = resolution.to_dict()
     if cost is not None:
-        cost, cost_currency = _normalized_value(float(cost), raw_unit, "currency")
+        cost, cost_currency, resolution = _normalized_value_with_resolution(
+            float(cost),
+            raw_unit,
+            "currency",
+            runtime_rules=runtime_unit_rules,
+        )
+        unit_resolutions["segment_cost"] = resolution.to_dict()
         if currency is not None and cost_currency != currency:
             raise ValueError("semantic segment revenue and cost currency mismatch")
         currency = currency or cost_currency
-    margin = row.get("gross_margin")
+    margin_raw = row.get("gross_margin")
+    margin_unit = str(row.get("gross_margin_unit") or "fraction").strip()
+    margin = (
+        None if margin_raw is None else float(normalize_ratio(margin_raw, margin_unit))
+    )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
     record_id = "bp-segment-" + _stable_hash(
         {
@@ -3212,15 +3582,20 @@ def _semantic_segment_record(
             "segment_name_raw": row["segment_name_raw"],
             "evidence": row["evidence"],
             "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            "processing_contract": _structured_record_contract_identity(),
+            "unit_resolutions": unit_resolutions,
         }
     )[:24]
-    return {
+    segment_id, canonical_name = _canonical_segment_identity(
+        str(row["segment_name_raw"]), str(row["segment_type"])
+    )
+    record = {
         "record_id": record_id,
         "instrument_id": item["instrument_id"],
         "report_period": item["document"]["report_period"],
-        "segment_id": "segment-" + _stable_hash(row["segment_name_raw"])[:16],
+        "segment_id": segment_id,
         "segment_name_raw": row["segment_name_raw"],
-        "segment_name_normalized": row["segment_name_raw"],
+        "segment_name_normalized": canonical_name,
         "segment_type": row["segment_type"],
         "revenue": revenue,
         "segment_cost": cost,
@@ -3241,12 +3616,22 @@ def _semantic_segment_record(
             "derivation_method": "semantic_synthesis",
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
             "semantic_synthesis": True,
-            "semantic_label": row["segment_name_raw"],
-            "numeric_reconciliation_valid": True,
+            "semantic_summary_zh": row.get("semantic_summary_zh"),
+            "source_label_raw": row.get("source_label_raw")
+            or row["segment_name_raw"],
+            "model_derived_hints": dict(row.get("model_derived_hints") or {}),
+            "source_units": {
+                "revenue": row.get("revenue_unit_raw") or raw_unit,
+                "segment_cost": row.get("cost_unit_raw") or raw_unit,
+                "gross_margin": margin_unit,
+            },
+            "unit_resolutions": unit_resolutions,
             "parser_manifest_promoted": False,
             "exact_evidence_valid": True,
         },
     }
+    _apply_segment_reconciliation(record, reported_margin_unit="fraction")
+    return record
 
 
 def _operating_records(
@@ -3275,6 +3660,8 @@ def _operating_records(
                     "row": row["row_label"],
                     "header": header,
                     "raw": raw,
+                    "document": item["document"]["identity"],
+                    "processing_contract": _structured_record_contract_identity(),
                 }
             )[:24]
         )
@@ -3304,7 +3691,11 @@ def _operating_records(
                     "table_id": table.table_id,
                     "signature_id": table.signature_id,
                     "source_header": header,
-                    "numeric_reconciliation_valid": True,
+                    "numeric_reconciliation_status": "not_applicable",
+                    "numeric_reconciliation_valid": bool(
+                        normalized_unit and normalized_value is not None
+                    ),
+                    "numeric_reconciliation_executed": True,
                     "parser_manifest_promoted": True,
                     "exact_evidence_valid": True,
                 },
@@ -3314,11 +3705,21 @@ def _operating_records(
 
 
 def _semantic_operating_record(
-    item: Mapping[str, Any], row: Mapping[str, Any], evidence_id: str
+    item: Mapping[str, Any],
+    row: Mapping[str, Any],
+    evidence_id: str,
+    *,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     value = float(row["value"])
     raw_unit = str(row["unit_raw"])
-    normalized_value, normalized_unit = _normalized_value(value, raw_unit)
+    normalized_value, normalized_unit, unit_resolution = (
+        _normalized_value_with_resolution(
+            value,
+            raw_unit,
+            runtime_rules=runtime_unit_rules,
+        )
+    )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
     record_id = "bp-operating-" + _stable_hash(
         {
@@ -3328,13 +3729,18 @@ def _semantic_operating_record(
             "fact_scope": row["fact_scope"],
             "evidence": row["evidence"],
             "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+            "processing_contract": _structured_record_contract_identity(),
+            "unit_resolution": unit_resolution.to_dict(),
         }
     )[:24]
+    segment_id, canonical_name = _canonical_segment_identity(
+        str(row["segment_name_raw"]), "product"
+    )
     return {
         "record_id": record_id,
         "instrument_id": item["instrument_id"],
         "report_period": item["document"]["report_period"],
-        "segment_id": "segment-" + _stable_hash(row["segment_name_raw"])[:16],
+        "segment_id": segment_id,
         "fact_type": row["fact_type"],
         "value_raw": value,
         "unit_raw": raw_unit,
@@ -3354,11 +3760,73 @@ def _semantic_operating_record(
             "derivation_method": "semantic_synthesis",
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
             "semantic_synthesis": True,
-            "semantic_segment_label": row["segment_name_raw"],
-            "numeric_reconciliation_valid": True,
+            "semantic_summary_zh": row.get("semantic_summary_zh"),
+            "source_label_raw": row.get("source_label_raw")
+            or row["segment_name_raw"],
+            "canonical_segment_name": canonical_name,
+            "model_derived_hints": dict(row.get("model_derived_hints") or {}),
+            "unit_resolution": unit_resolution.to_dict(),
+            "numeric_reconciliation_status": "not_applicable",
+            "numeric_reconciliation_valid": bool(
+                normalized_unit and normalized_value is not None
+            ),
+            "numeric_reconciliation_executed": True,
             "parser_manifest_promoted": False,
             "exact_evidence_valid": True,
         },
+    }
+
+
+def _apply_segment_reconciliation(
+    record: dict[str, Any], *, reported_margin_unit: str
+) -> None:
+    result = reconcile_gross_margin(
+        revenue=record.get("revenue"),
+        segment_cost=record.get("segment_cost"),
+        reported_margin=record.get("gross_margin"),
+        reported_margin_unit=reported_margin_unit,
+        dimensions_compatible=bool(record.get("currency")),
+    )
+    metadata = record.setdefault("metadata", {})
+    metadata["numeric_reconciliation"] = result.to_dict()
+    metadata["numeric_reconciliation_status"] = result.status
+    metadata["numeric_reconciliation_executed"] = True
+    metadata["numeric_reconciliation_valid"] = (
+        result.passed or result.status in {"derived", "not_applicable"}
+    )
+    if result.status == "derived":
+        metadata["derived_gross_margin"] = (
+            str(result.calculated_value)
+            if result.calculated_value is not None
+            else None
+        )
+    if result.status == "failed":
+        record["review_status"] = "candidate"
+        metadata["publication_blocker"] = "numeric_reconciliation_failed"
+
+
+def _canonical_segment_identity(
+    source_label: str, segment_type: str
+) -> tuple[str, str]:
+    source_native = unicodedata.normalize("NFKC", str(source_label or "")).strip()
+    normalized = normalize_product_alias(source_native)
+    if segment_type == "product":
+        resolution = load_business_product_catalog().resolve_alias(source_native)
+        if len(resolution.product_ids) == 1 and not resolution.review_required:
+            product_id = resolution.product_ids[0]
+            product = load_business_product_catalog().require_product(product_id)
+            return f"segment-product-{product_id}", product.label_zh
+    return "segment-" + _stable_hash(
+        {"segment_type": segment_type, "source_label": normalized}
+    )[:16], normalized
+
+
+def _structured_record_contract_identity() -> dict[str, str]:
+    return {
+        "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+        "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
+        "numeric_reconciliation_version": NUMERIC_RECONCILIATION_VERSION,
+        "unit_catalog_version": load_unit_conversion_catalog().catalog_version,
     }
 
 
@@ -3377,10 +3845,21 @@ def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:
         or metadata.get("exact_evidence_valid")
         or validation.get("exact_evidence_verified")
     )
-    target["numeric_reconciliation_valid"] = bool(
-        record.get("numeric_reconciliation_valid")
-        or metadata.get("numeric_reconciliation_valid")
-        or validation.get("numeric_reconciliation_valid")
+    target["numeric_reconciliation_valid"] = any(
+        value is True
+        for value in (
+            record.get("numeric_reconciliation_valid"),
+            metadata.get("numeric_reconciliation_valid"),
+            validation.get("numeric_reconciliation_valid"),
+        )
+    )
+    target["numeric_reconciliation_executed"] = any(
+        value is True
+        for value in (
+            record.get("numeric_reconciliation_executed"),
+            metadata.get("numeric_reconciliation_executed"),
+            validation.get("numeric_reconciliation_executed"),
+        )
     )
     target["parser_manifest_promoted"] = bool(
         record.get("parser_manifest_promoted")
@@ -3403,10 +3882,14 @@ def _bind_promotion_validation(
         "temporal_scope_valid": _temporal_scope_is_current(
             record, str(record.get("data_available_date") or "9999-12-31")
         ),
-        "numeric_reconciliation_valid": (
-            metadata.get("numeric_reconciliation_valid") is not False
+        "numeric_reconciliation_valid": bool(
+            metadata.get("numeric_reconciliation_executed") is True
+            and metadata.get("numeric_reconciliation_valid") is True
         ),
-        "no_conflicts": True,
+        "numeric_reconciliation_executed": (
+            metadata.get("numeric_reconciliation_executed") is True
+        ),
+        "no_conflicts": not bool(metadata.get("publication_blocker")),
     }
 
 
@@ -3493,26 +3976,36 @@ def _header_unit(header: str) -> str | None:
 def _normalized_value(
     value: float, raw_unit: str, required_dimension: str | None = None
 ) -> tuple[float, str]:
-    catalog = load_unit_conversion_catalog()
-    source = catalog.resolve_unit(raw_unit)
-    if required_dimension is not None and source.dimension != required_dimension:
-        raise ValueError(
-            f"unit dimension mismatch: {raw_unit} is {source.dimension}, "
-            f"required {required_dimension}"
-        )
-    target = next(
-        unit
-        for unit in catalog.units
-        if unit.dimension == source.dimension and unit.canonical_for_dimension
-    )
-    converted = catalog.convert(
+    normalized_value, normalized_unit, _ = _normalized_value_with_resolution(
         value,
-        from_unit=source.unit_id,
-        to_unit=target.unit_id,
+        raw_unit,
+        required_dimension,
+    )
+    return normalized_value, normalized_unit
+
+
+def _normalized_value_with_resolution(
+    value: float,
+    raw_unit: str,
+    required_dimension: str | None = None,
+    *,
+    runtime_rules: Sequence[Mapping[str, Any]] = (),
+) -> tuple[float, str, Any]:
+    catalog = load_unit_conversion_catalog()
+    resolution = catalog.resolve(
+        raw_unit,
+        required_dimension=required_dimension,
+        runtime_rules=runtime_rules,
+    )
+    if not resolution.publishable:
+        raise UnitResolutionPendingError(resolution)
+    converted = catalog.convert_resolved(
+        value,
+        resolution,
         period_basis="period_total",
         equity_basis="unknown",
     )
-    return float(converted.normalized_value), converted.normalized_unit
+    return float(converted.normalized_value), converted.normalized_unit, resolution
 
 
 def _rework_item(
@@ -3614,11 +4107,14 @@ def _semantic_failure_reason(exc: Exception) -> str:
         return "evidence_provenance_failed"
     if "schema" in text or "schema_validation_failed" in row_categories:
         return "schema_failure"
+    if "numeric_reconciliation_failed" in text:
+        return "numeric_reconciliation_failed"
     if "numeric_validation_failed" in row_categories:
         return "numeric_validation_failed"
     if (
         "resolve unit" in text
         or "unsupported unit" in text
+        or "unsupported ratio unit" in text
         or "business-profile unit" in text
         or "unit conversion" in text
         or "unit dimension mismatch" in text

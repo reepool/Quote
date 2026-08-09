@@ -31,9 +31,12 @@ from research.business_profile_semantic_runtime import (
     BusinessProfilePlannedDisclosureAcquirer,
     BusinessProfileSemanticRuntime,
     _normalized_value,
+    _semantic_failure_reason,
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
 )
+
+
 from research.providers.base import FinancialSourceFileManifest
 from research.storage import ResearchStorageManager
 from utils.config_manager import (
@@ -42,6 +45,93 @@ from utils.config_manager import (
     ResearchStorageConfig,
 )
 from utils.llm import LlmAuthenticationError, LlmResponse, LlmUsage
+
+
+def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
+    assert (
+        _semantic_failure_reason(
+            ValueError("numeric_reconciliation_failed: reported margin mismatch")
+        )
+        == "numeric_reconciliation_failed"
+    )
+    assert (
+        _semantic_failure_reason(ValueError("unsupported ratio unit: （%）"))
+        == "unit_normalization_failed"
+    )
+
+
+def test_structured_record_ids_rotate_without_changing_stable_segment_identity(
+    monkeypatch,
+):
+    item = {
+        "instrument_id": "600000.SH",
+        "document": {
+            "identity": "report-2025",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-31T08:00:00+08:00",
+        },
+    }
+    evidence = {
+        "evidence_span_ids": ["span-1"],
+        "evidence_spans": [{"evidence_span_id": "span-1"}],
+    }
+    segment_row = {
+        "revenue": 100,
+        "segment_cost": 60,
+        "gross_margin": 40,
+        "gross_margin_unit": "%",
+        "currency_unit": "万元",
+        "revenue_unit_raw": "万元",
+        "cost_unit_raw": "万元",
+        "segment_name_raw": "主营产品",
+        "segment_type": "product",
+        "source_label_raw": "主营产品",
+        "semantic_summary_zh": "主营产品收入和成本情况。",
+        "model_derived_hints": {},
+        "evidence": evidence,
+    }
+    operating_row = {
+        "value": 20,
+        "unit_raw": "万吨",
+        "segment_name_raw": "主营产品",
+        "fact_type": "production_volume",
+        "fact_scope": "报告期产量",
+        "source_label_raw": "产量",
+        "semantic_summary_zh": "报告期产量为20万吨。",
+        "model_derived_hints": {},
+        "evidence": evidence,
+    }
+
+    first_segment = runtime_module._semantic_segment_record(
+        item,
+        segment_row,
+        "evidence-1",
+    )
+    first_operating = runtime_module._semantic_operating_record(
+        item,
+        operating_row,
+        "evidence-1",
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "RUNTIME_SCHEMA_VERSION",
+        "business_profile_semantic_runtime.next",
+    )
+    next_segment = runtime_module._semantic_segment_record(
+        item,
+        segment_row,
+        "evidence-1",
+    )
+    next_operating = runtime_module._semantic_operating_record(
+        item,
+        operating_row,
+        "evidence-1",
+    )
+
+    assert first_segment["record_id"] != next_segment["record_id"]
+    assert first_operating["record_id"] != next_operating["record_id"]
+    assert first_segment["segment_id"] == next_segment["segment_id"]
+    assert first_operating["segment_id"] == next_operating["segment_id"]
 
 
 def _storage(tmp_path):

@@ -125,7 +125,7 @@
             "max_cost": 5.0,
             "max_elapsed_seconds": 900.0,
             "max_errors": 10,
-            "max_concurrency": 2
+            "max_concurrency": 10
           },
           "thresholds": {
             "max_unsupported_output_rate": 0.01,
@@ -166,16 +166,23 @@
           "lease_seconds": 900,
           "retry_backoff_seconds": 300,
           "writer_yield_seconds": 0.01,
+          "writer_duty_degraded_threshold": 0.60,
+          "writer_p95_degraded_seconds": 0.50,
+          "writer_health_min_transactions": 5,
+          "writer_health_min_observation_seconds": 5.0,
+          "unit_rule_governance": {
+            "enabled": true,
+            "proposal_llm_profile": "semantic_extraction",
+            "corroboration_observations": 3,
+            "corroboration_models": 2,
+            "corroboration_reconciliations": 2,
+            "telegram_notifications": true
+          },
           "stage_budgets": {
             "acquire": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 300, "high_water_mark": 1000},
             "parse": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000},
-            "semantic": {"max_items": 8, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 500},
+            "semantic": {"max_items": 20, "max_concurrency": 10, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
             "publish": {"max_items": 16, "max_concurrency": 4, "max_elapsed_seconds": 600, "high_water_mark": 1000}
-          },
-          "retry_policy": {
-            "machine_rework_max_attempts": 3,
-            "initial_backoff_hours": 24,
-            "max_backoff_days": 30
           },
           "rollback": "Disable the daily incremental scheduler job; preserve discovery windows, work queue, frontier, manifests, immutable PDFs, candidates, approvals, and audit history.",
           "note": "The versioned rollout config controls active field families and stage budgets. The manual latest-annual bootstrap advances independent bounded queues; semiannual and specialist disclosures require an explicitly scoped expanded backfill."

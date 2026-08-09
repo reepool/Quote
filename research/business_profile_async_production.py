@@ -9,6 +9,7 @@ import logging
 import os
 import threading
 import time
+from collections import deque
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -22,7 +23,12 @@ WORK_SCHEMA_VERSION = "business_profile_work_item.v1"
 ASYNC_REPORT_SCHEMA_VERSION = "business_profile_async_production_report.v1"
 WORK_STAGES = ("acquire", "parse", "semantic", "publish")
 CLAIMABLE_STATUSES = ("pending", "retry_due")
-TERMINAL_STATUSES = ("completed", "superseded", "terminal_failure")
+TERMINAL_STATUSES = (
+    "completed",
+    "machine_rework",
+    "superseded",
+    "terminal_failure",
+)
 AUTOMATIC_DOCUMENT_TYPES = ("annual_report", "annual_report_correction")
 _WRITE_COORDINATOR_CREATION_LOCK = threading.Lock()
 logger = logging.getLogger(__name__)
@@ -48,6 +54,43 @@ class StageBudget:
             raise ValueError("business-profile stage budgets must be positive")
 
 
+@dataclass(frozen=True)
+class BusinessProfileStorageReadiness:
+    identity: str
+    initialized_at: str
+    initialization_count: int
+
+
+def ensure_business_profile_storage_ready(storage: Any) -> BusinessProfileStorageReadiness:
+    """Run full schema/migration initialization once per storage-manager lifetime."""
+
+    token = getattr(storage, "_business_profile_storage_readiness", None)
+    if isinstance(token, BusinessProfileStorageReadiness):
+        return token
+    lock = getattr(storage, "_business_profile_storage_readiness_lock", None)
+    if lock is None:
+        lock = threading.Lock()
+        setattr(storage, "_business_profile_storage_readiness_lock", lock)
+    with lock:
+        token = getattr(storage, "_business_profile_storage_readiness", None)
+        if isinstance(token, BusinessProfileStorageReadiness):
+            return token
+        storage.initialize()
+        initialized_at = get_shanghai_time().isoformat()
+        identity = _stable_hash(
+            {
+                "db_path": str(getattr(storage, "db_path", "")),
+                "initialized_at": initialized_at,
+            }
+        )
+        token = BusinessProfileStorageReadiness(
+            identity=identity,
+            initialized_at=initialized_at,
+            initialization_count=1,
+        )
+        setattr(storage, "_business_profile_storage_readiness", token)
+        return token
+
 class BusinessProfileWriteCoordinator:
     """Serialize short SQLite transactions without serializing worker computation."""
 
@@ -67,7 +110,10 @@ class BusinessProfileWriteCoordinator:
         self._write_transactions = 0
         self._wait_seconds = 0.0
         self._write_seconds = 0.0
+        self._observation_started_monotonic = time.monotonic()
         self._last_release_monotonic = 0.0
+        self._inter_write_idle_seconds = 0.0
+        self._transaction_durations: deque[float] = deque(maxlen=10000)
 
     @contextmanager
     def write_scope(self):
@@ -99,6 +145,8 @@ class BusinessProfileWriteCoordinator:
                 self._active_writers,
             )
             last_release = self._last_release_monotonic
+            if last_release:
+                self._inter_write_idle_seconds += max(0.0, acquired_at - last_release)
         remaining_yield = self.inter_write_seconds - max(
             0.0, acquired_at - last_release
         )
@@ -116,6 +164,9 @@ class BusinessProfileWriteCoordinator:
                 self._write_transactions += 1
                 self._wait_seconds += max(0.0, acquired_at - wait_started)
                 self._write_seconds += max(0.0, finished_at - write_started)
+                self._transaction_durations.append(
+                    max(0.0, finished_at - write_started)
+                )
                 self._last_release_monotonic = finished_at
             self._writer_lock.release()
 
@@ -130,6 +181,10 @@ class BusinessProfileWriteCoordinator:
 
     def snapshot(self) -> dict[str, Any]:
         with self._metrics_lock:
+            durations = tuple(self._transaction_durations)
+            elapsed = max(
+                0.0, time.monotonic() - self._observation_started_monotonic
+            )
             return {
                 "pending_writers": self._pending_writers,
                 "active_writers": self._active_writers,
@@ -138,6 +193,16 @@ class BusinessProfileWriteCoordinator:
                 "write_transactions": self._write_transactions,
                 "wait_seconds": round(self._wait_seconds, 6),
                 "write_seconds": round(self._write_seconds, 6),
+                "observation_seconds": round(elapsed, 6),
+                "transaction_p50_seconds": round(_percentile(durations, 50), 6),
+                "transaction_p95_seconds": round(_percentile(durations, 95), 6),
+                "transaction_max_seconds": round(max(durations, default=0.0), 6),
+                "writer_lock_duty": round(
+                    self._write_seconds / elapsed if elapsed else 0.0, 6
+                ),
+                "inter_write_idle_seconds": round(
+                    self._inter_write_idle_seconds, 6
+                ),
                 "inter_write_seconds": self.inter_write_seconds,
             }
 
@@ -321,7 +386,67 @@ class BusinessProfileWorkRepository:
                     (lease_owner, lease_expires_at, now_text, *work_ids),
                 )
             conn.commit()
-        return tuple(self.get(item) for item in work_ids)
+        claimed = []
+        for row in rows:
+            item = dict(row)
+            item.update(
+                {
+                    "status": "running",
+                    "attempt_count": int(item.get("attempt_count") or 0) + 1,
+                    "lease_owner": lease_owner,
+                    "lease_expires_at": lease_expires_at,
+                    "updated_at": now_text,
+                }
+            )
+            claimed.append(_decode_work_row(item))
+        return tuple(claimed)
+
+    def has_claimable(
+        self,
+        stage: str,
+        *,
+        processing_identity_hash: str | None = None,
+        exclude_work_ids: Sequence[str] = (),
+    ) -> bool:
+        """Probe queue availability without taking the SQLite writer."""
+
+        normalized_stage = _stage(stage)
+        now_text = get_shanghai_time().isoformat()
+        identity_clause = (
+            "AND processing_identity_hash = ?"
+            if processing_identity_hash
+            else ""
+        )
+        excluded = tuple(
+            sorted({str(value) for value in exclude_work_ids if str(value)})
+        )
+        exclusion_clause = (
+            "AND work_id NOT IN (" + ",".join("?" for _ in excluded) + ")"
+            if excluded
+            else ""
+        )
+        params: list[Any] = [normalized_stage, now_text, now_text]
+        if processing_identity_hash:
+            params.append(str(processing_identity_hash))
+        params.extend(excluded)
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                f"""
+                SELECT 1 FROM business_profile_work_items
+                WHERE stage = ?
+                  AND (
+                    (status IN ('pending', 'retry_due')
+                     AND (next_attempt_at IS NULL OR next_attempt_at <= ?))
+                    OR (status = 'running' AND lease_expires_at <= ?)
+                  )
+                  {identity_clause}
+                  {exclusion_clause}
+                LIMIT 1
+                """,
+                tuple(params),
+            ).fetchone()
+        return row is not None
 
     def acknowledge(
         self,
@@ -455,6 +580,61 @@ class BusinessProfileWorkRepository:
             )
             conn.commit()
         return "configuration_blocked" if int(cursor.rowcount or 0) == 1 else "lease_lost"
+
+    def finalize_machine_rework(
+        self,
+        work_id: str,
+        *,
+        lease_owner: str,
+        reason: str,
+        result: Mapping[str, Any],
+    ) -> str:
+        """Finalize a classified data-quality rejection without retry churn."""
+
+        item = self.get(work_id)
+        now = get_shanghai_time().isoformat()
+        stage = _stage(item["stage"])
+        metadata = {
+            **dict(item.get("metadata") or {}),
+            "stage_results": {
+                **dict((item.get("metadata") or {}).get("stage_results") or {}),
+                stage: dict(result),
+            },
+        }
+        replay_ready = int(
+            dict(result.get("metrics") or {}).get("unit_rule_auto_approved") or 0
+        ) > 0
+        status = "retry_due" if replay_ready else "machine_rework"
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                """
+                UPDATE business_profile_work_items
+                SET status = ?, next_attempt_at = NULL,
+                    attempt_count = CASE
+                        WHEN ? AND attempt_count > 0 THEN attempt_count - 1
+                        ELSE attempt_count
+                    END,
+                    lease_owner = NULL, lease_expires_at = NULL,
+                    last_error = ?, metadata_json = ?, completed_at = ?,
+                    updated_at = ?
+                WHERE work_id = ? AND status = 'running' AND lease_owner = ?
+                """,
+                (
+                    status,
+                    int(replay_ready),
+                    str(reason)[:4000],
+                    _canonical_json(metadata),
+                    None if replay_ready else now,
+                    now,
+                    work_id,
+                    str(lease_owner),
+                ),
+            )
+            conn.commit()
+        if int(cursor.rowcount or 0) != 1:
+            return "lease_lost"
+        return "artifact_replay_deferred" if replay_ready else "machine_rework"
 
     def get(self, work_id: str) -> dict[str, Any]:
         with self.storage.get_connection() as conn:
@@ -1055,6 +1235,11 @@ class BusinessProfileWorkRepository:
                 for item in groups
                 if item["status"] == "completed"
             ),
+            "machine_rework": sum(
+                int(item["row_count"])
+                for item in groups
+                if item["status"] == "machine_rework"
+            ),
             "finalized": sum(
                 int(item["row_count"])
                 for item in groups
@@ -1248,7 +1433,7 @@ class BusinessProfileWorkRepository:
                     "lease_owner = NULL, lease_expires_at = NULL, updated_at = ? "
                     "WHERE frontier_id = ? AND policy = ? AND work_id <> ? "
                     "AND processing_identity_hash <> ? "
-                    "AND (status IN ('pending', 'retry_due', 'terminal_failure') "
+                    "AND (status IN ('pending', 'retry_due', 'machine_rework', 'terminal_failure') "
                     "OR (status = 'running' AND lease_expires_at <= ?))",
                     (
                         now,
@@ -1274,7 +1459,8 @@ class BusinessProfileWorkRepository:
                         WHERE work.instrument_id = ? AND work.policy = ?
                           AND work.work_id <> ?
                           AND work.status IN (
-                              'pending', 'retry_due', 'terminal_failure'
+                              'pending', 'retry_due', 'machine_rework',
+                              'terminal_failure'
                           )
                         """,
                         (row["instrument_id"], policy, work_id),
@@ -1400,6 +1586,11 @@ class BusinessProfileAsyncProductionService:
         retry_backoff_seconds: int = 300,
         progress_log_interval_seconds: float = 30.0,
         write_coordinator: BusinessProfileWriteCoordinator | None = None,
+        storage_readiness: BusinessProfileStorageReadiness | None = None,
+        writer_duty_degraded_threshold: float = 0.60,
+        writer_p95_degraded_seconds: float = 0.50,
+        writer_health_min_transactions: int = 5,
+        writer_health_min_observation_seconds: float = 5.0,
     ) -> None:
         self.repository = repository
         self.discovery_runner = discovery_runner
@@ -1413,6 +1604,77 @@ class BusinessProfileAsyncProductionService:
             write_coordinator
             or get_business_profile_write_coordinator(repository.storage)
         )
+        self.storage_readiness = storage_readiness
+        self.writer_duty_degraded_threshold = max(
+            0.0, min(float(writer_duty_degraded_threshold), 1.0)
+        )
+        self.writer_p95_degraded_seconds = max(
+            0.001, float(writer_p95_degraded_seconds)
+        )
+        self.writer_health_min_transactions = max(
+            1, int(writer_health_min_transactions)
+        )
+        self.writer_health_min_observation_seconds = max(
+            0.0, float(writer_health_min_observation_seconds)
+        )
+
+    def _readiness_metrics(self) -> dict[str, Any]:
+        token = self.storage_readiness
+        return {
+            "storage_readiness_identity": token.identity if token else None,
+            "storage_initialized_at": token.initialized_at if token else None,
+            "initialization_count": token.initialization_count if token else 0,
+        }
+
+    async def _run_storage_operation(
+        self,
+        func: Callable[..., Any],
+        /,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """Coordinate only mutating SQL inside a repository operation."""
+
+        storage = getattr(self.repository, "storage", None)
+        coordinated_writes = getattr(type(storage), "coordinated_writes", None)
+        if not callable(coordinated_writes):
+            return await self.write_coordinator.run(func, *args, **kwargs)
+
+        def invoke() -> Any:
+            with storage.coordinated_writes(self.write_coordinator):
+                return func(*args, **kwargs)
+
+        return await asyncio.to_thread(invoke)
+
+    def _apply_writer_health(
+        self, status: str, reason_codes: Sequence[str]
+    ) -> tuple[str, list[str], dict[str, Any]]:
+        writer = self.write_coordinator.snapshot()
+        reasons = list(reason_codes)
+        sample_ready = bool(
+            int(writer.get("write_transactions") or 0)
+            >= self.writer_health_min_transactions
+            and float(writer.get("observation_seconds") or 0)
+            >= self.writer_health_min_observation_seconds
+        )
+        writer["health_sample_ready"] = sample_ready
+        writer["health_min_transactions"] = self.writer_health_min_transactions
+        writer["health_min_observation_seconds"] = (
+            self.writer_health_min_observation_seconds
+        )
+        if (
+            sample_ready
+            and float(writer.get("writer_lock_duty") or 0)
+            > self.writer_duty_degraded_threshold
+        ):
+            reasons.append("writer_lock_duty_exceeded")
+        if (
+            sample_ready
+            and float(writer.get("transaction_p95_seconds") or 0)
+            > self.writer_p95_degraded_seconds
+        ):
+            reasons.append("writer_p95_exceeded")
+        return ("degraded" if reasons and status == "success" else status), reasons, writer
 
     async def run_daily(
         self,
@@ -1429,17 +1691,21 @@ class BusinessProfileAsyncProductionService:
             knowledge_cutoff,
             _stage_budget_log_value(stage_budgets),
         )
-        recovery = await self.write_coordinator.run(
+        contract_recovery = await self._run_storage_operation(
+            self._run_contract_recovery
+        )
+        recovery = await self._run_storage_operation(
             self.repository.recover_completed_without_evidence
         )
-        stale_scope_recovery = await self.write_coordinator.run(
+        stale_scope_recovery = await self._run_storage_operation(
             self.repository.recover_stale_scope_items,
             processing_identity=processing_identity,
         )
-        structured_recovery = await self.write_coordinator.run(
+        structured_recovery = await self._run_storage_operation(
             self.repository.recover_structured_semantic_retries
         )
         recovery["stale_scope"] = stale_scope_recovery
+        recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
@@ -1471,7 +1737,7 @@ class BusinessProfileAsyncProductionService:
                 "errors": [f"{type(exc).__name__}: {exc}"],
             }
         self._log_discovery(discovery)
-        enqueue = await self.write_coordinator.run(
+        enqueue = await self._run_storage_operation(
             self.repository.enqueue_latest_annual,
             knowledge_cutoff=knowledge_cutoff,
             processing_identity=processing_identity,
@@ -1496,6 +1762,7 @@ class BusinessProfileAsyncProductionService:
             discovery=discovery,
             workers=workers,
         )
+        status, reason_codes, writer = self._apply_writer_health(status, reason_codes)
         report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
             "status": status,
@@ -1508,7 +1775,7 @@ class BusinessProfileAsyncProductionService:
             "workers": workers,
             "throughput": throughput,
             "queue_health": health,
-            "writer": self.write_coordinator.snapshot(),
+            "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
         self._log_completion(report)
@@ -1558,17 +1825,21 @@ class BusinessProfileAsyncProductionService:
             tuple(document_types),
             _stage_budget_log_value(stage_budgets or {}),
         )
-        recovery = await self.write_coordinator.run(
+        contract_recovery = await self._run_storage_operation(
+            self._run_contract_recovery
+        )
+        recovery = await self._run_storage_operation(
             self.repository.recover_completed_without_evidence
         )
-        stale_scope_recovery = await self.write_coordinator.run(
+        stale_scope_recovery = await self._run_storage_operation(
             self.repository.recover_stale_scope_items,
             processing_identity=processing_identity,
         )
-        structured_recovery = await self.write_coordinator.run(
+        structured_recovery = await self._run_storage_operation(
             self.repository.recover_structured_semantic_retries
         )
         recovery["stale_scope"] = stale_scope_recovery
+        recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
@@ -1603,7 +1874,7 @@ class BusinessProfileAsyncProductionService:
                 }
             self._log_discovery(discovery)
         if policy == "latest_annual_only":
-            enqueue = await self.write_coordinator.run(
+            enqueue = await self._run_storage_operation(
                 self.repository.enqueue_latest_annual,
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=processing_identity,
@@ -1614,7 +1885,7 @@ class BusinessProfileAsyncProductionService:
                 force=force,
             )
         elif policy == "expanded":
-            enqueue = await self.write_coordinator.run(
+            enqueue = await self._run_storage_operation(
                 self.repository.enqueue_scoped,
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=processing_identity,
@@ -1644,6 +1915,7 @@ class BusinessProfileAsyncProductionService:
             discovery=discovery,
             workers=workers,
         )
+        status, reason_codes, writer = self._apply_writer_health(status, reason_codes)
         report = {
             "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
             "status": status,
@@ -1657,11 +1929,21 @@ class BusinessProfileAsyncProductionService:
             "workers": workers,
             "throughput": throughput,
             "queue_health": await asyncio.to_thread(self.repository.health),
-            "writer": self.write_coordinator.snapshot(),
+            "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
         self._log_completion(report)
         return report
+
+    def _run_contract_recovery(self) -> dict[str, Any]:
+        from research.business_profile_contract_recovery import (
+            BusinessProfileContractRecovery,
+        )
+        from research.business_profile_governance import BusinessProfileRepository
+
+        return BusinessProfileContractRecovery(
+            BusinessProfileRepository(self.repository.storage)
+        ).run()
 
     async def _run_discovery_with_heartbeat(
         self,
@@ -1869,10 +2151,19 @@ class BusinessProfileAsyncProductionService:
         started = time.monotonic()
         claimed = completed = retried = failed = lease_conflicts = 0
         configuration_blocked = 0
+        machine_rework_deferred = 0
+        artifact_replay_deferred = 0
         claimed_work_ids: set[str] = set()
         quality_totals: dict[str, Any] = {}
         errors: list[dict[str, str]] = []
         stopped = False
+        effective_concurrency = budget.max_concurrency
+        throttled_requests = 0
+        provider_congestion_events = 0
+        provider_congestion_failures = 0
+        admitted_requests = 0
+        empty_polls = 0
+        empty_poll_delay_seconds = 0.05
         lease_owner = f"async-{stage}-{get_shanghai_time().strftime('%Y%m%d%H%M%S%f')}"
         logger.info(
             "business-profile stage start stage=%s max_items=%s concurrency=%s "
@@ -1890,29 +2181,53 @@ class BusinessProfileAsyncProductionService:
             if time.monotonic() - started >= budget.max_elapsed_seconds:
                 break
             batch_limit = min(
-                budget.max_concurrency,
+                effective_concurrency,
                 budget.max_items - claimed,
             )
-            items = await self.write_coordinator.run(
-                self.repository.claim,
-                stage,
-                limit=batch_limit,
-                lease_owner=lease_owner,
-                lease_seconds=self.lease_seconds,
-                processing_identity_hash=processing_identity_hash,
-                exclude_work_ids=tuple(claimed_work_ids),
-            )
+            before_provider_congestion_failures = provider_congestion_failures
+            claim_kwargs = {
+                "processing_identity_hash": processing_identity_hash,
+                "exclude_work_ids": tuple(claimed_work_ids),
+            }
+            probe = getattr(self.repository, "has_claimable", None)
+            claimable = True
+            if callable(probe):
+                claimable = await asyncio.to_thread(
+                    probe,
+                    stage,
+                    **claim_kwargs,
+                )
+            items = ()
+            if claimable:
+                items = await self._run_storage_operation(
+                    self.repository.claim,
+                    stage,
+                    limit=batch_limit,
+                    lease_owner=lease_owner,
+                    lease_seconds=self.lease_seconds,
+                    **claim_kwargs,
+                )
             if not items:
+                empty_polls += 1
                 if upstream_done is None or upstream_done.is_set():
                     break
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(empty_poll_delay_seconds)
+                empty_poll_delay_seconds = min(
+                    0.5,
+                    empty_poll_delay_seconds * 2,
+                )
                 continue
+            empty_poll_delay_seconds = 0.05
             claimed += len(items)
+            admitted_requests += len(items)
+            throttled_requests += max(0, budget.max_concurrency - len(items))
             claimed_work_ids.update(str(item["work_id"]) for item in items)
 
             async def run_one(item: Mapping[str, Any]) -> None:
                 nonlocal completed, retried, failed, lease_conflicts
-                nonlocal configuration_blocked
+                nonlocal configuration_blocked, machine_rework_deferred
+                nonlocal artifact_replay_deferred
+                nonlocal provider_congestion_failures
                 try:
                     result = dict(await self.stage_runner(stage, item))
                     quality = dict(result.get("quality") or {})
@@ -1939,6 +2254,7 @@ class BusinessProfileAsyncProductionService:
                         "outline_confidences",
                         "empty_output_reasons",
                         "blocked_configuration_reasons",
+                        "machine_rework_reasons",
                     ):
                         target = quality_totals.setdefault(counter_name, {})
                         for label, count in dict(
@@ -1955,7 +2271,7 @@ class BusinessProfileAsyncProductionService:
                                 )
                             )
                         )
-                        deferred_status = await self.write_coordinator.run(
+                        deferred_status = await self._run_storage_operation(
                             self.repository.defer_configuration,
                             str(item["work_id"]),
                             lease_owner=lease_owner,
@@ -1970,19 +2286,52 @@ class BusinessProfileAsyncProductionService:
                         else:
                             lease_conflicts += 1
                         return
-                    status = str(result.get("status") or "").lower()
-                    if status not in {"success", "completed", "unchanged"}:
-                        raise RuntimeError(
-                            str(result.get("reason") or status or "stage_failed")
-                        )
                     if quality and not bool(quality.get("stage_ready", True)):
+                        machine_rework_reasons = dict(
+                            quality.get("machine_rework_reasons") or {}
+                        )
+                        if int(quality.get("blocking_machine_rework") or 0) > 0 and (
+                            "gateway_failure" not in machine_rework_reasons
+                        ):
+                            reasons = ",".join(
+                                sorted(machine_rework_reasons)
+                            )
+                            deferred_status = await self._run_storage_operation(
+                                self.repository.finalize_machine_rework,
+                                str(item["work_id"]),
+                                lease_owner=lease_owner,
+                                reason=(
+                                    "machine_rework:"
+                                    + (reasons or "classified_quality_rejection")
+                                ),
+                                result=result,
+                            )
+                            if deferred_status == "machine_rework":
+                                machine_rework_deferred += 1
+                            elif deferred_status == "artifact_replay_deferred":
+                                artifact_replay_deferred += 1
+                            else:
+                                lease_conflicts += 1
+                            return
+                        if stage == "semantic" and "gateway_failure" in (
+                            machine_rework_reasons
+                        ):
+                            raise RuntimeError(
+                                "business-profile semantic provider congestion: "
+                                "gateway_failure"
+                            )
                         raise RuntimeError(
                             "business-profile stage quality gate failed: "
                             f"stage={stage} "
                             f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)} "
                             f"selected_documents={int(quality.get('selected_documents') or 0)}"
                         )
-                    await self.write_coordinator.run(
+                    status = str(result.get("status") or "").lower()
+                    if status not in {"success", "completed", "unchanged"}:
+                        raise RuntimeError(
+                            str(result.get("reason") or status or "stage_failed")
+                        )
+                    await self._run_storage_operation(
                         self.repository.acknowledge,
                         str(item["work_id"]),
                         lease_owner=lease_owner,
@@ -1990,7 +2339,9 @@ class BusinessProfileAsyncProductionService:
                     )
                     completed += 1
                 except Exception as exc:
-                    terminal_status = await self.write_coordinator.run(
+                    if stage == "semantic" and _is_provider_congestion_error(exc):
+                        provider_congestion_failures += 1
+                    terminal_status = await self._run_storage_operation(
                         self.repository.fail,
                         str(item["work_id"]),
                         lease_owner=lease_owner,
@@ -2055,6 +2406,8 @@ class BusinessProfileAsyncProductionService:
                                 - retried
                                 - failed
                                 - configuration_blocked
+                                - machine_rework_deferred
+                                - artifact_replay_deferred
                                 - lease_conflicts,
                             ),
                             claimed,
@@ -2073,10 +2426,21 @@ class BusinessProfileAsyncProductionService:
                 except asyncio.CancelledError:
                     pass
                 raise
+            if stage == "semantic":
+                batch_provider_congestion = (
+                    provider_congestion_failures
+                    - before_provider_congestion_failures
+                )
+                if batch_provider_congestion:
+                    provider_congestion_events += 1
+                    effective_concurrency = max(1, effective_concurrency // 2)
+                elif effective_concurrency < budget.max_concurrency:
+                    effective_concurrency += 1
             logger.info(
                 "business-profile stage batch stage=%s batch_size=%s claimed=%s "
                 "completed=%s retried=%s terminal_failures=%s "
-                "configuration_blocked=%s lease_conflicts=%s elapsed_seconds=%.3f",
+                "configuration_blocked=%s machine_rework_deferred=%s "
+                "artifact_replay_deferred=%s lease_conflicts=%s elapsed_seconds=%.3f",
                 stage,
                 len(items),
                 claimed,
@@ -2084,6 +2448,8 @@ class BusinessProfileAsyncProductionService:
                 retried,
                 failed,
                 configuration_blocked,
+                machine_rework_deferred,
+                artifact_replay_deferred,
                 lease_conflicts,
                 time.monotonic() - started,
             )
@@ -2099,20 +2465,38 @@ class BusinessProfileAsyncProductionService:
             "terminal_failures": failed,
             "lease_conflicts": lease_conflicts,
             "configuration_blocked": configuration_blocked,
+            "machine_rework_deferred": machine_rework_deferred,
+            "artifact_replay_deferred": artifact_replay_deferred,
             "claim_exclusions": len(claimed_work_ids),
+            "empty_polls": empty_polls,
             "errors": errors[:20],
             "quality": quality_totals,
             "elapsed_seconds": round(time.monotonic() - started, 3),
             "writer": self.write_coordinator.snapshot(),
+            "gateway_admission": {
+                "requested_concurrency": budget.max_concurrency,
+                "effective_concurrency": effective_concurrency,
+                "admitted_requests": admitted_requests,
+                "throttled_requests": throttled_requests,
+                "provider_congestion_events": provider_congestion_events,
+                "provider_congestion_failures": provider_congestion_failures,
+                "in_flight": 0,
+            },
         }
         log = (
             logger.warning
-            if failed or retried or configuration_blocked
+            if failed
+            or retried
+            or configuration_blocked
+            or machine_rework_deferred
+            or artifact_replay_deferred
             else logger.info
         )
         log(
             "business-profile stage end stage=%s status=%s claimed=%s completed=%s "
             "retried=%s terminal_failures=%s configuration_blocked=%s "
+            "machine_rework_deferred=%s "
+            "artifact_replay_deferred=%s "
             "lease_conflicts=%s claim_exclusions=%s elapsed_seconds=%s writer=%s",
             stage,
             result["status"],
@@ -2121,6 +2505,8 @@ class BusinessProfileAsyncProductionService:
             retried,
             failed,
             configuration_blocked,
+            machine_rework_deferred,
+            artifact_replay_deferred,
             lease_conflicts,
             result["claim_exclusions"],
             result["elapsed_seconds"],
@@ -2159,6 +2545,8 @@ def _business_profile_operation_status(
         ("retried", "worker_retries"),
         ("terminal_failures", "worker_terminal_failures"),
         ("configuration_blocked", "worker_configuration_blocked"),
+        ("machine_rework_deferred", "worker_machine_rework_deferred"),
+        ("artifact_replay_deferred", "worker_artifact_replay_deferred"),
         ("lease_conflicts", "worker_lease_conflicts"),
     )
     for counter, reason in counter_reasons:
@@ -2176,7 +2564,9 @@ def parse_stage_budgets(value: Mapping[str, Any] | None) -> dict[str, StageBudge
         payload = dict(raw or {})
         output[normalized] = StageBudget(
             max_items=int(payload.get("max_items", 10)),
-            max_concurrency=int(payload.get("max_concurrency", 2)),
+            max_concurrency=int(
+                payload.get("max_concurrency", 10 if normalized == "semantic" else 2)
+            ),
             max_elapsed_seconds=float(payload.get("max_elapsed_seconds", 300.0)),
             high_water_mark=int(payload.get("high_water_mark", 1000)),
         )
@@ -2354,6 +2744,32 @@ def _retryable(exc: Exception) -> bool:
     return isinstance(exc, (OSError, RuntimeError, TimeoutError, asyncio.TimeoutError))
 
 
+def _is_provider_congestion_error(exc: Exception) -> bool:
+    code = str(getattr(exc, "code", "") or "").strip().lower()
+    if code in {
+        "rate_limit_error",
+        "transient_transport_error",
+        "deadline_exceeded",
+    }:
+        return True
+    if code == "provider_error" and bool(getattr(exc, "retryable", False)):
+        return True
+    if isinstance(exc, (TimeoutError, asyncio.TimeoutError, ConnectionError)):
+        return True
+    text = str(exc).strip().lower()
+    return any(
+        marker in text
+        for marker in (
+            "gateway_failure",
+            "provider congestion",
+            "rate limit",
+            "http 429",
+            "timed out",
+            "timeout",
+        )
+    )
+
+
 def _evidence_free_stage(stage_results: Mapping[str, Any]) -> str | None:
     """Return the earliest stage proven to have blocked evidence production."""
 
@@ -2470,6 +2886,19 @@ def _business_profile_throughput(
         "worker_completed": int(stage_completed.get("publish") or 0),
         "stage_completed": stage_completed,
     }
+
+
+def _percentile(values: Sequence[float], percentile: int) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(float(value) for value in values)
+    if len(ordered) == 1:
+        return ordered[0]
+    rank = (len(ordered) - 1) * max(0, min(int(percentile), 100)) / 100
+    lower = int(rank)
+    upper = min(lower + 1, len(ordered) - 1)
+    fraction = rank - lower
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
 
 
 def _canonical_json(value: Any) -> str:

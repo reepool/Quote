@@ -6,7 +6,9 @@ import pytest
 
 from research.business_profile_unit_conversions import (
     DEFAULT_UNIT_CONVERSION_CATALOG_PATH,
+    UnitResolution,
     load_unit_conversion_catalog,
+    normalize_unit_lexeme,
     parse_unit_conversion_catalog,
 )
 from research.business_profile_fact_catalog import load_business_fact_catalog
@@ -24,7 +26,7 @@ def test_default_unit_catalog_has_canonical_unit_for_each_dimension():
         unit.dimension for unit in catalog.units if unit.canonical_for_dimension
     }
 
-    assert catalog.catalog_version == "business_profile_units.2026.2"
+    assert catalog.catalog_version == "business_profile_units.2026.4"
     assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
     assert dimensions == canonical_dimensions
     assert len(catalog.units) == 37
@@ -190,3 +192,83 @@ def test_loader_rejects_fact_catalog_version_mismatch(tmp_path):
 
     with pytest.raises(ValueError, match="fact catalog version mismatch"):
         load_unit_conversion_catalog(path)
+
+
+@pytest.mark.parametrize(
+    ("raw_unit", "dimension", "canonical", "multiplier"),
+    [
+        ("千只", "count", "unit", Decimal("1000")),
+        ("万台（套）", "count", "unit", Decimal("10000")),
+        ("亿千瓦时", "energy", "kwh", Decimal("100000000")),
+        ("kW", "power", "watt", Decimal("1000")),
+        ("元/吨", "price_per_mass", "CNY/tonne", Decimal("1")),
+        ("元/公斤", "price_per_mass", "CNY/tonne", Decimal("1000")),
+        ("吨每年", "mass_capacity", "tonne/year", Decimal("1")),
+        ("CNY hundred million", "currency", "CNY", Decimal("100000000")),
+        ("人民币元", "currency", "CNY", Decimal("1")),
+    ],
+)
+def test_compositional_resolution_handles_chinese_and_si_units(
+    raw_unit, dimension, canonical, multiplier
+):
+    catalog = load_unit_conversion_catalog()
+    resolution = catalog.resolve(raw_unit)
+    assert isinstance(resolution, UnitResolution)
+    assert resolution.status == "resolved"
+    assert resolution.dimension == dimension
+    assert resolution.canonical_unit == canonical
+    assert resolution.multiplier == multiplier
+
+
+def test_unknown_unit_is_pending_and_does_not_raise():
+    resolution = load_unit_conversion_catalog().resolve("每百枚神秘单位")
+    assert resolution.status == "unit_resolution_pending"
+    assert resolution.publishable is False
+    assert resolution.reason in {"unknown_unit_token", "unsupported_compound_unit"}
+
+
+def test_unit_normalization_is_unicode_and_punctuation_stable():
+    assert normalize_unit_lexeme("  万台（套） ") == "万台(套)"
+    assert normalize_unit_lexeme("吨每年") == "吨/年"
+    assert normalize_unit_lexeme("（%）") == "%"
+    assert normalize_unit_lexeme("[(元/吨)]") == "元/吨"
+
+
+def test_enclosed_ratio_unit_resolves_without_changing_source_lineage():
+    resolution = load_unit_conversion_catalog().resolve(
+        "（%）", required_dimension="ratio"
+    )
+
+    assert resolution.status == "resolved"
+    assert resolution.source_unit == "（%）"
+    assert resolution.normalized_lexeme == "%"
+    assert resolution.canonical_unit == "fraction"
+    assert resolution.multiplier == Decimal("0.01")
+
+
+def test_runtime_auto_approved_overlay_is_publishable_and_shadow_is_opt_in():
+    catalog = load_unit_conversion_catalog()
+    rules = [
+        {
+            "rule_id": "runtime:箱",
+            "normalized_lexeme": "箱",
+            "dimension": "count",
+            "canonical_unit": "unit",
+            "multiplier": "24",
+            "status": "auto_approved",
+        },
+        {
+            "rule_id": "runtime:托",
+            "normalized_lexeme": "托",
+            "dimension": "count",
+            "canonical_unit": "unit",
+            "multiplier": "10",
+            "status": "shadow_active",
+        },
+    ]
+    assert catalog.resolve("箱", runtime_rules=rules).publishable
+    assert catalog.resolve("托", runtime_rules=rules).status == "unit_resolution_pending"
+    assert (
+        catalog.resolve("托", runtime_rules=rules, allow_shadow=True).status
+        == "shadow_active"
+    )

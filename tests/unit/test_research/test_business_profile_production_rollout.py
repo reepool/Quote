@@ -14,6 +14,14 @@ from research.business_profile_production_rollout import (
     parse_business_profile_rollout_config,
     resolve_business_profile_runtime_identities,
 )
+from research.business_profile_semantic_artifacts import (
+    BusinessProfileSemanticArtifactRepository,
+    SemanticArtifactIdentity,
+)
+from research.business_profile_semantic_extraction import (
+    STRUCTURED_EXTRACTION_PROMPT_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+)
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
 from utils.config_manager import UnifiedConfigManager
 
@@ -70,9 +78,9 @@ def test_runtime_identity_is_derived_and_explicit_values_must_match():
     assert first == second
     assert set(first) == RUNTIME_IDENTITY_KEYS
     assert "business_profile_semantic_schemas.v2" in first["schema"]
-    assert "business_profile_atomic_extraction.v3" in first["schema"]
-    assert "business_profile_structured_extraction.v3" in first["schema"]
-    assert "business_profile_structured_extraction.v3" in first["policy"]
+    assert "business_profile_atomic_extraction.v4" in first["schema"]
+    assert "business_profile_structured_extraction.v4" in first["schema"]
+    assert "business_profile_structured_extraction.v4" in first["policy"]
     assert "logical_profile=semantic_extraction" in first["model"]
     assert llm_config.route_fingerprint("semantic_extraction") in first["model"]
     assert (
@@ -211,6 +219,85 @@ def test_rollout_status_reports_field_completion_and_exception_backlog(tmp_path)
     assert status["open_deep_review"] == 1
 
 
+def test_rollout_status_observes_repeated_llm_calls_after_conversion_pending(tmp_path):
+    storage = _storage(tmp_path)
+    phase = parse_business_profile_rollout_config(_payload()).phase()
+    identities = {key: f"{key}.v1" for key in RUNTIME_IDENTITY_KEYS}
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="600000.SH",
+        source_document_id="annual-2025",
+        document_hash="d" * 64,
+        report_period="2025-12-31",
+        field_family="structured_segments",
+        evidence_scope_hash="e" * 64,
+        input_hash="i" * 64,
+        prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
+        schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    )
+    first = artifacts.receive(
+        identity,
+        response={"rows": [{"source_unit_raw": "未知单位", "source_value": "1"}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    artifacts.mark(first["artifact_id"], "conversion_pending")
+    artifacts.receive(
+        identity,
+        response={"rows": [{"source_unit_raw": "未知单位", "source_value": "2"}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+
+    status = build_business_profile_rollout_status(
+        storage,
+        phase=phase,
+        active_universe_count=1,
+        manifests={},
+        runtime_identities=identities,
+    )
+
+    assert status["repeated_conversion_llm_calls"] == 1
+
+
+def test_rollout_status_counts_numeric_failures_from_open_exceptions(tmp_path):
+    storage = _storage(tmp_path)
+    phase = parse_business_profile_rollout_config(_payload()).phase()
+    identities = {key: f"{key}.v1" for key in RUNTIME_IDENTITY_KEYS}
+    now = "2026-08-09T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_exceptions ("
+            "exception_id, target_type, target_id, instrument_id, field_family, "
+            "tier, reason_codes_json, gate_signature, gate_manifest_hash, "
+            "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                "numeric-exception",
+                "document_field_family",
+                "work-1",
+                "600000.SH",
+                "structured_segments",
+                "machine_rework",
+                json.dumps(["numeric_reconciliation_failed"]),
+                "gate-numeric",
+                "manifest-numeric",
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+
+    status = build_business_profile_rollout_status(
+        storage,
+        phase=phase,
+        active_universe_count=1,
+        manifests={},
+        runtime_identities=identities,
+    )
+
+    assert status["numeric_reconciliation_failures"] == 1
+
+
 def test_daily_readiness_requires_complete_discovery_queue_and_field_families():
     payload = _payload()
     payload["active_phase"] = "daily_incremental"
@@ -342,6 +429,73 @@ def test_phase_readiness_waits_for_in_flight_queue_leases():
     assert readiness["phase_ready"] is False
     assert readiness["running_work_items"] == 1
     assert "running_work_remaining" in readiness["phase_reason_codes"]
+
+
+@pytest.mark.parametrize(
+    ("status_patch", "reason_code"),
+    [
+        ({"language_contract_violations": 1}, "language_contract_violations_present"),
+        ({"unproved_unit_publications": 1}, "unproved_unit_publication_present"),
+        (
+            {"numeric_reconciliation_failures": 1},
+            "numeric_reconciliation_failures_present",
+        ),
+        (
+            {"repeated_conversion_llm_calls": 1},
+            "conversion_repeated_llm_call_present",
+        ),
+        ({"approved_history_blockers": 1}, "approved_history_blocker_present"),
+        (
+            {"writer": {"writer_lock_duty": 0.61}},
+            "writer_lock_duty_exceeded",
+        ),
+        (
+            {"writer": {"transaction_p95_seconds": 0.51}},
+            "writer_p95_exceeded",
+        ),
+        (
+            {
+                "gateway_admission": {
+                    "admitted_requests": 10,
+                    "provider_congestion_events": 2,
+                }
+            },
+            "gateway_congestion_exceeded",
+        ),
+    ],
+)
+def test_structured_readiness_fails_closed_for_every_production_blocker(
+    status_patch, reason_code
+):
+    payload = _payload()
+    phase = parse_business_profile_rollout_config(payload).phase("structured_shadow")
+    rollout_status = {
+        "field_families": {
+            family: {"completion_ratio": 1.0, "manifest_ready": False}
+            for family in phase.field_families
+        },
+        "open_machine_rework": 0,
+        "open_quick_review": 0,
+        "open_deep_review": 0,
+        **status_patch,
+    }
+
+    readiness = evaluate_business_profile_rollout_readiness(
+        phase=phase,
+        queue_health={"claimable": 0, "running": 0, "terminal": 0},
+        discovery={"status": "success", "discovery_window_backlog": 0},
+        reconciliation={
+            "active_universe_count": 100,
+            "current_annual_instrument_count": 100,
+            "stalled_frontier_count": 0,
+        },
+        rollout_status=rollout_status,
+        readiness=payload["readiness"],
+        scheduler_enabled=False,
+    )
+
+    assert readiness["phase_ready"] is False
+    assert reason_code in readiness["phase_reason_codes"]
 
 
 def test_daily_and_disabled_backfill_phase_stop_before_storage_initialization():

@@ -26,7 +26,15 @@
       "maximum_open_machine_rework": 0,
       "maximum_open_quick_review": 100,
       "maximum_open_deep_review": 50,
-      "maximum_stalled_frontier": 0
+      "maximum_stalled_frontier": 0,
+      "maximum_language_contract_violations": 0,
+      "maximum_unproved_unit_publications": 0,
+      "maximum_numeric_reconciliation_failures": 0,
+      "maximum_repeated_conversion_llm_calls": 0,
+      "maximum_writer_lock_duty": 0.60,
+      "maximum_writer_p95_seconds": 0.50,
+      "maximum_gateway_congestion_rate": 0.10,
+      "maximum_approved_history_blockers": 0
     },
     "promotion_manifests": {},
     "phases": {
@@ -43,7 +51,7 @@
         "stage_budgets": {
           "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
           "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
-          "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "semantic": {"max_items": 20, "max_concurrency": 10, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
           "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
         }
       },

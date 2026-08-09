@@ -314,9 +314,19 @@ Kill switch 不删除事实、候选、审核、异常或历史发布版本。
 批准候选事实；否则调度器无法自动发现到期重试。重试耗尽后的记录不再自动
 入队，quick/deep review 也不参与自动重试。
 
-确定性数值解析绑定单位目录 `business_profile_units.2026.2`。其中 `万元`
-固定换算为 `CNY * 10000`，`万吨` 固定换算为 `tonne * 10000`；未知单位在
-bundle 写入前失败关闭，不允许部分事实落库。
+确定性数值解析绑定单位目录 `business_profile_units.2026.4`。其中 `万元`
+固定换算为 `CNY * 10000`，`万吨` 固定换算为 `tonne * 10000`，并通过 NFKC、
+中文/SI 数量级、量词和复合单位语法解析 `千只`、`万台（套）`、`亿千瓦时`、
+`kW` 等单位。LLM 只返回年报中的原始数值和原始单位；换算、百分比、比例、
+合计、差值、毛利率、排名、重要性、置信度和数值暴露全部由版本化程序计算。
+
+未知单位不会丢弃已经成功的语义响应。系统先把闭合 schema 和证据范围验证后的
+响应写入 `business_profile_semantic_artifacts`，再把转换状态追加到
+`business_profile_semantic_artifact_events`。单位规则按 `proposed ->
+shadow_active -> auto_approved/quarantined -> superseded` 追加记录；只有已经提交
+确定性证明和目录版本的 `auto_approved` 规则可进入规范值和发布。`shadow_active`
+只允许不可发布的影子计算。目录升级或规则纠正会自动重放受影响工件，抽取 LLM
+token 计数必须为零。
 
 ## 7. 例外人工处理
 
@@ -381,6 +391,39 @@ signature 和排序后的本地候选。
 选择的公告和页数、确定性完成率、
 LLM 调用和 token、成本、延迟、自动晋级、机器返工恢复、quick/deep review、
 unsupported output、冲突、漂移、检查点身份和候选估值泄漏数。
+
+结构化影子阶段的 semantic 并发上限为 10；共享 LLM 网关仍可按 provider 限额、
+排队和拥塞自适应实际准入更少请求。运行报告应同时包含 requested、admitted、
+in-flight、throttled 和 provider-congestion。SQLite 始终只有一个逻辑 writer，
+报告还必须包含事务 p50/p95/max、writer lock duty、累计等待、写间空闲和
+`initialization_count=1`。超过配置阈值时任务状态为 degraded，但队列保持可续传。
+
+调试期将 `research.business_profile_semantic_extraction`、
+`research.business_profile_semantic_runtime` 和
+`research.business_profile_async_production` 设为 DEBUG。日志可查看模型中文语义
+摘要、来源字段、工件 ID、转换状态、规则 ID、程序核验输入/结果及重放节省 token；
+不得记录完整公告、响应正文、Cookie 或密钥。常用只读查询：
+
+```sql
+SELECT artifact_id, instrument_id, field_family, input_hash, response_hash, received_at
+FROM business_profile_semantic_artifacts
+ORDER BY received_at DESC LIMIT 20;
+
+SELECT r.rule_id, r.source_unit, r.status, r.dimension, r.multiplier,
+       r.catalog_version, r.created_at
+FROM business_profile_unit_rules r
+ORDER BY r.created_at DESC LIMIT 30;
+
+SELECT artifact_id, status, unit_catalog_version, reason_code,
+       saved_input_tokens + saved_output_tokens AS saved_tokens, created_at
+FROM business_profile_semantic_artifact_events
+ORDER BY created_at DESC LIMIT 30;
+```
+
+若数值核验失败，检查候选 metadata 中的 `numeric_reconciliation`，同时比较
+`reported_value`、`calculated_value`、`difference` 和 `tolerance`。程序不覆盖
+年报报告值；整组语义候选保持不可发布并从最早可复用阶段自动续做。已批准历史
+不会静默修改，而是在 `business_profile_readiness_blockers` 中阻断 promotion。
 
 人工工作量的目标指标是 quick/deep review 比率，而不是总候选数。异常积压
 优先通过 reason-code 聚类推动 parser、selector、catalog 和规则自动修复。

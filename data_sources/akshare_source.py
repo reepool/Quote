@@ -23,6 +23,11 @@ from .adjustment_config import AdjustmentConfig
 from utils.exceptions import DataSourceError, NetworkError, ErrorCodes
 from utils import log_execution, data_source_metrics, config_manager, get_shanghai_time, exchange_mapper
 from utils import akshare_logger
+from .sina_factor_parser import (
+    MAX_SINA_FACTOR_BODY_BYTES,
+    SinaFactorParseError,
+    parse_sina_qfq_factor_response,
+)
 
 
 class AkShareSource(BaseDataSource):
@@ -40,6 +45,8 @@ class AkShareSource(BaseDataSource):
         "fallback_on_invalid_response": True,
         "rounding_tolerance": 0.0001,
         "diagnostic_hfq_check_enabled": False,
+        "request_timeout_seconds": 30.0,
+        "max_response_bytes": MAX_SINA_FACTOR_BODY_BYTES,
     }
     _HK_FACTOR_RATIO_REL_TOL = 0.0005
     _HK_FACTOR_RATIO_ABS_TOL = 0.0005
@@ -1689,8 +1696,15 @@ class AkShareSource(BaseDataSource):
             threshold = float(cfg.get("rounding_tolerance", 0.0001))
 
             await self.rate_limiter.acquire()
+            if factor_adjust != "qfq-factor":
+                raise ValueError(f"unsupported HK factor adjustment: {factor_adjust}")
             factor_df = await asyncio.to_thread(
-                ak.stock_hk_daily, symbol=symbol, adjust=factor_adjust
+                self._fetch_sina_hk_qfq_factor_frame,
+                symbol,
+                float(cfg.get("request_timeout_seconds", 30.0)),
+                str(base_date.date()),
+                require_base_date,
+                int(cfg.get("max_response_bytes", MAX_SINA_FACTOR_BODY_BYTES)),
             )
 
             if factor_df is None or factor_df.empty:
@@ -1762,11 +1776,82 @@ class AkShareSource(BaseDataSource):
             )
             return factors
 
-        except Exception as e:
+        except SinaFactorParseError as e:
             akshare_logger.warning(
-                f"[{self.name}] Failed to get HK adjustment factors for {symbol}: {e}"
+                "[%s] HK factor parser failure provider=sina endpoint_family=hk_qfq_factor "
+                "symbol=%s status=%s response_hash=%s error_type=%s error_code=%s",
+                self.name,
+                symbol,
+                e.http_status,
+                e.response_hash,
+                type(e).__name__,
+                e.code,
+            )
+            akshare_logger.debug(
+                "[%s] HK factor parser traceback symbol=%s error_code=%s",
+                self.name,
+                symbol,
+                e.code,
+                exc_info=True,
             )
             return None if cfg.get("fallback_on_invalid_response", True) else []
+        except Exception as e:
+            akshare_logger.warning(
+                "[%s] HK factor acquisition failure provider=sina "
+                "endpoint_family=hk_qfq_factor symbol=%s status=%s "
+                "response_hash=%s error_type=%s error_code=%s",
+                self.name,
+                symbol,
+                None,
+                None,
+                type(e).__name__,
+                "network_or_transport_error",
+            )
+            akshare_logger.debug(
+                "[%s] HK factor acquisition traceback symbol=%s",
+                self.name,
+                symbol,
+                exc_info=True,
+            )
+            return None if cfg.get("fallback_on_invalid_response", True) else []
+
+    @staticmethod
+    def _fetch_sina_hk_qfq_factor_frame(
+        symbol: str,
+        request_timeout_seconds: float,
+        base_date: str,
+        require_base_date: bool,
+        max_response_bytes: int,
+    ) -> pd.DataFrame:
+        """Fetch and safely parse Sina's HK qfq-factor assignment payload."""
+
+        from akshare.stock.stock_hk_sina import (
+            hk_sina_stock_hist_qfq_url,
+            requests as sina_requests,
+        )
+
+        timeout_seconds = max(1.0, float(request_timeout_seconds))
+        connect_timeout = min(10.0, timeout_seconds)
+        try:
+            response = sina_requests.get(
+                hk_sina_stock_hist_qfq_url.format(symbol),
+                timeout=(connect_timeout, timeout_seconds),
+            )
+        except sina_requests.exceptions.Timeout as exc:
+            raise TimeoutError(
+                f"Sina HK qfq-factor request timed out for {symbol}"
+            ) from exc
+        rows = parse_sina_qfq_factor_response(
+            response.content,
+            http_status=int(response.status_code),
+            base_date=base_date,
+            require_base_date=require_base_date,
+            max_body_bytes=max_response_bytes,
+        )
+        frame = pd.DataFrame(rows, columns=["date", "qfq_factor"])
+        frame["date"] = pd.to_datetime(frame["date"], errors="raise")
+        frame["qfq_factor"] = pd.to_numeric(frame["qfq_factor"], errors="raise")
+        return frame
 
     async def close(self):
         """关闭AkShare数据源连接和资源"""
