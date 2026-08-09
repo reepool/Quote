@@ -52,6 +52,11 @@ The migration SHALL recognize valid existing annual-report files and MAY retain 
 - **THEN** cleanup SHALL default to dry-run and use a per-file manifest/hash allowlist
 - **AND** no excluded file or directory SHALL be deleted
 
+#### Scenario: Legacy duplicate path is removed
+- **WHEN** a verified business-owned duplicate is approved for cleanup after cutover
+- **THEN** a versioned rollback manifest SHALL map its prior path and consumer identity to the shared asset and content hash
+- **AND** reconstruction from a verified canonical or backup blob SHALL be tested before unlink
+
 ### Requirement: Filings Storage Has Capacity And Backup Gates
 The archive SHALL enforce configurable free-space thresholds, planned-download preflight, and incremental backup state independently from SQLite database backup.
 
@@ -78,13 +83,23 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 
 #### Scenario: Filings backup is verified
 - **WHEN** canonical attachment files are replicated to the configured NAS target
-- **THEN** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, catalog snapshot or manifest watermark, completion time, and errors
+- **THEN** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, a file manifest watermark paired with a recoverable catalog database snapshot, completion time, and errors
 
 #### Scenario: Backup target shares the primary storage host
 - **WHEN** the configured destination resolves to the same server or storage failure domain as the primary filings mount
 - **THEN** the copy SHALL be reported as non-independent and SHALL NOT satisfy physical-deletion readiness
 
+#### Scenario: Backup target capacity is low
+- **WHEN** planned or streamed backup bytes would cross the target warning threshold, hard stop, or absolute free-space reserve
+- **THEN** the backup SHALL warn, checkpoint, or fail according to the configured gate without publishing partial content
+- **AND** local source assets SHALL remain valid while destructive readiness remains blocked
+
+#### Scenario: Backup retention is evaluated
+- **WHEN** superseded content-addressed blobs remain on the backup target
+- **THEN** version 1 SHALL retain them as non-consumer-visible recovery content
+- **AND** it SHALL NOT automatically garbage-collect them without a separately approved retention specification
+
 #### Scenario: A paired restore is performed
 - **WHEN** catalog and filing assets are restored from backup
-- **THEN** their snapshot or manifest watermarks SHALL be compatible and restored blobs SHALL pass size/hash verification
+- **THEN** the catalog database snapshot and paired file-manifest watermarks SHALL be compatible and restored blobs SHALL pass size/hash verification
 - **AND** consumers and destructive maintenance SHALL remain disabled until reconciliation completes

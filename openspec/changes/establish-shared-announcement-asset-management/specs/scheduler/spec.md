@@ -21,6 +21,11 @@ The scheduler SHALL expose `annual_report_asset_latest_backfill` as an annual-re
 - **WHEN** a prior backfill stopped with incomplete windows, pending instruments, or retryable downloads
 - **THEN** a subsequent execution SHALL resume durable work without reprocessing verified completed assets
 
+#### Scenario: Bootstrap completes before daily enablement
+- **WHEN** latest-only bootstrap and readiness gates complete successfully
+- **THEN** the scheduler SHALL persist a bootstrap-to-daily handoff cutoff and compatible per-source coverage watermarks
+- **AND** daily enablement SHALL use those watermarks with overlap so no publication interval is skipped
+
 ### Requirement: Annual-Report Asset Daily Update Has Its Own Schedule
 The scheduler SHALL provide `annual_report_asset_daily_update` with configuration and state independent from consuming business tasks.
 
@@ -66,6 +71,11 @@ Annual-report scheduler jobs SHALL use explicit network, time, storage, and work
 - **WHEN** a dense day cannot complete in one run
 - **THEN** the job SHALL resume stable page ranges or provider-supported subscopes under a fixed cutoff
 - **AND** it SHALL not advance the parent cursor until every child scope completes
+
+#### Scenario: A complete publication window has no records
+- **WHEN** all required source scopes complete successfully through the run cutoff without an in-range result
+- **THEN** the job SHALL still advance the range-coverage watermark to the cutoff
+- **AND** it SHALL report a successful empty window separately from an incomplete window
 
 #### Scenario: Job completes
 - **WHEN** a backfill or daily run completes

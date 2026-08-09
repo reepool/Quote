@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Formal Annual And Semiannual Reports Are Primary Broker Regulatory Sources
-The system SHALL use shared verified formal annual and semiannual report assets as the primary source for listed-broker regulatory capital and risk-control facts. Broker ingestion SHALL NOT independently discover, download, or archive a formal report when the shared asset capability supports that document type.
+For each periodic-report type enabled by the shared capability, the system SHALL use the shared verified formal asset as the primary source for listed-broker regulatory capital and risk-control facts. Version 1 enables shared annual reports but not shared semiannual reports. Broker ingestion SHALL NOT independently discover, download, or archive a formal report when the shared asset capability supports that document type.
 
 #### Scenario: Formal annual report is selected
 - **WHEN** the shared asset service exposes the effective formal annual report for a listed broker and report period

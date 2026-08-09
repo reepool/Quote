@@ -13,6 +13,11 @@ The Research Data Engine SHALL provide one stable annual-report asset dependency
 - **THEN** the shared service SHALL ensure that exact filing or return an explicit unavailable/integrity status
 - **AND** it SHALL not substitute a different legal filing solely because its content or title is similar
 
+#### Scenario: Consumer requests a superseded exact filing
+- **WHEN** a business work item requests a known predecessor whose bytes were deleted under version 1 retention
+- **THEN** the shared service SHALL return historical metadata with local content unavailable
+- **AND** ordinary consumer acquisition SHALL NOT redownload the superseded attachment
+
 #### Scenario: Consumer needs only local data
 - **WHEN** a research workflow runs with network calls disabled
 - **THEN** annual-report lookup SHALL be local-only and SHALL return an explicit missing status when unavailable
@@ -107,6 +112,11 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **WHEN** a metadata GET cannot resolve a local valid effective report
 - **THEN** the API SHALL return structured missing, metadata-only, corrupt, ambiguous, or blocked availability with last-checked evidence
 - **AND** it SHALL NOT convert a normal absence into an internal-server error or trigger acquisition
+
+#### Scenario: A served predecessor is provisional
+- **WHEN** a newer complete correction is known but has not passed acquisition and validation
+- **THEN** the API SHALL expose the predecessor's local availability separately from a provisional effective-decision state, pending correction identity, and stable reason code
+- **AND** business-facing clients SHALL NOT label the predecessor as an unqualified final latest-effective report
 
 #### Scenario: Client downloads an asset
 - **WHEN** a client requests an available asset by id

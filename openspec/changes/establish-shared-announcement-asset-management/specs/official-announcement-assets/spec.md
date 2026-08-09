@@ -155,8 +155,13 @@ The system SHALL provide a local-first `ensure` contract that returns a verified
 
 #### Scenario: Exact legal filing is requested
 - **WHEN** a consumer requests a source-qualified announcement or filing identity
-- **THEN** ensure SHALL return or acquire that exact filing under the caller's network and integrity policy
+- **THEN** ensure SHALL return or acquire that exact filing only when permitted by the caller's network, integrity, and version 1 retention policy
 - **AND** it SHALL NOT substitute a merely similar or newer legal filing
+
+#### Scenario: Exact filing is a deleted predecessor
+- **WHEN** the exact source-qualified filing is known to be superseded or withdrawn and its bytes were deleted under version 1 retention
+- **THEN** ordinary consumer and API ensure SHALL return its metadata with explicit local-content-unavailable status
+- **AND** it SHALL NOT redownload the predecessor or recreate a second physical attachment for that instrument and fiscal year
 
 ### Requirement: Latest-Only Historical Backfill Covers The Active A-Share Universe
 The system SHALL provide a resumable bootstrap that targets current active stock instruments on SSE, SZSE, and BSE and stores only the latest available effective annual-report attachment for each instrument.
@@ -165,6 +170,21 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 - **WHEN** the bootstrap discovers multiple fiscal years for an instrument
 - **THEN** it SHALL create one bootstrap effective record and physical attachment only for the latest available fiscal-year winner
 - **AND** it MAY retain non-winning discovery metadata for audit without downloading those attachments
+
+#### Scenario: Bootstrap derives fiscal-year search bounds
+- **WHEN** bootstrap evaluates an instrument at a fixed `as_of`
+- **THEN** a versioned policy SHALL deterministically derive the candidate upper year, disclosure-due year, and earliest searchable year from project timezone, fiscal-year end, listing date, configured disclosure-calendar boundary, provider coverage start, and bounded lookback
+- **AND** the version 1 default for a calendar-year A-share report SHALL use April 30 of the following year as the disclosure-due boundary, with any governed calendar override changing the policy fingerprint
+- **AND** it SHALL persist those inputs and outputs as coverage evidence
+
+#### Scenario: Newer fiscal year is not yet due
+- **WHEN** a completely scanned newer fiscal year contains no published full report before its configured disclosure-due boundary
+- **THEN** the newest actually published older report MAY remain the latest available asset
+- **AND** the not-yet-due year SHALL NOT be misreported as a provider failure or permanent missing report
+
+#### Scenario: Expected report is overdue
+- **WHEN** the configured disclosure-due boundary has passed and complete source coverage finds no expected report
+- **THEN** the overdue fiscal year SHALL remain a visible coverage gap with delay or missing evidence even if an older report is locally usable
 
 #### Scenario: Older valid files already exist before bootstrap
 - **WHEN** migration inventory finds valid annual reports from earlier fiscal years that are not the latest-only bootstrap winner
@@ -177,7 +197,7 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 
 #### Scenario: Instrument has no published annual report
 - **WHEN** a newly listed or otherwise uncovered active instrument has no valid full annual report
-- **THEN** the bootstrap SHALL record a confirmed missing or successful-empty coverage state with the searched bounds
+- **THEN** the bootstrap SHALL record `confirmed_missing` only after every eligible source and fiscal-year scope completes successfully and listing/source bounds prove the search empty
 - **AND** it SHALL remain eligible for bounded later repair and daily discovery
 
 #### Scenario: A newer fiscal-year search is incomplete
@@ -186,7 +206,7 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 - **AND** the instrument SHALL remain incomplete, retryable, or blocked
 
 #### Scenario: Confirmed missing evidence expires
-- **WHEN** a successful-empty decision reaches its configured expiry or its source/query fingerprint changes
+- **WHEN** `confirmed_missing` evidence reaches its configured expiry or its source/query fingerprint changes
 - **THEN** the instrument SHALL reenter bounded coverage repair
 
 #### Scenario: Latest correction cannot be verified during bootstrap
@@ -212,7 +232,18 @@ The daily annual-report update SHALL use category-filtered market discovery, dur
 
 #### Scenario: Normal daily run resumes
 - **WHEN** a committed annual-report cursor exists for a source, exchange, and normalized category scope
-- **THEN** the run SHALL begin from the committed watermark minus the configured calendar-day overlap and end at the run cutoff
+- **THEN** the run SHALL begin from the committed range-coverage watermark `covered_until` minus the configured calendar-day overlap and end at one fixed run cutoff
+- **AND** provider item position SHALL be persisted separately from completed time-range coverage
+
+#### Scenario: A complete daily window is empty
+- **WHEN** every page and required source scope completes successfully through the fixed run cutoff but yields no in-range annual-report record
+- **THEN** the system SHALL atomically advance `covered_until` to that cutoff
+- **AND** a later run SHALL start from the advanced watermark minus overlap rather than repeatedly scanning from the last announcement timestamp
+
+#### Scenario: Bootstrap hands off to daily maintenance
+- **WHEN** bootstrap has completed an equivalent source/exchange/category scope through its fixed cutoff and daily readiness gates pass
+- **THEN** daily mode SHALL adopt the compatible per-scope coverage watermark and begin from it minus overlap
+- **AND** any scope without compatible complete bootstrap coverage SHALL use only the configured bounded initial filing-season window
 
 #### Scenario: Daily discovery finds a new complete original report
 - **WHEN** the version 1 daily window discovers an eligible complete annual-report original for an active A-share instrument
@@ -251,6 +282,16 @@ The daily annual-report update SHALL use category-filtered market discovery, dur
 #### Scenario: A correction is indexed late
 - **WHEN** a correction whose publication time falls outside the normal overlap appears later at the provider
 - **THEN** a bounded rotating long-lookback reconciliation of already-covered instruments SHALL discover it within the configured maximum reconciliation period
+
+#### Scenario: An old managed fiscal year receives a very late correction
+- **WHEN** a correction for a managed `instrument + fiscal_year` is first indexed outside the configured publication lookback
+- **THEN** an oldest-first period-level reconciliation queue SHALL still revisit that managed period within the configured maximum cycle
+- **AND** `last_reconciled_at`, retry state, and checkpoint progress SHALL prevent failed items or newer periods from starving older managed periods
+
+#### Scenario: A fallback source returns data after a primary source fails
+- **WHEN** a configured fallback source completes but a required primary source scope is incomplete
+- **THEN** each source SHALL retain its own item cursor, `covered_until`, and gap state
+- **AND** route-level coverage SHALL remain incomplete unless the versioned route policy explicitly declares the fallback an equivalent substitute for that scope
 
 #### Scenario: Active universe changes
 - **WHEN** a stock lists, delists, or changes active state after bootstrap
@@ -368,6 +409,11 @@ Migration SHALL inventory existing annual-report manifests and paths, validate t
 - **THEN** migration cleanup SHALL use an explicit per-file manifest/hash allowlist and default dry-run
 - **AND** it SHALL NOT delete any excluded file or perform directory-level cleanup
 
+#### Scenario: Legacy paths are approved for physical cleanup
+- **WHEN** a verified duplicate business-profile or broker path is approved for deletion after consumer cutover
+- **THEN** migration SHALL first persist a versioned rollback manifest mapping the legacy path and consumer identity to the shared asset and content hash
+- **AND** a temporary-root drill SHALL prove required aliases or copies can be reconstructed from verified canonical or backup blobs before cleanup proceeds
+
 ### Requirement: Archive Layout And Storage Gates Are Governed
 The shared archive SHALL reside below the remounted `data/filings` volume, use safe project-relative configuration, include immutable content identity in filenames or blob paths, and enforce disk and attachment-size gates.
 
@@ -440,6 +486,11 @@ The system SHALL expose shared annual-report asset access through DataManager/se
 - **WHEN** a client inspects an acquisition and its downstream business result
 - **THEN** asset availability, ensure disposition, durable operation state, and consumer-processing state SHALL be returned as separate fields
 
+#### Scenario: A predecessor remains usable while a newer correction is pending
+- **WHEN** a legally newer complete correction is discovered but cannot yet be verified and policy continues serving the predecessor
+- **THEN** the effective decision SHALL be exposed as provisional with the pending correction identity and stable reason
+- **AND** clients SHALL NOT present the predecessor as an unqualified final latest-effective report
+
 #### Scenario: Client downloads an available report
 - **WHEN** an authorized endpoint streams a local annual report
 - **THEN** it SHALL resolve the asset by identifier, validate current availability, set a safe filename and media type, and prevent path traversal
@@ -479,13 +530,23 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 - **THEN** that copy SHALL NOT satisfy the predecessor-deletion backup gate
 
 #### Scenario: File and catalog recovery watermarks disagree
-- **WHEN** a replacement blob backup cannot be paired with a recoverable catalog database snapshot or consistent manifest watermark
+- **WHEN** a replacement blob backup and consistent file manifest watermark cannot be paired with a recoverable catalog database snapshot containing the replacement transaction
 - **THEN** predecessor physical deletion SHALL remain blocked
 
 #### Scenario: Asset has not been backed up
 - **WHEN** a canonical asset is locally valid but has no verified backup copy
 - **THEN** readiness SHALL expose the backup gap
 - **AND** physical deletion of its predecessor SHALL remain blocked until the replacement backup is verified in an independent failure domain
+
+#### Scenario: Backup target reserve would be violated
+- **WHEN** planned or streamed backup bytes would violate the backup target's configured free-space reserve or hard-stop threshold
+- **THEN** backup SHALL fail or checkpoint without publishing a partial target blob and SHALL clean or reconcile temporary files
+- **AND** the local asset SHALL remain valid while readiness exposes unprotected bytes and predecessor deletion remains blocked
+
+#### Scenario: A superseded blob already exists in backup
+- **WHEN** a local predecessor is superseded after its content-addressed blob was backed up
+- **THEN** version 1 SHALL keep that backup blob as non-consumer-visible disaster-recovery content
+- **AND** no automatic backup garbage collection SHALL run without a separately specified audited retention policy
 
 #### Scenario: Database and attachment assets are restored
 - **WHEN** an operator restores the announcement-asset capability after data loss
