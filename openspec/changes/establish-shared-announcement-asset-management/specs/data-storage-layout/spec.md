@@ -85,6 +85,8 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 - **WHEN** canonical attachment files are replicated to the configured NAS target
 - **THEN** each missing blob SHALL be copied through a target-side temporary file, flushed, length/hash verified, and atomically published before it is eligible for the backup watermark
 - **AND** an existing hash-named target SHALL be reverified rather than trusted by path alone
+- **AND** a present target with mismatched length or hash SHALL remain unprotected, SHALL NOT advance the paired backup watermark, and SHALL keep its path, bytes, and modification time unchanged during an ordinary backup run
+- **AND** quarantine or replacement SHALL occur only inside an operator-authorized, auditable repair operation that preserves original path/hash evidence
 - **AND** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, a file manifest watermark paired with a recoverable catalog database snapshot, completion time, and errors
 
 #### Scenario: Backup target shares the primary storage host

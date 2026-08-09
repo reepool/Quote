@@ -361,8 +361,9 @@ Backfill, daily, ensure, migration, integrity, deletion, and backup work SHALL u
 
 #### Scenario: The same ensure scope is requested concurrently
 - **WHEN** scheduler, API, or consumers request the same normalized instrument/fiscal-year or exact-filing scope under the same policy version
-- **THEN** the service SHALL create at most one active operation for the idempotency scope
-- **AND** every caller SHALL receive the existing operation identity or the completed local asset
+- **THEN** the service SHALL create at most one active internal asset operation for the acquisition scope
+- **AND** every external caller SHALL receive the completed local asset or its own authorized subscription/opaque query handle to that shared operation
+- **AND** sharing work SHALL NOT transfer another principal's idempotency key, consumer continuation, ownership, or privileged diagnostics
 
 #### Scenario: A worker stops during an operation
 - **WHEN** a process exits after persisting progress or holding a lease
@@ -377,6 +378,11 @@ Backfill, daily, ensure, migration, integrity, deletion, and backup work SHALL u
 #### Scenario: Cancellation is unsupported or unsafe
 - **WHEN** a caller requests cancellation for a non-cancellable stage or version 1 cancellation is disabled
 - **THEN** the API SHALL reject the request explicitly while lease expiry and bounded recovery remain defined
+
+#### Scenario: One subscriber cancels shared acquisition
+- **WHEN** one principal cancels its request subscription or consumer continuation while another subscriber or scheduler still requires the same internal asset operation
+- **THEN** only the cancelling principal's subscription/continuation SHALL become cancelled
+- **AND** the shared acquisition SHALL continue or checkpoint according to its remaining subscribers and scheduler policy; one caller SHALL NOT cancel work required by another caller
 
 #### Scenario: Shared rollout is rolled back before physical cleanup
 - **WHEN** an operator disables shared consumer routing or daily writes before legacy files are removed
@@ -542,7 +548,9 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 #### Scenario: A hash-named backup blob already exists
 - **WHEN** the backup target already contains the expected content-addressed path
 - **THEN** the workflow SHALL verify its byte length and SHA-256 before marking the source blob protected
-- **AND** a missing or mismatched target SHALL remain unprotected and SHALL be repaired through a temporary verified publication without silently overwriting untrusted bytes
+- **AND** a mismatched existing target SHALL remain unprotected and SHALL NOT advance the paired backup watermark
+- **AND** an ordinary backup run SHALL preserve the mismatched target's path, bytes, and modification time
+- **AND** quarantine or replacement SHALL occur only inside an operator-authorized, auditable repair operation that preserves original path/hash evidence and uses temporary verified publication
 
 #### Scenario: Backup stops during file publication or watermark commit
 - **WHEN** the process stops while copying a temporary file, after atomic publication, or before committing the paired file-manifest watermark

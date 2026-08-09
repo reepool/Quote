@@ -64,6 +64,7 @@ The target model uses business-neutral structures conceptually equivalent to:
 - `official_attachment_versions`: attachment observation plus content hash, final URL, retrieval evidence, validity, and download attempt lineage.
 - `effective_annual_reports`: instrument, fiscal year, report period, selected attachment version, correction flag, classification version, effective state, and replacement link.
 - `official_asset_operations`: durable discovery/download/backfill/on-demand operation state and leases.
+- `official_asset_operation_subscriptions`: principal/consumer-scoped idempotency, authorization, response projection, and continuation links to a globally single-flight asset operation.
 - `official_asset_deletion_audit`: append-only physical deletion decisions.
 - `official_asset_consumer_processing`: optional shared index that links consumer/parser identities to source assets while consumer-owned manifests remain authoritative for domain outputs.
 
@@ -218,7 +219,7 @@ When an effective asset is added, replaced, repaired, withdrawn, or deleted, app
 
 ### Make operations resumable and single-flight
 
-Durable operations use scopes, checkpoints, leases, attempts, retry times, bounded errors, and separate status/stage/outcome fields. The same normalized scope and policy version has at most one active operation across scheduler, API, and consumers. Files are written to `.part` on the same verified NFS mount, validated, fsynced where supported, atomically renamed, reopened, and reverified. Lease expiry permits cleanup and retry after process failure.
+Durable asset operations use scopes, checkpoints, leases, attempts, retry times, bounded errors, and separate status/stage/outcome fields. The same normalized scope and policy version has at most one active asset operation across scheduler, API, and consumers. That internal operation is not transferred to the first caller: API/consumer requests create principal-scoped subscriptions or opaque query handles that bind caller idempotency and expose only authorized projections of the shared work. A second principal may subscribe to the same acquisition without inheriting the first principal's idempotency key, consumer continuation, or diagnostics. Files are written to `.part` on the same verified NFS mount, validated, fsynced where supported, atomically renamed, reopened, and reverified. Lease expiry permits cleanup and retry after process failure.
 
 The scheduler control plane uses these durable operations for authenticated manual start, status, cooperative stop, resume, and duplicate-start reuse. It retains bounded run history and exposes last successful cutoff, heartbeat age, consecutive failures, cursor lag, and oldest retry age. Front-facing readiness is a redacted summary; provider, filesystem, actor, and failure diagnostics require operator scope.
 
@@ -259,10 +260,10 @@ The scheduler control plane uses these durable operations for authenticated manu
 8. Migrate business-profile annual-report acquisition and its existing catalog APIs to shared assets while leaving parsing and semantic workflows unchanged.
 9. Add DataManager and FastAPI surfaces, consumer lineage, operation status, and front-facing integration tests.
 10. Run dual-read reconciliation, asset backup verification, storage readiness, and affected consumer regression suites.
-11. Stop legacy annual-report writes, persist a versioned `legacy_path -> content_hash/shared_asset` rollback manifest, prove legacy paths can be reconstructed from verified blobs, then remove duplicate business-owned files and code only after verified cutover and enforce repository residue checks.
+11. Stop legacy annual-report writes, persist a versioned `legacy_path -> content_hash/shared_asset/consumer` rollback manifest, prove legacy paths can be reconstructed from verified blobs, then remove duplicate business-owned files and code only after verified cutover and enforce repository residue checks.
 12. Enable daily scheduling only after bootstrap reaches configured coverage, integrity, storage, backup, and migration gates.
 
-Rollback before legacy-write removal disables shared consumer routing and daily scheduling while leaving additive records and adopted files intact; rollback SHALL NOT delete canonical metadata, replacement lineage, or audit records. Rollback after physical cleanup restores the verified archive backup plus its paired database snapshot and application version, then reconstructs required legacy paths from the signed path/hash manifest before legacy consumers start; code rollback alone is insufficient after predecessor or duplicate file deletion.
+Rollback before legacy-write removal disables shared consumer routing and daily scheduling while leaving additive records and adopted files intact; rollback SHALL NOT delete canonical metadata, replacement lineage, or audit records. Rollback after physical cleanup restores the verified archive backup plus its paired database snapshot and application version, then reconstructs required legacy paths from the immutable, versioned, hash-verified path manifest before legacy consumers start; code rollback alone is insufficient after predecessor or duplicate file deletion.
 
 ## Requirement Traceability
 
@@ -287,6 +288,6 @@ The detailed requirements document is the business-level source of intent. The f
 
 ## Confirmed Scope And Deferred Decisions
 
-- Version 1 sets the scheduled/bootstrap universe to current active SSE/SZSE/BSE stocks; inactive and delisted instruments are on-demand only.
+- Version 1 sets the scheduled/bootstrap universe through the versioned active RMB-denominated A-share eligibility policy for SSE, SZSE, and BSE; B shares and non-stock security types are excluded, while inactive and delisted instruments remain on-demand only.
 - Version 1 intentionally deletes superseded physical annual-report PDFs after safe replacement. A later requirement is needed if point-in-time reconstruction of source documents becomes mandatory.
 - Semiannual reports reuse the architecture but are not enabled in the first scheduled rollout.

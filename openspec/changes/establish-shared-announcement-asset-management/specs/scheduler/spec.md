@@ -86,12 +86,12 @@ Annual-report scheduler jobs SHALL use explicit network, time, storage, and work
 - **THEN** scheduler and asset leases SHALL prevent duplicate active acquisition while reporting the existing run identity
 
 ### Requirement: Annual-Report Jobs Have A Durable Operator Control Plane
-Manual and scheduled backfill, daily-update, integrity, and backup execution SHALL use authenticated bounded operator commands backed by durable operation state rather than process-local task state.
+Manual and scheduled backfill, daily-update, integrity, and backup execution SHALL use one shared command service backed by durable operation state rather than process-local task state. Existing scheduler task registration, operator CLI, and any operator HTTP adapter SHALL call that service and SHALL NOT create independent run semantics. Manual commands SHALL require an `annual_report_assets:operate`-equivalent scope, while service-scheduled commands SHALL use an auditable configured service principal whose identity/configuration version is reloadable without rewriting operation history.
 
 #### Scenario: Operator starts a manual job
 - **WHEN** an authorized operator starts a bounded annual-report job with a validated scope and policy
-- **THEN** the control plane SHALL return a durable run or operation id, normalized scope, accepted bounds, and current status
-- **AND** the command, actor, request fingerprint, and start time SHALL be auditable
+- **THEN** the control plane SHALL return the durable asset operation id as `run_id`, normalized scope, accepted bounds, and current status; adapters SHALL NOT invent a second process-local run identity
+- **AND** the command, authenticated principal, effective permission, request fingerprint, accepted configuration version, and start time SHALL be auditable
 
 #### Scenario: The same job scope is already active
 - **WHEN** a manual, API, or cron trigger targets an equivalent active normalized scope and policy
@@ -101,10 +101,11 @@ Manual and scheduled backfill, daily-update, integrity, and backup execution SHA
 - **WHEN** an authorized operator stops a cancellable batch job
 - **THEN** the worker SHALL checkpoint at a safe boundary, release or expire its lease, and preserve completed windows and verified assets
 - **AND** status SHALL become `cancelled` without rolling back committed coverage; a non-cancellable stage SHALL reject the stop explicitly
+- **AND** stopping the batch SHALL stop creation of new child work but SHALL NOT cancel an already-shared child acquisition that still has another principal or consumer subscription
 
 #### Scenario: Process restarts with a stale job heartbeat
 - **WHEN** a run remains non-terminal after its heartbeat and lease expire
-- **THEN** status and checkpoints SHALL remain queryable and an authorized resume SHALL reclaim the work idempotently
+- **THEN** status and checkpoints SHALL remain queryable and an authorized resume SHALL reclaim the same operation id, increment its attempt/resume generation, and record the resuming principal or service identity
 - **AND** restart SHALL NOT create a second logical run or repeat verified acquisition
 
 #### Scenario: Operator queries run history
@@ -112,6 +113,10 @@ Manual and scheduled backfill, daily-update, integrity, and backup execution SHA
 - **THEN** the service SHALL return retained recent runs, last successful cutoff by scope, active heartbeat age, consecutive failures, cursor lag, oldest retry age, terminal outcome, and bounded diagnostics
 - **AND** stale heartbeat, lag, failure-count, storage, and backup thresholds SHALL produce explicit readiness blockers or alerts
 - **AND** a front-facing readiness summary SHALL omit provider-sensitive and filesystem diagnostics exposed only to operators
+
+#### Scenario: A non-operator invokes the control plane
+- **WHEN** a caller lacks the operator scope for start, stop, resume, detailed history, repair, or backup control
+- **THEN** the command SHALL fail before creating or mutating an operation and SHALL follow the configured 401/403/404 non-disclosure policy
 
 ### Requirement: Annual-Report Integrity And Backup Have Governed Jobs
 The scheduler SHALL expose independently configured `annual_report_asset_integrity_audit` and `annual_report_asset_backup` jobs in addition to latest-backfill and daily update.

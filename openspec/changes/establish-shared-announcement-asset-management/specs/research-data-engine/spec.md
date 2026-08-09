@@ -52,6 +52,7 @@ DataManager SHALL expose business-neutral annual-report asset lookup, ensure, st
 - **WHEN** a caller requests ensure with permitted network and storage policy
 - **THEN** DataManager SHALL invoke the shared service and return `local_hit`, `local_miss`, `operation_created`, or `operation_reused` disposition
 - **AND** asset availability, durable operation status/stage, and final `adopted|downloaded|repaired` origin SHALL be represented separately
+- **AND** a front-facing caller SHALL receive its authorized `asset_request_id` opaque subscription handle rather than the internal shared operation identity
 
 #### Scenario: Legacy annual-report catalog is called during migration
 - **WHEN** an existing caller uses `get_annual_report_assets` or `get_annual_report_asset`
@@ -65,7 +66,8 @@ DataManager SHALL expose business-neutral annual-report asset lookup, ensure, st
 
 #### Scenario: Caller inspects operations and readiness
 - **WHEN** a caller requests annual-report operation status or service readiness
-- **THEN** DataManager SHALL expose durable progress plus coverage, integrity, storage, backup, scheduler, and consumer-migration state without constructing business-profile services
+- **THEN** DataManager SHALL require a trusted request context and expose the caller's authorized operation projection plus redacted readiness without constructing business-profile services
+- **AND** raw internal operation, provider, filesystem, actor, and detailed failure state SHALL require operator or service scope
 
 ### Requirement: Annual-Report Asset API Is Additive And Safe
 The Research API SHALL provide additive endpoints for effective annual-report metadata, readiness, acquisition requests, operation status, and controlled file delivery.
@@ -76,9 +78,9 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **AND** the GET request SHALL perform zero provider calls and zero attachment writes
 
 #### Scenario: Client requests acquisition
-- **WHEN** an authorized client requests a missing annual report
+- **WHEN** an authorized client requests ensure for an annual report
 - **THEN** the API SHALL accept only one instrument/fiscal-year or exact source-filing scope and create or reuse a bounded operation
-- **AND** it SHALL return HTTP 200 with `local_hit` for an immediately valid asset or HTTP 202 with operation id, `Location`, and `Retry-After` for created or reused work
+- **AND** it SHALL return HTTP 200 with `local_hit` for an immediately valid asset, HTTP 200 with `local_miss` when network acquisition is explicitly disabled, or HTTP 202 with principal-scoped `asset_request_id`, a `Location` containing only that opaque handle, and `Retry-After` for created or reused asynchronous work
 - **AND** it SHALL not keep the request open for an unbounded market or attachment fetch
 
 #### Scenario: Client submits an invalid selector combination
@@ -88,35 +90,45 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 
 #### Scenario: Acquisition request is repeated
 - **WHEN** the same normalized scope and policy is submitted again with the same idempotency identity while work is active
-- **THEN** the API SHALL return the same durable operation and SHALL NOT issue a second provider request or physical write
+- **THEN** the API SHALL return the same principal-scoped request subscription and SHALL NOT issue a second provider request or physical write
+- **AND** the subscription MAY reference a globally shared internal asset operation without exposing another trigger's ownership or diagnostics
 
 #### Scenario: Idempotency identity is reused for a different request
 - **WHEN** one principal reuses an `Idempotency-Key` with a different normalized selector, policy, or request body
 - **THEN** the API SHALL return HTTP 409 with a stable idempotency-conflict code and SHALL neither reuse the old result nor create new work
-- **AND** idempotency and operation ownership SHALL be scoped to the authenticated principal so another principal cannot inherit the first caller's operation
+- **AND** request idempotency, response visibility, and consumer continuation SHALL be scoped to the authenticated principal
+- **AND** another principal MAY attach its own subscription to the same globally single-flight asset operation but SHALL NOT inherit the first caller's request handle, idempotency record, continuation, or privileged diagnostics
 
 #### Scenario: Authorization boundary is unavailable
 - **WHEN** the deployment has no configured trusted identity and scoped permissions
-- **THEN** acquisition, content delivery, cancellation, repair, and operator endpoints SHALL remain disabled or fail closed
+- **THEN** registered acquisition, content delivery, cancellation, repair, and operator endpoints SHALL return HTTP 503 with `authorization_boundary_unavailable`
+- **AND** the response SHALL not contact a provider, reveal filesystem paths, or create a durable mutation operation
+- **AND** this fail-closed gate SHALL run before selector validation, resource lookup, or ownership checks so response differences cannot be used to enumerate assets or operations
 
 #### Scenario: Caller exceeds an API scope or rate bound
 - **WHEN** a client requests a market-wide scope, an unsafe parameter, or exceeds configured request/rate limits
-- **THEN** the API SHALL reject the request with a stable bounded error (such as 400/422 or 429 with `Retry-After`)
+- **THEN** the API SHALL return HTTP 422 with a stable validation code for an invalid/over-broad scope, or HTTP 429 with `Retry-After` for a rate-limit violation
 - **AND** it SHALL NOT create an unbounded operation or contact a provider
 
 #### Scenario: Provider or storage is temporarily unavailable
 - **WHEN** an authorized bounded ensure cannot proceed because the provider, archive mount, or storage reserve is unavailable
-- **THEN** the API SHALL return or expose a retryable/blocked reason with stable diagnostics (such as 503)
+- **THEN** the API SHALL return HTTP 503 with a stable retryable or blocked error code and bounded diagnostics
 - **AND** it SHALL preserve any durable operation and never publish partial bytes
 
 #### Scenario: Client follows operation status
-- **WHEN** a client polls an acquisition operation
+- **WHEN** a client polls its `asset_request_id`
 - **THEN** the API SHALL return `queued|running|completed|missing|failed|blocked|cancelled|expired` status, current stage, retry metadata, timestamps, progress, result asset id, stable reason codes, and bounded diagnostics
 - **AND** it SHALL separately return asset availability, ensure disposition, and downstream consumer-processing state where applicable
+- **AND** the API SHALL project the underlying shared asset operation through that caller's subscription rather than expose the internal operation directly
+
+#### Scenario: Client cancels one shared acquisition request
+- **WHEN** an authorized client cancels its `asset_request_id` while another principal or scheduler still depends on the underlying acquisition
+- **THEN** only that request subscription and its pending consumer continuation SHALL become cancelled
+- **AND** the internal asset operation SHALL remain active or checkpoint according to remaining subscribers and SHALL NOT expose their identities
 
 #### Scenario: Client polls another caller's operation
-- **WHEN** a caller lacks ownership/read scope for the requested operation
-- **THEN** the API SHALL deny access without disclosing the operation scope, diagnostics, or existence beyond the configured authorization policy
+- **WHEN** a caller lacks ownership/read scope for the requested operation subscription or consumer continuation
+- **THEN** the API SHALL deny access through the common error envelope without disclosing the underlying operation scope, diagnostics, subscribers, or existence beyond the configured authorization policy
 
 #### Scenario: Effective report is not locally available
 - **WHEN** a metadata GET cannot resolve a local valid effective report
@@ -148,11 +160,17 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 ### Requirement: Consumer Outputs Surface Asset Lineage
 Business-facing results that depend on annual reports SHALL expose sufficient shared asset lineage for audit without leaking internal archive paths.
 
+#### Scenario: A business action has an immediately valid asset
+- **WHEN** a front-facing business-profile or broker command resolves a verified local annual-report asset
+- **THEN** that business orchestration SHALL create or reuse exactly one consumer operation for the requested consumer and processing fingerprint without creating an asset-acquisition operation
+- **AND** the response SHALL expose the consumer operation or processing identity separately from asset availability
+
 #### Scenario: A business action must wait for asset acquisition
 - **WHEN** a front-facing business-profile or broker command creates or reuses an asset ensure operation
-- **THEN** that business orchestration SHALL persist a continuation tied to the requested consumer and enqueue exactly one consumer operation after the asset becomes locally valid
+- **THEN** that business orchestration SHALL persist one idempotent continuation tied to the requested consumer, processing fingerprint, and asset operation
+- **AND** it SHALL enqueue exactly one consumer operation after the asset becomes locally valid, or terminally fail/block the continuation when the asset operation cannot produce a valid asset
 - **AND** generic asset ensure SHALL NOT implicitly start every consumer
-- **AND** the response SHALL expose the consumer operation or processing identity so asset completion and business-result completion remain independently queryable
+- **AND** the response SHALL expose `asset_request_id` and consumer-continuation/processing identity, never the internal asset operation id, so asset completion and business-result completion remain independently queryable
 
 #### Scenario: Business-profile result uses annual-report evidence
 - **WHEN** a business-profile result is returned
