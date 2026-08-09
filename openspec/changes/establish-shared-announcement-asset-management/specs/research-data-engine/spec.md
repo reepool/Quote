@@ -93,9 +93,18 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **WHEN** a protected business-profile or broker command requires an annual-report-backed processing result
 - **THEN** that business command SHALL accept a consumer processing fingerprint and caller idempotency key and SHALL execute the shared local-first lookup before processing
 - **AND** a local hit SHALL create or reuse exactly one caller-owned `consumer_request_id` without creating an asset acquisition subscription
-- **AND** a local miss with acquisition permitted SHALL create or reuse one `asset_request_id`, persist one consumer-specific continuation, and create or reuse the linked `consumer_request_id` only after the asset is valid
-- **AND** the command SHALL return HTTP 200 for an immediately available local result or HTTP 202 with the applicable opaque request handles for pending work, using the same ownership, `Location`, `Retry-After`, and error-envelope rules as the generic asset resources
+- **AND** the command SHALL create or reuse the caller-owned `consumer_request_id` immediately, with `pending_asset` status when the shared asset is not yet locally valid
+- **AND** a local miss with acquisition permitted SHALL create or reuse one `asset_request_id`, persist one consumer-specific continuation linked to that already-created consumer request, and advance the same consumer request to `queued|processing` only after the asset is valid
+- **AND** the command SHALL return HTTP 200 only when an existing current consumer result is available; a local asset hit that still requires consumer processing SHALL return HTTP 202 with the `consumer_request_id`, and an asset miss with acquisition permitted SHALL return HTTP 202 with both opaque request handles
+- **AND** network-disabled or policy-blocked requests SHALL return a structured terminal consumer projection with a stable `missing|blocked` reason and SHALL NOT create provider work
+- **AND** the response SHALL use the same owner, `Location`, `Retry-After`, and error-envelope rules as the generic asset resources
 - **AND** generic asset ensure SHALL NOT start this consumer processing implicitly
+
+#### Scenario: Business command adapters have explicit ownership
+- **WHEN** the business-profile or broker risk-control front end starts annual-report-backed processing
+- **THEN** it SHALL call its own protected command adapter (for example `POST /api/v1/research/company/{instrument_id}/business-profile/annual-report-process` or `POST /api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process`)
+- **AND** the adapter SHALL own the consumer processing fingerprint, caller idempotency contract, and `consumer_request_id` lifecycle while delegating source discovery and attachment acquisition to the shared asset service
+- **AND** generic asset ensure SHALL remain a source-asset-only entry point and SHALL NOT be treated as the business processing entry point
 
 #### Scenario: Client submits an invalid selector combination
 - **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies an attachment/hash/observation pin without exact-filing identity, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
@@ -137,7 +146,7 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 
 #### Scenario: Client follows downstream consumer status
 - **WHEN** a business command returns a `consumer_request_id` and the owner polls `GET /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`
-- **THEN** the API SHALL return consumer identity, processing fingerprint, `pending|not_started|queued|processing|current|stale|failed|blocked|cancelled` request/processing status, result identity, retry metadata, timestamps, stable reason codes, and bounded diagnostics
+- **THEN** the API SHALL return consumer identity, processing fingerprint, `pending_asset|not_started|queued|processing|current|stale|failed|missing|blocked|cancelled` request/processing status, result identity, retry metadata, timestamps, stable reason codes, and bounded diagnostics
 - **AND** it SHALL include the linked caller-visible `asset_request_id` only when acquisition was required; a local-hit consumer request SHALL not invent one
 - **AND** it SHALL NOT expose internal asset or consumer operation ids, other principals, or filesystem paths
 - **AND** an unknown or cross-owner consumer request SHALL follow the same configured 404 non-disclosure and common error-envelope policy as an asset request

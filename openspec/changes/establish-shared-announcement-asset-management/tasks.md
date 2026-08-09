@@ -1,48 +1,48 @@
 ## 1. Contracts And Configuration
 
-- [ ] 1.1 Define business-neutral announcement, attachment, blob, effective-annual-report, operation, deletion-audit, and consumer-processing models with stable schema versions.
-- [ ] 1.2 Add an independently enabled annual-report asset configuration section and config-template defaults covering archive root, providers, classifier policy, bootstrap scope, daily overlap, reconciliation, request limits, storage gates, leases, retries, backup target, and all jobs default-disabled/manual-only as specified.
-- [ ] 1.3 Validate that configured archive, temporary, quarantine, and backup paths cannot escape their permitted roots or silently resolve a missing NAS mount onto local storage.
-- [ ] 1.4 Add clean-database schema creation and migration tests without changing existing business-profile or financial-fact table contracts.
+- [x] 1.1 Define business-neutral announcement, attachment, blob, effective-annual-report, operation, deletion-audit, and consumer-processing models with stable schema versions.
+- [x] 1.2 Add an independently enabled annual-report asset configuration section and config-template defaults covering archive root, providers, classifier policy, bootstrap scope, daily overlap, reconciliation, request limits, storage gates, leases, retries, backup target, and all jobs default-disabled/manual-only as specified.
+- [x] 1.3 Validate that configured archive, temporary, quarantine, and backup paths cannot escape their permitted roots or silently resolve a missing NAS mount onto local storage.
+- [x] 1.4 Add clean-database schema creation and migration tests without changing existing business-profile or financial-fact table contracts.
 - [ ] 1.5 Add import/startup tests proving service, API, and scheduler initialization perform zero market scans, downloads, migration moves, or deletions.
-- [ ] 1.6 Define principal/consumer-scoped operation subscriptions and opaque query handles separately from globally single-flight asset operations, including schema version, ownership, idempotency fingerprint, authorized projection, and consumer-continuation links.
+- [x] 1.6 Define principal/consumer-scoped operation subscriptions and opaque query handles separately from globally single-flight asset operations, including schema version, ownership, idempotency fingerprint, authorized projection, and consumer-continuation links.
 
 ## 2. Canonical Repository And Classification
 
-- [ ] 2.1 Implement repositories for source-qualified announcements, attachments, content blobs, immutable attachment observations, effective annual reports, durable operations, replayable change events, deletion audit, and optional consumer-processing links, preserving first/last observed and raw metadata identity.
-- [ ] 2.2 Implement deterministic idempotent upsert, unique-key, retention-pin, lease, per-source item cursor, range `covered_until`, and operation-transition behavior with concurrency tests.
-- [ ] 2.3 Implement the versioned attachment-level formal annual-report classifier for originals, complete corrections, summaries, translations, visual editions, audit/inquiry/briefing material, periodic reports outside V1, notices, and unresolvable identities.
-- [ ] 2.4 Implement fiscal-year/report-period extraction, a versioned `as_of`/listing/disclosure-calendar/provider-coverage search-bound policy, and deterministic latest-effective winner selection, including multiple corrections, withdrawal/silent-update observations, cross-source legal evidence, provisional state, overdue coverage gaps, and fail-closed ambiguity diagnostics.
-- [ ] 2.5 Add immutable observation `version_available_at`/time-source/precision semantics, exact withdrawal-target evidence, and fail-closed same-source timestamp-tie handling; prove knowledge cutoffs cannot see later silent-update bytes or retroactive withdrawal state.
+- [x] 2.1 Implement repositories for source-qualified announcements, attachments, content blobs, immutable attachment observations, effective annual reports, durable operations, replayable change events, deletion audit, and optional consumer-processing links, preserving first/last observed and raw metadata identity.
+- [x] 2.2 Implement deterministic idempotent upsert, unique-key, retention-pin, lease, per-source item cursor, range `covered_until`, and operation-transition behavior with concurrency tests.
+- [x] 2.3 Implement the versioned attachment-level formal annual-report classifier for originals, complete corrections, summaries, translations, visual editions, audit/inquiry/briefing material, periodic reports outside V1, notices, and unresolvable identities.
+- [x] 2.4 Implement fiscal-year/report-period extraction, a versioned `as_of`/listing/disclosure-calendar/provider-coverage search-bound policy, and deterministic latest-effective winner selection, including multiple corrections, withdrawal/silent-update observations, cross-source legal evidence, provisional state, overdue coverage gaps, and fail-closed ambiguity diagnostics.
+- [x] 2.5 Add immutable observation `version_available_at`/time-source/precision semantics, exact withdrawal-target evidence, and fail-closed same-source timestamp-tie handling; prove knowledge cutoffs cannot see later silent-update bytes or retroactive withdrawal state.
 
 ## 3. File Acquisition And Lifecycle
 
-- [ ] 3.1 Build the shared service on existing `research.announcements` discovery and governed attachment retrieval contracts without adding provider-specific transport logic.
-- [ ] 3.2 Implement attachment-scoped single-flight leases, bounded retries, `.part` writes, PDF signature and size checks, SHA-256 verification, flush, and atomic publication.
-- [ ] 3.3 Implement local integrity levels, corruption/missing-file handling, safe quarantine state, and bounded reacquisition.
-- [ ] 3.4 Implement correction activation plus a durable `planned -> deleting -> deleted|failed` deletion-intent state machine, consumer invalidation/change events, retention pins, and append-only audit while preserving the old effective file on any failed replacement precondition.
-- [ ] 3.5 Add crash-injection and concurrent-reader tests around database commit, NFS unlink, audit finalization, shared blobs, aliases, and expired deletion leases.
-- [ ] 3.6 Implement storage warning/stop/reserve, atomic concurrent byte reservations, unknown-size budgeting, and annual-report stream limits so metadata discovery continues when scheduled attachment acquisition is blocked.
-- [ ] 3.7 Serialize effective-version activation at `instrument + fiscal_year`, reselect the winner transactionally, and test reverse completion of concurrent corrections, stale compare-and-swap, withdrawal races, and deletion-intent safety.
+- [x] 3.1 Build the shared service on existing `research.announcements` discovery and governed attachment retrieval contracts without adding provider-specific transport logic.
+- [x] 3.2 Implement attachment-scoped single-flight leases, bounded retries, `.part` writes, PDF signature and size checks, SHA-256 verification, flush, and atomic publication.
+- [x] 3.3 Implement local integrity levels, corruption/missing-file handling, safe quarantine state, and bounded reacquisition.
+- [x] 3.4 Implement correction activation plus a durable `planned -> deleting -> deleted|failed` deletion-intent state machine, consumer invalidation/change events, retention pins, and append-only audit while preserving the old effective file on any failed replacement precondition.
+- [x] 3.5 Add crash-injection and concurrent-reader tests around database commit, NFS unlink, audit finalization, shared blobs, aliases, and expired deletion leases.
+- [x] 3.6 Implement storage warning/stop/reserve, atomic concurrent byte reservations, unknown-size budgeting, and annual-report stream limits so metadata discovery continues when scheduled attachment acquisition is blocked.
+- [x] 3.7 Serialize effective-version activation at `instrument + fiscal_year`, reselect the winner transactionally, and test reverse completion of concurrent corrections, stale compare-and-swap, withdrawal races, and deletion-intent safety.
 
 ## 4. Existing Archive Adoption
 
-- [ ] 4.1 Build a read-only inventory tool for business-profile and broker annual-report manifests and files that reports valid, missing, corrupt, duplicate, conflicting, superseded, and adoptable entries.
-- [ ] 4.2 Register valid existing annual-report files in shadow state using source identity, report period, PDF signature, length, and SHA-256 without redownloading or moving them.
-- [ ] 4.3 Reconcile latest-effective decisions against the existing `AnnualReportAssetCatalog`, business-profile manifests, and broker source manifests, and require explicit conflict resolution before cutover.
-- [ ] 4.4 Add a separately gated convergence tool whose default dry-run emits a per-file manifest/hash allowlist, persists a versioned `legacy_path -> content_hash/shared_asset/consumer` rollback manifest for approved cleanup, and excludes derived files, semiannual reports, other fiscal years, orphans, and conflicts.
-- [ ] 4.5 Probe NFS mount identity and link/rename behavior, then create verified links or copies only after shared reads, reference checks, independent-failure-domain backup checks, and reconciliation succeed.
-- [ ] 4.6 Prove the inventory-only mode performs zero network, move, link, quarantine, or delete operations and that latest-only bootstrap never deletes valid older-fiscal-year files merely because they are outside its target.
-- [ ] 4.7 Adopt verifiable older-fiscal-year local reports for zero-network period-specific reuse without counting them toward latest-only coverage or triggering adjacent historical network backfill, applying normal correction governance within each adopted period.
+- [x] 4.1 Build a read-only inventory tool for business-profile and broker annual-report manifests and files that reports valid, missing, corrupt, duplicate, conflicting, superseded, and adoptable entries.
+- [x] 4.2 Register valid existing annual-report files in shadow state using source identity, report period, PDF signature, length, and SHA-256 without redownloading or moving them.
+- [x] 4.3 Reconcile latest-effective decisions against the existing `AnnualReportAssetCatalog`, business-profile manifests, and broker source manifests, and require explicit conflict resolution before cutover.
+- [x] 4.4 Add a separately gated convergence tool whose default dry-run emits a per-file manifest/hash allowlist, persists a versioned `legacy_path -> content_hash/shared_asset/consumer` rollback manifest for approved cleanup, and excludes derived files, semiannual reports, other fiscal years, orphans, and conflicts.
+- [x] 4.5 Probe NFS mount identity and link/rename behavior, then create verified links or copies only after shared reads, reference checks, independent-failure-domain backup checks, and reconciliation succeed.
+- [x] 4.6 Prove the inventory-only mode performs zero network, move, link, quarantine, or delete operations and that latest-only bootstrap never deletes valid older-fiscal-year files merely because they are outside its target.
+- [x] 4.7 Adopt verifiable older-fiscal-year local reports for zero-network period-specific reuse without counting them toward latest-only coverage or triggering adjacent historical network backfill, applying normal correction governance within each adopted period.
 
 ## 5. Latest-Only Historical Bootstrap
 
-- [ ] 5.1 Implement a versioned A-share eligibility policy and snapshot the current active SSE, SZSE, and BSE universe with listing metadata, master-data version, policy version, and durable per-instrument coverage state; include main-board/STAR/ChiNext/BSE, ST, and suspended-active stocks while excluding B shares and non-stock security types.
-- [ ] 5.2 Implement bounded market-wide annual-category discovery over current and prior filing seasons with adaptive date-window partitioning and durable progress.
-- [ ] 5.3 Select and acquire only each instrument's latest available fiscal-year winner, preferring the newest verified complete correction and reusing adopted files.
-- [ ] 5.4 Implement rotating targeted repair for uncovered instruments with fixed `as_of`, deterministic candidate/due/earliest fiscal-year bounds, listing and provider-coverage evidence, expiring confirmed-missing evidence, overdue-but-older-asset-usable state, retry states, and restart-safe checkpoints.
-- [ ] 5.5 Add bootstrap reports and tests proving latest-only physical acquisition, audit-only retention of non-winning metadata, attachment-level correction precedence, cross-source conflict blocking, January and April-30 boundary behavior, post-period listings, delayed filings, zero redownload on resume, and `success` only when no incomplete/retryable/blocked coverage remains.
-- [ ] 5.6 Add master-data freshness and `eligibility_indeterminate` governance with last-complete-snapshot fallback, plus orthogonal asset-availability/expected-period coverage and default non-circular `overdue_missing` daily-readiness behavior.
+- [x] 5.1 Implement a versioned A-share eligibility policy and snapshot the current active SSE, SZSE, and BSE universe with listing metadata, master-data version, policy version, and durable per-instrument coverage state; include main-board/STAR/ChiNext/BSE, ST, and suspended-active stocks while excluding B shares and non-stock security types.
+- [x] 5.2 Implement bounded market-wide annual-category discovery over current and prior filing seasons with adaptive date-window partitioning and durable progress.
+- [x] 5.3 Select and acquire only each instrument's latest available fiscal-year winner, preferring the newest verified complete correction and reusing adopted files.
+- [x] 5.4 Implement rotating targeted repair for uncovered instruments with fixed `as_of`, deterministic candidate/due/earliest fiscal-year bounds, listing and provider-coverage evidence, expiring confirmed-missing evidence, overdue-but-older-asset-usable state, retry states, and restart-safe checkpoints.
+- [x] 5.5 Add bootstrap reports and tests proving latest-only physical acquisition, audit-only retention of non-winning metadata, attachment-level correction precedence, cross-source conflict blocking, January and April-30 boundary behavior, post-period listings, delayed filings, zero redownload on resume, and `success` only when no incomplete/retryable/blocked coverage or unresolved `eligibility_indeterminate` denominator remains.
+- [x] 5.6 Add master-data freshness and `eligibility_indeterminate` governance with last-complete-snapshot fallback, plus orthogonal asset-availability/expected-period coverage and default non-circular `overdue_missing` daily-readiness behavior.
 
 ## 6. Independent Daily Update
 
@@ -69,7 +69,8 @@
 - [ ] 8.2 Prove broker parsing produces equivalent facts and performs zero provider requests and zero duplicate archive writes when a shared asset is present.
 - [ ] 8.3 Change business-profile acquisition and exact-filing reuse to request shared assets while preserving page artifacts, semantic extraction, review, promotion, and knowledge-cutoff behavior, including explicit metadata-only historical results and zero redownload when predecessor bytes were deleted.
 - [ ] 8.4 Convert `AnnualReportAssetCatalog` and existing DataManager methods into read-through compatibility adapters, then disable legacy business-owned annual-report writes after dual-read reconciliation.
-- [ ] 8.5 Link all affected business outputs to shared asset id, source filing, report period, content hash, and effective-correction state without coupling shared validity to parser status; persist consumer-specific continuations so a front-facing business command immediately queues/reuses one consumer operation on local hit or queues it once after asset readiness, exposes terminal failure/blocking separately, and never starts unrelated consumers from generic ensure.
+- [ ] 8.5 Link all affected business outputs to shared asset id, source filing, report period, content hash, and effective-correction state without coupling shared validity to parser status; persist consumer-specific continuations and the immediately-created `consumer_request_id` so a front-facing business command queues/reuses one consumer operation on local hit or after asset readiness, exposes terminal failure/blocking separately, and never starts unrelated consumers from generic ensure.
+- [ ] 8.6 Implement the business-profile and broker risk-control protected POST command adapters (or register exact equivalent existing routes in the OpenAPI snapshot) with caller idempotency, processing fingerprint, immediate `consumer_request_id`, `pending_asset` transition, local-hit 200/202 semantics, asset-miss 202 with both handles, structured network-disabled/blocked terminal responses, and zero duplicate consumer operations.
 
 ## 9. DataManager API And Frontend Integration
 
@@ -79,7 +80,8 @@
 - [ ] 9.4 Separate asset availability, provisional/final effective-decision state, ensure disposition, operation status, operation stage, batch outcome, result origin, and consumer-processing states, and expose optional shared lineage in business-profile and broker responses without local paths.
 - [ ] 9.5 Integrate status, explicit acquire action, idempotent polling, safe content access, and correction-stale behavior into front-facing contracts; register the external UI repository/owner/version as an enablement gate because this repository has no UI source.
 - [ ] 9.6 Add OpenAPI snapshot and API/consumer tests proving every GET is zero-network; selector forms are mutually exclusive, complete, identity-consistent, and path/URL-free; same-key/same-fingerprint POST reuses one subscription while same-key/different-fingerprint returns 409 per principal; two principals share one underlying acquisition but receive isolated handles/continuations and cancelling one leaves the other's work active; authorization-unavailable precedes lookup/validation; restart recovery and owner isolation work; responses leak no internal operation id or path; streams reject superseded/corrupt assets; knowledge cutoffs hold; and legacy fields remain compatible.
-- [ ] 9.7 Add caller-scoped `consumer_request_id` DataManager/FastAPI/OpenAPI status and idempotent cancellation resources with owner/operator authorization, linked `asset_request_id`, processing/result/error projection, common non-disclosure behavior, and independent asset-versus-business polling plus pending-versus-started cancellation tests.
+- [ ] 9.7 Add caller-scoped `consumer_request_id` DataManager/FastAPI/OpenAPI status and idempotent cancellation resources with owner/operator authorization, linked `asset_request_id`, `pending_asset` to processing/result/error projection, common non-disclosure behavior, and independent asset-versus-business polling plus pending-versus-started cancellation tests.
+- [ ] 9.8 Add API/consumer integration tests proving the business command adapters create the consumer request before acquisition completes, preserve the same handle through asset readiness, return 200 only for a current consumer result, return 202 for pending parser work or asset acquisition, and return structured terminal missing/blocked outcomes without provider activity.
 
 ## 10. Backup Observability And Operations
 

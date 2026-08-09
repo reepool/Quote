@@ -699,7 +699,7 @@ Ensure 的即时处置只区分：
 
 - `GET /api/v1/research/company/{instrument_id}/annual-reports`：分页查询本地记录，纯读、零网络；
 - `GET /api/v1/research/company/{instrument_id}/annual-reports/effective`：按 fiscal year 查询单一有效状态；
-- `POST /api/v1/research/company/{instrument_id}/annual-reports/ensure`：只为单股票单财年或精确 filing 创建/复用 operation；
+- `POST /api/v1/research/company/{instrument_id}/annual-reports/ensure`：执行共享 local-first ensure；只有本地缺失且允许网络时才创建/复用异步 acquisition operation；
 - `GET /api/v1/research/annual-report-asset-requests/{asset_request_id}`：通过 principal-scoped opaque handle 轮询 durable operation 的授权投影；
 - `DELETE /api/v1/research/annual-report-asset-requests/{asset_request_id}`：幂等解绑 caller subscription；V1 不因最后一个订阅者取消而中止已创建的有界共享 acquisition；
 - `GET /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`：轮询 caller-scoped 业务 continuation/processing 投影，返回 consumer、request/processing status、发生 acquisition 时关联的 `asset_request_id`、结果身份和脱敏错误；
@@ -707,9 +707,9 @@ Ensure 的即时处置只区分：
 - `GET /api/v1/research/annual-report-assets/readiness`：查询覆盖和运行状态；
 - `GET /api/v1/research/annual-report-assets/{asset_id}/content`：按 asset ID 安全下载文件。
 
-依赖年报并需要启动业务解析的前台命令必须由业务消费者自己的受保护 POST 命令提供入口（公司画像和券商风控分别沿用或新增其业务命令端点）。该命令必须接收业务 processing fingerprint 和调用方幂等键，先执行共享 local-first 查询：本地命中时直接创建或复用一个 `consumer_request_id`；资产缺失时创建或复用一个 `asset_request_id`，并持久化只针对该 consumer 的 continuation，待资产就绪后创建或复用对应 `consumer_request_id`。generic asset ensure 不得隐式启动任何消费者。业务命令的 HTTP 200/202 返回、`Location`、`Retry-After`、请求所有权和错误投影必须与下方两类 request 资源一致；若具体业务命令属于后续变更，必须登记为本期前台闭环的外部 enablement gate，不得以 generic ensure 已完成宣称业务链路完成。
+依赖年报并需要启动业务解析的前台命令必须由业务消费者自己的受保护 POST 命令提供入口。本期至少登记两个业务适配器：`POST /api/v1/research/company/{instrument_id}/business-profile/annual-report-process` 和 `POST /api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process`；若现有路由命名不同，必须在 OpenAPI snapshot 中登记等价的稳定路由和 owner。该命令必须接收业务 processing fingerprint 和调用方幂等键，并在请求接受时立即创建或复用一个 caller-owned `consumer_request_id`：本地命中且已有 current consumer result 时返回 HTTP 200；资产本地命中但 parser 尚未完成时返回 HTTP 202 和 `consumer_request_id`；资产缺失且允许获取时返回 HTTP 202、`consumer_request_id`、`asset_request_id`，并将 consumer request 置于 `pending_asset`；资产有效后沿用同一 `consumer_request_id` 推进到 `queued|processing`，不能重新生成前台句柄。网络禁用或策略阻止时返回结构化的 `missing|blocked` consumer 终态，不创建 provider operation。generic asset ensure 不得隐式启动任何消费者。业务命令的 HTTP 200/202 返回、`Location`、`Retry-After`、请求所有权和错误投影必须与两类 request 资源一致；若具体业务命令未在本变更实现，必须作为 11.5 的 enablement gate，不能以 generic ensure 已完成宣称业务链路完成。
 
-实际路由必须避免动态路径冲突，并通过 OpenAPI snapshot 固定。任何 GET，包括现有公司画像 GET，都不得隐式触发公告发现或下载。POST 本地命中返回 HTTP 200；创建或复用异步 operation 返回 HTTP 202，并设置 `Location` 和 `Retry-After`。
+实际路由必须避免动态路径冲突，并通过 OpenAPI snapshot 固定。任何 GET，包括现有公司画像 GET，都不得隐式触发公告发现或下载。generic asset ensure 的本地命中或网络禁用缺失返回 HTTP 200；业务命令只有在已有 current consumer result 时返回 HTTP 200，资产本地命中但 parser 尚未完成、或资产缺失并创建异步 acquisition 时均返回 HTTP 202，并设置对应 consumer/asset request 的 `Location` 和 `Retry-After`。
 
 ### 18.2 前台状态模型
 
@@ -718,7 +718,7 @@ Ensure 的即时处置只区分：
 - asset availability：`local_valid/metadata_only/missing/ambiguous/corrupt/superseded/blocked`；
 - operation status：`queued/running/completed/missing/failed/blocked/cancelled/expired`；
 - operation stage：`discovering/downloading/validating/activating/backing_up`；
-- consumer request/processing：`pending/not_started/queued/processing/current/stale/failed/blocked/cancelled`。
+- consumer request/processing：`pending_asset/not_started/queued/processing/current/stale/failed/missing/blocked/cancelled`。
 
 ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_reused`；`local_miss` 表示本地不满足且调用策略未创建网络 operation。asset request 投影明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、stage、进度、最终结果来源和脱敏诊断。consumer request 投影独立返回 `consumer_request_id`、consumer/processing fingerprint、request/processing status、可选关联 `asset_request_id`、结果身份、可重试性和脱敏诊断；本地命中未创建 acquisition 时该关联为空。两类 request 均只允许 owner 或 operator 查询，并遵循统一 404 non-disclosure policy。
 
@@ -743,7 +743,7 @@ V1 取消 `asset_request_id` 只解绑该 principal 的 subscription 和尚未�
 1. 后端先调用共享 local-first 查询；
 2. `local_valid` 时取得 asset ID 作为后续 consumer operation 输入；
 3. 缺失且允许获取时创建 ensure operation；
-4. 业务命令同时持久化 `consumer_request_id` 和 continuation；本地命中时立即创建或复用一个 consumer operation，缺失时在 asset operation 成功后自动创建或复用该 consumer operation，generic asset ensure 不隐式启动无关消费者；
+4. 业务命令在接收时立即持久化或复用 `consumer_request_id` 和 continuation；本地命中时若没有 current consumer result 则返回 202 并创建或复用 consumer operation，资产缺失时先返回 202 + `pending_asset`，在 asset operation 成功后沿用同一 consumer request 创建或复用 consumer operation，generic asset ensure 不隐式启动无关消费者；
 5. 前台分别以 `asset_request_id` 和 `consumer_request_id` 轮询两个 caller-scoped 投影，不能用“附件完成”代替“业务结果 current”；
 6. 业务结果保存共享 asset ID、来源公告、报告期、hash 和修订状态；
 7. 若之后修订版生效，前台将依赖旧 asset 的业务结果标记“来源已更新/待重算”，不得静默显示为最新。
@@ -965,6 +965,7 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 
 - 可查询年报是否存在、当前财务年度、是否修订、本地完整性和最后检查时间。
 - 缺失时可发起获取并看到 queued 到 completed/failed/blocked 的状态变化。
+- 业务命令在资产获取期间即可获得并轮询 `consumer_request_id`（`pending_asset`），资产就绪后沿用同一句柄进入 `queued/processing/current`；已有资产但尚无 current consumer result 时返回 HTTP 202，而不是误报业务完成。
 - 可按 asset ID 安全下载本地 PDF。
 - 公司画像和券商结果可追溯到共享 asset ID 和 hash。
 - 修订发生后，依赖旧原件的业务结果可见“待重算/已过期”状态。
