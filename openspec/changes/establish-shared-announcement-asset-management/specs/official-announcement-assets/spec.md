@@ -11,6 +11,10 @@ The system SHALL provide an official announcement asset capability that is indep
 - **WHEN** a future business module needs a formal annual-report attachment
 - **THEN** it SHALL use the shared asset contract without implementing a provider scanner, attachment downloader, archive layout, or revision store
 
+#### Scenario: Application process starts
+- **WHEN** an API, scheduler, or business process initializes the asset capability
+- **THEN** startup SHALL NOT trigger an unbounded market scan, bulk attachment download, destructive migration, or physical deletion
+
 ### Requirement: Existing Announcement Acquisition Infrastructure Is Reused
 The asset capability SHALL use the existing source-neutral announcement providers, route configuration, normalized records, conservative cursors, and governed attachment retrieval rather than introducing parallel source transports.
 
@@ -36,8 +40,13 @@ The system SHALL distinguish legal announcement identity, attachment observation
 
 #### Scenario: Two filings contain identical bytes
 - **WHEN** two source-qualified attachments have the same SHA-256 content
-- **THEN** they MAY share one physical blob
+- **THEN** they SHALL share one physical blob after canonical migration or acquisition converges
 - **AND** their legal announcement and attachment identities SHALL remain distinct
+
+#### Scenario: A known announcement is observed again
+- **WHEN** the same source-qualified announcement or attachment is rediscovered
+- **THEN** the canonical record SHALL be updated idempotently with first/last-observed evidence and raw metadata identity
+- **AND** it SHALL NOT create a duplicate legal announcement or overwrite prior attachment-version evidence
 
 #### Scenario: One asset is parsed by two consumers
 - **WHEN** business-profile and broker risk-control process the same annual-report asset
@@ -57,6 +66,10 @@ Version 1 SHALL centrally classify A-share formal full annual reports, annual-re
 #### Scenario: Translation or visual edition is found
 - **WHEN** the title denotes an English translation, illustrated edition, or another non-primary rendition
 - **THEN** it SHALL NOT replace the primary Chinese full report
+
+#### Scenario: Related material or unresolvable identity is found
+- **WHEN** an attachment is an audit or assurance report, inquiry or reply, briefing material, semiannual or quarterly report, or lacks a reliable instrument or fiscal-year identity
+- **THEN** it SHALL NOT be eligible as the version 1 effective annual-report asset
 
 #### Scenario: Correction notice has no full replacement report
 - **WHEN** a correction announcement contains only a notice or changed pages and not a complete corrected annual-report attachment
@@ -88,11 +101,11 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 - **WHEN** one valid original full annual report exists for an instrument and fiscal year
 - **THEN** it SHALL be the effective asset
 
-#### Scenario: Correction arrives after original
+#### Scenario: Correction arrives after a predecessor
 - **WHEN** a complete corrected report is downloaded and passes identity, PDF signature, byte-length, and SHA-256 verification
 - **THEN** the system SHALL atomically activate the correction
-- **AND** it SHALL mark the original attachment record superseded
-- **AND** it SHALL invalidate or requeue consumer processing bound to the original asset
+- **AND** it SHALL mark the original or earlier-correction attachment record superseded
+- **AND** it SHALL invalidate or requeue consumer processing bound to the predecessor asset
 
 #### Scenario: New correction fails verification
 - **WHEN** a discovered correction cannot be downloaded or fails integrity validation
@@ -134,18 +147,29 @@ The system SHALL provide a local-first `ensure` contract that returns a verified
 
 #### Scenario: Caller prohibits network access
 - **WHEN** a consumer requests a missing asset with network acquisition disabled
-- **THEN** the service SHALL return an explicit missing status and SHALL NOT contact a provider
+- **THEN** the service SHALL return `local_miss` disposition with explicit missing availability and SHALL NOT create an operation or contact a provider
 
 #### Scenario: Requested period is ambiguous
 - **WHEN** discovery cannot determine one effective full report for the requested instrument and fiscal year
 - **THEN** the service SHALL fail closed with candidate identities and reasons rather than returning an arbitrary attachment
+
+#### Scenario: Exact legal filing is requested
+- **WHEN** a consumer requests a source-qualified announcement or filing identity
+- **THEN** ensure SHALL return or acquire that exact filing under the caller's network and integrity policy
+- **AND** it SHALL NOT substitute a merely similar or newer legal filing
 
 ### Requirement: Latest-Only Historical Backfill Covers The Active A-Share Universe
 The system SHALL provide a resumable bootstrap that targets current active stock instruments on SSE, SZSE, and BSE and stores only the latest available effective annual-report attachment for each instrument.
 
 #### Scenario: Instrument has several historical annual reports
 - **WHEN** the bootstrap discovers multiple fiscal years for an instrument
-- **THEN** it SHALL retain only the latest available fiscal year's effective full report
+- **THEN** it SHALL create one bootstrap effective record and physical attachment only for the latest available fiscal-year winner
+- **AND** it MAY retain non-winning discovery metadata for audit without downloading those attachments
+
+#### Scenario: Older valid files already exist before bootstrap
+- **WHEN** migration inventory finds valid annual reports from earlier fiscal years that are not the latest-only bootstrap winner
+- **THEN** bootstrap SHALL NOT delete them merely because they are outside its acquisition target
+- **AND** any later cleanup SHALL require an independently specified per-file retention or duplicate decision
 
 #### Scenario: Latest fiscal year has corrections
 - **WHEN** the latest available fiscal year has an original and one or more complete corrections
@@ -174,9 +198,14 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 - **WHEN** the process stops after completing part of the universe
 - **THEN** a subsequent run SHALL resume from durable scope and acquisition state without redownloading verified assets or restarting completed instruments
 
+#### Scenario: Bootstrap reaches an overall terminal result
+- **WHEN** every target instrument is evaluated
+- **THEN** the run SHALL report `success` only when every target is available or has unexpired confirmed-missing evidence
+- **AND** any incomplete, retryable, or blocked target SHALL make the run `partial` or `blocked`, never falsely complete
+
 #### Scenario: Delisted history is requested
 - **WHEN** an operator explicitly requests an inactive or delisted instrument outside the default active-universe bootstrap
-- **THEN** the same local-first ensure contract MAY acquire its requested latest annual report without broadening the default scheduled universe
+- **THEN** the same local-first ensure contract SHALL perform the permitted bounded lookup or acquisition without broadening the default scheduled universe
 
 ### Requirement: Daily Discovery Is Windowed Efficient And Fail-Closed
 The daily annual-report update SHALL use category-filtered market discovery, durable provider cursors, overlap windows, bounded date partitions, and targeted missing-instrument repair.
@@ -184,6 +213,15 @@ The daily annual-report update SHALL use category-filtered market discovery, dur
 #### Scenario: Normal daily run resumes
 - **WHEN** a committed annual-report cursor exists for a source, exchange, and normalized category scope
 - **THEN** the run SHALL begin from the committed watermark minus the configured calendar-day overlap and end at the run cutoff
+
+#### Scenario: Daily discovery finds a new complete original report
+- **WHEN** the version 1 daily window discovers an eligible complete annual-report original for an active A-share instrument
+- **THEN** the daily workflow SHALL register its metadata and proactively ensure, validate, and archive the effective attachment
+
+#### Scenario: Daily discovery finds an older-fiscal-year correction
+- **WHEN** the daily or reconciliation window discovers a complete correction for an older fiscal year
+- **THEN** it SHALL reevaluate and replace only that instrument and fiscal year
+- **AND** it SHALL NOT change the effective asset for a later fiscal year
 
 #### Scenario: No cursor exists after bootstrap
 - **WHEN** daily mode starts without a valid committed cursor
@@ -201,6 +239,15 @@ The daily annual-report update SHALL use category-filtered market discovery, dur
 - **AND** the parent day SHALL complete only after every child scope completes
 - **AND** if no stable completion path exists, the day SHALL remain pending with an explicit blocker
 
+#### Scenario: Cursor query semantics change
+- **WHEN** source routing, exchange scope, category, time-boundary semantics, or classification policy changes incompatibly
+- **THEN** the persisted cursor SHALL NOT be reused without explicit migration or bounded rediscovery
+
+#### Scenario: Publication timestamps meet the run boundary
+- **WHEN** records share timestamps across pages, carry future timestamps, or arrive while the run is executing
+- **THEN** the run SHALL preserve raw timestamps, normalize them to the configured project timezone, and apply explicit inclusive/exclusive boundaries against one fixed cutoff
+- **AND** it SHALL not advance past records that cannot be proven inside the completed window
+
 #### Scenario: A correction is indexed late
 - **WHEN** a correction whose publication time falls outside the normal overlap appears later at the provider
 - **THEN** a bounded rotating long-lookback reconciliation of already-covered instruments SHALL discover it within the configured maximum reconciliation period
@@ -214,11 +261,16 @@ The daily annual-report update SHALL use category-filtered market discovery, dur
 - **WHEN** an active instrument is expected to have a latest annual report but coverage is absent
 - **THEN** a bounded rotating repair cohort SHALL run instrument-scoped annual-category discovery without forcing one query per instrument in every daily run
 
-#### Scenario: Later page or attachment fails
-- **WHEN** discovery or attachment acquisition fails after partial progress
-- **THEN** completed metadata and verified attachments SHALL remain reusable
-- **AND** the prior committed cursor SHALL be retained
-- **AND** failures SHALL enter bounded retry state
+#### Scenario: A discovery page fails
+- **WHEN** metadata discovery fails before every page or child scope in the requested window completes
+- **THEN** completed metadata SHALL remain reusable
+- **AND** the prior committed discovery cursor SHALL be retained
+- **AND** the incomplete discovery work SHALL enter bounded retry state
+
+#### Scenario: Attachment acquisition fails after discovery completes
+- **WHEN** every metadata page in a discovery window completes but one or more selected attachments fail acquisition
+- **THEN** the discovery cursor MAY advance for the completed metadata window
+- **AND** attachment failures SHALL remain in a separate bounded retry queue without losing their metadata
 
 ### Requirement: Attachment Acquisition Is Atomic Idempotent And Concurrency-Safe
 The asset service SHALL ensure that concurrent schedulers, API requests, and business consumers cannot download or publish duplicate physical assets for the same attachment observation.
@@ -251,8 +303,48 @@ The asset service SHALL ensure that concurrent schedulers, API requests, and bus
 - **THEN** it SHALL not satisfy local-first access
 - **AND** the service SHALL quarantine or mark it corrupt before bounded reacquisition
 
+### Requirement: Asset Operations Are Durable Idempotent And Recoverable
+Backfill, daily, ensure, migration, integrity, deletion, and backup work SHALL use durable operation state and leases rather than process-local background-task state.
+
+#### Scenario: The same ensure scope is requested concurrently
+- **WHEN** scheduler, API, or consumers request the same normalized instrument/fiscal-year or exact-filing scope under the same policy version
+- **THEN** the service SHALL create at most one active operation for the idempotency scope
+- **AND** every caller SHALL receive the existing operation identity or the completed local asset
+
+#### Scenario: A worker stops during an operation
+- **WHEN** a process exits after persisting progress or holding a lease
+- **THEN** operation status, stage, checkpoint, attempts, heartbeat, retry time, and bounded diagnostics SHALL remain queryable
+- **AND** lease expiry SHALL permit safe resume without repeating verified work
+
+#### Scenario: Operation state is exposed
+- **WHEN** an operation is queried
+- **THEN** `queued|running|completed|missing|failed|blocked|cancelled|expired` status SHALL be separate from its discovery/download/validation/activation/backup stage
+- **AND** batch `success|partial|blocked|failed` outcomes, `local_hit|local_miss|operation_created|operation_reused` ensure disposition, and asset availability SHALL remain separate concepts
+
+#### Scenario: Cancellation is unsupported or unsafe
+- **WHEN** a caller requests cancellation for a non-cancellable stage or version 1 cancellation is disabled
+- **THEN** the API SHALL reject the request explicitly while lease expiry and bounded recovery remain defined
+
+#### Scenario: Shared rollout is rolled back before physical cleanup
+- **WHEN** an operator disables shared consumer routing or daily writes before legacy files are removed
+- **THEN** additive canonical metadata, replacement lineage, operation history, and audit records SHALL remain intact
+- **AND** rollback SHALL use feature gates rather than deleting shared database state
+
+### Requirement: Effective-Asset Changes Are Durable And Replayable
+The system SHALL append a durable monotonic change event or watermark whenever an effective annual-report asset is added, replaced, repaired, withdrawn, or physically removed.
+
+#### Scenario: A consumer is offline during a correction
+- **WHEN** a correction becomes effective while a registered consumer is not running
+- **THEN** the consumer SHALL resume from its own checkpoint and receive the affected instrument, fiscal year, predecessor asset, and replacement asset
+- **AND** idempotent replay SHALL NOT require announcement rediscovery or attachment redownload
+
 ### Requirement: Existing Annual-Report Files Are Reconciled And Reused
 Migration SHALL inventory existing annual-report manifests and paths, validate their identities and content, and adopt valid files before enabling new downloads.
+
+#### Scenario: Initial migration inventory runs
+- **WHEN** an operator inventories existing business-profile and broker archives
+- **THEN** the default operation SHALL be read-only and SHALL NOT download, move, link, quarantine, or delete files
+- **AND** it SHALL report adoptable, duplicate, missing, corrupt, conflicting, orphan, derived, and out-of-scope entries
 
 #### Scenario: Business-profile archive contains a valid latest report
 - **WHEN** an existing business-profile manifest and file identify the selected latest effective annual report
@@ -357,11 +449,11 @@ Backfill, daily, on-demand, migration, deletion, and integrity operations SHALL 
 
 #### Scenario: Daily update completes
 - **WHEN** the daily task finishes
-- **THEN** its result SHALL include target exchanges, discovery windows, pages and requests, records seen, formal reports selected, corrections selected, local hits, downloads, reused existing files, bytes written, superseded files, files deleted, retries, missing coverage, cursor decisions, elapsed time, and errors by source
+- **THEN** its result SHALL include target exchanges, discovery and reconciliation windows, pages and requests, records seen, formal reports selected, corrections selected, local hits, downloads, reused existing files, bytes reserved/written, superseded files, deletion states, retries, missing coverage, cursor decisions, storage/backup gates, elapsed time, and errors by source
 
 #### Scenario: Latest-only backfill completes
 - **WHEN** the bootstrap reaches terminal coverage
-- **THEN** it SHALL report target active instruments, instruments with effective assets, confirmed missing instruments, retryable instruments, corrections chosen, existing files adopted, downloaded files, validation failures, and checkpoint completeness
+- **THEN** it SHALL report target active instruments, instruments with effective assets, confirmed missing, retryable, incomplete, and blocked instruments, corrections chosen, existing files adopted, downloaded files, conflicts, validation failures, and checkpoint completeness
 
 #### Scenario: Physical predecessor is deleted
 - **WHEN** any superseded original or earlier-correction file is deleted
@@ -369,7 +461,7 @@ Backfill, daily, on-demand, migration, deletion, and integrity operations SHALL 
 
 #### Scenario: Operator inspects readiness
 - **WHEN** readiness is queried
-- **THEN** it SHALL report active-universe coverage, integrity failures, pending discovery windows, retry queues, storage gates, backup freshness, scheduler enablement, and consumer migration status
+- **THEN** it SHALL report active-universe coverage, attachment readiness, integrity failures, pending discovery/reconciliation windows, retry queues, storage reservations/gates, backup freshness and unprotected bytes, bootstrap completion, scheduler enablement/last result, and consumer migration status
 
 ### Requirement: File Backup Protects The Shared Archive
 Canonical attachment files SHALL have a governed incremental backup or replication workflow separate from SQLite online database backup.
@@ -395,12 +487,22 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 - **THEN** readiness SHALL expose the backup gap
 - **AND** physical deletion of its predecessor SHALL remain blocked until the replacement backup is verified in an independent failure domain
 
+#### Scenario: Database and attachment assets are restored
+- **WHEN** an operator restores the announcement-asset capability after data loss
+- **THEN** a compatible catalog database snapshot and attachment backup watermark SHALL be restored together
+- **AND** hash/integrity reconciliation SHALL complete before consumer reads, destructive cleanup, or daily writes are re-enabled
+
 ### Requirement: The Capability Is Extensible Beyond Annual Reports
 The data model and service boundaries SHALL permit future semiannual and other announcement attachment types without weakening version 1 annual-report rules.
 
 #### Scenario: Semiannual support is added later
 - **WHEN** a future change enables semiannual reports
 - **THEN** it SHALL reuse announcement, attachment, blob, acquisition, integrity, API, and processing contracts while defining its own effective-version and retention policy
+
+#### Scenario: Version 1 discovers a non-annual announcement type
+- **WHEN** semiannual or another announcement metadata record is observed before its attachment policy is enabled
+- **THEN** version 1 SHALL NOT proactively download that attachment as part of annual-report maintenance
+- **AND** it MAY retain normalized metadata according to the existing announcement-layer policy
 
 #### Scenario: Domain-specific announcement is added later
 - **WHEN** another announcement type gains multiple consumers

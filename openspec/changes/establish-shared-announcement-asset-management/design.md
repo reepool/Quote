@@ -139,7 +139,7 @@ Bootstrap phases:
 2. adopt and classify existing valid local annual-report files;
 3. scan annual-report categories market-wide through bounded date partitions covering current and prior filing seasons;
 4. select each instrument's latest available fiscal year and correction winner;
-5. acquire winners only;
+5. acquire winners only, retaining non-winning discovery metadata for audit without downloading their attachments;
 6. create a rotating targeted repair queue for uncovered instruments;
 7. search each missing instrument backwards through bounded annual-category windows until a valid latest report is found or listing/coverage bounds prove empty;
 8. finish successfully only when every target is `available` or unexpired `confirmed_missing`; any incomplete/retryable/blocked scope makes the run partial.
@@ -150,7 +150,7 @@ Market-wide discovery prevents a normal one-request-per-stock strategy. Targeted
 
 Daily state is keyed by source, exchange, normalized `annual_report` category, and market scope. The normal start is committed maximum publication time minus a configurable overlap, defaulting to three calendar days. The end is the run cutoff.
 
-If a window exceeds provider bounds, selected metadata is retained and the interval is bisected. A single dense day continues through durable page ranges or provider-supported subscopes under the fixed cutoff; its parent completes only when every child completes, otherwise it remains an explicit blocker. Cursor advancement occurs only after the full requested interval completes successfully. Attachment failure does not discard discovered metadata and creates a retryable asset operation. Cursor state is bound to a query/configuration fingerprint.
+If a window exceeds provider bounds, selected metadata is retained and the interval is bisected. A single dense day continues through durable page ranges or provider-supported subscopes under the fixed cutoff; its parent completes only when every child completes, otherwise it remains an explicit blocker. Discovery cursor advancement occurs only after the full metadata window completes successfully. Attachment failure after metadata completion does not roll back the discovery cursor; it creates a separate retryable attachment operation. Cursor state is bound to a query/configuration fingerprint, explicit timestamp boundaries, and one fixed run cutoff.
 
 After market discovery, one bounded rotating cohort repairs instruments missing the expected latest annual report and a separate long-lookback cohort reconciles already-covered instruments for provider-late or backdated corrections. The active-universe snapshot refreshes on a bounded cadence so new listings enter repair and delistings leave the denominator without deleting files. The daily run reports metadata discovery, late-revision reconciliation, and attachment readiness separately.
 
@@ -160,7 +160,7 @@ Alternative: query all instruments daily. Rejected because roughly 5,500 active 
 
 ### Provide hybrid download policy
 
-The independent daily job downloads effective formal annual-report attachments in version 1, as explicitly required. The architecture still separates metadata and attachment stages so future announcement types can use metadata-only or lazy policies.
+The independent daily job proactively downloads both newly selected complete originals and complete corrections in version 1, as explicitly required. The architecture still separates metadata and attachment stages so future announcement types can use metadata-only or lazy policies.
 
 On-demand ensure remains a correctness fallback for missed, manually requested, or historical assets. A scheduler run is an optimization and coverage mechanism, not a prerequisite for business use.
 
@@ -196,17 +196,17 @@ Additive API resources expose:
 - bounded ensure operation creation and status;
 - controlled file streaming by asset id.
 
-Responses expose stable asset lineage, not unrestricted local paths. All metadata and existing business-profile GETs remain zero-network. Asset availability, ensure disposition, durable operation state, and consumer-processing state are separate. Business-profile and broker responses retain existing schemas while adding optional shared lineage. No current API must synchronously crawl the market.
+Responses expose stable asset lineage, not unrestricted local paths. All metadata and existing business-profile GETs remain zero-network. Asset availability, ensure disposition, operation status, operation stage, batch outcome, result origin, and consumer-processing state are separate. Business-profile and broker responses retain existing schemas while adding optional shared lineage. No current API must synchronously crawl the market.
 
 The repository currently has rate limiting but no complete authentication middleware. Acquire, content, cancellation, repair, and operator endpoints therefore remain disabled unless a trusted identity and scoped permission boundary is configured. Durable SQLite operations, not FastAPI `BackgroundTasks`, are the source of truth. The repository supplies DataManager/FastAPI/OpenAPI contracts and UI state definitions; the actual external UI repository and owner are an enablement dependency.
 
 ### Publish asset-change events or watermarks for consumers
 
-When an effective asset is added, replaced, repaired, or deleted, append a change event or watermark keyed by instrument/fiscal year/asset id. Consumers can process only affected assets. A correction marks old consumer runs stale and drives domain-specific reprocessing; the asset service does not delete or rewrite business facts itself.
+When an effective asset is added, replaced, repaired, withdrawn, or deleted, append a monotonic change event or watermark keyed by instrument/fiscal year/asset id. Each consumer keeps its own checkpoint and can replay missed events idempotently without rediscovery or redownload. A correction marks old consumer runs stale and drives domain-specific reprocessing; the asset service does not delete or rewrite business facts itself.
 
 ### Make operations resumable and single-flight
 
-Durable operations use scopes, checkpoints, leases, attempts, retry times, and bounded errors. A unique active lease prevents scheduler, API, and consumer requests from downloading the same attachment concurrently. Files are written to `.part` on the same verified NFS mount, validated, fsynced where supported, atomically renamed, reopened, and reverified. Lease expiry permits cleanup and retry after process failure.
+Durable operations use scopes, checkpoints, leases, attempts, retry times, bounded errors, and separate status/stage/outcome fields. The same normalized scope and policy version has at most one active operation across scheduler, API, and consumers. Files are written to `.part` on the same verified NFS mount, validated, fsynced where supported, atomically renamed, reopened, and reverified. Lease expiry permits cleanup and retry after process failure.
 
 ## Risks / Trade-offs
 
@@ -214,6 +214,7 @@ Durable operations use scopes, checkpoints, leases, attempts, retry times, and b
 - [A correction notice is mistaken for a complete replacement] -> Require a complete full-report classification and validated PDF attachment before winner promotion.
 - [Provider categories omit a report] -> Combine category-filtered market scans with bounded targeted repair of missing expected instruments.
 - [A dense filing date exceeds page bounds] -> Persist completed metadata, continue stable page ranges/subscopes under a fixed cutoff, and advance the parent cursor only after all children complete; otherwise expose an unsplittable-day blocker.
+- [Attachment failure is mistaken for discovery failure] -> Keep discovery cursor and attachment retry state separate; only incomplete metadata work retains the cursor.
 - [Late or backdated corrections are missed] -> Add a rotating long-lookback reconciliation cohort over already-covered assets, separate from the three-day low-latency overlap.
 - [Incomplete newest-year evidence is mistaken for an older latest year] -> Fix `as_of` and fiscal-year/search bounds, classify incomplete/blocked separately from confirmed missing, and never downgrade silently.
 - [Cross-source or withdrawn corrections select the wrong winner] -> Require attachment-level classification, governed mirror/legal precedence, withdrawal observations, and fail-closed ambiguity/provisional states.
@@ -223,6 +224,7 @@ Durable operations use scopes, checkpoints, leases, attempts, retry times, and b
 - [NAS is unavailable] -> Keep local service operational, fail backup explicitly, expose readiness degradation, and prevent unsafe local fallback. Same-server exports do not count as independent disaster recovery.
 - [SQLite and NFS deletion are not one transaction] -> Persist deletion intent before unlink, finalize `deleted|failed` afterward, and run an idempotent reconciler with crash-injection tests.
 - [Business parser status corrupts shared asset status] -> Separate asset and consumer-processing stores.
+- [History reads use a post-cutoff correction or deleted predecessor] -> Apply knowledge-cutoff filtering and return metadata-only unavailable state when eligible predecessor bytes are no longer retained.
 - [API-triggered acquisition causes unbounded work] -> Require authorization, bounded single-instrument scopes, durable asynchronous operations, rate limits, and no caller-supplied paths.
 - [Active business-profile changes overlap migration files] -> Land shared contracts/storage/service first, use adapters, and migrate business-profile in a bounded later step after rebasing current work.
 
@@ -239,12 +241,33 @@ Durable operations use scopes, checkpoints, leases, attempts, retry times, and b
 9. Add DataManager and FastAPI surfaces, consumer lineage, operation status, and front-facing integration tests.
 10. Run dual-read reconciliation, asset backup verification, storage readiness, and affected consumer regression suites.
 11. Stop legacy annual-report writes, remove duplicate business-owned files and code only after verified cutover, and enforce repository residue checks.
-12. Enable daily scheduling after bootstrap reaches the configured coverage gate.
+12. Enable daily scheduling only after bootstrap reaches configured coverage, integrity, storage, backup, and migration gates.
 
-Rollback before legacy-write removal disables shared consumer routing and daily scheduling while leaving additive records and adopted files intact. Rollback after physical cleanup restores the verified archive backup plus the preceding database backup and application version; code rollback alone is insufficient after predecessor or duplicate file deletion.
+Rollback before legacy-write removal disables shared consumer routing and daily scheduling while leaving additive records and adopted files intact; rollback SHALL NOT delete canonical metadata, replacement lineage, or audit records. Rollback after physical cleanup restores the verified archive backup plus its paired database snapshot and application version; code rollback alone is insufficient after predecessor or duplicate file deletion.
 
-## Open Questions
+## Requirement Traceability
 
-- Version 1 assumes the scheduled/bootstrap universe is current active SSE/SZSE/BSE stocks; inactive and delisted instruments are on-demand only.
+The detailed requirements document is the business-level source of intent. The following matrix records where each implementation-relevant requirement is made normative or trackable.
+
+| Requirements document sections | Normative OpenSpec coverage | Implementation tasks |
+| --- | --- | --- |
+| 3-7: ownership, scope, identities, responsibilities | `official-announcement-assets` business-neutral/provider/identity/source separation; `research-data-engine` consumer contract | 1, 2, 8 |
+| 8: canonical metadata/blob/effective/operation/audit state | durable operations, effective selection, replayable changes, deletion audit | 1, 2, 3, 7 |
+| 9: classifier and correction precedence | attachment-level classifier, mixed attachments, cross-source ambiguity, withdrawal, retention pins | 2, 3 |
+| 10: latest-only historical backfill | latest-only scenarios, fixed bounds, terminal status; independent scheduler backfill | 4, 5, 11 |
+| 11: daily windows, dense pages, late corrections, universe lifecycle | daily discovery, cursor boundaries, separate attachment retry, independent daily scheduler | 6 |
+| 12: local-first ensure and exact filing | local-first contract, exact filing, local-only mode, durable single-flight | 7, 8, 9 |
+| 13: content-addressed storage, adoption, deletion | storage layout, atomic files, migration allowlist, mount and space gates | 3, 4 |
+| 14-15: capacity, reservations, independent backup, restore | storage capacity/backup gates and paired restore scenarios | 3, 10, 11 |
+| 16: independent jobs and configuration | scheduler independence, default rollout gates, bounded reporting, integrity/backup jobs | 1, 6, 10, 11 |
+| 17-18: DataManager, API and frontend states | additive safe API, structured missing, HTTP/idempotency semantics, state separation | 7, 9 |
+| 19-20: business-profile and broker migration | shared consumer/no legacy fallback; broker modified capability and lineage | 8, 9, 11 |
+| 21-23: failure, observability and testing | durable operation/audit/lineage, scheduler reports, storage/backup scenarios | 3, 6, 7, 10, 11 |
+| 24-25: acceptance, rollout and rollback | bootstrap cron gate and paired restore; migration/cleanup tasks | 4, 10, 11 |
+| 26-27: V1 trade-offs and implementation entry | proposal non-goals/impact, extensibility requirement, complete checklist | all groups |
+
+## Confirmed Scope And Deferred Decisions
+
+- Version 1 sets the scheduled/bootstrap universe to current active SSE/SZSE/BSE stocks; inactive and delisted instruments are on-demand only.
 - Version 1 intentionally deletes superseded physical annual-report PDFs after safe replacement. A later requirement is needed if point-in-time reconstruction of source documents becomes mandatory.
 - Semiannual reports reuse the architecture but are not enabled in the first scheduled rollout.

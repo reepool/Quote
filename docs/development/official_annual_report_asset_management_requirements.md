@@ -136,7 +136,7 @@ research.announcements
 - 选择同一股票、财务年度的最有效附件。
 - 下载、校验、原子发布、完整性审计和必要时重新获取。
 - 管理日更游标、回补进度、下载 lease、重试和 durable operation。
-- 管理替换关系、引用计数、旧文件删除和删除审计。
+- 管理替换关系、retention pin、旧文件删除和删除审计。
 - 提供 local-first 查询与 ensure。
 - 提供 DataManager、API、可观测性、空间和备份状态。
 
@@ -194,7 +194,7 @@ research.announcements
 - 内容长度、PDF 签名状态、完整性状态；
 - 受控 canonical path；
 - 首次下载/采用时间、最后校验时间；
-- 当前引用计数或可事务计算的引用关系；
+- 可事务查询的 retention-pin 关系，不使用可能漂移的手工引用计数；
 - 备份状态和最近验证时间。
 
 同一内容可被多个法律附件引用，但不能因此合并法律公告身份。
@@ -226,8 +226,9 @@ research.announcements
 用于历史回补、日更、按需获取、迁移、完整性修复和备份：
 
 - operation ID、类型、scope、幂等键；
-- `queued/running/partial/completed/missing/failed/blocked`；
-- 细分阶段 `discovering/downloading/validating/activating/backing_up`；
+- operation status：`queued/running/completed/missing/failed/blocked/cancelled/expired`；
+- operation stage：`discovering/downloading/validating/activating/backing_up`；
+- batch outcome：`success/partial/blocked/failed`，不与单资产 operation status 混用；
 - checkpoint、lease、attempt、next_retry_at；
 - 请求边界、进度计数、最后心跳、错误摘要和最终结果。
 
@@ -286,7 +287,7 @@ research.announcements
 6. 在数据库事务中激活修订版并记录替换边；
 7. 发布资产变更事件，将依赖旧 asset 的业务处理标记为 superseded 或入重跑队列；
 8. 解除旧有效附件对旧 Blob 的活动引用；
-9. 仅在引用计数为零、替换记录完整、备份/删除前提满足时删除旧文件；
+9. 仅在所有 retention pin 释放、替换记录完整、备份/删除前提满足时删除旧文件；
 10. 写入追加式删除审计。
 
 任一前置步骤失败时，旧年报必须继续有效和物理存在。不得因“发现修订标题”就先删除原件。
@@ -594,7 +595,7 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 1. 恢复匹配时间点的数据库备份；
 2. 按数据库登记的 hash 从附件备份恢复 Blob；
 3. 运行全量或抽样完整性核对；
-4. 重建可派生的引用计数和 readiness；
+4. 重建可派生的 retention-pin 投影和 readiness；
 5. 再开放消费者读取和日更写入。
 
 代码回滚不能代替在物理删除发生后的数据库加附件联合恢复。
@@ -649,16 +650,14 @@ DataManager 至少提供：
 
 ### 17.2 Ensure 返回状态
 
-结构化结果至少区分：
+Ensure 的即时处置只区分：
 
 - `local_hit`；
-- `adopted`；
-- `downloaded`；
-- `queued`；
-- `missing`；
-- `ambiguous`；
-- `failed`；
-- `blocked`。
+- `local_miss`；
+- `operation_created`；
+- `operation_reused`。
+
+异步 operation 再通过独立字段报告 status、stage 和最终结果来源 `adopted/downloaded/repaired`；`missing/ambiguous/failed/blocked` 属于资产可用性或 operation 结果，不与 ensure disposition 混在同一枚举。
 
 返回应包含 asset/operation ID、股票、财务年度、来源、filing ID、发布时间、是否修订、hash、长度、完整性、是否当前有效、诊断和下一步，但不向外部客户端暴露任意服务器绝对路径。
 
@@ -681,17 +680,18 @@ DataManager 至少提供：
 
 前台必须分别呈现三套正交状态，不得把“附件下载完成”误解为“业务结果已更新”：
 
-- asset availability：`local_valid/metadata_only/missing/corrupt/superseded/blocked`；
-- operation state：`queued/discovering/downloading/validating/completed/missing/failed/blocked/cancelled/expired`；
+- asset availability：`local_valid/metadata_only/missing/ambiguous/corrupt/superseded/blocked`；
+- operation status：`queued/running/completed/missing/failed/blocked/cancelled/expired`；
+- operation stage：`discovering/downloading/validating/activating/backing_up`；
 - consumer processing：`not_started/queued/processing/current/stale/failed`。
 
-ensure 另返回 `disposition=local_hit|operation_created|operation_reused`。operation 明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、进度和脱敏诊断。若一期不支持取消，必须定义超时、lease 过期和重启恢复语义。
+ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_reused`；`local_miss` 表示本地不满足且调用策略未创建网络 operation。operation 明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、stage、进度、最终结果来源和脱敏诊断。若一期不支持取消，必须定义超时、lease 过期和重启恢复语义。
 
 | 状态 | 前台含义 | 允许操作 |
 | --- | --- | --- |
 | `local_valid` | 当前有效附件本地完整 | 查看来源、下载、启动业务处理 |
 | `metadata_only` | 已知公告但附件未下载 | 发起获取 |
-| `queued/discovering/downloading/validating` | 正在获取 | 轮询，不重复创建任务 |
+| `queued` 或 `running + stage` | 正在获取 | 轮询，不重复创建任务 |
 | `missing` | 有界搜索未找到 | 显示最后检查时间，可按策略重试 |
 | `ambiguous` | 候选不能安全决策 | 展示诊断，等待运维处理 |
 | `blocked` | 空间、权限、网络策略或备份门槛阻止 | 展示可执行的 blocker |
@@ -704,7 +704,7 @@ ensure 另返回 `disposition=local_hit|operation_created|operation_reused`。op
 当用户在公司画像或券商风控前台发起依赖年报的操作：
 
 1. 后端先调用共享 local-first 查询；
-2. `available` 时直接将 asset ID 交给业务 parser；
+2. `local_valid` 时直接将 asset ID 交给业务 parser；
 3. 缺失且允许获取时创建 ensure operation；
 4. 前台轮询 operation，完成后再触发或自动排队业务处理；
 5. 业务结果保存共享 asset ID、来源公告、报告期、hash 和修订状态；

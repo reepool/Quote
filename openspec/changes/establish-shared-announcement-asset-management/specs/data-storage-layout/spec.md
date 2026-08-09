@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Shared Announcement Assets Reside On The Filings Data Volume
-The system SHALL store shared official announcement attachments beneath a configurable project-relative root under `/home/python/Quote/data/filings` so the remounted data volume provides the physical capacity.
+The system SHALL store shared official announcement attachments beneath a configurable project-relative root that resolves within the configured filings volume, defaulting to `data/filings`, so the remounted data volume provides the physical capacity without hard-coding a machine-specific project path.
 
 #### Scenario: Default annual-report archive is configured
 - **WHEN** the shared asset service uses its default layout
@@ -42,6 +42,11 @@ The migration SHALL recognize valid existing annual-report files and MAY retain 
 - **THEN** migration SHALL preserve all copies until consumer references are switched and reconciliation passes
 - **AND** it SHALL then remove redundant files according to the verified deletion plan
 
+#### Scenario: Existing file cannot be hard-linked
+- **WHEN** the verified NFS mount does not support a safe hard link or returns a cross-filesystem or unsupported-operation error
+- **THEN** migration SHALL either keep the adopted path or use copy, flush, hash verification, and same-filesystem atomic rename
+- **AND** it SHALL NOT fall back to an unverified move or duplicate network download
+
 #### Scenario: Existing archive has mixed content
 - **WHEN** annual reports share directories with semiannual reports, historical periods, derived artifacts, orphan files, or conflicts
 - **THEN** cleanup SHALL default to dry-run and use a per-file manifest/hash allowlist
@@ -61,6 +66,7 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 #### Scenario: Concurrent downloads plan space
 - **WHEN** multiple acquisitions reserve temporary, replacement, or unknown-length bytes concurrently
 - **THEN** atomic filesystem-scoped reservations SHALL prevent aggregate use from crossing the hard reserve
+- **AND** completion, failure, cancellation, or expired lease SHALL release or reconcile the reservation idempotently
 
 #### Scenario: Filings mount identity changes
 - **WHEN** the configured NFS source is unavailable, read-only, or replaced by an unapproved or local fallback mount
@@ -73,3 +79,12 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 #### Scenario: Filings backup is verified
 - **WHEN** canonical attachment files are replicated to the configured NAS target
 - **THEN** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, catalog snapshot or manifest watermark, completion time, and errors
+
+#### Scenario: Backup target shares the primary storage host
+- **WHEN** the configured destination resolves to the same server or storage failure domain as the primary filings mount
+- **THEN** the copy SHALL be reported as non-independent and SHALL NOT satisfy physical-deletion readiness
+
+#### Scenario: A paired restore is performed
+- **WHEN** catalog and filing assets are restored from backup
+- **THEN** their snapshot or manifest watermarks SHALL be compatible and restored blobs SHALL pass size/hash verification
+- **AND** consumers and destructive maintenance SHALL remain disabled until reconciliation completes

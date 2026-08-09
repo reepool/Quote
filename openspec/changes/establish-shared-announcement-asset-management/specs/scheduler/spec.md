@@ -1,7 +1,12 @@
 ## ADDED Requirements
 
 ### Requirement: Annual-Report Asset Backfill Is An Independent Operator Job
-The scheduler SHALL expose an annual-report latest-asset backfill job that is independent from business-profile and broker processing jobs.
+The scheduler SHALL expose `annual_report_asset_latest_backfill` as an annual-report latest-asset operator job that is independent from business-profile and broker processing jobs.
+
+#### Scenario: Scheduler configuration is loaded before rollout
+- **WHEN** the new annual-report asset job definitions first appear in production configuration and templates
+- **THEN** latest-backfill SHALL be manual-only and daily, integrity, backup, and destructive-cleanup execution SHALL default disabled
+- **AND** their enablement SHALL NOT inherit business-profile or broker switches
 
 #### Scenario: Operator starts the bootstrap
 - **WHEN** the operator runs the annual-report asset backfill
@@ -17,11 +22,16 @@ The scheduler SHALL expose an annual-report latest-asset backfill job that is in
 - **THEN** a subsequent execution SHALL resume durable work without reprocessing verified completed assets
 
 ### Requirement: Annual-Report Asset Daily Update Has Its Own Schedule
-The scheduler SHALL provide a daily annual-report asset update with configuration and state independent from consuming business tasks.
+The scheduler SHALL provide `annual_report_asset_daily_update` with configuration and state independent from consuming business tasks.
 
 #### Scenario: Daily job is enabled
 - **WHEN** annual-report asset daily scheduling is enabled
 - **THEN** the scheduler SHALL register the configured cron trigger regardless of business-profile rollout state
+
+#### Scenario: Daily enablement is requested before bootstrap readiness
+- **WHEN** bootstrap coverage, local integrity, storage reserve, backup, or migration gates have not passed
+- **THEN** scheduled daily enablement SHALL fail closed or remain disabled with explicit blockers
+- **AND** local reads, manual bounded operations, and on-demand ensure SHALL remain available
 
 #### Scenario: Daily job is disabled
 - **WHEN** annual-report asset daily scheduling is disabled
@@ -30,6 +40,10 @@ The scheduler SHALL provide a daily annual-report asset update with configuratio
 #### Scenario: Daily update discovers a correction
 - **WHEN** a complete corrected annual report appears in the discovery window
 - **THEN** the daily job SHALL ensure the corrected attachment and execute the governed effective-version replacement workflow
+
+#### Scenario: Daily update discovers an original annual report
+- **WHEN** the daily job selects a new effective complete original annual report
+- **THEN** it SHALL proactively acquire and validate that attachment in version 1 rather than wait for a business consumer
 
 #### Scenario: A correction is indexed outside normal overlap
 - **WHEN** a provider exposes a correction after its publication time has fallen outside the daily overlap
@@ -60,6 +74,18 @@ Annual-report scheduler jobs SHALL use explicit network, time, storage, and work
 #### Scenario: Concurrent execution is attempted
 - **WHEN** another scheduled or manual instance targets the same annual-report operation scope
 - **THEN** scheduler and asset leases SHALL prevent duplicate active acquisition while reporting the existing run identity
+
+### Requirement: Annual-Report Integrity And Backup Have Governed Jobs
+The scheduler SHALL expose independently configured `annual_report_asset_integrity_audit` and `annual_report_asset_backup` jobs in addition to latest-backfill and daily update.
+
+#### Scenario: Integrity audit runs
+- **WHEN** an operator or low-frequency schedule starts integrity audit
+- **THEN** it SHALL default to read-only verification and SHALL require explicit bounded authorization for repair, quarantine, move, link, or deletion
+
+#### Scenario: Archive backup runs
+- **WHEN** the configured archive-backup job starts
+- **THEN** it SHALL use the shared durable operation and independent-failure-domain backup contracts
+- **AND** a backup failure SHALL degrade readiness without causing a local asset to become invalid
 
 ### Requirement: Consumer Processing Can Depend On Asset Readiness
 Scheduler dependency configuration SHALL allow consuming business jobs to require annual-report asset availability without embedding asset downloads inside those jobs.
