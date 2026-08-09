@@ -5,12 +5,14 @@ The `business-profile-20260809112342618082` production-shadow batch proved that 
 ## What Changes
 
 - Require every business-profile LLM prompt and semantic conclusion to use Chinese, preserve source-native labels and units without translation, and leave canonical field mapping and normalization to deterministic program code.
+- Prohibit production extraction LLMs from calculating conversions, percentages, ratios, totals, differences, margins, concentration, rankings, materiality, confidence, or derived exposure values; the model returns only source-reported values, source units, qualitative statements, and evidence references.
 - Replace the ambiguous unit string contract with source value/unit lineage plus a versioned programmatic unit parser, dimension catalog, scale grammar, exact `Decimal` conversion, and replayable unresolved-unit state. Unit resolution failures will not repeat a successful LLM request.
+- Add automatic unknown-unit governance: deterministic composition runs first; an optional LLM may submit a bounded candidate decomposition/formula, but program code independently proves dimensions, recomputes the multiplier, runs round-trip/safety tests, and auto-promotes only rules mechanically derivable from existing governed primitives. The LLM cannot directly edit or approve the production unit catalog.
 - Perform real row-level numeric reconciliation after unit normalization, including revenue/cost/gross-margin identities and precision-aware tolerances. Remove all unconditional reconciliation-success flags.
 - Preserve distinct source-native labels, Chinese semantic summaries, and program-generated canonical identifiers so model wording cannot change cross-period entity identity.
 - Persist the raw validated semantic envelope before downstream conversion, allowing catalog or conversion fixes to replay without another LLM call.
 - Automatically quarantine and supersede affected shadow candidates, recover the 12 unit-blocked work items and inconsistent `600403.SH` rows, and reuse downloaded reports, selected sections, evidence, and valid semantic artifacts.
-- Raise structured semantic worker concurrency from 2 to an initial configurable value of 4, while retaining shared-gateway admission, adaptive provider congestion controls, per-provider limits, and automatic reduction under pressure.
+- Raise structured semantic worker concurrency from 2 to an initial configurable value of 10, while retaining shared-gateway admission, adaptive provider congestion controls, per-provider limits, and automatic reduction under pressure.
 - Initialize research storage once before worker startup, remove per-work-item schema initialization, keep parsing/network/LLM work outside the write gate, query only referenced evidence during bundle persistence, and expose transaction latency and writer-duty metrics.
 - Replace the HKEX factor path's evaluation of Sina response text with a safe bounded parser and classify upstream response/parser errors with exception type, source, symbol, response metadata, and DEBUG traceback.
 

@@ -31,7 +31,7 @@ provenance must remain reproducible without the LLM.
   fixes do not spend another LLM request.
 - Reject or quarantine arithmetic inconsistencies before candidate persistence and
   automatically recover the affected shadow work.
-- Raise structured semantic concurrency to four by default, with shared gateway
+- Raise structured semantic concurrency to ten by default, with shared gateway
   admission, provider-specific limits, adaptive congestion reduction, and clear
   observability.
 - Initialize storage once per production run, keep computation outside the write
@@ -42,8 +42,10 @@ provenance must remain reproducible without the LLM.
 
 **Non-Goals:**
 
-- Do not make the LLM calculate unit multipliers, currency conversions, margins,
-  identifiers, page offsets, hashes, or approval decisions.
+- Do not make a production extraction LLM calculate unit multipliers, currency
+  conversions, percentages, ratios, totals, differences, margins, concentration,
+  rankings, materiality, confidence, exposure values, identifiers, page offsets,
+  hashes, or approval decisions.
 - Do not require every semantic summary to reproduce source wording.
 - Do not delete immutable PDFs, evidence spans, prior audits, or approved history.
 - Do not auto-promote shadow data or broaden the rollout to value-chain and
@@ -114,7 +116,42 @@ Alternative rejected: continuously append ad-hoc aliases to JSON. That approach
 cannot distinguish `万台（套）`, `千只`, `亿千瓦时`, and currency scales or prove
 that a new alias has the correct dimension.
 
+Unknown units use an automated three-tier maintenance path:
+
+1. The deterministic grammar first attempts to compose the unit from governed
+   prefixes, base units, classifiers, numerators, and denominators. Successful
+   compositions are runtime resolutions and do not require a new catalog row.
+2. If tokens remain unknown, a separate unit-proposal LLM profile may receive the
+   raw unit, bounded Chinese context, and the closed list of governed primitives.
+   It returns a data-only proposal containing token decomposition, proposed
+   dimension, canonical primitive references, and a declarative multiplier. It
+   does not convert any company value and cannot write the catalog.
+3. Program code parses the proposal without evaluating expressions, recomputes
+   the multiplier from governed prefixes, proves numerator/denominator dimensions,
+   checks dependency cycles and prohibited transformations, and runs exact
+   round-trip test vectors. Only a rule fully derivable from existing primitives
+   becomes an append-only `auto_approved` runtime overlay with a new catalog
+   version. New base dimensions, contextual/non-linear conversions, FX formulas,
+   or proposals that depend only on model assertion remain quarantined.
+
+The runtime overlay is stored in a governed unit-rule table rather than rewriting
+the source JSON file. Every proposal, proof result, rejection, promotion, and
+catalog version is auditable and replayable. This keeps normal operation automatic
+while reserving manual intervention for genuinely new or context-dependent unit
+semantics, not formatting variants. A proposal is unusable by normalization and
+publication paths until the deterministic proof transaction commits; model
+confidence, repeated agreement, or successful extraction cannot substitute for
+that proof.
+
 ### 3. Enforce numeric reconciliation after conversion
+
+All arithmetic belongs to deterministic code. The extraction LLM identifies which
+source values and units belong to a fact and returns source-reported numbers
+unchanged. Program code handles percent-to-fraction conversion, scale application,
+totals, ratios, changes, margins, concentration, rankings, materiality thresholds,
+confidence formulas, exposure aggregation, and every other derived numeric field.
+If a source explicitly reports a percentage or total, the model returns that raw
+reported value and unit; the program separately normalizes and verifies it.
 
 For each structured segment with revenue, cost, and reported gross margin:
 
@@ -154,8 +191,8 @@ unnecessary LLM calls.
 
 ### 5. Raise concurrency without bypassing controls
 
-Set structured semantic `max_concurrency` to 4 in shadow configuration. The stage
-creates at most four async requests, while the common gateway remains authoritative
+Set structured semantic `max_concurrency` to 10 in shadow configuration. The stage
+creates at most ten async requests, while the common gateway remains authoritative
 for pool admission, provider limits, token budgets, retries, and circuit breaking.
 The service records requested, admitted, in-flight, throttled, failover, and
 provider-congestion counts. A configured adaptive controller can lower the stage
@@ -163,9 +200,10 @@ limit when timeout/error or queue-wait thresholds are exceeded and restore it af
 the cooldown window. Parse and semantic CPU/network work remains outside the
 SQLite writer.
 
-Alternative rejected: setting concurrency to a large fixed number. The previous
-run had successful calls but a saturated writer; unbounded LLM concurrency would
-hide the real bottleneck and increase provider failures during filing season.
+Alternative rejected: bypassing admission or setting an unbounded fixed number.
+The previous run had successful calls but a saturated writer; the requested limit
+of ten remains a stage ceiling, while gateway and provider controls may admit fewer
+requests under filing-season pressure.
 
 ### 6. Make storage initialization and writes genuinely short
 
@@ -220,10 +258,11 @@ source results.
    audits.
 3. Replay stored semantic artifacts under the new unit and numeric contracts. Only
    artifacts that fail hash/evidence scope validation are sent to the LLM again.
-4. Run a bounded 20-company shadow batch with semantic concurrency 4 and DEBUG
+4. Run a bounded 20-company shadow batch with semantic concurrency 10 and DEBUG
    logging. Require zero unconditional reconciliation flags, zero repeated
    initialization calls, no terminal failures, and all unresolved units represented
-   as pending artifacts.
+   as pending artifacts. Require zero normalization or publication decisions that
+   reference an unproved or quarantined unit rule.
 5. Compare writer duty, p95 transaction time, gateway timeout rate, accepted rows,
    unit-resolution counts, and Chinese-language contract violations with the
    2026-08-09 baseline. Keep promotion disabled until the readiness manifest passes.

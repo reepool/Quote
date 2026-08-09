@@ -5,6 +5,7 @@
 - [ ] 1.3 Implement a bounded Chinese-language contract validator with one automatic repair request and no routine human-review escalation
 - [ ] 1.4 Update runtime record builders so `*_raw` remains source-native, semantic summaries remain Chinese, and stable canonical IDs never depend on model translation
 - [ ] 1.5 Add tests for Chinese labels, English-only violations, mixed Chinese/acronym text, source symbols, semantic paraphrases, and stable cross-period identities
+- [ ] 1.6 Audit every business-profile prompt/schema and prohibit model-calculated conversions, percentages, ratios, totals, differences, margins, concentration, rankings, materiality, confidence, and exposure values
 
 ## 2. Deterministic Unit Governance
 
@@ -15,6 +16,10 @@
 - [ ] 2.5 Represent unresolved or cross-dimension units as `unit_resolution_pending` without discarding the semantic response or consuming another LLM attempt
 - [ ] 2.6 Add catalog replay and tests proving pending units resolve after a catalog-only version change with zero new model calls
 - [ ] 2.7 Add property and table-driven tests for magnitude composition, compound classifiers, plural aliases, incompatible dimensions, precision, overflow bounds, and unknown units
+- [ ] 2.8 Add the append-only runtime unit-rule proposal/overlay tables with proposal, proof, quarantine, auto-approval, catalog-version, and replay lineage
+- [ ] 2.9 Implement the optional closed-schema unit-proposal LLM path without catalog write authority or company-value conversion
+- [ ] 2.10 Implement deterministic formula proof by primitive-reference validation, multiplier recomputation, dimensional analysis, cycle/prohibited-rule checks, and exact round-trip tests
+- [ ] 2.11 Auto-promote only mechanically provable overlay rules, make uncommitted proofs unusable by normalization/publication, and quarantine new dimensions, contextual/non-linear rules, FX, ambiguous mappings, and model-only assertions
 
 ## 3. Replayable Semantic Artifacts
 
@@ -31,6 +36,7 @@
 - [ ] 4.3 Reject the whole affected semantic bundle when a reported numeric identity conflicts beyond tolerance and retain both reported and calculated diagnostics without overwriting either value
 - [ ] 4.4 Add regression fixtures for the two inconsistent `600403.SH` rows and representative correct, rounded, missing-margin, zero-revenue, negative-margin, and incompatible-unit cases
 - [ ] 4.5 Ensure promotion/readiness cannot accept a candidate lacking an executed applicable reconciliation result
+- [ ] 4.6 Move percentage, ratio, total, difference, concentration, ranking, materiality, confidence, and exposure arithmetic into versioned program functions and test that LLM-calculated values are ignored or rejected
 
 ## 5. Automatic Recovery And Data Hygiene
 
@@ -46,7 +52,7 @@
 - [ ] 6.2 Remove per-work-item full initialization and add tests that multiple acquire/parse/semantic/publish items initialize configured databases exactly once
 - [ ] 6.3 Restrict bundle evidence validation queries to referenced evidence IDs and preserve one bounded bulk transaction per field-family bundle
 - [ ] 6.4 Add writer transaction p50/p95/max latency, lock-duty, wait, initialization-count, and inter-write-yield metrics with configurable degraded thresholds
-- [ ] 6.5 Raise structured-shadow semantic concurrency from 2 to 4, keep the shared logical-profile gateway authoritative, and expose requested/admitted/in-flight/throttled/provider-congestion metrics
+- [ ] 6.5 Raise structured-shadow semantic concurrency from 2 to 10, keep the shared logical-profile gateway authoritative, and expose requested/admitted/in-flight/throttled/provider-congestion metrics
 - [ ] 6.6 Add adaptive stage reduction/recovery around gateway congestion without coupling semantic concurrency to the single SQLite writer
 - [ ] 6.7 Add concurrency tests proving parse/LLM work runs in parallel outside the write gate, `max_active_writers` remains 1, and another SQLite client can write during a long semantic batch
 - [ ] 6.8 Add a bounded performance regression comparing initialization count, transaction count, writer duty, elapsed time, and LLM throughput with the 2026-08-09 baseline
@@ -64,6 +70,6 @@
 - [ ] 8.1 Update rollout configuration, unit/prompt/schema identities, DEBUG runbook queries, recovery instructions, and readiness thresholds without enabling structured promotion
 - [ ] 8.2 Run focused semantic extraction/runtime/async/unit/storage/HKEX tests, JSON/schema validation, AST compilation, and static checks
 - [ ] 8.3 Run the expanded business-profile and adjustment-factor regression suites and fix every confirmed correctness or compatibility finding
-- [ ] 8.4 Execute a bounded 20-company shadow validation with semantic concurrency 4, verify zero terminal failures and zero repeated LLM calls for conversion retries, and inspect Chinese outputs, unit lineage, arithmetic gates, artifacts, and writer metrics
-- [ ] 8.5 Keep promotion disabled unless the machine-readable readiness manifest has no language, unit, numeric, replay, writer, gateway, or approved-history blocker
+- [ ] 8.4 Execute a bounded 20-company shadow validation with semantic concurrency 10, verify zero terminal failures and zero repeated LLM calls for conversion retries, and inspect Chinese outputs, unit proposals/proofs, arithmetic gates, artifacts, gateway pressure, and writer metrics
+- [ ] 8.5 Keep promotion disabled unless the machine-readable readiness manifest has no language, unproved/quarantined-unit-use, numeric, replay, writer, gateway, or approved-history blocker
 - [ ] 8.6 Review the complete implementation diff, classify findings for real trigger paths versus over-strict suggestions, fix confirmed issues, and record the final validation evidence

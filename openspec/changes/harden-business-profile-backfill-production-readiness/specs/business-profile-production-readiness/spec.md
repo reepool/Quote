@@ -64,6 +64,46 @@ The system SHALL require the LLM to return the source numeric value and source u
 - **THEN** the system replays the stored semantic artifact and performs conversion without an LLM call
 - **AND** it records the new catalog and rule lineage
 
+#### Scenario: Unknown unit is compositionally resolvable
+- **WHEN** an unseen source-unit string can be decomposed entirely into governed prefixes, base units, classifiers, numerators, and denominators
+- **THEN** deterministic code resolves it automatically without an LLM or manual review
+- **AND** it records the complete compositional rule trace
+
+#### Scenario: LLM proposes a rule for unknown tokens
+- **WHEN** deterministic parsing leaves one or more unknown unit tokens and the optional unit-proposal profile is enabled
+- **THEN** the LLM may return a bounded data-only candidate decomposition and declarative formula referencing only supplied governed primitives
+- **AND** the proposal does not convert company values, execute code, edit a catalog, or approve itself
+
+#### Scenario: Candidate formula is mechanically provable
+- **WHEN** program code can independently recompute a proposed multiplier from existing governed prefixes, prove dimensional compatibility, reject cycles and prohibited transformations, and pass exact round-trip test vectors
+- **THEN** it appends an `auto_approved` rule to the governed runtime overlay
+- **AND** it creates a new catalog version and replays matching pending artifacts automatically
+- **AND** normalization and publication paths may use the rule only after its deterministic proof and catalog-version transaction commits
+
+#### Scenario: Candidate formula depends on model assertion
+- **WHEN** a proposal introduces a new base dimension, contextual or non-linear conversion, implicit FX rate, unproved multiplier, or ambiguous semantic mapping
+- **THEN** the system quarantines the proposal and keeps the original fact pending
+- **AND** it does not auto-maintain the production conversion rules from that proposal
+- **AND** model confidence, repeated model agreement, or successful extraction cannot promote or activate the rule
+
+### Requirement: All business-profile calculations are program-owned
+The production extraction LLM SHALL return source-reported numeric values and source units unchanged, and deterministic program code SHALL perform every conversion, percentage, ratio, total, difference, margin, concentration, ranking, materiality, confidence, and exposure calculation.
+
+#### Scenario: Source reports a percentage
+- **WHEN** annual-report evidence explicitly reports `18.41%`
+- **THEN** the LLM returns source value `18.41` and source unit `%`
+- **AND** program code converts it to the governed fraction and records conversion lineage
+
+#### Scenario: Source provides inputs but not a derived result
+- **WHEN** evidence reports revenue and cost but does not report gross margin
+- **THEN** the LLM returns only the reported revenue/cost values and units
+- **AND** program code may calculate a separately identified derived margin
+
+#### Scenario: Business logic needs a score or aggregate
+- **WHEN** downstream value-chain, concentration, materiality, confidence, ranking, or commodity-exposure logic needs arithmetic
+- **THEN** deterministic versioned code calculates the result from governed inputs
+- **AND** no LLM-provided calculated value is accepted as authoritative
+
 ### Requirement: Structured numeric identities are reconciled before persistence
 The structured semantic runtime SHALL calculate applicable arithmetic identities after unit normalization and SHALL never mark numeric reconciliation successful without executing the corresponding check.
 
@@ -126,11 +166,11 @@ The system SHALL automatically identify and make non-publishable structured shad
 - **AND** it does not silently mutate approved history
 
 ### Requirement: Structured semantic concurrency is configurable and adaptive
-The backfill SHALL support at least four concurrent structured semantic requests while keeping shared gateway admission, provider limits, token budgets, timeout handling, and adaptive congestion control authoritative.
+The backfill SHALL support a configured ceiling of ten concurrent structured semantic requests while keeping shared gateway admission, provider limits, token budgets, timeout handling, and adaptive congestion control authoritative.
 
 #### Scenario: Shadow backfill uses the new default
 - **WHEN** structured-shadow backfill starts without an explicit semantic concurrency override
-- **THEN** it requests a maximum semantic concurrency of four
+- **THEN** it requests a maximum semantic concurrency of ten
 - **AND** parse and semantic work run outside the SQLite write gate
 
 #### Scenario: Gateway admits fewer requests
@@ -176,7 +216,7 @@ Business-profile database writes SHALL remain serialized but SHALL be limited to
 Structured promotion SHALL remain disabled until a bounded shadow run proves Chinese output compliance, deterministic unit resolution behavior, numeric reconciliation, replay behavior, and acceptable writer and gateway metrics.
 
 #### Scenario: Readiness audit passes
-- **WHEN** the bounded validation cohort has no unclassified unit loss, no unconditional reconciliation success, no inconsistent publishable row, no repeated successful LLM call for conversion retry, and no storage/concurrency threshold breach
+- **WHEN** the bounded validation cohort has no unclassified unit loss, no unproved or quarantined unit rule used for normalization/publication, no unconditional reconciliation success, no inconsistent publishable row, no repeated successful LLM call for conversion retry, and no storage/concurrency threshold breach
 - **THEN** the system may produce a promotion manifest for the structured phase
 
 #### Scenario: Readiness audit fails
