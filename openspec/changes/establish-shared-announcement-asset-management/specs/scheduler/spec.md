@@ -34,10 +34,15 @@ The scheduler SHALL provide `annual_report_asset_daily_update` with configuratio
 - **THEN** the scheduler SHALL register the configured cron trigger regardless of business-profile rollout state
 
 #### Scenario: Daily enablement is requested before bootstrap readiness
-- **WHEN** bootstrap coverage, local integrity, storage reserve, backup, or migration gates have not passed
+- **WHEN** bootstrap coverage/handoff, local integrity, storage reserve, backup configuration, or asset-adoption promotion gates have not passed
 - **THEN** scheduled daily enablement SHALL fail closed or remain disabled with explicit blockers
 - **AND** local reads, manual bounded operations, and on-demand ensure SHALL remain available
 - **AND** a completely proven `overdue_missing` period SHALL degrade readiness but SHALL NOT block daily discovery under the default version 1 policy, because the daily job must remain able to discover the delayed filing
+
+#### Scenario: Business consumers have not migrated
+- **WHEN** business-profile, broker risk-control, or both still use their legacy consumer paths after the asset bootstrap is ready
+- **THEN** shared annual-report daily scheduling SHALL remain independently enableable and SHALL continue discovery, proactive attachment acquisition, correction replacement, and asset events
+- **AND** incomplete consumer migration SHALL block only that consumer's cutover and legacy cleanup, not asset backfill or daily maintenance
 
 #### Scenario: Daily job is disabled
 - **WHEN** annual-report asset daily scheduling is disabled

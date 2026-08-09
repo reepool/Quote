@@ -301,7 +301,7 @@ research.announcements
 9. 仅在所有 retention pin 释放、替换记录完整、备份/删除前提满足时，将意图置为 `deleting` 并删除旧文件；
 10. 成功后写 `deleted`，失败写 `failed` 和可重试诊断；追加式审计在任何阶段都不得先于实际 unlink 宣称已删除。
 
-任一前置步骤失败时，旧年报必须继续有效和物理存在。不得因“发现修订标题”就先删除原件。
+新附件校验失败或第 6 步激活事务提交前失败时，旧年报必须继续有效和物理存在。第 6 步事务提交后，新修订版是唯一 effective winner；后续事件发布、消费者失效、备份或文件删除失败只能形成可重试的 `planned/deleting/failed` 清理和消费重算状态，不得把 effective winner 回退到旧版。不得因“发现修订标题”就先删除原件。
 
 ## 10. 历史回补需求
 
@@ -528,13 +528,13 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 
 不得仅因文件名相同认定内容相同，也不得在 consumer 尚未切换时删除其原路径。
 
-shadow 记录在 source identity、股票/报告期、附件分类、长度/hash 和 latest-effective 决策完成对账前，不得进入生产 effective 查询、不得满足 bootstrap coverage，也不得被前台或业务 parser 消费。只有无冲突对账完成并通过显式 consumer cutover gate 后，才可把采用记录提升为 production-visible；冲突和证据不足记录始终 fail closed。
+shadow 记录在 source identity、股票/报告期、附件分类、长度/hash、受控路径和 latest-effective 决策完成对账前，不得进入生产 effective 查询、不得满足 bootstrap coverage，也不得被前台或业务 parser 消费。无冲突对账完成后，由独立的 asset-adoption promotion gate 将记录提升为 production-visible，使共享回补和日更可以复用该文件；该 gate 不依赖公司画像或券商是否已切换。消费者自己的 cutover gate 只决定对应业务是否读取共享资产，不得阻止资产层提升、回补或日更。冲突和证据不足记录始终 fail closed。
 
 任何迁移清理都必须生成逐文件 allowlist，列出 managed path、manifest/asset ID、hash 和删除理由。允许删除的原因仅限：字节完全相同的冗余副本，或被完整修订版替代且已满足删除门槛的同财年旧原件。`derived/`、半年报、其他财务年度、未入 manifest 的孤儿文件和任何冲突文件一律排除。工具默认 dry-run，禁止目录级删除。
 
 ### 13.4 一个财务年度一个有效附件
 
-该约束指一个有效逻辑选择和一个无冗余物理 Blob：
+该约束指共享 canonical archive 中一个有效逻辑选择和一个无冗余物理 Blob：
 
 - 同一股票、财务年度只有一行当前有效选择；
 - 若多个法律附件内容完全相同，可共享 Blob，但法律身份保留；
@@ -543,6 +543,8 @@ shadow 记录在 source identity、股票/报告期、附件分类、长度/hash
 - 任一 retention pin 未释放时不能删除，pin 应由数据库查询/约束计算，不能依赖可能漂移的手工计数字段；
 - read/processing lease 必须包含 owner、TTL、heartbeat、generation 和安全宽限期；过期 lease 只能由 CAS/reconciler 撤销并重新计算 pin，仍有新 heartbeat 或无法证明 owner 已失效时继续阻止删除。崩溃、长时间解析、续租竞争和过期回收必须有测试，避免陈旧 lease 永久阻塞，也避免活跃 reader 被提前删除原件；
 - 删除文件不删除公告、附件、hash、替换链和删除审计。
+
+迁移过渡期允许受管 legacy alias 为尚未切换的消费者暂时保留 predecessor 字节；该 alias 不计入 current-effective、latest-only coverage 或共享 canonical Blob 数量，且必须有 owner、consumer、hash、过期/切换条件和 retention pin。消费者切换后应按逐文件 allowlist 清理 alias，不能把迁移兼容副本误报为长期有效年报。
 
 ## 14. 当前存储容量评估与门槛
 
@@ -599,6 +601,7 @@ shadow 记录在 source identity、股票/报告期、附件分类、长度/hash
 ### 15.1 备份要求
 
 - 目标必须是经过身份校验的 NAS mount；
+- 备份输入必须从 catalog 的 required-blob 集合枚举，而不是只遍历 canonical blob 目录；仍位于受控 legacy path 的已采用 Blob 也必须按登记 hash 读取、复制和验证；
 - 按内容 hash 只复制缺失 Blob；
 - 复制后校验长度和 SHA-256；
 - 记录 destination identity、完成时间、错误和未保护字节；
@@ -613,7 +616,7 @@ shadow 记录在 source identity、股票/报告期、附件分类、长度/hash
 
 ### 15.2 删除前提
 
-修订替换删除旧文件时，必须要求新文件本地完整、数据库已激活、所有 retention pin 已释放、删除审计可写，并且新文件已经在独立故障域完成长度/hash 验证，且其 file-manifest 水位与包含 replacement 事务的可恢复 catalog 数据库快照配对。任一条件不满足时只可标记待删除，不得 unlink。
+修订替换删除旧文件时，必须要求新文件本地完整、数据库已激活、所有 retention pin 已释放、删除审计可写，并且 replacement Blob 与准备删除的 predecessor Blob 均已在独立故障域完成长度/hash 验证，且 file-manifest 水位与包含 replacement 事务、predecessor hash、替换边和 rollback manifest 引用的可恢复 catalog 数据库快照配对。任一条件不满足时只可标记待删除，不得 unlink。predecessor 的备份副本仅用于灾备/回滚，不得重新成为业务可见的第二份有效年报；V1 不对这类备份 Blob 自动执行 GC。
 
 ### 15.3 恢复顺序
 
@@ -621,7 +624,7 @@ shadow 记录在 source identity、股票/报告期、附件分类、长度/hash
 
 1. 恢复匹配时间点的数据库备份；
 2. 按数据库登记的 hash 从附件备份恢复 Blob；
-3. 对数据库引用的全部 current-effective、retention-pinned 和 pending-deletion replacement Blob 执行 presence、length 和 SHA-256 全量核对；任一必需 Blob 缺失或不匹配时保持 blocked，抽样只用于日常演练，不能作为恢复后开放门槛；
+3. 对数据库引用的全部 current-effective、retention-pinned、pending-deletion replacement 和仍在有效 rollback manifest 中的 predecessor Blob 执行 presence、length 和 SHA-256 全量核对；任一必需 Blob 缺失或不匹配时保持 blocked，抽样只用于日常演练，不能作为恢复后开放门槛；
 4. 重建可派生的 retention-pin 投影和 readiness；
 5. 再开放消费者读取和日更写入。
 
@@ -707,9 +710,15 @@ Ensure 的即时处置只区分：
 - `GET /api/v1/research/annual-report-assets/readiness`：查询覆盖和运行状态；
 - `GET /api/v1/research/annual-report-assets/{asset_id}/content`：按 asset ID 安全下载文件。
 
-依赖年报并需要启动业务解析的前台命令必须由业务消费者自己的受保护 POST 命令提供入口。本期至少登记两个业务适配器：`POST /api/v1/research/company/{instrument_id}/business-profile/annual-report-process` 和 `POST /api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process`；若现有路由命名不同，必须在 OpenAPI snapshot 中登记等价的稳定路由和 owner。该命令必须接收业务 processing fingerprint 和调用方幂等键，并在请求接受时立即创建或复用一个 caller-owned `consumer_request_id`：本地命中且已有 current consumer result 时返回 HTTP 200；资产本地命中但 parser 尚未完成时返回 HTTP 202 和 `consumer_request_id`；资产缺失且允许获取时返回 HTTP 202、`consumer_request_id`、`asset_request_id`，并将 consumer request 置于 `pending_asset`；资产有效后沿用同一 `consumer_request_id` 推进到 `queued|processing`，不能重新生成前台句柄。网络禁用或策略阻止时返回结构化的 `missing|blocked` consumer 终态，不创建 provider operation。generic asset ensure 不得隐式启动任何消费者。业务命令的 HTTP 200/202 返回、`Location`、`Retry-After`、请求所有权和错误投影必须与两类 request 资源一致；若具体业务命令未在本变更实现，必须作为 11.5 的 enablement gate，不能以 generic ensure 已完成宣称业务链路完成。
+依赖年报并需要启动业务解析的前台命令必须由业务消费者自己的受保护 POST 命令提供入口。本期至少登记两个业务适配器：`POST /api/v1/research/company/{instrument_id}/business-profile/annual-report-process` 和 `POST /api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process`；若现有路由命名不同，必须在 OpenAPI snapshot 中登记等价的稳定路由和 owner。该命令必须接收业务 processing fingerprint 和调用方幂等键，并在请求接受时立即创建或复用一个 caller-owned `consumer_request_id`：本地命中且已有绑定当前 effective asset ID/hash 与相同 processing fingerprint 的 current consumer result 时返回 HTTP 200；资产本地命中但 parser 尚未完成、或旧结果已因修订而 stale 时返回 HTTP 202 和 `consumer_request_id`；资产缺失且调用者同时拥有业务处理权限和 `annual_report_assets:acquire` 权限时返回 HTTP 202、`consumer_request_id`、`asset_request_id`，并将 consumer request 置于 `pending_asset`；资产有效后沿用同一 `consumer_request_id` 推进到 `queued|processing`，不能重新生成前台句柄。业务命令的 `Location` 始终指向总体 `consumer_request_id` 状态资源，asset request URL 通过响应体 `links.asset_request` 暴露；只有 generic ensure 的 `Location` 指向 `asset_request_id`。
 
-实际路由必须避免动态路径冲突，并通过 OpenAPI snapshot 固定。任何 GET，包括现有公司画像 GET，都不得隐式触发公告发现或下载。generic asset ensure 的本地命中或网络禁用缺失返回 HTTP 200；业务命令只有在已有 current consumer result 时返回 HTTP 200，资产本地命中但 parser 尚未完成、或资产缺失并创建异步 acquisition 时均返回 HTTP 202，并设置对应 consumer/asset request 的 `Location` 和 `Retry-After`。
+业务命令的终态必须确定映射：本地或有界搜索确认未找到、或 `allow_network=false` 时返回 HTTP 200 + terminal `missing` consumer projection 和稳定 reason code；缺少业务处理权限或缺失资产时缺少 acquire 权限返回 HTTP 403（按配置可使用 404 non-disclosure），且不创建 consumer/asset work；已接受的异步请求随后因 provider、mount 或空间进入临时 `blocked` 时，由 consumer request 终态投影稳定报告，首次请求若在创建工作前即可确定基础设施不可用则返回 HTTP 503；候选歧义或当前状态冲突返回 HTTP 409。任何路径都不得借业务命令绕过 acquire scope。generic asset ensure 不得隐式启动任何消费者。
+
+V1 reason code 至少固定为：`annual_report_not_found`、`network_disabled`、`provider_unavailable`、`archive_mount_unavailable`、`storage_reserve_exceeded`、`backup_gate_blocked`、`domain_scope_required`、`asset_acquire_scope_required`、`candidate_ambiguous`、`effective_state_conflict`、`idempotency_conflict` 和 `consumer_processing_stale`。错误 envelope 还必须携带 `retryable`、`next_retry_at`（如适用）和不泄露 provider/path 的安全诊断。
+
+业务命令幂等键绑定 principal、consumer、instrument/selector、processing fingerprint 和规范化请求体：同键同指纹复用同一 `consumer_request_id` 和 continuation，同键不同请求返回 HTTP 409 且不得创建第二个 consumer operation。若具体业务命令未在本变更实现，必须作为对应消费者 cutover 的 enablement gate；不得以 generic ensure 已完成宣称业务链路完成。
+
+实际路由必须避免动态路径冲突，并通过 OpenAPI snapshot 固定。任何 GET，包括现有公司画像 GET，都不得隐式触发公告发现或下载。generic asset ensure 的本地命中或网络禁用缺失返回 HTTP 200；业务命令只有在当前 effective asset 和 processing fingerprint 对应的 consumer result 已为 current 时返回 HTTP 200，资产本地命中但 parser 尚未完成、旧结果 stale、或资产缺失并创建异步 acquisition 时均返回 HTTP 202，并设置指向 consumer request 的 `Location` 和 `Retry-After`。
 
 ### 18.2 前台状态模型
 
@@ -723,6 +732,8 @@ Ensure 的即时处置只区分：
 ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_reused`；`local_miss` 表示本地不满足且调用策略未创建网络 operation。asset request 投影明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、stage、进度、最终结果来源和脱敏诊断。consumer request 投影独立返回 `consumer_request_id`、consumer/processing fingerprint、request/processing status、可选关联 `asset_request_id`、结果身份、可重试性和脱敏诊断；本地命中未创建 acquisition 时该关联为空。两类 request 均只允许 owner 或 operator 查询，并遵循统一 404 non-disclosure policy。
 
 V1 取消 `asset_request_id` 只解绑该 principal 的 subscription 和尚未启动的 consumer continuation；已创建的有界共享 acquisition 即使没有剩余订阅者也继续完成，以避免订阅竞态破坏可复用资产。取消 asset request 不得级联停止已经开始的 consumer processing；后者只能通过该业务自己的受控停止契约处理，不支持时明确拒绝。底层 operation 的 lease 过期和重启恢复语义必须独立定义。
+
+DELETE 是保留审计记录的逻辑解绑/取消，不得物理删除 request handle。尚未启动的 asset subscription 或 consumer continuation 首次和重复 DELETE 均返回 HTTP 200 及同一 `cancelled` projection，后续 owner GET 仍可查询 `cancelled`；unknown 或 cross-owner 遵循统一 404 non-disclosure。consumer processing 已开始且业务接受协作停止时返回 HTTP 202 并保持可轮询；业务不支持停止或状态已不可取消时返回 HTTP 409。取消已完成/current request 不改写既有结果。
 
 | 状态 | 前台含义 | 允许操作 |
 | --- | --- | --- |
@@ -754,7 +765,8 @@ V1 取消 `asset_request_id` 只解绑该 principal 的 subscription 和尚未�
 
 - 获取和文件下载需使用本期新增或配置的可信身份与 scoped permission boundary；
 - 当前仓库没有完整认证中间件，只有 CORS、限流和并发保护；因此 V1 必须实现可信反向代理身份、管理凭证或等价最小权限边界，否则 acquire、content、readiness 管理端点默认关闭；
-- 建议权限至少区分 `annual_report_assets:acquire`、`annual_report_assets:read_content` 和 operator/admin；asset/consumer request 查询校验 subscription owner 或管理权限，internal operation 只允许 operator/service scope；
+- 权限至少区分 `annual_report_assets:acquire`、`annual_report_assets:read_content`、`business_profile:process`、`broker_risk_control:process` 和 operator/admin；asset/consumer request 查询校验 subscription owner 或管理权限，internal operation 只允许 operator/service scope；
+- 业务命令必须先校验对应 domain processing scope；本地资产可在只有 domain scope 时处理，但本地缺失时只有同时具备 `annual_report_assets:acquire` 才能触发 provider acquisition；
 - ensure 只允许单股票、单期间等有界 scope，不能由前台触发全市场回补；
 - 使用幂等键和 rate limit 防止重复任务；
 - 文件下载仅接受 asset ID，拒绝 caller path；
@@ -794,8 +806,9 @@ API acquisition 必须落在共享 SQLite durable operation/lease 中，不能�
 
 - 唯一活动 lease 至少按附件观察 identity 或精确 acquisition scope 建立。
 - lease 包含 owner、TTL、heartbeat 和 attempt。
-- 进程崩溃后 lease 到期可恢复，但新 worker 必须先处理遗留 `.part`。
+- 进程崩溃后 lease 到期可恢复，但新 worker 必须先以 owner、generation、heartbeat 和安全宽限期核对遗留 `.part`；只有证明原 owner 已失效后才能删除或接管，不能清理仍在写入的临时文件。
 - 数据库唯一约束和文件原子 rename 共同保证不发布重复 Blob。
+- `.part` 必须记录 operation/owner/generation/创建时间/计划字节，并按最大年龄和总字节纳入 readiness；quarantine 必须有配置的最大年龄和字节上限，只允许 operator 通过审计命令清理，自动流程不得静默删除取证文件。reservation 释放与实际临时/隔离字节清理必须分别对账，避免磁盘占用脱离账本。
 
 ### 21.2 重试分类
 
@@ -858,11 +871,13 @@ SQLite 事务与 NFS `unlink` 无法组成一个原子事务，因此删除必�
 - 存储 warning/stop；
 - backup freshness 和 unprotected bytes；
 - bootstrap 是否完成；
-- daily scheduler 是否启用及最近成功；
-- 公司画像和券商迁移阶段；
+- asset daily scheduler 是否启用及最近成功；
+- 公司画像和券商各自迁移阶段（独立展示，不作为 asset daily 的前置条件）；
 - 是否允许停止 legacy writes 和删除重复文件。
 
 readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat age、连续失败、cursor lag、最老 retry/backlog age 和告警阈值。前台只返回脱敏摘要；provider route、文件系统路径/mount、actor 和详细错误只允许 operator 查询。
+
+资产层 readiness 与消费者迁移 readiness 必须分开。bootstrap/handoff、发现覆盖、附件完整性、主卷空间和备份配置决定资产日更是否可启用；公司画像或券商尚未切换只能阻止对应 consumer cutover 和 legacy cleanup，不得阻止共享资产回补、日更、local-first 查询或按需获取。
 
 ## 23. 测试要求
 
@@ -893,6 +908,11 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 - NAS 未挂载时备份 fail closed。
 - 同一服务器不同 export、备份目标已有 hash 不符文件、数据库水位不一致时不得满足删除备份门槛；普通备份不得静默覆盖不匹配目标或推进 watermark，显式 repair 后可幂等恢复。
 - 删除状态机在 DB commit、unlink 和 finalize 各阶段崩溃后可幂等收敛。
+- 修订激活事务提交后，即使事件发布、备份或 predecessor unlink 失败，新修订版仍保持 effective，旧版进入可重试 cleanup；激活提交前失败才保留旧版为 effective。
+- 准备从主卷删除的 predecessor 及 replacement 均已进入同一独立故障域备份/配对 catalog 水位，且删除后可按 rollback manifest 恢复旧 hash 字节。
+- adopted Blob 即使仍位于受控 legacy path，也能由 catalog required-set 枚举并按 hash 备份，不要求先移动到 canonical blob 目录。
+- shadow adoption 在 asset promotion 前不能满足 effective lookup/bootstrap coverage，promotion 后即使两个业务消费者均未 cutover 也可供资产层回补和日更复用。
+- `.part` 的 owner/generation 竞争和 quarantine age/byte gate、operator 审计清理均有崩溃与并发测试。
 
 ### 23.2 迁移测试
 
@@ -957,8 +977,8 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 
 - 存储预检显示 latest-only 回补计划可容纳，并保留配置的 hard reserve。
 - 附件备份独立运行，NAS 不可用时明确失败且不退化到本地。
-- 允许物理删除前，replacement 已在独立故障域备份并与 catalog 恢复水位匹配。
-- 配对恢复后，全部 current-effective、retention-pinned 和 pending-deletion replacement Blob 的 identity、length、hash、有效版本和消费者血缘一致；抽样恢复演练只能作为附加证据，不能替代开放门槛。
+- 允许物理删除前，replacement 和 predecessor 均已在独立故障域备份并与包含替换边和 rollback manifest 的 catalog 恢复水位匹配。
+- 配对恢复后，全部 current-effective、retention-pinned、pending-deletion replacement 和有效 rollback-manifest predecessor Blob 的 identity、length、hash、有效版本和消费者血缘一致；抽样恢复演练只能作为附加证据，不能替代开放门槛。
 - legacy archive 写入只在双读对账、备份和回滚门槛通过后关闭。
 
 ### 24.4 前台验收
@@ -982,12 +1002,12 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 4. 实现 local-first、文件生命周期、空间和备份，在临时库/目录验证。
 5. 在临时范围完成 latest-only 回补和中断恢复验证。
 6. 上线独立手工作业和有界真实来源探针。
-7. 券商先切共享读取，验证事实等价和零重复下载。
-8. 公司画像切共享读取，验证知识截止、派生物和语义流程兼容。
-9. 上线 DataManager/API 和前台状态整合。
-10. 完成全市场 shadow 对账、备份和容量检查后运行正式回补。
-11. 覆盖门槛通过后启用日更 cron。
-12. 最后关闭 legacy writes，并按审计计划清理冗余副本。
+7. 完成全市场 asset-adoption 对账、备份和容量检查后运行正式回补。
+8. 资产层覆盖、完整性、存储、备份配置和 handoff 门槛通过后启用日更 cron；不得等待公司画像或券商 cutover。
+9. 上线 DataManager/API 和共享资产前台状态契约。
+10. 券商按自己的 consumer gate 切共享读取，验证事实等价和零重复下载。
+11. 公司画像按自己的 consumer gate 切共享读取，验证知识截止、派生物和语义流程兼容。
+12. 两个消费者各自完成切换后关闭对应 legacy writes，并按审计计划清理其冗余副本。
 
 ### 25.2 回滚
 

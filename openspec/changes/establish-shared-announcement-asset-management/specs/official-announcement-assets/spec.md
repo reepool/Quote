@@ -128,6 +128,11 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 - **THEN** the existing effective report SHALL remain active and physically present
 - **AND** the correction SHALL remain retryable with explicit diagnostics
 
+#### Scenario: Post-activation work fails
+- **WHEN** the correction activation transaction commits but change-event publication, consumer invalidation, backup, or predecessor unlink subsequently fails
+- **THEN** the verified correction SHALL remain the effective winner and SHALL NOT roll back to the predecessor
+- **AND** the failed downstream step SHALL remain durably retryable while the predecessor stays physically present until every deletion gate passes
+
 #### Scenario: Corrections finish acquisition out of publication order
 - **WHEN** two complete corrections for the same instrument and fiscal year are acquired or activated concurrently and the older correction finishes last
 - **THEN** activation SHALL serialize at the `instrument + fiscal_year` decision scope and reselect the winner from all committed observations inside the activation transaction
@@ -136,7 +141,7 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 
 #### Scenario: Superseded file is no longer referenced
 - **WHEN** the corrected report is active and the superseded physical blob has no remaining retention pin
-- **THEN** the superseded physical file SHALL be deleted
+- **THEN** the superseded physical file SHALL be deleted only after both predecessor and replacement blobs are verified in the independent backup and paired catalog recovery watermark
 - **AND** its announcement metadata, content hash, size, prior archive path, replacement edge, deletion reason, and deletion timestamp SHALL remain auditable
 
 #### Scenario: Superseded blob is shared
@@ -146,6 +151,7 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 #### Scenario: A physical retention pin remains
 - **WHEN** a blob is held by another effective attachment, a managed legacy alias, a not-yet-migrated consumer, or an active read or processing lease
 - **THEN** the physical file SHALL remain even though historical metadata does not itself require physical retention
+- **AND** a predecessor retained only by a migration alias SHALL not be exposed as current-effective, latest-only coverage, or a second consumer-visible annual report
 
 #### Scenario: A retention lease expires
 - **WHEN** a read or processing lease passes its TTL
@@ -373,7 +379,12 @@ The asset service SHALL ensure that concurrent schedulers, API requests, and bus
 #### Scenario: Process stops during download
 - **WHEN** a process terminates while writing a temporary attachment
 - **THEN** no partial file SHALL be visible as a valid asset
-- **AND** an expired lease SHALL allow a later retry to clean or replace the temporary file
+- **AND** a later retry SHALL verify owner, heartbeat, lease generation, and safety-grace evidence before cleaning or adopting the temporary file
+
+#### Scenario: Temporary and quarantine bytes accumulate
+- **WHEN** stale `.part` files or quarantined evidence exceed configured age or byte thresholds
+- **THEN** readiness SHALL expose their actual bytes independently from released reservations
+- **AND** stale `.part` cleanup SHALL be lease-generation safe, while quarantine cleanup SHALL require an operator-authorized audited command and SHALL preserve evidence metadata
 
 #### Scenario: Existing file has matching evidence
 - **WHEN** an existing path has the registered byte length, valid PDF signature, and SHA-256
@@ -469,7 +480,12 @@ Migration SHALL inventory existing annual-report manifests and paths, validate t
 #### Scenario: Shadow adoption has not reconciled
 - **WHEN** an adopted record has not completed source, instrument, report-period, classification, content, and latest-effective reconciliation
 - **THEN** it SHALL NOT satisfy production effective lookup, bootstrap coverage, or consumer parsing
-- **AND** conflict-free reconciliation plus an explicit consumer cutover gate SHALL be required before production visibility
+- **AND** conflict-free reconciliation plus an explicit asset-adoption promotion gate SHALL be required before production visibility
+
+#### Scenario: Adopted asset is promoted before consumer cutover
+- **WHEN** a shadow record passes the asset-adoption promotion gate while business-profile or broker migration remains disabled
+- **THEN** the shared asset layer SHALL allow the promoted record to satisfy effective lookup, bootstrap reuse, daily maintenance, and local-first ensure
+- **AND** each consumer SHALL remain governed by its own separate cutover gate
 
 #### Scenario: Duplicate valid copies exist
 - **WHEN** business-profile and broker archives contain the same source filing and content hash at different paths
@@ -590,13 +606,15 @@ Backfill, daily, on-demand, migration, deletion, and integrity operations SHALL 
 #### Scenario: Operator inspects readiness
 - **WHEN** readiness is queried
 - **THEN** it SHALL report active-universe coverage, attachment readiness, integrity failures, pending discovery/reconciliation windows, retry queues, storage reservations/gates, backup freshness and unprotected bytes, bootstrap completion, scheduler enablement/last result, and consumer migration status
+- **AND** asset-scheduler readiness SHALL be calculated independently from per-consumer migration readiness so an unready consumer cannot block shared backfill or daily maintenance
 
 ### Requirement: File Backup Protects The Shared Archive
 Canonical attachment files SHALL have a governed incremental backup or replication workflow separate from SQLite online database backup.
 
 #### Scenario: Archive backup runs
 - **WHEN** new or changed canonical blobs exist
-- **THEN** the backup workflow SHALL copy only missing content-addressed files to the configured backup mount and SHALL verify size and hash for copied content
+- **THEN** the backup workflow SHALL enumerate the catalog required-blob set, including adopted blobs still located at controlled legacy paths, and copy only missing content-addressed files to the configured backup mount
+- **AND** it SHALL verify size and hash for copied content without requiring a legacy-path blob to move first
 
 #### Scenario: A hash-named backup blob already exists
 - **WHEN** the backup target already contains the expected content-addressed path
@@ -629,7 +647,7 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 #### Scenario: Asset has not been backed up
 - **WHEN** a canonical asset is locally valid but has no verified backup copy
 - **THEN** readiness SHALL expose the backup gap
-- **AND** physical deletion of its predecessor SHALL remain blocked until the replacement backup is verified in an independent failure domain
+- **AND** physical deletion of its predecessor SHALL remain blocked until both the replacement and that predecessor are verified in an independent failure domain and paired with the catalog recovery watermark
 
 #### Scenario: Backup target reserve would be violated
 - **WHEN** planned or streamed backup bytes would violate the backup target's configured free-space reserve or hard-stop threshold
@@ -641,11 +659,16 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 - **THEN** version 1 SHALL keep that backup blob as non-consumer-visible disaster-recovery content
 - **AND** no automatic backup garbage collection SHALL run without a separately specified audited retention policy
 
+#### Scenario: A predecessor has never been backed up
+- **WHEN** a superseded predecessor is otherwise eligible for deletion but its hash is absent or invalid in the independent backup required set
+- **THEN** primary-storage unlink SHALL remain blocked even when the replacement is fully protected
+- **AND** backup SHALL protect the predecessor as non-consumer-visible recovery content before deletion proceeds
+
 #### Scenario: Database and attachment assets are restored
 - **WHEN** an operator restores the announcement-asset capability after data loss
 - **THEN** a compatible catalog database snapshot and attachment backup watermark SHALL be restored together
 - **AND** hash/integrity reconciliation SHALL complete before consumer reads, destructive cleanup, or daily writes are re-enabled
-- **AND** every current-effective, retention-pinned, and pending-deletion replacement blob referenced by the restored catalog SHALL pass full presence, length, and SHA-256 verification
+- **AND** every current-effective, retention-pinned, pending-deletion replacement, and still-valid rollback-manifest predecessor blob referenced by the restored catalog SHALL pass full presence, length, and SHA-256 verification
 - **AND** a missing or mismatched required blob SHALL keep recovery readiness blocked; sampling MAY be used for routine drills but SHALL NOT replace this enablement gate
 
 ### Requirement: The Capability Is Extensible Beyond Annual Reports

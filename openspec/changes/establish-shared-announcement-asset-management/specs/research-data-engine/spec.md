@@ -95,9 +95,9 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **AND** a local hit SHALL create or reuse exactly one caller-owned `consumer_request_id` without creating an asset acquisition subscription
 - **AND** the command SHALL create or reuse the caller-owned `consumer_request_id` immediately, with `pending_asset` status when the shared asset is not yet locally valid
 - **AND** a local miss with acquisition permitted SHALL create or reuse one `asset_request_id`, persist one consumer-specific continuation linked to that already-created consumer request, and advance the same consumer request to `queued|processing` only after the asset is valid
-- **AND** the command SHALL return HTTP 200 only when an existing current consumer result is available; a local asset hit that still requires consumer processing SHALL return HTTP 202 with the `consumer_request_id`, and an asset miss with acquisition permitted SHALL return HTTP 202 with both opaque request handles
-- **AND** network-disabled or policy-blocked requests SHALL return a structured terminal consumer projection with a stable `missing|blocked` reason and SHALL NOT create provider work
-- **AND** the response SHALL use the same owner, `Location`, `Retry-After`, and error-envelope rules as the generic asset resources
+- **AND** the command SHALL return HTTP 200 only when an existing consumer result is bound to the current effective asset id/content hash and the same processing fingerprint; a local asset hit that still requires consumer processing or whose prior result is stale SHALL return HTTP 202 with the `consumer_request_id`, and an asset miss with acquisition permitted SHALL return HTTP 202 with both opaque request handles
+- **AND** a business-command `Location` SHALL always identify the overall consumer-request resource, while an applicable asset-request URL SHALL appear in a response-body link; generic asset ensure alone SHALL use an asset-request `Location`
+- **AND** a normal local/confirmed miss or network-disabled request SHALL return HTTP 200 with a terminal `missing` consumer projection, a pre-work temporary provider/storage blocker SHALL return HTTP 503, and an ambiguity/current-state conflict SHALL return HTTP 409, each with stable reason codes (`annual_report_not_found`, `network_disabled`, `provider_unavailable`, `archive_mount_unavailable`, `storage_reserve_exceeded`, `backup_gate_blocked`, `candidate_ambiguous`, `effective_state_conflict`, or the applicable authorization/idempotency code) and no unintended provider work
 - **AND** generic asset ensure SHALL NOT start this consumer processing implicitly
 
 #### Scenario: Business command adapters have explicit ownership
@@ -105,6 +105,17 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **THEN** it SHALL call its own protected command adapter (for example `POST /api/v1/research/company/{instrument_id}/business-profile/annual-report-process` or `POST /api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process`)
 - **AND** the adapter SHALL own the consumer processing fingerprint, caller idempotency contract, and `consumer_request_id` lifecycle while delegating source discovery and attachment acquisition to the shared asset service
 - **AND** generic asset ensure SHALL remain a source-asset-only entry point and SHALL NOT be treated as the business processing entry point
+
+#### Scenario: Business command authorization is composed safely
+- **WHEN** a caller invokes a business-profile or broker risk-control processing command
+- **THEN** the adapter SHALL require its domain processing scope before creating a consumer request
+- **AND** a verified local asset MAY be processed with the domain scope alone, but a missing asset SHALL contact a provider only when the caller also has `annual_report_assets:acquire`
+- **AND** insufficient domain or acquire scope SHALL return HTTP 403 or the configured HTTP 404 non-disclosure response before creating unauthorized consumer/asset work
+
+#### Scenario: Business command idempotency is repeated or conflicts
+- **WHEN** one principal repeats a business command with the same idempotency key, consumer, selector, processing fingerprint, and normalized body
+- **THEN** the adapter SHALL return the same `consumer_request_id` and continuation and SHALL NOT create a second consumer operation
+- **AND** reuse of that key with a different consumer, selector, processing fingerprint, or body SHALL return HTTP 409 with a stable idempotency-conflict code and no new work
 
 #### Scenario: Client submits an invalid selector combination
 - **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies an attachment/hash/observation pin without exact-filing identity, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
@@ -155,16 +166,19 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **WHEN** an authorized client cancels its `asset_request_id` while another principal or scheduler still depends on the underlying acquisition
 - **THEN** only that request subscription and its pending consumer continuation SHALL become cancelled
 - **AND** the internal asset operation SHALL remain active or checkpoint according to remaining subscribers and SHALL NOT expose their identities
+- **AND** DELETE SHALL return HTTP 200 with a durable `cancelled` projection, repeated DELETE SHALL return the same outcome, and a later owner GET SHALL remain queryable for audit
 
 #### Scenario: Client cancels the last shared acquisition request
 - **WHEN** the last principal cancels its `asset_request_id` after bounded internal acquisition work exists
 - **THEN** version 1 SHALL cancel only that subscription and any not-yet-started continuation while the internal acquisition continues to a bounded terminal state
 - **AND** consumer processing that already started SHALL not be cancelled through the asset request; its own domain stop contract SHALL apply or the stop SHALL be explicitly rejected
+- **AND** an unknown or cross-owner request SHALL follow the configured HTTP 404 non-disclosure policy
 
 #### Scenario: Client cancels a consumer request
 - **WHEN** an authorized owner deletes a `consumer_request_id`
-- **THEN** a not-yet-started continuation SHALL be cancelled idempotently
-- **AND** already-started consumer processing SHALL use that consumer domain's authorized cooperative-stop contract or return an explicit current-state conflict; it SHALL NOT be force-cancelled through request-subscription deletion
+- **THEN** a not-yet-started continuation SHALL be cancelled idempotently with HTTP 200, remain queryable as `cancelled`, and return the same projection on repeated DELETE
+- **AND** already-started consumer processing SHALL use that consumer domain's authorized cooperative-stop contract and return HTTP 202 when accepted, or HTTP 409 when stopping is unsupported/current-state invalid; it SHALL NOT be force-cancelled through request-subscription deletion
+- **AND** cancelling a completed or current request SHALL NOT rewrite its result, while unknown or cross-owner identifiers SHALL follow the configured HTTP 404 non-disclosure policy
 
 #### Scenario: Client polls another caller's operation
 - **WHEN** a caller lacks ownership/read scope for the requested asset-request subscription or consumer-request projection

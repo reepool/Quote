@@ -28,13 +28,19 @@ The storage layer SHALL use immutable content identity, atomic publication, and 
 #### Scenario: Superseded original is removed
 - **WHEN** a verified corrected report becomes effective and the original blob has no remaining retention pin
 - **THEN** a durable deletion intent SHALL be committed before unlink and finalized as deleted or failed afterward
-- **AND** the old physical file SHALL be deleted only after all retention pins are released and the replacement has a verified independent-failure-domain backup
+- **AND** the old physical file SHALL be deleted only after all retention pins are released and both predecessor and replacement have verified independent-failure-domain backup paired with the catalog recovery watermark
 
 #### Scenario: A read or processing lease appears expired
 - **WHEN** deletion encounters a retention lease whose TTL has elapsed
 - **THEN** a reconciler SHALL compare owner, heartbeat, generation, and safety-grace evidence before releasing the pin
 - **AND** a newer heartbeat, lease generation, or uncertain live reader SHALL continue to block deletion
 - **AND** crash recovery and stale-lease reclamation SHALL be idempotent so an abandoned lease cannot retain a blob indefinitely
+
+#### Scenario: Temporary or quarantine storage becomes stale
+- **WHEN** `.part` or quarantine bytes remain after failure, cancellation, or lease expiry
+- **THEN** the storage layer SHALL track their operation owner, lease generation, age, and actual bytes separately from byte reservations
+- **AND** a stale `.part` SHALL be reclaimed only after heartbeat/generation reconciliation and a safety grace period
+- **AND** quarantine age/byte limits SHALL affect readiness while physical cleanup requires an operator-authorized audited command
 
 ### Requirement: Existing Filings Are Adopted Without Unnecessary Copying
 The migration SHALL recognize valid existing annual-report files and MAY retain an existing verified path or create a verified hard link during cutover before converging on the canonical layout.
@@ -51,7 +57,8 @@ The migration SHALL recognize valid existing annual-report files and MAY retain 
 #### Scenario: A file is registered in shadow state
 - **WHEN** migration adopts bytes before source identity, report period, classification, content, and latest-effective reconciliation have all passed
 - **THEN** the record SHALL remain excluded from production effective lookup, bootstrap coverage, and consumer parsing
-- **AND** only an explicit cutover gate after conflict-free reconciliation SHALL make it production-visible
+- **AND** only an explicit asset-adoption promotion gate after conflict-free reconciliation SHALL make it production-visible
+- **AND** promotion SHALL NOT require business-profile or broker consumer cutover
 
 #### Scenario: Existing duplicate files are found
 - **WHEN** identical valid content exists at multiple business-owned paths
@@ -76,6 +83,11 @@ The migration SHALL recognize valid existing annual-report files and MAY retain 
 ### Requirement: Filings Storage Has Capacity And Backup Gates
 The archive SHALL enforce configurable free-space thresholds, planned-download preflight, and incremental backup state independently from SQLite database backup.
 
+#### Scenario: Measured V1 capacity baseline is evaluated
+- **WHEN** rollout evaluates the measured `data/filings` baseline of approximately 2.1 TiB free against an estimated 24-25 GiB latest-only active A-share bootstrap and the configured backup target capacity
+- **THEN** preflight SHALL report the estimate as currently supportable while still applying runtime warning, hard-reserve, temporary-byte, and backup-target gates
+- **AND** the estimate SHALL not authorize a download or deletion when mount identity, required-blob backup, or concurrent reservation checks fail
+
 #### Scenario: Daily plan fits available space
 - **WHEN** planned attachment bytes plus reserve fit below the warning threshold
 - **THEN** scheduled acquisition MAY proceed and SHALL report planned and actual bytes
@@ -99,7 +111,8 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 
 #### Scenario: Filings backup is verified
 - **WHEN** canonical attachment files are replicated to the configured NAS target
-- **THEN** each missing blob SHALL be copied through a target-side temporary file, flushed, length/hash verified, and atomically published before it is eligible for the backup watermark
+- **THEN** the source set SHALL be enumerated from catalog-required blobs rather than only the canonical directory, including promoted adopted blobs whose controlled current path remains under a legacy business directory
+- **AND** each missing blob SHALL be copied through a target-side temporary file, flushed, length/hash verified, and atomically published before it is eligible for the backup watermark
 - **AND** an existing hash-named target SHALL be reverified rather than trusted by path alone
 - **AND** a present target with mismatched length or hash SHALL remain unprotected, SHALL NOT advance the paired backup watermark, and SHALL keep its path, bytes, and modification time unchanged during an ordinary backup run
 - **AND** quarantine or replacement SHALL occur only inside an operator-authorized, auditable repair operation that preserves original path/hash evidence
@@ -127,5 +140,5 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 #### Scenario: A paired restore is performed
 - **WHEN** catalog and filing assets are restored from backup
 - **THEN** the catalog database snapshot and paired file-manifest watermarks SHALL be compatible and restored blobs SHALL pass size/hash verification
-- **AND** all current-effective, retention-pinned, and pending-deletion replacement blobs SHALL be reconciled rather than sampled before enablement
+- **AND** all current-effective, retention-pinned, pending-deletion replacement, and still-valid rollback-manifest predecessor blobs SHALL be reconciled rather than sampled before enablement
 - **AND** consumers and destructive maintenance SHALL remain disabled until reconciliation completes without a required-blob gap
