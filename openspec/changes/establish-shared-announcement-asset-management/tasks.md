@@ -13,6 +13,7 @@
 - [ ] 2.2 Implement deterministic idempotent upsert, unique-key, retention-pin, lease, per-source item cursor, range `covered_until`, and operation-transition behavior with concurrency tests.
 - [ ] 2.3 Implement the versioned attachment-level formal annual-report classifier for originals, complete corrections, summaries, translations, visual editions, audit/inquiry/briefing material, periodic reports outside V1, notices, and unresolvable identities.
 - [ ] 2.4 Implement fiscal-year/report-period extraction, a versioned `as_of`/listing/disclosure-calendar/provider-coverage search-bound policy, and deterministic latest-effective winner selection, including multiple corrections, withdrawal/silent-update observations, cross-source legal evidence, provisional state, overdue coverage gaps, and fail-closed ambiguity diagnostics.
+- [ ] 2.5 Add immutable observation `version_available_at`/time-source/precision semantics, exact withdrawal-target evidence, and fail-closed same-source timestamp-tie handling; prove knowledge cutoffs cannot see later silent-update bytes or retroactive withdrawal state.
 
 ## 3. File Acquisition And Lifecycle
 
@@ -41,6 +42,7 @@
 - [ ] 5.3 Select and acquire only each instrument's latest available fiscal-year winner, preferring the newest verified complete correction and reusing adopted files.
 - [ ] 5.4 Implement rotating targeted repair for uncovered instruments with fixed `as_of`, deterministic candidate/due/earliest fiscal-year bounds, listing and provider-coverage evidence, expiring confirmed-missing evidence, overdue-but-older-asset-usable state, retry states, and restart-safe checkpoints.
 - [ ] 5.5 Add bootstrap reports and tests proving latest-only physical acquisition, audit-only retention of non-winning metadata, attachment-level correction precedence, cross-source conflict blocking, January and April-30 boundary behavior, post-period listings, delayed filings, zero redownload on resume, and `success` only when no incomplete/retryable/blocked coverage remains.
+- [ ] 5.6 Add master-data freshness and `eligibility_indeterminate` governance with last-complete-snapshot fallback, plus orthogonal asset-availability/expected-period coverage and default non-circular `overdue_missing` daily-readiness behavior.
 
 ## 6. Independent Daily Update
 
@@ -59,6 +61,7 @@
 - [ ] 7.2 Return verified local hits with zero provider calls, acquire eligible metadata-only records, run bounded instrument discovery for absent metadata, fail closed for ambiguous or blocked requests, and return metadata-only unavailable without redownloading a deleted superseded filing.
 - [ ] 7.3 Implement globally single-flight asynchronous acquisition operations plus principal-scoped subscriptions/opaque handles with separate status/stage/outcome/disposition enums, authorization/rate bounds, polling projections, cancellation/expiry policy that cannot cancel other subscribers' work, restart recovery, and actionable diagnostics.
 - [ ] 7.4 Publish durable monotonic effective-asset change events or watermarks with consumer checkpoints and idempotent replay so offline consumers process only added, replaced, repaired, withdrawn, or deleted annual-report assets.
+- [ ] 7.5 Support exact-filing attachment/hash/observation pins and version 1 detach-only request cancellation, including last-subscriber behavior and no cancellation propagation into already-started consumer processing.
 
 ## 8. Business Consumer Migration
 
@@ -71,11 +74,12 @@
 ## 9. DataManager API And Frontend Integration
 
 - [ ] 9.1 Add DataManager list, get, ensure, readiness, caller-scoped asset-request status, consumer-continuation status, and controlled-stream methods backed only by the shared asset service.
-- [ ] 9.2 Fix additive FastAPI/OpenAPI contracts for zero-network GET, single-scope ensure, principal-scoped `asset_request_id` polling without internal operation ids, readiness, and asset-id content streaming with a versioned error envelope and deterministic HTTP 200/202/401/403/404/409/410/422/429/503 mappings, including the configured 404 non-disclosure policy.
+- [ ] 9.2 Fix additive FastAPI/OpenAPI contracts for zero-network GET, single-scope ensure, principal-scoped `asset_request_id` polling/idempotent detach without internal operation ids, readiness, and asset-id content streaming with a versioned error envelope and deterministic HTTP 200/202/401/403/404/409/410/422/429/503 mappings, including the configured 404 non-disclosure policy.
 - [ ] 9.3 Implement a real trusted identity/permission boundary for acquire, content, request-subscription ownership, and operator readiness; when that boundary is not configured, make registered protected endpoints fail before lookup/validation with HTTP 503 `authorization_boundary_unavailable` and zero operation/provider activity.
 - [ ] 9.4 Separate asset availability, provisional/final effective-decision state, ensure disposition, operation status, operation stage, batch outcome, result origin, and consumer-processing states, and expose optional shared lineage in business-profile and broker responses without local paths.
 - [ ] 9.5 Integrate status, explicit acquire action, idempotent polling, safe content access, and correction-stale behavior into front-facing contracts; register the external UI repository/owner/version as an enablement gate because this repository has no UI source.
 - [ ] 9.6 Add OpenAPI snapshot and API/consumer tests proving every GET is zero-network; selector forms are mutually exclusive, complete, identity-consistent, and path/URL-free; same-key/same-fingerprint POST reuses one subscription while same-key/different-fingerprint returns 409 per principal; two principals share one underlying acquisition but receive isolated handles/continuations and cancelling one leaves the other's work active; authorization-unavailable precedes lookup/validation; restart recovery and owner isolation work; responses leak no internal operation id or path; streams reject superseded/corrupt assets; knowledge cutoffs hold; and legacy fields remain compatible.
+- [ ] 9.7 Add caller-scoped `consumer_request_id` DataManager/FastAPI/OpenAPI status and idempotent cancellation resources with owner/operator authorization, linked `asset_request_id`, processing/result/error projection, common non-disclosure behavior, and independent asset-versus-business polling plus pending-versus-started cancellation tests.
 
 ## 10. Backup Observability And Operations
 
