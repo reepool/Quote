@@ -98,6 +98,8 @@ Winner order for one instrument/fiscal year is:
 
 Cross-source candidates can converge automatically only when their content hash matches or governed mirror/legal-precedence evidence exists. Different verified bytes with no precedence evidence are ambiguous, never resolved by lexical source or filing-id order. Withdrawal, cancellation, or a changed attachment under the same announcement id creates a new observation and triggers reevaluation.
 
+Attachment acquisition leases do not by themselves serialize the effective-version decision. Activation therefore uses an `instrument + fiscal_year` decision lease or row-version compare-and-swap, and reselects the winner from all committed observations inside the transaction. A worker that downloaded an older correction after a newer correction committed cannot downgrade the effective row or create a deletion intent for the true winner.
+
 Replacement is a staged transaction:
 
 1. discover and register correction metadata;
@@ -133,7 +135,7 @@ Exact identity prevents legal-filing substitution, but it does not override vers
 
 ### Use latest-only full-market bootstrap with targeted completeness repair
 
-The default universe is active instruments with `type=stock` on SSE, SZSE, and BSE. Inactive/delisted instruments remain available through explicit ensure but are not part of the default bootstrap.
+The default universe is produced by a versioned eligibility policy over active RMB-denominated A-share instruments on SSE, SZSE, and BSE. It includes main-board, STAR Market, ChiNext, BSE, ST, and temporarily suspended-but-not-delisted stocks; it excludes B shares, funds/ETFs, bonds, indices, and other non-A-share security types. The snapshot stores instrument identities, policy/master-data versions, and time. Inactive/delisted instruments remain available through explicit ensure but are not part of the default bootstrap.
 
 Bootstrap phases:
 
@@ -187,7 +189,9 @@ Current observed PDFs average approximately 4.6 MiB, with P95 approximately 12.9
 
 Before download, operations atomically reserve planned bytes on the target filesystem using Content-Length or a configured unknown-size budget, accounting for `.part`, quarantine, and old/new overlap. They also check free bytes, warning utilization, hard stop utilization, and absolute reserve. Metadata sync can continue after the attachment hard stop. Attachment size limits are separately configurable for annual reports because the current 50 MiB generic default is close to observed large files.
 
-SQLite online backup does not cover `data/filings`. Add an incremental content-addressed archive backup to a verified independent storage failure domain, copying only missing blobs, validating hashes, and pairing its file manifest watermark with a recoverable catalog database snapshot that includes the replacement transaction. The current filings and PVE-Bak mounts share server `192.168.188.88`, so PVE-Bak alone cannot satisfy the deletion disaster-recovery gate; QuoteBak is currently on a different server with approximately 384 GiB free. That is sufficient for the approximately 24-25 GiB version 1 bootstrap and near-term annual increments, but not an unlimited-retention assumption. The backup target therefore has its own free-space warning, hard reserve, planned-byte preflight, temporary-file cleanup, freshness, and unprotected-byte state. Backup capacity failure degrades readiness and blocks predecessor deletion but never invalidates the local replacement. Version 1 performs no automatic backup-blob garbage collection; superseded backup blobs remain disaster-recovery-only and are not consumer-visible. A later audited retention/GC policy is required before reclaiming them. Never fall back to writing a NAS backup into the local data mount when the share is absent.
+SQLite online backup does not cover `data/filings`. Add an incremental content-addressed archive backup to a verified independent storage failure domain, copying only missing blobs, validating hashes, and pairing its file manifest watermark with a recoverable catalog database snapshot that includes the replacement transaction. Existing hash-named targets are reverified rather than trusted by name. New or repaired targets use same-directory temporary files, flush, hash validation, and atomic publication; restart reconciles crashes before file publication or watermark commit without treating uncommitted bytes as protected. The current filings and PVE-Bak mounts share server `192.168.188.88`, so PVE-Bak alone cannot satisfy the deletion disaster-recovery gate; QuoteBak is currently on a different server with approximately 384 GiB free. That is sufficient for the approximately 24-25 GiB version 1 bootstrap and near-term annual increments, but not an unlimited-retention assumption. The backup target therefore has its own free-space warning, hard reserve, planned-byte preflight, temporary-file cleanup, freshness, and unprotected-byte state. Backup capacity failure degrades readiness and blocks predecessor deletion but never invalidates the local replacement. Version 1 performs no automatic backup-blob garbage collection; superseded backup blobs remain disaster-recovery-only and are not consumer-visible. A later audited retention/GC policy is required before reclaiming them. Never fall back to writing a NAS backup into the local data mount when the share is absent.
+
+Restore enablement performs a complete presence, length, and SHA-256 reconciliation of every current-effective, retention-pinned, and pending-deletion replacement blob referenced by the restored catalog. Sampling remains useful for routine drills, but a sample cannot authorize consumer reads, writes, or destructive maintenance after recovery.
 
 ### Integrate front-facing workflows through DataManager and FastAPI
 
@@ -202,6 +206,10 @@ Additive API resources expose:
 
 Responses expose stable asset lineage, not unrestricted local paths. All metadata and existing business-profile GETs remain zero-network. Asset availability, ensure disposition, operation status, operation stage, batch outcome, result origin, and consumer-processing state are separate. Business-profile and broker responses retain existing schemas while adding optional shared lineage. No current API must synchronously crawl the market.
 
+Ensure accepts exactly one normalized selector: either effective-period identity or exact source-filing identity. Selector members are all-or-none, fiscal year and report period must agree when both are present, exact filing identity must belong to the path instrument, and caller-supplied URLs or paths are rejected. `Idempotency-Key` is bound to principal plus normalized request fingerprint; reuse with different input is a conflict rather than a new or reused operation. HTTP outcome mapping is versioned and deterministic so normal metadata absence remains a structured `200`, unknown resources are `404`, validation is `422`, idempotency/current-state conflicts are `409`, deleted predecessors are `410`, rate limits are `429`, and temporary infrastructure blockers are `503`, with authentication and permission failures following the configured non-disclosure policy.
+
+A generic asset ensure obtains only the shared source asset. A front-facing business command that depends on a missing asset persists a consumer-specific continuation and enqueues exactly one consumer operation when the asset becomes valid, exposing that processing identity separately from the asset operation. Asset completion never implies that business-profile or broker output is already current.
+
 The repository currently has rate limiting but no complete authentication middleware. Acquire, content, cancellation, repair, and operator endpoints therefore remain disabled unless a trusted identity and scoped permission boundary is configured. Durable SQLite operations, not FastAPI `BackgroundTasks`, are the source of truth. The repository supplies DataManager/FastAPI/OpenAPI contracts and UI state definitions; the actual external UI repository and owner are an enablement dependency.
 
 ### Publish asset-change events or watermarks for consumers
@@ -211,6 +219,8 @@ When an effective asset is added, replaced, repaired, withdrawn, or deleted, app
 ### Make operations resumable and single-flight
 
 Durable operations use scopes, checkpoints, leases, attempts, retry times, bounded errors, and separate status/stage/outcome fields. The same normalized scope and policy version has at most one active operation across scheduler, API, and consumers. Files are written to `.part` on the same verified NFS mount, validated, fsynced where supported, atomically renamed, reopened, and reverified. Lease expiry permits cleanup and retry after process failure.
+
+The scheduler control plane uses these durable operations for authenticated manual start, status, cooperative stop, resume, and duplicate-start reuse. It retains bounded run history and exposes last successful cutoff, heartbeat age, consecutive failures, cursor lag, and oldest retry age. Front-facing readiness is a redacted summary; provider, filesystem, actor, and failure diagnostics require operator scope.
 
 ## Risks / Trade-offs
 

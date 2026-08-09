@@ -83,7 +83,9 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 
 #### Scenario: Filings backup is verified
 - **WHEN** canonical attachment files are replicated to the configured NAS target
-- **THEN** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, a file manifest watermark paired with a recoverable catalog database snapshot, completion time, and errors
+- **THEN** each missing blob SHALL be copied through a target-side temporary file, flushed, length/hash verified, and atomically published before it is eligible for the backup watermark
+- **AND** an existing hash-named target SHALL be reverified rather than trusted by path alone
+- **AND** backup state SHALL record independent failure-domain identity, mount source, size/hash verification, a file manifest watermark paired with a recoverable catalog database snapshot, completion time, and errors
 
 #### Scenario: Backup target shares the primary storage host
 - **WHEN** the configured destination resolves to the same server or storage failure domain as the primary filings mount
@@ -102,4 +104,5 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 #### Scenario: A paired restore is performed
 - **WHEN** catalog and filing assets are restored from backup
 - **THEN** the catalog database snapshot and paired file-manifest watermarks SHALL be compatible and restored blobs SHALL pass size/hash verification
-- **AND** consumers and destructive maintenance SHALL remain disabled until reconciliation completes
+- **AND** all current-effective, retention-pinned, and pending-deletion replacement blobs SHALL be reconciled rather than sampled before enablement
+- **AND** consumers and destructive maintenance SHALL remain disabled until reconciliation completes without a required-blob gap

@@ -21,6 +21,7 @@
 - [ ] 3.4 Implement correction activation plus a durable `planned -> deleting -> deleted|failed` deletion-intent state machine, consumer invalidation/change events, retention pins, and append-only audit while preserving the old effective file on any failed replacement precondition.
 - [ ] 3.5 Add crash-injection and concurrent-reader tests around database commit, NFS unlink, audit finalization, shared blobs, aliases, and expired deletion leases.
 - [ ] 3.6 Implement storage warning/stop/reserve, atomic concurrent byte reservations, unknown-size budgeting, and annual-report stream limits so metadata discovery continues when scheduled attachment acquisition is blocked.
+- [ ] 3.7 Serialize effective-version activation at `instrument + fiscal_year`, reselect the winner transactionally, and test reverse completion of concurrent corrections, stale compare-and-swap, withdrawal races, and deletion-intent safety.
 
 ## 4. Existing Archive Adoption
 
@@ -30,10 +31,11 @@
 - [ ] 4.4 Add a separately gated convergence tool whose default dry-run emits a per-file manifest/hash allowlist, persists a versioned `legacy_path -> content_hash/shared_asset/consumer` rollback manifest for approved cleanup, and excludes derived files, semiannual reports, other fiscal years, orphans, and conflicts.
 - [ ] 4.5 Probe NFS mount identity and link/rename behavior, then create verified links or copies only after shared reads, reference checks, independent-failure-domain backup checks, and reconciliation succeed.
 - [ ] 4.6 Prove the inventory-only mode performs zero network, move, link, quarantine, or delete operations and that latest-only bootstrap never deletes valid older-fiscal-year files merely because they are outside its target.
+- [ ] 4.7 Adopt verifiable older-fiscal-year local reports for zero-network period-specific reuse without counting them toward latest-only coverage or triggering adjacent historical network backfill, applying normal correction governance within each adopted period.
 
 ## 5. Latest-Only Historical Bootstrap
 
-- [ ] 5.1 Snapshot the current active SSE, SZSE, and BSE stock universe with listing metadata and durable per-instrument coverage state.
+- [ ] 5.1 Implement a versioned A-share eligibility policy and snapshot the current active SSE, SZSE, and BSE universe with listing metadata, master-data version, policy version, and durable per-instrument coverage state; include main-board/STAR/ChiNext/BSE, ST, and suspended-active stocks while excluding B shares and non-stock security types.
 - [ ] 5.2 Implement bounded market-wide annual-category discovery over current and prior filing seasons with adaptive date-window partitioning and durable progress.
 - [ ] 5.3 Select and acquire only each instrument's latest available fiscal-year winner, preferring the newest verified complete correction and reusing adopted files.
 - [ ] 5.4 Implement rotating targeted repair for uncovered instruments with fixed `as_of`, deterministic candidate/due/earliest fiscal-year bounds, listing and provider-coverage evidence, expiring confirmed-missing evidence, overdue-but-older-asset-usable state, retry states, and restart-safe checkpoints.
@@ -48,6 +50,7 @@
 - [ ] 6.5 Refresh and audit the active-universe snapshot so new listings enter repair, delistings leave the coverage denominator without deleting assets, and older-fiscal-year corrections stay period-scoped.
 - [ ] 6.6 Emit stage logs, metrics, durable job results, affected-asset events, and tests for 1,500-record dense days, consecutive success-empty windows, equal/future timestamps, seven-day-late and years-late managed-period corrections, primary/fallback partial coverage, cursor/config fingerprints, bootstrap-to-daily no-gap handoff, non-annual metadata with zero V1 prefetch, and scheduled/manual/API overlap.
 - [ ] 6.7 Separate discovery-window completion from attachment retry so a fully discovered window may advance its cursor while failed attachments remain durably queued.
+- [ ] 6.8 Add an authenticated durable scheduler control plane for bounded manual start, status, cooperative stop, resume, duplicate-scope operation reuse, restart recovery, actor audit, and retained recent-run history; prove disabled cron does not disable local reads or on-demand ensure.
 
 ## 7. Local-First Consumer Service
 
@@ -62,23 +65,23 @@
 - [ ] 8.2 Prove broker parsing produces equivalent facts and performs zero provider requests and zero duplicate archive writes when a shared asset is present.
 - [ ] 8.3 Change business-profile acquisition and exact-filing reuse to request shared assets while preserving page artifacts, semantic extraction, review, promotion, and knowledge-cutoff behavior, including explicit metadata-only historical results and zero redownload when predecessor bytes were deleted.
 - [ ] 8.4 Convert `AnnualReportAssetCatalog` and existing DataManager methods into read-through compatibility adapters, then disable legacy business-owned annual-report writes after dual-read reconciliation.
-- [ ] 8.5 Link all affected business outputs to shared asset id, source filing, report period, content hash, and effective-correction state without coupling shared validity to parser status.
+- [ ] 8.5 Link all affected business outputs to shared asset id, source filing, report period, content hash, and effective-correction state without coupling shared validity to parser status; persist consumer-specific continuations so a front-facing business command queues exactly one consumer operation after asset readiness and exposes its state separately.
 
 ## 9. DataManager API And Frontend Integration
 
 - [ ] 9.1 Add DataManager list, get, ensure, readiness, operation-status, and controlled-stream methods backed only by the shared asset service.
-- [ ] 9.2 Fix additive FastAPI/OpenAPI contracts for zero-network GET, single-scope ensure, operation polling, readiness, and asset-id content streaming, including HTTP 200/202/400/403/404/409/410/422/429/503 semantics.
+- [ ] 9.2 Fix additive FastAPI/OpenAPI contracts for zero-network GET, single-scope ensure, operation polling, readiness, and asset-id content streaming with a versioned error envelope and deterministic HTTP 200/202/401/403/404/409/410/422/429/503 mappings, including the configured 404 non-disclosure policy.
 - [ ] 9.3 Implement a real trusted identity/permission boundary for acquire, content, operation ownership, and operator readiness; keep mutation/content endpoints disabled when that boundary is not configured.
 - [ ] 9.4 Separate asset availability, provisional/final effective-decision state, ensure disposition, operation status, operation stage, batch outcome, result origin, and consumer-processing states, and expose optional shared lineage in business-profile and broker responses without local paths.
 - [ ] 9.5 Integrate status, explicit acquire action, idempotent polling, safe content access, and correction-stale behavior into front-facing contracts; register the external UI repository/owner/version as an enablement gate because this repository has no UI source.
-- [ ] 9.6 Add OpenAPI snapshot and API/consumer tests proving every GET is zero-network, repeated/concurrent POST reuses one operation, restart recovery and owner isolation work, responses leak no path, streams reject superseded/corrupt assets, knowledge cutoffs hold, and legacy fields remain compatible.
+- [ ] 9.6 Add OpenAPI snapshot and API/consumer tests proving every GET is zero-network; selector forms are mutually exclusive, complete, identity-consistent, and path/URL-free; same-key/same-fingerprint POST reuses one operation while same-key/different-fingerprint returns 409 per principal; restart recovery and owner isolation work; responses leak no path; streams reject superseded/corrupt assets; knowledge cutoffs hold; and legacy fields remain compatible.
 
 ## 10. Backup Observability And Operations
 
-- [ ] 10.1 Implement incremental content-addressed archive backup to a verified independent storage failure domain with missing-only copy, size/hash validation, mount-source checks, target-side warning/hard-reserve/planned-byte gates, temporary-file recovery, a file manifest watermark paired with a recoverable catalog database snapshot, freshness state, unprotected bytes, and explicit mount/capacity failure handling; version 1 performs no automatic backup-blob GC.
-- [ ] 10.2 Add readiness and operational reports for active-universe coverage, discovery gaps, attachment readiness, integrity, retries, storage, unprotected bytes, backup freshness, scheduler state, and consumer migration.
+- [ ] 10.1 Implement incremental content-addressed archive backup to a verified independent storage failure domain with missing-only copy, mandatory revalidation of existing hash-named targets, atomic temporary-file publication, size/hash validation, mount-source checks, target-side warning/hard-reserve/planned-byte gates, crash recovery before/after publication and watermark commit, a file manifest watermark paired with a recoverable catalog database snapshot, freshness state, unprotected bytes, and explicit mount/capacity failure handling; version 1 performs no automatic backup-blob GC.
+- [ ] 10.2 Add persisted readiness and operational reports for active-universe coverage, discovery gaps, attachment readiness, integrity, retries, storage, unprotected bytes, backup freshness, scheduler state, and consumer migration, including recent-run retention, last successful cutoff, stale heartbeat, consecutive failures, cursor lag, oldest backlog age, alert thresholds, and separate redacted frontend versus operator diagnostics.
 - [ ] 10.3 Add `annual_report_asset_integrity_audit` and `annual_report_asset_backup` jobs plus repair commands that default to read-only and require explicit bounded flags for network repair, quarantine, linking, moving, or deletion.
-- [ ] 10.4 Implement and document backup/restore ordering for database plus files, legacy-path rollback-manifest reconstruction, and verify a sampled paired-watermark restore preserves asset identities, hashes, effective selection, consumer lineage, and required legacy aliases before re-enabling reads, writes, or predecessor deletion.
+- [ ] 10.4 Implement and document backup/restore ordering for database plus files and legacy-path rollback-manifest reconstruction; require full presence/length/hash reconciliation of every current-effective, retention-pinned, and pending-deletion replacement blob before re-enabling reads, writes, or predecessor deletion, while keeping sampled restore drills as additional routine evidence.
 
 ## 11. Validation Rollout And Cleanup
 
@@ -86,5 +89,5 @@
 - [ ] 11.2 Run bounded live provider probes for SSE, SZSE, and BSE originals and corrections, recording classification, pagination, cursor, attachment, and rate-limit evidence without broad production writes.
 - [ ] 11.3 Run production archive inventory and shadow adoption, then reconcile database rows, file hashes, active-universe coverage, duplicate bytes, calibrate annual-report size limits from measured P95/P99/max, and verify estimated/free storage before any download or deletion.
 - [ ] 11.4 Enable shared reads for broker and business-profile behind migration gates, process affected assets, and require zero duplicate network/archive activity plus compatible business outputs.
-- [ ] 11.5 Verify canonical archive backup and restore, complete the latest-only bootstrap, and prove daily cron enablement fails closed until configured coverage, integrity, storage, backup, and migration gates pass, then starts from a compatible handoff watermark without a discovery gap.
+- [ ] 11.5 Verify canonical archive backup and restore, including a required blob outside a sampling cohort that must still block enablement; complete the latest-only bootstrap; and prove daily cron enablement fails closed until configured coverage, integrity, storage, backup, and migration gates pass, then starts from a compatible handoff watermark without a discovery gap.
 - [ ] 11.6 Disable legacy annual-report writes and remove redundant files/code only after the deletion plan is reviewed, all retention pins are released, backups are verified, a temporary-root drill reconstructs legacy paths from the rollback manifest, and legacy consumer reads pass against those reconstructed paths.

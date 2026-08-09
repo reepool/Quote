@@ -81,9 +81,19 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **AND** it SHALL return HTTP 200 with `local_hit` for an immediately valid asset or HTTP 202 with operation id, `Location`, and `Retry-After` for created or reused work
 - **AND** it SHALL not keep the request open for an unbounded market or attachment fetch
 
+#### Scenario: Client submits an invalid selector combination
+- **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
+- **THEN** the API SHALL reject the request with HTTP 422 and a stable validation code before creating an operation or contacting a provider
+- **AND** the two supported selector forms SHALL remain mutually exclusive and all-or-none
+
 #### Scenario: Acquisition request is repeated
 - **WHEN** the same normalized scope and policy is submitted again with the same idempotency identity while work is active
 - **THEN** the API SHALL return the same durable operation and SHALL NOT issue a second provider request or physical write
+
+#### Scenario: Idempotency identity is reused for a different request
+- **WHEN** one principal reuses an `Idempotency-Key` with a different normalized selector, policy, or request body
+- **THEN** the API SHALL return HTTP 409 with a stable idempotency-conflict code and SHALL neither reuse the old result nor create new work
+- **AND** idempotency and operation ownership SHALL be scoped to the authenticated principal so another principal cannot inherit the first caller's operation
 
 #### Scenario: Authorization boundary is unavailable
 - **WHEN** the deployment has no configured trusted identity and scoped permissions
@@ -125,10 +135,24 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 
 #### Scenario: Client requests a superseded or corrupt asset
 - **WHEN** a content request resolves to a superseded, missing, or integrity-failed file
-- **THEN** the API SHALL reject delivery with a stable conflict or gone response and SHALL NOT stream stale bytes
+- **THEN** the API SHALL return HTTP 410 for a known superseded/deleted asset and HTTP 409 for a current asset whose bytes fail integrity, using stable error codes
+- **AND** it SHALL NOT stream stale bytes
+
+#### Scenario: API outcomes are mapped deterministically
+- **WHEN** a client receives a normal missing metadata result, an unknown resource, an authentication or permission failure, a malformed selector, a rate limit, or a temporary provider/storage blocker
+- **THEN** a metadata query with no local report SHALL return HTTP 200 with structured availability, while an unknown asset or operation SHALL return HTTP 404
+- **AND** a configured trusted boundary SHALL use HTTP 401 for missing authentication, HTTP 403 for insufficient scope, or the documented HTTP 404 non-disclosure policy for cross-owner operation lookup
+- **AND** selector validation SHALL use HTTP 422, rate limits HTTP 429 with `Retry-After`, and temporary infrastructure blockers HTTP 503 with a stable retryable or blocked code
+- **AND** every non-success response SHALL use the versioned common error envelope rather than provider exception text
 
 ### Requirement: Consumer Outputs Surface Asset Lineage
 Business-facing results that depend on annual reports SHALL expose sufficient shared asset lineage for audit without leaking internal archive paths.
+
+#### Scenario: A business action must wait for asset acquisition
+- **WHEN** a front-facing business-profile or broker command creates or reuses an asset ensure operation
+- **THEN** that business orchestration SHALL persist a continuation tied to the requested consumer and enqueue exactly one consumer operation after the asset becomes locally valid
+- **AND** generic asset ensure SHALL NOT implicitly start every consumer
+- **AND** the response SHALL expose the consumer operation or processing identity so asset completion and business-result completion remain independently queryable
 
 #### Scenario: Business-profile result uses annual-report evidence
 - **WHEN** a business-profile result is returned

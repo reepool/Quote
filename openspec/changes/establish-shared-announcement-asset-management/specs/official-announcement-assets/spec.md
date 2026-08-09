@@ -112,6 +112,12 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 - **THEN** the existing effective report SHALL remain active and physically present
 - **AND** the correction SHALL remain retryable with explicit diagnostics
 
+#### Scenario: Corrections finish acquisition out of publication order
+- **WHEN** two complete corrections for the same instrument and fiscal year are acquired or activated concurrently and the older correction finishes last
+- **THEN** activation SHALL serialize at the `instrument + fiscal_year` decision scope and reselect the winner from all committed observations inside the activation transaction
+- **AND** a stale worker SHALL fail its compare-and-swap or otherwise leave the newer valid correction effective
+- **AND** no deletion intent SHALL target the actual current winner
+
 #### Scenario: Superseded file is no longer referenced
 - **WHEN** the corrected report is active and the superseded physical blob has no remaining retention pin
 - **THEN** the superseded physical file SHALL be deleted
@@ -165,6 +171,12 @@ The system SHALL provide a local-first `ensure` contract that returns a verified
 
 ### Requirement: Latest-Only Historical Backfill Covers The Active A-Share Universe
 The system SHALL provide a resumable bootstrap that targets current active stock instruments on SSE, SZSE, and BSE and stores only the latest available effective annual-report attachment for each instrument.
+
+#### Scenario: Version 1 universe eligibility is evaluated
+- **WHEN** the bootstrap or daily coverage denominator is materialized
+- **THEN** a versioned eligibility policy SHALL include active RMB-denominated A-share instruments on the main boards, STAR Market, ChiNext, and BSE, including ST or suspended-but-not-delisted stocks
+- **AND** it SHALL exclude B shares, funds and ETFs, bonds, indices, and other non-A-share security types
+- **AND** the resulting instrument identities, policy version, source master-data version, and snapshot time SHALL be persisted so the denominator is auditable
 
 #### Scenario: Instrument has several historical annual reports
 - **WHEN** the bootstrap discovers multiple fiscal years for an instrument
@@ -387,6 +399,12 @@ Migration SHALL inventory existing annual-report manifests and paths, validate t
 - **THEN** the default operation SHALL be read-only and SHALL NOT download, move, link, quarantine, or delete files
 - **AND** it SHALL report adoptable, duplicate, missing, corrupt, conflicting, orphan, derived, and out-of-scope entries
 
+#### Scenario: A valid older-fiscal-year report already exists
+- **WHEN** migration finds a verifiable complete annual report for an older fiscal year that is outside the latest-only bootstrap target
+- **THEN** it SHALL register the filing and bytes as a migration-adopted asset so an explicit local-first request for that fiscal year can reuse it with zero network access
+- **AND** adoption SHALL NOT add that older period to latest-only coverage or trigger network backfill of adjacent historical years
+- **AND** any original/correction competition within that adopted fiscal year SHALL use the same effective-version and deletion gates as newly acquired assets
+
 #### Scenario: Business-profile archive contains a valid latest report
 - **WHEN** an existing business-profile manifest and file identify the selected latest effective annual report
 - **THEN** migration SHALL register that file as the shared asset without redownloading it
@@ -521,6 +539,16 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 - **WHEN** new or changed canonical blobs exist
 - **THEN** the backup workflow SHALL copy only missing content-addressed files to the configured backup mount and SHALL verify size and hash for copied content
 
+#### Scenario: A hash-named backup blob already exists
+- **WHEN** the backup target already contains the expected content-addressed path
+- **THEN** the workflow SHALL verify its byte length and SHA-256 before marking the source blob protected
+- **AND** a missing or mismatched target SHALL remain unprotected and SHALL be repaired through a temporary verified publication without silently overwriting untrusted bytes
+
+#### Scenario: Backup stops during file publication or watermark commit
+- **WHEN** the process stops while copying a temporary file, after atomic publication, or before committing the paired file-manifest watermark
+- **THEN** no temporary or uncommitted file SHALL satisfy backup readiness
+- **AND** a resumed operation SHALL reconcile target bytes idempotently, verify the final hash, and commit one paired watermark without recopying already verified content
+
 #### Scenario: Backup mount is unavailable
 - **WHEN** the configured NAS mount is missing or resolves to an unsafe local fallback
 - **THEN** the backup SHALL fail and alert without writing a full archive copy to the local data volume
@@ -552,6 +580,8 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 - **WHEN** an operator restores the announcement-asset capability after data loss
 - **THEN** a compatible catalog database snapshot and attachment backup watermark SHALL be restored together
 - **AND** hash/integrity reconciliation SHALL complete before consumer reads, destructive cleanup, or daily writes are re-enabled
+- **AND** every current-effective, retention-pinned, and pending-deletion replacement blob referenced by the restored catalog SHALL pass full presence, length, and SHA-256 verification
+- **AND** a missing or mismatched required blob SHALL keep recovery readiness blocked; sampling MAY be used for routine drills but SHALL NOT replace this enablement gate
 
 ### Requirement: The Capability Is Extensible Beyond Annual Reports
 The data model and service boundaries SHALL permit future semiannual and other announcement attachment types without weakening version 1 annual-report rules.
