@@ -58,6 +58,7 @@ DataManager SHALL expose business-neutral annual-report asset lookup, ensure, st
 - **THEN** DataManager SHALL invoke the shared service and return `local_hit`, `local_miss`, `operation_created`, or `operation_reused` disposition
 - **AND** asset availability, durable operation status/stage, and final `adopted|downloaded|repaired` origin SHALL be represented separately
 - **AND** a front-facing caller SHALL receive its authorized `asset_request_id` opaque subscription handle rather than the internal shared operation identity
+- **AND** the handle SHALL be present only when asynchronous acquisition is created or reused; an immediate `local_hit` or network-disabled `local_miss` SHALL return no handle (or an explicit `null`)
 
 #### Scenario: Legacy annual-report catalog is called during migration
 - **WHEN** an existing caller uses `get_annual_report_assets` or `get_annual_report_asset`
@@ -87,6 +88,14 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **THEN** the API SHALL accept only one instrument/fiscal-year or exact source-filing scope and create or reuse a bounded operation
 - **AND** it SHALL return HTTP 200 with `local_hit` for an immediately valid asset, HTTP 200 with `local_miss` when network acquisition is explicitly disabled, or HTTP 202 with principal-scoped `asset_request_id`, a `Location` containing only that opaque handle, and `Retry-After` for created or reused asynchronous work
 - **AND** it SHALL not keep the request open for an unbounded market or attachment fetch
+
+#### Scenario: A business command starts consumer processing
+- **WHEN** a protected business-profile or broker command requires an annual-report-backed processing result
+- **THEN** that business command SHALL accept a consumer processing fingerprint and caller idempotency key and SHALL execute the shared local-first lookup before processing
+- **AND** a local hit SHALL create or reuse exactly one caller-owned `consumer_request_id` without creating an asset acquisition subscription
+- **AND** a local miss with acquisition permitted SHALL create or reuse one `asset_request_id`, persist one consumer-specific continuation, and create or reuse the linked `consumer_request_id` only after the asset is valid
+- **AND** the command SHALL return HTTP 200 for an immediately available local result or HTTP 202 with the applicable opaque request handles for pending work, using the same ownership, `Location`, `Retry-After`, and error-envelope rules as the generic asset resources
+- **AND** generic asset ensure SHALL NOT start this consumer processing implicitly
 
 #### Scenario: Client submits an invalid selector combination
 - **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies an attachment/hash/observation pin without exact-filing identity, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
@@ -170,6 +179,7 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 #### Scenario: Client requests a superseded or corrupt asset
 - **WHEN** a content request resolves to a superseded, missing, or integrity-failed file
 - **THEN** the API SHALL return HTTP 410 for a known superseded/deleted asset and HTTP 409 for a current asset whose bytes fail integrity, using stable error codes
+- **AND** it SHALL never return HTTP 409 for a known superseded/deleted asset
 - **AND** it SHALL NOT stream stale bytes
 
 #### Scenario: API outcomes are mapped deterministically

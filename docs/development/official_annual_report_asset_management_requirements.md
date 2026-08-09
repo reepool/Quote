@@ -689,7 +689,7 @@ Ensure 的即时处置只区分：
 
 异步 operation 再通过独立字段报告 status、stage 和最终结果来源 `adopted/downloaded/repaired`；`missing/ambiguous/failed/blocked` 属于资产可用性或 operation 结果，不与 ensure disposition 混在同一枚举。
 
-返回应包含 asset ID、前台 `asset_request_id`、股票、财务年度、来源、filing ID、发布时间、是否修订、hash、长度、完整性、是否当前有效、诊断和下一步，但不向外部客户端暴露 internal operation ID 或任意服务器绝对路径。
+返回应包含 asset ID、股票、财务年度、来源、filing ID、发布时间、是否修订、hash、长度、完整性、是否当前有效、诊断和下一步。仅在创建或复用异步 acquisition 时返回前台 `asset_request_id`；HTTP 200 的 `local_hit` 和网络禁用的 `local_miss` 不创建 subscription，`asset_request_id` 应省略或为 `null`。任何响应都不得向外部客户端暴露 internal operation ID 或任意服务器绝对路径。
 
 ## 18. FastAPI 与前台业务整合
 
@@ -706,6 +706,8 @@ Ensure 的即时处置只区分：
 - `DELETE /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`：幂等取消尚未启动的 continuation；consumer processing 已开始时按业务受控停止契约处理，不支持时返回明确冲突而不是强杀；
 - `GET /api/v1/research/annual-report-assets/readiness`：查询覆盖和运行状态；
 - `GET /api/v1/research/annual-report-assets/{asset_id}/content`：按 asset ID 安全下载文件。
+
+依赖年报并需要启动业务解析的前台命令必须由业务消费者自己的受保护 POST 命令提供入口（公司画像和券商风控分别沿用或新增其业务命令端点）。该命令必须接收业务 processing fingerprint 和调用方幂等键，先执行共享 local-first 查询：本地命中时直接创建或复用一个 `consumer_request_id`；资产缺失时创建或复用一个 `asset_request_id`，并持久化只针对该 consumer 的 continuation，待资产就绪后创建或复用对应 `consumer_request_id`。generic asset ensure 不得隐式启动任何消费者。业务命令的 HTTP 200/202 返回、`Location`、`Retry-After`、请求所有权和错误投影必须与下方两类 request 资源一致；若具体业务命令属于后续变更，必须登记为本期前台闭环的外部 enablement gate，不得以 generic ensure 已完成宣称业务链路完成。
 
 实际路由必须避免动态路径冲突，并通过 OpenAPI snapshot 固定。任何 GET，包括现有公司画像 GET，都不得隐式触发公告发现或下载。POST 本地命中返回 HTTP 200；创建或复用异步 operation 返回 HTTP 202，并设置 `Location` 和 `Retry-After`。
 
@@ -746,7 +748,7 @@ V1 取消 `asset_request_id` 只解绑该 principal 的 subscription 和尚未�
 6. 业务结果保存共享 asset ID、来源公告、报告期、hash 和修订状态；
 7. 若之后修订版生效，前台将依赖旧 asset 的业务结果标记“来源已更新/待重算”，不得静默显示为最新。
 
-现有公司画像 GET 保持本地纯读。应增加可选 `source_assets/annual_report_asset` 和 `consumer_processing_status` 字段而不破坏现有必填字段。缺失时由有权限用户显式点击获取，前台禁用重复提交并按 `Retry-After` 轮询。只有 `local_valid` 才显示查看/下载入口；superseded 旧 asset 的内容请求返回明确 409/410 或当前资产提示，不能继续流式输出旧文件。
+现有公司画像 GET 保持本地纯读。应增加可选 `source_assets/annual_report_asset` 和 `consumer_processing_status` 字段而不破坏现有必填字段。缺失时由有权限用户显式点击获取，前台禁用重复提交并按 `Retry-After` 轮询。只有 `local_valid` 才显示查看/下载入口；已知 superseded/deleted 旧 asset 的内容请求固定返回 HTTP 410（可在错误体提供 replacement asset 元数据），当前 asset 文件损坏或 hash 不匹配才返回 HTTP 409，任何情况下不能继续流式输出旧文件。
 
 ### 18.4 API 安全与边界
 
