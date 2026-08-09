@@ -20,6 +20,17 @@ The business-profile semantic extractor SHALL require Simplified Chinese for hum
 - **AND** it performs at most one bounded Chinese repair request before machine rework
 - **AND** it does not create a routine human-review task
 
+#### Scenario: Model includes a non-authoritative derived hint
+- **WHEN** an otherwise schema-valid response includes a `model_derived_hints` object such as a suggested margin, ratio, or unit multiplier
+- **THEN** the system accepts the valid source facts, semantic summary, and evidence references
+- **AND** it stores the hint as non-authoritative diagnostic data
+- **AND** it recomputes or ignores the hint without rejecting the whole response
+
+#### Scenario: One field is invalid while other fields are valid
+- **WHEN** one extracted fact has a missing source unit or invalid evidence reference but other facts pass validation
+- **THEN** the system preserves the valid fields and marks only the invalid field for machine rework
+- **AND** it retries the LLM only when the invalid field cannot be repaired locally
+
 ### Requirement: Source, semantic, and canonical fields remain distinct
 The system SHALL store source-native labels and values separately from Chinese semantic conclusions and program-generated canonical names, units, and identifiers.
 
@@ -86,8 +97,40 @@ The system SHALL require the LLM to return the source numeric value and source u
 - **AND** it does not auto-maintain the production conversion rules from that proposal
 - **AND** model confidence, repeated model agreement, or successful extraction cannot promote or activate the rule
 
-### Requirement: All business-profile calculations are program-owned
-The production extraction LLM SHALL return source-reported numeric values and source units unchanged, and deterministic program code SHALL perform every conversion, percentage, ratio, total, difference, margin, concentration, ranking, materiality, confidence, and exposure calculation.
+### Requirement: Unknown-unit rules are persistent, observable, and correctable
+Every unknown source-unit proposal SHALL be stored as an append-only governed rule record with lifecycle state, proof lineage, catalog version, affected-fact counts, and replay status; unknown units SHALL NOT be solved only in memory for one fact.
+
+#### Scenario: Unknown unit is first observed
+- **WHEN** a source unit cannot be resolved by the current deterministic catalog
+- **THEN** the system stores the raw unit, bounded source context, proposal JSON, input hashes, and status `proposed`
+- **AND** it emits at most one deduplicated Telegram notification for the rule and current impact window
+- **AND** the semantic artifact remains replayable without another extraction LLM call
+
+#### Scenario: Mechanically provable rule is promoted
+- **WHEN** deterministic proof derives the dimension and multiplier from governed primitives and exact test vectors pass
+- **THEN** the system appends an `auto_approved` rule and a new catalog version
+- **AND** matching pending facts are replayed automatically
+- **AND** the rule becomes usable only after the catalog transaction commits
+
+#### Scenario: Uncertain linear rule enters shadow use
+- **WHEN** a candidate is linear and bounded but cannot yet be derived solely from existing primitives
+- **THEN** the system stores it as `shadow_active` and may use it for non-publishable shadow calculations
+- **AND** it gathers independent model agreement, repeated source observations, and reconciliation outcomes
+- **AND** it promotes the rule automatically once configured corroboration thresholds pass
+
+#### Scenario: Rule is corrected after activation
+- **WHEN** later evidence or deterministic checks show that an active rule is wrong
+- **THEN** the system appends a superseding rule and new catalog version instead of mutating history
+- **AND** it automatically replays all affected semantic artifacts and reports the affected-fact count
+- **AND** Telegram receives a correction notification with the old and new rule identities
+
+#### Scenario: Rule is unsafe or ambiguous
+- **WHEN** a proposal requires a new dimension, FX, contextual/non-linear conversion, or has contradictory evidence
+- **THEN** the system stores it as `quarantined`, keeps affected canonical facts pending, and sends a deduplicated Telegram alert
+- **AND** no routine manual review task is created unless the quarantine remains unresolved after automated retries
+
+### Requirement: Authoritative business-profile calculations are program-owned
+The production extraction LLM SHALL provide source-reported numeric values and source units as the only authoritative numeric inputs. It MAY provide qualitative semantic conclusions and non-authoritative derived hints; deterministic program code SHALL perform every authoritative conversion, percentage, ratio, total, difference, margin, concentration, ranking, materiality, confidence, and numeric exposure calculation.
 
 #### Scenario: Source reports a percentage
 - **WHEN** annual-report evidence explicitly reports `18.41%`
@@ -103,6 +146,12 @@ The production extraction LLM SHALL return source-reported numeric values and so
 - **WHEN** downstream value-chain, concentration, materiality, confidence, ranking, or commodity-exposure logic needs arithmetic
 - **THEN** deterministic versioned code calculates the result from governed inputs
 - **AND** no LLM-provided calculated value is accepted as authoritative
+
+#### Scenario: Commodity exposure requires semantic interpretation
+- **WHEN** evidence describes a commodity, product, input, customer, or directional exposure without a directly reported numeric exposure value
+- **THEN** the LLM identifies the semantic commodity and relationship as a qualitative assertion with evidence
+- **AND** program code derives any numeric score, ratio, amount, ranking, or aggregate from governed source facts
+- **AND** the semantic assertion is not rejected merely because no arithmetic result is reported in the source
 
 ### Requirement: Structured numeric identities are reconciled before persistence
 The structured semantic runtime SHALL calculate applicable arithmetic identities after unit normalization and SHALL never mark numeric reconciliation successful without executing the corresponding check.
@@ -136,6 +185,11 @@ The system SHALL persist an immutable, bounded semantic artifact after response-
 - **WHEN** a validated semantic response cannot be converted under the current unit or fact catalog
 - **THEN** the response JSON, evidence references, input and response hashes, model lineage, schema identity, and usage are persisted as a conversion-pending artifact
 - **AND** the business work item remains resumable
+
+#### Scenario: Optional model-derived fields accompany a valid artifact
+- **WHEN** a validated response contains non-authoritative model-derived hints alongside valid source facts
+- **THEN** the artifact stores both the source envelope and the hints with separate authority labels
+- **AND** conversion or reconciliation retries do not call the extraction LLM again solely because a hint was ignored
 
 #### Scenario: Conversion retry begins
 - **WHEN** a compatible conversion-pending artifact exists for the same immutable input and processing identity
@@ -216,7 +270,7 @@ Business-profile database writes SHALL remain serialized but SHALL be limited to
 Structured promotion SHALL remain disabled until a bounded shadow run proves Chinese output compliance, deterministic unit resolution behavior, numeric reconciliation, replay behavior, and acceptable writer and gateway metrics.
 
 #### Scenario: Readiness audit passes
-- **WHEN** the bounded validation cohort has no unclassified unit loss, no unproved or quarantined unit rule used for normalization/publication, no unconditional reconciliation success, no inconsistent publishable row, no repeated successful LLM call for conversion retry, and no storage/concurrency threshold breach
+- **WHEN** the bounded validation cohort has no unclassified unit loss, no unproved or quarantined unit rule used for canonical publication, no unconditional reconciliation success, no inconsistent publishable row, no repeated successful LLM call for conversion retry, and no storage/concurrency threshold breach
 - **THEN** the system may produce a promotion manifest for the structured phase
 
 #### Scenario: Readiness audit fails

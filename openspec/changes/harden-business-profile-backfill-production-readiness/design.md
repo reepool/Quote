@@ -71,11 +71,20 @@ Every structured row will distinguish:
 
 The prompt will state “use Simplified Chinese; never translate source labels,
 proper nouns, product names, units, or quoted text; preserve acronyms such as
-LED/MOSFET exactly.” A bounded language gate will reject English-only values for
-source-label and summary fields and automatically issue one Chinese repair
-request. It will not reject legitimate Latin acronyms, registered names, or unit
-symbols. The gate is a language/contract check, not a substring check on semantic
-meaning.
+LED/MOSFET exactly.” A bounded language gate will reject only invalid
+source-label/summary fields and automatically issue one Chinese repair request.
+It will not reject legitimate Latin acronyms, registered names, unit symbols, or
+optional model-derived hints. The gate is a language/contract check, not a
+substring check on semantic meaning.
+
+The response validator is fail-soft at field level. It accepts the valid source
+facts, semantic conclusions, and evidence references even when the model also
+returns `model_derived_hints` such as a suggested margin or scale. Such hints are
+retained as non-authoritative diagnostics, are never used as canonical inputs, and
+are recomputed or ignored by program code. A whole response is retried only for
+malformed JSON, missing required source fields, invalid evidence scope, or an
+unrepairable type/contract violation. This prevents useful semantic work from
+being discarded merely because the model volunteered arithmetic.
 
 Alternative rejected: storing the model's paraphrase in existing `*_raw` columns
 and treating `*_normalized` as an alias. The 2026-08-09 output showed that this
@@ -104,19 +113,19 @@ The parser applies the following deterministic stages:
 - Exact `Decimal` multiplication and division. Currency and cross-currency
   conversion remain prohibited without an explicit dated FX lineage.
 
-The LLM returns only source value and source unit; it never returns a canonical
-unit or a converted number. Unknown or ambiguous units create a durable
-`unit_resolution_pending` artifact containing the semantic response and evidence.
-The next catalog version replays that artifact automatically. It does not call
-the LLM again and does not require a human for units that the parser can resolve
-from the generic grammar. Truly ambiguous dimensions remain blocked from
-publication with a machine-rework reason.
+The LLM must return source value and source unit as the only authoritative numeric
+inputs. It may also return an optional candidate unit interpretation or derived
+hint, but program code treats those fields as untrusted suggestions. Unknown or
+ambiguous units create a durable `unit_resolution_pending` artifact containing the
+semantic response and evidence. The next catalog version replays that artifact
+automatically and does not call the extraction LLM again.
 
 Alternative rejected: continuously append ad-hoc aliases to JSON. That approach
 cannot distinguish `万台（套）`, `千只`, `亿千瓦时`, and currency scales or prove
 that a new alias has the correct dimension.
 
-Unknown units use an automated three-tier maintenance path:
+Unknown units use an automated three-tier maintenance path and a persistent rule
+lifecycle:
 
 1. The deterministic grammar first attempts to compose the unit from governed
    prefixes, base units, classifiers, numerators, and denominators. Successful
@@ -129,27 +138,37 @@ Unknown units use an automated three-tier maintenance path:
 3. Program code parses the proposal without evaluating expressions, recomputes
    the multiplier from governed prefixes, proves numerator/denominator dimensions,
    checks dependency cycles and prohibited transformations, and runs exact
-   round-trip test vectors. Only a rule fully derivable from existing primitives
-   becomes an append-only `auto_approved` runtime overlay with a new catalog
-   version. New base dimensions, contextual/non-linear conversions, FX formulas,
-   or proposals that depend only on model assertion remain quarantined.
+   round-trip test vectors. Every proposal is appended to the governed runtime
+   registry with status `proposed`, `shadow_active`, `auto_approved`,
+   `quarantined`, or `superseded`; it is never a one-off conversion.
+
+Rules fully derivable from existing primitives become `auto_approved` and take
+effect after the catalog-version transaction commits. A linear alias or multiplier
+that cannot yet be mechanically derived may enter `shadow_active` for candidate
+calculations only, while the system gathers independent model agreement, repeated
+source observations, and reconciliation outcomes. It is promoted automatically
+after configured corroboration thresholds are met. New dimensions, contextual or
+non-linear conversions, FX formulas, contradictory proposals, or unsafe rules stay
+`quarantined` and cannot affect canonical publication.
 
 The runtime overlay is stored in a governed unit-rule table rather than rewriting
-the source JSON file. Every proposal, proof result, rejection, promotion, and
-catalog version is auditable and replayable. This keeps normal operation automatic
-while reserving manual intervention for genuinely new or context-dependent unit
-semantics, not formatting variants. A proposal is unusable by normalization and
-publication paths until the deterministic proof transaction commits; model
-confidence, repeated agreement, or successful extraction cannot substitute for
-that proof.
+the source JSON file. Every proposal, proof result, shadow activation, corroboration,
+rejection, promotion, superseding correction, catalog version, affected-fact count,
+and replay outcome is auditable and replayable. Telegram sends deduplicated batch
+notifications for new rules, promotions, quarantines, and superseding corrections;
+notifications are informational and do not create a routine approval queue. A rule
+is unusable by canonical publication until its applicable lifecycle state and
+deterministic proof transaction commit; model confidence alone cannot substitute
+for that state.
 
 ### 3. Enforce numeric reconciliation after conversion
 
-All arithmetic belongs to deterministic code. The extraction LLM identifies which
-source values and units belong to a fact and returns source-reported numbers
-unchanged. Program code handles percent-to-fraction conversion, scale application,
-totals, ratios, changes, margins, concentration, rankings, materiality thresholds,
-confidence formulas, exposure aggregation, and every other derived numeric field.
+All authoritative arithmetic belongs to deterministic code. The extraction LLM
+identifies which source values and units belong to a fact, summarizes qualitative
+business meaning, and may provide non-authoritative derived hints. Program code
+handles percent-to-fraction conversion, scale application, totals, ratios, changes,
+margins, concentration, rankings, materiality thresholds, confidence formulas,
+numeric exposure aggregation, and every other derived numeric field.
 If a source explicitly reports a percentage or total, the model returns that raw
 reported value and unit; the program separately normalizes and verifies it.
 
@@ -251,7 +270,7 @@ source results.
 
 ## Migration Plan
 
-1. Deploy code, catalog/schema versions, artifact manifest tables, and configuration
+1. Deploy code, catalog/schema versions, artifact manifest and unit-rule registry tables, and configuration
    with promotion still disabled.
 2. Run an automatic migration that marks the known inconsistent shadow candidates
    and unit-blocked work as non-publishable/replayable; do not delete PDFs or prior
@@ -261,8 +280,9 @@ source results.
 4. Run a bounded 20-company shadow batch with semantic concurrency 10 and DEBUG
    logging. Require zero unconditional reconciliation flags, zero repeated
    initialization calls, no terminal failures, and all unresolved units represented
-   as pending artifacts. Require zero normalization or publication decisions that
-   reference an unproved or quarantined unit rule.
+   as pending artifacts. Require zero canonical publication decisions that reference
+   an unproved or quarantined unit rule, and verify every unknown-unit proposal has
+   a persistent lifecycle record and a deduplicated Telegram notification.
 5. Compare writer duty, p95 transaction time, gateway timeout rate, accepted rows,
    unit-resolution counts, and Chinese-language contract violations with the
    2026-08-09 baseline. Keep promotion disabled until the readiness manifest passes.

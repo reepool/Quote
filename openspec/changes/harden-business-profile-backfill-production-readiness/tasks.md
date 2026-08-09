@@ -2,10 +2,11 @@
 
 - [ ] 1.1 Version structured and narrative business-profile prompts/schemas with source-native label/value/unit fields, Chinese semantic-summary fields, and program-owned canonical fields
 - [ ] 1.2 Require Simplified Chinese conclusions, preserve Chinese source labels/proper nouns/acronyms/units, and remove prompt language that invites translation or model-side conversion
-- [ ] 1.3 Implement a bounded Chinese-language contract validator with one automatic repair request and no routine human-review escalation
+- [ ] 1.3 Implement a bounded Chinese-language contract validator with one automatic repair request, field-level fail-soft handling, and no routine human-review escalation
 - [ ] 1.4 Update runtime record builders so `*_raw` remains source-native, semantic summaries remain Chinese, and stable canonical IDs never depend on model translation
 - [ ] 1.5 Add tests for Chinese labels, English-only violations, mixed Chinese/acronym text, source symbols, semantic paraphrases, and stable cross-period identities
-- [ ] 1.6 Audit every business-profile prompt/schema and prohibit model-calculated conversions, percentages, ratios, totals, differences, margins, concentration, rankings, materiality, confidence, and exposure values
+- [ ] 1.6 Audit every business-profile prompt/schema so model-derived hints are non-authoritative, while program code owns authoritative conversions, percentages, ratios, totals, differences, margins, concentration, rankings, materiality, confidence, and numeric exposure values
+- [ ] 1.7 Preserve optional `model_derived_hints` as diagnostics and ignore/recompute them without rejecting otherwise valid semantic responses; add field-level partial-acceptance tests
 
 ## 2. Deterministic Unit Governance
 
@@ -19,7 +20,11 @@
 - [ ] 2.8 Add the append-only runtime unit-rule proposal/overlay tables with proposal, proof, quarantine, auto-approval, catalog-version, and replay lineage
 - [ ] 2.9 Implement the optional closed-schema unit-proposal LLM path without catalog write authority or company-value conversion
 - [ ] 2.10 Implement deterministic formula proof by primitive-reference validation, multiplier recomputation, dimensional analysis, cycle/prohibited-rule checks, and exact round-trip tests
-- [ ] 2.11 Auto-promote only mechanically provable overlay rules, make uncommitted proofs unusable by normalization/publication, and quarantine new dimensions, contextual/non-linear rules, FX, ambiguous mappings, and model-only assertions
+- [ ] 2.11 Auto-promote only mechanically provable overlay rules, make uncommitted proofs unusable by canonical publication, and quarantine new dimensions, contextual/non-linear rules, FX, ambiguous mappings, and model-only assertions
+- [ ] 2.12 Persist every unknown-unit proposal with append-only lifecycle states (`proposed`, `shadow_active`, `auto_approved`, `quarantined`, `superseded`) and affected-fact/replay lineage
+- [ ] 2.13 Add automated corroboration and promotion thresholds for bounded linear shadow rules without routine manual approval
+- [ ] 2.14 Send deduplicated Telegram notifications for new, shadow-active, promoted, quarantined, and superseding unit rules
+- [ ] 2.15 Implement superseding-rule correction and automatic replay of all affected semantic artifacts without rewriting prior catalog history
 
 ## 3. Replayable Semantic Artifacts
 
@@ -36,7 +41,7 @@
 - [ ] 4.3 Reject the whole affected semantic bundle when a reported numeric identity conflicts beyond tolerance and retain both reported and calculated diagnostics without overwriting either value
 - [ ] 4.4 Add regression fixtures for the two inconsistent `600403.SH` rows and representative correct, rounded, missing-margin, zero-revenue, negative-margin, and incompatible-unit cases
 - [ ] 4.5 Ensure promotion/readiness cannot accept a candidate lacking an executed applicable reconciliation result
-- [ ] 4.6 Move percentage, ratio, total, difference, concentration, ranking, materiality, confidence, and exposure arithmetic into versioned program functions and test that LLM-calculated values are ignored or rejected
+- [ ] 4.6 Move authoritative percentage, ratio, total, difference, concentration, ranking, materiality, confidence, and numeric exposure arithmetic into versioned program functions and test that LLM-calculated hints are retained diagnostically but never accepted as authority
 
 ## 5. Automatic Recovery And Data Hygiene
 
@@ -70,6 +75,6 @@
 - [ ] 8.1 Update rollout configuration, unit/prompt/schema identities, DEBUG runbook queries, recovery instructions, and readiness thresholds without enabling structured promotion
 - [ ] 8.2 Run focused semantic extraction/runtime/async/unit/storage/HKEX tests, JSON/schema validation, AST compilation, and static checks
 - [ ] 8.3 Run the expanded business-profile and adjustment-factor regression suites and fix every confirmed correctness or compatibility finding
-- [ ] 8.4 Execute a bounded 20-company shadow validation with semantic concurrency 10, verify zero terminal failures and zero repeated LLM calls for conversion retries, and inspect Chinese outputs, unit proposals/proofs, arithmetic gates, artifacts, gateway pressure, and writer metrics
+- [ ] 8.4 Execute a bounded 20-company shadow validation with semantic concurrency 10, verify zero terminal failures and zero repeated LLM calls for conversion retries, and inspect Chinese outputs, field-level partial acceptance, unit lifecycle/proposals/proofs, automatic corroboration, Telegram notifications, arithmetic gates, artifacts, gateway pressure, and writer metrics
 - [ ] 8.5 Keep promotion disabled unless the machine-readable readiness manifest has no language, unproved/quarantined-unit-use, numeric, replay, writer, gateway, or approved-history blocker
 - [ ] 8.6 Review the complete implementation diff, classify findings for real trigger paths versus over-strict suggestions, fix confirmed issues, and record the final validation evidence
