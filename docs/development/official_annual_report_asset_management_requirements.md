@@ -95,7 +95,9 @@
 - 证券为人民币计价 A 股，包含主板、科创板、创业板、北交所、ST/*ST 和停牌但未退市股票；
 - 排除沪深 B 股、基金/ETF、债券、指数、存托凭证及其他非 A 股证券类型。
 
-以上规则必须形成可版本化的 eligibility policy。退市、非活跃和范围外证券不进入默认全市场回补，但允许通过受控的按需接口获取指定年报。股票范围必须在每次历史回补启动时生成包含 instrument identity、policy version、主数据版本和时间戳的快照，避免执行期间主数据变化造成覆盖分母漂移。
+以上规则必须形成可版本化的 eligibility policy。退市、非活跃和范围外证券不进入默认全市场回补，但允许通过受控的按需接口获取指定年报。股票范围必须在每次历史回补启动时生成包含 instrument identity、policy version、主数据版本、主数据最近成功更新时间和快照时间戳的快照，避免执行期间主数据变化造成覆盖分母漂移。
+
+主数据刷新失败时必须保留上一份成功且完整的快照，不得用空集或部分结果覆盖。配置必须定义最大允许陈旧时间；证券关键资格字段缺失或冲突时进入 `eligibility_indeterminate` 明细而不是静默排除。快照超过 freshness 门槛、刷新失败且没有可接受旧快照，或仍有无法分类证券时，市场公告发现可以继续，但不得宣称全市场覆盖完成，readiness 必须显示 `degraded/blocked` 及分母不确定数量。
 
 ### 6.2 “最新一期”定义
 
@@ -110,6 +112,7 @@
 - 公告必须保存官方原始发布时间、规范化发布时间、首次发现时间和最后检查时间。
 - 业务回测或时点研究使用公告实际可得时间，不得使用报告期替代公告时间。
 - 新修订版只能从其发布时间起成为可得资料；当前有效查询返回修订版，历史知识截止查询如果旧文件已按策略删除，应明确返回“元数据可追溯但原件不在本地”，不得退回当前修订版冒充历史资料。
+- 同一公告 ID 下的附件内容更新、撤回或状态回填必须为每次 observation 保存 `version_available_at` 及时间来源/精度。优先使用官方生效时间；来源不提供时使用首次观察时间。知识截止和业务 `data_available_date` 按 observation 的 `version_available_at` 判断，不得沿用父公告较早的发布时间把后来才出现的字节或撤回状态回填到历史。
 
 ## 7. 总体架构与职责边界
 
@@ -207,6 +210,7 @@ research.announcements
 
 - attachment ID、blob hash、最终 URL；
 - 下载尝试、响应证据、长度和 hash；
+- observation version、首次/最后观察时间、`version_available_at`、时间来源和时间精度；
 - 有效、损坏、缺失、超限或重试状态；
 - lease、attempt、next_retry_at、错误摘要；
 - 临时路径不得成为有效资产路径。
@@ -240,6 +244,7 @@ research.announcements
 
 - `official_asset_deletion_audit`：追加式保存旧/新 asset、hash、路径、引用判断、删除原因、任务/操作者和时间。
 - `official_asset_consumer_processing`：可选公共索引，保存 `asset_id + consumer + parser_version + parameter_hash`，但业务自己的 manifest 仍是派生输出的权威记录。
+- 前台业务命令还需持久化 principal-scoped `consumer_request_id`（或等价 opaque handle），关联调用者、consumer、processing fingerprint、pending continuation 和最终 consumer operation；外部状态查询不得暴露内部 consumer operation ID。
 - 资产新增、替换、修复和删除应生成可消费的 change event 或单调 watermark。
 
 ## 9. 年报分类与最有效版本规则
@@ -275,7 +280,9 @@ research.announcements
 
 跨来源候选只有在内容 hash 相同或存在经过配置审计的官方镜像映射时，才能自动判为等价。不同来源对同一股票、同一财务年度给出不同完整 PDF 且无法证明法律优先关系时，必须 `ambiguous/blocked`，不得按 source 名称或 filing ID 字符串任意决胜。
 
-分类和选择必须落到 attachment 级。一个公告同时包含完整中文报告、摘要、英文版和附录时，只允许完整中文正文参与 winner 选择。来源若撤回、取消公告，或在相同公告 ID 下静默更新附件，系统必须保存新的 observation 并重新评估；撤回当前有效修订版时，仅在可以证明前任仍合法、完整且物理可用时安全回退，否则进入 blocked。
+同一来源的两个完整修订版如果规范化发布时间相同但内容 hash 不同，只有 provider 明确的 replacement edge、官方 revision sequence 或其他版本化法律优先证据可以决胜；否则同样必须 `ambiguous/blocked`。系统必须保留原始发布时间和时间精度，不能用 filing/attachment ID 的字典序推断先后。
+
+分类和选择必须落到 attachment 级。一个公告同时包含完整中文报告、摘要、英文版和附录时，只允许完整中文正文参与 winner 选择。来源若撤回、取消公告，或在相同公告 ID 下静默更新附件，系统必须保存新的 observation 并重新评估；撤回/取消只有在 provider 显式状态、被撤公告或附件 ID、官方 replacement/withdrawal relation，或版本化确定性规则能够绑定到具体候选时才生效，仅凭通用标题关键词不得撤销当前资产。目标不确定时只登记 evidence 并进入 `ambiguous`。撤回当前有效修订版时，仅在可以证明前任仍合法、完整且物理可用时安全回退，否则进入 blocked。
 
 首次历史回补若发现法律上更新的完整修订版但无法下载或验证，不得把原版宣称为最终 latest-effective。该股票应为 `blocked/retryable`。已经在线服务且原版仍有效时，可继续提供原版，但必须标为 `provisional` 或“存在待验证修订”，直到修订问题收敛。
 
@@ -322,6 +329,8 @@ research.announcements
 
 回补必须固定 `as_of` 和来源/查询配置指纹。版本化财年边界策略以 `as_of`、项目时区、财年末、上市日、provider coverage start、有限 lookback 和披露日历为输入，输出 candidate upper year、due year 和 earliest searchable year；日历年 A 股 V1 默认使用次年 4 月 30 日披露边界。未到期的空年度可以继续使用实际已发布的上一年度作为 latest available，但到期仍缺报必须形成显式 overdue coverage gap。上市日晚于报告期末的股票可以形成有证据的 `confirmed_missing`；延期披露、长期停牌或来源部分失败不能据此确认缺失。若较新财务年度窗口扫描不完整，不得降级选择更老财务年度并宣称“最新”。
 
+每只股票必须分开记录 asset availability（例如 `available/confirmed_missing/retryable/blocked`）和 expected-period coverage（`not_due/current/overdue_missing/incomplete`）。来源完整扫描后确认应披露年度仍缺报时，上一年度可以继续作为 `available` 的 latest available asset，但必须同时携带 `overdue_missing`，不能把“有旧资产”误报为“本期覆盖完成”。V1 默认允许 discovery-complete 的 bootstrap 结束并启用日更，使延期公告仍能被日更发现；`overdue_missing` 默认使 readiness 降级并持续进入 repair，而不是形成阻止日更自身启动的循环依赖。部署可通过版本化 policy 将其升级为更严格 blocker。
+
 ### 10.3 为什么不是逐股全量扫描
 
 约 5,500 只股票逐日逐股查询会产生大量请求和负结果，容易触发限流。历史回补应以市场级、年报类别、日期窗口扫描为主，只对不断缩小的缺失股票集合使用单标的查询。
@@ -334,6 +343,7 @@ research.announcements
 - `confirmed_missing` 必须记录来源、完整成功的查询边界、上市时间、`as_of`、证据和过期时间，不得仅因一次空响应写入永久缺失。
 - 来源暂时失败、页面超限或身份歧义只能进入 `incomplete/retryable/blocked`，不能计入成功覆盖。
 - 回补只有在不存在 `incomplete/blocked` 时返回 `success`；仍有这类记录时只能返回 `partial`，即使本次运行已经停止。
+- `overdue_missing` 只有在 expected-period 搜索完整时才允许与 `success` 并存，并必须使默认 readiness 降级、保留修复资格和逾期证据；未完成的应披露期间仍属于 `incomplete`。
 
 ## 11. 每日更新与公告发现机制
 
@@ -425,7 +435,9 @@ publication lookback 之外还必须维护覆盖所有受管 `instrument_id + fi
 请求至少支持两类身份：
 
 - `instrument_id + fiscal_year/report_period`：获取该期间最有效年报；
-- `source + source_announcement_id/filing_id`：获取业务已绑定的精确法律公告。
+- `source + source_announcement_id/filing_id`：获取业务已绑定的精确法律公告；可附带 `attachment_id` 以及 `expected_content_hash` 或 `observation_version` 钉住具体附件 observation。
+
+带版本 pin 的 exact-filing 请求必须精确匹配，不得返回同一 filing 后来静默更新的字节冒充原证据。未提供版本 pin 时，返回该法律 filing 当前有效的 observation，并在响应中明确 observation version、hash 和 `version_available_at`；被钉住的旧 observation 已按 V1 删除时，只返回 metadata + `local_content_unavailable`。
 
 请求策略至少包含：
 
@@ -499,7 +511,7 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 
 - 公司画像文件名已经包含股票、报告期、公告 ID 和 SHA-256，可作为采用证据；
 - 公司画像目录也有 `derived/` 派生内容，公共资产迁移不得把派生文件当原始公告；
-- 券商目录同时包含年报和半年报，一期只能采用报告期为年末且通过完整年报分类的原件；
+- 券商目录同时包含年报和半年报，一期只能采用报告期为年末且通过完整年报分类的正文附件，包括可验证原版和完整修订版；
 - 两边可能保存相同附件的不同副本，必须按 source identity、报告期、PDF 签名、长度和 SHA-256 核对。
 
 ### 13.3 采用优先于搬迁
@@ -516,6 +528,8 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 
 不得仅因文件名相同认定内容相同，也不得在 consumer 尚未切换时删除其原路径。
 
+shadow 记录在 source identity、股票/报告期、附件分类、长度/hash 和 latest-effective 决策完成对账前，不得进入生产 effective 查询、不得满足 bootstrap coverage，也不得被前台或业务 parser 消费。只有无冲突对账完成并通过显式 consumer cutover gate 后，才可把采用记录提升为 production-visible；冲突和证据不足记录始终 fail closed。
+
 任何迁移清理都必须生成逐文件 allowlist，列出 managed path、manifest/asset ID、hash 和删除理由。允许删除的原因仅限：字节完全相同的冗余副本，或被完整修订版替代且已满足删除门槛的同财年旧原件。`derived/`、半年报、其他财务年度、未入 manifest 的孤儿文件和任何冲突文件一律排除。工具默认 dry-run，禁止目录级删除。
 
 ### 13.4 一个财务年度一个有效附件
@@ -527,6 +541,7 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 - 修订版生效后解除旧引用；
 - 物理保留依据独立的 `retention pin`，包括其他有效附件、受管 legacy alias、尚未切换的消费者、活动文件流/解析 lease 和迁移操作；历史元数据外键本身不永久 pin 文件；
 - 任一 retention pin 未释放时不能删除，pin 应由数据库查询/约束计算，不能依赖可能漂移的手工计数字段；
+- read/processing lease 必须包含 owner、TTL、heartbeat、generation 和安全宽限期；过期 lease 只能由 CAS/reconciler 撤销并重新计算 pin，仍有新 heartbeat 或无法证明 owner 已失效时继续阻止删除。崩溃、长时间解析、续租竞争和过期回收必须有测试，避免陈旧 lease 永久阻塞，也避免活跃 reader 被提前删除原件；
 - 删除文件不删除公告、附件、hash、替换链和删除审计。
 
 ## 14. 当前存储容量评估与门槛
@@ -589,7 +604,7 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 - 记录 destination identity、完成时间、错误和未保护字节；
 - NAS 未挂载或路径退化为本地目录时 fail closed；
 - 不得把本应写 NAS 的完整副本落到本地 `data` 卷。
-- 备份目标必须与主 `data/filings` 处于独立存储故障域，并核对 mount source、服务器和 export 身份；同一服务器的不同 export 不计灾备。
+- 备份目标必须与主 `data/filings` 处于独立存储故障域，并核对配置的不可混淆 `failure_domain_id`、mount source、服务器、export 和可取得的文件系统标识；不能只凭路径名、主机别名或运维标签判断。同一服务器的不同 export 不计灾备，运行时无法证明独立性时按 non-independent fail closed。
 - 当前 `data/filings` 与 `PVE-Bak` 都来自 `192.168.188.88`，因此 PVE-Bak 不能作为允许删除前任文件的唯一灾备；当前位于 `192.168.188.68` 的 QuoteBak 才具备不同主机这一最低隔离条件。
 - 备份目标也必须执行 warning、hard reserve、planned-byte、临时文件和 freshness 门槛；目标容量不足时保持本地资产有效，但 readiness 降级并阻止前任删除。
 - 缺失 Blob 使用目标端临时文件、flush、长度/hash 校验和同目录原子发布；已有 hash 命名目标必须重新验证，不能只信任文件名。已有目标 hash/长度不符时保持 unprotected，普通备份不得改变其 path、bytes 或 mtime，也不得推进 watermark；quarantine 或 replacement 只能由 operator-authorized、可审计 repair operation 执行并保留原始证据。
@@ -635,6 +650,7 @@ data/filings/financial_statements/broker_risk_control/{exchange}/{symbol}/
 
 - module enabled、scheduled enabled、dry-run；
 - active exchanges、instrument type/status；
+- universe master-data freshness limit、eligibility policy version、indeterminate handling 和 overdue-missing readiness policy；
 - source routes、normalized categories、classifier version；
 - bootstrap filing-season bounds 和 targeted repair bounds；
 - daily cron、timezone、overlap days、initial lookback；
@@ -657,7 +673,7 @@ DataManager 至少提供：
 - 按股票、财务年度、来源、filing ID、完整性、获取状态列出资产；
 - 获取某股票某年度当前最有效年报；
 - 查询 active-universe coverage、存储、备份和 scheduler readiness；
-- 查询 durable operation 状态；
+- 通过 caller-owned `asset_request_id` 查询共享 acquisition 的授权投影，通过 `consumer_request_id` 查询业务 continuation/processing 的授权投影；internal operation ID 仅允许 operator/service scope 查询；
 - 根据 asset ID 获取受控文件流或内部文件 handle。
 
 现有 `get_annual_report_assets` 和 `get_annual_report_asset` 在迁移期改为共享仓库 read-through adapter，避免破坏调用方；长期不得继续只筛选公司画像 manifest。
@@ -685,6 +701,9 @@ Ensure 的即时处置只区分：
 - `GET /api/v1/research/company/{instrument_id}/annual-reports/effective`：按 fiscal year 查询单一有效状态；
 - `POST /api/v1/research/company/{instrument_id}/annual-reports/ensure`：只为单股票单财年或精确 filing 创建/复用 operation；
 - `GET /api/v1/research/annual-report-asset-requests/{asset_request_id}`：通过 principal-scoped opaque handle 轮询 durable operation 的授权投影；
+- `DELETE /api/v1/research/annual-report-asset-requests/{asset_request_id}`：幂等解绑 caller subscription；V1 不因最后一个订阅者取消而中止已创建的有界共享 acquisition；
+- `GET /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`：轮询 caller-scoped 业务 continuation/processing 投影，返回 consumer、request/processing status、发生 acquisition 时关联的 `asset_request_id`、结果身份和脱敏错误；
+- `DELETE /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`：幂等取消尚未启动的 continuation；consumer processing 已开始时按业务受控停止契约处理，不支持时返回明确冲突而不是强杀；
 - `GET /api/v1/research/annual-report-assets/readiness`：查询覆盖和运行状态；
 - `GET /api/v1/research/annual-report-assets/{asset_id}/content`：按 asset ID 安全下载文件。
 
@@ -692,14 +711,16 @@ Ensure 的即时处置只区分：
 
 ### 18.2 前台状态模型
 
-前台必须分别呈现三套正交状态，不得把“附件下载完成”误解为“业务结果已更新”：
+前台必须分别呈现四类正交状态，不得把“附件下载完成”误解为“业务结果已更新”：
 
 - asset availability：`local_valid/metadata_only/missing/ambiguous/corrupt/superseded/blocked`；
 - operation status：`queued/running/completed/missing/failed/blocked/cancelled/expired`；
 - operation stage：`discovering/downloading/validating/activating/backing_up`；
-- consumer processing：`not_started/queued/processing/current/stale/failed`。
+- consumer request/processing：`pending/not_started/queued/processing/current/stale/failed/blocked/cancelled`。
 
-ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_reused`；`local_miss` 表示本地不满足且调用策略未创建网络 operation。asset request 投影明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、stage、进度、最终结果来源和脱敏诊断。取消一个 `asset_request_id` 只取消该 principal 的 subscription 和 pending consumer continuation；其他订阅者仍需要时不得取消底层 acquisition。底层 operation 的 lease 过期和重启恢复语义必须独立定义。
+ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_reused`；`local_miss` 表示本地不满足且调用策略未创建网络 operation。asset request 投影明确 terminal 集、是否可重试、reason codes、attempt、`next_retry_at`、创建/开始/心跳/完成时间、stage、进度、最终结果来源和脱敏诊断。consumer request 投影独立返回 `consumer_request_id`、consumer/processing fingerprint、request/processing status、可选关联 `asset_request_id`、结果身份、可重试性和脱敏诊断；本地命中未创建 acquisition 时该关联为空。两类 request 均只允许 owner 或 operator 查询，并遵循统一 404 non-disclosure policy。
+
+V1 取消 `asset_request_id` 只解绑该 principal 的 subscription 和尚未启动的 consumer continuation；已创建的有界共享 acquisition 即使没有剩余订阅者也继续完成，以避免订阅竞态破坏可复用资产。取消 asset request 不得级联停止已经开始的 consumer processing；后者只能通过该业务自己的受控停止契约处理，不支持时明确拒绝。底层 operation 的 lease 过期和重启恢复语义必须独立定义。
 
 | 状态 | 前台含义 | 允许操作 |
 | --- | --- | --- |
@@ -720,8 +741,8 @@ ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_r
 1. 后端先调用共享 local-first 查询；
 2. `local_valid` 时取得 asset ID 作为后续 consumer operation 输入；
 3. 缺失且允许获取时创建 ensure operation；
-4. 业务命令同时持久化 consumer continuation；本地命中时立即创建或复用一个 consumer operation，缺失时在 asset operation 成功后自动创建或复用该 consumer operation，generic asset ensure 不隐式启动无关消费者；
-5. 前台分别轮询 asset request handle 和 consumer continuation/operation，不能用“附件完成”代替“业务结果 current”；
+4. 业务命令同时持久化 `consumer_request_id` 和 continuation；本地命中时立即创建或复用一个 consumer operation，缺失时在 asset operation 成功后自动创建或复用该 consumer operation，generic asset ensure 不隐式启动无关消费者；
+5. 前台分别以 `asset_request_id` 和 `consumer_request_id` 轮询两个 caller-scoped 投影，不能用“附件完成”代替“业务结果 current”；
 6. 业务结果保存共享 asset ID、来源公告、报告期、hash 和修订状态；
 7. 若之后修订版生效，前台将依赖旧 asset 的业务结果标记“来源已更新/待重算”，不得静默显示为最新。
 
@@ -729,9 +750,9 @@ ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_r
 
 ### 18.4 API 安全与边界
 
-- 获取和文件下载需使用现有授权机制；
+- 获取和文件下载需使用本期新增或配置的可信身份与 scoped permission boundary；
 - 当前仓库没有完整认证中间件，只有 CORS、限流和并发保护；因此 V1 必须实现可信反向代理身份、管理凭证或等价最小权限边界，否则 acquire、content、readiness 管理端点默认关闭；
-- 建议权限至少区分 `annual_report_assets:acquire`、`annual_report_assets:read_content` 和 operator/admin；operation 查询校验创建者或管理权限；
+- 建议权限至少区分 `annual_report_assets:acquire`、`annual_report_assets:read_content` 和 operator/admin；asset/consumer request 查询校验 subscription owner 或管理权限，internal operation 只允许 operator/service scope；
 - ensure 只允许单股票、单期间等有界 scope，不能由前台触发全市场回补；
 - 使用幂等键和 rate limit 防止重复任务；
 - 文件下载仅接受 asset ID，拒绝 caller path；
@@ -741,7 +762,7 @@ ensure 另返回 `disposition=local_hit|local_miss|operation_created|operation_r
 
 若已注册受保护路由但可信身份边界未配置，统一在 selector 校验、资源查询和 ownership 判断之前返回 HTTP 503 + `authorization_boundary_unavailable`，且不创建 operation 或接触 provider，避免通过 404/422 差异枚举资源。普通 readiness GET 只能返回脱敏摘要；provider、文件系统、actor 和失败明细属于 operator-only 诊断。
 
-API operation 必须落在共享 SQLite durable operation/lease 中，不能复用 FastAPI `BackgroundTasks` 作为状态真相。规范化 scope、财年/精确 filing 和 policy version 构成 single-flight key，同时支持 `Idempotency-Key`。scheduler、API 和业务消费者命中相同 key 时复用同一 operation。
+API acquisition 必须落在共享 SQLite durable operation/lease 中，不能复用 FastAPI `BackgroundTasks` 作为状态真相。规范化 scope、财年/精确 filing 和 policy version 构成 single-flight key，同时支持 `Idempotency-Key`。scheduler、API 和业务消费者命中相同 key 时只复用同一 internal operation，各前台调用者仍获得自己的 `asset_request_id` 和可选 `consumer_request_id`。
 
 本仓库未包含实际 Web 前端源码。本期仓库交付范围是 DataManager、FastAPI、OpenAPI、状态模型和集成测试；真实 UI 所在仓库、负责人和上线版本必须作为外部交付 gate 登记，不能以后端接口完成宣称“前端已完成整合”。
 
@@ -846,8 +867,10 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 ### 23.1 单元测试
 
 - A 股 eligibility policy 纳入主板/科创板/创业板/北交所、ST 和停牌未退市股票，排除 B 股、基金/ETF、债券、指数和其他非 A 股证券，并固定 policy/master-data snapshot。
+- 主数据刷新失败保留上一份完整快照；过期快照、资格字段缺失和新上市证券尚未进入主数据时，不得宣称全市场完成，并暴露 `eligibility_indeterminate`。
 - 原版、摘要、英文版、图解版、修订通知、完整修订版分类。
 - 财务年度提取、1 月和 4 月 30 日前后边界、报告期末后上市、延期披露、多个修订版排序和发布时间并列。
+- 同一来源、相同时间精度但不同 hash 的完整修订只有明确法律优先证据才能决胜，否则 fail closed；撤回公告只有绑定具体候选时才生效。
 - source/announcement/attachment/blob/consumer 四类 identity 不混合。
 - local hit 零网络、metadata-only 下载、无记录有界发现、network disabled。
 - `.part` 不可见、hash/长度/PDF 校验、超限和原子 rename。
@@ -860,6 +883,7 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 - 一份超出 publication lookback、数年后才被索引的受管旧财年修订版，仍由 oldest-first 期间队列在最大周期内发现。
 - 同一公告包含完整中文正文、摘要、英文版和附录时只选正文；跨来源同时间不同 hash 时 fail closed。
 - 修订撤回、同公告 ID 附件静默更新以及首次回补最新修订不可验证的 provisional/blocked 行为。
+- 同一公告第 10 天静默换 hash 或首次观察撤回时，知识截止第 5 天不得看到新字节或被追溯撤回；带 attachment/hash/observation pin 的 exact filing 不得被当前 observation 替代。
 - 回补中断恢复不重新下载。
 - 新上市股票自动加入日更 coverage，退市只移出活跃分母不删除资产，旧财年修订不影响新财年记录。
 - 空间 hard stop 仅阻止附件，不阻止元数据。
@@ -890,6 +914,7 @@ readiness 必须持久化最近运行历史、最近成功 cutoff、heartbeat ag
 - 所有 GET 零网络；重复 POST、API+scheduler+consumer 并发复用一个 operation 和一次物理写入。
 - operation 在进程重启后可继续轮询/恢复，并隔离不同调用者权限。
 - 两个 principal 请求同一资产时复用一个底层下载 operation，但各自获得独立 subscription/opaque handle、幂等记录和脱敏诊断，不能读取对方 continuation。
+- `asset_request_id` 与 `consumer_request_id` 可独立轮询且 owner 隔离；取消最后一个 asset subscription 只 detach，底层有界 acquisition 继续，已启动 consumer processing 不被级联取消。
 - 文件流拒绝 superseded、missing、hash mismatch 和路径穿越；knowledge cutoff 不读取截止日后的修订版。
 - 已按 V1 删除的 superseded/withdrawn exact filing 只能返回 metadata + local-content-unavailable，普通 ensure 不得重新下载。
 

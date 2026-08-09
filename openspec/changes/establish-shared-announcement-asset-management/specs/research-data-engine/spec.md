@@ -13,6 +13,11 @@ The Research Data Engine SHALL provide one stable annual-report asset dependency
 - **THEN** the shared service SHALL ensure that exact filing or return an explicit unavailable/integrity status
 - **AND** it SHALL not substitute a different legal filing solely because its content or title is similar
 
+#### Scenario: Consumer pins an exact filing observation
+- **WHEN** a business work item supplies attachment id plus expected content hash or observation version for an exact filing
+- **THEN** the shared service SHALL preserve that evidence identity and SHALL NOT substitute a later attachment observation under the same filing id
+- **AND** a deleted pinned predecessor SHALL return metadata with local content unavailable rather than current bytes
+
 #### Scenario: Consumer requests a superseded exact filing
 - **WHEN** a business work item requests a known predecessor whose bytes were deleted under version 1 retention
 - **THEN** the shared service SHALL return historical metadata with local content unavailable
@@ -24,7 +29,7 @@ The Research Data Engine SHALL provide one stable annual-report asset dependency
 
 #### Scenario: Historical knowledge cutoff is requested
 - **WHEN** a consumer requests annual-report evidence with a knowledge cutoff
-- **THEN** selection SHALL exclude announcements and corrections published after that cutoff
+- **THEN** selection SHALL exclude announcements, attachment observations, and withdrawal states whose publication or `version_available_at` is after that cutoff
 - **AND** if the eligible predecessor bytes were deleted under version 1 retention, the service SHALL report historical metadata with local content unavailable rather than substitute a later correction
 
 #### Scenario: Structured financial facts are available
@@ -66,11 +71,11 @@ DataManager SHALL expose business-neutral annual-report asset lookup, ensure, st
 
 #### Scenario: Caller inspects operations and readiness
 - **WHEN** a caller requests annual-report operation status or service readiness
-- **THEN** DataManager SHALL require a trusted request context and expose the caller's authorized operation projection plus redacted readiness without constructing business-profile services
+- **THEN** DataManager SHALL require a trusted request context and expose caller-owned `asset_request_id` and `consumer_request_id` projections plus redacted readiness without constructing business-profile services
 - **AND** raw internal operation, provider, filesystem, actor, and detailed failure state SHALL require operator or service scope
 
 ### Requirement: Annual-Report Asset API Is Additive And Safe
-The Research API SHALL provide additive endpoints for effective annual-report metadata, readiness, acquisition requests, operation status, and controlled file delivery.
+The Research API SHALL provide additive endpoints for effective annual-report metadata, readiness, acquisition requests, caller-scoped asset-request and consumer-request status, and controlled file delivery.
 
 #### Scenario: Front-facing client queries status
 - **WHEN** a client requests annual-report asset status for an instrument
@@ -84,7 +89,7 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **AND** it SHALL not keep the request open for an unbounded market or attachment fetch
 
 #### Scenario: Client submits an invalid selector combination
-- **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
+- **WHEN** an ensure request mixes effective-period and exact-filing selectors, omits one member of `source + filing_id`, supplies an attachment/hash/observation pin without exact-filing identity, supplies inconsistent fiscal-year and report-period values, binds an exact filing to a different path instrument, or supplies a provider URL or filesystem path
 - **THEN** the API SHALL reject the request with HTTP 422 and a stable validation code before creating an operation or contacting a provider
 - **AND** the two supported selector forms SHALL remain mutually exclusive and all-or-none
 
@@ -121,13 +126,30 @@ The Research API SHALL provide additive endpoints for effective annual-report me
 - **AND** it SHALL separately return asset availability, ensure disposition, and downstream consumer-processing state where applicable
 - **AND** the API SHALL project the underlying shared asset operation through that caller's subscription rather than expose the internal operation directly
 
+#### Scenario: Client follows downstream consumer status
+- **WHEN** a business command returns a `consumer_request_id` and the owner polls `GET /api/v1/research/annual-report-consumer-requests/{consumer_request_id}`
+- **THEN** the API SHALL return consumer identity, processing fingerprint, `pending|not_started|queued|processing|current|stale|failed|blocked|cancelled` request/processing status, result identity, retry metadata, timestamps, stable reason codes, and bounded diagnostics
+- **AND** it SHALL include the linked caller-visible `asset_request_id` only when acquisition was required; a local-hit consumer request SHALL not invent one
+- **AND** it SHALL NOT expose internal asset or consumer operation ids, other principals, or filesystem paths
+- **AND** an unknown or cross-owner consumer request SHALL follow the same configured 404 non-disclosure and common error-envelope policy as an asset request
+
 #### Scenario: Client cancels one shared acquisition request
 - **WHEN** an authorized client cancels its `asset_request_id` while another principal or scheduler still depends on the underlying acquisition
 - **THEN** only that request subscription and its pending consumer continuation SHALL become cancelled
 - **AND** the internal asset operation SHALL remain active or checkpoint according to remaining subscribers and SHALL NOT expose their identities
 
+#### Scenario: Client cancels the last shared acquisition request
+- **WHEN** the last principal cancels its `asset_request_id` after bounded internal acquisition work exists
+- **THEN** version 1 SHALL cancel only that subscription and any not-yet-started continuation while the internal acquisition continues to a bounded terminal state
+- **AND** consumer processing that already started SHALL not be cancelled through the asset request; its own domain stop contract SHALL apply or the stop SHALL be explicitly rejected
+
+#### Scenario: Client cancels a consumer request
+- **WHEN** an authorized owner deletes a `consumer_request_id`
+- **THEN** a not-yet-started continuation SHALL be cancelled idempotently
+- **AND** already-started consumer processing SHALL use that consumer domain's authorized cooperative-stop contract or return an explicit current-state conflict; it SHALL NOT be force-cancelled through request-subscription deletion
+
 #### Scenario: Client polls another caller's operation
-- **WHEN** a caller lacks ownership/read scope for the requested operation subscription or consumer continuation
+- **WHEN** a caller lacks ownership/read scope for the requested asset-request subscription or consumer-request projection
 - **THEN** the API SHALL deny access through the common error envelope without disclosing the underlying operation scope, diagnostics, subscribers, or existence beyond the configured authorization policy
 
 #### Scenario: Effective report is not locally available
@@ -163,14 +185,14 @@ Business-facing results that depend on annual reports SHALL expose sufficient sh
 #### Scenario: A business action has an immediately valid asset
 - **WHEN** a front-facing business-profile or broker command resolves a verified local annual-report asset
 - **THEN** that business orchestration SHALL create or reuse exactly one consumer operation for the requested consumer and processing fingerprint without creating an asset-acquisition operation
-- **AND** the response SHALL expose the consumer operation or processing identity separately from asset availability
+- **AND** the response SHALL expose a caller-owned `consumer_request_id` separately from asset availability without exposing the internal consumer operation identity
 
 #### Scenario: A business action must wait for asset acquisition
 - **WHEN** a front-facing business-profile or broker command creates or reuses an asset ensure operation
 - **THEN** that business orchestration SHALL persist one idempotent continuation tied to the requested consumer, processing fingerprint, and asset operation
 - **AND** it SHALL enqueue exactly one consumer operation after the asset becomes locally valid, or terminally fail/block the continuation when the asset operation cannot produce a valid asset
 - **AND** generic asset ensure SHALL NOT implicitly start every consumer
-- **AND** the response SHALL expose `asset_request_id` and consumer-continuation/processing identity, never the internal asset operation id, so asset completion and business-result completion remain independently queryable
+- **AND** the response SHALL expose caller-owned `asset_request_id` and `consumer_request_id`, never internal asset or consumer operation ids, so asset completion and business-result completion remain independently queryable
 
 #### Scenario: Business-profile result uses annual-report evidence
 - **WHEN** a business-profile result is returned

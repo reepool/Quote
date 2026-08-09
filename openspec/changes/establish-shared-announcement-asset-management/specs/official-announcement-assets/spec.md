@@ -48,6 +48,12 @@ The system SHALL distinguish legal announcement identity, attachment observation
 - **THEN** the canonical record SHALL be updated idempotently with first/last-observed evidence and raw metadata identity
 - **AND** it SHALL NOT create a duplicate legal announcement or overwrite prior attachment-version evidence
 
+#### Scenario: Attachment bytes or withdrawal state appear after the announcement
+- **WHEN** a provider silently changes an attachment or first exposes a withdrawal/cancellation state after the parent announcement publication time
+- **THEN** the system SHALL create an immutable observation with `version_available_at`, original time value, time source, and time precision
+- **AND** `version_available_at` SHALL use an official effective time when available or otherwise the first-observed time
+- **AND** a knowledge-cutoff query SHALL NOT expose the new bytes or withdrawal state before that observation was available
+
 #### Scenario: One asset is parsed by two consumers
 - **WHEN** business-profile and broker risk-control process the same annual-report asset
 - **THEN** they SHALL share the source asset and SHALL retain separate consumer, parser-version, parameter-hash, status, and derived-output records
@@ -89,10 +95,20 @@ Version 1 SHALL centrally classify A-share formal full annual reports, annual-re
 - **THEN** selection SHALL fail closed as ambiguous
 - **AND** lexical source or filing-id order SHALL NOT choose the effective report
 
+#### Scenario: Same-source corrections have tied publication time and different bytes
+- **WHEN** two complete corrections from one source have the same normalized publication time but different verified content
+- **THEN** only an explicit provider replacement edge, official revision sequence, or other versioned legal-precedence evidence SHALL choose the winner
+- **AND** absent that evidence selection SHALL fail closed as ambiguous and SHALL NOT infer precedence from filing or attachment id order
+
 #### Scenario: Effective correction is withdrawn or silently changed
 - **WHEN** a source withdraws an effective correction or changes the attachment observed under an existing announcement id
 - **THEN** the system SHALL retain a new observation and reevaluate the effective asset
 - **AND** it SHALL only fall back to a legally valid locally available predecessor or SHALL become blocked
+
+#### Scenario: Withdrawal target cannot be proven
+- **WHEN** a withdrawal or cancellation record cannot be bound to a candidate through provider state, target announcement/attachment identity, an official relation, or a versioned deterministic rule
+- **THEN** the system SHALL retain the record as unresolved evidence and SHALL NOT deactivate the effective asset based only on generic title wording
+- **AND** the affected decision SHALL expose ambiguity for review
 
 ### Requirement: One Effective Annual-Report Attachment Is Retained Per Fiscal Year
 For each instrument and fiscal year, the system SHALL expose exactly one effective formal annual-report attachment after convergence, preferring a valid complete correction over a non-correction and the latest valid correction over earlier corrections.
@@ -131,6 +147,11 @@ For each instrument and fiscal year, the system SHALL expose exactly one effecti
 - **WHEN** a blob is held by another effective attachment, a managed legacy alias, a not-yet-migrated consumer, or an active read or processing lease
 - **THEN** the physical file SHALL remain even though historical metadata does not itself require physical retention
 
+#### Scenario: A retention lease expires
+- **WHEN** a read or processing lease passes its TTL
+- **THEN** its retention pin SHALL remain until compare-and-swap reconciliation checks owner, heartbeat, generation, and the configured safety grace period
+- **AND** a newer heartbeat or uncertain live reader SHALL continue to block deletion, while an abandoned lease SHALL be reclaimed idempotently
+
 #### Scenario: Process stops during predecessor deletion
 - **WHEN** a process stops before or after unlinking a predecessor file
 - **THEN** a durable `planned`, `deleting`, `deleted`, or `failed` deletion intent SHALL allow idempotent reconciliation
@@ -164,6 +185,12 @@ The system SHALL provide a local-first `ensure` contract that returns a verified
 - **THEN** ensure SHALL return or acquire that exact filing only when permitted by the caller's network, integrity, and version 1 retention policy
 - **AND** it SHALL NOT substitute a merely similar or newer legal filing
 
+#### Scenario: Exact filing request pins an attachment observation
+- **WHEN** an exact-filing request supplies an attachment id plus expected content hash or observation version
+- **THEN** ensure SHALL return only that matching immutable observation or explicit metadata-only unavailable status
+- **AND** it SHALL NOT substitute bytes from a later silent update under the same legal filing
+- **AND** an unpinned exact-filing request SHALL explicitly return the filing's current observation identity, hash, and `version_available_at`
+
 #### Scenario: Exact filing is a deleted predecessor
 - **WHEN** the exact source-qualified filing is known to be superseded or withdrawn and its bytes were deleted under version 1 retention
 - **THEN** ordinary consumer and API ensure SHALL return its metadata with explicit local-content-unavailable status
@@ -176,7 +203,13 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 - **WHEN** the bootstrap or daily coverage denominator is materialized
 - **THEN** a versioned eligibility policy SHALL include active RMB-denominated A-share instruments on the main boards, STAR Market, ChiNext, and BSE, including ST or suspended-but-not-delisted stocks
 - **AND** it SHALL exclude B shares, funds and ETFs, bonds, indices, and other non-A-share security types
-- **AND** the resulting instrument identities, policy version, source master-data version, and snapshot time SHALL be persisted so the denominator is auditable
+- **AND** the resulting instrument identities, policy version, source master-data version, master-data last-success time, and snapshot time SHALL be persisted so the denominator is auditable
+
+#### Scenario: Universe refresh is stale incomplete or fails
+- **WHEN** master-data refresh fails, exceeds the configured freshness limit, returns a partial result, or leaves security type, currency, exchange, or active-state eligibility indeterminate
+- **THEN** the service SHALL retain the last complete acceptable snapshot instead of replacing it with an empty or partial denominator
+- **AND** indeterminate instruments, freshness age, refresh failure, and missing fields SHALL remain explicit readiness evidence
+- **AND** market announcement discovery MAY continue, but bootstrap SHALL NOT claim complete full-market coverage while no acceptable snapshot exists or eligibility remains indeterminate
 
 #### Scenario: Instrument has several historical annual reports
 - **WHEN** the bootstrap discovers multiple fiscal years for an instrument
@@ -196,7 +229,9 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 
 #### Scenario: Expected report is overdue
 - **WHEN** the configured disclosure-due boundary has passed and complete source coverage finds no expected report
-- **THEN** the overdue fiscal year SHALL remain a visible coverage gap with delay or missing evidence even if an older report is locally usable
+- **THEN** asset availability MAY remain `available` for the latest actually published older report while expected-period coverage SHALL be `overdue_missing`
+- **AND** the overdue fiscal year SHALL remain a visible repair-eligible gap with delay or missing evidence
+- **AND** version 1 default readiness SHALL be degraded without blocking daily discovery, while a versioned deployment policy MAY make the gap a stricter enablement blocker
 
 #### Scenario: Older valid files already exist before bootstrap
 - **WHEN** migration inventory finds valid annual reports from earlier fiscal years that are not the latest-only bootstrap winner
@@ -232,7 +267,8 @@ The system SHALL provide a resumable bootstrap that targets current active stock
 
 #### Scenario: Bootstrap reaches an overall terminal result
 - **WHEN** every target instrument is evaluated
-- **THEN** the run SHALL report `success` only when every target is available or has unexpired confirmed-missing evidence
+- **THEN** the run SHALL report `success` only when every target has complete discovery evidence and is available or has unexpired confirmed-missing evidence
+- **AND** a completely proven `overdue_missing` expected period MAY coexist with batch success and an older available asset, but SHALL degrade readiness and remain in repair under the default version 1 policy
 - **AND** any incomplete, retryable, or blocked target SHALL make the run `partial` or `blocked`, never falsely complete
 
 #### Scenario: Delisted history is requested
@@ -384,6 +420,12 @@ Backfill, daily, ensure, migration, integrity, deletion, and backup work SHALL u
 - **THEN** only the cancelling principal's subscription/continuation SHALL become cancelled
 - **AND** the shared acquisition SHALL continue or checkpoint according to its remaining subscribers and scheduler policy; one caller SHALL NOT cancel work required by another caller
 
+#### Scenario: The last asset subscriber cancels
+- **WHEN** the last external request subscription is cancelled after a bounded shared acquisition operation has been created
+- **THEN** version 1 SHALL detach that subscription and cancel only its not-yet-started consumer continuation
+- **AND** the internal acquisition SHALL continue to a bounded terminal state so its canonical result remains reusable
+- **AND** cancellation of the asset request SHALL NOT stop consumer processing that has already started; any such stop SHALL use the consumer domain's own authorized contract or be explicitly rejected
+
 #### Scenario: Shared rollout is rolled back before physical cleanup
 - **WHEN** an operator disables shared consumer routing or daily writes before legacy files are removed
 - **THEN** additive canonical metadata, replacement lineage, operation history, and audit records SHALL remain intact
@@ -418,6 +460,16 @@ Migration SHALL inventory existing annual-report manifests and paths, validate t
 #### Scenario: Broker archive contains the only valid copy
 - **WHEN** a broker annual-report manifest contains the selected latest effective annual report and no business-profile copy exists
 - **THEN** migration SHALL register and reuse the broker file as the shared asset
+
+#### Scenario: Broker archive contains a complete corrected annual report
+- **WHEN** a broker file has an annual period end and passes complete annual-report classification as either an original or complete correction
+- **THEN** migration SHALL apply normal effective-version selection and SHALL allow that verified correction to be adopted
+- **AND** it SHALL continue to exclude semiannual reports and correction notices without a complete report body
+
+#### Scenario: Shadow adoption has not reconciled
+- **WHEN** an adopted record has not completed source, instrument, report-period, classification, content, and latest-effective reconciliation
+- **THEN** it SHALL NOT satisfy production effective lookup, bootstrap coverage, or consumer parsing
+- **AND** conflict-free reconciliation plus an explicit consumer cutover gate SHALL be required before production visibility
 
 #### Scenario: Duplicate valid copies exist
 - **WHEN** business-profile and broker archives contain the same source filing and content hash at different paths
@@ -496,7 +548,7 @@ The system SHALL expose shared annual-report asset access through DataManager/se
 
 #### Scenario: Client requests missing asset acquisition
 - **WHEN** an authorized client requests ensure/download for a missing report
-- **THEN** the API SHALL create or reuse a bounded acquisition job and return its stable task identity and current status rather than holding an unbounded HTTP request open
+- **THEN** the API SHALL create or reuse a bounded acquisition job and return the caller's stable opaque `asset_request_id` and current authorized status projection rather than holding an unbounded HTTP request open or exposing the internal operation id
 
 #### Scenario: A read-only API is called
 - **WHEN** a client invokes an annual-report metadata GET or an existing business-profile GET
@@ -508,7 +560,8 @@ The system SHALL expose shared annual-report asset access through DataManager/se
 
 #### Scenario: Frontend observes progress
 - **WHEN** a client inspects an acquisition and its downstream business result
-- **THEN** asset availability, ensure disposition, durable operation state, and consumer-processing state SHALL be returned as separate fields
+- **THEN** asset availability and ensure disposition SHALL be exposed through the caller's `asset_request_id` projection while downstream continuation/processing SHALL be exposed through a separate caller-owned `consumer_request_id`
+- **AND** the two projections SHALL be independently queryable without exposing internal asset or consumer operation ids
 
 #### Scenario: A predecessor remains usable while a newer correction is pending
 - **WHEN** a legally newer complete correction is discovered but cannot yet be verified and policy continues serving the predecessor
@@ -564,6 +617,10 @@ Canonical attachment files SHALL have a governed incremental backup or replicati
 #### Scenario: Backup shares the primary failure domain
 - **WHEN** backup and primary filings resolve to the same storage server or otherwise non-independent failure domain
 - **THEN** that copy SHALL NOT satisfy the predecessor-deletion backup gate
+
+#### Scenario: Backup independence evidence is ambiguous
+- **WHEN** runtime mount source, server, export, or available filesystem identity conflicts with the configured failure-domain identity, or independence relies only on path/host aliases or labels
+- **THEN** the backup SHALL be treated as non-independent and predecessor deletion SHALL remain blocked
 
 #### Scenario: File and catalog recovery watermarks disagree
 - **WHEN** a replacement blob backup and consistent file manifest watermark cannot be paired with a recoverable catalog database snapshot containing the replacement transaction

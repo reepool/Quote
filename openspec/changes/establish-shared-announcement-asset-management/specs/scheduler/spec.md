@@ -37,6 +37,7 @@ The scheduler SHALL provide `annual_report_asset_daily_update` with configuratio
 - **WHEN** bootstrap coverage, local integrity, storage reserve, backup, or migration gates have not passed
 - **THEN** scheduled daily enablement SHALL fail closed or remain disabled with explicit blockers
 - **AND** local reads, manual bounded operations, and on-demand ensure SHALL remain available
+- **AND** a completely proven `overdue_missing` period SHALL degrade readiness but SHALL NOT block daily discovery under the default version 1 policy, because the daily job must remain able to discover the delayed filing
 
 #### Scenario: Daily job is disabled
 - **WHEN** annual-report asset daily scheduling is disabled
@@ -58,6 +59,12 @@ The scheduler SHALL provide `annual_report_asset_daily_update` with configuratio
 - **WHEN** stocks list, delist, or change active status after bootstrap
 - **THEN** the daily task SHALL use a refreshed auditable universe snapshot for coverage and repair
 - **AND** a delisting SHALL NOT trigger attachment deletion
+
+#### Scenario: Active-universe refresh is stale or incomplete
+- **WHEN** master-data refresh fails, exceeds its freshness limit, or leaves eligibility-indeterminate instruments
+- **THEN** the daily task SHALL retain the last complete acceptable denominator rather than replace it with an empty or partial snapshot
+- **AND** market discovery MAY continue while coverage/readiness reports expose snapshot age, refresh failure, and indeterminate count
+- **AND** the scheduler SHALL NOT report complete full-market coverage until an acceptable complete snapshot is restored
 
 ### Requirement: Annual-Report Jobs Are Bounded And Observable
 Annual-report scheduler jobs SHALL use explicit network, time, storage, and work-volume bounds and SHALL report progress by acquisition stage.

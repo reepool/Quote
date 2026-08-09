@@ -30,12 +30,28 @@ The storage layer SHALL use immutable content identity, atomic publication, and 
 - **THEN** a durable deletion intent SHALL be committed before unlink and finalized as deleted or failed afterward
 - **AND** the old physical file SHALL be deleted only after all retention pins are released and the replacement has a verified independent-failure-domain backup
 
+#### Scenario: A read or processing lease appears expired
+- **WHEN** deletion encounters a retention lease whose TTL has elapsed
+- **THEN** a reconciler SHALL compare owner, heartbeat, generation, and safety-grace evidence before releasing the pin
+- **AND** a newer heartbeat, lease generation, or uncertain live reader SHALL continue to block deletion
+- **AND** crash recovery and stale-lease reclamation SHALL be idempotent so an abandoned lease cannot retain a blob indefinitely
+
 ### Requirement: Existing Filings Are Adopted Without Unnecessary Copying
 The migration SHALL recognize valid existing annual-report files and MAY retain an existing verified path or create a verified hard link during cutover before converging on the canonical layout.
 
 #### Scenario: Existing file is on the filings volume
 - **WHEN** an existing business-profile or broker file matches its manifest identity, length, PDF signature, and hash
 - **THEN** the migration SHALL adopt it without network download
+
+#### Scenario: A broker archive contains a complete correction
+- **WHEN** a broker path has an annual period end and is classified as a verifiable complete original or complete corrected annual-report body
+- **THEN** migration SHALL consider it adoptable under normal effective-version policy rather than exclude it merely because it is not an original variant
+- **AND** semiannual reports, correction notices without a complete body, and derived files SHALL remain excluded from version 1 adoption
+
+#### Scenario: A file is registered in shadow state
+- **WHEN** migration adopts bytes before source identity, report period, classification, content, and latest-effective reconciliation have all passed
+- **THEN** the record SHALL remain excluded from production effective lookup, bootstrap coverage, and consumer parsing
+- **AND** only an explicit cutover gate after conflict-free reconciliation SHALL make it production-visible
 
 #### Scenario: Existing duplicate files are found
 - **WHEN** identical valid content exists at multiple business-owned paths
@@ -92,6 +108,11 @@ The archive SHALL enforce configurable free-space thresholds, planned-download p
 #### Scenario: Backup target shares the primary storage host
 - **WHEN** the configured destination resolves to the same server or storage failure domain as the primary filings mount
 - **THEN** the copy SHALL be reported as non-independent and SHALL NOT satisfy physical-deletion readiness
+
+#### Scenario: Backup failure-domain identity cannot be verified
+- **WHEN** independence is inferred only from a path, host alias, or operator label, or runtime mount/server/export/filesystem evidence conflicts with the configured failure-domain identity
+- **THEN** the target SHALL be treated as non-independent and SHALL NOT satisfy physical-deletion readiness
+- **AND** readiness SHALL expose the bounded identity evidence and verification failure without leaking it to unauthorized clients
 
 #### Scenario: Backup target capacity is low
 - **WHEN** planned or streamed backup bytes would cross the target warning threshold, hard stop, or absolute free-space reserve
