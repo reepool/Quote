@@ -1383,6 +1383,9 @@ def test_stage_quality_gate_finalizes_machine_rework_without_acknowledging(tmp_p
         "structured_fallback_calls": 0,
         "structured_fallback_accepted_records": 0,
         "structured_fallback_rejected": 0,
+        "page_artifact_cache_hits": 0,
+        "page_artifact_cache_misses": 0,
+        "pdf_parser_warning_count": 0,
         "blocked_configuration_reasons": {},
         "machine_rework_reasons": {},
     }
@@ -2107,6 +2110,78 @@ def test_stage_stop_request_finishes_inflight_batch_before_next_claim():
     repository.acknowledge.assert_called_once()
 
 
+def test_stage_continuously_refills_available_concurrency_slots():
+    class StreamingRepository:
+        def __init__(self):
+            self.available = [{"work_id": "work-1", "instrument_id": "600001.SH"}]
+            self.completed = []
+
+        def has_claimable(self, _stage, *, exclude_work_ids=(), **_kwargs):
+            excluded = set(exclude_work_ids)
+            return any(item["work_id"] not in excluded for item in self.available)
+
+        def claim(self, _stage, *, limit, exclude_work_ids=(), **_kwargs):
+            excluded = set(exclude_work_ids)
+            claimed = []
+            remaining = []
+            for item in self.available:
+                if len(claimed) < limit and item["work_id"] not in excluded:
+                    claimed.append(item)
+                else:
+                    remaining.append(item)
+            self.available = remaining
+            return tuple(claimed)
+
+        def acknowledge(self, work_id, **_kwargs):
+            self.completed.append(work_id)
+            return "completed"
+
+    repository = StreamingRepository()
+    first_started = asyncio.Event()
+    second_started = asyncio.Event()
+
+    async def stage_runner(_stage, item):
+        if item["work_id"] == "work-1":
+            first_started.set()
+            await second_started.wait()
+        else:
+            second_started.set()
+        return {
+            "status": "success",
+            "quality": {"selection_seconds": 0.01},
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=repository,
+        discovery_runner=AsyncMock(),
+        stage_runner=stage_runner,
+        progress_log_interval_seconds=0.05,
+        write_coordinator=BusinessProfileWriteCoordinator(inter_write_seconds=0),
+    )
+
+    async def run_streaming_stage():
+        task = asyncio.create_task(
+            service._drain_stage(
+                "semantic",
+                StageBudget(max_items=2, max_concurrency=2, max_elapsed_seconds=1),
+            )
+        )
+        await asyncio.wait_for(first_started.wait(), timeout=0.5)
+        repository.available.append(
+            {"work_id": "work-2", "instrument_id": "600002.SH"}
+        )
+        return await asyncio.wait_for(task, timeout=1)
+
+    result = asyncio.run(run_streaming_stage())
+
+    assert result["completed"] == 2
+    assert result["peak_in_flight"] == 2
+    assert result["queue_underfilled_slots"] >= 1
+    assert result["gateway_admission"]["throttled_requests"] == 0
+    assert result["quality"]["selection_seconds"] == pytest.approx(0.02)
+    assert set(repository.completed) == {"work-1", "work-2"}
+
+
 @pytest.mark.parametrize(
     (
         "reason_code",
@@ -2270,7 +2345,7 @@ def test_empty_downstream_poll_does_not_take_writer_and_claims_new_work(tmp_path
                 StageBudget(
                     max_items=1,
                     max_concurrency=1,
-                    max_elapsed_seconds=2,
+                    max_elapsed_seconds=0.05,
                 ),
                 upstream_done=upstream_done,
             )
@@ -2292,6 +2367,7 @@ def test_empty_downstream_poll_does_not_take_writer_and_claims_new_work(tmp_path
 
     assert result["completed"] == 1
     assert result["empty_polls"] >= 1
+    assert result["active_work_seconds"] < 0.05
     assert coordinator.snapshot()["write_transactions"] == 2
 
 

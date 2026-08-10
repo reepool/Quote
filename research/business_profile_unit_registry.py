@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import OrderedDict
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence
@@ -389,6 +390,104 @@ class BusinessProfileUnitRuleRegistry:
             raise ValueError(f"unknown unit rule: {rule_id}")
         return [self._decode_rule(dict(row)) for row in rows]
 
+    def get_unit_state(self, source_unit: str) -> dict[str, Any]:
+        """Return the final effective state across one unit's append-only rules."""
+
+        normalized = normalize_unit_lexeme(source_unit)
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            history_rows = conn.execute(
+                """
+                SELECT * FROM business_profile_unit_rules
+                WHERE normalized_lexeme = ?
+                ORDER BY created_at, rowid
+                """,
+                (normalized,),
+            ).fetchall()
+            latest_rows = conn.execute(
+                """
+                SELECT r.* FROM business_profile_unit_rules r
+                WHERE r.normalized_lexeme = ?
+                  AND r.rowid = (
+                    SELECT latest.rowid FROM business_profile_unit_rules latest
+                    WHERE latest.rule_id = r.rule_id
+                    ORDER BY latest.created_at DESC, latest.rowid DESC LIMIT 1
+                  )
+                ORDER BY r.created_at, r.rowid
+                """,
+                (normalized,),
+            ).fetchall()
+        history = [self._decode_rule(dict(row)) for row in history_rows]
+        rules = [self._decode_rule(dict(row)) for row in latest_rows]
+        if not rules:
+            raise ValueError(f"unknown normalized unit: {normalized}")
+        effective = [rule for rule in rules if rule["status"] == "auto_approved"]
+        shadow = [rule for rule in rules if rule["status"] == "shadow_active"]
+        quarantined = [rule for rule in rules if rule["status"] == "quarantined"]
+        superseded = [rule for rule in rules if rule["status"] == "superseded"]
+        current = effective[-1] if effective else (shadow[-1] if shadow else rules[-1])
+        if effective:
+            final_status = "enabled"
+        elif shadow:
+            final_status = "shadow_only"
+        elif quarantined:
+            final_status = "quarantined"
+            current = quarantined[-1]
+        else:
+            final_status = str(current["status"])
+        reason_codes = tuple(
+            str(value)
+            for value in (current.get("proof") or {}).get("reason_codes", [])
+        )
+        replacements = [
+            {
+                "rule_id": rule["rule_id"],
+                "superseded_by": rule.get("supersedes_rule_id"),
+            }
+            for rule in superseded
+        ]
+        lifecycle_by_rule: OrderedDict[str, list[str]] = OrderedDict()
+        quarantine_reasons: list[dict[str, Any]] = []
+        for event in history:
+            rule_id = str(event["rule_id"])
+            statuses = lifecycle_by_rule.setdefault(rule_id, [])
+            status = str(event["status"])
+            if not statuses or statuses[-1] != status:
+                statuses.append(status)
+            if status == "quarantined":
+                quarantine_reasons.append(
+                    {
+                        "rule_id": rule_id,
+                        "reason_codes": tuple(
+                            str(value)
+                            for value in (event.get("proof") or {}).get(
+                                "reason_codes", []
+                            )
+                        ),
+                    }
+                )
+        impacts = sorted(
+            {
+                instrument
+                for rule in rules
+                for instrument in self._rule_impacts(str(rule["rule_id"]))
+            }
+        )[:20]
+        return {
+            "normalized_lexeme": normalized,
+            "source_unit": current["source_unit"],
+            "final_status": final_status,
+            "effective": bool(effective),
+            "effective_rule": effective[-1] if effective else None,
+            "current_rule": current,
+            "reason_codes": reason_codes,
+            "replacements": replacements,
+            "lifecycle_by_rule": dict(lifecycle_by_rule),
+            "quarantine_reasons": quarantine_reasons,
+            "rules": rules,
+            "impacts": impacts,
+        }
+
     def correct_rule(
         self,
         rule_id: str,
@@ -769,37 +868,63 @@ class BusinessProfileUnitRuleRegistry:
                 "ORDER BY created_at LIMIT ?",
                 (max(1, min(int(limit), 100)),),
             ).fetchall()
-        delivered = 0
+        grouped: OrderedDict[tuple[str, str], list[dict[str, Any]]] = OrderedDict()
         for raw in rows:
             row = dict(raw)
             rule = self.get_rule(str(row["rule_id"]))
-            impacts = self._rule_impacts(str(row["rule_id"]))
-            proof_reasons = ",".join(
-                str(value) for value in (rule.get("proof") or {}).get("reason_codes", [])
-            ) or "none"
-            effective = rule.get("status") == "auto_approved"
+            key = (str(rule["normalized_lexeme"]), str(row["impact_window"]))
+            grouped.setdefault(key, []).append(row)
+        delivered = 0
+        for (normalized_lexeme, impact_window), event_rows in grouped.items():
+            state = self.get_unit_state(normalized_lexeme)
+            current = dict(state["current_rule"])
+            effective_rule = state.get("effective_rule")
+            event_history = ",".join(
+                dict.fromkeys(str(row["lifecycle_status"]) for row in event_rows)
+            )
+            proof_reasons = ",".join(state["reason_codes"]) or "none"
+            replacement_history = ",".join(
+                f"{item['rule_id']}->{item['superseded_by']}"
+                for item in state["replacements"]
+                if item.get("superseded_by")
+            )[:800] or "none"
+            lifecycle_history = ";".join(
+                f"{rule_id}:{'>'.join(statuses)}"
+                for rule_id, statuses in state["lifecycle_by_rule"].items()
+            )[:1200] or "none"
+            quarantine_history = ";".join(
+                f"{item['rule_id']}:{','.join(item['reason_codes']) or 'none'}"
+                for item in state["quarantine_reasons"]
+            )[:1200] or "none"
             message = (
                 "[公司画像单位规则] "
-                f"状态={row['lifecycle_status']} 单位={rule['source_unit']} "
-                f"已生效={'是' if effective else '否'} "
-                f"维度={rule.get('dimension')} 规范单位={rule.get('canonical_unit')} "
-                f"倍率={rule.get('multiplier')} 原因={proof_reasons} "
-                f"影响公司={','.join(impacts) or '暂无'} "
-                f"规则={rule['rule_id']}"
+                f"单位={state['source_unit']} 当前最终状态={state['final_status']} "
+                f"已生效={'是' if state['effective'] else '否'} "
+                f"本次事件={event_history} 窗口={impact_window} "
+                f"维度={current.get('dimension')} "
+                f"规范单位={current.get('canonical_unit')} "
+                f"倍率={current.get('multiplier')} 原因={proof_reasons} "
+                f"有效规则={effective_rule['rule_id'] if effective_rule else 'none'} "
+                f"替代链={replacement_history} "
+                f"生命周期={lifecycle_history} "
+                f"隔离原因={quarantine_history} "
+                f"影响公司={','.join(state['impacts']) or '暂无'}"
             )
             try:
                 receipt = await notifier(message)
             except Exception as exc:
-                self._update_notification(
-                    str(row["notification_id"]), "retry", error=type(exc).__name__
-                )
+                for row in event_rows:
+                    self._update_notification(
+                        str(row["notification_id"]), "retry", error=type(exc).__name__
+                    )
             else:
-                self._update_notification(
-                    str(row["notification_id"]),
-                    "delivered",
-                    message_id=str(getattr(receipt, "id", "") or "") or None,
-                )
-                delivered += 1
+                for row in event_rows:
+                    self._update_notification(
+                        str(row["notification_id"]),
+                        "delivered",
+                        message_id=str(getattr(receipt, "id", "") or "") or None,
+                    )
+                    delivered += 1
         return delivered
 
     def _rule_impacts(self, rule_id: str, *, limit: int = 8) -> list[str]:

@@ -14,6 +14,7 @@ from research.business_profile_semantic_runtime import (
 from research.business_profile_unit_conversions import (
     governed_primitive_definitions,
     governed_primitive_multipliers,
+    normalize_unit_lexeme,
 )
 from research.business_profile_unit_registry import (
     BusinessProfileUnitRuleRegistry,
@@ -259,8 +260,71 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
 
     delivered = asyncio.run(registry.dispatch_notifications(notifier, limit=10))
     assert delivered == 3
-    assert any("已生效=是" in message for message in messages)
-    assert any("影响公司=688799.SH" in message for message in messages)
+    assert len(messages) == 1
+    assert "当前最终状态=enabled" in messages[0]
+    assert "已生效=是" in messages[0]
+    assert "本次事件=quarantined,auto_approved,superseded" in messages[0]
+    assert "生命周期=" in messages[0]
+    assert "proposed>quarantined>superseded" in messages[0]
+    assert "隔离原因=" in messages[0]
+    assert "new_or_unknown_dimension" in messages[0]
+    assert "影响公司=688799.SH" in messages[0]
+    assert len(messages[0]) < 4096
+    state = registry.get_unit_state("万粒")
+    assert state["effective"] is True
+    assert state["effective_rule"]["rule_id"] == replacement["rule_id"]
+    assert state["replacements"] == [
+        {"rule_id": old["rule_id"], "superseded_by": replacement["rule_id"]}
+    ]
+    assert state["quarantine_reasons"][0]["rule_id"] == old["rule_id"]
+
+
+@pytest.mark.parametrize(
+    ("source_unit", "expected_status", "expected_multiplier"),
+    [
+        ("万张", "enabled", "10000"),
+        ("点", "enabled", "1"),
+        ("万粒/万瓶", "enabled", "10000"),
+        ("万台（万千瓦时）", "quarantined", None),
+    ],
+)
+def test_catalog_reconciles_only_deterministic_production_units(
+    tmp_path,
+    source_unit,
+    expected_status,
+    expected_multiplier,
+):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(storage)
+    old = registry.register_proposal(
+        {
+            "source_unit": source_unit,
+            "normalized_lexeme": normalize_unit_lexeme(source_unit),
+            "dimension": "unknown",
+            "canonical_unit": "unknown",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "contextual",
+            "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+            "semantic_summary_zh": "旧版未能确定性解析的候选",
+        },
+        proposal_input_hash=(source_unit.encode("utf-8").hex() + "0" * 64)[:64],
+    )
+
+    report = registry.reconcile_deterministic_rules()
+    state = registry.get_unit_state(source_unit)
+
+    assert state["final_status"] == expected_status
+    if expected_multiplier is None:
+        assert report["resolved"] == 0
+        assert registry.get_rule(old["rule_id"])["status"] == "quarantined"
+        assert state["effective_rule"] is None
+    else:
+        assert report["resolved"] == 1
+        assert registry.get_rule(old["rule_id"])["status"] == "superseded"
+        assert state["effective_rule"]["multiplier"] == expected_multiplier
 
 
 def test_operator_correction_supersedes_rule_and_replays_without_formula_input(

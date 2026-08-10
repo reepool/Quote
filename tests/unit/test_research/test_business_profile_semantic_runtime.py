@@ -2110,6 +2110,65 @@ def test_real_local_pdf_plan_select_and_hash_incremental_discovery(tmp_path):
     )
 
 
+def test_select_shares_page_artifact_across_field_families(tmp_path, monkeypatch):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    content = _pdf_bytes(
+        "Principal Business Segment Information revenue and cost product details"
+    )
+    pdf = tmp_path / "annual.pdf"
+    pdf.write_bytes(content)
+    manifest = _manifest(pdf, content)
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository,
+        artifact_root=tmp_path / "artifacts",
+        manifest_loader=lambda instrument_id: [manifest],
+    )
+    pipeline = BusinessProfileSemanticPipeline(
+        config=SemanticProductionConfig(enabled=True),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "shared-checkpoint.json"
+        ),
+        handlers=runtime.handlers(),
+    )
+    scope = replace(
+        _scope("structured_segments"),
+        field_families=("structured_segments", "tabular_operating_facts"),
+    )
+    original = runtime_module.ensure_archived_pdf_page_artifact
+    extraction_calls = 0
+
+    def count_page_artifact(document):
+        nonlocal extraction_calls
+        extraction_calls += 1
+        return original(document)
+
+    monkeypatch.setattr(
+        runtime_module,
+        "ensure_archived_pdf_page_artifact",
+        count_page_artifact,
+    )
+
+    assert pipeline.run("plan", scope=scope)["status"] == "success"
+    selected = pipeline.run("select", scope=scope)
+
+    assert selected["status"] in {"success", "stopped"}
+    assert extraction_calls == 1
+    assert selected["metrics"]["page_artifact_cache_misses"] == 1
+    assert selected["metrics"]["page_artifact_cache_hits"] == 1
+    for timing_name in (
+        "pdf_hash_read_seconds",
+        "pdf_cache_read_seconds",
+        "pdf_extract_seconds",
+        "page_artifact_write_seconds",
+        "outline_seconds",
+        "selection_seconds",
+        "selected_artifact_write_seconds",
+    ):
+        assert timing_name in selected["metrics"]
+        assert selected["metrics"][timing_name] >= 0
+
+
 def test_storage_backed_discovery_is_hash_family_identity_and_retry_incremental(
     tmp_path,
 ):

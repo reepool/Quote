@@ -121,3 +121,21 @@
 - Focused business-profile regression result: 209 passed across extraction, schema, unit, artifact, runtime, async production, rollout, and production-readiness suites. Additional async rework tests passed, including the one-time context expansion retry.
 - Strict OpenSpec validation passed and Python compilation/diff checks passed. Ruff reports pre-existing repository-wide style findings in touched legacy files; no new test or runtime failure was introduced.
 - `codex review --uncommitted` was attempted with escalation but could not authenticate because the session refresh token was revoked/expired. Equivalent manual review was completed for only this session's files; unrelated baseline worktree changes were not modified.
+
+## 11. Work-Conserving Throughput And Final Unit State
+
+- [x] 11.1 Reuse a validated immutable PDF page artifact before extraction and share the hydrated artifact and outline across field-family plans
+- [x] 11.2 Add per-document hash/cache/extraction/outline/selection/write timings and aggregate repetitive handled pypdf warnings
+- [x] 11.3 Replace stage wave barriers with continuously refilled in-flight tasks while preserving stop, retry, lease, adaptive-congestion, and single-writer behavior
+- [x] 11.4 Exclude upstream idle waits from downstream active-work budgets and separate queue underfill from real provider throttling metrics
+- [x] 11.5 Consolidate pending unit notifications by normalized unit and impact window with explicit final state, active replacement, history, and quarantine reasons
+- [x] 11.6 Resolve `万张`, count-context `点`, and same-scale count alternatives such as `万粒/万瓶` deterministically while keeping `万台（万千瓦时）` cross-dimension pending
+- [x] 11.7 Add focused cache, streaming-concurrency, downstream-wait, telemetry, notification, and unit regression tests; run expanded validation, strict OpenSpec validation, and code review
+
+### 2026-08-10 Work-Conserving Throughput And Final Unit State Evidence
+
+- PDF artifact cache-hit validation bypasses extraction and shares one hydrated artifact/outline across field-family plans; per-document timing fields and aggregated pypdf warning counters are persisted and exposed in pipeline metrics.
+- Streaming stage tests prove immediate slot refill, stop/drain behavior, queue-underfill separation, downstream idle-budget exclusion, and adaptive provider-congestion handling with the single writer preserved.
+- Unit lifecycle tests prove deterministic reconciliation for `万张`, count-context `点`, and `万粒/万瓶`; `万台（万千瓦时）` remains quarantined as cross-dimension. Consolidated notification tests expose final effective state and replacement history.
+- Final focused regression passed 175 tests across PDF artifacts, unit conversions, semantic artifacts, semantic runtime, and async production; strict OpenSpec validation, Python compilation, diff checks, and fatal Ruff checks passed.
+- External `codex review --uncommitted` was rejected by tenant policy because it would transmit the repository's broad dirty-worktree diff. Equivalent local review of this change found and fixed concurrent immutable-artifact publication, missing historical quarantine reasons, and missing timing aggregation; unrelated baseline changes were excluded.

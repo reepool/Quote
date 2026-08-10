@@ -513,6 +513,32 @@ class BusinessProfileSemanticPipeline:
                 "pages": int(metrics.get("pages") or 0),
                 "selected_documents": int(metrics.get("selected_documents") or 0),
                 "selected_pages": int(metrics.get("selected_pages") or 0),
+                "page_artifact_cache_hits": int(
+                    metrics.get("page_artifact_cache_hits") or 0
+                ),
+                "page_artifact_cache_misses": int(
+                    metrics.get("page_artifact_cache_misses") or 0
+                ),
+                "pdf_parser_warning_count": int(
+                    metrics.get("pdf_parser_warning_count") or 0
+                ),
+                "pdf_hash_read_seconds": float(
+                    metrics.get("pdf_hash_read_seconds") or 0
+                ),
+                "pdf_cache_read_seconds": float(
+                    metrics.get("pdf_cache_read_seconds") or 0
+                ),
+                "pdf_extract_seconds": float(
+                    metrics.get("pdf_extract_seconds") or 0
+                ),
+                "page_artifact_write_seconds": float(
+                    metrics.get("page_artifact_write_seconds") or 0
+                ),
+                "outline_seconds": float(metrics.get("outline_seconds") or 0),
+                "selection_seconds": float(metrics.get("selection_seconds") or 0),
+                "selected_artifact_write_seconds": float(
+                    metrics.get("selected_artifact_write_seconds") or 0
+                ),
                 "evidence_records": int(metrics.get("evidence_records") or 0),
                 "record_count": int(metrics.get("record_count") or 0),
                 "verified_records": int(metrics.get("verified_records") or 0),

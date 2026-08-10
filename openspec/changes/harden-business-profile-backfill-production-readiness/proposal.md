@@ -14,6 +14,9 @@ The `business-profile-20260809112342618082` production-shadow batch proved that 
 - Persist the raw validated semantic envelope before downstream conversion, allowing catalog or conversion fixes to replay without another LLM call.
 - Automatically quarantine and supersede affected shadow candidates, recover the 12 unit-blocked work items and inconsistent `600403.SH` rows, and reuse downloaded reports, selected sections, evidence, and valid semantic artifacts.
 - Raise structured semantic worker concurrency from 2 through the validated value of 10 to a configurable ceiling of 20, while retaining shared-gateway admission, adaptive provider congestion controls, per-provider limits, and automatic reduction under pressure.
+- Make the configured semantic ceiling reachable in production: reuse immutable PDF page artifacts before extraction, share one page artifact across field families, continuously refill worker slots instead of waiting for whole waves, and keep downstream stages alive while upstream work is still producing records.
+- Replace misleading stage `throttled` counts with separate queue-underfill and real provider-congestion telemetry, and add per-document PDF hash/cache/extraction/outline/selection/write timing with aggregated parser-warning diagnostics.
+- Consolidate unit-rule Telegram lifecycle events by normalized unit and impact window so every message states the current final effective rule, replacement chain, quarantine reason, and whether canonical conversion is currently enabled.
 - Initialize research storage once before worker startup, remove per-work-item schema initialization, keep parsing/network/LLM work outside the write gate, query only referenced evidence during bundle persistence, and expose transaction latency and writer-duty metrics.
 - Replace the HKEX factor path's evaluation of Sina response text with a safe bounded parser and classify upstream response/parser errors with exception type, source, symbol, response metadata, and DEBUG traceback.
 
@@ -33,3 +36,4 @@ The `business-profile-20260809112342618082` production-shadow batch proved that 
 - `ResearchStorage` initialization lifecycle, business-profile write coordination, bundle persistence queries, and focused performance tests.
 - HKEX AkShare/Sina adjustment-factor transport/parser diagnostics and its existing unit/integration tests.
 - Existing immutable annual-report PDFs and selected-section assets remain reusable. Existing approved records are not destructively rewritten; affected shadow candidates are automatically made non-publishable and regenerated under the new identities.
+- Existing append-only unit-rule and notification history remains intact; consolidated messages change operator presentation, not lifecycle authority or historical rows.

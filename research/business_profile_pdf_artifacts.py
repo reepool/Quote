@@ -6,9 +6,13 @@ import gzip
 import hashlib
 import io
 import json
+import logging
 import os
 import re
+import threading
+import time
 import unicodedata
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
@@ -52,6 +56,7 @@ DEFAULT_HEADING_ALIASES: Dict[str, Sequence[str]] = {
     ),
 }
 _SAFE_COMPONENT_RE = re.compile(r"[^0-9A-Za-z_.-]+")
+logger = logging.getLogger(__name__)
 DERIVED_ARTIFACT_DIRECTORIES = {
     "page_text": "derived",
     "tables": "tables",
@@ -235,6 +240,40 @@ class BusinessProfilePdfArtifact:
             item.to_dict() for item in self.parser_diagnostics
         ]
         return payload
+
+    @classmethod
+    def from_dict(
+        cls,
+        value: Mapping[str, Any],
+        *,
+        source_file_id: Optional[str] = None,
+        source_pdf_path: Optional[str] = None,
+    ) -> "BusinessProfilePdfArtifact":
+        """Hydrate a stored immutable artifact into its typed runtime form."""
+
+        payload = dict(value)
+        pages = []
+        for raw_page in payload.get("pages") or []:
+            page = dict(raw_page)
+            page["heading_matches"] = [
+                BusinessProfileHeadingMatch(**dict(item))
+                for item in page.get("heading_matches") or []
+            ]
+            pages.append(BusinessProfilePdfPageArtifact(**page))
+        payload["pages"] = pages
+        payload["heading_index"] = [
+            BusinessProfileHeadingMatch(**dict(item))
+            for item in payload.get("heading_index") or []
+        ]
+        payload["parser_diagnostics"] = [
+            BusinessProfileParserDiagnostic(**dict(item))
+            for item in payload.get("parser_diagnostics") or []
+        ]
+        if source_file_id is not None:
+            payload["source_file_id"] = source_file_id
+        if source_pdf_path is not None:
+            payload["source_pdf_path"] = source_pdf_path
+        return cls(**payload)
 
 
 @dataclass(frozen=True)
@@ -784,25 +823,122 @@ class BusinessProfilePdfArtifactStore:
                 status="unchanged",
             )
         path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = path.with_suffix(path.suffix + ".part")
+        temporary = path.with_name(
+            f".{path.name}.{os.getpid()}.{threading.get_ident()}."
+            f"{time.monotonic_ns()}.part"
+        )
         temporary.write_bytes(compressed)
         try:
             stored = self.read(temporary)
             if stored.get("artifact_hash") != artifact.artifact_hash:
                 raise RuntimeError("derived artifact write verification failed")
-            os.replace(temporary, path)
-        except Exception:
+            try:
+                os.link(temporary, path)
+                status = "written"
+            except FileExistsError:
+                existing = self.read(path)
+                if existing.get("artifact_hash") != artifact.artifact_hash:
+                    raise RuntimeError(
+                        f"immutable derived artifact hash mismatch: {path}"
+                    )
+                status = "unchanged"
+        finally:
             temporary.unlink(missing_ok=True)
-            raise
         return BusinessProfilePdfArtifactWriteResult(
             artifact_path=str(path),
             artifact_hash=artifact.artifact_hash,
-            status="written",
+            status=status,
         )
 
     @staticmethod
     def read(path: str | Path) -> Dict[str, Any]:
         return json.loads(gzip.decompress(Path(path).read_bytes()).decode("utf-8"))
+
+    def read_artifact(
+        self,
+        path: str | Path,
+        *,
+        source_file_id: Optional[str] = None,
+        source_pdf_path: Optional[str] = None,
+        expected_content_hash: Optional[str] = None,
+        expected_extractor_version: Optional[str] = None,
+        expected_parameter_hash: Optional[str] = None,
+    ) -> BusinessProfilePdfArtifact:
+        """Read and fully validate one immutable page artifact."""
+
+        payload = self.read(path)
+        expected = {
+            "schema_version": BUSINESS_PROFILE_PDF_ARTIFACT_SCHEMA_VERSION,
+            "source_content_hash": expected_content_hash,
+            "extractor_version": expected_extractor_version,
+            "parameter_hash": expected_parameter_hash,
+        }
+        for field_name, expected_value in expected.items():
+            if expected_value is not None and payload.get(field_name) != expected_value:
+                raise RuntimeError(
+                    "immutable derived artifact identity mismatch: "
+                    f"field={field_name} path={path}"
+                )
+        stored_hash = str(payload.get("artifact_hash") or "")
+        hashable = dict(payload)
+        hashable.pop("artifact_hash", None)
+        hashable.pop("source_file_id", None)
+        hashable.pop("source_pdf_path", None)
+        calculated_hash = hashlib.sha256(
+            json.dumps(
+                hashable,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if not stored_hash or stored_hash != calculated_hash:
+            raise RuntimeError(f"immutable derived artifact hash mismatch: {path}")
+        return BusinessProfilePdfArtifact.from_dict(
+            payload,
+            source_file_id=source_file_id,
+            source_pdf_path=source_pdf_path,
+        )
+
+
+class _PypdfWarningFilter(logging.Filter):
+    """Aggregate handled pypdf warnings in the parsing thread."""
+
+    local = threading.local()
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        collector = getattr(self.local, "collector", None)
+        if (
+            collector is None
+            or record.levelno < logging.WARNING
+            or not record.name.startswith("pypdf")
+        ):
+            return True
+        if not getattr(record, "_business_profile_warning_counted", False):
+            record._business_profile_warning_counted = True
+            collector["count"] += 1
+            if len(collector["samples"]) < 3:
+                collector["samples"].append(record.getMessage()[:240])
+        return False
+
+
+_PYPDF_WARNING_FILTER = _PypdfWarningFilter()
+_PYPDF_FILTER_LOCK = threading.Lock()
+
+
+@contextmanager
+def _aggregate_pypdf_warnings():
+    collector: Dict[str, Any] = {"count": 0, "samples": []}
+    with _PYPDF_FILTER_LOCK:
+        for handler in logging.getLogger().handlers:
+            if _PYPDF_WARNING_FILTER not in handler.filters:
+                handler.addFilter(_PYPDF_WARNING_FILTER)
+    previous = getattr(_PYPDF_WARNING_FILTER.local, "collector", None)
+    _PYPDF_WARNING_FILTER.local.collector = collector
+    try:
+        yield collector
+    finally:
+        _PYPDF_WARNING_FILTER.local.collector = previous
 
 
 def ensure_archived_pdf_page_artifact(
@@ -820,20 +956,102 @@ def ensure_archived_pdf_page_artifact(
         raise FileNotFoundError(archive_path)
     if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
         raise ValueError("manifest content_hash must be a sha256 hex digest")
-    actual_hash = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+    started = time.monotonic()
+    content = archive_path.read_bytes()
+    hash_completed = time.monotonic()
+    actual_hash = hashlib.sha256(content).hexdigest()
     if actual_hash != expected_hash:
         raise RuntimeError(f"archived PDF hash mismatch: {archive_path}")
     active_extractor = extractor or BusinessProfilePdfArtifactExtractor()
     active_store = store or BusinessProfilePdfArtifactStore()
-    artifact = active_extractor.extract_file(
+    source_file_id = str(manifest.get("source_file_id") or "") or None
+    target_pages = active_extractor._normalize_target_pages(target_page_numbers)
+    parameter_hash = active_extractor._parameter_hash(target_pages)
+    artifact_path = active_store.artifact_path(
         archive_path,
-        source_file_id=str(manifest.get("source_file_id") or "") or None,
-        target_page_numbers=target_page_numbers,
+        source_content_hash=expected_hash,
+        extractor_version=active_extractor.extractor_version,
+        parameter_hash=parameter_hash,
     )
+    if artifact_path.is_file():
+        artifact = active_store.read_artifact(
+            artifact_path,
+            source_file_id=source_file_id,
+            source_pdf_path=str(archive_path),
+            expected_content_hash=expected_hash,
+            expected_extractor_version=active_extractor.extractor_version,
+            expected_parameter_hash=parameter_hash,
+        )
+        completed = time.monotonic()
+        timings = {
+            "hash_read_seconds": round(hash_completed - started, 6),
+            "cache_read_seconds": round(completed - hash_completed, 6),
+            "extract_seconds": 0.0,
+            "write_seconds": 0.0,
+            "total_seconds": round(completed - started, 6),
+        }
+        logger.info(
+            "business-profile pdf artifact cache hit source_file_id=%s "
+            "bytes=%s pages=%s timings=%s path=%s",
+            source_file_id,
+            len(content),
+            artifact.page_count,
+            timings,
+            artifact_path,
+        )
+        return {
+            "artifact": artifact,
+            "artifact_path": str(artifact_path),
+            "artifact_hash": artifact.artifact_hash,
+            "status": "unchanged",
+            "cache_status": "hit",
+            "timings": timings,
+            "pypdf_warning_count": 0,
+        }
+    extract_started = time.monotonic()
+    with _aggregate_pypdf_warnings() as warning_summary:
+        artifact = active_extractor.extract_bytes(
+            content,
+            source_file_id=source_file_id,
+            source_pdf_path=str(archive_path),
+            target_page_numbers=target_pages,
+        )
+    extract_completed = time.monotonic()
     write_result = active_store.write(artifact)
+    completed = time.monotonic()
+    timings = {
+        "hash_read_seconds": round(hash_completed - started, 6),
+        "cache_read_seconds": 0.0,
+        "extract_seconds": round(extract_completed - extract_started, 6),
+        "write_seconds": round(completed - extract_completed, 6),
+        "total_seconds": round(completed - started, 6),
+    }
+    if warning_summary["count"]:
+        logger.warning(
+            "business-profile pdf parser warnings aggregated source_file_id=%s "
+            "count=%s samples=%s path=%s",
+            source_file_id,
+            warning_summary["count"],
+            warning_summary["samples"],
+            archive_path,
+        )
+    logger.info(
+        "business-profile pdf artifact extracted source_file_id=%s bytes=%s "
+        "pages=%s status=%s parser_warnings=%s timings=%s path=%s",
+        source_file_id,
+        len(content),
+        artifact.page_count,
+        artifact.status,
+        warning_summary["count"],
+        timings,
+        write_result.artifact_path,
+    )
     return {
         "artifact": artifact,
         "artifact_path": write_result.artifact_path,
         "artifact_hash": write_result.artifact_hash,
         "status": write_result.status,
+        "cache_status": "miss",
+        "timings": timings,
+        "pypdf_warning_count": warning_summary["count"],
     }

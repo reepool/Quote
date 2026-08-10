@@ -574,6 +574,8 @@ _COUNT_ALIASES = {
     "支",
     "根",
     "块",
+    "张",
+    "点",
 }
 _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     # currency; cross-currency normalization is intentionally not represented.
@@ -796,16 +798,45 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
                 numerator=(primary.token, alternative.token),
                 extra_rules=("same_dimension_alternative",),
             )
+        if (
+            primary is not None
+            and alternative is not None
+            and primary.dimension != alternative.dimension
+        ):
+            return _pending_composed(
+                source, catalog_version, "cross_dimension_alternative"
+            )
         return _pending_composed(source, catalog_version, "ambiguous_alternative")
 
     # Slash between classifiers is an alternative rather than a rate.
     parts = lower.split("/")
-    if (
-        2 <= len(parts) <= MAX_CLASSIFIER_ALTERNATIVES
-        and all(part in _COUNT_ALIASES for part in parts)
+    alternatives = (
+        [_resolve_primitive(part) for part in parts]
+        if 2 <= len(parts) <= MAX_CLASSIFIER_ALTERNATIVES
+        else []
+    )
+    if alternatives and all(
+        item is not None and item.dimension == "count" for item in alternatives
     ):
+        multipliers = {item.multiplier for item in alternatives if item is not None}
+        if len(multipliers) != 1:
+            return _pending_composed(
+                source, catalog_version, "ambiguous_alternative_scale"
+            )
+        rules = tuple(
+            dict.fromkeys(
+                rule_id
+                for item in alternatives
+                if item is not None
+                for rule_id in item.rule_ids
+            )
+        )
         primitive = _PrimitiveResolution(
-            "count", "unit", Decimal("1"), lower, ("classifier_alternative",)
+            "count",
+            "unit",
+            next(iter(multipliers)),
+            lower,
+            ("classifier_alternative", *rules),
         )
         return _resolution_from_primitive(
             source,

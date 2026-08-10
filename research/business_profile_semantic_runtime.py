@@ -924,6 +924,19 @@ class BusinessProfileSemanticRuntime:
         outline_confidences: dict[str, int] = {}
         outline_pages_scoped = 0
         planned_documents = 0
+        page_artifact_cache: dict[tuple[str, str], dict[str, Any]] = {}
+        page_artifact_cache_hits = 0
+        page_artifact_cache_misses = 0
+        pdf_parser_warning_count = 0
+        timing_totals = {
+            "pdf_hash_read_seconds": 0.0,
+            "pdf_cache_read_seconds": 0.0,
+            "pdf_extract_seconds": 0.0,
+            "page_artifact_write_seconds": 0.0,
+            "outline_seconds": 0.0,
+            "selection_seconds": 0.0,
+            "selected_artifact_write_seconds": 0.0,
+        }
         selector = BusinessProfileSectionSelector(
             max_pages=min(12, config.budgets.max_pages)
         )
@@ -961,9 +974,33 @@ class BusinessProfileSemanticRuntime:
                     )
                     continue
                 try:
-                    page_result = ensure_archived_pdf_page_artifact(document)
-                    pdf_artifact = page_result["artifact"]
-                    outline = locate_business_profile_outline(pdf_artifact)
+                    document_cache_key = (
+                        str(document.get("identity") or ""),
+                        str(document.get("content_hash") or ""),
+                    )
+                    cached_document = page_artifact_cache.get(document_cache_key)
+                    if cached_document is None:
+                        page_result = ensure_archived_pdf_page_artifact(document)
+                        pdf_artifact = page_result["artifact"]
+                        outline_started = time.monotonic()
+                        outline = locate_business_profile_outline(pdf_artifact)
+                        outline_seconds = time.monotonic() - outline_started
+                        page_artifact_cache[document_cache_key] = {
+                            "page_result": page_result,
+                            "outline": outline,
+                        }
+                        page_artifact_cache_misses += 1
+                        pdf_parser_warning_count += int(
+                            page_result.get("pypdf_warning_count") or 0
+                        )
+                        page_timings = dict(page_result.get("timings") or {})
+                    else:
+                        page_result = dict(cached_document["page_result"])
+                        pdf_artifact = page_result["artifact"]
+                        outline = cached_document["outline"]
+                        page_artifact_cache_hits += 1
+                        outline_seconds = 0.0
+                        page_timings = {}
                     outline_sources[outline.source] = outline_sources.get(outline.source, 0) + 1
                     outline_confidences[outline.confidence] = (
                         outline_confidences.get(outline.confidence, 0) + 1
@@ -985,6 +1022,7 @@ class BusinessProfileSemanticRuntime:
                         else None
                     )
                     if prior is None:
+                        selection_started = time.monotonic()
                         selected = selector.select(
                             artifact=pdf_artifact,
                             instrument_id=plan["instrument_id"],
@@ -994,6 +1032,7 @@ class BusinessProfileSemanticRuntime:
                             page_scope=outline.page_numbers,
                         )
                     else:
+                        selection_started = time.monotonic()
                         selected = selector.expand_for_missing_context(
                             prior=prior,
                             artifact=pdf_artifact,
@@ -1003,7 +1042,44 @@ class BusinessProfileSemanticRuntime:
                             templates=templates,
                             page_scope=outline.page_numbers,
                         )
+                    selection_seconds = time.monotonic() - selection_started
+                    selected_write_started = time.monotonic()
                     selected_path, write_status = self.section_store.write(selected)
+                    selected_write_seconds = time.monotonic() - selected_write_started
+                    document_timings = {
+                        "pdf_hash_read_seconds": float(
+                            page_timings.get("hash_read_seconds") or 0
+                        ),
+                        "pdf_cache_read_seconds": float(
+                            page_timings.get("cache_read_seconds") or 0
+                        ),
+                        "pdf_extract_seconds": float(
+                            page_timings.get("extract_seconds") or 0
+                        ),
+                        "page_artifact_write_seconds": float(
+                            page_timings.get("write_seconds") or 0
+                        ),
+                        "outline_seconds": outline_seconds,
+                        "selection_seconds": selection_seconds,
+                        "selected_artifact_write_seconds": selected_write_seconds,
+                    }
+                    for metric_name, elapsed in document_timings.items():
+                        timing_totals[metric_name] += elapsed
+                    logger.info(
+                        "business-profile selection completed instrument_id=%s "
+                        "field_family=%s source_document_id=%s page_cache=%s "
+                        "page_artifact_status=%s selected_pages=%s characters=%s "
+                        "outline_source=%s timings=%s",
+                        plan["instrument_id"],
+                        plan["field_family"],
+                        document["identity"],
+                        "shared" if cached_document is not None else page_result.get("cache_status"),
+                        page_result.get("status"),
+                        len(selected.sections),
+                        sum(len(item.normalized_text) for item in selected.sections),
+                        outline.source,
+                        document_timings,
+                    )
                 except (FileNotFoundError, RuntimeError, ValueError) as exc:
                     machine_rework.append(
                         _rework_item(plan, document, _selection_failure_reason(exc))
@@ -1045,6 +1121,7 @@ class BusinessProfileSemanticRuntime:
                         "selected_artifact_hash": selected.artifact_hash,
                         "selected_artifact_path": str(selected_path),
                         "selected_write_status": write_status,
+                        "timings": document_timings,
                         "template_ids": [item.template_id for item in templates],
                         "template_scopes": [item.scope.scope_id for item in templates],
                         "expanded_for_missing_context": prior is not None,
@@ -1084,6 +1161,10 @@ class BusinessProfileSemanticRuntime:
                 "outline_sources": outline_sources,
                 "outline_confidences": outline_confidences,
                 "outline_pages_scoped": outline_pages_scoped,
+                "page_artifact_cache_hits": page_artifact_cache_hits,
+                "page_artifact_cache_misses": page_artifact_cache_misses,
+                "pdf_parser_warning_count": pdf_parser_warning_count,
+                **timing_totals,
             },
             "metrics": {
                 "pages": pages,
@@ -1093,6 +1174,10 @@ class BusinessProfileSemanticRuntime:
                 "selected_pages": pages,
                 "blocking_machine_rework": len(machine_rework),
                 "machine_rework_recovered": recovered_rework,
+                "page_artifact_cache_hits": page_artifact_cache_hits,
+                "page_artifact_cache_misses": page_artifact_cache_misses,
+                "pdf_parser_warning_count": pdf_parser_warning_count,
+                **timing_totals,
                 "by_field_family": by_field_family,
             },
         }

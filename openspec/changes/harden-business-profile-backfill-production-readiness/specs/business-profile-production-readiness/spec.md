@@ -159,6 +159,22 @@ Every unknown source-unit proposal SHALL be stored as an append-only governed ru
 - **THEN** Telegram states whether the rule is effective, its stable reason codes, affected instruments, multiplier, canonical unit, and rule identity
 - **AND** repeated events for the same normalized unit, lifecycle state, and impact window are aggregated or deduplicated
 
+#### Scenario: One unit has quarantine and replacement events
+- **WHEN** an earlier quarantined proposal is superseded by an auto-approved rule
+- **THEN** the delivered notification states the final current status as enabled
+- **AND** it identifies both the effective replacement and the superseded rule
+- **AND** historical quarantine wording cannot be mistaken for the current effective state
+
+#### Scenario: Count classifiers observed in production are resolved
+- **WHEN** the source unit is `万张`, `点` in an explicit item-count context, or same-scale alternatives such as `万粒/万瓶`
+- **THEN** deterministic code resolves the count dimension and exact magnitude
+- **AND** matching quarantined artifacts are replayable without another extraction LLM call
+
+#### Scenario: Parenthesized alternatives cross dimensions
+- **WHEN** a source unit such as `万台（万千瓦时）` combines count and energy dimensions
+- **THEN** it remains non-publishable with a stable cross-dimension reason
+- **AND** the system does not create a single unit rule or multiplier for the combined text
+
 ### Requirement: Authoritative business-profile calculations are program-owned
 The production extraction LLM SHALL provide source-reported numeric values and source units as the only authoritative numeric inputs. It MAY provide qualitative semantic conclusions and non-authoritative derived hints; deterministic program code SHALL perform every authoritative conversion, percentage, ratio, total, difference, margin, concentration, ranking, materiality, confidence, and numeric exposure calculation.
 
@@ -271,6 +287,40 @@ The backfill SHALL support a configured ceiling of twenty concurrent structured 
 - **WHEN** timeout, transient-error, or queue-wait thresholds exceed configured limits
 - **THEN** adaptive control reduces effective semantic concurrency for the cooldown window
 - **AND** progress metrics expose requested, admitted, in-flight, throttled, and failed counts
+
+#### Scenario: Upstream produces semantic work incrementally
+- **WHEN** parse produces fewer items than the semantic concurrency ceiling
+- **THEN** semantic workers start those items immediately and refill each free slot as new work becomes claimable
+- **AND** they do not wait for an entire claimed wave to finish before polling for replacement work
+- **AND** queue underfill is reported separately from provider throttling
+
+#### Scenario: Publish waits for semantic completion
+- **WHEN** publish temporarily has no claimable work while semantic is still running
+- **THEN** publish keeps polling without consuming its active-work budget
+- **AND** it drains newly published semantic outputs before ending or reaching its own completed-work bound
+
+### Requirement: Immutable PDF page artifacts are reused before extraction
+The backfill SHALL resolve and validate an existing page-artifact identity before parsing an archived PDF and SHALL share one hydrated page artifact across field-family selection plans for the same document.
+
+#### Scenario: Matching page artifact already exists
+- **WHEN** content hash, extractor version, parameter hash, schema, and artifact hash all match
+- **THEN** the system reads the immutable artifact without invoking PDF text extraction
+- **AND** it records cache-read and validation timings
+
+#### Scenario: Two field families use the same annual report
+- **WHEN** structured segments and operating facts select evidence from the same source document in one work item
+- **THEN** both plans reuse one hydrated page artifact and one report outline
+- **AND** the PDF is not parsed twice
+
+#### Scenario: Existing artifact is corrupt or incompatible
+- **WHEN** stored schema, content identity, parameters, or artifact hash does not match
+- **THEN** the system fails closed with an actionable artifact error
+- **AND** it does not silently overwrite the immutable artifact
+
+#### Scenario: PDF parser emits repetitive handled warnings
+- **WHEN** pypdf repairs repeated malformed cross-reference entries under non-strict parsing
+- **THEN** the system suppresses per-entry log flooding and emits one bounded per-document warning summary
+- **AND** parse failures and affected file identity remain visible
 
 ### Requirement: Storage initialization occurs once per backfill run
 The business-profile service SHALL complete schema readiness before starting workers and SHALL NOT execute full research, financial, valuation, or interests database initialization for each work item or stage.

@@ -2191,11 +2191,16 @@ class BusinessProfileAsyncProductionService:
         errors: list[dict[str, str]] = []
         stopped = False
         effective_concurrency = budget.max_concurrency
-        throttled_requests = 0
         provider_congestion_events = 0
         provider_congestion_failures = 0
         admitted_requests = 0
         empty_polls = 0
+        underfilled_claim_slots = 0
+        peak_in_flight = 0
+        active_work_seconds = 0.0
+        active_interval_started: float | None = None
+        active_tasks: set[asyncio.Task[bool]] = set()
+        last_progress_log = started
         empty_poll_delay_seconds = 0.05
         lease_owner = f"async-{stage}-{get_shanghai_time().strftime('%Y%m%d%H%M%S%f')}"
         logger.info(
@@ -2207,290 +2212,266 @@ class BusinessProfileAsyncProductionService:
             budget.max_elapsed_seconds,
             budget.high_water_mark,
         )
-        while claimed < budget.max_items:
-            if should_stop is not None and should_stop():
-                stopped = True
-                break
-            if time.monotonic() - started >= budget.max_elapsed_seconds:
-                break
-            batch_limit = min(
-                effective_concurrency,
-                budget.max_items - claimed,
+        def active_elapsed(now: float | None = None) -> float:
+            current = time.monotonic() if now is None else now
+            return active_work_seconds + (
+                current - active_interval_started
+                if active_interval_started is not None
+                else 0.0
             )
-            before_provider_congestion_failures = provider_congestion_failures
-            claim_kwargs = {
-                "processing_identity_hash": processing_identity_hash,
-                "exclude_work_ids": tuple(claimed_work_ids),
-            }
-            probe = getattr(self.repository, "has_claimable", None)
-            claimable = True
-            if callable(probe):
-                claimable = await asyncio.to_thread(
-                    probe,
-                    stage,
-                    **claim_kwargs,
-                )
-            items = ()
-            if claimable:
-                items = await self._run_storage_operation(
-                    self.repository.claim,
-                    stage,
-                    limit=batch_limit,
-                    lease_owner=lease_owner,
-                    lease_seconds=self.lease_seconds,
-                    **claim_kwargs,
-                )
-            if not items:
-                empty_polls += 1
-                if upstream_done is None or upstream_done.is_set():
-                    break
-                await asyncio.sleep(empty_poll_delay_seconds)
-                empty_poll_delay_seconds = min(
-                    0.5,
-                    empty_poll_delay_seconds * 2,
-                )
-                continue
-            empty_poll_delay_seconds = 0.05
-            claimed += len(items)
-            admitted_requests += len(items)
-            throttled_requests += max(0, budget.max_concurrency - len(items))
-            claimed_work_ids.update(str(item["work_id"]) for item in items)
 
-            async def run_one(item: Mapping[str, Any]) -> None:
-                nonlocal completed, retried, failed, lease_conflicts
-                nonlocal configuration_blocked, machine_rework_deferred
-                nonlocal artifact_replay_deferred, context_reselect_deferred
-                nonlocal provider_congestion_failures
-                try:
-                    result = dict(await self.stage_runner(stage, item))
-                    quality = dict(result.get("quality") or {})
-                    for key in (
-                        "blocking_machine_rework",
-                        "selected_documents",
-                        "selected_pages",
-                        "outline_pages_scoped",
-                        "evidence_records",
-                        "record_count",
-                        "verified_records",
-                        "empty_output_documents",
-                        "expected_non_disclosure_documents",
-                        "structured_fallback_required",
-                        "structured_fallback_calls",
-                        "structured_fallback_accepted_records",
-                        "structured_fallback_rejected",
+        async def run_one(item: Mapping[str, Any]) -> bool:
+            nonlocal completed, retried, failed, lease_conflicts
+            nonlocal configuration_blocked, machine_rework_deferred
+            nonlocal artifact_replay_deferred, context_reselect_deferred
+            nonlocal provider_congestion_failures, active_work_seconds
+            nonlocal active_interval_started
+            congestion_failure = False
+            item_started = time.monotonic()
+            if active_interval_started is None:
+                active_interval_started = item_started
+            try:
+                result = dict(await self.stage_runner(stage, item))
+                quality = dict(result.get("quality") or {})
+                for key in (
+                    "blocking_machine_rework", "selected_documents", "selected_pages",
+                    "outline_pages_scoped", "evidence_records", "record_count",
+                    "verified_records", "empty_output_documents",
+                    "expected_non_disclosure_documents", "structured_fallback_required",
+                    "structured_fallback_calls", "structured_fallback_accepted_records",
+                    "structured_fallback_rejected", "page_artifact_cache_hits",
+                    "page_artifact_cache_misses", "pdf_parser_warning_count",
+                ):
+                    quality_totals[key] = quality_totals.get(key, 0) + int(
+                        quality.get(key) or 0
+                    )
+                for key in (
+                    "pdf_hash_read_seconds",
+                    "pdf_cache_read_seconds",
+                    "pdf_extract_seconds",
+                    "page_artifact_write_seconds",
+                    "outline_seconds",
+                    "selection_seconds",
+                    "selected_artifact_write_seconds",
+                ):
+                    if key in quality:
+                        quality_totals[key] = float(
+                            quality_totals.get(key) or 0
+                        ) + float(quality.get(key) or 0)
+                for counter_name in (
+                    "outline_sources", "outline_confidences", "empty_output_reasons",
+                    "blocked_configuration_reasons", "machine_rework_reasons",
+                ):
+                    target = quality_totals.setdefault(counter_name, {})
+                    for label, count in dict(quality.get(counter_name) or {}).items():
+                        target[str(label)] = target.get(str(label), 0) + int(count or 0)
+                if quality.get("blocked_configuration") is True:
+                    reasons = ",".join(
+                        sorted(dict(quality.get("blocked_configuration_reasons") or {}))
+                    )
+                    deferred_status = await self._run_storage_operation(
+                        self.repository.defer_configuration,
+                        str(item["work_id"]),
+                        lease_owner=lease_owner,
+                        reason="blocked_configuration:"
+                        + (reasons or "semantic_gateway_unavailable"),
+                        retry_after_seconds=self.retry_backoff_seconds,
+                    )
+                    if deferred_status == "configuration_blocked":
+                        configuration_blocked += 1
+                    else:
+                        lease_conflicts += 1
+                    return False
+                if quality and not bool(quality.get("stage_ready", True)):
+                    machine_rework_reasons = dict(
+                        quality.get("machine_rework_reasons") or {}
+                    )
+                    if int(quality.get("blocking_machine_rework") or 0) > 0 and (
+                        "gateway_failure" not in machine_rework_reasons
                     ):
-                        quality_totals[key] = quality_totals.get(key, 0) + int(
-                            quality.get(key) or 0
-                        )
-                    for counter_name in (
-                        "outline_sources",
-                        "outline_confidences",
-                        "empty_output_reasons",
-                        "blocked_configuration_reasons",
-                        "machine_rework_reasons",
-                    ):
-                        target = quality_totals.setdefault(counter_name, {})
-                        for label, count in dict(
-                            quality.get(counter_name) or {}
-                        ).items():
-                            target[str(label)] = target.get(str(label), 0) + int(
-                                count or 0
-                            )
-                    if quality.get("blocked_configuration") is True:
-                        reasons = ",".join(
-                            sorted(
-                                dict(
-                                    quality.get("blocked_configuration_reasons") or {}
-                                )
-                            )
-                        )
+                        reasons = ",".join(sorted(machine_rework_reasons))
                         deferred_status = await self._run_storage_operation(
-                            self.repository.defer_configuration,
+                            self.repository.finalize_machine_rework,
                             str(item["work_id"]),
                             lease_owner=lease_owner,
-                            reason=(
-                                "blocked_configuration:"
-                                + (reasons or "semantic_gateway_unavailable")
-                            ),
-                            retry_after_seconds=self.retry_backoff_seconds,
+                            reason="machine_rework:"
+                            + (reasons or "classified_quality_rejection"),
+                            result=result,
                         )
-                        if deferred_status == "configuration_blocked":
-                            configuration_blocked += 1
+                        if deferred_status == "machine_rework":
+                            machine_rework_deferred += 1
+                        elif deferred_status == "artifact_replay_deferred":
+                            artifact_replay_deferred += 1
+                        elif deferred_status == "context_reselect_deferred":
+                            context_reselect_deferred += 1
                         else:
                             lease_conflicts += 1
-                        return
-                    if quality and not bool(quality.get("stage_ready", True)):
-                        machine_rework_reasons = dict(
-                            quality.get("machine_rework_reasons") or {}
-                        )
-                        if int(quality.get("blocking_machine_rework") or 0) > 0 and (
-                            "gateway_failure" not in machine_rework_reasons
-                        ):
-                            reasons = ",".join(
-                                sorted(machine_rework_reasons)
-                            )
-                            deferred_status = await self._run_storage_operation(
-                                self.repository.finalize_machine_rework,
-                                str(item["work_id"]),
-                                lease_owner=lease_owner,
-                                reason=(
-                                    "machine_rework:"
-                                    + (reasons or "classified_quality_rejection")
-                                ),
-                                result=result,
-                            )
-                            if deferred_status == "machine_rework":
-                                machine_rework_deferred += 1
-                            elif deferred_status == "artifact_replay_deferred":
-                                artifact_replay_deferred += 1
-                            elif deferred_status == "context_reselect_deferred":
-                                context_reselect_deferred += 1
-                            else:
-                                lease_conflicts += 1
-                            return
-                        if stage == "semantic" and "gateway_failure" in (
-                            machine_rework_reasons
-                        ):
-                            raise RuntimeError(
-                                "business-profile semantic provider congestion: "
-                                "gateway_failure"
-                            )
+                        return False
+                    if stage == "semantic" and "gateway_failure" in machine_rework_reasons:
                         raise RuntimeError(
-                            "business-profile stage quality gate failed: "
-                            f"stage={stage} "
-                            f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)} "
-                            f"selected_documents={int(quality.get('selected_documents') or 0)}"
+                            "business-profile semantic provider congestion: gateway_failure"
                         )
-                    status = str(result.get("status") or "").lower()
-                    if status not in {"success", "completed", "unchanged"}:
-                        raise RuntimeError(
-                            str(result.get("reason") or status or "stage_failed")
-                        )
-                    await self._run_storage_operation(
-                        self.repository.acknowledge,
-                        str(item["work_id"]),
-                        lease_owner=lease_owner,
-                        result=result,
+                    raise RuntimeError(
+                        "business-profile stage quality gate failed: "
+                        f"stage={stage} "
+                        f"blocking_machine_rework={int(quality.get('blocking_machine_rework') or 0)} "
+                        f"selected_documents={int(quality.get('selected_documents') or 0)}"
                     )
-                    completed += 1
-                except Exception as exc:
-                    if stage == "semantic" and _is_provider_congestion_error(exc):
-                        provider_congestion_failures += 1
-                    terminal_status = await self._run_storage_operation(
-                        self.repository.fail,
-                        str(item["work_id"]),
-                        lease_owner=lease_owner,
-                        error=f"{type(exc).__name__}: {exc}",
-                        retryable=_retryable(exc),
-                        initial_backoff_seconds=self.retry_backoff_seconds,
-                    )
-                    if terminal_status == "retry_due":
-                        retried += 1
-                    elif terminal_status == "lease_lost":
-                        lease_conflicts += 1
-                    else:
-                        failed += 1
-                    errors.append(
-                        {
-                            "work_id": str(item["work_id"]),
-                            "error": f"{type(exc).__name__}: {exc}"[:1000],
-                        }
-                    )
-                    logger.warning(
-                        "business-profile work failed work_id=%s instrument_id=%s "
-                        "stage=%s disposition=%s category=%s error=%s",
-                        item.get("work_id"),
-                        item.get("instrument_id"),
-                        stage,
-                        terminal_status,
-                        type(exc).__name__,
-                        str(exc).replace("\n", " ")[:1000],
-                    )
-                    logger.debug(
-                        "business-profile work failure traceback work_id=%s "
-                        "instrument_id=%s stage=%s",
-                        item.get("work_id"),
-                        item.get("instrument_id"),
-                        stage,
-                        exc_info=True,
-                    )
-
-            batch_task = asyncio.create_task(self._run_stage_batch(items, run_one))
-            batch_started = time.monotonic()
-            try:
-                while not batch_task.done():
-                    try:
-                        await asyncio.wait_for(
-                            asyncio.shield(batch_task),
-                            timeout=self.progress_log_interval_seconds,
-                        )
-                    except asyncio.TimeoutError:
-                        logger.info(
-                            "business-profile stage heartbeat stage=%s "
-                            "elapsed_seconds=%.3f batch_elapsed_seconds=%.3f "
-                            "in_flight=%s claimed=%s completed=%s retried=%s "
-                            "terminal_failures=%s configuration_blocked=%s "
-                            "claim_exclusions=%s writer=%s",
-                            stage,
-                            time.monotonic() - started,
-                            time.monotonic() - batch_started,
-                            max(
-                                0,
-                                claimed
-                                - completed
-                                - retried
-                                - failed
-                                - configuration_blocked
-                                - machine_rework_deferred
-                                - artifact_replay_deferred
-                                - lease_conflicts,
-                            ),
-                            claimed,
-                            completed,
-                            retried,
-                            failed,
-                            configuration_blocked,
-                            len(claimed_work_ids),
-                            self.write_coordinator.snapshot(),
-                        )
-                await batch_task
-            except asyncio.CancelledError:
-                batch_task.cancel()
-                try:
-                    await batch_task
-                except asyncio.CancelledError:
-                    pass
-                raise
-            if stage == "semantic":
-                batch_provider_congestion = (
-                    provider_congestion_failures
-                    - before_provider_congestion_failures
+                status = str(result.get("status") or "").lower()
+                if status not in {"success", "completed", "unchanged"}:
+                    raise RuntimeError(str(result.get("reason") or status or "stage_failed"))
+                await self._run_storage_operation(
+                    self.repository.acknowledge,
+                    str(item["work_id"]),
+                    lease_owner=lease_owner,
+                    result=result,
                 )
-                if batch_provider_congestion:
-                    provider_congestion_events += 1
-                    effective_concurrency = max(1, effective_concurrency // 2)
-                elif effective_concurrency < budget.max_concurrency:
-                    effective_concurrency += 1
-            logger.info(
-                "business-profile stage batch stage=%s batch_size=%s claimed=%s "
-                "completed=%s retried=%s terminal_failures=%s "
-                "configuration_blocked=%s machine_rework_deferred=%s "
-                "artifact_replay_deferred=%s lease_conflicts=%s elapsed_seconds=%.3f",
-                stage,
-                len(items),
-                claimed,
-                completed,
-                retried,
-                failed,
-                configuration_blocked,
-                machine_rework_deferred,
-                artifact_replay_deferred,
-                lease_conflicts,
-                time.monotonic() - started,
-            )
-            if should_stop is not None and should_stop():
-                stopped = True
-                break
+                completed += 1
+            except Exception as exc:
+                congestion_failure = stage == "semantic" and _is_provider_congestion_error(exc)
+                if congestion_failure:
+                    provider_congestion_failures += 1
+                terminal_status = await self._run_storage_operation(
+                    self.repository.fail,
+                    str(item["work_id"]),
+                    lease_owner=lease_owner,
+                    error=f"{type(exc).__name__}: {exc}",
+                    retryable=_retryable(exc),
+                    initial_backoff_seconds=self.retry_backoff_seconds,
+                )
+                if terminal_status == "retry_due":
+                    retried += 1
+                elif terminal_status == "lease_lost":
+                    lease_conflicts += 1
+                else:
+                    failed += 1
+                errors.append(
+                    {"work_id": str(item["work_id"]), "error": f"{type(exc).__name__}: {exc}"[:1000]}
+                )
+                logger.warning(
+                    "business-profile work failed work_id=%s instrument_id=%s "
+                    "stage=%s disposition=%s category=%s error=%s",
+                    item.get("work_id"), item.get("instrument_id"), stage,
+                    terminal_status, type(exc).__name__, str(exc).replace("\n", " ")[:1000],
+                )
+                logger.debug(
+                    "business-profile work failure traceback work_id=%s "
+                    "instrument_id=%s stage=%s",
+                    item.get("work_id"), item.get("instrument_id"), stage,
+                    exc_info=True,
+                )
+            finally:
+                logger.info(
+                    "business-profile stage item stage=%s work_id=%s instrument_id=%s "
+                    "duration_seconds=%.3f claimed=%s completed=%s retried=%s "
+                    "terminal_failures=%s",
+                    stage, item.get("work_id"), item.get("instrument_id"),
+                    time.monotonic() - item_started, claimed, completed, retried, failed,
+                )
+            return congestion_failure
+
+        try:
+            while claimed < budget.max_items or active_tasks:
+                now = time.monotonic()
+                stop_requested = should_stop is not None and should_stop()
+                budget_exhausted = active_elapsed(now) >= budget.max_elapsed_seconds
+                if stop_requested:
+                    stopped = True
+                may_claim = not stopped and not budget_exhausted and claimed < budget.max_items
+                available_slots = max(0, effective_concurrency - len(active_tasks))
+                items: Sequence[Mapping[str, Any]] = ()
+                if may_claim and available_slots:
+                    batch_limit = min(available_slots, budget.max_items - claimed)
+                    claim_kwargs = {
+                        "processing_identity_hash": processing_identity_hash,
+                        "exclude_work_ids": tuple(claimed_work_ids),
+                    }
+                    probe = getattr(self.repository, "has_claimable", None)
+                    claimable = True
+                    if callable(probe):
+                        claimable = await asyncio.to_thread(probe, stage, **claim_kwargs)
+                    if claimable:
+                        items = await self._run_storage_operation(
+                            self.repository.claim,
+                            stage,
+                            limit=batch_limit,
+                            lease_owner=lease_owner,
+                            lease_seconds=self.lease_seconds,
+                            **claim_kwargs,
+                        )
+                    if items:
+                        claimed += len(items)
+                        admitted_requests += len(items)
+                        underfilled_claim_slots += max(0, batch_limit - len(items))
+                        claimed_work_ids.update(str(item["work_id"]) for item in items)
+                        for item in items:
+                            active_tasks.add(asyncio.create_task(run_one(item)))
+                        peak_in_flight = max(peak_in_flight, len(active_tasks))
+                        empty_poll_delay_seconds = 0.05
+                    else:
+                        empty_polls += 1
+                        underfilled_claim_slots += batch_limit
+
+                if not active_tasks:
+                    active_interval_started = None
+                    if stopped or budget_exhausted or claimed >= budget.max_items:
+                        break
+                    if not items and (upstream_done is None or upstream_done.is_set()):
+                        break
+                    await asyncio.sleep(empty_poll_delay_seconds)
+                    empty_poll_delay_seconds = min(0.5, empty_poll_delay_seconds * 2)
+                    continue
+
+                wait_timeout = (
+                    min(self.progress_log_interval_seconds, empty_poll_delay_seconds)
+                    if may_claim and available_slots and not items
+                    else self.progress_log_interval_seconds
+                )
+                done, pending = await asyncio.wait(
+                    active_tasks,
+                    timeout=wait_timeout,
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+                active_tasks = set(pending)
+                if done:
+                    congestion_failures = sum(
+                        [bool(await task) for task in done]
+                    )
+                    if not active_tasks and active_interval_started is not None:
+                        active_work_seconds += time.monotonic() - active_interval_started
+                        active_interval_started = None
+                    if stage == "semantic":
+                        if congestion_failures:
+                            provider_congestion_events += 1
+                            effective_concurrency = max(1, effective_concurrency // 2)
+                        elif effective_concurrency < budget.max_concurrency:
+                            effective_concurrency += 1
+                    logger.info(
+                        "business-profile stage progress stage=%s finished=%s in_flight=%s "
+                        "claimed=%s completed=%s retried=%s terminal_failures=%s "
+                        "effective_concurrency=%s elapsed_seconds=%.3f active_seconds=%.3f",
+                        stage, len(done), len(active_tasks), claimed, completed, retried,
+                        failed, effective_concurrency, time.monotonic() - started,
+                        active_elapsed(),
+                    )
+                if time.monotonic() - last_progress_log >= self.progress_log_interval_seconds:
+                    last_progress_log = time.monotonic()
+                    logger.info(
+                        "business-profile stage heartbeat stage=%s elapsed_seconds=%.3f "
+                        "active_seconds=%.3f in_flight=%s peak_in_flight=%s claimed=%s "
+                        "completed=%s retried=%s terminal_failures=%s "
+                        "configuration_blocked=%s queue_underfilled_slots=%s "
+                        "claim_exclusions=%s writer=%s",
+                        stage, time.monotonic() - started, active_elapsed(),
+                        len(active_tasks), peak_in_flight, claimed, completed, retried,
+                        failed, configuration_blocked, underfilled_claim_slots,
+                        len(claimed_work_ids), self.write_coordinator.snapshot(),
+                    )
+        except asyncio.CancelledError:
+            for task in active_tasks:
+                task.cancel()
+            await asyncio.gather(*active_tasks, return_exceptions=True)
+            raise
         result = {
             "status": "stopped" if stopped else "success",
             "stop_requested": stopped,
@@ -2505,6 +2486,9 @@ class BusinessProfileAsyncProductionService:
             "context_reselect_deferred": context_reselect_deferred,
             "claim_exclusions": len(claimed_work_ids),
             "empty_polls": empty_polls,
+            "queue_underfilled_slots": underfilled_claim_slots,
+            "peak_in_flight": peak_in_flight,
+            "active_work_seconds": round(active_elapsed(), 3),
             "errors": errors[:20],
             "quality": quality_totals,
             "elapsed_seconds": round(time.monotonic() - started, 3),
@@ -2513,10 +2497,12 @@ class BusinessProfileAsyncProductionService:
                 "requested_concurrency": budget.max_concurrency,
                 "effective_concurrency": effective_concurrency,
                 "admitted_requests": admitted_requests,
-                "throttled_requests": throttled_requests,
+                "throttled_requests": 0,
+                "queue_underfilled_slots": underfilled_claim_slots,
                 "provider_congestion_events": provider_congestion_events,
                 "provider_congestion_failures": provider_congestion_failures,
                 "in_flight": 0,
+                "peak_in_flight": peak_in_flight,
             },
         }
         log = (
@@ -2534,7 +2520,8 @@ class BusinessProfileAsyncProductionService:
             "machine_rework_deferred=%s "
             "artifact_replay_deferred=%s "
             "context_reselect_deferred=%s lease_conflicts=%s "
-            "claim_exclusions=%s elapsed_seconds=%s writer=%s",
+            "claim_exclusions=%s elapsed_seconds=%s active_work_seconds=%s "
+            "peak_in_flight=%s queue_underfilled_slots=%s writer=%s",
             stage,
             result["status"],
             claimed,
@@ -2548,6 +2535,9 @@ class BusinessProfileAsyncProductionService:
             lease_conflicts,
             result["claim_exclusions"],
             result["elapsed_seconds"],
+            result["active_work_seconds"],
+            result["peak_in_flight"],
+            result["queue_underfilled_slots"],
             result["writer"],
         )
         return result

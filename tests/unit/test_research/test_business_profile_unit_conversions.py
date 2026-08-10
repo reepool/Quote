@@ -212,6 +212,9 @@ def test_loader_rejects_fact_catalog_version_mismatch(tmp_path):
         ("瓶/支/盒/袋/板", "count", "unit", Decimal("1")),
         ("瓶/袋/支", "count", "unit", Decimal("1")),
         ("万Ah", "electric_charge", "Ah", Decimal("10000")),
+        ("万张", "count", "unit", Decimal("10000")),
+        ("点", "count", "unit", Decimal("1")),
+        ("万粒/万瓶", "count", "unit", Decimal("10000")),
         ("mAh", "electric_charge", "Ah", Decimal("0.001")),
         ("kAh", "electric_charge", "Ah", Decimal("1000")),
     ],
@@ -233,6 +236,13 @@ def test_unknown_unit_is_pending_and_does_not_raise():
     assert resolution.status == "unit_resolution_pending"
     assert resolution.publishable is False
     assert resolution.reason in {"unknown_unit_token", "unsupported_compound_unit"}
+
+
+def test_cross_dimension_parenthesized_unit_remains_pending():
+    resolution = load_unit_conversion_catalog().resolve("万台（万千瓦时）")
+
+    assert resolution.status == "unit_resolution_pending"
+    assert resolution.reason == "cross_dimension_alternative"
 
 
 def test_unit_normalization_is_unicode_and_punctuation_stable():

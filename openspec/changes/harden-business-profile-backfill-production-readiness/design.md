@@ -297,6 +297,44 @@ final machine rework. The queue automatically returns the item to selection once
 expands the relevant table context, and retries extraction. A second empty result
 is finalized as machine rework so the workflow remains bounded.
 
+### 9. Make pipeline concurrency work-conserving and unit notifications final-state aware
+
+The 2026-08-10 run requested semantic concurrency twenty but reached only three
+simultaneous extraction calls. The semantic queue started empty, parse supplied
+one to four items at a time, and each stage waited for its whole claimed wave
+before claiming again. The reported `throttled_requests` counter measured unused
+stage slots rather than gateway rejection. PDF selection also called the page
+artifact extractor once per field-family plan; the supposed reuse helper parsed
+the complete PDF before discovering that the immutable output already existed.
+
+The worker loop becomes work-conserving: it keeps up to the effective stage limit
+in flight, claims replacement work as individual tasks finish, and waits for the
+upstream completion event only when no claimable work exists. Stage active-work
+time excludes idle waits for upstream, so publish does not exhaust its budget
+while semantic is still producing rows. Stop requests cease new claims and drain
+already admitted work. Provider failures still reduce semantic admission; queue
+underfill is reported separately and is not called provider throttling.
+
+The PDF asset path is resolved from the verified content hash, extractor version,
+and parameter hash before extraction. A valid immutable artifact is hydrated and
+reused; a corrupt or identity-mismatched artifact fails closed. Within one select
+stage, all field-family plans for the same source document share the hydrated
+artifact and outline. INFO logs report bounded timings and cache status, while
+repetitive handled pypdf warnings are counted and emitted once per document.
+
+Unit notifications remain append-only lifecycle events, but delivery groups
+pending events by normalized unit and impact window. The message distinguishes
+the event history from the current final state, identifies the active replacement
+rule when one exists, and states stable quarantine reasons otherwise. A prior
+quarantine followed by `auto_approved` and `superseded` therefore produces one
+clear current-state message instead of apparently contradictory alerts.
+
+The observed `万张`, `点`, and `万粒/万瓶` units are count classifiers or
+same-scale count alternatives and become deterministically resolvable. The source
+unit `万台（万千瓦时）` combines count and energy dimensions; it remains pending
+and must be split into separately evidenced facts rather than assigned one
+canonical multiplier.
+
 ## Risks / Trade-offs
 
 - [Source labels are missing or the model paraphrases a label] -> Ask for a

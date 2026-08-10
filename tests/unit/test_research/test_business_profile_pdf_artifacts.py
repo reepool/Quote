@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
 
@@ -237,6 +238,24 @@ def test_artifact_identity_and_layout_are_stable(tmp_path):
     )
 
 
+def test_concurrent_identical_artifact_writes_are_atomic(tmp_path):
+    source_path = tmp_path / "original" / "report.pdf"
+    source_path.parent.mkdir(parents=True)
+    source_path.write_bytes(_pdf_bytes(["Principal Business native text"]))
+    artifact = BusinessProfilePdfArtifactExtractor(
+        low_text_character_threshold=5
+    ).extract_file(source_path, source_file_id="source-1")
+    store = BusinessProfilePdfArtifactStore()
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _index: store.write(artifact), range(16)))
+
+    assert {result.artifact_hash for result in results} == {artifact.artifact_hash}
+    assert {result.status for result in results} <= {"written", "unchanged"}
+    assert sum(result.status == "written" for result in results) == 1
+    assert not list(tmp_path.rglob("*.part"))
+
+
 def test_diagnostics_only_command_helper_does_not_write_artifact(tmp_path):
     source_path = tmp_path / "original" / "report.pdf"
     source_path.parent.mkdir(parents=True)
@@ -266,18 +285,26 @@ def test_archived_manifest_page_artifact_is_hash_bound_and_reused(tmp_path):
         "content_hash": __import__("hashlib").sha256(content).hexdigest(),
     }
 
-    first = ensure_archived_pdf_page_artifact(
-        manifest,
-        extractor=BusinessProfilePdfArtifactExtractor(low_text_character_threshold=5),
-    )
-    second = ensure_archived_pdf_page_artifact(
-        manifest,
-        extractor=BusinessProfilePdfArtifactExtractor(low_text_character_threshold=5),
-    )
+    class CountingExtractor(BusinessProfilePdfArtifactExtractor):
+        def __init__(self):
+            super().__init__(low_text_character_threshold=5)
+            self.calls = 0
+
+        def extract_bytes(self, *args, **kwargs):
+            self.calls += 1
+            return super().extract_bytes(*args, **kwargs)
+
+    extractor = CountingExtractor()
+    first = ensure_archived_pdf_page_artifact(manifest, extractor=extractor)
+    second = ensure_archived_pdf_page_artifact(manifest, extractor=extractor)
 
     assert first["status"] == "written"
     assert second["status"] == "unchanged"
+    assert first["cache_status"] == "miss"
+    assert second["cache_status"] == "hit"
+    assert extractor.calls == 1
     assert first["artifact_hash"] == second["artifact_hash"]
+    assert second["artifact"].source_file_id == "source-1"
 
     source_path.write_bytes(content + b"changed")
     with pytest.raises(RuntimeError, match="hash mismatch"):
