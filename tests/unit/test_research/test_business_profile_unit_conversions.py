@@ -26,11 +26,11 @@ def test_default_unit_catalog_has_canonical_unit_for_each_dimension():
         unit.dimension for unit in catalog.units if unit.canonical_for_dimension
     }
 
-    assert catalog.catalog_version == "business_profile_units.2026.6"
+    assert catalog.catalog_version == "business_profile_units.2026.7"
     assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
     assert dimensions == canonical_dimensions
-    assert len(catalog.units) == 42
-    assert len(catalog.conversions) == 21
+    assert len(catalog.units) == 44
+    assert len(catalog.conversions) == 23
 
 
 def test_unit_catalog_covers_all_business_fact_canonical_units():
@@ -213,6 +213,13 @@ def test_loader_rejects_fact_catalog_version_mismatch(tmp_path):
         ("瓶/袋/支", "count", "unit", Decimal("1")),
         ("万Ah", "electric_charge", "Ah", Decimal("10000")),
         ("万张", "count", "unit", Decimal("10000")),
+        ("项", "count", "unit", Decimal("1")),
+        ("艘", "count", "unit", Decimal("1")),
+        ("套/项", "count", "unit", Decimal("1")),
+        ("万重箱", "mass", "tonne", Decimal("500")),
+        ("万重量箱", "mass", "tonne", Decimal("500")),
+        ("重箱", "mass", "tonne", Decimal("0.05")),
+        ("重量箱", "mass", "tonne", Decimal("0.05")),
         ("点", "count", "unit", Decimal("1")),
         ("万粒/万瓶", "count", "unit", Decimal("10000")),
         ("PCS", "count", "unit", Decimal("1")),

@@ -395,6 +395,30 @@ class _UnsupportedUnitOperatingGateway(_StructuredOperatingGateway):
         )
 
 
+class _MixedUnitOperatingGateway(_StructuredOperatingGateway):
+    async def complete(self, request):
+        response = await super().complete(request)
+        data = json.loads(json.dumps(response.data, ensure_ascii=False))
+        pending = dict(data["rows"][0])
+        pending.update(
+            {
+                "segment_name_raw": "化工产品",
+                "fact_type": "sales_volume",
+                "value": 12.0,
+                "unit_raw": "T/KL",
+                "fact_scope": "化工产品:销量",
+            }
+        )
+        data["rows"].append(pending)
+        raw = json.dumps(data, ensure_ascii=False)
+        return replace(
+            response,
+            data=data,
+            raw_content=raw,
+            response_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+
+
 class _PartialStructuredSegmentGateway(_StructuredSegmentGateway):
     async def complete(self, request):
         response = await super().complete(request)
@@ -1447,7 +1471,7 @@ def test_semantic_unit_alias_absent_from_source_is_normalized(tmp_path, monkeypa
     assert fact["unit_normalized"] == "tonne"
 
 
-def test_unit_conversion_failure_persists_semantic_output_and_stage(
+def test_unit_conversion_pending_persists_raw_row_without_blocking_stage(
     tmp_path, monkeypatch
 ):
     repository, pipeline, scope = _deterministic_runtime(
@@ -1471,19 +1495,164 @@ def test_unit_conversion_failure_persists_semantic_output_and_stage(
         assert pipeline.run(stage, scope=scope)["status"] == "success"
     extracted = pipeline.run("extract", scope=scope)
 
-    assert extracted["status"] == "stopped"
-    exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
-    assert exception["reason_codes"] == ["unit_normalization_failed"]
-    diagnostics = exception["metadata"]["diagnostics"]
-    assert diagnostics["exception"]["transformation_stage"] == (
-        "structured_record_conversion"
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["stage_ready"] is True
+    assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["metrics"]["semantic_rows_unit_pending"] == 1
+    assert repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    ) == []
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
+    with repository.storage.get_connection() as conn:
+        artifact = conn.execute(
+            "SELECT response_json FROM business_profile_semantic_artifacts"
+        ).fetchone()
+        event = conn.execute(
+            "SELECT status, reason_code, metadata_json "
+            "FROM business_profile_semantic_artifact_events "
+            "ORDER BY created_at DESC, rowid DESC LIMIT 1"
+        ).fetchone()
+        semantic_run = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+        )
+    assert json.loads(artifact["response_json"])["rows"][0]["unit_raw"] == (
+        "未治理质量单位"
     )
-    assert diagnostics["semantic_audit"]["diagnostics"]["semantic_result"][
-        "rows"
-    ][0]["unit_raw"] == "未治理质量单位"
-    assert "煤炭 200 210 50" in diagnostics["semantic_audit"]["diagnostics"][
-        "resolved_evidence"
-    ][0]["quote"]
+    assert event["status"] == "conversion_pending"
+    assert event["reason_code"] == "unit_normalization_failed"
+    pending = json.loads(event["metadata_json"])["pending_rows"][0]
+    assert pending["source_value"] == 210.0
+    assert pending["source_unit"] == "未治理质量单位"
+    assert semantic_run["semantic_family_complete"] is False
+    assert semantic_run["unit_conversion_pending"][0]["source_unit"] == (
+        "未治理质量单位"
+    )
+
+
+def test_pending_unit_row_does_not_block_independently_convertible_row(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="tabular_operating_facts",
+        text=(
+            "主要产品产销情况 单位：万吨\n"
+            "产品 销售量 生产量 库存量\n"
+            "煤炭 200 210 50\n化工产品 12"
+        ),
+        gateway=_MixedUnitOperatingGateway(),
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+    facts = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )
+
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["stage_ready"] is True
+    assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["metrics"]["semantic_rows_unit_pending"] == 1
+    assert [(row["segment_id"], row["unit_normalized"]) for row in facts]
+    assert len(facts) == 1
+    assert facts[0]["unit_raw"] == "万吨"
+    with repository.storage.get_connection() as conn:
+        metadata = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs"
+            ).fetchone()[0]
+        )
+    assert metadata["semantic_family_complete"] is False
+    assert metadata["unit_conversion_pending"][0]["source_unit"] == "T/KL"
+    verified = pipeline.run("verify", scope=scope)
+    assert verified["status"] == "success"
+    assert verified["quality"]["verified_records"] == 1
+    promoted = pipeline.run("promote", scope=scope)
+    assert promoted["status"] == "success"
+    assert repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )[0]["review_status"] == "approved"
+
+
+def test_auto_approved_unit_rule_is_replayed_inline_without_extraction_retry(
+    tmp_path, monkeypatch
+):
+    runtime_rules = []
+
+    def register_proposal(_registry, proposal, **_kwargs):
+        rule = {
+            "rule_id": "bp-unit-rule-inline",
+            "normalized_lexeme": proposal["normalized_lexeme"],
+            "source_unit": proposal["source_unit"],
+            "status": "auto_approved",
+            "dimension": "count",
+            "canonical_unit": "unit",
+            "multiplier": "1",
+            "numerator": [],
+            "denominator": [],
+            "catalog_version": "runtime-inline",
+        }
+        runtime_rules[:] = [rule]
+        return rule
+
+    monkeypatch.setattr(
+        runtime_module.BusinessProfileUnitRuleRegistry,
+        "register_proposal",
+        register_proposal,
+    )
+    monkeypatch.setattr(
+        runtime_module.BusinessProfileUnitRuleRegistry,
+        "overlay_rules",
+        lambda _registry, **_kwargs: list(runtime_rules),
+    )
+    gateway = _UnsupportedUnitOperatingGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="tabular_operating_facts",
+        text=(
+            "主要产品产销情况 单位：万吨\n"
+            "产品 销售量 生产量 库存量\n"
+            "煤炭 200 210 50"
+        ),
+        gateway=gateway,
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "parse_selected_tables",
+        lambda *args, **kwargs: ([], []),
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    extracted = pipeline.run("extract", scope=scope)
+    facts = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )
+
+    assert extracted["status"] == "success"
+    assert extracted["quality"]["stage_ready"] is True
+    assert extracted["quality"]["structured_fallback_calls"] == 1
+    assert extracted["metrics"]["semantic_artifact_inline_replays"] == 1
+    assert extracted["metrics"]["semantic_rows_unit_pending"] == 0
+    assert len(facts) == 1
+    assert facts[0]["value_normalized"] == 210.0
+    assert facts[0]["unit_normalized"] == "unit"
+    with repository.storage.get_connection() as conn:
+        latest_status = conn.execute(
+            "SELECT status FROM business_profile_semantic_artifact_events "
+            "ORDER BY created_at DESC, rowid DESC LIMIT 1"
+        ).fetchone()[0]
+    assert latest_status == "converted"
 
 
 def test_unit_proposal_failure_logging_is_bounded_and_has_debug_traceback(monkeypatch):

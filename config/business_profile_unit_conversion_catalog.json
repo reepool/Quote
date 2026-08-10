@@ -1,6 +1,6 @@
 {
   "schema_version": "business_profile_unit_conversion_catalog.v1",
-  "catalog_version": "business_profile_units.2026.6",
+  "catalog_version": "business_profile_units.2026.7",
   "fact_catalog_version": "business_profile_facts.2026.2",
   "released_on": "2026-08-10",
   "period_basis_values": [
@@ -30,6 +30,8 @@
     {"unit_id": "tonne", "dimension": "mass", "aliases": ["ton", "metric_ton", "吨", "公吨"], "canonical_for_dimension": true},
     {"unit_id": "kg", "dimension": "mass", "aliases": ["kilogram", "千克", "公斤"], "canonical_for_dimension": false},
     {"unit_id": "10k_tonne", "dimension": "mass", "aliases": ["万吨", "万公吨"], "canonical_for_dimension": false},
+    {"unit_id": "weight_case", "dimension": "mass", "aliases": ["重量箱", "重箱"], "canonical_for_dimension": false},
+    {"unit_id": "10k_weight_case", "dimension": "mass", "aliases": ["万重量箱", "万重箱"], "canonical_for_dimension": false},
     {"unit_id": "tonne_km", "dimension": "freight_turnover", "aliases": ["吨千米", "吨公里"], "canonical_for_dimension": true},
     {"unit_id": "barrel", "dimension": "liquid_volume", "aliases": ["bbl", "桶"], "canonical_for_dimension": true},
     {"unit_id": "cubic_meter", "dimension": "volume", "aliases": ["m3", "立方米"], "canonical_for_dimension": true},
@@ -38,8 +40,8 @@
     {"unit_id": "kwh", "dimension": "energy", "aliases": ["千瓦时", "度"], "canonical_for_dimension": true},
     {"unit_id": "mwh", "dimension": "energy", "aliases": ["兆瓦时"], "canonical_for_dimension": false},
     {"unit_id": "gwh", "dimension": "energy", "aliases": ["吉瓦时"], "canonical_for_dimension": false},
-    {"unit_id": "unit", "dimension": "count", "aliases": ["个", "件", "台", "套", "颗", "粒", "羽", "只", "瓶", "盒", "袋", "板", "腔", "辆", "部", "枚", "片", "支", "根", "块"], "canonical_for_dimension": true},
-    {"unit_id": "10k_unit", "dimension": "count", "aliases": ["万个", "万件", "万台", "万套", "万颗", "万粒", "万羽", "万只", "万瓶", "万盒", "万袋", "万板", "万腔", "万辆", "万部", "万枚", "万片", "万支", "万根", "万块"], "canonical_for_dimension": false},
+    {"unit_id": "unit", "dimension": "count", "aliases": ["个", "件", "台", "套", "项", "艘", "颗", "粒", "羽", "只", "瓶", "盒", "袋", "板", "腔", "辆", "部", "枚", "片", "支", "根", "块"], "canonical_for_dimension": true},
+    {"unit_id": "10k_unit", "dimension": "count", "aliases": ["万个", "万件", "万台", "万套", "万项", "万艘", "万颗", "万粒", "万羽", "万只", "万瓶", "万盒", "万袋", "万板", "万腔", "万辆", "万部", "万枚", "万片", "万支", "万根", "万块"], "canonical_for_dimension": false},
     {"unit_id": "Ah", "dimension": "electric_charge", "aliases": ["ampere_hour", "安时", "安培小时"], "canonical_for_dimension": true},
     {"unit_id": "mAh", "dimension": "electric_charge", "aliases": ["毫安时", "毫安培小时"], "canonical_for_dimension": false},
     {"unit_id": "kAh", "dimension": "electric_charge", "aliases": ["千安时", "千安培小时"], "canonical_for_dimension": false},
@@ -73,6 +75,8 @@
   "conversions": [
     {"rule_id": "mass.kg_to_tonne", "from_unit": "kg", "to_unit": "tonne", "conversion_type": "fixed_multiplier", "multiplier": "0.001", "required_lineage_fields": []},
     {"rule_id": "mass.10k_tonne_to_tonne", "from_unit": "10k_tonne", "to_unit": "tonne", "conversion_type": "fixed_multiplier", "multiplier": "10000", "required_lineage_fields": []},
+    {"rule_id": "mass.weight_case_to_tonne", "from_unit": "weight_case", "to_unit": "tonne", "conversion_type": "fixed_multiplier", "multiplier": "0.05", "required_lineage_fields": []},
+    {"rule_id": "mass.10k_weight_case_to_tonne", "from_unit": "10k_weight_case", "to_unit": "tonne", "conversion_type": "fixed_multiplier", "multiplier": "500", "required_lineage_fields": []},
     {"rule_id": "volume.10k_cubic_meter_to_cubic_meter", "from_unit": "10k_cubic_meter", "to_unit": "cubic_meter", "conversion_type": "fixed_multiplier", "multiplier": "10000", "required_lineage_fields": []},
     {"rule_id": "energy.mwh_to_kwh", "from_unit": "mwh", "to_unit": "kwh", "conversion_type": "fixed_multiplier", "multiplier": "1000", "required_lineage_fields": []},
     {"rule_id": "energy.gwh_to_kwh", "from_unit": "gwh", "to_unit": "kwh", "conversion_type": "fixed_multiplier", "multiplier": "1000000", "required_lineage_fields": []},

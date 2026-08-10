@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections import OrderedDict
 from dataclasses import dataclass
 from decimal import Decimal
@@ -120,6 +121,7 @@ class BusinessProfileUnitRuleRegistry:
                 ),
                 "dimension": raw.get("dimension"),
                 "canonical_unit": raw.get("canonical_unit"),
+                "source_tokens": list(raw.get("source_tokens") or ()),
             }
         self.corroboration_observations = max(2, int(corroboration_observations))
         self.corroboration_models = max(1, int(corroboration_models))
@@ -217,6 +219,13 @@ class BusinessProfileUnitRuleRegistry:
                 ),
                 "dimension": rule.get("dimension"),
                 "canonical_unit": rule.get("canonical_unit"),
+                "source_tokens": [
+                    str(
+                        rule.get("normalized_lexeme")
+                        or rule.get("source_unit")
+                        or ""
+                    )
+                ],
             }
         return definitions
 
@@ -660,7 +669,7 @@ class BusinessProfileUnitRuleRegistry:
         }
 
     def reconcile_deterministic_rules(self, *, limit: int = 100) -> dict[str, int]:
-        """Replace quarantined rules that the current deterministic catalog resolves."""
+        """Replace stale runtime rules with current deterministic catalog truth."""
 
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -672,7 +681,7 @@ class BusinessProfileUnitRuleRegistry:
                     WHERE latest.rule_id = r.rule_id
                     ORDER BY latest.created_at DESC, latest.rowid DESC LIMIT 1
                 )
-                  AND r.status = 'quarantined'
+                  AND r.status IN ('quarantined', 'auto_approved', 'shadow_active')
                 ORDER BY r.created_at, r.rowid LIMIT ?
                 """,
                 (max(1, min(int(limit), 1000)),),
@@ -681,11 +690,18 @@ class BusinessProfileUnitRuleRegistry:
         report = {"scanned": len(rows), "resolved": 0, "superseded": 0, "replayed": 0}
         for raw in rows:
             current = self._decode_rule(dict(raw))
-            resolution = catalog.resolve(
-                str(current["source_unit"]),
-                runtime_rules=self.overlay_rules(),
-            )
+            # Runtime overlays must not mask a corrected static interpretation.
+            resolution = catalog.resolve(str(current["source_unit"]))
             if not resolution.publishable or resolution.multiplier is None:
+                continue
+            if (
+                current.get("status") == "auto_approved"
+                and current.get("dimension") == resolution.dimension
+                and current.get("canonical_unit") == resolution.canonical_unit
+                and current.get("multiplier") is not None
+                and decimal_value(current["multiplier"], "current multiplier")
+                == resolution.multiplier
+            ):
                 continue
             replacement = self._register_deterministic_resolution(resolution)
             replacement_id = str(replacement["rule_id"])
@@ -1203,6 +1219,10 @@ def prove_unit_proposal(
     }
     if dimensionful_references and dimensionful_references != {dimension}:
         reasons.append("primitive_dimension_mismatch")
+    if definitions and not _source_tokens_are_proved(
+        proposal.get("source_unit"), references, definitions
+    ):
+        reasons.append("unproved_source_token")
     magnitude_references = {
         reference for reference in references if reference.startswith("magnitude:")
     }
@@ -1266,6 +1286,38 @@ def prove_unit_proposal(
         reason_codes=tuple(reasons),
         proof_hash=_stable_hash(proof_payload),
     )
+
+
+def _source_tokens_are_proved(
+    source_unit: Any,
+    references: Sequence[str],
+    definitions: Mapping[str, Mapping[str, Any]],
+) -> bool:
+    """Require governed references to cover the complete source-unit lexeme."""
+
+    source = normalize_unit_lexeme(source_unit).lower()
+    matched_tokens: set[str] = set()
+    for reference in references:
+        definition = definitions.get(reference, {})
+        raw_tokens = definition.get("source_tokens")
+        if not isinstance(raw_tokens, Sequence) or isinstance(raw_tokens, (str, bytes)):
+            if definition.get("dimension"):
+                return False
+            continue
+        tokens = [
+            normalize_unit_lexeme(token).lower()
+            for token in raw_tokens
+            if str(token).strip()
+        ]
+        present = {token for token in tokens if token and token in source}
+        if definition.get("dimension") and not present:
+            return False
+        matched_tokens.update(present)
+    residual = source
+    for token in sorted(matched_tokens, key=len, reverse=True):
+        residual = residual.replace(token, "", 1)
+    residual = re.sub(r"[/\*(),\[\]{}]+", "", residual)
+    return not residual
 
 
 def unit_proposal_response_schema(
@@ -1379,7 +1431,9 @@ async def propose_unknown_unit(
                         "dimension 和 canonical_unit 必须逐字选择给定治理集合中的值，"
                         "primitive_rule_ids 必须与 factors 中的引用完全一致。"
                         "round_trip_vectors 的 source 和 canonical 必须是纯数字字符串，不能包含单位文字。"
-                        "可以把未知计数词作为既有 count/unit 的线性别名，但不得换算任何公司数值；"
+                        "不得把未知词借用为其他计数词或基础单位的别名，"
+                        "每个有维度的基础规则必须能在 source_unit 原文中逐字找到；"
+                        "不得换算任何公司数值；"
                         "不得引入汇率、上下文公式、非线性公式或新维度，不得批准规则或修改目录。"
                         "只返回闭合 JSON。"
                     ),

@@ -79,6 +79,7 @@ from research.business_profile_semantic_artifacts import (
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
 from research.business_profile_temporal import derive_report_observation_interval
 from research.business_profile_unit_conversions import (
+    UnitResolution,
     UnitResolutionPendingError,
     governed_primitive_multipliers,
     load_unit_conversion_catalog,
@@ -92,13 +93,27 @@ from utils.date_utils import get_shanghai_time
 
 logger = logging.getLogger(__name__)
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v4"
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v5"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
     "commodity_exposure_facts",
     "commodity_exposure_publication",
 }
+
+
+@dataclass(frozen=True)
+class PendingStructuredUnit:
+    """One source row retained for deterministic conversion replay."""
+
+    resolution: UnitResolution
+    diagnostic: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class StructuredSemanticConversion:
+    records_by_type: Mapping[str, list[dict[str, Any]]]
+    pending_units: tuple[PendingStructuredUnit, ...] = ()
 
 
 def _log_unit_proposal_failure(source_unit: str, exc: Exception) -> None:
@@ -1300,6 +1315,7 @@ class BusinessProfileSemanticRuntime:
             structured_fallback_used = False
             expected_non_disclosure = False
             semantic_family_complete = True
+            unit_conversion_pending: list[dict[str, Any]] = []
             if item["field_family"] in {
                 "structured_segments",
                 "tabular_operating_facts",
@@ -1340,11 +1356,17 @@ class BusinessProfileSemanticRuntime:
                         "saved_tokens": dict(replay.get("usage") or {}),
                     }
                     try:
-                        records_by_type = self._structured_semantic_records(
+                        conversion = self._structured_semantic_records(
                             item,
                             selected,
                             tuple(replay_payload.get("rows") or ()),
                         )
+                        records_by_type = dict(conversion.records_by_type)
+                        unit_conversion_pending = [
+                            dict(pending.diagnostic)
+                            for pending in conversion.pending_units
+                        ]
+                        semantic_family_complete = not unit_conversion_pending
                         deterministic_count = sum(
                             len(rows)
                             for key, rows in records_by_type.items()
@@ -1400,36 +1422,51 @@ class BusinessProfileSemanticRuntime:
                         )
                         continue
                     else:
-                        self.semantic_artifacts.mark(
-                            semantic_artifact_id,
-                            "replayed",
-                            unit_catalog_version=(
-                                load_unit_conversion_catalog().catalog_version
-                            ),
-                            runtime_version=RUNTIME_SCHEMA_VERSION,
-                            saved_tokens=dict(replay.get("usage") or {}),
-                        )
-                        metrics["semantic_artifact_replays"] = int(
-                            metrics.get("semantic_artifact_replays") or 0
-                        ) + 1
-                        metrics["semantic_replay_saved_tokens"] = int(
-                            metrics.get("semantic_replay_saved_tokens") or 0
-                        ) + int(
-                            (replay.get("usage") or {}).get("total_tokens") or 0
-                        )
+                        if unit_conversion_pending:
+                            self._mark_unit_conversion_pending(
+                                semantic_artifact_id,
+                                unit_conversion_pending,
+                                reason="unit_normalization_failed",
+                            )
+                            metrics["semantic_artifact_conversion_pending"] = int(
+                                metrics.get("semantic_artifact_conversion_pending")
+                                or 0
+                            ) + 1
+                            metrics["semantic_rows_unit_pending"] = int(
+                                metrics.get("semantic_rows_unit_pending") or 0
+                            ) + len(unit_conversion_pending)
+                        else:
+                            self.semantic_artifacts.mark(
+                                semantic_artifact_id,
+                                "replayed",
+                                unit_catalog_version=(
+                                    load_unit_conversion_catalog().catalog_version
+                                ),
+                                runtime_version=RUNTIME_SCHEMA_VERSION,
+                                saved_tokens=dict(replay.get("usage") or {}),
+                            )
+                            metrics["semantic_artifact_replays"] = int(
+                                metrics.get("semantic_artifact_replays") or 0
+                            ) + 1
+                            metrics["semantic_replay_saved_tokens"] = int(
+                                metrics.get("semantic_replay_saved_tokens") or 0
+                            ) + int(
+                                (replay.get("usage") or {}).get("total_tokens") or 0
+                            )
                         logger.info(
                             "business-profile semantic artifact replay "
                             "artifact_id=%s instrument_id=%s field_family=%s "
-                            "rows=%s saved_tokens=%s",
+                            "rows=%s pending_units=%s saved_tokens=%s",
                             semantic_artifact_id,
                             item.get("instrument_id"),
                             item.get("field_family"),
                             deterministic_count,
+                            len(unit_conversion_pending),
                             int((replay.get("usage") or {}).get("total_tokens") or 0),
                         )
                 fallback_reason = (
                     _structured_fallback_reason(selected, diagnostics)
-                    if deterministic_count == 0
+                    if deterministic_count == 0 and replay is None
                     else None
                 )
                 if fallback_reason is not None:
@@ -1531,17 +1568,60 @@ class BusinessProfileSemanticRuntime:
                         )
                         rejected_rows = list(envelope.rejected_rows)
                         rejected_row_count = envelope.rejected_row_count
-                        records_by_type = self._structured_semantic_records(
+                        conversion = self._structured_semantic_records(
                             item,
                             selected,
                             envelope.rows,
                         )
-                        self.semantic_artifacts.mark(
-                            semantic_artifact_id,
-                            "converted",
-                            unit_catalog_version=load_unit_conversion_catalog().catalog_version,
-                            runtime_version=RUNTIME_SCHEMA_VERSION,
+                        unit_rules = self._register_pending_unit_rules(
+                            conversion.pending_units,
+                            artifact_id=semantic_artifact_id,
+                            artifact_identity=artifact_identity,
+                            item=item,
+                            selected=selected,
+                            semantic_audit=semantic_audit,
+                            metrics=metrics,
                         )
+                        if any(
+                            str(rule.get("status") or "") == "auto_approved"
+                            for rule in unit_rules
+                        ):
+                            conversion = self._structured_semantic_records(
+                                item,
+                                selected,
+                                envelope.rows,
+                            )
+                            metrics["semantic_artifact_inline_replays"] = int(
+                                metrics.get("semantic_artifact_inline_replays") or 0
+                            ) + 1
+                        records_by_type = dict(conversion.records_by_type)
+                        unit_conversion_pending = [
+                            dict(pending.diagnostic)
+                            for pending in conversion.pending_units
+                        ]
+                        semantic_family_complete = not unit_conversion_pending
+                        if unit_conversion_pending:
+                            self._mark_unit_conversion_pending(
+                                semantic_artifact_id,
+                                unit_conversion_pending,
+                                reason="unit_normalization_failed",
+                            )
+                            metrics["semantic_artifact_conversion_pending"] = int(
+                                metrics.get("semantic_artifact_conversion_pending")
+                                or 0
+                            ) + 1
+                            metrics["semantic_rows_unit_pending"] = int(
+                                metrics.get("semantic_rows_unit_pending") or 0
+                            ) + len(unit_conversion_pending)
+                        else:
+                            self.semantic_artifacts.mark(
+                                semantic_artifact_id,
+                                "converted",
+                                unit_catalog_version=(
+                                    load_unit_conversion_catalog().catalog_version
+                                ),
+                                runtime_version=RUNTIME_SCHEMA_VERSION,
+                            )
                         accepted = sum(
                             len(rows)
                             for key, rows in records_by_type.items()
@@ -1570,7 +1650,7 @@ class BusinessProfileSemanticRuntime:
                             semantic_audit,
                         )
                         semantic_metrics_recorded = True
-                        if accepted == 0:
+                        if accepted == 0 and not unit_conversion_pending:
                             raise ValueError(
                                 "context incomplete: structured semantic response "
                                 "has no explicit rows for a governed table"
@@ -1613,81 +1693,6 @@ class BusinessProfileSemanticRuntime:
                                 structured_fallback_calls=-1,
                             )
                         reason = _semantic_failure_reason(exc)
-                        unit_rule = None
-                        if isinstance(exc, UnitResolutionPendingError):
-                            resolution = exc.resolution
-                            proposal_input_hash = _stable_hash(
-                                {
-                                    "source_unit": resolution.source_unit,
-                                    "artifact_id": semantic_artifact_id,
-                                    "evidence_scope": artifact_identity.evidence_scope_hash,
-                                }
-                            )
-                            try:
-                                if self.llm_client is None:
-                                    raise RuntimeError("unit proposal gateway unavailable")
-                                proposal = self._async_bridge.run(
-                                    propose_unknown_unit(
-                                        self.llm_client,
-                                        source_unit=resolution.source_unit,
-                                        context_zh="\n".join(
-                                            section.text for section in selected.sections
-                                        )[:1200],
-                                        primitive_multipliers=(
-                                            self.unit_rule_registry.proof_primitives()
-                                        ),
-                                        primitive_definitions=(
-                                            self.unit_rule_registry.proof_primitive_definitions()
-                                        ),
-                                    )
-                                )
-                                metrics["unit_proposal_llm_calls"] = int(
-                                    metrics.get("unit_proposal_llm_calls") or 0
-                                ) + 1
-                            except Exception as proposal_exc:
-                                proposal = {
-                                    "source_unit": resolution.source_unit,
-                                    "normalized_lexeme": resolution.normalized_lexeme,
-                                    "dimension": resolution.dimension or "unknown",
-                                    "canonical_unit": resolution.canonical_unit
-                                    or "unknown",
-                                    "numerator": [],
-                                    "denominator": [],
-                                    "primitive_rule_ids": [],
-                                    "factors": [],
-                                    "transformation_type": "unknown",
-                                    "round_trip_vectors": [],
-                                    "semantic_summary_zh": "单位尚未能由自动规则证明",
-                                }
-                                _log_unit_proposal_failure(
-                                    resolution.source_unit,
-                                    proposal_exc,
-                                )
-                            unit_rule = self.unit_rule_registry.register_proposal(
-                                proposal,
-                                proposal_input_hash=proposal_input_hash,
-                                artifact_id=semantic_artifact_id,
-                                source_document_id=str(item["document"]["identity"]),
-                                context_hash=artifact_identity.evidence_scope_hash,
-                                model_identity=str(
-                                    (semantic_audit or {}).get("actual_model") or ""
-                                )
-                                or None,
-                            )
-                            metrics["unit_rule_proposals"] = int(
-                                metrics.get("unit_rule_proposals") or 0
-                            ) + 1
-                            rule_status = str(unit_rule.get("status") or "unknown")
-                            metric_name = f"unit_rule_{rule_status}"
-                            metrics[metric_name] = int(metrics.get(metric_name) or 0) + 1
-                            logger.info(
-                                "business-profile unit rule persisted rule_id=%s "
-                                "unit=%s status=%s artifact_id=%s",
-                                unit_rule.get("rule_id"),
-                                resolution.source_unit,
-                                unit_rule.get("status"),
-                                semantic_artifact_id,
-                            )
                         if semantic_artifact_id is not None:
                             self.semantic_artifacts.mark(
                                 semantic_artifact_id,
@@ -1697,9 +1702,6 @@ class BusinessProfileSemanticRuntime:
                                 reason_code=reason,
                                 metadata={
                                     "error_type": type(exc).__name__,
-                                    "unit_rule_id": (
-                                        unit_rule.get("rule_id") if unit_rule else None
-                                    ),
                                 },
                             )
                             metrics["semantic_artifact_conversion_pending"] = int(
@@ -1955,6 +1957,8 @@ class BusinessProfileSemanticRuntime:
                             item["field_family"],
                             machine_rework=1,
                         )
+                elif unit_conversion_pending:
+                    empty_reason = "unit_conversion_pending"
                 elif diagnostics:
                     empty_reason = "deterministic_parser_failure"
                 elif any(
@@ -2007,6 +2011,7 @@ class BusinessProfileSemanticRuntime:
                             ],
                             "expected_non_disclosure": expected_non_disclosure,
                             "semantic_family_complete": semantic_family_complete,
+                            "unit_conversion_pending": unit_conversion_pending,
                             "empty_output_reason": (
                                 empty_reason if item_record_count == 0 else None
                             ),
@@ -2076,6 +2081,7 @@ class BusinessProfileSemanticRuntime:
                     "semantic_audit": semantic_audit,
                     "expected_non_disclosure": expected_non_disclosure,
                     "semantic_family_complete": semantic_family_complete,
+                    "unit_conversion_pending": unit_conversion_pending,
                 }
             )
             _increment_family_metrics(
@@ -2713,10 +2719,11 @@ class BusinessProfileSemanticRuntime:
         item: Mapping[str, Any],
         selected: SelectedSectionArtifact,
         rows: Sequence[Mapping[str, Any]],
-    ) -> dict[str, list[dict[str, Any]]]:
+    ) -> StructuredSemanticConversion:
         evidence_by_id: dict[str, dict[str, Any]] = {}
         output: dict[str, list[dict[str, Any]]] = {"evidence": []}
         runtime_unit_rules = self.unit_rule_registry.overlay_rules()
+        pending_units: list[PendingStructuredUnit] = []
         for raw in rows:
             row = dict(raw)
             evidence = _semantic_evidence(item, selected, row)
@@ -2727,33 +2734,47 @@ class BusinessProfileSemanticRuntime:
             # reconciliation are bound to the candidate record below.
             validation.setdefault("numeric_reconciliation_status", "not_applicable")
             evidence_by_id[evidence["evidence_id"]] = evidence
-            if item["field_family"] == "structured_segments":
-                record = _semantic_segment_record(
-                    item,
-                    row,
-                    evidence["evidence_id"],
-                    runtime_unit_rules=runtime_unit_rules,
-                )
-                reconciliation = dict(
-                    (record.get("metadata") or {}).get("numeric_reconciliation")
-                    or {}
-                )
-                if reconciliation.get("status") == "failed":
-                    raise ValueError(
-                        "numeric_reconciliation_failed: "
-                        + _runtime_debug_json(reconciliation)
+            try:
+                if item["field_family"] == "structured_segments":
+                    record = _semantic_segment_record(
+                        item,
+                        row,
+                        evidence["evidence_id"],
+                        runtime_unit_rules=runtime_unit_rules,
                     )
-                output.setdefault("segments", []).append(record)
-            elif item["field_family"] == "tabular_operating_facts":
-                record = _semantic_operating_record(
-                    item,
-                    row,
-                    evidence["evidence_id"],
-                    runtime_unit_rules=runtime_unit_rules,
+                    reconciliation = dict(
+                        (record.get("metadata") or {}).get("numeric_reconciliation")
+                        or {}
+                    )
+                    if reconciliation.get("status") == "failed":
+                        raise ValueError(
+                            "numeric_reconciliation_failed: "
+                            + _runtime_debug_json(reconciliation)
+                        )
+                    output.setdefault("segments", []).append(record)
+                elif item["field_family"] == "tabular_operating_facts":
+                    record = _semantic_operating_record(
+                        item,
+                        row,
+                        evidence["evidence_id"],
+                        runtime_unit_rules=runtime_unit_rules,
+                    )
+                    output.setdefault("operating_facts", []).append(record)
+                else:
+                    raise ValueError("unsupported structured semantic field family")
+            except UnitResolutionPendingError as exc:
+                pending_units.append(
+                    PendingStructuredUnit(
+                        resolution=exc.resolution,
+                        diagnostic=_pending_structured_unit_diagnostic(
+                            item,
+                            row,
+                            evidence["evidence_id"],
+                            exc.resolution,
+                        ),
+                    )
                 )
-                output.setdefault("operating_facts", []).append(record)
-            else:
-                raise ValueError("unsupported structured semantic field family")
+                continue
             record.setdefault("metadata", {})["exact_evidence"] = row["evidence"]
             _bind_promotion_validation(record, evidence)
             record_type = (
@@ -2773,7 +2794,113 @@ class BusinessProfileSemanticRuntime:
                 ),
             )
         output["evidence"] = list(evidence_by_id.values())
-        return output
+        return StructuredSemanticConversion(
+            records_by_type=output,
+            pending_units=tuple(pending_units),
+        )
+
+    def _mark_unit_conversion_pending(
+        self,
+        artifact_id: str,
+        pending_rows: Sequence[Mapping[str, Any]],
+        *,
+        reason: str,
+    ) -> None:
+        self.semantic_artifacts.mark(
+            artifact_id,
+            "conversion_pending",
+            unit_catalog_version=load_unit_conversion_catalog().catalog_version,
+            runtime_version=RUNTIME_SCHEMA_VERSION,
+            reason_code=reason,
+            metadata={
+                "pending_row_count": len(pending_rows),
+                "pending_rows": [dict(row) for row in pending_rows[:128]],
+            },
+        )
+
+    def _register_pending_unit_rules(
+        self,
+        pending_units: Sequence[PendingStructuredUnit],
+        *,
+        artifact_id: str,
+        artifact_identity: SemanticArtifactIdentity,
+        item: Mapping[str, Any],
+        selected: SelectedSectionArtifact,
+        semantic_audit: Mapping[str, Any],
+        metrics: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        registered: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for pending in pending_units:
+            resolution = pending.resolution
+            if resolution.normalized_lexeme in seen:
+                continue
+            seen.add(resolution.normalized_lexeme)
+            proposal_input_hash = _stable_hash(
+                {
+                    "source_unit": resolution.source_unit,
+                    "artifact_id": artifact_id,
+                    "evidence_scope": artifact_identity.evidence_scope_hash,
+                }
+            )
+            try:
+                if self.llm_client is None:
+                    raise RuntimeError("unit proposal gateway unavailable")
+                proposal = self._async_bridge.run(
+                    propose_unknown_unit(
+                        self.llm_client,
+                        source_unit=resolution.source_unit,
+                        context_zh="\n".join(
+                            section.text for section in selected.sections
+                        )[:1200],
+                        primitive_multipliers=self.unit_rule_registry.proof_primitives(),
+                        primitive_definitions=(
+                            self.unit_rule_registry.proof_primitive_definitions()
+                        ),
+                    )
+                )
+                metrics["unit_proposal_llm_calls"] = int(
+                    metrics.get("unit_proposal_llm_calls") or 0
+                ) + 1
+            except Exception as proposal_exc:
+                proposal = {
+                    "source_unit": resolution.source_unit,
+                    "normalized_lexeme": resolution.normalized_lexeme,
+                    "dimension": resolution.dimension or "unknown",
+                    "canonical_unit": resolution.canonical_unit or "unknown",
+                    "numerator": [],
+                    "denominator": [],
+                    "primitive_rule_ids": [],
+                    "factors": [],
+                    "transformation_type": "unknown",
+                    "round_trip_vectors": [],
+                    "semantic_summary_zh": "单位尚未能由自动规则证明",
+                }
+                _log_unit_proposal_failure(resolution.source_unit, proposal_exc)
+            rule = self.unit_rule_registry.register_proposal(
+                proposal,
+                proposal_input_hash=proposal_input_hash,
+                artifact_id=artifact_id,
+                source_document_id=str(item["document"]["identity"]),
+                context_hash=artifact_identity.evidence_scope_hash,
+                model_identity=str(semantic_audit.get("actual_model") or "") or None,
+            )
+            registered.append(rule)
+            metrics["unit_rule_proposals"] = int(
+                metrics.get("unit_rule_proposals") or 0
+            ) + 1
+            rule_status = str(rule.get("status") or "unknown")
+            metric_name = f"unit_rule_{rule_status}"
+            metrics[metric_name] = int(metrics.get(metric_name) or 0) + 1
+            logger.info(
+                "business-profile unit rule persisted rule_id=%s unit=%s "
+                "status=%s artifact_id=%s",
+                rule.get("rule_id"),
+                resolution.source_unit,
+                rule_status,
+                artifact_id,
+            )
+        return registered
 
     def _semantic_records(
         self,
@@ -3915,6 +4042,33 @@ def _semantic_operating_record(
             "parser_manifest_promoted": False,
             "exact_evidence_valid": True,
         },
+    }
+
+
+def _pending_structured_unit_diagnostic(
+    item: Mapping[str, Any],
+    row: Mapping[str, Any],
+    evidence_id: str,
+    resolution: UnitResolution,
+) -> dict[str, Any]:
+    source_value = row.get("source_value", row.get("value"))
+    source_unit = str(row.get("source_unit_raw") or row.get("unit_raw") or "")
+    row_identity = {
+        "instrument_id": item.get("instrument_id"),
+        "source_document_id": (item.get("document") or {}).get("identity"),
+        "field_family": item.get("field_family"),
+        "segment_name_raw": row.get("segment_name_raw"),
+        "fact_type": row.get("fact_type"),
+        "fact_scope": row.get("fact_scope"),
+        "source_value": source_value,
+        "source_unit": source_unit,
+        "evidence_id": evidence_id,
+    }
+    return {
+        "pending_row_id": "bp-unit-pending-" + _stable_hash(row_identity)[:24],
+        **row_identity,
+        "resolution": resolution.to_dict(),
+        "reason_code": "unit_normalization_failed",
     }
 
 

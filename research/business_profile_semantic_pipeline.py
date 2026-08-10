@@ -555,6 +555,15 @@ class BusinessProfileSemanticPipeline:
                 "semantic_rows_rejected": int(
                     metrics.get("semantic_rows_rejected") or 0
                 ),
+                "semantic_rows_unit_pending": int(
+                    metrics.get("semantic_rows_unit_pending") or 0
+                ),
+                "semantic_artifact_inline_replays": int(
+                    metrics.get("semantic_artifact_inline_replays") or 0
+                ),
+                "semantic_artifact_conversion_pending": int(
+                    metrics.get("semantic_artifact_conversion_pending") or 0
+                ),
                 "evidence_spans_offered": int(
                     metrics.get("evidence_spans_offered") or 0
                 ),

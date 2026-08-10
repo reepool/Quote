@@ -561,6 +561,8 @@ _COUNT_ALIASES = {
     "件",
     "台",
     "套",
+    "项",
+    "艘",
     "颗",
     "粒",
     "羽",
@@ -739,6 +741,7 @@ def governed_primitive_definitions() -> dict[str, dict[str, Any]]:
             "multiplier": multiplier,
             "dimension": dimension,
             "canonical_unit": canonical,
+            "source_tokens": [token],
         }
         for token, (dimension, canonical, multiplier) in _PRIMITIVES.items()
     }
@@ -748,6 +751,7 @@ def governed_primitive_definitions() -> dict[str, dict[str, Any]]:
                 "multiplier": multiplier,
                 "dimension": None,
                 "canonical_unit": None,
+                "source_tokens": [prefix],
             }
             for prefix, multiplier in _MAGNITUDES
         }
@@ -758,6 +762,7 @@ def governed_primitive_definitions() -> dict[str, dict[str, Any]]:
                 "multiplier": Decimal("1"),
                 "dimension": "count",
                 "canonical_unit": "unit",
+                "source_tokens": [token],
             }
             for token in _COUNT_ALIASES
         }

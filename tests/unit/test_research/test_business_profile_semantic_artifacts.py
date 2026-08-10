@@ -141,10 +141,10 @@ def test_unit_rule_is_persistent_proved_notified_and_available_as_overlay(tmp_pa
             "SELECT parent_catalog_version FROM business_profile_unit_catalog_versions"
         ).fetchone()[0]
     assert notification_count == 1
-    assert catalog_lineage == "business_profile_units.2026.6"
+    assert catalog_lineage == "business_profile_units.2026.7"
 
 
-def test_governed_llm_alias_is_persisted_and_auto_approved(tmp_path):
+def test_unknown_llm_alias_cannot_borrow_unrelated_count_primitive(tmp_path):
     storage = _Storage(tmp_path / "research.db")
     registry = BusinessProfileUnitRuleRegistry(
         storage,
@@ -170,10 +170,181 @@ def test_governed_llm_alias_is_persisted_and_auto_approved(tmp_path):
 
     rule = registry.register_proposal(proposal, proposal_input_hash="9" * 64)
 
-    assert rule["status"] == "auto_approved"
-    assert rule["dimension"] == "count"
-    assert rule["canonical_unit"] == "unit"
-    assert rule["multiplier"] == "10000"
+    assert rule["status"] == "quarantined"
+    assert "unproved_source_token" in rule["proof"]["reason_codes"]
+
+
+@pytest.mark.parametrize(
+    ("source_unit", "dimension", "canonical_unit", "primitive_rule_id"),
+    [
+        ("神秘件", "count", "unit", "classifier:件"),
+        ("件/件", "count", "unit", "classifier:件"),
+        ("T/KL", "mass", "tonne", "primitive:t"),
+    ],
+)
+def test_partially_matched_unknown_source_unit_is_not_proved(
+    tmp_path, source_unit, dimension, canonical_unit, primitive_rule_id
+):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers=governed_primitive_multipliers(),
+        primitive_definitions=governed_primitive_definitions(),
+    )
+    proposal = {
+        "source_unit": source_unit,
+        "normalized_lexeme": source_unit,
+        "dimension": dimension,
+        "canonical_unit": canonical_unit,
+        "numerator": [source_unit],
+        "denominator": [],
+        "primitive_rule_ids": [primitive_rule_id],
+        "factors": [{"primitive_rule_id": primitive_rule_id, "exponent": 1}],
+        "transformation_type": "linear_multiplier",
+        "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+        "semantic_summary_zh": "不能只凭后缀件推断整个未知单位",
+    }
+
+    rule = registry.register_proposal(proposal, proposal_input_hash="8" * 64)
+
+    assert rule["status"] == "quarantined"
+    assert "unproved_source_token" in rule["proof"]["reason_codes"]
+
+
+def test_deterministic_reconciliation_supersedes_unsafe_active_weight_case_rule(
+    tmp_path,
+):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers={
+            "prefix:万": "10000",
+            "base:unit": "1",
+        },
+        primitive_definitions={},
+    )
+    unsafe = registry.register_proposal(
+        {
+            "source_unit": "万重箱",
+            "normalized_lexeme": "万重箱",
+            "dimension": "count",
+            "canonical_unit": "unit",
+            "numerator": ["重箱"],
+            "denominator": [],
+            "primitive_rule_ids": ["prefix:万", "base:unit"],
+            "factors": [
+                {"primitive_rule_id": "prefix:万", "exponent": 1},
+                {"primitive_rule_id": "base:unit", "exponent": 1},
+            ],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1", "canonical": "10000"}],
+            "semantic_summary_zh": "历史错误规则",
+        },
+        proposal_input_hash="7" * 64,
+    )
+
+    report = registry.reconcile_deterministic_rules()
+    effective = registry.get_unit_state("万重箱")["effective_rule"]
+
+    assert unsafe["status"] == "auto_approved"
+    assert report["resolved"] == 1
+    assert registry.get_rule(unsafe["rule_id"])["status"] == "superseded"
+    assert effective is not None
+    assert effective["dimension"] == "mass"
+    assert effective["canonical_unit"] == "tonne"
+    assert effective["multiplier"] == "500"
+
+
+def test_deterministic_reconciliation_recovers_owning_completed_work(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = _identity(instrument_id="688799.SH")
+    artifact = artifacts.receive(
+        identity,
+        response={"rows": [{"unit_raw": "万重箱", "value": 2}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    now = "2026-08-10T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_work_items ("
+            "work_id, frontier_id, instrument_id, source, announcement_id, "
+            "report_period, document_type, policy, processing_identity_hash, "
+            "stage, status, attempt_count, lease_owner, lease_expires_at, "
+            "checkpoint_path, metadata_json, completed_at, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                "work-weight-case",
+                "frontier-weight-case",
+                "688799.SH",
+                "cninfo",
+                "annual-2025",
+                "2025-12-31",
+                "annual_report",
+                "latest_annual_only",
+                "identity-weight-case",
+                "publish",
+                "completed",
+                2,
+                "worker-1",
+                now,
+                "checkpoint.json",
+                json.dumps({"source_document_id": "document-1"}),
+                now,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers={"prefix:万": "10000", "base:unit": "1"},
+        primitive_definitions={},
+    )
+    unsafe = registry.register_proposal(
+        {
+            "source_unit": "万重箱",
+            "normalized_lexeme": "万重箱",
+            "dimension": "count",
+            "canonical_unit": "unit",
+            "numerator": ["重箱"],
+            "denominator": [],
+            "primitive_rule_ids": ["prefix:万", "base:unit"],
+            "factors": [
+                {"primitive_rule_id": "prefix:万", "exponent": 1},
+                {"primitive_rule_id": "base:unit", "exponent": 1},
+            ],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1", "canonical": "10000"}],
+            "semantic_summary_zh": "历史错误规则",
+        },
+        proposal_input_hash="6" * 64,
+        artifact_id=artifact["artifact_id"],
+        source_document_id="document-1",
+        context_hash="scope-weight-case",
+        model_identity="unit-model-1",
+    )
+
+    report = registry.reconcile_deterministic_rules()
+
+    assert report["replayed"] == 1
+    assert registry.get_rule(unsafe["rule_id"])["status"] == "superseded"
+    with storage.get_connection() as conn:
+        work = conn.execute(
+            "SELECT stage, status, attempt_count, lease_owner, lease_expires_at, "
+            "completed_at, last_error FROM business_profile_work_items "
+            "WHERE work_id = 'work-weight-case'"
+        ).fetchone()
+    assert dict(work) == {
+        "stage": "semantic",
+        "status": "retry_due",
+        "attempt_count": 0,
+        "lease_owner": None,
+        "lease_expires_at": None,
+        "completed_at": None,
+        "last_error": f"unit_rule_superseded:{unsafe['rule_id']}",
+    }
 
 
 def test_cross_dimension_llm_alias_is_quarantined(tmp_path):
@@ -265,6 +436,7 @@ def test_unit_proposal_request_serializes_decimal_primitive_definitions():
         "multiplier": "1",
         "dimension": "count",
         "canonical_unit": "unit",
+        "source_tokens": ["件"],
     }
     assert all(isinstance(item["multiplier"], str) for item in primitives)
     assert result["dimension"] == "count"
@@ -583,7 +755,7 @@ def test_unit_rule_without_round_trip_proof_is_quarantined(tmp_path):
     assert "round_trip_vectors_missing" in rule["proof"]["reason_codes"]
 
 
-def test_auto_approved_rule_is_reusable_by_proof_and_semantic_conversion(tmp_path):
+def test_auto_approved_rule_converts_exact_unit_but_cannot_prove_new_alias(tmp_path):
     storage = _Storage(tmp_path / "research.db")
     registry = BusinessProfileUnitRuleRegistry(
         storage,
@@ -634,7 +806,9 @@ def test_auto_approved_rule_is_reusable_by_proof_and_semantic_conversion(tmp_pat
         runtime_rules=registry.overlay_rules(),
     )
 
-    assert first["status"] == second["status"] == "auto_approved"
+    assert first["status"] == "auto_approved"
+    assert second["status"] == "quarantined"
+    assert "unproved_source_token" in second["proof"]["reason_codes"]
     assert normalized == 20000
     assert unit == "unit"
     assert resolution.runtime_rule_id == first["rule_id"]
