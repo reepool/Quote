@@ -88,3 +88,22 @@
 - The clean no-competing-test replay reported `max_active_writers=1`, 192 write transactions, transaction p50 0.009270 seconds, p95 0.132397 seconds, maximum 0.342970 seconds, writer duty 0.147097, and requested semantic concurrency 10 with zero provider-congestion events.
 - Final regression result: 531 passed with six pre-existing deprecation warnings. Python compilation, JSON validation, `git diff --check`, and strict OpenSpec validation passed.
 - `codex review --uncommitted` was attempted outside the sandbox but could not authenticate (`refresh_token_invalidated` / `token_expired`). Equivalent manual review classified and fixed real queue, unit, replay, transaction-scope, and immutable-record trigger paths; style-only, speculative, and unrelated pre-existing worktree findings were not changed.
+
+## 9. Production-Observed Unit Automation Completion
+
+- [x] 9.1 Constrain unit-proposal LLM dimensions, canonical units, primitive dimensions, and round-trip vectors to a program-supplied governed vocabulary while retaining Chinese semantic explanations
+- [x] 9.2 Add deterministic count aliases and arbitrary-length same-dimension classifier alternatives for all 2026-08-10 observations
+- [x] 9.3 Add governed `Ah`/`mAh`/`kAh`/`万Ah` electric-charge conversion without implicit energy conversion
+- [x] 9.4 Reconcile deterministically resolvable quarantined rules into append-only auto-approved replacements and replay affected semantic artifacts without extraction LLM calls
+- [x] 9.5 Automatically return an explicit-table empty semantic result to expanded selection once before final machine rework
+- [x] 9.6 Make Telegram unit notifications state effective status, proof/quarantine reasons, affected instruments, and deduplicate by normalized unit lifecycle window
+- [x] 9.7 Add regression coverage for all six observed units, automatic rule replacement/replay, actionable notifications, and the bounded `601390.SH` empty-table retry path
+- [x] 9.8 Run focused and expanded validation, strict OpenSpec validation, and review the complete session diff for confirmed correctness findings
+
+### 2026-08-10 Production-Observed Closure Evidence
+
+- The six quarantined units from run `business-profile-20260810083411252525` were reconciled in an isolated catalog migration probe and then in `data/research.db`: six append-only auto-approved replacements, six superseded proposals, and six conversion-pending artifact replays; no extraction LLM calls were made.
+- The new unit catalog resolves `万粒`, `万羽`, `个/片/套/只`, `万Ah`, `瓶/支/盒/袋/板`, and `瓶/袋/支`; `Ah` remains an electric-charge unit and is not convertible to energy without voltage lineage.
+- Focused business-profile regression result: 209 passed across extraction, schema, unit, artifact, runtime, async production, rollout, and production-readiness suites. Additional async rework tests passed, including the one-time context expansion retry.
+- Strict OpenSpec validation passed and Python compilation/diff checks passed. Ruff reports pre-existing repository-wide style findings in touched legacy files; no new test or runtime failure was introduced.
+- `codex review --uncommitted` was attempted with escalation but could not authenticate because the session refresh token was revoked/expired. Equivalent manual review was completed for only this session's files; unrelated baseline worktree changes were not modified.

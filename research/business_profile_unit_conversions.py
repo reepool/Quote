@@ -27,6 +27,7 @@ UNIT_RESOLUTION_STATUSES = {
 }
 MAX_UNIT_LEXEME_LENGTH = 96
 MAX_ABS_DECIMAL_EXPONENT = 100
+MAX_CLASSIFIER_ALTERNATIVES = 16
 
 
 @dataclass(frozen=True)
@@ -558,8 +559,13 @@ _COUNT_ALIASES = {
     "台",
     "套",
     "颗",
+    "粒",
+    "羽",
     "只",
     "瓶",
+    "盒",
+    "袋",
+    "板",
     "腔",
     "辆",
     "部",
@@ -632,6 +638,16 @@ _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     "mwh": ("energy", "kwh", Decimal("1000")),
     "吉瓦时": ("energy", "kwh", Decimal("1000000")),
     "gwh": ("energy", "kwh", Decimal("1000000")),
+    # electric charge / battery charge capacity; energy conversion needs voltage.
+    "ah": ("electric_charge", "Ah", Decimal("1")),
+    "安时": ("electric_charge", "Ah", Decimal("1")),
+    "安培小时": ("electric_charge", "Ah", Decimal("1")),
+    "mah": ("electric_charge", "Ah", Decimal("0.001")),
+    "毫安时": ("electric_charge", "Ah", Decimal("0.001")),
+    "毫安培小时": ("electric_charge", "Ah", Decimal("0.001")),
+    "kah": ("electric_charge", "Ah", Decimal("1000")),
+    "千安时": ("electric_charge", "Ah", Decimal("1000")),
+    "千安培小时": ("electric_charge", "Ah", Decimal("1000")),
     # ratio and duration
     "%": ("ratio", "fraction", Decimal("0.01")),
     "百分比": ("ratio", "fraction", Decimal("0.01")),
@@ -700,6 +716,60 @@ def governed_primitive_multipliers() -> dict[str, Decimal]:
     return output
 
 
+def governed_primitive_definitions() -> dict[str, dict[str, Any]]:
+    """Expose multiplier and dimension metadata for bounded LLM proposals."""
+
+    output = {
+        f"primitive:{token}": {
+            "multiplier": multiplier,
+            "dimension": dimension,
+            "canonical_unit": canonical,
+        }
+        for token, (dimension, canonical, multiplier) in _PRIMITIVES.items()
+    }
+    output.update(
+        {
+            f"magnitude:{prefix}": {
+                "multiplier": multiplier,
+                "dimension": None,
+                "canonical_unit": None,
+            }
+            for prefix, multiplier in _MAGNITUDES
+        }
+    )
+    output.update(
+        {
+            f"classifier:{token}": {
+                "multiplier": Decimal("1"),
+                "dimension": "count",
+                "canonical_unit": "unit",
+            }
+            for token in _COUNT_ALIASES
+        }
+    )
+    return output
+
+
+def governed_canonical_units() -> dict[str, str]:
+    """Return the single program-owned canonical unit for each catalog dimension."""
+
+    return {
+        unit.dimension: unit.unit_id
+        for unit in load_unit_conversion_catalog().units
+        if unit.canonical_for_dimension
+    }
+
+
+def unit_magnitude_multiplier(raw_unit: Any) -> Decimal:
+    """Return the explicit Chinese magnitude prefix in a source unit."""
+
+    normalized = normalize_unit_lexeme(raw_unit).lower()
+    for prefix, multiplier in _MAGNITUDES:
+        if normalized.startswith(prefix) and len(normalized) > len(prefix):
+            return multiplier
+    return Decimal("1")
+
+
 def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
     source = normalized
     lower = normalized.lower()
@@ -730,7 +800,10 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
 
     # Slash between classifiers is an alternative rather than a rate.
     parts = lower.split("/")
-    if len(parts) == 2 and all(part in _COUNT_ALIASES for part in parts):
+    if (
+        2 <= len(parts) <= MAX_CLASSIFIER_ALTERNATIVES
+        and all(part in _COUNT_ALIASES for part in parts)
+    ):
         primitive = _PrimitiveResolution(
             "count", "unit", Decimal("1"), lower, ("classifier_alternative",)
         )

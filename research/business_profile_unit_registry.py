@@ -10,8 +10,12 @@ from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence
 
 from research.business_profile_numeric_reconciliation import decimal_value
 from research.business_profile_unit_conversions import (
+    UnitResolution,
+    governed_canonical_units,
+    governed_primitive_definitions,
     load_unit_conversion_catalog,
     normalize_unit_lexeme,
+    unit_magnitude_multiplier,
 )
 from utils.llm import LlmMessage, LlmRequest
 from utils.date_utils import get_shanghai_time
@@ -34,6 +38,7 @@ GOVERNED_DIMENSIONS = {
     "volume",
     "liquid_volume",
     "energy",
+    "electric_charge",
     "power",
     "length",
     "duration",
@@ -90,6 +95,7 @@ class BusinessProfileUnitRuleRegistry:
         storage: Any,
         *,
         primitive_multipliers: Optional[Mapping[str, Any]] = None,
+        primitive_definitions: Optional[Mapping[str, Mapping[str, Any]]] = None,
         corroboration_observations: int = 3,
         corroboration_models: int = 2,
         corroboration_reconciliations: int = 2,
@@ -99,6 +105,20 @@ class BusinessProfileUnitRuleRegistry:
             str(key): decimal_value(value, f"primitive:{key}")
             for key, value in dict(primitive_multipliers or {}).items()
         }
+        defaults = governed_primitive_definitions()
+        supplied_definitions = dict(primitive_definitions or {})
+        self.primitive_definitions: dict[str, dict[str, Any]] = {}
+        for key in self.primitive_multipliers:
+            raw = supplied_definitions.get(key) or defaults.get(key)
+            if not raw:
+                continue
+            self.primitive_definitions[key] = {
+                "multiplier": decimal_value(
+                    raw.get("multiplier"), f"primitive definition:{key}"
+                ),
+                "dimension": raw.get("dimension"),
+                "canonical_unit": raw.get("canonical_unit"),
+            }
         self.corroboration_observations = max(2, int(corroboration_observations))
         self.corroboration_models = max(1, int(corroboration_models))
         self.corroboration_reconciliations = max(
@@ -126,6 +146,8 @@ class BusinessProfileUnitRuleRegistry:
         proof = prove_unit_proposal(
             validated,
             primitive_multipliers=self.proof_primitives(),
+            primitive_definitions=self.proof_primitive_definitions(),
+            canonical_units=governed_canonical_units(),
             existing_rule_ids=self._known_rule_ids(),
             target_rule_id=rule_id,
         )
@@ -157,6 +179,9 @@ class BusinessProfileUnitRuleRegistry:
                 model_identity=model_identity,
             )
         if lifecycle_status == "auto_approved":
+            # Observation must be recorded before replay; otherwise the newly
+            # discovered artifact is absent from the replay set and remains
+            # stuck in conversion_pending until a later unrelated run.
             self._replay_affected_artifacts(rule_id, reason="unit_rule_auto_approved")
         self.queue_notification(rule_id, lifecycle_status)
         return self.get_rule(rule_id)
@@ -173,6 +198,25 @@ class BusinessProfileUnitRuleRegistry:
                 multiplier, f"runtime primitive:{rule['rule_id']}"
             )
         return primitives
+
+    def proof_primitive_definitions(self) -> dict[str, dict[str, Any]]:
+        """Return dimensioned primitives plus committed runtime overlays."""
+
+        definitions = {
+            key: dict(value) for key, value in self.primitive_definitions.items()
+        }
+        for rule in self.overlay_rules():
+            multiplier = rule.get("multiplier")
+            if multiplier is None:
+                continue
+            definitions[str(rule["rule_id"])] = {
+                "multiplier": decimal_value(
+                    multiplier, f"runtime primitive:{rule['rule_id']}"
+                ),
+                "dimension": rule.get("dimension"),
+                "canonical_unit": rule.get("canonical_unit"),
+            }
+        return definitions
 
     def observe(
         self,
@@ -331,11 +375,167 @@ class BusinessProfileUnitRuleRegistry:
             raise ValueError(f"unknown unit rule: {rule_id}")
         return self._decode_rule(dict(row))
 
+    def reconcile_deterministic_rules(self, *, limit: int = 100) -> dict[str, int]:
+        """Replace quarantined rules that the current deterministic catalog resolves."""
+
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT r.* FROM business_profile_unit_rules r
+                WHERE r.rowid = (
+                    SELECT latest.rowid FROM business_profile_unit_rules latest
+                    WHERE latest.rule_id = r.rule_id
+                    ORDER BY latest.created_at DESC, latest.rowid DESC LIMIT 1
+                )
+                  AND r.status = 'quarantined'
+                ORDER BY r.created_at, r.rowid LIMIT ?
+                """,
+                (max(1, min(int(limit), 1000)),),
+            ).fetchall()
+        catalog = load_unit_conversion_catalog()
+        report = {"scanned": len(rows), "resolved": 0, "superseded": 0, "replayed": 0}
+        for raw in rows:
+            current = self._decode_rule(dict(raw))
+            resolution = catalog.resolve(
+                str(current["source_unit"]),
+                runtime_rules=self.overlay_rules(),
+            )
+            if not resolution.publishable or resolution.multiplier is None:
+                continue
+            replacement = self._register_deterministic_resolution(resolution)
+            replacement_id = str(replacement["rule_id"])
+            current_id = str(current["rule_id"])
+            self._copy_observations(current_id, replacement_id)
+            proof = UnitRuleProof(
+                valid=False,
+                status="superseded",
+                multiplier=(
+                    decimal_value(current["multiplier"], "superseded multiplier")
+                    if current.get("multiplier") is not None
+                    else None
+                ),
+                reason_codes=(f"superseded_by:{replacement_id}",),
+                proof_hash=_stable_hash(
+                    {"old": current_id, "replacement": replacement_id}
+                ),
+            )
+            self._append_rule_event(
+                current_id,
+                "superseded",
+                dict(current.get("proposal") or {}),
+                proof,
+                proposal_input_hash=str(current["proposal_input_hash"]),
+                supersedes_rule_id=replacement_id,
+            )
+            report["replayed"] += self._replay_affected_artifacts(
+                replacement_id,
+                reason=f"unit_rule_superseded:{current_id}",
+            )
+            self.queue_notification(current_id, "superseded")
+            report["resolved"] += 1
+            report["superseded"] += 1
+        return report
+
+    def _register_deterministic_resolution(
+        self, resolution: UnitResolution
+    ) -> dict[str, Any]:
+        proposal = {
+            "source_unit": resolution.source_unit,
+            "normalized_lexeme": resolution.normalized_lexeme,
+            "dimension": resolution.dimension,
+            "canonical_unit": resolution.canonical_unit,
+            "numerator": list(resolution.numerator),
+            "denominator": list(resolution.denominator),
+            "primitive_rule_ids": list(resolution.rule_ids),
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [
+                {"source": "1", "canonical": str(resolution.multiplier)}
+            ],
+            "semantic_summary_zh": "当前版本单位目录已完成确定性解析",
+        }
+        rule_id = "bp-unit-rule-" + _stable_hash(
+            {
+                "normalized_lexeme": resolution.normalized_lexeme,
+                "dimension": resolution.dimension,
+                "canonical_unit": resolution.canonical_unit,
+                "authority": "deterministic_catalog",
+            }
+        )[:20]
+        try:
+            existing = self.get_rule(rule_id)
+        except ValueError:
+            existing = None
+        if existing is not None and existing.get("status") == "auto_approved":
+            return existing
+        proof = UnitRuleProof(
+            valid=True,
+            status="auto_approved",
+            multiplier=resolution.multiplier,
+            reason_codes=("deterministic_catalog_resolution",),
+            proof_hash=_stable_hash(
+                {
+                    "rule_id": rule_id,
+                    "catalog_version": resolution.catalog_version,
+                    "multiplier": str(resolution.multiplier),
+                }
+            ),
+        )
+        proposal_input_hash = _stable_hash(
+            {
+                "source_unit": resolution.source_unit,
+                "catalog_version": resolution.catalog_version,
+            }
+        )
+        self._append_rule_event(
+            rule_id,
+            "proposed",
+            proposal,
+            proof,
+            proposal_input_hash=proposal_input_hash,
+        )
+        catalog_version = self._commit_catalog_version(rule_id)
+        self._append_rule_event(
+            rule_id,
+            "auto_approved",
+            proposal,
+            proof,
+            proposal_input_hash=proposal_input_hash,
+            catalog_version=catalog_version,
+        )
+        self.queue_notification(rule_id, "auto_approved")
+        return self.get_rule(rule_id)
+
+    def _copy_observations(self, source_rule_id: str, target_rule_id: str) -> None:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM business_profile_unit_rule_observations "
+                "WHERE rule_id = ? ORDER BY created_at",
+                (source_rule_id,),
+            ).fetchall()
+        for raw in rows:
+            row = dict(raw)
+            self.observe(
+                target_rule_id,
+                artifact_id=row.get("artifact_id"),
+                source_document_id=row.get("source_document_id"),
+                context_hash=str(row["context_hash"]),
+                model_identity=row.get("model_identity"),
+                reconciliation_status=row.get("reconciliation_status"),
+            )
+
     def queue_notification(
         self, rule_id: str, lifecycle_status: str, *, impact_window: Optional[str] = None
     ) -> str:
         window = impact_window or get_shanghai_time().date().isoformat()
-        payload = {"rule_id": rule_id, "status": lifecycle_status, "window": window}
+        rule = self.get_rule(rule_id)
+        payload = {
+            "normalized_lexeme": rule["normalized_lexeme"],
+            "status": lifecycle_status,
+            "window": window,
+        }
         payload_hash = _stable_hash(payload)
         notification_id = "bp-unit-notify-" + payload_hash[:24]
         now = get_shanghai_time().isoformat()
@@ -379,10 +579,18 @@ class BusinessProfileUnitRuleRegistry:
         for raw in rows:
             row = dict(raw)
             rule = self.get_rule(str(row["rule_id"]))
+            impacts = self._rule_impacts(str(row["rule_id"]))
+            proof_reasons = ",".join(
+                str(value) for value in (rule.get("proof") or {}).get("reason_codes", [])
+            ) or "none"
+            effective = rule.get("status") == "auto_approved"
             message = (
                 "[公司画像单位规则] "
                 f"状态={row['lifecycle_status']} 单位={rule['source_unit']} "
-                f"维度={rule.get('dimension')} 倍率={rule.get('multiplier')} "
+                f"已生效={'是' if effective else '否'} "
+                f"维度={rule.get('dimension')} 规范单位={rule.get('canonical_unit')} "
+                f"倍率={rule.get('multiplier')} 原因={proof_reasons} "
+                f"影响公司={','.join(impacts) or '暂无'} "
                 f"规则={rule['rule_id']}"
             )
             try:
@@ -399,6 +607,22 @@ class BusinessProfileUnitRuleRegistry:
                 )
                 delivered += 1
         return delivered
+
+    def _rule_impacts(self, rule_id: str, *, limit: int = 8) -> list[str]:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT DISTINCT a.instrument_id
+                FROM business_profile_unit_rule_observations o
+                JOIN business_profile_semantic_artifacts a
+                  ON a.artifact_id = o.artifact_id
+                WHERE o.rule_id = ? AND a.instrument_id IS NOT NULL
+                ORDER BY a.instrument_id LIMIT ?
+                """,
+                (rule_id, max(1, min(int(limit), 50))),
+            ).fetchall()
+        return [str(row["instrument_id"]) for row in rows]
 
     def _append_rule_event(
         self,
@@ -615,6 +839,8 @@ def prove_unit_proposal(
     proposal: Mapping[str, Any],
     *,
     primitive_multipliers: Mapping[str, Decimal],
+    primitive_definitions: Optional[Mapping[str, Mapping[str, Any]]] = None,
+    canonical_units: Optional[Mapping[str, str]] = None,
     existing_rule_ids: set[str],
     target_rule_id: str,
 ) -> UnitRuleProof:
@@ -627,16 +853,52 @@ def prove_unit_proposal(
         reasons.append("non_linear_or_unknown_transformation")
     if dimension not in GOVERNED_DIMENSIONS:
         reasons.append("new_or_unknown_dimension")
+    canonical = str(proposal.get("canonical_unit") or "")
+    allowed_canonical = dict(canonical_units or governed_canonical_units())
+    if dimension in allowed_canonical and canonical != allowed_canonical[dimension]:
+        reasons.append("canonical_unit_dimension_mismatch")
     references = tuple(str(item) for item in proposal.get("primitive_rule_ids") or ())
+    factors = tuple(proposal.get("factors") or ())
+    factor_references = tuple(
+        str(factor.get("primitive_rule_id") or "")
+        for factor in factors
+        if isinstance(factor, Mapping)
+    )
+    if set(references) != set(factor_references):
+        reasons.append("primitive_factor_reference_mismatch")
+    if len(factor_references) != len(set(factor_references)):
+        reasons.append("duplicate_primitive_reference")
     round_trip_vectors = tuple(proposal.get("round_trip_vectors") or ())
     if target_rule_id in references:
         reasons.append("dependency_cycle")
     unknown_references = set(references) - set(primitive_multipliers) - existing_rule_ids
     if unknown_references:
         reasons.append("unknown_primitive_reference")
+    definitions = dict(primitive_definitions or {})
+    dimensionful_references = {
+        str(definitions[reference].get("dimension"))
+        for reference in references
+        if reference in definitions and definitions[reference].get("dimension")
+    }
+    if dimensionful_references and dimensionful_references != {dimension}:
+        reasons.append("primitive_dimension_mismatch")
+    magnitude_references = {
+        reference for reference in references if reference.startswith("magnitude:")
+    }
+    if magnitude_references:
+        supplied_scale = Decimal("1")
+        for reference in magnitude_references:
+            definition = definitions.get(reference)
+            if definition is not None:
+                supplied_scale *= decimal_value(
+                    definition.get("multiplier"),
+                    f"magnitude primitive:{reference}",
+                )
+        if supplied_scale != unit_magnitude_multiplier(proposal.get("source_unit")):
+            reasons.append("source_magnitude_mismatch")
     multiplier = Decimal("1")
     try:
-        for factor in proposal.get("factors") or ():
+        for factor in factors:
             if not isinstance(factor, Mapping):
                 raise ValueError("factor_not_object")
             reference = str(factor.get("primitive_rule_id") or "")
@@ -685,7 +947,12 @@ def prove_unit_proposal(
     )
 
 
-def unit_proposal_response_schema() -> dict[str, Any]:
+def unit_proposal_response_schema(
+    *,
+    dimensions: Optional[Sequence[str]] = None,
+    canonical_units: Optional[Sequence[str]] = None,
+    primitive_rule_ids: Optional[Sequence[str]] = None,
+) -> dict[str, Any]:
     """Closed data-only schema for the optional unit-proposal LLM profile."""
 
     return {
@@ -697,13 +964,28 @@ def unit_proposal_response_schema() -> dict[str, Any]:
         "properties": {
             "source_unit": {"type": "string", "minLength": 1},
             "normalized_lexeme": {"type": "string", "minLength": 1},
-            "dimension": {"type": "string", "minLength": 1},
-            "canonical_unit": {"type": "string", "minLength": 1},
+            "dimension": {
+                "type": "string",
+                "enum": sorted(set(dimensions or GOVERNED_DIMENSIONS)),
+            },
+            "canonical_unit": {
+                "type": "string",
+                "enum": sorted(
+                    set(canonical_units or governed_canonical_units().values())
+                ),
+            },
             "numerator": {"type": "array", "items": {"type": "string"}},
             "denominator": {"type": "array", "items": {"type": "string"}},
             "primitive_rule_ids": {
                 "type": "array",
-                "items": {"type": "string"},
+                "items": {
+                    "type": "string",
+                    **(
+                        {"enum": sorted(set(primitive_rule_ids))}
+                        if primitive_rule_ids
+                        else {}
+                    ),
+                },
             },
             "factors": {
                 "type": "array",
@@ -741,6 +1023,7 @@ async def propose_unknown_unit(
     source_unit: str,
     context_zh: str,
     primitive_multipliers: Mapping[str, Decimal],
+    primitive_definitions: Optional[Mapping[str, Mapping[str, Any]]] = None,
     profile: str = "semantic_extraction",
 ) -> Mapping[str, Any]:
     """Ask for data-only decomposition; proof and writes remain local authority."""
@@ -750,9 +1033,15 @@ async def propose_unknown_unit(
         "source_unit": str(source_unit),
         "context_zh": bounded_context,
         "governed_primitives": [
-            {"rule_id": key, "multiplier": str(value)}
+            {
+                "rule_id": key,
+                "multiplier": str(value),
+                **dict((primitive_definitions or {}).get(key) or {}),
+            }
             for key, value in sorted(primitive_multipliers.items())
         ][:300],
+        "governed_dimensions": sorted(GOVERNED_DIMENSIONS),
+        "governed_canonical_units": governed_canonical_units(),
     }
     response = await llm_client.complete(
         LlmRequest(
@@ -763,13 +1052,21 @@ async def propose_unknown_unit(
                     is_safety_instruction=True,
                     content=(
                         "你只负责把未知原始单位拆解为给定基础规则的候选公式，使用简体中文说明。"
-                        "不得换算任何公司数值，不得引入汇率、上下文公式、非线性公式、新维度，"
-                        "不得批准规则或修改目录。只返回闭合 JSON。"
+                        "dimension 和 canonical_unit 必须逐字选择给定治理集合中的值，"
+                        "primitive_rule_ids 必须与 factors 中的引用完全一致。"
+                        "round_trip_vectors 的 source 和 canonical 必须是纯数字字符串，不能包含单位文字。"
+                        "可以把未知计数词作为既有 count/unit 的线性别名，但不得换算任何公司数值；"
+                        "不得引入汇率、上下文公式、非线性公式或新维度，不得批准规则或修改目录。"
+                        "只返回闭合 JSON。"
                     ),
                 ),
                 LlmMessage(role="user", content=_json(request_payload)),
             ),
-            response_schema=unit_proposal_response_schema(),
+            response_schema=unit_proposal_response_schema(
+                dimensions=GOVERNED_DIMENSIONS,
+                canonical_units=governed_canonical_units().values(),
+                primitive_rule_ids=primitive_multipliers.keys(),
+            ),
             schema_name="business_profile_unit_proposal_v1",
             schema_version="business_profile_unit_proposal.v1",
             temperature=0,

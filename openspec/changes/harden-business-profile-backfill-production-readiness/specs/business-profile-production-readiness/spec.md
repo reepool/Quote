@@ -55,14 +55,20 @@ The system SHALL require the LLM to return the source numeric value and source u
 - **AND** it records the parser rule, multiplier, canonical unit, and catalog version
 
 #### Scenario: Industry count classifier is resolved
-- **WHEN** a source unit uses a classifier such as `颗`, `只`, `瓶`, `腔`, `台`, or `套`
+- **WHEN** a source unit uses a classifier such as `颗`, `粒`, `羽`, `只`, `瓶`, `盒`, `袋`, `板`, `腔`, `台`, or `套`
 - **THEN** the program maps the unit to the governed count dimension
 - **AND** it retains the original classifier in lineage
 
 #### Scenario: Compound classifier shares one dimension
-- **WHEN** a source unit such as `只/瓶` contains alternatives that all resolve to the count dimension
+- **WHEN** a source unit such as `只/瓶` or `瓶/支/盒/袋/板` contains any bounded number of alternatives that all resolve to the count dimension
 - **THEN** the program may normalize the value to the canonical count unit
 - **AND** it preserves every source alternative in lineage
+
+#### Scenario: Ampere-hour capacity is resolved without energy inference
+- **WHEN** a source unit is `Ah`, `mAh`, `kAh`, `万Ah`, `安时`, or `安培小时`
+- **THEN** deterministic code resolves it to the governed electric-charge dimension
+- **AND** it applies only the explicit scale multiplier
+- **AND** it does not convert the value to `Wh` or `kWh` without voltage and derivation lineage
 
 #### Scenario: Unit is unresolved or dimensionally ambiguous
 - **WHEN** deterministic grammar and the current catalog cannot resolve a source unit to exactly one dimension and multiplier
@@ -82,7 +88,8 @@ The system SHALL require the LLM to return the source numeric value and source u
 
 #### Scenario: LLM proposes a rule for unknown tokens
 - **WHEN** deterministic parsing leaves one or more unknown unit tokens and the optional unit-proposal profile is enabled
-- **THEN** the LLM may return a bounded data-only candidate decomposition and declarative formula referencing only supplied governed primitives
+- **THEN** the LLM may return a bounded data-only candidate decomposition and declarative formula referencing only supplied governed primitives, dimensions, and canonical units
+- **AND** round-trip vectors contain numeric source and canonical values without unit text
 - **AND** the proposal does not convert company values, execute code, edit a catalog, or approve itself
 
 #### Scenario: Candidate formula is mechanically provable
@@ -90,6 +97,12 @@ The system SHALL require the LLM to return the source numeric value and source u
 - **THEN** it appends an `auto_approved` rule to the governed runtime overlay
 - **AND** it creates a new catalog version and replays matching pending artifacts automatically
 - **AND** normalization and publication paths may use the rule only after its deterministic proof and catalog-version transaction commits
+
+#### Scenario: Governed linear alias is automatically maintained
+- **WHEN** the LLM maps an unknown token to an existing governed dimension and canonical unit using a bounded linear formula
+- **AND** program code verifies the target vocabulary, primitive dimensions, source magnitude, exact multiplier, and numeric round trip
+- **THEN** the system persists the mapping as a reusable runtime unit rule rather than a one-fact answer
+- **AND** it activates the proved rule, creates a catalog version, replays matching artifacts, and sends an informational Telegram notification without routine human approval
 
 #### Scenario: Candidate formula depends on model assertion
 - **WHEN** a proposal introduces a new base dimension, contextual or non-linear conversion, implicit FX rate, unproved multiplier, or ambiguous semantic mapping
@@ -128,6 +141,17 @@ Every unknown source-unit proposal SHALL be stored as an append-only governed ru
 - **WHEN** a proposal requires a new dimension, FX, contextual/non-linear conversion, or has contradictory evidence
 - **THEN** the system stores it as `quarantined`, keeps affected canonical facts pending, and sends a deduplicated Telegram alert
 - **AND** no routine manual review task is created unless the quarantine remains unresolved after automated retries
+
+#### Scenario: Catalog release resolves a quarantined rule
+- **WHEN** deterministic parsing under the current catalog can resolve a previously quarantined source unit
+- **THEN** the system appends an auto-approved replacement rule and supersedes the quarantined proposal
+- **AND** it automatically replays all observed semantic artifacts with zero extraction LLM calls
+- **AND** the notification identifies the effective replacement and prior quarantine reason
+
+#### Scenario: Unit-rule notification is actionable
+- **WHEN** a unit rule is activated, quarantined, promoted, or superseded
+- **THEN** Telegram states whether the rule is effective, its stable reason codes, affected instruments, multiplier, canonical unit, and rule identity
+- **AND** repeated events for the same normalized unit, lifecycle state, and impact window are aggregated or deduplicated
 
 ### Requirement: Authoritative business-profile calculations are program-owned
 The production extraction LLM SHALL provide source-reported numeric values and source units as the only authoritative numeric inputs. It MAY provide qualitative semantic conclusions and non-authoritative derived hints; deterministic program code SHALL perform every authoritative conversion, percentage, ratio, total, difference, margin, concentration, ranking, materiality, confidence, and numeric exposure calculation.
@@ -213,6 +237,12 @@ The system SHALL automatically identify and make non-publishable structured shad
 - **WHEN** a retry exception contains a complete validated semantic result and matching evidence hashes
 - **THEN** recovery creates or reuses a replayable semantic artifact
 - **AND** it resumes conversion without redownloading the annual report or repeating successful parse work
+
+#### Scenario: Explicit governed table receives an empty semantic response
+- **WHEN** selected evidence contains an explicit governed table but structured semantic extraction returns zero rows
+- **THEN** the queue automatically returns the item to selection once and expands the table context
+- **AND** the next extraction is a bounded automatic retry
+- **AND** only a second empty result is finalized as machine rework
 
 #### Scenario: Approved history is encountered
 - **WHEN** deterministic audit detects a conflict in a previously approved record

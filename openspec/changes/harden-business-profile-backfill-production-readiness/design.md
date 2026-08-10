@@ -247,6 +247,45 @@ response hash, exception type/code, and a DEBUG traceback; response bodies and
 credentials are not logged. The fallback still receives `None` for indeterminate
 source results.
 
+### 8. Complete the unknown-unit automation loop
+
+The 2026-08-10 structured-shadow run exposed a gap between the intended lifecycle
+and the implementation. Six ordinary units were persisted and safely quarantined,
+but none could become reusable: free-form model dimensions/canonical units were
+not constrained to the governed vocabulary, round-trip examples contained unit
+text instead of numeric test vectors, count aliases were incomplete, slash
+alternatives supported only two tokens, and `Ah` had no governed dimension. The
+system therefore implemented safe rejection but not automatic maintenance.
+
+The corrected lifecycle is:
+
+1. Deterministic parsing resolves known aliases, arbitrary-length same-dimension
+   classifier alternatives, and governed physical units first.
+2. For an unknown token, the LLM receives the allowed dimensions, canonical
+   units, and dimensioned primitive rules. It selects only from those targets and
+   returns numeric round-trip vectors. The program validates target compatibility,
+   recomputes the multiplier, checks source magnitude, and rejects prohibited or
+   cross-dimension formulas.
+3. A bounded linear alias into an existing governed dimension becomes a reusable
+   runtime rule after these checks. The rule is persisted, versioned, replayed,
+   and notified automatically. A later correction appends a superseding rule.
+4. New dimensions, FX, non-linear/contextual formulas, inconsistent targets, and
+   ambiguous mappings remain quarantined. This is the exceptional safety path,
+   not a routine approval queue.
+5. When a catalog release makes a quarantined rule deterministically resolvable,
+   the runtime automatically appends a proved replacement, supersedes the old
+   proposal, and replays every affected semantic artifact without extraction LLM
+   usage.
+
+`Ah` is governed as electric charge/battery charge capacity, not energy. `Ah` may
+be scaled to `mAh`, `kAh`, or `万Ah`, but conversion to `Wh`/`kWh` is prohibited
+without an explicit voltage and derivation lineage.
+
+An explicit structured table that receives an empty LLM result is not immediately
+final machine rework. The queue automatically returns the item to selection once,
+expands the relevant table context, and retries extraction. A second empty result
+is finalized as machine rework so the workflow remains bounded.
+
 ## Risks / Trade-offs
 
 - [Source labels are missing or the model paraphrases a label] -> Ask for a

@@ -1215,6 +1215,77 @@ def test_auto_approved_unit_rule_defers_artifact_replay_without_attempt_cost(tmp
     assert item["completed_at"] is None
 
 
+def test_context_incomplete_reselects_once_before_machine_rework(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items "
+            "SET stage = 'semantic', status = 'pending'"
+        )
+        conn.commit()
+
+    async def stage_runner(_stage, _item):
+        return {
+            "status": "stopped",
+            "quality": {
+                "stage_ready": False,
+                "blocking_machine_rework": 1,
+                "machine_rework_reasons": {"context_incomplete": 1},
+            },
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+    )
+    first = asyncio.run(
+        service._drain_stage(
+            "semantic", StageBudget(max_items=1, max_concurrency=1)
+        )
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+
+    assert first["context_reselect_deferred"] == 1
+    assert first["machine_rework_deferred"] == 0
+    assert item["stage"] == "parse"
+    assert item["status"] == "retry_due"
+    assert item["attempt_count"] == 0
+    assert item["metadata"]["automated_rework_counts"] == {
+        "context_incomplete": 1
+    }
+
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items "
+            "SET stage = 'semantic', status = 'pending'"
+        )
+        conn.commit()
+    second = asyncio.run(
+        service._drain_stage(
+            "semantic", StageBudget(max_items=1, max_concurrency=1)
+        )
+    )
+    item = queue.get(work_id)
+
+    assert second["context_reselect_deferred"] == 0
+    assert second["machine_rework_deferred"] == 1
+    assert item["stage"] == "semantic"
+    assert item["status"] == "machine_rework"
+
+
 def test_evidence_free_recovery_requires_positive_defect_history(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)

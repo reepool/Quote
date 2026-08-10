@@ -1130,6 +1130,28 @@ class BusinessProfileSemanticRuntime:
             "machine_rework_recovered": 0,
             "by_field_family": {},
         }
+        # A catalog release may make an older quarantined proposal provable.
+        # Reconcile it before claiming new semantic work so persisted artifacts
+        # are replayed without another extraction request.
+        try:
+            rule_reconciliation = self.unit_rule_registry.reconcile_deterministic_rules()
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            rule_reconciliation = {"scanned": 0, "resolved": 0, "superseded": 0, "replayed": 0}
+            logger.warning(
+                "business-profile unit-rule deterministic reconciliation failed "
+                "error_type=%s",
+                type(exc).__name__,
+            )
+        metrics["unit_rule_deterministic_reconciliation"] = rule_reconciliation
+        if rule_reconciliation.get("resolved"):
+            logger.info(
+                "business-profile unit-rule deterministic reconciliation "
+                "scanned=%s resolved=%s superseded=%s replayed=%s",
+                rule_reconciliation.get("scanned", 0),
+                rule_reconciliation.get("resolved", 0),
+                rule_reconciliation.get("superseded", 0),
+                rule_reconciliation.get("replayed", 0),
+            )
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
         empty_output_reasons: dict[str, int] = {}
@@ -1508,6 +1530,9 @@ class BusinessProfileSemanticRuntime:
                                         )[:1200],
                                         primitive_multipliers=(
                                             self.unit_rule_registry.proof_primitives()
+                                        ),
+                                        primitive_definitions=(
+                                            self.unit_rule_registry.proof_primitive_definitions()
                                         ),
                                     )
                                 )

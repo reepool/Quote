@@ -1,3 +1,4 @@
+import asyncio
 import sqlite3
 from contextlib import contextmanager
 
@@ -8,7 +9,14 @@ from research.business_profile_semantic_artifacts import (
 from research.business_profile_semantic_runtime import (
     _normalized_value_with_resolution,
 )
-from research.business_profile_unit_registry import BusinessProfileUnitRuleRegistry
+from research.business_profile_unit_conversions import (
+    governed_primitive_definitions,
+    governed_primitive_multipliers,
+)
+from research.business_profile_unit_registry import (
+    BusinessProfileUnitRuleRegistry,
+    unit_proposal_response_schema,
+)
 from research.storage import ResearchStorageManager
 
 
@@ -127,7 +135,130 @@ def test_unit_rule_is_persistent_proved_notified_and_available_as_overlay(tmp_pa
             "SELECT parent_catalog_version FROM business_profile_unit_catalog_versions"
         ).fetchone()[0]
     assert notification_count == 1
-    assert catalog_lineage == "business_profile_units.2026.4"
+    assert catalog_lineage == "business_profile_units.2026.5"
+
+
+def test_governed_llm_alias_is_persisted_and_auto_approved(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers=governed_primitive_multipliers(),
+        primitive_definitions=governed_primitive_definitions(),
+    )
+    proposal = {
+        "source_unit": "万箱",
+        "normalized_lexeme": "万箱",
+        "dimension": "count",
+        "canonical_unit": "unit",
+        "numerator": ["箱"],
+        "denominator": [],
+        "primitive_rule_ids": ["magnitude:万", "classifier:件"],
+        "factors": [
+            {"primitive_rule_id": "magnitude:万", "exponent": 1},
+            {"primitive_rule_id": "classifier:件", "exponent": 1},
+        ],
+        "transformation_type": "linear_multiplier",
+        "round_trip_vectors": [{"source": "1", "canonical": "10000"}],
+        "semantic_summary_zh": "箱是计数单位，万表示一万倍",
+    }
+
+    rule = registry.register_proposal(proposal, proposal_input_hash="9" * 64)
+
+    assert rule["status"] == "auto_approved"
+    assert rule["dimension"] == "count"
+    assert rule["canonical_unit"] == "unit"
+    assert rule["multiplier"] == "10000"
+
+
+def test_cross_dimension_llm_alias_is_quarantined(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers=governed_primitive_multipliers(),
+        primitive_definitions=governed_primitive_definitions(),
+    )
+    proposal = {
+        "source_unit": "神秘电量",
+        "normalized_lexeme": "神秘电量",
+        "dimension": "electric_charge",
+        "canonical_unit": "Ah",
+        "numerator": [],
+        "denominator": [],
+        "primitive_rule_ids": ["classifier:件"],
+        "factors": [{"primitive_rule_id": "classifier:件", "exponent": 1}],
+        "transformation_type": "linear_multiplier",
+        "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+        "semantic_summary_zh": "错误地映射到计数 primitive",
+    }
+
+    rule = registry.register_proposal(proposal, proposal_input_hash="8" * 64)
+
+    assert rule["status"] == "quarantined"
+    assert "primitive_dimension_mismatch" in rule["proof"]["reason_codes"]
+
+
+def test_unit_proposal_schema_closes_dimension_and_canonical_vocabulary():
+    schema = unit_proposal_response_schema()
+
+    assert "electric_charge" in schema["properties"]["dimension"]["enum"]
+    assert "Ah" in schema["properties"]["canonical_unit"]["enum"]
+
+
+def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    artifact = artifacts.receive(
+        _identity(instrument_id="688799.SH"),
+        response={"rows": [{"unit_raw": "万粒", "value": 2}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    registry = BusinessProfileUnitRuleRegistry(
+        storage,
+        primitive_multipliers=governed_primitive_multipliers(),
+        primitive_definitions=governed_primitive_definitions(),
+    )
+    old = registry.register_proposal(
+        {
+            "source_unit": "万粒",
+            "normalized_lexeme": "万粒",
+            "dimension": "粒",
+            "canonical_unit": "粒",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": ["magnitude:万"],
+            "factors": [{"primitive_rule_id": "magnitude:万", "exponent": 1}],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1万粒", "canonical": "10000粒"}],
+            "semantic_summary_zh": "旧版自由文本候选",
+        },
+        proposal_input_hash="7" * 64,
+        artifact_id=artifact["artifact_id"],
+        source_document_id="document-1",
+        context_hash="scope-1",
+        model_identity="model-1",
+    )
+
+    report = registry.reconcile_deterministic_rules()
+
+    assert report == {"scanned": 1, "resolved": 1, "superseded": 1, "replayed": 1}
+    assert registry.get_rule(old["rule_id"])["status"] == "superseded"
+    replacement = next(
+        rule for rule in registry.overlay_rules() if rule["source_unit"] == "万粒"
+    )
+    assert replacement["status"] == "auto_approved"
+    assert replacement["multiplier"] == "10000"
+    assert artifacts.find_replay(_identity(instrument_id="688799.SH")) is not None
+
+    messages = []
+
+    async def notifier(message):
+        messages.append(message)
+
+    delivered = asyncio.run(registry.dispatch_notifications(notifier, limit=10))
+    assert delivered == 3
+    assert any("已生效=是" in message for message in messages)
+    assert any("影响公司=688799.SH" in message for message in messages)
 
 
 def test_unit_rule_without_round_trip_proof_is_quarantined(tmp_path):

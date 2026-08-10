@@ -601,16 +601,43 @@ class BusinessProfileWorkRepository:
                 stage: dict(result),
             },
         }
+        quality = dict(result.get("quality") or {})
+        machine_rework_reasons = {
+            str(key)
+            for key, value in dict(quality.get("machine_rework_reasons") or {}).items()
+            if int(value or 0) > 0
+        }
+        automated_rework_counts = {
+            str(key): int(value or 0)
+            for key, value in dict(
+                (item.get("metadata") or {}).get("automated_rework_counts") or {}
+            ).items()
+        }
+        context_retry_count = automated_rework_counts.get("context_incomplete", 0)
+        context_retry_ready = (
+            stage == "semantic"
+            and machine_rework_reasons == {"context_incomplete"}
+            and context_retry_count < 1
+        )
+        if context_retry_ready:
+            automated_rework_counts["context_incomplete"] = context_retry_count + 1
+            metadata["automated_rework_counts"] = automated_rework_counts
         replay_ready = int(
             dict(result.get("metrics") or {}).get("unit_rule_auto_approved") or 0
         ) > 0
-        status = "retry_due" if replay_ready else "machine_rework"
+        status = "retry_due" if replay_ready or context_retry_ready else "machine_rework"
+        next_stage = "parse" if context_retry_ready else stage
+        reason_text = (
+            "automatic_context_expansion_retry"
+            if context_retry_ready
+            else str(reason)[:4000]
+        )
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             cursor = conn.execute(
                 """
                 UPDATE business_profile_work_items
-                SET status = ?, next_attempt_at = NULL,
+                SET stage = ?, status = ?, next_attempt_at = NULL,
                     attempt_count = CASE
                         WHEN ? AND attempt_count > 0 THEN attempt_count - 1
                         ELSE attempt_count
@@ -621,11 +648,12 @@ class BusinessProfileWorkRepository:
                 WHERE work_id = ? AND status = 'running' AND lease_owner = ?
                 """,
                 (
+                    next_stage,
                     status,
-                    int(replay_ready),
-                    str(reason)[:4000],
+                    int(replay_ready or context_retry_ready),
+                    reason_text,
                     _canonical_json(metadata),
-                    None if replay_ready else now,
+                    None if status == "retry_due" else now,
                     now,
                     work_id,
                     str(lease_owner),
@@ -634,7 +662,11 @@ class BusinessProfileWorkRepository:
             conn.commit()
         if int(cursor.rowcount or 0) != 1:
             return "lease_lost"
-        return "artifact_replay_deferred" if replay_ready else "machine_rework"
+        if replay_ready:
+            return "artifact_replay_deferred"
+        if context_retry_ready:
+            return "context_reselect_deferred"
+        return "machine_rework"
 
     def get(self, work_id: str) -> dict[str, Any]:
         with self.storage.get_connection() as conn:
@@ -2153,6 +2185,7 @@ class BusinessProfileAsyncProductionService:
         configuration_blocked = 0
         machine_rework_deferred = 0
         artifact_replay_deferred = 0
+        context_reselect_deferred = 0
         claimed_work_ids: set[str] = set()
         quality_totals: dict[str, Any] = {}
         errors: list[dict[str, str]] = []
@@ -2226,7 +2259,7 @@ class BusinessProfileAsyncProductionService:
             async def run_one(item: Mapping[str, Any]) -> None:
                 nonlocal completed, retried, failed, lease_conflicts
                 nonlocal configuration_blocked, machine_rework_deferred
-                nonlocal artifact_replay_deferred
+                nonlocal artifact_replay_deferred, context_reselect_deferred
                 nonlocal provider_congestion_failures
                 try:
                     result = dict(await self.stage_runner(stage, item))
@@ -2310,6 +2343,8 @@ class BusinessProfileAsyncProductionService:
                                 machine_rework_deferred += 1
                             elif deferred_status == "artifact_replay_deferred":
                                 artifact_replay_deferred += 1
+                            elif deferred_status == "context_reselect_deferred":
+                                context_reselect_deferred += 1
                             else:
                                 lease_conflicts += 1
                             return
@@ -2467,6 +2502,7 @@ class BusinessProfileAsyncProductionService:
             "configuration_blocked": configuration_blocked,
             "machine_rework_deferred": machine_rework_deferred,
             "artifact_replay_deferred": artifact_replay_deferred,
+            "context_reselect_deferred": context_reselect_deferred,
             "claim_exclusions": len(claimed_work_ids),
             "empty_polls": empty_polls,
             "errors": errors[:20],
@@ -2497,7 +2533,8 @@ class BusinessProfileAsyncProductionService:
             "retried=%s terminal_failures=%s configuration_blocked=%s "
             "machine_rework_deferred=%s "
             "artifact_replay_deferred=%s "
-            "lease_conflicts=%s claim_exclusions=%s elapsed_seconds=%s writer=%s",
+            "context_reselect_deferred=%s lease_conflicts=%s "
+            "claim_exclusions=%s elapsed_seconds=%s writer=%s",
             stage,
             result["status"],
             claimed,
@@ -2507,6 +2544,7 @@ class BusinessProfileAsyncProductionService:
             configuration_blocked,
             machine_rework_deferred,
             artifact_replay_deferred,
+            context_reselect_deferred,
             lease_conflicts,
             result["claim_exclusions"],
             result["elapsed_seconds"],
