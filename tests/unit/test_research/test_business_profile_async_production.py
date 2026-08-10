@@ -766,6 +766,59 @@ def test_structured_semantic_retry_recovery_is_idempotent_and_preserves_attempts
     assert queue.get(work_id)["status"] == "retry_due"
 
 
+def test_duplicate_bundle_terminal_recovery_preserves_checkpoint_and_is_idempotent(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: b"%PDF-1.4\nreusable\n%%EOF",
+        ),
+    ).acquire(item)
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'terminal_failure', attempt_count = 1, last_error = ? "
+            "WHERE work_id = ?",
+            (
+                "ValueError: duplicate business profile primary key in bundle: "
+                "operating_facts",
+                work_id,
+            ),
+        )
+        conn.commit()
+
+    first = queue.recover_identical_duplicate_bundle_failures()
+    second = queue.recover_identical_duplicate_bundle_failures()
+    recovered = queue.get(work_id)
+
+    assert first["requeued"] == 1
+    assert second["requeued"] == 0
+    assert recovered["status"] == "pending"
+    assert recovered["stage"] == "semantic"
+    assert recovered["attempt_count"] == 0
+    assert recovered["checkpoint_path"] == item["checkpoint_path"]
+    assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
+        "identical_duplicate_bundle_collapse_enabled"
+    )
+
+
 def test_stale_scope_recovery_requeues_terminal_items_without_content_attempts(
     tmp_path,
 ):

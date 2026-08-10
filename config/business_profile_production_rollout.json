@@ -50,7 +50,7 @@
         "prerequisites": [],
         "stage_budgets": {
           "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
-          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 8, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
           "semantic": {"max_items": 20, "max_concurrency": 20, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
           "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
         }

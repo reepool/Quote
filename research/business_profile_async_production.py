@@ -1010,6 +1010,66 @@ class BusinessProfileWorkRepository:
             "work_ids": recovered_ids,
         }
 
+    def recover_identical_duplicate_bundle_failures(self) -> dict[str, Any]:
+        """Retry legacy duplicate-key failures once under conflict-aware collapse."""
+
+        marker = "duplicate business profile primary key in bundle"
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM business_profile_work_items "
+                "WHERE stage = 'semantic' AND status = 'terminal_failure' "
+                "AND last_error LIKE ? ORDER BY work_id",
+                (f"%{marker}%",),
+            ).fetchall()
+        candidates = [
+            item
+            for item in (_decode_work_row(row) for row in rows)
+            if self.get_usable_bound_manifest(item) is not None
+        ]
+        now = get_shanghai_time().isoformat()
+        recovered_ids: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for item in candidates:
+                metadata = dict(item.get("metadata") or {})
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "identical_duplicate_bundle_collapse_enabled",
+                        "recovered_at": now,
+                        "from_stage": item.get("stage"),
+                        "from_status": item.get("status"),
+                        "from_attempt_count": item.get("attempt_count"),
+                        "checkpoint_path": item.get("checkpoint_path"),
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                cursor = conn.execute(
+                    "UPDATE business_profile_work_items SET status = 'pending', "
+                    "attempt_count = 0, next_attempt_at = NULL, lease_owner = NULL, "
+                    "lease_expires_at = NULL, last_error = NULL, metadata_json = ?, "
+                    "completed_at = NULL, updated_at = ? "
+                    "WHERE work_id = ? AND stage = 'semantic' "
+                    "AND status = 'terminal_failure' AND last_error LIKE ?",
+                    (
+                        _canonical_json(metadata),
+                        now,
+                        item["work_id"],
+                        f"%{marker}%",
+                    ),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered_ids.append(str(item["work_id"]))
+            conn.commit()
+        return {
+            "eligible_duplicate_failures": len(rows),
+            "valid_manifest_candidates": len(candidates),
+            "requeued": len(recovered_ids),
+            "work_ids": recovered_ids,
+        }
+
     def recover_stale_scope_items(
         self,
         *,
@@ -1736,17 +1796,23 @@ class BusinessProfileAsyncProductionService:
         structured_recovery = await self._run_storage_operation(
             self.repository.recover_structured_semantic_retries
         )
+        duplicate_recovery = await self._run_storage_operation(
+            self.repository.recover_identical_duplicate_bundle_failures
+        )
         recovery["stale_scope"] = stale_scope_recovery
         recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
+        recovery["duplicate_bundle"] = duplicate_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
         ) + int(stale_scope_recovery.get("requeued") or 0)
+        recovery["requeued"] += int(duplicate_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
                 *list(recovery.get("work_ids") or []),
                 *list(structured_recovery.get("work_ids") or []),
                 *list(stale_scope_recovery.get("work_ids") or []),
+                *list(duplicate_recovery.get("work_ids") or []),
             }
         )
         self._log_recovery(recovery)
@@ -1870,17 +1936,23 @@ class BusinessProfileAsyncProductionService:
         structured_recovery = await self._run_storage_operation(
             self.repository.recover_structured_semantic_retries
         )
+        duplicate_recovery = await self._run_storage_operation(
+            self.repository.recover_identical_duplicate_bundle_failures
+        )
         recovery["stale_scope"] = stale_scope_recovery
         recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
+        recovery["duplicate_bundle"] = duplicate_recovery
         recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
             structured_recovery.get("requeued") or 0
         ) + int(stale_scope_recovery.get("requeued") or 0)
+        recovery["requeued"] += int(duplicate_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
                 *list(recovery.get("work_ids") or []),
                 *list(structured_recovery.get("work_ids") or []),
                 *list(stale_scope_recovery.get("work_ids") or []),
+                *list(duplicate_recovery.get("work_ids") or []),
             }
         )
         self._log_recovery(recovery)

@@ -831,11 +831,12 @@ async def test_independent_verifier_agreement_and_conflict_are_lineaged():
     assert audits[0]["diagnostics"]["isolated_evidence"][0]["text"]
 
 
-def test_deterministic_parser_proof_skips_semantic_verifier_only_when_complete():
+def test_deterministic_parser_proof_always_stays_out_of_semantic_verifier():
     complete = deterministic_semantic_verification_decision(
         {
             "derivation_method": "deterministic_parser",
             "exact_evidence_valid": True,
+            "numeric_reconciliation_executed": True,
             "numeric_reconciliation_valid": True,
             "parser_manifest_promoted": True,
         }
@@ -844,13 +845,18 @@ def test_deterministic_parser_proof_skips_semantic_verifier_only_when_complete()
         {
             "derivation_method": "deterministic_parser",
             "exact_evidence_valid": True,
+            "numeric_reconciliation_executed": True,
             "numeric_reconciliation_valid": False,
             "parser_manifest_promoted": True,
         }
     )
 
     assert complete["skip_semantic_verifier"] is True
-    assert incomplete["skip_semantic_verifier"] is False
+    assert complete["canonical_promotion_allowed"] is True
+    assert incomplete["skip_semantic_verifier"] is True
+    assert incomplete["canonical_promotion_allowed"] is False
+    assert incomplete["reason"] == "deterministic_proof_held_locally"
+    assert incomplete["promotion_block_reasons"] == ["numeric_validation_failed"]
 
 
 @pytest.mark.asyncio

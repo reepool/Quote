@@ -358,6 +358,40 @@ aliases are loaded, startup reconciliation supersedes matching quarantined rules
 copies their observations, and replays persisted conversion-pending semantic
 artifacts. It does not redownload PDFs or call the extraction LLM again.
 
+### 11. Close production replay gaps and increase bounded PDF throughput
+
+The next shadow run showed that PDF extraction remains the dominant stage: four
+parse workers stayed busy while twenty reports consumed roughly 2,674 cumulative
+seconds. On the current 16-physical-core host the rollout therefore raises only
+the parse-stage ceiling from four to eight. Parsing remains outside the database
+write gate, claims remain bounded and work-conserving, and publication retains one
+SQLite writer. A process pool or alternate PDF library is not introduced until a
+representative annual-report fidelity benchmark proves equal page text, ordering,
+outline, evidence hashes, and resource behavior.
+
+Two source-unit cases receive deterministic treatment. `吨千米` and `亿吨千米`
+belong to a governed freight-turnover dimension with canonical `tonne_km` and
+exact multipliers one and one hundred million. Exact annual-report table headers
+such as `元币种：人民币` are normalized to source currency unit `元`; the rewrite is
+strictly bounded to known header forms and never changes arbitrary evidence text.
+Catalog reconciliation supersedes matching quarantined rules and replays their
+persisted semantic artifacts without extraction calls.
+
+Rows derived by the deterministic parser never enter the semantic verifier. Local
+proof decides whether they are eligible for canonical promotion; a non-promoted
+parser manifest remains a locally confirmed shadow result instead of becoming a
+gateway failure. During bundle persistence, rows sharing a primary key are
+collapsed only when their complete prepared payloads are identical. Conflicting
+payloads remain an explicit terminal correctness error. Historical terminal work
+whose stored error is the former identical-duplicate failure is requeued at the
+earliest reusable stage while preserving checkpoint and history.
+
+Unit lifecycle notifications are rendered from the final current state after
+replacement and supersession reconciliation. A verified effective rule starts
+with `✅`; quarantined, pending, ineffective, or otherwise unsuccessful outcomes
+start with `⚠️`. The icon is presentation only and does not alter lifecycle
+authority.
+
 ## Risks / Trade-offs
 
 - [Source labels are missing or the model paraphrases a label] -> Ask for a

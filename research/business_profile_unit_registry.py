@@ -35,6 +35,7 @@ GOVERNED_DIMENSIONS = {
     "currency",
     "count",
     "mass",
+    "freight_turnover",
     "area",
     "volume",
     "liquid_volume",
@@ -896,8 +897,9 @@ class BusinessProfileUnitRuleRegistry:
                 f"{item['rule_id']}:{','.join(item['reason_codes']) or 'none'}"
                 for item in state["quarantine_reasons"]
             )[:1200] or "none"
+            outcome_icon = "✅" if state["effective"] else "⚠️"
             message = (
-                "[公司画像单位规则] "
+                f"{outcome_icon} [公司画像单位规则] "
                 f"单位={state['source_unit']} 当前最终状态={state['final_status']} "
                 f"已生效={'是' if state['effective'] else '否'} "
                 f"本次事件={event_history} 窗口={impact_window} "

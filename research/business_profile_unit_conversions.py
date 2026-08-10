@@ -580,6 +580,10 @@ _COUNT_ALIASES = {
     "张",
     "点",
 }
+_EXACT_TABLE_HEADER_UNIT_ALIASES = {
+    "元币种:人民币": "元",
+    "单位:元币种:人民币": "元",
+}
 _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     # currency; cross-currency normalization is intentionally not represented.
     "元": ("currency", "CNY", Decimal("1")),
@@ -600,6 +604,9 @@ _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     "kg": ("mass", "tonne", Decimal("0.001")),
     "克": ("mass", "tonne", Decimal("0.000001")),
     "g": ("mass", "tonne", Decimal("0.000001")),
+    # freight transport work; this is neither a mass nor a length fact alone.
+    "吨千米": ("freight_turnover", "tonne_km", Decimal("1")),
+    "吨公里": ("freight_turnover", "tonne_km", Decimal("1")),
     # area
     "平方": ("area", "square_meter", Decimal("1")),
     "平方米": ("area", "square_meter", Decimal("1")),
@@ -680,7 +687,8 @@ def normalize_unit_lexeme(value: Any) -> str:
     text = re.sub(r"\s+", "", text).replace("每", "/")
     text = text.replace("per", "/")
     text = text.strip(".,;:")
-    return _strip_enclosing_unit_delimiters(text)
+    text = _strip_enclosing_unit_delimiters(text)
+    return _EXACT_TABLE_HEADER_UNIT_ALIASES.get(text, text)
 
 
 def _strip_enclosing_unit_delimiters(text: str) -> str:

@@ -141,7 +141,7 @@ def test_unit_rule_is_persistent_proved_notified_and_available_as_overlay(tmp_pa
             "SELECT parent_catalog_version FROM business_profile_unit_catalog_versions"
         ).fetchone()[0]
     assert notification_count == 1
-    assert catalog_lineage == "business_profile_units.2026.5"
+    assert catalog_lineage == "business_profile_units.2026.6"
 
 
 def test_governed_llm_alias_is_persisted_and_auto_approved(tmp_path):
@@ -201,6 +201,14 @@ def test_cross_dimension_llm_alias_is_quarantined(tmp_path):
 
     assert rule["status"] == "quarantined"
     assert "primitive_dimension_mismatch" in rule["proof"]["reason_codes"]
+
+    messages = []
+
+    async def notifier(message):
+        messages.append(message)
+
+    assert asyncio.run(registry.dispatch_notifications(notifier, limit=10)) == 1
+    assert messages[0].startswith("⚠️ [公司画像单位规则]")
 
 
 def test_unit_proposal_schema_closes_dimension_and_canonical_vocabulary():
@@ -262,12 +270,22 @@ def test_unit_proposal_request_serializes_decimal_primitive_definitions():
     assert result["dimension"] == "count"
 
 
-def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
+@pytest.mark.parametrize(
+    ("source_unit", "expected_multiplier"),
+    [
+        ("万粒", "10000"),
+        ("亿吨千米", "100000000"),
+        ("元币种：人民币", "1"),
+    ],
+)
+def test_catalog_reconciles_quarantined_rule_and_replays_artifact(
+    tmp_path, source_unit, expected_multiplier
+):
     storage = _Storage(tmp_path / "research.db")
     artifacts = BusinessProfileSemanticArtifactRepository(storage)
     artifact = artifacts.receive(
         _identity(instrument_id="688799.SH"),
-        response={"rows": [{"unit_raw": "万粒", "value": 2}]},
+        response={"rows": [{"unit_raw": source_unit, "value": 2}]},
         response_hash="",
         evidence_ids=["span-1"],
     )
@@ -278,10 +296,10 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     )
     old = registry.register_proposal(
         {
-            "source_unit": "万粒",
-            "normalized_lexeme": "万粒",
-            "dimension": "粒",
-            "canonical_unit": "粒",
+            "source_unit": source_unit,
+            "normalized_lexeme": normalize_unit_lexeme(source_unit),
+            "dimension": "unknown",
+            "canonical_unit": "unknown",
             "numerator": [],
             "denominator": [],
             "primitive_rule_ids": ["magnitude:万"],
@@ -302,10 +320,10 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     assert report == {"scanned": 1, "resolved": 1, "superseded": 1, "replayed": 1}
     assert registry.get_rule(old["rule_id"])["status"] == "superseded"
     replacement = next(
-        rule for rule in registry.overlay_rules() if rule["source_unit"] == "万粒"
+        rule for rule in registry.overlay_rules() if rule["source_unit"] == source_unit
     )
     assert replacement["status"] == "auto_approved"
-    assert replacement["multiplier"] == "10000"
+    assert replacement["multiplier"] == expected_multiplier
     assert artifacts.find_replay(_identity(instrument_id="688799.SH")) is not None
 
     messages = []
@@ -316,6 +334,7 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     delivered = asyncio.run(registry.dispatch_notifications(notifier, limit=10))
     assert delivered == 3
     assert len(messages) == 1
+    assert messages[0].startswith("✅ [公司画像单位规则]")
     assert "当前最终状态=enabled" in messages[0]
     assert "已生效=是" in messages[0]
     assert "本次事件=quarantined,auto_approved,superseded" in messages[0]
@@ -325,7 +344,7 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     assert "new_or_unknown_dimension" in messages[0]
     assert "影响公司=688799.SH" in messages[0]
     assert len(messages[0]) < 4096
-    state = registry.get_unit_state("万粒")
+    state = registry.get_unit_state(source_unit)
     assert state["effective"] is True
     assert state["effective_rule"]["rule_id"] == replacement["rule_id"]
     assert state["replacements"] == [
@@ -343,6 +362,8 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
         ("PCS", "enabled", "1"),
         ("平方", "enabled", "1"),
         ("立方", "enabled", "1"),
+        ("亿吨千米", "enabled", "100000000"),
+        ("元币种：人民币", "enabled", "1"),
         ("万台（万千瓦时）", "quarantined", None),
     ],
 )

@@ -26,10 +26,10 @@ def test_default_unit_catalog_has_canonical_unit_for_each_dimension():
         unit.dimension for unit in catalog.units if unit.canonical_for_dimension
     }
 
-    assert catalog.catalog_version == "business_profile_units.2026.5"
+    assert catalog.catalog_version == "business_profile_units.2026.6"
     assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
     assert dimensions == canonical_dimensions
-    assert len(catalog.units) == 41
+    assert len(catalog.units) == 42
     assert len(catalog.conversions) == 21
 
 
@@ -221,6 +221,10 @@ def test_loader_rejects_fact_catalog_version_mismatch(tmp_path):
         ("pieces", "count", "unit", Decimal("1")),
         ("平方", "area", "square_meter", Decimal("1")),
         ("立方", "volume", "cubic_meter", Decimal("1")),
+        ("吨千米", "freight_turnover", "tonne_km", Decimal("1")),
+        ("亿吨千米", "freight_turnover", "tonne_km", Decimal("100000000")),
+        ("元币种：人民币", "currency", "CNY", Decimal("1")),
+        ("单位：元 币种：人民币", "currency", "CNY", Decimal("1")),
         ("mAh", "electric_charge", "Ah", Decimal("0.001")),
         ("kAh", "electric_charge", "Ah", Decimal("1000")),
     ],
@@ -249,6 +253,12 @@ def test_pcs_alias_is_exact_and_does_not_rewrite_product_text():
 
     assert resolution.status == "unit_resolution_pending"
     assert resolution.reason == "unknown_unit_token"
+
+
+def test_currency_header_alias_is_exact_and_does_not_rewrite_prose():
+    resolution = load_unit_conversion_catalog().resolve("本表单位为元币种人民币")
+
+    assert resolution.status == "unit_resolution_pending"
 
 
 def test_cross_dimension_parenthesized_unit_remains_pending():

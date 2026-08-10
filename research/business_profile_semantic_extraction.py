@@ -933,21 +933,40 @@ class BusinessProfileSemanticExtractor:
 def deterministic_semantic_verification_decision(
     record: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    """Return an explicit verifier bypass only for promoted parser proof."""
+    """Keep deterministic parser facts inside local proof governance."""
 
-    proven = (
+    deterministic = (
         str(record.get("derivation_method") or "") == "deterministic_parser"
+    )
+    locally_publishable = bool(
+        deterministic
         and bool(record.get("exact_evidence_valid"))
-        and record.get("numeric_reconciliation_executed") is not False
+        and record.get("numeric_reconciliation_executed") is True
         and bool(record.get("numeric_reconciliation_valid"))
         and bool(record.get("parser_manifest_promoted"))
     )
+    promotion_block_reasons = []
+    if deterministic and not bool(record.get("exact_evidence_valid")):
+        promotion_block_reasons.append("evidence_provenance_failed")
+    if deterministic and (
+        record.get("numeric_reconciliation_executed") is not True
+        or not bool(record.get("numeric_reconciliation_valid"))
+    ):
+        promotion_block_reasons.append("numeric_validation_failed")
+    if deterministic and not bool(record.get("parser_manifest_promoted")):
+        promotion_block_reasons.append("manifest_not_promoted")
     return {
-        "skip_semantic_verifier": proven,
+        "skip_semantic_verifier": deterministic,
+        "canonical_promotion_allowed": locally_publishable,
+        "promotion_block_reasons": promotion_block_reasons,
         "reason": (
             "promoted_deterministic_proof"
-            if proven
-            else "independent_semantic_verification_required"
+            if locally_publishable
+            else (
+                "deterministic_proof_held_locally"
+                if deterministic
+                else "independent_semantic_verification_required"
+            )
         ),
     }
 

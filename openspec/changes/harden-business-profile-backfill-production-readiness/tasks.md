@@ -155,3 +155,22 @@
 - Focused unit, artifact, and semantic-runtime regression passed 115 tests. A post-review full-catalog serialization check also passed. Python compilation, fatal Ruff checks, `git diff --check`, and strict OpenSpec validation passed.
 - The broader async-production suite was attempted but stopped after prolonged worker waiting while another pre-existing pytest process was running the same module; no failure was emitted before interruption. No production database was opened or changed.
 - External `codex review --uncommitted` was rejected by tenant policy because the dirty worktree contains unrelated private changes. Equivalent local review found and fixed the incomplete production-catalog serialization test coverage; no further confirmed correctness finding remained.
+
+## 13. Production Replay Closure And PDF Throughput
+
+- [x] 13.1 Add governed freight-turnover units and bounded currency-table-header normalization, then prove quarantined-rule reconciliation and artifact replay require zero extraction calls
+- [x] 13.2 Keep deterministic-parser records out of the semantic verifier while preserving local proof and promotion governance
+- [x] 13.3 Collapse only identical duplicate primary-key rows and automatically requeue historical terminal work caused by the former duplicate error
+- [x] 13.4 Raise structured-shadow parse concurrency from 4 to 8 while preserving work-conserving backpressure, immutable PDF cache reuse, and the single writer
+- [x] 13.5 Prefix final verified effective unit-rule notifications with `✅` and all non-effective outcomes with `⚠️`
+- [x] 13.6 Add focused regressions, run compilation/static/OpenSpec validation, review confirmed findings, and record production-validation guidance
+
+### 2026-08-10 Production Replay Closure And PDF Throughput Evidence
+
+- The active `structured_shadow` parse ceiling is eight on the 16-physical-core host; immutable page-artifact caching, continuous slot refill, bounded claims, and the single SQLite writer remain unchanged. An alternate parser or process pool is deferred until representative annual-report fidelity and resource benchmarks pass.
+- The catalog resolves `吨千米` and `亿吨千米` as freight turnover and exact annual-report header forms such as `元币种：人民币` as CNY. Temporary-database tests prove quarantined rules are superseded and matching semantic artifacts replay without an extraction client.
+- Deterministic parser rows never enter the semantic verifier. Local evidence, executed numeric reconciliation, and parser-manifest proof separately control canonical promotion; non-promoted rows route to machine rework instead of an LLM gateway error or human review.
+- Bundle persistence collapses complete-payload-identical primary keys and fails explicitly for conflicting payloads. Legacy semantic terminal work with the old duplicate error is requeued once with its checkpoint and recovery history preserved.
+- Unit notifications begin with `✅` only when the grouped final state has a verified effective rule; quarantined and other non-effective states begin with `⚠️`.
+- The expanded focused suite passed 240 tests, followed by 73 full semantic extraction/runtime regressions after the final promotion-routing correction. Python compilation, fatal Ruff checks, JSON validation, `git diff --check`, and strict OpenSpec validation passed.
+- External `codex review --uncommitted` was rejected by tenant policy because the broad dirty worktree contains unrelated private changes. Equivalent local review of this task diff found and fixed missing explicit reconciliation execution and a canonical-promotion gate that could otherwise approve or deep-review locally held parser rows; speculative parser-engine replacement and unrelated baseline changes were not modified.

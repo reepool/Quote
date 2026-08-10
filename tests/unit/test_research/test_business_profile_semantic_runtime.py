@@ -1174,6 +1174,53 @@ def test_deterministic_segment_table_persists_and_promotes_normalized_currency(
     assert evidence[0]["review_status"] == "approved"
 
 
+def test_unpromoted_deterministic_parser_record_never_calls_verifier_or_promotes(
+    tmp_path, monkeypatch
+):
+    gateway = _FakeGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息\n"
+            "|分产品|营业收入（万元）|营业成本（万元）|毛利率|\n"
+            "|煤炭|100|60|40%|"
+        ),
+        gateway=gateway,
+    )
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    segment = repository.list_records("segments", instrument_id="601088.SH")[0]
+    segment["metadata"]["parser_manifest_promoted"] = False
+    repository.upsert("segments", segment)
+
+    verified = pipeline.run("verify", scope=scope)
+
+    assert verified["status"] == "success"
+    assert verified["metrics"]["llm_calls"] == 0
+    assert verified["metrics"]["errors"] == 0
+    assert gateway.requests == []
+    verification_artifact = pipeline.checkpoint_store.load()["artifacts"]["verify"]
+    verification = pipeline.handlers["verify"].__self__.stage_store.read(
+        verification_artifact, expected_stage="verify"
+    )["verifications"][0]
+    assert verification["proof"]["canonical_promotion_allowed"] is False
+
+    promoted = pipeline.run("promote", scope=scope)
+    assert promoted["status"] == "success"
+    promotion_artifact = pipeline.handlers["promote"].__self__.stage_store.read(
+        promoted["artifact"], expected_stage="promote"
+    )
+    assert any(
+        item["decision"]["classification"] == "machine_rework"
+        and "manifest_not_promoted" in item["decision"]["reason_codes"]
+        for item in promotion_artifact["decisions"]
+    )
+    held = repository.list_records("segments", instrument_id="601088.SH")[0]
+    assert held["review_status"] != "approved"
+
+
 def test_structured_empty_output_reports_expected_non_disclosure(tmp_path, monkeypatch):
     _repository, pipeline, scope = _deterministic_runtime(
         tmp_path,

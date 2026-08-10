@@ -55,6 +55,32 @@ def _stable_hash(payload: Any) -> str:
     return hashlib.sha256(_json_dumps(payload).encode("utf-8")).hexdigest()
 
 
+def _collapse_identical_bundle_records(
+    record_type: str,
+    prepared: Sequence[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Collapse exact duplicates while failing closed on same-key conflicts."""
+
+    unique: Dict[str, Dict[str, Any]] = {}
+    ordered: List[Dict[str, Any]] = []
+    for item in prepared:
+        primary_key = str(item["pk_value"])
+        existing = unique.get(primary_key)
+        if existing is None:
+            unique[primary_key] = item
+            ordered.append(item)
+            continue
+        if (
+            existing["status"] != item["status"]
+            or existing["payload"] != item["payload"]
+        ):
+            raise ValueError(
+                "conflicting business profile primary key in bundle: "
+                f"{record_type}:{primary_key}"
+            )
+    return ordered
+
+
 def build_empty_business_profile_context(
     instrument_id: str,
     *,
@@ -554,11 +580,7 @@ class BusinessProfileRepository:
                 self._prepare_record(record_type, row, now=prepared_at)
                 for row in rows
             ]
-            primary_keys = [item["pk_value"] for item in prepared]
-            if len(primary_keys) != len(set(primary_keys)):
-                raise ValueError(
-                    f"duplicate business profile primary key in bundle: {record_type}"
-                )
+            prepared = _collapse_identical_bundle_records(record_type, prepared)
             self._validate_prepared_batch_temporal(record_type, prepared)
             prepared_by_type[record_type] = prepared
         run_id = str(run_payload["run_id"])

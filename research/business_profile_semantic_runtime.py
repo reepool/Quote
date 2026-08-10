@@ -2534,8 +2534,13 @@ class BusinessProfileSemanticRuntime:
                 for record_id in record_ids:
                     record = self._find_record(record_type, record_id)
                     verification = verification_by_id.get(record_id)
-                    proof = not output["semantic"] or bool(
-                        verification and verification.get("decision") == "confirmed"
+                    verification_proof = dict(
+                        (verification or {}).get("proof") or {}
+                    )
+                    proof = (
+                        not output["semantic"]
+                        if verification is None
+                        else verification.get("decision") == "confirmed"
                     )
                     decisions.append(
                         self._promote_record(
@@ -2545,6 +2550,12 @@ class BusinessProfileSemanticRuntime:
                             manifest=manifest,
                             scope=scope,
                             semantic_proof=proof,
+                            exception_reasons=tuple(
+                                str(item)
+                                for item in verification_proof.get(
+                                    "promotion_block_reasons", []
+                                )
+                            ),
                         )
                     )
         derived = self._derive_and_publish(scope)
@@ -2968,6 +2979,7 @@ class BusinessProfileSemanticRuntime:
         manifest: FieldFamilyPromotionManifest,
         scope: Any,
         semantic_proof: bool,
+        exception_reasons: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         if record["review_status"] != "candidate":
             return {
@@ -3054,6 +3066,7 @@ class BusinessProfileSemanticRuntime:
                 gates=gates,
                 runtime_identities=scope.identities,
                 evidence_references=tuple(value for value in (evidence_id,) if value),
+                exception_reasons=exception_reasons,
             ),
             manifest,
         )

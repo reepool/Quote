@@ -1,6 +1,6 @@
 {
   "schema_version": "business_profile_unit_conversion_catalog.v1",
-  "catalog_version": "business_profile_units.2026.5",
+  "catalog_version": "business_profile_units.2026.6",
   "fact_catalog_version": "business_profile_facts.2026.2",
   "released_on": "2026-08-10",
   "period_basis_values": [
@@ -30,6 +30,7 @@
     {"unit_id": "tonne", "dimension": "mass", "aliases": ["ton", "metric_ton", "吨", "公吨"], "canonical_for_dimension": true},
     {"unit_id": "kg", "dimension": "mass", "aliases": ["kilogram", "千克", "公斤"], "canonical_for_dimension": false},
     {"unit_id": "10k_tonne", "dimension": "mass", "aliases": ["万吨", "万公吨"], "canonical_for_dimension": false},
+    {"unit_id": "tonne_km", "dimension": "freight_turnover", "aliases": ["吨千米", "吨公里"], "canonical_for_dimension": true},
     {"unit_id": "barrel", "dimension": "liquid_volume", "aliases": ["bbl", "桶"], "canonical_for_dimension": true},
     {"unit_id": "cubic_meter", "dimension": "volume", "aliases": ["m3", "立方米"], "canonical_for_dimension": true},
     {"unit_id": "10k_cubic_meter", "dimension": "volume", "aliases": ["万立方米"], "canonical_for_dimension": false},

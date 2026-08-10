@@ -162,6 +162,39 @@ def test_valid_document_field_family_bundle_commits_once(tmp_path):
     assert run["activity_count"] == 1
 
 
+def test_bundle_collapses_identical_primary_keys(tmp_path):
+    repository, _storage_manager = _repository(tmp_path)
+
+    result = repository.persist_document_field_family_bundle(
+        run=_run(),
+        records_by_type={
+            "evidence": [_evidence(), _evidence()],
+            "activities": [_activity(), _activity()],
+        },
+    )
+
+    assert result["evidence_count"] == 1
+    assert result["activity_count"] == 1
+    assert len(repository.list_records("evidence")) == 1
+    assert len(repository.list_records("activities")) == 1
+
+
+def test_bundle_rejects_conflicting_duplicate_primary_keys(tmp_path):
+    repository, storage = _repository(tmp_path)
+    conflict = _activity()
+    conflict["object_raw"] = "焦煤"
+
+    with pytest.raises(ValueError, match="conflicting business profile primary key"):
+        repository.persist_document_field_family_bundle(
+            run=_run(),
+            records_by_type={
+                "evidence": [_evidence()],
+                "activities": [_activity(), conflict],
+            },
+        )
+    _assert_empty(repository, storage)
+
+
 @pytest.mark.parametrize(
     "mutation,match",
     [

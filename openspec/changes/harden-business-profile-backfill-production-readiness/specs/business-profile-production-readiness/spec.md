@@ -381,3 +381,42 @@ Structured promotion SHALL remain disabled until a bounded shadow run proves Chi
 - **WHEN** any required quality or operational metric fails
 - **THEN** the phase remains shadow-only
 - **AND** machine-readable blockers identify the affected instruments, field families, units, rows, or runtime metric
+
+### Requirement: Production-observed unit and replay gaps recover deterministically
+The backfill SHALL resolve governed freight-turnover and bounded currency-header units in program code, SHALL keep deterministic parser records out of the semantic verifier, and SHALL automatically recover identical duplicate-primary-key history without weakening conflict detection.
+
+#### Scenario: Freight turnover is disclosed
+- **WHEN** a source table reports `吨千米` or `亿吨千米`
+- **THEN** deterministic unit code resolves the freight-turnover dimension and canonical unit `tonne_km`
+- **AND** it applies exact multipliers one or one hundred million respectively
+
+#### Scenario: Currency unit is joined to its table header
+- **WHEN** a source-unit field exactly matches a governed annual-report header form such as `元币种：人民币`
+- **THEN** deterministic code resolves it as Chinese yuan with source unit `元`
+- **AND** it does not rewrite arbitrary currency prose or evidence text
+
+#### Scenario: Deterministic parser row requires verification
+- **WHEN** a row has deterministic-parser derivation and valid local evidence and numeric proof
+- **THEN** it is decided locally and no semantic-verifier request is made
+- **AND** a non-promoted parser manifest keeps the row in confirmed shadow state rather than reporting a gateway failure
+
+#### Scenario: Bundle repeats an identical primary key
+- **WHEN** two prepared rows have the same primary key and identical complete payloads
+- **THEN** persistence collapses them deterministically to one row
+- **AND** historical terminal work caused by the former duplicate error is requeued from reusable checkpoints
+- **WHEN** duplicate primary keys contain conflicting payloads
+- **THEN** persistence fails explicitly and does not choose one value silently
+
+### Requirement: Parse throughput and unit notifications remain governed
+The structured-shadow rollout SHALL use bounded parse concurrency appropriate to host capacity while retaining immutable page-artifact reuse, work-conserving refill, backpressure, and one SQLite writer; unit notifications SHALL visibly distinguish final success from non-effective outcomes.
+
+#### Scenario: Structured-shadow PDF parsing starts on the current host
+- **WHEN** no parse-concurrency override is supplied
+- **THEN** the rollout admits at most eight parse workers
+- **AND** parsing runs outside the single SQLite writer gate with existing queue and memory bounds
+
+#### Scenario: Unit lifecycle reaches a final effective rule
+- **WHEN** grouped lifecycle events resolve to a verified enabled current rule
+- **THEN** the Telegram message begins with `✅`
+- **WHEN** the final current state is quarantined, pending, ineffective, or unsuccessful
+- **THEN** the Telegram message begins with `⚠️`
