@@ -2,6 +2,8 @@ import asyncio
 import sqlite3
 from contextlib import contextmanager
 
+import pytest
+
 from research.business_profile_semantic_artifacts import (
     BusinessProfileSemanticArtifactRepository,
     SemanticArtifactIdentity,
@@ -259,6 +261,155 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     assert delivered == 3
     assert any("已生效=是" in message for message in messages)
     assert any("影响公司=688799.SH" in message for message in messages)
+
+
+def test_operator_correction_supersedes_rule_and_replays_without_formula_input(
+    tmp_path,
+):
+    storage = _Storage(tmp_path / "research.db")
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = _identity(instrument_id="300750.SZ")
+    artifact = artifacts.receive(
+        identity,
+        response={"rows": [{"unit_raw": "万Ah", "value": "12"}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    registry = BusinessProfileUnitRuleRegistry(storage)
+    old = registry.register_proposal(
+        {
+            "source_unit": "万Ah",
+            "normalized_lexeme": "万Ah",
+            "dimension": "未确定（含未登记的 A 维度）",
+            "canonical_unit": "Ah",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [
+                {"source": "1", "canonical": "416.6666666666667"}
+            ],
+            "semantic_summary_zh": "错误的模型建议",
+        },
+        proposal_input_hash="7" * 64,
+        artifact_id=artifact["artifact_id"],
+        source_document_id="document-1",
+        context_hash="scope-1",
+        model_identity="unit-model-1",
+    )
+
+    result = registry.correct_rule(
+        old["rule_id"],
+        dimension="electric_charge",
+        canonical_unit="Ah",
+        multiplier="10000",
+        reason="万表示一万，Ah 是电荷容量单位",
+    )
+
+    replacement = result["replacement_rule"]
+    assert registry.get_rule(old["rule_id"])["status"] == "superseded"
+    assert replacement["status"] == "auto_approved"
+    assert replacement["dimension"] == "electric_charge"
+    assert replacement["canonical_unit"] == "Ah"
+    assert replacement["multiplier"] == "10000"
+    assert result["replayed_artifacts"] == 1
+    assert artifacts.find_replay(identity) is not None
+    assert [row["status"] for row in registry.get_rule_history(old["rule_id"])] == [
+        "proposed",
+        "quarantined",
+        "superseded",
+    ]
+    overlay = {
+        row["normalized_lexeme"]: row for row in registry.overlay_rules()
+    }
+    assert overlay["万Ah"]["rule_id"] == replacement["rule_id"]
+    repeated = registry.correct_rule(
+        old["rule_id"],
+        dimension="electric_charge",
+        canonical_unit="Ah",
+        multiplier="1e4",
+        reason="重复执行不应产生新生命周期",
+    )
+    assert repeated["idempotent_reuse"] is True
+    assert repeated["replayed_artifacts"] == 0
+    assert len(registry.get_rule_history(old["rule_id"])) == 3
+    assert len(registry.get_rule_history(replacement["rule_id"])) == 2
+
+
+def test_operator_correction_rejects_ungoverned_target(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(storage)
+    old = registry.register_proposal(
+        {
+            "source_unit": "箱当量",
+            "normalized_lexeme": "箱当量",
+            "dimension": "unknown",
+            "canonical_unit": "unknown",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+        },
+        proposal_input_hash="8" * 64,
+    )
+
+    with pytest.raises(ValueError, match="unknown dimension"):
+        registry.correct_rule(
+            old["rule_id"],
+            dimension="custom_dimension",
+            canonical_unit="custom",
+            multiplier="1",
+        )
+
+
+def test_operator_correction_resumes_after_interrupted_catalog_commit(
+    tmp_path, monkeypatch
+):
+    storage = _Storage(tmp_path / "research.db")
+    registry = BusinessProfileUnitRuleRegistry(storage)
+    old = registry.register_proposal(
+        {
+            "source_unit": "未知安时单位",
+            "normalized_lexeme": "未知安时单位",
+            "dimension": "unknown",
+            "canonical_unit": "unknown",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+        },
+        proposal_input_hash="9" * 64,
+    )
+    commit_catalog = registry._commit_catalog_version
+
+    def interrupted(_rule_id):
+        raise RuntimeError("simulated interruption")
+
+    monkeypatch.setattr(registry, "_commit_catalog_version", interrupted)
+    with pytest.raises(RuntimeError, match="simulated interruption"):
+        registry.correct_rule(
+            old["rule_id"],
+            dimension="electric_charge",
+            canonical_unit="Ah",
+            multiplier="1000",
+        )
+    assert registry.get_rule(old["rule_id"])["status"] == "superseded"
+
+    monkeypatch.setattr(registry, "_commit_catalog_version", commit_catalog)
+    resumed = registry.correct_rule(
+        old["rule_id"],
+        dimension="electric_charge",
+        canonical_unit="Ah",
+        multiplier="1000",
+    )
+
+    assert resumed["replacement_rule"]["status"] == "auto_approved"
+    assert resumed["idempotent_reuse"] is False
 
 
 def test_unit_rule_without_round_trip_proof_is_quarantined(tmp_path):

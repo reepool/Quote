@@ -375,6 +375,190 @@ class BusinessProfileUnitRuleRegistry:
             raise ValueError(f"unknown unit rule: {rule_id}")
         return self._decode_rule(dict(row))
 
+    def get_rule_history(self, rule_id: str) -> list[dict[str, Any]]:
+        """Return the append-only lifecycle history for an operator-visible rule."""
+
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM business_profile_unit_rules WHERE rule_id = ? "
+                "ORDER BY created_at, rowid",
+                (rule_id,),
+            ).fetchall()
+        if not rows:
+            raise ValueError(f"unknown unit rule: {rule_id}")
+        return [self._decode_rule(dict(row)) for row in rows]
+
+    def correct_rule(
+        self,
+        rule_id: str,
+        *,
+        dimension: str,
+        canonical_unit: str,
+        multiplier: Any,
+        reason: str = "operator_correction",
+    ) -> dict[str, Any]:
+        """Append a governed operator correction and replay affected artifacts.
+
+        This is the exceptional fallback for a wrong automated proposal. It accepts
+        only an exact positive multiplier into an existing governed dimension; no
+        formula or executable expression crosses the operator boundary.
+        """
+
+        current = self.get_rule(rule_id)
+        normalized_dimension = str(dimension or "").strip()
+        normalized_canonical = str(canonical_unit or "").strip()
+        allowed_canonical = governed_canonical_units()
+        if normalized_dimension not in GOVERNED_DIMENSIONS:
+            raise ValueError(
+                f"unit correction uses unknown dimension: {normalized_dimension}"
+            )
+        if allowed_canonical.get(normalized_dimension) != normalized_canonical:
+            raise ValueError(
+                "unit correction canonical unit does not match governed dimension: "
+                f"{normalized_dimension}->{normalized_canonical}"
+            )
+        normalized_multiplier = decimal_value(multiplier, "unit correction multiplier")
+        if normalized_multiplier <= 0:
+            raise ValueError("unit correction multiplier must be positive")
+        multiplier_text = _canonical_decimal_text(normalized_multiplier)
+        correction_reason = str(reason or "operator_correction").strip()[:240]
+        source_unit = str(current.get("source_unit") or "").strip()
+        normalized_lexeme = normalize_unit_lexeme(source_unit)
+        replacement_rule_id = "bp-unit-rule-" + _stable_hash(
+            {
+                "normalized_lexeme": normalized_lexeme,
+                "dimension": normalized_dimension,
+                "canonical_unit": normalized_canonical,
+                "multiplier": multiplier_text,
+                "authority": "operator_correction",
+            }
+        )[:20]
+        try:
+            existing = self.get_rule(replacement_rule_id)
+        except ValueError:
+            existing = None
+        if existing is not None and existing.get("status") not in {
+            "proposed",
+            "auto_approved",
+        }:
+            raise ValueError(
+                "operator correction replacement is not resumable: "
+                f"{replacement_rule_id}:{existing.get('status')}"
+            )
+
+        proposal = {
+            "source_unit": source_unit,
+            "normalized_lexeme": normalized_lexeme,
+            "dimension": normalized_dimension,
+            "canonical_unit": normalized_canonical,
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [
+                {"source": "1", "canonical": multiplier_text}
+            ],
+            "semantic_summary_zh": f"人工纠正规则：{correction_reason}",
+        }
+        proposal_input_hash = _stable_hash(
+            {
+                "replaces": rule_id,
+                "proposal": proposal,
+                "reason": correction_reason,
+            }
+        )
+        replacement_proof = UnitRuleProof(
+            valid=True,
+            status="auto_approved",
+            multiplier=normalized_multiplier,
+            reason_codes=("operator_governed_correction",),
+            proof_hash=_stable_hash(
+                {
+                    "rule_id": replacement_rule_id,
+                    "proposal": proposal,
+                    "authority": "operator_correction",
+                }
+            ),
+        )
+        if existing is None:
+            self._append_rule_event(
+                replacement_rule_id,
+                "proposed",
+                proposal,
+                replacement_proof,
+                proposal_input_hash=proposal_input_hash,
+            )
+
+        old_proof = UnitRuleProof(
+            valid=False,
+            status="superseded",
+            multiplier=(
+                decimal_value(current["multiplier"], "superseded multiplier")
+                if current.get("multiplier") is not None
+                else None
+            ),
+            reason_codes=(
+                f"superseded_by:{replacement_rule_id}",
+                "operator_governed_correction",
+            ),
+            proof_hash=_stable_hash(
+                {"old": rule_id, "replacement": replacement_rule_id}
+            ),
+        )
+        old_already_superseded = current.get("status") == "superseded"
+        if old_already_superseded:
+            if current.get("supersedes_rule_id") != replacement_rule_id:
+                raise ValueError(
+                    "unit rule was superseded by a different replacement: "
+                    f"{current.get('supersedes_rule_id')}"
+                )
+        else:
+            self._append_rule_event(
+                rule_id,
+                "superseded",
+                dict(current.get("proposal") or {}),
+                old_proof,
+                proposal_input_hash=str(current["proposal_input_hash"]),
+                supersedes_rule_id=replacement_rule_id,
+            )
+        replacement_already_active = (
+            existing is not None and existing.get("status") == "auto_approved"
+        )
+        if not replacement_already_active:
+            catalog_version = self._commit_catalog_version(replacement_rule_id)
+            self._append_rule_event(
+                replacement_rule_id,
+                "auto_approved",
+                proposal,
+                replacement_proof,
+                proposal_input_hash=proposal_input_hash,
+                catalog_version=catalog_version,
+                supersedes_rule_id=rule_id,
+            )
+        completed_before_call = (
+            old_already_superseded
+            and replacement_already_active
+            and self._notification_exists(replacement_rule_id, "auto_approved")
+            and self._notification_exists(rule_id, "superseded")
+        )
+        replayed = 0
+        if not completed_before_call:
+            self._copy_observations(rule_id, replacement_rule_id)
+            replayed = self._replay_affected_artifacts(
+                replacement_rule_id,
+                reason=f"unit_rule_operator_correction:{rule_id}",
+            )
+            self.queue_notification(replacement_rule_id, "auto_approved")
+            self.queue_notification(rule_id, "superseded")
+        return {
+            "old_rule": self.get_rule(rule_id),
+            "replacement_rule": self.get_rule(replacement_rule_id),
+            "replayed_artifacts": replayed,
+            "idempotent_reuse": completed_before_call,
+        }
+
     def reconcile_deterministic_rules(self, *, limit: int = 100) -> dict[str, int]:
         """Replace quarantined rules that the current deterministic catalog resolves."""
 
@@ -560,6 +744,16 @@ class BusinessProfileUnitRuleRegistry:
             )
             conn.commit()
         return notification_id
+
+    def _notification_exists(self, rule_id: str, lifecycle_status: str) -> bool:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                "SELECT 1 FROM business_profile_unit_rule_notifications "
+                "WHERE rule_id = ? AND lifecycle_status = ? LIMIT 1",
+                (rule_id, lifecycle_status),
+            ).fetchone()
+        return row is not None
 
     async def dispatch_notifications(
         self,
@@ -1083,6 +1277,13 @@ async def propose_unknown_unit(
 
 def _json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _canonical_decimal_text(value: Decimal) -> str:
+    text = format(value, "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return "0" if text in {"", "-0"} else text
 
 
 def _stable_hash(value: Any) -> str:

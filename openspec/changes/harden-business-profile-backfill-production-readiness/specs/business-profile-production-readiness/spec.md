@@ -137,6 +137,12 @@ Every unknown source-unit proposal SHALL be stored as an append-only governed ru
 - **AND** it automatically replays all affected semantic artifacts and reports the affected-fact count
 - **AND** Telegram receives a correction notification with the old and new rule identities
 
+#### Scenario: Operator corrects a remaining wrong proposal
+- **WHEN** automated retries still leave a wrong proposal and an operator supplies a governed dimension, its governed canonical unit, and an exact positive multiplier
+- **THEN** the system rejects unknown dimensions, mismatched canonical units, non-positive values, and formula strings
+- **AND** it appends an `auto_approved` replacement with explicit operator-correction lineage and marks the old rule `superseded`
+- **AND** it replays affected semantic artifacts and sends informational Telegram notices without editing prior rows
+
 #### Scenario: Rule is unsafe or ambiguous
 - **WHEN** a proposal requires a new dimension, FX, contextual/non-linear conversion, or has contradictory evidence
 - **THEN** the system stores it as `quarantined`, keeps affected canonical facts pending, and sends a deduplicated Telegram alert
@@ -250,11 +256,11 @@ The system SHALL automatically identify and make non-publishable structured shad
 - **AND** it does not silently mutate approved history
 
 ### Requirement: Structured semantic concurrency is configurable and adaptive
-The backfill SHALL support a configured ceiling of ten concurrent structured semantic requests while keeping shared gateway admission, provider limits, token budgets, timeout handling, and adaptive congestion control authoritative.
+The backfill SHALL support a configured ceiling of twenty concurrent structured semantic requests while keeping shared gateway admission, provider limits, token budgets, timeout handling, and adaptive congestion control authoritative.
 
 #### Scenario: Shadow backfill uses the new default
 - **WHEN** structured-shadow backfill starts without an explicit semantic concurrency override
-- **THEN** it requests a maximum semantic concurrency of ten
+- **THEN** it requests a maximum semantic concurrency of twenty
 - **AND** parse and semantic work run outside the SQLite write gate
 
 #### Scenario: Gateway admits fewer requests

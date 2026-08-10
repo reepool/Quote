@@ -7909,6 +7909,129 @@ class ScheduledTasks:
             )
             return False
 
+    async def business_profile_unit_rule_control(
+        self,
+        action: str = "show",
+        rule_id: Optional[str] = None,
+        dimension: Optional[str] = None,
+        canonical_unit: Optional[str] = None,
+        multiplier: Optional[str] = None,
+        reason: str = "operator_correction",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Inspect or append a governed correction for a business-profile unit rule."""
+
+        task_id = "business_profile_unit_rule_control"
+        action_name = str(action or "show").strip().lower()
+        try:
+            if action_name not in {"show", "correct"}:
+                raise ValueError(
+                    "business-profile unit-rule action must be show or correct"
+                )
+            normalized_rule_id = str(rule_id or "").strip()
+            if not normalized_rule_id:
+                raise ValueError("business-profile unit-rule control requires rule_id")
+            storage = getattr(data_manager, "research_storage", None)
+            if storage is None:
+                raise ValueError("business-profile research storage is unavailable")
+
+            from research.business_profile_async_production import (
+                ensure_business_profile_storage_ready,
+            )
+            from research.business_profile_unit_registry import (
+                BusinessProfileUnitRuleRegistry,
+            )
+
+            ensure_business_profile_storage_ready(storage)
+            registry = BusinessProfileUnitRuleRegistry(storage)
+            notification = None
+            if action_name == "show":
+                current = registry.get_rule(normalized_rule_id)
+                history = registry.get_rule_history(normalized_rule_id)
+                payload = {
+                    "action": "show",
+                    "rule": current,
+                    "history": history,
+                    "history_event_count": len(history),
+                }
+                detail = (
+                    f"规则={normalized_rule_id} 状态={current.get('status')} "
+                    f"单位={current.get('source_unit')} "
+                    f"维度={current.get('dimension')} "
+                    f"规范单位={current.get('canonical_unit')} "
+                    f"倍率={current.get('multiplier')} "
+                    f"历史事件={len(history)}"
+                )
+            else:
+                if dimension is None or canonical_unit is None or multiplier is None:
+                    raise ValueError(
+                        "correct requires dimension, canonical_unit and multiplier"
+                    )
+                correction = registry.correct_rule(
+                    normalized_rule_id,
+                    dimension=str(dimension),
+                    canonical_unit=str(canonical_unit),
+                    multiplier=multiplier,
+                    reason=str(reason or "operator_correction"),
+                )
+                dispatcher = getattr(
+                    data_manager,
+                    "_dispatch_business_profile_unit_rule_notifications",
+                    None,
+                )
+                if callable(dispatcher):
+                    notification = await dispatcher()
+                replacement = correction["replacement_rule"]
+                payload = {
+                    "action": "correct",
+                    **correction,
+                    "notification": notification,
+                }
+                detail = (
+                    f"旧规则={normalized_rule_id} 已追加替代规则="
+                    f"{replacement.get('rule_id')} 状态={replacement.get('status')} "
+                    f"维度={replacement.get('dimension')} "
+                    f"规范单位={replacement.get('canonical_unit')} "
+                    f"倍率={replacement.get('multiplier')} "
+                    f"重放语义产物={correction.get('replayed_artifacts', 0)}"
+                )
+
+            await self._send_task_report(
+                report_data={
+                    "name": "公司画像单位规则控制",
+                    "status": "success",
+                    "tasks_completed": 1,
+                    "maintenance_tasks": [
+                        {"task_name": task_id, "status": "success"}
+                    ],
+                    "business_profile_unit_rule_control": payload,
+                    "detail_messages": [detail],
+                },
+                report_type="maintenance_report",
+                task_name="公司画像单位规则控制",
+                job_config=job_config,
+            )
+            return True
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Business-profile unit-rule control failed: %s", exc
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "公司画像单位规则控制",
+                    "status": "error",
+                    "tasks_completed": 0,
+                    "maintenance_tasks": [
+                        {"task_name": task_id, "status": "failed"}
+                    ],
+                    "detail_messages": [f"{type(exc).__name__}: {exc}"],
+                },
+                report_type="maintenance_report",
+                task_name="公司画像单位规则控制",
+                job_config=job_config,
+            )
+            return False
+
     async def industry_shadow_sync(
         self,
         exchanges: Optional[List[str]] = None,

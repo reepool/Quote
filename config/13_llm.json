@@ -38,11 +38,11 @@
       "scorpio:luna": {
         "provider": "openai_compatible",
         "quota_bucket": "scorpio:luna-key",
-        "hard_max_concurrency": 10,
-        "default_bulk_concurrency": 8,
+        "hard_max_concurrency": 20,
+        "default_bulk_concurrency": 18,
         "reserved_concurrency": 2,
-        "http_max_connections": 12,
-        "http_max_keepalive_connections": 10,
+        "http_max_connections": 22,
+        "http_max_keepalive_connections": 20,
         "requests_per_minute": 10,
         "adaptive_concurrency_enabled": true,
         "adaptive_min_bulk_concurrency": 2,
@@ -82,7 +82,7 @@
     "pools": {
       "shared_semantic": {
         "enabled": true,
-        "total_concurrency": 10,
+        "total_concurrency": 20,
         "queue_size": 200,
         "strategy": "weighted_fair",
         "borrow_idle_capacity": true,
@@ -174,7 +174,7 @@
         "attempt_timeout_seconds": 300,
         "max_retries": 1,
         "max_schema_repair_attempts": 1,
-        "max_concurrency": 10,
+        "max_concurrency": 20,
         "requests_per_minute": 0,
         "temperature": 0.0,
         "max_output_tokens_field": "max_completion_tokens",

@@ -43,6 +43,7 @@ def test_production_rollout_starts_in_structured_shadow_with_bounded_budgets():
     )
     assert phase.promotion_enabled is False
     assert set(phase.stage_budgets) == {"acquire", "parse", "semantic", "publish"}
+    assert phase.stage_budgets["semantic"]["max_concurrency"] == 20
     assert rollout.phases["daily_incremental"].enabled is False
     assert rollout.bootstrap["selection_policy"] == "latest_annual_only"
     assert rollout.bootstrap["start_date"] is None

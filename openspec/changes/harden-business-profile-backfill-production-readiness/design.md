@@ -31,7 +31,7 @@ provenance must remain reproducible without the LLM.
   fixes do not spend another LLM request.
 - Reject or quarantine arithmetic inconsistencies before candidate persistence and
   automatically recover the affected shadow work.
-- Raise structured semantic concurrency to ten by default, with shared gateway
+- Raise structured semantic concurrency to twenty by default, with shared gateway
   admission, provider-specific limits, adaptive congestion reduction, and clear
   observability.
 - Initialize storage once per production run, keep computation outside the write
@@ -210,9 +210,15 @@ unnecessary LLM calls.
 
 ### 5. Raise concurrency without bypassing controls
 
-Set structured semantic `max_concurrency` to 10 in shadow configuration. The stage
-creates at most ten async requests, while the common gateway remains authoritative
+Set structured semantic `max_concurrency` to 20 in shadow configuration. The stage
+creates at most twenty async requests, while the common gateway remains authoritative
 for pool admission, provider limits, token budgets, retries, and circuit breaking.
+The active shared semantic pool and Luna provider resource are raised to twenty
+with two reserved slots and eighteen default bulk slots; adaptive controls may
+still admit fewer requests.
+These values are rollout configuration, not code constants: a future increase
+must update the stage, pool, provider/profile, and HTTP connection ceilings
+together, while retaining the same quota and adaptive-governance checks.
 The service records requested, admitted, in-flight, throttled, failover, and
 provider-congestion counts. A configured adaptive controller can lower the stage
 limit when timeout/error or queue-wait thresholds are exceeded and restore it after
@@ -221,7 +227,7 @@ SQLite writer.
 
 Alternative rejected: bypassing admission or setting an unbounded fixed number.
 The previous run had successful calls but a saturated writer; the requested limit
-of ten remains a stage ceiling, while gateway and provider controls may admit fewer
+of twenty remains a stage ceiling, while gateway and provider controls may admit fewer
 requests under filing-season pressure.
 
 ### 6. Make storage initialization and writes genuinely short
@@ -276,6 +282,11 @@ The corrected lifecycle is:
    the runtime automatically appends a proved replacement, supersedes the old
    proposal, and replays every affected semantic artifact without extraction LLM
    usage.
+6. If the automated proposal remains wrong, an exceptional operator control accepts
+   only a governed dimension, its governed canonical unit, and an exact positive
+   multiplier. It appends a separately identified replacement, supersedes the old
+   lifecycle, replays affected semantic artifacts, and sends both lifecycle notices.
+   It never accepts executable formulas or rewrites historical rows.
 
 `Ah` is governed as electric charge/battery charge capacity, not energy. `Ah` may
 be scaled to `mAh`, `kAh`, or `万Ah`, but conversion to `Wh`/`kWh` is prohibited
@@ -316,7 +327,7 @@ is finalized as machine rework so the workflow remains bounded.
    audits.
 3. Replay stored semantic artifacts under the new unit and numeric contracts. Only
    artifacts that fail hash/evidence scope validation are sent to the LLM again.
-4. Run a bounded 20-company shadow batch with semantic concurrency 10 and DEBUG
+4. Run a bounded 20-company shadow batch with semantic concurrency 20 and DEBUG
    logging. Require zero unconditional reconciliation flags, zero repeated
    initialization calls, no terminal failures, and all unresolved units represented
    as pending artifacts. Require zero canonical publication decisions that reference

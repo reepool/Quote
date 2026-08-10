@@ -1,17 +1,18 @@
 import asyncio
 from unittest.mock import ANY, AsyncMock, Mock
 
-import scheduler.tasks as task_module
 import research.business_profile_semantic_runtime as runtime_module
+import scheduler.tasks as task_module
 import utils.llm as llm_module
 from data_manager import DataManager
-from scheduler.job_config import JobConfig
-from scheduler.scheduler import TaskScheduler
-from scheduler.tasks import ScheduledTasks
-from research.storage import ResearchStorageManager
 from research.business_profile_backfill_control import (
     BusinessProfileBackfillControlStore,
 )
+from research.business_profile_unit_registry import BusinessProfileUnitRuleRegistry
+from research.storage import ResearchStorageManager
+from scheduler.job_config import JobConfig
+from scheduler.scheduler import TaskScheduler
+from scheduler.tasks import ScheduledTasks
 from utils.config_manager import (
     ResearchBudgetConfig,
     ResearchConfig,
@@ -109,6 +110,11 @@ def test_only_manual_business_profile_backfill_is_enabled_during_bootstrap():
     assert jobs["business_profile_backfill"]["parameters"]["max_runtime_seconds"] is None
     assert jobs["business_profile_backfill_control"]["enabled"] is True
     assert jobs["business_profile_backfill_control"]["manual_only"] is True
+    assert jobs["business_profile_unit_rule_control"]["enabled"] is True
+    assert jobs["business_profile_unit_rule_control"]["manual_only"] is True
+    assert jobs["business_profile_unit_rule_control"]["parameters"]["action"] == (
+        "show"
+    )
     for legacy_job_id in (
         "business_profile_index_discovery_daily",
         "business_profile_semantic_maintenance",
@@ -512,3 +518,71 @@ def test_scheduler_backfill_control_requests_stop(tmp_path, monkeypatch):
     )
     assert store.status()["state"] == "stop_requested"
     assert store.should_stop("active-run")["reason"] == "test"
+
+
+def test_scheduler_unit_rule_control_shows_and_corrects_rule(tmp_path, monkeypatch):
+    research_config = ResearchConfig(
+        enabled=True,
+        modules={},
+        storage=ResearchStorageConfig(
+            db_path=str(tmp_path / "research.db"),
+            shadow_mode=True,
+            attach_quotes_db=False,
+            quotes_db_path=str(tmp_path / "quotes.db"),
+            financials_db_path=str(tmp_path / "financials.db"),
+            valuation_db_path=str(tmp_path / "valuation.db"),
+            interests_db_path=str(tmp_path / "interests.db"),
+        ),
+        budget=ResearchBudgetConfig(),
+    )
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    old = BusinessProfileUnitRuleRegistry(storage).register_proposal(
+        {
+            "source_unit": "万Ah",
+            "normalized_lexeme": "万Ah",
+            "dimension": "错误维度",
+            "canonical_unit": "Ah",
+            "numerator": [],
+            "denominator": [],
+            "primitive_rule_ids": [],
+            "factors": [],
+            "transformation_type": "linear_multiplier",
+            "round_trip_vectors": [{"source": "1", "canonical": "416.67"}],
+        },
+        proposal_input_hash="f" * 64,
+    )
+    manager = Mock(research_storage=storage)
+    manager._dispatch_business_profile_unit_rule_notifications = AsyncMock(
+        return_value={"status": "success", "delivered": 2}
+    )
+    monkeypatch.setattr(task_module, "data_manager", manager)
+    task = _task()
+
+    assert asyncio.run(
+        task.business_profile_unit_rule_control(
+            action="show", rule_id=old["rule_id"]
+        )
+    )
+    show_report = task._send_task_report.await_args.kwargs["report_data"]
+    assert show_report["business_profile_unit_rule_control"]["rule"]["status"] == (
+        "quarantined"
+    )
+
+    assert asyncio.run(
+        task.business_profile_unit_rule_control(
+            action="correct",
+            rule_id=old["rule_id"],
+            dimension="electric_charge",
+            canonical_unit="Ah",
+            multiplier="10000",
+            reason="operator verified annual-report unit",
+        )
+    )
+    correction = task._send_task_report.await_args.kwargs["report_data"][
+        "business_profile_unit_rule_control"
+    ]
+    assert correction["old_rule"]["status"] == "superseded"
+    assert correction["replacement_rule"]["status"] == "auto_approved"
+    assert correction["replacement_rule"]["multiplier"] == "10000"
+    manager._dispatch_business_profile_unit_rule_notifications.assert_awaited_once()

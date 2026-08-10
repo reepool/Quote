@@ -1072,6 +1072,25 @@
           "max_runtime_seconds": 60
         }
       },
+      "business_profile_unit_rule_control": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "查看公司画像单位规则或追加受治理的替代规则",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "action": "show",
+          "rule_id": null,
+          "dimension": null,
+          "canonical_unit": null,
+          "multiplier": null,
+          "reason": "operator_correction",
+          "max_runtime_seconds": 60
+        }
+      },
       "industry_official_mapping_refresh": {
         "enabled": false,
         "description": "研究域申万官方历史分类映射审计缓存刷新（非 current membership 前置）",

@@ -100,6 +100,20 @@
 - [x] 9.7 Add regression coverage for all six observed units, automatic rule replacement/replay, actionable notifications, and the bounded `601390.SH` empty-table retry path
 - [x] 9.8 Run focused and expanded validation, strict OpenSpec validation, and review the complete session diff for confirmed correctness findings
 
+## 10. Concurrency Twenty And Exceptional Rule Correction
+
+- [x] 10.1 Raise the active structured-shadow, shared semantic pool, and Luna provider/profile ceilings from 10 to 20 while preserving adaptive congestion reduction and the single SQLite writer
+- [x] 10.2 Add append-only operator inspection/correction for a remaining wrong unit proposal using governed dimension, canonical unit, and exact positive multiplier inputs only
+- [x] 10.3 Automatically supersede the old rule, replay affected semantic artifacts, and dispatch the replacement and superseded Telegram lifecycle notices
+- [x] 10.4 Add configuration, registry, scheduler-command, and regression coverage and run strict OpenSpec validation plus code review
+
+### 2026-08-10 Concurrency Twenty And Correction Evidence
+
+- The active structured-shadow stage, shared semantic pool, Luna provider resource, and Luna semantic profile all request a ceiling of 20; the gateway retains 18 bulk slots, 2 reserved slots, weighted-fair admission, RPM control, and adaptive reduction.
+- Operator correction accepts only a governed dimension/canonical-unit pair and exact positive decimal multiplier. It appends a distinct replacement, supersedes history, resumes across interrupted catalog commits, replays affected artifacts, and uses durable notification rows as its idempotent completion marker.
+- Focused and expanded business-profile, scheduler, rollout, LLM routing, and orchestration suites passed 173 tests. AST compilation, JSON parsing, focused Ruff fatal/undefined/import checks, `git diff --check`, and strict OpenSpec validation passed.
+- `codex review --uncommitted` could not produce a formal verdict because the local Codex refresh token is revoked (`refresh_token_invalidated`, followed by `token_expired`). Equivalent review of the task diff confirmed and fixed the effective-gateway ceiling, interrupted-correction recovery, post-lifecycle replay/notification recovery, and decimal-text idempotency findings; unrelated pre-existing worktree changes were excluded.
+
 ### 2026-08-10 Production-Observed Closure Evidence
 
 - The six quarantined units from run `business-profile-20260810083411252525` were reconciled in an isolated catalog migration probe and then in `data/research.db`: six append-only auto-approved replacements, six superseded proposals, and six conversion-pending artifact replays; no extraction LLM calls were made.

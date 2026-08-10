@@ -406,6 +406,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "semantic_extraction",
     }
     assert config.pools["shared_semantic"].enabled is True
+    assert config.pools["shared_semantic"].total_concurrency == 20
     assert config.is_logical_profile_enabled("semantic_extraction") is True
     members = config.pools["shared_semantic"].members
     assert [member.source_label for member in members] == ["scorpio:gpt-5.6-luna"]
@@ -418,6 +419,9 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         is False
     )
     assert profiles["semantic_extraction__scorpio_luna"].enabled is True
+    assert profiles["semantic_extraction__scorpio_luna"].max_concurrency == 20
+    assert config.provider_resources["scorpio:luna"].hard_max_concurrency == 20
+    assert config.provider_resources["scorpio:luna"].default_bulk_concurrency == 18
     assert (
         profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
     )
