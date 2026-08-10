@@ -335,6 +335,29 @@ unit `万台（万千瓦时）` combines count and energy dimensions; it remains
 and must be split into separately evidenced facts rather than assigned one
 canonical multiplier.
 
+### 10. Make governed unit aliases and proposal transport production-safe
+
+The 2026-08-10 production trace for `603601.SH` contained an explicit operating
+table whose unit was `PCS`. In that table `PCS` is the conventional plural of
+piece, not a product acronym, and therefore resolves to the governed count
+dimension with canonical unit `unit` and multiplier one. The same run observed
+`立方` and `平方` as abbreviated table units for cubic metres and square metres.
+These aliases belong in deterministic unit resolution; normalization is scoped to
+the source-unit field and never rewrites product names, labels, or evidence text.
+
+The optional unit-proposal request currently combines `Decimal` primitive
+multipliers with dictionaries whose values can overwrite their JSON-safe string
+forms. The request then fails locally during `json.dumps`, before shared-gateway
+admission. Request construction will apply the definition first and overwrite its
+multiplier last with canonical decimal text. This keeps the wire payload data-only
+and JSON-safe without weakening the closed response schema or deterministic proof.
+
+Proposal fallback logs will include the source unit, exception type, and a bounded
+single-line error message at WARNING; DEBUG retains the traceback. Once the new
+aliases are loaded, startup reconciliation supersedes matching quarantined rules,
+copies their observations, and replays persisted conversion-pending semantic
+artifacts. It does not redownload PDFs or call the extraction LLM again.
+
 ## Risks / Trade-offs
 
 - [Source labels are missing or the model paraphrases a label] -> Ask for a

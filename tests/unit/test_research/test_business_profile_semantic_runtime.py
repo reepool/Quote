@@ -5,6 +5,7 @@ import sqlite3
 from dataclasses import replace
 from io import BytesIO
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from pypdf import PdfWriter
@@ -1436,6 +1437,30 @@ def test_unit_conversion_failure_persists_semantic_output_and_stage(
     assert "煤炭 200 210 50" in diagnostics["semantic_audit"]["diagnostics"][
         "resolved_evidence"
     ][0]["quote"]
+
+
+def test_unit_proposal_failure_logging_is_bounded_and_has_debug_traceback(monkeypatch):
+    logger = SimpleNamespace(warning=Mock(), debug=Mock())
+    monkeypatch.setattr(runtime_module, "logger", logger)
+    try:
+        raise TypeError("Decimal 无法序列化\n" + "x" * 800)
+    except TypeError as exc:
+        runtime_module._log_unit_proposal_failure("PCS", exc)
+
+    warning_args = logger.warning.call_args.args
+    assert warning_args[:3] == (
+        "business-profile unit proposal fallback unit=%s "
+        "error_type=%s error_message=%s",
+        "PCS",
+        "TypeError",
+    )
+    assert warning_args[3].startswith("Decimal 无法序列化 ")
+    assert "\n" not in warning_args[3]
+    assert len(warning_args[3]) == 500
+    debug_call = logger.debug.call_args
+    assert debug_call.args[-1] == "PCS"
+    assert debug_call.kwargs["exc_info"][0] is TypeError
+    assert debug_call.kwargs["exc_info"][2] is not None
 
 
 def test_semantic_row_failure_categories_are_not_collapsed_to_context():

@@ -215,6 +215,12 @@ def test_loader_rejects_fact_catalog_version_mismatch(tmp_path):
         ("万张", "count", "unit", Decimal("10000")),
         ("点", "count", "unit", Decimal("1")),
         ("万粒/万瓶", "count", "unit", Decimal("10000")),
+        ("PCS", "count", "unit", Decimal("1")),
+        ("pcs", "count", "unit", Decimal("1")),
+        ("piece", "count", "unit", Decimal("1")),
+        ("pieces", "count", "unit", Decimal("1")),
+        ("平方", "area", "square_meter", Decimal("1")),
+        ("立方", "volume", "cubic_meter", Decimal("1")),
         ("mAh", "electric_charge", "Ah", Decimal("0.001")),
         ("kAh", "electric_charge", "Ah", Decimal("1000")),
     ],
@@ -236,6 +242,13 @@ def test_unknown_unit_is_pending_and_does_not_raise():
     assert resolution.status == "unit_resolution_pending"
     assert resolution.publishable is False
     assert resolution.reason in {"unknown_unit_token", "unsupported_compound_unit"}
+
+
+def test_pcs_alias_is_exact_and_does_not_rewrite_product_text():
+    resolution = load_unit_conversion_catalog().resolve("储能PCS")
+
+    assert resolution.status == "unit_resolution_pending"
+    assert resolution.reason == "unknown_unit_token"
 
 
 def test_cross_dimension_parenthesized_unit_remains_pending():

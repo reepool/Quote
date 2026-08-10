@@ -139,3 +139,19 @@
 - Unit lifecycle tests prove deterministic reconciliation for `万张`, count-context `点`, and `万粒/万瓶`; `万台（万千瓦时）` remains quarantined as cross-dimension. Consolidated notification tests expose final effective state and replacement history.
 - Final focused regression passed 175 tests across PDF artifacts, unit conversions, semantic artifacts, semantic runtime, and async production; strict OpenSpec validation, Python compilation, diff checks, and fatal Ruff checks passed.
 - External `codex review --uncommitted` was rejected by tenant policy because it would transmit the repository's broad dirty-worktree diff. Equivalent local review of this change found and fixed concurrent immutable-artifact publication, missing historical quarantine reasons, and missing timing aggregation; unrelated baseline changes were excluded.
+
+## 12. Production Unit Alias And Proposal Transport Recovery
+
+- [x] 12.1 Add deterministic unit-field aliases for `PCS`/`pcs`/`piece`/`pieces`, `平方`, and `立方` without altering product labels or evidence text
+- [x] 12.2 Make governed primitive metadata JSON-safe in the optional unit-proposal request and add a regression proving the request reaches the LLM client
+- [x] 12.3 Add bounded WARNING error details and DEBUG traceback for unit-proposal fallback failures
+- [x] 12.4 Prove existing quarantined rules are superseded and persisted semantic artifacts are replayed under the new aliases without extraction LLM calls
+- [x] 12.5 Run focused and expanded tests, compilation, fatal Ruff checks, strict OpenSpec validation, diff checks, and code review
+
+### 2026-08-10 Production Unit Alias And Proposal Transport Evidence
+
+- Deterministic unit tests resolve `PCS`/`pcs`/`piece`/`pieces` to count, `平方` to square metres, and `立方` to cubic metres; exact-token coverage proves product text such as `储能PCS` is not rewritten.
+- The complete production primitive catalog, including its internal `Decimal` definitions, serializes every proposal multiplier as a JSON string and reaches the fake shared LLM client. Existing quarantined-rule tests prove replacement, supersession, and conversion-pending artifact replay for all three observed aliases.
+- Focused unit, artifact, and semantic-runtime regression passed 115 tests. A post-review full-catalog serialization check also passed. Python compilation, fatal Ruff checks, `git diff --check`, and strict OpenSpec validation passed.
+- The broader async-production suite was attempted but stopped after prolonged worker waiting while another pre-existing pytest process was running the same module; no failure was emitted before interruption. No production database was opened or changed.
+- External `codex review --uncommitted` was rejected by tenant policy because the dirty worktree contains unrelated private changes. Equivalent local review found and fixed the incomplete production-catalog serialization test coverage; no further confirmed correctness finding remained.

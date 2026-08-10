@@ -99,6 +99,26 @@ LOCAL_DERIVED_FAMILIES = {
     "commodity_exposure_facts",
     "commodity_exposure_publication",
 }
+
+
+def _log_unit_proposal_failure(source_unit: str, exc: Exception) -> None:
+    """Emit actionable bounded diagnostics without exposing proposal payloads."""
+
+    error_message = str(exc).replace("\r", " ").replace("\n", " ")[:500]
+    logger.warning(
+        "business-profile unit proposal fallback unit=%s "
+        "error_type=%s error_message=%s",
+        source_unit,
+        type(exc).__name__,
+        error_message,
+    )
+    logger.debug(
+        "business-profile unit proposal fallback traceback unit=%s",
+        source_unit,
+        exc_info=(type(exc), exc, exc.__traceback__),
+    )
+
+
 DOCUMENT_FAMILIES = {
     "structured_segments",
     "tabular_operating_facts",
@@ -1639,11 +1659,9 @@ class BusinessProfileSemanticRuntime:
                                     "round_trip_vectors": [],
                                     "semantic_summary_zh": "单位尚未能由自动规则证明",
                                 }
-                                logger.warning(
-                                    "business-profile unit proposal fallback unit=%s "
-                                    "error_type=%s",
+                                _log_unit_proposal_failure(
                                     resolution.source_unit,
-                                    type(proposal_exc).__name__,
+                                    proposal_exc,
                                 )
                             unit_rule = self.unit_rule_registry.register_proposal(
                                 proposal,

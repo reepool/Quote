@@ -1354,8 +1354,11 @@ async def propose_unknown_unit(
         "governed_primitives": [
             {
                 "rule_id": key,
-                "multiplier": str(value),
                 **dict((primitive_definitions or {}).get(key) or {}),
+                # Definitions use Decimal internally for exact proof. Keep the
+                # wire contract JSON-safe even when a definition also carries
+                # its own multiplier value.
+                "multiplier": _canonical_decimal_text(value),
             }
             for key, value in sorted(primitive_multipliers.items())
         ][:300],

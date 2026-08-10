@@ -554,6 +554,9 @@ _MAGNITUDES: tuple[tuple[str, Decimal], ...] = (
     ("十", Decimal("10")),
 )
 _COUNT_ALIASES = {
+    "pcs",
+    "piece",
+    "pieces",
     "个",
     "件",
     "台",
@@ -598,6 +601,7 @@ _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     "克": ("mass", "tonne", Decimal("0.000001")),
     "g": ("mass", "tonne", Decimal("0.000001")),
     # area
+    "平方": ("area", "square_meter", Decimal("1")),
     "平方米": ("area", "square_meter", Decimal("1")),
     "m2": ("area", "square_meter", Decimal("1")),
     "㎡": ("area", "square_meter", Decimal("1")),
@@ -606,6 +610,7 @@ _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     "平方公里": ("area", "square_meter", Decimal("1000000")),
     "km2": ("area", "square_meter", Decimal("1000000")),
     # volume
+    "立方": ("volume", "cubic_meter", Decimal("1")),
     "立方米": ("volume", "cubic_meter", Decimal("1")),
     "m3": ("volume", "cubic_meter", Decimal("1")),
     "m³": ("volume", "cubic_meter", Decimal("1")),

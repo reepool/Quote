@@ -170,6 +170,24 @@ Every unknown source-unit proposal SHALL be stored as an append-only governed ru
 - **THEN** deterministic code resolves the count dimension and exact magnitude
 - **AND** matching quarantined artifacts are replayable without another extraction LLM call
 
+#### Scenario: Governed abbreviated table units are resolved
+- **WHEN** an explicit production, sales, or inventory table uses `PCS`, `pcs`, `piece`, or `pieces` as its source-unit field
+- **THEN** deterministic unit code resolves it to count, canonical unit `unit`, and multiplier one
+- **AND** product names and other source text containing the same letters remain untouched
+- **WHEN** such a table uses `平方` or `立方` as its source-unit field
+- **THEN** deterministic unit code resolves it to square metres or cubic metres respectively with multiplier one
+
+#### Scenario: Unit-proposal request contains decimal governance metadata
+- **WHEN** governed primitive definitions contain exact decimal multipliers
+- **THEN** request construction serializes every multiplier as canonical JSON string data before gateway admission
+- **AND** primitive metadata cannot overwrite the JSON-safe multiplier representation
+
+#### Scenario: Unit-proposal request fails locally or remotely
+- **WHEN** request construction, gateway admission, response parsing, or schema validation raises an exception
+- **THEN** WARNING logs identify the source unit, exception type, and a bounded sanitized error message
+- **AND** DEBUG logs include the traceback without logging credentials or an unbounded prompt
+- **AND** the semantic artifact remains conversion-pending and reusable
+
 #### Scenario: Parenthesized alternatives cross dimensions
 - **WHEN** a source unit such as `万台（万千瓦时）` combines count and energy dimensions
 - **THEN** it remains non-publishable with a stable cross-dimension reason

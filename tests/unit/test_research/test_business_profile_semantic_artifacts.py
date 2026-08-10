@@ -1,6 +1,8 @@
 import asyncio
+import json
 import sqlite3
 from contextlib import contextmanager
+from types import SimpleNamespace
 
 import pytest
 
@@ -18,6 +20,7 @@ from research.business_profile_unit_conversions import (
 )
 from research.business_profile_unit_registry import (
     BusinessProfileUnitRuleRegistry,
+    propose_unknown_unit,
     unit_proposal_response_schema,
 )
 from research.storage import ResearchStorageManager
@@ -207,6 +210,58 @@ def test_unit_proposal_schema_closes_dimension_and_canonical_vocabulary():
     assert "Ah" in schema["properties"]["canonical_unit"]["enum"]
 
 
+def test_unit_proposal_request_serializes_decimal_primitive_definitions():
+    class _Client:
+        request = None
+
+        async def complete(self, request):
+            self.request = request
+            return SimpleNamespace(
+                data={
+                    "source_unit": "箱",
+                    "normalized_lexeme": "箱",
+                    "dimension": "count",
+                    "canonical_unit": "unit",
+                    "numerator": ["箱"],
+                    "denominator": [],
+                    "primitive_rule_ids": ["classifier:件"],
+                    "factors": [
+                        {"primitive_rule_id": "classifier:件", "exponent": 1}
+                    ],
+                    "transformation_type": "linear_multiplier",
+                    "round_trip_vectors": [{"source": "1", "canonical": "1"}],
+                    "semantic_summary_zh": "箱是计数单位",
+                }
+            )
+
+    client = _Client()
+    primitive_multipliers = governed_primitive_multipliers()
+    primitive_definitions = governed_primitive_definitions()
+    result = asyncio.run(
+        propose_unknown_unit(
+            client,
+            source_unit="箱",
+            context_zh="产品产销量单位为箱",
+            primitive_multipliers=primitive_multipliers,
+            primitive_definitions=primitive_definitions,
+        )
+    )
+
+    payload = json.loads(client.request.messages[-1].content)
+    primitives = payload["governed_primitives"]
+    primitive = next(
+        item for item in primitives if item["rule_id"] == "classifier:件"
+    )
+    assert primitive == {
+        "rule_id": "classifier:件",
+        "multiplier": "1",
+        "dimension": "count",
+        "canonical_unit": "unit",
+    }
+    assert all(isinstance(item["multiplier"], str) for item in primitives)
+    assert result["dimension"] == "count"
+
+
 def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
     storage = _Storage(tmp_path / "research.db")
     artifacts = BusinessProfileSemanticArtifactRepository(storage)
@@ -285,6 +340,9 @@ def test_catalog_reconciles_quarantined_rule_and_replays_artifact(tmp_path):
         ("万张", "enabled", "10000"),
         ("点", "enabled", "1"),
         ("万粒/万瓶", "enabled", "10000"),
+        ("PCS", "enabled", "1"),
+        ("平方", "enabled", "1"),
+        ("立方", "enabled", "1"),
         ("万台（万千瓦时）", "quarantined", None),
     ],
 )
