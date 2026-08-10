@@ -16,6 +16,7 @@
 - [x] 3.2 Add a developer CLI that defaults to the 4/6/8 pypdf concurrency matrix and cannot discover, download, or write production state.
 - [x] 3.3 Add unit tests for identical corpus enforcement, cache isolation, bounded execution, partial failures, fidelity rejection, and report schema.
 - [x] 3.4 Run a bounded benchmark against cached annual reports and retain the result as change evidence without changing production parser defaults unless the evidence supports it.
+- [x] 3.5 Set the active structured-shadow production parse concurrency to four after the retained same-corpus benchmark identifies four as the fastest fidelity-passing candidate.
 
 ## 4. Validation And Handoff
 

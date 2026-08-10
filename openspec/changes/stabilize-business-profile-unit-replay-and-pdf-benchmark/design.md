@@ -72,7 +72,7 @@ Alternative: infer performance from consecutive production batches. Rejected bec
 2. Add inline replay and row-level pending conversion tests using temporary databases and persisted semantic artifacts.
 3. Reconcile the unsafe `万重箱` rule only through the normal deterministic rule reconciliation in a later controlled run; do not directly mutate production rows in this change.
 4. Add and run the read-only parser benchmark on a bounded cached corpus.
-5. Keep production parse concurrency unchanged pending benchmark evidence.
+5. Keep production parse concurrency at the benchmark-supported value of four; any future increase requires new same-corpus fidelity and throughput evidence.
 6. After the shared asset change completes consumer tasks 7.1, 7.2, 7.4, 8.3, and 8.4, integrate stage-scoped processing identity and rerun the benchmark against shared assets.
 
 Rollback consists of reverting code/catalog changes before production replay. Persisted semantic artifacts and quarantined rules remain valid audit evidence; no source PDF or canonical fact is deleted.
