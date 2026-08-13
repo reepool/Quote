@@ -1256,6 +1256,25 @@
           "business_profile_process": "business_profile:process",
           "broker_risk_control_process": "broker_risk_control:process"
         }
+      },
+      "business_profile_evidence": {
+        "annual_report_asset_dependency": {
+          "enabled": false,
+          "legacy_fallback_enabled": true,
+          "mode": "legacy",
+          "reconciliation_evidence_id": null,
+          "legacy_writer_disabled": false
+        }
+      },
+      "broker_risk_control_reports": {
+        "annual_report_asset_dependency": {
+          "enabled": false,
+          "legacy_fallback_enabled": true,
+          "legacy_semiannual_enabled": true,
+          "mode": "legacy",
+          "reconciliation_evidence_id": null,
+          "legacy_writer_disabled": false
+        }
       }
     }
   },

@@ -27,6 +27,7 @@ from research.broker_risk_control import (
     BrokerRiskControlPdfFactParser,
     BrokerRiskControlReportSyncService,
     BrokerRiskControlSyncResult,
+    validate_broker_shared_asset_processing,
     classify_broker_annual_report_risk_control_artifact,
     classify_broker_risk_control_artifact,
     infer_broker_annual_report_period,
@@ -682,7 +683,16 @@ class _FakeSyncStorage:
 
     def upsert_financial_source_file_manifest(self, manifest, *, ingestion_run_id=None):
         source_file_id = manifest.source_file_id or f"manifest-{len(self.manifests) + 1}"
-        self.manifests.append({"source_file_id": source_file_id, "content_hash": manifest.content_hash, "parser_version": manifest.parser_version, "status": manifest.status})
+        self.manifests.append(
+            {
+                "source_file_id": source_file_id,
+                "content_hash": manifest.content_hash,
+                "parser_version": manifest.parser_version,
+                "source_mode": manifest.source_mode,
+                "status": manifest.status,
+                "metadata": manifest.metadata_json,
+            }
+        )
         return source_file_id
 
     def upsert_financial_numeric_facts(self, facts, *, ingestion_run_id=None, tier="hot"):
@@ -868,6 +878,45 @@ def test_broker_risk_control_incremental_uses_common_announcement_storage():
     assert result["retryable_pending_reports"] == 1
     assert storage.generic_state["scan_result"].source == "cninfo"
     assert storage.generic_audits[0]["record"].source_announcement_id == "risk-common-2025"
+
+
+def test_broker_service_reads_nested_financial_statement_dependency_config(
+    monkeypatch,
+):
+    shared_access = object()
+    monkeypatch.setattr(
+        "research.broker_risk_control._build_shared_annual_report_access",
+        lambda _config: shared_access,
+    )
+    research_config = SimpleNamespace(
+        sources={},
+        routing={},
+        modules={
+            "financial_statements": {
+                "broker_risk_control_reports": {
+                    "annual_report_asset_dependency": {
+                        "enabled": True,
+                        "mode": "dual_read",
+                        "legacy_fallback_enabled": True,
+                        "legacy_semiannual_enabled": True,
+                    }
+                }
+            }
+        }
+    )
+
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        research_config=research_config,
+        announcement_service=_FakeAnnouncementService([]),
+        payload_fetcher=lambda _record: None,
+    )
+
+    assert service.shared_asset_access is shared_access
+    assert service.shared_annual_report_enabled is True
+    assert service.annual_report_asset_mode == "dual_read"
+    assert service.legacy_annual_report_fallback_enabled is True
+    assert service.legacy_semiannual_enabled is True
 
 
 def test_broker_risk_control_payload_uses_common_attachment_retriever():
@@ -1172,6 +1221,32 @@ def test_shared_broker_asset_matches_legacy_parser_output_without_archive_copy(
             }
 
     shared_storage = _FakeSyncStorage()
+    shared_storage.manifests.append(
+        {
+            "source_file_id": "legacy-direct-manifest",
+            "content_hash": digest,
+            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+            "source_mode": "direct",
+            "status": "parsed",
+            "metadata": {},
+        }
+    )
+    shared_storage.manifests.append(
+        {
+            "source_file_id": "stale-shared-manifest",
+            "content_hash": digest,
+            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+            "source_mode": "shared_announcement_asset",
+            "status": "parsed",
+            "metadata": {
+                "shared_annual_report_asset": {
+                    "asset_id": "asset-equivalent-2025",
+                    "observation_version": "observation-stale-2025",
+                    "content_hash": digest,
+                }
+            },
+        }
+    )
     shared_service = BrokerRiskControlReportSyncService(
         storage=shared_storage,
         parser=_TextParser(
@@ -1222,6 +1297,18 @@ def test_shared_broker_asset_matches_legacy_parser_output_without_archive_copy(
         == "observation-equivalent-2025"
         for fact in shared_storage.facts
     )
+
+    fact_count = len(shared_storage.facts)
+    repeated = shared_service.backfill(
+        instruments=[instrument],
+        report_periods=["2025-12-31"],
+        announcement_records=[record],
+        dry_run=False,
+    )
+    assert repeated["unchanged_reports"] == 1
+    assert repeated["reports_parsed"] == 0
+    assert repeated["facts_written"] == 0
+    assert len(shared_storage.facts) == fact_count
 
     event_storage = _FakeSyncStorage()
     event_service = BrokerRiskControlReportSyncService(
@@ -1338,6 +1425,63 @@ def test_broker_consumer_event_reads_exact_bound_observation_after_correction(tm
         and fact.raw_fact_json["annual_report_content_hash"] == digest
         for fact in storage.facts
     )
+
+
+def test_shared_processing_validation_requires_fact_lineage_and_net_capital():
+    asset = {
+        "asset_id": "asset-2025",
+        "instrument_id": "600030.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "filing-2025",
+        "attachment_id": "attachment-2025",
+        "observation_version": "version-2025",
+        "content_hash": "a" * 64,
+    }
+    lineage = {
+        "asset_id": asset["asset_id"],
+        "observation_version": asset["observation_version"],
+        "content_hash": asset["content_hash"],
+    }
+    class _ValidationStorage(_FakeBrokerRiskControlStorage):
+        def get_financial_numeric_facts(self, *args, **kwargs):
+            return list(self.rows)
+
+    storage = _ValidationStorage(
+        manifests=[
+            {
+                "source_file_id": "shared-source",
+                "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+                "source_mode": "shared_announcement_asset",
+                "content_hash": asset["content_hash"],
+                "status": "parsed",
+                "metadata": {"shared_annual_report_asset": lineage},
+            }
+        ],
+        rows=[
+            {
+                "source_file_id": "shared-source",
+                "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+                "source_mode": "shared_announcement_asset",
+                "canonical_fact_name": "net_capital",
+                "raw_fact": {"source_asset_lineage": lineage},
+                "dimensions": {"source_asset_lineage": lineage},
+            }
+        ],
+    )
+
+    assert validate_broker_shared_asset_processing(storage, asset)["ready"] is True
+    storage.rows[0]["canonical_fact_name"] = "risk_coverage_ratio"
+    validation = validate_broker_shared_asset_processing(storage, asset)
+    assert validation["ready"] is False
+    assert validation["reason_code"] == "broker_required_fact_missing"
+    assert validation["missing_required_facts"] == ["net_capital"]
+    storage.rows[0]["canonical_fact_name"] = "net_capital"
+    storage.rows[0]["raw_fact"] = {"source_asset_lineage": {**lineage, "asset_id": "other"}}
+    validation = validate_broker_shared_asset_processing(storage, asset)
+    assert validation["ready"] is False
+    assert validation["reason_code"] == "broker_fact_lineage_invalid"
 
 
 def test_broker_risk_control_artifact_classification_is_title_scoped():

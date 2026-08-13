@@ -49,6 +49,114 @@ BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
 LOGGER = logging.getLogger(__name__)
 
 
+def validate_broker_shared_asset_processing(
+    storage: Any,
+    asset: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate persisted broker facts against one exact shared asset binding."""
+
+    binding = _normalize_bound_shared_annual_report_asset(asset)
+    manifests = storage.get_financial_source_file_manifests(
+        instrument_id=binding["instrument_id"],
+        report_period=binding["report_period"],
+        source=binding["source"],
+        filing_id=binding["source_announcement_id"],
+        statuses=("parsed",),
+    )
+    matching_manifests: list[Mapping[str, Any]] = []
+    for manifest in manifests:
+        metadata = manifest.get("metadata") or {}
+        lineage = (
+            metadata.get("shared_annual_report_asset")
+            if isinstance(metadata, Mapping)
+            else None
+        )
+        if not isinstance(lineage, Mapping):
+            continue
+        if (
+            manifest.get("parser_version")
+            == BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+            and manifest.get("source_mode") == "shared_announcement_asset"
+            and str(manifest.get("content_hash") or "").lower()
+            == binding["content_hash"]
+            and all(
+                str(lineage.get(field) or "").strip().lower()
+                == str(binding[field]).strip().lower()
+                for field in ("asset_id", "observation_version", "content_hash")
+            )
+        ):
+            matching_manifests.append(manifest)
+    if len(matching_manifests) != 1:
+        return {
+            "ready": False,
+            "reason_code": "shared_broker_manifest_not_unique",
+            "matching_manifest_count": len(matching_manifests),
+            "required_facts": list(BROKER_RISK_CONTROL_REQUIRED_FACTS),
+        }
+
+    source_file_id = str(matching_manifests[0].get("source_file_id") or "")
+    facts = storage.get_financial_numeric_facts(
+        binding["instrument_id"],
+        include_history=True,
+        report_period=binding["report_period"],
+    )
+    matching_facts: list[Mapping[str, Any]] = []
+    invalid_lineage_count = 0
+    for fact in facts:
+        if (
+            str(fact.get("source_file_id") or "") != source_file_id
+            or fact.get("parser_version")
+            != BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+            or fact.get("source_mode") != "shared_announcement_asset"
+        ):
+            continue
+        raw_fact = fact.get("raw_fact") or {}
+        dimensions = fact.get("dimensions") or {}
+        lineages = (
+            raw_fact.get("source_asset_lineage")
+            if isinstance(raw_fact, Mapping)
+            else None,
+            dimensions.get("source_asset_lineage")
+            if isinstance(dimensions, Mapping)
+            else None,
+        )
+        if not all(
+            isinstance(lineage, Mapping)
+            and all(
+                str(lineage.get(field) or "").strip().lower()
+                == str(binding[field]).strip().lower()
+                for field in ("asset_id", "observation_version", "content_hash")
+            )
+            for lineage in lineages
+        ):
+            invalid_lineage_count += 1
+            continue
+        matching_facts.append(fact)
+    canonical_facts = {
+        str(fact.get("canonical_fact_name") or fact.get("fact_name") or "")
+        for fact in matching_facts
+    }
+    missing_required = sorted(
+        set(BROKER_RISK_CONTROL_REQUIRED_FACTS) - canonical_facts
+    )
+    ready = bool(matching_facts) and not missing_required and invalid_lineage_count == 0
+    return {
+        "ready": ready,
+        "reason_code": (
+            None
+            if ready
+            else "broker_fact_lineage_invalid"
+            if invalid_lineage_count
+            else "broker_required_fact_missing"
+        ),
+        "source_file_id": source_file_id,
+        "fact_count": len(matching_facts),
+        "invalid_lineage_count": invalid_lineage_count,
+        "required_facts": list(BROKER_RISK_CONTROL_REQUIRED_FACTS),
+        "missing_required_facts": missing_required,
+    }
+
+
 def _normalize_bound_shared_annual_report_asset(
     asset: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -1420,8 +1528,16 @@ class BrokerRiskControlReportSyncService:
                 "provide shared_asset_access or shared_asset_service, not both"
             )
         modules = getattr(self.research_config, "modules", {}) or {}
+        financial_cfg = (
+            modules.get("financial_statements", {})
+            if isinstance(modules, Mapping)
+            else {}
+        )
         broker_cfg = (
-            modules.get("broker_risk_control_reports", {})
+            modules.get(
+                "broker_risk_control_reports",
+                financial_cfg.get("broker_risk_control_reports", {}),
+            )
             if isinstance(modules, Mapping)
             else {}
         )
@@ -1435,26 +1551,27 @@ class BrokerRiskControlReportSyncService:
                 "broker_risk_control_reports.annual_report_asset_dependency "
                 "must be a mapping"
             )
-        inferred_enabled = explicit_shared_dependency
-        dependency_enabled = bool(
-            inferred_enabled
-            if explicit_shared_dependency and shared_annual_report_enabled is None
-            else dependency_cfg.get("enabled", False)
-            if shared_annual_report_enabled is None
-            else shared_annual_report_enabled
-        )
+        explicit_mode = annual_report_asset_mode is not None
         dependency_mode = str(
             annual_report_asset_mode
             or (
                 "shared_only"
                 if explicit_shared_dependency
                 else dependency_cfg.get(
-                    "mode", "shared_only" if dependency_enabled else "legacy"
+                    "mode",
+                    "shared_only" if dependency_cfg.get("enabled", False) else "legacy",
                 )
             )
         ).strip().lower()
         if dependency_mode not in {"legacy", "dual_read", "shared_only"}:
             raise ValueError("invalid broker annual-report asset mode")
+        dependency_enabled = bool(
+            shared_annual_report_enabled
+            if shared_annual_report_enabled is not None
+            else dependency_mode in {"dual_read", "shared_only"}
+            if explicit_mode or explicit_shared_dependency
+            else dependency_cfg.get("enabled", False)
+        )
         if (
             not explicit_shared_dependency
             and dependency_mode == "shared_only"
@@ -1472,8 +1589,8 @@ class BrokerRiskControlReportSyncService:
         if dependency_enabled != (dependency_mode in {"dual_read", "shared_only"}):
             raise ValueError("broker annual-report mode conflicts with enabled flag")
         legacy_annual_fallback = bool(
-            dependency_mode != "shared_only"
-            if explicit_shared_dependency and annual_report_asset_mode is None
+            dependency_mode in {"legacy", "dual_read"}
+            if explicit_mode or explicit_shared_dependency
             else dependency_cfg.get(
                 "legacy_fallback_enabled", dependency_mode != "shared_only"
             )
@@ -2373,12 +2490,46 @@ class BrokerRiskControlReportSyncService:
             report_period=manifest.report_period,
             source=manifest.source,
         )
-        return any(
-            row.get("content_hash") == content_hash
-            and row.get("parser_version") == manifest.parser_version
-            and row.get("status") in {"downloaded", "parsed"}
+        matching_rows = [
+            row
             for row in rows
+            if row.get("content_hash") == content_hash
+            and row.get("parser_version") == manifest.parser_version
+        ]
+        if manifest.source_mode != "shared_announcement_asset":
+            return any(
+                row.get("status") in {"downloaded", "parsed"}
+                for row in matching_rows
+            )
+
+        expected_lineage = (
+            manifest.metadata_json.get("shared_annual_report_asset") or {}
         )
+        expected_identity = tuple(
+            str(expected_lineage.get(field) or "").strip().lower()
+            for field in ("asset_id", "observation_version", "content_hash")
+        )
+        if not all(expected_identity):
+            return False
+        for row in matching_rows:
+            if (
+                row.get("source_mode") != "shared_announcement_asset"
+                or row.get("status") != "parsed"
+            ):
+                continue
+            metadata = row.get("metadata") or {}
+            if not isinstance(metadata, Mapping):
+                continue
+            shared_lineage = metadata.get("shared_annual_report_asset") or {}
+            if not isinstance(shared_lineage, Mapping):
+                continue
+            row_identity = tuple(
+                str(shared_lineage.get(field) or "").strip().lower()
+                for field in ("asset_id", "observation_version", "content_hash")
+            )
+            if row_identity == expected_identity:
+                return True
+        return False
 
     def _record_period(self, record: AnnouncementRecord) -> str:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:

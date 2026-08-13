@@ -1116,7 +1116,11 @@ class DataManager:
         )
         modules = getattr(self.research_config, "modules", {}) or {}
         profile_config = modules.get("business_profile_evidence", {}) or {}
-        broker_config = modules.get("broker_risk_control_reports", {}) or {}
+        financial_config = modules.get("financial_statements", {}) or {}
+        broker_config = modules.get(
+            "broker_risk_control_reports",
+            financial_config.get("broker_risk_control_reports", {}),
+        ) or {}
         configuration_fingerprint = hashlib.sha256(
             json.dumps(
                 {
@@ -1166,6 +1170,7 @@ class DataManager:
                             parameters={
                                 "selection_policy": "latest_annual_only",
                                 "document_family": "annual_report",
+                                "configuration_fingerprint": configuration_fingerprint,
                             },
                             configuration_fingerprint=configuration_fingerprint,
                             processor=business_profile_processor,
@@ -1179,6 +1184,7 @@ class DataManager:
                             parameters={
                                 "source_policy": "shared_effective_annual_report",
                                 "document_family": "annual_report",
+                                "configuration_fingerprint": configuration_fingerprint,
                             },
                             configuration_fingerprint=configuration_fingerprint,
                             processor=broker_processor,
@@ -1244,16 +1250,156 @@ class DataManager:
                 diagnostics={"status": status},
                 metadata={"business_result": result},
             )
+        completion = self._business_profile_bound_result_completion(
+            asset,
+            result,
+        )
+        if not completion["ready"]:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code=str(
+                    completion.get("reason_code")
+                    or "business_profile_result_not_current"
+                ),
+                diagnostics={
+                    "status": status,
+                    "work_status": completion.get("work_status"),
+                    "work_stage": completion.get("work_stage"),
+                },
+                metadata={
+                    "business_result": result,
+                    "completion_validation": completion,
+                },
+            )
         return ConsumerProcessingOutcome(
             status="completed",
-            result_identity=stable_id(
-                "business-profile-result",
-                asset.get("asset_id"),
-                asset.get("observation_version"),
-                asset.get("content_hash"),
-            ),
-            metadata={"business_result": result},
+            result_identity=str(completion["result_identity"]),
+            metadata={
+                "business_result": result,
+                "completion_validation": completion,
+            },
         )
+
+    def _business_profile_bound_result_completion(
+        self,
+        asset: Mapping[str, Any],
+        result: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Prove one bound BP request reached evidence-backed publish completion."""
+
+        from research.announcement_assets.models import stable_id
+
+        if getattr(self, "research_storage", None) is None:
+            return {"ready": False, "reason_code": "research_storage_unavailable"}
+        enqueue = dict(result.get("enqueue") or {})
+        work_ids = [str(value) for value in enqueue.get("work_ids", []) if str(value)]
+        if len(work_ids) != 1:
+            return {
+                "ready": False,
+                "reason_code": "business_profile_completed_work_not_unique",
+                "work_id_count": len(work_ids),
+            }
+        work_id = work_ids[0]
+        with self.research_storage.get_connection() as conn:
+            self.research_storage._apply_pragmas(conn)
+            row = conn.execute(
+                "SELECT * FROM business_profile_work_items WHERE work_id=?",
+                (work_id,),
+            ).fetchone()
+        if row is None:
+            return {
+                "ready": False,
+                "reason_code": "business_profile_completed_work_missing",
+                "work_id": work_id,
+            }
+        work = dict(row)
+        try:
+            metadata = json.loads(work.pop("metadata_json") or "{}")
+        except (TypeError, ValueError, json.JSONDecodeError):
+            metadata = {}
+        metadata = dict(metadata) if isinstance(metadata, Mapping) else {}
+        binding = dict(metadata.get("bound_shared_asset") or {})
+        binding_matches = all(
+            str(binding.get(field) or "").strip().lower()
+            == str(asset.get(field) or "").strip().lower()
+            for field in ("asset_id", "observation_version", "content_hash")
+        )
+        stage_results = dict(metadata.get("stage_results") or {})
+        required_stages = ("acquire", "parse", "semantic", "publish")
+        stages_complete = all(
+            isinstance(stage_results.get(stage), Mapping)
+            and bool(stage_results.get(stage))
+            for stage in required_stages
+        )
+        successful_stage_statuses = {"completed", "success", "unchanged"}
+        upstream_stage_statuses = {
+            stage: str(
+                dict(stage_results.get(stage) or {}).get("pipeline_status")
+                or dict(stage_results.get(stage) or {}).get("status")
+                or ""
+            ).strip().lower()
+            for stage in ("acquire", "parse", "semantic")
+        }
+        upstream_stages_successful = all(
+            status in successful_stage_statuses
+            for status in upstream_stage_statuses.values()
+        )
+        from research.business_profile_async_production import _evidence_free_stage
+
+        evidence_free_stage = _evidence_free_stage(stage_results)
+        publish = dict(stage_results.get("publish") or {})
+        publish_status = str(
+            publish.get("pipeline_status") or publish.get("status") or ""
+        ).strip().lower()
+        ready = bool(
+            work.get("status") == "completed"
+            and work.get("stage") == "publish"
+            and work.get("completed_at")
+            and binding_matches
+            and stages_complete
+            and upstream_stages_successful
+            and evidence_free_stage is None
+            and publish_status in {"completed", "success"}
+        )
+        checkpoint_path = str(work.get("checkpoint_path") or "")
+        checkpoint_hash = None
+        if ready and checkpoint_path:
+            checkpoint = Path(checkpoint_path)
+            if checkpoint.is_file():
+                checkpoint_hash = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+        if ready and not checkpoint_hash:
+            ready = False
+        result_identity = (
+            stable_id(
+                "business-profile-result",
+                work_id,
+                str(work.get("processing_identity_hash") or ""),
+                str(checkpoint_hash or ""),
+                str(asset.get("asset_id") or ""),
+                str(asset.get("observation_version") or ""),
+                str(asset.get("content_hash") or ""),
+            )
+            if ready
+            else None
+        )
+        return {
+            "ready": ready,
+            "reason_code": None if ready else "business_profile_result_not_current",
+            "work_id": work_id,
+            "work_status": work.get("status"),
+            "work_stage": work.get("stage"),
+            "completed_at": work.get("completed_at"),
+            "processing_identity_hash": work.get("processing_identity_hash"),
+            "shared_source_file_id": f"shared-asset:{asset.get('asset_id')}",
+            "binding_matches": binding_matches,
+            "stages_complete": stages_complete,
+            "upstream_stage_statuses": upstream_stage_statuses,
+            "upstream_stages_successful": upstream_stages_successful,
+            "evidence_free_stage": evidence_free_stage,
+            "publish_status": publish_status,
+            "checkpoint_hash": checkpoint_hash,
+            "result_identity": result_identity,
+        }
 
     def _process_broker_risk_control_annual_report_asset(
         self,
@@ -1268,9 +1414,12 @@ class DataManager:
                 status="blocked",
                 reason_code="research_storage_unavailable",
             )
-        broker_cfg = self.research_config.modules.get(
-            "broker_risk_control_reports", {}
-        )
+        modules = self.research_config.modules
+        financial_cfg = modules.get("financial_statements", {}) or {}
+        broker_cfg = modules.get(
+            "broker_risk_control_reports",
+            financial_cfg.get("broker_risk_control_reports", {}),
+        ) or {}
         dependency = broker_cfg.get("annual_report_asset_dependency", {}) or {}
         mode = str(dependency.get("mode", "legacy")).strip().lower()
         if mode not in {"dual_read", "shared_only"}:
@@ -1281,6 +1430,7 @@ class DataManager:
         from research.broker_risk_control import (
             BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
             BrokerRiskControlReportSyncService,
+            validate_broker_shared_asset_processing,
         )
         from scripts.dev_validation.backfill_broker_risk_control_reports import (
             _financial_storage_scope,
@@ -1347,6 +1497,29 @@ class DataManager:
                 diagnostics={"status": status},
                 metadata={"business_result": result},
             )
+        with _financial_storage_scope(self.research_storage):
+            validation = validate_broker_shared_asset_processing(
+                self.research_storage,
+                asset,
+            )
+        if not validation["ready"]:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code=str(
+                    validation.get("reason_code")
+                    or "broker_shared_lineage_validation_failed"
+                ),
+                diagnostics={
+                    "status": status,
+                    "missing_required_facts": validation.get(
+                        "missing_required_facts", []
+                    ),
+                },
+                metadata={
+                    "business_result": result,
+                    "shared_lineage_validation": validation,
+                },
+            )
         return ConsumerProcessingOutcome(
             status="completed",
             result_identity=stable_id(
@@ -1355,7 +1528,10 @@ class DataManager:
                 asset.get("observation_version"),
                 asset.get("content_hash"),
             ),
-            metadata={"business_result": result},
+            metadata={
+                "business_result": result,
+                "shared_lineage_validation": validation,
+            },
         )
 
     def _get_or_create_llm_client(self):

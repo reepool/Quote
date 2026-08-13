@@ -238,12 +238,12 @@
       "business_profile_evidence": {
         "enabled": true,
         "annual_report_asset_dependency": {
-          "enabled": false,
+          "enabled": true,
           "legacy_fallback_enabled": true,
-          "mode": "legacy",
-          "reconciliation_evidence_id": null,
+          "mode": "dual_read",
+          "reconciliation_evidence_id": "annual-report-consumer-input-reconciliation-20260813-v2",
           "legacy_writer_disabled": false,
-          "note": "Set mode to shared_only and disable legacy fallback only after dual-read filing/observation/hash reconciliation passes."
+          "note": "Shared assets are read first during dual-read reconciliation; legacy fallback and writer remain enabled until task 11.6 cleanup gates pass."
         },
         "archive": {
           "archive_root": "data/filings/business_profile",
@@ -610,13 +610,13 @@
         "broker_risk_control_reports": {
           "enabled": true,
           "annual_report_asset_dependency": {
-            "enabled": false,
+            "enabled": true,
             "legacy_fallback_enabled": true,
             "legacy_semiannual_enabled": true,
-            "mode": "legacy",
-            "reconciliation_evidence_id": null,
+            "mode": "dual_read",
+            "reconciliation_evidence_id": "annual-report-consumer-input-reconciliation-20260813-v2",
             "legacy_writer_disabled": false,
-            "note": "Shared annual-report processing is enabled only after consumer reconciliation; semiannual remains explicitly legacy-gated in V1."
+            "note": "Shared annual reports are read first in dual-read mode; annual legacy fallback/writer and explicitly gated legacy semiannual processing remain until later cutover."
           },
           "source_profile": "broker_annual_report_embedded_risk_control",
           "supplementary_source_profile": "broker_risk_control_report",

@@ -105,6 +105,45 @@ def test_required_config_fields_round_trip_and_enter_fingerprint():
             AnnouncementAssetConfig.from_mapping(changed)
 
 
+def test_production_consumers_use_dual_read_while_template_remains_fail_safe():
+    production = json.loads(
+        Path("config/10_research.json").read_text(encoding="utf-8")
+    )["research_config"]["modules"]
+    template = json.loads(
+        Path("config/config-template.json.example").read_text(encoding="utf-8")
+    )["research_config"]["modules"]
+
+    production_consumers = {
+        "business_profile_evidence": production["business_profile_evidence"],
+        "broker_risk_control_reports": production["financial_statements"][
+            "broker_risk_control_reports"
+        ],
+    }
+    for module_name in ("business_profile_evidence", "broker_risk_control_reports"):
+        dependency = production_consumers[module_name][
+            "annual_report_asset_dependency"
+        ]
+        assert dependency["enabled"] is True
+        assert dependency["mode"] == "dual_read"
+        assert dependency["legacy_fallback_enabled"] is True
+        assert dependency["legacy_writer_disabled"] is False
+        assert dependency["reconciliation_evidence_id"] == (
+            "annual-report-consumer-input-reconciliation-20260813-v2"
+        )
+
+        template_dependency = template[module_name][
+            "annual_report_asset_dependency"
+        ]
+        assert template_dependency["enabled"] is False
+        assert template_dependency["mode"] == "legacy"
+        assert template_dependency["legacy_fallback_enabled"] is True
+        assert template_dependency["legacy_writer_disabled"] is False
+
+    assert production_consumers["broker_risk_control_reports"][
+        "annual_report_asset_dependency"
+    ]["legacy_semiannual_enabled"] is True
+
+
 def test_scheduler_parameters_match_versioned_research_config_policies():
     production = _production_mapping()
     scheduler = json.loads(

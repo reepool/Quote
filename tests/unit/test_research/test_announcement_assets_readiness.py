@@ -519,6 +519,144 @@ def test_cleanup_gates_require_canonical_consumers_adoption_closure_and_alias_re
     assert closed.legacy_write_stop_allowed is True
 
 
+def test_consumer_migration_uses_each_consumers_legacy_asset_scope(tmp_path):
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    config = _config(tmp_path, relaxed=True)
+    _insert_effective_fixture(repository, config)
+    now = "2026-08-10T00:00:00+00:00"
+    with repository.transaction() as conn:
+        conn.execute(
+            """INSERT INTO official_asset_retention_pins(
+                   pin_id, blob_hash, pin_type, pin_key, owner, created_at,
+                   blocks_primary_unlink, required_set_hold, metadata_json
+               ) SELECT 'pin-business-profile', content_hash, 'legacy_alias',
+                        '/legacy/business-profile.pdf', 'business_profile', ?,
+                        1, 0, '{}'
+                 FROM effective_annual_reports WHERE asset_id='asset-ready'""",
+            (now,),
+        )
+        for consumer in ("business_profile", "broker_risk_control"):
+            conn.execute(
+                """INSERT INTO official_asset_consumer_processing(
+                       processing_id, schema_version, asset_id, consumer,
+                       parser_version, parameter_hash, status,
+                       equivalent_source_filings_json, metadata_json,
+                       created_at, updated_at
+                   ) VALUES(?, 'official_asset_consumer_processing.v2',
+                            'asset-ready', ?, 'parser-v1', ?, 'current',
+                            '[]', '{}', ?, ?)""",
+                (f"processing-{consumer}", consumer, consumer, now, now),
+            )
+
+    report = AnnouncementAssetReadinessService(
+        repository=repository,
+        config=config,
+    ).report(now="2026-08-10T01:00:00+00:00")
+
+    assert report.summary["consumer_migration_required_asset_count"] == {
+        "business_profile": 1,
+        "broker_risk_control": 1,
+    }
+    assert report.summary["consumer_migration_complete"] is True
+
+
+def test_non_broker_assets_do_not_expand_explicit_broker_migration_scope(tmp_path):
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    config = _config(tmp_path, relaxed=True)
+    digest = _insert_effective_fixture(repository, config)
+    now = "2026-08-10T00:00:00+00:00"
+    with repository.transaction() as conn:
+        conn.execute(
+            """INSERT INTO official_asset_retention_pins(
+                   pin_id, blob_hash, pin_type, pin_key, owner, created_at,
+                   blocks_primary_unlink, required_set_hold, metadata_json
+               ) VALUES('pin-broker', ?, 'legacy_alias',
+                        '/legacy/broker.pdf', 'broker_risk_control', ?,
+                        1, 0, '{"source_file_id":"broker-source"}')""",
+            (digest, now),
+        )
+        conn.execute(
+            """UPDATE effective_annual_reports
+               SET decision_evidence_json='{"source_file_id":"broker-source"}'
+               WHERE asset_id='asset-ready'"""
+        )
+        conn.execute(
+            """INSERT INTO official_asset_consumer_processing(
+                   processing_id, schema_version, asset_id, consumer,
+                   parser_version, parameter_hash, status,
+                   equivalent_source_filings_json, metadata_json,
+                   created_at, updated_at
+               ) VALUES('processing-broker',
+                        'official_asset_consumer_processing.v2', 'asset-ready',
+                        'broker_risk_control', 'parser-v1', 'parameter-v1',
+                        'current', '[]', '{}', ?, ?)""",
+            (now, now),
+        )
+        conn.execute(
+            """INSERT INTO effective_annual_reports(
+                   asset_id, schema_version, instrument_id, fiscal_year,
+                   report_period, announcement_id, attachment_id, version_id,
+                   content_hash, source, source_announcement_id, variant,
+                   classifier_version, decision_state, availability,
+                   visibility_state, last_checked_at, created_at, updated_at
+               ) VALUES('asset-non-broker', 'effective_annual_report.v1',
+                        '600001.SH', 2025, '2025-12-31', 'ann-ready',
+                        'att-ready', 'version-ready', ?, 'cninfo',
+                        'filing-non-broker', 'original',
+                        'formal_annual_report.v1', 'current', 'local_valid',
+                        'production', ?, ?, ?)""",
+            (digest, now, now, now),
+        )
+
+    report = AnnouncementAssetReadinessService(
+        repository=repository,
+        config=config,
+    ).report(now="2026-08-10T01:00:00+00:00")
+
+    assert report.summary["consumer_migration_required_asset_count"][
+        "broker_risk_control"
+    ] == 1
+    assert report.summary["consumer_migration_missing_asset_count"][
+        "broker_risk_control"
+    ] == 0
+
+
+def test_failed_consumer_processing_remains_in_explicit_migration_scope(tmp_path):
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    config = _config(tmp_path, relaxed=True)
+    _insert_effective_fixture(repository, config)
+    now = "2026-08-10T00:00:00+00:00"
+    with repository.transaction() as conn:
+        conn.execute(
+            """INSERT INTO official_asset_consumer_processing(
+                   processing_id, schema_version, asset_id, consumer,
+                   parser_version, parameter_hash, status, error_code,
+                   equivalent_source_filings_json, metadata_json,
+                   created_at, updated_at
+               ) VALUES('processing-failed',
+                        'official_asset_consumer_processing.v2', 'asset-ready',
+                        'broker_risk_control', 'parser-v1', 'parameter-v1',
+                        'failed', 'required_fact_missing', '[]', '{}', ?, ?)""",
+            (now, now),
+        )
+
+    report = AnnouncementAssetReadinessService(
+        repository=repository,
+        config=config,
+    ).report(now="2026-08-10T01:00:00+00:00")
+
+    assert report.summary["consumer_migration_required_asset_count"][
+        "broker_risk_control"
+    ] == 1
+    assert report.summary["consumer_migration_missing_asset_count"][
+        "broker_risk_control"
+    ] == 1
+    assert report.summary["consumer_migration_complete"] is False
+
+
 def test_persisted_readiness_report_round_trips_typed_and_redacted(tmp_path):
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()

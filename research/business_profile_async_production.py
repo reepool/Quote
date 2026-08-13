@@ -1888,7 +1888,7 @@ class BusinessProfileWorkRepository:
                         )
                         superseded += int(cursor.rowcount or 0)
             conn.commit()
-        return {
+        result = {
             "eligible": len(rows),
             "inserted": inserted,
             "reused": reused,
@@ -1896,6 +1896,20 @@ class BusinessProfileWorkRepository:
             "superseded": superseded,
             "identity_superseded": identity_superseded,
         }
+        if normalized_binding is not None:
+            result["work_ids"] = [
+                "bp-work-"
+                + _stable_hash(
+                    {
+                        "frontier_id": row["frontier_id"],
+                        "policy": policy,
+                        "processing_identity_hash": identity_hash,
+                        "bound_shared_asset": normalized_binding,
+                    }
+                )[:24]
+                for row in rows
+            ]
+        return result
 
 
 class BusinessProfileFrontierBoundAcquirer:

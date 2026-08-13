@@ -177,6 +177,7 @@ class AnnouncementAssetReadinessService:
                 "quarantine_invalid_sidecar_count",
                 "consumer_migration_complete",
                 "consumer_migration_status",
+                "consumer_migration_required_asset_count",
                 "consumer_migration_missing_asset_count",
                 "shared_custody_adoption_complete",
                 "consumed_adoption_gate_count",
@@ -393,6 +394,34 @@ class AnnouncementAssetReadinessService:
                 """SELECT asset_id, consumer, status
                    FROM official_asset_consumer_processing"""
             ).fetchall()
+            consumer_asset_scope_rows = conn.execute(
+                """SELECT effective.asset_id, pin.owner AS consumer
+                   FROM official_asset_retention_pins pin
+                   JOIN effective_annual_reports effective
+                     ON effective.content_hash=pin.blob_hash
+                    AND json_extract(
+                            effective.decision_evidence_json,
+                            '$.source_file_id'
+                        ) = json_extract(pin.metadata_json, '$.source_file_id')
+                   WHERE pin.pin_type IN ('legacy_alias', 'managed_alias')
+                     AND pin.owner IN ('business_profile', 'broker_risk_control')
+                   UNION
+                   SELECT gate.asset_id,
+                          json_extract(
+                              gate.evidence_json,
+                              '$.legacy_custody_evidence.consumer'
+                          ) AS consumer
+                   FROM official_asset_adoption_promotion_gates gate
+                   WHERE json_extract(
+                             gate.evidence_json,
+                             '$.legacy_custody_evidence.consumer'
+                         ) IN ('business_profile', 'broker_risk_control')
+                   UNION
+                   SELECT asset_id, consumer
+                   FROM official_asset_consumer_processing
+                   WHERE consumer IN ('business_profile', 'broker_risk_control')
+                     AND status IN ('current', 'failed')"""
+            ).fetchall()
             attachments = conn.execute(
                 """SELECT a.attachment_id, a.content_length_hint
                    FROM official_announcement_attachments a
@@ -543,22 +572,41 @@ class AnnouncementAssetReadinessService:
                 current_consumer_assets.setdefault(canonical_consumer, set()).add(
                     str(row["asset_id"])
                 )
-        required_consumer_assets = {
+        production_consumer_assets = {
             str(row["asset_id"])
             for row in effective
             if row["visibility_state"] == "production"
             and row["availability"] == "local_valid"
         }
         required_consumers = ("business_profile", "broker_risk_control")
+        explicit_consumer_asset_scope: dict[str, set[str]] = {}
+        for row in consumer_asset_scope_rows:
+            consumer_name = _canonical_consumer_name(str(row["consumer"] or ""))
+            if consumer_name not in required_consumers:
+                continue
+            explicit_consumer_asset_scope.setdefault(consumer_name, set()).add(
+                str(row["asset_id"])
+            )
+        required_consumer_assets = {
+            name: (
+                explicit_consumer_asset_scope.get(name, set())
+                & production_consumer_assets
+                if explicit_consumer_asset_scope.get(name)
+                else set(production_consumer_assets)
+            )
+            for name in required_consumers
+        }
         consumer_missing_asset_count = {
             name: len(
-                required_consumer_assets
+                required_consumer_assets[name]
                 - current_consumer_assets.get(name, set())
             )
             for name in required_consumers
         }
-        migration_complete = bool(required_consumer_assets) and not any(
-            consumer_missing_asset_count.values()
+        migration_complete = bool(production_consumer_assets) and all(
+            required_consumer_assets[name]
+            and consumer_missing_asset_count[name] == 0
+            for name in required_consumers
         )
         complete_cutoffs = [
             row["covered_until"]
@@ -747,6 +795,10 @@ class AnnouncementAssetReadinessService:
             "backup_stale": backup_stale,
             "consumer_migration_complete": migration_complete,
             "consumer_migration_status": consumer_status,
+            "consumer_migration_required_asset_count": {
+                name: len(required_consumer_assets[name])
+                for name in required_consumers
+            },
             "consumer_migration_missing_asset_count": consumer_missing_asset_count,
             "shared_custody_adoption_complete": bool(
                 any(row["status"] == "consumed" for row in adoption_gates)

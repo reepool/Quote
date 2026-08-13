@@ -739,9 +739,11 @@ def test_data_manager_business_consumer_passes_complete_asset_binding():
         return {
             "status": "success",
             "bound_shared_asset": dict(kwargs["bound_annual_report_asset"]),
+            "enqueue": {"work_ids": []},
         }
 
     manager.run_business_profile_backfill = run_backfill
+    manager.research_storage = None
     asset = {
         "asset_id": "asset-2025",
         "instrument_id": "600000.SH",
@@ -761,9 +763,127 @@ def test_data_manager_business_consumer_passes_complete_asset_binding():
         )
     )
 
-    assert outcome.status == "completed"
+    assert outcome.status == "blocked"
+    assert outcome.reason_code == "research_storage_unavailable"
     assert captured["instrument_ids"] == ["600000.SH"]
     assert captured["bound_annual_report_asset"] == asset
+
+
+def test_data_manager_business_consumer_accepts_only_persisted_publish_completion(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    checkpoint = tmp_path / "completed.json"
+    checkpoint.write_text('{"status":"completed"}', encoding="utf-8")
+    asset = {
+        "asset_id": "asset-2025",
+        "instrument_id": "600000.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "annual-2025",
+        "attachment_id": "attachment-2025",
+        "observation_version": "observation-2025",
+        "content_hash": "c" * 64,
+    }
+    now = "2026-04-01T00:00:00+08:00"
+    metadata = {
+        "bound_shared_asset": asset,
+        "stage_results": {
+            "acquire": {"status": "unchanged"},
+            "parse": {"status": "success", "metrics": {"pages": 1}},
+            "semantic": {"status": "success", "metrics": {"errors": 0}},
+            "publish": {"pipeline_status": "completed", "metrics": {"errors": 0}},
+        },
+    }
+    with storage.get_connection() as conn:
+        conn.execute(
+            """INSERT INTO business_profile_announcement_frontier(
+                   frontier_id, instrument_id, symbol, exchange, source,
+                   announcement_id, title, published_at, report_period,
+                   document_type, index_payload_hash, source_url, status,
+                   metadata_json, first_seen_at, last_seen_at, created_at,
+                   updated_at
+               ) VALUES('frontier-completed', '600000.SH', '600000', 'SSE',
+                        'cninfo', 'annual-2025', '2025年年度报告', ?, '2025-12-31',
+                        'annual_report', 'payload-hash',
+                        'shared-asset://asset-2025', 'active', '{}',
+                        ?, ?, ?, ?)""",
+            (now, now, now, now, now),
+        )
+        conn.execute(
+            """INSERT INTO business_profile_work_items(
+                   work_id, frontier_id, instrument_id, source, announcement_id,
+                   report_period, document_type, policy, processing_identity_hash,
+                   stage, status, attempt_count, max_attempts, checkpoint_path,
+                   metadata_json, completed_at, created_at, updated_at
+               ) VALUES('work-completed', 'frontier-completed', '600000.SH',
+                        'cninfo', 'annual-2025', '2025-12-31', 'annual_report',
+                        'latest_annual_only', 'identity-hash', 'publish', 'completed',
+                        0, 3, ?, ?, ?, ?, ?)""",
+            (str(checkpoint), json.dumps(metadata), now, now, now),
+        )
+        conn.commit()
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = storage
+
+    completion = manager._business_profile_bound_result_completion(
+        asset,
+        {"enqueue": {"work_ids": ["work-completed"]}},
+    )
+
+    assert completion["ready"] is True
+    assert completion["result_identity"].startswith("business-profile-result_")
+    assert completion["checkpoint_hash"]
+
+    metadata["stage_results"]["semantic"] = {
+        "status": "failed",
+        "metrics": {"errors": 0},
+    }
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET metadata_json=? "
+            "WHERE work_id='work-completed'",
+            (json.dumps(metadata),),
+        )
+        conn.commit()
+
+    blocked = manager._business_profile_bound_result_completion(
+        asset,
+        {"enqueue": {"work_ids": ["work-completed"]}},
+    )
+    assert blocked["ready"] is False
+    assert blocked["upstream_stage_statuses"]["semantic"] == "failed"
+
+
+def test_data_manager_broker_consumer_reads_nested_dependency_config(monkeypatch):
+    monkeypatch.setattr(
+        "scripts.dev_validation.backfill_broker_risk_control_reports.select_broker_instruments",
+        lambda *_args, **_kwargs: [],
+    )
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = object()
+    manager.db_ops = object()
+    manager.research_config = SimpleNamespace(
+        modules={
+            "financial_statements": {
+                "broker_risk_control_reports": {
+                    "annual_report_asset_dependency": {
+                        "enabled": True,
+                        "mode": "dual_read",
+                    }
+                }
+            }
+        }
+    )
+
+    outcome = manager._process_broker_risk_control_annual_report_asset(
+        {"instrument_id": "600030.SH"},
+        SimpleNamespace(),
+    )
+
+    assert outcome.status == "blocked"
+    assert outcome.reason_code == "instrument_not_confirmed_listed_broker"
 
 
 def test_recovery_requeues_only_empty_completion_and_is_idempotent(tmp_path):
