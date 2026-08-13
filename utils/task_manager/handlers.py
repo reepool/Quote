@@ -234,14 +234,23 @@ class TaskManagerHandlers:
         try:
             # Telethon中data属性访问
             action, target, job_id = TaskManagerKeyboards.parse_callback_data(event.data)
+            operator_principal = (
+                None
+                if not hasattr(event, 'sender_id')
+                else f"telegram:{event.sender_id}"
+            )
 
             # 处理不同的操作
             if action == "task_detail":
                 await self._handle_task_detail(chat_id, target)
             elif action == "task_action":
-                await self._handle_task_action(chat_id, target, job_id)
+                await self._handle_task_action(
+                    chat_id, target, job_id, operator_principal=operator_principal
+                )
             elif action == "confirm":
-                await self._handle_confirmation(chat_id, target, job_id)
+                await self._handle_confirmation(
+                    chat_id, target, job_id, operator_principal=operator_principal
+                )
             elif action == "cancel":
                 await self._handle_cancellation(chat_id, target, job_id)
             elif action == "refresh":
@@ -370,7 +379,14 @@ class TaskManagerHandlers:
             self.task_manager.logger.error(f"[TaskManagerHandlers] 安全显示任务详情失败: {e}")
             raise
 
-    async def _handle_task_action(self, chat_id: int, action: str, job_id: str) -> None:
+    async def _handle_task_action(
+        self,
+        chat_id: int,
+        action: str,
+        job_id: str,
+        *,
+        operator_principal: Optional[str] = None,
+    ) -> None:
         """处理任务操作"""
         user_state = self._get_user_state(chat_id)
 
@@ -394,14 +410,31 @@ class TaskManagerHandlers:
 
         elif action == "run":
             # 立即执行任务
-            await self._execute_task_action(chat_id, action, job_id)
+            await self._execute_task_action(
+                chat_id,
+                action,
+                job_id,
+                operator_principal=operator_principal,
+            )
 
         else:
             await self._handle_unknown_action(chat_id, f"task_action:{action}")
 
-    async def _handle_confirmation(self, chat_id: int, action: str, job_id: str) -> None:
+    async def _handle_confirmation(
+        self,
+        chat_id: int,
+        action: str,
+        job_id: str,
+        *,
+        operator_principal: Optional[str] = None,
+    ) -> None:
         """处理确认操作"""
-        await self._execute_task_action(chat_id, action, job_id)
+        await self._execute_task_action(
+            chat_id,
+            action,
+            job_id,
+            operator_principal=operator_principal,
+        )
 
     async def _handle_cancellation(self, chat_id: int, action: str, job_id: str) -> None:
         """处理取消操作"""
@@ -574,7 +607,14 @@ class TaskManagerHandlers:
             parse_mode='markdown'
         )
 
-    async def _execute_task_action(self, chat_id: int, action: str, job_id: str) -> None:
+    async def _execute_task_action(
+        self,
+        chat_id: int,
+        action: str,
+        job_id: str,
+        *,
+        operator_principal: Optional[str] = None,
+    ) -> None:
         """执行任务操作"""
         user_state = self._get_user_state(chat_id)
 
@@ -593,7 +633,11 @@ class TaskManagerHandlers:
 
         try:
             # 执行操作
-            success = await self._perform_task_action(action, job_id)
+            success = await self._perform_task_action(
+                action,
+                job_id,
+                operator_principal=operator_principal,
+            )
 
             # 显示结果
             message = TaskManagerFormatters.format_action_result(action, job_id, success)
@@ -897,10 +941,22 @@ class TaskManagerHandlers:
             # 如果获取执行历史失败，返回空列表而不是抛出异常
             return []
 
-    async def _perform_task_action(self, action: str, job_id: str) -> bool:
+    async def _perform_task_action(
+        self,
+        action: str,
+        job_id: str,
+        *,
+        operator_principal: Optional[str] = None,
+    ) -> bool:
         """执行任务操作"""
         try:
             if action == "run":
+                if job_id.startswith("annual_report_asset_"):
+                    return await self.task_manager.task_scheduler.execute_job_direct(
+                        job_id,
+                        include_dependencies=True,
+                        operator_principal=operator_principal,
+                    )
                 return await self.task_manager.task_scheduler.run_job_now(job_id)
             elif action == "enable":
                 success = await self._enable_task(job_id)
@@ -1103,6 +1159,22 @@ class TaskManagerHandlers:
 
         self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
 
+        # Keep manual task execution behind the same administrator boundary as
+        # other mutating Telegram commands.  Reject before parsing or looking
+        # up a job so an unauthenticated caller cannot probe task/config state.
+        is_authorized = getattr(self.task_manager, "is_authorized", None)
+        if callable(is_authorized) and not is_authorized(chat_id):
+            await self.task_manager.send_message(
+                chat_id,
+                "⛔ *未授权操作*\n\n当前 chat_id 不在管理员白名单中。",
+                parse_mode="markdown",
+            )
+            self.task_manager.logger.warning(
+                "[TaskManagerHandlers] 拒绝未授权任务执行请求，chat_id=%s",
+                chat_id,
+            )
+            return
+
         # 解析命令参数
         try:
             parts = shlex.split(command_text.strip())
@@ -1217,6 +1289,7 @@ class TaskManagerHandlers:
                 job_id,
                 target_date=target_date,
                 runtime_params=runtime_params,
+                operator_principal=f"telegram:{user_id}",
             )
 
             if success:
@@ -3207,6 +3280,8 @@ class TaskManagerHandlers:
             key = aliases.get(raw_key.strip(), raw_key.strip())
             if not key:
                 raise ValueError(f"参数名不能为空: `{token}`")
+            if key in {"operator_principal", "trigger_kind"}:
+                raise ValueError(f"参数 `{key}` 由认证适配器控制")
 
             value_text = raw_value.strip()
             lowered = value_text.lower()
@@ -3232,6 +3307,7 @@ class TaskManagerHandlers:
         job_id: str,
         target_date=None,
         runtime_params: Optional[Dict[str, Any]] = None,
+        operator_principal: Optional[str] = None,
     ) -> bool:
         """直接执行任务，不通过UI交互
 
@@ -3243,6 +3319,15 @@ class TaskManagerHandlers:
         """
         try:
             runtime_params = dict(runtime_params or {})
+            protected_adapter_keys = {
+                "operator_principal",
+                "trigger_kind",
+            } & set(runtime_params)
+            if protected_adapter_keys:
+                raise ValueError(
+                    "adapter-controlled runtime parameters: "
+                    + ",".join(sorted(protected_adapter_keys))
+                )
             self.task_manager.logger.info(
                 f"[TaskManagerHandlers] 直接执行任务: {job_id}, "
                 f"target_date={target_date}, runtime_params={runtime_params}"
@@ -3292,29 +3377,48 @@ class TaskManagerHandlers:
                     f"[TaskManagerHandlers] 通过依赖执行器执行 manual_only 任务: {job_id}"
                 )
                 if runtime_params:
+                    direct_kwargs = {
+                        "operator_principal": operator_principal
+                    } if job_id.startswith("annual_report_asset_") else {}
                     result = await scheduler.execute_job_direct(
                         job_id,
                         parameters=runtime_params,
                         include_dependencies=True,
+                        **direct_kwargs,
                     )
                 else:
+                    direct_kwargs = {
+                        "operator_principal": operator_principal
+                    } if job_id.startswith("annual_report_asset_") else {}
                     result = await scheduler.execute_job_direct(
                         job_id,
                         include_dependencies=True,
+                        **direct_kwargs,
                     )
                 self.task_manager.logger.info(f"[TaskManagerHandlers] manual_only 任务执行结果: {job_id}, 成功: {result}")
                 return bool(result)
 
             if runtime_params:
+                direct_kwargs = {
+                    "operator_principal": operator_principal
+                } if job_id.startswith("annual_report_asset_") else {}
                 result = await scheduler.execute_job_direct(
                     job_id,
                     parameters=runtime_params,
                     include_dependencies=True,
+                    **direct_kwargs,
                 )
                 self.task_manager.logger.info(f"[TaskManagerHandlers] 参数化任务执行结果: {job_id}, 成功: {result}")
                 return bool(result)
 
-            success = await scheduler.run_job_now(job_id)
+            if job_id.startswith("annual_report_asset_"):
+                success = await scheduler.execute_job_direct(
+                    job_id,
+                    include_dependencies=True,
+                    operator_principal=operator_principal,
+                )
+            else:
+                success = await scheduler.run_job_now(job_id)
             self.task_manager.logger.info(f"[TaskManagerHandlers] 任务调度结果: {job_id}, 成功: {success}")
             return success
 

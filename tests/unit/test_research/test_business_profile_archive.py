@@ -1,4 +1,6 @@
 from dataclasses import asdict
+import hashlib
+import io
 import json
 from pathlib import Path
 import sqlite3
@@ -63,6 +65,185 @@ def _candidate(announcement_id, title, *, content_url=None):
 
 def _instrument(instrument_id="600309.SH", symbol="600309", exchange="SSE"):
     return {"instrument_id": instrument_id, "symbol": symbol, "exchange": exchange}
+
+
+def test_annual_report_archive_uses_shared_asset_service_without_pdf_downloader():
+    storage = _Storage()
+    payload = b"%PDF-1.7\nshared annual report"
+    blob = SimpleNamespace(
+        canonical_path="/shared/aa/annual.pdf",
+        content_hash=hashlib.sha256(payload).hexdigest(),
+        content_length=len(payload),
+    )
+    asset = SimpleNamespace(
+        asset_id="shared-asset-1",
+        source_announcement_id="annual-shared",
+        content_hash=blob.content_hash,
+        variant=SimpleNamespace(value="original"),
+    )
+
+    class _Shared:
+        def __init__(self):
+            self.calls = []
+
+        def ensure(self, request):
+            self.calls.append(("ensure", request))
+            return {
+                "availability": "local_valid",
+                "asset": {
+                    "asset_id": asset.asset_id,
+                    "source": "cninfo",
+                    "source_announcement_id": "annual-shared",
+                    "observation_version": "observation-1",
+                    "variant": "original",
+                },
+            }
+
+        def content_handle(self, asset_id):
+            self.calls.append(("content", asset_id))
+            return {
+                "asset_id": asset_id,
+                "content_hash": blob.content_hash,
+                "content_length": blob.content_length,
+                "path": Path(blob.canonical_path),
+                "file_handle": io.BytesIO(payload),
+            }
+
+    shared = _Shared()
+    service = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        shared_asset_access=shared,
+        downloader=lambda _candidate: (_ for _ in ()).throw(
+            AssertionError("legacy PDF downloader must not run")
+        ),
+    )
+    record = service.archive_candidates(
+        _instrument(),
+        [_candidate("annual-shared", "万华化学2025年年度报告")],
+    ).records[0]
+
+    assert record.status == "archived"
+    assert record.archive_path == blob.canonical_path
+    assert record.content_hash == blob.content_hash
+    assert shared.calls[0][0] == "ensure"
+    assert shared.calls[0][1].instrument_id == "600309.SH"
+    assert shared.calls[1] == ("content", asset.asset_id)
+    assert storage.rows[0]["source_mode"] == "shared_announcement_asset"
+    assert storage.rows[0]["metadata"]["shared_asset_id"] == asset.asset_id
+
+
+def test_shared_only_annual_report_miss_never_uses_legacy_downloader():
+    class _SharedMiss:
+        def ensure(self, request):
+            return {"availability": "metadata_only", "asset": None}
+
+    service = BusinessProfileDocumentArchiveService(
+        storage=_Storage(),
+        shared_asset_access=_SharedMiss(),
+        downloader=lambda _candidate: (_ for _ in ()).throw(
+            AssertionError("legacy PDF downloader must not run")
+        ),
+    )
+
+    result = service.archive_candidates(
+        _instrument(),
+        [_candidate("annual-missing", "万华化学2025年年度报告")],
+    )
+
+    assert result.failed == 1
+    assert result.records == []
+    assert "not locally ready" in result.errors[0]["error"]
+
+
+def test_non_annual_document_keeps_business_owned_downloader_in_shared_only_mode(
+    tmp_path,
+):
+    class _NoAnnualCalls:
+        def ensure(self, request):
+            raise AssertionError("non-annual document must not use shared annual assets")
+
+    candidate = _candidate("change-1", "万华化学关于公司经营范围变更的公告")
+    service = BusinessProfileDocumentArchiveService(
+        storage=_Storage(),
+        archive_root=tmp_path,
+        shared_asset_access=_NoAnnualCalls(),
+        downloader=lambda _candidate: b"%PDF-1.7\nnon-annual",
+    )
+
+    result = service.archive_candidates(_instrument(), [candidate])
+
+    assert result.failed == 0
+    assert result.archived == 1
+
+
+def test_shared_asset_path_change_keeps_business_processing_identity(tmp_path):
+    payload = b"%PDF-1.7\nshared stable identity"
+    digest = hashlib.sha256(payload).hexdigest()
+
+    class _SharedAccess:
+        def __init__(self):
+            self.path = tmp_path / "first.pdf"
+
+        def ensure(self, request):
+            return {
+                "availability": "local_valid",
+                "asset": {
+                    "asset_id": "stable-asset",
+                    "source": "cninfo",
+                    "source_announcement_id": "annual-stable",
+                    "observation_version": "stable-observation",
+                    "variant": "original",
+                },
+            }
+
+        def content_handle(self, asset_id):
+            return {
+                "asset_id": asset_id,
+                "content_hash": digest,
+                "content_length": len(payload),
+                "path": self.path,
+                "file_handle": io.BytesIO(payload),
+            }
+
+    storage = _Storage()
+    shared = _SharedAccess()
+    service = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        shared_asset_access=shared,
+        downloader=lambda _candidate: (_ for _ in ()).throw(
+            AssertionError("legacy downloader must not run")
+        ),
+    )
+    candidate = _candidate("annual-stable", "万华化学2025年年度报告")
+
+    first = service.archive_candidates(_instrument(), [candidate]).records[0]
+    shared.path = tmp_path / "relocated.pdf"
+    second = service.archive_candidates(_instrument(), [candidate]).records[0]
+
+    assert first.source_file_id == second.source_file_id == "shared-asset:stable-asset"
+    assert first.content_hash == second.content_hash == digest
+    assert second.status == "unchanged"
+    assert storage.upsert_calls == 1
+
+
+def test_shared_only_business_profile_cutover_requires_reconciliation_evidence():
+    with pytest.raises(ValueError, match="requires reconciliation evidence"):
+        BusinessProfileDocumentArchiveService.from_research_config(
+            storage=_Storage(),
+            research_config=SimpleNamespace(
+                modules={
+                    "business_profile_evidence": {
+                        "annual_report_asset_dependency": {
+                            "enabled": True,
+                            "legacy_fallback_enabled": False,
+                            "mode": "shared_only",
+                            "legacy_writer_disabled": False,
+                        }
+                    }
+                }
+            ),
+            shared_asset_access=SimpleNamespace(),
+        )
 
 
 @pytest.mark.parametrize(

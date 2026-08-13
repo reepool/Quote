@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Dict, FrozenSet, Iterable, Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from .models import AnnouncementQuery, AnnouncementScanResult
 
@@ -16,16 +17,17 @@ class AnnouncementQueryNotSupported(ValueError):
 class AnnouncementProviderCapabilities:
     """Explicit provider eligibility boundary; it is not route priority."""
 
-    exchanges: FrozenSet[str]
+    exchanges: frozenset[str]
     supports_market_scope: bool = True
     supports_instrument_scope: bool = False
     supports_date_filter: bool = False
     supports_keyword_filter: bool = False
     supports_category_filter: bool = False
-    cursor_kind: Optional[str] = None
+    cursor_kind: str | None = None
     max_page_size: int = 30
     supports_attachment_retrieval: bool = False
     requires_provider_identity: bool = False
+    attachment_version_signal: str | None = None
 
     def __post_init__(self) -> None:
         exchanges = frozenset(str(item).strip().upper() for item in self.exchanges if str(item).strip())
@@ -33,6 +35,14 @@ class AnnouncementProviderCapabilities:
             raise ValueError("provider capability exchanges cannot be empty")
         object.__setattr__(self, "exchanges", exchanges)
         object.__setattr__(self, "max_page_size", max(1, int(self.max_page_size)))
+        signal = (
+            None
+            if self.attachment_version_signal in (None, "")
+            else str(self.attachment_version_signal).strip().lower()
+        )
+        if signal not in {None, "etag", "last_modified", "source_version_id"}:
+            raise ValueError("unsupported attachment version signal")
+        object.__setattr__(self, "attachment_version_signal", signal)
 
     def validate(self, query: AnnouncementQuery) -> None:
         scope = query.scope
@@ -71,9 +81,9 @@ class AnnouncementProvider(Protocol):
 class AnnouncementProviderRegistry:
     """Resolve provider implementations independently from route order."""
 
-    providers: Dict[str, AnnouncementProvider] = field(default_factory=dict)
+    providers: dict[str, AnnouncementProvider] = field(default_factory=dict)
 
-    def __init__(self, providers: Optional[Iterable[AnnouncementProvider]] = None) -> None:
+    def __init__(self, providers: Iterable[AnnouncementProvider] | None = None) -> None:
         self.providers = {}
         for provider in providers or ():
             self.register(provider)
@@ -86,7 +96,7 @@ class AnnouncementProviderRegistry:
             raise ValueError(f"announcement provider already registered: {source}")
         self.providers[source] = provider
 
-    def get(self, source: str) -> Optional[AnnouncementProvider]:
+    def get(self, source: str) -> AnnouncementProvider | None:
         return self.providers.get(str(source or "").strip().lower())
 
     def require(self, source: str) -> AnnouncementProvider:

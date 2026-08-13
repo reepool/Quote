@@ -20,11 +20,36 @@ BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES = (
 class AnnualReportAssetCatalog:
     """Query and validate immutable annual-report assets for cross-module reuse."""
 
-    def __init__(self, storage: Any, *, archive_base: str | Path | None = None):
+    def __init__(
+        self,
+        storage: Any,
+        *,
+        archive_base: str | Path | None = None,
+        shared_asset_access: Any | None = None,
+        mode: str | None = None,
+    ):
         self.storage = storage
         self.archive_base = (
             Path(archive_base) if archive_base is not None else Path.cwd()
         )
+        research_config = getattr(storage, "research_config", None)
+        modules = getattr(research_config, "modules", {}) or {}
+        business_profile_cfg = (
+            modules.get("business_profile_evidence", {})
+            if isinstance(modules, Mapping)
+            else {}
+        )
+        dependency_cfg = (
+            business_profile_cfg.get("annual_report_asset_dependency", {})
+            if isinstance(business_profile_cfg, Mapping)
+            else {}
+        )
+        self.mode = str(mode or dependency_cfg.get("mode", "legacy")).strip().lower()
+        if self.mode not in {"legacy", "dual_read", "shared_only"}:
+            raise ValueError("invalid annual-report compatibility catalog mode")
+        self.shared_asset_access = shared_asset_access
+        if self.shared_asset_access is None and self.mode != "legacy":
+            self.shared_asset_access = self._build_shared_access(research_config)
 
     def list_assets(
         self,
@@ -38,6 +63,19 @@ class AnnualReportAssetCatalog:
         validate_files: bool = False,
     ) -> list[dict[str, Any]]:
         """Return catalog rows, retaining history unless ``active_only`` is set."""
+
+        if self.mode != "legacy":
+            shared_assets = self._list_shared_assets(
+                instrument_id=instrument_id,
+                report_period=report_period,
+                filing_id=filing_id,
+                source=source,
+                knowledge_cutoff=knowledge_cutoff,
+                active_only=active_only,
+                validate_files=validate_files,
+            )
+            if self.mode == "shared_only" or shared_assets:
+                return shared_assets
 
         rows = self._get_manifests(
             instrument_id=instrument_id,
@@ -115,6 +153,16 @@ class AnnualReportAssetCatalog:
         filing_id: str,
     ) -> dict[str, Any] | None:
         """Return an exact verified source filing suitable for download avoidance."""
+
+        if self.mode != "legacy":
+            shared = self._find_shared_filing(
+                instrument_id=instrument_id,
+                report_period=report_period,
+                source=source,
+                filing_id=filing_id,
+            )
+            if self.mode == "shared_only" or shared is not None:
+                return shared
 
         assets = self.list_assets(
             instrument_id=instrument_id,
@@ -198,6 +246,171 @@ class AnnualReportAssetCatalog:
         if repository is not None and hasattr(repository, "get_source_file_manifests"):
             return repository.get_source_file_manifests(**kwargs)
         return self.storage.get_financial_source_file_manifests(**kwargs)
+
+    def _list_shared_assets(
+        self,
+        *,
+        instrument_id: str | None,
+        report_period: str | None,
+        filing_id: str | None,
+        source: str | None,
+        knowledge_cutoff: str | None,
+        active_only: bool,
+        validate_files: bool,
+    ) -> list[dict[str, Any]]:
+        if self.shared_asset_access is None:
+            if self.mode == "shared_only":
+                raise RuntimeError("shared annual-report catalog access is unavailable")
+            return []
+        fiscal_year = (
+            int(str(report_period)[:4])
+            if report_period and len(str(report_period)) >= 4
+            else None
+        )
+        projection = self.shared_asset_access.list_assets(
+            instrument_id=instrument_id,
+            fiscal_year=fiscal_year,
+            source=source,
+            limit=1000,
+        )
+        rows: list[dict[str, Any]] = []
+        for asset in projection.get("items", ()):
+            if active_only and not asset.get("asset_id"):
+                continue
+            if report_period and str(asset.get("report_period") or "") != str(
+                report_period
+            ):
+                continue
+            if filing_id and str(asset.get("source_announcement_id") or "") != str(
+                filing_id
+            ):
+                continue
+            if knowledge_cutoff and str(asset.get("published_at") or "") > str(
+                knowledge_cutoff
+            ):
+                continue
+            if knowledge_cutoff and str(
+                asset.get("version_available_at") or ""
+            ) > str(knowledge_cutoff):
+                continue
+            rows.append(
+                self._shared_catalog_row(asset, validate_file=validate_files)
+            )
+        return sorted(rows, key=_asset_sort_key, reverse=True)
+
+    def _find_shared_filing(
+        self,
+        *,
+        instrument_id: str,
+        report_period: str,
+        source: str,
+        filing_id: str,
+    ) -> dict[str, Any] | None:
+        if self.shared_asset_access is None:
+            return None
+        from research.announcement_assets import EnsureRequest
+
+        ensured = self.shared_asset_access.ensure(
+            EnsureRequest(
+                instrument_id=instrument_id,
+                source=source,
+                source_announcement_id=filing_id,
+                allow_network=False,
+                consumer="annual_report_catalog_compatibility",
+                principal="internal",
+            )
+        )
+        asset = ensured.get("asset")
+        if not asset or ensured.get("availability") != "local_valid":
+            return None
+        if str(asset.get("report_period") or "") != str(report_period):
+            return None
+        return self._shared_catalog_row(asset, validate_file=True)
+
+    def _shared_catalog_row(
+        self,
+        asset: Mapping[str, Any],
+        *,
+        validate_file: bool,
+    ) -> dict[str, Any]:
+        content = None
+        integrity_status = str(asset.get("integrity") or "unchecked")
+        try:
+            content = self.shared_asset_access.content_handle(str(asset["asset_id"]))
+        except (FileNotFoundError, KeyError, RuntimeError, ValueError):
+            if validate_file:
+                integrity_status = "missing"
+        else:
+            handle = content.get("file_handle")
+            if handle is not None:
+                handle.close()
+            integrity_status = "valid"
+        archive_path = "" if content is None else str(content.get("path") or "")
+        return {
+            "schema_version": ANNUAL_REPORT_ASSET_SCHEMA_VERSION,
+            "source_file_id": f"shared-asset:{asset['asset_id']}",
+            "shared_asset_id": str(asset["asset_id"]),
+            "instrument_id": str(asset.get("instrument_id") or ""),
+            "symbol": str(asset.get("instrument_id") or "").split(".", 1)[0],
+            "exchange": str(asset.get("instrument_id") or "").split(".", 1)[-1],
+            "report_period": str(asset.get("report_period") or ""),
+            "report_type": (
+                "annual_report_correction"
+                if asset.get("is_correction")
+                else "annual_report"
+            ),
+            "filing_id": str(asset.get("source_announcement_id") or ""),
+            "source": str(asset.get("source") or ""),
+            "source_url": None,
+            "archive_path": archive_path,
+            "resolved_archive_path": archive_path,
+            "content_hash": str(asset.get("content_hash") or ""),
+            "content_length": asset.get("content_length"),
+            "published_at": asset.get("published_at"),
+            "downloaded_at": None,
+            "created_at": asset.get("activated_at"),
+            "updated_at": asset.get("last_checked_at"),
+            "status": "verified" if integrity_status == "valid" else "unavailable",
+            "supersedes_source_file_id": (
+                None
+                if not asset.get("predecessor_asset_id")
+                else f"shared-asset:{asset['predecessor_asset_id']}"
+            ),
+            "is_active": True,
+            "integrity_status": integrity_status,
+            "metadata": {
+                "shared_asset_id": asset.get("asset_id"),
+                "observation_version": asset.get("observation_version"),
+                "effective_decision_state": asset.get(
+                    "effective_decision_state"
+                ),
+                "compatibility_mode": self.mode,
+            },
+        }
+
+    @staticmethod
+    def _build_shared_access(research_config: Any) -> Any | None:
+        storage_config = getattr(research_config, "storage", None)
+        db_path = getattr(storage_config, "db_path", None)
+        if not db_path:
+            return None
+        from research.announcement_assets import (
+            AnnouncementAssetAccess,
+            AnnouncementAssetConfig,
+            AnnouncementAssetRepository,
+        )
+
+        config = AnnouncementAssetConfig.from_research_config(
+            research_config,
+            project_root=Path.cwd(),
+        )
+        path = Path(str(db_path))
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        return AnnouncementAssetAccess(
+            repository=AnnouncementAssetRepository(path),
+            config=config,
+        )
 
 
 def _asset_sort_key(row: Mapping[str, Any]) -> tuple[str, str, int, str]:

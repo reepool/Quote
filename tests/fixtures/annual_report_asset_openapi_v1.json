@@ -1,0 +1,37 @@
+{
+  "schema_version": "annual_report_asset_openapi_snapshot.v1",
+  "asset_response_fields": ["content_url"],
+  "paths": {
+    "/api/v1/research/annual-report-asset-requests/{asset_request_id}": ["delete", "get"],
+    "/api/v1/research/annual-report-assets/readiness": ["get"],
+    "/api/v1/research/annual-report-assets/{asset_id}/content": ["get"],
+    "/api/v1/research/annual-report-consumer-requests/{consumer_request_id}": ["delete", "get"],
+    "/api/v1/research/company/{instrument_id}/annual-reports": ["get"],
+    "/api/v1/research/company/{instrument_id}/annual-reports/effective": ["get"],
+    "/api/v1/research/company/{instrument_id}/annual-reports/ensure": ["post"],
+    "/api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process": ["post"],
+    "/api/v1/research/company/{instrument_id}/business-profile": ["get"],
+    "/api/v1/research/company/{instrument_id}/business-profile/annual-report-process": ["post"]
+  },
+  "response_statuses": {
+    "asset_request_delete": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "asset_request_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "business_command": ["200", "202", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "consumer_request_delete": ["200", "202", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "consumer_request_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "content_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "effective_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "ensure_post": ["200", "202", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "list_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"],
+    "readiness_get": ["200", "401", "403", "404", "409", "410", "422", "429", "503"]
+  },
+  "state_enums": {
+    "asset_availability": ["local_valid", "metadata_only", "missing", "ambiguous", "corrupt", "superseded", "blocked"],
+    "asset_request_status": ["active", "cancelled", "expired"],
+    "consumer_request_status": ["pending_asset", "not_started", "queued", "processing", "completed", "failed", "missing", "blocked", "cancelled", "expired"],
+    "consumer_result_state": ["unavailable", "current", "stale", "reprocessing"],
+    "ensure_disposition": ["local_hit", "local_miss", "operation_created", "operation_reused"],
+    "exact_content_state": ["local_valid", "retained_internal_only", "local_content_unavailable"],
+    "operation_status": ["queued", "running", "completed", "missing", "failed", "blocked", "cancelled"]
+  }
+}

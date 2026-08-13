@@ -118,6 +118,7 @@ def test_index_market_state_and_price_limit_routes_are_point_in_time(tmp_path, m
         )
     )
     assert index["items"][0]["source_symbol"] == "000001.SZ"
+    assert index["readiness"] == {"membership": "ready", "weights": "deferred"}
     assert state["state"] == "st"
     assert limits["evidence"]["limit_up"] == 10.5
 

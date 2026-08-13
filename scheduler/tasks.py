@@ -10,6 +10,7 @@ import os
 import threading
 import time as time_module
 from datetime import datetime, date, timedelta, time
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Union
 
 # Some tests and operator scripts import scheduler.tasks directly. Install the
@@ -51,6 +52,10 @@ from research.backtest_data.corporate_action_history_backfill import (
 )
 from research.backtest_data.financial_store import FinancialVintageStore
 from research.backtest_data.maintenance import BacktestDataMaintenance
+from research.backtest_data.index_constituent_history_backfill import (
+    CoreIndexConstituentHistoryBackfill,
+    SUPPORTED_INDEXES,
+)
 from research.backtest_data.rollout import BacktestRolloutPolicy
 
 
@@ -71,6 +76,203 @@ def _disabled_backtest_stage(name: str) -> Dict[str, Any]:
         "network_requests": 0,
         "blockers": ["rollout_disabled"],
     }
+
+
+async def _run_index_constituent_history_stage(
+    *,
+    start_date: date,
+    end_date: date,
+    index_instrument_ids: List[str],
+    daily_request_reserve: int,
+    sampling: str,
+    max_queries_per_run: int,
+    checkpoint_path: str,
+    dry_run: bool,
+    resume: bool,
+) -> Dict[str, Any]:
+    from data_sources.baostock_source import BaostockAccessGovernor, BaostockSource
+    from data_sources.base_source import RateLimitConfig
+    from utils.exceptions import DataSourceError, NetworkError
+
+    source_config = config_manager.get("data_sources_config", {}).get("baostock", {})
+    if not source_config.get("enabled", False):
+        return {
+            "stage": "index_composition",
+            "status": "unavailable",
+            "network_requests": 0,
+            "provider_usage": [],
+            "blockers": ["baostock_source_disabled"],
+            "membership_readiness": "unavailable",
+            "weight_readiness": "deferred",
+        }
+    daily_limit = int(source_config.get("daily_request_safety_limit", 40000))
+    usage_state_path = source_config.get(
+        "usage_state_path", "data/runtime/baostock/api_usage.json"
+    )
+    session_lock_path = source_config.get(
+        "session_lock_path", "data/runtime/baostock/session.lock"
+    )
+    default_usage_path = "data/runtime/baostock/api_usage.json"
+    default_lock_path = "data/runtime/baostock/session.lock"
+    governor = BaostockAccessGovernor(
+        daily_request_limit=daily_limit,
+        state_path=usage_state_path,
+        session_lock_path=session_lock_path,
+        legacy_state_path=(
+            "~/.cache/quote/baostock_api_usage.json"
+            if BaostockAccessGovernor._resolve_path(usage_state_path)
+            == BaostockAccessGovernor._resolve_path(default_usage_path)
+            else None
+        ),
+        legacy_session_lock_path=(
+            "~/.cache/quote/baostock_session.lock"
+            if BaostockAccessGovernor._resolve_path(session_lock_path)
+            == BaostockAccessGovernor._resolve_path(default_lock_path)
+            else None
+        ),
+    )
+    records = await data_manager.db_ops.get_trading_calendar_records(
+        "SSE", start_date, end_date
+    )
+    calendar_coverage = evaluate_calendar_coverage(
+        "SSE", start_date, end_date, records
+    )
+    if calendar_coverage.get("status") == "blocked":
+        return {
+            "stage": "index_composition",
+            "status": "blocked",
+            "network_requests": 0,
+            "provider_usage": [],
+            "blockers": [
+                "SSE:calendar_coverage_incomplete:"
+                f"{calendar_coverage.get('missing_days', 0)}"
+            ],
+            "calendar_coverage": calendar_coverage,
+            "membership_readiness": "unavailable",
+            "weight_readiness": "deferred",
+        }
+    trading_dates = []
+    for record in records:
+        if not bool(record.get("is_trading_day")):
+            continue
+        value = record.get("date")
+        if isinstance(value, datetime):
+            value = value.date()
+        elif not isinstance(value, date):
+            try:
+                value = datetime.fromisoformat(str(value)[:10]).date()
+            except (TypeError, ValueError):
+                continue
+        trading_dates.append(value)
+
+    service = CoreIndexConstituentHistoryBackfill(
+        quotes_db_path=_quote_database_path(),
+        checkpoint_path=checkpoint_path,
+        quota_reader=governor.usage_snapshot,
+    )
+    try:
+        plan = service.build_plan(
+            start_date=start_date,
+            end_date=end_date,
+            trading_dates=trading_dates,
+            indexes=index_instrument_ids,
+            daily_request_reserve=daily_request_reserve,
+            sampling=sampling,
+            max_queries_per_run=max_queries_per_run,
+        )
+    except ValueError as exc:
+        return {
+            "stage": "index_composition",
+            "status": "unavailable",
+            "network_requests": 0,
+            "provider_usage": [],
+            "blockers": [str(exc)],
+            "supported_indexes": sorted(SUPPORTED_INDEXES),
+            "membership_readiness": "unavailable",
+            "weight_readiness": "deferred",
+        }
+    dry_run_result = service.dry_run(plan)
+    if dry_run:
+        return dry_run_result
+    non_quota_blockers = [
+        item for item in (dry_run_result.get("blockers") or [])
+        if item != "insufficient_baostock_quota_headroom"
+    ]
+    usable_requests = int(
+        (dry_run_result.get("quota") or {}).get("usable", 0) or 0
+    )
+    if non_quota_blockers or usable_requests < 3:
+        return dry_run_result
+
+    source = None
+    owns_source = False
+    source_factory = getattr(data_manager, "source_factory", None)
+    if source_factory is not None:
+        source = source_factory.get_source_instance("baostock", region="a_stock")
+    if source is None:
+        rate_limit = RateLimitConfig(
+            max_requests_per_minute=int(source_config.get("max_requests_per_minute", 300)),
+            max_requests_per_hour=int(source_config.get("max_requests_per_hour", 5000)),
+            max_requests_per_day=int(source_config.get("max_requests_per_day", 40000)),
+            retry_times=int(source_config.get("retry_times", 5)),
+            retry_interval=float(source_config.get("retry_interval", 5.0)),
+            min_interval_seconds=float(source_config.get("min_interval_seconds", 0.2)),
+        )
+        source = BaostockSource(
+            "baostock_index_history",
+            rate_limit,
+            connection_timeout_seconds=float(source_config.get("connection_timeout", 30.0)),
+            login_timeout_seconds=float(source_config.get("login_timeout", 30.0)),
+            daily_request_safety_limit=daily_limit,
+            usage_state_path=source_config.get(
+                "usage_state_path", "data/runtime/baostock/api_usage.json"
+            ),
+            session_lock_path=source_config.get(
+                "session_lock_path", "data/runtime/baostock/session.lock"
+            ),
+        )
+        owns_source = True
+    if not hasattr(source, "get_historical_index_constituents"):
+        return {
+            "stage": "index_composition",
+            "status": "unavailable",
+            "network_requests": 0,
+            "provider_usage": [],
+            "blockers": ["configured_baostock_history_source_unavailable"],
+            "membership_readiness": "unavailable",
+            "weight_readiness": "deferred",
+        }
+    quota_before = governor.usage_snapshot()
+    try:
+        await source.initialize()
+        service.fetcher = source.get_historical_index_constituents
+        stage_result = await service.run(plan, resume=resume)
+    except (DataSourceError, NetworkError) as exc:
+        stage_result = {
+            "stage": "index_composition",
+            "status": "blocked",
+            "network_requests": 0,
+            "provider_usage": [],
+            "blockers": [f"baostock_source_unavailable:{exc}"],
+            "membership_readiness": "unavailable",
+            "weight_readiness": "deferred",
+            "retryable": True,
+        }
+    finally:
+        if owns_source:
+            await source.close()
+            source._bs_executor.shutdown(wait=False)
+    quota_after = governor.usage_snapshot()
+    stage_result["quota_before"] = quota_before
+    stage_result["quota_after"] = quota_after
+    stage_result["calendar_coverage"] = calendar_coverage
+    stage_result["quota_request_delta"] = max(
+        int(quota_after.get("count", 0)) - int(quota_before.get("count", 0)), 0
+    )
+    stage_result.setdefault("totals", {})["quota_request_delta"] = stage_result[
+        "quota_request_delta"
+    ]
+    return stage_result
 
 
 async def _run_backtest_stage(
@@ -3741,6 +3943,205 @@ class ScheduledTasks:
                 except Exception as e:
                     scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
 
+    async def _run_annual_report_asset_job(
+        self,
+        *,
+        job_name: str,
+        runner,
+        job_config: Optional[JobConfig],
+    ) -> bool:
+        """Execute one durable shared-asset command and publish its result."""
+        scheduler_logger.info(
+            "[Scheduler] Starting shared annual-report asset job: %s",
+            job_name,
+        )
+        try:
+            result = await runner()
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Shared annual-report asset job failed: %s",
+                job_name,
+            )
+            result = {
+                "schema_version": "annual_report_asset_job_execution.v1",
+                "job_name": job_name,
+                "status": "failed",
+                "outcome": "failed",
+                "diagnostics": {
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                },
+            }
+        await self._send_task_report(
+            report_data={
+                "name": job_name,
+                "status": result.get("status"),
+                "result": result,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            },
+            report_type="maintenance_report",
+            task_name=job_name,
+            job_config=job_config,
+        )
+        return bool(
+            result.get("status") == "completed"
+            and result.get("outcome") in {"success", "partial"}
+        )
+
+    async def annual_report_asset_latest_backfill(
+        self,
+        as_of: Optional[str] = None,
+        bounds: Optional[Dict[str, int]] = None,
+        trigger_kind: Optional[str] = None,
+        operator_principal: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run the manual-only latest-effective annual-report bootstrap."""
+        return await self._run_annual_report_asset_job(
+            job_name="annual_report_asset_latest_backfill",
+            runner=lambda: data_manager.run_annual_report_asset_latest_backfill(
+                as_of=as_of,
+                bounds=bounds,
+                trigger_kind=trigger_kind or "manual",
+                **({"principal_id": operator_principal}
+                   if operator_principal is not None else {}),
+            ),
+            job_config=job_config,
+        )
+
+    async def annual_report_asset_daily_update(
+        self,
+        timezone: Optional[str] = None,
+        overlap_days: Optional[int] = None,
+        catch_up_max_days: Optional[int] = None,
+        minimum_runs_per_calendar_day: Optional[int] = None,
+        universe_refresh_cadence: Optional[str] = None,
+        run_cutoff: Optional[str] = None,
+        bounds: Optional[Dict[str, int]] = None,
+        trigger_kind: Optional[str] = None,
+        operator_principal: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run bounded daily discovery, reconciliation, and attachment upkeep."""
+        expected_schedule = {
+            "timezone": timezone,
+            "overlap_days": overlap_days,
+            "catch_up_max_days": catch_up_max_days,
+            "minimum_runs_per_calendar_day": minimum_runs_per_calendar_day,
+            "universe_refresh_cadence": universe_refresh_cadence,
+        }
+        effective_trigger = (
+            trigger_kind
+            or (
+                "manual"
+                if job_config is not None and job_config.manual_only
+                else "cron"
+            )
+        )
+        principal_id = (
+            operator_principal
+            if effective_trigger != "cron"
+            else "service:annual-report-asset-scheduler"
+        )
+        return await self._run_annual_report_asset_job(
+            job_name="annual_report_asset_daily_update",
+            runner=lambda: data_manager.run_annual_report_asset_daily_update(
+                run_cutoff=run_cutoff,
+                bounds=bounds,
+                trigger_kind=effective_trigger,
+                expected_schedule=expected_schedule,
+                **({"principal_id": principal_id} if principal_id is not None else {}),
+            ),
+            job_config=job_config,
+        )
+
+    async def annual_report_asset_integrity_audit(
+        self,
+        read_only: bool = True,
+        content_hashes: Optional[List[str]] = None,
+        deletion_ids: Optional[List[str]] = None,
+        action_flags: Optional[Dict[str, bool]] = None,
+        bounds: Optional[Dict[str, int]] = None,
+        trigger_kind: Optional[str] = None,
+        operator_principal: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run a read-only audit unless an exact bounded repair is authorized."""
+        requested_actions = {
+            name for name, enabled in (action_flags or {}).items() if enabled
+        }
+        if read_only and requested_actions:
+            raise ValueError("read-only integrity audit cannot request repair actions")
+        if not read_only and not requested_actions:
+            raise ValueError("non-read-only integrity audit requires an action flag")
+        effective_trigger = (
+            trigger_kind
+            or (
+                "cron"
+                if job_config is not None and not job_config.manual_only
+                else "manual"
+            )
+        )
+        principal_id = (
+            operator_principal
+            if effective_trigger != "cron"
+            else "service:annual-report-asset-scheduler"
+        )
+        return await self._run_annual_report_asset_job(
+            job_name="annual_report_asset_integrity_audit",
+            runner=lambda: data_manager.run_annual_report_asset_integrity_audit(
+                content_hashes=tuple(content_hashes or ()),
+                deletion_ids=tuple(deletion_ids or ()),
+                action_flags=action_flags,
+                bounds=bounds,
+                trigger_kind=effective_trigger,
+                **({"principal_id": principal_id} if principal_id is not None else {}),
+            ),
+            job_config=job_config,
+        )
+
+    async def annual_report_asset_backup(
+        self,
+        recovery_journal_retention_policy: Optional[str] = None,
+        recovery_journal_integrity_policy: Optional[str] = None,
+        bounds: Optional[Dict[str, int]] = None,
+        trigger_kind: Optional[str] = None,
+        operator_principal: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run the independent-failure-domain incremental archive backup."""
+        expected_policy = {
+            "recovery_journal_retention_policy": (
+                recovery_journal_retention_policy
+            ),
+            "recovery_journal_integrity_policy": (
+                recovery_journal_integrity_policy
+            ),
+        }
+        effective_trigger = (
+            trigger_kind
+            or (
+                "manual"
+                if job_config is not None and job_config.manual_only
+                else "cron"
+            )
+        )
+        principal_id = (
+            operator_principal
+            if effective_trigger != "cron"
+            else "service:annual-report-asset-scheduler"
+        )
+        return await self._run_annual_report_asset_job(
+            job_name="annual_report_asset_backup",
+            runner=lambda: data_manager.run_annual_report_asset_backup(
+                bounds=bounds,
+                trigger_kind=effective_trigger,
+                expected_recovery_policy=expected_policy,
+                **({"principal_id": principal_id} if principal_id is not None else {}),
+            ),
+            job_config=job_config,
+        )
+
     async def hkex_instrument_master_sync(
         self,
         mode: str = "audit_only",
@@ -4410,6 +4811,11 @@ class ScheduledTasks:
         repair_universe_limit: Optional[int] = None,
         force_current_master_refresh: bool = True,
         repair_pending_factor_quotes: bool = False,
+        index_instrument_ids: Optional[List[str]] = None,
+        index_daily_request_reserve: int = 5000,
+        index_sampling: str = 'daily',
+        index_max_queries_per_run: int = 4000,
+        index_checkpoint_path: Optional[str] = None,
         per_instrument_timeout_sec: Optional[int] = 30,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -4441,12 +4847,31 @@ class ScheduledTasks:
                 per_instrument_timeout_sec = int(per_instrument_timeout_sec)
                 if per_instrument_timeout_sec < 1:
                     raise ValueError('per_instrument_timeout_sec must be positive')
+            normalized_index_ids = [
+                item.upper() for item in normalize_string_list(index_instrument_ids)
+            ] or list(SUPPORTED_INDEXES)
+            index_daily_request_reserve = int(index_daily_request_reserve)
+            if index_daily_request_reserve < 0:
+                raise ValueError('index_daily_request_reserve must not be negative')
+            index_sampling = str(index_sampling or 'daily').strip().lower()
+            if index_sampling not in {'daily', 'monthly'}:
+                raise ValueError('index_sampling must be daily or monthly')
+            index_max_queries_per_run = int(index_max_queries_per_run)
+            if index_max_queries_per_run < 1 or index_max_queries_per_run > 4500:
+                raise ValueError('index_max_queries_per_run must be between 1 and 4500')
 
             checkpoint_parameters = dict(parameters)
             checkpoint_parameters.update({
                 'repair_universe_limit': repair_universe_limit,
                 'per_instrument_timeout_sec': per_instrument_timeout_sec,
             })
+            if 'index_composition' in parameters['scopes']:
+                checkpoint_parameters.update({
+                    'index_instrument_ids': normalized_index_ids,
+                    'index_daily_request_reserve': index_daily_request_reserve,
+                    'index_sampling': index_sampling,
+                    'index_max_queries_per_run': index_max_queries_per_run,
+                })
             data_dir = data_manager.data_config.get('data_dir', 'data')
             checkpoint_store = AShareBackfillCheckpointStore(data_dir)
             resolved_checkpoint_id = checkpoint_store.resolve_id(
@@ -4484,6 +4909,8 @@ class ScheduledTasks:
                 set(parameters['scopes']) & set(A_SHARE_BACKFILL_OPTIONAL_SCOPES)
             )
             for optional_scope in selected_optional_scopes:
+                if optional_scope == 'index_composition':
+                    continue
                 result['stages'][optional_scope] = {
                     'status': 'unavailable',
                     'reuse_decision': 'extend_existing',
@@ -4501,15 +4928,55 @@ class ScheduledTasks:
                     'watermark': None,
                     'blockers': ['historical_source_not_proven_by_bounded_probe'],
                 }
+            if 'index_composition' in selected_optional_scopes:
+                resolved_index_checkpoint_path = index_checkpoint_path or str(
+                    Path(data_dir)
+                    / 'backfill_checkpoints'
+                    / f"{resolved_checkpoint_id}_index_composition.json"
+                )
+                index_stage = await _run_index_constituent_history_stage(
+                    start_date=parameters['start_date'],
+                    end_date=parameters['end_date'],
+                    index_instrument_ids=normalized_index_ids,
+                    daily_request_reserve=index_daily_request_reserve,
+                    sampling=index_sampling,
+                    max_queries_per_run=index_max_queries_per_run,
+                    checkpoint_path=resolved_index_checkpoint_path,
+                    dry_run=parameters['dry_run'],
+                    resume=parameters['resume'],
+                )
+                result['stages']['index_composition'] = index_stage
+                if index_stage.get('status') in {
+                    'partial', 'blocked', 'unavailable', 'failed'
+                }:
+                    result['blockers'].extend(
+                        f"index_composition:{item}"
+                        for item in (index_stage.get('blockers') or [])
+                    )
+                result['failure_samples'].extend(
+                    {
+                        'instrument_id': item.get('unit_id', 'index_composition'),
+                        'reason': item.get('reason', 'failed'),
+                    }
+                    for item in (index_stage.get('failures') or [])[:10]
+                    if isinstance(item, dict)
+                )
             selected_default_scopes = (
                 set(parameters['scopes']) & set(A_SHARE_BACKFILL_DEFAULT_SCOPES)
             )
             if selected_optional_scopes and not selected_default_scopes:
-                result['status'] = 'unavailable'
-                result['blockers'] = [
-                    f"{scope}:historical_source_not_proven_by_bounded_probe"
+                stage_statuses = [
+                    str((result['stages'].get(scope) or {}).get('status') or 'unavailable')
                     for scope in selected_optional_scopes
                 ]
+                if len(stage_statuses) == 1:
+                    result['status'] = stage_statuses[0]
+                elif any(status in {'blocked', 'failed', 'error'} for status in stage_statuses):
+                    result['status'] = 'blocked'
+                elif any(status in {'success', 'dry_run'} for status in stage_statuses):
+                    result['status'] = 'partial'
+                else:
+                    result['status'] = 'unavailable'
                 if self.telegram_enabled:
                     await self._send_task_report(
                         report_data={
@@ -5278,7 +5745,8 @@ class ScheduledTasks:
                 in {'partial', 'failed', 'error'}
                 for name in (
                     'master', 'calendar', 'quotes', 'dividends', 'factors',
-                    'pending_quote_repair', 'completeness',
+                    'index_composition', 'security_state', 'price_limits',
+                    'corporate_actions', 'pending_quote_repair', 'completeness',
                 )
             ):
                 result['status'] = 'partial'

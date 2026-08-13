@@ -1,10 +1,12 @@
 import asyncio
+import io
 import json
 import logging
 import sqlite3
 import threading
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -22,6 +24,7 @@ from research.business_profile_async_production import (
 from research.business_profile_archive import BusinessProfileDocumentArchiveService
 from research.business_profile_production_operations import (
     BusinessProfileAnnouncementFrontierRepository,
+    register_business_profile_shared_annual_report_asset,
 )
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
 from tests.unit.test_research.test_business_profile_production_operations import (
@@ -518,6 +521,249 @@ def test_acquire_worker_retries_when_bound_pdf_has_no_usable_manifest(tmp_path):
     assert row["stage"] == "acquire"
     assert row["status"] == "retry_due"
     assert "produced no usable manifest" in row["last_error"]
+
+
+def test_shared_non_effective_business_profile_filing_returns_metadata_only(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+
+    class _SharedAccess:
+        repository = SimpleNamespace(get_effective_report=lambda *args, **kwargs: None)
+
+        def ensure(self, request):
+            assert request.allow_network is False
+            return {
+                "availability": "superseded",
+                "asset": {
+                    "source": request.source,
+                    "source_announcement_id": request.source_announcement_id,
+                },
+                "reason_code": "non_effective_exact_filing_content_unavailable",
+            }
+
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+        shared_asset_access=_SharedAccess(),
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    item = queue.get(work_id)
+    acquirer = BusinessProfileFrontierBoundAcquirer(
+        repository=queue,
+        archive_service=BusinessProfileDocumentArchiveService(
+            storage=storage,
+            archive_root=tmp_path / "archive",
+            downloader=lambda _candidate: (_ for _ in ()).throw(
+                AssertionError("superseded exact filing must not be downloaded")
+            ),
+        ),
+    )
+
+    result = acquirer.acquire(item)
+
+    assert result["status"] == "metadata_only"
+    assert result["asset_availability"] == "superseded"
+    assert result["local_content_unavailable"] is True
+    assert result["reason_code"] == (
+        "non_effective_exact_filing_content_unavailable"
+    )
+    assert not list((tmp_path / "archive").rglob("*.pdf"))
+
+
+def test_business_profile_cutoff_uses_retained_exact_observation_handle(tmp_path):
+    report = SimpleNamespace(
+        asset_id="historical-asset",
+        instrument_id="600000.SH",
+        report_period="2025-12-31",
+        source="cninfo",
+        source_announcement_id="annual-2025",
+        attachment_id="attachment-2025",
+        version_id="observation-2025",
+        content_hash="e" * 64,
+        published_at="2026-03-30T08:00:00+08:00",
+    )
+
+    class _SharedAccess:
+        repository = SimpleNamespace(get_effective_report=lambda *args, **kwargs: report)
+
+        def content_handle(self, asset_id):
+            raise FileNotFoundError("historical asset is not public-current")
+
+        def exact_observation_handle(self, request, *, authorized):
+            assert authorized is True
+            assert request.attachment_id == "attachment-2025"
+            assert request.observation_version == "observation-2025"
+            assert request.expected_content_hash == "e" * 64
+            return {
+                "path": tmp_path / "retained.pdf",
+                "content_length": 321,
+                "file_handle": io.BytesIO(b"retained"),
+            }
+
+    queue = BusinessProfileWorkRepository(
+        object(),
+        checkpoint_root=tmp_path / "checkpoints",
+        shared_asset_access=_SharedAccess(),
+    )
+
+    manifest = queue.get_usable_bound_manifest(
+        {
+            "instrument_id": "600000.SH",
+            "source": "cninfo",
+            "announcement_id": "annual-2025",
+            "report_period": "2025-12-31",
+            "document_type": "annual_report",
+            "knowledge_cutoff": "2026-03-31",
+        }
+    )
+
+    assert manifest is not None
+    assert manifest["source_file_id"] == "shared-asset:historical-asset"
+    assert manifest["metadata"]["shared_observation_version"] == (
+        "observation-2025"
+    )
+    assert manifest["metadata"]["selector_kind"] == "knowledge_cutoff"
+
+
+def test_bound_shared_asset_does_not_drift_to_later_effective_correction(tmp_path):
+    storage = _storage(tmp_path)
+    original = {
+        "asset_id": "asset-original-2025",
+        "instrument_id": "600000.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "annual-original-2025",
+        "attachment_id": "attachment-original-2025",
+        "observation_version": "observation-original-2025",
+        "content_hash": "a" * 64,
+        "published_at": "2026-03-20T08:00:00+08:00",
+        "is_correction": False,
+    }
+    correction = {
+        **original,
+        "asset_id": "asset-correction-2025",
+        "source_announcement_id": "annual-correction-2025",
+        "attachment_id": "attachment-correction-2025",
+        "observation_version": "observation-correction-2025",
+        "content_hash": "b" * 64,
+        "published_at": "2026-04-20T08:00:00+08:00",
+        "is_correction": True,
+    }
+    register_business_profile_shared_annual_report_asset(
+        storage=storage,
+        asset=original,
+    )
+    register_business_profile_shared_annual_report_asset(
+        storage=storage,
+        asset=correction,
+    )
+    exact_requests = []
+
+    class _SharedAccess:
+        class _Repository:
+            @staticmethod
+            def get_effective_report(*_args, **_kwargs):
+                raise AssertionError("bound processing must not reselect effective asset")
+
+        repository = _Repository()
+
+        def exact_observation_handle(self, request, *, authorized):
+            assert authorized is True
+            exact_requests.append(request)
+            return {
+                "source": request.source,
+                "source_announcement_id": request.source_announcement_id,
+                "attachment_id": request.attachment_id,
+                "observation_version": request.observation_version,
+                "content_hash": request.expected_content_hash,
+                "content_length": 123,
+                "path": tmp_path / "original.pdf",
+                "file_handle": io.BytesIO(b"%PDF-original"),
+            }
+
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+        shared_asset_access=_SharedAccess(),
+    )
+    result = queue.enqueue_bound_annual_report_asset(
+        knowledge_cutoff="2026-05-01",
+        processing_identity={"rules": "v1"},
+        asset=original,
+    )
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    work = queue.get(work_id)
+    assert work["announcement_id"] == "annual-original-2025"
+    assert work["metadata"]["bound_shared_asset"]["asset_id"] == (
+        "asset-original-2025"
+    )
+    assert queue.get_bound_frontier(work)["status"] == "superseded"
+
+    manifest = queue.get_usable_bound_manifest(work)
+
+    assert manifest is not None
+    assert manifest["source_file_id"] == "shared-asset:asset-original-2025"
+    assert manifest["content_hash"] == "a" * 64
+    assert len(exact_requests) == 1
+    assert exact_requests[0].observation_version == "observation-original-2025"
+    assert exact_requests[0].expected_content_hash == "a" * 64
+
+
+def test_data_manager_business_consumer_passes_complete_asset_binding():
+    manager = DataManager.__new__(DataManager)
+    manager.research_config = SimpleNamespace(
+        modules={
+            "business_profile_evidence": {
+                "annual_report_asset_dependency": {"mode": "shared_only"}
+            }
+        }
+    )
+    captured = {}
+
+    async def run_backfill(**kwargs):
+        captured.update(kwargs)
+        return {
+            "status": "success",
+            "bound_shared_asset": dict(kwargs["bound_annual_report_asset"]),
+        }
+
+    manager.run_business_profile_backfill = run_backfill
+    asset = {
+        "asset_id": "asset-2025",
+        "instrument_id": "600000.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "annual-2025",
+        "attachment_id": "attachment-2025",
+        "observation_version": "observation-2025",
+        "content_hash": "c" * 64,
+    }
+
+    outcome = asyncio.run(
+        manager._process_business_profile_annual_report_asset(
+            asset,
+            SimpleNamespace(knowledge_cutoff="2026-04-01"),
+        )
+    )
+
+    assert outcome.status == "completed"
+    assert captured["instrument_ids"] == ["600000.SH"]
+    assert captured["bound_annual_report_asset"] == asset
 
 
 def test_recovery_requeues_only_empty_completion_and_is_idempotent(tmp_path):
@@ -2690,6 +2936,61 @@ def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
     assert result["status"] == "failed"
     assert result["reason"] == "business_profile_promotion_failed"
     assert result["promotion"]["reason"] == "manifest_mismatch"
+
+
+def test_data_manager_shared_only_discovery_never_calls_business_profile_provider(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = storage
+    manager.research_config = SimpleNamespace(
+        modules={
+            "business_profile_evidence": {
+                "annual_report_asset_dependency": {
+                    "enabled": True,
+                    "legacy_fallback_enabled": False,
+                    "mode": "shared_only",
+                    "reconciliation_evidence_id": "reconciliation-1",
+                    "legacy_writer_disabled": True,
+                }
+            }
+        },
+        storage=SimpleNamespace(db_path=str(tmp_path / "research.db")),
+    )
+    manager.run_business_profile_index_discovery = AsyncMock(
+        side_effect=AssertionError("business-profile provider discovery must not run")
+    )
+
+    class _SharedAccess:
+        repository = SimpleNamespace()
+
+        def list_assets(self, *, limit, offset):
+            return {"items": []}
+
+    shared = _SharedAccess()
+    manager._get_announcement_asset_access = Mock(return_value=shared)
+    service, _identity = manager._build_business_profile_async_service(
+        cutoff="2026-08-30",
+        configured_families=("atomic_activities",),
+        identities={"rules": "v1"},
+        operations={"checkpoint_root": str(tmp_path / "checkpoints")},
+        semantic={"promotion_enabled": False},
+        default_exchanges=("SSE",),
+    )
+
+    result = asyncio.run(
+        service.discovery_runner(
+            category="annual_report",
+            end_date="2026-08-30",
+            page_size=100,
+            max_pages_per_market=2,
+        )
+    )
+
+    assert result["operation"] == "shared_annual_report_discovery"
+    assert result["provider_requests"] == 0
+    manager.run_business_profile_index_discovery.assert_not_awaited()
 
 
 def test_data_manager_stage_runner_uses_work_bound_cutoff(tmp_path):

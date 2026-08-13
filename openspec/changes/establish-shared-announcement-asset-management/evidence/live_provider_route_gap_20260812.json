@@ -1,0 +1,68 @@
+{
+  "schema_version": "annual_report_asset_live_route_gap.v1",
+  "observed_at": "2026-08-12T09:40:17.776735+00:00",
+  "read_only": true,
+  "database_writes": false,
+  "attachment_downloads": false,
+  "production_archive_writes": false,
+  "catalog_writes": false,
+  "scope": {
+    "instrument_id": "920001.BJ",
+    "exchange": "BSE",
+    "start_date": "2026-03-01",
+    "end_date": "2026-05-15",
+    "keyword": "年度报告",
+    "max_pages": 2
+  },
+  "primary_route": {
+    "source": "bse",
+    "evidence_path": "evidence/live_probes_20260812/bse_920001_filing_season.json",
+    "evidence_sha256": "18d3e09683527e1c47d66342c6a1934400aab91e6012ec73286ed960c3f4ca54",
+    "status": "indeterminate",
+    "stop_reason": "max_pages_exhausted",
+    "is_complete": false,
+    "cursor_commit_allowed": false,
+    "route_gap_preserved": true,
+    "limitation": "BSE recent-market endpoint does not support instrument scope and did not honor the requested historical range within the bounded page budget. A later explicit market-scope probe confirmed that keyword filtering also returns semiannual reports."
+  },
+  "direct_market_scope_evidence": {
+    "evidence_path": "evidence/live_provider_bse_market_scope_20260812.json",
+    "raw_evidence_sha256": "09cf180e2faeede076e982f0dbb80cd5d345f2f1539f45e9f25068a6ef9119cb",
+    "records_after_local_filter": 41,
+    "attachments_observed": 41,
+    "repeat_source_qualified_keys_identical": true,
+    "annual_report_coverage_commit_allowed": false,
+    "role": "bounded recent cross-discovery metadata only"
+  },
+  "fallback_route": {
+    "source": "cninfo",
+    "evidence_path": "evidence/live_probes_20260812/cninfo_920001_bse_fallback_filing_season.json",
+    "evidence_sha256": "2efade0b3b80fea4f904a3c2ac9b103b377b5b2649b49e02bd87cbe86b644ac7",
+    "status": "success",
+    "is_complete": true,
+    "cursor_commit_allowed_for_source": true,
+    "advances_primary_cursor": false,
+    "eligible_originals": 1,
+    "excluded_summaries": 1
+  },
+  "route_equivalence": {
+    "audited": false,
+    "query_equivalent": null,
+    "reason": "The BSE primary route did not return a complete comparable result set, so equality of result scope cannot be established.",
+    "may_satisfy_primary_route_coverage": false
+  },
+  "configured_production_route": {
+    "purpose": "official_announcement_assets via source-qualified discovery",
+    "exchange": "BSE",
+    "sources": [
+      "cninfo"
+    ],
+    "bse_direct_registered_as_equivalent_fallback": false,
+    "decision": "CNINFO is the configured BSE annual-report completeness route; the BSE recent-market feed is not a fallback substitute and maintains no annual-report coverage cursor."
+  },
+  "readiness": {
+    "full_market_ready": false,
+    "bse_direct_route_ready": false,
+    "reason": "non-equivalent fallback preserves the primary route gap"
+  }
+}

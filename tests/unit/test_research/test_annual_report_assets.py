@@ -1,5 +1,6 @@
 import asyncio
 from dataclasses import replace
+import io
 from pathlib import Path
 
 from data_manager import DataManager
@@ -118,3 +119,79 @@ def test_catalog_rejects_missing_file_and_data_manager_lists_history(tmp_path):
     )
     assert listed[0]["source_file_id"] == record.source_file_id
     assert listed[0]["integrity_status"] == "missing"
+
+
+def test_shared_only_catalog_projects_shared_repository_without_legacy_reads(
+    tmp_path,
+):
+    payload = b"%PDF-1.7\nshared compatibility asset"
+    path = tmp_path / "shared.pdf"
+    path.write_bytes(payload)
+
+    class _NoLegacyStorage:
+        def get_financial_source_file_manifests(self, **kwargs):
+            raise AssertionError("shared-only catalog must not read legacy manifests")
+
+    class _SharedAccess:
+        def __init__(self):
+            self.ensure_requests = []
+
+        def list_assets(self, **kwargs):
+            return {
+                "items": [
+                    {
+                        "asset_id": "asset-2025",
+                        "instrument_id": "601088.SH",
+                        "report_period": "2025-12-31",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-2025",
+                        "observation_version": "observation-2025",
+                        "published_at": "2026-03-30T00:00:00+08:00",
+                        "content_hash": "a" * 64,
+                        "content_length": len(payload),
+                        "integrity": "valid",
+                        "is_correction": False,
+                        "activated_at": "2026-03-30T01:00:00+08:00",
+                        "last_checked_at": "2026-03-30T01:00:00+08:00",
+                        "predecessor_asset_id": None,
+                        "effective_decision_state": "final",
+                    }
+                ]
+            }
+
+        def ensure(self, request):
+            self.ensure_requests.append(request)
+            return {
+                "availability": "local_valid",
+                "asset": self.list_assets()["items"][0],
+            }
+
+        def content_handle(self, asset_id):
+            return {
+                "asset_id": asset_id,
+                "path": path,
+                "content_length": len(payload),
+                "file_handle": io.BytesIO(payload),
+            }
+
+    shared = _SharedAccess()
+    catalog = AnnualReportAssetCatalog(
+        _NoLegacyStorage(),
+        shared_asset_access=shared,
+        mode="shared_only",
+    )
+
+    rows = catalog.list_assets(instrument_id="601088.SH", validate_files=True)
+    exact = catalog.find_reusable_filing(
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        source="cninfo",
+        filing_id="annual-2025",
+    )
+
+    assert rows[0]["source_file_id"] == "shared-asset:asset-2025"
+    assert rows[0]["archive_path"] == str(path)
+    assert rows[0]["integrity_status"] == "valid"
+    assert exact is not None
+    assert exact["shared_asset_id"] == "asset-2025"
+    assert shared.ensure_requests[0].allow_network is False

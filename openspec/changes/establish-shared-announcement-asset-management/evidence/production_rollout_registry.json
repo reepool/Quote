@@ -1,0 +1,35 @@
+{
+  "schema_version": "annual_report_asset_production_rollout_registry.v1",
+  "change_name": "establish-shared-announcement-asset-management",
+  "generated_at": "2026-08-13T00:00:00+00:00",
+  "stages": {
+    "11.3": {
+      "status": "pending",
+      "accountable_owner": null,
+      "completed_at": null,
+      "evidence_path": null,
+      "description": "Production inventory, shadow adoption, reconciliation, promotion, required-set measurement, capacity finalization, and approval."
+    },
+    "11.4": {
+      "status": "pending",
+      "accountable_owner": null,
+      "completed_at": null,
+      "evidence_path": null,
+      "description": "Production business-profile and broker shared-read cutover with compatible outputs and zero duplicate acquisition."
+    },
+    "11.5": {
+      "status": "pending",
+      "accountable_owner": null,
+      "completed_at": null,
+      "evidence_path": null,
+      "description": "Production backup/restore, required-set protection, bootstrap, invariant audit, and daily enablement."
+    },
+    "11.6": {
+      "status": "pending",
+      "accountable_owner": null,
+      "completed_at": null,
+      "evidence_path": null,
+      "description": "Legacy writer shutdown, governed cleanup, consumer rollback, and paired data-loss restore drills."
+    }
+  }
+}

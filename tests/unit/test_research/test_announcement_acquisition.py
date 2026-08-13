@@ -11,6 +11,7 @@ from research.announcements import (
     AnnouncementProviderCapabilities,
     AnnouncementProviderRegistry,
     AnnouncementQuery,
+    AnnouncementQueryNotSupported,
     AnnouncementRecord,
     AnnouncementRouteConfig,
     AnnouncementScanResult,
@@ -866,28 +867,26 @@ def test_sse_provider_normalizes_without_business_classification():
     assert session.calls[0]["params"]["productId"] == "600028"
 
 
-def test_sse_market_scope_uses_official_annual_category_parameters():
+def test_sse_market_scope_is_rejected_before_network():
     session = _ExchangeSession(
         [_ExchangeResponse({"result": [], "pageHelp": {"pageCount": 0}})]
     )
 
-    result = _exchange_provider("SSE", session).discover(
-        AnnouncementQuery(
-            purpose_key="business_profile_evidence:index",
-            source="sse",
-            scope=AnnouncementScope(
-                exchange="SSE",
-                start_date="2026-01-01",
-                end_date="2026-04-30",
-                category="annual_report",
-            ),
+    with pytest.raises(AnnouncementQueryNotSupported, match="market scope"):
+        _exchange_provider("SSE", session).discover(
+            AnnouncementQuery(
+                purpose_key="business_profile_evidence:index",
+                source="sse",
+                scope=AnnouncementScope(
+                    exchange="SSE",
+                    start_date="2026-01-01",
+                    end_date="2026-04-30",
+                    category="annual_report",
+                ),
+            )
         )
-    )
 
-    assert result.status == "success_empty"
-    assert session.calls[0]["params"]["productId"] is None
-    assert session.calls[0]["params"]["reportType2"] == "DQBG"
-    assert session.calls[0]["params"]["reportType"] == "YEARLY"
+    assert session.calls == []
 
 
 def test_sse_provider_applies_declared_keyword_filter_locally():
@@ -1174,7 +1173,7 @@ def test_bse_recent_market_provider_flattens_and_stops_at_date_boundary():
     )
 
 
-def test_bse_recent_market_provider_applies_optional_symbol_filter_locally():
+def test_bse_recent_market_provider_rejects_instrument_scope_before_network():
     payload = {
         "data": {
             "content": [{
@@ -1198,6 +1197,45 @@ def test_bse_recent_market_provider_applies_optional_symbol_filter_locally():
             "totalPages": 1,
         }
     }
+    session = _ExchangeSession([_ExchangeResponse(payload)])
+    provider = _exchange_provider(
+        "BSE",
+        session,
+        options={"endpoint_mode": "recent_market"},
+    )
+
+    with pytest.raises(
+        AnnouncementQueryNotSupported,
+        match="does not support instrument scope",
+    ):
+        provider.discover(AnnouncementQuery(
+            purpose_key="unit_test",
+            source="bse",
+            scope=AnnouncementScope(
+                exchange="BSE",
+                symbol="920002",
+                keyword="权益分派实施公告",
+            ),
+        ))
+
+    assert session.calls == []
+
+
+def test_bse_recent_market_skips_unrelated_page_rows_without_malformed_error():
+    payload = {
+        "data": {
+            "content": [{
+                "disclosures": [{
+                    "disclosureCode": "bse-live-code",
+                    "disclosureTitle": "其他公司年度报告",
+                    "publishDate": "2026-07-16",
+                    "destFilePath": "/other.pdf",
+                    "companyCd": "920001",
+                }],
+            }],
+            "totalPages": 1,
+        }
+    }
     result = _exchange_provider(
         "BSE",
         _ExchangeSession([_ExchangeResponse(payload)]),
@@ -1207,12 +1245,44 @@ def test_bse_recent_market_provider_applies_optional_symbol_filter_locally():
         source="bse",
         scope=AnnouncementScope(
             exchange="BSE",
-            symbol="920002",
             keyword="权益分派实施公告",
         ),
     ))
 
-    assert [record.symbols for record in result.records] == [("920002",)]
+    assert result.status == "success_empty"
+    assert result.is_complete is True
+    assert result.errors == ()
+
+
+def test_bse_disclosure_code_is_used_as_stable_live_announcement_id():
+    payload = {
+        "data": {
+            "content": [{
+                "disclosures": [{
+                    "disclosureCode": "37936fe42e9649e8a88e37dd7555dbd7",
+                    "disclosureTitle": "测试公司2025年年度报告",
+                    "publishDate": "2026-03-30",
+                    "destFilePath": "/annual.pdf",
+                    "companyCd": "920833",
+                }],
+            }],
+            "totalPages": 1,
+        }
+    }
+    result = _exchange_provider(
+        "BSE",
+        _ExchangeSession([_ExchangeResponse(payload)]),
+        options={"endpoint_mode": "recent_market"},
+    ).discover(AnnouncementQuery(
+        purpose_key="unit_test",
+        source="bse",
+        scope=AnnouncementScope(exchange="BSE"),
+    ))
+
+    assert result.records[0].source_announcement_id == (
+        "37936fe42e9649e8a88e37dd7555dbd7"
+    )
+    assert result.records[0].identity_is_derived is False
 
 
 def test_exchange_provider_marks_exhausted_page_bound_incomplete():

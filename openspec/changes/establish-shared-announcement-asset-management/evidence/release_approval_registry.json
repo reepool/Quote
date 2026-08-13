@@ -1,0 +1,33 @@
+{
+  "schema_version": "annual_report_asset_release_approval_registry.v1",
+  "change_name": "establish-shared-announcement-asset-management",
+  "generated_at": "2026-08-13T00:00:00+00:00",
+  "gate_status": "pending_signoff",
+  "required_signoffs": {
+    "deletion_retention_product": {
+      "status": "pending",
+      "accountable_owner": null,
+      "approved_at": null,
+      "evidence_path": null,
+      "statement": "V1 deletion unlinks superseded bytes from the primary consumer-visible archive while retaining governed disaster-recovery bytes; it provides neither normal point-in-time source replay nor secure erasure from every backup medium."
+    },
+    "deletion_retention_operations": {
+      "status": "pending",
+      "accountable_owner": null,
+      "approved_at": null,
+      "evidence_path": null,
+      "statement": "Operations accepts the V1 primary-unlink and governed recovery-retention policy and its backup, restore, and cleanup obligations."
+    },
+    "full_market_scope_product": {
+      "status": "pending",
+      "accountable_owner": null,
+      "approved_at": null,
+      "evidence_path": null,
+      "statement": "V1 full market is the independently reconciled snapshot-time still-listed RMB A-share universe on SSE, SZSE, and BSE; historical delisted securities are excluded from scheduled coverage."
+    }
+  },
+  "rollout_effect": {
+    "release_claim_allowed": false,
+    "reason": "Required product and operations sign-offs have not been supplied."
+  }
+}

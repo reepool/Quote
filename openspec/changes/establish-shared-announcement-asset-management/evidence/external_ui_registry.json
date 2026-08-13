@@ -1,0 +1,7 @@
+{
+  "schema_version": "annual_report_asset_external_ui_registry.deprecated.v1",
+  "change_name": "establish-shared-announcement-asset-management",
+  "status": "not_applicable_api_only",
+  "superseded_by": "evidence/api_client_registry.json",
+  "reason": "This project intentionally serves AI/API callers and has no external Web UI release dependency."
+}

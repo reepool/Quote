@@ -18,7 +18,6 @@ from research.announcements import (
     AnnouncementAttachmentRetriever,
     load_announcement_acquisition_config,
 )
-from research.annual_report_assets import AnnualReportAssetCatalog
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import (
     business_profile_document_family,
@@ -53,6 +52,46 @@ _ARCHIVE_TEMPLATE_FIELDS = {
     "symbol",
     "year",
 }
+
+
+def _build_shared_annual_report_access(research_config: Any) -> Any | None:
+    """Build the shared asset access facade when a real research DB is available."""
+
+    storage_config = getattr(research_config, "storage", None)
+    db_path = getattr(storage_config, "db_path", None)
+    if not isinstance(db_path, (str, os.PathLike)) or not str(db_path).strip():
+        # Small compatibility fixtures may only provide business-profile
+        # archive settings; they intentionally retain the old adapter.
+        return None
+    from research.announcement_assets import (
+        AnnouncementAssetAccess,
+        AnnouncementAssetConfig,
+        AnnouncementAssetRepository,
+        AnnouncementAssetService,
+    )
+
+    asset_config = AnnouncementAssetConfig.from_research_config(
+        research_config,
+        project_root=Path.cwd(),
+    )
+    path = Path(str(db_path))
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    repository = AnnouncementAssetRepository(path)
+    acquisition_config = load_announcement_acquisition_config(research_config)
+    retriever = AnnouncementAttachmentRetriever.from_provider_configs(
+        acquisition_config.provider_configs
+    )
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=asset_config,
+        attachment_retriever=retriever,
+    )
+    return AnnouncementAssetAccess(
+        repository=repository,
+        config=asset_config,
+        service=service,
+    )
 
 
 def download_business_profile_candidate(
@@ -169,6 +208,11 @@ class BusinessProfileDocumentArchiveService:
         downloader: Optional[
             Callable[[BusinessProfileDocumentCandidate], bytes]
         ] = None,
+        shared_asset_access: Any | None = None,
+        shared_asset_service: Any | None = None,
+        shared_annual_report_enabled: bool | None = None,
+        legacy_annual_report_fallback_enabled: bool | None = None,
+        annual_report_asset_mode: str | None = None,
     ) -> None:
         self.storage = storage
         self.archive_root = Path(archive_root)
@@ -188,7 +232,42 @@ class BusinessProfileDocumentArchiveService:
                 "business-profile archive layout must include {content_hash}"
             )
         self.downloader = downloader or download_business_profile_candidate
-        self.asset_catalog = AnnualReportAssetCatalog(storage)
+        if shared_asset_access is not None and shared_asset_service is not None:
+            raise ValueError(
+                "provide shared_asset_access or shared_asset_service, not both"
+            )
+        if shared_asset_access is None and shared_asset_service is not None:
+            from research.announcement_assets import AnnouncementAssetAccess
+
+            shared_asset_access = AnnouncementAssetAccess(
+                repository=shared_asset_service.repository,
+                config=shared_asset_service.config,
+                service=shared_asset_service,
+            )
+        inferred_mode = "shared_only" if shared_asset_access is not None else "legacy"
+        mode = str(annual_report_asset_mode or inferred_mode).strip().lower()
+        if mode not in {"legacy", "dual_read", "shared_only"}:
+            raise ValueError("invalid business-profile annual-report asset mode")
+        expected_shared = mode in {"dual_read", "shared_only"}
+        expected_legacy = mode in {"legacy", "dual_read"}
+        if (
+            shared_annual_report_enabled is not None
+            and bool(shared_annual_report_enabled) != expected_shared
+        ):
+            raise ValueError("annual-report asset mode conflicts with enabled flag")
+        if (
+            legacy_annual_report_fallback_enabled is not None
+            and bool(legacy_annual_report_fallback_enabled) != expected_legacy
+        ):
+            raise ValueError("annual-report asset mode conflicts with legacy fallback")
+        self.shared_asset_access = shared_asset_access
+        self.annual_report_asset_mode = mode
+        self.shared_annual_report_enabled = expected_shared
+        self.legacy_annual_report_fallback_enabled = expected_legacy
+        if self.shared_annual_report_enabled and self.shared_asset_access is None:
+            raise ValueError(
+                "shared annual-report dependency requires shared asset access"
+            )
 
     @classmethod
     def from_research_config(
@@ -199,6 +278,8 @@ class BusinessProfileDocumentArchiveService:
         downloader: Optional[
             Callable[[BusinessProfileDocumentCandidate], bytes]
         ] = None,
+        shared_asset_access: Any | None = None,
+        shared_asset_service: Any | None = None,
     ) -> "BusinessProfileDocumentArchiveService":
         """Build the archive service from the governed research module config."""
         modules = getattr(research_config, "modules", {}) or {}
@@ -210,6 +291,33 @@ class BusinessProfileDocumentArchiveService:
         archive_cfg = module_cfg.get("archive", {})
         if not isinstance(archive_cfg, Mapping):
             raise ValueError("business_profile_evidence.archive must be a mapping")
+        dependency_cfg = module_cfg.get("annual_report_asset_dependency", {})
+        if not isinstance(dependency_cfg, Mapping):
+            raise ValueError(
+                "business_profile_evidence.annual_report_asset_dependency "
+                "must be a mapping"
+            )
+        dependency_enabled = bool(dependency_cfg.get("enabled", False))
+        legacy_fallback_enabled = bool(
+            dependency_cfg.get("legacy_fallback_enabled", not dependency_enabled)
+        )
+        dependency_mode = str(
+            dependency_cfg.get(
+                "mode", "shared_only" if dependency_enabled else "legacy"
+            )
+        )
+        if dependency_mode == "shared_only" and (
+            not str(
+                dependency_cfg.get("reconciliation_evidence_id") or ""
+            ).strip()
+            or dependency_cfg.get("legacy_writer_disabled") is not True
+        ):
+            raise ValueError(
+                "business-profile shared-only cutover requires reconciliation "
+                "evidence and legacy writer disablement"
+            )
+        if shared_asset_access is None and shared_asset_service is None and dependency_enabled:
+            shared_asset_access = _build_shared_annual_report_access(research_config)
         return cls(
             storage=storage,
             archive_root=archive_cfg.get(
@@ -225,6 +333,11 @@ class BusinessProfileDocumentArchiveService:
                 DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE,
             ),
             downloader=downloader,
+            shared_asset_access=shared_asset_access,
+            shared_asset_service=shared_asset_service,
+            shared_annual_report_enabled=dependency_enabled,
+            legacy_annual_report_fallback_enabled=legacy_fallback_enabled,
+            annual_report_asset_mode=dependency_mode,
         )
 
     def archive_candidates(
@@ -266,8 +379,30 @@ class BusinessProfileDocumentArchiveService:
                     break
                 result.attempted += 1
                 try:
-                    record = self._reuse_annual_report_asset(instrument, candidate)
+                    managed_annual_report = self._is_managed_annual_report(candidate)
+                    record = None
+                    if managed_annual_report and self.shared_annual_report_enabled:
+                        record = self._reuse_shared_annual_report_asset(
+                            instrument, candidate
+                        )
+                        if (
+                            record is None
+                            and not self.legacy_annual_report_fallback_enabled
+                        ):
+                            raise RuntimeError(
+                                "shared annual-report asset is not locally ready"
+                            )
+                    if (
+                        record is None
+                        and managed_annual_report
+                        and self.legacy_annual_report_fallback_enabled
+                    ):
+                        record = self._reuse_annual_report_asset(instrument, candidate)
                     if record is None:
+                        if managed_annual_report and not self.legacy_annual_report_fallback_enabled:
+                            raise RuntimeError(
+                                "legacy annual-report acquisition is disabled"
+                            )
                         content = self.downloader(candidate)
                         record = self.archive_content(
                             instrument,
@@ -321,6 +456,125 @@ class BusinessProfileDocumentArchiveService:
                     interrupted_error=interrupted_error,
                 )
 
+    def _reuse_shared_annual_report_asset(
+        self,
+        instrument: Mapping[str, Any],
+        candidate: BusinessProfileDocumentCandidate,
+    ) -> BusinessProfileArchiveRecord | None:
+        """Acquire annual PDFs through shared custody and project a manifest row."""
+
+        if self.shared_asset_access is None:
+            return None
+        document_type = candidate.classification.document_type
+        if document_type not in {"annual_report", "annual_report_correction"}:
+            return None
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        if not instrument_id:
+            raise ValueError("shared annual-report identity is incomplete")
+        source = str(candidate.source or "cninfo").strip().lower()
+        source_announcement_id = str(candidate.announcement_id)
+        from research.announcement_assets import EnsureRequest
+
+        access_config = getattr(self.shared_asset_access, "config", None)
+        wait_seconds = float(
+            getattr(access_config, "wait_seconds_maximum", 30.0)
+        )
+        ensured = self.shared_asset_access.ensure(
+            EnsureRequest(
+                instrument_id=instrument_id,
+                source=source,
+                source_announcement_id=source_announcement_id,
+                allow_network=True,
+                wait_seconds=wait_seconds,
+                consumer="business_profile",
+                principal="business-profile",
+            )
+        )
+        asset = ensured.get("asset")
+        if not asset or ensured.get("availability") != "local_valid":
+            return None
+        if (
+            str(asset.get("source") or "").strip().lower() != source
+            or str(asset.get("source_announcement_id") or "")
+            != source_announcement_id
+        ):
+            raise RuntimeError(
+                "shared annual-report selector resolved a different legal filing"
+            )
+        content = self.shared_asset_access.content_handle(str(asset["asset_id"]))
+        handle = content["file_handle"]
+        try:
+            payload = handle.read()
+        finally:
+            handle.close()
+        content_hash = str(content["content_hash"])
+        if hashlib.sha256(payload).hexdigest() != content_hash:
+            raise RuntimeError("shared annual-report content handle hash mismatch")
+        report_period = infer_business_profile_report_period(
+            candidate.title,
+            candidate.announcement_time,
+        )
+        source_file_id = f"shared-asset:{asset['asset_id']}"
+        manifest = FinancialSourceFileManifest(
+            source=source,
+            source_mode="shared_announcement_asset",
+            source_tier=str(
+                candidate.source_tier or BUSINESS_PROFILE_SOURCE_TIER
+            ),
+            instrument_id=instrument_id,
+            symbol=str(instrument.get("symbol") or "").strip(),
+            exchange=str(instrument.get("exchange") or "").strip().upper(),
+            report_period=report_period,
+            report_type=document_type,
+            filing_id=source_announcement_id,
+            source_url=str(candidate.adjunct_url),
+            archive_path=str(content["path"]),
+            content_hash=content_hash,
+            content_length=int(content["content_length"]),
+            published_at=candidate.announcement_time,
+            downloaded_at=get_shanghai_time().isoformat(),
+            parser_version=BUSINESS_PROFILE_ARCHIVE_VERSION,
+            source_file_id=source_file_id,
+            status="archived",
+            schema_version=BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
+            metadata_json={
+                "shared_asset_id": asset["asset_id"],
+                "shared_asset_observation_version": asset.get("observation_version"),
+                "shared_asset_variant": asset.get("variant"),
+                "shared_asset_mode": "read_through_compatibility_manifest",
+            },
+        )
+        existing = self._find_exact_manifest(
+            self._get_manifests(
+                instrument_id=instrument_id,
+                report_period=report_period,
+            ),
+            source_announcement_id,
+            content_hash,
+        )
+        if existing is None:
+            self.storage.upsert_financial_source_file_manifest(manifest)
+        return BusinessProfileArchiveRecord(
+            announcement_id=source_announcement_id,
+            report_period=report_period,
+            document_type=document_type,
+            content_hash=content_hash,
+            archive_path=str(content["path"]),
+            source_file_id=str(
+                existing["source_file_id"] if existing else source_file_id
+            ),
+            status="unchanged" if existing else "archived",
+        )
+
+    @staticmethod
+    def _is_managed_annual_report(
+        candidate: BusinessProfileDocumentCandidate,
+    ) -> bool:
+        return candidate.classification.document_type in {
+            "annual_report",
+            "annual_report_correction",
+        }
+
     def _reuse_annual_report_asset(
         self,
         instrument: Mapping[str, Any],
@@ -332,11 +586,16 @@ class BusinessProfileDocumentArchiveService:
         instrument_id = str(instrument.get("instrument_id") or "").strip()
         if not instrument_id:
             return None
+        # Compatibility adapter for callers that have not yet supplied the
+        # shared service; production construction binds shared custody above.
+        from research.annual_report_assets import AnnualReportAssetCatalog
+
+        asset_catalog = AnnualReportAssetCatalog(self.storage)
         report_period = infer_business_profile_report_period(
             candidate.title,
             candidate.announcement_time,
         )
-        asset = self.asset_catalog.find_reusable_filing(
+        asset = asset_catalog.find_reusable_filing(
             instrument_id=instrument_id,
             report_period=report_period,
             source=str(candidate.source or "cninfo").strip().lower(),

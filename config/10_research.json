@@ -40,6 +40,195 @@
             "reason": "Announcement audit rows contain raw provider payloads and are exposed through bounded maintenance repository reads until a stable consumer-facing API contract is approved."
           }
         },
+        "official_announcement_assets": {
+          "schema_version": "official_announcement_assets.config.v1",
+          "enabled": false,
+          "scheduled_enabled": false,
+          "dry_run": true,
+          "capacity_artifact_required": true,
+          "capacity_artifact_path": "config/runtime_evidence/official_announcement_asset_capacity.json",
+          "capacity_artifact_max_age_hours": 24,
+          "active_exchanges": ["SSE", "SZSE", "BSE"],
+          "instrument_type": "stock",
+          "active_only": true,
+          "universe_policy_version": "a_share_active.v1",
+          "classifier_version": "formal_annual_report.v1",
+          "policy_version": "annual_report_asset_policy.v1",
+          "timezone": "Asia/Shanghai",
+          "bootstrap_scope": "latest_only_active_a_share",
+          "master_data_max_age_hours": 36,
+          "listed_security_census_max_age_hours": 36,
+          "eligibility_indeterminate_policy": "retain_last_complete",
+          "overdue_missing_readiness_policy": "degraded",
+          "bootstrap_filing_season_start_month": 1,
+          "bootstrap_filing_season_end_month": 5,
+          "bootstrap_max_lookback_years": 5,
+          "daily_catch_up_max_days": 14,
+          "daily_min_runs_per_calendar_day": 1,
+          "universe_refresh_cadence": "before_each_daily_run.v1",
+          "wait_seconds_default": 0.0,
+          "wait_seconds_maximum": 30.0,
+          "paths": {
+            "filings_root": "data/filings",
+            "archive_root": "data/filings/announcements",
+            "temp_root": "data/filings/announcements/tmp",
+            "quarantine_root": "data/filings/announcements/quarantine",
+            "adoption_roots": [
+              "data/filings/business_profile",
+              "data/filings/financial_statements/broker_risk_control"
+            ],
+            "require_mount": true,
+            "expected_mount_source": "192.168.188.88:/volume2/Announcement"
+          },
+          "legacy_inventory": {
+            "registry_version": "legacy_annual_report_roots.v1",
+            "path_template_version": "legacy_annual_report_paths.v1",
+            "exclusion_policy_version": "legacy_annual_report_exclusions.v1",
+            "roots": {
+              "business_profile": {
+                "base_root": "data/filings/business_profile",
+                "path_template": "business_profile/{fiscal_year}/{exchange}/"
+              },
+              "broker_risk_control": {
+                "base_root": "data/filings/financial_statements/broker_risk_control",
+                "path_template": "broker_risk_control/{exchange}/{symbol}/"
+              }
+            },
+            "exclusions": {
+              "allowed_document_families": ["annual_report"],
+              "business_profile_subtrees": ["derived"],
+              "broker_document_families": ["semiannual_report"]
+            }
+          },
+          "acquisition": {
+            "source_routes": ["cninfo", "sse", "szse", "bse"],
+            "normalized_categories": ["annual_report"],
+            "download_concurrency": 2,
+            "per_source_concurrency": 1,
+            "max_task_download_bytes": 53687091200,
+            "max_task_planned_bytes": 53687091200,
+            "max_task_actual_bytes": 53687091200,
+            "source_requests_per_minute": {
+              "cninfo": 30,
+              "sse": 20,
+              "szse": 20,
+              "bse": 20
+            }
+          },
+          "discovery": {
+            "overlap_days": 3,
+            "initial_lookback_days": 180,
+            "reconciliation_lookback_days": 400,
+            "reconciliation_cohort_size": 200,
+            "reconciliation_max_cycle_days": 30,
+            "missing_repair_cohort_size": 100,
+            "max_pages": 20,
+            "page_size": 30,
+            "max_requests": 300,
+            "max_windows": 64,
+            "max_instruments": 200,
+            "max_elapsed_seconds": 1800,
+            "targeted_repair_lookback_years": 5,
+            "targeted_repair_max_requests": 50,
+            "targeted_repair_max_instruments": 100,
+            "targeted_repair_max_elapsed_seconds": 600,
+            "provider_coverage_start_year": 2000
+          },
+          "storage": {
+            "warning_utilization": 0.8,
+            "hard_stop_utilization": 0.9,
+            "free_space_reserve_bytes": 107374182400,
+            "max_attachment_bytes": 209715200,
+            "max_attachment_planned_bytes": 209715200,
+            "max_attachment_actual_bytes": 209715200,
+            "unknown_length_reservation_bytes": 67108864,
+            "part_max_age_seconds": 3600,
+            "part_max_bytes": 10737418240,
+            "part_warning_age_seconds": 1800,
+            "part_warning_bytes": 5368709120,
+            "part_safety_grace_seconds": 300,
+            "quarantine_warning_age_seconds": 604800,
+            "quarantine_hard_age_seconds": 2592000,
+            "quarantine_warning_bytes": 1073741824,
+            "quarantine_hard_bytes": 10737418240,
+            "quarantine_cleanup_policy": "operator_audited_only",
+            "predecessor_cleanup_warning_age_seconds": 604800,
+            "predecessor_cleanup_hard_age_seconds": 2592000,
+            "candidate_verification_max_bytes": 10737418240,
+            "unprotected_write_reservation_bytes": 67108864
+          },
+          "retry": {
+            "max_attempts": 4,
+            "initial_backoff_seconds": 60,
+            "max_backoff_seconds": 3600,
+            "lease_seconds": 900,
+            "heartbeat_seconds": 60,
+            "lease_safety_grace_seconds": 30
+          },
+          "backup": {
+            "enabled": false,
+            "scheduled_enabled": false,
+            "mount_root": "data/QuoteBak",
+            "destination_root": "data/QuoteBak/announcement_assets",
+            "expected_mount_source": "192.168.188.68:/export/HDD-2/QuoteBak",
+            "expected_failure_domain": "quotebak_nas",
+            "warning_utilization": 0.8,
+            "hard_stop_utilization": 0.9,
+            "free_space_reserve_bytes": 53687091200,
+            "freshness_hours": 48,
+            "max_unprotected_bytes": 10737418240,
+            "max_unprotected_age_seconds": 259200,
+            "unprotected_accumulation_origin": "first_unprotected_at",
+            "reset_on_verified_backup": true,
+            "unblock_requires_verified_backup": true,
+            "recovery_journal_retention_policy": "append_only_no_automatic_gc.v1",
+            "recovery_journal_integrity_policy": "sha256_chain_with_watermarks.v1"
+          },
+          "capacity_override": {
+            "enabled": false,
+            "max_bytes": 2147483648,
+            "max_duration_seconds": 3600,
+            "requires_operator": true,
+            "audit_required": true,
+            "scope_mode": "single_operation_and_target"
+          },
+          "provisional_result": {
+            "enabled": true,
+            "policy_version": "provisional_effective.v1"
+          },
+          "jobs": {
+            "latest_backfill_enabled": false,
+            "latest_backfill_manual_only": true,
+            "latest_backfill_cron": null,
+            "daily_enabled": false,
+            "daily_manual_only": false,
+            "daily_cron": "15 3 * * *",
+            "backup_enabled": false,
+            "backup_manual_only": false,
+            "backup_cron": "45 4 * * *",
+            "integrity_enabled": false,
+            "integrity_manual_only": true,
+            "integrity_cron": null,
+            "integrity_read_only": true
+          },
+          "rollout_gates": {
+            "require_bootstrap": true,
+            "require_integrity": true,
+            "require_storage": true,
+            "require_backup": true,
+            "require_consumer_migration": true,
+            "consumer_dependency_policy": "completed_assets_only"
+          },
+          "permissions": {
+            "trusted_identity_enabled": false,
+            "principals": [],
+            "acquire": "annual_report_assets:acquire",
+            "read_content": "annual_report_assets:read_content",
+            "operator": "annual_report_assets:operator",
+            "business_profile_process": "business_profile:process",
+            "broker_risk_control_process": "broker_risk_control:process"
+          }
+        },
         "company_profile": {
         "enabled": true,
         "optional_empty_exchanges": [
@@ -48,6 +237,14 @@
       },
       "business_profile_evidence": {
         "enabled": true,
+        "annual_report_asset_dependency": {
+          "enabled": false,
+          "legacy_fallback_enabled": true,
+          "mode": "legacy",
+          "reconciliation_evidence_id": null,
+          "legacy_writer_disabled": false,
+          "note": "Set mode to shared_only and disable legacy fallback only after dual-read filing/observation/hash reconciliation passes."
+        },
         "archive": {
           "archive_root": "data/filings/business_profile",
           "checkpoint_root": "data/checkpoints/business_profile_official_archive",
@@ -412,8 +609,21 @@
         },
         "broker_risk_control_reports": {
           "enabled": true,
+          "annual_report_asset_dependency": {
+            "enabled": false,
+            "legacy_fallback_enabled": true,
+            "legacy_semiannual_enabled": true,
+            "mode": "legacy",
+            "reconciliation_evidence_id": null,
+            "legacy_writer_disabled": false,
+            "note": "Shared annual-report processing is enabled only after consumer reconciliation; semiannual remains explicitly legacy-gated in V1."
+          },
           "source_profile": "broker_annual_report_embedded_risk_control",
           "supplementary_source_profile": "broker_risk_control_report",
+          "source_priority": [
+            "broker_annual_report_embedded_risk_control",
+            "broker_risk_control_report"
+          ],
           "exchanges": [
             "SSE",
             "SZSE",

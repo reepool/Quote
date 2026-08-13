@@ -10,6 +10,7 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 4. 历史日线行情分 chunk 回补。
 5. TDX XDXR 原始分红、送转、配股事件回补。
 6. 生产复权因子同步和 TDX 审计因子派生。
+7. 显式选择 `index_composition` 时，使用共享 BaoStock 额度和 session lock 回补核心指数历史成分。
 
 任务为 `manual_only`，没有 cron trigger，默认 `dry_run=true`。部署或重启 Scheduler 不会自动执行历史下载。
 
@@ -45,7 +46,7 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 
 - `start_date`、`end_date`：必填，格式为 `YYYY-MM-DD`。
 - `exchanges`：默认 `SSE,SZSE,BSE`。
-- `scopes`：可选 `master,calendar,quotes,dividends,factors`。
+- `scopes`：可选 `master,calendar,quotes,dividends,factors,index_composition,security_state,price_limits,corporate_actions`；除指数成分外的可选历史项仍需各自来源完成后才能写入。
 - `instrument_ids`：可选，用于小样本验证或定向恢复。
 - `dry_run` / `write`：默认 dry-run；只有 `write` 才执行生产写入。
 - `scan_sources`：默认 `false`；仅允许与 `dry_run=true` 组合，并且 scopes 必须包含 `dividends` 或 `factors`。
@@ -56,6 +57,11 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 - `force_current_master_refresh`：写入模式默认先刷新当前股票主数据。
 - `override_lifecycle_filter`：仅用于明确的取证型修复，正常回补保持 `false`。
 - `repair_pending_factor_quotes`：默认 `false`；仅可在包含 `factors` 的写入模式启用。启用后只对当前范围内 `pending_factor_missing_pre_close` 的股票调用既有退市 A 股历史行情回补，并重新派生 TDX 因子。
+- `index_instrument_ids`：指数历史范围，默认 `000300.SH,000905.SH,000016.SH`；未验证的 `000852.SH` 会零请求返回 unavailable。
+- `index_sampling`：默认 `daily`，最终历史基线必须逐交易日观察；`monthly` 仅用于小范围源探针和临时验证。
+- `index_max_queries_per_run`：默认 `4000`，单次最多查询次数，不超过项目 BaoStock 每小时 5000 次限制。
+- `index_daily_request_reserve`：默认 `5000`，为日更和其他任务保留的当日额度。
+- `index_checkpoint_path`：可选指数专用 checkpoint；默认位于主任务 checkpoint 同目录。
 
 ## Checkpoint
 
@@ -70,6 +76,30 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 每个成功 chunk 完成后原子更新 checkpoint。失败或超时的 chunk 不会标记完成，使用相同参数再次执行时会继续处理。
 
 普通 dry-run 不创建或更新 checkpoint，也不会调用行情、XDXR 或主数据写入接口。`scan_sources=true` 会读取 TDX，但仍不会创建、更新或完成 checkpoint chunk。
+
+## 核心指数历史成分
+
+指数成分复用同一个手工任务，但该 scope 在股票 universe 解析前独立执行，不会下载股票行情或刷新股票主数据。BaoStock 只提供历史成员，不提供历史权重；落库成员的 `weight` 保持 `NULL`，API readiness 明确返回 membership ready、weights deferred。
+
+先做零网络全范围 dry-run，核对交易日数量、总请求量、单批请求量和剩余额度：
+
+```text
+/run a_share_daily_data_historical_backfill start_date=2005-01-01 end_date=2026-08-04 scopes=index_composition index_instrument_ids=000300.SH,000905.SH,000016.SH index_sampling=daily index_max_queries_per_run=4000 index_daily_request_reserve=5000 dry_run
+```
+
+单日三指数源探针使用 write 模式和临时数据库环境执行。不要把 `monthly` 探针结果当成最终历史基线：
+
+```text
+/run a_share_daily_data_historical_backfill start_date=2020-06-30 end_date=2020-06-30 scopes=index_composition index_instrument_ids=000300.SH,000905.SH,000016.SH index_sampling=monthly index_max_queries_per_run=3 index_daily_request_reserve=5000 write
+```
+
+生产回补前必须先在临时 `quotes.db` 完成多年验证，再备份生产库。生产每轮最多 4000 次查询，返回 `batch_query_limit_reached` 属于正常的可恢复 partial；使用完全相同参数和 checkpoint 重跑，直到所有逐交易日 observation 完成：
+
+```text
+/run a_share_daily_data_historical_backfill start_date=2005-01-01 end_date=2026-08-04 scopes=index_composition index_instrument_ids=000300.SH,000905.SH,000016.SH index_sampling=daily index_max_queries_per_run=4000 index_daily_request_reserve=5000 resume=true write
+```
+
+每次真实调用都先由 `BaostockAccessGovernor` 写入 `data/runtime/baostock/api_usage.json`，完整登录会话持有 `data/runtime/baostock/session.lock`。额度不足、锁冲突、网络异常或成员数量越界时停止当前批次，不绕过治理器。历史观测日期与本地实际获取时间分开保存；严格 `known_at` 早于获取时间时不会返回后来回补的数据。
 
 ## 数据治理规则
 

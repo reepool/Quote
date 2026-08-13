@@ -3,12 +3,13 @@ Middleware for the quote system API.
 Provides CORS, logging, authentication, and other middleware components.
 """
 
-import time
-import json
-import re
 import asyncio
+import hmac
+import os
+import re
+import time
 from collections import defaultdict
-from typing import Callable
+from collections.abc import Callable, Mapping
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -34,6 +35,170 @@ class PathNormalizationMiddleware(BaseHTTPMiddleware):
             normalized_path = normalize_repeated_slashes(path)
             request.scope["path"] = normalized_path
             request.scope["raw_path"] = normalized_path.encode("ascii")
+        return await call_next(request)
+
+
+class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
+    """Fail closed for protected announcement-asset routes before request parsing."""
+
+    @staticmethod
+    def _is_protected(path: str, method: str) -> bool:
+        if method.upper() == "OPTIONS":
+            return False
+        if "/annual-report-asset-requests/" in path:
+            return True
+        if "/annual-report-consumer-requests/" in path:
+            return True
+        if method.upper() == "POST" and path.endswith("/annual-reports/ensure"):
+            return True
+        if method.upper() == "POST" and path.endswith("/annual-report-process"):
+            return True
+        return "/annual-report-assets/" in path and path.endswith("/content")
+
+    @staticmethod
+    def _error(status_code: int, error_code: str, message: str) -> JSONResponse:
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "schema_version": "annual_report_error.v1",
+                "error_code": error_code,
+                "message": message,
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        path = request.scope.get("path", "")
+        operator_readiness = (
+            path.endswith("/annual-report-assets/readiness")
+            and "operator" in request.query_params
+            and request.query_params.get("operator", "").strip().lower()
+            not in {"", "0", "false", "no", "off"}
+        )
+        if not self._is_protected(path, request.method) and not operator_readiness:
+            return await call_next(request)
+        research_config = config_manager.get_research_config()
+        modules = getattr(research_config, "modules", {}) or {}
+        module = modules.get("official_announcement_assets", {}) or {}
+        permissions = module.get("permissions", {}) or {}
+        if not bool(permissions.get("trusted_identity_enabled", False)):
+            return self._error(
+                503,
+                "authorization_boundary_unavailable",
+                "trusted identity boundary is not configured",
+            )
+
+        configured_principals = permissions.get("principals")
+        if not isinstance(configured_principals, list) or not configured_principals:
+            return self._error(
+                503,
+                "authorization_boundary_unavailable",
+                "trusted identity principals are not configured",
+            )
+        bindings: list[tuple[str, str, frozenset[str]]] = []
+        principal_names: set[str] = set()
+        token_env_names: set[str] = set()
+        for item in configured_principals:
+            if not isinstance(item, Mapping):
+                return self._error(
+                    503,
+                    "authorization_boundary_unavailable",
+                    "trusted identity principal configuration is invalid",
+                )
+            principal = str(item.get("principal") or "").strip()
+            token_env = str(item.get("token_env") or "").strip()
+            scopes_raw = item.get("scopes")
+            if (
+                not principal
+                or not token_env
+                or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token_env) is None
+                or not isinstance(scopes_raw, list)
+                or not scopes_raw
+                or principal in principal_names
+                or token_env in token_env_names
+            ):
+                return self._error(
+                    503,
+                    "authorization_boundary_unavailable",
+                    "trusted identity principal configuration is invalid",
+                )
+            scopes = frozenset(
+                str(scope).strip() for scope in scopes_raw if str(scope).strip()
+            )
+            expected = os.environ.get(token_env, "")
+            if not expected or not scopes:
+                return self._error(
+                    503,
+                    "authorization_boundary_unavailable",
+                    "trusted identity credential is not configured",
+                )
+            bindings.append((expected, principal, scopes))
+            principal_names.add(principal)
+            token_env_names.add(token_env)
+        if len({secret for secret, _, _ in bindings}) != len(bindings):
+            return self._error(
+                503,
+                "authorization_boundary_unavailable",
+                "trusted identity credentials are ambiguous",
+            )
+
+        authorization = request.headers.get("authorization", "")
+        supplied = (
+            authorization[7:].strip()
+            if authorization.lower().startswith("bearer ")
+            else ""
+        )
+        matches = [
+            (principal, scopes)
+            for expected, principal, scopes in bindings
+            if supplied and hmac.compare_digest(supplied, expected)
+        ]
+        if len(matches) != 1:
+            return self._error(
+                401,
+                "authentication_required",
+                "authentication is required",
+            )
+        principal, scopes = matches[0]
+        asserted_principal = request.headers.get(
+            "x-annual-report-principal", ""
+        ).strip()
+        if asserted_principal and asserted_principal != principal:
+            return self._error(
+                403,
+                "principal_mismatch",
+                "asserted principal does not match the authenticated identity",
+            )
+        request.state.annual_report_principal = principal
+        request.state.annual_report_permissions = scopes
+        permission_names = {
+            "acquire": str(
+                permissions.get("acquire") or "annual_report_assets:acquire"
+            ).strip(),
+            "read_content": str(
+                permissions.get("read_content")
+                or "annual_report_assets:read_content"
+            ).strip(),
+            "operator": str(
+                permissions.get("operator") or "annual_report_assets:operator"
+            ).strip(),
+            "business_profile_process": str(
+                permissions.get("business_profile_process")
+                or "business_profile:process"
+            ).strip(),
+            "broker_risk_control_process": str(
+                permissions.get("broker_risk_control_process")
+                or "broker_risk_control:process"
+            ).strip(),
+        }
+        if any(not name for name in permission_names.values()):
+            return self._error(
+                503,
+                "authorization_boundary_unavailable",
+                "trusted identity permission names are invalid",
+            )
+        request.state.annual_report_permission_names = permission_names
         return await call_next(request)
 
 
@@ -244,6 +409,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         current_time: float,
     ) -> JSONResponse:
         retry_after = str(config.get("retry_after_seconds", 5))
+        if "annual-report" in request_path:
+            return JSONResponse(
+                status_code=int(config.get("busy_status_code", 503) or 503),
+                content={
+                    "schema_version": "annual_report_error.v1",
+                    "error_code": reason,
+                    "message": "annual-report endpoint is temporarily busy",
+                    "retryable": True,
+                    "details": {
+                        "active_limit": config.get("active_limit"),
+                        "queue_limit": config.get("queue_limit"),
+                        "queue_timeout_seconds": config.get(
+                            "queue_timeout_seconds"
+                        ),
+                    },
+                },
+                headers={"Retry-After": retry_after},
+            )
         return JSONResponse(
             status_code=int(config.get("busy_status_code", 503) or 503),
             content={
@@ -294,6 +477,21 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 request_path,
                 requests_per_minute,
             )
+            if "annual-report" in request_path:
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "schema_version": "annual_report_error.v1",
+                        "error_code": "rate_limit_exceeded",
+                        "message": "annual-report request rate limit exceeded",
+                        "retryable": True,
+                        "details": {
+                            "limit": requests_per_minute,
+                            "window": "60 seconds",
+                        },
+                    },
+                    headers={"Retry-After": "60"},
+                )
             return JSONResponse(
                 status_code=429,
                 content={
@@ -487,6 +685,7 @@ def setup_middleware(app):
     )
     app.add_middleware(ErrorHandlingMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(AnnualReportTrustedIdentityMiddleware)
     app.add_middleware(PathNormalizationMiddleware)
 
     api_logger.info("[API] Middleware setup completed")

@@ -63,6 +63,14 @@ class AnnouncementAcquisitionService:
         provider_cursors: Optional[Mapping[str, ProviderCursor]] = None,
     ) -> AnnouncementRouteResult:
         route = self.config.route_for(query.purpose_key, query.scope.exchange)
+        sources = route.sources
+        if query.source is not None:
+            requested_source = str(query.source).strip().lower()
+            if requested_source not in route.sources:
+                raise ValueError(
+                    "source-qualified announcement query is outside the configured route"
+                )
+            sources = (requested_source,)
         selector_list = tuple(selectors or ())
         attempts: List[AnnouncementRouteAttempt] = []
         selected_result: Optional[AnnouncementScanResult] = None
@@ -73,7 +81,7 @@ class AnnouncementAcquisitionService:
             query.purpose_key,
             query.scope.exchange,
             query.scope.scope_key,
-            list(route.sources),
+            list(sources),
             query.scope.page_size,
             query.scope.max_pages,
         )
@@ -82,10 +90,10 @@ class AnnouncementAcquisitionService:
             str(source).strip().lower(): cursor
             for source, cursor in (provider_cursors or {}).items()
         }
-        for index, source in enumerate(route.sources):
+        for index, source in enumerate(sources):
             if provider_cursors is not None:
                 source_cursor = normalized_cursors.get(source)
-            elif len(route.sources) == 1 or index == 0:
+            elif len(sources) == 1 or index == 0:
                 source_cursor = query.scope.cursor
             else:
                 # A cursor is provider state. Never reuse the primary source's
@@ -101,7 +109,7 @@ class AnnouncementAcquisitionService:
                 query.purpose_key,
                 source,
                 index + 1,
-                len(route.sources),
+                len(sources),
                 query.scope.scope_key,
             )
             try:
@@ -120,6 +128,10 @@ class AnnouncementAcquisitionService:
                     is_complete=False,
                     stop_reason="provider_exception",
                     errors=(f"{type(exc).__name__}: {exc}",),
+                    diagnostics={
+                        "exception_type": type(exc).__name__,
+                        "exception_message": str(exc),
+                    },
                 )
 
             selected = self._select(result.records, selector_list)
@@ -134,6 +146,9 @@ class AnnouncementAcquisitionService:
                     pages_scanned=result.pages_scanned,
                     stop_reason=result.stop_reason,
                     errors=result.errors,
+                    requests_made=result.requests_made,
+                    announcements_seen=result.announcements_seen,
+                    diagnostics=result.diagnostics,
                 )
             )
             LOGGER.info(
@@ -176,6 +191,41 @@ class AnnouncementAcquisitionService:
             None if selected_result is None else selected_result.stop_reason,
             elapsed,
         )
+        route_evidence = {
+            "selected_source": (
+                None if selected_result is None else selected_result.source
+            ),
+            "status": "failed" if selected_result is None else selected_result.status,
+            "fallback_used": len(attempts) > 1,
+            "fallback_reason": fallback_reason,
+            "attempts": [
+                {
+                    "source": attempt.source,
+                    "status": attempt.status,
+                    "record_count": attempt.record_count,
+                    "selected_count": attempt.selected_count,
+                    "pages_scanned": attempt.pages_scanned,
+                    "requests_made": attempt.requests_made,
+                    "announcements_seen": attempt.announcements_seen,
+                    "stop_reason": attempt.stop_reason,
+                    "errors": list(attempt.errors),
+                    "diagnostics": dict(attempt.diagnostics),
+                }
+                for attempt in attempts
+            ],
+        }
+        if selected_result is not None:
+            selected_result = replace(
+                selected_result,
+                records=tuple(
+                    record.with_provider_route_evidence(route_evidence)
+                    for record in selected_result.records
+                ),
+                selected_records=tuple(
+                    record.with_provider_route_evidence(route_evidence)
+                    for record in selected_result.selected_records
+                ),
+            )
         return AnnouncementRouteResult(
             query=query,
             status="failed" if selected_result is None else selected_result.status,
@@ -184,6 +234,7 @@ class AnnouncementAcquisitionService:
             attempts=tuple(attempts),
             fallback_used=len(attempts) > 1,
             fallback_reason=fallback_reason,
+            diagnostics=route_evidence,
         )
 
     @staticmethod

@@ -146,6 +146,32 @@ async def test_protected_path_marks_backend_execution_as_api_workload():
 
 @pytest.mark.unit
 @pytest.mark.asyncio
+async def test_annual_report_rate_limit_uses_common_error_envelope():
+    middleware = RateLimitMiddleware(
+        app=lambda scope, receive, send: None,
+        requests_per_minute=1,
+    )
+
+    async def call_next(request):
+        return JSONResponse({"ok": True})
+
+    request = _request(
+        "/api/v1/research/company/600000.SH/annual-reports/ensure"
+    )
+    first = await middleware.dispatch(request, call_next)
+    limited = await middleware.dispatch(request, call_next)
+
+    assert first.status_code == 200
+    assert limited.status_code == 429
+    assert limited.headers["retry-after"] == "60"
+    payload = json.loads(limited.body)
+    assert payload["schema_version"] == "annual_report_error.v1"
+    assert payload["error_code"] == "rate_limit_exceeded"
+    assert payload["retryable"] is True
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
 async def test_protected_path_times_out_when_queue_wait_expires():
     middleware = _protected_middleware(queue_timeout_seconds=0.01)
     path_key = "/api/v1/quotes/daily"

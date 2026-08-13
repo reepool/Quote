@@ -230,9 +230,16 @@ def get_business_profile_write_coordinator(
 class BusinessProfileWorkRepository:
     """Own idempotent work identities, leases, retries, and queue diagnostics."""
 
-    def __init__(self, storage: Any, *, checkpoint_root: str | Path):
+    def __init__(
+        self,
+        storage: Any,
+        *,
+        checkpoint_root: str | Path,
+        shared_asset_access: Any | None = None,
+    ):
         self.storage = storage
         self.checkpoint_root = Path(checkpoint_root)
+        self.shared_asset_access = shared_asset_access
 
     def enqueue_latest_annual(
         self,
@@ -274,6 +281,51 @@ class BusinessProfileWorkRepository:
             max_attempts=max_attempts,
             force=force,
             supersede_older=True,
+        )
+
+    def enqueue_bound_annual_report_asset(
+        self,
+        *,
+        knowledge_cutoff: str,
+        processing_identity: Mapping[str, Any],
+        asset: Mapping[str, Any],
+        max_attempts: int = 3,
+        force: bool = False,
+    ) -> dict[str, int]:
+        """Enqueue only the immutable shared observation selected by a caller."""
+
+        binding = _normalize_bound_shared_asset(asset)
+        cutoff = _date_text(knowledge_cutoff, "knowledge_cutoff")
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                "SELECT * FROM business_profile_announcement_frontier "
+                "WHERE instrument_id = ? AND source = ? AND announcement_id = ?",
+                (
+                    binding["instrument_id"],
+                    binding["source"],
+                    binding["source_announcement_id"],
+                ),
+            ).fetchone()
+        if row is None:
+            raise RuntimeError(
+                "business-profile bound shared filing is absent from frontier: "
+                f"{binding['asset_id']}"
+            )
+        frontier = dict(row)
+        if str(frontier.get("report_period") or "") != binding["report_period"]:
+            raise RuntimeError(
+                "business-profile bound shared filing report period mismatch"
+            )
+        return self._enqueue_rows(
+            (frontier,),
+            policy="latest_annual_only",
+            knowledge_cutoff=cutoff,
+            processing_identity=processing_identity,
+            max_attempts=max_attempts,
+            force=force,
+            supersede_older=False,
+            bound_shared_asset=binding,
         )
 
     def enqueue_scoped(
@@ -701,7 +753,13 @@ class BusinessProfileWorkRepository:
                 f"business-profile bound frontier is missing: {frontier_id}"
             )
         frontier = dict(row)
-        if str(frontier.get("status") or "") == "superseded":
+        bound_shared_asset = dict(
+            (item.get("metadata") or {}).get("bound_shared_asset") or {}
+        )
+        if (
+            str(frontier.get("status") or "") == "superseded"
+            and not bound_shared_asset
+        ):
             raise RuntimeError(
                 f"business-profile bound frontier is superseded: {frontier_id}"
             )
@@ -740,9 +798,145 @@ class BusinessProfileWorkRepository:
     ) -> dict[str, Any] | None:
         """Return an integrity-verified annual-report asset matching the work identity."""
 
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        bound_shared_asset = dict(
+            (item.get("metadata") or {}).get("bound_shared_asset") or {}
+        )
+        if self.shared_asset_access is not None:
+            if bound_shared_asset:
+                binding = _normalize_bound_shared_asset(bound_shared_asset)
+                identity_mismatches = [
+                    field
+                    for field, work_field in (
+                        ("instrument_id", "instrument_id"),
+                        ("source", "source"),
+                        ("source_announcement_id", "announcement_id"),
+                        ("report_period", "report_period"),
+                    )
+                    if str(binding[field]) != str(item.get(work_field) or "")
+                ]
+                if identity_mismatches:
+                    raise RuntimeError(
+                        "business-profile work/shared-asset binding mismatch: "
+                        + ",".join(identity_mismatches)
+                    )
+                from research.announcement_assets import EnsureRequest
+
+                try:
+                    content = self.shared_asset_access.exact_observation_handle(
+                        EnsureRequest(
+                            instrument_id=binding["instrument_id"],
+                            source=binding["source"],
+                            source_announcement_id=binding[
+                                "source_announcement_id"
+                            ],
+                            attachment_id=binding["attachment_id"],
+                            expected_content_hash=binding["content_hash"],
+                            observation_version=binding["observation_version"],
+                            allow_network=False,
+                            knowledge_cutoff=(item.get("metadata") or {}).get(
+                                "knowledge_cutoff"
+                            ),
+                        ),
+                        authorized=True,
+                    )
+                except (FileNotFoundError, KeyError, RuntimeError, ValueError):
+                    return None
+                handle = content.get("file_handle")
+                if handle is not None:
+                    handle.close()
+                return {
+                    "schema_version": "business_profile_source_file_manifest.v1",
+                    "source_file_id": f"shared-asset:{binding['asset_id']}",
+                    "instrument_id": binding["instrument_id"],
+                    "report_period": binding["report_period"],
+                    "report_type": str(item.get("document_type") or ""),
+                    "filing_id": binding["source_announcement_id"],
+                    "source": binding["source"],
+                    "archive_path": str(content["path"]),
+                    "content_hash": binding["content_hash"],
+                    "content_length": content["content_length"],
+                    "published_at": binding.get("published_at"),
+                    "status": "verified",
+                    "integrity_status": "valid",
+                    "metadata": {
+                        "shared_asset_id": binding["asset_id"],
+                        "shared_attachment_id": binding["attachment_id"],
+                        "shared_observation_version": binding[
+                            "observation_version"
+                        ],
+                        "selector_kind": binding.get("selector_kind")
+                        or "default_effective",
+                    },
+                }
+            report_period = str(item.get("report_period") or "")
+            fiscal_year = int(report_period[:4]) if len(report_period) >= 4 else None
+            if fiscal_year is None:
+                return None
+            report = self.shared_asset_access.repository.get_effective_report(
+                str(item.get("instrument_id") or ""),
+                fiscal_year,
+                knowledge_cutoff=item.get("knowledge_cutoff"),
+            )
+            if (
+                report is None
+                or report.source != str(item.get("source") or "").strip().lower()
+                or report.source_announcement_id
+                != str(item.get("announcement_id") or "")
+            ):
+                return None
+            try:
+                content = self.shared_asset_access.content_handle(report.asset_id)
+            except (FileNotFoundError, KeyError, RuntimeError):
+                from research.announcement_assets import EnsureRequest
+
+                try:
+                    content = self.shared_asset_access.exact_observation_handle(
+                        EnsureRequest(
+                            instrument_id=str(item.get("instrument_id") or ""),
+                            source=report.source,
+                            source_announcement_id=report.source_announcement_id,
+                            attachment_id=report.attachment_id,
+                            expected_content_hash=report.content_hash,
+                            observation_version=report.version_id,
+                            allow_network=False,
+                            knowledge_cutoff=item.get("knowledge_cutoff"),
+                        ),
+                        authorized=True,
+                    )
+                except (FileNotFoundError, KeyError, RuntimeError, ValueError):
+                    return None
+            handle = content.get("file_handle")
+            if handle is not None:
+                handle.close()
+            return {
+                "schema_version": "business_profile_source_file_manifest.v1",
+                "source_file_id": f"shared-asset:{report.asset_id}",
+                "instrument_id": report.instrument_id,
+                "report_period": report.report_period,
+                "report_type": str(item.get("document_type") or ""),
+                "filing_id": report.source_announcement_id,
+                "source": report.source,
+                "archive_path": str(content["path"]),
+                "content_hash": report.content_hash,
+                "content_length": content["content_length"],
+                "published_at": report.published_at,
+                "status": "verified",
+                "integrity_status": "valid",
+                "metadata": {
+                    "shared_asset_id": report.asset_id,
+                    "shared_attachment_id": report.attachment_id,
+                    "shared_observation_version": report.version_id,
+                    "selector_kind": (
+                        "knowledge_cutoff"
+                        if item.get("knowledge_cutoff")
+                        else "default_effective"
+                    ),
+                },
+            }
+
         from research.annual_report_assets import AnnualReportAssetCatalog
 
-        item = self.get(work) if isinstance(work, str) else dict(work)
         asset = AnnualReportAssetCatalog(self.storage).find_reusable_filing(
             instrument_id=str(item.get("instrument_id") or ""),
             report_period=str(item.get("report_period") or ""),
@@ -756,6 +950,119 @@ class BusinessProfileWorkRepository:
         ):
             return None
         return asset
+
+    def get_bound_asset_resolution(
+        self,
+        work: str | Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Return an explicit local-only resolution for one bound filing."""
+
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        usable = self.get_usable_bound_manifest(item)
+        if usable is not None:
+            return {
+                "asset_availability": "local_valid",
+                "local_content_unavailable": False,
+                "manifest": usable,
+                "reason_code": None,
+            }
+        bound_shared_asset = dict(
+            (item.get("metadata") or {}).get("bound_shared_asset") or {}
+        )
+        if bound_shared_asset:
+            return {
+                "asset_availability": "missing",
+                "local_content_unavailable": True,
+                "asset": bound_shared_asset,
+                "manifest": None,
+                "reason_code": "exact_filing_pin_unavailable",
+            }
+        if self.shared_asset_access is None:
+            return {
+                "asset_availability": "missing",
+                "local_content_unavailable": True,
+                "manifest": None,
+                "reason_code": "legacy_manifest_missing",
+            }
+        from research.announcement_assets import EnsureRequest
+
+        ensured = self.shared_asset_access.ensure(
+            EnsureRequest(
+                instrument_id=str(item.get("instrument_id") or ""),
+                source=str(item.get("source") or "").strip().lower(),
+                source_announcement_id=str(item.get("announcement_id") or ""),
+                allow_network=False,
+                consumer="business_profile",
+                principal="business-profile",
+                knowledge_cutoff=item.get("knowledge_cutoff"),
+            )
+        )
+        return {
+            "asset_availability": ensured.get("availability") or "missing",
+            "local_content_unavailable": True,
+            "asset": ensured.get("asset"),
+            "manifest": None,
+            "reason_code": ensured.get("reason_code") or "local_content_unavailable",
+        }
+
+    def persist_bound_shared_manifest(
+        self,
+        work: str | Mapping[str, Any],
+        manifest: Mapping[str, Any],
+    ) -> str:
+        """Persist the exact shared-asset projection for downstream BP stages."""
+
+        item = self.get(work) if isinstance(work, str) else dict(work)
+        binding = _normalize_bound_shared_asset(
+            dict((item.get("metadata") or {}).get("bound_shared_asset") or {})
+        )
+        frontier = self.get_bound_frontier(item)
+        from research.business_profile_archive import (
+            BUSINESS_PROFILE_ARCHIVE_VERSION,
+            BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
+        )
+        from research.providers.base import FinancialSourceFileManifest
+
+        record = FinancialSourceFileManifest(
+            source=binding["source"],
+            source_mode="shared_announcement_asset",
+            source_tier=(
+                "official_primary"
+                if binding["source"] == "cninfo"
+                else "official_backup"
+            ),
+            instrument_id=binding["instrument_id"],
+            symbol=str(frontier.get("symbol") or ""),
+            exchange=str(frontier.get("exchange") or ""),
+            report_period=binding["report_period"],
+            report_type=str(item.get("document_type") or ""),
+            filing_id=binding["source_announcement_id"],
+            source_url=f"shared-asset://{binding['asset_id']}",
+            archive_path=str(manifest["archive_path"]),
+            content_hash=binding["content_hash"],
+            content_length=int(manifest["content_length"]),
+            published_at=binding.get("published_at"),
+            downloaded_at=get_shanghai_time().isoformat(),
+            parser_version=BUSINESS_PROFILE_ARCHIVE_VERSION,
+            source_file_id=f"shared-asset:{binding['asset_id']}",
+            status="archived",
+            schema_version=BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
+            metadata_json={
+                "shared_asset_id": binding["asset_id"],
+                "shared_attachment_id": binding["attachment_id"],
+                "shared_asset_observation_version": binding[
+                    "observation_version"
+                ],
+                "shared_asset_content_hash": binding["content_hash"],
+                "selector_kind": binding["selector_kind"],
+            },
+        )
+        repository = getattr(self.storage, "financial_statements", None)
+        if repository is not None and hasattr(
+            repository, "upsert_source_file_manifest"
+        ):
+            return str(repository.upsert_source_file_manifest(record))
+        return str(self.storage.upsert_financial_source_file_manifest(record))
 
     def recover_completed_without_bound_manifest(
         self,
@@ -1416,8 +1723,14 @@ class BusinessProfileWorkRepository:
         max_attempts: int,
         force: bool = False,
         supersede_older: bool,
+        bound_shared_asset: Mapping[str, Any] | None = None,
     ) -> dict[str, int]:
         identity_hash = _stable_hash(processing_identity)
+        normalized_binding = (
+            _normalize_bound_shared_asset(bound_shared_asset)
+            if bound_shared_asset
+            else None
+        )
         now = get_shanghai_time().isoformat()
         inserted = reused = superseded = identity_superseded = reset = 0
         with self.storage.get_connection() as conn:
@@ -1431,6 +1744,7 @@ class BusinessProfileWorkRepository:
                             "frontier_id": row["frontier_id"],
                             "policy": policy,
                             "processing_identity_hash": identity_hash,
+                            "bound_shared_asset": normalized_binding,
                         }
                     )[:24]
                 )
@@ -1489,6 +1803,8 @@ class BusinessProfileWorkRepository:
                         "knowledge_cutoff": knowledge_cutoff,
                         "processing_identity": dict(processing_identity),
                     }
+                    if normalized_binding is not None:
+                        metadata["bound_shared_asset"] = normalized_binding
                     conn.execute(
                         """
                         INSERT INTO business_profile_work_items (
@@ -1594,8 +1910,11 @@ class BusinessProfileFrontierBoundAcquirer:
         from research.business_profile_documents import classify_business_profile_document
 
         frontier = self.repository.get_bound_frontier(work)
-        existing = self.repository.get_usable_bound_manifest(work)
+        resolution = self.repository.get_bound_asset_resolution(work)
+        existing = resolution.get("manifest")
         if existing is not None:
+            if (work.get("metadata") or {}).get("bound_shared_asset"):
+                self.repository.persist_bound_shared_manifest(work, existing)
             resolved = self.repository.resolve_missing_document_exceptions(work)
             return {
                 "status": "unchanged",
@@ -1603,6 +1922,19 @@ class BusinessProfileFrontierBoundAcquirer:
                 "source_file_id": existing["source_file_id"],
                 "archive_path": existing["archive_path"],
                 "resolved_missing_document_exceptions": resolved,
+            }
+        if resolution.get("reason_code") in {
+            "retained_internal_only",
+            "non_effective_exact_filing_content_unavailable",
+            "exact_filing_pin_unavailable",
+        }:
+            return {
+                "status": "metadata_only",
+                "frontier_id": frontier["frontier_id"],
+                "asset_availability": resolution.get("asset_availability"),
+                "local_content_unavailable": True,
+                "reason_code": resolution.get("reason_code"),
+                "asset": resolution.get("asset"),
             }
         title = str(frontier["title"])
         classification = classify_business_profile_document(title, adjunct_type="PDF")
@@ -1894,6 +2226,7 @@ class BusinessProfileAsyncProductionService:
         force: bool = False,
         selection_policy: str = "expanded",
         should_stop: Callable[[], bool] | None = None,
+        bound_annual_report_asset: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         started = time.monotonic()
         if not instrument_ids and not start_date:
@@ -1912,6 +2245,19 @@ class BusinessProfileAsyncProductionService:
                     "latest-annual backfill does not accept specialist document types: "
                     + ",".join(unsupported_types)
                 )
+        bound_asset = (
+            _normalize_bound_shared_asset(bound_annual_report_asset)
+            if bound_annual_report_asset
+            else None
+        )
+        if bound_asset and (
+            tuple(instrument_ids) != (bound_asset["instrument_id"],)
+            or policy != "latest_annual_only"
+        ):
+            raise ValueError(
+                "bound annual-report processing requires exactly its instrument "
+                "and latest_annual_only policy"
+            )
         logger.info(
             "business-profile backfill start cutoff=%s policy=%s instruments=%s "
             "start_date=%s end_date=%s document_types=%s stages=%s",
@@ -1957,7 +2303,26 @@ class BusinessProfileAsyncProductionService:
         )
         self._log_recovery(recovery)
         discovery = None
-        if discovery_kwargs is not None:
+        if bound_asset is not None:
+            from research.business_profile_production_operations import (
+                register_business_profile_shared_annual_report_asset,
+            )
+
+            await asyncio.to_thread(
+                register_business_profile_shared_annual_report_asset,
+                storage=self.repository.storage,
+                asset=bound_asset,
+            )
+            discovery = {
+                "status": "success",
+                "operation": "bound_shared_annual_report_registration",
+                "provider_requests": 0,
+                "attachment_downloads": 0,
+                "asset_id": bound_asset["asset_id"],
+                "observation_version": bound_asset["observation_version"],
+                "content_hash": bound_asset["content_hash"],
+            }
+        elif discovery_kwargs is not None:
             logger.info(
                 "business-profile discovery start operation=backfill scope=%s",
                 _safe_discovery_scope(discovery_kwargs),
@@ -1977,7 +2342,16 @@ class BusinessProfileAsyncProductionService:
                     "errors": [f"{type(exc).__name__}: {exc}"],
                 }
             self._log_discovery(discovery)
-        if policy == "latest_annual_only":
+        if bound_asset is not None:
+            enqueue = await self._run_storage_operation(
+                self.repository.enqueue_bound_annual_report_asset,
+                knowledge_cutoff=knowledge_cutoff,
+                processing_identity=processing_identity,
+                asset=bound_asset,
+                max_attempts=max_attempts,
+                force=force,
+            )
+        elif policy == "latest_annual_only":
             enqueue = await self._run_storage_operation(
                 self.repository.enqueue_latest_annual,
                 knowledge_cutoff=knowledge_cutoff,
@@ -2036,6 +2410,8 @@ class BusinessProfileAsyncProductionService:
             "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
+        if bound_asset is not None:
+            report["bound_shared_asset"] = bound_asset
         self._log_completion(report)
         return report
 
@@ -2681,6 +3057,58 @@ def _decode_work_row(row: Mapping[str, Any]) -> dict[str, Any]:
         metadata = {}
     item["metadata"] = metadata if isinstance(metadata, Mapping) else {}
     return item
+
+
+def _normalize_bound_shared_asset(
+    asset: Mapping[str, Any],
+) -> dict[str, Any]:
+    binding = {
+        "asset_id": str(asset.get("asset_id") or "").strip(),
+        "instrument_id": str(asset.get("instrument_id") or "").strip(),
+        "fiscal_year": int(asset.get("fiscal_year") or 0),
+        "source": str(asset.get("source") or "").strip().lower(),
+        "source_announcement_id": str(
+            asset.get("source_announcement_id") or ""
+        ).strip(),
+        "attachment_id": str(asset.get("attachment_id") or "").strip(),
+        "observation_version": str(
+            asset.get("observation_version") or ""
+        ).strip(),
+        "content_hash": str(asset.get("content_hash") or "").strip().lower(),
+        "report_period": str(asset.get("report_period") or "").strip(),
+        "published_at": asset.get("published_at"),
+        "selector_kind": str(asset.get("selector_kind") or "").strip()
+        or "default_effective",
+    }
+    missing = sorted(
+        key
+        for key in (
+            "asset_id",
+            "instrument_id",
+            "source",
+            "source_announcement_id",
+            "attachment_id",
+            "observation_version",
+            "content_hash",
+            "report_period",
+        )
+        if not binding[key]
+    )
+    if missing:
+        raise ValueError(
+            "bound shared annual-report asset is incomplete: " + ",".join(missing)
+        )
+    if len(binding["content_hash"]) != 64 or any(
+        character not in "0123456789abcdef"
+        for character in binding["content_hash"]
+    ):
+        raise ValueError("bound shared annual-report content_hash is invalid")
+    _date_text(binding["report_period"], "report_period")
+    if binding["fiscal_year"] < 1990 or int(binding["report_period"][:4]) != binding[
+        "fiscal_year"
+    ]:
+        raise ValueError("bound shared annual-report fiscal year is invalid")
+    return binding
 
 
 def _frontier_sort_key(row: Mapping[str, Any]) -> tuple[str, int, str, str]:

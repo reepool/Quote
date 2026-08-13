@@ -127,13 +127,16 @@ class OfficialExchangeAnnouncementProvider:
                 "official announcement endpoint_mode must be instrument or "
                 "recent_market"
             )
-        supports_market_scope = config.exchange in {"SSE", "SZSE"} or (
+        supports_market_scope = config.exchange == "SZSE" or (
+            config.exchange == "BSE" and self.endpoint_mode == "recent_market"
+        )
+        supports_instrument_scope = not (
             config.exchange == "BSE" and self.endpoint_mode == "recent_market"
         )
         self.capabilities = AnnouncementProviderCapabilities(
             exchanges=frozenset({config.exchange}),
             supports_market_scope=supports_market_scope,
-            supports_instrument_scope=True,
+            supports_instrument_scope=supports_instrument_scope,
             supports_date_filter=True,
             supports_keyword_filter=True,
             supports_category_filter=config.exchange in {"SSE", "SZSE"},
@@ -223,7 +226,12 @@ class OfficialExchangeAnnouncementProvider:
                 if (
                     record := self._normalize_record(
                         row,
-                        expected_symbol=scope.symbol,
+                        expected_symbol=(
+                            None
+                            if self.config.exchange == "BSE"
+                            and self.endpoint_mode == "recent_market"
+                            else scope.symbol
+                        ),
                     )
                 )
                 is not None
@@ -621,7 +629,11 @@ class OfficialExchangeAnnouncementProvider:
                 row.get("companyCd") or row.get("companyCode") or row.get("secCode")
             )
             raw_id = self._text(
-                row.get("disclosureId") or row.get("announcementId") or row.get("id")
+                row.get("disclosureId")
+                or row.get("disclosureCode")
+                or row.get("announcementId")
+                or row.get("infoId")
+                or row.get("id")
             )
             attachment_type = self._suffix(raw_url)
         if not title or not raw_url:

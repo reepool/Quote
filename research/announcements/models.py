@@ -267,6 +267,7 @@ class AnnouncementRecord:
     diagnostics: Tuple[str, ...] = ()
     identity_is_derived: bool = False
     selection_reasons: Tuple[str, ...] = ()
+    provider_route_evidence: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         source = str(self.source or "").strip().lower()
@@ -289,9 +290,21 @@ class AnnouncementRecord:
         object.__setattr__(self, "raw_payload", dict(self.raw_payload or {}))
         object.__setattr__(self, "diagnostics", _deduplicated_texts(self.diagnostics))
         object.__setattr__(self, "selection_reasons", _deduplicated_texts(self.selection_reasons))
+        object.__setattr__(
+            self,
+            "provider_route_evidence",
+            dict(self.provider_route_evidence or {}),
+        )
 
     def with_selection_reasons(self, reasons: Iterable[str]) -> "AnnouncementRecord":
         return replace(self, selection_reasons=_deduplicated_texts(reasons))
+
+    def with_provider_route_evidence(
+        self,
+        evidence: Mapping[str, Any],
+    ) -> "AnnouncementRecord":
+        """Attach source-neutral ordered route evidence to a selected record."""
+        return replace(self, provider_route_evidence=dict(evidence or {}))
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -330,6 +343,12 @@ class AnnouncementScanResult:
         object.__setattr__(self, "announcements_seen", max(0, int(self.announcements_seen)))
         object.__setattr__(self, "errors", _deduplicated_texts(self.errors))
         object.__setattr__(self, "diagnostics", dict(self.diagnostics or {}))
+        if self.query.source and self.query.source != source:
+            raise ValueError("scan result source does not match query source")
+        if any(record.source != source for record in self.records):
+            raise ValueError("scan result contains a record from another source")
+        if any(record.source != source for record in self.selected_records):
+            raise ValueError("selected scan record belongs to another source")
 
     @property
     def cursor_commit_allowed(self) -> bool:
@@ -353,6 +372,28 @@ class AnnouncementRouteAttempt:
     pages_scanned: int
     stop_reason: Optional[str] = None
     errors: Tuple[str, ...] = ()
+    requests_made: int = 0
+    announcements_seen: int = 0
+    diagnostics: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        source = str(self.source or "").strip().lower()
+        if not source:
+            raise ValueError("route attempt source is required")
+        object.__setattr__(self, "source", source)
+        object.__setattr__(self, "status", str(self.status or "").strip().lower())
+        object.__setattr__(self, "record_count", max(0, int(self.record_count)))
+        object.__setattr__(self, "selected_count", max(0, int(self.selected_count)))
+        object.__setattr__(self, "pages_scanned", max(0, int(self.pages_scanned)))
+        object.__setattr__(self, "requests_made", max(0, int(self.requests_made)))
+        object.__setattr__(
+            self,
+            "announcements_seen",
+            max(0, int(self.announcements_seen)),
+        )
+        object.__setattr__(self, "stop_reason", _clean_text(self.stop_reason))
+        object.__setattr__(self, "errors", _deduplicated_texts(self.errors))
+        object.__setattr__(self, "diagnostics", dict(self.diagnostics or {}))
 
 
 @dataclass(frozen=True)
@@ -366,6 +407,27 @@ class AnnouncementRouteResult:
     attempts: Tuple[AnnouncementRouteAttempt, ...] = ()
     fallback_used: bool = False
     fallback_reason: Optional[str] = None
+    diagnostics: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        status = str(self.status or "").strip().lower()
+        selected_source = _clean_text(self.selected_source)
+        if selected_source is not None:
+            selected_source = selected_source.lower()
+        attempts = tuple(self.attempts or ())
+        if self.scan_result is not None:
+            if selected_source != self.scan_result.source:
+                raise ValueError("selected source does not match scan result source")
+            if attempts and attempts[-1].source != selected_source:
+                raise ValueError("selected source must be the final route attempt")
+        elif selected_source is not None:
+            raise ValueError("selected source requires a scan result")
+        object.__setattr__(self, "status", status)
+        object.__setattr__(self, "selected_source", selected_source)
+        object.__setattr__(self, "attempts", attempts)
+        object.__setattr__(self, "fallback_used", bool(self.fallback_used))
+        object.__setattr__(self, "fallback_reason", _clean_text(self.fallback_reason))
+        object.__setattr__(self, "diagnostics", dict(self.diagnostics or {}))
 
 
 @dataclass(frozen=True)

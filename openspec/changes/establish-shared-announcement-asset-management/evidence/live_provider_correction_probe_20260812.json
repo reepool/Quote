@@ -1,0 +1,269 @@
+{
+  "schema_version": "annual_report_asset_live_provider_probe.v1",
+  "status": "success",
+  "read_only": true,
+  "database_writes": false,
+  "attachment_downloads": false,
+  "production_archive_writes": false,
+  "catalog_writes": false,
+  "overlap_policy": {
+    "policy_version": "annual_report_discovery_overlap.v1",
+    "overlap_days": 3,
+    "probe_policy_fingerprint": "1b28b9df6b07febb67041eebd7fd0cbaead12b75aa7511c558e48ad35ea5763f",
+    "announcement_asset_config_fingerprint": "167f86223348a0ccbdca2f4bb3e8b35a748119fc891a911aa13367af6c2b2cfe"
+  },
+  "query_filters": {
+    "keyword": "年度报告",
+    "category": null
+  },
+  "readiness_contract": {
+    "full_market_ready": false,
+    "reason": "bounded_probe_is_evidence_only",
+    "primary_failure_route_probe_present": false,
+    "route_equivalence_audited": false
+  },
+  "target_count": 1,
+  "elapsed_seconds": 1.625,
+  "results": [
+    {
+      "source": "cninfo",
+      "instrument_id": "688353.SH",
+      "symbol": "688353",
+      "exchange": "SSE",
+      "status": "success",
+      "is_complete": true,
+      "pages_scanned": 1,
+      "requests_made": 1,
+      "announcements_seen": 7,
+      "stop_reason": "last_page",
+      "cursor_commit_allowed": true,
+      "effective_bounds": {
+        "page_size": 30,
+        "max_pages": 2,
+        "request_timeout_seconds": 10.0,
+        "request_interval_seconds": 0.3
+      },
+      "capabilities": {
+        "exchanges": [
+          "BSE",
+          "SSE",
+          "SZSE"
+        ],
+        "supports_market_scope": true,
+        "supports_instrument_scope": true,
+        "supports_date_filter": true,
+        "supports_keyword_filter": true,
+        "supports_category_filter": true,
+        "cursor_kind": "published_at",
+        "max_page_size": 30,
+        "supports_attachment_retrieval": true,
+        "requires_provider_identity": true,
+        "attachment_version_signal": null
+      },
+      "classification": {
+        "policy_version": "formal_annual_report.v1",
+        "eligible_originals": 0,
+        "eligible_complete_corrections": 1,
+        "excluded_summaries": 2,
+        "excluded_other": 4,
+        "examples": [
+          {
+            "announcement_key": "cninfo:1225332800",
+            "title": "江苏华盛锂电材料股份有限公司2025年半<em>年度报告</em>（更正后）",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "correction",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:半年度报告"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332795",
+            "title": "江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>摘要（更正后）",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "correction",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:摘要"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332794",
+            "title": "容诚会计师事务所（特殊普通合伙）关于江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>的信息披露监管问询函回复的核查意见",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "original",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:问询函"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332790",
+            "title": "华泰联合证券有限责任公司关于江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>的信息披露监管问询函回复的核查意见",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "original",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:问询函"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332789",
+            "title": "江苏华盛锂电材料股份有限公司2025年半<em>年度报告</em>摘要（更正后）",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "correction",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:摘要"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332787",
+            "title": "江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>（更正后）",
+            "attachment_id": null,
+            "eligible": true,
+            "variant": "correction",
+            "fiscal_year": 2025,
+            "reasons": [
+              "eligible_complete_correction"
+            ]
+          },
+          {
+            "announcement_key": "cninfo:1225332781",
+            "title": "江苏华盛锂电材料股份有限公司关于2025年<em>年度报告</em>的信息披露监管问询函的回复公告",
+            "attachment_id": null,
+            "eligible": false,
+            "variant": "original",
+            "fiscal_year": 2025,
+            "reasons": [
+              "excluded:问询函"
+            ]
+          }
+        ]
+      },
+      "pagination": {
+        "pages_scanned": 1,
+        "max_pages": 2,
+        "stop_reason": "last_page",
+        "is_complete": true
+      },
+      "cursor": {
+        "commit_allowed": true,
+        "kind": "published_at",
+        "value": "2026-05-27T16:00:00+00:00",
+        "reached_prior_cursor": false
+      },
+      "overlap_idempotency": {
+        "overlap_days": 3,
+        "first_status": "success",
+        "repeat_status": "success",
+        "source_qualified_keys_equal": true,
+        "first_key_count": 7,
+        "repeat_key_count": 7,
+        "duplicate_keys_in_first": false
+      },
+      "managed_attachment_version": {
+        "provider_signal": null,
+        "conditional_signal_supported": false,
+        "bounded_silent_byte_verification_feasible": true,
+        "readiness_limitation": "provider_has_no_trustworthy_attachment_version_signal;bounded_hash_refresh_is_required"
+      },
+      "attachment_evidence": {
+        "record_count": 7,
+        "attachment_count": 7,
+        "records_without_attachment": 0
+      },
+      "rate_limit_evidence": {
+        "requests_made_first": 1,
+        "requests_made_repeat": 1,
+        "configured_request_interval_seconds": 0.3
+      },
+      "publication_delay_evidence": {
+        "sample_count": 7,
+        "status": "unavailable_from_single_observation",
+        "limitation": "provider_first_available_at_is_not_exposed; observed age is not publication delay",
+        "observed_age_basis": "probe_observed_at_minus_normalized_publication_time",
+        "observed_age_minimum_seconds": 6603574,
+        "observed_age_maximum_seconds": 6603574
+      },
+      "response_shape": {
+        "first_record_raw_keys": [
+          "adjunctSize",
+          "adjunctType",
+          "adjunctUrl",
+          "announcementContent",
+          "announcementId",
+          "announcementTime",
+          "announcementTitle",
+          "announcementType",
+          "announcementTypeName",
+          "associateAnnouncement",
+          "batchNum",
+          "columnId",
+          "id",
+          "important",
+          "orgId",
+          "orgName",
+          "pageColumn",
+          "secCode",
+          "secName",
+          "secNameList",
+          "shortTitle",
+          "storageTime",
+          "tileSecName"
+        ],
+        "first_record_attachment_count": 1
+      },
+      "record_samples": [
+        {
+          "announcement_key": "cninfo:1225332800",
+          "title": "江苏华盛锂电材料股份有限公司2025年半<em>年度报告</em>（更正后）",
+          "published_at": "2026-05-27T16:00:00+00:00",
+          "attachment_count": 1,
+          "diagnostics": []
+        },
+        {
+          "announcement_key": "cninfo:1225332795",
+          "title": "江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>摘要（更正后）",
+          "published_at": "2026-05-27T16:00:00+00:00",
+          "attachment_count": 1,
+          "diagnostics": []
+        },
+        {
+          "announcement_key": "cninfo:1225332794",
+          "title": "容诚会计师事务所（特殊普通合伙）关于江苏华盛锂电材料股份有限公司2025年<em>年度报告</em>的信息披露监管问询函回复的核查意见",
+          "published_at": "2026-05-27T16:00:00+00:00",
+          "attachment_count": 1,
+          "diagnostics": []
+        }
+      ],
+      "diagnostics": {
+        "effective_page_size": 30,
+        "total_pages": 1,
+        "start_page": 1,
+        "last_page_scanned": 1,
+        "next_page": null,
+        "preflight_page_bound": false,
+        "market_config": {
+          "market": "SSE",
+          "column": "sse",
+          "plate": "sh",
+          "tab_name": "fulltext"
+        },
+        "identity": {
+          "symbol": "688353",
+          "org_id": "9900047233",
+          "stock": "688353,9900047233"
+        }
+      },
+      "errors": [],
+      "elapsed_seconds": 1.625
+    }
+  ],
+  "observed_at": "2026-08-12T10:20:00+08:00"
+}

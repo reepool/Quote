@@ -177,6 +177,25 @@ def test_strict_index_read_requires_knowledge_cutoff(store):
     assert result["reason"] == "known_at_required_for_strict_pit"
 
 
+def test_index_validity_bounds_non_strict_reads_and_reports_readiness(store):
+    store.upsert_index_snapshot(
+        snapshot={**_snapshot(), "weight_unit": None},
+        members=[{**item, "weight": None} for item in _members()],
+        validity={**_validity(), "valid_to_exclusive": "2026-02-01", "evidence": {
+            "membership_readiness": "ready", "weight_readiness": "deferred"
+        }},
+    )
+    inside = store.list_index_constituents(
+        "000300.SH", as_of_date="2026-01-15", strict=False
+    )
+    assert inside["status"] == "success"
+    assert inside["readiness"] == {"membership": "ready", "weights": "deferred"}
+    outside = store.list_index_constituents(
+        "000300.SH", as_of_date="2026-02-01", strict=False
+    )
+    assert outside["status"] == "unavailable"
+
+
 def test_security_interval_revision_selection_and_conflict_fail_closed(store):
     base = {
         "instrument_id": "000001.SZ",

@@ -54,6 +54,20 @@ def test_financial_disclosure_filter_detects_regular_periodic_report():
     assert financial_disclosure_event_filter(record) == ["periodic_report"]
 
 
+def test_financial_disclosure_filter_excludes_subsidiary_announcements():
+    record = _record(
+        announcement_id="subsidiary-report-1",
+        title="关于控股子公司披露2026年半年度报告的提示性公告",
+        announcement_time="2026-08-10",
+        market="SZSE",
+        column="szse",
+        symbols=["002149"],
+    )
+
+    assert financial_disclosure_event_filter(record) == []
+    assert is_non_primary_financial_announcement_title(record.title) is True
+
+
 def test_financial_disclosure_filter_detects_formal_correction_and_revision():
     correction = _record(
         announcement_id="a3",

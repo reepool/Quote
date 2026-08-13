@@ -579,7 +579,11 @@ class BacktestQuoteStore:
                     " ORDER BY decision_available_at DESC, validity_revision_id DESC LIMIT 1",
                     validity_params,
                 ).fetchone()
-                if candidate_validity is not None or not strict:
+                has_validity = connection.execute(
+                    "SELECT 1 FROM index_composition_validity_revisions WHERE snapshot_id = ? LIMIT 1",
+                    (candidate["snapshot_id"],),
+                ).fetchone()
+                if candidate_validity is not None or (not strict and has_validity is None):
                     snapshot = dict(candidate)
                     validity = candidate_validity
                     break
@@ -593,6 +597,17 @@ class BacktestQuoteStore:
                 "SELECT * FROM index_composition_members WHERE snapshot_id = ? ORDER BY source_symbol, member_row_id LIMIT ? OFFSET ?",
                 (snapshot["snapshot_id"], int(limit), max(int(offset), 0)),
             ).fetchall()
+        readiness = {
+            "membership": "ready",
+            "weights": "ready" if snapshot.get("weight_unit") else "deferred",
+        }
+        if validity is not None:
+            try:
+                evidence = json.loads(validity["evidence_json"] or "{}")
+            except (TypeError, json.JSONDecodeError):
+                evidence = {}
+            readiness["membership"] = evidence.get("membership_readiness", readiness["membership"])
+            readiness["weights"] = evidence.get("weight_readiness", readiness["weights"])
         return {
             "status": "success",
             "as_of_date": as_of,
@@ -604,6 +619,7 @@ class BacktestQuoteStore:
             "limit": int(limit),
             "offset": max(int(offset), 0),
             "strict": strict,
+            "readiness": readiness,
         }
 
     def append_security_event(self, event: Mapping[str, Any]) -> dict[str, Any]:

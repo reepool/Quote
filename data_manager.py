@@ -214,9 +214,22 @@ class DataManager:
         # so a second process cannot silently overwrite a newer promotion.
         self._canonical_mutation_lock = asyncio.Lock()
         self._dcf_run_cache: Dict[str, Dict[str, Any]] = {}
+        self._announcement_asset_access = None
+        self._announcement_asset_access_signature: Optional[Tuple[str, str]] = None
+        self._announcement_consumer_coordinator = None
+        self._announcement_consumer_coordinator_signature: Optional[
+            Tuple[str, str]
+        ] = None
+        self._announcement_asset_scheduler_commands = None
+        self._announcement_asset_scheduler_commands_signature: Optional[
+            Tuple[str, str]
+        ] = None
 
     def refresh_runtime_config(self) -> None:
         """Refresh config references cached on the long-lived DataManager."""
+        coordinator = self._announcement_consumer_coordinator
+        if coordinator is not None:
+            coordinator.close()
         self.research_config = self.config.get_research_config()
         self.telegram_enabled = self.config.get_nested('telegram_config.enabled', False)
         self.data_config = self.config.get_nested('data_config', {})
@@ -228,7 +241,1122 @@ class DataManager:
         self._factor_activation_signature = None
         self._factor_activation = None
         self._factor_activation_error = None
+        self._announcement_asset_access = None
+        self._announcement_asset_access_signature = None
+        self._announcement_consumer_coordinator = None
+        self._announcement_consumer_coordinator_signature = None
+        self._announcement_asset_scheduler_commands = None
+        self._announcement_asset_scheduler_commands_signature = None
         self.invalidate_factor_cache()
+
+    def _get_announcement_asset_access(self, *, initialize_schema: bool = False):
+        """Return the lazy shared annual-report facade without market activity."""
+        from research.announcement_assets import (
+            AnnouncementAssetConfig,
+            AnnouncementAssetRepository,
+            AnnouncementAssetService,
+        )
+        from research.announcement_assets.access import AnnouncementAssetAccess
+        from research.announcements import AnnouncementAttachmentRetriever
+
+        config = AnnouncementAssetConfig.from_research_config(
+            self.research_config,
+            project_root=Path.cwd(),
+        )
+        configured_storage = getattr(self.research_config, "storage", None)
+        configured_db_path = getattr(configured_storage, "db_path", None)
+        if not isinstance(configured_db_path, (str, os.PathLike)):
+            raise RuntimeError("research storage database path is unavailable")
+        db_path = Path(configured_db_path)
+        if not db_path.is_absolute():
+            db_path = Path.cwd() / db_path
+        signature = (
+            str(db_path.resolve(strict=False)),
+            config.config_fingerprint,
+        )
+        if (
+            getattr(self, "_announcement_asset_access", None) is None
+            or getattr(self, "_announcement_asset_access_signature", None)
+            != signature
+        ):
+            repository = AnnouncementAssetRepository(db_path)
+            if config.enabled:
+                acquisition_service = (
+                    self._build_official_announcement_acquisition_service()
+                )
+                acquisition_service = self._bind_announcement_asset_routes(
+                    acquisition_service,
+                    config,
+                )
+                attachment_retriever = (
+                    AnnouncementAttachmentRetriever.from_provider_configs(
+                        acquisition_service.config.provider_configs
+                    )
+                )
+            else:
+                # Disabled registration must remain a local-only read facade.
+                acquisition_service = None
+                attachment_retriever = None
+            service = AnnouncementAssetService(
+                repository=repository,
+                config=config,
+                acquisition_service=acquisition_service,
+                attachment_retriever=attachment_retriever,
+            )
+            self._announcement_asset_access = AnnouncementAssetAccess(
+                repository=repository,
+                config=config,
+                service=service,
+            )
+            self._announcement_asset_access_signature = signature
+        if initialize_schema:
+            self._announcement_asset_access.repository.initialize_schema()
+        return self._announcement_asset_access
+
+    @staticmethod
+    def _bind_announcement_asset_routes(acquisition_service: Any, config: Any):
+        """Add the asset module's source allowlist without changing other purposes."""
+        from research.announcements import AnnouncementRouteConfig
+
+        registry = getattr(acquisition_service, "registry", None)
+        acquisition_config = getattr(acquisition_service, "config", None)
+        if registry is None or acquisition_config is None:
+            return acquisition_service
+        routes = {
+            purpose: dict(exchange_routes)
+            for purpose, exchange_routes in acquisition_config.purpose_routes.items()
+        }
+        asset_routes: Dict[str, Any] = {}
+        source_allowlist = set(config.acquisition.source_routes)
+        source_for_exchange = {"SSE": "sse", "SZSE": "szse", "BSE": "bse"}
+        for exchange in config.exchanges:
+            candidates = (source_for_exchange.get(exchange), "cninfo")
+            sources = tuple(
+                source
+                for source in candidates
+                if source
+                and source in source_allowlist
+                and registry.get(source) is not None
+                and registry.require(source).capabilities.supports_instrument_scope
+                and exchange in registry.require(source).capabilities.exchanges
+                and registry.require(source).capabilities.supports_date_filter
+                and registry.require(source).capabilities.supports_category_filter
+            )
+            if not sources:
+                raise RuntimeError(
+                    "no eligible announcement asset provider route for " + exchange
+                )
+            asset_routes[exchange] = AnnouncementRouteConfig(sources=sources)
+        routes["official_announcement_assets"] = asset_routes
+        acquisition_service.config = replace(
+            acquisition_config,
+            purpose_routes=routes,
+        )
+        return acquisition_service
+
+    def _get_announcement_asset_scheduler_commands(
+        self,
+        *,
+        initialize_schema: bool = False,
+    ):
+        """Build the one durable command plane used by every runtime adapter."""
+        from research.announcement_assets import (
+            ARCHIVE_BACKUP_JOB,
+            DAILY_UPDATE_JOB,
+            INTEGRITY_AUDIT_JOB,
+            LATEST_BACKFILL_JOB,
+            AnnualReportSchedulerCommandService,
+        )
+
+        access = self._get_announcement_asset_access(
+            initialize_schema=initialize_schema
+        )
+        signature = (
+            str(self._announcement_asset_access_signature),
+            access.config.config_fingerprint,
+        )
+        if (
+            getattr(self, "_announcement_asset_scheduler_commands", None) is None
+            or getattr(
+                self,
+                "_announcement_asset_scheduler_commands_signature",
+                None,
+            )
+            != signature
+        ):
+            runners = {
+                job_name: self._run_announcement_asset_operation
+                for job_name in (
+                    LATEST_BACKFILL_JOB,
+                    DAILY_UPDATE_JOB,
+                    INTEGRITY_AUDIT_JOB,
+                    ARCHIVE_BACKUP_JOB,
+                )
+            }
+
+            def readiness_gate(job_name: str) -> tuple[bool, tuple[str, ...]]:
+                if job_name != DAILY_UPDATE_JOB:
+                    return True, ()
+                report = access.readiness(operator=False)
+                return (
+                    bool(report.get("ready_for_daily")),
+                    tuple(str(item) for item in report.get("blockers", ())),
+                )
+
+            self._announcement_asset_scheduler_commands = (
+                AnnualReportSchedulerCommandService(
+                    repository=access.repository,
+                    config=access.config,
+                    config_version=access.config.config_fingerprint,
+                    runners=runners,
+                    readiness_gate=readiness_gate,
+                    acquisition_service=access.service.acquisition_service,
+                )
+            )
+            self._announcement_asset_scheduler_commands_signature = signature
+        return self._announcement_asset_scheduler_commands
+
+    @staticmethod
+    def _announcement_asset_bounded_config(config: Any, operation: Any) -> Any:
+        """Apply the accepted command bounds to the actual worker config."""
+        accepted = dict(
+            operation.scope.get("bounds")
+            or operation.progress.get("accepted_bounds")
+            or {}
+        )
+        discovery = replace(
+            config.discovery,
+            max_pages=int(accepted.get("max_pages", config.discovery.max_pages)),
+            max_requests=int(
+                accepted.get("max_requests", config.discovery.max_requests)
+            ),
+            max_windows=int(
+                accepted.get("max_windows", config.discovery.max_windows)
+            ),
+            max_instruments=int(
+                accepted.get("max_instruments", config.discovery.max_instruments)
+            ),
+            max_elapsed_seconds=int(
+                accepted.get(
+                    "max_elapsed_seconds",
+                    config.discovery.max_elapsed_seconds,
+                )
+            ),
+        )
+        acquisition = replace(
+            config.acquisition,
+            max_task_download_bytes=int(
+                accepted.get(
+                    "max_download_bytes",
+                    config.acquisition.max_task_download_bytes,
+                )
+            ),
+        )
+        return replace(config, discovery=discovery, acquisition=acquisition)
+
+    @staticmethod
+    def _announcement_asset_timestamp(value: Any) -> Optional[str]:
+        if value in (None, ""):
+            return None
+        if isinstance(value, datetime):
+            parsed = value
+        elif isinstance(value, date):
+            parsed = datetime.combine(value, datetime.min.time())
+        else:
+            try:
+                parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+            except ValueError:
+                return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat()
+
+    def _materialize_announcement_asset_universe(
+        self,
+        *,
+        repository: Any,
+        config: Any,
+        snapshot_at: str,
+    ):
+        """Materialize the local A-share master and revalidate a census pair."""
+        from research.announcement_assets import (
+            EligibilityPolicy,
+            ListedSecurityCensusSnapshot,
+            pair_with_listed_security_census,
+        )
+        from research.announcement_assets.models import canonical_json
+
+        reader = getattr(
+            self.db_ops,
+            "get_research_target_instruments_by_exchange_sync",
+            None,
+        )
+        if reader is None:
+            raise RuntimeError("synchronous A-share instrument master is unavailable")
+        rows: List[Dict[str, Any]] = []
+        counts: Dict[str, int] = {}
+        for exchange in config.exchanges:
+            exchange_rows = [
+                dict(item)
+                for item in reader(exchange, is_active=config.active_only)
+            ]
+            counts[exchange] = len(exchange_rows)
+            rows.extend(exchange_rows)
+        source_complete = bool(rows) and all(
+            counts.get(exchange, 0) > 0 for exchange in config.exchanges
+        )
+        updated_at_values = [
+            value
+            for item in rows
+            if (value := self._announcement_asset_timestamp(item.get("updated_at")))
+        ]
+        master_last_success_at = (
+            min(updated_at_values) if updated_at_values else None
+        )
+        version_payload = {
+            "schema_version": "announcement_asset_local_master.v1",
+            "counts": counts,
+            "items": sorted(
+                (
+                    {
+                        key: item.get(key)
+                        for key in (
+                            "instrument_id",
+                            "exchange",
+                            "type",
+                            "currency",
+                            "status",
+                            "is_active",
+                            "listed_date",
+                            "delisted_date",
+                            "updated_at",
+                            "data_version",
+                        )
+                    }
+                    for item in rows
+                ),
+                key=lambda item: str(item.get("instrument_id") or ""),
+            ),
+        }
+        master_version = hashlib.sha256(
+            canonical_json(version_payload).encode("utf-8")
+        ).hexdigest()
+        policy = EligibilityPolicy(
+            policy_version=config.universe_policy_version,
+            exchanges=config.exchanges,
+            instrument_type=config.instrument_type,
+            max_freshness_hours=config.master_data_max_age_hours,
+        )
+        candidate = policy.materialize(
+            rows,
+            master_data_version=master_version,
+            master_data_last_success_at=master_last_success_at,
+            snapshot_at=snapshot_at,
+            source_complete=source_complete,
+        )
+        census_row = repository.get_latest_complete_listed_security_census_snapshot()
+        if census_row is None:
+            return candidate
+        census_payload = census_row.get("instrument_rows") or {}
+        census = ListedSecurityCensusSnapshot(
+            census_snapshot_id=str(census_row["census_snapshot_id"]),
+            source=str(census_row["source"]),
+            query_boundary=dict(census_row.get("query_boundary") or {}),
+            completeness_watermark=str(census_row["completeness_watermark"]),
+            source_version=str(census_row["source_version"]),
+            snapshot_at=str(census_row["snapshot_at"]),
+            raw_payload_hash=str(census_row["raw_payload_hash"]),
+            status=str(census_row["status"]),
+            instruments=tuple(census_payload.get("items", ())),
+            metadata=dict(census_row.get("metadata") or {}),
+            schema_version=str(
+                census_row.get(
+                    "schema_version",
+                    "official_listed_security_census.v1",
+                )
+            ),
+        )
+        return pair_with_listed_security_census(
+            candidate,
+            census,
+            census_max_age_hours=config.listed_security_census_max_age_hours,
+        )
+
+    async def _produce_announcement_asset_listed_security_census(
+        self,
+        *,
+        repository: Any,
+        config: Any,
+        snapshot_at: str,
+        source: Any = None,
+    ):
+        """Refresh the independent official listed-stock denominator."""
+        from data_sources.a_share_official_stock_master import (
+            AShareOfficialStockMasterSource,
+        )
+        from research.announcement_assets import (
+            OfficialListedSecurityCensusBuilder,
+            OfficialListedSecurityCensusProducer,
+        )
+
+        source_config = dict(
+            self.config.get_nested("data_sources_config.exchange_official", {})
+            or {}
+        )
+        owned_source = source is None
+        if source is None:
+            source = AShareOfficialStockMasterSource(
+                "announcement_asset_official_listed_security_census",
+                config=source_config,
+            )
+        boundaries = {
+            "SSE": {
+                "endpoint": str(
+                    source_config.get("sse", {}).get("current_list_url")
+                    or "https://query.sse.com.cn/sseQuery/commonQuery.do"
+                ),
+                "stock_types": list(
+                    source_config.get("sse", {}).get("stock_types")
+                    or [
+                        {"label": "main_board_a", "stock_type": "1"},
+                        {"label": "star_market", "stock_type": "8"},
+                    ]
+                ),
+                "company_status": str(
+                    source_config.get("sse", {}).get("company_status")
+                    or "2,4,5,7,8"
+                ),
+            },
+            "SZSE": {
+                "endpoint": str(
+                    source_config.get("szse", {}).get("current_list_url")
+                    or "https://www.szse.cn/api/report/ShowReport"
+                ),
+                "catalog_id": str(
+                    source_config.get("szse", {}).get("catalog_id") or "1110"
+                ),
+                "tab_key": str(
+                    source_config.get("szse", {}).get("tab_key") or "tab1"
+                ),
+            },
+            "BSE": {
+                "endpoint": str(
+                    source_config.get("bse", {}).get("current_list_url")
+                    or "https://www.bse.cn/nqxxController/nqxxCnzq.do"
+                ),
+                "typejb": str(
+                    source_config.get("bse", {}).get("typejb") or "T"
+                ),
+                "xxfcbj": str(
+                    source_config.get("bse", {}).get("xxfcbj") or "2"
+                ),
+            },
+        }
+        try:
+            if owned_source:
+                await source.initialize()
+            census = await OfficialListedSecurityCensusProducer(
+                source=source,
+                builder=OfficialListedSecurityCensusBuilder(
+                    exchanges=tuple(config.exchanges),
+                ),
+                query_boundaries=boundaries,
+            ).produce(snapshot_at=snapshot_at)
+            if census.is_complete:
+                repository.upsert_listed_security_census_snapshot(census.to_mapping())
+            else:
+                dm_logger.warning(
+                    "[AnnouncementAssets] Official listed-security census is partial; "
+                    "retaining the last complete snapshot: errors=%s",
+                    census.metadata.get("source_errors", {}),
+                )
+            return census
+        finally:
+            if owned_source:
+                await source.close()
+
+    def _refresh_announcement_asset_listed_security_census(
+        self,
+        *,
+        repository: Any,
+        config: Any,
+        snapshot_at: str,
+    ) -> None:
+        """Run the official census producer from the synchronous worker thread."""
+        try:
+            asyncio.run(
+                self._produce_announcement_asset_listed_security_census(
+                    repository=repository,
+                    config=config,
+                    snapshot_at=snapshot_at,
+                )
+            )
+        except Exception as exc:
+            dm_logger.warning(
+                "[AnnouncementAssets] Official listed-security census refresh "
+                "failed closed: %s",
+                exc,
+            )
+
+    def _run_announcement_asset_operation(self, operation: Any) -> Any:
+        """Execute one already-claimed durable operation with real services."""
+        from research.announcement_assets import (
+            ARCHIVE_BACKUP_JOB,
+            DAILY_UPDATE_JOB,
+            INTEGRITY_AUDIT_JOB,
+            LATEST_BACKFILL_JOB,
+            AnnouncementAssetIntegrityAuditService,
+            AnnouncementAssetService,
+            AnnualReportBootstrap,
+            AnnualReportDailyUpdater,
+            ProductionIntegrityRepairHandlers,
+        )
+        from research.announcement_assets.backup import AnnouncementAssetBackupService
+
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        config = self._announcement_asset_bounded_config(access.config, operation)
+        service = AnnouncementAssetService(
+            repository=access.repository,
+            config=config,
+            acquisition_service=access.service.acquisition_service,
+            attachment_retriever=access.service.attachment_retriever,
+        )
+        scope = dict(operation.scope)
+        if operation.operation_type == LATEST_BACKFILL_JOB:
+            from zoneinfo import ZoneInfo
+
+            from research.announcements import AnnouncementQuery, AnnouncementScope
+
+            as_of_value = scope.get("as_of")
+            as_of = (
+                date.fromisoformat(str(as_of_value)[:10])
+                if as_of_value
+                else datetime.now(ZoneInfo(config.timezone)).date()
+            )
+            snapshot_at = datetime.now(timezone.utc).isoformat()
+            self._refresh_announcement_asset_listed_security_census(
+                repository=access.repository,
+                config=config,
+                snapshot_at=snapshot_at,
+            )
+            snapshot = self._materialize_announcement_asset_universe(
+                repository=access.repository,
+                config=config,
+                snapshot_at=snapshot_at,
+            )
+
+            def repair_missing_instrument(
+                instrument_id: str,
+                source: str,
+                exchange: str,
+                start_date: str,
+                end_date: str,
+                fiscal_year: int,
+            ):
+                if service.acquisition_service is None:
+                    raise RuntimeError(
+                        "bootstrap targeted-repair service is not configured"
+                    )
+                return service.acquisition_service.acquire(
+                    AnnouncementQuery(
+                        purpose_key="official_announcement_assets",
+                        source=source,
+                        scope=AnnouncementScope(
+                            exchange=exchange,
+                            instrument_id=instrument_id,
+                            symbol=instrument_id.split(".", 1)[0],
+                            start_date=start_date,
+                            end_date=end_date,
+                            category="annual_report",
+                            page_size=config.discovery.page_size,
+                            max_pages=config.discovery.max_pages,
+                            preflight_page_bound=True,
+                            source_options={"fiscal_year": int(fiscal_year)},
+                        ),
+                    )
+                )
+
+            return AnnualReportBootstrap(
+                service=service,
+                repository=access.repository,
+                config=config,
+                acquisition_service=service.acquisition_service,
+            ).run(
+                snapshot=snapshot,
+                as_of=as_of,
+                repair=repair_missing_instrument,
+                operation_id=operation.operation_id,
+            )
+        if operation.operation_type == DAILY_UPDATE_JOB:
+            cutoff = scope.get("run_cutoff")
+            census_refreshed = False
+
+            def refresh_universe(refresh_cutoff: str):
+                nonlocal census_refreshed
+                if not census_refreshed:
+                    self._refresh_announcement_asset_listed_security_census(
+                        repository=access.repository,
+                        config=config,
+                        snapshot_at=refresh_cutoff,
+                    )
+                    census_refreshed = True
+                return self._materialize_announcement_asset_universe(
+                    repository=access.repository,
+                    config=config,
+                    snapshot_at=refresh_cutoff,
+                )
+
+            return AnnualReportDailyUpdater(
+                service=service,
+                repository=access.repository,
+                config=config,
+                acquisition_service=service.acquisition_service,
+            ).run(
+                run_cutoff=None if cutoff is None else str(cutoff),
+                operation_id=operation.operation_id,
+                universe_refresh=refresh_universe,
+            )
+        if operation.operation_type == INTEGRITY_AUDIT_JOB:
+            deletion_ids = tuple(scope.get("deletion_ids", ()))
+            action_flags = dict(scope.get("action_flags") or {})
+            read_only = bool(scope.get("read_only", True))
+            repair_handlers = {}
+            if not read_only:
+                repair_handlers = ProductionIntegrityRepairHandlers(
+                    repository=access.repository,
+                    config=config,
+                    service=service,
+                    operation_id=operation.operation_id,
+                    actor=str(operation.owner or operation.lease_owner or ""),
+                    request_fingerprint=str(
+                        scope.get("request_fingerprint") or ""
+                    ),
+                ).as_mapping()
+            return AnnouncementAssetIntegrityAuditService(
+                repository=access.repository,
+                config=config,
+                repair_handlers=repair_handlers,
+            ).run(
+                content_hashes=tuple(scope.get("content_hashes", ())),
+                deletion_ids=deletion_ids,
+                action_flags=action_flags,
+                operator_authorized=not read_only,
+                max_targets=int(
+                    scope.get("bounds", {}).get(
+                        "max_instruments",
+                        config.discovery.max_instruments,
+                    )
+                ),
+                persist=not read_only,
+                operation_id=operation.operation_id,
+            )
+        if operation.operation_type == ARCHIVE_BACKUP_JOB:
+            return AnnouncementAssetBackupService(
+                repository=access.repository,
+                config=config,
+            ).run()
+        raise ValueError("unsupported annual-report asset operation")
+
+    async def _start_and_execute_announcement_asset_job(
+        self,
+        job_name: str,
+        *,
+        trigger_kind: str,
+        scope: Optional[Mapping[str, Any]] = None,
+        bounds: Optional[Mapping[str, int]] = None,
+        action_flags: Optional[Mapping[str, bool]] = None,
+        principal_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Persist, audit, claim, and execute one shared-asset scheduler job."""
+        from research.announcement_assets import (
+            DAILY_UPDATE_JOB,
+            LATEST_BACKFILL_JOB,
+            SCHEDULER_SERVICE_PRINCIPAL,
+            AuthorizationBoundaryUnavailable,
+            CommandPrincipal,
+            daily_schedule_fingerprint,
+            latest_backfill_schedule_fingerprint,
+        )
+
+        def run() -> Dict[str, Any]:
+            commands = self._get_announcement_asset_scheduler_commands(
+                initialize_schema=False
+            )
+            config = commands.config
+            if not config.trusted_identity_enabled:
+                raise AuthorizationBoundaryUnavailable(
+                    "authorization_boundary_unavailable"
+                )
+            if not config.enabled:
+                raise RuntimeError("annual-report asset module is disabled")
+            normalized_scope = dict(scope or {})
+            if job_name == DAILY_UPDATE_JOB:
+                from zoneinfo import ZoneInfo
+
+                normalized_scope.setdefault(
+                    "run_cutoff",
+                    datetime.now(ZoneInfo(config.timezone)).isoformat(),
+                )
+                normalized_scope.update(
+                    {
+                        "schedule_timezone": config.timezone,
+                        "schedule_cron": config.jobs.daily_cron,
+                        "overlap_days": config.discovery.overlap_days,
+                        "catch_up_max_days": config.daily_catch_up_max_days,
+                        "minimum_runs_per_calendar_day": (
+                            config.daily_min_runs_per_calendar_day
+                        ),
+                        "cadence_fingerprint": daily_schedule_fingerprint(config),
+                    }
+                )
+            elif job_name == LATEST_BACKFILL_JOB:
+                normalized_scope.update(
+                    {
+                        "manual_only": True,
+                        "cron": None,
+                        "schedule_timezone": config.timezone,
+                        "cadence_fingerprint": (
+                            latest_backfill_schedule_fingerprint(config)
+                        ),
+                    }
+                )
+            trigger = str(trigger_kind).strip().lower()
+            if trigger == "cron":
+                effective_principal_id = str(principal_id or "").strip()
+                if effective_principal_id != SCHEDULER_SERVICE_PRINCIPAL:
+                    raise AuthorizationBoundaryUnavailable(
+                        "scheduler_service_identity_unavailable"
+                    )
+                service_identity = True
+            else:
+                effective_principal_id = str(principal_id or "").strip()
+                if not effective_principal_id:
+                    raise AuthorizationBoundaryUnavailable(
+                        "manual_operator_identity_unavailable"
+                    )
+                if effective_principal_id == SCHEDULER_SERVICE_PRINCIPAL:
+                    raise AuthorizationBoundaryUnavailable(
+                        "scheduler_service_identity_requires_cron"
+                    )
+                service_identity = False
+            principal = CommandPrincipal(
+                principal_id=effective_principal_id,
+                permissions=frozenset({config.operator_permission}),
+                authenticated=True,
+                service_identity=service_identity,
+            )
+            commands.preflight_start(
+                job_name,
+                principal=principal,
+                trigger_kind=trigger_kind,
+                scope=normalized_scope,
+                bounds=bounds,
+                action_flags=action_flags,
+            )
+            commands.repository.initialize_schema()
+            started = commands.start(
+                job_name,
+                principal=principal,
+                trigger_kind=trigger_kind,
+                scope=normalized_scope,
+                bounds=bounds,
+                action_flags=action_flags,
+            )
+            completed = commands.execute(started.run_id, principal=principal)
+            return {
+                "schema_version": "annual_report_asset_job_execution.v1",
+                "run_id": completed.operation_id,
+                "job_name": completed.operation_type,
+                "status": completed.status.value,
+                "stage": None if completed.stage is None else completed.stage.value,
+                "outcome": (
+                    None if completed.outcome is None else completed.outcome.value
+                ),
+                "attempt": completed.attempt,
+                "reused": started.reused,
+                "progress": dict(completed.progress),
+                "diagnostics": dict(completed.diagnostics),
+                "config_version": started.config_version,
+            }
+
+        return await asyncio.to_thread(run)
+
+    async def run_annual_report_asset_latest_backfill(
+        self,
+        *,
+        as_of: Optional[str] = None,
+        bounds: Optional[Mapping[str, int]] = None,
+        trigger_kind: str = "manual",
+        principal_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        from research.announcement_assets import LATEST_BACKFILL_JOB
+
+        scope = {} if as_of is None else {"as_of": str(as_of)}
+        return await self._start_and_execute_announcement_asset_job(
+            LATEST_BACKFILL_JOB,
+            trigger_kind=trigger_kind,
+            scope=scope,
+            bounds=bounds,
+            principal_id=principal_id,
+        )
+
+    async def run_annual_report_asset_daily_update(
+        self,
+        *,
+        run_cutoff: Optional[str] = None,
+        bounds: Optional[Mapping[str, int]] = None,
+        trigger_kind: str = "cron",
+        expected_schedule: Optional[Mapping[str, Any]] = None,
+        principal_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        from research.announcement_assets import DAILY_UPDATE_JOB
+
+        commands = self._get_announcement_asset_scheduler_commands(
+            initialize_schema=False
+        )
+        config = commands.config
+        expected = dict(expected_schedule or {})
+        actual = {
+            "timezone": config.timezone,
+            "overlap_days": config.discovery.overlap_days,
+            "catch_up_max_days": config.daily_catch_up_max_days,
+            "minimum_runs_per_calendar_day": config.daily_min_runs_per_calendar_day,
+            "universe_refresh_cadence": config.universe_refresh_cadence,
+        }
+        mismatches = {
+            key: {"expected": value, "configured": actual.get(key)}
+            for key, value in expected.items()
+            if value is not None and value != actual.get(key)
+        }
+        if mismatches:
+            raise ValueError(f"annual-report daily schedule mismatch: {mismatches}")
+        scope = {} if run_cutoff is None else {"run_cutoff": str(run_cutoff)}
+        return await self._start_and_execute_announcement_asset_job(
+            DAILY_UPDATE_JOB,
+            trigger_kind=trigger_kind,
+            scope=scope,
+            bounds=bounds,
+            principal_id=principal_id,
+        )
+
+    async def run_annual_report_asset_integrity_audit(
+        self,
+        *,
+        content_hashes: Sequence[str] = (),
+        deletion_ids: Sequence[str] = (),
+        action_flags: Optional[Mapping[str, bool]] = None,
+        bounds: Optional[Mapping[str, int]] = None,
+        trigger_kind: str = "manual",
+        principal_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        from research.announcement_assets import INTEGRITY_AUDIT_JOB
+
+        return await self._start_and_execute_announcement_asset_job(
+            INTEGRITY_AUDIT_JOB,
+            trigger_kind=trigger_kind,
+            scope={
+                "content_hashes": tuple(content_hashes),
+                "deletion_ids": tuple(deletion_ids),
+            },
+            bounds=bounds,
+            action_flags=action_flags,
+            principal_id=principal_id,
+        )
+
+    async def run_annual_report_asset_backup(
+        self,
+        *,
+        bounds: Optional[Mapping[str, int]] = None,
+        trigger_kind: str = "cron",
+        expected_recovery_policy: Optional[Mapping[str, str]] = None,
+        principal_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        from research.announcement_assets import ARCHIVE_BACKUP_JOB
+
+        commands = self._get_announcement_asset_scheduler_commands(
+            initialize_schema=False
+        )
+        expected = dict(expected_recovery_policy or {})
+        configured = {
+            "recovery_journal_retention_policy": (
+                commands.config.backup.recovery_journal_retention_policy
+            ),
+            "recovery_journal_integrity_policy": (
+                commands.config.backup.recovery_journal_integrity_policy
+            ),
+        }
+        if any(
+            value is not None and value != configured.get(key)
+            for key, value in expected.items()
+        ):
+            raise ValueError("annual-report backup recovery policy mismatch")
+        return await self._start_and_execute_announcement_asset_job(
+            ARCHIVE_BACKUP_JOB,
+            trigger_kind=trigger_kind,
+            bounds=bounds,
+            principal_id=principal_id,
+        )
+
+    def _get_announcement_consumer_coordinator(
+        self,
+        *,
+        initialize_schema: bool = False,
+    ):
+        """Build the durable front-facing consumer command coordinator lazily."""
+        from research.announcement_assets import (
+            AnnualReportConsumerRequestCoordinator,
+            ConsumerProcessingProfile,
+        )
+        from research.broker_risk_control import (
+            BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+        )
+
+        access = self._get_announcement_asset_access(
+            initialize_schema=initialize_schema
+        )
+        modules = getattr(self.research_config, "modules", {}) or {}
+        profile_config = modules.get("business_profile_evidence", {}) or {}
+        broker_config = modules.get("broker_risk_control_reports", {}) or {}
+        configuration_fingerprint = hashlib.sha256(
+            json.dumps(
+                {
+                    "business_profile": profile_config,
+                    "broker_risk_control": broker_config,
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                default=str,
+            ).encode("utf-8")
+        ).hexdigest()
+        signature = (
+            str(self._announcement_asset_access_signature),
+            configuration_fingerprint,
+        )
+        if (
+            self._announcement_consumer_coordinator is None
+            or self._announcement_consumer_coordinator_signature != signature
+        ):
+            previous_coordinator = self._announcement_consumer_coordinator
+            if previous_coordinator is not None:
+                previous_coordinator.close()
+
+            def business_profile_processor(asset, request):
+                return asyncio.run(
+                    self._process_business_profile_annual_report_asset(
+                        asset,
+                        request,
+                    )
+                )
+
+            def broker_processor(asset, request):
+                return self._process_broker_risk_control_annual_report_asset(
+                    asset,
+                    request,
+                )
+
+            self._announcement_consumer_coordinator = (
+                AnnualReportConsumerRequestCoordinator(
+                    access=access,
+                    profiles=(
+                        ConsumerProcessingProfile(
+                            consumer="business_profile",
+                            profile_name="default",
+                            parser_version="business_profile_annual_report_process.v1",
+                            parameters={
+                                "selection_policy": "latest_annual_only",
+                                "document_family": "annual_report",
+                            },
+                            configuration_fingerprint=configuration_fingerprint,
+                            processor=business_profile_processor,
+                        ),
+                        ConsumerProcessingProfile(
+                            consumer="broker_risk_control",
+                            profile_name="default",
+                            parser_version=(
+                                BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+                            ),
+                            parameters={
+                                "source_policy": "shared_effective_annual_report",
+                                "document_family": "annual_report",
+                            },
+                            configuration_fingerprint=configuration_fingerprint,
+                            processor=broker_processor,
+                        ),
+                    ),
+                )
+            )
+            self._announcement_consumer_coordinator_signature = signature
+        return self._announcement_consumer_coordinator
+
+    async def _process_business_profile_annual_report_asset(
+        self,
+        asset: Mapping[str, Any],
+        request: Any,
+    ):
+        from research.announcement_assets import ConsumerProcessingOutcome
+        from research.announcement_assets.models import stable_id
+
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        dependency = module.get("annual_report_asset_dependency", {}) or {}
+        mode = str(dependency.get("mode", "legacy")).strip().lower()
+        if mode not in {"dual_read", "shared_only"}:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code="business_profile_shared_cutover_disabled",
+            )
+        result = await self.run_business_profile_backfill(
+            knowledge_cutoff=request.knowledge_cutoff,
+            selection_policy="latest_annual_only",
+            instrument_ids=[str(asset["instrument_id"])],
+            bound_annual_report_asset=dict(asset),
+            force=False,
+        )
+        status = str(result.get("status") or result.get("pipeline_status") or "")
+        bound_result = dict(result.get("bound_shared_asset") or {})
+        binding_fields = (
+            "asset_id",
+            "observation_version",
+            "content_hash",
+        )
+        binding_matches = all(
+            str(bound_result.get(field) or "")
+            == str(asset.get(field) or "")
+            for field in binding_fields
+        )
+        if status in {"success", "completed"} and not binding_matches:
+            return ConsumerProcessingOutcome(
+                status="failed",
+                reason_code="business_profile_result_asset_binding_mismatch",
+                diagnostics={"status": status},
+                metadata={"business_result": result},
+            )
+        if status not in {"success", "completed"}:
+            return ConsumerProcessingOutcome(
+                status=(
+                    "blocked"
+                    if status in {"disabled", "not_ready", "blocked", "unavailable"}
+                    else "failed"
+                ),
+                reason_code=str(
+                    result.get("reason") or "business_profile_processing_failed"
+                ),
+                diagnostics={"status": status},
+                metadata={"business_result": result},
+            )
+        return ConsumerProcessingOutcome(
+            status="completed",
+            result_identity=stable_id(
+                "business-profile-result",
+                asset.get("asset_id"),
+                asset.get("observation_version"),
+                asset.get("content_hash"),
+            ),
+            metadata={"business_result": result},
+        )
+
+    def _process_broker_risk_control_annual_report_asset(
+        self,
+        asset: Mapping[str, Any],
+        request: Any,
+    ):
+        from research.announcement_assets import ConsumerProcessingOutcome
+        from research.announcement_assets.models import stable_id
+
+        if self.research_storage is None:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code="research_storage_unavailable",
+            )
+        broker_cfg = self.research_config.modules.get(
+            "broker_risk_control_reports", {}
+        )
+        dependency = broker_cfg.get("annual_report_asset_dependency", {}) or {}
+        mode = str(dependency.get("mode", "legacy")).strip().lower()
+        if mode not in {"dual_read", "shared_only"}:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code="broker_shared_cutover_disabled",
+            )
+        from research.broker_risk_control import (
+            BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+            BrokerRiskControlReportSyncService,
+        )
+        from scripts.dev_validation.backfill_broker_risk_control_reports import (
+            _financial_storage_scope,
+            select_broker_instruments,
+        )
+
+        instrument_id = str(asset.get("instrument_id") or "")
+        exchange = instrument_id.rsplit(".", 1)[-1].upper()
+        exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
+            exchange, exchange
+        )
+        instruments = select_broker_instruments(
+            self.db_ops,
+            exchanges=[exchange],
+            limit=0,
+            instrument_ids=[instrument_id],
+            storage=self.research_storage,
+            require_confirmed_scope=True,
+        )
+        if not instruments:
+            return ConsumerProcessingOutcome(
+                status="blocked",
+                reason_code="instrument_not_confirmed_listed_broker",
+            )
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        archive_root = (
+            broker_cfg.get("storage", {}).get("archive_root")
+            or "data/filings/financial_statements/broker_risk_control"
+        )
+        service = BrokerRiskControlReportSyncService(
+            storage=self.research_storage,
+            announcement_service=None,
+            payload_fetcher=None,
+            archive_root=archive_root,
+            source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+            shared_asset_access=access,
+            annual_report_asset_mode="shared_only",
+        )
+        event = {
+            "event_type": "added",
+            "asset_id": asset.get("asset_id"),
+            "instrument_id": instrument_id,
+            "fiscal_year": asset.get("fiscal_year"),
+            "source": asset.get("source"),
+            "source_announcement_id": asset.get("source_announcement_id"),
+            "attachment_id": asset.get("attachment_id"),
+            "observation_version": asset.get("observation_version"),
+            "content_hash": asset.get("content_hash"),
+            "trigger_origin": "consumer_request",
+        }
+        with _financial_storage_scope(self.research_storage):
+            result = service.process_shared_asset_event(
+                event,
+                instrument=instruments[0],
+                tier="hot",
+                dry_run=False,
+                bound_asset=asset,
+            )
+        status = str(result.get("status") or "")
+        if status != "success" or int(result.get("parse_failures") or 0) > 0:
+            return ConsumerProcessingOutcome(
+                status="failed" if status == "failed" else "blocked",
+                reason_code="broker_risk_control_processing_failed",
+                diagnostics={"status": status},
+                metadata={"business_result": result},
+            )
+        return ConsumerProcessingOutcome(
+            status="completed",
+            result_identity=stable_id(
+                "broker-risk-control-result",
+                asset.get("asset_id"),
+                asset.get("observation_version"),
+                asset.get("content_hash"),
+            ),
+            metadata={"business_result": result},
+        )
 
     def _get_or_create_llm_client(self):
         """Return the application-owned common LLM client."""
@@ -1941,6 +3069,7 @@ class DataManager:
         max_attempts: int = 3,
         stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
         should_stop: Optional[Callable[[], bool]] = None,
+        bound_annual_report_asset: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Run explicitly scoped historical or specialist work through the same queues."""
 
@@ -2174,6 +3303,7 @@ class DataManager:
             force=force,
             selection_policy=policy,
             should_stop=should_stop,
+            bound_annual_report_asset=bound_annual_report_asset,
         )
         if derived_bootstrap_start:
             result["bootstrap_start"] = {
@@ -2314,6 +3444,29 @@ class DataManager:
         )
 
         async def discovery_runner(**kwargs: Any) -> Mapping[str, Any]:
+            category = str(kwargs.get("category") or "annual_report")
+            if (
+                category == "annual_report"
+                and business_profile_asset_mode == "shared_only"
+            ):
+                if shared_asset_access is None:
+                    raise RuntimeError(
+                        "shared-only business-profile discovery has no asset access"
+                    )
+                from research.business_profile_production_operations import (
+                    discover_business_profile_shared_annual_reports,
+                )
+
+                return await asyncio.to_thread(
+                    discover_business_profile_shared_annual_reports,
+                    storage=self.research_storage,
+                    shared_asset_access=shared_asset_access,
+                    knowledge_cutoff=str(
+                        kwargs.get("end_date") or cutoff
+                    ),
+                    page_size=int(kwargs.get("page_size", 500)),
+                    max_pages=int(kwargs.get("max_pages_per_market", 20)),
+                )
             return await self.run_business_profile_index_discovery(
                 exchanges=kwargs.get("exchanges") or list(default_exchanges),
                 start_date=kwargs.get("start_date"),
@@ -2325,7 +3478,7 @@ class DataManager:
                 dry_run=False,
                 resumable_windows=True,
                 max_windows_per_market=int(kwargs.get("max_windows_per_market", 2)),
-                category=str(kwargs.get("category") or "annual_report"),
+                category=category,
                 max_targeted_repairs=int(kwargs.get("max_targeted_repairs", 0)),
                 targeted_repair_lookback_years=int(
                     kwargs.get("targeted_repair_lookback_years", 3)
@@ -2371,6 +3524,13 @@ class DataManager:
                     semantic.get("promotion_manifests") or {}
                 ),
             }
+            bound_shared_asset = dict(
+                (item.get("metadata") or {}).get("bound_shared_asset") or {}
+            )
+            if bound_shared_asset:
+                call_kwargs["source_file_ids"] = [
+                    f"shared-asset:{bound_shared_asset['asset_id']}"
+                ]
             acquisition = None
             if stage == "acquire":
                 def acquire_bound_frontier() -> Mapping[str, Any]:
@@ -2378,6 +3538,23 @@ class DataManager:
                         return frontier_acquirer.acquire(item)
 
                 acquisition = await asyncio.to_thread(acquire_bound_frontier)
+                if (
+                    bound_shared_asset
+                    and acquisition.get("status") == "metadata_only"
+                ):
+                    return {
+                        "status": "blocked",
+                        "reason": acquisition.get("reason_code")
+                        or "bound_shared_asset_unavailable",
+                        "bound_acquisition": dict(acquisition),
+                        "quality": {
+                            "stage_ready": False,
+                            "blocking_machine_rework": 1,
+                            "machine_rework_reasons": {
+                                "bound_shared_asset_unavailable": 1
+                            },
+                        },
+                    }
             result = await self.run_business_profile_semantic_production(
                 mode=mode,
                 write_coordinator=write_coordinator,
@@ -2410,9 +3587,27 @@ class DataManager:
             or semantic.get("checkpoint_root")
             or "data/checkpoints/business_profile_async"
         )
+        configured_storage = getattr(self.research_config, "storage", None)
+        configured_db_path = getattr(configured_storage, "db_path", None)
+        business_profile_cfg = self.research_config.modules.get(
+            "business_profile_evidence", {}
+        )
+        business_profile_dependency = business_profile_cfg.get(
+            "annual_report_asset_dependency", {}
+        )
+        business_profile_asset_mode = str(
+            business_profile_dependency.get("mode", "legacy")
+        ).strip().lower()
+        shared_asset_access = (
+            self._get_announcement_asset_access(initialize_schema=True)
+            if business_profile_asset_mode in {"dual_read", "shared_only"}
+            and isinstance(configured_db_path, (str, os.PathLike))
+            else None
+        )
         repository = BusinessProfileWorkRepository(
             self.research_storage,
             checkpoint_root=checkpoint_root,
+            shared_asset_access=shared_asset_access,
         )
         from research.business_profile_archive import (
             BusinessProfileDocumentArchiveService,
@@ -2423,6 +3618,7 @@ class DataManager:
             archive_service=BusinessProfileDocumentArchiveService.from_research_config(
                 storage=self.research_storage,
                 research_config=self.research_config,
+                shared_asset_access=shared_asset_access,
             ),
         )
         service = BusinessProfileAsyncProductionService(
@@ -2529,6 +3725,7 @@ class DataManager:
         checkpoint_path: Optional[str] = None,
         selection_policy: str = "latest_annual_only",
         write_coordinator: Optional[Any] = None,
+        source_file_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -2610,6 +3807,32 @@ class DataManager:
                 ),
             }
         repository = BusinessProfileRepository(self.research_storage)
+        normalized_source_file_ids = {
+            str(item).strip() for item in (source_file_ids or []) if str(item).strip()
+        }
+
+        def manifest_loader(instrument_id: str) -> Sequence[Mapping[str, Any]]:
+            source_repository = getattr(
+                self.research_storage, "financial_statements", None
+            )
+            if source_repository is not None and hasattr(
+                source_repository, "get_source_file_manifests"
+            ):
+                rows = source_repository.get_source_file_manifests(
+                    instrument_id=instrument_id
+                )
+            else:
+                rows = self.research_storage.get_financial_source_file_manifests(
+                    instrument_id=instrument_id
+                )
+            if not normalized_source_file_ids:
+                return rows
+            return tuple(
+                item
+                for item in rows
+                if str(item.get("source_file_id") or "")
+                in normalized_source_file_ids
+            )
         instruments = tuple(
             convert_to_database_format(item) for item in (instrument_ids or []) if item
         )
@@ -2674,6 +3897,7 @@ class DataManager:
                         else min(1, config.budgets.max_documents - 1)
                     ),
                     selection_policy=selection_policy,
+                    manifest_loader=manifest_loader,
                 )
                 if mode != "report"
                 else ""
@@ -2703,6 +3927,7 @@ class DataManager:
             ),
             planned_disclosure_acquirer=planned_disclosure_acquirer,
             selection_policy=selection_policy,
+            manifest_loader=manifest_loader,
         )
 
         scope = SemanticProductionScope(
@@ -2777,14 +4002,11 @@ class DataManager:
     ) -> List[Dict[str, Any]]:
         """List reusable annual-report PDFs from the canonical manifest catalog."""
 
-        storage = self._require_research_storage()
-        from research.annual_report_assets import AnnualReportAssetCatalog
-
         normalized_id = (
             convert_to_database_format(instrument_id) if instrument_id else None
         )
         return await asyncio.to_thread(
-            AnnualReportAssetCatalog(storage).list_assets,
+            self._get_annual_report_compatibility_catalog().list_assets,
             instrument_id=normalized_id,
             report_period=report_period,
             filing_id=filing_id,
@@ -2793,6 +4015,280 @@ class DataManager:
             active_only=active_only,
             validate_files=validate_files,
         )
+
+    def _get_annual_report_compatibility_catalog(self):
+        """Return the migration adapter with explicit shared-repository wiring."""
+        storage = self._require_research_storage()
+        from research.annual_report_assets import AnnualReportAssetCatalog
+
+        modules = getattr(self.research_config, "modules", {}) or {}
+        business_profile = modules.get("business_profile_evidence", {}) or {}
+        dependency = business_profile.get("annual_report_asset_dependency", {}) or {}
+        mode = str(dependency.get("mode", "legacy")).strip().lower()
+        shared_access = None
+        if mode != "legacy":
+            shared_access = self._get_announcement_asset_access(
+                initialize_schema=False
+            )
+        return AnnualReportAssetCatalog(
+            storage,
+            shared_asset_access=shared_access,
+            mode=mode,
+        )
+
+    async def list_shared_annual_report_assets(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        fiscal_year: Optional[int] = None,
+        source: Optional[str] = None,
+        source_announcement_id: Optional[str] = None,
+        integrity: Optional[str] = None,
+        acquisition_status: Optional[str] = None,
+        effective_state: Optional[str] = None,
+        asset_availability: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """List shared annual-report assets with a zero-network local read."""
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return {"items": [], "returned": 0, "limit": limit, "offset": offset}
+        return await asyncio.to_thread(
+            access.list_assets,
+            instrument_id=instrument_id,
+            fiscal_year=fiscal_year,
+            source=source,
+            source_announcement_id=source_announcement_id,
+            integrity=integrity,
+            acquisition_status=acquisition_status,
+            effective_state=effective_state,
+            asset_availability=asset_availability,
+            limit=limit,
+            offset=offset,
+        )
+
+    async def get_shared_annual_report_asset(
+        self,
+        instrument_id: str,
+        *,
+        fiscal_year: Optional[int] = None,
+        knowledge_cutoff: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the shared effective asset without provider or file writes."""
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return None
+        return await asyncio.to_thread(
+            access.get_effective_asset,
+            instrument_id,
+            fiscal_year=fiscal_year,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+
+    async def ensure_shared_annual_report(self, request: Any) -> Dict[str, Any]:
+        """Run a bounded local-first ensure and return its durable projection."""
+        access = self._get_announcement_asset_access(initialize_schema=True)
+        return await asyncio.to_thread(access.ensure, request)
+
+    async def get_shared_annual_report_asset_request(
+        self,
+        asset_request_id: str,
+        *,
+        principal: str,
+    ) -> Optional[Dict[str, Any]]:
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return None
+        return await asyncio.to_thread(
+            access.get_asset_request,
+            asset_request_id,
+            principal=principal,
+        )
+
+    async def cancel_shared_annual_report_asset_request(
+        self,
+        asset_request_id: str,
+        *,
+        principal: str,
+    ) -> Dict[str, Any]:
+        access = self._get_announcement_asset_access(initialize_schema=True)
+        return await asyncio.to_thread(
+            access.cancel_asset_request,
+            asset_request_id,
+            principal=principal,
+        )
+
+    async def get_shared_annual_report_consumer_request(
+        self,
+        consumer_request_id: str,
+        *,
+        principal: str,
+        operator: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return None
+        coordinator = self._get_announcement_consumer_coordinator(
+            initialize_schema=False
+        )
+        return await asyncio.to_thread(
+            coordinator.refresh,
+            consumer_request_id,
+            principal=principal,
+            operator=operator,
+        )
+
+    async def get_shared_annual_report_consumer_request_identity(
+        self,
+        consumer_request_id: str,
+        *,
+        principal: Optional[str],
+    ) -> Optional[Dict[str, str]]:
+        """Read authorization fields without expiring or advancing a request."""
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return None
+        return await asyncio.to_thread(
+            access.repository.get_consumer_request_identity,
+            consumer_request_id,
+            principal=principal,
+        )
+
+    async def cancel_shared_annual_report_consumer_request(
+        self,
+        consumer_request_id: str,
+        *,
+        principal: str,
+        cooperative_stop_accepted: bool = False,
+        operator: bool = False,
+    ) -> tuple[Dict[str, Any], str]:
+        coordinator = self._get_announcement_consumer_coordinator(
+            initialize_schema=True
+        )
+        return await asyncio.to_thread(
+            coordinator.request_cancellation,
+            consumer_request_id,
+            principal=principal,
+            operator=operator,
+        )
+
+    async def process_shared_business_profile_annual_report(
+        self,
+        request: Any,
+        *,
+        profile_name: str = "default",
+        expected_processing_fingerprint: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        coordinator = self._get_announcement_consumer_coordinator(
+            initialize_schema=True
+        )
+        result = await asyncio.to_thread(
+            coordinator.start,
+            request,
+            consumer="business_profile",
+            profile_name=profile_name,
+            expected_processing_fingerprint=expected_processing_fingerprint,
+        )
+        return {**dict(result.projection), "_http_status": result.http_status}
+
+    async def process_shared_broker_risk_control_annual_report(
+        self,
+        request: Any,
+        *,
+        profile_name: str = "default",
+        expected_processing_fingerprint: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        coordinator = self._get_announcement_consumer_coordinator(
+            initialize_schema=True
+        )
+        result = await asyncio.to_thread(
+            coordinator.start,
+            request,
+            consumer="broker_risk_control",
+            profile_name=profile_name,
+            expected_processing_fingerprint=expected_processing_fingerprint,
+        )
+        return {**dict(result.projection), "_http_status": result.http_status}
+
+    async def get_shared_annual_report_readiness(
+        self,
+        *,
+        operator: bool = False,
+    ) -> Dict[str, Any]:
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return {
+                "status": "not_initialized",
+                "ready_for_reads": True,
+                "ready_for_daily": False,
+                "ready_for_deletion": False,
+                "blockers": ["catalog_not_initialized"],
+                "warnings": [],
+                "summary": {},
+                "operator_diagnostics": {} if operator else None,
+            }
+        return await asyncio.to_thread(access.readiness, operator=operator)
+
+    async def get_shared_annual_report_content(
+        self,
+        asset_id: str,
+    ) -> Dict[str, Any]:
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            raise FileNotFoundError("annual-report catalog is not initialized")
+        return await asyncio.to_thread(access.content_handle, asset_id)
+
+    async def get_shared_annual_report_exact_observation_content(
+        self,
+        request: Any,
+        *,
+        authorized_internal: bool = False,
+    ) -> Dict[str, Any]:
+        """Open one retained exact observation through the non-public lease path."""
+        if not authorized_internal:
+            raise PermissionError("exact annual-report content is internal-only")
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            raise FileNotFoundError("annual-report catalog is not initialized")
+        return await asyncio.to_thread(
+            access.exact_observation_handle,
+            request,
+            authorized=True,
+        )
+
+    async def resume_shared_annual_report_pending_work(
+        self,
+        *,
+        limit: int = 100,
+    ) -> Dict[str, Any]:
+        """Explicitly recover durable asset and consumer work after restart."""
+        bounded_limit = max(1, min(int(limit), 1000))
+        access = self._get_announcement_asset_access(initialize_schema=False)
+        if not access.repository.schema_initialized():
+            return {
+                "asset_operation_ids": [],
+                "consumer_request_ids": [],
+                "resumed": 0,
+            }
+        coordinator = self._get_announcement_consumer_coordinator(
+            initialize_schema=False
+        )
+        def resume_pending_work():
+            local_asset_ids = access.service.resume_pending_ensure_operations(
+                limit=bounded_limit,
+            )
+            local_consumer_ids = coordinator.resume_pending(limit=bounded_limit)
+            return local_asset_ids, local_consumer_ids
+
+        asset_operation_ids, consumer_request_ids = await asyncio.to_thread(
+            resume_pending_work
+        )
+        return {
+            "asset_operation_ids": list(asset_operation_ids),
+            "consumer_request_ids": list(consumer_request_ids),
+            "resumed": len(asset_operation_ids) + len(consumer_request_ids),
+        }
 
     async def get_annual_report_asset(
         self,
@@ -2804,11 +4300,8 @@ class DataManager:
     ) -> Optional[Dict[str, Any]]:
         """Return one latest reusable annual report, optionally for one period."""
 
-        storage = self._require_research_storage()
-        from research.annual_report_assets import AnnualReportAssetCatalog
-
         return await asyncio.to_thread(
-            AnnualReportAssetCatalog(storage).get_asset,
+            self._get_annual_report_compatibility_catalog().get_asset,
             convert_to_database_format(instrument_id),
             report_period=report_period,
             knowledge_cutoff=knowledge_cutoff,
@@ -2860,13 +4353,66 @@ class DataManager:
             valuation_date=cutoff,
             historical_request=as_of_date is not None,
         )
-        return await self._resolve_business_profile_context(
+        payload = await self._resolve_business_profile_context(
             storage,
             normalized_id,
             valuation_date=cutoff,
             industry_membership=membership,
             include_candidates=include_candidates,
         )
+        payload["source_assets"] = {"annual_report_asset": None}
+        payload["consumer_processing_status"] = None
+        try:
+            access = self._get_announcement_asset_access(initialize_schema=False)
+            if not access.repository.schema_initialized():
+                return payload
+            knowledge_cutoff = f"{cutoff}T23:59:59+08:00"
+            def load_shared_lineage():
+                local_asset = access.get_effective_asset(
+                    normalized_id,
+                    knowledge_cutoff=knowledge_cutoff,
+                )
+                if local_asset is None or not local_asset.get("asset_id"):
+                    return local_asset, []
+                local_rows = access.repository.list_consumer_processing(
+                    asset_id=str(local_asset["asset_id"]),
+                    consumer="business_profile",
+                )
+                return local_asset, local_rows
+
+            asset, processing_rows = await asyncio.to_thread(load_shared_lineage)
+            payload["source_assets"] = {"annual_report_asset": asset}
+            if asset is None or not asset.get("asset_id"):
+                return payload
+            if not processing_rows:
+                return payload
+            processing = processing_rows[-1]
+            processing_status = str(processing.get("status") or "not_started")
+            if processing_status == "current":
+                result_state = "current"
+            elif processing_status == "stale":
+                result_state = "stale"
+            elif processing_status == "failed" and processing.get(
+                "derived_identity"
+            ):
+                result_state = "stale"
+            else:
+                result_state = "reprocessing"
+            payload["consumer_processing_status"] = {
+                "consumer": "business_profile",
+                "processing_status": processing_status,
+                "consumer_result_state": result_state,
+                "parser_version": processing.get("parser_version"),
+                "reason_code": processing.get("error_code"),
+                "updated_at": processing.get("updated_at"),
+            }
+        except (OSError, RuntimeError, ValueError) as exc:
+            dm_logger.warning(
+                "[DataManager] shared annual-report lineage unavailable for %s: %s",
+                normalized_id,
+                exc,
+            )
+        return payload
 
     async def get_research_company_business_profile_history(
         self,
@@ -5849,8 +7395,10 @@ class DataManager:
                 "reason": "research storage is not initialized",
             }
 
-        module_cfg = self.research_config.modules.get("financial_statements", {})
-        if not module_cfg.get("enabled", False):
+        financial_module_cfg = self.research_config.modules.get(
+            "financial_statements", {}
+        )
+        if not financial_module_cfg.get("enabled", False):
             return {
                 "status": "disabled",
                 "reason": "research financial_statements module is disabled",
@@ -6001,8 +7549,10 @@ class DataManager:
                 "status": "unavailable",
                 "reason": "research storage is not initialized",
             }
-        module_cfg = self.research_config.modules.get("financial_statements", {})
-        if not module_cfg.get("enabled", False):
+        financial_module_cfg = self.research_config.modules.get(
+            "financial_statements", {}
+        )
+        if not financial_module_cfg.get("enabled", False):
             return {
                 "status": "disabled",
                 "reason": "research financial_statements module is disabled",
@@ -6078,14 +7628,19 @@ class DataManager:
                 "reason": "research storage is not initialized",
                 "mode": "incremental_update",
             }
-        module_cfg = self.research_config.modules.get("financial_statements", {})
-        if not module_cfg.get("enabled", False):
+        financial_module_cfg = self.research_config.modules.get(
+            "financial_statements", {}
+        )
+        if not financial_module_cfg.get("enabled", False):
             return {
                 "status": "disabled",
                 "reason": "research financial_statements module is disabled",
                 "mode": "incremental_update",
             }
-        broker_cfg = module_cfg.get("broker_risk_control_reports", {})
+        broker_cfg = self.research_config.modules.get(
+            "broker_risk_control_reports",
+            financial_module_cfg.get("broker_risk_control_reports", {}),
+        )
         if not broker_cfg.get("enabled", False):
             return {
                 "status": "disabled",
@@ -6154,6 +7709,15 @@ class DataManager:
             else include_standalone_supplement
         )
         tier = str(broker_cfg.get("storage", {}).get("incremental_tier") or "hot")
+        dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
+        annual_report_asset_mode = str(
+            dependency_cfg.get("mode", "legacy")
+        ).strip().lower()
+        shared_asset_access = (
+            self._get_announcement_asset_access(initialize_schema=True)
+            if annual_report_asset_mode in {"dual_read", "shared_only"}
+            else None
+        )
 
         from scripts.dev_validation.backfill_broker_risk_control_reports import (
             run_broker_risk_control_backfill,
@@ -6186,6 +7750,8 @@ class DataManager:
             include_standalone_supplement=include_supplement,
             archive_root=selected_archive_root,
             tier=tier,
+            shared_asset_access=shared_asset_access,
+            annual_report_asset_mode=annual_report_asset_mode,
         )
         result["mode"] = "incremental_update"
         result["elapsed_seconds"] = round((datetime.now() - started_at).total_seconds(), 3)
@@ -10110,6 +11676,13 @@ class DataManager:
             enriched["lineage"] = lineage
         selected_rows: Dict[str, Dict[str, Any]] = {}
         for canonical_name in BROKER_RISK_CONTROL_CANONICAL_FACTS:
+            if (
+                latest_facts.get(canonical_name) is not None
+                or enriched.get(canonical_name) is not None
+            ):
+                # Canonical structured facts are authoritative. PDF-derived
+                # broker facts are only a fallback and must not add lineage.
+                continue
             try:
                 rows = self._run_financial_storage_call(
                     storage,
@@ -10123,7 +11696,15 @@ class DataManager:
                 continue
             if not isinstance(rows, list):
                 continue
-            row = self._select_latest_broker_risk_control_fact(rows)
+            eligible_rows = [
+                row
+                for row in rows
+                if self._broker_risk_control_fact_is_current_eligible(
+                    instrument_id,
+                    row,
+                )
+            ]
+            row = self._select_latest_broker_risk_control_fact(eligible_rows)
             if row is None:
                 continue
             selected_rows[canonical_name] = row
@@ -10182,15 +11763,116 @@ class DataManager:
             )
         return enriched
 
-    @staticmethod
+    def _broker_risk_control_fact_is_current_eligible(
+        self,
+        instrument_id: str,
+        row: Dict[str, Any],
+    ) -> bool:
+        """Fail closed for annual-report PDF facts under a pending decision."""
+        from research.announcement_assets.models import EffectiveDecisionState
+        from research.broker_risk_control import (
+            BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        )
+
+        raw_fact = row.get("raw_fact") or {}
+        if not isinstance(raw_fact, dict) or raw_fact.get(
+            "source_profile"
+        ) != BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return True
+        research_config = getattr(self, "research_config", None)
+        modules = getattr(research_config, "modules", {}) or {}
+        financial_cfg = modules.get("financial_statements", {})
+        broker_cfg = modules.get(
+            "broker_risk_control_reports",
+            financial_cfg.get("broker_risk_control_reports", {}),
+        )
+        dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
+        dependency_mode = str(
+            dependency_cfg.get("mode", "legacy")
+        ).strip().lower()
+        shared_authoritative = dependency_mode == "shared_only"
+        report_period = str(row.get("report_period") or "")
+        try:
+            fiscal_year = int(report_period[:4])
+        except (TypeError, ValueError):
+            return False
+        try:
+            access = self._get_announcement_asset_access(initialize_schema=False)
+            if not access.repository.schema_initialized():
+                return not shared_authoritative
+            report = access.repository.get_effective_report(
+                instrument_id,
+                fiscal_year,
+            )
+        except (AttributeError, OSError, RuntimeError, ValueError):
+            # Legacy-only deployments continue to use their existing lineage
+            # until the shared catalog is initialized for that instrument.
+            return not shared_authoritative
+        if report is None:
+            return not shared_authoritative
+        if report.decision_state in {
+            EffectiveDecisionState.AMBIGUOUS,
+            EffectiveDecisionState.PROVISIONAL,
+        }:
+            return False
+        source_asset_id = str(
+            raw_fact.get("annual_report_asset_id")
+            or raw_fact.get("source_asset_id")
+            or ""
+        )
+        if not source_asset_id:
+            return not shared_authoritative
+        if source_asset_id != report.asset_id:
+            return False
+        source_observation_version = str(
+            raw_fact.get("annual_report_observation_version") or ""
+        )
+        if (
+            source_observation_version
+            and source_observation_version != str(report.version_id)
+        ):
+            return False
+        source_content_hash = str(
+            raw_fact.get("annual_report_content_hash") or ""
+        ).lower()
+        return not source_content_hash or source_content_hash == str(
+            report.content_hash or ""
+        ).lower()
+
     def _select_latest_broker_risk_control_fact(
+        self,
         rows: List[Dict[str, Any]],
     ) -> Optional[Dict[str, Any]]:
-        from research.broker_risk_control import BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        from research.broker_risk_control import (
+            BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+            BROKER_RISK_CONTROL_SOURCE_PROFILE,
+        )
+
+        research_config = getattr(self, "research_config", None)
+        modules = getattr(research_config, "modules", {}) or {}
+        financial_cfg = modules.get("financial_statements", {})
+        broker_cfg = modules.get(
+            "broker_risk_control_reports",
+            financial_cfg.get("broker_risk_control_reports", {}),
+        )
+        source_priority = tuple(
+            str(item)
+            for item in broker_cfg.get(
+                "source_priority",
+                (
+                    BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+                    BROKER_RISK_CONTROL_SOURCE_PROFILE,
+                ),
+            )
+        )
+        priority_by_profile = {
+            profile: len(source_priority) - index
+            for index, profile in enumerate(source_priority)
+        }
 
         def _source_priority(row: Dict[str, Any]) -> int:
             raw_fact = row.get("raw_fact") or {}
-            return 1 if raw_fact.get("source_profile") == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE else 0
+            return priority_by_profile.get(str(raw_fact.get("source_profile") or ""), 0)
 
         candidates = [
             row for row in rows if row.get("fact_value") is not None and row.get("report_period")
@@ -11313,6 +12995,11 @@ class DataManager:
 
     async def close(self) -> None:
         """安全关闭所有数据源连接，防止协程退出时 ResourceWarning"""
+        coordinator = self._announcement_consumer_coordinator
+        if coordinator is not None:
+            coordinator.close()
+            self._announcement_consumer_coordinator = None
+            self._announcement_consumer_coordinator_signature = None
         if self._llm_client is not None:
             try:
                 await self._llm_client.close()

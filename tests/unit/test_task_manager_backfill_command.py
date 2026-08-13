@@ -224,6 +224,133 @@ async def test_run_configured_task_passes_key_value_overrides(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_run_annual_report_job_propagates_telegram_operator_identity(monkeypatch):
+    import utils
+    import scheduler.tasks as task_module
+
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.jobs = {}
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+    monkeypatch.setattr(
+        utils.config_manager,
+        "get_nested",
+        lambda path, default=None: {
+            "enabled": True,
+            "manual_only": True,
+        }
+        if path
+        == "scheduler_config.jobs.annual_report_asset_latest_backfill"
+        else default,
+    )
+    monkeypatch.setattr(
+        task_module.scheduled_tasks,
+        "annual_report_asset_latest_backfill",
+        AsyncMock(),
+    )
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=4242,
+        text="/run annual_report_asset_latest_backfill",
+    )
+
+    await handler.handle_run_command(event)
+
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        "annual_report_asset_latest_backfill",
+        include_dependencies=True,
+        operator_principal="telegram:4242",
+    )
+
+
+@pytest.mark.asyncio
+async def test_operator_principal_cannot_be_spoofed_from_run_parameters(monkeypatch):
+    import utils
+
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.jobs = {}
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+    monkeypatch.setattr(
+        utils.config_manager,
+        "get_nested",
+        lambda path, default=None: {
+            "enabled": True,
+            "manual_only": True,
+        }
+        if path
+        == "scheduler_config.jobs.annual_report_asset_latest_backfill"
+        else default,
+    )
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=4242,
+        text=(
+            "/run annual_report_asset_latest_backfill "
+            "operator_principal=service:forged"
+        ),
+    )
+
+    await handler.handle_run_command(event)
+
+    task_manager.task_scheduler.execute_job_direct.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_trigger_kind_cannot_be_spoofed_from_run_parameters(monkeypatch):
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=4242,
+        text="/run annual_report_asset_daily_update trigger_kind=cron",
+    )
+
+    await handler.handle_run_command(event)
+
+    task_manager.task_scheduler.execute_job_direct.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_run_command_rejects_unauthorized_chat_before_job_lookup():
+    handler, task_manager = _build_handler()
+    task_manager.is_authorized = Mock(return_value=False)
+    task_manager.task_scheduler = Mock()
+    event = SimpleNamespace(
+        chat_id=999,
+        sender_id=4242,
+        text="/run annual_report_asset_daily_update",
+    )
+
+    await handler.handle_run_command(event)
+
+    task_manager.is_authorized.assert_called_once_with(999)
+    assert task_manager.task_scheduler.mock_calls == []
+
+
+@pytest.mark.asyncio
+async def test_annual_report_callback_propagates_sender_identity(monkeypatch):
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+    handler._get_user_state(1).message_id = 10
+    monkeypatch.setattr(
+        "utils.task_manager.keyboards.TaskManagerKeyboards.parse_callback_data",
+        lambda data: ("task_action", "run", "annual_report_asset_daily_update"),
+    )
+    event = SimpleNamespace(chat_id=1, sender_id=77, data=b"ignored")
+
+    await handler.handle_callback_query(event)
+
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        "annual_report_asset_daily_update",
+        include_dependencies=True,
+        operator_principal="telegram:77",
+    )
+
+
+@pytest.mark.asyncio
 async def test_run_futures_market_data_backfill_defaults_to_master_governance():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(

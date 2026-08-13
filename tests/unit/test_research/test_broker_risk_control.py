@@ -1,9 +1,13 @@
-from dataclasses import dataclass
 import sqlite3
+import hashlib
+import io
+from dataclasses import dataclass
+from types import SimpleNamespace
 
 import pytest
 
 from data_manager import DataManager
+from research.announcement_assets import EffectiveDecisionState
 from research.announcements import (
     AnnouncementAttachment,
     AnnouncementRecord,
@@ -22,17 +26,22 @@ from research.broker_risk_control import (
     BROKER_RISK_CONTROL_SOURCE_PROFILE,
     BrokerRiskControlPdfFactParser,
     BrokerRiskControlReportSyncService,
+    BrokerRiskControlSyncResult,
     classify_broker_annual_report_risk_control_artifact,
     classify_broker_risk_control_artifact,
     infer_broker_annual_report_period,
-    is_formal_broker_annual_or_semiannual_report_title,
     is_broker_risk_control_title,
+    is_formal_broker_annual_or_semiannual_report_title,
 )
 from research.listed_broker_dealer_scope import resolve_listed_broker_dealer_scope
 from research.providers.base import FinancialSourceFileManifest
 from research.storage import ResearchStorageManager
 from research.valuation_service import ResearchValuationService
-from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
+from utils.config_manager import (
+    ResearchBudgetConfig,
+    ResearchConfig,
+    ResearchStorageConfig,
+)
 
 
 def _build_storage_manager(tmp_path):
@@ -511,6 +520,156 @@ def test_data_manager_enriches_dcf_bundle_with_local_net_capital():
     assert "broker_net_capital_regulatory_scope_may_differ_from_accounting_equity" in result["warnings"]
 
 
+@pytest.mark.parametrize(
+    "decision_state",
+    [EffectiveDecisionState.PROVISIONAL, EffectiveDecisionState.AMBIGUOUS],
+)
+def test_data_manager_excludes_pending_annual_report_broker_facts_from_current_dcf(
+    decision_state,
+):
+    manager = object.__new__(DataManager)
+
+    class _AssetRepository:
+        @staticmethod
+        def schema_initialized():
+            return True
+
+        @staticmethod
+        def get_effective_report(instrument_id, fiscal_year):
+            assert instrument_id == "600030.SH"
+            assert fiscal_year == 2025
+            return SimpleNamespace(
+                asset_id="shared-asset-2025",
+                decision_state=decision_state,
+            )
+
+    manager._get_announcement_asset_access = lambda **kwargs: SimpleNamespace(
+        repository=_AssetRepository()
+    )
+    storage = _FakeBrokerRiskControlStorage(
+        rows=[
+            {
+                "canonical_fact_name": "net_capital",
+                "fact_value": 260.0,
+                "report_period": "2025-12-31",
+                "source": "cninfo",
+                "source_mode": "direct",
+                "source_file_id": "risk-600030-2025",
+                "raw_fact": {
+                    "source_profile": (
+                        BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                    ),
+                    "annual_report_asset_id": "shared-asset-2025",
+                },
+                "updated_at": "2026-03-30",
+            }
+        ],
+        manifests=[],
+    )
+
+    enriched = manager._enrich_dcf_bundle_with_broker_risk_control_facts(
+        storage,
+        "600030.SH",
+        {"latest_facts": {"equity": 1000.0}},
+    )
+
+    assert "net_capital" not in enriched["latest_facts"]
+    assert "broker_risk_control" not in enriched.get("lineage", {})
+
+
+def test_data_manager_shared_only_requires_exact_current_broker_fact_lineage():
+    manager = object.__new__(DataManager)
+    manager.research_config = SimpleNamespace(
+        modules={
+            "broker_risk_control_reports": {
+                "annual_report_asset_dependency": {"mode": "shared_only"}
+            }
+        }
+    )
+
+    class _AssetRepository:
+        @staticmethod
+        def schema_initialized():
+            return True
+
+        @staticmethod
+        def get_effective_report(instrument_id, fiscal_year):
+            return SimpleNamespace(
+                asset_id="asset-current",
+                version_id="observation-current",
+                content_hash="d" * 64,
+                decision_state=EffectiveDecisionState.CURRENT,
+            )
+
+    manager._get_announcement_asset_access = lambda **kwargs: SimpleNamespace(
+        repository=_AssetRepository()
+    )
+    base = {
+        "report_period": "2025-12-31",
+        "raw_fact": {
+            "source_profile": BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        },
+    }
+
+    assert not manager._broker_risk_control_fact_is_current_eligible(
+        "600030.SH", base
+    )
+    matching = {
+        **base,
+        "raw_fact": {
+            **base["raw_fact"],
+            "annual_report_asset_id": "asset-current",
+            "annual_report_observation_version": "observation-current",
+            "annual_report_content_hash": "d" * 64,
+        },
+    }
+    assert manager._broker_risk_control_fact_is_current_eligible(
+        "600030.SH", matching
+    )
+    mismatched = {
+        **matching,
+        "raw_fact": {
+            **matching["raw_fact"],
+            "annual_report_observation_version": "observation-old",
+        },
+    }
+    assert not manager._broker_risk_control_fact_is_current_eligible(
+        "600030.SH", mismatched
+    )
+
+
+def test_data_manager_uses_configured_broker_fact_source_priority():
+    manager = object.__new__(DataManager)
+    manager.research_config = SimpleNamespace(
+        modules={
+            "broker_risk_control_reports": {
+                "source_priority": [
+                    BROKER_RISK_CONTROL_SOURCE_PROFILE,
+                    BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+                ]
+            }
+        }
+    )
+    annual = {
+        "fact_value": 100.0,
+        "report_period": "2025-12-31",
+        "updated_at": "2026-04-01",
+        "raw_fact": {
+            "source_profile": BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        },
+    }
+    supplementary = {
+        "fact_value": 101.0,
+        "report_period": "2025-12-31",
+        "updated_at": "2026-03-31",
+        "raw_fact": {"source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE},
+    }
+
+    assert manager._select_latest_broker_risk_control_fact(
+        [annual, supplementary]
+    ) is supplementary
+
+
 class _FakeSyncStorage:
     def __init__(self):
         self.manifests = []
@@ -746,6 +905,439 @@ def test_broker_risk_control_payload_uses_common_attachment_retriever():
     assert service._download_payload(record) == b"%PDF-test"
     assert retriever.calls[0][0] == "cninfo"
     assert retriever.calls[0][2] is True
+
+
+def test_broker_annual_report_payload_reuses_shared_asset_without_legacy_download(
+    tmp_path,
+):
+    payload = b"%PDF-1.4\nshared broker annual report\n%%EOF\n"
+    digest = hashlib.sha256(payload).hexdigest()
+    path = tmp_path / "shared.pdf"
+    path.write_bytes(payload)
+    blob = SimpleNamespace(
+        canonical_path=str(path),
+        content_hash=digest,
+        content_length=len(payload),
+    )
+    asset = SimpleNamespace(content_hash=digest)
+
+    class _Shared:
+        def __init__(self):
+            self.calls = []
+
+        def ensure(self, request):
+            self.calls.append(("ensure", request))
+            return {
+                "availability": "local_valid",
+                "asset": {
+                    "asset_id": "shared-asset-2025",
+                    "source": "cninfo",
+                    "source_announcement_id": "annual-shared-2025",
+                    "attachment_id": "shared-attachment",
+                    "observation_version": "observation-1",
+                    "content_hash": digest,
+                    "variant": "original",
+                    "effective_decision_state": "final",
+                },
+            }
+
+        def content_handle(self, asset_id):
+            self.calls.append(("content", asset_id))
+            return {
+                "asset_id": asset_id,
+                "content_hash": digest,
+                "content_length": len(payload),
+                "path": path,
+                "file_handle": io.BytesIO(payload),
+            }
+
+    shared = _Shared()
+    record = _announcement_record(
+        announcement_id="annual-shared-2025",
+        title="2025年年度报告",
+        announcement_time="2026-03-30",
+        market="沪市",
+        symbols=["600030"],
+        adjunct_url="/annual.pdf",
+        adjunct_type="PDF",
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("legacy broker downloader must not run")
+        ),
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=shared,
+    )
+
+    shared_result = service._shared_annual_report_asset(
+        record,
+        {"instrument_id": "600030.SH"},
+    )
+    assert shared_result is not None
+    shared_payload, shared_lineage, shared_content = shared_result
+    assert shared_payload == payload
+    assert shared_lineage["asset_id"] == "shared-asset-2025"
+    assert shared_lineage["observation_version"] == "observation-1"
+    assert shared_content["path"] == path
+    assert shared_content["file_handle"].closed
+    assert shared.calls[0][0] == "ensure"
+    assert shared.calls[0][1].source_announcement_id == "annual-shared-2025"
+    assert shared.calls[1] == ("content", "shared-asset-2025")
+
+
+def test_broker_shared_only_annual_miss_never_uses_legacy_downloader():
+    class _SharedMiss:
+        def ensure(self, request):
+            return {"availability": "metadata_only", "asset": None}
+
+    record = _announcement_record(
+        announcement_id="annual-shared-missing",
+        title="2025年年度报告",
+        announcement_time="2026-03-30",
+        market="沪市",
+        symbols=["600030"],
+        adjunct_url="/annual.pdf",
+        adjunct_type="PDF",
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("legacy broker downloader must not run")
+        ),
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=_SharedMiss(),
+    )
+    result = BrokerRiskControlSyncResult(status="success", mode="test")
+
+    service._process_record(
+        record,
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+        },
+        result,
+        ingestion_run_id=None,
+        tier="hot",
+        dry_run=False,
+    )
+
+    assert result.retryable_pending_reports == 1
+    assert "not locally ready" in result.errors[0]
+
+
+def test_financial_disclosure_incremental_without_asset_event_skips_annual_scan():
+    class _NoScan:
+        def acquire(self, *args, **kwargs):
+            raise AssertionError("formal annual-report provider scan must not run")
+
+    class _Shared:
+        def ensure(self, request):
+            raise AssertionError("no asset event means no annual ensure")
+
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        announcement_service=_NoScan(),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("legacy broker downloader must not run")
+        ),
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=_Shared(),
+    )
+
+    result = service.incremental_update(
+        market="沪市",
+        column="sse",
+        instruments=[],
+    )
+
+    assert result["status"] == "success"
+    assert result["mode"] == "shared_asset_event_required"
+    assert result["announcements_scanned"] == 0
+
+
+def test_broker_manifest_binds_shared_asset_observation_and_owns_no_pdf_path():
+    record = _announcement_record(
+        announcement_id="annual-correction-2025",
+        title="2025年年度报告（修订版）",
+        announcement_time="2026-04-02",
+        market="沪市",
+        symbols=["600030"],
+        adjunct_url="shared-asset://asset-correction",
+        adjunct_type="PDF",
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        payload_fetcher=lambda _record: None,
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    manifest = service._build_manifest(
+        record,
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+        },
+        "2025-12-31",
+        b"%PDF-1.7\nfixture",
+        "c" * 64,
+        archive_path=None,
+        shared_asset_lineage={
+            "asset_id": "asset-correction",
+            "source": "cninfo",
+            "source_announcement_id": "annual-correction-2025",
+            "attachment_id": "attachment-correction",
+            "observation_version": "observation-correction",
+            "content_hash": "c" * 64,
+            "variant": "correction",
+            "effective_decision_state": "final",
+        },
+        shared_content={"content_length": 18},
+    )
+
+    lineage = manifest.metadata_json["shared_annual_report_asset"]
+    assert manifest.source_mode == "shared_announcement_asset"
+    assert manifest.archive_path is None
+    assert lineage["asset_id"] == "asset-correction"
+    assert lineage["observation_version"] == "observation-correction"
+    assert lineage["variant"] == "correction"
+
+
+def test_shared_broker_asset_matches_legacy_parser_output_without_archive_copy(
+    tmp_path,
+):
+    payload = _risk_control_text().encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    record = _announcement_record(
+        announcement_id="annual-equivalent-2025",
+        title="2025年年度报告",
+        announcement_time="2026-03-30",
+        market="沪市",
+        symbols=["600030"],
+        adjunct_url="/annual.pdf",
+        adjunct_type="PDF",
+    )
+    instrument = {
+        "instrument_id": "600030.SH",
+        "symbol": "600030",
+        "exchange": "SSE",
+    }
+
+    class _TextParser(BrokerRiskControlPdfFactParser):
+        def parse(self, value, **kwargs):
+            if isinstance(value, bytes):
+                value = value.decode("utf-8")
+            return super().parse(value, **kwargs)
+
+    class _SharedAccess:
+        @staticmethod
+        def _asset():
+            return {
+                "asset_id": "asset-equivalent-2025",
+                "instrument_id": "600030.SH",
+                "fiscal_year": 2025,
+                "report_period": "2025-12-31",
+                "source": "cninfo",
+                "source_announcement_id": "annual-equivalent-2025",
+                "attachment_id": "attachment-equivalent-2025",
+                "observation_version": "observation-equivalent-2025",
+                "content_hash": digest,
+                "variant": "original",
+                "is_correction": False,
+                "published_at": "2026-03-30",
+                "availability": "local_valid",
+                "effective_decision_state": "current",
+            }
+
+        def ensure(self, request):
+            return {
+                "availability": "local_valid",
+                "asset": self._asset(),
+            }
+
+        def get_effective_asset(self, instrument_id, *, fiscal_year):
+            assert instrument_id == "600030.SH"
+            assert fiscal_year == 2025
+            return self._asset()
+
+        def content_handle(self, asset_id):
+            return {
+                "asset_id": asset_id,
+                "content_hash": digest,
+                "content_length": len(payload),
+                "path": tmp_path / "canonical.pdf",
+                "file_handle": io.BytesIO(payload),
+            }
+
+    shared_storage = _FakeSyncStorage()
+    shared_service = BrokerRiskControlReportSyncService(
+        storage=shared_storage,
+        parser=_TextParser(
+            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        ),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("legacy downloader must not run")
+        ),
+        archive_root=tmp_path / "shared-broker-archive",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=_SharedAccess(),
+    )
+    legacy_service = BrokerRiskControlReportSyncService(
+        storage=_FakeSyncStorage(),
+        parser=_TextParser(
+            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        ),
+        payload_fetcher=lambda _record: payload,
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        annual_report_asset_mode="legacy",
+        shared_annual_report_enabled=False,
+    )
+
+    shared_result = shared_service.backfill(
+        instruments=[instrument],
+        report_periods=["2025-12-31"],
+        announcement_records=[record],
+        dry_run=False,
+    )
+    legacy_result = legacy_service.backfill(
+        instruments=[instrument],
+        report_periods=["2025-12-31"],
+        announcement_records=[record],
+        dry_run=True,
+    )
+
+    assert shared_result["facts_parsed"] == legacy_result["facts_parsed"]
+    assert shared_result["report_summaries"] == legacy_result["report_summaries"]
+    assert shared_result["facts_written"] > 0
+    assert not (tmp_path / "shared-broker-archive").exists()
+    assert shared_storage.facts
+    assert all(
+        fact.raw_fact_json["annual_report_asset_id"] == "asset-equivalent-2025"
+        for fact in shared_storage.facts
+    )
+    assert all(
+        fact.raw_fact_json["annual_report_observation_version"]
+        == "observation-equivalent-2025"
+        for fact in shared_storage.facts
+    )
+
+    event_storage = _FakeSyncStorage()
+    event_service = BrokerRiskControlReportSyncService(
+        storage=event_storage,
+        parser=_TextParser(
+            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        ),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("event processing must not use legacy downloader")
+        ),
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=_SharedAccess(),
+    )
+    event_result = event_service.process_shared_asset_event(
+        {
+            "event_type": "replaced",
+            "asset_id": "asset-equivalent-2025",
+            "fiscal_year": 2025,
+        },
+        instrument=instrument,
+        dry_run=True,
+    )
+
+    assert event_result["facts_parsed"] == legacy_result["facts_parsed"]
+    assert event_result["report_summaries"] == legacy_result["report_summaries"]
+
+
+def test_broker_consumer_event_reads_exact_bound_observation_after_correction(tmp_path):
+    payload = _risk_control_text().encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    bound_asset = {
+        "asset_id": "asset-original-2025",
+        "instrument_id": "600030.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "annual-original-2025",
+        "attachment_id": "attachment-original-2025",
+        "observation_version": "observation-original-2025",
+        "content_hash": digest,
+        "variant": "original",
+        "is_correction": False,
+        "published_at": "2026-03-30",
+    }
+    exact_requests = []
+
+    class _SharedAccess:
+        @staticmethod
+        def get_effective_asset(*_args, **_kwargs):
+            raise AssertionError("bound consumer event must not reselect correction")
+
+        @staticmethod
+        def ensure(*_args, **_kwargs):
+            raise AssertionError("bound consumer event must not call ensure")
+
+        def exact_observation_handle(self, request, *, authorized):
+            assert authorized is True
+            exact_requests.append(request)
+            return {
+                "source": request.source,
+                "source_announcement_id": request.source_announcement_id,
+                "attachment_id": request.attachment_id,
+                "observation_version": request.observation_version,
+                "content_hash": request.expected_content_hash,
+                "content_length": len(payload),
+                "path": tmp_path / "bound-original.pdf",
+                "file_handle": io.BytesIO(payload),
+            }
+
+    class _TextParser(BrokerRiskControlPdfFactParser):
+        def parse(self, value, **kwargs):
+            if isinstance(value, bytes):
+                value = value.decode("utf-8")
+            return super().parse(value, **kwargs)
+
+    storage = _FakeSyncStorage()
+    service = BrokerRiskControlReportSyncService(
+        storage=storage,
+        parser=_TextParser(
+            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        ),
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("bound consumer event must not use legacy downloader")
+        ),
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        shared_asset_access=_SharedAccess(),
+    )
+
+    result = service.process_shared_asset_event(
+        {
+            "event_type": "added",
+            "asset_id": bound_asset["asset_id"],
+            "fiscal_year": 2025,
+        },
+        instrument={
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+        },
+        bound_asset=bound_asset,
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["facts_parsed"] > 0
+    assert len(exact_requests) == 1
+    assert exact_requests[0].observation_version == "observation-original-2025"
+    assert exact_requests[0].expected_content_hash == digest
+    assert storage.facts
+    assert all(
+        fact.raw_fact_json["annual_report_asset_id"] == "asset-original-2025"
+        and fact.raw_fact_json["annual_report_observation_version"]
+        == "observation-original-2025"
+        and fact.raw_fact_json["annual_report_content_hash"] == digest
+        for fact in storage.facts
+    )
 
 
 def test_broker_risk_control_artifact_classification_is_title_scoped():

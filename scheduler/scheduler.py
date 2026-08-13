@@ -481,6 +481,7 @@ class TaskScheduler:
         parameters: Optional[Dict[str, Any]] = None,
         *,
         include_dependencies: bool = True,
+        operator_principal: Optional[str] = None,
     ) -> bool:
         """Execute a configured job immediately, including manual-only jobs."""
         try:
@@ -490,6 +491,22 @@ class TaskScheduler:
                 return False
             params = dict(job_config.parameters or {})
             params.update(dict(parameters or {}))
+            if "operator_principal" in params:
+                raise ValueError("operator_principal is adapter-controlled")
+            annual_asset_job = job_id.startswith("annual_report_asset_")
+            if annual_asset_job and "trigger_kind" in params:
+                raise ValueError("trigger_kind is adapter-controlled")
+            if operator_principal is not None:
+                normalized_principal = str(operator_principal).strip()
+                if not normalized_principal:
+                    raise ValueError("operator_principal must be non-empty")
+                params["operator_principal"] = normalized_principal
+            if annual_asset_job:
+                if not operator_principal:
+                    raise PermissionError(
+                        "manual annual-report jobs require an authenticated operator"
+                    )
+                params["trigger_kind"] = "manual"
             executor = getattr(self, "dependency_executor", None)
             if executor is None:
                 self.job_configs = self.job_config_manager.get_all_job_configs()

@@ -4,7 +4,7 @@ Pydantic models for request/response validation with comprehensive features.
 """
 
 from enum import Enum
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any, Union, Literal
 from datetime import datetime, date
 from pydantic import BaseModel, Field, field_validator, model_validator
 from database.models import Instrument, DailyQuote, TradingCalendar
@@ -725,6 +725,57 @@ class ResearchCompanyProfileResponse(BaseModel):
     profile: Optional[Dict[str, Any]] = Field(None, description="标准化快照详情")
 
 
+class ResearchAnnualReportAssetLineage(BaseModel):
+    """Nullable shared annual-report lineage exposed by company-profile reads."""
+
+    asset_id: Optional[str] = None
+    asset_availability: Literal[
+        "local_valid",
+        "metadata_only",
+        "missing",
+        "ambiguous",
+        "corrupt",
+        "superseded",
+        "blocked",
+    ]
+    effective_decision_state: Optional[
+        Literal["current", "provisional", "ambiguous", "blocked", "withdrawn"]
+    ] = None
+    source: Optional[str] = None
+    source_announcement_id: Optional[str] = None
+    filing_id: Optional[str] = None
+    attachment_id: Optional[str] = None
+    observation_version: Optional[str] = None
+    version_available_at: Optional[str] = None
+    fiscal_year: Optional[int] = None
+    report_period: Optional[str] = None
+    published_at: Optional[str] = None
+    variant: Optional[Literal["original", "correction"]] = None
+    content_hash: Optional[str] = None
+    content_length: Optional[int] = None
+    content_url: Optional[str] = None
+    integrity: Optional[str] = None
+    canonical_source_filing: Optional[Dict[str, Any]] = None
+    equivalent_source_filings: List[Dict[str, Any]] = Field(default_factory=list)
+    canonical_projection_policy_version: Optional[str] = None
+    evidence_set_hash: Optional[str] = None
+
+
+class ResearchBusinessProfileSourceAssets(BaseModel):
+    annual_report_asset: Optional[ResearchAnnualReportAssetLineage] = None
+
+
+class ResearchBusinessProfileConsumerProcessingStatus(BaseModel):
+    consumer: Literal["business_profile"] = "business_profile"
+    processing_status: Literal[
+        "not_started", "queued", "processing", "current", "stale", "failed"
+    ]
+    consumer_result_state: Literal["current", "stale", "reprocessing"]
+    parser_version: Optional[str] = None
+    reason_code: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
 class ResearchCompanyBusinessProfileResponse(BaseModel):
     """公司业务画像治理上下文。"""
 
@@ -751,6 +802,10 @@ class ResearchCompanyBusinessProfileResponse(BaseModel):
     profile_version: str = Field(..., description="画像版本")
     lineage_hash: str = Field(..., description="画像血缘哈希")
     readiness: Dict[str, Any] = Field(default_factory=dict)
+    source_assets: Optional[ResearchBusinessProfileSourceAssets] = None
+    consumer_processing_status: Optional[
+        ResearchBusinessProfileConsumerProcessingStatus
+    ] = None
 
 
 class ResearchCompanyBusinessProfileHistoryResponse(BaseModel):

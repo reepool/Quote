@@ -1,8 +1,10 @@
 import json
+import multiprocessing
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
+from datetime import date
 
 import pytest
 
@@ -22,6 +24,23 @@ def _governor(tmp_path, *, limit=2):
     )
 
 
+def _attempt_session_in_spawned_process(state_path, lock_path, result_queue):
+    governor = BaostockAccessGovernor(
+        daily_request_limit=2,
+        state_path=state_path,
+        session_lock_path=lock_path,
+    )
+    try:
+        governor.acquire_session()
+    except DataSourceError as exc:
+        result_queue.put(("blocked", exc.error_code))
+        return
+    try:
+        result_queue.put(("acquired", None))
+    finally:
+        governor.release_session()
+
+
 def test_baostock_governor_persists_and_hard_stops_daily_quota(tmp_path):
     governor = _governor(tmp_path, limit=2)
 
@@ -39,20 +58,47 @@ def test_baostock_governor_persists_and_hard_stops_daily_quota(tmp_path):
         restarted_governor.reserve_request("login")
 
 
+def test_baostock_governor_usage_snapshot_is_read_only(tmp_path):
+    governor = _governor(tmp_path, limit=10)
+    governor.reserve_request("login")
+    before = (tmp_path / "usage.json").read_text(encoding="utf-8")
+
+    snapshot = governor.usage_snapshot()
+
+    assert snapshot["count"] == 1
+    assert snapshot["remaining"] == 9
+    assert (tmp_path / "usage.json").read_text(encoding="utf-8") == before
+
+
 def test_baostock_governor_allows_only_one_cross_process_session(tmp_path):
     first = _governor(tmp_path)
-    second = _governor(tmp_path)
+    context = multiprocessing.get_context("spawn")
+
+    def run_contender():
+        result_queue = context.Queue()
+        contender = context.Process(
+            target=_attempt_session_in_spawned_process,
+            args=(
+                str(tmp_path / "usage.json"),
+                str(tmp_path / "session.lock"),
+                result_queue,
+            ),
+        )
+        contender.start()
+        contender.join(timeout=10)
+        assert contender.exitcode == 0
+        return result_queue.get(timeout=1)
 
     first.acquire_session()
     try:
-        with pytest.raises(DataSourceError) as exc_info:
-            second.acquire_session()
-        assert exc_info.value.error_code == ErrorCodes.DATASOURCE_RATE_LIMIT
+        assert run_contender() == (
+            "blocked",
+            ErrorCodes.DATASOURCE_RATE_LIMIT,
+        )
     finally:
         first.release_session()
 
-    second.acquire_session()
-    second.release_session()
+    assert run_contender() == ("acquired", None)
 
 
 def test_baostock_governor_preserves_legacy_quota_during_migration(tmp_path):
@@ -142,6 +188,59 @@ async def test_baostock_run_call_counts_every_actual_api_call(tmp_path):
     with pytest.raises(DataSourceError) as exc_info:
         await source._run_bs_call(lambda: "blocked")
     assert exc_info.value.error_code == ErrorCodes.DATASOURCE_RATE_LIMIT
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("index_id", "method_name"),
+    [
+        ("000300.SH", "query_hs300_stocks"),
+        ("000905.SH", "query_zz500_stocks"),
+        ("000016.SH", "query_sz50_stocks"),
+    ],
+)
+async def test_baostock_historical_index_query_mapping(
+    tmp_path, monkeypatch, index_id, method_name
+):
+    source = BaostockSource(
+        "baostock",
+        RateLimitConfig(max_requests_per_day=10),
+        usage_state_path=str(tmp_path / "usage.json"),
+        session_lock_path=str(tmp_path / "session.lock"),
+    )
+    source.rate_limiter.acquire = AsyncMock()
+    source._ensure_login = AsyncMock()
+    sdk_method = Mock(name=method_name)
+    monkeypatch.setattr(f"data_sources.baostock_source.bs.{method_name}", sdk_method)
+
+    class Result:
+        error_code = "0"
+        error_msg = ""
+        fields = ["updateDate", "code", "code_name"]
+
+        def __init__(self):
+            self.rows = iter([["2020-06-30", "sh.600000", "浦发银行"]])
+            self.current = None
+
+        def next(self):
+            self.current = next(self.rows, None)
+            return self.current is not None
+
+        def get_row_data(self):
+            return self.current
+
+    source._run_bs_call = AsyncMock(return_value=Result())
+
+    rows = await source.get_historical_index_constituents(
+        index_id, date(2020, 6, 30)
+    )
+
+    source._run_bs_call.assert_awaited_once_with(sdk_method, "2020-06-30")
+    assert rows == [{
+        "updateDate": "2020-06-30",
+        "code": "sh.600000",
+        "code_name": "浦发银行",
+    }]
 
 
 def test_baostock_config_stays_below_provider_daily_limit():

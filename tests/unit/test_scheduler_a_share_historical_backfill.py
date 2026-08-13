@@ -72,6 +72,8 @@ async def test_a_share_historical_backfill_dry_run_has_no_business_writes(monkey
     assert result["stages"]["master"]["status"] == "dry_run"
     assert result["stages"]["calendar"]["status"] == "dry_run"
     assert result["stages"]["quotes"]["status"] == "dry_run"
+    assert "index_instrument_ids" not in result["parameters"]
+    assert "index_sampling" not in result["parameters"]
     quote_mock.assert_not_awaited()
     xdxr_mock.assert_not_awaited()
     assert not (tmp_path / "backfill_checkpoints").exists()

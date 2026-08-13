@@ -10,7 +10,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
 
 from research.announcements import (
     AnnouncementAcquisitionService,
@@ -20,6 +20,7 @@ from research.announcements import (
     AnnouncementRecord,
     AnnouncementScope,
     ProviderCursor,
+    build_announcement_key,
     load_announcement_acquisition_config,
 )
 from research.financial_fact_aliases import describe_financial_numeric_fact_name
@@ -46,6 +47,96 @@ BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = "broker_annual_or_semiannual_r
 BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
 BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
 LOGGER = logging.getLogger(__name__)
+
+
+def _normalize_bound_shared_annual_report_asset(
+    asset: Mapping[str, Any],
+) -> dict[str, Any]:
+    binding = {
+        **dict(asset),
+        "asset_id": str(asset.get("asset_id") or "").strip(),
+        "instrument_id": str(asset.get("instrument_id") or "").strip(),
+        "fiscal_year": int(asset.get("fiscal_year") or 0),
+        "source": str(asset.get("source") or "").strip().lower(),
+        "source_announcement_id": str(
+            asset.get("source_announcement_id") or ""
+        ).strip(),
+        "attachment_id": str(asset.get("attachment_id") or "").strip(),
+        "observation_version": str(
+            asset.get("observation_version") or ""
+        ).strip(),
+        "content_hash": str(asset.get("content_hash") or "").strip().lower(),
+        "report_period": str(asset.get("report_period") or "").strip(),
+    }
+    missing = sorted(
+        key
+        for key in (
+            "asset_id",
+            "instrument_id",
+            "source",
+            "source_announcement_id",
+            "attachment_id",
+            "observation_version",
+            "content_hash",
+            "report_period",
+        )
+        if not binding[key]
+    )
+    if missing:
+        raise ValueError(
+            "bound broker shared annual-report asset is incomplete: "
+            + ",".join(missing)
+        )
+    if len(binding["content_hash"]) != 64 or any(
+        character not in "0123456789abcdef"
+        for character in binding["content_hash"]
+    ):
+        raise ValueError("bound broker shared annual-report content_hash is invalid")
+    if (
+        binding["fiscal_year"] < 1990
+        or len(binding["report_period"]) < 4
+        or int(binding["report_period"][:4]) != binding["fiscal_year"]
+    ):
+        raise ValueError("bound broker shared annual-report fiscal year is invalid")
+    return binding
+
+
+def _build_shared_annual_report_access(research_config: ResearchConfig) -> Any | None:
+    """Bind broker annual-report reads to the independent asset access facade."""
+
+    storage_config = getattr(research_config, "storage", None)
+    db_path = getattr(storage_config, "db_path", None)
+    if not db_path:
+        return None
+    from research.announcement_assets import (
+        AnnouncementAssetAccess,
+        AnnouncementAssetConfig,
+        AnnouncementAssetRepository,
+        AnnouncementAssetService,
+    )
+
+    asset_config = AnnouncementAssetConfig.from_research_config(
+        research_config,
+        project_root=Path.cwd(),
+    )
+    path = Path(str(db_path))
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    repository = AnnouncementAssetRepository(path)
+    acquisition_config = load_announcement_acquisition_config(research_config)
+    retriever = AnnouncementAttachmentRetriever.from_provider_configs(
+        acquisition_config.provider_configs
+    )
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=asset_config,
+        attachment_retriever=retriever,
+    )
+    return AnnouncementAssetAccess(
+        repository=repository,
+        config=asset_config,
+        service=service,
+    )
 
 
 def _announcement_id(record: AnnouncementRecord) -> str:
@@ -491,6 +582,7 @@ class BrokerRiskControlPdfFactParser:
         artifact_kind: str = BROKER_RISK_CONTROL_ARTIFACT_KIND,
         licensed_broker_name: Optional[str] = None,
         listed_broker_scope: Optional[Dict[str, Any]] = None,
+        source_asset_lineage: Mapping[str, Any] | None = None,
     ) -> BrokerRiskControlParseResult:
         text, text_diagnostics = self._extract_text(payload)
         source_unit, unit_scale = self._detect_money_unit(text)
@@ -605,6 +697,7 @@ class BrokerRiskControlPdfFactParser:
                     artifact_kind=artifact_kind,
                     licensed_broker_name=licensed_broker_name,
                     listed_broker_scope=listed_broker_scope,
+                    source_asset_lineage=source_asset_lineage,
                     report_scope=report_scope,
                     canonical_name=canonical_name,
                     canonical_value=canonical_value,
@@ -697,6 +790,7 @@ class BrokerRiskControlPdfFactParser:
                         artifact_kind=artifact_kind,
                         licensed_broker_name=licensed_broker_name,
                         listed_broker_scope=listed_broker_scope,
+                        source_asset_lineage=source_asset_lineage,
                         report_scope=report_scope,
                         canonical_name=canonical_name,
                         canonical_value=canonical_value,
@@ -724,6 +818,11 @@ class BrokerRiskControlPdfFactParser:
             "report_scope": report_scope,
             "licensed_broker_name": licensed_broker_name,
             "listed_broker_scope": listed_broker_scope,
+            "source_asset_lineage": (
+                None
+                if source_asset_lineage is None
+                else dict(source_asset_lineage)
+            ),
             "report_scope_uncertain": report_scope == "unknown",
             "candidate_row_count": len(rows),
             "matched_canonical_facts": sorted(matched_rows),
@@ -751,6 +850,7 @@ class BrokerRiskControlPdfFactParser:
         artifact_kind: str,
         licensed_broker_name: Optional[str],
         listed_broker_scope: Optional[Dict[str, Any]],
+        source_asset_lineage: Mapping[str, Any] | None,
         report_scope: str,
         canonical_name: str,
         canonical_value: float,
@@ -798,6 +898,31 @@ class BrokerRiskControlPdfFactParser:
                 "report_scope": report_scope,
                 "licensed_broker_name": licensed_broker_name,
                 "listed_broker_scope": listed_broker_scope,
+                "annual_report_asset_id": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("asset_id")
+                ),
+                "annual_report_observation_version": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("observation_version")
+                ),
+                "annual_report_content_hash": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("content_hash")
+                ),
+                "annual_report_effective_decision_state": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("effective_decision_state")
+                ),
+                "source_asset_lineage": (
+                    None
+                    if source_asset_lineage is None
+                    else dict(source_asset_lineage)
+                ),
             },
             raw_fact_json={
                 "source_profile": source_profile,
@@ -809,6 +934,31 @@ class BrokerRiskControlPdfFactParser:
                 "report_scope": report_scope,
                 "licensed_broker_name": licensed_broker_name,
                 "listed_broker_scope": listed_broker_scope,
+                "annual_report_asset_id": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("asset_id")
+                ),
+                "annual_report_observation_version": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("observation_version")
+                ),
+                "annual_report_content_hash": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("content_hash")
+                ),
+                "annual_report_effective_decision_state": (
+                    None
+                    if source_asset_lineage is None
+                    else source_asset_lineage.get("effective_decision_state")
+                ),
+                "source_asset_lineage": (
+                    None
+                    if source_asset_lineage is None
+                    else dict(source_asset_lineage)
+                ),
                 "raw_line": line,
                 "line_index": line_index,
                 "extraction_strategy": extraction_strategy,
@@ -1254,9 +1404,109 @@ class BrokerRiskControlReportSyncService:
         archive_root: Optional[str | Path] = None,
         force_reparse_existing: bool = False,
         replace_existing_facts: bool = False,
+        shared_asset_access: Any | None = None,
+        shared_asset_service: Any | None = None,
+        shared_annual_report_enabled: bool | None = None,
+        legacy_semiannual_enabled: bool | None = None,
+        annual_report_asset_mode: str | None = None,
     ) -> None:
         self.storage = storage
         self.research_config = research_config or config_manager.get_research_config()
+        explicit_shared_dependency = (
+            shared_asset_access is not None or shared_asset_service is not None
+        )
+        if shared_asset_access is not None and shared_asset_service is not None:
+            raise ValueError(
+                "provide shared_asset_access or shared_asset_service, not both"
+            )
+        modules = getattr(self.research_config, "modules", {}) or {}
+        broker_cfg = (
+            modules.get("broker_risk_control_reports", {})
+            if isinstance(modules, Mapping)
+            else {}
+        )
+        dependency_cfg = (
+            broker_cfg.get("annual_report_asset_dependency", {})
+            if isinstance(broker_cfg, Mapping)
+            else {}
+        )
+        if not isinstance(dependency_cfg, Mapping):
+            raise ValueError(
+                "broker_risk_control_reports.annual_report_asset_dependency "
+                "must be a mapping"
+            )
+        inferred_enabled = explicit_shared_dependency
+        dependency_enabled = bool(
+            inferred_enabled
+            if explicit_shared_dependency and shared_annual_report_enabled is None
+            else dependency_cfg.get("enabled", False)
+            if shared_annual_report_enabled is None
+            else shared_annual_report_enabled
+        )
+        dependency_mode = str(
+            annual_report_asset_mode
+            or (
+                "shared_only"
+                if explicit_shared_dependency
+                else dependency_cfg.get(
+                    "mode", "shared_only" if dependency_enabled else "legacy"
+                )
+            )
+        ).strip().lower()
+        if dependency_mode not in {"legacy", "dual_read", "shared_only"}:
+            raise ValueError("invalid broker annual-report asset mode")
+        if (
+            not explicit_shared_dependency
+            and dependency_mode == "shared_only"
+            and (
+                not str(
+                    dependency_cfg.get("reconciliation_evidence_id") or ""
+                ).strip()
+                or dependency_cfg.get("legacy_writer_disabled") is not True
+            )
+        ):
+            raise ValueError(
+                "broker shared-only cutover requires reconciliation evidence "
+                "and legacy writer disablement"
+            )
+        if dependency_enabled != (dependency_mode in {"dual_read", "shared_only"}):
+            raise ValueError("broker annual-report mode conflicts with enabled flag")
+        legacy_annual_fallback = bool(
+            dependency_mode != "shared_only"
+            if explicit_shared_dependency and annual_report_asset_mode is None
+            else dependency_cfg.get(
+                "legacy_fallback_enabled", dependency_mode != "shared_only"
+            )
+        )
+        if legacy_annual_fallback != (dependency_mode in {"legacy", "dual_read"}):
+            raise ValueError(
+                "broker annual-report mode conflicts with legacy fallback"
+            )
+        if shared_asset_access is None and shared_asset_service is not None:
+            from research.announcement_assets import AnnouncementAssetAccess
+
+            shared_asset_access = AnnouncementAssetAccess(
+                repository=shared_asset_service.repository,
+                config=shared_asset_service.config,
+                service=shared_asset_service,
+            )
+        if shared_asset_access is None and dependency_enabled:
+            shared_asset_access = _build_shared_annual_report_access(
+                self.research_config
+            )
+        self.shared_asset_access = shared_asset_access
+        self.shared_annual_report_enabled = bool(dependency_enabled)
+        self.annual_report_asset_mode = dependency_mode
+        self.legacy_annual_report_fallback_enabled = legacy_annual_fallback
+        self.legacy_semiannual_enabled = (
+            bool(dependency_cfg.get("legacy_semiannual_enabled", True))
+            if legacy_semiannual_enabled is None
+            else bool(legacy_semiannual_enabled)
+        )
+        if self.shared_annual_report_enabled and self.shared_asset_access is None:
+            raise ValueError(
+                "shared annual-report dependency requires shared asset access"
+            )
         acquisition_config = load_announcement_acquisition_config(self.research_config)
         self.announcement_service = announcement_service or AnnouncementAcquisitionService(
             registry=OfficialAnnouncementProviderRegistry(
@@ -1342,6 +1592,20 @@ class BrokerRiskControlReportSyncService:
         max_pages: int = 20,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
+        if (
+            self.source_profile
+            == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+            and self.annual_report_asset_mode == "shared_only"
+        ):
+            LOGGER.info(
+                "broker formal annual-report incremental scan skipped: "
+                "shared asset event is required"
+            )
+            return BrokerRiskControlSyncResult(
+                status="success",
+                mode="shared_asset_event_required",
+                target_instruments=len(instruments),
+            ).to_dict()
         purpose_key = self.source_profile
         exchange = self._exchange_from_market_column(market, column)
         scope = AnnouncementScope(
@@ -1441,6 +1705,224 @@ class BrokerRiskControlReportSyncService:
                 )
         return result.to_dict()
 
+    def process_shared_asset_event(
+        self,
+        event: Mapping[str, Any],
+        *,
+        instrument: Mapping[str, Any],
+        ingestion_run_id: int | None = None,
+        tier: str = "hot",
+        dry_run: bool = False,
+        bound_asset: Mapping[str, Any] | None = None,
+    ) -> Dict[str, Any]:
+        """Process one qualifying shared annual-report event through normal parsing."""
+
+        if not self.shared_annual_report_enabled or self.shared_asset_access is None:
+            raise RuntimeError("shared broker annual-report dependency is disabled")
+        event_type = str(event.get("event_type") or "").strip().lower()
+        if event_type not in {"added", "replaced", "repaired"}:
+            return BrokerRiskControlSyncResult(
+                status="success",
+                mode="shared_asset_event_ignored",
+                target_instruments=1,
+            ).to_dict()
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        fiscal_year = int(event.get("fiscal_year") or 0)
+        if not instrument_id or fiscal_year < 1990:
+            raise ValueError("shared broker asset event scope is incomplete")
+        asset = (
+            _normalize_bound_shared_annual_report_asset(bound_asset)
+            if bound_asset is not None
+            else self.shared_asset_access.get_effective_asset(
+                instrument_id,
+                fiscal_year=fiscal_year,
+            )
+        )
+        if (
+            not asset
+            or (
+                bound_asset is None
+                and asset.get("availability") != "local_valid"
+            )
+            or str(asset.get("asset_id") or "")
+            != str(event.get("asset_id") or "")
+            or str(asset.get("instrument_id") or "") != instrument_id
+            or int(asset.get("fiscal_year") or 0) != fiscal_year
+        ):
+            return BrokerRiskControlSyncResult(
+                status="partial",
+                mode="shared_asset_event_stale",
+                target_instruments=1,
+                retryable_pending_reports=1,
+                errors=["shared asset event does not match the current local asset"],
+            ).to_dict()
+        source = str(asset.get("source") or "").strip().lower()
+        source_announcement_id = str(
+            asset.get("source_announcement_id") or ""
+        ).strip()
+        attachment_id = str(asset.get("attachment_id") or asset["asset_id"])
+        record = AnnouncementRecord(
+            source=source,
+            source_announcement_id=source_announcement_id,
+            announcement_key=build_announcement_key(
+                source, source_announcement_id
+            ),
+            title=(
+                f"{fiscal_year}年年度报告"
+                + ("（修订版）" if asset.get("is_correction") else "")
+            ),
+            published_at=asset.get("published_at"),
+            exchange=str(instrument.get("exchange") or "").upper() or None,
+            market=str(instrument.get("exchange") or "").upper() or None,
+            symbols=(str(instrument.get("symbol") or "").strip(),),
+            attachments=(
+                AnnouncementAttachment(
+                    source_url=f"shared-asset://{asset['asset_id']}",
+                    attachment_id=attachment_id,
+                    media_type="application/pdf",
+                    file_extension="pdf",
+                    raw_metadata={
+                        "shared_asset_id": asset["asset_id"],
+                        "observation_version": asset.get("observation_version"),
+                        "content_hash": asset.get("content_hash"),
+                    },
+                ),
+            ),
+            raw_payload={
+                "shared_asset_event": dict(event),
+                "shared_asset_projection": dict(asset),
+                "shared_asset_binding_mode": (
+                    "exact_observation"
+                    if bound_asset is not None
+                    else "effective_projection"
+                ),
+            },
+            selection_reasons=("shared_annual_report_asset_event",),
+        )
+        return self.backfill(
+            instruments=[dict(instrument)],
+            report_periods=[str(asset.get("report_period") or f"{fiscal_year}-12-31")],
+            announcement_records=[record],
+            ingestion_run_id=ingestion_run_id,
+            tier=tier,
+            dry_run=dry_run,
+        )
+
+    def _shared_annual_report_asset(
+        self,
+        record: AnnouncementRecord,
+        instrument: Mapping[str, Any],
+    ) -> tuple[bytes, dict[str, Any], dict[str, Any]] | None:
+        """Read a formal annual report from shared custody, if bound."""
+
+        if (
+            not self.shared_annual_report_enabled
+            or self.shared_asset_access is None
+            or self.source_profile
+            != BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+            or "半年度报告" in _normalize_announcement_title(record.title)
+        ):
+            return None
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        if not instrument_id:
+            raise ValueError("shared broker annual-report identity is incomplete")
+        from research.announcement_assets import EnsureRequest
+
+        bound_asset_raw = dict(
+            (record.raw_payload or {}).get("shared_asset_projection") or {}
+        )
+        if (
+            bound_asset_raw
+            and (record.raw_payload or {}).get("shared_asset_binding_mode")
+            == "exact_observation"
+        ):
+            asset = _normalize_bound_shared_annual_report_asset(bound_asset_raw)
+            if (
+                asset["instrument_id"] != instrument_id
+                or asset["source"] != _announcement_source(record)
+                or asset["source_announcement_id"] != _announcement_id(record)
+            ):
+                raise RuntimeError(
+                    "bound broker shared asset does not match parser record identity"
+                )
+            content = self.shared_asset_access.exact_observation_handle(
+                EnsureRequest(
+                    instrument_id=instrument_id,
+                    source=asset["source"],
+                    source_announcement_id=asset["source_announcement_id"],
+                    attachment_id=asset["attachment_id"],
+                    observation_version=asset["observation_version"],
+                    expected_content_hash=asset["content_hash"],
+                    allow_network=False,
+                    principal="broker-risk-control",
+                ),
+                authorized=True,
+            )
+            handle = content["file_handle"]
+            try:
+                payload = handle.read()
+            finally:
+                handle.close()
+            if (
+                str(content.get("observation_version") or "")
+                != asset["observation_version"]
+                or str(content.get("content_hash") or "").lower()
+                != asset["content_hash"]
+                or hashlib.sha256(payload).hexdigest() != asset["content_hash"]
+                or len(payload) != int(content["content_length"])
+            ):
+                raise RuntimeError(
+                    "bound broker shared asset observation integrity mismatch"
+                )
+            return payload, asset, dict(content)
+
+        access_config = getattr(self.shared_asset_access, "config", None)
+        wait_seconds = float(
+            getattr(access_config, "wait_seconds_maximum", 30.0)
+        )
+        ensured = self.shared_asset_access.ensure(
+            EnsureRequest(
+                instrument_id=instrument_id,
+                source=_announcement_source(record),
+                source_announcement_id=_announcement_id(record),
+                allow_network=True,
+                wait_seconds=wait_seconds,
+                consumer="broker_risk_control",
+                principal="broker-risk-control",
+            )
+        )
+        asset = ensured.get("asset")
+        if not asset or ensured.get("availability") != "local_valid":
+            return None
+        if (
+            str(asset.get("source") or "").strip().lower()
+            != _announcement_source(record)
+            or str(asset.get("source_announcement_id") or "")
+            != _announcement_id(record)
+        ):
+            raise RuntimeError(
+                "shared broker annual-report selector resolved a different legal filing"
+            )
+        content = self.shared_asset_access.content_handle(str(asset["asset_id"]))
+        handle = content["file_handle"]
+        try:
+            payload = handle.read()
+        finally:
+            handle.close()
+        if hashlib.sha256(payload).hexdigest() != str(content["content_hash"]).lower():
+            raise RuntimeError("shared broker annual-report hash validation failed")
+        if len(payload) != int(content["content_length"]):
+            raise RuntimeError("shared broker annual-report length validation failed")
+        return payload, dict(asset), dict(content)
+
+    def _formal_annual_uses_shared_assets(self, record: AnnouncementRecord) -> bool:
+        return (
+            self.shared_annual_report_enabled
+            and self.source_profile
+            == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+            and "半年度报告" not in _normalize_announcement_title(record.title)
+        )
+
     def _record_filter(self, record: AnnouncementRecord) -> List[str]:
         if not self._record_matches(record):
             return []
@@ -1482,7 +1964,27 @@ class BrokerRiskControlReportSyncService:
             dry_run,
         )
         try:
-            payload = self.payload_fetcher(record)
+            shared_asset = self._shared_annual_report_asset(record, instrument)
+            if shared_asset is not None:
+                payload, shared_asset_lineage, shared_content = shared_asset
+            else:
+                if (
+                    self._formal_annual_uses_shared_assets(record)
+                    and not self.legacy_annual_report_fallback_enabled
+                ):
+                    raise RuntimeError(
+                        "shared broker annual-report asset is not locally ready"
+                    )
+                if (
+                    self.source_profile
+                    == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                    and "半年度报告" in _normalize_announcement_title(record.title)
+                    and not self.legacy_semiannual_enabled
+                ):
+                    raise RuntimeError("legacy broker semiannual acquisition is disabled")
+                payload = self.payload_fetcher(record)
+                shared_asset_lineage = None
+                shared_content = None
         except Exception as exc:
             result.retryable_pending_reports += 1
             result.errors.append(str(exc))
@@ -1515,7 +2017,17 @@ class BrokerRiskControlReportSyncService:
             _announcement_id(record),
             len(hash_payload),
         )
-        archive_path = None if dry_run else self._archive_payload(record, instrument, report_period, hash_payload)
+        archive_path = (
+            None
+            if dry_run
+            else (
+                None
+                if shared_asset_lineage is not None
+                else self._archive_payload(
+                    record, instrument, report_period, hash_payload
+                )
+            )
+        )
         manifest = self._build_manifest(
             record,
             instrument,
@@ -1523,6 +2035,8 @@ class BrokerRiskControlReportSyncService:
             payload,
             content_hash,
             archive_path=archive_path,
+            shared_asset_lineage=shared_asset_lineage,
+            shared_content=shared_content,
         )
         if not self.force_reparse_existing and self._unchanged_manifest_exists(manifest, content_hash):
             result.unchanged_reports += 1
@@ -1558,11 +2072,16 @@ class BrokerRiskControlReportSyncService:
                 report_period=report_period,
                 report_type=self._record_report_type(record),
                 source=_announcement_source(record),
-                source_mode="direct",
+                source_mode=(
+                    "shared_announcement_asset"
+                    if shared_asset_lineage is not None
+                    else "direct"
+                ),
                 source_profile=self.source_profile,
                 artifact_kind=self._artifact_kind(),
                 licensed_broker_name=licensed_broker_name,
                 listed_broker_scope=listed_scope,
+                source_asset_lineage=shared_asset_lineage,
             )
         except Exception as exc:
             result.parse_failures += 1
@@ -1761,12 +2280,18 @@ class BrokerRiskControlReportSyncService:
         payload: bytes | str,
         content_hash: str,
         archive_path: Optional[str] = None,
+        shared_asset_lineage: Mapping[str, Any] | None = None,
+        shared_content: Mapping[str, Any] | None = None,
     ) -> FinancialSourceFileManifest:
         classification = self._classify_record(record)
         scope_resolution = resolve_listed_broker_dealer_scope(instrument)
         return FinancialSourceFileManifest(
             source=_announcement_source(record),
-            source_mode="direct",
+            source_mode=(
+                "shared_announcement_asset"
+                if shared_asset_lineage is not None
+                else "direct"
+            ),
             instrument_id=str(instrument.get("instrument_id") or ""),
             symbol=str(instrument.get("symbol") or ""),
             exchange=str(instrument.get("exchange") or ""),
@@ -1792,6 +2317,31 @@ class BrokerRiskControlReportSyncService:
                     "symbols": record.symbols,
                     "selection_reasons": record.selection_reasons,
                 },
+                "shared_annual_report_asset": (
+                    None
+                    if shared_asset_lineage is None
+                    else {
+                        "asset_id": shared_asset_lineage.get("asset_id"),
+                        "source": shared_asset_lineage.get("source"),
+                        "source_announcement_id": shared_asset_lineage.get(
+                            "source_announcement_id"
+                        ),
+                        "attachment_id": shared_asset_lineage.get("attachment_id"),
+                        "observation_version": shared_asset_lineage.get(
+                            "observation_version"
+                        ),
+                        "content_hash": shared_asset_lineage.get("content_hash"),
+                        "variant": shared_asset_lineage.get("variant"),
+                        "effective_decision_state": shared_asset_lineage.get(
+                            "effective_decision_state"
+                        ),
+                        "content_length": (
+                            None
+                            if shared_content is None
+                            else shared_content.get("content_length")
+                        ),
+                    }
+                ),
             },
         )
 

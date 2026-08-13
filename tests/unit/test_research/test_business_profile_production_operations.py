@@ -13,6 +13,7 @@ from research.business_profile_production_operations import (
     BusinessProfileIndexDiscoveryService,
     audit_business_profile_archive,
     build_business_profile_reconciliation_report,
+    discover_business_profile_shared_annual_reports,
 )
 from research.business_profile_semantic_runtime import (
     discover_business_profile_semantic_scope,
@@ -109,6 +110,74 @@ def test_frontier_persists_source_qualified_annual_report_without_pdf(tmp_path):
         "document_type": "annual_report",
         "status": "pending",
     }
+    assert not list(tmp_path.rglob("*.pdf"))
+
+
+def test_shared_only_business_profile_discovery_uses_effective_assets_zero_provider(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+
+    class _SharedAccess:
+        def __init__(self):
+            self.calls = []
+
+        def list_assets(self, *, limit, offset):
+            self.calls.append((limit, offset))
+            if offset:
+                return {"items": []}
+            return {
+                "items": [
+                    {
+                        "asset_id": "asset-2025",
+                        "instrument_id": "600000.SH",
+                        "fiscal_year": 2025,
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-2025",
+                        "attachment_id": "attachment-2025",
+                        "observation_version": "observation-2025",
+                        "content_hash": "a" * 64,
+                        "published_at": "2026-03-30T08:00:00+08:00",
+                        "is_correction": False,
+                    },
+                    {
+                        "asset_id": "asset-after-cutoff",
+                        "instrument_id": "600001.SH",
+                        "fiscal_year": 2025,
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-after-cutoff",
+                        "published_at": "2026-05-02T08:00:00+08:00",
+                    },
+                ]
+            }
+
+    shared = _SharedAccess()
+    result = discover_business_profile_shared_annual_reports(
+        storage=storage,
+        shared_asset_access=shared,
+        knowledge_cutoff="2026-04-30",
+        page_size=100,
+        max_pages=2,
+    )
+
+    assert result["status"] == "success"
+    assert result["provider_requests"] == 0
+    assert result["attachment_downloads"] == 0
+    assert result["selected_announcements"] == 1
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT announcement_id, source_url, document_type, metadata_json "
+            "FROM business_profile_announcement_frontier"
+        ).fetchone()
+    assert row["announcement_id"] == "annual-2025"
+    assert row["source_url"] == "shared-asset://asset-2025"
+    assert row["document_type"] == "annual_report"
     assert not list(tmp_path.rglob("*.pdf"))
 
 

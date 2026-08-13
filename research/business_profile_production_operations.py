@@ -10,7 +10,14 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from research.announcements import AnnouncementQuery, AnnouncementScope, ProviderCursor
+from research.announcements import (
+    AnnouncementAttachment,
+    AnnouncementQuery,
+    AnnouncementRecord,
+    AnnouncementScope,
+    ProviderCursor,
+    build_announcement_key,
+)
 from research.announcements.categories import ANNUAL_REPORT_CATEGORY
 from research.business_profile_archive import (
     BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
@@ -170,7 +177,6 @@ class BusinessProfileAnnouncementFrontierRepository:
                 status = "superseded"
             conn.commit()
         return status
-
     def pending_instruments(self, *, knowledge_cutoff: str) -> tuple[str, ...]:
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -351,6 +357,153 @@ class BusinessProfileAnnouncementFrontierRepository:
             (predecessor_id, now, winner_id),
         )
         return winner_id
+
+
+def discover_business_profile_shared_annual_reports(
+    *,
+    storage: Any,
+    shared_asset_access: Any,
+    knowledge_cutoff: str,
+    page_size: int = 500,
+    max_pages: int = 20,
+) -> dict[str, Any]:
+    """Populate the business-profile frontier from shared effective assets only."""
+
+    cutoff = str(knowledge_cutoff)[:10]
+    bounded_page_size = max(1, min(int(page_size), 1000))
+    bounded_max_pages = max(1, min(int(max_pages), 100))
+    frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    report = {
+        "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
+        "status": "success",
+        "operation": "shared_annual_report_discovery",
+        "category": ANNUAL_REPORT_CATEGORY,
+        "filter_mode": "shared_effective_assets_only",
+        "provider_requests": 0,
+        "attachment_downloads": 0,
+        "pages_scanned": 0,
+        "selected_announcements": 0,
+        "frontier_inserted": 0,
+        "frontier_changed": 0,
+        "errors": [],
+    }
+    for page in range(bounded_max_pages):
+        projection = shared_asset_access.list_assets(
+            limit=bounded_page_size,
+            offset=page * bounded_page_size,
+        )
+        assets = list(projection.get("items", ()))
+        report["pages_scanned"] += 1
+        for asset in assets:
+            if (
+                asset.get("document_family") != "annual_report"
+                or asset.get("availability") != "local_valid"
+                or str(asset.get("published_at") or "")[:10] > cutoff
+            ):
+                continue
+            try:
+                status = register_business_profile_shared_annual_report_asset(
+                    storage=storage,
+                    asset=asset,
+                    frontier=frontier,
+                )
+            except ValueError as exc:
+                report["errors"].append(str(exc))
+                continue
+            report["selected_announcements"] += 1
+            if status == "pending":
+                report["frontier_inserted"] += 1
+            elif status == "changed":
+                report["frontier_changed"] += 1
+        if len(assets) < bounded_page_size:
+            break
+    else:
+        report["status"] = "partial"
+        report["errors"].append("shared asset pagination bound reached")
+    if report["errors"] and report["status"] == "success":
+        report["status"] = "partial"
+    return report
+
+
+def register_business_profile_shared_annual_report_asset(
+    *,
+    storage: Any,
+    asset: Mapping[str, Any],
+    frontier: BusinessProfileAnnouncementFrontierRepository | None = None,
+) -> str:
+    """Register one exact shared annual-report projection in the BP frontier."""
+
+    required = {
+        "asset_id": str(asset.get("asset_id") or "").strip(),
+        "source": str(asset.get("source") or "").strip().lower(),
+        "source_announcement_id": str(
+            asset.get("source_announcement_id") or ""
+        ).strip(),
+        "attachment_id": str(asset.get("attachment_id") or "").strip(),
+        "observation_version": str(
+            asset.get("observation_version") or ""
+        ).strip(),
+        "content_hash": str(asset.get("content_hash") or "").strip().lower(),
+    }
+    missing = sorted(key for key, value in required.items() if not value)
+    instrument_id = str(asset.get("instrument_id") or "").strip()
+    fiscal_year = int(asset.get("fiscal_year") or 0)
+    if missing or "." not in instrument_id or fiscal_year < 1990:
+        details = ",".join(missing) if missing else "instrument_or_fiscal_year"
+        raise ValueError(
+            "incomplete shared filing identity:"
+            f"{required['asset_id'] or 'unknown'}:{details}"
+        )
+    if len(required["content_hash"]) != 64 or any(
+        character not in "0123456789abcdef"
+        for character in required["content_hash"]
+    ):
+        raise ValueError(
+            f"invalid shared content hash:{required['asset_id']}"
+        )
+    symbol, suffix = instrument_id.rsplit(".", 1)
+    exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
+        suffix.upper(), suffix.upper()
+    )
+    record = AnnouncementRecord(
+        source=required["source"],
+        source_announcement_id=required["source_announcement_id"],
+        announcement_key=build_announcement_key(
+            required["source"], required["source_announcement_id"]
+        ),
+        title=(
+            f"{fiscal_year}年年度报告"
+            + ("（修订版）" if asset.get("is_correction") else "")
+        ),
+        published_at=asset.get("published_at"),
+        exchange=exchange,
+        market=exchange,
+        symbols=(symbol,),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=f"shared-asset://{required['asset_id']}",
+                attachment_id=required["attachment_id"],
+                media_type="application/pdf",
+                file_extension="pdf",
+                raw_metadata={
+                    "shared_asset_id": required["asset_id"],
+                    "observation_version": required["observation_version"],
+                    "content_hash": required["content_hash"],
+                },
+            ),
+        ),
+        raw_payload={"shared_asset_projection": dict(asset)},
+        selection_reasons=("shared_annual_report_asset",),
+    )
+    repository = frontier or BusinessProfileAnnouncementFrontierRepository(storage)
+    return repository.upsert_record(
+        instrument={
+            "instrument_id": instrument_id,
+            "symbol": symbol,
+            "exchange": exchange,
+        },
+        record=record,
+    )
 
 
 class BusinessProfileIndexDiscoveryService:

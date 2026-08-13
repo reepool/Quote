@@ -1,0 +1,650 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quote:announcement-assets:traceability-registry:v2",
+  "title": "Announcement asset bidirectional traceability registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "change_name",
+    "id_namespace",
+    "previous_baseline",
+    "previous_requirement_baseline",
+    "source_catalog",
+    "task_catalog_sha256",
+    "requirement_source_sha256",
+    "normative_source_sha256",
+    "requirement_leaves",
+    "spec_clauses",
+    "coverage_links"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "announcement_asset_traceability_registry.v2"
+    },
+    "change_name": {
+      "const": "establish-shared-announcement-asset-management"
+    },
+    "id_namespace": {
+      "const": "AAM-V1"
+    },
+    "previous_baseline": {
+      "$ref": "#/$defs/previousBaseline"
+    },
+    "previous_requirement_baseline": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/previousRequirementBaseline"}
+      ]
+    },
+    "source_catalog": {
+      "type": "array",
+      "minItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sourceCatalogEntry"
+      }
+    },
+    "task_catalog_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "requirement_source_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "normative_source_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "spec_split_manifest_sha256": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sha256"}
+      ]
+    },
+    "requirement_leaves": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/requirementLeaf"
+      }
+    },
+    "spec_clauses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/specClause"
+      }
+    },
+    "coverage_links": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/coverageLink"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "requirementLeafId": {
+      "type": "string",
+      "pattern": "^AAM-V1-REQ-[0-9]{4,}$"
+    },
+    "specClauseId": {
+      "type": "string",
+      "pattern": "^AAM-V1-[0-9]{4,}$"
+    },
+    "coverageLinkId": {
+      "type": "string",
+      "pattern": "^AAM-V1-LNK-[0-9]{4,}$"
+    },
+    "taskId": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": ["active", "retired"]
+    },
+    "previousBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_path",
+        "registry_sha256",
+        "schema_version",
+        "id_namespace",
+        "entry_count",
+        "maximum_spec_clause_id"
+      ],
+      "properties": {
+        "registry_path": {
+          "enum": [
+            "openspec/changes/establish-shared-announcement-asset-management/evidence/traceability_registry.json",
+            "openspec/changes/establish-shared-announcement-asset-management/evidence/traceability_registry_v1_baseline.json"
+          ]
+        },
+        "registry_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schema_version": {
+          "const": "announcement_asset_traceability_registry.v1"
+        },
+        "id_namespace": {
+          "const": "AAM-V1"
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum_spec_clause_id": {
+          "$ref": "#/$defs/specClauseId"
+        }
+      }
+    },
+    "previousRequirementBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_sha256",
+        "schema_version",
+        "requirement_entry_count",
+        "maximum_requirement_leaf_id",
+        "requirement_source_sha256",
+        "spec_entry_count",
+        "maximum_spec_clause_id",
+        "normative_source_sha256"
+      ],
+      "properties": {
+        "registry_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schema_version": {
+          "const": "announcement_asset_traceability_registry.v2"
+        },
+        "requirement_entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum_requirement_leaf_id": {
+          "$ref": "#/$defs/requirementLeafId"
+        },
+        "requirement_source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "spec_entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum_spec_clause_id": {
+          "$ref": "#/$defs/specClauseId"
+        },
+        "normative_source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "sourceCatalogEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "sha256"],
+      "properties": {
+        "kind": {
+          "enum": ["requirements", "spec", "tasks"]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(docs/development/official_annual_report_asset_management_requirements\\.md|openspec/changes/establish-shared-announcement-asset-management/(tasks\\.md|specs/.+/spec\\.md))$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "lineRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "end": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        }
+      }
+    },
+    "requirementLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "heading_path",
+        "block_kind",
+        "block_index",
+        "marker",
+        "line_range",
+        "locator_sha256"
+      ],
+      "properties": {
+        "path": {
+          "const": "docs/development/official_annual_report_asset_management_requirements.md"
+        },
+        "heading_path": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+          }
+        },
+        "block_kind": {
+          "enum": ["paragraph", "bullet", "ordered_step", "table_row"]
+        },
+        "block_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "marker": {
+          "type": ["string", "null"],
+          "pattern": "^AAM-V1-REQ-[0-9]{4,}$"
+        },
+        "line_range": {
+          "$ref": "#/$defs/lineRange"
+        },
+        "locator_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "specLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "requirement",
+        "scenario",
+        "clause_kind",
+        "clause_index",
+        "marker",
+        "line_range",
+        "locator_sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^openspec/changes/establish-shared-announcement-asset-management/specs/.+/spec\\.md$"
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenario": {
+          "type": ["string", "null"]
+        },
+        "clause_kind": {
+          "enum": ["scenario", "shall"]
+        },
+        "clause_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "marker": {
+          "type": ["string", "null"],
+          "pattern": "^AAM-V1-[0-9]{4,}$"
+        },
+        "line_range": {
+          "$ref": "#/$defs/lineRange"
+        },
+        "locator_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "requirementSourceAlias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_key", "locator", "text_sha256", "reason"],
+      "properties": {
+        "source_key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "locator": {
+          "$ref": "#/$defs/requirementLocator"
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "specSourceAlias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_key", "locator", "text_sha256", "reason"],
+      "properties": {
+        "source_key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "locator": {
+          "$ref": "#/$defs/specLocator"
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "relocationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previous_source_key",
+        "previous_locator",
+        "previous_text_sha256",
+        "reason"
+      ],
+      "properties": {
+        "previous_source_key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "previous_locator": {
+          "$ref": "#/$defs/specLocator"
+        },
+        "previous_text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirementLeaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_leaf_id",
+        "status",
+        "aliases",
+        "source_locator",
+        "normalized_text",
+        "text_sha256",
+        "source_key",
+        "source_aliases",
+        "retired_reason",
+        "superseded_by"
+      ],
+      "properties": {
+        "requirement_leaf_id": {
+          "$ref": "#/$defs/requirementLeafId"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/requirementLeafId"
+          }
+        },
+        "source_locator": {
+          "$ref": "#/$defs/requirementLocator"
+        },
+        "normalized_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/requirementSourceAlias"
+          }
+        },
+        "retired_reason": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "superseded_by": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/requirementLeafId"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "active"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "retired_reason": {"type": "null"},
+              "superseded_by": {"maxItems": 0}
+            }
+          },
+          "else": {
+            "properties": {
+              "retired_reason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    },
+    "specClause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_clause_id",
+        "status",
+        "aliases",
+        "source_locator",
+        "normalized_text",
+        "text_sha256",
+        "source_key",
+        "source_aliases",
+        "relocation_history",
+        "shall_occurrences",
+        "multi_shall_disposition",
+        "multi_shall_review_note",
+        "retired_reason",
+        "superseded_by"
+      ],
+      "properties": {
+        "spec_clause_id": {
+          "$ref": "#/$defs/specClauseId"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/specClauseId"
+          }
+        },
+        "source_locator": {
+          "$ref": "#/$defs/specLocator"
+        },
+        "normalized_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/specSourceAlias"
+          }
+        },
+        "relocation_history": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relocationRecord"
+          }
+        },
+        "shall_occurrences": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "multi_shall_disposition": {
+          "enum": [
+            "not_applicable",
+            "pending_review",
+            "compound_single_clause",
+            "split"
+          ]
+        },
+        "multi_shall_review_note": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "retired_reason": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "superseded_by": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/specClauseId"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "active"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "retired_reason": {"type": "null"},
+              "superseded_by": {"maxItems": 0}
+            }
+          },
+          "else": {
+            "properties": {
+              "retired_reason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    },
+    "coverageLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage_link_id",
+        "status",
+        "aliases",
+        "requirement_leaf_id",
+        "spec_clause_id",
+        "task_ids",
+        "owner",
+        "relationship",
+        "rationale",
+        "retired_reason"
+      ],
+      "properties": {
+        "coverage_link_id": {
+          "$ref": "#/$defs/coverageLinkId"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/coverageLinkId"
+          }
+        },
+        "requirement_leaf_id": {
+          "$ref": "#/$defs/requirementLeafId"
+        },
+        "spec_clause_id": {
+          "$ref": "#/$defs/specClauseId"
+        },
+        "task_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/taskId"
+          }
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationship": {
+          "enum": ["implements", "verifies", "constrains"]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retired_reason": {
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "active"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "retired_reason": {"type": "null"}
+            }
+          },
+          "else": {
+            "properties": {
+              "retired_reason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

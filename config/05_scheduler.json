@@ -60,6 +60,77 @@
           ]
         }
       },
+      "annual_report_asset_latest_backfill": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "公告资产最新一期年报历史回补（仅手工，独立于消费者）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {}
+      },
+      "annual_report_asset_daily_update": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "公告资产年报元数据发现与有效附件日更",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-sun",
+          "hour": 3,
+          "minute": 15,
+          "second": 0,
+          "timezone": "Asia/Shanghai"
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "timezone": "Asia/Shanghai",
+          "overlap_days": 3,
+          "catch_up_max_days": 14,
+          "minimum_runs_per_calendar_day": 1,
+          "universe_refresh_cadence": "before_each_daily_run.v1"
+        }
+      },
+      "annual_report_asset_integrity_audit": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "公告资产文件/hash/引用只读审计",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "read_only": true
+        }
+      },
+      "annual_report_asset_backup": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "公告资产独立故障域增量备份",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-sun",
+          "hour": 4,
+          "minute": 45,
+          "second": 0,
+          "timezone": "Asia/Shanghai"
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "recovery_journal_retention_policy": "append_only_no_automatic_gc.v1",
+          "recovery_journal_integrity_policy": "sha256_chain_with_watermarks.v1"
+        }
+      },
       "a_share_cninfo_corporate_action_daily_sync": {
         "enabled": true,
         "manual_only": false,
@@ -224,6 +295,10 @@
           "scan_sources": false,
           "resume": true,
           "chunk_size": 100,
+          "index_instrument_ids": ["000300.SH", "000905.SH", "000016.SH"],
+          "index_sampling": "daily",
+          "index_max_queries_per_run": 4000,
+          "index_daily_request_reserve": 5000,
           "repair_universe_mode": "historical_backfill",
           "override_lifecycle_filter": false,
           "force_current_master_refresh": true,

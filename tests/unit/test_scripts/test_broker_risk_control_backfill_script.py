@@ -11,6 +11,7 @@ from scripts.dev_validation.backfill_broker_risk_control_reports import (
     build_candidate_report_periods,
     build_default_announcement_window,
     filter_standalone_supplement_records_for_primary_gaps,
+    load_shared_broker_annual_report_records,
     run_broker_risk_control_backfill,
     select_broker_instruments,
 )
@@ -373,6 +374,107 @@ def test_backfill_script_scan_only_skips_payload_fetch():
     assert result["status"] == "scan_only"
     assert result["backfill"]["reports_discovered"] == 1
     assert result["backfill"]["reports_parsed"] == 0
+
+
+def test_shared_only_backfill_lists_local_assets_without_provider_scan():
+    class _SharedAccess:
+        def __init__(self):
+            self.calls = []
+
+        def list_assets(self, *, instrument_id, limit):
+            self.calls.append((instrument_id, limit))
+            return {
+                "items": [
+                    {
+                        "asset_id": "asset-2025",
+                        "instrument_id": instrument_id,
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-2025",
+                        "attachment_id": "attachment-2025",
+                        "observation_version": "observation-2025",
+                        "content_hash": "a" * 64,
+                        "published_at": "2026-03-30T00:00:00+08:00",
+                        "is_correction": False,
+                    }
+                ]
+            }
+
+    shared = _SharedAccess()
+    result = run_broker_risk_control_backfill(
+        db_ops=_FakeDbOps(
+            {
+                "SSE": [
+                    {
+                        "instrument_id": "600030.SH",
+                        "symbol": "600030",
+                        "exchange": "SSE",
+                        "name": "中信证券",
+                        "industry": "证券",
+                    }
+                ]
+            }
+        ),
+        storage=_FakeStorage(),
+        exchanges=["SSE"],
+        as_of_date="2026-06-06",
+        announcement_service=None,
+        payload_fetcher=lambda record: (_ for _ in ()).throw(
+            AssertionError("shared-only scan must not fetch a broker payload")
+        ),
+        scan_only=True,
+        shared_asset_access=shared,
+        annual_report_asset_mode="shared_only",
+    )
+
+    assert shared.calls == [("600030.SH", 1000)]
+    assert result["announcement_scan"]["source_mode"] == (
+        "shared_announcement_asset"
+    )
+    assert result["announcement_scan"]["selected_announcements"] == 1
+    assert result["backfill"]["reports_discovered"] == 1
+
+
+def test_shared_asset_projection_preserves_exact_filing_identity():
+    class _SharedAccess:
+        def list_assets(self, *, instrument_id, limit):
+            return {
+                "items": [
+                    {
+                        "asset_id": "asset-correction",
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-correction",
+                        "attachment_id": "attachment-correction",
+                        "observation_version": "observation-correction",
+                        "content_hash": "b" * 64,
+                        "published_at": "2026-04-02T00:00:00+08:00",
+                        "is_correction": True,
+                    }
+                ]
+            }
+
+    projection = load_shared_broker_annual_report_records(
+        _SharedAccess(),
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+            }
+        ],
+        report_periods=["2025-12-31"],
+    )
+
+    record = projection["selected_records"][0]
+    assert record.source_announcement_id == "annual-correction"
+    assert record.attachments[0].attachment_id == "attachment-correction"
+    assert record.raw_payload["shared_asset_id"] == "asset-correction"
+    assert "修订版" in record.title
 
 
 def test_standalone_supplement_only_parses_primary_net_capital_gaps():

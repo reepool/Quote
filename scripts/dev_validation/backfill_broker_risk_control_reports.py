@@ -499,6 +499,102 @@ def scan_broker_risk_control_announcements(
     }
 
 
+def load_shared_broker_annual_report_records(
+    shared_asset_access: Any,
+    *,
+    instruments: Sequence[Dict[str, Any]],
+    report_periods: Sequence[str],
+) -> Dict[str, Any]:
+    """Project locally valid shared annual assets into the existing parser input."""
+
+    allowed_periods = {str(item) for item in report_periods}
+    records: list[AnnouncementRecord] = []
+    seen_assets: set[str] = set()
+    for instrument in instruments:
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        if not instrument_id:
+            continue
+        projection = shared_asset_access.list_assets(
+            instrument_id=instrument_id,
+            limit=1000,
+        )
+        for asset in projection.get("items", ()):
+            if (
+                asset.get("document_family") != "annual_report"
+                or asset.get("availability") != "local_valid"
+                or str(asset.get("report_period") or "") not in allowed_periods
+            ):
+                continue
+            asset_id = str(asset.get("asset_id") or "")
+            if not asset_id or asset_id in seen_assets:
+                continue
+            seen_assets.add(asset_id)
+            source = str(asset.get("source") or "").strip().lower()
+            source_announcement_id = str(
+                asset.get("source_announcement_id") or ""
+            ).strip()
+            attachment_id = str(asset.get("attachment_id") or asset_id)
+            records.append(
+                AnnouncementRecord(
+                    source=source,
+                    source_announcement_id=source_announcement_id,
+                    announcement_key=build_announcement_key(
+                        source, source_announcement_id
+                    ),
+                    title=(
+                        f"{str(asset['report_period'])[:4]}年年度报告"
+                        + ("（修订版）" if asset.get("is_correction") else "")
+                    ),
+                    published_at=asset.get("published_at"),
+                    exchange=str(instrument.get("exchange") or "").upper() or None,
+                    market=str(instrument.get("exchange") or "").upper() or None,
+                    symbols=(str(instrument.get("symbol") or "").strip(),),
+                    attachments=(
+                        AnnouncementAttachment(
+                            source_url=f"shared-asset://{asset_id}",
+                            attachment_id=attachment_id,
+                            media_type="application/pdf",
+                            file_extension="pdf",
+                            raw_metadata={
+                                "shared_asset_id": asset_id,
+                                "observation_version": asset.get(
+                                    "observation_version"
+                                ),
+                                "content_hash": asset.get("content_hash"),
+                            },
+                        ),
+                    ),
+                    raw_payload={
+                        "shared_asset_id": asset_id,
+                        "shared_asset_projection": dict(asset),
+                    },
+                    selection_reasons=("shared_annual_report_asset",),
+                )
+            )
+    records.sort(
+        key=lambda item: (
+            str(item.published_at or ""),
+            item.source,
+            item.source_announcement_id,
+        )
+    )
+    return {
+        "selected_records": records,
+        "scan_results": [],
+        "market_scan_results": [],
+        "per_instrument_scan": {
+            "enabled": False,
+            "attempted_instruments": 0,
+            "instruments_with_matches": len(
+                {symbol for record in records for symbol in record.symbols}
+            ),
+            "selected_announcements_added": len(records),
+            "results": [],
+        },
+        "source_mode": "shared_announcement_asset",
+    }
+
+
 def run_broker_risk_control_backfill(
     *,
     db_ops: Any,
@@ -525,6 +621,8 @@ def run_broker_risk_control_backfill(
     archive_root: Optional[str | Path] = None,
     tier: str = "history",
     repair_existing: bool = False,
+    shared_asset_access: Any | None = None,
+    annual_report_asset_mode: str | None = None,
 ) -> Dict[str, Any]:
     """Run a broker risk-control report dry-run/backfill and return JSON-ready data."""
     window = build_default_announcement_window(
@@ -550,15 +648,34 @@ def run_broker_risk_control_backfill(
         ",".join(instrument_ids or []),
         scan_only,
     )
-    acquisition_config = load_announcement_acquisition_config(
-        data_manager.research_config
+    broker_cfg = data_manager.research_config.modules.get(
+        "broker_risk_control_reports", {}
     )
-    active_announcement_service = announcement_service or AnnouncementAcquisitionService(
-        registry=OfficialAnnouncementProviderRegistry(
-            research_config=data_manager.research_config
-        ),
-        config=acquisition_config,
+    dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
+    dependency_mode = str(
+        annual_report_asset_mode
+        or dependency_cfg.get("mode", "legacy")
+    ).strip().lower()
+    if dependency_mode not in {"legacy", "dual_read", "shared_only"}:
+        raise ValueError("invalid broker annual-report asset mode")
+    shared_only_annual = (
+        source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        and dependency_mode == "shared_only"
     )
+    active_announcement_service = announcement_service
+    if not shared_only_annual or include_standalone_supplement:
+        acquisition_config = load_announcement_acquisition_config(
+            data_manager.research_config
+        )
+        active_announcement_service = (
+            active_announcement_service
+            or AnnouncementAcquisitionService(
+                registry=OfficialAnnouncementProviderRegistry(
+                    research_config=data_manager.research_config
+                ),
+                config=acquisition_config,
+            )
+        )
     effective_limit = 0 if instrument_ids else limit_instruments
     selected_instruments = select_broker_instruments(
         db_ops,
@@ -580,7 +697,21 @@ def run_broker_risk_control_backfill(
         "errors": [],
         "owner": "announcement_provider",
     }
-    if repair_existing:
+    if shared_only_annual:
+        if shared_asset_access is None:
+            raise RuntimeError(
+                "shared-only broker annual-report backfill requires asset access"
+            )
+        scan = load_shared_broker_annual_report_records(
+            shared_asset_access,
+            instruments=selected_instruments,
+            report_periods=periods,
+        )
+        LOGGER.info(
+            "broker shared annual-report assets loaded: selected_assets=%s",
+            len(scan["selected_records"]),
+        )
+    elif repair_existing:
         scan = load_existing_broker_risk_control_records(
             storage,
             instruments=selected_instruments,
@@ -594,6 +725,8 @@ def run_broker_risk_control_backfill(
             (scan.get("repair_existing") or {}).get("missing_archives"),
         )
     else:
+        if active_announcement_service is None:
+            raise RuntimeError("broker announcement service is unavailable")
         scan = scan_broker_risk_control_announcements(
             active_announcement_service,
             exchanges=exchanges,
@@ -615,6 +748,8 @@ def run_broker_risk_control_backfill(
         )
     standalone_scan: Optional[Dict[str, Any]] = None
     if include_standalone_supplement:
+        if active_announcement_service is None:
+            raise RuntimeError("supplementary announcement service is unavailable")
         standalone_scan = scan_broker_risk_control_announcements(
             active_announcement_service,
             exchanges=exchanges,
@@ -660,6 +795,8 @@ def run_broker_risk_control_backfill(
             source_profile=source_profile,
             force_reparse_existing=repair_existing,
             replace_existing_facts=repair_existing,
+            shared_asset_access=shared_asset_access,
+            annual_report_asset_mode=dependency_mode,
         )
         with _financial_storage_scope(storage):
             service_result = service.backfill(
@@ -758,6 +895,7 @@ def run_broker_risk_control_backfill(
             for item in selected_instruments
         ],
         "announcement_scan": {
+            "source_mode": scan.get("source_mode", "provider_discovery"),
             "cninfo_org_id_resolution": org_resolution,
             "selected_announcements": len(scan["selected_records"]),
             "scan_results": scan["scan_results"],

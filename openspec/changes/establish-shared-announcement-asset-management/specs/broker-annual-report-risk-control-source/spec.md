@@ -5,7 +5,8 @@ For each periodic-report type enabled by the shared capability, the system SHALL
 
 #### Scenario: Formal annual report is selected
 - **WHEN** the shared asset service exposes the effective formal annual report for a listed broker and report period
-- **THEN** broker ingestion SHALL parse that asset and exclude summaries, audit reports, inquiry letters, reply notices, continuous-supervision reports, and performance-briefing announcements
+- **THEN** broker ingestion SHALL use its existing embedded-table parser and preserve its supplementary `风险控制指标报告` path
+- **AND** it SHALL exclude summaries, audit reports, inquiry letters, reply notices, continuous-supervision reports, and performance-briefing announcements from the formal annual-report parser
 
 #### Scenario: Formal annual report is missing locally
 - **WHEN** broker ingestion requires an annual report that is not locally available
@@ -27,7 +28,8 @@ For each periodic-report type enabled by the shared capability, the system SHALL
 - **AND** current broker facts SHALL not silently remain bound to the deleted predecessor attachment
 
 ### Requirement: Broker Regulatory Facts Must Use Existing Financial Storage
-Parsed broker annual/semiannual regulatory facts SHALL be stored through existing financial numeric-fact APIs, while source-asset identity and parser-processing identity SHALL remain separate.
+Parsed broker annual/semiannual regulatory facts SHALL be stored through existing financial numeric-fact APIs.
+Source-asset identity SHALL remain separate from parser-processing identity.
 
 #### Scenario: Shared annual report is parsed
 - **WHEN** a formal annual-report asset is parsed

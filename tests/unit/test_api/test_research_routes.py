@@ -1447,6 +1447,8 @@ class TestResearchRoutes:
         assert isinstance(response, ResearchCompanyBusinessProfileResponse)
         assert response.model_recommendation == "industry_default"
         assert response.exceptions[0]["tier"] == "machine_rework"
+        assert response.source_assets is None
+        assert response.consumer_processing_status is None
         mock_dm.get_research_company_business_profile.assert_awaited_once_with(
             "601088.SH",
             as_of_date="2026-04-30",

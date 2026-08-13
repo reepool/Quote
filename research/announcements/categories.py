@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
+from typing import Any
 
 ANNUAL_REPORT_CATEGORY = "annual_report"
 SEMIANNUAL_REPORT_CATEGORY = "semiannual_report"
 
 _ALIASES = {
     ANNUAL_REPORT_CATEGORY: ANNUAL_REPORT_CATEGORY,
+    "annual": ANNUAL_REPORT_CATEGORY,
+    "annual_report_correction": ANNUAL_REPORT_CATEGORY,
+    "annual_correction": ANNUAL_REPORT_CATEGORY,
+    "correction_notice": ANNUAL_REPORT_CATEGORY,
     "category_ndbg_szsh": ANNUAL_REPORT_CATEGORY,
     SEMIANNUAL_REPORT_CATEGORY: SEMIANNUAL_REPORT_CATEGORY,
+    "semiannual": SEMIANNUAL_REPORT_CATEGORY,
+    "semiannual_correction": SEMIANNUAL_REPORT_CATEGORY,
     "category_bndbg_szsh": SEMIANNUAL_REPORT_CATEGORY,
 }
 
@@ -20,7 +25,7 @@ _CNINFO_VALUES = {
     SEMIANNUAL_REPORT_CATEGORY: "category_bndbg_szsh",
 }
 
-_EXCHANGE_OPTIONS: Dict[str, Dict[str, Dict[str, Any]]] = {
+_EXCHANGE_OPTIONS: dict[str, dict[str, dict[str, Any]]] = {
     "SSE": {
         ANNUAL_REPORT_CATEGORY: {"report_type2": "DQBG", "report_type": "YEARLY"},
         SEMIANNUAL_REPORT_CATEGORY: {"report_type2": "DQBG", "report_type": "QUATER2"},
@@ -50,7 +55,7 @@ def cninfo_category_value(value: Any) -> str | None:
     return _CNINFO_VALUES.get(normalized, normalized)
 
 
-def exchange_category_options(exchange: str, value: Any) -> Dict[str, Any] | None:
+def exchange_category_options(exchange: str, value: Any) -> dict[str, Any] | None:
     """Return official exchange parameters, or None for an unsupported category."""
 
     normalized = normalize_announcement_category(value)

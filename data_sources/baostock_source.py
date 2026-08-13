@@ -160,6 +160,20 @@ class BaostockAccessGovernor:
         })
         return count
 
+    def usage_snapshot(self) -> Dict[str, Any]:
+        """Return current project-wide usage without reserving a request."""
+        now = datetime.now(_HONG_KONG_TZ)
+        state = self._read_state()
+        count = int(state.get("count", 0)) if state.get("date") == now.date().isoformat() else 0
+        return {
+            "date": now.date().isoformat(),
+            "count": count,
+            "limit": self.daily_request_limit,
+            "remaining": max(self.daily_request_limit - count, 0),
+            "state_path": str(self.state_path),
+            "session_lock_path": str(self.session_lock_path),
+        }
+
     def _read_state(self) -> Dict[str, Any]:
         states = [self._read_state_path(self.state_path, required=True)]
         if (
@@ -394,6 +408,41 @@ class BaostockSource(BaseDataSource):
     # BaoStock type 字段映射: 1=股票, 2=指数, 4=可转债, 5=ETF/基金
     # 注意: BaoStock query_history_k_data_plus 不支持 ETF 日线数据查询
     BAOSTOCK_TYPE_MAP: Dict[str, str] = {'1': 'stock', '2': 'index', '5': 'etf'}
+    HISTORICAL_INDEX_QUERIES = {
+        "000300.SH": "query_hs300_stocks",
+        "000905.SH": "query_zz500_stocks",
+        "000016.SH": "query_sz50_stocks",
+    }
+
+    def get_quota_snapshot(self) -> Dict[str, Any]:
+        """Expose read-only governed quota state for dry-run planning."""
+        return self._access_governor.usage_snapshot()
+
+    async def get_historical_index_constituents(
+        self,
+        index_instrument_id: str,
+        observation_date: date,
+    ) -> List[Dict[str, Any]]:
+        """Fetch one date-specific core-index membership observation."""
+        method_name = self.HISTORICAL_INDEX_QUERIES.get(str(index_instrument_id).upper())
+        if method_name is None:
+            raise ValueError(f"unsupported BaoStock historical index: {index_instrument_id}")
+        await self.rate_limiter.acquire()
+        await self._ensure_login()
+        query = getattr(bs, method_name)
+        async with BaostockSource._bs_lock:
+            result = await self._run_bs_call(query, observation_date.isoformat())
+            if result.error_code != "0":
+                raise DataSourceError(
+                    f"BaoStock {method_name} failed: {result.error_msg}",
+                    ErrorCodes.DATASOURCE_CONNECTION_FAILED,
+                )
+            rows: List[Dict[str, Any]] = []
+            while (result.error_code == "0") & result.next():
+                values = result.get_row_data()
+                rows.append(dict(zip(result.fields, values)))
+        self._last_success_time = asyncio.get_event_loop().time()
+        return rows
 
     async def get_instrument_list(self, exchange: str = None,
                                   instrument_types: List[str] = None) -> List[Dict[str, Any]]:
