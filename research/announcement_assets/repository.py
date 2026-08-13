@@ -1579,6 +1579,39 @@ class AnnouncementAssetRepository:
             if result.rowcount != 1:
                 raise KeyError(f"blob not found: {content_hash}")
 
+    def compare_and_set_blob_path(
+        self,
+        content_hash: str,
+        *,
+        expected_path: str | Path,
+        canonical_path: str | Path,
+    ) -> None:
+        """Atomically switch a verified blob from one exact path to another."""
+
+        expected = str(Path(expected_path).resolve(strict=False))
+        canonical = str(Path(canonical_path).resolve(strict=False))
+        with self.transaction() as conn:
+            row = conn.execute(
+                "SELECT canonical_path FROM official_document_blobs WHERE content_hash=?",
+                (str(content_hash),),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"blob not found: {content_hash}")
+            stored = str(row["canonical_path"])
+            current = str(Path(stored).resolve(strict=False))
+            if stored == canonical:
+                return
+            if current != expected:
+                raise RuntimeError("blob canonical path changed after planning")
+            result = conn.execute(
+                """UPDATE official_document_blobs
+                   SET canonical_path=?, updated_at=?
+                   WHERE content_hash=? AND canonical_path=?""",
+                (canonical, utc_now_iso(), str(content_hash), stored),
+            )
+            if result.rowcount != 1:
+                raise RuntimeError("blob canonical path update raced")
+
     def upsert_legacy_path_manifest(
         self,
         *,
