@@ -87,6 +87,12 @@ class _Storage:
     def financial_database_scope(self):
         return nullcontext()
 
+    def get_financial_source_file_manifests(self, **_kwargs):
+        return []
+
+    def get_financial_numeric_facts(self, *_args, **_kwargs):
+        return []
+
 
 class _Service:
     def __init__(self, **kwargs):
@@ -102,6 +108,21 @@ class _Service:
             "reports_parsed": 1,
             "facts_parsed": 1,
             "report_summaries": [{"missing_required_facts": []}],
+        }
+
+
+class _PartialFactService(_Service):
+    def process_shared_asset_event(self, event, *, instrument, dry_run, **kwargs):
+        assert event["asset_id"].startswith("asset-")
+        assert instrument["instrument_id"] == event["instrument_id"]
+        return {
+            "status": "success",
+            "reports_parsed": 1,
+            "facts_parsed": 4,
+            "parse_failures": 0,
+            "retryable_pending_reports": 0,
+            "report_summaries": [{"missing_required_facts": ["net_capital"]}],
+            "dry_run": dry_run,
         }
 
 
@@ -149,6 +170,56 @@ def test_write_requires_exact_preapproved_asset_count_before_service_creation():
                 "service must not be created before bound approval passes"
             ),
         )
+
+
+def test_write_marks_lineage_valid_partial_fact_output_current(monkeypatch):
+    access = _Access([_asset("002670.SZ", 2024)])
+    validations = iter(
+        (
+            {"ready": False, "reason_code": "shared_broker_manifest_not_unique"},
+            {
+                "ready": True,
+                "reason_code": None,
+                "fact_count": 4,
+                "missing_required_facts": ["net_capital"],
+                "business_fact_complete": False,
+            },
+        )
+    )
+    monkeypatch.setattr(
+        "scripts.dev_validation.migrate_broker_shared_annual_reports.validate_broker_shared_asset_processing",
+        lambda *_args, **_kwargs: next(validations),
+    )
+    monkeypatch.setattr(
+        "scripts.dev_validation.migrate_broker_shared_annual_reports._stale_superseded_default_processing",
+        lambda *_args, **_kwargs: 0,
+    )
+
+    result = migrate_broker_shared_annual_reports(
+        access=access,
+        storage=_Storage(),
+        instruments={
+            "002670.SZ": {
+                "instrument_id": "002670.SZ",
+                "symbol": "002670",
+                "exchange": "SZSE",
+            }
+        },
+        write=True,
+        expected_asset_count=1,
+        service_factory=_PartialFactService,
+    )
+
+    assert result["status"] == "completed"
+    assert result["current_count"] == 1
+    assert result["failed_count"] == 0
+    assert result["business_incomplete_count"] == 1
+    assert result["business_incomplete_assets"][0]["missing_required_facts"] == [
+        "net_capital"
+    ]
+    assert result["provider_requests"] == 0
+    assert result["attachment_downloads"] == 0
+    assert access.repository.rows[0]["status"].value == "current"
 
 
 def test_stale_superseded_default_processing_preserves_exact_selector(tmp_path):

@@ -23,11 +23,10 @@ from scripts.dev_validation.inventory_announcement_asset_capacity import (
     _write_new_json,
 )
 
-SCHEMA_VERSION = "annual_report_asset_consumer_reconciliation.v1"
-EVIDENCE_ID = "annual-report-consumer-input-reconciliation-20260813-v2"
+SCHEMA_VERSION = "annual_report_asset_consumer_reconciliation.v2"
+EVIDENCE_ID = "annual-report-consumer-dependency-reconciliation-20260813-v3"
 BP_PARSER_VERSION = "business_profile_pdf_archive.v2"
 BROKER_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
-BP_PROCESSOR_VERSION = "business_profile_annual_report_process.v1"
 BP_USABLE_STATUSES = ("archived", "archived_unchanged_content", "verified", "success")
 
 
@@ -200,49 +199,6 @@ def _json_mapping(value: Any) -> dict[str, Any]:
     except (TypeError, ValueError, json.JSONDecodeError):
         return {}
     return dict(parsed) if isinstance(parsed, Mapping) else {}
-
-
-def _business_profile_processing_is_current(
-    row: Mapping[str, Any],
-    *,
-    asset: Mapping[str, Any] | None,
-    required_asset_ids: set[str],
-) -> bool:
-    asset_id = str(row.get("asset_id") or "")
-    metadata = _json_mapping(row.get("metadata_json"))
-    completion = metadata.get("completion_validation")
-    completion = dict(completion) if isinstance(completion, Mapping) else {}
-    business_result = metadata.get("business_result")
-    business_result = (
-        dict(business_result) if isinstance(business_result, Mapping) else {}
-    )
-    bound = business_result.get("bound_shared_asset")
-    bound = dict(bound) if isinstance(bound, Mapping) else {}
-    exact_binding = bool(
-        asset
-        and all(
-            str(bound.get(field) or "").strip().lower()
-            == str(asset.get(asset_field) or "").strip().lower()
-            for field, asset_field in (
-                ("asset_id", "asset_id"),
-                ("observation_version", "version_id"),
-                ("content_hash", "content_hash"),
-            )
-        )
-    )
-    return bool(
-        asset_id in required_asset_ids
-        and exact_binding
-        and completion.get("ready") is True
-        and completion.get("binding_matches") is True
-        and completion.get("stages_complete") is True
-        and completion.get("upstream_stages_successful") is True
-        and str(completion.get("publish_status") or "").lower()
-        in {"completed", "success"}
-        and completion.get("checkpoint_hash")
-        and completion.get("result_identity")
-        and completion.get("result_identity") == row.get("derived_identity")
-    )
 
 
 def _broker_processing_sets_match(
@@ -449,7 +405,6 @@ def reconcile_consumers(
                 and binding.get("content_hash") == asset.get("content_hash")
                 and row.get("content_hash") == asset.get("content_hash")
                 and signature["fact_count"] > 0
-                and signature["has_required_net_capital"]
             )
             if exact:
                 broker_shared_current.append(item)
@@ -500,42 +455,6 @@ def reconcile_consumers(
             else:
                 processing_conflicts.append(item)
 
-        bp_processing_rows = _rows(
-            research,
-            """SELECT asset_id, status, parser_version, parameter_hash,
-                      derived_identity, error_code, metadata_json
-               FROM official_asset_consumer_processing
-               WHERE consumer='business_profile'
-                 AND parser_version=?
-                 AND status='current'""",
-            (BP_PROCESSOR_VERSION,),
-        )
-        bp_processing_current: list[dict[str, Any]] = []
-        bp_processing_conflicts: list[dict[str, Any]] = []
-        bp_required_asset_ids = {
-            str(shared_by_scope[scope]["asset_id"])
-            for scope in bp_groups
-            if scope in shared_by_scope
-        }
-        for row in bp_processing_rows:
-            asset_id = str(row.get("asset_id") or "")
-            asset = shared_assets_by_id.get(asset_id)
-            valid = _business_profile_processing_is_current(
-                row,
-                asset=asset,
-                required_asset_ids=bp_required_asset_ids,
-            )
-            completion = _json_mapping(row.get("metadata_json")).get(
-                "completion_validation"
-            )
-            completion = dict(completion) if isinstance(completion, Mapping) else {}
-            item = {
-                "asset_id": asset_id,
-                "derived_identity": row.get("derived_identity"),
-                "completion_ready": completion.get("ready"),
-            }
-            (bp_processing_current if valid else bp_processing_conflicts).append(item)
-
         semiannual_count = int(
             financials.execute(
                 """SELECT COUNT(*) FROM financial_source_files
@@ -560,7 +479,12 @@ def reconcile_consumers(
             default=str,
         ).encode()
     ).hexdigest()
-    bp_compatible = not bp_conflicts and bp_overlap == bp_active_match + len(bp_text_equivalent)
+    bp_dependency_handoff_ready = bool(
+        bp_groups
+        and bp_overlap == len(bp_groups)
+        and not bp_conflicts
+        and bp_overlap == bp_active_match + len(bp_text_equivalent)
+    )
     broker_input_compatible = bool(
         legacy_parsed_broker_rows
         and not broker_legacy_conflicts
@@ -588,35 +512,27 @@ def reconcile_consumers(
             },
         )
     )
-    broker_output_reconciliation_ready = bool(
+    broker_processing_reconciliation_ready = bool(
         broker_processing_accounted and not processing_failed
     )
     mutation_free = database_before == database_after and tree_before == tree_after
     input_reconciliation_ready = bool(
         shared
         and not shared_failures
-        and bp_compatible
+        and bp_dependency_handoff_ready
         and broker_input_compatible
         and mutation_free
     )
-    bp_current_asset_ids = {str(row["asset_id"]) for row in bp_processing_current}
-    business_profile_output_ready = bool(
-        bp_required_asset_ids
-        and not bp_processing_conflicts
-        and bp_current_asset_ids == bp_required_asset_ids
+    consumer_dependency_ready = bool(
+        bp_dependency_handoff_ready and broker_processing_reconciliation_ready
     )
-    business_output_reconciliation_ready = bool(
-        business_profile_output_ready and broker_output_reconciliation_ready
-    )
-    business_output_blockers: list[str] = []
-    if not business_profile_output_ready:
-        business_output_blockers.append(
-            "business_profile_shared_semantic_processing_missing"
-        )
-    if not broker_output_reconciliation_ready:
-        business_output_blockers.append("broker_shared_processing_incomplete")
+    dependency_blockers: list[str] = []
+    if not bp_dependency_handoff_ready:
+        dependency_blockers.append("business_profile_shared_asset_handoff_incomplete")
+    if not broker_processing_reconciliation_ready:
+        dependency_blockers.append("broker_shared_processing_incomplete")
     dual_read_ready = bool(
-        input_reconciliation_ready and business_output_reconciliation_ready
+        input_reconciliation_ready and consumer_dependency_ready
     )
     return {
         "schema_version": SCHEMA_VERSION,
@@ -638,12 +554,13 @@ def reconcile_consumers(
             "binary_mismatch_text_equivalent": bp_text_equivalent,
             "canonical_only_count": len(shared_by_scope) - bp_overlap,
             "conflicts": bp_conflicts,
-            "output_contract": "source_manifest_plus_business_profile_pdf_parser_input.v1",
-            "semantic_result_baseline_available": business_profile_output_ready,
-            "required_processing_asset_count": len(bp_required_asset_ids),
-            "processing_current_count": len(bp_processing_current),
-            "processing_conflicts": bp_processing_conflicts,
-            "output_reconciliation_ready": business_profile_output_ready,
+            "dependency_contract": "shared_annual_report_lookup_binding_handoff.v1",
+            "dependency_required_scope_count": len(bp_groups),
+            "dependency_ready_scope_count": bp_overlap - len(bp_conflicts),
+            "dependency_missing_scope_count": len(bp_groups) - bp_overlap,
+            "dependency_handoff_ready": bp_dependency_handoff_ready,
+            "downstream_processing_owner": "business_profile",
+            "downstream_processing_in_rollout_gate": False,
         },
         "broker_risk_control": {
             "confirmed_instrument_count": len(confirmed_brokers),
@@ -662,7 +579,10 @@ def reconcile_consumers(
                 len(processing_current) + len(processing_failed)
             ),
             "processing_accounted": broker_processing_accounted,
-            "output_reconciliation_ready": broker_output_reconciliation_ready,
+            "processing_reconciliation_ready": broker_processing_reconciliation_ready,
+            "business_incomplete_scope_count": len(
+                broker_legacy_missing_required_facts
+            ),
             "historical_failed_rows_ignored": historical_failed_count,
             "legacy_semiannual_parsed_count": semiannual_count,
             "semiannual_policy": "legacy_gate_retained_not_shared_v1",
@@ -681,17 +601,17 @@ def reconcile_consumers(
         },
         "migration_gates": {
             "input_reconciliation_ready": input_reconciliation_ready,
-            "business_output_reconciliation_ready": (
-                business_output_reconciliation_ready
-            ),
-            "business_output_blockers": business_output_blockers,
+            "consumer_dependency_ready": consumer_dependency_ready,
+            "dependency_blockers": dependency_blockers,
             "dual_read_ready": dual_read_ready,
             "shared_only_ready": False,
             "legacy_writer_disable_allowed": False,
             "reason": (
-                "shared PDF input reconciliation passed; business-output "
-                "reconciliation remains gated by business-profile shared "
-                "semantic processing and any incomplete broker shared assets"
+                "shared annual-report dependency handoff passed for business-profile "
+                "and broker; downstream business-profile processing is independently owned"
+                if dual_read_ready
+                else "shared PDF input reconciliation passed; consumer dependency "
+                "handoff remains incomplete"
                 if input_reconciliation_ready
                 else "shared PDF input reconciliation failed"
             ),

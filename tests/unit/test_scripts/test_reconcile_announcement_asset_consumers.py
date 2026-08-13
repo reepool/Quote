@@ -7,7 +7,6 @@ from pathlib import Path
 from scripts.dev_validation.reconcile_announcement_asset_consumers import (
     _active_manifest,
     _broker_processing_sets_match,
-    _business_profile_processing_is_current,
     _normalize_filing_id,
     reconcile_consumers,
 )
@@ -96,35 +95,6 @@ def test_reconciliation_is_read_only_and_accepts_identical_consumer_bytes(tmp_pa
                 ),
             ),
         )
-        bp_completion = {
-            "ready": True,
-            "binding_matches": True,
-            "stages_complete": True,
-            "upstream_stages_successful": True,
-            "publish_status": "completed",
-            "checkpoint_hash": "checkpoint-hash",
-            "result_identity": "bp-result-1",
-        }
-        conn.execute(
-            "INSERT INTO official_asset_consumer_processing VALUES(?,?,?,?,?,?,?,?)",
-            (
-                "asset-1", "business_profile",
-                "business_profile_annual_report_process.v1", "bp-parameter-1",
-                "current", None, "bp-result-1",
-                json.dumps(
-                    {
-                        "business_result": {
-                            "bound_shared_asset": {
-                                "asset_id": "asset-1",
-                                "observation_version": "version-1",
-                                "content_hash": digest,
-                            }
-                        },
-                        "completion_validation": bp_completion,
-                    }
-                ),
-            ),
-        )
     with sqlite3.connect(financials_db) as conn:
         conn.executescript(
             """
@@ -181,14 +151,14 @@ def test_reconciliation_is_read_only_and_accepts_identical_consumer_bytes(tmp_pa
         conn.execute(
             "INSERT INTO financial_numeric_facts VALUES(?,?,?,?,?,?,?,?,?,?)",
             (
-                "broker-1", "net_capital", "net_capital", "CNY", "CNY",
+                "broker-1", "regulatory_net_assets", "regulatory_net_assets", "CNY", "CNY",
                 1.0, "1", "2025-12-31", "annual", "broker_risk_control",
             ),
         )
         conn.execute(
             "INSERT INTO financial_numeric_facts VALUES(?,?,?,?,?,?,?,?,?,?)",
             (
-                "broker-shared-1", "net_capital", "net_capital", "CNY", "CNY",
+                "broker-shared-1", "regulatory_net_assets", "regulatory_net_assets", "CNY", "CNY",
                 1.0, "1", "2025-12-31", "annual", "broker_risk_control",
             ),
         )
@@ -210,11 +180,13 @@ def test_reconciliation_is_read_only_and_accepts_identical_consumer_bytes(tmp_pa
     )
 
     assert result["migration_gates"]["input_reconciliation_ready"] is True
-    assert result["migration_gates"]["business_output_reconciliation_ready"] is True
+    assert result["migration_gates"]["consumer_dependency_ready"] is True
     assert result["migration_gates"]["dual_read_ready"] is True
     assert result["migration_gates"]["shared_only_ready"] is False
-    assert result["migration_gates"]["business_output_blockers"] == []
+    assert result["migration_gates"]["dependency_blockers"] == []
     assert result["business_profile"]["active_winner_content_match_count"] == 1
+    assert result["business_profile"]["dependency_handoff_ready"] is True
+    assert result["business_profile"]["downstream_processing_in_rollout_gate"] is False
     broker = result["broker_risk_control"]
     assert broker["legacy_parsed_annual_scope_count"] == 1
     assert broker["legacy_exact_shared_input_match_count"] == 1
@@ -222,57 +194,11 @@ def test_reconciliation_is_read_only_and_accepts_identical_consumer_bytes(tmp_pa
     assert broker["processing_current_count"] == 1
     assert broker["processing_failed_count"] == 0
     assert broker["processing_accounted"] is True
-    assert broker["output_reconciliation_ready"] is True
+    assert broker["processing_reconciliation_ready"] is True
+    assert broker["business_incomplete_scope_count"] == 1
     assert result["activity"]["provider_requests"] == 0
     assert result["activity"]["database_mutations"] == 0
     assert before == (research_db.stat().st_mtime_ns, financials_db.stat().st_mtime_ns)
-
-
-def test_business_profile_current_requires_exact_completed_evidence():
-    asset = {
-        "asset_id": "asset-1",
-        "version_id": "version-1",
-        "content_hash": "a" * 64,
-    }
-    completion = {
-        "ready": True,
-        "binding_matches": True,
-        "stages_complete": True,
-        "upstream_stages_successful": True,
-        "publish_status": "completed",
-        "checkpoint_hash": "checkpoint-hash",
-        "result_identity": "result-1",
-    }
-    row = {
-        "asset_id": "asset-1",
-        "derived_identity": "result-1",
-        "metadata_json": json.dumps(
-            {
-                "business_result": {
-                    "bound_shared_asset": {
-                        "asset_id": "asset-1",
-                        "observation_version": "version-1",
-                        "content_hash": "a" * 64,
-                    }
-                },
-                "completion_validation": completion,
-            }
-        ),
-    }
-
-    assert _business_profile_processing_is_current(
-        row, asset=asset, required_asset_ids={"asset-1"}
-    ) is True
-    completion["checkpoint_hash"] = None
-    row["metadata_json"] = json.dumps(
-        {
-            "business_result": json.loads(row["metadata_json"])["business_result"],
-            "completion_validation": completion,
-        }
-    )
-    assert _business_profile_processing_is_current(
-        row, asset=asset, required_asset_ids={"asset-1"}
-    ) is False
 
 
 def test_broker_processing_requires_exact_asset_set_not_only_equal_count():

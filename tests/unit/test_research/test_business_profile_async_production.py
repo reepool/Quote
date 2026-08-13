@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import nullcontext
 import io
 import json
 import logging
@@ -884,6 +885,64 @@ def test_data_manager_broker_consumer_reads_nested_dependency_config(monkeypatch
 
     assert outcome.status == "blocked"
     assert outcome.reason_code == "instrument_not_confirmed_listed_broker"
+
+
+def test_data_manager_broker_consumer_completes_with_missing_fact_diagnostic(
+    monkeypatch,
+):
+    asset = {
+        "asset_id": "asset-2024",
+        "instrument_id": "002670.SZ",
+        "fiscal_year": 2024,
+        "observation_version": "version-2024",
+        "content_hash": "a" * 64,
+    }
+    monkeypatch.setattr(
+        "scripts.dev_validation.backfill_broker_risk_control_reports.select_broker_instruments",
+        lambda *_args, **_kwargs: [
+            {"instrument_id": "002670.SZ", "symbol": "002670", "exchange": "SZSE"}
+        ],
+    )
+    monkeypatch.setattr(
+        "research.broker_risk_control.BrokerRiskControlReportSyncService.process_shared_asset_event",
+        lambda *_args, **_kwargs: {"status": "success", "parse_failures": 0},
+    )
+    monkeypatch.setattr(
+        "research.broker_risk_control.validate_broker_shared_asset_processing",
+        lambda *_args, **_kwargs: {
+            "ready": True,
+            "reason_code": None,
+            "fact_count": 4,
+            "missing_required_facts": ["net_capital"],
+            "business_fact_complete": False,
+        },
+    )
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = SimpleNamespace(
+        financial_database_scope=nullcontext
+    )
+    manager.db_ops = object()
+    manager.research_config = SimpleNamespace(
+        modules={
+            "financial_statements": {
+                "broker_risk_control_reports": {
+                    "annual_report_asset_dependency": {"mode": "dual_read"}
+                }
+            }
+        }
+    )
+    manager._get_announcement_asset_access = lambda **_kwargs: object()
+
+    outcome = manager._process_broker_risk_control_annual_report_asset(
+        asset,
+        SimpleNamespace(),
+    )
+
+    assert outcome.status == "completed"
+    assert outcome.diagnostics == {
+        "missing_required_facts": ["net_capital"],
+        "business_fact_complete": False,
+    }
 
 
 def test_recovery_requeues_only_empty_completion_and_is_idempotent(tmp_path):

@@ -1427,7 +1427,7 @@ def test_broker_consumer_event_reads_exact_bound_observation_after_correction(tm
     )
 
 
-def test_shared_processing_validation_requires_fact_lineage_and_net_capital():
+def test_shared_processing_validation_separates_lineage_from_business_completeness():
     asset = {
         "asset_id": "asset-2025",
         "instrument_id": "600030.SH",
@@ -1474,14 +1474,41 @@ def test_shared_processing_validation_requires_fact_lineage_and_net_capital():
     assert validate_broker_shared_asset_processing(storage, asset)["ready"] is True
     storage.rows[0]["canonical_fact_name"] = "risk_coverage_ratio"
     validation = validate_broker_shared_asset_processing(storage, asset)
-    assert validation["ready"] is False
-    assert validation["reason_code"] == "broker_required_fact_missing"
+    assert validation["ready"] is True
+    assert validation["reason_code"] is None
     assert validation["missing_required_facts"] == ["net_capital"]
+    assert validation["business_fact_complete"] is False
     storage.rows[0]["canonical_fact_name"] = "net_capital"
     storage.rows[0]["raw_fact"] = {"source_asset_lineage": {**lineage, "asset_id": "other"}}
     validation = validate_broker_shared_asset_processing(storage, asset)
     assert validation["ready"] is False
     assert validation["reason_code"] == "broker_fact_lineage_invalid"
+    storage.rows = [
+        {
+            "source_file_id": "shared-source",
+            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+            "source_mode": "shared_announcement_asset",
+            "canonical_fact_name": "net_capital",
+            "raw_fact": {"source_asset_lineage": lineage},
+            "dimensions": {"source_asset_lineage": lineage},
+        },
+        {
+            "source_file_id": "shared-source",
+            "parser_version": "unexpected-parser",
+            "source_mode": "legacy_archive",
+            "canonical_fact_name": "risk_coverage_ratio",
+            "raw_fact": {"source_asset_lineage": lineage},
+            "dimensions": {"source_asset_lineage": lineage},
+        },
+    ]
+    validation = validate_broker_shared_asset_processing(storage, asset)
+    assert validation["ready"] is False
+    assert validation["reason_code"] == "broker_fact_lineage_invalid"
+    assert validation["invalid_lineage_count"] == 1
+    storage.rows = []
+    validation = validate_broker_shared_asset_processing(storage, asset)
+    assert validation["ready"] is False
+    assert validation["reason_code"] == "broker_fact_output_empty"
 
 
 def test_broker_risk_control_artifact_classification_is_title_scoped():

@@ -128,7 +128,7 @@ def test_production_consumers_use_dual_read_while_template_remains_fail_safe():
         assert dependency["legacy_fallback_enabled"] is True
         assert dependency["legacy_writer_disabled"] is False
         assert dependency["reconciliation_evidence_id"] == (
-            "annual-report-consumer-input-reconciliation-20260813-v2"
+            "annual-report-consumer-dependency-reconciliation-20260813-v3"
         )
 
         template_dependency = template[module_name][

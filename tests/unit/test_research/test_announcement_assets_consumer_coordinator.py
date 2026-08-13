@@ -121,6 +121,10 @@ def test_local_asset_business_command_completes_and_reuses_processing(tmp_path):
         return ConsumerProcessingOutcome(
             status="completed",
             result_identity="business-profile-result-1",
+            diagnostics={
+                "missing_required_facts": ["net_capital"],
+                "business_fact_complete": False,
+            },
             metadata={"source": "business-profile"},
         )
 
@@ -190,7 +194,144 @@ def test_local_asset_business_command_completes_and_reuses_processing(tmp_path):
         "consumer_request_id"
     ]
     assert other_principal.projection["consumer_request_status"] == "completed"
+    assert first.projection["diagnostics"] == {
+        "missing_required_facts": ["net_capital"],
+        "business_fact_complete": False,
+    }
+    assert other_principal.projection["diagnostics"] == first.projection[
+        "diagnostics"
+    ]
     assert calls == [first.projection["asset_id"]]
+    coordinator.close()
+
+
+def test_current_processing_restores_legacy_broker_completeness_diagnostics(
+    tmp_path,
+):
+    access = _access(tmp_path)
+    calls: list[str] = []
+
+    def processor(asset, request):
+        calls.append(str(asset["asset_id"]))
+        return ConsumerProcessingOutcome(
+            status="completed",
+            result_identity="broker-result-1",
+            metadata={
+                "shared_lineage_validation": {
+                    "ready": True,
+                    "missing_required_facts": ["net_capital"],
+                    "business_fact_complete": False,
+                }
+            },
+        )
+
+    coordinator = AnnualReportConsumerRequestCoordinator(
+        access=access,
+        profiles=(
+            ConsumerProcessingProfile(
+                consumer="broker_risk_control",
+                profile_name="default",
+                parser_version="broker-v1",
+                parameters={},
+                processor=processor,
+            ),
+        ),
+    )
+    first = coordinator.start(
+        EnsureRequest(
+            instrument_id="600000.SH",
+            fiscal_year=2025,
+            principal="alice",
+            idempotency_key="broker-command-1",
+            wait_seconds=2,
+        ),
+        consumer="broker_risk_control",
+        profile_name="default",
+    )
+    second = coordinator.start(
+        EnsureRequest(
+            instrument_id="600000.SH",
+            fiscal_year=2025,
+            principal="bob",
+            idempotency_key="broker-command-2",
+            wait_seconds=2,
+        ),
+        consumer="broker_risk_control",
+        profile_name="default",
+    )
+
+    assert first.projection["diagnostics"] == {}
+    assert second.projection["diagnostics"] == {
+        "missing_required_facts": ["net_capital"],
+        "business_fact_complete": False,
+    }
+    assert calls == [first.projection["asset_id"]]
+    coordinator.close()
+
+
+def test_refresh_and_idempotent_replay_repair_current_diagnostics(tmp_path):
+    access = _access(tmp_path)
+    coordinator = AnnualReportConsumerRequestCoordinator(
+        access=access,
+        profiles=(
+            ConsumerProcessingProfile(
+                consumer="broker_risk_control",
+                profile_name="default",
+                parser_version="broker-v1",
+                parameters={},
+                processor=lambda asset, request: ConsumerProcessingOutcome(
+                    status="completed",
+                    result_identity="broker-result-1",
+                    metadata={
+                        "shared_lineage_validation": {
+                            "ready": True,
+                            "missing_required_facts": ["net_capital"],
+                            "business_fact_complete": False,
+                        }
+                    },
+                ),
+            ),
+        ),
+    )
+    request = EnsureRequest(
+        instrument_id="600000.SH",
+        fiscal_year=2025,
+        principal="alice",
+        idempotency_key="broker-command-repair",
+        wait_seconds=2,
+    )
+    completed = coordinator.start(
+        request,
+        consumer="broker_risk_control",
+        profile_name="default",
+    )
+    request_id = completed.projection["consumer_request_id"]
+    access.repository.transition_consumer_request(
+        request_id,
+        status=ConsumerRequestStatus.COMPLETED,
+        result_state=ConsumerResultState.CURRENT,
+        diagnostics={},
+    )
+
+    refreshed = coordinator.refresh(request_id, principal="alice")
+    assert refreshed["diagnostics"] == {
+        "missing_required_facts": ["net_capital"],
+        "business_fact_complete": False,
+    }
+    access.repository.transition_consumer_request(
+        request_id,
+        status=ConsumerRequestStatus.COMPLETED,
+        result_state=ConsumerResultState.CURRENT,
+        diagnostics={},
+    )
+    replayed = coordinator.start(
+        request,
+        consumer="broker_risk_control",
+        profile_name="default",
+    )
+    assert replayed.created is False
+    assert replayed.projection["diagnostics"] == refreshed["diagnostics"]
+    coordinator.close()
 
 
 def test_network_disabled_missing_creates_queryable_terminal_consumer_request(tmp_path):

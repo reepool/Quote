@@ -241,7 +241,7 @@
           "enabled": true,
           "legacy_fallback_enabled": true,
           "mode": "dual_read",
-          "reconciliation_evidence_id": "annual-report-consumer-input-reconciliation-20260813-v2",
+          "reconciliation_evidence_id": "annual-report-consumer-dependency-reconciliation-20260813-v3",
           "legacy_writer_disabled": false,
           "note": "Shared assets are read first during dual-read reconciliation; legacy fallback and writer remain enabled until task 11.6 cleanup gates pass."
         },
@@ -614,7 +614,7 @@
             "legacy_fallback_enabled": true,
             "legacy_semiannual_enabled": true,
             "mode": "dual_read",
-            "reconciliation_evidence_id": "annual-report-consumer-input-reconciliation-20260813-v2",
+            "reconciliation_evidence_id": "annual-report-consumer-dependency-reconciliation-20260813-v3",
             "legacy_writer_disabled": false,
             "note": "Shared annual reports are read first in dual-read mode; annual legacy fallback/writer and explicitly gated legacy semiannual processing remain until later cutover."
           },

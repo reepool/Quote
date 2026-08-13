@@ -103,12 +103,14 @@ def validate_broker_shared_asset_processing(
     matching_facts: list[Mapping[str, Any]] = []
     invalid_lineage_count = 0
     for fact in facts:
+        if str(fact.get("source_file_id") or "") != source_file_id:
+            continue
         if (
-            str(fact.get("source_file_id") or "") != source_file_id
-            or fact.get("parser_version")
+            fact.get("parser_version")
             != BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
             or fact.get("source_mode") != "shared_announcement_asset"
         ):
+            invalid_lineage_count += 1
             continue
         raw_fact = fact.get("raw_fact") or {}
         dimensions = fact.get("dimensions") or {}
@@ -139,7 +141,7 @@ def validate_broker_shared_asset_processing(
     missing_required = sorted(
         set(BROKER_RISK_CONTROL_REQUIRED_FACTS) - canonical_facts
     )
-    ready = bool(matching_facts) and not missing_required and invalid_lineage_count == 0
+    ready = bool(matching_facts) and invalid_lineage_count == 0
     return {
         "ready": ready,
         "reason_code": (
@@ -147,13 +149,14 @@ def validate_broker_shared_asset_processing(
             if ready
             else "broker_fact_lineage_invalid"
             if invalid_lineage_count
-            else "broker_required_fact_missing"
+            else "broker_fact_output_empty"
         ),
         "source_file_id": source_file_id,
         "fact_count": len(matching_facts),
         "invalid_lineage_count": invalid_lineage_count,
         "required_facts": list(BROKER_RISK_CONTROL_REQUIRED_FACTS),
         "missing_required_facts": missing_required,
+        "business_fact_complete": not missing_required,
     }
 
 

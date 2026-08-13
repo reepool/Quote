@@ -1528,6 +1528,14 @@ class DataManager:
                 asset.get("observation_version"),
                 asset.get("content_hash"),
             ),
+            diagnostics={
+                "missing_required_facts": validation.get(
+                    "missing_required_facts", []
+                ),
+                "business_fact_complete": validation.get(
+                    "business_fact_complete", False
+                ),
+            },
             metadata={
                 "business_result": result,
                 "shared_lineage_validation": validation,

@@ -178,11 +178,12 @@ def _legacy_same_parser_preflight(storage: Any, asset: Mapping[str, Any]) -> dic
     }
     missing_required = sorted({"net_capital"} - canonical)
     return {
-        "ready": bool(selected) and not missing_required,
-        "reason_code": None if selected and not missing_required else "broker_required_fact_missing",
+        "ready": bool(selected),
+        "reason_code": None if selected else "broker_fact_output_empty",
         "source_file_id": source_file_id,
         "fact_count": len(selected),
         "missing_required_facts": missing_required,
+        "business_fact_complete": not missing_required,
         "content_hash": asset["content_hash"],
         "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
     }
@@ -298,7 +299,9 @@ def migrate_broker_shared_annual_reports(
                             "preflight": legacy_preflight,
                         }
                         preflight_ready = True
-                        missing_preflight: list[str] = []
+                        missing_preflight = list(
+                            legacy_preflight.get("missing_required_facts", [])
+                        )
                     else:
                         preflight = service.process_shared_asset_event(
                             event,
@@ -320,7 +323,6 @@ def migrate_broker_shared_annual_reports(
                             and int(preflight.get("facts_parsed") or 0) > 0
                             and int(preflight.get("parse_failures") or 0) == 0
                             and int(preflight.get("retryable_pending_reports") or 0) == 0
-                            and not missing_preflight
                         )
                     if write and preflight_ready:
                         business_result = service.process_shared_asset_event(
@@ -340,8 +342,6 @@ def migrate_broker_shared_annual_reports(
                             "reason_code": (
                                 "dry_run_not_persisted"
                                 if not write and preflight_ready
-                                else "broker_required_fact_missing"
-                                if missing_preflight
                                 else "broker_preflight_failed"
                             ),
                             "missing_required_facts": missing_preflight,
@@ -409,7 +409,7 @@ def migrate_broker_shared_annual_reports(
                 error_code=None if ready else str(validation.get("reason_code")),
                 metadata={
                     "migration_evidence_id": (
-                        "annual-report-consumer-input-reconciliation-20260813-v2"
+                        "annual-report-consumer-dependency-reconciliation-20260813-v3"
                     ),
                     "configuration_fingerprint": configuration_fingerprint,
                     "selector_mode": "default_effective",
@@ -442,6 +442,19 @@ def migrate_broker_shared_annual_reports(
         raise RuntimeError("broker shared migration used a forbidden network path")
     current_count = sum(row["processing_status"] == "current" for row in results)
     failed_count = sum(row["processing_status"] == "failed" for row in results)
+    business_incomplete = [
+        {
+            "asset_id": row["asset_id"],
+            "instrument_id": row["instrument_id"],
+            "fiscal_year": row["fiscal_year"],
+            "missing_required_facts": row["validation"].get(
+                "missing_required_facts", []
+            ),
+        }
+        for row in results
+        if row["processing_status"] == "current"
+        and row["validation"].get("missing_required_facts")
+    ]
     status = (
         "failed"
         if write and results and failed_count == len(results)
@@ -455,6 +468,8 @@ def migrate_broker_shared_annual_reports(
         "selected_asset_count": len(selected),
         "current_count": current_count,
         "failed_count": failed_count,
+        "business_incomplete_count": len(business_incomplete),
+        "business_incomplete_assets": business_incomplete,
         "incomplete_asset_ids": [
             row["asset_id"] for row in results if row["processing_status"] == "failed"
         ],

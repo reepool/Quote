@@ -151,6 +151,23 @@ class AnnualReportConsumerRequestCoordinator:
             metadata={"profile_name": profile.profile_name},
         )
         if not created:
+            if consumer_request.processing_id:
+                processing = next(
+                    (
+                        item
+                        for item in self.repository.list_consumer_processing(
+                            asset_id=consumer_request.asset_id,
+                            consumer=consumer_request.consumer,
+                        )
+                        if item.get("processing_id")
+                        == consumer_request.processing_id
+                    ),
+                    None,
+                )
+                if processing is not None:
+                    consumer_request = self._project_processing_state(
+                        consumer_request, processing
+                    )
             return ConsumerCommandResult(
                 self.access._consumer_request_projection(consumer_request),
                 False,
@@ -565,6 +582,7 @@ class AnnualReportConsumerRequestCoordinator:
         )
         processing_status = str(processing.get("status") or "")
         if processing_status == ConsumerProcessingStatus.CURRENT.value:
+            diagnostics = self._processing_diagnostics(processing)
             completed = self._transition_bound_request(
                 consumer_request_id,
                 asset=asset,
@@ -572,6 +590,7 @@ class AnnualReportConsumerRequestCoordinator:
                 status=ConsumerRequestStatus.COMPLETED,
                 result_state=ConsumerResultState.CURRENT,
                 result_identity=processing.get("derived_identity"),
+                diagnostics=diagnostics,
             )
             return ConsumerCommandResult(
                 self.access._consumer_request_projection(completed),
@@ -674,12 +693,17 @@ class AnnualReportConsumerRequestCoordinator:
             stop_heartbeat.set()
             heartbeat_thread.join(timeout=1)
         if outcome.status == "completed":
+            processing_metadata = dict(outcome.metadata)
+            if outcome.diagnostics:
+                processing_metadata["consumer_diagnostics"] = dict(
+                    outcome.diagnostics
+                )
             try:
                 self.repository.transition_consumer_processing(
                     processing_id,
                     status=ConsumerProcessingStatus.CURRENT,
                     derived_identity=outcome.result_identity,
-                    metadata=outcome.metadata,
+                    metadata=processing_metadata,
                     lease_owner=lease_owner,
                     lease_generation=lease_generation,
                 )
@@ -757,6 +781,7 @@ class AnnualReportConsumerRequestCoordinator:
         status: ConsumerRequestStatus,
         result_state: ConsumerResultState,
         result_identity: str | None = None,
+        diagnostics: Mapping[str, Any] | None = None,
     ):
         current = self.repository.get_consumer_request(consumer_request_id)
         metadata = {} if current is None else dict(current.metadata)
@@ -786,13 +811,48 @@ class AnnualReportConsumerRequestCoordinator:
             resolved_content_hash=asset.get("content_hash"),
             resolved_report_period=asset.get("report_period"),
             metadata=metadata,
+            diagnostics=diagnostics,
         )
+
+    @staticmethod
+    def _processing_diagnostics(
+        processing: Mapping[str, Any],
+    ) -> Mapping[str, Any]:
+        metadata = processing.get("metadata") or {}
+        if not isinstance(metadata, Mapping):
+            return {}
+        diagnostics = metadata.get("consumer_diagnostics")
+        if isinstance(diagnostics, Mapping):
+            return dict(diagnostics)
+        # Broker processing rows created before diagnostics persistence already
+        # carry the equivalent completeness evidence in lineage validation.
+        validation = metadata.get("shared_lineage_validation")
+        if not isinstance(validation, Mapping):
+            return {}
+        if not {
+            "missing_required_facts",
+            "business_fact_complete",
+        }.intersection(validation):
+            return {}
+        missing_required = list(
+            validation.get("missing_required_facts") or []
+        )
+        return {
+            "missing_required_facts": missing_required,
+            "business_fact_complete": bool(
+                validation.get(
+                    "business_fact_complete", not missing_required
+                )
+            ),
+        }
 
     def _project_processing_state(self, request, processing: Mapping[str, Any]):
         status = str(processing.get("status") or "")
+        diagnostics: Mapping[str, Any] | None = None
         if status == ConsumerProcessingStatus.CURRENT.value:
             target = ConsumerRequestStatus.COMPLETED
             result = ConsumerResultState.CURRENT
+            diagnostics = self._processing_diagnostics(processing)
         elif status == ConsumerProcessingStatus.FAILED.value:
             target = ConsumerRequestStatus.FAILED
             result = ConsumerResultState.UNAVAILABLE
@@ -804,7 +864,16 @@ class AnnualReportConsumerRequestCoordinator:
             result = ConsumerResultState.STALE
         else:
             return request
-        if request.status is target and request.result_state is result:
+        diagnostics_match = (
+            diagnostics is None
+            or not diagnostics
+            or dict(request.diagnostics) == dict(diagnostics)
+        )
+        if (
+            request.status is target
+            and request.result_state is result
+            and diagnostics_match
+        ):
             return request
         try:
             return self.repository.transition_consumer_request(
@@ -813,6 +882,7 @@ class AnnualReportConsumerRequestCoordinator:
                 result_state=result,
                 result_identity=processing.get("derived_identity"),
                 reason_code=processing.get("error_code"),
+                diagnostics=diagnostics,
             )
         except ValueError:
             return request
