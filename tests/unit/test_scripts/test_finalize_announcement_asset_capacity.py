@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,6 +16,15 @@ from research.announcement_assets import (
 from scripts.dev_validation import finalize_announcement_asset_capacity as finalize
 from scripts.dev_validation.drill_announcement_asset_shadow_adoption import (
     SCHEMA_VERSION as SHADOW_SCHEMA_VERSION,
+)
+from scripts.dev_validation.prepare_announcement_asset_production_shadow import (
+    SCHEMA_VERSION as PRODUCTION_SHADOW_SCHEMA_VERSION,
+)
+from scripts.dev_validation.promote_announcement_asset_production_shadow import (
+    SCHEMA_VERSION as PRODUCTION_PROMOTION_SCHEMA_VERSION,
+)
+from scripts.dev_validation.reconcile_announcement_asset_production_shadow import (
+    SCHEMA_VERSION as PRODUCTION_RECONCILIATION_SCHEMA_VERSION,
 )
 
 
@@ -158,6 +168,90 @@ def _required_set_evidence(config: AnnouncementAssetConfig) -> dict[str, object]
     }
 
 
+def _production_rollout(
+    tmp_path: Path,
+    config: AnnouncementAssetConfig,
+    *,
+    inventory_path: Path,
+) -> tuple[Path, Path, Path]:
+    fingerprint = "a" * 64
+    shadow_path = tmp_path / "production-shadow.json"
+    reconciliation_path = tmp_path / "production-reconciliation.json"
+    promotion_path = tmp_path / "production-promotion.json"
+    shadow = {
+        "schema_version": PRODUCTION_SHADOW_SCHEMA_VERSION,
+        "mode": "production_shadow",
+        "configuration_fingerprint": config.config_fingerprint,
+        "network_requests": 0,
+        "archive_mutations": {
+            "copied": 0,
+            "moved": 0,
+            "linked": 0,
+            "quarantined": 0,
+            "deleted": 0,
+        },
+        "inventory": {"fingerprint": fingerprint, "counts": {"adoptable": 3}},
+        "adoption": {
+            "effective_scope_count": 3,
+            "effective_scope_unique": True,
+            "review_required_periods": [],
+        },
+        "production_catalog": {"catalog_counts": {"effective_reports": 3}},
+    }
+    reconciliation = {
+        "schema_version": PRODUCTION_RECONCILIATION_SCHEMA_VERSION,
+        "mode": "production_shadow_reconciliation",
+        "configuration_fingerprint": config.config_fingerprint,
+        "inventory_fingerprint": fingerprint,
+        "inventory_artifact_path": str(inventory_path.resolve()),
+        "shadow_artifact_path": str(shadow_path.resolve()),
+        "network_requests": 0,
+        "archive_mutations": {
+            "copied": 0,
+            "moved": 0,
+            "linked": 0,
+            "quarantined": 0,
+            "deleted": 0,
+        },
+        "production_readiness": {"reconciliation_ready": True},
+        "reconciliation": {
+            "ready_for_cutover": True,
+            "conflict_count": 0,
+            "pending_custody_count": 0,
+            "period_count": 3,
+        },
+    }
+    promotion = {
+        "schema_version": PRODUCTION_PROMOTION_SCHEMA_VERSION,
+        "mode": "production_shadow_promotion",
+        "configuration_fingerprint": config.config_fingerprint,
+        "inventory_fingerprint": fingerprint,
+        "inventory_artifact_path": str(inventory_path.resolve()),
+        "reconciliation_artifact_path": str(reconciliation_path.resolve()),
+        "network_requests": 0,
+        "archive_mutations": {
+            "copied": 0,
+            "moved": 0,
+            "linked": 0,
+            "quarantined": 0,
+            "deleted": 0,
+        },
+        "promotion": {
+            "run": True,
+            "production_visible_rows_added": 3,
+            "asset_ids": ["asset-1", "asset-2", "asset-3"],
+        },
+        "production_catalog": {
+            "projection_count_before": 0,
+            "projection_count_after": 3,
+        },
+    }
+    _write(shadow_path, shadow)
+    _write(reconciliation_path, reconciliation)
+    _write(promotion_path, promotion)
+    return shadow_path, reconciliation_path, promotion_path
+
+
 @pytest.fixture(autouse=True)
 def _stub_required_set_measurement(monkeypatch):
     monkeypatch.setattr(
@@ -169,6 +263,24 @@ def _stub_required_set_measurement(monkeypatch):
         capacity_module,
         "measure_required_set_evidence",
         lambda config: _required_set_evidence(config),
+    )
+    projection = {
+        "schema_version": "official_announcement_asset_production_projection.v1",
+        "count": 3,
+        "fingerprint": "b" * 64,
+        "asset_id_fingerprint": hashlib.sha256(
+            b"asset-1\nasset-2\nasset-3"
+        ).hexdigest(),
+    }
+    monkeypatch.setattr(
+        finalize,
+        "measure_production_projection_evidence",
+        lambda config: projection,
+    )
+    monkeypatch.setattr(
+        capacity_module,
+        "measure_production_projection_evidence",
+        lambda config: projection,
     )
 
 
@@ -207,6 +319,143 @@ def test_finalize_binds_shadow_and_operator_inputs_then_reuses_runtime_validator
     assert payload["generated_at"] == json.loads(
         inventory_path.read_text(encoding="utf-8")
     )["generated_at"]
+
+
+def test_finalize_binds_completed_production_rollout_and_operator_approval(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    inventory_path = tmp_path / "inventory.json"
+    required_set_path = tmp_path / "required-set.json"
+    output_path = tmp_path / "approved-production.json"
+    _write(inventory_path, _inventory(config))
+    _write(required_set_path, _required_set_evidence(config))
+    shadow_path, reconciliation_path, promotion_path = _production_rollout(
+        tmp_path, config, inventory_path=inventory_path
+    )
+
+    payload = finalize.finalize_capacity_artifact(
+        inventory_path=inventory_path,
+        shadow_path=shadow_path,
+        output_path=output_path,
+        config=config,
+        planning_horizon_years=5,
+        budget_basis="expected",
+        required_set_evidence_path=required_set_path,
+        approver="Reepool",
+        reconciliation_path=reconciliation_path,
+        promotion_path=promotion_path,
+    )
+
+    approval = validate_capacity_artifact(config, artifact_path=output_path)
+    assert approval is not None
+    assert approval.approver == "Reepool"
+    assert approval.planning_horizon_years == 5
+    assert approval.budget_basis == "expected"
+    assert payload["approval"]["evidence_mode"] == "production_rollout"
+    assert payload["approval"]["reconciliation_path"] == str(
+        reconciliation_path.resolve()
+    )
+    assert payload["approval"]["promotion_path"] == str(promotion_path.resolve())
+
+
+def test_finalize_rejects_incomplete_or_tampered_production_rollout(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    inventory_path = tmp_path / "inventory.json"
+    required_set_path = tmp_path / "required-set.json"
+    _write(inventory_path, _inventory(config))
+    _write(required_set_path, _required_set_evidence(config))
+    shadow_path, reconciliation_path, promotion_path = _production_rollout(
+        tmp_path, config, inventory_path=inventory_path
+    )
+
+    with pytest.raises(ValueError, match="must_be_complete"):
+        finalize.finalize_capacity_artifact(
+            inventory_path=inventory_path,
+            shadow_path=shadow_path,
+            output_path=tmp_path / "missing-promotion.json",
+            config=config,
+            planning_horizon_years=5,
+            budget_basis="expected",
+            required_set_evidence_path=required_set_path,
+            approver="Reepool",
+            reconciliation_path=reconciliation_path,
+        )
+
+    promotion = json.loads(promotion_path.read_text(encoding="utf-8"))
+    promotion["promotion"]["production_visible_rows_added"] = 2
+    _write(promotion_path, promotion)
+    with pytest.raises(ValueError, match="promotion_not_complete"):
+        finalize.finalize_capacity_artifact(
+            inventory_path=inventory_path,
+            shadow_path=shadow_path,
+            output_path=tmp_path / "tampered-promotion.json",
+            config=config,
+            planning_horizon_years=5,
+            budget_basis="expected",
+            required_set_evidence_path=required_set_path,
+            approver="Reepool",
+            reconciliation_path=reconciliation_path,
+            promotion_path=promotion_path,
+        )
+
+
+def test_finalize_rejects_incomplete_mutation_evidence_and_catalog_drift(
+    tmp_path: Path, monkeypatch
+) -> None:
+    config = _config(tmp_path)
+    inventory_path = tmp_path / "inventory.json"
+    required_set_path = tmp_path / "required-set.json"
+    _write(inventory_path, _inventory(config))
+    _write(required_set_path, _required_set_evidence(config))
+    shadow_path, reconciliation_path, promotion_path = _production_rollout(
+        tmp_path, config, inventory_path=inventory_path
+    )
+
+    shadow = json.loads(shadow_path.read_text(encoding="utf-8"))
+    shadow["archive_mutations"].pop("deleted")
+    _write(shadow_path, shadow)
+    with pytest.raises(ValueError, match="archive_mutations_fields_invalid"):
+        finalize.finalize_capacity_artifact(
+            inventory_path=inventory_path,
+            shadow_path=shadow_path,
+            output_path=tmp_path / "missing-mutation-field.json",
+            config=config,
+            planning_horizon_years=5,
+            budget_basis="expected",
+            required_set_evidence_path=required_set_path,
+            approver="Reepool",
+            reconciliation_path=reconciliation_path,
+            promotion_path=promotion_path,
+        )
+
+    shadow["archive_mutations"]["deleted"] = 0
+    _write(shadow_path, shadow)
+    monkeypatch.setattr(
+        finalize,
+        "measure_production_projection_evidence",
+        lambda config: {
+            "schema_version": "official_announcement_asset_production_projection.v1",
+            "count": 3,
+            "fingerprint": "c" * 64,
+            "asset_id_fingerprint": "d" * 64,
+        },
+    )
+    with pytest.raises(ValueError, match="production_promotion_not_complete"):
+        finalize.finalize_capacity_artifact(
+            inventory_path=inventory_path,
+            shadow_path=shadow_path,
+            output_path=tmp_path / "catalog-drift.json",
+            config=config,
+            planning_horizon_years=5,
+            budget_basis="expected",
+            required_set_evidence_path=required_set_path,
+            approver="Reepool",
+            reconciliation_path=reconciliation_path,
+            promotion_path=promotion_path,
+        )
 
 
 def test_finalize_rejects_mismatched_shadow_without_creating_output(

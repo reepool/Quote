@@ -156,10 +156,14 @@ def probe_mount_identity(path: str | Path) -> MountIdentity:
     )
 
 
-def validate_backup_mount(config: AnnouncementAssetConfig) -> MountIdentity | None:
-    """Fail closed when an enabled backup resolves to an unsafe local fallback."""
+def validate_backup_mount(
+    config: AnnouncementAssetConfig,
+    *,
+    require_enabled: bool = True,
+) -> MountIdentity | None:
+    """Validate the backup mount, optionally before backup execution is enabled."""
     backup = config.backup
-    if not backup.enabled:
+    if require_enabled and not backup.enabled:
         return None
     if backup.mount_root is None or backup.destination_root is None:
         raise RuntimeError("enabled backup has no configured mount or destination")

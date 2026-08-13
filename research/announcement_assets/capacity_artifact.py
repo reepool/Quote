@@ -19,6 +19,16 @@ CAPACITY_ARTIFACT_SCHEMA_VERSION = "official_announcement_asset_capacity_artifac
 REQUIRED_SET_EVIDENCE_SCHEMA_VERSION = (
     "official_announcement_asset_required_set_evidence.v1"
 )
+PRODUCTION_PROJECTION_EVIDENCE_SCHEMA_VERSION = (
+    "official_announcement_asset_production_projection.v1"
+)
+PRODUCTION_ROLLOUT_EVIDENCE_SCHEMAS = {
+    "shadow_schema_version": "annual_report_asset_production_shadow.v1",
+    "reconciliation_schema_version": (
+        "annual_report_asset_production_shadow_reconciliation.v1"
+    ),
+    "promotion_schema_version": "annual_report_asset_production_shadow_promotion.v1",
+}
 
 
 class CapacityArtifactNotReadyError(RuntimeError):
@@ -69,6 +79,8 @@ def validate_capacity_artifact(
     age_seconds = (observed - generated_at).total_seconds()
     if age_seconds < 0 or age_seconds > config.capacity_artifact_max_age_hours * 3600:
         raise CapacityArtifactNotReadyError("capacity_artifact_expired")
+    if _requires_production_rollout_evidence(config):
+        _validate_production_rollout_approval(payload, config=config)
 
     active_universe = _mapping(payload.get("active_universe"), "active_universe")
     if active_universe.get("status") != "complete":
@@ -96,7 +108,7 @@ def validate_capacity_artifact(
                 name="primary_archive",
                 actual=probe_mount_identity(config.filings_root),
             )
-            actual_backup = validate_backup_mount(config)
+            actual_backup = validate_backup_mount(config, require_enabled=False)
         except CapacityArtifactNotReadyError:
             raise
         except (OSError, RuntimeError) as exc:
@@ -429,6 +441,101 @@ def measure_required_set_evidence(
         "backup_verified_set": _set_measurement(backup, lengths),
         "permanent_recovery_set": _set_measurement(recovery, lengths),
     }
+
+
+def measure_production_projection_evidence(
+    config: AnnouncementAssetConfig,
+) -> dict[str, int | str]:
+    """Fingerprint the current consumer-visible production projection."""
+
+    catalog_path = (config.project_root / "data/research.db").resolve(strict=False)
+    if not catalog_path.is_file():
+        raise CapacityArtifactNotReadyError("capacity_projection_catalog_missing")
+    try:
+        with sqlite3.connect(f"file:{catalog_path}?mode=ro", uri=True) as connection:
+            rows = connection.execute(
+                """SELECT asset_id, instrument_id, fiscal_year, version_id,
+                          COALESCE(content_hash, ''), decision_state, availability
+                   FROM effective_annual_reports
+                   WHERE visibility_state='production'
+                   ORDER BY asset_id"""
+            ).fetchall()
+    except sqlite3.Error as exc:
+        raise CapacityArtifactNotReadyError(
+            "capacity_projection_catalog_unreadable"
+        ) from exc
+    encoded_rows = [
+        json.dumps(list(row), ensure_ascii=True, separators=(",", ":"))
+        for row in rows
+    ]
+    asset_ids = [str(row[0]) for row in rows]
+    return {
+        "schema_version": PRODUCTION_PROJECTION_EVIDENCE_SCHEMA_VERSION,
+        "count": len(rows),
+        "fingerprint": hashlib.sha256(
+            "\n".join(encoded_rows).encode("utf-8")
+        ).hexdigest(),
+        "asset_id_fingerprint": hashlib.sha256(
+            "\n".join(asset_ids).encode("utf-8")
+        ).hexdigest(),
+    }
+
+
+def _validate_production_rollout_approval(
+    payload: Mapping[str, Any], *, config: AnnouncementAssetConfig
+) -> None:
+    approval = _mapping(payload.get("approval"), "approval")
+    if approval.get("evidence_mode") != "production_rollout":
+        raise CapacityArtifactNotReadyError(
+            "capacity_artifact_production_rollout_missing"
+        )
+    for field, expected in PRODUCTION_ROLLOUT_EVIDENCE_SCHEMAS.items():
+        if approval.get(field) != expected:
+            raise CapacityArtifactNotReadyError(
+                f"capacity_artifact_{field}_mismatch"
+            )
+    evidence_fields = (
+        "inventory",
+        "shadow",
+        "reconciliation",
+        "promotion",
+        "required_set_evidence",
+    )
+    for name in evidence_fields:
+        raw_path = str(approval.get(f"{name}_path") or "").strip()
+        expected_hash = str(approval.get(f"{name}_sha256") or "").strip()
+        if len(expected_hash) != 64:
+            raise CapacityArtifactNotReadyError(
+                f"capacity_artifact_{name}_hash_missing"
+            )
+        try:
+            path = Path(raw_path).resolve(strict=True)
+            path.relative_to(config.project_root.resolve(strict=True))
+            actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        except (OSError, ValueError) as exc:
+            raise CapacityArtifactNotReadyError(
+                f"capacity_artifact_{name}_evidence_unavailable"
+            ) from exc
+        if actual_hash != expected_hash:
+            raise CapacityArtifactNotReadyError(
+                f"capacity_artifact_{name}_evidence_mismatch"
+            )
+    expected_projection = _mapping(
+        approval.get("production_projection"), "approval.production_projection"
+    )
+    if dict(expected_projection) != measure_production_projection_evidence(config):
+        raise CapacityArtifactNotReadyError(
+            "capacity_artifact_production_projection_mismatch"
+        )
+
+
+def _requires_production_rollout_evidence(config: AnnouncementAssetConfig) -> bool:
+    root = config.project_root.resolve(strict=False)
+    isolated = any(
+        root == allowed or allowed in root.parents
+        for allowed in (Path("/tmp"), Path("/dev/shm"))
+    )
+    return config.require_filings_mount and not isolated
 
 
 def _hash_set(connection: sqlite3.Connection, query: str) -> set[str]:

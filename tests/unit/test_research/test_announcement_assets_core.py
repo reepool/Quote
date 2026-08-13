@@ -894,6 +894,44 @@ def test_config_rejects_backup_destination_symlink_escape(tmp_path):
         )
 
 
+def test_backup_mount_validation_can_run_before_backup_is_enabled(
+    tmp_path, monkeypatch
+):
+    config = _config(
+        tmp_path,
+        backup={
+            "enabled": False,
+            "mount_root": "data/QuoteBak",
+            "destination_root": "data/QuoteBak/announcement_assets",
+            "expected_mount_source": "backup.example:/archive",
+            "expected_failure_domain": "backup-nas",
+            "free_space_reserve_bytes": 1,
+        },
+    )
+    backup_identity = MountIdentity(
+        requested_path=config.backup.mount_root,
+        mount_point=config.backup.mount_root,
+        source="backup.example:/archive",
+        fs_type="nfs4",
+        device_id=2,
+    )
+    primary_identity = MountIdentity(
+        requested_path=config.filings_root,
+        mount_point=config.filings_root,
+        source="primary.example:/filings",
+        fs_type="nfs4",
+        device_id=3,
+    )
+    identities = iter((backup_identity, primary_identity))
+    monkeypatch.setattr(
+        "research.announcement_assets.storage.probe_mount_identity",
+        lambda path: next(identities),
+    )
+
+    assert validate_backup_mount(config) is None
+    assert validate_backup_mount(config, require_enabled=False) == backup_identity
+
+
 def test_backup_mount_guard_rejects_local_fallback_and_same_host(tmp_path, monkeypatch):
     config = _config(
         tmp_path,

@@ -7,6 +7,7 @@ from .capacity_artifact import (
     REQUIRED_SET_EVIDENCE_SCHEMA_VERSION,
     CapacityArtifactApproval,
     CapacityArtifactNotReadyError,
+    measure_production_projection_evidence,
     measure_required_set_evidence,
     validate_capacity_artifact,
 )
@@ -321,6 +322,7 @@ __all__ = [
     "derive_fiscal_year_search_bounds",
     "effective_snapshot",
     "latest_backfill_schedule_fingerprint",
+    "measure_production_projection_evidence",
     "measure_required_set_evidence",
     "normalize_annual_report_variant",
     "normalize_document_family",

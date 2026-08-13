@@ -272,6 +272,26 @@ def test_capacity_artifact_rejects_missing_and_expired_files(tmp_path):
         )
 
 
+def test_production_capacity_gate_requires_bound_rollout_evidence(
+    tmp_path, monkeypatch
+):
+    config = _config(tmp_path)
+    payload = _approved_artifact(config)
+    _write(config, payload)
+    monkeypatch.setattr(
+        capacity_module,
+        "_requires_production_rollout_evidence",
+        lambda config: True,
+    )
+
+    with pytest.raises(
+        CapacityArtifactNotReadyError, match="approval_missing"
+    ):
+        validate_capacity_artifact(
+            config, now=datetime(2026, 8, 12, 11, tzinfo=timezone.utc)
+        )
+
+
 def test_capacity_artifact_path_cannot_escape_runtime_evidence_root(tmp_path):
     with pytest.raises(ValueError, match="capacity_artifact_path"):
         AnnouncementAssetConfig.from_mapping(
@@ -439,7 +459,11 @@ def test_capacity_artifact_rejects_runtime_mount_read_only_or_filesystem_change(
         device_id=11,
         filesystem_id="11:1",
     )
-    monkeypatch.setattr(capacity_module, "validate_backup_mount", lambda config: backup)
+    monkeypatch.setattr(
+        capacity_module,
+        "validate_backup_mount",
+        lambda config, *, require_enabled=True: backup,
+    )
     monkeypatch.setattr(capacity_module, "_current_free_bytes", lambda path: 9_000)
 
     monkeypatch.setattr(

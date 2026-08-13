@@ -136,6 +136,7 @@ dmypy.json
 # 配置文件 (包含敏感信息)
 config/config.json*
 config/02_tg.json
+config/runtime_evidence/
 .env
 .env.local
 .env.production
