@@ -1,7 +1,7 @@
 import asyncio
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 from scheduler.tasks import (
     ScheduledTasks,
@@ -775,7 +775,9 @@ def test_futures_market_data_sync_stops_when_governance_blocks_production():
     assert "futures_market_data_sync" not in task._active_tasks
 
 
-def test_futures_market_data_sync_continues_when_calendar_preflight_partially_blocks():
+def test_futures_market_data_sync_marks_partial_when_calendar_preflight_partially_blocks(
+    monkeypatch,
+):
     task = ScheduledTasks()
 
     from scheduler import tasks as scheduler_tasks_module
@@ -844,6 +846,7 @@ def test_futures_market_data_sync_continues_when_calendar_preflight_partially_bl
     data_manager.run_futures_market_data_sync = AsyncMock(
         return_value={
             "status": "success",
+            "run_id": 287,
             "totals": {"inserted": 1, "changed": 0, "unchanged": 0, "failed": 0},
             "trading_day_governance": {"status": "success", "target_date_count": 1},
             "scope_selection": {"exchanges": ["GFEX"]},
@@ -857,6 +860,12 @@ def test_futures_market_data_sync_continues_when_calendar_preflight_partially_bl
             ],
         }
     )
+    storage = MagicMock()
+    monkeypatch.setattr(
+        data_manager,
+        "_require_futures_storage",
+        MagicMock(return_value=storage),
+    )
     task._send_task_report = AsyncMock(return_value=True)
 
     result = _run(
@@ -868,7 +877,7 @@ def test_futures_market_data_sync_continues_when_calendar_preflight_partially_bl
         )
     )
 
-    assert result is True
+    assert result is False
     data_manager.run_futures_trading_day_governance.assert_awaited_once()
     assert data_manager.run_futures_trading_day_governance.await_args.kwargs["exchanges"] == ["GFEX"]
     data_manager.run_futures_market_data_sync.assert_awaited_once()
@@ -878,6 +887,21 @@ def test_futures_market_data_sync_continues_when_calendar_preflight_partially_bl
     assert first_report["status"] == "warning"
     assert "DCE" in first_report["content"]
     assert "GFEX" in first_report["content"]
+    final_report = task._send_task_report.await_args_list[1].kwargs["report_data"]
+    assert final_report["status"] == "partial"
+    assert "状态: `partial`" in final_report["content"]
+    storage.finish_ingestion_run.assert_called_once()
+    finish_call = storage.finish_ingestion_run.call_args
+    assert finish_call.args == (287,)
+    assert finish_call.kwargs["status"] == "partial"
+    persisted_metadata = finish_call.kwargs["metadata"]
+    assert persisted_metadata["status"] == "partial"
+    assert persisted_metadata["totals"]["inserted"] == 1
+    assert persisted_metadata["calendar_preflight"] == {
+        "status": "blocked",
+        "blocked_exchanges": ["DCE"],
+        "continued_exchanges": ["GFEX"],
+    }
 
 
 def test_futures_market_data_sync_allows_dry_run_with_governance_warning():

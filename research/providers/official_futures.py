@@ -184,6 +184,9 @@ class DceOfficialBrowserClient:
                 allow_session_restart=False,
             )
         except Exception as exc:
+            classification = classify_official_futures_failure(exc)
+            if classification.category == "dce_anti_bot_challenge":
+                raise
             logger.warning(
                 "[OfficialFutures] DCE browser warm-up maxTradeDate failed; continuing with requested API path error=%s",
                 exc,
@@ -235,6 +238,14 @@ class DceOfficialBrowserClient:
                     f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
                 )
             last_error = f"HTTP {status}: {text[:200]}"
+            # DCE returns a JavaScript challenge page with HTTP 412 when the
+            # current browser session or egress IP has not passed its
+            # verification. Repeating the same fetch cannot solve that
+            # challenge and only adds latency/risk-control pressure.
+            if status == 412:
+                raise OfficialFuturesSourceUnavailable(
+                    f"official DCE {path} anti-bot challenge: {last_error}"
+                )
             if attempt < self.retry_attempts:
                 if allow_session_restart and self._is_in_page_fetch_failure(status=status, text=text):
                     logger.warning(
@@ -936,6 +947,8 @@ class OfficialFuturesMarketDataProvider:
                 last_error = exc
                 classification = classify_official_futures_failure(exc)
                 if not classification.is_retryable:
+                    if classification.category == "dce_anti_bot_challenge":
+                        raise
                     raise OfficialFuturesSourceUnavailable(
                         f"official {exchange} no report for {trade_date}: {exc}"
                     ) from exc
@@ -2939,6 +2952,18 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
         "人机",
         "challenge",
     )
+    if (
+        "dce" in lowered
+        and "412" in lowered
+        and ("precondition" in lowered or "http 412" in lowered)
+    ):
+        return OfficialFuturesFailureClassification(
+            category="dce_anti_bot_challenge",
+            is_retryable=False,
+            suspected_local_ip_risk_control=True,
+            summary="DCE returned HTTP 412 challenge HTML; retry later from a verified session or alternate egress",
+            evidence=evidence,
+        )
     if any(marker in lowered for marker in anti_bot_markers):
         return OfficialFuturesFailureClassification(
             category="possible_anti_bot_or_ip_risk_control",

@@ -6721,7 +6721,10 @@ class FuturesOfficialCalendarBackfillService:
         dry_run: bool = False,
         max_days: Optional[int] = None,
     ) -> Dict[str, Any]:
-        from research.providers.official_futures import OfficialFuturesMarketDataProvider
+        from research.providers.official_futures import (
+            OfficialFuturesMarketDataProvider,
+            classify_official_futures_failure,
+        )
 
         universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
         scope_selection = universe_selector.resolve(
@@ -6821,6 +6824,7 @@ class FuturesOfficialCalendarBackfillService:
                 }
                 verified_by_date: Dict[str, FuturesTradingCalendarDay] = {}
                 unresolved_reasons: Dict[str, str] = {}
+                unresolved_retryable: Dict[str, bool] = {}
                 if start <= probe_end:
                     current = date.fromisoformat(start)
                     end_obj = date.fromisoformat(probe_end)
@@ -6847,6 +6851,15 @@ class FuturesOfficialCalendarBackfillService:
                             verified_by_date[key] = calendar_day
                         else:
                             unresolved_reasons[key] = probe.failure_reason or probe.status
+                            failure_classification = classify_official_futures_failure(
+                                unresolved_reasons[key]
+                            )
+                            unresolved_retryable[key] = bool(
+                                probe.metadata.get(
+                                    "is_retryable",
+                                    failure_classification.is_retryable,
+                                )
+                            )
                             logger.warning(
                                 "[FuturesOfficialCalendarBackfill] unresolved exchange=%s trade_date=%s reason=%s category=%s retryable=%s",
                                 exchange,
@@ -6867,7 +6880,11 @@ class FuturesOfficialCalendarBackfillService:
                         current += timedelta(days=1)
                     if unresolved_reasons and not result.get("truncated") and self.retry_unresolved_passes > 0:
                         for retry_pass in range(1, self.retry_unresolved_passes + 1):
-                            retry_dates = sorted(unresolved_reasons)
+                            retry_dates = sorted(
+                                key
+                                for key in unresolved_reasons
+                                if unresolved_retryable.get(key, True)
+                            )
                             if not retry_dates:
                                 break
                             result["retry_passes_attempted"] = retry_pass
@@ -6910,6 +6927,15 @@ class FuturesOfficialCalendarBackfillService:
                                     result["retry_dates_resolved"] += 1
                                 else:
                                     unresolved_reasons[key] = probe.failure_reason or probe.status
+                                    failure_classification = classify_official_futures_failure(
+                                        unresolved_reasons[key]
+                                    )
+                                    unresolved_retryable[key] = bool(
+                                        probe.metadata.get(
+                                            "is_retryable",
+                                            failure_classification.is_retryable,
+                                        )
+                                    )
                                     logger.warning(
                                         "[FuturesOfficialCalendarBackfill] unresolved retry still failed exchange=%s pass=%s trade_date=%s reason=%s category=%s retryable=%s",
                                         exchange,

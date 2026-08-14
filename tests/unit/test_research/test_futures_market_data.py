@@ -1183,6 +1183,136 @@ def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
     assert state["requested_api_calls"] == 2
 
 
+def test_dce_http_412_is_classified_as_non_retryable_anti_bot_challenge():
+    classification = classify_official_futures_failure(
+        "official DCE /dcereport/publicweb/dailystat/dayQuotes request failed: "
+        "HTTP 412: <html><head><title>Precondition Failed</title></head></html>"
+    )
+
+    assert classification.category == "dce_anti_bot_challenge"
+    assert classification.is_retryable is False
+    assert classification.suspected_local_ip_risk_control is True
+
+
+def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    class FakeDceClient:
+        def fetch_day_quotes_payload(self, trade_date):
+            raise OfficialFuturesSourceUnavailable(
+                "official DCE /dcereport/publicweb/dailystat/dayQuotes anti-bot challenge: "
+                "HTTP 412: Precondition Failed"
+            )
+
+    monkeypatch.setattr(provider, "_get_dce_browser_client", lambda: FakeDceClient())
+
+    with requests.Session() as session:
+        with pytest.raises(OfficialFuturesSourceUnavailable) as exc_info:
+            provider._request_exchange_payload(session, "DCE", "2026-06-17")
+
+    assert "anti-bot challenge" in str(exc_info.value)
+    assert "no report" not in str(exc_info.value)
+
+
+def test_dce_browser_412_does_not_retry_same_session(monkeypatch):
+    state = {"warmup_calls": 0, "requested_api_calls": 0}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                state["warmup_calls"] += 1
+                return json.dumps({
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True}),
+                })
+            state["requested_api_calls"] += 1
+            return json.dumps({
+                "status": 412,
+                "ok": False,
+                "text": "<html><title>Precondition Failed</title></html>",
+            })
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "retry_attempts": 3,
+        "retry_backoff_seconds": 0,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        with pytest.raises(OfficialFuturesSourceUnavailable, match="anti-bot challenge"):
+            client.fetch_day_quotes_payload("2026-06-17")
+    finally:
+        client.close()
+
+    assert state["warmup_calls"] == 1
+    assert state["requested_api_calls"] == 1
+
+
+def test_dce_browser_warmup_412_aborts_requested_api(monkeypatch):
+    state = {"warmup_calls": 0, "requested_api_calls": 0}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                state["warmup_calls"] += 1
+                return json.dumps({
+                    "status": 412,
+                    "ok": False,
+                    "text": "<html><title>Precondition Failed</title></html>",
+                })
+            state["requested_api_calls"] += 1
+            return json.dumps({"status": 200, "ok": True, "text": "{}"})
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "retry_attempts": 3,
+        "retry_backoff_seconds": 0,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        with pytest.raises(OfficialFuturesSourceUnavailable, match="anti-bot challenge"):
+            client.fetch_day_quotes_payload("2026-06-17")
+    finally:
+        client.close()
+
+    assert state["warmup_calls"] == 1
+    assert state["requested_api_calls"] == 0
+
+
 def test_dce_browser_page_html_waits_out_transient_challenge_shell(monkeypatch):
     class FakePage:
         def __init__(self):
@@ -3647,6 +3777,65 @@ def test_official_calendar_backfill_retries_unresolved_dates_at_task_end(monkeyp
     assert attempts["2024-06-04"] == 2
     assert [row["trade_date"] for row in rows] == ["2024-06-03", "2024-06-04", "2024-06-05"]
     assert storage.list_manual_calendar_reviews(status="review_required") == []
+
+
+def test_official_calendar_backfill_does_not_retry_non_retryable_dce_challenge(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "official_calendar_backfill": {
+            "start_date": "2026-06-17",
+            "retry_unresolved_passes": 1,
+            "retry_unresolved_pause_seconds": 60,
+        },
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    attempts = {"count": 0}
+
+    def _probe(self, exchange, trade_date):
+        attempts["count"] += 1
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="unresolved",
+            is_trading_day=None,
+            row_count=0,
+            source_interface="official_dce_day_quotes",
+            evidence_url="http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
+            parser_version="fixture.v1",
+            failure_reason="official DCE dayQuotes anti-bot challenge: HTTP 412",
+            metadata={
+                "failure_category": "dce_anti_bot_challenge",
+                "is_retryable": False,
+                "suspected_local_ip_risk_control": True,
+            },
+        )
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day",
+        _probe,
+    )
+
+    result = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-06-17",
+        end_date="2026-06-17",
+    )
+
+    assert result["status"] == "blocked"
+    assert result["exchanges"][0]["retry_passes_attempted"] == 0
+    assert attempts["count"] == 1
 
 
 def test_official_calendar_backfill_max_days_reports_partial_not_unresolved(monkeypatch, tmp_path):

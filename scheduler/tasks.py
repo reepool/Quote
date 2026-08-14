@@ -8936,6 +8936,7 @@ class ScheduledTasks:
         self._active_tasks.add('futures_market_data_sync')
         try:
             master_results: List[Dict[str, Any]] = []
+            blocked_calendar_exchanges: List[str] = []
             effective_scope_id = scope_id
             effective_scope_ids = scope_ids
             effective_exchanges = exchanges
@@ -9228,6 +9229,30 @@ class ScheduledTasks:
                         metadata_error,
                     )
             status = result.get('status', 'failed')
+            if blocked_calendar_exchanges:
+                result["calendar_preflight"] = {
+                    "status": "blocked",
+                    "blocked_exchanges": blocked_calendar_exchanges,
+                    "continued_exchanges": effective_exchanges or [],
+                }
+                if status == "success":
+                    status = "partial"
+                result["status"] = status
+                try:
+                    run_id = result.get("run_id")
+                    if run_id is not None:
+                        data_manager._require_futures_storage().finish_ingestion_run(
+                            int(run_id),
+                            status=status,
+                            metadata=result,
+                        )
+                except Exception as metadata_error:
+                    scheduler_logger.warning(
+                        "[Scheduler] Failed to persist calendar preflight status context "
+                        "run_id=%s error=%s",
+                        result.get("run_id"),
+                        metadata_error,
+                    )
             success = status == 'success'
             reports = _format_futures_market_data_scheduler_reports(result)
             report_mode = (
