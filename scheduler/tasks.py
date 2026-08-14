@@ -2454,8 +2454,19 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             f"blockers {result.get('blocking_gap_count', 0)}，"
             f"failed {result.get('failed_count', 0)}"
         ),
+        f"历史异常运行: 本轮自动收敛 {result.get('stale_run_count', 0)}",
         f"耗时: `{result.get('elapsed_seconds', 0)}s`",
     ]
+    stale_run_samples = result.get("stale_run_samples") or []
+    if stale_run_samples:
+        rendered_stale_runs = [
+            (
+                f"run {item.get('run_id')} "
+                f"({item.get('job_name')}，started {item.get('started_at')})"
+            )
+            for item in stale_run_samples[:5]
+        ]
+        lines.append("历史异常明细: " + "；".join(rendered_stale_runs))
     unlimited_candidates = int(result.get("candidate_unlimited_count", 0) or 0)
     candidate_limit = int(result.get("candidate_limit", 0) or 0)
     if candidate_limit > 0 and unlimited_candidates > result.get("candidate_count", 0):

@@ -946,6 +946,56 @@ def test_ingestion_run_and_payload_audit_round_trip(tmp_path):
     )
 
 
+def test_finalize_stale_ingestion_runs_marks_only_expired_running_rows(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    stale_run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_disclosure_incremental_sync",
+        metadata={"scope": "stale"},
+    )
+    current_run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_disclosure_incremental_sync",
+        metadata={"scope": "current"},
+    )
+    with sqlite3.connect(research_db_path) as conn:
+        conn.execute(
+            "UPDATE ingestion_runs SET updated_at = ? WHERE id = ?",
+            ("2026-08-13T01:00:00+08:00", stale_run_id),
+        )
+        conn.execute(
+            "UPDATE ingestion_runs SET updated_at = ? WHERE id = ?",
+            ("2026-08-14T11:30:00+08:00", current_run_id),
+        )
+        conn.commit()
+
+    recovered = storage.finalize_stale_ingestion_runs(
+        domain="financial_statements",
+        job_names=["financial_disclosure_incremental_sync"],
+        stale_before="2026-08-14T06:00:00+08:00",
+    )
+
+    assert [item["run_id"] for item in recovered] == [stale_run_id]
+    with sqlite3.connect(research_db_path) as conn:
+        rows = conn.execute(
+            """
+            SELECT id, status, completed_at, error_message, metadata_json
+            FROM ingestion_runs
+            WHERE id IN (?, ?)
+            ORDER BY id
+            """,
+            (stale_run_id, current_run_id),
+        ).fetchall()
+    assert rows[0][1] == "failed"
+    assert rows[0][2]
+    assert rows[0][3] == "auto-finalized stale running ingestion record"
+    assert '"scope": "stale"' in rows[0][4]
+    assert '"stale_run_recovery"' in rows[0][4]
+    assert rows[1][1] == "running"
+    assert rows[1][2] is None
+
+
 def test_upsert_company_profile_writes_normalized_snapshot(tmp_path):
     storage, research_db_path = _build_storage_manager(tmp_path)
     storage.initialize()

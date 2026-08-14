@@ -71,6 +71,25 @@ def test_financial_disclosure_report_includes_blocker_samples():
     assert "blocker样本: 601187.SH@2026-03-31:revenue,equity_parent" in text
 
 
+def test_financial_disclosure_report_includes_stale_run_recovery():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "success",
+            "stale_run_count": 1,
+            "stale_run_samples": [
+                {
+                    "run_id": 1102,
+                    "job_name": "financial_disclosure_incremental_sync",
+                    "started_at": "2026-08-13T21:45:11+08:00",
+                }
+            ],
+        }
+    )
+
+    assert "历史异常运行: 本轮自动收敛 1" in text
+    assert "历史异常明细: run 1102" in text
+
+
 def test_financial_disclosure_report_includes_expired_pending_and_source_degradation():
     text = task_module._format_financial_disclosure_scheduler_report(
         {

@@ -67,6 +67,12 @@ DISCLOSURE_ANOMALY_SEARCH_KEYS = ("披露", "定期报告")
 _BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT = (
     "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do"
 )
+DEFAULT_STALE_RUNNING_TIMEOUT_SECONDS = 6 * 60 * 60
+STALE_FINANCIAL_JOB_NAMES = (
+    "financial_disclosure_incremental_sync",
+    "financial_disclosure_reconciliation_sync",
+    "financial_statements_shadow_sync",
+)
 
 
 @dataclass
@@ -198,16 +204,35 @@ class FinancialDisclosureIncrementalSyncService:
             or "data/financials.db"
         )
 
+        job_name = (
+            "financial_disclosure_reconciliation_sync"
+            if reconciliation
+            else self.purpose_key
+        )
+        stale_running_timeout_seconds = max(
+            1,
+            int(
+                maintenance_cfg.get(
+                    "stale_running_timeout_seconds",
+                    DEFAULT_STALE_RUNNING_TIMEOUT_SECONDS,
+                )
+            )
+        )
+        stale_runs: List[Dict[str, Any]] = []
         run_id: Optional[int] = None
         if not dry_run:
             with self.storage.financial_database_scope():
+                stale_runs = self.storage.finalize_stale_ingestion_runs(
+                    domain="financial_statements",
+                    job_names=STALE_FINANCIAL_JOB_NAMES,
+                    stale_before=(
+                        get_shanghai_time()
+                        - timedelta(seconds=stale_running_timeout_seconds)
+                    ).isoformat(),
+                )
                 run_id = self.storage.start_ingestion_run(
                     domain="financial_statements",
-                    job_name=(
-                        "financial_disclosure_reconciliation_sync"
-                        if reconciliation
-                        else self.purpose_key
-                    ),
+                    job_name=job_name,
                     market=",".join(target_exchanges),
                     metadata={
                         "exchanges": target_exchanges,
@@ -285,11 +310,7 @@ class FinancialDisclosureIncrementalSyncService:
             )
             result = {
                 "status": status,
-                "job_name": (
-                    "financial_disclosure_reconciliation_sync"
-                    if reconciliation
-                    else self.purpose_key
-                ),
+                "job_name": job_name,
                 "dry_run": dry_run,
                 "reconciliation": reconciliation,
                 "db_path": str(financial_db_path),
@@ -324,6 +345,8 @@ class FinancialDisclosureIncrementalSyncService:
                 "candidate_sources": dict(self._last_candidate_source_summary),
                 "expired_pending_count": self._last_expired_pending_count,
                 "scan_errors": scan_result["errors"][:10],
+                "stale_run_count": len(stale_runs),
+                "stale_run_samples": stale_runs[:10],
                 "elapsed_seconds": elapsed,
                 **write_result,
             }

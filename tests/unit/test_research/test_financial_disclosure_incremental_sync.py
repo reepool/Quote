@@ -89,6 +89,7 @@ class _FakeStorage:
         audit_rows=None,
         industry_memberships=None,
         company_profiles=None,
+        stale_runs=None,
     ):
         self.financial_statements = _FakeFinancialStatements(
             ready=ready,
@@ -101,6 +102,7 @@ class _FakeStorage:
         self.audit_rows = list(audit_rows or [])
         self.industry_memberships = dict(industry_memberships or {})
         self.company_profiles = dict(company_profiles or {})
+        self.stale_runs = list(stale_runs or [])
         self.generic_scan_states = []
         self.generic_audits = []
 
@@ -142,6 +144,10 @@ class _FakeStorage:
 
     def start_ingestion_run(self, **kwargs):
         return 1
+
+    def finalize_stale_ingestion_runs(self, **kwargs):
+        self.stale_run_query = kwargs
+        return list(self.stale_runs)
 
     def finish_ingestion_run(self, *args, **kwargs):
         self.finished_run = {"args": args, "kwargs": kwargs}
@@ -328,7 +334,16 @@ def test_incremental_sync_uses_common_announcement_service_and_generic_audit(tmp
         symbols=("002731",),
         raw_payload={"announcementId": "ann-common-risk"},
     )
-    storage = _FakeStorage(ready=False)
+    storage = _FakeStorage(
+        ready=False,
+        stale_runs=[
+            {
+                "run_id": 1102,
+                "job_name": "financial_disclosure_incremental_sync",
+                "started_at": "2026-08-13T21:45:11+08:00",
+            }
+        ],
+    )
     announcement_service = _FakeAnnouncementService([record])
     service = FinancialDisclosureIncrementalSyncService(
         db_ops=_FakeDbOps(),
@@ -348,6 +363,13 @@ def test_incremental_sync_uses_common_announcement_service_and_generic_audit(tmp
     assert result["status"] == "success"
     assert result["pending_delisting_risk_count"] == 1
     assert result["selected_announcements"] == 1
+    assert result["stale_run_count"] == 1
+    assert result["stale_run_samples"][0]["run_id"] == 1102
+    assert storage.stale_run_query["job_names"] == (
+        "financial_disclosure_incremental_sync",
+        "financial_disclosure_reconciliation_sync",
+        "financial_statements_shadow_sync",
+    )
     assert storage.generic_scan_states[0]["scan_result"].source == "cninfo"
     assert storage.generic_audits[0]["record"].source_announcement_id == "ann-common-risk"
     assert announcement_service.queries[0].purpose_key == service.purpose_key

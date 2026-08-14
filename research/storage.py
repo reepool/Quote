@@ -885,6 +885,97 @@ class ResearchStorageManager:
 
         return IngestionRunRecord(run_id=run_id, status=status)
 
+    def finalize_stale_ingestion_runs(
+        self,
+        *,
+        domain: str,
+        job_names: Sequence[str],
+        stale_before: str,
+    ) -> List[Dict[str, Any]]:
+        """Mark stale running ingestion records as failed and return their details."""
+        if self._is_financial_domain(domain) and self._active_db_path is None:
+            with self.financial_database_scope():
+                return self.finalize_stale_ingestion_runs(
+                    domain=domain,
+                    job_names=job_names,
+                    stale_before=stale_before,
+                )
+        if self._is_valuation_domain(domain) and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.finalize_stale_ingestion_runs(
+                    domain=domain,
+                    job_names=job_names,
+                    stale_before=stale_before,
+                )
+
+        normalized_job_names = [
+            str(name).strip() for name in job_names if str(name).strip()
+        ]
+        if not normalized_job_names:
+            return []
+
+        now = get_shanghai_time().isoformat()
+        reason = "auto-finalized stale running ingestion record"
+        placeholders = ", ".join("?" for _ in normalized_job_names)
+        params: List[Any] = [domain, *normalized_job_names, stale_before]
+        recovered: List[Dict[str, Any]] = []
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT id, job_name, started_at, updated_at, metadata_json
+                FROM ingestion_runs
+                WHERE domain = ?
+                  AND job_name IN ({placeholders})
+                  AND status = 'running'
+                  AND COALESCE(updated_at, started_at, created_at) < ?
+                ORDER BY started_at, id
+                """,
+                params,
+            ).fetchall()
+            for row in rows:
+                item = dict(row)
+                metadata = self._deserialize_json(item.get("metadata_json")) or {}
+                if not isinstance(metadata, dict):
+                    metadata = {"original_metadata": metadata}
+                metadata["stale_run_recovery"] = {
+                    "recovered_at": now,
+                    "stale_before": stale_before,
+                    "reason": reason,
+                }
+                cursor = conn.execute(
+                    """
+                    UPDATE ingestion_runs
+                    SET status = 'failed',
+                        completed_at = ?,
+                        updated_at = ?,
+                        error_message = ?,
+                        metadata_json = ?
+                    WHERE id = ? AND status = 'running'
+                    """,
+                    (
+                        now,
+                        now,
+                        reason,
+                        json.dumps(metadata, ensure_ascii=False, sort_keys=True),
+                        item["id"],
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    continue
+                recovered.append(
+                    {
+                        "run_id": int(item["id"]),
+                        "job_name": str(item["job_name"]),
+                        "started_at": item.get("started_at"),
+                        "last_updated_at": item.get("updated_at"),
+                    }
+                )
+            conn.commit()
+
+        return recovered
+
     def get_latest_successful_ingestion_run(
         self,
         *,
