@@ -109,10 +109,34 @@ def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
         "关于权益分派后调整限制性股票回购价格的公告",
         "关于回购股份注销完成调整可转债转股价格的公告",
         "关于回购股份注销完成调整可转换公司债券转股价格的公告",
+        "关于与预重整投资人签署《重整投资协议》暨公司股票复牌的公告",
+        "关于文科转债转股数量累计达到转股前公司已发行股份总额10%的公告",
+        "关于可转换公司债券累计转股进展的公告",
     ],
 )
 def test_daily_title_trigger_rejects_unrelated_disclosures(title):
     assert classify_daily_corporate_action_title(title)["selected"] is False
+
+
+@pytest.mark.parametrize(
+    ("title", "reason"),
+    [
+        (
+            "关于与预重整投资人签署《重整投资协议》暨公司股票复牌的公告",
+            "deterministic_exclusion:pre_restructuring_stage",
+        ),
+        (
+            "关于文科转债转股数量累计达到转股前公司已发行股份总额10%的公告",
+            "deterministic_exclusion:convertible_bond_conversion_activity",
+        ),
+    ],
+)
+def test_daily_title_trigger_reports_non_xdxr_exclusion_reason(title, reason):
+    decision = classify_daily_corporate_action_title(title)
+
+    assert decision["selected"] is False
+    assert decision["reason"] == reason
+    assert decision["requires_semantic_review"] is False
 
 
 def test_distribution_implementation_takes_precedence_over_exclusion_words():

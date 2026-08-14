@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v4"
+    "cninfo_corporate_action_daily_title_trigger_v5"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -113,17 +113,24 @@ _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS = (
     "现金红利发放",
     "分红派息实施",
 )
+_PRE_RESTRUCTURING_MARKERS = (
+    "预重整",
+    "重整预案",
+    "重整意向",
+)
+_CONVERTIBLE_BOND_MARKERS = (
+    "可转债",
+    "可转换公司债券",
+    "转债",
+)
 
 
-def _has_convertible_bond_conversion_price_language(
+def _has_convertible_bond_conversion_language(
     normalized_title: str,
 ) -> bool:
     return (
-        (
-            "可转债" in normalized_title
-            or "可转换公司债券" in normalized_title
-        )
-        and "转股价格" in normalized_title
+        any(marker in normalized_title for marker in _CONVERTIBLE_BOND_MARKERS)
+        and "转股" in normalized_title
     )
 
 
@@ -134,16 +141,10 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
         for marker in _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS
     ):
         return None
-    if (
-        _has_convertible_bond_conversion_price_language(normalized_title)
-        and "回购" in normalized_title
-        and "注销" in normalized_title
-        and any(
-            marker in normalized_title
-            for marker in ("调整", "修正", "下调")
-        )
-    ):
-        return "convertible_bond_conversion_price_adjustment"
+    if any(marker in normalized_title for marker in _PRE_RESTRUCTURING_MARKERS):
+        return "pre_restructuring_stage"
+    if _has_convertible_bond_conversion_language(normalized_title):
+        return "convertible_bond_conversion_activity"
     if (
         "向特定对象发行" in normalized_title
         and "不存在" in normalized_title
@@ -281,7 +282,7 @@ def classify_daily_corporate_action_title(title: Any) -> Dict[str, Any]:
         if marker in normalized_title
         and not (
             marker == "债转股"
-            and _has_convertible_bond_conversion_price_language(
+            and _has_convertible_bond_conversion_language(
                 normalized_title
             )
         )
