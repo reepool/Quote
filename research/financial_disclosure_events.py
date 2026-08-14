@@ -53,6 +53,7 @@ DISCLOSURE_CORRECTION_KEYWORDS = (
 
 NON_PRIMARY_ANNOUNCEMENT_KEYWORDS = (
     "子公司",
+    "进展",
     "业绩说明会",
     "说明会预告",
     "年度报告说明会",
@@ -128,7 +129,7 @@ class FinancialDisclosureEvent:
 def financial_disclosure_event_filter(record: AnnouncementRecord) -> List[str]:
     """Return financial disclosure event reasons for one announcement."""
     title = record.title or ""
-    if "子公司" in title:
+    if "子公司" in title or "进展" in title:
         return []
     reasons: List[str] = []
     has_periodic_report = any(

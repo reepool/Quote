@@ -884,7 +884,7 @@ def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):
     assert result["status"] == "degraded"
 
 
-def test_incremental_sync_keeps_pending_delisting_risk_without_explicit_period(tmp_path):
+def test_incremental_sync_filters_progress_pending_delisting_risk(tmp_path):
     storage = _FakeStorage(
         ready=False,
         pending_states=[
@@ -916,8 +916,8 @@ def test_incremental_sync_keeps_pending_delisting_risk_without_explicit_period(t
         )
     )
 
-    assert result["candidate_sources"]["filtered_stale_pending"] == 0
-    assert result["candidate_sources"]["pending_state"] == 1
+    assert result["candidate_sources"]["filtered_stale_pending"] == 1
+    assert result["candidate_sources"]["pending_state"] == 0
 
 
 def test_readiness_accepts_cninfo_data20_official_fact_for_missing_core(tmp_path):

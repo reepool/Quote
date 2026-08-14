@@ -68,6 +68,20 @@ def test_financial_disclosure_filter_excludes_subsidiary_announcements():
     assert is_non_primary_financial_announcement_title(record.title) is True
 
 
+def test_financial_disclosure_filter_excludes_progress_announcements():
+    record = _record(
+        announcement_id="report-progress-1",
+        title="新华锦关于公司股票被实施其他风险警示事项及2026年半年度报告编制的进展公告",
+        announcement_time="2026-08-13",
+        market="SSE",
+        column="sse",
+        symbols=["600735"],
+    )
+
+    assert financial_disclosure_event_filter(record) == []
+    assert is_non_primary_financial_announcement_title(record.title) is True
+
+
 def test_financial_disclosure_filter_detects_formal_correction_and_revision():
     correction = _record(
         announcement_id="a3",
