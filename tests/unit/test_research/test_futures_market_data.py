@@ -1077,17 +1077,26 @@ def test_dce_master_governance_refreshes_existing_master_data(monkeypatch, tmp_p
     assert series["metadata"]["master_governance_refreshed_from_instrument"] == "CNF.I.DCE"
 
 
-def test_dce_browser_warmup_failure_does_not_block_requested_api(monkeypatch):
+def test_dce_browser_waits_for_warmup_fetch_to_recover(monkeypatch):
+    state = {"warmup_calls": 0}
+
     class FakePage:
         async def sleep(self, seconds):
             return None
 
         async def evaluate(self, script, await_promise=False, return_by_value=False):
             if "/dcereport/publicweb/maxTradeDate" in script:
+                state["warmup_calls"] += 1
+                if state["warmup_calls"] == 1:
+                    return json.dumps({
+                        "status": -1,
+                        "ok": False,
+                        "text": "TypeError: Failed to fetch",
+                    })
                 return json.dumps({
-                    "status": -1,
-                    "ok": False,
-                    "text": "TypeError: Failed to fetch",
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True}),
                 })
             assert "/dcereport/publicweb/tradepara/contractInfo" in script
             return json.dumps({
@@ -1111,6 +1120,8 @@ def test_dce_browser_warmup_failure_does_not_block_requested_api(monkeypatch):
 
     client = DceOfficialBrowserClient({
         "settle_seconds": 0,
+        "readiness_timeout_seconds": 1,
+        "readiness_poll_seconds": 0.1,
         "retry_attempts": 1,
         "browser_executable_path": "/tmp/fake-chrome",
     })
@@ -1120,6 +1131,7 @@ def test_dce_browser_warmup_failure_does_not_block_requested_api(monkeypatch):
         client.close()
 
     assert payload == {"success": True, "data": []}
+    assert state["warmup_calls"] == 2
 
 
 def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
@@ -1191,7 +1203,7 @@ def test_dce_http_412_is_classified_as_non_retryable_anti_bot_challenge():
 
     assert classification.category == "dce_anti_bot_challenge"
     assert classification.is_retryable is False
-    assert classification.suspected_local_ip_risk_control is True
+    assert classification.suspected_local_ip_risk_control is False
 
 
 def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
@@ -1215,8 +1227,8 @@ def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
     assert "no report" not in str(exc_info.value)
 
 
-def test_dce_browser_412_does_not_retry_same_session(monkeypatch):
-    state = {"warmup_calls": 0, "requested_api_calls": 0}
+def test_dce_browser_412_restarts_with_clean_session(monkeypatch):
+    state = {"starts": 0, "warmup_calls": 0, "requested_api_calls": 0}
 
     class FakePage:
         async def sleep(self, seconds):
@@ -1231,10 +1243,75 @@ def test_dce_browser_412_does_not_retry_same_session(monkeypatch):
                     "text": json.dumps({"success": True}),
                 })
             state["requested_api_calls"] += 1
+            if state["requested_api_calls"] > 1:
+                return json.dumps({
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True, "data": []}),
+                })
             return json.dumps({
                 "status": 412,
                 "ok": False,
                 "text": "<html><title>Precondition Failed</title></html>",
+            })
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "retry_attempts": 3,
+        "retry_backoff_seconds": 0,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        payload = client.fetch_day_quotes_payload("2026-06-17")
+    finally:
+        client.close()
+
+    assert payload == {"success": True, "data": []}
+    assert state["starts"] == 2
+    assert state["warmup_calls"] == 2
+    assert state["requested_api_calls"] == 2
+
+
+def test_dce_browser_warmup_412_waits_until_challenge_is_ready(monkeypatch):
+    state = {"warmup_calls": 0, "requested_api_calls": 0}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                state["warmup_calls"] += 1
+                if state["warmup_calls"] > 1:
+                    return json.dumps({
+                        "status": 200,
+                        "ok": True,
+                        "text": json.dumps({"success": True}),
+                    })
+                return json.dumps({
+                    "status": 412,
+                    "ok": False,
+                    "text": "<html><title>Precondition Failed</title></html>",
+                })
+            state["requested_api_calls"] += 1
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
             })
 
     class FakeBrowser:
@@ -1252,21 +1329,23 @@ def test_dce_browser_412_does_not_retry_same_session(monkeypatch):
 
     client = DceOfficialBrowserClient({
         "settle_seconds": 0,
+        "readiness_timeout_seconds": 1,
+        "readiness_poll_seconds": 0.1,
         "retry_attempts": 3,
         "retry_backoff_seconds": 0,
         "browser_executable_path": "/tmp/fake-chrome",
     })
     try:
-        with pytest.raises(OfficialFuturesSourceUnavailable, match="anti-bot challenge"):
-            client.fetch_day_quotes_payload("2026-06-17")
+        payload = client.fetch_day_quotes_payload("2026-06-17")
     finally:
         client.close()
 
-    assert state["warmup_calls"] == 1
+    assert payload == {"success": True, "data": []}
+    assert state["warmup_calls"] == 2
     assert state["requested_api_calls"] == 1
 
 
-def test_dce_browser_warmup_412_aborts_requested_api(monkeypatch):
+def test_dce_browser_warmup_412_fails_after_readiness_timeout(monkeypatch):
     state = {"warmup_calls": 0, "requested_api_calls": 0}
 
     class FakePage:
@@ -1299,12 +1378,16 @@ def test_dce_browser_warmup_412_aborts_requested_api(monkeypatch):
 
     client = DceOfficialBrowserClient({
         "settle_seconds": 0,
+        "readiness_timeout_seconds": 0,
         "retry_attempts": 3,
         "retry_backoff_seconds": 0,
         "browser_executable_path": "/tmp/fake-chrome",
     })
     try:
-        with pytest.raises(OfficialFuturesSourceUnavailable, match="anti-bot challenge"):
+        with pytest.raises(
+            OfficialFuturesSourceUnavailable,
+            match="browser challenge did not become ready",
+        ):
             client.fetch_day_quotes_payload("2026-06-17")
     finally:
         client.close()

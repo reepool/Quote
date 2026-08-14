@@ -64,7 +64,15 @@ class DceOfficialBrowserClient:
             or ""
         ).strip()
         self.headless = bool(cfg.get("headless", False))
-        self.settle_seconds = max(0.0, float(cfg.get("settle_seconds", 9)))
+        self.settle_seconds = max(0.0, float(cfg.get("settle_seconds", 0)))
+        self.readiness_timeout_seconds = max(
+            0.0,
+            float(cfg.get("readiness_timeout_seconds", 45)),
+        )
+        self.readiness_poll_seconds = max(
+            0.1,
+            float(cfg.get("readiness_poll_seconds", 3)),
+        )
         self.page_settle_seconds = max(0.0, float(cfg.get("page_settle_seconds", min(self.settle_seconds, 2.0))))
         self.page_challenge_settle_seconds = max(
             0.0,
@@ -175,22 +183,65 @@ class DceOfficialBrowserClient:
             await self._stop()
             raise OfficialFuturesSourceUnavailable(
                 "official DCE browser session failed; install real Chrome or set "
-                f"QUOTE_DCE_CHROME_PATH/browser_executable_path: {exc}"
+                "QUOTE_DCE_CHROME_PATH/browser_executable_path: "
+                f"{type(exc).__name__}: {exc!r}"
             ) from exc
         try:
-            await self._api(
-                "GET",
-                "/dcereport/publicweb/maxTradeDate",
-                allow_session_restart=False,
-            )
-        except Exception as exc:
-            classification = classify_official_futures_failure(exc)
-            if classification.category == "dce_anti_bot_challenge":
-                raise
-            logger.warning(
-                "[OfficialFutures] DCE browser warm-up maxTradeDate failed; continuing with requested API path error=%s",
-                exc,
-            )
+            await self._wait_until_ready()
+        except Exception:
+            await self._stop()
+            raise
+
+    async def _wait_until_ready(self) -> None:
+        """Wait for DCE's browser challenge to finish before calling business APIs."""
+        started = time.monotonic()
+        deadline = started + self.readiness_timeout_seconds
+        attempt = 0
+        last_error = ""
+        while True:
+            attempt += 1
+            try:
+                await self._api(
+                    "GET",
+                    "/dcereport/publicweb/maxTradeDate",
+                    allow_session_restart=False,
+                    max_attempts=1,
+                )
+                logger.info(
+                    "[OfficialFutures] DCE browser challenge ready attempts=%s elapsed_seconds=%.1f",
+                    attempt,
+                    time.monotonic() - started,
+                )
+                return
+            except Exception as exc:
+                last_error = str(exc)
+                classification = classify_official_futures_failure(exc)
+                challenge_pending = (
+                    classification.category == "dce_anti_bot_challenge"
+                    or self._is_in_page_fetch_failure(status=-1, text=last_error)
+                )
+                if not challenge_pending:
+                    logger.warning(
+                        "[OfficialFutures] DCE browser readiness probe failed with non-challenge error; "
+                        "continuing with requested API path error=%s",
+                        exc,
+                    )
+                    return
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise OfficialFuturesSourceUnavailable(
+                        "official DCE browser challenge did not become ready within "
+                        f"{self.readiness_timeout_seconds:.1f}s: {last_error}"
+                    ) from exc
+                sleep_seconds = min(self.readiness_poll_seconds, remaining)
+                logger.info(
+                    "[OfficialFutures] DCE browser challenge pending attempt=%s "
+                    "sleep_seconds=%.1f error=%s",
+                    attempt,
+                    sleep_seconds,
+                    last_error,
+                )
+                await asyncio.sleep(sleep_seconds)
 
     async def _api(
         self,
@@ -199,6 +250,7 @@ class DceOfficialBrowserClient:
         body: Optional[Mapping[str, Any]] = None,
         *,
         allow_session_restart: bool = True,
+        max_attempts: Optional[int] = None,
     ) -> Mapping[str, Any]:
         body_js = json.dumps(body, ensure_ascii=False) if body is not None else "null"
         script = f"""
@@ -219,7 +271,8 @@ class DceOfficialBrowserClient:
         }})()
         """
         last_error = ""
-        for attempt in range(1, self.retry_attempts + 1):
+        attempt_limit = self.retry_attempts if max_attempts is None else max(1, int(max_attempts))
+        for attempt in range(1, attempt_limit + 1):
             await self._ensure_started()
             raw_result = await self._page.evaluate(script, await_promise=True, return_by_value=True)
             response = json.loads(raw_result if isinstance(raw_result, str) else str(raw_result))
@@ -238,15 +291,27 @@ class DceOfficialBrowserClient:
                     f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
                 )
             last_error = f"HTTP {status}: {text[:200]}"
-            # DCE returns a JavaScript challenge page with HTTP 412 when the
-            # current browser session or egress IP has not passed its
-            # verification. Repeating the same fetch cannot solve that
-            # challenge and only adds latency/risk-control pressure.
+            # DCE returns its JavaScript challenge page with HTTP 412 until the
+            # real browser session is ready. Repeating the request in the same
+            # invalidated page context cannot solve it, but a clean browser
+            # session may recover after completing the challenge again.
             if status == 412:
+                if allow_session_restart and attempt < attempt_limit:
+                    logger.warning(
+                        "[OfficialFutures] DCE API challenge returned after readiness; "
+                        "restarting browser session path=%s attempt=%s next_attempt=%s",
+                        path,
+                        attempt,
+                        attempt + 1,
+                    )
+                    await self._stop()
+                    if self.retry_backoff_seconds > 0:
+                        await asyncio.sleep(self.retry_backoff_seconds)
+                    continue
                 raise OfficialFuturesSourceUnavailable(
                     f"official DCE {path} anti-bot challenge: {last_error}"
                 )
-            if attempt < self.retry_attempts:
+            if attempt < attempt_limit:
                 if allow_session_restart and self._is_in_page_fetch_failure(status=status, text=text):
                     logger.warning(
                         "[OfficialFutures] DCE in-page fetch failed; restarting browser session path=%s attempt=%s next_attempt=%s error=%s",
@@ -2960,8 +3025,8 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
         return OfficialFuturesFailureClassification(
             category="dce_anti_bot_challenge",
             is_retryable=False,
-            suspected_local_ip_risk_control=True,
-            summary="DCE returned HTTP 412 challenge HTML; retry later from a verified session or alternate egress",
+            suspected_local_ip_risk_control=False,
+            summary="DCE returned its browser challenge HTML; complete the challenge in a real browser session before calling the API",
             evidence=evidence,
         )
     if any(marker in lowered for marker in anti_bot_markers):
