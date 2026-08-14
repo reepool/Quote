@@ -787,6 +787,127 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     assert deduped["facts_written"] == 0
 
 
+def test_broker_semiannual_skips_download_for_parsed_filing(tmp_path):
+    payload = _risk_control_text().encode("utf-8")
+    archive_path = tmp_path / "existing-semiannual.pdf"
+    archive_path.write_bytes(payload)
+    storage = _FakeSyncStorage()
+    storage.manifests.append(
+        {
+            "source_file_id": "existing-semiannual",
+            "instrument_id": "600030.SH",
+            "report_period": "2026-06-30",
+            "report_type": "semiannual",
+            "source": "cninfo",
+            "filing_id": "semiannual-2026",
+            "source_url": "/semiannual.pdf",
+            "source_mode": "direct",
+            "status": "parsed",
+            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+            "archive_path": str(archive_path),
+            "content_hash": hashlib.sha256(payload).hexdigest(),
+            "content_length": len(payload),
+        }
+    )
+    record = _announcement_record(
+        announcement_id="semiannual-2026",
+        title="2026年半年度报告",
+        announcement_time="2026-08-01",
+        market="沪市",
+        column="sse",
+        symbols=["600030"],
+        adjunct_url="/semiannual.pdf",
+        adjunct_type="PDF",
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=storage,
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("parsed filing must not be downloaded again")
+        ),
+        archive_root=tmp_path,
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        annual_report_asset_mode="legacy",
+        shared_annual_report_enabled=False,
+    )
+
+    result = service.backfill(
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+                "industry_name": "证券",
+            }
+        ],
+        report_periods=["2026-06-30"],
+        announcement_records=[record],
+    )
+
+    assert result["status"] == "success"
+    assert result["unchanged_reports"] == 1
+    assert result["reports_parsed"] == 0
+    assert result["facts_written"] == 0
+
+
+def test_broker_semiannual_retries_parse_failed_filing(tmp_path):
+    payload = _risk_control_text().encode("utf-8")
+    archive_path = tmp_path / "failed-semiannual.pdf"
+    archive_path.write_bytes(payload)
+    storage = _FakeSyncStorage()
+    storage.manifests.append(
+        {
+            "source_file_id": "failed-semiannual",
+            "instrument_id": "600030.SH",
+            "report_period": "2026-06-30",
+            "report_type": "semiannual",
+            "source": "cninfo",
+            "filing_id": "semiannual-2026",
+            "source_url": "/semiannual.pdf",
+            "source_mode": "direct",
+            "status": "parse_failed",
+            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+            "archive_path": str(archive_path),
+            "content_hash": hashlib.sha256(payload).hexdigest(),
+            "content_length": len(payload),
+        }
+    )
+    fetches = []
+    record = _announcement_record(
+        announcement_id="semiannual-2026",
+        title="2026年半年度报告",
+        announcement_time="2026-08-01",
+        market="沪市",
+        column="sse",
+        symbols=["600030"],
+        adjunct_url="/semiannual.pdf",
+        adjunct_type="PDF",
+    )
+    service = BrokerRiskControlReportSyncService(
+        storage=storage,
+        payload_fetcher=lambda _record: fetches.append(_record) or payload,
+        archive_root=tmp_path,
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        annual_report_asset_mode="legacy",
+        shared_annual_report_enabled=False,
+    )
+
+    result = service.backfill(
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+                "industry_name": "证券",
+            }
+        ],
+        report_periods=["2026-06-30"],
+        announcement_records=[record],
+    )
+
+    assert fetches == [record]
+    assert result["reports_parsed"] == 1
+
+
 class _FakeAnnouncementService:
     def __init__(self, records):
         self.records = tuple(records)

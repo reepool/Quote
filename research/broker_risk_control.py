@@ -2102,6 +2102,24 @@ class BrokerRiskControlReportSyncService:
                     and not self.legacy_semiannual_enabled
                 ):
                     raise RuntimeError("legacy broker semiannual acquisition is disabled")
+                existing_manifest = self._existing_direct_filing_manifest(
+                    record,
+                    instrument,
+                    report_period,
+                )
+                if existing_manifest is not None:
+                    result.unchanged_reports += 1
+                    LOGGER.info(
+                        "broker risk-control report unchanged before download: "
+                        "instrument_id=%s symbol=%s report_period=%s "
+                        "announcement_id=%s source_file_id=%s",
+                        instrument.get("instrument_id"),
+                        instrument.get("symbol"),
+                        report_period,
+                        _announcement_id(record),
+                        existing_manifest.get("source_file_id"),
+                    )
+                    return
                 payload = self.payload_fetcher(record)
                 shared_asset_lineage = None
                 shared_content = None
@@ -2533,6 +2551,71 @@ class BrokerRiskControlReportSyncService:
             if row_identity == expected_identity:
                 return True
         return False
+
+    def _existing_direct_filing_manifest(
+        self,
+        record: AnnouncementRecord,
+        instrument: Mapping[str, Any],
+        report_period: str,
+    ) -> Mapping[str, Any] | None:
+        """Return an already parsed direct filing that needs no new download."""
+        if self.force_reparse_existing:
+            return None
+        filing_id = _announcement_id(record)
+        instrument_id = str(instrument.get("instrument_id") or "").strip()
+        source = _announcement_source(record)
+        report_type = self._record_report_type(record)
+        if not filing_id or not instrument_id or not report_period or not source:
+            return None
+        rows = self.storage.get_financial_source_file_manifests(
+            instrument_id=instrument_id,
+            report_period=report_period,
+            source=source,
+            report_types=(report_type,),
+            filing_id=filing_id,
+            statuses=("parsed",),
+        )
+        source_url = str(_announcement_source_url(record) or "").strip()
+        for row in rows:
+            if (
+                str(row.get("instrument_id") or "").strip() != instrument_id
+                or str(row.get("report_period") or "").strip() != report_period
+                or str(row.get("report_type") or "").strip() != report_type
+                or str(row.get("source") or "").strip().lower() != source
+                or str(row.get("filing_id") or "").strip() != filing_id
+                or row.get("source_mode") != "direct"
+                or row.get("status") != "parsed"
+                or row.get("parser_version") != self.parser.parser_version
+            ):
+                continue
+            manifest_url = str(row.get("source_url") or "").strip()
+            if source_url and manifest_url and source_url != manifest_url:
+                continue
+            if self.archive_root is not None and not self._manifest_archive_is_valid(row):
+                continue
+            return row
+        return None
+
+    @staticmethod
+    def _manifest_archive_is_valid(manifest: Mapping[str, Any]) -> bool:
+        archive_path = str(manifest.get("archive_path") or "").strip()
+        expected_hash = str(manifest.get("content_hash") or "").strip().lower()
+        if not archive_path or not expected_hash:
+            return False
+        path = Path(archive_path)
+        if not path.is_file():
+            return False
+        try:
+            expected_length = manifest.get("content_length")
+            if expected_length is not None and path.stat().st_size != int(expected_length):
+                return False
+            digest = hashlib.sha256()
+            with path.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            return digest.hexdigest() == expected_hash
+        except (OSError, TypeError, ValueError):
+            return False
 
     def _record_period(self, record: AnnouncementRecord) -> str:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
