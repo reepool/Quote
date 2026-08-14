@@ -479,7 +479,7 @@ async def weekly_data_maintenance(self,
 财务报表不再依赖周六股东刷新窗口。L1 本地核心层完成初始化后，财务维护应拆成手工全量入口、公告驱动增量入口和周期对账入口，模式参考股东摘要更新，但写入目标为 `data/financials.db`。
 
 - `financial_l1_full_import`：仅手工 `/run`，封装当前 L1 全量导入/补处理脚本，不注册 cron；用于初始化、灾后恢复和大范围补处理。
-- `financial_disclosure_incremental_sync`：公告驱动日更，扫描 CNInfo 定期报告公告和披露异常公告，生成候选标的/报告期后定向补处理。
+- `financial_disclosure_incremental_sync`：公告驱动日更；SSE/SZSE 通过 CNInfo 四类定期报告 category 做市场级主扫描，披露异常使用独立关键词窄扫描；BSE 使用官方高级筛选接口的定报/延期披露 subtype，生成候选标的/报告期后定向补处理。
 - `financial_disclosure_reconciliation_sync`：周度兜底，复核缺失报告期、accepted gap、pending recheck 和 CNInfo 静默更新。
 - 旧 `financial_statements_catchup_sync / financial_statements_reconciliation_sync` 在新任务落地前保持禁用；后续应迁移到新的公告驱动语义或作为兼容别名。
 
@@ -645,9 +645,9 @@ async def weekly_data_maintenance(self,
 
 #### 业务逻辑
 1. **主数据前置**：三个财务任务在读取 active 股票池前都先走共享证券主数据治理，历史回补语义除外。
-2. **公告候选**：增量任务按 CNInfo 市场/栏目和时间窗口扫描公告，不逐股票扫描；只筛选正式年度报告、半年度报告、一季报、三季报主公告及其更正/修订、延期披露、停牌、退市风险警示和可能终止上市公告。业绩说明会、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤。
+2. **公告候选**：增量任务不逐股票扫描。SSE/SZSE 主流通过 CNInfo `periodic_report` 组合 category 在上游只取正式年度报告、半年度报告、一季报和三季报，再由本地规则保留主公告及更正/修订；披露异常通过 `披露 / 定期报告` 独立关键词流发现。BSE 使用官方 `companyAnnouncement.do` 高级筛选接口及已验证的定报/预计无法按期披露 subtype，不再扫描整个 NEEQ 公告流。异常公告必须能从标题推导明确报告期。子公司、进展、业绩说明会、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤。
    历史 `pending_recheck` 在再次进入候选前也会重新套用当前筛选规则，旧逻辑留下的说明会、英文版、图文版、问询函专项说明等噪声计入 `filtered_stale_pending`，不再触发补数。
-3. **披露异常标记**：历史缺报且公告显示无法按期披露、停牌、退市风险或可能终止上市时，先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，并记录公告证据；该状态解释披露异常，不替代字段映射，也不触发每日补数重试。
+3. **披露异常标记**：历史缺报且公告标题明确指向同一报告期，并显示无法按期披露、定报相关停牌、退市风险或可能终止上市时，先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，并记录公告证据；普通面值/市值退市或无明确报告期的停牌风险公告不进入财务候选。
 4. **定向补处理**：只对公告候选、pending recheck、本地缺失报告期和 required core facts 不完整标的调用补数流程；已完整落库的 instrument-period 跳过。补数前会先套用股票生命周期，报告期早于上市日的本地缺口或历史 pending 直接记录为 `accepted_disclosure_gap/pre_listing_period`，不进入 CNInfo/THS/Sina 路由。
 5. **字段口径与补数源路由**：L1 required facts 使用 `revenue / net_income_parent / equity_parent / total_assets / total_liabilities`，保持归母与合计口径分离。增量和周度对账维护任务按 `CNInfo data20 -> THS -> Sina` 执行。CNInfo data20 是官方结构化优先源；THS/Sina 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做字段级补齐。源顺序、CNInfo-first 修复、fallback 和 readiness 合并由 `FinancialMaintenanceRepairRouter` 统一处理，调度任务不直接写各数据源调用逻辑。
    Telegram 报告中的 `CNInfo ready` 是最终 canonical readiness 成功数；`CNInfo 批处理通过` 是 CNInfo 批处理层面的 instrument-period 通过数，二者必须分开解读。
@@ -655,6 +655,7 @@ async def weekly_data_maintenance(self,
 7. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。`outside_approved_local_core / mapping_catalog_empty` 会归为 `mapping_policy_gap`，不再调用补数源；`missing_local_core_fact` 等才归为 source missing 并进入补数路由。候选超过上限时按交易所、profile 和报告期均衡抽样。
 8. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
 9. **状态持久化**：财务公告候选和处理结果写入 `financial_disclosure_event_state`，扫描水位和公告证据使用独立 purpose key 写入 CNInfo announcement 状态/审计表。
+10. **扫描完整性**：每个 category/keyword 流使用独立 scope key 和游标；任一流达到页数上限、请求失败或未到最终页时不提交新游标，并将父任务标记为 `degraded`（无可用候选时为 `failed`）。
 
 ### 7. 系统健康检查 (system_health_check)
 

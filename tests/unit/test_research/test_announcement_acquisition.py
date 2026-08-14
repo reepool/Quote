@@ -478,12 +478,18 @@ def test_cninfo_provider_resolves_identity_caps_page_size_and_normalizes_attachm
 
 
 def test_cninfo_provider_maps_source_neutral_periodic_categories():
-    session = _Session(payloads=[{"announcements": []}])
+    session = _Session(payloads=[{"announcements": []}, {"announcements": []}])
 
     result = _cninfo_provider(session).discover(_query(category="annual_report"))
+    periodic = _cninfo_provider(session).discover(_query(category="periodic_report"))
 
     assert result.status == "success_empty"
+    assert periodic.status == "success_empty"
     assert session.calls[0]["data"]["category"] == "category_ndbg_szsh"
+    assert session.calls[1]["data"]["category"] == (
+        "category_yjdbg_szsh;category_bndbg_szsh;"
+        "category_sjdbg_szsh;category_ndbg_szsh"
+    )
 
 
 def test_cninfo_provider_distinguishes_identity_failure_and_partial_scan():
@@ -550,6 +556,25 @@ def test_cninfo_provider_deduplicates_split_values():
         )
     ).discover(_query())
     assert result.records[0].symbols == ("600000", "600001")
+
+
+def test_cninfo_provider_removes_search_highlight_tags_from_titles():
+    result = _cninfo_provider(
+        _Session(
+            payloads=[
+                {
+                    "announcements": [
+                        {
+                            "announcementId": "highlighted",
+                            "announcementTitle": "关于<em>延期</em><em>披露</em>2026年半年度报告的公告",
+                        }
+                    ]
+                }
+            ]
+        )
+    ).discover(_query(keyword="延期披露"))
+
+    assert result.records[0].title == "关于延期披露2026年半年度报告的公告"
 
 
 def test_cninfo_provider_retry_exhaustion_and_malformed_payload_are_failures():
@@ -657,6 +682,41 @@ def test_cninfo_provider_derives_total_pages_from_record_counts(
 
     assert result.stop_reason == "estimated_pages_exceed_bound"
     assert result.diagnostics["total_pages"] == expected_total
+
+
+def test_cninfo_provider_uses_record_count_when_reported_pages_omit_partial_page():
+    full_page = [
+        {"announcementId": f"full-{index}", "announcementTitle": "公告"}
+        for index in range(30)
+    ]
+    final_page = [
+        {"announcementId": f"tail-{index}", "announcementTitle": "公告"}
+        for index in range(8)
+    ]
+    session = _Session(
+        payloads=[
+            {
+                "announcements": full_page,
+                "totalpages": 7,
+                "totalAnnouncement": 218,
+            },
+            {
+                "announcements": final_page,
+                "totalpages": 7,
+                "totalAnnouncement": 218,
+            },
+        ]
+    )
+
+    result = _cninfo_provider(session).discover(
+        _query(page_size=30, max_pages=2, start_page=7)
+    )
+
+    assert result.status == "success"
+    assert result.stop_reason == "last_page"
+    assert result.announcements_seen == 38
+    assert result.diagnostics["total_pages"] == 8
+    assert [call["data"]["pageNum"] for call in session.calls] == ["7", "8"]
 
 
 @pytest.mark.parametrize(
@@ -1019,6 +1079,92 @@ def test_szse_market_scope_uses_official_annual_category_parameters():
     assert session.calls[0]["json"]["stock"] == []
     assert session.calls[0]["json"]["channelCode"] == ["fixed_disc"]
     assert session.calls[0]["json"]["bigCategoryId"] == ["010301"]
+
+
+def test_exchange_providers_map_combined_periodic_report_category():
+    sse_session = _ExchangeSession(
+        [_ExchangeResponse({"result": [], "pageHelp": {"pageCount": 0}})]
+    )
+    sse = _exchange_provider("SSE", sse_session)
+    sse.discover(
+        AnnouncementQuery(
+            purpose_key="unit_test",
+            source="sse",
+            scope=AnnouncementScope(
+                exchange="SSE",
+                symbol="600000",
+                category="periodic_report",
+            ),
+        )
+    )
+
+    szse_session = _ExchangeSession(
+        [_ExchangeResponse({"announceCount": 0, "data": []})]
+    )
+    szse = _exchange_provider("SZSE", szse_session)
+    szse.discover(
+        AnnouncementQuery(
+            purpose_key="unit_test",
+            source="szse",
+            scope=AnnouncementScope(
+                exchange="SZSE",
+                category="periodic_report",
+            ),
+        )
+    )
+
+    assert sse_session.calls[0]["params"]["reportType2"] == "DQBG"
+    assert sse_session.calls[0]["params"]["reportType"] == "ALL"
+    assert szse_session.calls[0]["json"]["bigCategoryId"] == [
+        "010301",
+        "010302",
+        "010303",
+        "010304",
+    ]
+
+
+def test_bse_provider_maps_periodic_and_anomaly_categories_for_market_scope():
+    session = _ExchangeSession(
+        [
+            _ExchangeResponse({"listInfo": {"content": [], "totalPages": 1}}),
+            _ExchangeResponse({"listInfo": {"content": [], "totalPages": 1}}),
+        ]
+    )
+    provider = _exchange_provider(
+        "BSE",
+        session,
+        options={
+            "endpoint_mode": "instrument",
+            "supports_market_scope": True,
+            "xxfcbj": ["2"],
+        },
+    )
+
+    for category in ("periodic_report", "periodic_report_anomaly"):
+        result = provider.discover(
+            AnnouncementQuery(
+                purpose_key="financial_disclosure_incremental_sync",
+                source="bse",
+                scope=AnnouncementScope(
+                    exchange="BSE",
+                    category=category,
+                    start_date="2026-08-01",
+                    end_date="2026-08-14",
+                ),
+            )
+        )
+        assert result.status == "success_empty"
+
+    periodic_form = session.calls[0]["data"]
+    anomaly_form = session.calls[1]["data"]
+    assert ("companyCd", "") in periodic_form
+    assert ("xxfcbj[]", "2") in periodic_form
+    assert ("disclosureSubtype[]", "9503-1001") in periodic_form
+    assert ("disclosureSubtype[]", "9503-1002") in periodic_form
+    assert ("disclosureSubtype[]", "9503-1003") in periodic_form
+    assert ("disclosureSubtype[]", "9503-1004") in periodic_form
+    assert ("disclosureSubtype[]", "9504-2104") in periodic_form
+    assert ("disclosureSubtype[]", "9504-2108") in anomaly_form
 
 
 def test_bse_provider_parses_jsonp_and_continues_full_unbounded_page():

@@ -5,13 +5,14 @@ Financial statement maintenance driven by CNInfo disclosure announcements.
 from __future__ import annotations
 
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from research.announcements import (
     AnnouncementAcquisitionService,
+    AnnouncementRouteConfig,
     AnnouncementQuery,
     AnnouncementRecord,
     AnnouncementScope,
@@ -27,6 +28,7 @@ from research.financial_disclosure_events import (
     FinancialDisclosureEvent,
     build_financial_disclosure_events,
     build_financial_symbol_index,
+    financial_disclosure_anomaly_filter,
     financial_disclosure_event_filter,
     infer_report_periods_from_title,
     is_financial_disclosure_like_title,
@@ -58,6 +60,12 @@ ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS = frozenset(
 ACCEPTED_MAINTENANCE_GAP_CLASSIFICATIONS = (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
     | ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS
+)
+PERIODIC_REPORT_ANNOUNCEMENT_CATEGORY = "periodic_report"
+PERIODIC_REPORT_ANOMALY_CATEGORY = "periodic_report_anomaly"
+DISCLOSURE_ANOMALY_SEARCH_KEYS = ("披露", "定期报告")
+_BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT = (
+    "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do"
 )
 
 
@@ -350,11 +358,37 @@ class FinancialDisclosureIncrementalSyncService:
             raise
 
     def _build_announcement_service(self) -> AnnouncementAcquisitionService:
+        acquisition_config = load_announcement_acquisition_config(
+            self.research_config
+        )
+        purpose_routes = {
+            purpose: dict(routes)
+            for purpose, routes in acquisition_config.purpose_routes.items()
+        }
+        purpose_routes.setdefault(self.purpose_key, {})["BSE"] = (
+            AnnouncementRouteConfig(sources=("bse",))
+        )
+        acquisition_config = replace(
+            acquisition_config,
+            purpose_routes=purpose_routes,
+        )
+        bse_config = acquisition_config.provider_configs.get("bse", {})
+        bse_options = {
+            **dict(bse_config.get("options") or {}),
+            "endpoint_mode": "instrument",
+            "supports_market_scope": True,
+        }
         return AnnouncementAcquisitionService(
             registry=OfficialAnnouncementProviderRegistry(
-                research_config=self.research_config
+                research_config=self.research_config,
+                provider_config_overrides={
+                    "bse": {
+                        "endpoint_url": _BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT,
+                        "options": bse_options,
+                    }
+                },
             ),
-            config=load_announcement_acquisition_config(self.research_config),
+            config=acquisition_config,
         )
 
     async def _load_active_instruments(
@@ -406,93 +440,147 @@ class FinancialDisclosureIncrementalSyncService:
         now = get_shanghai_time()
         end_date = now.date().isoformat()
         symbol_index = build_financial_symbol_index(instruments)
-        all_selected = []
+        selected_by_key: Dict[str, AnnouncementRecord] = {}
         pages_scanned = 0
         announcements_scanned = 0
         selected_announcements = 0
         financial_like_announcements = 0
         errors: List[str] = []
 
+        start_date = (
+            now - timedelta(days=max(lookback_days, overlap_days))
+        ).date().isoformat()
         for exchange in exchanges:
-            scope = AnnouncementScope(
-                exchange=exchange,
-                market=exchange,
-                keyword=search_key,
-                start_date=(
-                    now - timedelta(days=max(lookback_days, overlap_days))
-                ).date().isoformat(),
-                end_date=end_date,
-                page_size=page_size,
-                max_pages=max_pages_per_market,
-                overlap_days=overlap_days,
-            )
-            with self.storage.financial_database_scope():
-                state = self.storage.get_announcement_scan_state(
-                    purpose_key=self.purpose_key,
-                    source="cninfo",
-                    scope_key=scope.scope_key,
+            normalized_exchange = str(exchange).strip().upper()
+            stream_specs = [
+                {
+                    "category": (
+                        PERIODIC_REPORT_ANNOUNCEMENT_CATEGORY
+                        if normalized_exchange in {"SSE", "SZSE", "BSE"}
+                        else None
+                    ),
+                    "keyword": search_key,
+                    "selector": financial_disclosure_event_filter,
+                    "kind": "periodic_report",
+                }
+            ]
+            if search_key is None and normalized_exchange in {"SSE", "SZSE"}:
+                stream_specs.extend(
+                    {
+                        "category": None,
+                        "keyword": keyword,
+                        "selector": financial_disclosure_anomaly_filter,
+                        "kind": "disclosure_anomaly",
+                    }
+                    for keyword in DISCLOSURE_ANOMALY_SEARCH_KEYS
                 )
-            if state and state.get("committed_cursor"):
-                cursor = state["committed_cursor"]
-                scope = AnnouncementScope(
-                    **{
-                        **scope.__dict__,
-                        "cursor": ProviderCursor(
-                            kind=str(cursor["kind"]),
-                            value=str(cursor["value"]),
-                        ),
+            elif search_key is None and normalized_exchange == "BSE":
+                stream_specs.append(
+                    {
+                        "category": PERIODIC_REPORT_ANOMALY_CATEGORY,
+                        "keyword": None,
+                        "selector": financial_disclosure_anomaly_filter,
+                        "kind": "disclosure_anomaly",
                     }
                 )
-            route_result = self.announcement_service.acquire(
-                AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
-                selectors=[financial_disclosure_event_filter],
-            )
-            result = route_result.scan_result
-            if result is None:
-                errors.append(f"{exchange}:announcement_route_returned_no_result")
-                continue
-            pages_scanned += result.pages_scanned
-            announcements_scanned += result.announcements_seen
-            selected_announcements += len(result.selected_records)
-            exchange_financial_like = sum(
-                1
-                for record in result.records
-                if is_financial_disclosure_like_title(record.title)
-            )
-            financial_like_announcements += exchange_financial_like
-            all_selected.extend(result.selected_records)
-            errors.extend(result.errors)
-            if not dry_run:
-                with self.storage.financial_database_scope():
-                    self.storage.upsert_announcement_scan_state(
-                        scan_result=result,
-                        selected_announcements=len(result.selected_records),
-                        attempts=[asdict(item) for item in route_result.attempts],
-                        metadata={
-                            "financial_like_announcements": exchange_financial_like,
-                            "filtered_financial_like_announcements": max(
-                                0,
-                                exchange_financial_like
-                                - len(result.selected_records),
-                            ),
-                            "overlap_days": overlap_days,
-                        },
-                    )
-                    for record in result.selected_records:
-                        for symbol in record.symbols or ("",):
-                            instrument = symbol_index.get(symbol)
-                            self.storage.store_announcement_audit(
-                                purpose_key=self.purpose_key,
-                                record=record,
-                                instrument_id=(
-                                    None
-                                    if instrument is None
-                                    else str(instrument.get("instrument_id") or "")
-                                ),
-                                symbol=symbol or None,
-                                ingestion_run_id=run_id,
-                            )
 
+            for stream in stream_specs:
+                scope = AnnouncementScope(
+                    exchange=normalized_exchange,
+                    market=normalized_exchange,
+                    keyword=stream["keyword"],
+                    category=stream["category"],
+                    start_date=start_date,
+                    end_date=end_date,
+                    page_size=page_size,
+                    max_pages=max_pages_per_market,
+                    overlap_days=overlap_days,
+                )
+                with self.storage.financial_database_scope():
+                    state = self.storage.get_announcement_scan_state(
+                        purpose_key=self.purpose_key,
+                        source=(
+                            "bse" if normalized_exchange == "BSE" else "cninfo"
+                        ),
+                        scope_key=scope.scope_key,
+                    )
+                if state and state.get("committed_cursor"):
+                    cursor = state["committed_cursor"]
+                    scope = AnnouncementScope(
+                        **{
+                            **scope.__dict__,
+                            "cursor": ProviderCursor(
+                                kind=str(cursor["kind"]),
+                                value=str(cursor["value"]),
+                            ),
+                        }
+                    )
+                route_result = self.announcement_service.acquire(
+                    AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
+                    selectors=[stream["selector"]],
+                )
+                result = route_result.scan_result
+                stream_label = (
+                    f"category={scope.category}"
+                    if scope.category
+                    else f"keyword={scope.keyword or 'none'}"
+                )
+                if result is None:
+                    errors.append(
+                        f"{normalized_exchange}:{stream_label}:"
+                        "announcement_route_returned_no_result"
+                    )
+                    continue
+                pages_scanned += result.pages_scanned
+                announcements_scanned += result.announcements_seen
+                exchange_financial_like = sum(
+                    1
+                    for record in result.records
+                    if is_financial_disclosure_like_title(record.title)
+                )
+                financial_like_announcements += exchange_financial_like
+                for record in result.selected_records:
+                    selected_by_key.setdefault(record.announcement_key, record)
+                errors.extend(result.errors)
+                if not result.is_complete:
+                    errors.append(
+                        f"{normalized_exchange}:{stream_label}:{result.source}:"
+                        f"{result.status}:{result.stop_reason or 'incomplete'}"
+                    )
+                if not dry_run:
+                    with self.storage.financial_database_scope():
+                        self.storage.upsert_announcement_scan_state(
+                            scan_result=result,
+                            selected_announcements=len(result.selected_records),
+                            attempts=[asdict(item) for item in route_result.attempts],
+                            metadata={
+                                "stream_kind": stream["kind"],
+                                "financial_like_announcements": exchange_financial_like,
+                                "filtered_financial_like_announcements": max(
+                                    0,
+                                    exchange_financial_like
+                                    - len(result.selected_records),
+                                ),
+                                "overlap_days": overlap_days,
+                            },
+                        )
+                        for record in result.selected_records:
+                            for symbol in record.symbols or ("",):
+                                instrument = symbol_index.get(symbol)
+                                self.storage.store_announcement_audit(
+                                    purpose_key=self.purpose_key,
+                                    record=record,
+                                    instrument_id=(
+                                        None
+                                        if instrument is None
+                                        else str(instrument.get("instrument_id") or "")
+                                    ),
+                                    symbol=symbol or None,
+                                    ingestion_run_id=run_id,
+                                )
+
+        all_selected = list(selected_by_key.values())
+        selected_announcements = len(all_selected)
         events = build_financial_disclosure_events(all_selected, symbol_index)
         selected_event_ids = {
             str(event.announcement_id)
@@ -995,6 +1083,8 @@ class FinancialDisclosureIncrementalSyncService:
         for row in rows:
             reasons = {str(item) for item in row.get("selection_reasons") or []}
             if not reasons & accepted_reasons:
+                continue
+            if not infer_report_periods_from_title(str(row.get("title") or "")):
                 continue
             instrument_id = str(row.get("instrument_id") or "")
             if not instrument_id:

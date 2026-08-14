@@ -456,15 +456,18 @@ class _CninfoTransport:
         *,
         page_size: int,
     ) -> Optional[int]:
-        """Return a validated provider total, deriving it from row counts if needed."""
+        """Return the largest valid reported or record-derived page estimate."""
+        estimates: List[int] = []
         reported = cls._positive_int(payload.get("totalpages"))
         if reported is not None:
-            return reported
+            estimates.append(reported)
         for key in ("totalAnnouncement", "totalRecordNum"):
             total_records = cls._positive_int(payload.get(key))
             if total_records is not None:
-                return int(math.ceil(total_records / max(1, int(page_size))))
-        return None
+                estimates.append(
+                    int(math.ceil(total_records / max(1, int(page_size))))
+                )
+        return max(estimates) if estimates else None
 
     @staticmethod
     def _positive_int(value: Any) -> Optional[int]:
@@ -583,7 +586,7 @@ class _CninfoTransport:
             or row.get("title")
             or row.get("announcement_title")
             or ""
-        ).strip()
+        ).strip().replace("<em>", "").replace("</em>", "")
         if not announcement_id or not title:
             return None
         return _CninfoRawRecord(

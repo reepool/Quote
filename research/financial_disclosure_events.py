@@ -155,9 +155,25 @@ def financial_disclosure_event_filter(record: AnnouncementRecord) -> List[str]:
         reasons.append("periodic_report_correction")
     if has_periodic_report and not reasons:
         reasons.append("periodic_report")
-    if has_trading_risk:
+    if has_periodic_report and report_periods and has_trading_risk:
         reasons.append("pending_delisting_risk")
     return reasons
+
+
+def financial_disclosure_anomaly_filter(record: AnnouncementRecord) -> List[str]:
+    """Return only explicit periodic-report delay or trading-risk reasons."""
+    if not infer_report_periods_from_title(record.title):
+        return []
+    return [
+        reason
+        for reason in financial_disclosure_event_filter(record)
+        if reason
+        in {
+            "periodic_report_delayed",
+            "periodic_report_related_trading_risk",
+            "pending_delisting_risk",
+        }
+    ]
 
 
 def is_non_primary_financial_announcement_title(title: str) -> bool:

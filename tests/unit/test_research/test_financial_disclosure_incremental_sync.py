@@ -13,6 +13,7 @@ from research.financial_disclosure_incremental_sync import (
     FinancialDisclosureMaintenanceCandidate,
     FinancialDisclosureIncrementalSyncService,
 )
+from research.financial_disclosure_events import financial_disclosure_anomaly_filter
 from research.financial_statement_maintenance_repair import (
     FinancialMaintenanceRepairRouter,
     FinancialMaintenanceRepairTarget,
@@ -175,14 +176,44 @@ def _record(
 
 
 class _FakeAnnouncementService:
-    def __init__(self, records):
+    def __init__(
+        self,
+        records,
+        *,
+        status="success",
+        is_complete=True,
+        stop_reason="completed",
+        errors=(),
+    ):
         self.records = tuple(records)
+        self.status = status
+        self.is_complete = is_complete
+        self.stop_reason = stop_reason
+        self.errors = tuple(errors)
         self.queries = []
 
     def acquire(self, query, *, selectors=None):
         self.queries.append(query)
+        records = tuple(
+            record
+            for record in self.records
+            if str(record.exchange or record.market or "").upper()
+            == query.scope.exchange
+        )
+        if query.scope.category == "periodic_report":
+            records = tuple(
+                record
+                for record in records
+                if not financial_disclosure_anomaly_filter(record)
+            )
+        if query.scope.keyword:
+            records = tuple(
+                record
+                for record in records
+                if query.scope.keyword in record.title
+            )
         selected = []
-        for record in self.records:
+        for record in records:
             reasons = []
             for selector in selectors or ():
                 reasons.extend(selector(record) or ())
@@ -192,31 +223,33 @@ class _FakeAnnouncementService:
         scan_result = AnnouncementScanResult(
             source="cninfo",
             query=source_query,
-            status="success",
-            records=self.records,
+            status=self.status,
+            records=records,
             selected_records=tuple(selected),
             pages_scanned=1,
             requests_made=1,
-            announcements_seen=len(self.records),
+            announcements_seen=len(records),
             max_published_at=max(
-                (record.published_at for record in self.records if record.published_at),
+                (record.published_at for record in records if record.published_at),
                 default=None,
             ),
             provider_cursor=ProviderCursor(kind="published_at", value="2026-05-06"),
-            is_complete=True,
-            stop_reason="completed",
+            is_complete=self.is_complete,
+            stop_reason=self.stop_reason,
+            errors=self.errors,
         )
         attempt = AnnouncementRouteAttempt(
             source="cninfo",
-            status="success",
-            record_count=len(self.records),
+            status=self.status,
+            record_count=len(records),
             selected_count=len(selected),
             pages_scanned=1,
-            stop_reason="completed",
+            stop_reason=self.stop_reason,
+            errors=self.errors,
         )
         return AnnouncementRouteResult(
             query=query,
-            status="success",
+            status=self.status,
             selected_source="cninfo",
             scan_result=scan_result,
             attempts=(attempt,),
@@ -318,6 +351,125 @@ def test_incremental_sync_uses_common_announcement_service_and_generic_audit(tmp
     assert storage.generic_scan_states[0]["scan_result"].source == "cninfo"
     assert storage.generic_audits[0]["record"].source_announcement_id == "ann-common-risk"
     assert announcement_service.queries[0].purpose_key == service.purpose_key
+
+
+def test_incremental_sync_uses_periodic_and_narrow_anomaly_scopes(tmp_path):
+    records = [
+        _record(
+            announcement_id="formal",
+            title="2026年第一季度报告",
+            announcement_time="2026-04-30",
+            market="SZSE",
+            symbols=["002731"],
+        ),
+        _record(
+            announcement_id="delayed",
+            title="关于延期披露2026年半年度报告的公告",
+            announcement_time="2026-08-14",
+            market="SZSE",
+            symbols=["002731"],
+        ),
+    ]
+    announcement_service = _FakeAnnouncementService(records)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=announcement_service,
+    )
+
+    result = service._scan_announcements(
+        exchanges=["SZSE"],
+        instruments=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+            }
+        ],
+        lookback_days=14,
+        overlap_days=2,
+        page_size=30,
+        max_pages_per_market=40,
+        search_key=None,
+        run_id=None,
+        dry_run=True,
+    )
+
+    assert [
+        (query.scope.category, query.scope.keyword)
+        for query in announcement_service.queries
+    ] == [
+        ("periodic_report", None),
+        (None, "披露"),
+        (None, "定期报告"),
+    ]
+    assert result["selected_announcements"] == 2
+    assert result["event_count"] == 2
+    assert result["errors"] == []
+
+
+def test_incremental_sync_uses_bse_official_periodic_scopes(tmp_path):
+    announcement_service = _FakeAnnouncementService([])
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=announcement_service,
+    )
+
+    service._scan_announcements(
+        exchanges=["BSE"],
+        instruments=[],
+        lookback_days=14,
+        overlap_days=2,
+        page_size=30,
+        max_pages_per_market=40,
+        search_key=None,
+        run_id=None,
+        dry_run=True,
+    )
+
+    assert [
+        (query.scope.category, query.scope.keyword)
+        for query in announcement_service.queries
+    ] == [
+        ("periodic_report", None),
+        ("periodic_report_anomaly", None),
+    ]
+
+
+def test_incremental_sync_reports_incomplete_announcement_stream_as_degraded(tmp_path):
+    record = _record(
+        announcement_id="formal-incomplete",
+        title="2026年第一季度报告",
+        announcement_time="2026-04-30",
+        market="SZSE",
+        symbols=["002731"],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService(
+            [record],
+            status="degraded",
+            is_complete=False,
+            stop_reason="max_pages_exhausted",
+        ),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["status"] == "degraded"
+    assert result["candidate_count"] == 1
+    assert any("max_pages_exhausted" in item for item in result["scan_errors"])
 
 
 def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):
@@ -1313,7 +1465,7 @@ def test_reconciliation_reuses_accepted_disclosure_state_without_source_retry(tm
     assert storage.states[-1]["status"] == "accepted_disclosure_gap"
 
 
-def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(tmp_path):
+def test_reconciliation_ignores_recent_generic_risk_audit_without_report_period(tmp_path):
     storage = _FakeStorage(
         ready=False,
         audit_rows=[
@@ -1335,36 +1487,11 @@ def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(t
         announcement_service=_FakeAnnouncementService([]),
     )
 
-    async def _unexpected_import(**kwargs):
-        raise AssertionError("recent disclosure risk audits must not call source repair")
-
-    service._run_targeted_import = _unexpected_import
-
-    result = _run(
-        service.sync(
-            exchanges=["SZSE"],
-            target_instrument_ids=["002731.SZ"],
-            report_periods=["2026-03-31"],
-            max_candidates=5,
-            dry_run=False,
-            reconciliation=True,
-        )
+    result = service._load_disclosure_risk_audits_by_instrument(
+        ["002731.SZ"]
     )
 
-    assert result["status"] == "success"
-    assert result["pending_delisting_risk_count"] == 1
-    assert result["accepted_gap_count"] == 1
-    assert result["blocking_gap_count"] == 0
-    assert result["source_routing"]["cninfo_attempts"] == 0
-    assert result["source_routing"]["fallback_attempts"] == 0
-    assert storage.states[-1]["status"] == "pending_delisting_risk"
-    assert storage.states[-1]["announcement_id"] == "risk-generic"
-    assert storage.deleted_states[-1] == {
-        "instrument_id": "002731.SZ",
-        "report_period": "2026-03-31",
-        "announcement_id": "local-gap:002731.SZ:2026-03-31",
-        "statuses": ["blocking_gap", "mapping_policy_gap", "source_missing"],
-    }
+    assert result == {}
 
 
 def test_reconciliation_candidate_limit_is_balanced_across_groups():

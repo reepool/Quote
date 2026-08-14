@@ -205,7 +205,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 | 任务 | 触发方式 | 读取范围 | 写入策略 |
 |---|---|---|---|
 | `financial_l1_full_import` | 仅 `/run` | `SSE / SZSE / BSE` active 股票池和最近 rolling 报告期 | 可续跑；已完整落库的标的/报告期跳过；用于初始化和大范围补处理 |
-| `financial_disclosure_incremental_sync` | 每日 `21:45` / `/run` | CNInfo 正式定报/更正/延期/风险公告候选、pending recheck、本地缺失报告期 | 只对候选补处理；先用 CNInfo data20，缺口再用 THS/Sina；公告先到但结构化源未更新时进入 pending recheck |
+| `financial_disclosure_incremental_sync` | 每日 `21:45` / `/run` | CNInfo 四类定报 category、披露异常关键词窄流、BSE 官方定报 subtype、pending recheck、本地缺失报告期 | 只对候选补处理；扫描未完成时降级且不推进游标；先用 CNInfo data20，缺口再用 THS/Sina |
 | `broker_risk_control_incremental_sync` | `financial_disclosure_incremental_sync` 成功后的后置任务 / `/run` | 确认上市券商范围内最近公告窗口的正式年报/半年报 | 写 `financial_numeric_facts_hot`；提取 `net_capital`、风险覆盖率、资本杠杆率、LCR、NSFR 等券商监管事实 |
 | `financial_disclosure_reconciliation_sync` | 周日 `09:30` / `/run` | 最近 rolling 报告期全市场覆盖情况 | 只补缺失、变化或 required core facts 不完整的 instrument-period |
 

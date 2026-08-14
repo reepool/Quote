@@ -2,6 +2,7 @@ from research.financial_disclosure_events import (
     build_financial_disclosure_event_index,
     build_financial_disclosure_events,
     build_financial_symbol_index,
+    financial_disclosure_anomaly_filter,
     financial_disclosure_event_filter,
     infer_report_periods_from_title,
     is_non_primary_financial_announcement_title,
@@ -39,6 +40,11 @@ def test_financial_disclosure_filter_detects_delayed_periodic_report():
         "periodic_report_related_trading_risk",
         "pending_delisting_risk",
     ]
+    assert financial_disclosure_anomaly_filter(record) == [
+        "periodic_report_delayed",
+        "periodic_report_related_trading_risk",
+        "pending_delisting_risk",
+    ]
 
 
 def test_financial_disclosure_filter_detects_regular_periodic_report():
@@ -52,6 +58,20 @@ def test_financial_disclosure_filter_detects_regular_periodic_report():
     )
 
     assert financial_disclosure_event_filter(record) == ["periodic_report"]
+    assert financial_disclosure_anomaly_filter(record) == []
+
+
+def test_financial_disclosure_filters_exclude_generic_trading_risk():
+    record = _record(
+        announcement_id="generic-risk",
+        title="关于公司股票可能因股价低于1元被终止上市的风险提示公告",
+        announcement_time="2026-08-13",
+        market="SSE",
+        symbols=["688121"],
+    )
+
+    assert financial_disclosure_event_filter(record) == []
+    assert financial_disclosure_anomaly_filter(record) == []
 
 
 def test_financial_disclosure_filter_excludes_subsidiary_announcements():

@@ -128,7 +128,11 @@ class OfficialExchangeAnnouncementProvider:
                 "recent_market"
             )
         supports_market_scope = config.exchange == "SZSE" or (
-            config.exchange == "BSE" and self.endpoint_mode == "recent_market"
+            config.exchange == "BSE"
+            and (
+                self.endpoint_mode == "recent_market"
+                or bool(config.options.get("supports_market_scope", False))
+            )
         )
         supports_instrument_scope = not (
             config.exchange == "BSE" and self.endpoint_mode == "recent_market"
@@ -139,7 +143,10 @@ class OfficialExchangeAnnouncementProvider:
             supports_instrument_scope=supports_instrument_scope,
             supports_date_filter=True,
             supports_keyword_filter=True,
-            supports_category_filter=config.exchange in {"SSE", "SZSE"},
+            supports_category_filter=(
+                config.exchange in {"SSE", "SZSE"}
+                or config.exchange == "BSE" and self.endpoint_mode == "instrument"
+            ),
             cursor_kind="published_at",
             max_page_size=config.max_page_size,
             supports_attachment_retrieval=True,
@@ -473,6 +480,23 @@ class OfficialExchangeAnnouncementProvider:
                 return {
                     "data": form_fields,
                 }
+            if category_options:
+                form_fields: List[tuple[str, Any]] = [
+                    ("page", str(page_num - 1)),
+                    ("companyCd", symbol or ""),
+                    ("isNewThree", str(self.config.options.get("is_new_three", "1"))),
+                    ("keyword", keyword or ""),
+                    ("startTime", start_date or ""),
+                    ("endTime", end_date or ""),
+                    ("hyType", ""),
+                ]
+                for value in self.config.options.get("xxfcbj", ["2"]):
+                    form_fields.append(("xxfcbj[]", value))
+                for value in category_options.get("disclosure_type", []):
+                    form_fields.append(("disclosureType[]", value))
+                for value in category_options.get("disclosure_subtype", []):
+                    form_fields.append(("disclosureSubtype[]", value))
+                return {"data": form_fields}
             return {
                 "data": {
                     "page": str(page_num - 1),
