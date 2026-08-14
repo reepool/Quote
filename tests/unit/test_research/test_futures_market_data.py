@@ -4837,6 +4837,57 @@ def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_pat
     assert artifacts["mappings"][0].contract_id == "CNF.CU.SHFE.CU2408"
 
 
+def test_official_futures_provider_excludes_ine_tas_rows_from_contract_artifacts(tmp_path):
+    provider = OfficialFuturesMarketDataProvider(_research_config(tmp_path))
+    rows = provider._parse_shfe_payload(
+        {
+            "o_curinstrument": [
+                {
+                    "PRODUCTGROUPID": "sc",
+                    "PRODUCTID": "sc_f",
+                    "PRODUCTNAME": "原油",
+                    "DELIVERYMONTH": "2610",
+                    "OPENPRICE": "547",
+                    "HIGHESTPRICE": "557.9",
+                    "LOWESTPRICE": "543.6",
+                    "CLOSEPRICE": "553.5",
+                    "SETTLEMENTPRICE": "550.6",
+                    "VOLUME": "46990",
+                    "OPENINTEREST": "31188",
+                },
+                {
+                    "PRODUCTGROUPID": "sc_tas",
+                    "PRODUCTID": "sc_tas",
+                    "PRODUCTNAME": "原油TAS",
+                    "DELIVERYMONTH": "2610",
+                    "CLOSEPRICE": "0",
+                },
+            ]
+        },
+        trade_date="2026-08-13",
+        exchange="INE",
+    )
+    series = FuturesSeries(
+        series_id="CNF.SC.INE.main",
+        instrument_id="CNF.SC.INE",
+        symbol="SC0",
+        series_type="main_continuous",
+        source_profile="exchange_official",
+        source="exchange_official",
+        unit="CNY/barrel",
+    )
+
+    artifacts = provider._build_storage_artifacts(series, rows, mode="direct")
+
+    assert [(row.variety, row.contract, row.close) for row in rows] == [
+        ("SC", "SC2610", 553.5)
+    ]
+    assert len(artifacts["contracts"]) == 1
+    assert len(artifacts["contract_bars"]) == 1
+    assert artifacts["contract_bars"][0].contract_id == "CNF.SC.INE.SC2610"
+    assert artifacts["series_bars"][0].close == 553.5
+
+
 def test_official_futures_provider_filters_shfe_ine_mixed_payload_by_root_exchange(tmp_path, monkeypatch):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())

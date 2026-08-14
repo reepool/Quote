@@ -3695,11 +3695,17 @@ def _is_shfe_family_non_futures_row(variety: str, row: Mapping[str, Any]) -> boo
     """Identify SHFE/INE pseudo rows that are not listed futures contracts.
 
     SHFE-family daily files can include exchange-for-physical rows such as
-    AGEFP/AUEFP with product names containing 期转现. They are not listed futures
-    products and must not be promoted into futures instruments.
+    AGEFP/AUEFP and INE trade-at-settlement rows such as SC_TAS. They are not
+    standalone listed futures products and must not share futures storage keys.
     """
     variety_key = str(variety or "").upper().strip()
     if len(variety_key) > 3 and variety_key.endswith("EFP"):
+        return True
+    identifiers = {
+        str(row.get(key) or "").upper().strip()
+        for key in ("PRODUCTID", "PRODUCTGROUPID")
+    }
+    if any(identifier == "TAS" or identifier.endswith("_TAS") for identifier in identifiers):
         return True
     text = _row_text(
         row,
