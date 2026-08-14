@@ -2936,6 +2936,10 @@ def _format_futures_market_data_scheduler_report(
             "inserted": 0,
             "changed": 0,
             "unchanged": 0,
+            "new_business_date_rows": 0,
+            "source_upgrade_rows": 0,
+            "same_source_correction_rows": 0,
+            "post_cutoff_verified_unchanged_rows": 0,
             "failed": 0,
             "calendar_skipped": 0,
             "provider_empty_on_trading_day": 0,
@@ -2953,6 +2957,13 @@ def _format_futures_market_data_scheduler_report(
             aggregate["inserted"] += int(write_result.get("inserted") or 0)
             aggregate["changed"] += int(write_result.get("changed") or 0)
             aggregate["unchanged"] += int(write_result.get("unchanged") or 0)
+            for key in (
+                "new_business_date_rows",
+                "source_upgrade_rows",
+                "same_source_correction_rows",
+                "post_cutoff_verified_unchanged_rows",
+            ):
+                aggregate[key] += int(write_result.get(key) or 0)
             aggregate["would_write_price_bars"] += int(write_result.get("would_write_rows") or 0)
             for date_result in item.get("date_results") or []:
                 if int(date_result.get("fetched_rows") or 0) == 0:
@@ -2967,7 +2978,13 @@ def _format_futures_market_data_scheduler_report(
     )
     status = result.get("status", "unknown")
     if series_override is not None:
-        status = "partial" if int(totals.get("failed", 0) or 0) > 0 else "success"
+        exchange_completeness = result.get("exchange_completeness") or {}
+        scoped_completeness = exchange_completeness.get(str(exchange_label or "").upper()) or {}
+        completeness_status = str(scoped_completeness.get("status") or "")
+        if completeness_status and completeness_status != "success":
+            status = completeness_status
+        else:
+            status = "partial" if int(totals.get("failed", 0) or 0) > 0 else "success"
     icon, label = _format_scheduler_status(status)
 
     def _freshness_lines() -> List[str]:
@@ -2979,6 +2996,8 @@ def _format_futures_market_data_scheduler_report(
             target_dates = item.get("required_target_dates") or item.get("governed_target_dates") or []
             missing_dates = item.get("remaining_missing_dates") or []
             repaired_dates = item.get("repaired_dates") or []
+            provisional_dates = item.get("remaining_provisional_dates") or []
+            semantics = item.get("write_semantics") or {}
             blockers = item.get("blockers") or []
             lines.append(
                 f"{exchange}: range={item.get('requested_start_date') or 'N/A'}.."
@@ -2987,8 +3006,16 @@ def _format_futures_market_data_scheduler_report(
                 f"targets={','.join(map(str, target_dates)) or 'none'}, "
                 f"expected={item.get('expected_latest_trading_date') or 'N/A'}, "
                 f"actual={item.get('actual_latest_price_date') or 'N/A'}, "
+                f"final={item.get('finalized_latest_price_date') or 'N/A'}, "
                 f"repaired={','.join(map(str, repaired_dates)) or 'none'}, "
                 f"missing={','.join(map(str, missing_dates)) or 'none'}, "
+                f"provisional={','.join(map(str, provisional_dates)) or 'none'}, "
+                f"new={semantics.get('new_business_date_rows', 0)}, "
+                f"new_dates={','.join(map(str, semantics.get('new_business_dates') or [])) or 'none'}, "
+                f"upgrade={semantics.get('source_upgrade_rows', 0)}, "
+                f"upgrade_dates={','.join(map(str, semantics.get('source_upgrade_dates') or [])) or 'none'}, "
+                f"correction={semantics.get('same_source_correction_rows', 0)}, "
+                f"verified={semantics.get('post_cutoff_verified_unchanged_rows', 0)}, "
                 f"blockers={';'.join(map(str, blockers)) or 'none'}"
             )
         return lines
@@ -3329,6 +3356,10 @@ def _format_futures_market_data_scheduler_report(
                 f"inserted={write_result.get('inserted', 0)}, "
                 f"changed={write_result.get('changed', 0)}, "
                 f"unchanged={write_result.get('unchanged', 0)}, "
+                f"new={write_result.get('new_business_date_rows', 0)}, "
+                f"upgrade={write_result.get('source_upgrade_rows', 0)}, "
+                f"correction={write_result.get('same_source_correction_rows', 0)}, "
+                f"verified={write_result.get('post_cutoff_verified_unchanged_rows', 0)}, "
                 f"status={item.get('status', 'ok')}"
                 f"{lifecycle_text}"
             )
@@ -3356,6 +3387,10 @@ def _format_futures_market_data_scheduler_report(
         f"inserted: `{totals.get('inserted', 0)}`\n"
         f"changed: `{totals.get('changed', 0)}`\n"
         f"unchanged: `{totals.get('unchanged', 0)}`\n"
+        f"new_business_date_rows: `{totals.get('new_business_date_rows', 0)}`\n"
+        f"source_upgrade_rows: `{totals.get('source_upgrade_rows', 0)}`\n"
+        f"same_source_correction_rows: `{totals.get('same_source_correction_rows', 0)}`\n"
+        f"post_cutoff_verified_unchanged_rows: `{totals.get('post_cutoff_verified_unchanged_rows', 0)}`\n"
         f"failed: `{totals.get('failed', 0)}`\n"
         f"dry_run: `{result.get('dry_run', 'N/A')}`\n\n"
         f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
@@ -3426,6 +3461,10 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 "unchanged": 0,
                 "failed": 0,
                 "lifecycle_skipped": 0,
+                "new_business_date_rows": 0,
+                "source_upgrade_rows": 0,
+                "same_source_correction_rows": 0,
+                "post_cutoff_verified_unchanged_rows": 0,
             }
             for item in exchange_items:
                 exchange_totals["fetched"] += int(item.get("fetched_rows") or 0)
@@ -3437,6 +3476,13 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 exchange_totals["inserted"] += int(write_result.get("inserted") or 0)
                 exchange_totals["changed"] += int(write_result.get("changed") or 0)
                 exchange_totals["unchanged"] += int(write_result.get("unchanged") or 0)
+                for key in (
+                    "new_business_date_rows",
+                    "source_upgrade_rows",
+                    "same_source_correction_rows",
+                    "post_cutoff_verified_unchanged_rows",
+                ):
+                    exchange_totals[key] += int(write_result.get(key) or 0)
             lifecycle_skipped_total += exchange_totals["lifecycle_skipped"]
             completeness = exchange_completeness.get(exchange) or {}
             lines.append(
@@ -3445,9 +3491,17 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 f"不变 {exchange_totals['unchanged']}，"
                 f"获取 {exchange_totals['fetched']}，"
                 f"跳过 {exchange_totals['lifecycle_skipped']}，"
+                f"新增日期 {exchange_totals['new_business_date_rows']}，"
+                f"来源升级 {exchange_totals['source_upgrade_rows']}，"
+                f"同源修正 {exchange_totals['same_source_correction_rows']}，"
+                f"最终验证 {exchange_totals['post_cutoff_verified_unchanged_rows']}，"
+                f"新增日 {','.join(completeness.get('write_semantics', {}).get('new_business_dates') or []) or 'none'}，"
+                f"升级日 {','.join(completeness.get('write_semantics', {}).get('source_upgrade_dates') or []) or 'none'}，"
                 f"目标 {','.join(completeness.get('required_target_dates') or []) or 'none'}，"
                 f"预期 {completeness.get('expected_latest_trading_date') or 'N/A'}，"
-                f"实际 {completeness.get('actual_latest_price_date') or 'N/A'}"
+                f"实际 {completeness.get('actual_latest_price_date') or 'N/A'}，"
+                f"最终 {completeness.get('finalized_latest_price_date') or 'N/A'}，"
+                f"暂存 {','.join(completeness.get('remaining_provisional_dates') or []) or 'none'}"
             )
         if not lines:
             lines.append("无交易所明细")
@@ -3463,6 +3517,10 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 f"更新: `{totals.get('changed', 0)}`｜"
                 f"不变: `{totals.get('unchanged', 0)}`｜"
                 f"失败: `{totals.get('failed', 0)}`\n"
+                f"新增日期行: `{totals.get('new_business_date_rows', 0)}`｜"
+                f"来源升级: `{totals.get('source_upgrade_rows', 0)}`｜"
+                f"同源修正: `{totals.get('same_source_correction_rows', 0)}`｜"
+                f"最终验证不变: `{totals.get('post_cutoff_verified_unchanged_rows', 0)}`\n"
                 f"新增品种: `{master_counts.get('auto_promoted', 0)}`｜"
                 f"待确认品种: `{master_counts.get('pending', 0)}`｜"
                 f"生命周期跳过: `{lifecycle_skipped_total}`\n\n"

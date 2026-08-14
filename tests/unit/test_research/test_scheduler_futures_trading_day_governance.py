@@ -377,8 +377,18 @@ def test_futures_market_data_report_exposes_stale_exchange_dates_and_blockers():
                     "required_target_dates": ["2026-08-12", "2026-08-13"],
                     "expected_latest_trading_date": "2026-08-13",
                     "actual_latest_price_date": "2026-08-11",
+                    "finalized_latest_price_date": "2026-08-11",
                     "repaired_dates": ["2026-08-12"],
                     "remaining_missing_dates": ["2026-08-12", "2026-08-13"],
+                    "remaining_provisional_dates": ["2026-08-13"],
+                    "write_semantics": {
+                        "new_business_date_rows": 0,
+                        "new_business_dates": [],
+                        "source_upgrade_rows": 23,
+                        "source_upgrade_dates": ["2026-08-10"],
+                        "same_source_correction_rows": 2,
+                        "post_cutoff_verified_unchanged_rows": 1,
+                    },
                     "blockers": [
                         "missing_price_coverage:DCE:2026-08-12",
                         "missing_price_coverage:DCE:2026-08-13",
@@ -402,8 +412,16 @@ def test_futures_market_data_report_exposes_stale_exchange_dates_and_blockers():
     assert "cutoff=18:00" in report
     assert "expected=2026-08-13" in report
     assert "actual=2026-08-11" in report
+    assert "final=2026-08-11" in report
     assert "repaired=2026-08-12" in report
     assert "missing=2026-08-12,2026-08-13" in report
+    assert "provisional=2026-08-13" in report
+    assert "new=0" in report
+    assert "new_dates=none" in report
+    assert "upgrade=23" in report
+    assert "upgrade_dates=2026-08-10" in report
+    assert "correction=2" in report
+    assert "verified=1" in report
     assert "missing_price_coverage:DCE:2026-08-13" in report
 
 
@@ -429,6 +447,15 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
                 {"exchange": "SHFE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
                 {"exchange": "DCE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
             ],
+        },
+        "exchange_completeness": {
+            "GFEX": {
+                "status": "partial",
+                "remaining_provisional_dates": ["2026-06-24"],
+                "blockers": ["stale_provisional_price_coverage:GFEX:2026-06-24"],
+            },
+            "SHFE": {"status": "success"},
+            "DCE": {"status": "partial"},
         },
         "series": [
             {
@@ -467,6 +494,8 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
     assert "provider_empty_on_trading_day: `1`" in dce_report
     assert "target_trade_dates: `1`" in dce_report
     assert "failed: `0`" in gfex_report
+    assert "状态: `partial`" in gfex_report
+    assert "provisional=2026-06-24" in gfex_report
     assert "inserted: `1`" in gfex_report
     assert "provider_empty_on_trading_day: `0`" in gfex_report
     assert "target_trade_dates: `1`" in gfex_report

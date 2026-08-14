@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import types
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 import pandas as pd
@@ -3174,24 +3175,16 @@ def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
     ])
 
     assert (tmp_path / "futures.db").exists()
-    assert first == {
-        "inserted": 1,
-        "changed": 0,
-        "unchanged": 0,
-        "changelog_written": 1,
-    }
-    assert second == {
-        "inserted": 0,
-        "changed": 0,
-        "unchanged": 1,
-        "changelog_written": 0,
-    }
-    assert changed == {
-        "inserted": 0,
-        "changed": 1,
-        "unchanged": 0,
-        "changelog_written": 1,
-    }
+    assert first["inserted"] == 1
+    assert first["new_business_date_rows"] == 1
+    assert first["new_business_dates"] == ["2020-01-02"]
+    assert first["changelog_written"] == 1
+    assert second["unchanged"] == 1
+    assert second["changelog_written"] == 0
+    assert changed["changed"] == 1
+    assert changed["same_source_correction_rows"] == 1
+    assert changed["same_source_correction_dates"] == ["2020-01-02"]
+    assert changed["changelog_written"] == 1
     price_bar = storage.get_price_bars(series.series_id)[0]
     assert price_bar["close"] == 1.15
     assert "row_version" not in price_bar
@@ -3266,6 +3259,10 @@ def test_futures_storage_official_price_bar_supersedes_fallback(tmp_path):
     assert storage.upsert_price_bars([fallback_bar])["inserted"] == 1
     official_write = storage.upsert_price_bars([official_bar])
     assert official_write["inserted"] == 1
+    assert official_write["source_upgrade_rows"] == 1
+    assert official_write["source_upgrade_dates"] == ["2020-01-02"]
+    assert official_write["new_business_date_rows"] == 0
+    assert official_write["new_business_dates"] == []
     assert official_write["changelog_written"] == 2
 
     rows = storage.get_price_bars(series.series_id)
@@ -3302,6 +3299,57 @@ def test_futures_storage_official_price_bar_supersedes_fallback(tmp_path):
             "row_version": 1,
         },
     ]
+
+
+def test_futures_storage_advances_final_verification_without_semantic_change(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    series = next(item for item in registry["series"] if item.series_id == "CNF.CU.SHFE.main")
+    provisional = FuturesBar(
+        series_id=series.series_id,
+        trade_date="2026-08-14",
+        open=10,
+        high=12,
+        low=9,
+        close=11,
+        settlement=10.5,
+        raw_payload_hash="same-final-values",
+        source="exchange_official",
+        source_mode="direct",
+        source_profile="exchange_official",
+        quality_flag="partial",
+        metadata={
+            "publication_state": "provisional",
+            "publication_timezone": "Asia/Shanghai",
+            "publication_cutoff": "18:00",
+        },
+    )
+    finalized = replace(
+        provisional,
+        quality_flag="ok",
+        metadata={
+            **provisional.metadata,
+            "publication_state": "final",
+            "final_verified_at": "2026-08-14T21:30:00+08:00",
+            "final_verified_run_id": 300,
+        },
+    )
+
+    first = storage.upsert_price_bars([provisional], ingestion_run_id=299)
+    second = storage.upsert_price_bars([finalized], ingestion_run_id=300)
+    stored = storage.get_price_bars(series.series_id)[0]
+
+    assert first["new_business_date_rows"] == 1
+    assert second["unchanged"] == 1
+    assert second["post_cutoff_verified_unchanged_rows"] == 1
+    assert second["post_cutoff_verified_dates"] == ["2026-08-14"]
+    assert second["changelog_written"] == 0
+    assert stored["quality_flag"] == "ok"
+    assert stored["metadata"]["publication_state"] == "final"
+    assert stored["metadata"]["final_verified_run_id"] == 300
 
 
 def test_futures_storage_preserves_contract_observed_metadata_on_market_data_upsert(tmp_path):
@@ -3981,6 +4029,51 @@ def test_futures_publication_policy_rejects_invalid_repair_window(tmp_path):
         )
 
 
+def test_futures_sync_stamps_pre_cutoff_and_post_cutoff_publication_state(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    service = FuturesMarketDataSyncService(storage, config)
+    complete_bar = FuturesBar(
+        series_id="CNF.CU.SHFE.main",
+        trade_date="2026-08-14",
+        open=10,
+        high=12,
+        low=9,
+        close=11,
+        settlement=10.5,
+        quality_flag="ok",
+        raw_payload_hash="publication-state",
+    )
+
+    provisional = service._with_publication_state(
+        complete_bar,
+        exchange="SHFE",
+        run_at=datetime(2026, 8, 14, 10, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=289,
+    )
+    finalized = service._with_publication_state(
+        complete_bar,
+        exchange="SHFE",
+        run_at=datetime(2026, 8, 14, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=293,
+    )
+    incomplete = service._with_publication_state(
+        replace(complete_bar, close=None, settlement=None, quality_flag="partial"),
+        exchange="SHFE",
+        run_at=datetime(2026, 8, 14, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=293,
+    )
+
+    assert provisional.metadata["publication_state"] == "provisional"
+    assert provisional.metadata["finalization_reason"] == "before_publication_cutoff"
+    assert provisional.metadata["publication_cutoff_at"] == "2026-08-14T18:00:00+08:00"
+    assert finalized.metadata["publication_state"] == "final"
+    assert finalized.metadata["final_verified_run_id"] == 293
+    assert incomplete.metadata["publication_state"] == "provisional"
+    assert incomplete.metadata["finalization_reason"] == "incomplete_final_fields"
+
+
 def test_official_calendar_daily_window_repairs_weak_dce_row(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["trading_day_governance"] = {
@@ -4250,6 +4343,100 @@ def test_exchange_completeness_counts_existing_rows_and_lifecycle_skips(tmp_path
     assert skipped["status"] == "success"
     assert skipped["required_target_dates"] == []
     assert skipped["lifecycle_skipped_series"] == 1
+
+
+def test_exchange_completeness_requires_finalized_eligible_date_but_ignores_future_provisional(
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    series = next(item for item in registry["series"] if item.series_id == "CNF.CU.SHFE.main")
+    final_13 = FuturesBar(
+        series_id=series.series_id,
+        trade_date="2026-08-13",
+        open=10,
+        high=12,
+        low=9,
+        close=11,
+        settlement=10.5,
+        raw_payload_hash="final-13",
+        source="exchange_official",
+        source_mode="direct",
+        source_profile="exchange_official",
+        quality_flag="ok",
+        metadata={"publication_state": "final"},
+    )
+    provisional_14 = replace(
+        final_13,
+        trade_date="2026-08-14",
+        close=None,
+        settlement=None,
+        quality_flag="partial",
+        raw_payload_hash="provisional-14",
+        metadata={
+            "publication_state": "provisional",
+            "publication_timezone": "Asia/Shanghai",
+            "publication_cutoff": "18:00",
+        },
+    )
+    storage.upsert_price_bars([final_13, provisional_14])
+    service = FuturesMarketDataSyncService(storage, config)
+
+    def calendar_gate(target_date):
+        return {
+            "target_dates_by_exchange": {"SHFE": [target_date]},
+            "exchange_diagnostics": {
+                "SHFE": {
+                    "requested_start_date": target_date,
+                    "requested_end_date": target_date,
+                    "publication_cutoff": "18:00",
+                    "publication_timezone": "Asia/Shanghai",
+                    "publication_as_of_date": target_date,
+                    "expected_latest_trading_date": target_date,
+                    "blockers": [],
+                    "warnings": [],
+                }
+            },
+        }
+
+    before_cutoff = service._build_exchange_completeness(
+        target_series=[series],
+        series_results=[
+            {
+                "series_id": series.series_id,
+                "status": "success",
+                "target_trade_dates": ["2026-08-13"],
+            }
+        ],
+        calendar_gate=calendar_gate("2026-08-13"),
+        dry_run=False,
+    )["SHFE"]
+    after_cutoff = service._build_exchange_completeness(
+        target_series=[series],
+        series_results=[
+            {
+                "series_id": series.series_id,
+                "status": "success",
+                "target_trade_dates": ["2026-08-14"],
+            }
+        ],
+        calendar_gate=calendar_gate("2026-08-14"),
+        dry_run=False,
+    )["SHFE"]
+
+    assert before_cutoff["status"] == "success"
+    assert before_cutoff["finalized_latest_price_date"] == "2026-08-13"
+    assert before_cutoff["remaining_provisional_dates"] == []
+    assert after_cutoff["status"] == "partial"
+    assert after_cutoff["actual_latest_price_date"] == "2026-08-14"
+    assert after_cutoff["finalized_latest_price_date"] == "2026-08-13"
+    assert after_cutoff["remaining_provisional_dates"] == ["2026-08-14"]
+    assert after_cutoff["blockers"] == [
+        "stale_provisional_price_coverage:SHFE:2026-08-14"
+    ]
 
 
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
@@ -5442,6 +5629,180 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
 
 
 @pytest.mark.asyncio
+async def test_futures_market_data_sync_finalizes_pre_cutoff_partial_row_at_2130(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["SHFE"],
+            "timeout_seconds": 1,
+        },
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    _seed_verified_calendar(storage, trade_date="2026-08-14")
+    storage.upsert_price_bars(
+        [
+            FuturesBar(
+                series_id="CNF.CU.SHFE.main",
+                trade_date="2026-08-14",
+                open=None,
+                high=None,
+                low=None,
+                close=None,
+                settlement=None,
+                volume=100,
+                open_interest=200,
+                raw_payload_hash="intraday-partial",
+                source="exchange_official",
+                source_mode="direct",
+                source_profile="exchange_official",
+                quality_flag="partial",
+                metadata={
+                    "publication_state": "provisional",
+                    "publication_timezone": "Asia/Shanghai",
+                    "publication_cutoff": "18:00",
+                },
+            )
+        ],
+        ingestion_run_id=289,
+    )
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="CU",
+                contract="CU2609",
+                close=11,
+            )
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.close",
+        lambda self: None,
+    )
+
+    result = await FuturesMarketDataSyncService(
+        storage,
+        config,
+        now_provider=lambda: datetime(
+            2026,
+            8,
+            14,
+            21,
+            30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+    ).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2026-08-14",
+        end_date="2026-08-14",
+    )
+    stored = storage.get_price_bars("CNF.CU.SHFE.main")[0]
+    completeness = result["exchange_completeness"]["SHFE"]
+
+    assert result["status"] == "success"
+    assert result["totals"]["changed"] == 1
+    assert result["totals"]["same_source_correction_rows"] == 1
+    assert completeness["finalized_latest_price_date"] == "2026-08-14"
+    assert completeness["remaining_provisional_dates"] == []
+    assert completeness["current_run_finalized_dates"] == ["2026-08-14"]
+    assert stored["close"] == 11
+    assert stored["quality_flag"] == "ok"
+    assert stored["metadata"]["publication_state"] == "final"
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_keeps_partial_when_post_cutoff_fetch_fails(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["SHFE"],
+            "timeout_seconds": 1,
+        },
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    _seed_verified_calendar(storage, trade_date="2026-08-14")
+    provisional = FuturesBar(
+        series_id="CNF.CU.SHFE.main",
+        trade_date="2026-08-14",
+        open=None,
+        high=None,
+        low=None,
+        close=None,
+        settlement=None,
+        raw_payload_hash="keep-provisional",
+        source="exchange_official",
+        source_mode="direct",
+        source_profile="exchange_official",
+        quality_flag="partial",
+        metadata={
+            "publication_state": "provisional",
+            "publication_timezone": "Asia/Shanghai",
+            "publication_cutoff": "18:00",
+        },
+    )
+    storage.upsert_price_bars([provisional], ingestion_run_id=289)
+
+    async def failed_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        raise OfficialFuturesSourceUnavailable("final publication unavailable")
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        failed_official_fetch,
+    )
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.close",
+        lambda self: None,
+    )
+
+    result = await FuturesMarketDataSyncService(
+        storage,
+        config,
+        now_provider=lambda: datetime(
+            2026,
+            8,
+            14,
+            21,
+            30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+    ).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2026-08-14",
+        end_date="2026-08-14",
+    )
+    completeness = result["exchange_completeness"]["SHFE"]
+    stored = storage.get_price_bars("CNF.CU.SHFE.main")[0]
+
+    assert result["status"] == "partial"
+    assert completeness["status"] == "partial"
+    assert completeness["remaining_provisional_dates"] == ["2026-08-14"]
+    assert "stale_provisional_price_coverage:SHFE:2026-08-14" in completeness["blockers"]
+    assert stored["metadata"]["publication_state"] == "provisional"
+
+
+@pytest.mark.asyncio
 async def test_futures_market_data_sync_falls_back_after_official_unavailable(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
@@ -5709,13 +6070,14 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
     assert result["totals"]["changed"] == 0
     assert result["totals"]["unchanged"] == 0
     assert result["totals"]["would_write_price_bars"] == 1
-    assert result["series"][0]["write_result"] == {
-        "inserted": 0,
-        "changed": 0,
-        "unchanged": 0,
-        "changelog_written": 0,
-        "would_write_rows": 1,
-    }
+    write_result = result["series"][0]["write_result"]
+    assert write_result["inserted"] == 0
+    assert write_result["changed"] == 0
+    assert write_result["unchanged"] == 0
+    assert write_result["changelog_written"] == 0
+    assert write_result["would_write_rows"] == 1
+    assert write_result["new_business_date_rows"] == 0
+    assert write_result["source_upgrade_rows"] == 0
     assert storage.get_price_bars("CNF.CU.SHFE.main") == []
 
 

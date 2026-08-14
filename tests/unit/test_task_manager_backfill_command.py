@@ -695,7 +695,13 @@ async def test_run_futures_market_data_sync_uses_daily_repair_window_and_reports
                         'required_target_dates': ['2026-08-12', '2026-08-13'],
                         'expected_latest_trading_date': '2026-08-13',
                         'actual_latest_price_date': '2026-08-11',
+                        'finalized_latest_price_date': '2026-08-11',
                         'remaining_missing_dates': ['2026-08-12', '2026-08-13'],
+                        'remaining_provisional_dates': ['2026-08-13'],
+                        'write_semantics': {
+                            'new_business_date_rows': 0,
+                            'source_upgrade_rows': 23,
+                        },
                         'blockers': ['missing_price_coverage:DCE:2026-08-12'],
                     }
                 },
@@ -723,6 +729,8 @@ async def test_run_futures_market_data_sync_uses_daily_repair_window_and_reports
     assert any(
         'expected=2026-08-13' in call.args[1]
         and 'actual=2026-08-11' in call.args[1]
+        and 'final=2026-08-11' in call.args[1]
+        and 'provisional=2026-08-13' in call.args[1]
         for call in task_manager.send_message.await_args_list
     )
 

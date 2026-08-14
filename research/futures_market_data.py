@@ -10,7 +10,7 @@ import math
 import sqlite3
 import time
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from statistics import median
@@ -131,6 +131,101 @@ def _futures_publication_context(
         "local_run_at": local_run_at.isoformat(),
         "publication_as_of_date": publication_as_of.isoformat(),
     }
+
+
+FUTURES_WRITE_SEMANTIC_ROW_KEYS = (
+    "new_business_date_rows",
+    "source_upgrade_rows",
+    "same_source_correction_rows",
+    "post_cutoff_verified_unchanged_rows",
+)
+FUTURES_WRITE_SEMANTIC_DATE_KEYS = (
+    "new_business_dates",
+    "source_upgrade_dates",
+    "same_source_correction_dates",
+    "post_cutoff_verified_dates",
+    "finalized_dates",
+)
+
+
+def _empty_futures_write_result() -> Dict[str, Any]:
+    return {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "changelog_written": 0,
+        **{key: 0 for key in FUTURES_WRITE_SEMANTIC_ROW_KEYS},
+        **{key: [] for key in FUTURES_WRITE_SEMANTIC_DATE_KEYS},
+    }
+
+
+def _merge_futures_write_result(target: Dict[str, Any], source: Mapping[str, Any]) -> None:
+    for key in (
+        "inserted",
+        "changed",
+        "unchanged",
+        "changelog_written",
+        *FUTURES_WRITE_SEMANTIC_ROW_KEYS,
+    ):
+        target[key] = int(target.get(key, 0) or 0) + int(source.get(key, 0) or 0)
+    for key in FUTURES_WRITE_SEMANTIC_DATE_KEYS:
+        target[key] = sorted(
+            {
+                str(item)
+                for item in list(target.get(key) or []) + list(source.get(key) or [])
+                if item
+            }
+        )
+
+
+def _futures_publication_cutoff_at(
+    trade_date: str,
+    *,
+    timezone_name: str,
+    cutoff: str,
+) -> datetime:
+    hour, minute = _parse_futures_publication_cutoff(cutoff)
+    return datetime.combine(
+        date.fromisoformat(_date_key(trade_date)),
+        datetime.min.time(),
+        tzinfo=ZoneInfo(timezone_name),
+    ).replace(hour=hour, minute=minute)
+
+
+def _stored_futures_bar_is_provisional(
+    row: Mapping[str, Any],
+    *,
+    timezone_name: str,
+    cutoff: str,
+) -> bool:
+    metadata = row.get("metadata")
+    if not isinstance(metadata, Mapping):
+        try:
+            metadata = json.loads(str(row.get("metadata_json") or "{}"))
+        except (TypeError, ValueError):
+            metadata = {}
+    publication_state = str((metadata or {}).get("publication_state") or "").lower()
+    if publication_state:
+        return publication_state == "provisional"
+    if str(row.get("quality_flag") or "").lower() != "partial":
+        return False
+    try:
+        created_at = datetime.fromisoformat(str(row.get("created_at") or ""))
+        timezone = ZoneInfo(timezone_name)
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone)
+        local_created_at = created_at.astimezone(timezone)
+        cutoff_at = _futures_publication_cutoff_at(
+            str(row.get("trade_date") or ""),
+            timezone_name=timezone_name,
+            cutoff=cutoff,
+        )
+    except (TypeError, ValueError, ZoneInfoNotFoundError):
+        return False
+    return (
+        local_created_at.date().isoformat() == str(row.get("trade_date") or "")
+        and local_created_at < cutoff_at
+    )
 
 
 def _provider_metrics_for_exchange(provider: Any, exchange: str) -> Dict[str, float]:
@@ -2228,28 +2323,77 @@ class FuturesStorageManager:
         bars: Sequence[FuturesContractBar],
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> Dict[str, int]:
-        inserted = 0
-        changed = 0
-        unchanged = 0
-        changelog_written = 0
+    ) -> Dict[str, Any]:
+        result = _empty_futures_write_result()
+        semantic_dates = {key: set() for key in FUTURES_WRITE_SEMANTIC_DATE_KEYS}
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for bar in bars:
+                business_existing = conn.execute(
+                    """
+                    SELECT source, source_profile FROM futures_contract_price_bars
+                    WHERE contract_id = ? AND trade_date = ? AND source_mode = ?
+                    LIMIT 1
+                    """,
+                    (bar.contract_id, bar.trade_date, bar.source_mode),
+                ).fetchone()
                 existing = conn.execute(
                     """
-                    SELECT raw_payload_hash, row_version FROM futures_contract_price_bars
+                    SELECT raw_payload_hash, row_version, quality_flag, metadata_json,
+                           created_at, trade_date
+                    FROM futures_contract_price_bars
                     WHERE contract_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
                     """,
                     (bar.contract_id, bar.trade_date, bar.source, bar.source_mode),
                 ).fetchone()
                 if existing and existing["raw_payload_hash"] == bar.raw_payload_hash:
-                    unchanged += 1
+                    metadata = dict(bar.metadata or {})
+                    incoming_final = metadata.get("publication_state") == "final"
+                    existing_provisional = _stored_futures_bar_is_provisional(
+                        dict(existing),
+                        timezone_name=str(metadata.get("publication_timezone") or "Asia/Shanghai"),
+                        cutoff=str(metadata.get("publication_cutoff") or "18:00"),
+                    )
+                    result["unchanged"] += 1
+                    if incoming_final and existing_provisional:
+                        row_version = int(existing["row_version"] or 1) + 1
+                        conn.execute(
+                            """
+                            UPDATE futures_contract_price_bars
+                            SET quality_flag = ?, metadata_json = ?, ingestion_run_id = ?,
+                                row_version = ?, updated_at = ?
+                            WHERE contract_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
+                            """,
+                            (
+                                bar.quality_flag,
+                                _json_dumps(metadata),
+                                ingestion_run_id,
+                                row_version,
+                                now,
+                                bar.contract_id,
+                                bar.trade_date,
+                                bar.source,
+                                bar.source_mode,
+                            ),
+                        )
+                        result["post_cutoff_verified_unchanged_rows"] += 1
+                        semantic_dates["post_cutoff_verified_dates"].add(bar.trade_date)
+                        semantic_dates["finalized_dates"].add(bar.trade_date)
                     continue
                 if existing:
-                    changed += 1
+                    result["changed"] += 1
+                    result["same_source_correction_rows"] += 1
+                    semantic_dates["same_source_correction_dates"].add(bar.trade_date)
                 else:
-                    inserted += 1
+                    result["inserted"] += 1
+                    if business_existing:
+                        result["source_upgrade_rows"] += 1
+                        semantic_dates["source_upgrade_dates"].add(bar.trade_date)
+                    else:
+                        result["new_business_date_rows"] += 1
+                        semantic_dates["new_business_dates"].add(bar.trade_date)
+                if (bar.metadata or {}).get("publication_state") == "final":
+                    semantic_dates["finalized_dates"].add(bar.trade_date)
                 row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
@@ -2333,13 +2477,10 @@ class FuturesStorageManager:
                     ingestion_run_id=ingestion_run_id,
                     changed_at=now,
                 ):
-                    changelog_written += 1
-        return {
-            "inserted": inserted,
-            "changed": changed,
-            "unchanged": unchanged,
-            "changelog_written": changelog_written,
-        }
+                    result["changelog_written"] += 1
+        for key, values in semantic_dates.items():
+            result[key] = sorted(values)
+        return result
 
     def upsert_trading_calendar(self, days: Sequence[FuturesTradingCalendarDay]) -> int:
         now = get_shanghai_time().isoformat()
@@ -3066,6 +3207,8 @@ class FuturesStorageManager:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         series_ids: Optional[Sequence[str]] = None,
+        publication_timezone: str = "Asia/Shanghai",
+        publication_cutoff: str = "18:00",
     ) -> Dict[str, Any]:
         clauses = ["i.exchange = ?"]
         params: List[Any] = [str(exchange).upper()]
@@ -3083,24 +3226,57 @@ class FuturesStorageManager:
         with self.get_connection() as conn:
             rows = conn.execute(
                 f"""
-                SELECT b.trade_date, COUNT(DISTINCT b.series_id) AS series_count
+                SELECT b.series_id, b.trade_date, b.quality_flag, b.metadata_json,
+                       b.created_at
                 FROM futures_price_bars b
                 JOIN futures_series s ON s.series_id = b.series_id
                 JOIN futures_instruments i ON i.instrument_id = s.instrument_id
                 WHERE {' AND '.join(clauses)}
-                GROUP BY b.trade_date
-                ORDER BY b.trade_date
+                ORDER BY b.trade_date, b.series_id
                 """,
                 params,
             ).fetchall()
-        dates = [str(row["trade_date"]) for row in rows]
+        final_by_date_series: Dict[str, Dict[str, bool]] = {}
+        for row in rows:
+            trade_date = str(row["trade_date"])
+            series_id = str(row["series_id"])
+            is_final = not _stored_futures_bar_is_provisional(
+                dict(row),
+                timezone_name=publication_timezone,
+                cutoff=publication_cutoff,
+            )
+            series_state = final_by_date_series.setdefault(trade_date, {})
+            series_state[series_id] = bool(series_state.get(series_id)) or is_final
+        dates = sorted(final_by_date_series)
+        finalized_dates = sorted(
+            trade_date
+            for trade_date, series_state in final_by_date_series.items()
+            if series_state and all(series_state.values())
+        )
+        provisional_dates = sorted(
+            trade_date
+            for trade_date, series_state in final_by_date_series.items()
+            if any(not is_final for is_final in series_state.values())
+        )
         return {
             "exchange": str(exchange).upper(),
             "covered_dates": dates,
             "series_count_by_date": {
-                str(row["trade_date"]): int(row["series_count"] or 0) for row in rows
+                trade_date: len(series_state)
+                for trade_date, series_state in final_by_date_series.items()
             },
+            "finalized_series_count_by_date": {
+                trade_date: sum(1 for is_final in series_state.values() if is_final)
+                for trade_date, series_state in final_by_date_series.items()
+            },
+            "provisional_series_count_by_date": {
+                trade_date: sum(1 for is_final in series_state.values() if not is_final)
+                for trade_date, series_state in final_by_date_series.items()
+            },
+            "finalized_dates": finalized_dates,
+            "provisional_dates": provisional_dates,
             "actual_latest_price_date": dates[-1] if dates else None,
+            "finalized_latest_price_date": finalized_dates[-1] if finalized_dates else None,
         }
 
     def list_continuous_mappings(
@@ -3187,14 +3363,21 @@ class FuturesStorageManager:
         bars: Sequence[FuturesBar],
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> Dict[str, int]:
-        inserted = 0
-        changed = 0
-        unchanged = 0
-        changelog_written = 0
+    ) -> Dict[str, Any]:
+        result = _empty_futures_write_result()
+        semantic_dates = {key: set() for key in FUTURES_WRITE_SEMANTIC_DATE_KEYS}
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for bar in bars:
+                business_existing = conn.execute(
+                    """
+                    SELECT source, source_profile FROM futures_price_bars
+                    WHERE series_id = ? AND trade_date = ? AND source_mode = ?
+                    LIMIT 1
+                    """,
+                    (bar.series_id, bar.trade_date, bar.source_mode),
+                ).fetchone()
+                source_upgrade = False
                 if str(bar.source_profile or "") == "exchange_official":
                     superseded_rows = conn.execute(
                         """
@@ -3208,6 +3391,7 @@ class FuturesStorageManager:
                         """,
                         (bar.series_id, bar.trade_date, bar.source_mode),
                     ).fetchall()
+                    source_upgrade = bool(superseded_rows)
                     conn.execute(
                         """
                         DELETE FROM futures_price_bars
@@ -3242,7 +3426,7 @@ class FuturesStorageManager:
                             ingestion_run_id=ingestion_run_id,
                             changed_at=now,
                         ):
-                            changelog_written += 1
+                            result["changelog_written"] += 1
                 else:
                     official_existing = conn.execute(
                         """
@@ -3256,22 +3440,65 @@ class FuturesStorageManager:
                         (bar.series_id, bar.trade_date, bar.source_mode),
                     ).fetchone()
                     if official_existing:
-                        unchanged += 1
+                        result["unchanged"] += 1
                         continue
                 existing = conn.execute(
                     """
-                    SELECT raw_payload_hash, row_version FROM futures_price_bars
+                    SELECT raw_payload_hash, row_version, quality_flag, metadata_json,
+                           created_at, trade_date
+                    FROM futures_price_bars
                     WHERE series_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
                     """,
                     (bar.series_id, bar.trade_date, bar.source, bar.source_mode),
                 ).fetchone()
                 if existing and existing["raw_payload_hash"] == bar.raw_payload_hash:
-                    unchanged += 1
+                    metadata = dict(bar.metadata or {})
+                    incoming_final = metadata.get("publication_state") == "final"
+                    existing_provisional = _stored_futures_bar_is_provisional(
+                        dict(existing),
+                        timezone_name=str(metadata.get("publication_timezone") or "Asia/Shanghai"),
+                        cutoff=str(metadata.get("publication_cutoff") or "18:00"),
+                    )
+                    result["unchanged"] += 1
+                    if incoming_final and existing_provisional:
+                        row_version = int(existing["row_version"] or 1) + 1
+                        conn.execute(
+                            """
+                            UPDATE futures_price_bars
+                            SET quality_flag = ?, metadata_json = ?, ingestion_run_id = ?,
+                                row_version = ?, updated_at = ?
+                            WHERE series_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
+                            """,
+                            (
+                                bar.quality_flag,
+                                _json_dumps(metadata),
+                                ingestion_run_id,
+                                row_version,
+                                now,
+                                bar.series_id,
+                                bar.trade_date,
+                                bar.source,
+                                bar.source_mode,
+                            ),
+                        )
+                        result["post_cutoff_verified_unchanged_rows"] += 1
+                        semantic_dates["post_cutoff_verified_dates"].add(bar.trade_date)
+                        semantic_dates["finalized_dates"].add(bar.trade_date)
                     continue
                 if existing:
-                    changed += 1
+                    result["changed"] += 1
+                    result["same_source_correction_rows"] += 1
+                    semantic_dates["same_source_correction_dates"].add(bar.trade_date)
                 else:
-                    inserted += 1
+                    result["inserted"] += 1
+                    if source_upgrade or business_existing:
+                        result["source_upgrade_rows"] += 1
+                        semantic_dates["source_upgrade_dates"].add(bar.trade_date)
+                    else:
+                        result["new_business_date_rows"] += 1
+                        semantic_dates["new_business_dates"].add(bar.trade_date)
+                if (bar.metadata or {}).get("publication_state") == "final":
+                    semantic_dates["finalized_dates"].add(bar.trade_date)
                 row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
@@ -3353,13 +3580,10 @@ class FuturesStorageManager:
                     ingestion_run_id=ingestion_run_id,
                     changed_at=now,
                 ):
-                    changelog_written += 1
-        return {
-            "inserted": inserted,
-            "changed": changed,
-            "unchanged": unchanged,
-            "changelog_written": changelog_written,
-        }
+                    result["changelog_written"] += 1
+        for key, values in semantic_dates.items():
+            result[key] = sorted(values)
+        return result
 
     def list_instruments(self, *, active_only: bool = True) -> List[Dict[str, Any]]:
         with self.get_connection() as conn:
@@ -4660,6 +4884,8 @@ class FuturesTradingDayGovernanceService:
                 exchange,
                 start_date=exchange_start,
                 end_date=exchange_end,
+                publication_timezone=publication["timezone"],
+                publication_cutoff=publication["publication_cutoff"],
             )
             covered_dates = set(coverage.get("covered_dates") or [])
             uncovered_dates = [
@@ -8019,10 +8245,18 @@ class FuturesReadinessService:
 class FuturesMarketDataSyncService:
     """Synchronize futures bars from configured providers into futures.db."""
 
-    def __init__(self, storage: FuturesStorageManager, research_config: ResearchConfig):
+    def __init__(
+        self,
+        storage: FuturesStorageManager,
+        research_config: ResearchConfig,
+        *,
+        now_provider: Callable[[], datetime] = get_shanghai_time,
+    ):
         self.storage = storage
         self.research_config = research_config
+        self.now_provider = now_provider
         self.module_cfg = research_config.modules.get("commodity_market_data", {})
+        _, self.publication_policy = _load_futures_publication_policy(self.module_cfg)
         sync_cfg = self.module_cfg.get("market_data_sync", {}) if isinstance(self.module_cfg, dict) else {}
         try:
             self.progress_log_every = max(1, int(sync_cfg.get("progress_log_every", 250)))
@@ -8032,6 +8266,58 @@ class FuturesMarketDataSyncService:
             self.heartbeat_every_seconds = max(5.0, float(sync_cfg.get("heartbeat_every_seconds", 60)))
         except (TypeError, ValueError):
             self.heartbeat_every_seconds = 60.0
+
+    def _with_publication_state(
+        self,
+        bar: FuturesBar | FuturesContractBar,
+        *,
+        exchange: str,
+        run_at: datetime,
+        ingestion_run_id: Optional[int],
+    ) -> FuturesBar | FuturesContractBar:
+        publication = _futures_publication_context(
+            exchange,
+            self.publication_policy,
+            run_at,
+        )
+        trade_date = _date_key(bar.trade_date)
+        publication_eligible = trade_date <= publication["publication_as_of_date"]
+        has_final_values = (
+            bar.close is not None
+            and str(bar.quality_flag or "").lower() != "partial"
+        )
+        publication_state = (
+            "final" if publication_eligible and has_final_values else "provisional"
+        )
+        cutoff_at = _futures_publication_cutoff_at(
+            trade_date,
+            timezone_name=publication["timezone"],
+            cutoff=publication["publication_cutoff"],
+        )
+        metadata = {
+            **dict(bar.metadata or {}),
+            "publication_state": publication_state,
+            "acquired_at": publication["local_run_at"],
+            "publication_timezone": publication["timezone"],
+            "publication_cutoff": publication["publication_cutoff"],
+            "publication_cutoff_at": cutoff_at.isoformat(),
+            "publication_eligible": publication_eligible,
+        }
+        if publication_state == "final":
+            metadata.update(
+                {
+                    "final_verified_at": publication["local_run_at"],
+                    "final_verified_run_id": ingestion_run_id,
+                    "finalization_reason": "publication_eligible_complete_payload",
+                }
+            )
+        else:
+            metadata["finalization_reason"] = (
+                "before_publication_cutoff"
+                if not publication_eligible
+                else "incomplete_final_fields"
+            )
+        return replace(bar, metadata=metadata)
 
     def _low_quality_calendar_ranges(
         self,
@@ -8150,16 +8436,28 @@ class FuturesMarketDataSyncService:
         target_dates_by_exchange = calendar_gate.get("target_dates_by_exchange") or {}
         outcomes: Dict[str, Dict[str, Any]] = {}
         for exchange, scoped_series in sorted(series_by_exchange.items()):
+            governance_diagnostic = calendar_diagnostics.get(exchange) or {}
+            publication_timezone = str(
+                governance_diagnostic.get("publication_timezone")
+                or self.publication_policy[exchange]["timezone"]
+            )
+            publication_cutoff = str(
+                governance_diagnostic.get("publication_cutoff")
+                or self.publication_policy[exchange]["cutoff"]
+            )
             governed_dates = sorted(
                 str(item) for item in target_dates_by_exchange.get(exchange, []) if item
             )
             required_dates: set[str] = set()
             lifecycle_skips = 0
+            failed_series: List[str] = []
             if governance_blocked:
                 required_dates.update(governed_dates)
             else:
                 for series in scoped_series:
                     series_result = result_by_series.get(series.series_id) or {}
+                    if str(series_result.get("status") or "") == "failed":
+                        failed_series.append(series.series_id)
                     if str(series_result.get("status") or "") in {
                         "lifecycle_skip",
                         "calendar_skip",
@@ -8178,27 +8476,52 @@ class FuturesMarketDataSyncService:
                     start_date=governed_dates[0],
                     end_date=governed_dates[-1],
                     series_ids=scoped_series_ids,
+                    publication_timezone=publication_timezone,
+                    publication_cutoff=publication_cutoff,
                 )
             else:
                 bounded_coverage = {
                     "covered_dates": [],
+                    "finalized_dates": [],
+                    "provisional_dates": [],
                     "series_count_by_date": {},
                 }
             all_coverage = self.storage.get_exchange_price_coverage(
                 exchange,
                 series_ids=scoped_series_ids,
+                publication_timezone=publication_timezone,
+                publication_cutoff=publication_cutoff,
             )
             covered_dates = set(bounded_coverage.get("covered_dates") or [])
+            finalized_covered_dates = set(bounded_coverage.get("finalized_dates") or [])
+            provisional_covered_dates = set(bounded_coverage.get("provisional_dates") or [])
             missing_dates = sorted(required_dates - covered_dates)
-            governance_diagnostic = calendar_diagnostics.get(exchange) or {}
+            stale_provisional_dates = sorted(
+                required_dates & provisional_covered_dates - finalized_covered_dates
+            )
             blockers = list(governance_diagnostic.get("blockers") or [])
             blockers.extend(
                 f"missing_price_coverage:{exchange}:{trade_date}"
                 for trade_date in missing_dates
             )
+            blockers.extend(
+                f"stale_provisional_price_coverage:{exchange}:{trade_date}"
+                for trade_date in stale_provisional_dates
+            )
+            blockers.extend(
+                f"provider_failure:{exchange}:{series_id}"
+                for series_id in failed_series
+            )
             if governance_blocked and not blockers:
                 blockers.append(f"trading_day_governance_blocked:{exchange}")
             status = "blocked" if governance_blocked else ("partial" if blockers else "success")
+            exchange_write_semantics = _empty_futures_write_result()
+            for series in scoped_series:
+                series_result = result_by_series.get(series.series_id) or {}
+                _merge_futures_write_result(
+                    exchange_write_semantics,
+                    series_result.get("write_result") or {},
+                )
             outcomes[exchange] = {
                 "exchange": exchange,
                 "status": status,
@@ -8213,9 +8536,18 @@ class FuturesMarketDataSyncService:
                     "expected_latest_trading_date"
                 ),
                 "actual_latest_price_date": all_coverage.get("actual_latest_price_date"),
+                "finalized_latest_price_date": all_coverage.get(
+                    "finalized_latest_price_date"
+                ),
+                "finalized_covered_dates": sorted(finalized_covered_dates),
+                "remaining_provisional_dates": stale_provisional_dates,
+                "current_run_finalized_dates": list(
+                    exchange_write_semantics.get("finalized_dates") or []
+                ),
                 "repaired_dates": list(governance_diagnostic.get("repaired_dates") or []),
                 "remaining_missing_dates": missing_dates,
                 "lifecycle_skipped_series": lifecycle_skips,
+                "write_semantics": exchange_write_semantics,
                 "blockers": sorted(set(blockers)),
                 "warnings": list(governance_diagnostic.get("warnings") or []),
                 "dry_run": dry_run,
@@ -8276,7 +8608,12 @@ class FuturesMarketDataSyncService:
                 "reason": "; ".join(scope_selection.blockers),
             }
             return result
-        governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
+        run_at = self.now_provider()
+        governance = FuturesTradingDayGovernanceService(
+            self.storage,
+            self.module_cfg,
+            now_provider=lambda: run_at,
+        )
         selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         target_series = [
             item for item in universe_selector.series
@@ -8424,10 +8761,7 @@ class FuturesMarketDataSyncService:
             self.storage.finish_ingestion_run(run_id, status="blocked", metadata=result)
             return result
         totals = {
-            "inserted": 0,
-            "changed": 0,
-            "unchanged": 0,
-            "changelog_written": 0,
+            **_empty_futures_write_result(),
             "failed": 0,
             "calendar_skipped": calendar_gate.get("skipped_date_count", 0),
             "provider_empty_on_trading_day": 0,
@@ -8684,12 +9018,28 @@ class FuturesMarketDataSyncService:
                                         exchange_rows,
                                         mode=mode,
                                     )
-                                    day_bars = list(official_artifacts.get("series_bars") or [])
+                                    day_bars = [
+                                        self._with_publication_state(
+                                            bar,
+                                            exchange=exchange,
+                                            run_at=run_at,
+                                            ingestion_run_id=run_id,
+                                        )
+                                        for bar in official_artifacts.get("series_bars") or []
+                                    ]
                                     day_official_status = "success" if day_bars else "empty"
                                     if day_bars:
                                         fanout_diagnostics["series_artifacts_built"] += 1
                                         contracts.extend(official_artifacts.get("contracts") or [])
-                                        contract_bars.extend(official_artifacts.get("contract_bars") or [])
+                                        contract_bars.extend(
+                                            self._with_publication_state(
+                                                bar,
+                                                exchange=exchange,
+                                                run_at=run_at,
+                                                ingestion_run_id=run_id,
+                                            )
+                                            for bar in official_artifacts.get("contract_bars") or []
+                                        )
                                         mappings.extend(official_artifacts.get("mappings") or [])
                                         selected_profile = "exchange_official"
                                     else:
@@ -8740,6 +9090,15 @@ class FuturesMarketDataSyncService:
                                     ),
                                     timeout=self._request_timeout_seconds("akshare_futures"),
                                 )
+                                day_bars = [
+                                    self._with_publication_state(
+                                        bar,
+                                        exchange=exchange,
+                                        run_at=run_at,
+                                        ingestion_run_id=run_id,
+                                    )
+                                    for bar in day_bars
+                                ]
                                 day_fallback_status = "success" if day_bars else "empty"
                                 if day_bars:
                                     selected_profile = selected_profile or "akshare_futures"
@@ -8771,6 +9130,12 @@ class FuturesMarketDataSyncService:
                                 "official_reason": day_official_reason,
                                 "fallback_status": day_fallback_status,
                                 "fallback_reason": day_fallback_reason,
+                                "publication_states": sorted(
+                                    {
+                                        str((bar.metadata or {}).get("publication_state") or "unknown")
+                                        for bar in day_bars
+                                    }
+                                ),
                             }
                         )
                     if any(item.get("official_status") == "success" for item in date_results):
@@ -8813,6 +9178,7 @@ class FuturesMarketDataSyncService:
                                 if part
                             )
                         )
+                    contract_write_result = _empty_futures_write_result()
                     if not dry_run and contracts:
                         self.storage.upsert_contracts(contracts)
                         contract_write_result = self.storage.upsert_contract_price_bars(
@@ -8824,18 +9190,14 @@ class FuturesMarketDataSyncService:
                         )
                         self.storage.upsert_continuous_mappings(mappings)
                     write_result = {
-                        "inserted": 0,
-                        "changed": 0,
-                        "unchanged": 0,
-                        "changelog_written": 0,
+                        **_empty_futures_write_result(),
                         "would_write_rows": len(bars),
                     }
                     if dry_run:
                         totals["would_write_price_bars"] += len(bars)
                     if not dry_run:
                         write_result = self.storage.upsert_price_bars(bars, ingestion_run_id=run_id)
-                    for key in ("inserted", "changed", "unchanged", "changelog_written"):
-                        totals[key] += int(write_result.get(key, 0) or 0)
+                    _merge_futures_write_result(totals, write_result)
                     series_results.append(
                         {
                             "series_id": item.series_id,
@@ -8851,6 +9213,7 @@ class FuturesMarketDataSyncService:
                             "lifecycle": lifecycle_note,
                             "date_results": date_results,
                             "write_result": write_result,
+                            "contract_write_result": contract_write_result,
                         }
                     )
                     processed_series_count += 1
