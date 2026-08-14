@@ -278,6 +278,31 @@
       "default_research_series_type": "main_continuous",
       "category_dictionary": "managed_enum",
       "default_timezone": "Asia/Shanghai",
+      "publication_policy": {
+        "repair_lookback_days": 5,
+        "exchanges": {
+          "SHFE": {
+            "timezone": "Asia/Shanghai",
+            "cutoff": "18:00"
+          },
+          "INE": {
+            "timezone": "Asia/Shanghai",
+            "cutoff": "18:00"
+          },
+          "DCE": {
+            "timezone": "Asia/Shanghai",
+            "cutoff": "18:00"
+          },
+          "CZCE": {
+            "timezone": "Asia/Shanghai",
+            "cutoff": "18:00"
+          },
+          "GFEX": {
+            "timezone": "Asia/Shanghai",
+            "cutoff": "18:00"
+          }
+        }
+      },
       "contract_discovery_retry": {
         "retry_passes": 1,
         "retry_pause_seconds": 2
@@ -603,13 +628,6 @@
         "retry_unresolved_pause_seconds": 60,
         "progress_log_every": 100,
         "exchange_start_dates": {
-          "SHFE": "2002-01-07",
-          "INE": "2018-03-26",
-          "DCE": "2000-06-01",
-          "CZCE": "2015-10-15",
-          "GFEX": "2022-12-22"
-        },
-        "empty_payload_closed_start_dates": {
           "SHFE": "2002-01-07",
           "INE": "2018-03-26",
           "DCE": "2000-06-01",

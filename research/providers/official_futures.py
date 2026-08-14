@@ -519,8 +519,6 @@ class OfficialFuturesMarketDataProvider:
         self.research_config = research_config
         self.module_cfg = research_config.modules.get("commodity_market_data", {})
         self.source_cfg = self.module_cfg.get("sources", {}).get("exchange_official", {})
-        governance_cfg = self.module_cfg.get("trading_day_governance", {})
-        backfill_cfg = governance_cfg.get("official_calendar_backfill", {}) if isinstance(governance_cfg, Mapping) else {}
         self.timeout_seconds = float(self.source_cfg.get("timeout_seconds", 20))
         self.retry_attempts = max(1, int(self.source_cfg.get("retry_attempts", 2)))
         self.retry_backoff_seconds = max(0.0, float(self.source_cfg.get("retry_backoff_seconds", 0.5)))
@@ -567,20 +565,6 @@ class OfficialFuturesMarketDataProvider:
             for exchange, value in batch_pause_seconds.items()
             if str(exchange).strip()
         } if isinstance(batch_pause_seconds, Mapping) else {}
-        empty_closed_defaults = {
-            exchange: "2010-01-01"
-            for exchange in self.supported_exchanges
-        }
-        empty_closed_config = backfill_cfg.get("empty_payload_closed_start_dates", {})
-        if isinstance(empty_closed_config, Mapping):
-            empty_closed_defaults.update(
-                {
-                    str(exchange).upper(): _date_key(value)
-                    for exchange, value in empty_closed_config.items()
-                    if value
-                }
-            )
-        self.empty_payload_closed_start_dates = empty_closed_defaults
         self.dce_browser_cfg = self.source_cfg.get("dce_browser", {}) if isinstance(self.source_cfg.get("dce_browser", {}), dict) else {}
         self.dce_browser_enabled = bool(self.dce_browser_cfg.get("enabled", True))
         self.enabled_exchanges = {
@@ -813,7 +797,7 @@ class OfficialFuturesMarketDataProvider:
             payload = self._request_exchange_payload(session, exchange_key, day_key)
             rows = self._parse_exchange_payload(exchange_key, payload, trade_date=day_key)
             row_count = len(rows)
-            if row_count == 0 and not self._can_treat_empty_payload_as_closed(exchange_key, day_key):
+            if row_count == 0:
                 return OfficialFuturesDailyProbeResult(
                     exchange=exchange_key,
                     trade_date=day_key,
@@ -824,64 +808,40 @@ class OfficialFuturesMarketDataProvider:
                     evidence_url=_official_daily_url(exchange_key, day_key),
                     parser_version=self.parser_version,
                     payload_hash=_hash_payload(payload),
-                    failure_reason=(
-                        "official empty payload before reliable empty-closed start date "
-                        f"{self.empty_payload_closed_start_dates.get(exchange_key)}"
-                    ),
+                    failure_reason="official daily endpoint returned no contract rows",
                     metadata={
-                        "classification_rule": "official_empty_payload_before_reliable_history_start",
-                        "empty_payload_closed_start_date": self.empty_payload_closed_start_dates.get(exchange_key),
+                        "classification_rule": "official_empty_payload_unresolved",
                     },
                 )
             return OfficialFuturesDailyProbeResult(
                 exchange=exchange_key,
                 trade_date=day_key,
-                status="trading" if row_count > 0 else "closed",
-                is_trading_day=row_count > 0,
+                status="trading",
+                is_trading_day=True,
                 row_count=row_count,
                 source_interface=_source_interface_for_exchange(exchange_key),
                 evidence_url=_official_daily_url(exchange_key, day_key),
                 parser_version=self.parser_version,
                 payload_hash=_hash_payload(payload),
-                metadata={"classification_rule": "official_daily_rows" if row_count > 0 else "official_empty_payload"},
+                metadata={"classification_rule": "official_daily_rows"},
             )
         except OfficialFuturesSourceUnavailable as exc:
             classification = classify_official_futures_failure(exc)
             if _is_official_closed_response(exc):
-                if not self._can_treat_empty_payload_as_closed(exchange_key, day_key):
-                    return OfficialFuturesDailyProbeResult(
-                        exchange=exchange_key,
-                        trade_date=day_key,
-                        status="unresolved",
-                        is_trading_day=None,
-                        row_count=0,
-                        source_interface=_source_interface_for_exchange(exchange_key),
-                        evidence_url=_official_daily_url(exchange_key, day_key),
-                        parser_version=self.parser_version,
-                        failure_reason=(
-                            "official no-report response before reliable empty-closed start date "
-                            f"{self.empty_payload_closed_start_dates.get(exchange_key)}: {exc}"
-                        ),
-                        metadata={
-                            "classification_rule": "official_no_report_before_reliable_history_start",
-                            "empty_payload_closed_start_date": self.empty_payload_closed_start_dates.get(exchange_key),
-                            "failure_category": classification.category,
-                            "suspected_local_ip_risk_control": classification.suspected_local_ip_risk_control,
-                        },
-                    )
                 return OfficialFuturesDailyProbeResult(
                     exchange=exchange_key,
                     trade_date=day_key,
-                    status="closed",
-                    is_trading_day=False,
+                    status="unresolved",
+                    is_trading_day=None,
                     row_count=0,
                     source_interface=_source_interface_for_exchange(exchange_key),
                     evidence_url=_official_daily_url(exchange_key, day_key),
                     parser_version=self.parser_version,
                     failure_reason=str(exc),
                     metadata={
-                        "classification_rule": "official_no_report_response",
+                        "classification_rule": "official_no_report_unresolved",
                         "failure_category": classification.category,
+                        "is_retryable": classification.is_retryable,
                         "suspected_local_ip_risk_control": classification.suspected_local_ip_risk_control,
                     },
                 )
@@ -902,12 +862,6 @@ class OfficialFuturesMarketDataProvider:
                     "suspected_local_ip_risk_control": classification.suspected_local_ip_risk_control,
                 },
             )
-
-    def _can_treat_empty_payload_as_closed(self, exchange: str, trade_date: str) -> bool:
-        start = self.empty_payload_closed_start_dates.get(str(exchange).upper())
-        if not start:
-            return True
-        return _date_key(trade_date) >= _date_key(start)
 
     def _parse_exchange_payload(
         self,

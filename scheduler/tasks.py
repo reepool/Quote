@@ -2959,6 +2959,29 @@ def _format_futures_market_data_scheduler_report(
         status = "partial" if int(totals.get("failed", 0) or 0) > 0 else "success"
     icon, label = _format_scheduler_status(status)
 
+    def _freshness_lines() -> List[str]:
+        exchange_completeness = result.get("exchange_completeness") or {}
+        lines: List[str] = []
+        for exchange, item in sorted(exchange_completeness.items()):
+            if exchange_label and str(exchange).upper() != exchange_label.upper():
+                continue
+            target_dates = item.get("required_target_dates") or item.get("governed_target_dates") or []
+            missing_dates = item.get("remaining_missing_dates") or []
+            repaired_dates = item.get("repaired_dates") or []
+            blockers = item.get("blockers") or []
+            lines.append(
+                f"{exchange}: range={item.get('requested_start_date') or 'N/A'}.."
+                f"{item.get('requested_end_date') or 'N/A'}, "
+                f"cutoff={item.get('publication_cutoff') or 'N/A'}, "
+                f"targets={','.join(map(str, target_dates)) or 'none'}, "
+                f"expected={item.get('expected_latest_trading_date') or 'N/A'}, "
+                f"actual={item.get('actual_latest_price_date') or 'N/A'}, "
+                f"repaired={','.join(map(str, repaired_dates)) or 'none'}, "
+                f"missing={','.join(map(str, missing_dates)) or 'none'}, "
+                f"blockers={';'.join(map(str, blockers)) or 'none'}"
+            )
+        return lines
+
     def _format_warning_items(warnings: List[Any], *, limit: int = 10) -> List[str]:
         lines: List[str] = []
         for item in warnings[:limit]:
@@ -3305,6 +3328,14 @@ def _format_futures_market_data_scheduler_report(
     else:
         detail_lines.append("序列明细已按交易所拆分发送。")
     exchange_scope = exchange_label or _futures_result_exchange_label(result)
+    freshness_lines = _freshness_lines()
+    freshness_text = ""
+    if freshness_lines:
+        freshness_text = (
+            "\n交易所目标与完整性:\n```text\n"
+            + "\n".join(freshness_lines)
+            + "\n```\n"
+        )
     return (
         f"{icon} *商品期货行情数据维护*\n\n"
         f"结论: *{label}*\n"
@@ -3329,8 +3360,9 @@ def _format_futures_market_data_scheduler_report(
         f"target_trade_dates: `{governance.get('target_date_count', 0)}`\n"
         f"calendar_quality: `{actual_calendar_quality}`\n"
         f"calendar_min_required: `{governance.get('minimum_quality', 'N/A')}`\n\n"
-        "序列明细:\n"
-        "```text\n"
+        + freshness_text
+        + "序列明细:\n"
+        + "```text\n"
         + "\n".join(detail_lines)
         + "\n```"
     )
@@ -3352,6 +3384,7 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
         or str((item or {}).get("status") or "") in {"blocked", "failed"}
         for item in (master_results or [])
     )
+    exchange_completeness = result.get("exchange_completeness") or {}
     normal_success = (
         str(result.get("status") or "") == "success"
         and not bool(result.get("dry_run"))
@@ -3361,6 +3394,10 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
         and master_status in {"success", "warning", "skipped"}
         and not master_has_blockers
         and int(master_counts.get("pending") or 0) == 0
+        and all(
+            str(item.get("status") or "") == "success"
+            for item in exchange_completeness.values()
+        )
     )
     if normal_success:
         groups: Dict[str, List[Dict[str, Any]]] = {}
@@ -3390,12 +3427,16 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 exchange_totals["changed"] += int(write_result.get("changed") or 0)
                 exchange_totals["unchanged"] += int(write_result.get("unchanged") or 0)
             lifecycle_skipped_total += exchange_totals["lifecycle_skipped"]
+            completeness = exchange_completeness.get(exchange) or {}
             lines.append(
                 f"{exchange}: 写入 {exchange_totals['inserted']}，"
                 f"更新 {exchange_totals['changed']}，"
                 f"不变 {exchange_totals['unchanged']}，"
                 f"获取 {exchange_totals['fetched']}，"
-                f"跳过 {exchange_totals['lifecycle_skipped']}"
+                f"跳过 {exchange_totals['lifecycle_skipped']}，"
+                f"目标 {','.join(completeness.get('required_target_dates') or []) or 'none'}，"
+                f"预期 {completeness.get('expected_latest_trading_date') or 'N/A'}，"
+                f"实际 {completeness.get('actual_latest_price_date') or 'N/A'}"
             )
         if not lines:
             lines.append("无交易所明细")
@@ -8941,8 +8982,8 @@ class ScheduledTasks:
             effective_scope_ids = scope_ids
             effective_exchanges = exchanges
             if requires_trading_day_governance:
-                calendar_start_date = start_date or end_date or get_shanghai_time().date().isoformat()
-                calendar_end_date = end_date or start_date or calendar_start_date
+                calendar_start_date = start_date or end_date
+                calendar_end_date = end_date or start_date
                 if requires_trading_calendar_backfill:
                     scheduler_logger.info(
                         "[Scheduler] Futures official calendar preflight start exchanges=%s scope_id=%s scope_ids=%s start=%s end=%s dry_run=%s",
@@ -9229,6 +9270,25 @@ class ScheduledTasks:
                         metadata_error,
                     )
             status = result.get('status', 'failed')
+            if (
+                dry_run
+                and requires_trading_day_governance
+                and str(governance_result.get("status") or "") != "success"
+                and status == "success"
+            ):
+                status = "partial"
+                result["status"] = status
+                result["governance_preflight"] = {
+                    "status": governance_result.get("status"),
+                    "blockers": (
+                        (governance_result.get("target_date_expansion") or {}).get("blockers")
+                        or []
+                    ),
+                    "warnings": (
+                        (governance_result.get("target_date_expansion") or {}).get("warnings")
+                        or []
+                    ),
+                }
             if blocked_calendar_exchanges:
                 result["calendar_preflight"] = {
                     "status": "blocked",

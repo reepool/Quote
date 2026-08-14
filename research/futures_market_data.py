@@ -14,7 +14,19 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from statistics import median
-from typing import Any, Dict, Generator, Iterable, List, Mapping, Optional, Protocol, Sequence
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+)
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from research.change_watermarks import (
     append_change_record,
@@ -43,6 +55,82 @@ FUTURES_CALENDAR_QUALITY_RANK: Dict[str, int] = {
     "official_parsed": 4,
     "official": 5,
 }
+
+DEFAULT_FUTURES_PUBLICATION_POLICY: Dict[str, Dict[str, str]] = {
+    exchange: {"timezone": "Asia/Shanghai", "cutoff": "18:00"}
+    for exchange in ("SHFE", "INE", "DCE", "CZCE", "GFEX")
+}
+
+
+def _parse_futures_publication_cutoff(value: str) -> tuple[int, int]:
+    try:
+        hour_text, minute_text = value.split(":", 1)
+        hour = int(hour_text)
+        minute = int(minute_text)
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise ValueError(f"invalid futures publication cutoff: {value}; expected HH:MM") from exc
+    if not 0 <= hour <= 23 or not 0 <= minute <= 59:
+        raise ValueError(f"invalid futures publication cutoff: {value}; expected HH:MM")
+    return hour, minute
+
+
+def _load_futures_publication_policy(
+    module_cfg: Mapping[str, Any],
+) -> tuple[int, Dict[str, Dict[str, str]]]:
+    governance_cfg = module_cfg.get("trading_day_governance") or {}
+    policy_cfg = governance_cfg.get("publication_policy") or {}
+    try:
+        lookback_days = int(policy_cfg.get("repair_lookback_days", 5))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("futures repair_lookback_days must be an integer from 3 through 5") from exc
+    if not 3 <= lookback_days <= 5:
+        raise ValueError("futures repair_lookback_days must be from 3 through 5")
+    configured_exchanges = policy_cfg.get("exchanges") or {}
+    result: Dict[str, Dict[str, str]] = {}
+    for exchange, defaults in DEFAULT_FUTURES_PUBLICATION_POLICY.items():
+        raw = configured_exchanges.get(exchange) or {}
+        timezone_name = str(raw.get("timezone") or defaults["timezone"])
+        cutoff = str(raw.get("cutoff") or defaults["cutoff"])
+        try:
+            ZoneInfo(timezone_name)
+        except ZoneInfoNotFoundError as exc:
+            raise ValueError(
+                f"invalid futures publication timezone for {exchange}: {timezone_name}"
+            ) from exc
+        try:
+            _parse_futures_publication_cutoff(cutoff)
+        except ValueError as exc:
+            raise ValueError(
+                f"invalid futures publication cutoff for {exchange}: {cutoff}; expected HH:MM"
+            ) from exc
+        result[exchange] = {"timezone": timezone_name, "cutoff": cutoff}
+    return lookback_days, result
+
+
+def _futures_publication_context(
+    exchange: str,
+    policy: Mapping[str, Mapping[str, str]],
+    run_at: datetime,
+) -> Dict[str, str]:
+    exchange_key = str(exchange or "").upper()
+    settings = policy.get(exchange_key) or DEFAULT_FUTURES_PUBLICATION_POLICY[exchange_key]
+    timezone_name = str(settings["timezone"])
+    timezone = ZoneInfo(timezone_name)
+    if run_at.tzinfo is None:
+        run_at = run_at.replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+    local_run_at = run_at.astimezone(timezone)
+    cutoff = str(settings["cutoff"])
+    cutoff_hour, cutoff_minute = _parse_futures_publication_cutoff(cutoff)
+    publication_as_of = local_run_at.date()
+    if (local_run_at.hour, local_run_at.minute) < (cutoff_hour, cutoff_minute):
+        publication_as_of -= timedelta(days=1)
+    return {
+        "exchange": exchange_key,
+        "timezone": timezone_name,
+        "publication_cutoff": cutoff,
+        "local_run_at": local_run_at.isoformat(),
+        "publication_as_of_date": publication_as_of.isoformat(),
+    }
 
 
 def _provider_metrics_for_exchange(provider: Any, exchange: str) -> Dict[str, float]:
@@ -2296,6 +2384,14 @@ class FuturesStorageManager:
                 )
         return len(days)
 
+    def delete_trading_calendar_day(self, exchange: str, trade_date: str) -> int:
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                "DELETE FROM futures_trading_calendar WHERE exchange = ? AND trade_date = ?",
+                (str(exchange).upper(), _date_key(trade_date)),
+            )
+        return int(cursor.rowcount or 0)
+
     def upsert_instrument_sessions(self, sessions: Sequence[FuturesInstrumentSession]) -> int:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
@@ -2962,6 +3058,50 @@ class FuturesStorageManager:
                 (str(exchange).upper(), cutoff),
             ).fetchone()
         return self._calendar_payload(row) if row else None
+
+    def get_exchange_price_coverage(
+        self,
+        exchange: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        series_ids: Optional[Sequence[str]] = None,
+    ) -> Dict[str, Any]:
+        clauses = ["i.exchange = ?"]
+        params: List[Any] = [str(exchange).upper()]
+        if start_date:
+            clauses.append("b.trade_date >= ?")
+            params.append(_date_key(start_date))
+        if end_date:
+            clauses.append("b.trade_date <= ?")
+            params.append(_date_key(end_date))
+        scoped_series_ids = sorted({str(item) for item in (series_ids or []) if item})
+        if scoped_series_ids:
+            placeholders = ",".join("?" for _ in scoped_series_ids)
+            clauses.append(f"b.series_id IN ({placeholders})")
+            params.extend(scoped_series_ids)
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT b.trade_date, COUNT(DISTINCT b.series_id) AS series_count
+                FROM futures_price_bars b
+                JOIN futures_series s ON s.series_id = b.series_id
+                JOIN futures_instruments i ON i.instrument_id = s.instrument_id
+                WHERE {' AND '.join(clauses)}
+                GROUP BY b.trade_date
+                ORDER BY b.trade_date
+                """,
+                params,
+            ).fetchall()
+        dates = [str(row["trade_date"]) for row in rows]
+        return {
+            "exchange": str(exchange).upper(),
+            "covered_dates": dates,
+            "series_count_by_date": {
+                str(row["trade_date"]): int(row["series_count"] or 0) for row in rows
+            },
+            "actual_latest_price_date": dates[-1] if dates else None,
+        }
 
     def list_continuous_mappings(
         self,
@@ -4293,10 +4433,20 @@ class FuturesCalendarService:
 class FuturesTradingDayGovernanceService:
     """Govern futures exchange calendars before futures provider requests."""
 
-    def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        storage: FuturesStorageManager,
+        module_cfg: Optional[Dict[str, Any]] = None,
+        *,
+        now_provider: Callable[[], datetime] = get_shanghai_time,
+    ):
         self.storage = storage
         self.module_cfg = module_cfg or {}
+        self.now_provider = now_provider
         self.governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        self.repair_lookback_days, self.publication_policy = _load_futures_publication_policy(
+            self.module_cfg
+        )
         master_cfg = self.module_cfg.get("master_data", {})
         calendar_cfg = master_cfg.get("calendar", {}) if isinstance(master_cfg, dict) else {}
         self.default_timezone = str(
@@ -4452,11 +4602,23 @@ class FuturesTradingDayGovernanceService:
                 "blockers": ["no_target_exchanges"],
                 "warnings": [],
             }
-        today = get_shanghai_time().date().isoformat()
+        run_at = self.now_provider()
         requested_start = _date_key(start_date) if start_date else None
         requested_end = _date_key(end_date) if end_date else None
-        range_start = requested_start or requested_end or today
-        range_end = requested_end or requested_start or range_start
+        explicit_range = bool(requested_start or requested_end)
+        if explicit_range:
+            range_start = requested_start or requested_end
+            range_end = requested_end or requested_start
+        else:
+            contexts = [
+                _futures_publication_context(exchange, self.publication_policy, run_at)
+                for exchange in exchange_list
+            ]
+            as_of_dates = [date.fromisoformat(item["publication_as_of_date"]) for item in contexts]
+            range_start = min(
+                item - timedelta(days=self.repair_lookback_days - 1) for item in as_of_dates
+            ).isoformat()
+            range_end = max(as_of_dates).isoformat()
         if range_start > range_end:
             raise ValueError("start_date must be earlier than or equal to end_date")
         all_blockers: List[str] = []
@@ -4464,13 +4626,29 @@ class FuturesTradingDayGovernanceService:
         expansions: List[Dict[str, Any]] = []
         target_dates_by_exchange: Dict[str, List[str]] = {}
         skipped_dates_by_exchange: Dict[str, List[str]] = {}
+        exchange_diagnostics: Dict[str, Dict[str, Any]] = {}
         for exchange in exchange_list:
-            exchange_start = range_start
-            exchange_end = range_end
-            if not requested_start and not requested_end:
-                latest = self.storage.get_latest_expected_trade_date(exchange, as_of_date=today)
-                if latest and latest.get("trade_date"):
-                    exchange_start = exchange_end = latest["trade_date"]
+            publication = _futures_publication_context(
+                exchange,
+                self.publication_policy,
+                run_at,
+            )
+            if explicit_range:
+                exchange_start = range_start
+                exchange_end = range_end
+                expected_as_of = exchange_end
+            else:
+                expected_as_of = publication["publication_as_of_date"]
+                exchange_end = expected_as_of
+                exchange_start = (
+                    date.fromisoformat(exchange_end)
+                    - timedelta(days=self.repair_lookback_days - 1)
+                ).isoformat()
+            latest = self.storage.get_latest_expected_trade_date(
+                exchange,
+                as_of_date=expected_as_of,
+            )
+            expected_latest = str(latest.get("trade_date")) if latest else None
             expansion = self._expand_exchange_dates(
                 exchange,
                 start_date=exchange_start,
@@ -4478,13 +4656,70 @@ class FuturesTradingDayGovernanceService:
                 purpose=purpose,
                 dry_run=dry_run,
             )
+            coverage = self.storage.get_exchange_price_coverage(
+                exchange,
+                start_date=exchange_start,
+                end_date=exchange_end,
+            )
+            covered_dates = set(coverage.get("covered_dates") or [])
+            uncovered_dates = [
+                item for item in expansion.target_dates if item not in covered_dates
+            ]
+            repaired_dates = list(expansion.metadata.get("repaired_dates") or [])
+            expansion = FuturesTargetDateExpansion(
+                **{
+                    **asdict(expansion),
+                    "metadata": {
+                        **expansion.metadata,
+                        "requested_start_date": range_start,
+                        "requested_end_date": range_end,
+                        "explicit_range": explicit_range,
+                        "repair_lookback_days": self.repair_lookback_days,
+                        **publication,
+                        "expected_latest_trading_date": expected_latest,
+                        "actual_latest_price_date": coverage.get("actual_latest_price_date"),
+                        "recent_uncovered_dates": uncovered_dates,
+                    },
+                }
+            )
             if persist:
                 self.storage.save_target_date_expansion(expansion)
             target_dates_by_exchange[exchange] = list(expansion.target_dates)
             skipped_dates_by_exchange[exchange] = list(expansion.skipped_dates)
             all_blockers.extend(expansion.blockers)
             all_warnings.extend(expansion.warnings)
-            expansions.append(asdict(expansion))
+            expansion_payload = asdict(expansion)
+            expansion_payload.update(
+                {
+                    "requested_start_date": range_start,
+                    "requested_end_date": range_end,
+                    "publication_cutoff": publication["publication_cutoff"],
+                    "publication_timezone": publication["timezone"],
+                    "publication_as_of_date": publication["publication_as_of_date"],
+                    "expected_latest_trading_date": expected_latest,
+                    "actual_latest_price_date": coverage.get("actual_latest_price_date"),
+                    "recent_uncovered_dates": uncovered_dates,
+                    "repaired_dates": repaired_dates,
+                }
+            )
+            expansions.append(expansion_payload)
+            exchange_diagnostics[exchange] = {
+                "exchange": exchange,
+                "requested_start_date": range_start,
+                "requested_end_date": range_end,
+                "target_start_date": exchange_start,
+                "target_end_date": exchange_end,
+                "publication_cutoff": publication["publication_cutoff"],
+                "publication_timezone": publication["timezone"],
+                "publication_as_of_date": publication["publication_as_of_date"],
+                "expected_latest_trading_date": expected_latest,
+                "actual_latest_price_date": coverage.get("actual_latest_price_date"),
+                "governed_target_dates": list(expansion.target_dates),
+                "recent_uncovered_dates": uncovered_dates,
+                "repaired_dates": repaired_dates,
+                "blockers": list(expansion.blockers),
+                "warnings": list(expansion.warnings),
+            }
         status = "blocked" if all_blockers else ("warning" if all_warnings else "success")
         return {
             "status": status,
@@ -4496,6 +4731,8 @@ class FuturesTradingDayGovernanceService:
             "skipped_dates_by_exchange": skipped_dates_by_exchange,
             "target_date_count": sum(len(items) for items in target_dates_by_exchange.values()),
             "skipped_date_count": sum(len(items) for items in skipped_dates_by_exchange.values()),
+            "repair_lookback_days": self.repair_lookback_days,
+            "exchange_diagnostics": exchange_diagnostics,
             "blockers": sorted(set(all_blockers)),
             "warnings": sorted(set(all_warnings)),
             "expansions": expansions,
@@ -4642,16 +4879,27 @@ class FuturesTradingDayGovernanceService:
         warnings: List[str] = []
         blockers: List[str] = []
         qualities: Dict[str, int] = {}
+        repaired_dates: List[str] = []
         current = date.fromisoformat(start_date)
         end = date.fromisoformat(end_date)
         while current <= end:
             key = current.isoformat()
             row = row_map.get(key)
             if not row:
+                if current.weekday() >= 5:
+                    skipped_dates.append(key)
+                    qualities["backfilled_verified"] = (
+                        qualities.get("backfilled_verified", 0) + 1
+                    )
+                    current += timedelta(days=1)
+                    continue
                 blockers.append(f"missing_calendar:{exchange}:{key}")
                 current += timedelta(days=1)
                 continue
             quality = str(row.get("quality_flag") or "missing")
+            row_metadata = row.get("metadata") or {}
+            if row_metadata.get("calendar_repair"):
+                repaired_dates.append(key)
             qualities[quality] = qualities.get(quality, 0) + 1
             if quality == "conflict":
                 blockers.append(f"calendar_conflict:{exchange}:{key}")
@@ -4694,7 +4942,11 @@ class FuturesTradingDayGovernanceService:
             quality_summary=quality_summary,
             blockers=blockers,
             warnings=warnings,
-            metadata={"dry_run": dry_run, "parser_version": FUTURES_TRADING_DAY_GOVERNANCE_VERSION},
+            metadata={
+                "dry_run": dry_run,
+                "parser_version": FUTURES_TRADING_DAY_GOVERNANCE_VERSION,
+                "repaired_dates": repaired_dates,
+            },
         )
 
     def _resolve_exchanges(
@@ -6683,11 +6935,17 @@ class FuturesOfficialCalendarBackfillService:
         storage: FuturesStorageManager,
         research_config: ResearchConfig,
         module_cfg: Optional[Dict[str, Any]] = None,
+        *,
+        now_provider: Callable[[], datetime] = get_shanghai_time,
     ):
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+        self.now_provider = now_provider
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        self.repair_lookback_days, self.publication_policy = _load_futures_publication_policy(
+            self.module_cfg
+        )
         backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
         master_cfg = self.module_cfg.get("master_data", {}) if isinstance(self.module_cfg.get("master_data", {}), dict) else {}
         self.start_date = str(backfill_cfg.get("start_date") or self.default_start_date)
@@ -6759,18 +7017,32 @@ class FuturesOfficialCalendarBackfillService:
                 "blockers": scope_selection.blockers,
             }
         exchange_list = self._resolve_exchanges(scope_selection.exchanges)
-        start = _date_key(start_date or self.start_date)
-        requested_end = _date_key(end_date or get_shanghai_time().date())
+        run_at = self.now_provider()
+        explicit_range = bool(start_date or end_date)
+        if explicit_range:
+            start = _date_key(start_date or end_date)
+            requested_end = _date_key(end_date or start_date)
+        else:
+            publication_dates = [
+                date.fromisoformat(
+                    _futures_publication_context(
+                        exchange,
+                        self.publication_policy,
+                        run_at,
+                    )["publication_as_of_date"]
+                )
+                for exchange in exchange_list
+            ]
+            requested_end = max(publication_dates).isoformat()
+            start = min(
+                item - timedelta(days=self.repair_lookback_days - 1)
+                for item in publication_dates
+            ).isoformat()
         if start > requested_end:
             raise ValueError("start_date must be earlier than or equal to end_date")
 
-        today = get_shanghai_time().date().isoformat()
+        today = run_at.date().isoformat()
         probe_end = min(requested_end, today)
-        future_unresolved_per_exchange = (
-            _date_range_count(max(start, _next_date(today)), requested_end)
-            if requested_end > today
-            else 0
-        )
         provider = OfficialFuturesMarketDataProvider(self.research_config)
         governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
 
@@ -6779,6 +7051,9 @@ class FuturesOfficialCalendarBackfillService:
         total_trading = 0
         total_closed = 0
         total_unresolved = 0
+        total_blocking_unresolved = 0
+        total_not_due = 0
+        total_future_unresolved = 0
         total_requests = 0
         total_challenges = 0
         total_challenge_backoff_seconds = 0.0
@@ -6791,25 +7066,56 @@ class FuturesOfficialCalendarBackfillService:
 
         try:
             for exchange in exchange_list:
+                publication = _futures_publication_context(
+                    exchange,
+                    self.publication_policy,
+                    run_at,
+                )
+                exchange_today = publication["local_run_at"][:10]
+                if explicit_range:
+                    exchange_start = start
+                    exchange_end = requested_end
+                else:
+                    exchange_end = publication["publication_as_of_date"]
+                    exchange_start = (
+                        date.fromisoformat(exchange_end)
+                        - timedelta(days=self.repair_lookback_days - 1)
+                    ).isoformat()
+                exchange_probe_end = min(exchange_end, exchange_today)
+                exchange_future_unresolved = (
+                    _date_range_count(max(exchange_start, _next_date(exchange_today)), exchange_end)
+                    if exchange_end > exchange_today
+                    else 0
+                )
                 metrics_before = _provider_metrics_for_exchange(provider, exchange)
                 logger.info(
                     "[FuturesOfficialCalendarBackfill] start exchange=%s start=%s end=%s probe_end=%s dry_run=%s",
                     exchange,
-                    start,
-                    requested_end,
-                    probe_end if start <= probe_end else None,
+                    exchange_start,
+                    exchange_end,
+                    exchange_probe_end if exchange_start <= exchange_probe_end else None,
                     dry_run,
                 )
                 result: Dict[str, Any] = {
                     "exchange": exchange,
-                    "start_date": start,
-                    "end_date": requested_end,
-                    "probe_end_date": probe_end if start <= probe_end else None,
+                    "start_date": exchange_start,
+                    "end_date": exchange_end,
+                    "probe_end_date": exchange_probe_end if exchange_start <= exchange_probe_end else None,
+                    "requested_start_date": start,
+                    "requested_end_date": requested_end,
+                    "explicit_range": explicit_range,
+                    "repair_lookback_days": self.repair_lookback_days,
+                    "publication_cutoff": publication["publication_cutoff"],
+                    "publication_timezone": publication["timezone"],
+                    "publication_as_of_date": publication["publication_as_of_date"],
                     "rows_written": 0,
                     "trading_days": 0,
                     "closed_days": 0,
                     "unresolved_dates": 0,
-                    "future_dates_unresolved": future_unresolved_per_exchange,
+                    "future_dates_unresolved": exchange_future_unresolved,
+                    "not_yet_due_dates": 0,
+                    "repaired_dates": [],
+                    "invalidated_weak_dates": [],
                     "request_count": 0,
                     "latest_verified_date": None,
                     "failure_samples": [],
@@ -6825,13 +7131,30 @@ class FuturesOfficialCalendarBackfillService:
                 verified_by_date: Dict[str, FuturesTradingCalendarDay] = {}
                 unresolved_reasons: Dict[str, str] = {}
                 unresolved_retryable: Dict[str, bool] = {}
-                if start <= probe_end:
-                    current = date.fromisoformat(start)
-                    end_obj = date.fromisoformat(probe_end)
+                existing_by_date = {
+                    str(item.get("trade_date")): item
+                    for item in self.storage.list_calendar_days(
+                        exchange=exchange,
+                        start_date=exchange_start,
+                        end_date=exchange_probe_end,
+                    )
+                }
+                weak_unresolved_dates: set[str] = set()
+                if exchange_start <= exchange_probe_end:
+                    current = date.fromisoformat(exchange_start)
+                    end_obj = date.fromisoformat(exchange_probe_end)
                     while current <= end_obj:
                         key = current.isoformat()
+                        if current.weekday() >= 5:
+                            verified_by_date[key] = self._weekend_calendar_day(
+                                exchange,
+                                key,
+                                existing_by_date.get(key),
+                            )
+                            current += timedelta(days=1)
+                            continue
                         if max_total_days is not None and total_requests >= max_total_days:
-                            remaining = _date_range_count(key, probe_end)
+                            remaining = _date_range_count(key, exchange_probe_end)
                             result["truncated"] = True
                             result["truncated_from_date"] = key
                             result["truncated_remaining_dates"] = remaining
@@ -6846,11 +7169,24 @@ class FuturesOfficialCalendarBackfillService:
                         probe = provider.probe_exchange_trading_day(exchange, key)
                         result["request_count"] += 1
                         total_requests += 1
-                        calendar_day = self._calendar_day_from_probe(exchange, key, probe)
+                        calendar_day = self._calendar_day_from_probe(
+                            exchange,
+                            key,
+                            probe,
+                            existing=existing_by_date.get(key),
+                        )
                         if calendar_day:
                             verified_by_date[key] = calendar_day
+                            if calendar_day.metadata.get("calendar_repair"):
+                                result["repaired_dates"].append(key)
                         else:
-                            unresolved_reasons[key] = probe.failure_reason or probe.status
+                            unresolved_reasons[key] = self._probe_unresolved_reason(
+                                key,
+                                probe,
+                                publication,
+                            )
+                            if self._is_weak_empty_calendar_row(existing_by_date.get(key)):
+                                weak_unresolved_dates.add(key)
                             failure_classification = classify_official_futures_failure(
                                 unresolved_reasons[key]
                             )
@@ -6859,7 +7195,7 @@ class FuturesOfficialCalendarBackfillService:
                                     "is_retryable",
                                     failure_classification.is_retryable,
                                 )
-                            )
+                            ) and key <= publication["publication_as_of_date"]
                             logger.warning(
                                 "[FuturesOfficialCalendarBackfill] unresolved exchange=%s trade_date=%s reason=%s category=%s retryable=%s",
                                 exchange,
@@ -6919,14 +7255,26 @@ class FuturesOfficialCalendarBackfillService:
                                 probe = provider.probe_exchange_trading_day(exchange, key)
                                 result["request_count"] += 1
                                 total_requests += 1
-                                calendar_day = self._calendar_day_from_probe(exchange, key, probe)
+                                calendar_day = self._calendar_day_from_probe(
+                                    exchange,
+                                    key,
+                                    probe,
+                                    existing=existing_by_date.get(key),
+                                )
                                 if calendar_day:
                                     verified_by_date[key] = calendar_day
                                     unresolved_reasons.pop(key, None)
+                                    weak_unresolved_dates.discard(key)
+                                    if calendar_day.metadata.get("calendar_repair"):
+                                        result["repaired_dates"].append(key)
                                     pass_resolved += 1
                                     result["retry_dates_resolved"] += 1
                                 else:
-                                    unresolved_reasons[key] = probe.failure_reason or probe.status
+                                    unresolved_reasons[key] = self._probe_unresolved_reason(
+                                        key,
+                                        probe,
+                                        publication,
+                                    )
                                     failure_classification = classify_official_futures_failure(
                                         unresolved_reasons[key]
                                     )
@@ -6952,12 +7300,29 @@ class FuturesOfficialCalendarBackfillService:
                                 pass_resolved,
                                 len(unresolved_reasons),
                             )
-                if requested_end > today:
+                if exchange_end > exchange_today:
                     result["future_note"] = "future dates require official notice evidence and were not weekday-filled"
+                remaining_weak_dates = sorted(
+                    key for key in weak_unresolved_dates if key in unresolved_reasons
+                )
+                if remaining_weak_dates and not dry_run:
+                    for key in remaining_weak_dates:
+                        self.storage.delete_trading_calendar_day(exchange, key)
+                result["invalidated_weak_dates"] = remaining_weak_dates
                 calendar_days = [verified_by_date[key] for key in sorted(verified_by_date)]
                 result["trading_days"] = sum(1 for item in calendar_days if item.is_trading_day)
                 result["closed_days"] = sum(1 for item in calendar_days if not item.is_trading_day)
                 result["unresolved_dates"] = len(unresolved_reasons)
+                not_due_dates = sorted(
+                    key
+                    for key in unresolved_reasons
+                    if key > publication["publication_as_of_date"]
+                )
+                result["not_yet_due_dates"] = len(not_due_dates)
+                blocking_unresolved_dates = sorted(
+                    key for key in unresolved_reasons if key not in not_due_dates
+                )
+                result["blocking_unresolved_dates"] = len(blocking_unresolved_dates)
                 result["latest_verified_date"] = max(verified_by_date) if verified_by_date else None
                 result["failure_samples"] = [
                     {"trade_date": key, "reason": reason}
@@ -6987,29 +7352,39 @@ class FuturesOfficialCalendarBackfillService:
                 if calendar_days and not dry_run:
                     result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
                     total_written += int(result["rows_written"])
-                if unresolved_reasons and not dry_run:
+                if blocking_unresolved_dates and not dry_run:
                     governance.create_review_required(
                         exchange=exchange,
-                        evidence_ref=f"{self.source_profile}:{exchange}:{start}:{probe_end}",
+                        evidence_ref=(
+                            f"{self.source_profile}:{exchange}:"
+                            f"{exchange_start}:{exchange_probe_end}"
+                        ),
                         reason="official calendar backfill unresolved dates",
                         scope_type="exchange",
                         scope_id=exchange,
-                        start_date=start,
-                        end_date=probe_end,
-                        trade_dates=sorted(unresolved_reasons)[:200],
+                        start_date=exchange_start,
+                        end_date=exchange_probe_end,
+                        trade_dates=blocking_unresolved_dates[:200],
                         metadata={
-                            "unresolved_count": len(unresolved_reasons),
+                            "unresolved_count": len(blocking_unresolved_dates),
                             "failure_samples": result["failure_samples"],
                             "source_profile": self.source_profile,
                         },
                     )
                 exchange_status = "success"
-                if result["unresolved_dates"] or result["future_dates_unresolved"]:
+                if result["blocking_unresolved_dates"] or result["future_dates_unresolved"]:
                     exchange_status = "blocked"
+                elif result["not_yet_due_dates"]:
+                    exchange_status = "warning"
                 elif truncated_dates:
                     exchange_status = "partial"
                 result["status"] = exchange_status
                 total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
+                total_blocking_unresolved += int(result["blocking_unresolved_dates"]) + int(
+                    result["future_dates_unresolved"]
+                )
+                total_not_due += int(result["not_yet_due_dates"])
+                total_future_unresolved += int(result["future_dates_unresolved"])
                 logger.info(
                     "[FuturesOfficialCalendarBackfill] exchange done exchange=%s status=%s requests=%s trading=%s closed=%s unresolved=%s retry_passes=%s retry_resolved=%s challenges=%s challenge_backoff_seconds=%s batch_pauses=%s batch_pause_seconds=%s rows_written=%s dry_run=%s",
                     exchange,
@@ -7034,10 +7409,12 @@ class FuturesOfficialCalendarBackfillService:
                 close()
 
         overall_status = "success"
-        if total_unresolved:
+        if total_blocking_unresolved:
             overall_status = "blocked"
         elif total_truncated_dates:
             overall_status = "partial"
+        elif total_not_due:
+            overall_status = "warning"
 
         return {
             "status": overall_status,
@@ -7055,8 +7432,10 @@ class FuturesOfficialCalendarBackfillService:
                 "trading_days": total_trading,
                 "closed_days": total_closed,
                 "unresolved_dates": total_unresolved,
+                "blocking_unresolved_dates": total_blocking_unresolved,
+                "not_yet_due_dates": total_not_due,
                 "request_count": total_requests,
-                "future_dates_unresolved": future_unresolved_per_exchange * len(exchange_list),
+                "future_dates_unresolved": total_future_unresolved,
                 "truncated_dates": total_truncated_dates,
                 "challenge_count": total_challenges,
                 "challenge_backoff_seconds": total_challenge_backoff_seconds,
@@ -7070,7 +7449,11 @@ class FuturesOfficialCalendarBackfillService:
                 if requested_end > today
                 else []
             ),
-            "blockers": ["unresolved_official_calendar_dates"] if total_unresolved else [],
+            "blockers": (
+                ["unresolved_official_calendar_dates"]
+                if total_blocking_unresolved
+                else []
+            ),
         }
 
     def _resolve_exchanges(self, exchanges: Optional[Sequence[str]]) -> List[str]:
@@ -7083,33 +7466,123 @@ class FuturesOfficialCalendarBackfillService:
             raise ValueError(f"unsupported futures official calendar exchanges: {', '.join(unsupported)}")
         return requested
 
+    @staticmethod
+    def _is_weak_empty_calendar_row(row: Optional[Mapping[str, Any]]) -> bool:
+        if not row or bool(row.get("is_trading_day")):
+            return False
+        metadata = row.get("metadata") or {}
+        classification_rule = str(metadata.get("classification_rule") or "")
+        return classification_rule in {
+            "official_empty_payload",
+            "official_no_report_response",
+            "official_empty_payload_before_reliable_history_start",
+            "official_no_report_before_reliable_history_start",
+        }
+
+    def _weekend_calendar_day(
+        self,
+        exchange: str,
+        trade_date: str,
+        existing: Optional[Mapping[str, Any]],
+    ) -> FuturesTradingCalendarDay:
+        metadata: Dict[str, Any] = {
+            "classification_status": "closed",
+            "classification_rule": "deterministic_weekend",
+            "verified_by": "calendar_weekend_rule",
+        }
+        if self._is_weak_empty_calendar_row(existing):
+            metadata.update(
+                {
+                    "calendar_repair": True,
+                    "repaired_from": {
+                        "source_profile": existing.get("source_profile"),
+                        "quality_flag": existing.get("quality_flag"),
+                        "metadata": existing.get("metadata") or {},
+                    },
+                }
+            )
+        return FuturesTradingCalendarDay(
+            exchange=exchange,
+            trade_date=trade_date,
+            is_trading_day=False,
+            timezone=self.publication_policy[exchange]["timezone"],
+            session_type="closed",
+            source_profile="deterministic_weekend",
+            quality_flag="backfilled_verified",
+            metadata=metadata,
+        )
+
+    @staticmethod
+    def _probe_unresolved_reason(
+        trade_date: str,
+        probe: Any,
+        publication: Mapping[str, str],
+    ) -> str:
+        base_reason = str(probe.failure_reason or probe.status or "unresolved")
+        if trade_date > publication["publication_as_of_date"]:
+            return (
+                "not_yet_due_before_publication_cutoff:"
+                f"{publication['publication_cutoff']}:{base_reason}"
+            )
+        classification_rule = str((probe.metadata or {}).get("classification_rule") or "")
+        if classification_rule in {
+            "official_empty_payload_unresolved",
+            "official_no_report_unresolved",
+        }:
+            return (
+                "post_cutoff_empty_or_no_report:"
+                f"{publication['publication_cutoff']}:{base_reason}"
+            )
+        return base_reason
+
     def _calendar_day_from_probe(
         self,
         exchange: str,
         trade_date: str,
         probe: Any,
+        *,
+        existing: Optional[Mapping[str, Any]] = None,
     ) -> Optional[FuturesTradingCalendarDay]:
         if probe.status not in {"trading", "closed"} or probe.is_trading_day is None:
             return None
+        classification_rule = str((probe.metadata or {}).get("classification_rule") or "")
+        if not probe.is_trading_day and classification_rule not in {
+            "official_holiday_notice",
+            "official_temporary_closure_notice",
+            "official_closure_notice",
+        }:
+            return None
+        metadata: Dict[str, Any] = {
+            "classification_status": probe.status,
+            "classification_rule": classification_rule,
+            "source_interface": probe.source_interface,
+            "row_count": probe.row_count,
+            "payload_hash": probe.payload_hash,
+            "failure_reason": probe.failure_reason,
+            "verified_by": "official_exchange_daily_market_data",
+        }
+        if probe.is_trading_day and self._is_weak_empty_calendar_row(existing):
+            metadata.update(
+                {
+                    "calendar_repair": True,
+                    "repaired_from": {
+                        "source_profile": existing.get("source_profile"),
+                        "quality_flag": existing.get("quality_flag"),
+                        "metadata": existing.get("metadata") or {},
+                    },
+                }
+            )
         return FuturesTradingCalendarDay(
             exchange=exchange,
             trade_date=trade_date,
             is_trading_day=bool(probe.is_trading_day),
-            timezone=self.default_timezone,
+            timezone=self.publication_policy[exchange]["timezone"],
             session_type="day_and_night" if probe.is_trading_day else "closed",
             source_profile=self.source_profile,
             quality_flag="backfilled_verified",
             parser_version=probe.parser_version,
             evidence_url=probe.evidence_url,
-            metadata={
-                "classification_status": probe.status,
-                "classification_rule": probe.metadata.get("classification_rule"),
-                "source_interface": probe.source_interface,
-                "row_count": probe.row_count,
-                "payload_hash": probe.payload_hash,
-                "failure_reason": probe.failure_reason,
-                "verified_by": "official_exchange_daily_market_data",
-            },
+            metadata=metadata,
         )
 
 
@@ -7657,6 +8130,98 @@ class FuturesMarketDataSyncService:
             "status": "success" if all(item.get("status") == "success" for item in results) else "blocked",
         }
 
+    def _build_exchange_completeness(
+        self,
+        *,
+        target_series: Sequence[FuturesSeries],
+        series_results: Sequence[Mapping[str, Any]],
+        calendar_gate: Mapping[str, Any],
+        dry_run: bool,
+        governance_blocked: bool = False,
+    ) -> Dict[str, Dict[str, Any]]:
+        series_by_exchange: Dict[str, List[FuturesSeries]] = {}
+        for item in target_series:
+            exchange = str(item.instrument_id).split(".")[-1].upper()
+            series_by_exchange.setdefault(exchange, []).append(item)
+        result_by_series = {
+            str(item.get("series_id")): item for item in series_results if item.get("series_id")
+        }
+        calendar_diagnostics = calendar_gate.get("exchange_diagnostics") or {}
+        target_dates_by_exchange = calendar_gate.get("target_dates_by_exchange") or {}
+        outcomes: Dict[str, Dict[str, Any]] = {}
+        for exchange, scoped_series in sorted(series_by_exchange.items()):
+            governed_dates = sorted(
+                str(item) for item in target_dates_by_exchange.get(exchange, []) if item
+            )
+            required_dates: set[str] = set()
+            lifecycle_skips = 0
+            if governance_blocked:
+                required_dates.update(governed_dates)
+            else:
+                for series in scoped_series:
+                    series_result = result_by_series.get(series.series_id) or {}
+                    if str(series_result.get("status") or "") in {
+                        "lifecycle_skip",
+                        "calendar_skip",
+                    }:
+                        lifecycle_skips += 1
+                        continue
+                    required_dates.update(
+                        str(item)
+                        for item in series_result.get("target_trade_dates") or []
+                        if item
+                    )
+            scoped_series_ids = [item.series_id for item in scoped_series]
+            if governed_dates:
+                bounded_coverage = self.storage.get_exchange_price_coverage(
+                    exchange,
+                    start_date=governed_dates[0],
+                    end_date=governed_dates[-1],
+                    series_ids=scoped_series_ids,
+                )
+            else:
+                bounded_coverage = {
+                    "covered_dates": [],
+                    "series_count_by_date": {},
+                }
+            all_coverage = self.storage.get_exchange_price_coverage(
+                exchange,
+                series_ids=scoped_series_ids,
+            )
+            covered_dates = set(bounded_coverage.get("covered_dates") or [])
+            missing_dates = sorted(required_dates - covered_dates)
+            governance_diagnostic = calendar_diagnostics.get(exchange) or {}
+            blockers = list(governance_diagnostic.get("blockers") or [])
+            blockers.extend(
+                f"missing_price_coverage:{exchange}:{trade_date}"
+                for trade_date in missing_dates
+            )
+            if governance_blocked and not blockers:
+                blockers.append(f"trading_day_governance_blocked:{exchange}")
+            status = "blocked" if governance_blocked else ("partial" if blockers else "success")
+            outcomes[exchange] = {
+                "exchange": exchange,
+                "status": status,
+                "requested_start_date": governance_diagnostic.get("requested_start_date"),
+                "requested_end_date": governance_diagnostic.get("requested_end_date"),
+                "publication_cutoff": governance_diagnostic.get("publication_cutoff"),
+                "publication_timezone": governance_diagnostic.get("publication_timezone"),
+                "publication_as_of_date": governance_diagnostic.get("publication_as_of_date"),
+                "governed_target_dates": governed_dates,
+                "required_target_dates": sorted(required_dates),
+                "expected_latest_trading_date": governance_diagnostic.get(
+                    "expected_latest_trading_date"
+                ),
+                "actual_latest_price_date": all_coverage.get("actual_latest_price_date"),
+                "repaired_dates": list(governance_diagnostic.get("repaired_dates") or []),
+                "remaining_missing_dates": missing_dates,
+                "lifecycle_skipped_series": lifecycle_skips,
+                "blockers": sorted(set(blockers)),
+                "warnings": list(governance_diagnostic.get("warnings") or []),
+                "dry_run": dry_run,
+            }
+        return outcomes
+
     async def sync(
         self,
         *,
@@ -7831,6 +8396,13 @@ class FuturesMarketDataSyncService:
             calendar_gate.get("status"),
         )
         if calendar_gate.get("status") == "blocked" and not dry_run:
+            exchange_completeness = self._build_exchange_completeness(
+                target_series=target_series,
+                series_results=[],
+                calendar_gate=calendar_gate,
+                dry_run=dry_run,
+                governance_blocked=True,
+            )
             result = {
                 "status": "blocked",
                 "run_id": run_id,
@@ -7845,6 +8417,7 @@ class FuturesMarketDataSyncService:
                 "source_selection": {},
                 "scope_selection": scope_selection.as_dict(),
                 "trading_day_governance": calendar_gate,
+                "exchange_completeness": exchange_completeness,
                 "series": [],
                 "reason": "; ".join(calendar_gate.get("blockers") or ["trading_day_governance_blocked"]),
             }
@@ -8332,7 +8905,24 @@ class FuturesMarketDataSyncService:
                         {"series_id": item.series_id, "exchange": exchange, "reason": str(exc)[:500]},
                         force=True,
                     )
-            status = "success" if totals["failed"] == 0 else "partial"
+            exchange_completeness = self._build_exchange_completeness(
+                target_series=target_series,
+                series_results=series_results,
+                calendar_gate=calendar_gate,
+                dry_run=dry_run,
+            )
+            incomplete_exchanges = [
+                exchange
+                for exchange, item in exchange_completeness.items()
+                if item.get("status") != "success"
+            ]
+            status = "success"
+            if (
+                totals["failed"]
+                or incomplete_exchanges
+                or (dry_run and calendar_gate.get("status") != "success")
+            ):
+                status = "partial"
             if not dry_run:
                 FuturesDiagnosticsService(self.storage, self.module_cfg).refresh_all()
             result = {
@@ -8344,6 +8934,7 @@ class FuturesMarketDataSyncService:
                 "official_fanout": fanout_diagnostics,
                 "scope_selection": scope_selection.as_dict(),
                 "trading_day_governance": calendar_gate,
+                "exchange_completeness": exchange_completeness,
                 "series": series_results,
             }
             close = getattr(official_provider, "close", None)

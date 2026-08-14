@@ -640,6 +640,94 @@ async def test_run_futures_market_data_backfill_can_skip_calendar_backfill_only(
 
 
 @pytest.mark.asyncio
+async def test_run_futures_market_data_sync_uses_daily_repair_window_and_reports_partial():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/run futures_market_data_sync exchange=DCE write',
+    )
+
+    with patch('data_manager.data_manager') as dm:
+        dm.run_futures_official_calendar_backfill = AsyncMock(
+            return_value={'status': 'success'}
+        )
+        dm.run_futures_trading_day_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'target_date_expansion': {
+                    'status': 'success',
+                    'target_dates_by_exchange': {
+                        'DCE': ['2026-08-12', '2026-08-13'],
+                    },
+                },
+            }
+        )
+        dm.run_futures_master_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'exchange': 'DCE',
+                'counts': {},
+                'blockers': [],
+            }
+        )
+        dm.run_futures_market_data_sync = AsyncMock(
+            return_value={
+                'status': 'partial',
+                'run_id': 289,
+                'dry_run': False,
+                'totals': {
+                    'inserted': 0,
+                    'changed': 0,
+                    'unchanged': 23,
+                    'failed': 0,
+                    'fetched_rows': 23,
+                },
+                'source_selection': {'official_success': 1, 'official_failed': 0},
+                'trading_day_governance': {'status': 'success', 'target_date_count': 2},
+                'scope_selection': {'exchanges': ['DCE']},
+                'exchange_completeness': {
+                    'DCE': {
+                        'status': 'partial',
+                        'requested_start_date': '2026-08-09',
+                        'requested_end_date': '2026-08-13',
+                        'publication_cutoff': '18:00',
+                        'required_target_dates': ['2026-08-12', '2026-08-13'],
+                        'expected_latest_trading_date': '2026-08-13',
+                        'actual_latest_price_date': '2026-08-11',
+                        'remaining_missing_dates': ['2026-08-12', '2026-08-13'],
+                        'blockers': ['missing_price_coverage:DCE:2026-08-12'],
+                    }
+                },
+                'series': [
+                    {
+                        'series_id': 'CNF.I.DCE.main',
+                        'status': 'partial',
+                        'target_trade_dates': ['2026-08-12', '2026-08-13'],
+                        'fetched_rows': 0,
+                        'write_result': {'inserted': 0, 'changed': 0, 'unchanged': 0},
+                    }
+                ],
+            }
+        )
+
+        await handler.handle_run_command(event)
+
+    calendar_kwargs = dm.run_futures_official_calendar_backfill.await_args.kwargs
+    assert calendar_kwargs['start_date'] is None
+    assert calendar_kwargs['end_date'] is None
+    assert any(
+        '⚠️ *期货行情任务部分完成*' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
+    assert any(
+        'expected=2026-08-13' in call.args[1]
+        and 'actual=2026-08-11' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
+
+
+@pytest.mark.asyncio
 async def test_hkex_review_command_appends_manual_evidence():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(

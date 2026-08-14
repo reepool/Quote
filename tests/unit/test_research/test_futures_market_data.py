@@ -5,7 +5,8 @@ import json
 import os
 import sys
 import types
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 import pandas as pd
 import pytest
 import requests
@@ -223,16 +224,17 @@ def test_futures_market_data_production_repairs_missing_calendar_before_provider
         "fetch_exchange_contract_bars",
         fail_if_called,
     )
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "close", lambda self: None)
 
     def fake_calendar_backfill(self, **kwargs):
         assert kwargs["exchanges"] == ["GFEX"]
-        assert kwargs["start_date"] == "2026-06-20"
-        assert kwargs["end_date"] == "2026-06-20"
+        assert kwargs["start_date"] == "2026-06-19"
+        assert kwargs["end_date"] == "2026-06-19"
         assert kwargs["dry_run"] is False
         self.storage.upsert_trading_calendar([
             FuturesTradingCalendarDay(
                 exchange="GFEX",
-                trade_date="2026-06-20",
+                    trade_date="2026-06-19",
                 is_trading_day=False,
                 source_profile="exchange_official_daily_probe",
                 quality_flag="backfilled_verified",
@@ -250,8 +252,8 @@ def test_futures_market_data_production_repairs_missing_calendar_before_provider
     result = asyncio.run(
         FuturesMarketDataSyncService(storage, config).sync(
             scope_id="gfex_all",
-            start_date="2026-06-20",
-            end_date="2026-06-20",
+            start_date="2026-06-19",
+            end_date="2026-06-19",
             dry_run=False,
         )
     )
@@ -261,16 +263,16 @@ def test_futures_market_data_production_repairs_missing_calendar_before_provider
     assert result["trading_day_governance"]["minimum_quality"] == "backfilled_verified"
     assert result["trading_day_governance"]["auto_official_calendar_backfill"]["attempted"] is True
     assert result["trading_day_governance"]["auto_official_calendar_backfill"]["ranges"] == [
-        {"exchange": "GFEX", "start_date": "2026-06-20", "end_date": "2026-06-20"}
+        {"exchange": "GFEX", "start_date": "2026-06-19", "end_date": "2026-06-19"}
     ]
-    assert result["trading_day_governance"]["skipped_dates_by_exchange"]["GFEX"] == ["2026-06-20"]
+    assert result["trading_day_governance"]["skipped_dates_by_exchange"]["GFEX"] == ["2026-06-19"]
     assert storage.get_price_bars("CNF.SI.GFEX.main") == []
     assert not [
         row
         for row in storage.list_calendar_days(
             exchange="GFEX",
-            start_date="2026-06-20",
-            end_date="2026-06-20",
+            start_date="2026-06-19",
+            end_date="2026-06-19",
         )
         if row.get("quality_flag") == "estimated"
     ]
@@ -294,6 +296,7 @@ def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails
         "fetch_exchange_contract_bars",
         fail_if_called,
     )
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "close", lambda self: None)
 
     def failed_calendar_backfill(self, **kwargs):
         return {
@@ -308,8 +311,8 @@ def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails
     result = asyncio.run(
         FuturesMarketDataSyncService(storage, config).sync(
             scope_id="gfex_all",
-            start_date="2026-06-20",
-            end_date="2026-06-20",
+            start_date="2026-06-19",
+            end_date="2026-06-19",
             dry_run=False,
         )
     )
@@ -317,7 +320,7 @@ def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails
     assert result["status"] == "blocked"
     assert result["totals"]["inserted"] == 0
     assert "calendar_quality_below_threshold:GFEX:missing<required:backfilled_verified" in result["reason"]
-    assert "missing_calendar:GFEX:2026-06-20" in result["reason"]
+    assert "missing_calendar:GFEX:2026-06-19" in result["reason"]
     assert result["trading_day_governance"]["auto_official_calendar_backfill"]["status"] == "blocked"
 
 
@@ -3630,7 +3633,7 @@ def test_official_futures_calendar_provider_parses_structured_notice(tmp_path):
     assert parsed.calendar_days[0].quality_flag == "official_parsed"
 
 
-def test_official_futures_provider_probe_classifies_trading_and_closed(monkeypatch, tmp_path):
+def test_official_futures_provider_probe_classifies_rows_and_keeps_empty_unresolved(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
         "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
@@ -3660,21 +3663,17 @@ def test_official_futures_provider_probe_classifies_trading_and_closed(monkeypat
     assert trading.row_count == 1
 
     monkeypatch.setattr(provider, "_request_exchange_payload", lambda session, exchange, trade_date: {"o_curinstrument": []})
-    closed = provider.probe_exchange_trading_day("SHFE", "2024-06-08")
-    assert closed.status == "closed"
-    assert closed.is_trading_day is False
-    assert closed.row_count == 0
+    empty = provider.probe_exchange_trading_day("SHFE", "2024-06-08")
+    assert empty.status == "unresolved"
+    assert empty.is_trading_day is None
+    assert empty.row_count == 0
+    assert empty.metadata["classification_rule"] == "official_empty_payload_unresolved"
 
 
-def test_official_futures_provider_probe_does_not_close_old_empty_payload(monkeypatch, tmp_path):
+def test_official_futures_provider_probe_never_closes_empty_payload(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
         "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
-    }
-    config.modules["commodity_market_data"]["trading_day_governance"] = {
-        "official_calendar_backfill": {
-            "empty_payload_closed_start_dates": {"SHFE": "2010-01-01"}
-        }
     }
     provider = OfficialFuturesMarketDataProvider(config)
 
@@ -3684,18 +3683,14 @@ def test_official_futures_provider_probe_does_not_close_old_empty_payload(monkey
 
     assert result.status == "unresolved"
     assert result.is_trading_day is None
-    assert "before reliable empty-closed start date" in result.failure_reason
+    assert result.failure_reason == "official daily endpoint returned no contract rows"
+    assert result.metadata["classification_rule"] == "official_empty_payload_unresolved"
 
 
-def test_official_futures_provider_probe_does_not_close_old_no_report(monkeypatch, tmp_path):
+def test_official_futures_provider_probe_never_closes_no_report_response(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
         "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
-    }
-    config.modules["commodity_market_data"]["trading_day_governance"] = {
-        "official_calendar_backfill": {
-            "empty_payload_closed_start_dates": {"SHFE": "2010-01-01"}
-        }
     }
     provider = OfficialFuturesMarketDataProvider(config)
 
@@ -3708,7 +3703,7 @@ def test_official_futures_provider_probe_does_not_close_old_no_report(monkeypatc
 
     assert result.status == "unresolved"
     assert result.is_trading_day is None
-    assert result.metadata["classification_rule"] == "official_no_report_before_reliable_history_start"
+    assert result.metadata["classification_rule"] == "official_no_report_unresolved"
 
 
 def test_official_futures_provider_probe_keeps_failures_unresolved(monkeypatch, tmp_path):
@@ -3769,6 +3764,7 @@ def test_official_calendar_backfill_writes_verified_rows_and_no_weekday_guess(mo
                 evidence_url="https://official.example/20240604",
                 parser_version="fixture.v1",
                 payload_hash="hash-closed",
+                metadata={"classification_rule": "official_closure_notice"},
             )
         return OfficialFuturesDailyProbeResult(
             exchange=exchange,
@@ -3963,11 +3959,297 @@ def test_official_calendar_backfill_max_days_reports_partial_not_unresolved(monk
     assert result["status"] == "partial"
     assert result["totals"]["request_count"] == 2
     assert result["totals"]["unresolved_dates"] == 0
-    assert result["totals"]["truncated_dates"] == 3
+    assert result["totals"]["truncated_dates"] == 1
     assert result["exchanges"][0]["status"] == "partial"
-    assert result["exchanges"][0]["truncated_from_date"] == "2000-06-03"
+    assert result["exchanges"][0]["truncated_from_date"] == "2000-06-05"
     assert result["exchanges"][0]["failure_samples"] == []
     assert storage.list_manual_calendar_reviews(status="review_required") == []
+
+
+def test_futures_publication_policy_rejects_invalid_repair_window(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "publication_policy": {"repair_lookback_days": 2}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    with pytest.raises(ValueError, match="repair_lookback_days must be from 3 through 5"):
+        FuturesTradingDayGovernanceService(
+            storage,
+            config.modules["commodity_market_data"],
+        )
+
+
+def test_official_calendar_daily_window_repairs_weak_dce_row(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "publication_policy": {
+            "repair_lookback_days": 5,
+            "exchanges": {"DCE": {"timezone": "Asia/Shanghai", "cutoff": "18:00"}},
+        },
+        "official_calendar_backfill": {
+            "retry_unresolved_passes": 0,
+            "retry_unresolved_pause_seconds": 0,
+        },
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar(
+        [
+            FuturesTradingCalendarDay(
+                exchange="DCE",
+                trade_date="2026-08-12",
+                is_trading_day=False,
+                source_profile="exchange_official_daily_probe",
+                quality_flag="backfilled_verified",
+                metadata={"classification_rule": "official_empty_payload"},
+            )
+        ]
+    )
+
+    def _probe(self, exchange, trade_date):
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=2,
+            source_interface="fixture",
+            evidence_url=f"https://official.example/{trade_date}",
+            parser_version="fixture.v1",
+            payload_hash=f"hash-{trade_date}",
+            metadata={"classification_rule": "official_daily_rows"},
+        )
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day",
+        _probe,
+    )
+    result = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+        now_provider=lambda: datetime(2026, 8, 14, 12, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+    ).run(exchanges=["DCE"])
+
+    repaired = storage.list_calendar_days(
+        exchange="DCE",
+        start_date="2026-08-09",
+        end_date="2026-08-13",
+    )
+    repaired_by_date = {item["trade_date"]: item for item in repaired}
+    assert result["status"] == "success"
+    assert result["start_date"] == "2026-08-09"
+    assert result["end_date"] == "2026-08-13"
+    assert result["exchanges"][0]["publication_as_of_date"] == "2026-08-13"
+    assert result["exchanges"][0]["repaired_dates"] == ["2026-08-12"]
+    assert repaired_by_date["2026-08-09"]["metadata"]["classification_rule"] == "deterministic_weekend"
+    assert repaired_by_date["2026-08-12"]["is_trading_day"] is True
+    assert repaired_by_date["2026-08-12"]["metadata"]["calendar_repair"] is True
+
+
+@pytest.mark.parametrize(
+    ("hour", "expected_status", "expected_reason_prefix"),
+    [
+        (12, "warning", "not_yet_due_before_publication_cutoff"),
+        (19, "blocked", "post_cutoff_empty_or_no_report"),
+    ],
+)
+def test_official_calendar_empty_current_date_respects_cutoff(
+    monkeypatch,
+    tmp_path,
+    hour,
+    expected_status,
+    expected_reason_prefix,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "publication_policy": {
+            "repair_lookback_days": 5,
+            "exchanges": {"DCE": {"timezone": "Asia/Shanghai", "cutoff": "18:00"}},
+        },
+        "official_calendar_backfill": {"retry_unresolved_passes": 0},
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def _probe(self, exchange, trade_date):
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="unresolved",
+            is_trading_day=None,
+            row_count=0,
+            source_interface="fixture",
+            evidence_url="https://official.example/empty",
+            parser_version="fixture.v1",
+            failure_reason="official daily endpoint returned no contract rows",
+            metadata={"classification_rule": "official_empty_payload_unresolved"},
+        )
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day",
+        _probe,
+    )
+    result = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+        now_provider=lambda: datetime(2026, 8, 14, hour, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-08-14",
+        end_date="2026-08-14",
+    )
+
+    assert result["status"] == expected_status
+    assert result["exchanges"][0]["failure_samples"][0]["reason"].startswith(
+        expected_reason_prefix
+    )
+    if hour < 18:
+        assert result["totals"]["not_yet_due_dates"] == 1
+        assert result["blockers"] == []
+    else:
+        assert result["totals"]["blocking_unresolved_dates"] == 1
+        assert result["blockers"] == ["unresolved_official_calendar_dates"]
+
+
+def test_governance_daily_window_reports_expected_and_internal_gaps(tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = config.modules["commodity_market_data"]
+    module_cfg["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "publication_policy": {
+            "repair_lookback_days": 5,
+            "exchanges": {"DCE": {"timezone": "Asia/Shanghai", "cutoff": "18:00"}},
+        },
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(module_cfg)
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    storage.upsert_trading_calendar(
+        [
+            FuturesTradingCalendarDay(
+                exchange="DCE",
+                trade_date=(date(2026, 8, 9) + timedelta(days=index)).isoformat(),
+                is_trading_day=True,
+                source_profile="exchange_official_daily_probe",
+                quality_flag="backfilled_verified",
+                metadata={"classification_rule": "fixture"},
+            )
+            for index in range(1, 5)
+        ]
+    )
+    storage.upsert_price_bars(
+        [
+            FuturesBar(
+                series_id="CNF.I.DCE.main",
+                trade_date=trade_date,
+                open=10,
+                high=12,
+                low=9,
+                close=11,
+                raw_payload_hash=f"coverage-{trade_date}",
+            )
+            for trade_date in ("2026-08-10", "2026-08-13")
+        ]
+    )
+
+    result = FuturesTradingDayGovernanceService(
+        storage,
+        module_cfg,
+        now_provider=lambda: datetime(2026, 8, 14, 12, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+    ).expand_target_dates(exchanges=["DCE"])
+    diagnostic = result["exchange_diagnostics"]["DCE"]
+
+    assert result["start_date"] == "2026-08-09"
+    assert result["end_date"] == "2026-08-13"
+    assert result["target_dates_by_exchange"]["DCE"] == [
+        "2026-08-10",
+        "2026-08-11",
+        "2026-08-12",
+        "2026-08-13",
+    ]
+    assert result["skipped_dates_by_exchange"]["DCE"] == ["2026-08-09"]
+    assert result["blockers"] == []
+    assert diagnostic["publication_as_of_date"] == "2026-08-13"
+    assert diagnostic["expected_latest_trading_date"] == "2026-08-13"
+    assert diagnostic["actual_latest_price_date"] == "2026-08-13"
+    assert diagnostic["recent_uncovered_dates"] == ["2026-08-11", "2026-08-12"]
+
+
+def test_exchange_completeness_counts_existing_rows_and_lifecycle_skips(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    series = next(item for item in registry["series"] if item.series_id == "CNF.I.DCE.main")
+    storage.upsert_price_bars(
+        [
+            FuturesBar(
+                series_id=series.series_id,
+                trade_date="2026-08-13",
+                open=10,
+                high=12,
+                low=9,
+                close=11,
+                raw_payload_hash="existing-unchanged",
+            )
+        ]
+    )
+    calendar_gate = {
+        "target_dates_by_exchange": {"DCE": ["2026-08-12", "2026-08-13"]},
+        "exchange_diagnostics": {
+            "DCE": {
+                "requested_start_date": "2026-08-12",
+                "requested_end_date": "2026-08-13",
+                "publication_cutoff": "18:00",
+                "publication_timezone": "Asia/Shanghai",
+                "publication_as_of_date": "2026-08-13",
+                "expected_latest_trading_date": "2026-08-13",
+                "repaired_dates": ["2026-08-12"],
+                "blockers": [],
+                "warnings": [],
+            }
+        },
+    }
+    service = FuturesMarketDataSyncService(storage, config)
+    partial = service._build_exchange_completeness(
+        target_series=[series],
+        series_results=[
+            {
+                "series_id": series.series_id,
+                "status": "partial",
+                "target_trade_dates": ["2026-08-12", "2026-08-13"],
+            }
+        ],
+        calendar_gate=calendar_gate,
+        dry_run=False,
+    )["DCE"]
+    skipped = service._build_exchange_completeness(
+        target_series=[series],
+        series_results=[{"series_id": series.series_id, "status": "lifecycle_skip"}],
+        calendar_gate=calendar_gate,
+        dry_run=False,
+    )["DCE"]
+
+    assert partial["status"] == "partial"
+    assert partial["actual_latest_price_date"] == "2026-08-13"
+    assert partial["remaining_missing_dates"] == ["2026-08-12"]
+    assert skipped["status"] == "success"
+    assert skipped["required_target_dates"] == []
+    assert skipped["lifecycle_skipped_series"] == 1
 
 
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
@@ -4923,8 +5205,8 @@ def _official_contract_row(
     contract: str = "CU2407",
     close: float = 11,
     open_interest: float = 200,
-    raw_payload: Optional[dict] = None,
-    warnings: Optional[list[str]] = None,
+    raw_payload: dict | None = None,
+    warnings: list[str] | None = None,
 ) -> OfficialFuturesContractBar:
     return OfficialFuturesContractBar(
         exchange=exchange,
@@ -5051,6 +5333,18 @@ async def test_futures_market_data_sync_uses_governed_trading_dates(monkeypatch,
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    storage.upsert_trading_calendar(
+        [
+            FuturesTradingCalendarDay(
+                exchange="SHFE",
+                trade_date=(date(2024, 6, 1) + timedelta(days=index)).isoformat(),
+                is_trading_day=index >= 2,
+                source_profile="exchange_official_daily_probe",
+                quality_flag="backfilled_verified",
+            )
+            for index in range(4)
+        ]
+    )
     requested_dates = []
 
     async def fake_fetch_daily_bars(self, series, *, start_date=None, end_date=None, mode="direct"):
@@ -5157,6 +5451,7 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
 
     async def failed_official_fetch(self, exchange, trade_date, *, mode="direct"):
         raise OfficialFuturesSourceUnavailable("official fixture unavailable")
@@ -5187,7 +5482,11 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
         fake_fallback_fetch,
     )
 
-    result = await FuturesMarketDataSyncService(storage, config).sync(series_ids=["CNF.CU.SHFE.main"])
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+    )
     rows = storage.get_price_bars("CNF.CU.SHFE.main")
 
     assert result["status"] == "success"
@@ -5303,7 +5602,10 @@ async def test_futures_market_data_sync_uses_promoted_discovery_series(monkeypat
         dry_run=True,
     )
 
-    assert result["status"] == "success"
+    assert result["status"] == "partial"
+    assert result["exchange_completeness"]["GFEX"]["remaining_missing_dates"] == [
+        "2026-01-02"
+    ]
     assert result["scope_selection"]["series_ids"] == ["CNF.PT.GFEX.main"]
     assert result["series"][0]["series_id"] == "CNF.PT.GFEX.main"
     assert result["totals"]["would_write_price_bars"] == 1
@@ -5319,6 +5621,7 @@ async def test_futures_market_data_sync_falls_back_after_official_empty(monkeypa
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
 
     async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
         return [_official_contract_row(exchange=exchange, trade_date=trade_date, variety="CU", contract="CU2407")]
@@ -5374,6 +5677,7 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
     heartbeats = []
     original_heartbeat = storage.heartbeat_ingestion_run
 
@@ -5397,7 +5701,10 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
         dry_run=True,
     )
 
-    assert result["status"] == "success"
+    assert result["status"] == "partial"
+    assert result["exchange_completeness"]["SHFE"]["remaining_missing_dates"] == [
+        "2024-06-03"
+    ]
     assert result["totals"]["inserted"] == 0
     assert result["totals"]["changed"] == 0
     assert result["totals"]["unchanged"] == 0
@@ -5426,6 +5733,7 @@ async def test_futures_market_data_sync_heartbeats_progress_metadata(monkeypatch
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
     heartbeats = []
     original_heartbeat = storage.heartbeat_ingestion_run
 
@@ -5456,9 +5764,9 @@ async def test_futures_market_data_sync_heartbeats_progress_metadata(monkeypatch
         ).fetchone()
     metadata = json.loads(row["metadata_json"])
 
-    assert result["status"] == "success"
+    assert result["status"] == "partial"
     assert any(item.get("progress", {}).get("stage") == "official_payload_fetch" for item in heartbeats)
-    assert metadata["status"] == "success"
+    assert metadata["status"] == "partial"
     assert result["official_fanout"]["exchange_payload_requests"] == 1
 
 
@@ -5470,6 +5778,7 @@ async def test_futures_market_data_sync_times_out_stuck_provider(monkeypatch, tm
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
 
     async def stuck_fetch_daily_bars(self, series, *, start_date=None, end_date=None, mode="direct"):
         await asyncio.sleep(5)
@@ -5481,7 +5790,9 @@ async def test_futures_market_data_sync_times_out_stuck_provider(monkeypatch, tm
     )
 
     result = await FuturesMarketDataSyncService(storage, config).sync(
-        series_ids=["CNF.CU.SHFE.main"]
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
     )
 
     assert result["status"] == "partial"

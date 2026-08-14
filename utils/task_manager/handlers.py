@@ -2661,6 +2661,24 @@ class TaskManagerHandlers:
                 mode=mode,
                 dry_run=dry_run,
             )
+            if (
+                dry_run
+                and requires_trading_day_governance
+                and str(governance_result.get('status') or '').lower() != 'success'
+                and str(result_payload.get('status') or '').lower() == 'success'
+            ):
+                result_payload['status'] = 'partial'
+                result_payload['governance_preflight'] = {
+                    'status': governance_result.get('status'),
+                    'blockers': (
+                        (governance_result.get('target_date_expansion') or {}).get('blockers')
+                        or []
+                    ),
+                    'warnings': (
+                        (governance_result.get('target_date_expansion') or {}).get('warnings')
+                        or []
+                    ),
+                }
             if requires_master_data_governance:
                 try:
                     from scheduler.tasks import _summarize_futures_master_governance_results
@@ -2673,12 +2691,13 @@ class TaskManagerHandlers:
                         "[TaskManagerHandlers] 期货行情前置主数据治理摘要生成失败: %s",
                         summary_exc,
                     )
+                    fallback_master = master_results[0] if master_results else {}
                     result_payload["master_data_governance"] = {
-                        "status": str(master_result.get("status") or "unknown"),
-                        "counts": master_result.get("counts") or {},
+                        "status": str(fallback_master.get("status") or "unknown"),
+                        "counts": fallback_master.get("counts") or {},
                     }
             result_status = str(result_payload.get('status') or '').lower()
-            result = result_status in {'success', 'warning', 'degraded', 'partial'}
+            result = result_status == 'success'
             totals = result_payload.get('totals') or {}
             source_selection = result_payload.get('source_selection') or {}
             self.task_manager.logger.info(
@@ -2693,11 +2712,19 @@ class TaskManagerHandlers:
                 source_selection.get('official_success'),
                 source_selection.get('official_failed'),
             )
-            status_text = '成功' if result else '失败'
+            if result:
+                status_icon = '✅'
+                status_text = '成功'
+            elif result_status in {'warning', 'degraded', 'partial'}:
+                status_icon = '⚠️'
+                status_text = '部分完成'
+            else:
+                status_icon = '❌'
+                status_text = '失败'
             await self.task_manager.send_message(
                 chat_id,
                 (
-                    f"{'✅' if result else '❌'} *期货行情任务{status_text}*\n\n"
+                    f"{status_icon} *期货行情任务{status_text}*\n\n"
                     f"task: `{job_id}`\n"
                     f"status: `{result_status or 'unknown'}`\n"
                     f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"

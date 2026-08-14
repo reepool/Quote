@@ -282,6 +282,20 @@ def test_futures_market_data_report_uses_compact_summary_for_normal_success():
                 },
             ],
         },
+        "exchange_completeness": {
+            "DCE": {
+                "status": "success",
+                "required_target_dates": ["2026-06-25"],
+                "expected_latest_trading_date": "2026-06-25",
+                "actual_latest_price_date": "2026-06-25",
+            },
+            "GFEX": {
+                "status": "success",
+                "required_target_dates": ["2026-06-25"],
+                "expected_latest_trading_date": "2026-06-25",
+                "actual_latest_price_date": "2026-06-25",
+            },
+        },
         "series": [
             {
                 "series_id": "CNF.SI.GFEX.main",
@@ -328,7 +342,69 @@ def test_futures_market_data_report_uses_compact_summary_for_normal_success():
     assert "生命周期跳过: `1`" in reports[0]
     assert "GFEX: 写入 2" in reports[0]
     assert "DCE: 写入 1" in reports[0]
+    assert "目标 2026-06-25" in reports[0]
+    assert "预期 2026-06-25" in reports[0]
+    assert "实际 2026-06-25" in reports[0]
     assert "CNF.SI.GFEX.main" not in reports[0]
+
+
+def test_futures_market_data_report_exposes_stale_exchange_dates_and_blockers():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "partial",
+            "dry_run": False,
+            "run_id": 289,
+            "scope_selection": {"exchanges": ["DCE"]},
+            "totals": {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 23,
+                "failed": 0,
+                "calendar_skipped": 1,
+                "provider_empty_on_trading_day": 0,
+            },
+            "trading_day_governance": {
+                "status": "success",
+                "target_date_count": 2,
+                "minimum_quality": "backfilled_verified",
+            },
+            "exchange_completeness": {
+                "DCE": {
+                    "status": "partial",
+                    "requested_start_date": "2026-08-09",
+                    "requested_end_date": "2026-08-13",
+                    "publication_cutoff": "18:00",
+                    "required_target_dates": ["2026-08-12", "2026-08-13"],
+                    "expected_latest_trading_date": "2026-08-13",
+                    "actual_latest_price_date": "2026-08-11",
+                    "repaired_dates": ["2026-08-12"],
+                    "remaining_missing_dates": ["2026-08-12", "2026-08-13"],
+                    "blockers": [
+                        "missing_price_coverage:DCE:2026-08-12",
+                        "missing_price_coverage:DCE:2026-08-13",
+                    ],
+                }
+            },
+            "series": [
+                {
+                    "series_id": "CNF.I.DCE.main",
+                    "status": "partial",
+                    "fetched_rows": 0,
+                    "target_trade_dates": ["2026-08-12", "2026-08-13"],
+                    "write_result": {"inserted": 0, "changed": 0, "unchanged": 0},
+                }
+            ],
+        }
+    )
+
+    assert "状态: `partial`" in report
+    assert "range=2026-08-09..2026-08-13" in report
+    assert "cutoff=18:00" in report
+    assert "expected=2026-08-13" in report
+    assert "actual=2026-08-11" in report
+    assert "repaired=2026-08-12" in report
+    assert "missing=2026-08-12,2026-08-13" in report
+    assert "missing_price_coverage:DCE:2026-08-13" in report
 
 
 def test_futures_market_data_report_splits_series_details_by_exchange():
@@ -771,6 +847,9 @@ def test_futures_market_data_sync_stops_when_governance_blocks_production():
     result = _run(task.futures_market_data_sync(dry_run=False))
 
     assert result is False
+    calendar_kwargs = data_manager.run_futures_official_calendar_backfill.await_args.kwargs
+    assert calendar_kwargs["start_date"] is None
+    assert calendar_kwargs["end_date"] is None
     data_manager.run_futures_market_data_sync.assert_not_awaited()
     assert "futures_market_data_sync" not in task._active_tasks
 
@@ -934,8 +1013,11 @@ def test_futures_market_data_sync_allows_dry_run_with_governance_warning():
 
     result = _run(task.futures_market_data_sync(dry_run=True))
 
-    assert result is True
+    assert result is False
     data_manager.run_futures_market_data_sync.assert_awaited_once()
+    final_report = task._send_task_report.await_args.kwargs["report_data"]
+    assert final_report["status"] == "partial"
+    assert "状态: `partial`" in final_report["content"]
 
 
 def test_futures_market_data_sync_can_skip_calendar_backfill_only():
