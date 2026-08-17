@@ -121,7 +121,15 @@
         "borrow_idle_capacity": true,
         "members": [
           {
-            "source_label": "scorpio:deepseek-v4-flash",
+            "source_label": "scorpio:gpt-5.6-luna",
+            "weight": 1,
+            "profiles": {
+              "semantic_extraction": "semantic_extraction__scorpio_luna",
+              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_luna"
+            }
+          },
+          {
+            "source_label": "scorpio:deepseek-v4-flash-0731",
             "weight": 1,
             "profiles": {
               "semantic_extraction": "semantic_extraction__scorpio_deepseek",
@@ -130,7 +138,7 @@
           }
         ],
         "failover": {
-          "enabled": false,
+          "enabled": true,
           "max_hops": 1,
           "failure_threshold": 3,
           "open_seconds": 60,
@@ -163,13 +171,13 @@
       "semantic_extraction__scorpio_grok": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:grok",
-        "source_label": "scorpio:grok-4.5",
+        "source_label": "scorpio:grok-4.6",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": false,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
-        "model": "grok-4.5",
+        "model": "grok-4.6",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
@@ -194,7 +202,7 @@
         "provider_resource": "scorpio:luna",
         "source_label": "scorpio:gpt-5.6-luna",
         "default_workload": "corporate_action_semantic_extraction",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
@@ -221,13 +229,13 @@
       "semantic_extraction__scorpio_deepseek": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:deepseek",
-        "source_label": "scorpio:deepseek-v4-flash",
+        "source_label": "scorpio:deepseek-v4-flash-0731",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY",
-        "model": "deepseek-v4-flash",
+        "model": "deepseek-v4-flash-0731",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
@@ -250,13 +258,13 @@
       "corporate_action_title_classification__scorpio_grok": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:grok",
-        "source_label": "scorpio:grok-4.5",
+        "source_label": "scorpio:grok-4.6",
         "default_workload": "corporate_action_title_classification",
         "enabled": false,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
-        "model": "grok-4.5",
+        "model": "grok-4.6",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
@@ -281,7 +289,7 @@
         "provider_resource": "scorpio:luna",
         "source_label": "scorpio:gpt-5.6-luna",
         "default_workload": "corporate_action_title_classification",
-        "enabled": false,
+        "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
@@ -308,13 +316,13 @@
       "corporate_action_title_classification__scorpio_deepseek": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:deepseek",
-        "source_label": "scorpio:deepseek-v4-flash",
+        "source_label": "scorpio:deepseek-v4-flash-0731",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY",
-        "model": "deepseek-v4-flash",
+        "model": "deepseek-v4-flash-0731",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
