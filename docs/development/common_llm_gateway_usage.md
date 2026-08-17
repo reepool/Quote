@@ -8,19 +8,19 @@
 ## 配置与密钥
 
 项目配置 `config/13_llm.json` 只包含非敏感 route、pool 和实际 profile。当前 Scorpio
-配置以保守限额启用，路由池暂时只启用 DeepSeek，Grok 和 Luna profile 保留但停用；各业务
+配置以保守限额启用，路由池当前启用 Luna 和 DeepSeek，Grok profile 保留但停用；各业务
 仍必须使用自己的独立 enable/write gate，公共路由开启不代表画像等业务自动开启：
 
 - 逻辑 profile：`semantic_extraction`
 - provider：`openai_compatible`
 - base URL：`https://scorpio.reepool.com`
-- profiles：Grok（停用）、`gpt-5.6-luna`（暂时停用）、`deepseek-v4-flash`（当前唯一池成员）
+- profiles：Grok（停用）、`gpt-5.6-luna`、`deepseek-v4-flash-0731`
 - key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`、`QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY`
-- 当前启用的 provider quota bucket：DeepSeek 使用独立的 `scorpio:deepseek` 资源
+- 当前启用的 provider quota bucket：Luna 使用 `scorpio:luna`，DeepSeek 使用 `scorpio:deepseek`
 
 本地开发时，将真实值放在项目根目录 `.env`，该文件已被 gitignore 忽略。应用入口显式调用 `load_project_environment()`，且 `override=False`，所以进程已经注入的变量优先。`.env` 不应被提交、写入日志或复制到报告中。
 
-常驻服务不要依赖 `.bashrc`：systemd、cron、容器和多 worker 进程不一定读取交互 shell 配置。生产环境应使用权限受控的 systemd `EnvironmentFile`、容器 secret 或部署平台 secret store，并注入两个来源专用环境变量。
+常驻服务不要依赖 `.bashrc`：systemd、cron、容器和多 worker 进程不一定读取交互 shell 配置。生产环境应使用权限受控的 systemd `EnvironmentFile`、容器 secret 或部署平台 secret store，并注入所需的来源专用环境变量。
 
 网关只从环境中读取 key。即使 `.env` 存在，profile 仍必须显式启用；缺少 key、错误 URL 或无能力声明时，网络请求前直接失败。
 
@@ -28,17 +28,17 @@
 
 业务只使用 `routes` 中的逻辑 profile；`routes` 指向 pool，pool 的 `members` 再映射到
 实际 profile。负载均衡权重配置在 `llm.pools.shared_semantic.members[*].weight`，运行时比例
-始终以该配置中的当前值为准。例如模型 A/B 配置为 `3`、`1` 时，在两个成员都健康、
-有容量且不发生借用的持续流量下，长期正常调度比例约为 75% 和 25%；配置为 `1`、`1`
-时目标比例约为 50% 和 50%。权重必须是正整数，不能用 `0` 禁用成员。
+始终以该配置中的当前值为准。当前 Luna/DeepSeek 配置为 `1`、`1`，在两个成员都健康、
+有容量且不发生借用的持续流量下，长期正常调度比例约为 50% 和 50%。例如配置为 `3`、`1` 时，
+长期正常调度比例约为 75% 和 25%。权重必须是正整数，不能用 `0` 禁用成员。
 
 `borrow_idle_capacity=true` 表示首选成员繁忙、熔断或不可用时，健康成员可以借用空闲容量，
 因此短时间实际比例可能偏离配置权重。若更重视严格比例而不是吞吐，可关闭借用，但故障成员可能
 导致容量闲置。
 
 只使用一个模型时，应从 `members` 删除另一个成员，并可将其两个实际 profile 的 `enabled`
-设为 `false`；不要把权重设为 `0`。当前只使用 DeepSeek，因此 pool 只保留
-`scorpio:deepseek-v4-flash` 成员。此时没有跨模型故障转移，可同时将 `failover.enabled` 设为 `false`；
+设为 `false`；不要把权重设为 `0`。单成员池没有跨模型故障转移，可同时将
+`failover.enabled` 设为 `false`；
 同源的有界重试仍由实际 profile 的 `max_retries` 控制。
 
 ## 最小调用边界

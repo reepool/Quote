@@ -410,20 +410,20 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert config.is_logical_profile_enabled("semantic_extraction") is True
     members = config.pools["shared_semantic"].members
     assert [member.source_label for member in members] == [
-        "scorpio:deepseek-v4-flash"
+        "scorpio:gpt-5.6-luna",
+        "scorpio:deepseek-v4-flash-0731",
     ]
-    assert config.pools["shared_semantic"].failover.enabled is False
-    assert all(member.weight > 0 for member in members)
+    assert [member.weight for member in members] == [1, 1]
+    assert config.pools["shared_semantic"].failover.enabled is True
     profiles = config.profiles
     assert profiles["semantic_extraction__scorpio_grok"].enabled is False
     assert (
         profiles["corporate_action_title_classification__scorpio_grok"].enabled
         is False
     )
-    assert profiles["semantic_extraction__scorpio_luna"].enabled is False
+    assert profiles["semantic_extraction__scorpio_luna"].enabled is True
     assert (
-        profiles["corporate_action_title_classification__scorpio_luna"].enabled
-        is False
+        profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
     )
     assert profiles["semantic_extraction__scorpio_deepseek"].enabled is True
     assert profiles["semantic_extraction__scorpio_deepseek"].max_concurrency == 20
@@ -442,6 +442,12 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert profiles["semantic_extraction__scorpio_deepseek"].api_key_env == (
         "QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY"
     )
+    assert profiles["semantic_extraction__scorpio_deepseek"].model == (
+        "deepseek-v4-flash-0731"
+    )
+    assert profiles["semantic_extraction__scorpio_deepseek"].source_label == (
+        "scorpio:deepseek-v4-flash-0731"
+    )
     serialized = json.dumps(
         {name: profile.safe_dict() for name, profile in profiles.items()}
     )
@@ -449,14 +455,21 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_supports_single_deepseek_member():
+def test_repository_llm_config_supports_luna_deepseek_equal_weight_pool():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
 
     config = LlmConfig.from_mapping(raw)
 
     assert config.is_logical_profile_enabled("semantic_extraction") is True
-    assert pool["failover"]["enabled"] is False
+    assert pool["failover"]["enabled"] is True
     assert [
         profile.name for profile in config.concrete_profiles_for("semantic_extraction")
-    ] == ["semantic_extraction__scorpio_deepseek"]
+    ] == [
+        "semantic_extraction__scorpio_luna",
+        "semantic_extraction__scorpio_deepseek",
+    ]
+    assert [member.weight for member in config.pools["shared_semantic"].members] == [
+        1,
+        1,
+    ]
