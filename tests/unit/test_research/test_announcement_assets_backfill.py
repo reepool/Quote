@@ -17,8 +17,6 @@ from research.announcement_assets import (
     BootstrapWindow,
     ContentAddressedBlobStore,
     EligibilityPolicy,
-    EnsureDisposition,
-    EnsureRequest,
     ListedSecurityCensusSnapshot,
     pair_with_listed_security_census,
 )
@@ -2191,13 +2189,13 @@ def test_confirmed_missing_requires_complete_evidence_and_expiry_is_non_terminal
         instrument_id="600000.SH",
         status="confirmed_missing",
         as_of="2026-08-10",
-        evidence_expires_at="2026-08-20T00:00:00+00:00",
         evidence=complete,
     )
     active = repository.list_asset_coverage(
         "snapshot-1", now="2026-08-19T00:00:00+00:00"
     )[0]
     assert active["status"] == "confirmed_missing"
+    assert active["evidence_expires_at"] == "2026-08-20T00:00:00+00:00"
     expired = repository.list_asset_coverage(
         "snapshot-1", now="2026-08-20T00:00:00+00:00"
     )[0]

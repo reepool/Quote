@@ -67,9 +67,11 @@ provider 参数位于 `config/10_research.json` 的 `research_config.sources.<so
 - 限制 timeout、retry、redirect、字节数和 pacing；
 - 返回 bytes、SHA-256、长度、final URL、媒体类型、PDF signature 和 retrieval time。
 
-公司业务画像、公司行动和券商风控模块继续拥有各自不可变归档、manifest、parser、OCR、LLM 和 supersession 规则。业务模块不得硬编码 CNInfo 或交易所附件 host，也不得保留第二套下载 transport。
+年报附件由 `research.announcement_assets` 统一归档和管理，公司业务画像与券商风控通过共享资产 API 获取年报，并继续拥有各自的 parser、OCR、LLM 和业务事实。其他公告类型仍由对应业务维护其业务归档。业务模块不得硬编码 CNInfo 或交易所附件 host，也不得保留第二套下载 transport。
 
-## 6. Legacy 迁移、删除与回滚
+## 6. 通用公告传输层的历史 Legacy 迁移
+
+本节仅记录 `research.announcements` 通用传输层在 2026-07 的旧表迁移，不是年报资产模块的运行时备份或恢复功能。年报资产模块不负责备份。
 
 运行时最终 schema 只包含 `announcement_scan_state` 和 `announcement_audit`。初始化检测到旧 CNInfo 专用表时按以下顺序 fail-closed 执行：
 

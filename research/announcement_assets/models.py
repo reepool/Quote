@@ -629,16 +629,6 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _aware_datetime(value: str, *, field_name: str) -> datetime:
-    try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise ValueError(f"capacity override {field_name} is invalid") from exc
-    if parsed.tzinfo is None:
-        raise ValueError(f"capacity override {field_name} must include a timezone")
-    return parsed
-
-
 def normalize_instrument_id(value: str) -> str:
     instrument_id = str(value or "").strip().upper()
     if not instrument_id:

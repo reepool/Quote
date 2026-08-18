@@ -6,7 +6,7 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from collections.abc import Generator, Iterable, Mapping, Sequence
+from collections.abc import Generator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
@@ -4645,6 +4645,11 @@ class AnnouncementAssetRepository:
         if status == "confirmed_missing":
             evidence_mapping = dict(evidence or {})
             evidence_mapping.setdefault("evidence_expires_at", evidence_expires_at)
+            evidence_expires_at = (
+                evidence_expires_at
+                or str(evidence_mapping.get("evidence_expires_at") or "").strip()
+                or None
+            )
             error = _confirmed_missing_evidence_error(
                 evidence_mapping, evidence_expires_at
             )
@@ -4719,8 +4724,15 @@ class AnnouncementAssetRepository:
                 )
                 expired = bool(
                     now
-                    and item.get("evidence_expires_at")
-                    and str(item["evidence_expires_at"]) <= str(now)
+                    and (
+                        item.get("evidence_expires_at")
+                        or evidence.get("evidence_expires_at")
+                    )
+                    and str(
+                        item.get("evidence_expires_at")
+                        or evidence.get("evidence_expires_at")
+                    )
+                    <= str(now)
                 )
                 fingerprint_changed = False
                 if fingerprints:

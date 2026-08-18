@@ -180,7 +180,7 @@
           "mode": "dual_read",
           "reconciliation_evidence_id": "annual-report-consumer-dependency-reconciliation-20260813-v3",
           "legacy_writer_disabled": false,
-          "note": "Shared assets are read first during dual-read reconciliation; legacy fallback and writer remain enabled until task 11.6 cleanup gates pass."
+          "note": "Shared assets are read first; legacy fallback and writer remain enabled until the business-profile consumer completes its separate migration."
         },
         "archive": {
           "archive_root": "data/filings/business_profile",
