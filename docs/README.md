@@ -1,30 +1,54 @@
-# Quote System 文档索引
+# Quote 文档索引
 
-本目录为项目现有文档的权威索引，仅包含当前代码中已实现/已存在的文档。
+本文件是当前文档的唯一总索引。当前架构、运行手册、开发约束和历史需求必须分开维护；未列入本索引的开发文档不自动具有当前规范效力。
 
-## 核心文档
-- `docs/architecture.md`：系统架构与技术栈概览
-- `docs/api/restful_api.md`：RESTful API 参考（与代码一致）
-- `docs/configuration/config_file.md`：配置文件详解（当前采用分文件配置）
-- `docs/features/scheduler_system.md`：调度器与内置任务说明
-- `docs/telegram_task_manager.md`：Telegram 任务管理器
+## 开发总纲
 
-## 功能与使用
-- `docs/financial_data_system.md`：财务数据系统专项文档，包含 L1/L2/L3 分层、字段映射、`financials.db` 存储边界和全量导入脚本使用方法
+- `docs/development/project_development_governance.md`：长期开发、架构边界、复用、单一执行链和生产稳定性约束
+- `docs/development/framework_refactoring_program.md`：框架改造总需求、工作流、依赖、验收和 OpenSpec change 矩阵
+- `docs/development/README.md`：当前开发入口和文档使用规则
+- `AGENTS.md`：所有 AI 和开发任务必须遵守的仓库级规则
+
+## 当前系统
+
+- `docs/architecture.md`：系统架构概览；框架改造 W1 将按当前代码重写
+- `docs/api/restful_api.md`：RESTful API 参考
+- `docs/configuration/config_file.md`：分文件配置参考
+- `docs/database_guide.md`：SQLite 存储布局与调优
+- `docs/financial_data_system.md`：财务数据系统
+- `docs/features/scheduler_system.md`：调度任务和生产时间表
+- `docs/telegram_task_manager.md`：Telegram 运维入口
+
+## 行情与主数据
+
 - `docs/features/historical_data_download.md`：历史数据下载
-- `docs/features/trading_calendar_management.md`：交易日历管理
-- `docs/gap_detection_usage.md`：缺口检测与报告
-- `docs/single_instrument_download_guide.md`：单股票下载
-- `docs/INSTRUMENT_DOWNLOAD_UPDATE.md`：代码格式转换与下载修复说明
+- `docs/single_instrument_download_guide.md`：单标的下载
+- `docs/gap_detection_usage.md`：行情缺口检测与修复
+- `docs/features/trading_calendar_management.md`：交易日历
+- `docs/development/instrument_master_sync.md`：证券主数据同步与治理
+- `docs/development/stock_adjustment_factor_framework.md`：复权因子当前框架
 
-## 运维与排障
-- `docs/DATABASE_BACKUP_IMPLEMENTATION.md`：数据库备份
-- `docs/troubleshooting/faq.md`：常见问题
+## 研究数据域
 
-## 开发
-- `docs/development/README.md`：开发说明与贡献入口
-- `docs/development/framework_audit_and_improvement_plan.md`：框架问题发现与改善方案（神对象、多出口、可复用未复用）
-- `docs/development/open_issues_backlog.md`：数据能力待办（主数据缺口、源端调研项）
+- `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
+- `docs/development/business_profile_semantic_production_runbook.md`：公司业务画像语义生产
+- `docs/development/common_llm_gateway_architecture.md`：公共 LLM 网关
+- `docs/development/fx_market_data_requirements.md`：外汇数据域
+- `docs/development/commodity_futures_market_data_requirements.md`：商品期货数据域
+- `docs/development/special_commodity_market_data_requirements.md`：特殊商品数据域
+- `docs/development/professional_dcf_requirements.md`：专业 DCF 需求与口径
 
-## 说明
-- 若新增文档，请同步更新本索引。
+## 运维与问题
+
+- `docs/DATABASE_BACKUP_IMPLEMENTATION.md`：数据库备份 runbook
+- `docs/troubleshooting/faq.md`：故障排查
+- `docs/development/open_issues_backlog.md`：尚未解决的数据能力和源端问题
+- `docs/CHANGELOG.md`：版本变更记录
+
+## 文档生命周期
+
+- current 文档描述当前代码和稳定边界；
+- runbook 必须包含当前可执行命令；
+- 未完成 requirements 由对应 OpenSpec change 管理；
+- 已完成的需求稿、调查、回执和迁移记录在有效内容合并后删除；
+- 文档清理与合并由 `consolidate-project-documentation` change 跟踪。

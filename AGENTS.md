@@ -362,6 +362,33 @@ $business-first-goal
 
 如果 Goal 中没有显式调用，但 Codex 根据 Skill description 自动匹配，也应按该工作流执行。
 
+### 10.2 项目开发与架构治理总纲
+
+所有功能开发和框架改造必须遵守：
+
+```text
+docs/development/project_development_governance.md
+```
+
+涉及框架合理性、核心文件拆分、执行链收口、代码/功能复用、遗留路径清理或文档整理时，还必须先读取：
+
+```text
+docs/development/framework_refactoring_program.md
+```
+
+强制规则：
+
+- 允许 CLI、API、Scheduler、Telegram 等多个入口，但同一业务动作只能有一个权威应用服务和一个写入 owner；
+- 新功能不得在入口、脚本或兼容门面中复制业务循环；
+- `data_manager.py`、`research/storage.py`、`scheduler/tasks.py`、`api/routes.py` 不得继续新增大段领域逻辑；
+- 新增共享抽象必须有至少两个当前真实调用方，并在同一变更中删除重复实现；
+- 兼容入口只能转发，必须记录替代入口和删除条件；
+- 框架 change 必须映射到改造纲要的 requirement/workstream，声明生产不变量，并按纵向切片交付；
+- 已完成 change 及时归档，已替代的代码、脚本和文档及时删除，不建立长期 legacy 垃圾区；
+- 任何重构不得影响日常数据采集、维护、查询和金融时间语义。
+
+若局部需求与总纲冲突，先澄清权威路径和 owner，不得为了实现功能另建平行系统。
+
 ---
 
 ## 11. 本仓库 Git 闭环授权
