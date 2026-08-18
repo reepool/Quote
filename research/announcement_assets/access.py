@@ -325,32 +325,6 @@ class AnnouncementAssetAccess:
         operation = self.repository.get_operation(subscription.operation_id)
         return self._asset_request_projection(subscription, operation)
 
-    def get_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str,
-    ) -> dict[str, Any] | None:
-        request = self.repository.get_consumer_request(
-            consumer_request_id,
-            principal=principal,
-        )
-        return None if request is None else self._consumer_request_projection(request)
-
-    def cancel_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str,
-        cooperative_stop_accepted: bool = False,
-    ) -> tuple[dict[str, Any], str]:
-        request, disposition = self.repository.cancel_consumer_request(
-            consumer_request_id,
-            principal=principal,
-            cooperative_stop_accepted=cooperative_stop_accepted,
-        )
-        return self._consumer_request_projection(request), disposition
-
     def readiness(self, *, operator: bool = False) -> dict[str, Any]:
         total = 0
         local_valid = 0
@@ -783,62 +757,4 @@ class AnnouncementAssetAccess:
             "expired_at": subscription.expired_at,
             "tombstone_until": subscription.tombstone_until,
             "retention_policy_version": subscription.retention_policy_version,
-        }
-
-    @staticmethod
-    def _consumer_request_projection(request: Any) -> dict[str, Any]:
-        lineage = request.metadata.get("resolved_asset_lineage") or {}
-        if not isinstance(lineage, dict):
-            lineage = {}
-        return {
-            "consumer_request_id": request.consumer_request_id,
-            "consumer": request.consumer,
-            "processing_fingerprint": request.processing_fingerprint,
-            "selector": dict(request.selector),
-            "asset_request_id": request.asset_request_id,
-            "asset_request_url": (
-                None
-                if request.asset_request_id is None
-                else "/api/v1/research/annual-report-asset-requests/"
-                + request.asset_request_id
-            ),
-            "consumer_request_status": request.status.value,
-            "consumer_result_state": request.result_state.value,
-            "asset_id": request.asset_id,
-            "result_identity": request.result_identity,
-            "resolved_source": request.resolved_source,
-            "resolved_source_announcement_id": (
-                request.resolved_source_announcement_id
-            ),
-            "resolved_attachment_id": request.resolved_attachment_id,
-            "resolved_observation_version": request.resolved_observation_version,
-            "resolved_content_hash": request.resolved_content_hash,
-            "resolved_report_period": request.resolved_report_period,
-            "resolved_variant": lineage.get("variant"),
-            "resolved_effective_decision_state": lineage.get(
-                "effective_decision_state"
-            ),
-            "resolved_canonical_source_filing": lineage.get(
-                "canonical_source_filing"
-            ),
-            "resolved_equivalent_source_filings": lineage.get(
-                "equivalent_source_filings", []
-            ),
-            "resolved_projection_policy_version": lineage.get(
-                "canonical_projection_policy_version"
-            ),
-            "resolved_evidence_set_hash": lineage.get("evidence_set_hash"),
-            "reason_code": request.reason_code,
-            "retry_metadata": dict(request.retry_metadata),
-            "diagnostics": dict(request.diagnostics),
-            "created_at": request.created_at,
-            "updated_at": request.updated_at,
-            "processing_started_at": request.processing_started_at,
-            "finished_at": request.finished_at,
-            "stop_requested_at": request.stop_requested_at,
-            "cancelled_at": request.cancelled_at,
-            "expires_at": request.expires_at,
-            "expired_at": request.expired_at,
-            "tombstone_until": request.tombstone_until,
-            "retention_policy_version": request.retention_policy_version,
         }

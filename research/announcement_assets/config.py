@@ -6,8 +6,7 @@ import hashlib
 import json
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass, field, replace
-from datetime import datetime
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -19,12 +18,6 @@ from .path_segments import validate_path_segment
 
 DEFAULT_MODULE_KEY = "official_announcement_assets"
 CONFIG_SCHEMA_VERSION = "official_announcement_assets.config.v1"
-BACKUP_PROTECTION_STATE_SCHEMA_VERSION = (
-    "official_announcement_assets.backup_protection_state.v1"
-)
-LEGACY_ARCHIVE_REGISTRY_VERSION = "legacy_annual_report_roots.v1"
-LEGACY_ARCHIVE_TEMPLATE_VERSION = "legacy_annual_report_paths.v1"
-LEGACY_ARCHIVE_EXCLUSION_POLICY_VERSION = "legacy_annual_report_exclusions.v1"
 
 def _bool_value(value: Any, field_name: str, default: bool) -> bool:
     if value is None:
@@ -66,25 +59,6 @@ def _non_negative_number(value: Any, field_name: str) -> float:
     return normalized
 
 
-def _unprotected_limit(value: Any, field_name: str) -> int:
-    if type(value) is not int:
-        raise TypeError(f"{field_name} must be an integer")
-    if value <= 0:
-        raise ValueError("backup unprotected limits must be positive")
-    return value
-
-
-def _aware_datetime(value: Any, field_name: str) -> datetime:
-    text = _non_empty_text(value, field_name)
-    try:
-        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise ValueError(f"{field_name} must be an ISO-8601 timestamp") from exc
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
-        raise ValueError(f"{field_name} must include a timezone offset")
-    return parsed
-
-
 def _validate_positive_dataclass_ints(
     instance: Any,
     names: tuple[str, ...],
@@ -112,15 +86,6 @@ def _normalized_strings(
     if not normalized or any(not item for item in normalized):
         raise ValueError(f"{field_name} must be non-empty")
     return normalized
-
-
-def _relative_to_project(path: Path, project_root: Path, field_name: str) -> str:
-    try:
-        return path.resolve(strict=False).relative_to(
-            project_root.resolve(strict=False)
-        ).as_posix()
-    except ValueError as exc:
-        raise ValueError(f"{field_name} must remain beneath project_root") from exc
 
 
 def _mapping(value: Any, field_name: str) -> Mapping[str, Any]:
@@ -165,14 +130,6 @@ def _resolve_beneath(
     return resolved
 
 
-def _is_isolated_test_root(project_root: Path) -> bool:
-    root = project_root.resolve(strict=False)
-    return any(
-        root == allowed or allowed in root.parents
-        for allowed in (Path("/tmp"), Path("/dev/shm"))
-    )
-
-
 def _validate_at_least_daily_cron(expression: str) -> None:
     """Reject schedules that can omit an entire project calendar day.
 
@@ -210,9 +167,7 @@ class StorageGateConfig:
     quarantine_cleanup_policy: str = "operator_audited_only"
     predecessor_cleanup_warning_age_seconds: int = 7 * 24 * 3600
     predecessor_cleanup_hard_age_seconds: int = 30 * 24 * 3600
-    # Candidate verification and backup-failure writes have their own byte
-    # budget.  Keep the public aliases explicit so configuration fingerprints
-    # do not depend on the original legacy field spelling.
+    # Candidate comparison is bounded separately from canonical downloads.
     candidate_verification_max_bytes: int = 10 * 1024**3
     unprotected_write_reservation_bytes: int = 64 * 1024**2
 
@@ -303,300 +258,10 @@ class StorageGateConfig:
         return self.max_attachment_bytes
 
 
-@dataclass(frozen=True)
-class BackupConfig:
-    enabled: bool = False
-    scheduled_enabled: bool = False
-    mount_root: Path | None = None
-    destination_root: Path | None = None
-    expected_mount_source: str | None = None
-    expected_failure_domain: str | None = None
-    warning_utilization: float = 0.80
-    hard_stop_utilization: float = 0.90
-    free_space_reserve_bytes: int = 50 * 1024**3
-    freshness_hours: int = 48
-    max_unprotected_bytes: int = 10 * 1024**3
-    max_unprotected_age_seconds: int = 72 * 3600
-    unprotected_accumulation_origin: str = "first_unprotected_at"
-    reset_on_verified_backup: bool = True
-    unblock_requires_verified_backup: bool = True
-    recovery_journal_retention_policy: str = "append_only_no_automatic_gc.v1"
-    recovery_journal_integrity_policy: str = "sha256_chain_with_watermarks.v1"
-
-    def __post_init__(self) -> None:
-        if self.scheduled_enabled and not self.enabled:
-            raise ValueError("backup scheduling requires backup.enabled")
-        if self.enabled and (self.mount_root is None or self.destination_root is None):
-            raise ValueError("enabled backup requires mount_root and destination_root")
-        if self.enabled and not self.expected_mount_source:
-            raise ValueError("enabled backup requires expected_mount_source")
-        if self.enabled and not self.expected_failure_domain:
-            raise ValueError("enabled backup requires expected_failure_domain")
-        if (
-            isinstance(self.warning_utilization, bool)
-            or isinstance(self.hard_stop_utilization, bool)
-            or not isinstance(self.warning_utilization, (int, float))
-            or not isinstance(self.hard_stop_utilization, (int, float))
-        ):
-            raise TypeError("backup utilization thresholds must be numeric")
-        if not 0 < self.warning_utilization < self.hard_stop_utilization < 1:
-            raise ValueError(
-                "backup utilization thresholds must satisfy 0 < warning < stop < 1"
-            )
-        _validate_positive_dataclass_ints(
-            self,
-            (
-                "free_space_reserve_bytes",
-                "freshness_hours",
-            ),
-            prefix="backup",
-        )
-        for name in ("max_unprotected_bytes", "max_unprotected_age_seconds"):
-            _unprotected_limit(getattr(self, name), f"backup.{name}")
-        if self.unprotected_accumulation_origin not in {
-            "first_unprotected_at",
-            "first_failed_backup_at",
-        }:
-            raise ValueError("invalid unprotected_accumulation_origin")
-        if not self.reset_on_verified_backup or not self.unblock_requires_verified_backup:
-            raise ValueError(
-                "runtime unprotected policy must reset and unblock only after verified backup"
-            )
-        if (
-            self.recovery_journal_retention_policy
-            != "append_only_no_automatic_gc.v1"
-        ):
-            raise ValueError("unsupported recovery journal retention policy")
-        if (
-            self.recovery_journal_integrity_policy
-            != "sha256_chain_with_watermarks.v1"
-        ):
-            raise ValueError("unsupported recovery journal integrity policy")
 
 
-@dataclass(frozen=True)
-class BackupProtectionRuntimeState:
-    """Restart-safe projection of the bounded unprotected-write policy.
-
-    The repository or scheduler owns durable storage for this JSON-safe state.
-    This value object owns the fail-closed transition rules so a restart cannot
-    reset accumulated bytes, elapsed age, or an already-raised blocker.
-    """
-
-    config_fingerprint: str
-    unprotected_bytes: int = 0
-    accumulation_started_at: str | None = None
-    blocked: bool = False
-    blocker_reasons: tuple[str, ...] = ()
-    last_backup_attempt_at: str | None = None
-    last_verified_backup_at: str | None = None
-    schema_version: str = BACKUP_PROTECTION_STATE_SCHEMA_VERSION
-
-    def __post_init__(self) -> None:
-        if self.schema_version != BACKUP_PROTECTION_STATE_SCHEMA_VERSION:
-            raise ValueError("unsupported backup protection state schema_version")
-        _non_empty_text(self.config_fingerprint, "config_fingerprint")
-        _non_negative_int(self.unprotected_bytes, "unprotected_bytes")
-        for name in (
-            "accumulation_started_at",
-            "last_backup_attempt_at",
-            "last_verified_backup_at",
-        ):
-            value = getattr(self, name)
-            if value is not None:
-                _aware_datetime(value, name)
-        normalized_reasons = tuple(
-            sorted(
-                dict.fromkeys(
-                    _non_empty_text(item, "blocker_reasons")
-                    for item in self.blocker_reasons
-                )
-            )
-        )
-        if self.blocked != bool(normalized_reasons):
-            raise ValueError("blocked state and blocker_reasons must agree")
-        if self.unprotected_bytes == 0 and self.accumulation_started_at is not None:
-            raise ValueError("zero unprotected bytes cannot retain an accumulation origin")
-        object.__setattr__(self, "blocker_reasons", normalized_reasons)
-
-    @classmethod
-    def fresh(cls, config: AnnouncementAssetConfig) -> BackupProtectionRuntimeState:
-        return cls(config_fingerprint=config.evidence_fingerprint)
-
-    @classmethod
-    def from_mapping(
-        cls,
-        value: Mapping[str, Any],
-        *,
-        config: AnnouncementAssetConfig,
-        now: str,
-    ) -> BackupProtectionRuntimeState:
-        raw = _mapping(value, "backup_protection_state")
-        allowed = {
-            "schema_version",
-            "config_fingerprint",
-            "unprotected_bytes",
-            "accumulation_started_at",
-            "blocked",
-            "blocker_reasons",
-            "last_backup_attempt_at",
-            "last_verified_backup_at",
-        }
-        unknown = sorted(set(raw) - allowed)
-        if unknown:
-            raise ValueError(
-                "backup protection state contains unknown fields: "
-                + ", ".join(unknown)
-            )
-        fingerprint = _non_empty_text(
-            raw.get("config_fingerprint"), "config_fingerprint"
-        )
-        if fingerprint != config.evidence_fingerprint:
-            raise ValueError("backup protection state configuration fingerprint mismatch")
-        reasons = raw.get("blocker_reasons", ())
-        if isinstance(reasons, (str, bytes)) or not isinstance(
-            reasons, (list, tuple)
-        ):
-            raise TypeError("blocker_reasons must be an array")
-        state = cls(
-            schema_version=str(raw.get("schema_version", "")),
-            config_fingerprint=fingerprint,
-            unprotected_bytes=_non_negative_int(
-                raw.get("unprotected_bytes"), "unprotected_bytes"
-            ),
-            accumulation_started_at=raw.get("accumulation_started_at"),
-            blocked=_bool_value(raw.get("blocked"), "blocked", False),
-            blocker_reasons=tuple(reasons),
-            last_backup_attempt_at=raw.get("last_backup_attempt_at"),
-            last_verified_backup_at=raw.get("last_verified_backup_at"),
-        )
-        return state.evaluate(config=config, now=now)
-
-    def normalized_mapping(self) -> dict[str, Any]:
-        return {
-            "schema_version": self.schema_version,
-            "config_fingerprint": self.config_fingerprint,
-            "unprotected_bytes": self.unprotected_bytes,
-            "accumulation_started_at": self.accumulation_started_at,
-            "blocked": self.blocked,
-            "blocker_reasons": list(self.blocker_reasons),
-            "last_backup_attempt_at": self.last_backup_attempt_at,
-            "last_verified_backup_at": self.last_verified_backup_at,
-        }
-
-    def record_unprotected_bytes(
-        self,
-        byte_count: int,
-        *,
-        observed_at: str,
-        config: AnnouncementAssetConfig,
-    ) -> BackupProtectionRuntimeState:
-        self._validate_config(config)
-        added = _positive_int(byte_count, "byte_count")
-        _aware_datetime(observed_at, "observed_at")
-        origin = self.accumulation_started_at
-        if (
-            origin is None
-            and config.backup.unprotected_accumulation_origin
-            == "first_unprotected_at"
-        ):
-            origin = observed_at
-        updated = replace(
-            self,
-            unprotected_bytes=self.unprotected_bytes + added,
-            accumulation_started_at=origin,
-        )
-        return updated.evaluate(config=config, now=observed_at)
-
-    def record_backup_attempt(
-        self,
-        *,
-        attempted_at: str,
-        verified_closure: bool,
-        config: AnnouncementAssetConfig,
-    ) -> BackupProtectionRuntimeState:
-        self._validate_config(config)
-        _aware_datetime(attempted_at, "attempted_at")
-        if type(verified_closure) is not bool:
-            raise TypeError("verified_closure must be a boolean")
-        if verified_closure:
-            return replace(
-                self,
-                unprotected_bytes=0,
-                accumulation_started_at=None,
-                blocked=False,
-                blocker_reasons=(),
-                last_backup_attempt_at=attempted_at,
-                last_verified_backup_at=attempted_at,
-            )
-        origin = self.accumulation_started_at
-        if (
-            origin is None
-            and self.unprotected_bytes > 0
-            and config.backup.unprotected_accumulation_origin
-            == "first_failed_backup_at"
-        ):
-            origin = attempted_at
-        updated = replace(
-            self,
-            accumulation_started_at=origin,
-            last_backup_attempt_at=attempted_at,
-        )
-        return updated.evaluate(config=config, now=attempted_at)
-
-    def evaluate(
-        self,
-        *,
-        config: AnnouncementAssetConfig,
-        now: str,
-    ) -> BackupProtectionRuntimeState:
-        self._validate_config(config)
-        current = _aware_datetime(now, "now")
-        reasons = set(self.blocker_reasons)
-        if self.unprotected_bytes >= config.backup.max_unprotected_bytes:
-            reasons.add("max_unprotected_bytes_reached")
-        if self.accumulation_started_at is not None:
-            started = _aware_datetime(
-                self.accumulation_started_at, "accumulation_started_at"
-            )
-            elapsed = (current - started).total_seconds()
-            if elapsed < 0:
-                raise ValueError("now cannot precede accumulation_started_at")
-            if elapsed >= config.backup.max_unprotected_age_seconds:
-                reasons.add("max_unprotected_age_reached")
-        normalized = tuple(sorted(reasons))
-        return replace(
-            self,
-            blocked=bool(normalized),
-            blocker_reasons=normalized,
-        )
-
-    def _validate_config(self, config: AnnouncementAssetConfig) -> None:
-        if self.config_fingerprint != config.evidence_fingerprint:
-            raise ValueError("backup protection state configuration fingerprint mismatch")
 
 
-@dataclass(frozen=True)
-class CapacityOverrideConfig:
-    """Explicit, bounded operator override for a single acquisition operation."""
-
-    enabled: bool = False
-    max_bytes: int = 2 * 1024**3
-    max_duration_seconds: int = 3600
-    requires_operator: bool = True
-    audit_required: bool = True
-    scope_mode: str = "single_operation_and_target"
-
-    def __post_init__(self) -> None:
-        _validate_positive_dataclass_ints(
-            self,
-            ("max_bytes", "max_duration_seconds"),
-            prefix="capacity_override",
-        )
-        if self.scope_mode != "single_operation_and_target":
-            raise ValueError("capacity override scope_mode is unsupported")
-        if not self.requires_operator or not self.audit_required:
-            raise ValueError("capacity override requires operator authorization and audit")
 
 
 @dataclass(frozen=True)
@@ -644,9 +309,7 @@ class DiscoveryConfig:
     overlap_days: int = 3
     initial_lookback_days: int = 180
     reconciliation_lookback_days: int = 400
-    reconciliation_cohort_size: int = 200
     reconciliation_max_cycle_days: int = 30
-    missing_repair_cohort_size: int = 100
     max_pages: int = 20
     page_size: int = 30
     max_requests: int = 300
@@ -663,9 +326,7 @@ class DiscoveryConfig:
         positive = (
             "initial_lookback_days",
             "reconciliation_lookback_days",
-            "reconciliation_cohort_size",
             "reconciliation_max_cycle_days",
-            "missing_repair_cohort_size",
             "max_pages",
             "page_size",
             "max_requests",
@@ -747,22 +408,6 @@ class AcquisitionConfig:
         return self.max_task_download_bytes
 
 
-@dataclass(frozen=True)
-class RolloutGateConfig:
-    require_bootstrap: bool = True
-    require_integrity: bool = True
-    require_storage: bool = True
-    require_backup: bool = True
-    require_consumer_migration: bool = True
-    consumer_dependency_policy: str = "completed_assets_only"
-
-    def __post_init__(self) -> None:
-        if self.consumer_dependency_policy not in {
-            "completed_assets_only",
-            "wait_for_full_success",
-            "disabled",
-        }:
-            raise ValueError("invalid consumer_dependency_policy")
 
 
 @dataclass(frozen=True)
@@ -776,13 +421,6 @@ class JobConfig:
     daily_enabled: bool = False
     daily_manual_only: bool = False
     daily_cron: str = "15 3 * * *"
-    backup_manual_only: bool = False
-    backup_cron: str = "45 4 * * *"
-    integrity_enabled: bool = False
-    integrity_manual_only: bool = True
-    integrity_cron: str | None = None
-    integrity_read_only: bool = True
-    backup_enabled: bool = False
 
     def __post_init__(self) -> None:
         if not self.latest_backfill_manual_only:
@@ -791,17 +429,9 @@ class JobConfig:
             raise ValueError("latest backfill manual-only job cannot have a cron")
         if self.daily_manual_only and self.daily_cron:
             raise ValueError("daily job cannot be manual-only when a cron is configured")
-        if self.backup_manual_only and self.backup_cron:
-            raise ValueError("backup job cannot be manual-only when a cron is configured")
-        if self.integrity_manual_only and self.integrity_cron:
-            raise ValueError(
-                "integrity audit cannot be manual-only when a cron is configured"
-            )
         for name in (
             "daily_cron",
-            "backup_cron",
             "latest_backfill_cron",
-            "integrity_cron",
         ):
             cron = getattr(self, name)
             if cron is not None and not str(cron).strip():
@@ -833,134 +463,6 @@ class TrustedPrincipalConfig:
         object.__setattr__(self, "scopes", scopes)
 
 
-@dataclass(frozen=True)
-class LegacyArchiveRegistryConfig:
-    """Versioned ownership and layout policy for legacy annual-report roots."""
-
-    registry_version: str = LEGACY_ARCHIVE_REGISTRY_VERSION
-    path_template_version: str = LEGACY_ARCHIVE_TEMPLATE_VERSION
-    exclusion_policy_version: str = LEGACY_ARCHIVE_EXCLUSION_POLICY_VERSION
-    business_profile_root: Path = Path("data/filings/business_profile")
-    broker_risk_control_root: Path = Path(
-        "data/filings/financial_statements/broker_risk_control"
-    )
-    business_profile_template: str = "business_profile/{fiscal_year}/{exchange}/"
-    broker_risk_control_template: str = (
-        "broker_risk_control/{exchange}/{symbol}/"
-    )
-    allowed_document_families: tuple[str, ...] = ("annual_report",)
-    business_profile_excluded_subtrees: tuple[str, ...] = ("derived",)
-    broker_excluded_document_families: tuple[str, ...] = ("semiannual_report",)
-
-    def __post_init__(self) -> None:
-        for name in (
-            "registry_version",
-            "path_template_version",
-            "exclusion_policy_version",
-        ):
-            _non_empty_text(getattr(self, name), f"legacy_inventory.{name}")
-        expected_placeholders = {
-            "business_profile_template": ("{fiscal_year}", "{exchange}"),
-            "broker_risk_control_template": ("{exchange}", "{symbol}"),
-        }
-        for name, placeholders in expected_placeholders.items():
-            template = _non_empty_text(
-                getattr(self, name), f"legacy_inventory.{name}"
-            )
-            if template.startswith("/") or ".." in PurePosixPath(template).parts:
-                raise ValueError(f"legacy_inventory.{name} must be relative")
-            if any(placeholder not in template for placeholder in placeholders):
-                raise ValueError(
-                    f"legacy_inventory.{name} is missing required placeholders"
-                )
-        allowed = tuple(
-            dict.fromkeys(
-                str(item or "").strip().lower()
-                for item in self.allowed_document_families
-            )
-        )
-        if allowed != ("annual_report",):
-            raise ValueError("version 1 legacy inventory accepts only annual_report")
-        excluded_subtrees = tuple(
-            dict.fromkeys(
-                str(item or "").strip().lower()
-                for item in self.business_profile_excluded_subtrees
-            )
-        )
-        if "derived" not in excluded_subtrees or any(
-            not item or "/" in item or item in {".", ".."}
-            for item in excluded_subtrees
-        ):
-            raise ValueError(
-                "business-profile legacy exclusions must include derived"
-            )
-        broker_excluded = tuple(
-            dict.fromkeys(
-                str(item or "").strip().lower()
-                for item in self.broker_excluded_document_families
-            )
-        )
-        if "semiannual_report" not in broker_excluded:
-            raise ValueError("broker legacy exclusions must include semiannual_report")
-        object.__setattr__(self, "allowed_document_families", allowed)
-        object.__setattr__(
-            self, "business_profile_excluded_subtrees", excluded_subtrees
-        )
-        object.__setattr__(
-            self, "broker_excluded_document_families", broker_excluded
-        )
-
-    @property
-    def roots(self) -> tuple[tuple[str, Path], ...]:
-        return (
-            ("business_profile", self.business_profile_root),
-            ("broker_risk_control", self.broker_risk_control_root),
-        )
-
-    def normalized_mapping(self, *, project_root: Path) -> dict[str, Any]:
-        return {
-            "registry_version": self.registry_version,
-            "path_template_version": self.path_template_version,
-            "exclusion_policy_version": self.exclusion_policy_version,
-            "roots": {
-                "business_profile": {
-                    "base_root": _relative_to_project(
-                        self.business_profile_root,
-                        project_root,
-                        "legacy_inventory.roots.business_profile.base_root",
-                    ),
-                    "path_template": self.business_profile_template,
-                },
-                "broker_risk_control": {
-                    "base_root": _relative_to_project(
-                        self.broker_risk_control_root,
-                        project_root,
-                        "legacy_inventory.roots.broker_risk_control.base_root",
-                    ),
-                    "path_template": self.broker_risk_control_template,
-                },
-            },
-            "exclusions": {
-                "allowed_document_families": list(
-                    self.allowed_document_families
-                ),
-                "business_profile_subtrees": list(
-                    self.business_profile_excluded_subtrees
-                ),
-                "broker_document_families": list(
-                    self.broker_excluded_document_families
-                ),
-            },
-        }
-
-    def fingerprint(self, *, project_root: Path) -> str:
-        payload = json.dumps(
-            self.normalized_mapping(project_root=project_root),
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=True,
-        ).encode("utf-8")
-        return hashlib.sha256(payload).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -969,22 +471,10 @@ class AnnouncementAssetConfig:
     scheduled_enabled: bool = False
     dry_run: bool = True
     project_root: Path = Path(".")
-    capacity_artifact_required: bool = False
-    capacity_artifact_path: Path = Path(
-        "config/runtime_evidence/official_announcement_asset_capacity.json"
-    )
-    capacity_artifact_max_age_hours: int = 24
     filings_root: Path = Path("data/filings")
     archive_root: Path = Path("data/filings/announcements")
     temp_root: Path = Path("data/filings/announcements/tmp")
     quarantine_root: Path = Path("data/filings/announcements/quarantine")
-    adoption_roots: tuple[Path, ...] = (
-        Path("data/filings/business_profile"),
-        Path("data/filings/financial_statements/broker_risk_control"),
-    )
-    legacy_inventory: LegacyArchiveRegistryConfig = field(
-        default_factory=LegacyArchiveRegistryConfig
-    )
     expected_filings_mount_source: str | None = None
     require_filings_mount: bool = True
     exchanges: tuple[str, ...] = ("SSE", "SZSE", "BSE")
@@ -1009,30 +499,19 @@ class AnnouncementAssetConfig:
     wait_seconds_default: float = 0.0
     wait_seconds_maximum: float = 30.0
     storage: StorageGateConfig = field(default_factory=StorageGateConfig)
-    backup: BackupConfig = field(default_factory=BackupConfig)
-    capacity_override: CapacityOverrideConfig = field(default_factory=CapacityOverrideConfig)
     provisional_result: ProvisionalResultConfig = field(default_factory=ProvisionalResultConfig)
     retry: RetryConfig = field(default_factory=RetryConfig)
     discovery: DiscoveryConfig = field(default_factory=DiscoveryConfig)
     acquisition: AcquisitionConfig = field(default_factory=AcquisitionConfig)
     jobs: JobConfig = field(default_factory=JobConfig)
-    rollout: RolloutGateConfig = field(default_factory=RolloutGateConfig)
     trusted_identity_enabled: bool = False
     trusted_principals: tuple[TrustedPrincipalConfig, ...] = ()
     acquire_permission: str = "annual_report_assets:acquire"
     content_permission: str = "annual_report_assets:read_content"
     operator_permission: str = "annual_report_assets:operator"
-    business_profile_process_permission: str = "business_profile:process"
-    broker_risk_control_process_permission: str = "broker_risk_control:process"
 
     def __post_init__(self) -> None:
         root = self.project_root.resolve(strict=False)
-        capacity_artifact = _resolve_beneath(
-            root,
-            self.capacity_artifact_path,
-            Path("config/runtime_evidence"),
-            "capacity_artifact_path",
-        )
         filings = _resolve_beneath(root, self.filings_root, Path("."), "filings_root")
         archive = _resolve_beneath(
             root, self.archive_root, self.filings_root, "archive_root"
@@ -1041,30 +520,6 @@ class AnnouncementAssetConfig:
         quarantine = _resolve_beneath(
             root, self.quarantine_root, self.archive_root, "quarantine_root"
         )
-        adoption_roots = tuple(
-            _resolve_beneath(root, path, self.filings_root, "adoption_roots")
-            for path in self.adoption_roots
-        )
-        legacy_inventory = replace(
-            self.legacy_inventory,
-            business_profile_root=_resolve_beneath(
-                root,
-                self.legacy_inventory.business_profile_root,
-                self.filings_root,
-                "legacy_inventory.roots.business_profile.base_root",
-            ),
-            broker_risk_control_root=_resolve_beneath(
-                root,
-                self.legacy_inventory.broker_risk_control_root,
-                self.filings_root,
-                "legacy_inventory.roots.broker_risk_control.base_root",
-            ),
-        )
-        registered_roots = tuple(path for _, path in legacy_inventory.roots)
-        if adoption_roots != registered_roots:
-            raise ValueError(
-                "paths.adoption_roots must match the versioned legacy root registry"
-            )
         if self.trusted_identity_enabled and not self.trusted_principals:
             raise ValueError(
                 "permissions.principals are required when trusted identity is enabled"
@@ -1079,22 +534,13 @@ class AnnouncementAssetConfig:
             "acquire_permission",
             "content_permission",
             "operator_permission",
-            "business_profile_process_permission",
-            "broker_risk_control_process_permission",
         ):
             _non_empty_text(getattr(self, name), f"permissions.{name}")
         object.__setattr__(self, "project_root", root)
-        object.__setattr__(self, "capacity_artifact_path", capacity_artifact)
         object.__setattr__(self, "filings_root", filings)
         object.__setattr__(self, "archive_root", archive)
         object.__setattr__(self, "temp_root", temp)
         object.__setattr__(self, "quarantine_root", quarantine)
-        object.__setattr__(self, "adoption_roots", adoption_roots)
-        object.__setattr__(self, "legacy_inventory", legacy_inventory)
-        _positive_int(
-            self.capacity_artifact_max_age_hours,
-            "capacity_artifact_max_age_hours",
-        )
         exchanges = tuple(
             dict.fromkeys(str(item).strip().upper() for item in self.exchanges)
         )
@@ -1171,9 +617,6 @@ class AnnouncementAssetConfig:
             "enabled": self.enabled,
             "scheduled_enabled": self.scheduled_enabled,
             "dry_run": self.dry_run,
-            "capacity_artifact_required": self.capacity_artifact_required,
-            "capacity_artifact_path": path(self.capacity_artifact_path),
-            "capacity_artifact_max_age_hours": self.capacity_artifact_max_age_hours,
             "active_exchanges": list(self.exchanges),
             "instrument_type": self.instrument_type,
             "active_only": self.active_only,
@@ -1199,13 +642,9 @@ class AnnouncementAssetConfig:
                 "archive_root": path(self.archive_root),
                 "temp_root": path(self.temp_root),
                 "quarantine_root": path(self.quarantine_root),
-                "adoption_roots": [path(item) for item in self.adoption_roots],
                 "expected_mount_source": self.expected_filings_mount_source,
                 "require_mount": self.require_filings_mount,
             },
-            "legacy_inventory": self.legacy_inventory.normalized_mapping(
-                project_root=self.project_root
-            ),
             "storage": {
                 "warning_utilization": self.storage.warning_utilization,
                 "hard_stop_utilization": self.storage.hard_stop_utilization,
@@ -1233,33 +672,6 @@ class AnnouncementAssetConfig:
                 "candidate_verification_max_bytes": self.storage.candidate_verification_max_bytes,
                 "unprotected_write_reservation_bytes": self.storage.unprotected_write_reservation_bytes,
             },
-            "backup": {
-                "enabled": self.backup.enabled,
-                "scheduled_enabled": self.backup.scheduled_enabled,
-                "mount_root": path(self.backup.mount_root),
-                "destination_root": path(self.backup.destination_root),
-                "expected_mount_source": self.backup.expected_mount_source,
-                "expected_failure_domain": self.backup.expected_failure_domain,
-                "warning_utilization": self.backup.warning_utilization,
-                "hard_stop_utilization": self.backup.hard_stop_utilization,
-                "free_space_reserve_bytes": self.backup.free_space_reserve_bytes,
-                "freshness_hours": self.backup.freshness_hours,
-                "max_unprotected_bytes": self.backup.max_unprotected_bytes,
-                "max_unprotected_age_seconds": self.backup.max_unprotected_age_seconds,
-                "unprotected_accumulation_origin": self.backup.unprotected_accumulation_origin,
-                "reset_on_verified_backup": self.backup.reset_on_verified_backup,
-                "unblock_requires_verified_backup": self.backup.unblock_requires_verified_backup,
-                "recovery_journal_retention_policy": self.backup.recovery_journal_retention_policy,
-                "recovery_journal_integrity_policy": self.backup.recovery_journal_integrity_policy,
-            },
-            "capacity_override": {
-                "enabled": self.capacity_override.enabled,
-                "max_bytes": self.capacity_override.max_bytes,
-                "max_duration_seconds": self.capacity_override.max_duration_seconds,
-                "requires_operator": self.capacity_override.requires_operator,
-                "audit_required": self.capacity_override.audit_required,
-                "scope_mode": self.capacity_override.scope_mode,
-            },
             "provisional_result": {
                 "enabled": self.provisional_result.enabled,
                 "policy_version": self.provisional_result.policy_version,
@@ -1280,9 +692,6 @@ class AnnouncementAssetConfig:
             },
             "retry": {name: getattr(self.retry, name) for name in self.retry.__dataclass_fields__},
             "jobs": {name: getattr(self.jobs, name) for name in self.jobs.__dataclass_fields__},
-            "rollout_gates": {
-                name: getattr(self.rollout, name) for name in self.rollout.__dataclass_fields__
-            },
             "permissions": {
                 "trusted_identity_enabled": self.trusted_identity_enabled,
                 "principals": [
@@ -1296,8 +705,6 @@ class AnnouncementAssetConfig:
                 "acquire": self.acquire_permission,
                 "read_content": self.content_permission,
                 "operator": self.operator_permission,
-                "business_profile_process": self.business_profile_process_permission,
-                "broker_risk_control_process": self.broker_risk_control_process_permission,
             },
         }
 
@@ -1310,22 +717,18 @@ class AnnouncementAssetConfig:
 
     @property
     def evidence_fingerprint(self) -> str:
-        """Fingerprint policy while excluding pure rollout-control toggles."""
+        """Fingerprint policy while excluding runtime enable switches."""
 
         mapping = self.normalized_mapping()
         mapping["enabled"] = False
         mapping["scheduled_enabled"] = False
         mapping["dry_run"] = True
-        mapping["backup"]["enabled"] = False
-        mapping["backup"]["scheduled_enabled"] = False
         # This bounds one execution batch without changing asset identity,
-        # retention, storage, provider routing, or backup semantics.
+        # storage, or provider routing.
         mapping["discovery"]["max_requests"] = 300
         for name in (
             "latest_backfill_enabled",
             "daily_enabled",
-            "backup_enabled",
-            "integrity_enabled",
         ):
             mapping["jobs"][name] = False
         mapping["permissions"]["trusted_identity_enabled"] = False
@@ -1387,9 +790,6 @@ class AnnouncementAssetConfig:
                 "universe_master_data_freshness_hours"
             )
         paths = _mapping(raw.get("paths"), "paths")
-        legacy_inventory_raw = _mapping(
-            raw.get("legacy_inventory"), "legacy_inventory"
-        )
         storage_raw = dict(_mapping(raw.get("storage"), "storage"))
         # Accept the contract vocabulary while retaining the original V1
         # ``stale_part``/``quarantine_max`` names for existing deployments.
@@ -1411,10 +811,6 @@ class AnnouncementAssetConfig:
                     f"storage.{public_name} conflicts with storage.{legacy_name}"
                 )
             storage_raw[legacy_name] = storage_raw.pop(public_name)
-        backup_raw = _mapping(raw.get("backup"), "backup")
-        capacity_override_raw = _mapping(
-            raw.get("capacity_override"), "capacity_override"
-        )
         provisional_result_raw = _mapping(
             raw.get("provisional_result"), "provisional_result"
         )
@@ -1436,7 +832,6 @@ class AnnouncementAssetConfig:
                     f"acquisition.{alias} conflicts with acquisition.max_task_download_bytes"
                 )
             acquisition_raw["max_task_download_bytes"] = acquisition_raw.pop(alias)
-        rollout_raw = _mapping(raw.get("rollout_gates"), "rollout_gates")
         permissions = _mapping(raw.get("permissions"), "permissions")
         principals_raw = permissions.get("principals", [])
         if not isinstance(principals_raw, list):
@@ -1463,78 +858,7 @@ class AnnouncementAssetConfig:
             paths.get("quarantine_root", "data/filings/announcements/quarantine"),
             "quarantine_root",
         )
-        adoption_roots_rel = tuple(
-            _relative_path(item, "paths.adoption_roots")
-            for item in paths.get(
-                "adoption_roots",
-                (
-                    "data/filings/business_profile",
-                    "data/filings/financial_statements/broker_risk_control",
-                ),
-            )
-        )
-        legacy_roots_raw = _mapping(
-            legacy_inventory_raw.get("roots"), "legacy_inventory.roots"
-        )
-        required_legacy_consumers = {"business_profile", "broker_risk_control"}
-        if (
-            "roots" in legacy_inventory_raw
-            and set(legacy_roots_raw) != required_legacy_consumers
-        ):
-            raise ValueError(
-                "legacy_inventory.roots must define business_profile and "
-                "broker_risk_control exactly"
-            )
-        business_root_raw = _mapping(
-            legacy_roots_raw.get("business_profile"),
-            "legacy_inventory.roots.business_profile",
-        )
-        broker_root_raw = _mapping(
-            legacy_roots_raw.get("broker_risk_control"),
-            "legacy_inventory.roots.broker_risk_control",
-        )
-        legacy_business_root = _relative_path(
-            business_root_raw.get(
-                "base_root", "data/filings/business_profile"
-            ),
-            "legacy_inventory.roots.business_profile.base_root",
-        )
-        legacy_broker_root = _relative_path(
-            broker_root_raw.get(
-                "base_root",
-                "data/filings/financial_statements/broker_risk_control",
-            ),
-            "legacy_inventory.roots.broker_risk_control.base_root",
-        )
-        if adoption_roots_rel != (legacy_business_root, legacy_broker_root):
-            raise ValueError(
-                "paths.adoption_roots conflicts with legacy_inventory.roots"
-            )
-        exclusions_raw = _mapping(
-            legacy_inventory_raw.get("exclusions"),
-            "legacy_inventory.exclusions",
-        )
-
-        backup_mount = backup_raw.get("mount_root")
-        backup_destination = backup_raw.get("destination_root")
-        backup_mount_rel = (
-            None
-            if backup_mount in (None, "")
-            else _relative_path(backup_mount, "backup.mount_root")
-        )
-        backup_destination_rel = (
-            None
-            if backup_destination in (None, "")
-            else _relative_path(backup_destination, "backup.destination_root")
-        )
         project = Path(project_root)
-        if backup_mount_rel is not None and backup_destination_rel is not None:
-            _resolve_beneath(
-                project,
-                backup_destination_rel,
-                backup_mount_rel,
-                "backup.destination_root",
-            )
 
         return cls(
             enabled=_bool_value(raw.get("enabled"), "enabled", False),
@@ -1543,74 +867,10 @@ class AnnouncementAssetConfig:
             ),
             dry_run=_bool_value(raw.get("dry_run"), "dry_run", True),
             project_root=project,
-            capacity_artifact_required=_bool_value(
-                raw.get("capacity_artifact_required"),
-                "capacity_artifact_required",
-                False,
-            ),
-            capacity_artifact_path=_relative_path(
-                raw.get(
-                    "capacity_artifact_path",
-                    "config/runtime_evidence/official_announcement_asset_capacity.json",
-                ),
-                "capacity_artifact_path",
-            ),
-            capacity_artifact_max_age_hours=_positive_int(
-                raw.get("capacity_artifact_max_age_hours", 24),
-                "capacity_artifact_max_age_hours",
-            ),
             filings_root=filings_rel,
             archive_root=archive_rel,
             temp_root=temp_rel,
             quarantine_root=quarantine_rel,
-            adoption_roots=adoption_roots_rel,
-            legacy_inventory=LegacyArchiveRegistryConfig(
-                registry_version=str(
-                    legacy_inventory_raw.get(
-                        "registry_version", LEGACY_ARCHIVE_REGISTRY_VERSION
-                    )
-                ),
-                path_template_version=str(
-                    legacy_inventory_raw.get(
-                        "path_template_version", LEGACY_ARCHIVE_TEMPLATE_VERSION
-                    )
-                ),
-                exclusion_policy_version=str(
-                    legacy_inventory_raw.get(
-                        "exclusion_policy_version",
-                        LEGACY_ARCHIVE_EXCLUSION_POLICY_VERSION,
-                    )
-                ),
-                business_profile_root=legacy_business_root,
-                broker_risk_control_root=legacy_broker_root,
-                business_profile_template=str(
-                    business_root_raw.get(
-                        "path_template",
-                        "business_profile/{fiscal_year}/{exchange}/",
-                    )
-                ),
-                broker_risk_control_template=str(
-                    broker_root_raw.get(
-                        "path_template",
-                        "broker_risk_control/{exchange}/{symbol}/",
-                    )
-                ),
-                allowed_document_families=tuple(
-                    exclusions_raw.get(
-                        "allowed_document_families", ("annual_report",)
-                    )
-                ),
-                business_profile_excluded_subtrees=tuple(
-                    exclusions_raw.get(
-                        "business_profile_subtrees", ("derived",)
-                    )
-                ),
-                broker_excluded_document_families=tuple(
-                    exclusions_raw.get(
-                        "broker_document_families", ("semiannual_report",)
-                    )
-                ),
-            ),
             expected_filings_mount_source=(
                 str(paths.get("expected_mount_source")).strip()
                 if paths.get("expected_mount_source")
@@ -1686,115 +946,6 @@ class AnnouncementAssetConfig:
                 raw.get("wait_seconds_maximum", 30.0), "wait_seconds_maximum"
             ),
             storage=StorageGateConfig(**storage_raw),
-            backup=BackupConfig(
-                enabled=_bool_value(
-                    backup_raw.get("enabled"), "backup.enabled", False
-                ),
-                scheduled_enabled=_bool_value(
-                    backup_raw.get("scheduled_enabled"),
-                    "backup.scheduled_enabled",
-                    False,
-                ),
-                mount_root=(
-                    None
-                    if backup_mount_rel is None
-                    else (project / backup_mount_rel).resolve(strict=False)
-                ),
-                destination_root=(
-                    None
-                    if backup_destination_rel is None
-                    else (project / backup_destination_rel).resolve(strict=False)
-                ),
-                expected_mount_source=(
-                    str(backup_raw.get("expected_mount_source")).strip()
-                    if backup_raw.get("expected_mount_source")
-                    else None
-                ),
-                expected_failure_domain=(
-                    str(backup_raw.get("expected_failure_domain")).strip()
-                    if backup_raw.get("expected_failure_domain")
-                    else None
-                ),
-                warning_utilization=float(backup_raw.get("warning_utilization", 0.80)),
-                hard_stop_utilization=float(
-                    backup_raw.get("hard_stop_utilization", 0.90)
-                ),
-                free_space_reserve_bytes=int(
-                    backup_raw.get("free_space_reserve_bytes", 50 * 1024**3)
-                ),
-                freshness_hours=int(backup_raw.get("freshness_hours", 48)),
-                max_unprotected_bytes=int(
-                    _unprotected_limit(
-                        backup_raw.get("max_unprotected_bytes", 10 * 1024**3),
-                        "backup.max_unprotected_bytes",
-                    )
-                ),
-                max_unprotected_age_seconds=int(
-                    _unprotected_limit(
-                        backup_raw.get(
-                            "max_unprotected_age_seconds", 72 * 3600
-                        ),
-                        "backup.max_unprotected_age_seconds",
-                    )
-                ),
-                unprotected_accumulation_origin=str(
-                    backup_raw.get(
-                        "unprotected_accumulation_origin", "first_unprotected_at"
-                    )
-                ),
-                reset_on_verified_backup=_bool_value(
-                    backup_raw.get("reset_on_verified_backup"),
-                    "backup.reset_on_verified_backup",
-                    True,
-                ),
-                unblock_requires_verified_backup=_bool_value(
-                    backup_raw.get("unblock_requires_verified_backup"),
-                    "backup.unblock_requires_verified_backup",
-                    True,
-                ),
-                recovery_journal_retention_policy=_non_empty_text(
-                    backup_raw.get(
-                        "recovery_journal_retention_policy",
-                        "append_only_no_automatic_gc.v1",
-                    ),
-                    "backup.recovery_journal_retention_policy",
-                ),
-                recovery_journal_integrity_policy=_non_empty_text(
-                    backup_raw.get(
-                        "recovery_journal_integrity_policy",
-                        "sha256_chain_with_watermarks.v1",
-                    ),
-                    "backup.recovery_journal_integrity_policy",
-                ),
-            ),
-            capacity_override=CapacityOverrideConfig(
-                enabled=_bool_value(
-                    capacity_override_raw.get("enabled"),
-                    "capacity_override.enabled",
-                    False,
-                ),
-                max_bytes=int(
-                    capacity_override_raw.get("max_bytes", 2 * 1024**3)
-                ),
-                max_duration_seconds=int(
-                    capacity_override_raw.get("max_duration_seconds", 3600)
-                ),
-                requires_operator=_bool_value(
-                    capacity_override_raw.get("requires_operator"),
-                    "capacity_override.requires_operator",
-                    True,
-                ),
-                audit_required=_bool_value(
-                    capacity_override_raw.get("audit_required"),
-                    "capacity_override.audit_required",
-                    True,
-                ),
-                scope_mode=str(
-                    capacity_override_raw.get(
-                        "scope_mode", "single_operation_and_target"
-                    )
-                ),
-            ),
             provisional_result=ProvisionalResultConfig(
                 enabled=_bool_value(
                     provisional_result_raw.get("enabled"),
@@ -1843,7 +994,6 @@ class AnnouncementAssetConfig:
                 },
             ),
             jobs=JobConfig(**jobs_raw),
-            rollout=RolloutGateConfig(**rollout_raw),
             trusted_identity_enabled=_bool_value(
                 permissions.get("trusted_identity_enabled"),
                 "permissions.trusted_identity_enabled",
@@ -1865,15 +1015,5 @@ class AnnouncementAssetConfig:
             ),
             operator_permission=str(
                 permissions.get("operator", "annual_report_assets:operator")
-            ),
-            business_profile_process_permission=str(
-                permissions.get(
-                    "business_profile_process", "business_profile:process"
-                )
-            ),
-            broker_risk_control_process_permission=str(
-                permissions.get(
-                    "broker_risk_control_process", "broker_risk_control:process"
-                )
             ),
         )

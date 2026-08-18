@@ -64,17 +64,6 @@ class StorageCapacitySnapshot:
 
 
 @dataclass(frozen=True)
-class StorageCapacityAdmission:
-    """A service-validated, target-bound capacity watermark admission."""
-
-    authorization_id: str
-    operation_id: str
-    target_attachment_id: str
-    filesystem_key: str
-    max_bytes: int
-
-
-@dataclass(frozen=True)
 class StorageArtifactMetrics:
     part_count: int
     part_bytes: int
@@ -156,45 +145,6 @@ def probe_mount_identity(path: str | Path) -> MountIdentity:
     )
 
 
-def validate_backup_mount(
-    config: AnnouncementAssetConfig,
-    *,
-    require_enabled: bool = True,
-) -> MountIdentity | None:
-    """Validate the backup mount, optionally before backup execution is enabled."""
-    backup = config.backup
-    if require_enabled and not backup.enabled:
-        return None
-    if backup.mount_root is None or backup.destination_root is None:
-        raise RuntimeError("enabled backup has no configured mount or destination")
-    mount_root = backup.mount_root.resolve(strict=False)
-    destination = backup.destination_root.resolve(strict=False)
-    try:
-        destination.relative_to(mount_root)
-    except ValueError as exc:
-        raise RuntimeError("backup destination escapes configured mount root") from exc
-    identity = probe_mount_identity(mount_root)
-    if identity.mount_point == Path("/"):
-        raise RuntimeError("backup root is not a dedicated mounted filesystem")
-    if backup.expected_mount_source and identity.source != backup.expected_mount_source:
-        raise RuntimeError(
-            "backup mount source mismatch: "
-            f"expected={backup.expected_mount_source} actual={identity.source}"
-        )
-    primary = probe_mount_identity(config.filings_root)
-    if identity.filesystem_key == primary.filesystem_key or (
-        _mount_host(identity.source)
-        and _mount_host(identity.source) == _mount_host(primary.source)
-    ):
-        raise RuntimeError("backup does not use an independent storage failure domain")
-    if mount_root.exists() and not os.access(mount_root, os.R_OK | os.W_OK):
-        raise RuntimeError("backup mount is not readable and writable")
-    resolved_destination = destination.resolve(strict=False)
-    try:
-        resolved_destination.relative_to(mount_root.resolve(strict=False))
-    except ValueError as exc:
-        raise RuntimeError("backup destination resolves outside mounted root") from exc
-    return identity
 
 
 class ContentAddressedBlobStore:
@@ -271,7 +221,6 @@ class ContentAddressedBlobStore:
         *,
         expected_hash: str | None = None,
         artifact_metadata: Mapping[str, Any] | None = None,
-        capacity_admission: StorageCapacityAdmission | None = None,
     ) -> BlobPublishResult:
         """Validate, fsync, atomically publish, reopen, and revalidate bytes."""
         if not isinstance(content, bytes):
@@ -285,16 +234,7 @@ class ContentAddressedBlobStore:
             raise ValueError("attachment hash does not match expected hash")
         target = self.blob_path(digest)
         initial_mount = self.validate_mount()
-        if capacity_admission is None:
-            self._check_capacity(len(content))
-        else:
-            snapshot = self.inspect_capacity(len(content))
-            if snapshot.filesystem_key != capacity_admission.filesystem_key:
-                raise RuntimeError("capacity admission filesystem identity changed")
-            if len(content) > int(capacity_admission.max_bytes):
-                raise RuntimeError("capacity admission byte bound exceeded")
-            if snapshot.projected_free_bytes < 0:
-                raise RuntimeError("capacity admission cannot exceed physical free space")
+        self._check_capacity(len(content))
         if target.exists():
             validation = self.validate_blob(
                 target,
@@ -1126,14 +1066,11 @@ class ContentAddressedBlobStore:
 
     def _require_readable_asset(self, path: Path) -> Path:
         candidate = path.resolve(strict=False)
-        roots = (self.config.archive_root, *self.config.adoption_roots)
-        for root in roots:
-            try:
-                candidate.relative_to(root.resolve(strict=False))
-            except ValueError:
-                continue
-            return candidate
-        raise ValueError("path escapes managed and read-only adoption roots")
+        try:
+            candidate.relative_to(self.config.archive_root.resolve(strict=False))
+        except ValueError as exc:
+            raise ValueError("path escapes the managed announcement archive") from exc
+        return candidate
 
 
 def _validated_hash(value: str) -> str:
@@ -1182,15 +1119,6 @@ def _unescape_mountinfo(value: str) -> str:
     )
 
 
-def _mount_host(source: str) -> str | None:
-    text = str(source or "").strip()
-    if not text or text in {"unknown", "none"}:
-        return None
-    if ":" in text:
-        return text.split(":", 1)[0].lower()
-    if text.startswith("//"):
-        return text[2:].split("/", 1)[0].lower()
-    return None
 
 
 def _fsync_directory(path: Path) -> None:

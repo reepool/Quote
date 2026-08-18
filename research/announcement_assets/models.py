@@ -20,24 +20,13 @@ EFFECTIVE_DECISION_SCHEMA_VERSION = "official_annual_report_decision.v1"
 OPERATION_SCHEMA_VERSION = "official_asset_operation.v2"
 OPERATION_STAGE_SCHEMA_VERSION = "official_asset_operation_stage.v1"
 OPERATION_SUBSCRIPTION_SCHEMA_VERSION = "official_asset_operation_subscription.v2"
-CONSUMER_REQUEST_SCHEMA_VERSION = "official_asset_consumer_request.v1"
 RETENTION_PIN_SCHEMA_VERSION = "official_asset_retention_pin.v1"
-DELETION_SCHEMA_VERSION = "official_asset_deletion.v1"
-CONSUMER_PROCESSING_SCHEMA_VERSION = "official_asset_consumer_processing.v2"
-CONSUMER_CHECKPOINT_SCHEMA_VERSION = "official_asset_consumer_checkpoint.v1"
 DISCOVERY_STATE_SCHEMA_VERSION = "official_asset_discovery_state.v2"
 BOOTSTRAP_RUN_SCHEMA_VERSION = "official_asset_bootstrap_run.v1"
-DELETION_INTENT_SCHEMA_VERSION = "official_asset_deletion_intent.v3"
-RECOVERY_MANIFEST_SCHEMA_VERSION = "official_asset_recovery_manifest.v2"
-RECOVERY_PAIR_CLOSURE_SCHEMA_VERSION = "official_asset_recovery_pair_closure.v1"
-BACKUP_RECOVERY_JOURNAL_SCHEMA_VERSION = "official_asset_backup_recovery_journal.v1"
 CHANGE_EVENT_SCHEMA_VERSION = "official_asset_change_event.v1"
 CANONICAL_FILING_PROJECTION_POLICY_VERSION = "canonical_source_filing.v1"
 CLASSIFICATION_VOCABULARY_VERSION = "official_document_classification.v1"
 ACQUISITION_POLICY_SCHEMA_VERSION = "official_document_acquisition_policy.v1"
-CAPACITY_OVERRIDE_SCHEMA_VERSION = "official_asset_capacity_override.v1"
-CAPACITY_OVERRIDE_PERMISSION = "annual_report_assets:operator"
-PHYSICAL_UNLINK_OUTCOME_SCHEMA_VERSION = "official_asset_physical_unlink_outcome.v1"
 
 
 class _StringEnum(str, Enum):
@@ -557,24 +546,8 @@ class AssetRequestStatus(_StringEnum):
     EXPIRED = "expired"
 
 
-class ConsumerRequestStatus(_StringEnum):
-    PENDING_ASSET = "pending_asset"
-    NOT_STARTED = "not_started"
-    QUEUED = "queued"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    MISSING = "missing"
-    BLOCKED = "blocked"
-    CANCELLED = "cancelled"
-    EXPIRED = "expired"
 
 
-class ConsumerResultState(_StringEnum):
-    UNAVAILABLE = "unavailable"
-    CURRENT = "current"
-    STALE = "stale"
-    REPROCESSING = "reprocessing"
 
 
 ACTIVE_OPERATION_STATUSES = frozenset(
@@ -591,14 +564,9 @@ class OperationStage(_StringEnum):
     NOT_APPLICABLE = "not_applicable"
     DISCOVERING = "discovering"
     RECONCILING = "reconciling"
-    ADOPTING = "adopting"
     DOWNLOADING = "downloading"
     VALIDATING = "validating"
     ACTIVATING = "activating"
-    DELETING = "deleting"
-    BACKING_UP = "backing_up"
-    RESTORING = "restoring"
-    AUDITING = "auditing"
 
 
 class BatchOutcome(_StringEnum):
@@ -614,20 +582,8 @@ class ResultOrigin(_StringEnum):
     REPAIRED = "repaired"
 
 
-class ConsumerProcessingStatus(_StringEnum):
-    NOT_STARTED = "not_started"
-    QUEUED = "queued"
-    PROCESSING = "processing"
-    CURRENT = "current"
-    STALE = "stale"
-    FAILED = "failed"
 
 
-class DeletionStatus(_StringEnum):
-    PLANNED = "planned"
-    DELETING = "deleting"
-    DELETED = "deleted"
-    FAILED = "failed"
 
 
 class CoverageStatus(_StringEnum):
@@ -767,12 +723,6 @@ class OfficialDocumentBlob:
     integrity_status: IntegrityStatus
     first_available_at: str
     last_verified_at: str | None
-    backup_status: str = "unprotected"
-    backup_verified_at: str | None = None
-    acquisition_origin: str | None = None
-    adopted_from_path: str | None = None
-    verification_evidence: Mapping[str, Any] = field(default_factory=dict)
-    backup_evidence: Mapping[str, Any] = field(default_factory=dict)
     schema_version: str = BLOB_SCHEMA_VERSION
 
 
@@ -1006,170 +956,18 @@ class AssetOperationSubscription:
     schema_version: str = OPERATION_SUBSCRIPTION_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetConsumerRequest:
-    """Caller-owned projection for one annual-report-backed business action."""
-
-    consumer_request_id: str
-    principal: str
-    consumer: str
-    idempotency_key: str
-    request_fingerprint: str
-    processing_fingerprint: str
-    selector: Mapping[str, Any]
-    status: ConsumerRequestStatus
-    result_state: ConsumerResultState
-    created_at: str
-    updated_at: str
-    asset_request_id: str | None = None
-    asset_id: str | None = None
-    processing_id: str | None = None
-    result_identity: str | None = None
-    resolved_source: str | None = None
-    resolved_source_announcement_id: str | None = None
-    resolved_attachment_id: str | None = None
-    resolved_observation_version: str | None = None
-    resolved_content_hash: str | None = None
-    resolved_report_period: str | None = None
-    reason_code: str | None = None
-    retry_metadata: Mapping[str, Any] = field(default_factory=dict)
-    diagnostics: Mapping[str, Any] = field(default_factory=dict)
-    metadata: Mapping[str, Any] = field(default_factory=dict)
-    processing_started_at: str | None = None
-    finished_at: str | None = None
-    stop_requested_at: str | None = None
-    cancelled_at: str | None = None
-    expires_at: str | None = None
-    expired_at: str | None = None
-    tombstone_until: str | None = None
-    retention_policy_version: str = "consumer_request_retention.v1"
-    schema_version: str = CONSUMER_REQUEST_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetDeletionAudit:
-    audit_id: int | None
-    deletion_id: str
-    status: DeletionStatus
-    blob_hash: str
-    managed_path: str
-    predecessor_asset_id: str | None
-    replacement_asset_id: str | None
-    replacement_blob_hash: str | None
-    reason: str
-    retention_evidence: Mapping[str, Any]
-    actor: str | None
-    details: Mapping[str, Any]
-    created_at: str
-    schema_version: str = DELETION_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetDeletionIntent:
-    deletion_id: str
-    blob_hash: str
-    managed_path: str
-    predecessor_asset_id: str | None
-    replacement_asset_id: str | None
-    replacement_blob_hash: str | None
-    status: DeletionStatus
-    reason: str
-    lease_owner: str | None
-    lease_generation: int
-    lease_expires_at: str | None
-    attempt: int
-    next_retry_at: str | None
-    error_code: str | None
-    planned_at: str
-    deleting_at: str | None
-    deleted_at: str | None
-    updated_at: str
-    recovery_pair_id: str | None = None
-    recovery_pin_id: str | None = None
-    recovery_manifest_id: str | None = None
-    required_set_released_at: str | None = None
-    decision_id: str | None = None
-    outbox_event_key: str | None = None
-    operation_mount_source: str | None = None
-    operation_mount_point: str | None = None
-    operation_mount_fs_type: str | None = None
-    operation_mount_device_id: int | None = None
-    operation_mount_filesystem_key: str | None = None
-    operation_mount_captured_at: str | None = None
-    schema_version: str = DELETION_INTENT_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetRetentionPin:
-    pin_id: str
-    blob_hash: str
-    pin_type: str
-    pin_key: str
-    owner: str | None
-    created_at: str
-    expires_at: str | None
-    released_at: str | None
-    blocks_primary_unlink: bool
-    required_set_hold: bool
-    required_set_released_at: str | None
-    metadata: Mapping[str, Any] = field(default_factory=dict)
-    schema_version: str = RETENTION_PIN_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetRecoveryManifestEntry:
-    recovery_id: str
-    manifest_kind: str
-    manifest_version: int
-    predecessor_asset_id: str | None
-    source: str | None
-    source_announcement_id: str | None
-    attachment_id: str | None
-    version_id: str | None
-    prior_path: str
-    content_hash: str
-    replacement_asset_id: str | None
-    replacement_content_hash: str | None
-    backup_object: str
-    file_manifest_watermark: str
-    recovery_pair_id: str
-    consumer: str | None
-    active_indefinitely: bool
-    created_at: str
-    created_by: str
-    catalog_snapshot_watermark: str | None = None
-    evidence: Mapping[str, Any] = field(default_factory=dict)
-    schema_version: str = RECOVERY_MANIFEST_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetRecoveryPairClosure:
-    closure_id: str
-    recovery_pair_id: str
-    recovery_id: str
-    catalog_snapshot_identity: str
-    catalog_snapshot_hash: str
-    file_manifest_watermark: str
-    verified_at: str
-    verified_by: str
-    evidence: Mapping[str, Any] = field(default_factory=dict)
-    schema_version: str = RECOVERY_PAIR_CLOSURE_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetBackupRecoveryJournalEntry:
-    journal_entry_id: str
-    journal_sequence: int
-    increment_kind: str
-    increment_identity: str
-    source_catalog_generation: str
-    predecessor_watermark: str | None
-    coverage_watermark: str
-    integrity_hash: str
-    payload: Mapping[str, Any]
-    created_at: str
-    created_by: str
-    schema_version: str = BACKUP_RECOVERY_JOURNAL_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
@@ -1185,51 +983,12 @@ class OfficialAssetChangeEvent:
     payload: Mapping[str, Any]
     created_at: str
     trigger_origin: str = "unknown"
-    dispatch_policy_version: str = "consumer_dispatch.v1"
+    dispatch_policy_version: str = "asset_change_event.v1"
     schema_version: str = CHANGE_EVENT_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetConsumerCheckpoint:
-    consumer: str
-    last_event_id: int
-    last_event_key: str | None
-    last_attempted_event_id: int | None
-    delivery_attempt: int
-    last_attempted_at: str | None
-    last_delivered_at: str | None
-    last_error_code: str | None
-    metadata: Mapping[str, Any]
-    created_at: str
-    updated_at: str
-    schema_version: str = CONSUMER_CHECKPOINT_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class OfficialAssetConsumerProcessing:
-    processing_id: str
-    asset_id: str
-    consumer: str
-    parser_version: str
-    parameter_hash: str
-    status: ConsumerProcessingStatus
-    derived_identity: str | None
-    error_code: str | None
-    metadata: Mapping[str, Any]
-    created_at: str
-    updated_at: str
-    lease_owner: str | None = None
-    lease_generation: int = 0
-    lease_expires_at: str | None = None
-    heartbeat_at: str | None = None
-    attempt: int = 0
-    max_attempts: int = 4
-    started_at: str | None = None
-    finished_at: str | None = None
-    canonical_projection_policy_version: str | None = None
-    evidence_set_hash: str | None = None
-    equivalent_source_filings: tuple[SourceFilingEvidence, ...] = ()
-    schema_version: str = CONSUMER_PROCESSING_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
@@ -1257,44 +1016,6 @@ class OfficialAssetDiscoveryState:
     schema_version: str = DISCOVERY_STATE_SCHEMA_VERSION
 
 
-@dataclass(frozen=True)
-class CapacityOverrideAuthorization:
-    """Operator authorization to relax only the storage capacity watermark."""
-
-    authorization_id: str
-    operation_id: str
-    target_attachment_id: str
-    principal: str
-    permission_scope: str
-    max_bytes: int
-    issued_at: str
-    expires_at: str
-    reason: str
-    schema_version: str = CAPACITY_OVERRIDE_SCHEMA_VERSION
-
-    def __post_init__(self) -> None:
-        normalized = {
-            "authorization_id": str(self.authorization_id or "").strip(),
-            "operation_id": str(self.operation_id or "").strip(),
-            "target_attachment_id": str(self.target_attachment_id or "").strip(),
-            "principal": str(self.principal or "").strip(),
-            "permission_scope": str(self.permission_scope or "").strip(),
-            "reason": str(self.reason or "").strip(),
-        }
-        if any(not value for value in normalized.values()):
-            raise ValueError("capacity override identity, scope, principal, and reason are required")
-        if self.schema_version != CAPACITY_OVERRIDE_SCHEMA_VERSION:
-            raise ValueError("capacity override schema version is unsupported")
-        if isinstance(self.max_bytes, bool) or not isinstance(self.max_bytes, int):
-            raise TypeError("capacity override max_bytes must be an integer")
-        if self.max_bytes <= 0:
-            raise ValueError("capacity override max_bytes must be positive")
-        issued = _aware_datetime(self.issued_at, field_name="issued_at")
-        expires = _aware_datetime(self.expires_at, field_name="expires_at")
-        if expires <= issued:
-            raise ValueError("capacity override expiry must be after issue time")
-        for field_name, value in normalized.items():
-            object.__setattr__(self, field_name, value)
 
 
 @dataclass(frozen=True)

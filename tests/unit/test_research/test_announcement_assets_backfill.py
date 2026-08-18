@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import replace
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from research.announcement_assets import (
-    AnnouncementArchiveInventory,
     AnnouncementAssetConfig,
     AnnouncementAssetRepository,
     AnnouncementAssetService,
@@ -22,7 +21,6 @@ from research.announcement_assets import (
     EnsureRequest,
     ListedSecurityCensusSnapshot,
     pair_with_listed_security_census,
-    probe_mount_identity,
 )
 from research.announcement_assets.backfill import _source_exchange_routes
 from research.announcement_assets.daily import daily_discovery_fingerprint
@@ -533,7 +531,6 @@ def test_bootstrap_report_metrics_include_more_than_one_repository_page(tmp_path
     blobs = {
         report.content_hash: SimpleNamespace(
             content_length=index + 1,
-            backup_status="pending",
         )
         for index, report in enumerate(reports)
     }
@@ -2749,192 +2746,3 @@ def test_bootstrap_verifies_equivalent_candidates_and_publishes_only_winner(tmp_
         '"cleanup_outcome":"deleted"' in row["metadata_json"] for row in verified
     )
     assert blob_count == 1
-
-
-def test_bootstrap_reuses_promoted_adopted_winner_without_network(tmp_path):
-    config = _config(tmp_path)
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    content = b"%PDF-1.4\nadopted annual report\n%%EOF\n"
-    digest = hashlib.sha256(content).hexdigest()
-    business_root = tmp_path / "data/filings/business_profile"
-    broker_root = tmp_path / "data/filings/financial_statements/broker_risk_control"
-    folder = business_root / "2025/SSE"
-    folder.mkdir(parents=True)
-    broker_root.mkdir(parents=True)
-    path = folder / f"600000_SH_2025Q4_adopted_{digest}.pdf"
-    path.write_bytes(content)
-    inventory = AnnouncementArchiveInventory().inventory(
-        business_profile_root=business_root,
-        broker_root=broker_root,
-        manifest_rows=[
-            {
-                "source_file_id": "adopted",
-                "instrument_id": "600000.SH",
-                "exchange": "SSE",
-                "report_period": "2025-12-31",
-                "report_type": "annual_report",
-                "filing_id": "adopted",
-                "source": "cninfo",
-                "archive_path": str(path),
-                "content_hash": digest,
-                "content_length": len(content),
-                "published_at": "2026-03-20T01:00:00+00:00",
-                "status": "archived",
-            }
-        ],
-    )
-    migration = AnnouncementArchiveInventory()
-    migration.shadow_adopt(inventory, repository=repository)
-    reconciliation = migration.reconcile_shadow_adoption(
-        inventory,
-        repository=repository,
-        config=config,
-        legacy_custody_evidence_by_path={
-            path: {
-                "path": str(path.resolve()),
-                "content_hash": digest,
-                "mount_filesystem_key": probe_mount_identity(path).filesystem_key,
-                "config_fingerprint": config.config_fingerprint,
-                "legacy_writer_disabled": True,
-                "legacy_cleaner_disabled": True,
-                "verified_at": datetime.now(timezone.utc).isoformat(),
-                "evidence_ref": "test-custody-shutdown.v1",
-            }
-        },
-    )
-    assert reconciliation.ready_for_cutover, reconciliation.periods
-    promoted = migration.promote_shadow_adoption(
-        reconciliation,
-        repository=repository,
-        config=config,
-    )
-    assert promoted and promoted[0].visibility_state == "production"
-
-    store = ContentAddressedBlobStore(config)
-    retriever = _Retriever()
-    service = AnnouncementAssetService(
-        repository=repository,
-        config=config,
-        blob_store=store,
-        attachment_retriever=retriever,
-    )
-    snapshot = _paired(
-        EligibilityPolicy(max_freshness_hours=36).materialize(
-            [
-                {
-                    "instrument_id": "600000.SH",
-                    "exchange": "SSE",
-                    "type": "stock",
-                    "currency": "CNY",
-                    "is_active": True,
-                }
-            ],
-            master_data_version="master-v1",
-            master_data_last_success_at="2026-08-10T00:00:00+00:00",
-            snapshot_at="2026-08-10T01:00:00+00:00",
-        )
-    )
-
-    result = AnnualReportBootstrap(
-        service=service, repository=repository, config=config
-    ).run(
-        snapshot=snapshot,
-        as_of=date(2026, 8, 10),
-        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
-        discover=lambda *args: (),
-    )
-
-    assert not result.errors, result.errors
-    assert result.status == "success"
-    assert result.local_hits == 1
-    assert result.downloaded == 0
-    assert retriever.calls == []
-    coverage = repository.list_asset_coverage(snapshot.snapshot_id)[0]
-    assert coverage["status"] == "available"
-    assert coverage["evidence"]["latest_winner_fiscal_year"] == 2025
-    assert coverage["evidence"]["asset_availability"] == "local_valid"
-
-
-def test_promoted_older_adoption_is_period_specific_local_first_without_coverage(
-    tmp_path,
-):
-    config = _config(tmp_path)
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    content = b"%PDF-1.4\nolder adopted annual report\n%%EOF\n"
-    digest = hashlib.sha256(content).hexdigest()
-    business_root = tmp_path / "data/filings/business_profile"
-    broker_root = tmp_path / "data/filings/financial_statements/broker_risk_control"
-    folder = business_root / "2024/SSE"
-    folder.mkdir(parents=True)
-    broker_root.mkdir(parents=True)
-    path = folder / f"600000_SH_2024Q4_adopted-older_{digest}.pdf"
-    path.write_bytes(content)
-    inventory = AnnouncementArchiveInventory().inventory(
-        business_profile_root=business_root,
-        broker_root=broker_root,
-        manifest_rows=[
-            {
-                "source_file_id": "adopted-older",
-                "instrument_id": "600000.SH",
-                "exchange": "SSE",
-                "report_period": "2024-12-31",
-                "report_type": "annual_report",
-                "filing_id": "adopted-older",
-                "source": "cninfo",
-                "archive_path": str(path),
-                "content_hash": digest,
-                "content_length": len(content),
-                "published_at": "2025-03-20T01:00:00+00:00",
-                "status": "archived",
-            }
-        ],
-    )
-    migration = AnnouncementArchiveInventory()
-    migration.shadow_adopt(inventory, repository=repository)
-    reconciliation = migration.reconcile_shadow_adoption(
-        inventory,
-        repository=repository,
-        config=config,
-        legacy_custody_evidence_by_path={
-            path: {
-                "path": str(path.resolve()),
-                "content_hash": digest,
-                "mount_filesystem_key": probe_mount_identity(path).filesystem_key,
-                "config_fingerprint": config.config_fingerprint,
-                "legacy_writer_disabled": True,
-                "legacy_cleaner_disabled": True,
-                "verified_at": datetime.now(timezone.utc).isoformat(),
-                "evidence_ref": "test-custody-shutdown.v1",
-            }
-        },
-    )
-    assert reconciliation.ready_for_cutover, reconciliation.periods
-    promoted = migration.promote_shadow_adoption(
-        reconciliation,
-        repository=repository,
-        config=config,
-    )
-    assert promoted and promoted[0].fiscal_year == 2024
-    assert repository.list_asset_coverage("bootstrap-not-run") == []
-
-    retriever = _Retriever()
-    service = AnnouncementAssetService(
-        repository=repository,
-        config=config,
-        blob_store=ContentAddressedBlobStore(config),
-        attachment_retriever=retriever,
-    )
-    result = service.ensure_annual_report(
-        EnsureRequest(
-            instrument_id="600000.SH",
-            fiscal_year=2024,
-            allow_network=False,
-            principal="business-profile",
-        )
-    )
-    assert result.disposition is EnsureDisposition.LOCAL_HIT
-    assert result.asset is not None
-    assert result.asset.fiscal_year == 2024
-    assert retriever.calls == []

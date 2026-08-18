@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import hashlib
 from dataclasses import replace
 from pathlib import Path
@@ -79,8 +78,6 @@ def _config(
                 "latest_backfill_manual_only": True,
                 "daily_enabled": scheduled,
                 "daily_cron": "15 3 * * *",
-                "integrity_enabled": False,
-                "backup_enabled": False,
             },
             "permissions": {
                 "trusted_identity_enabled": trusted,
@@ -153,8 +150,6 @@ def test_scheduler_definitions_are_independent_and_side_effect_free(tmp_path):
     assert [item.name for item in definitions] == [
         LATEST_BACKFILL_JOB,
         DAILY_UPDATE_JOB,
-        "annual_report_asset_integrity_audit",
-        "annual_report_asset_backup",
     ]
     assert definitions[0].manual_only is True
     assert definitions[0].timezone == config.timezone
@@ -169,22 +164,11 @@ def test_scheduler_definitions_are_independent_and_side_effect_free(tmp_path):
         config.daily_min_runs_per_calendar_day
     )
     assert definitions[1].cadence_fingerprint == daily_schedule_fingerprint(config)
-    assert definitions[2].manual_only is True
-    assert definitions[2].enabled is False
-    assert definitions[3].enabled is False
     assert repository.list_operations(limit=10) == []
     assert "business_profile" not in repr(definitions)
     assert "broker" not in repr(definitions)
 
 
-def test_scheduler_definitions_fail_closed_without_required_capacity_artifact(
-    tmp_path,
-):
-    config = replace(_config(tmp_path), capacity_artifact_required=True)
-
-    definitions = annual_report_scheduler_job_definitions(config)
-
-    assert all(item.enabled is False for item in definitions)
 
 
 def test_cron_cli_and_api_share_one_durable_run_and_audit_principals(tmp_path):
@@ -292,42 +276,6 @@ def test_stop_and_resume_keep_run_id_increment_generation_and_attempt(tmp_path):
     ] == ["start", "stop", "resume", "execute"]
 
 
-def test_running_stop_is_cooperative_and_non_cancellable_stage_rejects(tmp_path):
-    config, repository, commands = _commands(tmp_path)
-    operator = _principal("operator:alice")
-    started = commands.start(
-        DAILY_UPDATE_JOB,
-        principal=operator,
-        trigger_kind="cli",
-        scope={"run_cutoff": "2026-08-11T03:00:00+00:00"},
-    )
-    repository.claim_operation(
-        started.run_id,
-        lease_owner=operator.principal_id,
-        lease_expires_at="2026-08-11T04:00:00+00:00",
-        stage=OperationStage.DISCOVERING,
-    )
-    requested = commands.stop(started.run_id, principal=operator)
-    assert requested.status is OperationStatus.RUNNING
-    assert requested.progress["stop_requested"] is True
-    cancelled = commands.execute(started.run_id, principal=operator)
-    assert cancelled.status is OperationStatus.CANCELLED
-    assert cancelled.reason_code == "operator_stop"
-
-    backup_like, _ = repository.create_or_reuse_operation(
-        operation_type=DAILY_UPDATE_JOB,
-        idempotency_key="non-cancellable-stage",
-        scope={"run_cutoff": "2026-08-12T03:00:00+00:00"},
-        policy_version=config.policy_version,
-    )
-    repository.claim_operation(
-        backup_like.operation_id,
-        lease_owner=operator.principal_id,
-        lease_expires_at="2026-08-12T04:00:00+00:00",
-        stage=OperationStage.BACKING_UP,
-    )
-    with pytest.raises(RuntimeError, match="not cooperatively cancellable"):
-        commands.stop(backup_like.operation_id, principal=operator)
 
 
 def test_stale_running_job_resumes_same_id_but_live_lease_is_rejected(tmp_path):
@@ -452,107 +400,3 @@ def test_disabled_cron_does_not_disable_local_reads_or_on_demand_ensure(tmp_path
     assert local.disposition.value == "local_hit"
     assert tuple(retriever.calls) == before
     assert repository.list_operations(limit=10) == []
-
-
-@pytest.mark.asyncio
-async def test_scheduled_tasks_expose_and_delegate_all_four_asset_jobs(monkeypatch):
-    import scheduler.tasks as scheduler_tasks_module
-
-    manager = SimpleNamespace(
-        run_annual_report_asset_latest_backfill=AsyncMock(
-            return_value={"status": "completed", "outcome": "success"}
-        ),
-        run_annual_report_asset_daily_update=AsyncMock(
-            return_value={"status": "completed", "outcome": "partial"}
-        ),
-        run_annual_report_asset_integrity_audit=AsyncMock(
-            return_value={"status": "completed", "outcome": "success"}
-        ),
-        run_annual_report_asset_backup=AsyncMock(
-            return_value={"status": "completed", "outcome": "success"}
-        ),
-    )
-    monkeypatch.setattr(scheduler_tasks_module, "data_manager", manager)
-    tasks = object.__new__(scheduler_tasks_module.ScheduledTasks)
-    tasks._send_task_report = AsyncMock(return_value=False)
-
-    assert await tasks.annual_report_asset_latest_backfill(
-        as_of="2026-08-12"
-    )
-    assert await tasks.annual_report_asset_daily_update(
-        timezone="Asia/Shanghai",
-        overlap_days=3,
-        catch_up_max_days=14,
-        minimum_runs_per_calendar_day=1,
-        universe_refresh_cadence="before_each_daily_run.v1",
-    )
-    assert await tasks.annual_report_asset_integrity_audit(read_only=True)
-    assert await tasks.annual_report_asset_backup(
-        recovery_journal_retention_policy=(
-            "append_only_no_automatic_gc.v1"
-        ),
-        recovery_journal_integrity_policy=(
-            "sha256_chain_with_watermarks.v1"
-        ),
-    )
-
-    manager.run_annual_report_asset_latest_backfill.assert_awaited_once_with(
-        as_of="2026-08-12",
-        bounds=None,
-        trigger_kind="manual",
-    )
-    daily = manager.run_annual_report_asset_daily_update.await_args.kwargs
-    assert daily["trigger_kind"] == "cron"
-    assert daily["principal_id"] == "service:annual-report-asset-scheduler"
-    assert daily["expected_schedule"]["overlap_days"] == 3
-    manager.run_annual_report_asset_integrity_audit.assert_awaited_once()
-    backup = manager.run_annual_report_asset_backup.await_args.kwargs
-    assert backup["trigger_kind"] == "cron"
-    assert backup["principal_id"] == "service:annual-report-asset-scheduler"
-    assert tasks._send_task_report.await_count == 4
-
-
-@pytest.mark.asyncio
-async def test_scheduled_integrity_repair_flags_fail_before_dispatch(monkeypatch):
-    import scheduler.tasks as scheduler_tasks_module
-
-    dispatch = AsyncMock()
-    monkeypatch.setattr(
-        scheduler_tasks_module,
-        "data_manager",
-        SimpleNamespace(run_annual_report_asset_integrity_audit=dispatch),
-    )
-    tasks = object.__new__(scheduler_tasks_module.ScheduledTasks)
-
-    with pytest.raises(ValueError, match="read-only.*repair actions"):
-        await tasks.annual_report_asset_integrity_audit(
-            read_only=True,
-            content_hashes=["a" * 64],
-            action_flags={"quarantine": True},
-        )
-    with pytest.raises(ValueError, match="requires an action flag"):
-        await tasks.annual_report_asset_integrity_audit(read_only=False)
-    dispatch.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-async def test_low_frequency_integrity_registration_uses_cron_trigger(monkeypatch):
-    import scheduler.tasks as scheduler_tasks_module
-
-    dispatch = AsyncMock(
-        return_value={"status": "completed", "outcome": "success"}
-    )
-    monkeypatch.setattr(
-        scheduler_tasks_module,
-        "data_manager",
-        SimpleNamespace(run_annual_report_asset_integrity_audit=dispatch),
-    )
-    tasks = object.__new__(scheduler_tasks_module.ScheduledTasks)
-    tasks._send_task_report = AsyncMock(return_value=False)
-
-    assert await tasks.annual_report_asset_integrity_audit(
-        read_only=True,
-        job_config=SimpleNamespace(manual_only=False, report=False),
-    )
-
-    assert dispatch.await_args.kwargs["trigger_kind"] == "cron"

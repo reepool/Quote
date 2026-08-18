@@ -271,6 +271,95 @@ def test_complete_snapshot_seeds_durable_coverage_without_regressing_progress(
     assert rows["600000.SH"]["evidence"] == {"asset_id": "asset-current"}
 
 
+def test_unchanged_membership_reuses_snapshot_and_coverage_rows(tmp_path) -> None:
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    rows = [_row("600000.SH", "SSE"), _row("000001.SZ", "SZSE")]
+    policy = EligibilityPolicy()
+    first = policy.materialize(
+        rows,
+        master_data_version="master-v1",
+        master_data_last_success_at="2026-08-10T00:00:00+00:00",
+        master_data_refresh_evidence=_master_refresh(),
+        snapshot_at="2026-08-10T01:00:00+00:00",
+    )
+    second = policy.materialize(
+        rows,
+        master_data_version="master-v2",
+        master_data_last_success_at="2026-08-11T00:00:00+00:00",
+        master_data_refresh_evidence=_master_refresh(
+            "2026-08-11T00:00:00+00:00"
+        ),
+        snapshot_at="2026-08-11T01:00:00+00:00",
+    )
+
+    assert second.snapshot_id == first.snapshot_id
+    persist_universe_snapshot_with_coverage(
+        repository, first, as_of=first.snapshot_at
+    )
+    persist_universe_snapshot_with_coverage(
+        repository, second, as_of=second.snapshot_at
+    )
+
+    with repository.connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM official_asset_universe_snapshots"
+        ).fetchone()[0] == 1
+        assert conn.execute(
+            "SELECT COUNT(*) FROM official_asset_coverage"
+        ).fetchone()[0] == 2
+    persisted = repository.get_universe_snapshot(first.snapshot_id)
+    assert persisted is not None
+    assert persisted["snapshot_at"] == second.snapshot_at
+    assert persisted["master_data_version"] == "master-v2"
+
+
+def test_changed_membership_carries_forward_existing_coverage(tmp_path) -> None:
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    policy = EligibilityPolicy()
+    first = policy.materialize(
+        [_row("600000.SH", "SSE"), _row("000001.SZ", "SZSE")],
+        master_data_version="master-v1",
+        master_data_last_success_at="2026-08-10T00:00:00+00:00",
+        master_data_refresh_evidence=_master_refresh(),
+        snapshot_at="2026-08-10T01:00:00+00:00",
+    )
+    persist_universe_snapshot_with_coverage(repository, first, as_of=first.snapshot_at)
+    repository.upsert_asset_coverage(
+        universe_snapshot_id=first.snapshot_id,
+        instrument_id="600000.SH",
+        fiscal_year=2025,
+        status="available",
+        as_of="2026-08-10T02:00:00+00:00",
+        evidence={"asset_id": "asset-current"},
+    )
+
+    second = policy.materialize(
+        [
+            _row("600000.SH", "SSE"),
+            _row("000001.SZ", "SZSE"),
+            _row("920001.BJ", "BSE"),
+        ],
+        master_data_version="master-v2",
+        master_data_last_success_at="2026-08-11T00:00:00+00:00",
+        master_data_refresh_evidence=_master_refresh(
+            "2026-08-11T00:00:00+00:00"
+        ),
+        snapshot_at="2026-08-11T01:00:00+00:00",
+    )
+    persist_universe_snapshot_with_coverage(repository, second, as_of=second.snapshot_at)
+
+    coverage = {
+        row["instrument_id"]: row
+        for row in repository.list_asset_coverage(second.snapshot_id)
+    }
+    assert coverage["600000.SH"]["status"] == "available"
+    assert coverage["600000.SH"]["evidence"]["asset_id"] == "asset-current"
+    assert coverage["000001.SZ"]["status"] == "incomplete"
+    assert coverage["920001.BJ"]["status"] == "incomplete"
+
+
 def test_incomplete_snapshot_is_audited_but_does_not_seed_denominator_coverage(
     tmp_path,
 ) -> None:
@@ -534,6 +623,23 @@ def test_official_census_builder_requires_complete_three_exchange_evidence():
     }
     assert census.query_boundary["per_exchange"]["BSE"] == {"typejb": "T"}
     assert len(census.raw_payload_hash) == 64
+    refreshed = builder.materialize(
+        [
+            _official_census_row("600000.SH", "SSE", "d" * 64),
+            _official_census_row("000001.SZ", "SZSE", "e" * 64),
+            _official_census_row("920001.BJ", "BSE", "f" * 64),
+        ],
+        snapshot_at="2026-08-11T01:00:00+00:00",
+        completed_exchanges=("SSE", "SZSE", "BSE"),
+        completeness_watermarks={
+            "SSE": "sse-pages-complete-new",
+            "SZSE": "szse-file-complete-new",
+            "BSE": "bse-pages-complete-new",
+        },
+        query_boundaries=census.query_boundary["per_exchange"],
+        source_version="official-master.v1",
+    )
+    assert refreshed.census_snapshot_id == census.census_snapshot_id
 
 
 def test_official_census_builder_rejects_fallback_or_incomplete_exchange():

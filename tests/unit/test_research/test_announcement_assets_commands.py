@@ -323,38 +323,6 @@ def test_execute_rechecks_dry_run_after_job_was_queued(tmp_path):
     assert operation.status is OperationStatus.QUEUED
 
 
-def test_backup_command_rejects_unsupported_bounds_and_records_empty_bounds(
-    tmp_path,
-):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-    )
-
-    with pytest.raises(
-        ValueError,
-        match="backup job does not support caller bounds",
-    ):
-        command.start(
-            ARCHIVE_BACKUP_JOB,
-            principal=_principal(),
-            trigger_kind="manual",
-            bounds={"max_elapsed_seconds": 30},
-        )
-
-    assert repository.list_operations(limit=10) == []
-    started = command.start(
-        ARCHIVE_BACKUP_JOB,
-        principal=_principal(),
-        trigger_kind="manual",
-    )
-    assert started.accepted_bounds == {}
-    operation = repository.get_operation(started.run_id)
-    assert operation is not None
-    assert operation.scope["bounds"] == {}
 
 
 def test_acquisition_work_fingerprint_covers_route_capability_integrity_and_bounds(
@@ -434,9 +402,6 @@ def test_acquisition_work_fingerprint_covers_route_capability_integrity_and_boun
         "discovery_gaps_present",
         "effective_blob_integrity_failure",
         "storage_unavailable",
-        "backup_configuration_disabled",
-        "effective_blobs_unprotected",
-        "asset_adoption_promotion_incomplete",
     ),
 )
 def test_command_service_blocks_latest_backfill_from_cron_and_daily_before_readiness(
@@ -511,170 +476,16 @@ def test_command_service_fails_closed_without_trusted_identity(tmp_path):
         )
 
 
-def test_integrity_audit_defaults_to_read_only_and_persists_no_action_flags(tmp_path):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-    )
-
-    started = command.start(
-        INTEGRITY_AUDIT_JOB,
-        principal=_principal(),
-        trigger_kind="manual",
-    )
-
-    assert started.normalized_scope["read_only"] is True
-    assert not any(started.normalized_scope["action_flags"].values())
-    assert repository.get_operation(started.run_id) is not None
 
 
-@pytest.mark.parametrize(
-    ("scope", "action_flags", "error"),
-    [
-        ({}, {"delete": True}, "explicit target scope"),
-        (
-            {"content_hashes": ["a" * 64]},
-            {"delete": True},
-            "requires explicit deletion_ids",
-        ),
-        (
-            {"deletion_ids": ["deletion-1"]},
-            {"network_repair": True},
-            "requires explicit content_hashes",
-        ),
-        (
-            {
-                "content_hashes": ["a" * 64],
-                "deletion_ids": ["deletion-1"],
-            },
-            {"network_repair": True},
-            "targets not used",
-        ),
-    ],
-)
-def test_integrity_destructive_actions_require_exact_target_type_before_operation(
-    tmp_path,
-    scope,
-    action_flags,
-    error,
-):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-    )
-
-    with pytest.raises(ValueError, match=error):
-        command.start(
-            INTEGRITY_AUDIT_JOB,
-            principal=_principal(),
-            trigger_kind="manual",
-            scope=scope,
-            action_flags=action_flags,
-        )
-
-    assert repository.list_operations(limit=10) == []
-    assert repository.list_job_command_audit() == []
 
 
-def test_integrity_overbroad_target_scope_creates_no_operation(tmp_path):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    config = _config(tmp_path)
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=config,
-        config_version="assets-config-v1",
-    )
-    hashes = [
-        f"{index:064x}"
-        for index in range(config.discovery.max_instruments + 1)
-    ]
-
-    with pytest.raises(ValueError, match="exceeds configured bound"):
-        command.start(
-            INTEGRITY_AUDIT_JOB,
-            principal=_principal(),
-            trigger_kind="manual",
-            scope={"content_hashes": hashes},
-            action_flags={"network_repair": True},
-        )
-
-    assert repository.list_operations(limit=10) == []
 
 
-def test_integrity_cron_rejects_destructive_flags_before_operation(tmp_path):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-    )
-
-    with pytest.raises(ValueError, match="must remain read-only"):
-        command.start(
-            INTEGRITY_AUDIT_JOB,
-            principal=_principal(),
-            trigger_kind="cron",
-            scope={"deletion_ids": ["deletion-1"]},
-            action_flags={"delete": True},
-        )
-
-    assert repository.list_operations(limit=10) == []
 
 
-def test_non_integrity_job_rejects_action_or_target_scope_before_operation(tmp_path):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-    )
-
-    with pytest.raises(ValueError, match="only valid for integrity audit"):
-        command.start(
-            DAILY_UPDATE_JOB,
-            principal=_principal(),
-            trigger_kind="manual",
-            action_flags={"delete": True},
-        )
-    with pytest.raises(ValueError, match="target scope is only valid"):
-        command.start(
-            DAILY_UPDATE_JOB,
-            principal=_principal(),
-            trigger_kind="manual",
-            scope={"content_hashes": ["a" * 64]},
-        )
-
-    assert repository.list_operations(limit=10) == []
 
 
-def test_degraded_integrity_result_is_not_reported_as_full_success(tmp_path):
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    command = AnnualReportSchedulerCommandService(
-        repository=repository,
-        config=_config(tmp_path),
-        config_version="assets-config-v1",
-        runners={INTEGRITY_AUDIT_JOB: lambda operation: {"status": "degraded"}},
-    )
-    started = command.start(
-        INTEGRITY_AUDIT_JOB,
-        principal=_principal(),
-        trigger_kind="manual",
-    )
-
-    completed = command.execute(started.run_id, principal=_principal())
-
-    assert completed.status is OperationStatus.COMPLETED
-    assert completed.outcome is BatchOutcome.PARTIAL
 
 
 def test_command_runner_heartbeats_running_operation(tmp_path):

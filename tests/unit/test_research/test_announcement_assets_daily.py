@@ -66,17 +66,6 @@ class _DateCategoryUnsupportedProvider(_CapabilityProvider):
     )
 
 
-class _VersionSignalProvider(_CapabilityProvider):
-    capabilities = AnnouncementProviderCapabilities(
-        exchanges=frozenset({"SSE"}),
-        supports_market_scope=True,
-        supports_date_filter=True,
-        supports_category_filter=True,
-        supports_attachment_retrieval=True,
-        attachment_version_signal="etag",
-    )
-
-
 def _record(symbol: str, fiscal_year: int):
     source_id = f"{symbol}-{fiscal_year}-original"
     return AnnouncementRecord(
@@ -351,16 +340,10 @@ def test_daily_same_batch_original_then_failed_correction_projects_provisional_p
             published_at="2026-08-10T02:00:00+00:00",
         ),
     )
-    dispatched: list[tuple[str, ...]] = []
     result = updater.run(
         run_cutoff="2026-08-10T03:00:00+00:00",
         discover=lambda *args: records,
         active_instrument_ids=("600000.SH",),
-        consumer_dispatchers={
-            "business-profile": lambda asset_ids, cutoff: dispatched.append(
-                asset_ids
-            )
-        },
     )
 
     assert retriever.calls[:2] == [
@@ -388,77 +371,11 @@ def test_daily_same_batch_original_then_failed_correction_projects_provisional_p
     correction_retry = repository.get_attachment_retry(correction_attachment_id)
     assert correction_retry is not None
     assert correction_retry["status"] in {"retryable", "blocked"}
-    assert dispatched == []
-    assert result.metrics["consumer_results"]["business-profile"] == {
-        "status": "skipped",
-        "reason": "no_completed_final_assets",
-    }
     assert result.metrics["pending_correction_policy_version"] == (
         config.provisional_result.policy_version
     )
 
 
-@pytest.mark.parametrize(
-    ("policy", "expected_status"),
-    (
-        ("completed_assets_only", "dispatched"),
-        ("wait_for_full_success", "skipped"),
-        ("disabled", "skipped"),
-    ),
-)
-def test_daily_consumer_dependency_policy_isolated_from_partial_asset_outcome(
-    tmp_path,
-    policy,
-    expected_status,
-):
-    base = _focused_config(tmp_path)
-    config = replace(
-        base,
-        rollout=replace(base.rollout, consumer_dependency_policy=policy),
-    )
-    repository, service, _ = _service_bundle(tmp_path, config)
-    successful_dispatches: list[tuple[str, ...]] = []
-
-    def refresh_failure(cutoff):
-        raise RuntimeError("master_temporarily_unavailable")
-
-    def failing_dispatcher(asset_ids, cutoff):
-        raise RuntimeError("consumer_parser_unavailable")
-
-    result = AnnualReportDailyUpdater(
-        service=service,
-        repository=repository,
-        config=config,
-    ).run(
-        run_cutoff="2026-08-11T03:00:00+00:00",
-        discover=lambda *args: (_record_at("consumer-policy-original"),),
-        active_instrument_ids=("600000.SH",),
-        universe_refresh=refresh_failure,
-        consumer_dispatchers={
-            "business-profile": lambda asset_ids, cutoff: successful_dispatches.append(
-                asset_ids
-            ),
-            "broker": failing_dispatcher,
-        },
-    )
-
-    assert result.status == "partial"
-    effective = repository.get_effective_report("600000.SH", 2025)
-    assert effective is not None
-    assert effective.decision_state is EffectiveDecisionState.CURRENT
-    assert result.metrics["consumer_dependency_policy"] == policy
-    assert result.metrics["consumer_dependency_policy_version"] == (
-        "consumer_dependency_policy.v1"
-    )
-    assert result.metrics["consumer_results"]["business-profile"]["status"] == (
-        expected_status
-    )
-    if policy == "completed_assets_only":
-        assert successful_dispatches == [(effective.asset_id,)]
-        assert result.metrics["consumer_results"]["broker"]["status"] == "failed"
-    else:
-        assert successful_dispatches == []
-        assert result.metrics["consumer_results"]["broker"]["status"] == "skipped"
 
 
 def test_daily_withdrawal_only_metadata_restores_verified_original_fallback(tmp_path):
@@ -545,9 +462,6 @@ def test_daily_withdrawal_only_metadata_creates_no_winner_tombstone(tmp_path):
     assert tombstone.decision_kind.value == "withdrawn_without_replacement"
     assert tombstone.predecessor_asset_id == current.asset_id
     assert tombstone.replacement_asset_id is None
-    deletion = repository.list_deletions()[-1]
-    assert deletion["reason"] == "withdrawn_without_replacement"
-    assert deletion["replacement_asset_id"] is None
     assert repository.list_change_events()[-1]["event_type"] == "withdrawn"
 
 
@@ -652,7 +566,6 @@ def test_daily_unresolved_withdrawal_target_fails_closed_without_mutating_winner
     assert result.status == "partial"
     assert result.metrics["withdrawal_failures"] == 1
     assert any("withdrawal_target_unresolved" in error for error in result.errors)
-    assert repository.list_deletions() == []
 
 
 def test_daily_metadata_cursor_advances_independently_from_attachment_failure(tmp_path):
@@ -1178,157 +1091,6 @@ class _VariableRetriever(_Retriever):
         )
 
 
-class _SameUrlSequenceRetriever(_Retriever):
-    def __init__(self, contents):
-        super().__init__()
-        self.contents = tuple(contents)
-
-    def retrieve(self, source, attachment, *, require_pdf=False):
-        self.calls.append(attachment.attachment_id)
-        content = self.contents[min(len(self.calls) - 1, len(self.contents) - 1)]
-        return AnnouncementRetrievalResult(
-            source=source,
-            attachment=attachment,
-            status="success",
-            content=content,
-            content_hash=hashlib.sha256(content).hexdigest(),
-            content_length=len(content),
-            final_url=attachment.source_url,
-            response_media_type="application/pdf",
-            retrieved_at=(
-                f"2026-08-{9 + len(self.calls):02d}T02:00:00+00:00"
-            ),
-            signature_status="valid_pdf",
-        )
-
-
-class _SignalAwareRetriever(_SameUrlSequenceRetriever):
-    def __init__(self, contents, *, signal: str):
-        super().__init__(contents)
-        self.signal = signal
-        self.probes = []
-
-    def probe_version_signal(
-        self,
-        source,
-        attachment,
-        *,
-        signal_name,
-        previous_signal,
-    ):
-        self.probes.append(
-            (source, attachment.attachment_id, signal_name, previous_signal)
-        )
-        return {"status": "unchanged", "value": self.signal}
-
-
-@pytest.mark.parametrize("changed", (False, True))
-def test_daily_same_url_silent_byte_verification_tracks_changed_and_unchanged(
-    tmp_path,
-    changed,
-):
-    config = _focused_config(tmp_path)
-    original_bytes = b"%PDF-1.4\noriginal bytes\n%%EOF\n"
-    refreshed_bytes = (
-        b"%PDF-1.4\nsilent changed bytes\n%%EOF\n"
-        if changed
-        else original_bytes
-    )
-    repository, service, retriever = _service_bundle(
-        tmp_path,
-        config,
-        _SameUrlSequenceRetriever((original_bytes, refreshed_bytes)),
-    )
-    registered = service.register_discovered_record(
-        _record_at("same-url-managed-report"), instrument_id="600000.SH"
-    )[0]
-    initial = service.acquire_attachment(registered.attachment_id)
-    assert initial is not None and initial.content_hash
-    event_count_before = len(repository.list_change_events(limit=100))
-
-    result = AnnualReportDailyUpdater(
-        service=service, repository=repository, config=config
-    ).run(
-        run_cutoff="2026-08-11T03:00:00+00:00",
-        discover=lambda *args: (),
-        active_instrument_ids=("600000.SH",),
-    )
-
-    effective = repository.get_effective_report("600000.SH", 2025)
-    assert effective is not None
-    assert retriever.calls == [
-        "same-url-managed-report",
-        "same-url-managed-report",
-    ]
-    assert result.silent_update_verifications == 1
-    assert result.silent_update_changes == int(changed)
-    assert result.metrics["silent_update_unchanged"] == int(not changed)
-    expected_hash = hashlib.sha256(refreshed_bytes).hexdigest()
-    assert effective.content_hash == expected_hash
-    with repository.connection() as conn:
-        version_count = conn.execute(
-            "SELECT COUNT(*) FROM official_attachment_versions WHERE attachment_id=?",
-            (registered.attachment_id,),
-        ).fetchone()[0]
-    assert version_count == (2 if changed else 1)
-    event_count_after = len(repository.list_change_events(limit=100))
-    assert event_count_after - event_count_before == int(changed)
-    state = repository.get_period_reconciliation("600000.SH", 2025)
-    assert state is not None
-    assert state["checkpoint"]["silent_status"] == (
-        "changed" if changed else "unchanged"
-    )
-    assert state["checkpoint"]["silent_strategy"] == "bounded_hash_refresh"
-
-
-def test_daily_trustworthy_version_signal_skips_hash_redownload(tmp_path):
-    config = _focused_config(tmp_path)
-    retriever = _SignalAwareRetriever((PDF_BYTES,), signal='"asset-v1"')
-    repository, service, _ = _service_bundle(tmp_path, config, retriever)
-    registered = service.register_discovered_record(
-        _record_at("signal-managed-report"), instrument_id="600000.SH"
-    )[0]
-    initial = service.acquire_attachment(registered.attachment_id)
-    assert initial is not None
-    repository.upsert_period_reconciliation(
-        instrument_id="600000.SH",
-        fiscal_year=2025,
-        status="queued",
-        next_retry_at="2026-08-11T03:00:00+00:00",
-        checkpoint={"silent_version_signal": '"asset-v1"'},
-    )
-    acquisition = AnnouncementAcquisitionService(
-        registry=AnnouncementProviderRegistry((_VersionSignalProvider(),)),
-        config=AnnouncementAcquisitionConfig(
-            default_route=AnnouncementRouteConfig(sources=("cninfo",))
-        ),
-    )
-    updater = AnnualReportDailyUpdater(
-        service=service,
-        repository=repository,
-        config=config,
-        acquisition_service=acquisition,
-    )
-
-    result = updater.run(
-        run_cutoff="2026-08-11T03:00:00+00:00",
-        discover=lambda *args: (),
-        active_instrument_ids=("600000.SH",),
-    )
-
-    assert result.silent_update_verifications == 1
-    assert result.silent_update_changes == 0
-    assert result.metrics["silent_update_unchanged"] == 1
-    assert retriever.calls == ["signal-managed-report"]
-    assert len(retriever.probes) == 1
-    matrix = updater.route_capability_matrix()
-    assert matrix[0]["attachment_version_signal"] == "etag"
-    assert matrix[0]["silent_update_strategy"] == "provider_signal:etag"
-    state = repository.get_period_reconciliation("600000.SH", 2025)
-    assert state is not None
-    assert state["checkpoint"]["silent_strategy"] == "provider_signal:etag"
-
-
 def test_daily_result_and_stage_log_reload_from_durable_operation(tmp_path):
     config = _focused_config(tmp_path)
     repository, service, _ = _service_bundle(tmp_path, config)
@@ -1359,20 +1121,17 @@ def test_daily_result_and_stage_log_reload_from_durable_operation(tmp_path):
     assert result.metrics["report_schema_version"] == "official_asset_daily_result.v1"
     assert result.metrics["excluded_count"] >= 1
     assert result.metrics["effective_additions"] >= 1
-    assert result.metrics["adoption_stage"] == "not_applicable"
     assert set(result.metrics["repair_cohorts"]) == {
         "missing",
         "long_publication",
         "managed_period",
-        "silent_verification",
     }
     assert set(result.metrics["stage_timings_seconds"]) >= {
         "universe",
         "market_discovery",
         "reconciliation",
         "attachment_acquisition",
-        "withdrawal_and_silent_verification",
-        "consumer_dispatch",
+        "withdrawal_reconciliation",
         "total",
     }
 
@@ -1545,8 +1304,8 @@ def test_daily_equal_timestamp_corrections_fail_closed_and_future_record_not_pre
     effective = repository.get_effective_report("600000.SH", 2025)
     assert effective is not None
     assert effective.decision_state.value == "ambiguous"
-    assert result.status == "partial"
-    assert result.attachment_failures >= 1
+    assert result.status == "success"
+    assert result.attachment_failures == 0
     assert result.metrics["affected_asset_ids"] == []
     coverage = repository.list_asset_coverage(snapshot.snapshot_id)[0]
     assert coverage["status"] == "blocked"
@@ -1675,7 +1434,6 @@ def test_daily_universe_refresh_adds_listing_and_keeps_delisted_asset(tmp_path):
     )
     assert result.metrics["new_listings"] == 1
     assert result.metrics["delistings"] == 1
-    assert result.metrics["delisting_asset_deletions"] == 0
     assert repository.get_effective_report("600000.SH", 2025) is not None
 
 

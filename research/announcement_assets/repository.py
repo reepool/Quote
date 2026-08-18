@@ -20,32 +20,20 @@ from .models import (
     ANNOUNCEMENT_SCHEMA_VERSION,
     ATTACHMENT_SCHEMA_VERSION,
     ATTACHMENT_VERSION_SCHEMA_VERSION,
-    BACKUP_RECOVERY_JOURNAL_SCHEMA_VERSION,
     BLOB_SCHEMA_VERSION,
     BOOTSTRAP_RUN_SCHEMA_VERSION,
-    CONSUMER_CHECKPOINT_SCHEMA_VERSION,
-    CONSUMER_PROCESSING_SCHEMA_VERSION,
-    CONSUMER_REQUEST_SCHEMA_VERSION,
-    DELETION_INTENT_SCHEMA_VERSION,
     DISCOVERY_STATE_SCHEMA_VERSION,
     EFFECTIVE_ANNUAL_REPORT_SCHEMA_VERSION,
     EFFECTIVE_DECISION_SCHEMA_VERSION,
     OPERATION_SCHEMA_VERSION,
     OPERATION_STAGE_SCHEMA_VERSION,
     OPERATION_SUBSCRIPTION_SCHEMA_VERSION,
-    PHYSICAL_UNLINK_OUTCOME_SCHEMA_VERSION,
-    RECOVERY_MANIFEST_SCHEMA_VERSION,
-    RECOVERY_PAIR_CLOSURE_SCHEMA_VERSION,
     AnnualReportVariant,
     AssetAvailability,
     AssetOperation,
     AssetOperationSubscription,
     AssetRequestStatus,
     BatchOutcome,
-    ConsumerProcessingStatus,
-    ConsumerRequestStatus,
-    ConsumerResultState,
-    DeletionStatus,
     EffectiveAnnualReport,
     EffectiveAnnualReportDecision,
     EffectiveDecisionKind,
@@ -53,10 +41,6 @@ from .models import (
     IntegrityStatus,
     OfficialAnnouncement,
     OfficialAnnouncementAttachment,
-    OfficialAssetBackupRecoveryJournalEntry,
-    OfficialAssetConsumerRequest,
-    OfficialAssetRecoveryManifestEntry,
-    OfficialAssetRecoveryPairClosure,
     OfficialAttachmentVersion,
     OfficialDocumentBlob,
     OperationStage,
@@ -70,7 +54,7 @@ from .models import (
     stable_id,
     utc_now_iso,
 )
-from .schema import SCHEMA_SQL, SCHEMA_VERSION
+from .schema import OBSOLETE_COLUMNS, OBSOLETE_TABLES, SCHEMA_SQL, SCHEMA_VERSION
 
 _ALLOWED_OPERATION_TRANSITIONS = {
     OperationStatus.QUEUED: {
@@ -92,22 +76,12 @@ _ALLOWED_OPERATION_TRANSITIONS = {
     OperationStatus.COMPLETED: set(),
 }
 
-_ALLOWED_DELETION_TRANSITIONS = {
-    DeletionStatus.PLANNED: {DeletionStatus.DELETING, DeletionStatus.FAILED},
-    DeletionStatus.DELETING: {DeletionStatus.DELETED, DeletionStatus.FAILED},
-    DeletionStatus.FAILED: {DeletionStatus.DELETING},
-    DeletionStatus.DELETED: set(),
-}
-
 _UNSET = object()
 ASSET_REQUEST_RETENTION_POLICY_VERSION = "asset_request_retention.v1"
 ASSET_REQUEST_ACTIVE_TTL_SECONDS = 7 * 24 * 3600
 ASSET_REQUEST_TOMBSTONE_TTL_SECONDS = 30 * 24 * 3600
-CONSUMER_REQUEST_RETENTION_POLICY_VERSION = "consumer_request_retention.v1"
-CONSUMER_REQUEST_ACTIVE_TTL_SECONDS = 7 * 24 * 3600
-CONSUMER_REQUEST_TOMBSTONE_TTL_SECONDS = 30 * 24 * 3600
-CONSUMER_DISPATCH_POLICY_VERSION = "consumer_dispatch.v1"
 READ_LEASE_PIN_TYPE = "active_reader"
+CHANGE_EVENT_POLICY_VERSION = "asset_change_event.v1"
 
 
 _CONFIRMED_MISSING_REQUIRED_SCOPE_FIELDS = (
@@ -180,10 +154,6 @@ class IdempotencyConflictError(ValueError):
     """A principal reused an idempotency key for a different request."""
 
 
-class ConsumerRequestNotCancellableError(RuntimeError):
-    """A consumer request has reached a state that logical DELETE cannot stop."""
-
-
 class DiscoveryStateFenceError(RuntimeError):
     """A discovery worker attempted to commit an obsolete leased state."""
 
@@ -194,10 +164,6 @@ class DiscoveryRetryNotDueError(RuntimeError):
 
 class DiscoveryRetryBlockedError(RuntimeError):
     """A terminal discovery retry requires governed reopen evidence."""
-
-
-class DeletionLeaseFenceError(RuntimeError):
-    """A stale deletion worker attempted to mutate a newer lease generation."""
 
 
 class BootstrapRunIdentityError(ValueError):
@@ -264,21 +230,33 @@ class AnnouncementAssetRepository:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self.connection() as conn:
             conn.executescript(SCHEMA_SQL)
-            self._migrate_historical_asset_reference_contract(conn)
+            for table in OBSOLETE_TABLES:
+                conn.execute(f"DROP TABLE IF EXISTS {table}")
+            for table, columns in OBSOLETE_COLUMNS.items():
+                existing = {
+                    str(row[1])
+                    for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
+                }
+                for column in columns:
+                    if column in existing:
+                        conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
+            conn.execute(
+                """DELETE FROM official_asset_retention_pins
+                   WHERE pin_type NOT IN ('effective_asset', 'active_reader')
+                      OR released_at IS NOT NULL
+                      OR (pin_type='active_reader' AND expires_at<=?)""",
+                (utc_now_iso(),),
+            )
             self._migrate_attachment_version_temporal_columns(conn)
             self._migrate_attachment_version_visibility(conn)
             self._migrate_effective_visibility_column(conn)
             self._migrate_attachment_retry_columns(conn)
             self._migrate_canonical_contract_columns(conn)
-            self._migrate_recovery_contract(conn)
             self._migrate_operation_status_contract(conn)
             self._migrate_operation_lease_fencing(conn)
             self._migrate_effective_decision_history(conn)
             self._migrate_discovery_state_fencing(conn)
             self._migrate_universe_census_contract(conn)
-            self._migrate_storage_capacity_contract(conn)
-            self._migrate_backup_state_config_contract(conn)
-            self._migrate_consumer_processing_lease_contract(conn)
             conn.execute(
                 """
                 INSERT INTO official_asset_schema_versions(
@@ -292,164 +270,6 @@ class AnnouncementAssetRepository:
             )
             conn.commit()
 
-    @staticmethod
-    def _migrate_historical_asset_reference_contract(
-        conn: sqlite3.Connection,
-    ) -> None:
-        """Detach historical references from the mutable current projection."""
-
-        table_specs = {
-            "official_asset_adoption_promotion_gates": {
-                "create": """
-                    CREATE TABLE official_asset_adoption_promotion_gates (
-                        gate_id TEXT PRIMARY KEY,
-                        schema_version TEXT NOT NULL,
-                        asset_id TEXT NOT NULL,
-                        inventory_fingerprint TEXT NOT NULL,
-                        config_fingerprint TEXT NOT NULL,
-                        content_hash TEXT NOT NULL,
-                        content_length INTEGER NOT NULL CHECK(content_length > 0),
-                        canonical_path TEXT NOT NULL,
-                        mount_filesystem_key TEXT NOT NULL,
-                        custody_state TEXT NOT NULL CHECK(custody_state IN (
-                            'canonical', 'shared_controlled_legacy'
-                        )),
-                        status TEXT NOT NULL CHECK(status IN (
-                            'ready', 'consumed', 'invalidated'
-                        )),
-                        reconciled_at TEXT NOT NULL,
-                        expires_at TEXT NOT NULL,
-                        consumed_at TEXT,
-                        invalidated_at TEXT,
-                        invalidation_reason TEXT,
-                        evidence_json TEXT NOT NULL DEFAULT '{}',
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL,
-                        FOREIGN KEY(content_hash)
-                            REFERENCES official_document_blobs(content_hash)
-                    )
-                """,
-                "indexes": (
-                    """CREATE INDEX idx_official_asset_adoption_gates_asset
-                       ON official_asset_adoption_promotion_gates(
-                           asset_id, status, reconciled_at
-                       )""",
-                ),
-            },
-            "official_asset_consumer_requests": {
-                "create": """
-                    CREATE TABLE official_asset_consumer_requests (
-                        consumer_request_id TEXT PRIMARY KEY,
-                        schema_version TEXT NOT NULL,
-                        principal TEXT NOT NULL,
-                        consumer TEXT NOT NULL,
-                        idempotency_key TEXT NOT NULL,
-                        request_fingerprint TEXT NOT NULL,
-                        processing_fingerprint TEXT NOT NULL,
-                        selector_json TEXT NOT NULL,
-                        asset_request_id TEXT,
-                        asset_id TEXT,
-                        processing_id TEXT,
-                        status TEXT NOT NULL CHECK(status IN (
-                            'pending_asset', 'not_started', 'queued', 'processing',
-                            'completed', 'failed', 'missing', 'blocked',
-                            'cancelled', 'expired'
-                        )),
-                        result_state TEXT NOT NULL CHECK(result_state IN (
-                            'unavailable', 'current', 'stale', 'reprocessing'
-                        )),
-                        result_identity TEXT,
-                        resolved_source TEXT,
-                        resolved_source_announcement_id TEXT,
-                        resolved_attachment_id TEXT,
-                        resolved_observation_version TEXT,
-                        resolved_content_hash TEXT,
-                        resolved_report_period TEXT,
-                        reason_code TEXT,
-                        retry_metadata_json TEXT NOT NULL DEFAULT '{}',
-                        diagnostics_json TEXT NOT NULL DEFAULT '{}',
-                        metadata_json TEXT NOT NULL DEFAULT '{}',
-                        processing_started_at TEXT,
-                        finished_at TEXT,
-                        stop_requested_at TEXT,
-                        cancelled_at TEXT,
-                        expires_at TEXT NOT NULL,
-                        expired_at TEXT,
-                        tombstone_until TEXT,
-                        retention_policy_version TEXT NOT NULL DEFAULT
-                            'consumer_request_retention.v1',
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL,
-                        FOREIGN KEY(asset_request_id) REFERENCES
-                            official_asset_operation_subscriptions(asset_request_id),
-                        UNIQUE(principal, idempotency_key)
-                    )
-                """,
-                "indexes": (
-                    """CREATE INDEX idx_official_asset_consumer_requests_owner
-                       ON official_asset_consumer_requests(
-                           principal, status, updated_at
-                       )""",
-                    """CREATE INDEX idx_official_asset_consumer_requests_asset_request
-                       ON official_asset_consumer_requests(
-                           asset_request_id, status, updated_at
-                       )""",
-                ),
-            },
-        }
-        pending = []
-        for table, spec in table_specs.items():
-            foreign_keys = conn.execute(f"PRAGMA foreign_key_list({table})").fetchall()
-            if any(
-                str(row[2]) == "effective_annual_reports"
-                and str(row[3]) == "asset_id"
-                for row in foreign_keys
-            ):
-                pending.append((table, spec))
-        if not pending:
-            return
-
-        conn.commit()
-        conn.execute("PRAGMA foreign_keys=OFF")
-        try:
-            conn.execute("BEGIN IMMEDIATE")
-            for table, spec in pending:
-                legacy_table = f"{table}_legacy_effective_asset_fk"
-                conn.execute(f"ALTER TABLE {table} RENAME TO {legacy_table}")
-                conn.execute(str(spec["create"]))
-                old_columns = tuple(
-                    str(row[1])
-                    for row in conn.execute(
-                        f"PRAGMA table_info({legacy_table})"
-                    ).fetchall()
-                )
-                new_columns = tuple(
-                    str(row[1])
-                    for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
-                )
-                if old_columns != new_columns:
-                    raise RuntimeError(
-                        f"historical asset-reference migration column mismatch: {table}"
-                    )
-                columns_sql = ", ".join(old_columns)
-                conn.execute(
-                    f"INSERT INTO {table} ({columns_sql}) "
-                    f"SELECT {columns_sql} FROM {legacy_table}"
-                )
-                conn.execute(f"DROP TABLE {legacy_table}")
-                for index_sql in spec["indexes"]:
-                    conn.execute(str(index_sql))
-            conn.commit()
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            conn.execute("PRAGMA foreign_keys=ON")
-        violations = conn.execute("PRAGMA foreign_key_check").fetchall()
-        if violations:
-            raise RuntimeError(
-                "historical asset-reference migration left foreign-key violations"
-            )
 
     def schema_initialized(self) -> bool:
         """Return whether the shared catalog tables exist without mutating SQLite."""
@@ -478,50 +298,8 @@ class AnnouncementAssetRepository:
                 "ADD COLUMN paired_census_snapshot_id TEXT"
             )
 
-    @classmethod
-    def _migrate_storage_capacity_contract(cls, conn: sqlite3.Connection) -> None:
-        """Retain measured bytes when upgrading pre-v15 reservations."""
 
-        cls._add_missing_columns(
-            conn,
-            "official_asset_storage_reservations",
-            (("actual_bytes", "INTEGER NOT NULL DEFAULT 0"),),
-        )
 
-    @classmethod
-    def _migrate_backup_state_config_contract(cls, conn: sqlite3.Connection) -> None:
-        """Make legacy backup rows explicitly stale until reverified by config."""
-
-        cls._add_missing_columns(
-            conn,
-            "official_asset_backup_state",
-            (("config_fingerprint", "TEXT NOT NULL DEFAULT ''"),),
-        )
-
-    @classmethod
-    def _migrate_consumer_processing_lease_contract(
-        cls, conn: sqlite3.Connection
-    ) -> None:
-        """Fence parser recovery when upgrading pre-v20 catalogs."""
-
-        cls._add_missing_columns(
-            conn,
-            "official_asset_consumer_processing",
-            (
-                ("lease_owner", "TEXT"),
-                ("lease_generation", "INTEGER NOT NULL DEFAULT 0"),
-                ("lease_expires_at", "TEXT"),
-                ("heartbeat_at", "TEXT"),
-                ("attempt", "INTEGER NOT NULL DEFAULT 0"),
-                ("max_attempts", "INTEGER NOT NULL DEFAULT 4"),
-                ("started_at", "TEXT"),
-                ("finished_at", "TEXT"),
-            ),
-        )
-        conn.execute(
-            "UPDATE official_asset_consumer_processing SET schema_version=?",
-            (CONSUMER_PROCESSING_SCHEMA_VERSION,),
-        )
 
     @staticmethod
     def _migrate_attachment_version_temporal_columns(
@@ -657,33 +435,6 @@ class AnnouncementAssetRepository:
             "UPDATE official_asset_operation_subscriptions SET schema_version=?",
             (OPERATION_SUBSCRIPTION_SCHEMA_VERSION,),
         )
-        conn.execute(
-            "UPDATE official_asset_deletion_intents SET schema_version=?",
-            (DELETION_INTENT_SCHEMA_VERSION,),
-        )
-        cls._add_missing_columns(
-            conn,
-            "official_asset_deletion_intents",
-            (
-                ("operation_mount_source", "TEXT"),
-                ("operation_mount_point", "TEXT"),
-                ("operation_mount_fs_type", "TEXT"),
-                ("operation_mount_device_id", "INTEGER"),
-                ("operation_mount_filesystem_key", "TEXT"),
-                ("operation_mount_captured_at", "TEXT"),
-            ),
-        )
-
-        cls._add_missing_columns(
-            conn,
-            "official_document_blobs",
-            (
-                ("acquisition_origin", "TEXT"),
-                ("adopted_from_path", "TEXT"),
-                ("verification_evidence_json", "TEXT NOT NULL DEFAULT '{}'"),
-                ("backup_evidence_json", "TEXT NOT NULL DEFAULT '{}'"),
-            ),
-        )
         cls._add_missing_columns(
             conn,
             "official_attachment_versions",
@@ -771,121 +522,11 @@ class AnnouncementAssetRepository:
                 ("trigger_origin", "TEXT NOT NULL DEFAULT 'unknown'"),
                 (
                     "dispatch_policy_version",
-                    "TEXT NOT NULL DEFAULT 'consumer_dispatch.v1'",
+                    "TEXT NOT NULL DEFAULT 'asset_change_event.v1'",
                 ),
             ),
         )
-        cls._add_missing_columns(
-            conn,
-            "official_asset_deletion_intents",
-            (
-                ("lease_generation", "INTEGER NOT NULL DEFAULT 0"),
-                ("next_retry_at", "TEXT"),
-                ("recovery_pair_id", "TEXT"),
-                ("recovery_pin_id", "TEXT"),
-                ("recovery_manifest_id", "TEXT"),
-                ("required_set_released_at", "TEXT"),
-                ("decision_id", "TEXT"),
-                ("outbox_event_key", "TEXT"),
-            ),
-        )
-        cls._add_missing_columns(
-            conn,
-            "official_asset_retention_pins",
-            (
-                ("blocks_primary_unlink", "INTEGER NOT NULL DEFAULT 1"),
-                ("required_set_hold", "INTEGER NOT NULL DEFAULT 0"),
-                ("required_set_released_at", "TEXT"),
-            ),
-        )
-        cls._add_missing_columns(
-            conn,
-            "official_asset_consumer_processing",
-            (
-                ("canonical_projection_policy_version", "TEXT"),
-                ("evidence_set_hash", "TEXT"),
-                ("equivalent_source_filings_json", "TEXT NOT NULL DEFAULT '[]'"),
-            ),
-        )
 
-    @staticmethod
-    def _migrate_recovery_contract(conn: sqlite3.Connection) -> None:
-        """Add recovery pairing without treating legacy snapshot hints as closure."""
-
-        columns = {
-            str(row[1])
-            for row in conn.execute(
-                "PRAGMA table_info(official_asset_recovery_manifest)"
-            ).fetchall()
-        }
-        missing_pair_column = "recovery_pair_id" not in columns
-        missing_pair_rows = False
-        if not missing_pair_column:
-            missing_pair_rows = (
-                conn.execute(
-                    """SELECT 1 FROM official_asset_recovery_manifest
-                       WHERE recovery_pair_id IS NULL OR recovery_pair_id=''
-                       LIMIT 1"""
-                ).fetchone()
-                is not None
-            )
-        if missing_pair_column or missing_pair_rows:
-            conn.executescript(
-                """
-                DROP TRIGGER IF EXISTS prevent_official_asset_recovery_manifest_update;
-                DROP TRIGGER IF EXISTS prevent_official_asset_recovery_manifest_delete;
-                DROP TRIGGER IF EXISTS validate_official_asset_recovery_manifest_insert;
-                """
-            )
-        if missing_pair_column:
-            conn.execute(
-                "ALTER TABLE official_asset_recovery_manifest "
-                "ADD COLUMN recovery_pair_id TEXT"
-            )
-        conn.execute(
-            """CREATE UNIQUE INDEX IF NOT EXISTS uq_official_asset_recovery_pair
-               ON official_asset_recovery_manifest(recovery_pair_id)"""
-        )
-        if missing_pair_column or missing_pair_rows:
-            rows = conn.execute(
-                """SELECT recovery_id FROM official_asset_recovery_manifest
-                   WHERE recovery_pair_id IS NULL OR recovery_pair_id=''"""
-            ).fetchall()
-            for row in rows:
-                conn.execute(
-                    """UPDATE official_asset_recovery_manifest
-                       SET recovery_pair_id=? WHERE recovery_id=?""",
-                    (
-                        stable_id("recovery-pair", row["recovery_id"]),
-                        row["recovery_id"],
-                    ),
-                )
-        conn.executescript(
-            """
-            CREATE TRIGGER IF NOT EXISTS validate_official_asset_recovery_manifest_insert
-            BEFORE INSERT ON official_asset_recovery_manifest
-            WHEN NEW.recovery_pair_id IS NULL OR NEW.recovery_pair_id=''
-              OR (
-                  NEW.schema_version='official_asset_recovery_manifest.v2'
-                  AND COALESCE(NEW.catalog_snapshot_watermark, '') != ''
-              )
-            BEGIN
-                SELECT RAISE(ABORT, 'invalid recovery manifest pairing');
-            END;
-
-            CREATE TRIGGER IF NOT EXISTS prevent_official_asset_recovery_manifest_update
-            BEFORE UPDATE ON official_asset_recovery_manifest
-            BEGIN
-                SELECT RAISE(ABORT, 'recovery manifest is immutable');
-            END;
-
-            CREATE TRIGGER IF NOT EXISTS prevent_official_asset_recovery_manifest_delete
-            BEFORE DELETE ON official_asset_recovery_manifest
-            BEGIN
-                SELECT RAISE(ABORT, 'recovery manifest is immutable');
-            END;
-            """
-        )
 
     @staticmethod
     def _migrate_effective_decision_history(conn: sqlite3.Connection) -> None:
@@ -953,7 +594,7 @@ class AnnouncementAssetRepository:
                     row["asset_id"],
                     None,
                     row["content_hash"],
-                    CONSUMER_DISPATCH_POLICY_VERSION,
+                    CHANGE_EVENT_POLICY_VERSION,
                     canonical_json(
                         {
                             "decision_id": decision_id,
@@ -1066,6 +707,11 @@ class AnnouncementAssetRepository:
         )
         conn.executescript(
             """
+            DROP TRIGGER IF EXISTS trg_official_asset_operation_stage_insert;
+            DROP TRIGGER IF EXISTS trg_official_asset_operation_stage_update;
+            DROP TRIGGER IF EXISTS trg_official_asset_retention_pin_flags_insert;
+            DROP TRIGGER IF EXISTS trg_official_asset_retention_pin_flags_update;
+
             CREATE TRIGGER IF NOT EXISTS trg_official_asset_operation_status_insert
             BEFORE INSERT ON official_asset_operations
             WHEN NEW.status NOT IN (
@@ -1089,9 +735,8 @@ class AnnouncementAssetRepository:
             CREATE TRIGGER IF NOT EXISTS trg_official_asset_operation_stage_insert
             BEFORE INSERT ON official_asset_operations
             WHEN NEW.stage IS NOT NULL AND NEW.stage NOT IN (
-                'not_applicable', 'discovering', 'reconciling', 'adopting',
-                'downloading', 'validating', 'activating', 'deleting',
-                'backing_up', 'restoring', 'auditing'
+                'not_applicable', 'discovering', 'reconciling',
+                'downloading', 'validating', 'activating'
             )
             BEGIN
                 SELECT RAISE(ABORT, 'invalid operation stage');
@@ -1100,9 +745,8 @@ class AnnouncementAssetRepository:
             CREATE TRIGGER IF NOT EXISTS trg_official_asset_operation_stage_update
             BEFORE UPDATE OF stage ON official_asset_operations
             WHEN NEW.stage IS NOT NULL AND NEW.stage NOT IN (
-                'not_applicable', 'discovering', 'reconciling', 'adopting',
-                'downloading', 'validating', 'activating', 'deleting',
-                'backing_up', 'restoring', 'auditing'
+                'not_applicable', 'discovering', 'reconciling',
+                'downloading', 'validating', 'activating'
             )
             BEGIN
                 SELECT RAISE(ABORT, 'invalid operation stage');
@@ -1122,22 +766,6 @@ class AnnouncementAssetRepository:
                 SELECT RAISE(ABORT, 'invalid asset request status');
             END;
 
-            CREATE TRIGGER IF NOT EXISTS trg_official_asset_retention_pin_flags_insert
-            BEFORE INSERT ON official_asset_retention_pins
-            WHEN NEW.blocks_primary_unlink NOT IN (0, 1)
-              OR NEW.required_set_hold NOT IN (0, 1)
-            BEGIN
-                SELECT RAISE(ABORT, 'invalid retention pin transition flags');
-            END;
-
-            CREATE TRIGGER IF NOT EXISTS trg_official_asset_retention_pin_flags_update
-            BEFORE UPDATE OF blocks_primary_unlink, required_set_hold
-            ON official_asset_retention_pins
-            WHEN NEW.blocks_primary_unlink NOT IN (0, 1)
-              OR NEW.required_set_hold NOT IN (0, 1)
-            BEGIN
-                SELECT RAISE(ABORT, 'invalid retention pin transition flags');
-            END;
             """
         )
 
@@ -1704,21 +1332,12 @@ class AnnouncementAssetRepository:
                 INSERT INTO official_document_blobs(
                     content_hash, schema_version, content_length, canonical_path,
                     signature_status, integrity_status, first_available_at,
-                    last_verified_at, backup_status, backup_verified_at,
-                    acquisition_origin, adopted_from_path,
-                    verification_evidence_json, backup_evidence_json,
-                    created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    last_verified_at, created_at, updated_at
+                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(content_hash) DO UPDATE SET
                     signature_status=excluded.signature_status,
                     integrity_status=excluded.integrity_status,
                     last_verified_at=COALESCE(excluded.last_verified_at, official_document_blobs.last_verified_at),
-                    backup_status=excluded.backup_status,
-                    backup_verified_at=COALESCE(excluded.backup_verified_at, official_document_blobs.backup_verified_at),
-                    acquisition_origin=COALESCE(excluded.acquisition_origin, official_document_blobs.acquisition_origin),
-                    adopted_from_path=COALESCE(excluded.adopted_from_path, official_document_blobs.adopted_from_path),
-                    verification_evidence_json=excluded.verification_evidence_json,
-                    backup_evidence_json=excluded.backup_evidence_json,
                     updated_at=excluded.updated_at
                 """,
                 (
@@ -1730,12 +1349,6 @@ class AnnouncementAssetRepository:
                     blob.integrity_status.value,
                     blob.first_available_at,
                     blob.last_verified_at,
-                    blob.backup_status,
-                    blob.backup_verified_at,
-                    blob.acquisition_origin,
-                    blob.adopted_from_path,
-                    canonical_json(blob.verification_evidence),
-                    canonical_json(blob.backup_evidence),
                     now,
                     now,
                 ),
@@ -1754,718 +1367,25 @@ class AnnouncementAssetRepository:
             ).fetchone()
         return None if row is None else self._blob_from_row(row)
 
-    def update_blob_path(self, content_hash: str, canonical_path: str) -> None:
-        """Change a blob projection only after an externally verified move/copy."""
-        with self.transaction() as conn:
-            result = conn.execute(
-                """UPDATE official_document_blobs
-                   SET canonical_path=?, updated_at=?
-                   WHERE content_hash=?""",
-                (str(canonical_path), utc_now_iso(), content_hash),
-            )
-            if result.rowcount != 1:
-                raise KeyError(f"blob not found: {content_hash}")
 
-    def compare_and_set_blob_path(
-        self,
-        content_hash: str,
-        *,
-        expected_path: str | Path,
-        canonical_path: str | Path,
-    ) -> None:
-        """Atomically switch a verified blob from one exact path to another."""
 
-        expected = str(Path(expected_path).resolve(strict=False))
-        canonical = str(Path(canonical_path).resolve(strict=False))
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT canonical_path FROM official_document_blobs WHERE content_hash=?",
-                (str(content_hash),),
-            ).fetchone()
-            if row is None:
-                raise KeyError(f"blob not found: {content_hash}")
-            stored = str(row["canonical_path"])
-            current = str(Path(stored).resolve(strict=False))
-            if stored == canonical:
-                return
-            if current != expected:
-                raise RuntimeError("blob canonical path changed after planning")
-            result = conn.execute(
-                """UPDATE official_document_blobs
-                   SET canonical_path=?, updated_at=?
-                   WHERE content_hash=? AND canonical_path=?""",
-                (canonical, utc_now_iso(), str(content_hash), stored),
-            )
-            if result.rowcount != 1:
-                raise RuntimeError("blob canonical path update raced")
 
-    def upsert_legacy_path_manifest(
-        self,
-        *,
-        legacy_path: str,
-        consumer: str,
-        asset_id: str,
-        content_hash: str,
-        status: str,
-        manifest_version: str,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> None:
-        """Persist an immutable-versioned legacy path rollback projection."""
-        with self.transaction() as conn:
-            conn.execute(
-                """
-                INSERT INTO official_asset_legacy_path_manifest(
-                    legacy_path, consumer, asset_id, content_hash, status,
-                    manifest_version, created_at, verified_at, metadata_json
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(legacy_path) DO UPDATE SET
-                    consumer=excluded.consumer,
-                    asset_id=excluded.asset_id,
-                    content_hash=excluded.content_hash,
-                    status=excluded.status,
-                    manifest_version=excluded.manifest_version,
-                    verified_at=excluded.verified_at,
-                    metadata_json=excluded.metadata_json
-                """,
-                (
-                    str(legacy_path),
-                    str(consumer),
-                    str(asset_id),
-                    str(content_hash),
-                    str(status),
-                    str(manifest_version),
-                    utc_now_iso(),
-                    utc_now_iso() if status in {"verified", "deleted"} else None,
-                    canonical_json(metadata or {}),
-                ),
-            )
 
-    def list_legacy_path_manifest(self) -> list[dict[str, Any]]:
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_legacy_path_manifest ORDER BY legacy_path"
-            ).fetchall()
-        return [_decode_row(row, json_fields=("metadata_json",)) for row in rows]
 
-    def get_legacy_path_manifest(self, legacy_path: str) -> dict[str, Any] | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_legacy_path_manifest WHERE legacy_path=?",
-                (str(legacy_path),),
-            ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("metadata_json",))
-        )
 
-    def register_recovery_manifest_entry(
-        self,
-        entry: OfficialAssetRecoveryManifestEntry,
-    ) -> OfficialAssetRecoveryManifestEntry:
-        """Append one immutable, indefinitely-active version 1 recovery entry."""
 
-        values = self._recovery_manifest_values(entry)
-        with self.transaction() as conn:
-            persisted = self._insert_recovery_manifest_conn(conn, entry, values)
-        return persisted
 
-    @staticmethod
-    def _recovery_manifest_values(
-        entry: OfficialAssetRecoveryManifestEntry,
-    ) -> tuple[Any, ...]:
-        if int(entry.manifest_version) != 1 or not entry.active_indefinitely:
-            raise ValueError(
-                "version 1 recovery entries must be immutable and active indefinitely"
-            )
-        if entry.catalog_snapshot_watermark:
-            raise ValueError(
-                "new recovery manifests cannot claim a catalog snapshot closure"
-            )
-        if entry.manifest_kind == "withdrawal_tombstone":
-            if entry.replacement_asset_id is not None or entry.replacement_content_hash is not None:
-                raise ValueError(
-                    "withdrawal recovery manifests cannot contain a replacement"
-                )
-        elif entry.manifest_kind == "correction_predecessor":
-            if not entry.replacement_asset_id or not entry.replacement_content_hash:
-                raise ValueError(
-                    "correction predecessor manifests require a replacement"
-                )
-        elif entry.manifest_kind != "legacy_path_rollback":
-            raise ValueError("unsupported recovery manifest kind")
-        required = {
-            "recovery_id": entry.recovery_id,
-            "manifest_kind": entry.manifest_kind,
-            "prior_path": entry.prior_path,
-            "content_hash": entry.content_hash,
-            "backup_object": entry.backup_object,
-            "file_manifest_watermark": entry.file_manifest_watermark,
-            "recovery_pair_id": entry.recovery_pair_id,
-            "created_at": entry.created_at,
-            "created_by": entry.created_by,
-        }
-        missing = [
-            name for name, value in required.items() if not str(value or "").strip()
-        ]
-        if missing:
-            raise ValueError(
-                "recovery manifest entry is missing required fields: "
-                + ", ".join(sorted(missing))
-            )
-        return (
-            entry.recovery_id,
-            RECOVERY_MANIFEST_SCHEMA_VERSION,
-            entry.manifest_kind,
-            1,
-            entry.predecessor_asset_id,
-            entry.source,
-            entry.source_announcement_id,
-            entry.attachment_id,
-            entry.version_id,
-            entry.prior_path,
-            entry.content_hash,
-            entry.replacement_asset_id,
-            entry.replacement_content_hash,
-            entry.backup_object,
-            entry.file_manifest_watermark,
-            entry.recovery_pair_id,
-            entry.catalog_snapshot_watermark or "",
-            entry.consumer,
-            1,
-            entry.created_at,
-            entry.created_by,
-            canonical_json(entry.evidence),
-        )
 
-    def _insert_recovery_manifest_conn(
-        self,
-        conn: sqlite3.Connection,
-        entry: OfficialAssetRecoveryManifestEntry,
-        values: tuple[Any, ...] | None = None,
-    ) -> OfficialAssetRecoveryManifestEntry:
-        conn.execute(
-            """
-            INSERT OR IGNORE INTO official_asset_recovery_manifest(
-                recovery_id, schema_version, manifest_kind, manifest_version,
-                predecessor_asset_id, source, source_announcement_id,
-                attachment_id, version_id, prior_path, content_hash,
-                replacement_asset_id, replacement_content_hash,
-                backup_object, file_manifest_watermark,
-                recovery_pair_id, catalog_snapshot_watermark,
-                consumer, active_indefinitely,
-                created_at, created_by, evidence_json
-            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            values or self._recovery_manifest_values(entry),
-        )
-        row = conn.execute(
-            "SELECT * FROM official_asset_recovery_manifest WHERE recovery_id=?",
-            (entry.recovery_id,),
-        ).fetchone()
-        persisted = self._recovery_manifest_from_row(_require_row(row))
-        if persisted != replace(
-            entry, schema_version=RECOVERY_MANIFEST_SCHEMA_VERSION
-        ):
-            raise IdempotencyConflictError(
-                "recovery_id is already bound to different immutable evidence"
-            )
-        return persisted
 
-    def finalize_legacy_path_convergence(
-        self,
-        *,
-        content_hash: str,
-        content_length: int,
-        expected_blob_paths: Sequence[str],
-        canonical_path: str,
-        legacy_path: str,
-        consumer: str,
-        asset_id: str,
-        alias_expires_at: str,
-        alias_cutover_metadata: Mapping[str, Any],
-        recovery_entry: OfficialAssetRecoveryManifestEntry,
-        legacy_manifest_version: str,
-        legacy_manifest_metadata: Mapping[str, Any],
-    ) -> str:
-        """Atomically finalize every catalog side of one verified file publish."""
 
-        digest = str(content_hash).strip().lower()
-        canonical = str(canonical_path)
-        legacy = str(legacy_path)
-        owner = str(consumer)
-        if (
-            recovery_entry.manifest_kind != "legacy_path_rollback"
-            or recovery_entry.content_hash != digest
-            or recovery_entry.prior_path != legacy
-            or recovery_entry.consumer != owner
-        ):
-            raise ValueError("legacy convergence recovery identity mismatch")
-        recovery_values = self._recovery_manifest_values(recovery_entry)
-        alias_metadata = canonical_json(
-            {
-                "alias_path": legacy,
-                "content_hash": digest,
-                "cutover": dict(alias_cutover_metadata),
-            }
-        )
-        managed_pin_id = stable_id(
-            "pin", digest, "managed_alias", legacy
-        )
-        expected_paths = {str(path) for path in expected_blob_paths}
-        expected_paths.add(canonical)
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            blob = conn.execute(
-                """SELECT canonical_path, content_length, integrity_status
-                   FROM official_document_blobs WHERE content_hash=?""",
-                (digest,),
-            ).fetchone()
-            current_blob = _require_row(blob)
-            if (
-                str(current_blob["canonical_path"]) not in expected_paths
-                or int(current_blob["content_length"]) != int(content_length)
-                or current_blob["integrity_status"] != IntegrityStatus.VALID.value
-            ):
-                raise RuntimeError(
-                    "legacy convergence blob evidence changed before finalization"
-                )
-            legacy_pin = conn.execute(
-                """SELECT pin_id, owner, released_at FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND pin_type='legacy_alias' AND pin_key=?""",
-                (digest, legacy),
-            ).fetchone()
-            if legacy_pin is None or legacy_pin["owner"] != owner:
-                raise RuntimeError(
-                    "legacy convergence exact retention pin is missing or misowned"
-                )
-            conn.execute(
-                """UPDATE official_document_blobs
-                   SET canonical_path=?, updated_at=? WHERE content_hash=?""",
-                (canonical, now, digest),
-            )
-            conn.execute(
-                """INSERT OR IGNORE INTO official_asset_retention_pins(
-                       pin_id, blob_hash, pin_type, pin_key, owner, created_at,
-                       expires_at, blocks_primary_unlink, required_set_hold,
-                       metadata_json
-                   ) VALUES(?, ?, 'managed_alias', ?, ?, ?, ?, 1, 0, ?)""",
-                (
-                    managed_pin_id,
-                    digest,
-                    legacy,
-                    owner,
-                    now,
-                    str(alias_expires_at),
-                    alias_metadata,
-                ),
-            )
-            managed_pin = conn.execute(
-                """SELECT owner, expires_at, blocks_primary_unlink,
-                          required_set_hold, metadata_json
-                   FROM official_asset_retention_pins WHERE pin_id=?""",
-                (managed_pin_id,),
-            ).fetchone()
-            if (
-                managed_pin is None
-                or managed_pin["owner"] != owner
-                or managed_pin["expires_at"] != str(alias_expires_at)
-                or int(managed_pin["blocks_primary_unlink"]) != 1
-                or int(managed_pin["required_set_hold"]) != 0
-                or managed_pin["metadata_json"] != alias_metadata
-            ):
-                raise IdempotencyConflictError(
-                    "managed alias pin is bound to different convergence evidence"
-                )
-            self._insert_recovery_manifest_conn(
-                conn, recovery_entry, recovery_values
-            )
-            conn.execute(
-                """
-                INSERT INTO official_asset_legacy_path_manifest(
-                    legacy_path, consumer, asset_id, content_hash, status,
-                    manifest_version, created_at, verified_at, metadata_json
-                ) VALUES(?, ?, ?, ?, 'canonicalized_awaiting_cleanup', ?, ?, NULL, ?)
-                ON CONFLICT(legacy_path) DO UPDATE SET
-                    consumer=excluded.consumer,
-                    asset_id=excluded.asset_id,
-                    content_hash=excluded.content_hash,
-                    status=excluded.status,
-                    manifest_version=excluded.manifest_version,
-                    verified_at=NULL,
-                    metadata_json=excluded.metadata_json
-                """,
-                (
-                    legacy,
-                    owner,
-                    str(asset_id),
-                    digest,
-                    str(legacy_manifest_version),
-                    now,
-                    canonical_json(legacy_manifest_metadata),
-                ),
-            )
-            if legacy_pin["released_at"] is None:
-                released = conn.execute(
-                    """UPDATE official_asset_retention_pins
-                       SET released_at=?, required_set_hold=0
-                       WHERE pin_id=? AND released_at IS NULL""",
-                    (now, legacy_pin["pin_id"]),
-                )
-                if released.rowcount != 1:
-                    raise RuntimeError("legacy retention pin release raced")
-        return managed_pin_id
 
-    def list_recovery_manifest_entries(
-        self,
-        *,
-        content_hash: str | None = None,
-        manifest_kind: str | None = None,
-    ) -> list[OfficialAssetRecoveryManifestEntry]:
-        clauses: list[str] = []
-        params: list[Any] = []
-        if content_hash:
-            clauses.append("content_hash=?")
-            params.append(str(content_hash))
-        if manifest_kind:
-            clauses.append("manifest_kind=?")
-            params.append(str(manifest_kind))
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_recovery_manifest"
-                + where
-                + " ORDER BY created_at, recovery_id",
-                tuple(params),
-            ).fetchall()
-        return [self._recovery_manifest_from_row(row) for row in rows]
 
-    def register_recovery_pair_closure(
-        self,
-        closure: OfficialAssetRecoveryPairClosure,
-    ) -> OfficialAssetRecoveryPairClosure:
-        """Append an immutable closure for one manifest/snapshot pair."""
 
-        required = {
-            "closure_id": closure.closure_id,
-            "recovery_pair_id": closure.recovery_pair_id,
-            "recovery_id": closure.recovery_id,
-            "catalog_snapshot_identity": closure.catalog_snapshot_identity,
-            "catalog_snapshot_hash": closure.catalog_snapshot_hash,
-            "file_manifest_watermark": closure.file_manifest_watermark,
-            "verified_at": closure.verified_at,
-            "verified_by": closure.verified_by,
-        }
-        missing = [
-            name for name, value in required.items() if not str(value or "").strip()
-        ]
-        if missing:
-            raise ValueError(
-                "recovery pair closure is missing required fields: "
-                + ", ".join(sorted(missing))
-            )
-        values = (
-            closure.closure_id,
-            RECOVERY_PAIR_CLOSURE_SCHEMA_VERSION,
-            closure.recovery_pair_id,
-            closure.recovery_id,
-            closure.catalog_snapshot_identity,
-            closure.catalog_snapshot_hash,
-            closure.file_manifest_watermark,
-            closure.verified_at,
-            closure.verified_by,
-            canonical_json(closure.evidence),
-        )
-        with self.transaction() as conn:
-            conn.execute(
-                """INSERT OR IGNORE INTO official_asset_recovery_pair_closures(
-                       closure_id, schema_version, recovery_pair_id, recovery_id,
-                       catalog_snapshot_identity, catalog_snapshot_hash,
-                       file_manifest_watermark, verified_at, verified_by,
-                       evidence_json
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                values,
-            )
-            row = conn.execute(
-                """SELECT * FROM official_asset_recovery_pair_closures
-                   WHERE closure_id=?""",
-                (closure.closure_id,),
-            ).fetchone()
-            if row is None:
-                conflicting = conn.execute(
-                    """SELECT closure_id FROM official_asset_recovery_pair_closures
-                       WHERE recovery_pair_id=? OR recovery_id=?""",
-                    (closure.recovery_pair_id, closure.recovery_id),
-                ).fetchone()
-                raise IdempotencyConflictError(
-                    "recovery pair is already bound to a different closure: "
-                    + str(conflicting["closure_id"] if conflicting else "unknown")
-                )
-            persisted = self._recovery_pair_closure_from_row(row)
-            if persisted != replace(
-                closure, schema_version=RECOVERY_PAIR_CLOSURE_SCHEMA_VERSION
-            ):
-                raise IdempotencyConflictError(
-                    "closure_id is already bound to different immutable evidence"
-                )
-        return persisted
 
-    def list_recovery_pair_closures(self) -> list[OfficialAssetRecoveryPairClosure]:
-        with self.connection() as conn:
-            rows = conn.execute(
-                """SELECT * FROM official_asset_recovery_pair_closures
-                   ORDER BY verified_at, closure_id"""
-            ).fetchall()
-        return [self._recovery_pair_closure_from_row(row) for row in rows]
 
-    def get_recovery_manifest_by_pair(
-        self, recovery_pair_id: str
-    ) -> OfficialAssetRecoveryManifestEntry | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_recovery_manifest
-                   WHERE recovery_pair_id=?""",
-                (str(recovery_pair_id),),
-            ).fetchone()
-        return None if row is None else self._recovery_manifest_from_row(row)
 
-    def get_recovery_pair_closure(
-        self, recovery_pair_id: str
-    ) -> OfficialAssetRecoveryPairClosure | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_recovery_pair_closures
-                   WHERE recovery_pair_id=?""",
-                (str(recovery_pair_id),),
-            ).fetchone()
-        return None if row is None else self._recovery_pair_closure_from_row(row)
 
-    def complete_recovery_pair_handoff(
-        self,
-        deletion_id: str,
-        *,
-        recovery_id: str,
-    ) -> bool:
-        """CAS primary-unlink protection into a permanent required-set hold."""
 
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                """SELECT intent.*, pin.blocks_primary_unlink,
-                          pin.required_set_hold, pin.released_at AS pin_released_at,
-                          closure.closure_id
-                   FROM official_asset_deletion_intents intent
-                   JOIN official_asset_retention_pins pin
-                     ON pin.pin_id=intent.recovery_pin_id
-                   JOIN official_asset_recovery_manifest manifest
-                     ON manifest.recovery_id=?
-                    AND manifest.recovery_pair_id=intent.recovery_pair_id
-                   JOIN official_asset_recovery_pair_closures closure
-                     ON closure.recovery_id=manifest.recovery_id
-                    AND closure.recovery_pair_id=manifest.recovery_pair_id
-                    AND closure.file_manifest_watermark=manifest.file_manifest_watermark
-                   WHERE intent.deletion_id=?""",
-                (str(recovery_id), str(deletion_id)),
-            ).fetchone()
-            if row is None or row["pin_released_at"] is not None:
-                return False
-            if int(row["required_set_hold"] or 0) != 1:
-                return False
-            if int(row["blocks_primary_unlink"] or 0) == 0:
-                return row["recovery_manifest_id"] == str(recovery_id)
-            pin_result = conn.execute(
-                """UPDATE official_asset_retention_pins
-                   SET blocks_primary_unlink=0
-                   WHERE pin_id=? AND released_at IS NULL
-                     AND blocks_primary_unlink=1 AND required_set_hold=1""",
-                (row["recovery_pin_id"],),
-            )
-            if pin_result.rowcount != 1:
-                return False
-            intent_result = conn.execute(
-                """UPDATE official_asset_deletion_intents
-                   SET recovery_manifest_id=?, required_set_released_at=?,
-                       updated_at=?
-                   WHERE deletion_id=? AND recovery_pair_id=?
-                     AND recovery_pin_id=?
-                     AND status IN ('planned', 'failed')""",
-                (
-                    str(recovery_id),
-                    now,
-                    now,
-                    str(deletion_id),
-                    row["recovery_pair_id"],
-                    row["recovery_pin_id"],
-                ),
-            )
-            if intent_result.rowcount != 1:
-                raise RuntimeError("recovery handoff lost deletion-intent fencing")
-        return True
-
-    def deletion_recovery_pair_satisfies_unlink(self, deletion_id: str) -> bool:
-        """Return true only after the immutable manifest and pair closure hand off."""
-
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT 1
-                   FROM official_asset_deletion_intents intent
-                   JOIN official_asset_recovery_manifest manifest
-                     ON manifest.recovery_id=intent.recovery_manifest_id
-                    AND manifest.recovery_pair_id=intent.recovery_pair_id
-                   JOIN official_asset_recovery_pair_closures closure
-                     ON closure.recovery_id=manifest.recovery_id
-                    AND closure.recovery_pair_id=manifest.recovery_pair_id
-                    AND closure.file_manifest_watermark=manifest.file_manifest_watermark
-                   JOIN official_asset_retention_pins pin
-                     ON pin.pin_id=intent.recovery_pin_id
-                    AND pin.blob_hash=intent.blob_hash
-                   WHERE intent.deletion_id=?
-                     AND intent.required_set_released_at IS NOT NULL
-                     AND pin.released_at IS NULL
-                     AND pin.blocks_primary_unlink=0
-                     AND pin.required_set_hold=1""",
-                (str(deletion_id),),
-            ).fetchone()
-        return row is not None
-
-    @staticmethod
-    def recovery_journal_integrity_hash(
-        entry: OfficialAssetBackupRecoveryJournalEntry,
-    ) -> str:
-        material = canonical_json(
-            {
-                "journal_entry_id": entry.journal_entry_id,
-                "journal_sequence": int(entry.journal_sequence),
-                "increment_kind": entry.increment_kind,
-                "increment_identity": entry.increment_identity,
-                "source_catalog_generation": entry.source_catalog_generation,
-                "predecessor_watermark": entry.predecessor_watermark,
-                "coverage_watermark": entry.coverage_watermark,
-                "payload": entry.payload,
-                "created_at": entry.created_at,
-                "created_by": entry.created_by,
-            }
-        )
-        return hashlib.sha256(material.encode("utf-8")).hexdigest()
-
-    def append_backup_recovery_journal_entry(
-        self,
-        entry: OfficialAssetBackupRecoveryJournalEntry,
-    ) -> OfficialAssetBackupRecoveryJournalEntry:
-        """Append one integrity-checked, gap-free recovery increment."""
-
-        with self.transaction() as conn:
-            return self.append_backup_recovery_journal_entry_in_transaction(
-                conn,
-                entry,
-            )
-
-    def append_backup_recovery_journal_entry_in_transaction(
-        self,
-        conn: sqlite3.Connection,
-        entry: OfficialAssetBackupRecoveryJournalEntry,
-    ) -> OfficialAssetBackupRecoveryJournalEntry:
-        """Append an increment inside the caller's existing write fence.
-
-        Backup capture uses this form so the terminal catalog view and its
-        journal watermark commit atomically.  Callers are responsible for
-        owning an active write transaction on ``conn``.
-        """
-
-        required = {
-            "journal_entry_id": entry.journal_entry_id,
-            "increment_kind": entry.increment_kind,
-            "increment_identity": entry.increment_identity,
-            "source_catalog_generation": entry.source_catalog_generation,
-            "coverage_watermark": entry.coverage_watermark,
-            "integrity_hash": entry.integrity_hash,
-            "created_at": entry.created_at,
-            "created_by": entry.created_by,
-        }
-        missing = [
-            name for name, value in required.items() if not str(value or "").strip()
-        ]
-        if missing:
-            raise ValueError(
-                "recovery journal entry is missing required fields: "
-                + ", ".join(sorted(missing))
-            )
-        if int(entry.journal_sequence) <= 0:
-            raise ValueError("recovery journal sequence must be positive")
-        expected_hash = self.recovery_journal_integrity_hash(entry)
-        if entry.integrity_hash != expected_hash:
-            raise ValueError("recovery journal integrity hash mismatch")
-        normalized = replace(
-            entry, schema_version=BACKUP_RECOVERY_JOURNAL_SCHEMA_VERSION
-        )
-        existing = conn.execute(
-            """SELECT * FROM official_asset_backup_recovery_journal
-               WHERE journal_entry_id=?""",
-            (entry.journal_entry_id,),
-        ).fetchone()
-        if existing is not None:
-            persisted = self._backup_recovery_journal_from_row(existing)
-            if persisted != normalized:
-                raise IdempotencyConflictError(
-                    "journal_entry_id is already bound to different immutable evidence"
-                )
-            return persisted
-        latest = conn.execute(
-            """SELECT journal_sequence, coverage_watermark
-               FROM official_asset_backup_recovery_journal
-               ORDER BY journal_sequence DESC LIMIT 1"""
-        ).fetchone()
-        expected_sequence = (
-            1 if latest is None else int(latest["journal_sequence"]) + 1
-        )
-        expected_predecessor = (
-            None if latest is None else str(latest["coverage_watermark"])
-        )
-        if int(entry.journal_sequence) != expected_sequence:
-            raise ValueError(
-                f"recovery journal sequence gap: expected {expected_sequence}"
-            )
-        if entry.predecessor_watermark != expected_predecessor:
-            raise ValueError("recovery journal predecessor watermark mismatch")
-        try:
-            conn.execute(
-                """INSERT INTO official_asset_backup_recovery_journal(
-                       journal_entry_id, schema_version, journal_sequence,
-                       increment_kind, increment_identity,
-                       source_catalog_generation, predecessor_watermark,
-                       coverage_watermark, integrity_hash, payload_json,
-                       created_at, created_by
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    normalized.journal_entry_id,
-                    normalized.schema_version,
-                    normalized.journal_sequence,
-                    normalized.increment_kind,
-                    normalized.increment_identity,
-                    normalized.source_catalog_generation,
-                    normalized.predecessor_watermark,
-                    normalized.coverage_watermark,
-                    normalized.integrity_hash,
-                    canonical_json(normalized.payload),
-                    normalized.created_at,
-                    normalized.created_by,
-                ),
-            )
-        except sqlite3.IntegrityError as exc:
-            raise IdempotencyConflictError(
-                "recovery journal identity or watermark is already registered"
-            ) from exc
-        return normalized
-
-    def list_backup_recovery_journal_entries(
-        self,
-    ) -> list[OfficialAssetBackupRecoveryJournalEntry]:
-        with self.connection() as conn:
-            rows = conn.execute(
-                """SELECT * FROM official_asset_backup_recovery_journal
-                   ORDER BY journal_sequence"""
-            ).fetchall()
-        return [self._backup_recovery_journal_from_row(row) for row in rows]
 
     def update_blob_integrity(
         self,
@@ -2608,21 +1528,6 @@ class AnnouncementAssetRepository:
             ).fetchone()
         return None if row is None else self._version_from_row(row)
 
-    def list_attachment_ids_for_content_hash(
-        self, content_hash: str, *, limit: int = 100
-    ) -> tuple[str, ...]:
-        """Return deterministic attachment lineage for one exact physical hash."""
-        bounded = max(1, min(int(limit), 1000))
-        with self.connection() as conn:
-            rows = conn.execute(
-                """SELECT DISTINCT attachment_id
-                   FROM official_attachment_versions
-                   WHERE content_hash=?
-                   ORDER BY version_available_at DESC, observed_at DESC,
-                            attachment_id ASC LIMIT ?""",
-                (str(content_hash), bounded),
-            ).fetchall()
-        return tuple(str(row["attachment_id"]) for row in rows)
 
     def acquire_attachment_lease(
         self,
@@ -2776,61 +1681,6 @@ class AnnouncementAssetRepository:
             cutoff = cutoff.replace(tzinfo=timezone.utc)
         return (cutoff - heartbeat).total_seconds() <= max(0, int(safety_grace_seconds))
 
-    def claim_stale_artifact_cleanup(
-        self,
-        metadata: Mapping[str, Any],
-        *,
-        now: str | None = None,
-        safety_grace_seconds: int = 0,
-    ) -> bool:
-        """Fence one abandoned attachment generation before removing its `.part`."""
-
-        attachment_id = str(metadata.get("attachment_id") or "").strip()
-        owner = str(metadata.get("owner") or metadata.get("lease_owner") or "").strip()
-        generation_text = str(
-            metadata.get("lease_generation") or metadata.get("generation") or ""
-        ).strip()
-        if not attachment_id or not owner or not generation_text:
-            return False
-        try:
-            generation = int(generation_text)
-        except ValueError:
-            return False
-        timestamp = now or utc_now_iso()
-        cutoff = datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
-        if cutoff.tzinfo is None:
-            cutoff = cutoff.replace(tzinfo=timezone.utc)
-        with self.transaction() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_acquisition_leases
-                   WHERE attachment_id=?""",
-                (attachment_id,),
-            ).fetchone()
-            if row is None:
-                return True
-            if (
-                row["lease_owner"] != owner
-                or int(row["lease_generation"] or 0) != generation
-            ):
-                return True
-            if _iso_after(row["lease_expires_at"], timestamp):
-                return False
-            heartbeat = datetime.fromisoformat(
-                str(row["heartbeat_at"]).replace("Z", "+00:00")
-            )
-            if heartbeat.tzinfo is None:
-                heartbeat = heartbeat.replace(tzinfo=timezone.utc)
-            if (cutoff - heartbeat).total_seconds() <= max(
-                0, int(safety_grace_seconds)
-            ):
-                return False
-            result = conn.execute(
-                """DELETE FROM official_asset_acquisition_leases
-                   WHERE attachment_id=? AND lease_owner=?
-                     AND lease_generation=?""",
-                (attachment_id, owner, generation),
-            )
-        return result.rowcount == 1
 
     def upsert_effective_report(
         self, report: EffectiveAnnualReport
@@ -2846,9 +1696,8 @@ class AnnouncementAssetRepository:
         *,
         expected_current_asset_id: str | None | object = _UNSET,
     ) -> tuple[EffectiveAnnualReport | None, str | None, bool]:
-        """Atomically project, append the decision, emit, and plan cleanup."""
+        """Atomically project the selected report and append its decision event."""
         now = utc_now_iso()
-        deletion_id: str | None = None
         instrument_id = normalize_instrument_id(report.instrument_id)
         fiscal_year = int(report.fiscal_year)
         with self.transaction() as conn:
@@ -2881,7 +1730,7 @@ class AnnouncementAssetRepository:
                     else EffectiveDecisionKind.REPLACEMENT
                 )
             )
-            consumer_event_type = (
+            event_type = (
                 "added"
                 if decision_kind is EffectiveDecisionKind.INITIAL_ACTIVATION
                 else (
@@ -2889,12 +1738,6 @@ class AnnouncementAssetRepository:
                     if decision_kind is EffectiveDecisionKind.PROJECTION_UPDATE
                     else "replaced"
                 )
-            )
-            is_shadow_decision = report.visibility_state == "shadow"
-            event_type = (
-                f"shadow_{consumer_event_type}"
-                if is_shadow_decision
-                else consumer_event_type
             )
             event_key = stable_id(
                 "event",
@@ -2907,44 +1750,6 @@ class AnnouncementAssetRepository:
                 now,
             )
             decision_id = stable_id("decision", event_key)
-            same_hash_legal_replacement = bool(
-                prior is not None
-                and prior.content_hash
-                and prior.content_hash == report.content_hash
-                and (
-                    prior.announcement_id != report.announcement_id
-                    or prior.attachment_id != report.attachment_id
-                    or prior.version_id != report.version_id
-                )
-            )
-            predecessor_legal_identity = (
-                self._legal_filing_identity_conn(conn, prior)
-                if same_hash_legal_replacement
-                else (None, None)
-            )
-            replacement_legal_identity = (
-                self._legal_filing_identity_conn(conn, report)
-                if same_hash_legal_replacement
-                else (None, None)
-            )
-            physical_unlink_outcome = (
-                {
-                    "schema_version": PHYSICAL_UNLINK_OUTCOME_SCHEMA_VERSION,
-                    "outcome": "not_applicable_shared_blob",
-                    "predecessor_asset_id": prior.asset_id,
-                    "replacement_asset_id": report.asset_id,
-                    "predecessor_source": predecessor_legal_identity[0],
-                    "predecessor_source_announcement_id": predecessor_legal_identity[1],
-                    "predecessor_attachment_id": prior.attachment_id,
-                    "replacement_source": replacement_legal_identity[0],
-                    "replacement_source_announcement_id": replacement_legal_identity[1],
-                    "replacement_attachment_id": report.attachment_id,
-                    "content_hash": report.content_hash,
-                    "reason": "same_hash_distinct_legal_filing",
-                }
-                if same_hash_legal_replacement
-                else None
-            )
             self._upsert_effective_conn(conn, report, now=now)
             if report.content_hash:
                 pin_id = stable_id(
@@ -2957,9 +1762,6 @@ class AnnouncementAssetRepository:
                        ) VALUES(?, ?, 'effective_asset', ?, ?, '{}')
                        ON CONFLICT(pin_id) DO UPDATE SET
                            released_at=NULL,
-                           blocks_primary_unlink=1,
-                           required_set_hold=0,
-                           required_set_released_at=NULL,
                            metadata_json=excluded.metadata_json""",
                     (pin_id, report.content_hash, report.asset_id, now),
                 )
@@ -2969,26 +1771,10 @@ class AnnouncementAssetRepository:
                 and prior.content_hash
             ):
                 conn.execute(
-                    """UPDATE official_asset_consumer_processing
-                       SET status='stale', updated_at=?
-                       WHERE asset_id=? AND status IN ('queued', 'processing', 'current')""",
-                    (now, prior.asset_id),
-                )
-                conn.execute(
                     """UPDATE official_asset_retention_pins SET released_at=?
                        WHERE blob_hash=? AND pin_type='effective_asset'
                          AND pin_key=? AND released_at IS NULL""",
                     (now, prior.content_hash, prior.asset_id),
-                )
-            if report.decision_state in {
-                EffectiveDecisionState.AMBIGUOUS,
-                EffectiveDecisionState.PROVISIONAL,
-            }:
-                self._stale_default_consumer_processing_conn(
-                    conn,
-                    report=report,
-                    now=now,
-                    error_code="pending_correction",
                 )
             decision_policy_version = str(
                 report.decision_evidence.get("decision_policy_version")
@@ -3009,12 +1795,8 @@ class AnnouncementAssetRepository:
                     report.asset_id,
                     None if prior is None else prior.asset_id,
                     report.content_hash,
-                    (
-                        "shadow_effective_decision"
-                        if is_shadow_decision
-                        else "effective_decision"
-                    ),
-                    CONSUMER_DISPATCH_POLICY_VERSION,
+                    "effective_decision",
+                    CHANGE_EVENT_POLICY_VERSION,
                     canonical_json(
                         {
                             "schema_version": "official_asset_change_event.v1",
@@ -3026,12 +1808,8 @@ class AnnouncementAssetRepository:
                             "decision_state": report.decision_state.value,
                             "availability": report.availability.value,
                             "visibility_state": report.visibility_state,
-                            "consumer_event_type": consumer_event_type,
-                            "consumer_deliverable": not is_shadow_decision,
-                            "deferred_until_promotion": is_shadow_decision,
                             "pending_candidate_id": report.pending_candidate_id,
                             "decision_policy_version": decision_policy_version,
-                            "physical_unlink_outcome": physical_unlink_outcome,
                         }
                     ),
                     now,
@@ -3055,46 +1833,17 @@ class AnnouncementAssetRepository:
                     "evidence_set_hash": report.evidence_set_hash,
                     "variant": report.variant.value,
                     "availability": report.availability.value,
-                    "physical_unlink_outcome": physical_unlink_outcome,
                 },
                 activated_at=report.activated_at or now,
                 outbox_event_key=event_key,
                 created_at=now,
             )
-            if (
-                prior is not None
-                and prior.asset_id != report.asset_id
-                and prior.content_hash
-                and prior.content_hash != report.content_hash
-                and prior_row["prior_canonical_path"]
-            ):
-                deletion_id = stable_id(
-                    "del",
-                    prior.content_hash,
-                    prior_row["prior_canonical_path"],
-                    report.asset_id,
-                    "effective_replacement",
-                    decision_id,
-                )
-                self._plan_recovery_deletion_conn(
-                    conn,
-                    deletion_id=deletion_id,
-                    blob_hash=prior.content_hash,
-                    managed_path=str(prior_row["prior_canonical_path"]),
-                    predecessor_asset_id=prior.asset_id,
-                    replacement_asset_id=report.asset_id,
-                    replacement_blob_hash=report.content_hash,
-                    decision_id=decision_id,
-                    outbox_event_key=event_key,
-                    reason="effective_replacement",
-                    now=now,
-                )
             row = conn.execute(
                 """SELECT * FROM effective_annual_reports
                    WHERE instrument_id=? AND fiscal_year=?""",
                 (instrument_id, fiscal_year),
             ).fetchone()
-        return self._effective_from_row(_require_row(row)), deletion_id, True
+        return self._effective_from_row(_require_row(row)), None, True
 
     def withdraw_effective_report_without_replacement(
         self,
@@ -3152,7 +1901,7 @@ class AnnouncementAssetRepository:
                     instrument_id,
                     fiscal_year,
                     prior.asset_id,
-                    CONSUMER_DISPATCH_POLICY_VERSION,
+                    CHANGE_EVENT_POLICY_VERSION,
                     canonical_json(
                         {
                             "schema_version": "official_asset_change_event.v1",
@@ -3180,27 +1929,6 @@ class AnnouncementAssetRepository:
                 outbox_event_key=event_key,
                 created_at=now,
             )
-            deletion_id = stable_id(
-                "del",
-                prior.content_hash,
-                prior_row["prior_canonical_path"],
-                prior.asset_id,
-                "withdrawn_without_replacement",
-                decision_id,
-            )
-            self._plan_recovery_deletion_conn(
-                conn,
-                deletion_id=deletion_id,
-                blob_hash=prior.content_hash,
-                managed_path=str(prior_row["prior_canonical_path"]),
-                predecessor_asset_id=prior.asset_id,
-                replacement_asset_id=None,
-                replacement_blob_hash=None,
-                decision_id=decision_id,
-                outbox_event_key=event_key,
-                reason="withdrawn_without_replacement",
-                now=now,
-            )
             conn.execute(
                 """UPDATE official_asset_retention_pins SET released_at=?
                    WHERE blob_hash=? AND pin_type='effective_asset'
@@ -3208,86 +1936,12 @@ class AnnouncementAssetRepository:
                 (now, prior.content_hash, prior.asset_id),
             )
             conn.execute(
-                """UPDATE official_asset_consumer_processing
-                   SET status='stale', error_code='withdrawn_without_replacement',
-                       updated_at=?
-                   WHERE asset_id=? AND status IN ('queued', 'processing', 'current')""",
-                (now, prior.asset_id),
-            )
-            conn.execute(
                 """DELETE FROM effective_annual_reports
                    WHERE instrument_id=? AND fiscal_year=? AND asset_id=?""",
                 (instrument_id, fiscal_year, prior.asset_id),
             )
-        return deletion_id, True
+        return None, True
 
-    @staticmethod
-    def _plan_recovery_deletion_conn(
-        conn: sqlite3.Connection,
-        *,
-        deletion_id: str,
-        blob_hash: str,
-        managed_path: str,
-        predecessor_asset_id: str,
-        replacement_asset_id: str | None,
-        replacement_blob_hash: str | None,
-        decision_id: str,
-        outbox_event_key: str,
-        reason: str,
-        now: str,
-    ) -> None:
-        """Atomically protect a predecessor before exposing its replacement."""
-
-        recovery_pair_id = stable_id("recovery-pair", deletion_id)
-        recovery_pin_id = stable_id(
-            "pin", blob_hash, "recovery_predecessor", recovery_pair_id
-        )
-        conn.execute(
-            """INSERT OR IGNORE INTO official_asset_retention_pins(
-                   pin_id, blob_hash, pin_type, pin_key, owner, created_at,
-                   blocks_primary_unlink, required_set_hold, metadata_json
-               ) VALUES(?, ?, 'recovery_predecessor', ?,
-                        'announcement_asset_recovery', ?, 1, 1, ?)""",
-            (
-                recovery_pin_id,
-                blob_hash,
-                recovery_pair_id,
-                now,
-                canonical_json(
-                    {
-                        "recovery_pair_id": recovery_pair_id,
-                        "deletion_id": deletion_id,
-                        "decision_id": decision_id,
-                        "outbox_event_key": outbox_event_key,
-                    }
-                ),
-            ),
-        )
-        conn.execute(
-            """INSERT OR IGNORE INTO official_asset_deletion_intents(
-                   deletion_id, schema_version, blob_hash, managed_path,
-                   predecessor_asset_id, replacement_asset_id,
-                   replacement_blob_hash, decision_id, outbox_event_key,
-                   status, reason, recovery_pair_id, recovery_pin_id,
-                   planned_at, updated_at
-               ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, 'planned', ?, ?, ?, ?, ?)""",
-            (
-                deletion_id,
-                DELETION_INTENT_SCHEMA_VERSION,
-                blob_hash,
-                managed_path,
-                predecessor_asset_id,
-                replacement_asset_id,
-                replacement_blob_hash,
-                decision_id,
-                outbox_event_key,
-                reason,
-                recovery_pair_id,
-                recovery_pin_id,
-                now,
-                now,
-            ),
-        )
 
     def list_effective_decisions(
         self,
@@ -3405,299 +2059,10 @@ class AnnouncementAssetRepository:
             ).fetchall()
         return [self._effective_from_row(row) for row in rows]
 
-    def register_adoption_promotion_gate(
-        self,
-        *,
-        gate_id: str,
-        asset_id: str,
-        inventory_fingerprint: str,
-        config_fingerprint: str,
-        content_hash: str,
-        content_length: int,
-        canonical_path: str,
-        mount_filesystem_key: str,
-        custody_state: str,
-        reconciled_at: str,
-        expires_at: str,
-        evidence: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        """Persist immutable evidence that one shadow asset is promotable."""
 
-        required = {
-            "gate_id": gate_id,
-            "asset_id": asset_id,
-            "inventory_fingerprint": inventory_fingerprint,
-            "config_fingerprint": config_fingerprint,
-            "content_hash": content_hash,
-            "canonical_path": canonical_path,
-            "mount_filesystem_key": mount_filesystem_key,
-        }
-        missing = [name for name, value in required.items() if not str(value).strip()]
-        if missing:
-            raise ValueError(
-                "adoption promotion gate is missing required fields: "
-                + ", ".join(sorted(missing))
-            )
-        if custody_state not in {"canonical", "shared_controlled_legacy"}:
-            raise ValueError("adoption promotion gate lacks shared custody")
-        if int(content_length) <= 0:
-            raise ValueError("adoption promotion content length must be positive")
-        now = utc_now_iso()
-        values = (
-            gate_id,
-            "official_asset_adoption_promotion_gate.v1",
-            asset_id,
-            inventory_fingerprint,
-            config_fingerprint,
-            content_hash,
-            int(content_length),
-            canonical_path,
-            mount_filesystem_key,
-            custody_state,
-            reconciled_at,
-            expires_at,
-            canonical_json(evidence),
-            now,
-            now,
-        )
-        with self.transaction() as conn:
-            conn.execute(
-                """INSERT OR IGNORE INTO official_asset_adoption_promotion_gates(
-                       gate_id, schema_version, asset_id, inventory_fingerprint,
-                       config_fingerprint, content_hash, content_length,
-                       canonical_path, mount_filesystem_key, custody_state,
-                       status, reconciled_at, expires_at, evidence_json,
-                       created_at, updated_at
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?, ?, ?)""",
-                values,
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_adoption_promotion_gates WHERE gate_id=?",
-                (gate_id,),
-            ).fetchone()
-        decoded = _decode_row(_require_row(row), json_fields=("evidence_json",))
-        expected = {
-            "asset_id": asset_id,
-            "inventory_fingerprint": inventory_fingerprint,
-            "config_fingerprint": config_fingerprint,
-            "content_hash": content_hash,
-            "content_length": int(content_length),
-            "canonical_path": canonical_path,
-            "mount_filesystem_key": mount_filesystem_key,
-            "custody_state": custody_state,
-            "reconciled_at": reconciled_at,
-            "expires_at": expires_at,
-        }
-        if any(decoded.get(key) != value for key, value in expected.items()):
-            raise IdempotencyConflictError(
-                "adoption promotion gate identity is already registered differently"
-            )
-        return decoded
 
-    def get_adoption_promotion_gate(self, gate_id: str) -> dict[str, Any] | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_adoption_promotion_gates WHERE gate_id=?",
-                (str(gate_id),),
-            ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("evidence_json",))
-        )
 
-    def find_adoption_promotion_gate(
-        self,
-        *,
-        asset_id: str,
-        inventory_fingerprint: str,
-        config_fingerprint: str,
-        content_hash: str,
-        status: str,
-    ) -> dict[str, Any] | None:
-        """Find exact persisted adoption evidence for one inventory/config view."""
 
-        normalized_status = str(status).strip()
-        if normalized_status not in {"ready", "consumed", "invalidated"}:
-            raise ValueError("unsupported adoption promotion gate status")
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_adoption_promotion_gates
-                   WHERE asset_id=? AND inventory_fingerprint=?
-                     AND config_fingerprint=? AND content_hash=? AND status=?
-                   ORDER BY reconciled_at DESC, gate_id DESC LIMIT 1""",
-                (
-                    str(asset_id),
-                    str(inventory_fingerprint),
-                    str(config_fingerprint),
-                    str(content_hash),
-                    normalized_status,
-                ),
-            ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("evidence_json",))
-        )
-
-    def invalidate_adoption_promotion_gate(self, gate_id: str, *, reason: str) -> None:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            result = conn.execute(
-                """UPDATE official_asset_adoption_promotion_gates
-                   SET status='invalidated', invalidated_at=?,
-                       invalidation_reason=?, updated_at=?
-                   WHERE gate_id=? AND status='ready'""",
-                (now, str(reason), now, str(gate_id)),
-            )
-            if result.rowcount != 1:
-                raise RuntimeError("adoption promotion gate is not ready")
-
-    def promote_effective_report(
-        self,
-        asset_id: str,
-        *,
-        promotion_gate_id: str,
-        inventory_fingerprint: str,
-        config_fingerprint: str,
-        validated_mount_filesystem_key: str,
-    ) -> EffectiveAnnualReport:
-        """Atomically consume a persisted gate and expose one shadow asset."""
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT * FROM effective_annual_reports WHERE asset_id=?",
-                (asset_id,),
-            ).fetchone()
-            current = self._effective_from_row(_require_row(row))
-            gate_row = conn.execute(
-                "SELECT * FROM official_asset_adoption_promotion_gates WHERE gate_id=?",
-                (str(promotion_gate_id),),
-            ).fetchone()
-            gate = _decode_row(
-                _require_row(gate_row), json_fields=("evidence_json",)
-            )
-            if current.visibility_state == "production" and gate["status"] == "consumed":
-                return current
-            if gate["status"] != "ready":
-                raise RuntimeError("adoption promotion gate is not ready")
-            if gate["asset_id"] != current.asset_id:
-                raise RuntimeError("adoption promotion gate asset mismatch")
-            if gate["content_hash"] != current.content_hash:
-                raise RuntimeError("adoption promotion gate content mismatch")
-            if gate["inventory_fingerprint"] != str(inventory_fingerprint):
-                raise RuntimeError("adoption inventory fingerprint changed")
-            if gate["config_fingerprint"] != str(config_fingerprint):
-                raise RuntimeError("adoption configuration fingerprint changed")
-            if gate["mount_filesystem_key"] != str(validated_mount_filesystem_key):
-                raise RuntimeError("adoption mount identity changed")
-            if _parse_iso_datetime(str(gate["expires_at"])) < _parse_iso_datetime(now):
-                raise RuntimeError("adoption promotion gate is stale")
-            if current.visibility_state != "shadow":
-                raise RuntimeError("adoption asset is not shadow-visible")
-            if current.availability is not AssetAvailability.LOCAL_VALID:
-                raise RuntimeError("adoption asset is not locally valid")
-            if current.decision_state in {
-                EffectiveDecisionState.AMBIGUOUS,
-                EffectiveDecisionState.BLOCKED,
-                EffectiveDecisionState.PROVISIONAL,
-                EffectiveDecisionState.WITHDRAWN,
-            }:
-                raise RuntimeError("adoption decision is not promotable")
-            blob_row = conn.execute(
-                "SELECT * FROM official_document_blobs WHERE content_hash=?",
-                (current.content_hash,),
-            ).fetchone()
-            blob = self._blob_from_row(_require_row(blob_row))
-            if (
-                blob.canonical_path != gate["canonical_path"]
-                or blob.content_length != int(gate["content_length"])
-                or blob.integrity_status is not IntegrityStatus.VALID
-            ):
-                raise RuntimeError("adoption canonical blob evidence changed")
-            version_row = conn.execute(
-                "SELECT * FROM official_attachment_versions WHERE version_id=?",
-                (current.version_id,),
-            ).fetchone()
-            version = self._version_from_row(_require_row(version_row))
-            if (
-                version.visibility_state != "shadow"
-                or version.content_hash != current.content_hash
-                or version.integrity_status is not IntegrityStatus.VALID
-            ):
-                raise RuntimeError("adoption attachment observation changed")
-            version_update = conn.execute(
-                """UPDATE official_attachment_versions
-                   SET visibility_state='production', updated_at=?
-                   WHERE version_id=? AND visibility_state='shadow'""",
-                (now, current.version_id),
-            )
-            if version_update.rowcount != 1:
-                raise RuntimeError("adoption attachment promotion raced")
-            effective_update = conn.execute(
-                """UPDATE effective_annual_reports
-                   SET visibility_state='production', activated_at=COALESCE(activated_at, ?),
-                       updated_at=? WHERE asset_id=? AND visibility_state='shadow'""",
-                (now, now, asset_id),
-            )
-            if effective_update.rowcount != 1:
-                raise RuntimeError("adoption effective promotion raced")
-            deferred_rows = conn.execute(
-                """SELECT event.event_key
-                   FROM official_annual_report_decisions decision
-                   JOIN official_asset_change_events event
-                     ON event.event_key=decision.outbox_event_key
-                   WHERE decision.instrument_id=? AND decision.fiscal_year=?
-                     AND event.event_type LIKE 'shadow_%'
-                   ORDER BY decision.decision_sequence""",
-                (current.instrument_id, current.fiscal_year),
-            ).fetchall()
-            conn.execute(
-                """INSERT OR IGNORE INTO official_asset_change_events(
-                       event_key, event_type, instrument_id, fiscal_year,
-                       asset_id, predecessor_asset_id, content_hash,
-                       trigger_origin, dispatch_policy_version,
-                       payload_json, created_at
-                   ) VALUES(?, 'added', ?, ?, ?, ?, ?,
-                            'asset_adoption_promotion', ?, ?, ?)""",
-                (
-                    stable_id("event", "shadow_promoted", asset_id),
-                    current.instrument_id,
-                    current.fiscal_year,
-                    current.asset_id,
-                    None,
-                    current.content_hash,
-                    CONSUMER_DISPATCH_POLICY_VERSION,
-                    canonical_json(
-                        {
-                            "schema_version": "official_asset_change_event.v1",
-                            "origin": "asset_adoption_promotion",
-                            "visibility_state": "production",
-                            "consumer_deliverable": True,
-                            "shadow_predecessor_asset_id": (
-                                current.predecessor_asset_id
-                            ),
-                            "deferred_shadow_event_keys": [
-                                str(row["event_key"]) for row in deferred_rows
-                            ],
-                        }
-                    ),
-                    now,
-                ),
-            )
-            consumed = conn.execute(
-                """UPDATE official_asset_adoption_promotion_gates
-                   SET status='consumed', consumed_at=?, updated_at=?
-                   WHERE gate_id=? AND status='ready'""",
-                (now, now, str(promotion_gate_id)),
-            )
-            if consumed.rowcount != 1:
-                raise RuntimeError("adoption promotion gate consumption raced")
-            promoted = conn.execute(
-                "SELECT * FROM effective_annual_reports WHERE asset_id=?",
-                (asset_id,),
-            ).fetchone()
-        return self._effective_from_row(_require_row(promoted))
 
     def mark_effective_content_invalid(
         self,
@@ -3829,13 +2194,6 @@ class AnnouncementAssetRepository:
                     row["asset_id"],
                 ),
             )
-        conn.execute(
-            """UPDATE official_asset_adoption_promotion_gates
-               SET status='invalidated', invalidated_at=?,
-                   invalidation_reason=?, updated_at=?
-               WHERE content_hash=? AND status IN ('ready', 'consumed')""",
-            (now, str(reason), now, str(content_hash)),
-        )
 
     def create_or_reuse_operation(
         self,
@@ -4246,432 +2604,13 @@ class AnnouncementAssetRepository:
             ).fetchall()
         return [self._subscription_from_row(row) for row in rows]
 
-    def create_or_reuse_consumer_request(
-        self,
-        *,
-        principal: str,
-        consumer: str,
-        request_idempotency_key: str,
-        request_fingerprint: str,
-        processing_fingerprint: str,
-        selector: Mapping[str, Any],
-        status: ConsumerRequestStatus,
-        result_state: ConsumerResultState = ConsumerResultState.UNAVAILABLE,
-        asset_request_id: str | None = None,
-        asset_id: str | None = None,
-        processing_id: str | None = None,
-        reason_code: str | None = None,
-        metadata: Mapping[str, Any] | None = None,
-        expires_at: str | None = None,
-        retention_policy_version: str = CONSUMER_REQUEST_RETENTION_POLICY_VERSION,
-    ) -> tuple[OfficialAssetConsumerRequest, bool]:
-        """Create one principal-owned business request without starting asset work."""
-        normalized_principal = str(principal or "").strip()
-        normalized_consumer = str(consumer or "").strip()
-        request_key = str(request_idempotency_key or "").strip()
-        fingerprint = str(request_fingerprint or "").strip()
-        processing = str(processing_fingerprint or "").strip()
-        retention_version = str(retention_policy_version or "").strip()
-        if not all(
-            (
-                normalized_principal,
-                normalized_consumer,
-                request_key,
-                fingerprint,
-                processing,
-                retention_version,
-            )
-        ):
-            raise ValueError("consumer request identity fields are required")
-        if status in {
-            ConsumerRequestStatus.PROCESSING,
-            ConsumerRequestStatus.COMPLETED,
-            ConsumerRequestStatus.FAILED,
-        }:
-            raise ValueError("consumer request cannot be created after processing starts")
-        now = utc_now_iso()
-        active_expiry = expires_at or (
-            _parse_iso_datetime(now)
-            + timedelta(seconds=CONSUMER_REQUEST_ACTIVE_TTL_SECONDS)
-        ).isoformat()
-        if not _iso_after(active_expiry, now):
-            raise ValueError("consumer request expiry must be in the future")
-        with self.transaction() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_consumer_requests
-                   WHERE principal=? AND idempotency_key=?""",
-                (normalized_principal, request_key),
-            ).fetchone()
-            if row is not None:
-                if (
-                    row["request_fingerprint"] != fingerprint
-                    or row["consumer"] != normalized_consumer
-                    or row["processing_fingerprint"] != processing
-                ):
-                    raise IdempotencyConflictError(
-                        "idempotency key is already bound to another consumer request"
-                    )
-                return self._consumer_request_from_row(row), False
-            if asset_request_id is not None:
-                subscription = conn.execute(
-                    """SELECT principal FROM official_asset_operation_subscriptions
-                       WHERE asset_request_id=?""",
-                    (asset_request_id,),
-                ).fetchone()
-                if subscription is None or subscription["principal"] != normalized_principal:
-                    raise ValueError(
-                        "linked asset request is missing or belongs to another principal"
-                    )
-            consumer_request_id = stable_id(
-                "consumerreq", normalized_principal, request_key, now
-            )
-            finished_at = (
-                now
-                if status
-                in {
-                    ConsumerRequestStatus.MISSING,
-                    ConsumerRequestStatus.BLOCKED,
-                    ConsumerRequestStatus.CANCELLED,
-                }
-                else None
-            )
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_requests(
-                    consumer_request_id, schema_version, principal, consumer,
-                    idempotency_key, request_fingerprint, processing_fingerprint,
-                    selector_json, asset_request_id, asset_id, processing_id,
-                    status, result_state, reason_code, metadata_json,
-                    finished_at, cancelled_at, expires_at,
-                    retention_policy_version, created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    consumer_request_id,
-                    CONSUMER_REQUEST_SCHEMA_VERSION,
-                    normalized_principal,
-                    normalized_consumer,
-                    request_key,
-                    fingerprint,
-                    processing,
-                    canonical_json(selector),
-                    asset_request_id,
-                    asset_id,
-                    processing_id,
-                    status.value,
-                    result_state.value,
-                    reason_code,
-                    canonical_json(metadata or {}),
-                    finished_at,
-                    now if status is ConsumerRequestStatus.CANCELLED else None,
-                    active_expiry,
-                    retention_version,
-                    now,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                """SELECT * FROM official_asset_consumer_requests
-                   WHERE consumer_request_id=?""",
-                (consumer_request_id,),
-            ).fetchone()
-        return self._consumer_request_from_row(_require_row(row)), True
 
-    def get_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str | None = None,
-    ) -> OfficialAssetConsumerRequest | None:
-        clauses = ["consumer_request_id=?"]
-        params: list[Any] = [str(consumer_request_id)]
-        if principal is not None:
-            clauses.append("principal=?")
-            params.append(str(principal).strip())
-        now = utc_now_iso()
-        tombstone_until = (
-            _parse_iso_datetime(now)
-            + timedelta(seconds=CONSUMER_REQUEST_TOMBSTONE_TTL_SECONDS)
-        ).isoformat()
-        with self.transaction() as conn:
-            conn.execute(
-                """UPDATE official_asset_consumer_requests
-                   SET status='expired', expired_at=?, tombstone_until=?, updated_at=?
-                   WHERE consumer_request_id=?
-                     AND status NOT IN ('cancelled', 'expired')
-                     AND expires_at<=?""",
-                (now, tombstone_until, now, consumer_request_id, now),
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_consumer_requests WHERE "
-                + " AND ".join(clauses),
-                tuple(params),
-            ).fetchone()
-        return None if row is None else self._consumer_request_from_row(row)
 
-    def get_consumer_request_identity(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str | None = None,
-    ) -> dict[str, str] | None:
-        """Return immutable authorization fields without lifecycle mutation."""
-        clauses = ["consumer_request_id=?"]
-        params: list[Any] = [str(consumer_request_id)]
-        if principal is not None:
-            clauses.append("principal=?")
-            params.append(str(principal).strip())
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT principal, consumer FROM official_asset_consumer_requests WHERE "
-                + " AND ".join(clauses),
-                tuple(params),
-            ).fetchone()
-        if row is None:
-            return None
-        return {"principal": str(row["principal"]), "consumer": str(row["consumer"])}
 
-    def discard_unaccepted_consumer_request(
-        self, consumer_request_id: str
-    ) -> bool:
-        """Rollback a command that failed before any durable work was accepted."""
-        with self.transaction() as conn:
-            cursor = conn.execute(
-                """DELETE FROM official_asset_consumer_requests
-                   WHERE consumer_request_id=? AND status='not_started'
-                     AND asset_request_id IS NULL AND asset_id IS NULL
-                     AND processing_id IS NULL AND processing_started_at IS NULL""",
-                (str(consumer_request_id),),
-            )
-        return int(cursor.rowcount or 0) == 1
 
-    def list_consumer_requests(
-        self,
-        *,
-        processing_id: str | None = None,
-        asset_request_id: str | None = None,
-        principal: str | None = None,
-    ) -> list[OfficialAssetConsumerRequest]:
-        clauses: list[str] = []
-        params: list[Any] = []
-        for column, value in (
-            ("processing_id", processing_id),
-            ("asset_request_id", asset_request_id),
-            ("principal", principal),
-        ):
-            if value is not None:
-                clauses.append(f"{column}=?")
-                params.append(str(value))
-        where = " WHERE " + " AND ".join(clauses) if clauses else ""
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_consumer_requests"
-                + where
-                + " ORDER BY created_at, consumer_request_id",
-                tuple(params),
-            ).fetchall()
-        return [self._consumer_request_from_row(row) for row in rows]
 
-    def transition_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        status: ConsumerRequestStatus,
-        result_state: ConsumerResultState | None = None,
-        asset_request_id: str | None | object = _UNSET,
-        asset_id: str | None | object = _UNSET,
-        processing_id: str | None | object = _UNSET,
-        result_identity: str | None | object = _UNSET,
-        resolved_source: str | None | object = _UNSET,
-        resolved_source_announcement_id: str | None | object = _UNSET,
-        resolved_attachment_id: str | None | object = _UNSET,
-        resolved_observation_version: str | None | object = _UNSET,
-        resolved_content_hash: str | None | object = _UNSET,
-        resolved_report_period: str | None | object = _UNSET,
-        reason_code: str | None | object = _UNSET,
-        retry_metadata: Mapping[str, Any] | None = None,
-        diagnostics: Mapping[str, Any] | None = None,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> OfficialAssetConsumerRequest:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = _require_row(
-                conn.execute(
-                    """SELECT * FROM official_asset_consumer_requests
-                       WHERE consumer_request_id=?""",
-                    (consumer_request_id,),
-                ).fetchone()
-            )
-            current = self._consumer_request_from_row(row)
-            self._validate_consumer_request_transition(current.status, status)
-            if asset_request_id is not _UNSET and asset_request_id is not None:
-                subscription = conn.execute(
-                    """SELECT principal FROM official_asset_operation_subscriptions
-                       WHERE asset_request_id=?""",
-                    (asset_request_id,),
-                ).fetchone()
-                if subscription is None or subscription["principal"] != current.principal:
-                    raise ValueError(
-                        "linked asset request is missing or belongs to another principal"
-                    )
-            updates: dict[str, Any] = {
-                "status": status.value,
-                "updated_at": now,
-            }
-            if result_state is not None:
-                updates["result_state"] = result_state.value
-            for column, value in (
-                ("asset_request_id", asset_request_id),
-                ("asset_id", asset_id),
-                ("processing_id", processing_id),
-                ("result_identity", result_identity),
-                ("resolved_source", resolved_source),
-                ("resolved_source_announcement_id", resolved_source_announcement_id),
-                ("resolved_attachment_id", resolved_attachment_id),
-                ("resolved_observation_version", resolved_observation_version),
-                ("resolved_content_hash", resolved_content_hash),
-                ("resolved_report_period", resolved_report_period),
-                ("reason_code", reason_code),
-            ):
-                if value is not _UNSET:
-                    updates[column] = value
-            if retry_metadata is not None:
-                updates["retry_metadata_json"] = canonical_json(retry_metadata)
-            if diagnostics is not None:
-                updates["diagnostics_json"] = canonical_json(diagnostics)
-            if metadata is not None:
-                updates["metadata_json"] = canonical_json(metadata)
-            if (
-                status is ConsumerRequestStatus.PROCESSING
-                and current.processing_started_at is None
-            ):
-                updates["processing_started_at"] = now
-            if status in {
-                ConsumerRequestStatus.COMPLETED,
-                ConsumerRequestStatus.FAILED,
-                ConsumerRequestStatus.MISSING,
-                ConsumerRequestStatus.CANCELLED,
-            }:
-                updates["finished_at"] = now
-            if status is ConsumerRequestStatus.CANCELLED:
-                updates["cancelled_at"] = now
-            assignments = ", ".join(f"{column}=?" for column in updates)
-            conn.execute(
-                f"UPDATE official_asset_consumer_requests SET {assignments} "
-                "WHERE consumer_request_id=?",
-                (*updates.values(), consumer_request_id),
-            )
-            row = conn.execute(
-                """SELECT * FROM official_asset_consumer_requests
-                   WHERE consumer_request_id=?""",
-                (consumer_request_id,),
-            ).fetchone()
-        return self._consumer_request_from_row(_require_row(row))
 
-    def cancel_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str,
-        cooperative_stop_accepted: bool = False,
-    ) -> tuple[OfficialAssetConsumerRequest, str]:
-        """Cancel only the business request; linked asset work is untouched."""
-        current = self.get_consumer_request(
-            consumer_request_id,
-            principal=principal,
-        )
-        if current is None:
-            raise KeyError(consumer_request_id)
-        if current.status is ConsumerRequestStatus.CANCELLED:
-            return current, "cancelled"
-        if current.status is ConsumerRequestStatus.PROCESSING or (
-            current.status is ConsumerRequestStatus.BLOCKED
-            and current.processing_started_at is not None
-        ):
-            if not cooperative_stop_accepted:
-                raise ConsumerRequestNotCancellableError("request_not_cancellable")
-            now = utc_now_iso()
-            with self.transaction() as conn:
-                conn.execute(
-                    """UPDATE official_asset_consumer_requests
-                       SET stop_requested_at=?, reason_code='cooperative_stop_requested',
-                           updated_at=? WHERE consumer_request_id=?""",
-                    (now, now, consumer_request_id),
-                )
-                row = conn.execute(
-                    """SELECT * FROM official_asset_consumer_requests
-                       WHERE consumer_request_id=?""",
-                    (consumer_request_id,),
-                ).fetchone()
-            return self._consumer_request_from_row(_require_row(row)), "stop_requested"
-        if current.status in {
-            ConsumerRequestStatus.COMPLETED,
-            ConsumerRequestStatus.MISSING,
-            ConsumerRequestStatus.FAILED,
-            ConsumerRequestStatus.EXPIRED,
-        } or current.result_state is ConsumerResultState.CURRENT:
-            raise ConsumerRequestNotCancellableError("request_not_cancellable")
-        cancelled = self.transition_consumer_request(
-            consumer_request_id,
-            status=ConsumerRequestStatus.CANCELLED,
-            result_state=current.result_state,
-        )
-        return cancelled, "cancelled"
 
-    @staticmethod
-    def _validate_consumer_request_transition(
-        current: ConsumerRequestStatus,
-        target: ConsumerRequestStatus,
-    ) -> None:
-        if current is target:
-            return
-        allowed = {
-            ConsumerRequestStatus.PENDING_ASSET: {
-                ConsumerRequestStatus.NOT_STARTED,
-                ConsumerRequestStatus.QUEUED,
-                ConsumerRequestStatus.PROCESSING,
-                ConsumerRequestStatus.COMPLETED,
-                ConsumerRequestStatus.MISSING,
-                ConsumerRequestStatus.BLOCKED,
-                ConsumerRequestStatus.FAILED,
-                ConsumerRequestStatus.CANCELLED,
-            },
-            ConsumerRequestStatus.NOT_STARTED: {
-                ConsumerRequestStatus.PENDING_ASSET,
-                ConsumerRequestStatus.QUEUED,
-                ConsumerRequestStatus.PROCESSING,
-                ConsumerRequestStatus.COMPLETED,
-                ConsumerRequestStatus.MISSING,
-                ConsumerRequestStatus.BLOCKED,
-                ConsumerRequestStatus.FAILED,
-                ConsumerRequestStatus.CANCELLED,
-            },
-            ConsumerRequestStatus.QUEUED: {
-                ConsumerRequestStatus.PROCESSING,
-                ConsumerRequestStatus.COMPLETED,
-                ConsumerRequestStatus.MISSING,
-                ConsumerRequestStatus.BLOCKED,
-                ConsumerRequestStatus.FAILED,
-                ConsumerRequestStatus.CANCELLED,
-            },
-            ConsumerRequestStatus.PROCESSING: {
-                ConsumerRequestStatus.COMPLETED,
-                ConsumerRequestStatus.BLOCKED,
-                ConsumerRequestStatus.FAILED,
-            },
-            ConsumerRequestStatus.BLOCKED: {
-                ConsumerRequestStatus.PENDING_ASSET,
-                ConsumerRequestStatus.NOT_STARTED,
-                ConsumerRequestStatus.QUEUED,
-                ConsumerRequestStatus.PROCESSING,
-                ConsumerRequestStatus.FAILED,
-                ConsumerRequestStatus.CANCELLED,
-            },
-        }.get(current, set())
-        if target not in allowed:
-            raise ValueError(
-                f"invalid consumer request transition: {current.value}->{target.value}"
-            )
 
     def get_operation(self, operation_id: str) -> AssetOperation | None:
         with self.connection() as conn:
@@ -4742,10 +2681,6 @@ class AnnouncementAssetRepository:
                     ),
                 )
             elif current.status is OperationStatus.RUNNING:
-                if current.stage is OperationStage.BACKING_UP:
-                    raise RuntimeError(
-                        "operation stage is not cooperatively cancellable"
-                    )
                 conn.execute(
                     """UPDATE official_asset_operations SET progress_json=?, updated_at=?
                        WHERE operation_id=?""",
@@ -5071,215 +3006,10 @@ class AnnouncementAssetRepository:
             ).fetchall()
         return [_decode_row(row, json_fields=("payload_json",)) for row in rows]
 
-    def get_consumer_checkpoint(self, consumer: str) -> dict[str, Any] | None:
-        """Return one consumer's durable outbox cursor, if registered."""
-        key = _require_consumer_name(consumer)
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-        return None if row is None else _decode_row(row, json_fields=("metadata_json",))
 
-    def ensure_consumer_checkpoint(
-        self,
-        consumer: str,
-        *,
-        start_after_event_id: int = 0,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        """Register a consumer without changing an existing replay position."""
-        key = _require_consumer_name(consumer)
-        offset = max(0, int(start_after_event_id))
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            if offset:
-                known_event = conn.execute(
-                    "SELECT 1 FROM official_asset_change_events WHERE event_id=?",
-                    (offset,),
-                ).fetchone()
-                if known_event is None:
-                    raise ValueError("start_after_event_id is not a known event")
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_checkpoints(
-                    consumer, schema_version, last_event_id, metadata_json,
-                    created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?)
-                ON CONFLICT(consumer) DO NOTHING
-                """,
-                (
-                    key,
-                    CONSUMER_CHECKPOINT_SCHEMA_VERSION,
-                    offset,
-                    canonical_json(metadata or {}),
-                    now,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("metadata_json",))
 
-    def record_consumer_delivery_attempt(
-        self,
-        consumer: str,
-        *,
-        event_id: int,
-        error_code: str | None = None,
-        attempted_at: str | None = None,
-    ) -> dict[str, Any]:
-        """Persist a delivery attempt/failure without advancing the cursor."""
-        key = _require_consumer_name(consumer)
-        event = int(event_id)
-        if event < 1:
-            raise ValueError("event_id must be positive")
-        now = attempted_at or utc_now_iso()
-        with self.transaction() as conn:
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_checkpoints(
-                    consumer, schema_version, last_event_id,
-                    last_attempted_event_id, delivery_attempt,
-                    last_attempted_at, last_error_code, metadata_json,
-                    created_at, updated_at
-                ) VALUES(?, ?, 0, ?, 1, ?, ?, '{}', ?, ?)
-                ON CONFLICT(consumer) DO UPDATE SET
-                    last_attempted_event_id=excluded.last_attempted_event_id,
-                    delivery_attempt=official_asset_consumer_checkpoints.delivery_attempt+1,
-                    last_attempted_at=excluded.last_attempted_at,
-                    last_error_code=excluded.last_error_code,
-                    updated_at=excluded.updated_at
-                """,
-                (
-                    key,
-                    CONSUMER_CHECKPOINT_SCHEMA_VERSION,
-                    event,
-                    now,
-                    error_code,
-                    now,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("metadata_json",))
 
-    def record_consumer_delivery_failure(
-        self,
-        consumer: str,
-        *,
-        event_id: int,
-        error_code: str,
-        attempted_at: str | None = None,
-    ) -> dict[str, Any]:
-        """Attach failure evidence to the latest attempt without double-counting."""
-        key = _require_consumer_name(consumer)
-        if int(event_id) < 1 or not str(error_code).strip():
-            raise ValueError("event_id and error_code are required")
-        now = attempted_at or utc_now_iso()
-        with self.transaction() as conn:
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_checkpoints(
-                    consumer, schema_version, last_event_id,
-                    last_attempted_event_id, delivery_attempt,
-                    last_attempted_at, last_error_code, metadata_json,
-                    created_at, updated_at
-                ) VALUES(?, ?, 0, ?, 1, ?, ?, '{}', ?, ?)
-                ON CONFLICT(consumer) DO UPDATE SET
-                    last_attempted_event_id=excluded.last_attempted_event_id,
-                    last_attempted_at=excluded.last_attempted_at,
-                    last_error_code=excluded.last_error_code,
-                    updated_at=excluded.updated_at
-                """,
-                (
-                    key,
-                    CONSUMER_CHECKPOINT_SCHEMA_VERSION,
-                    int(event_id),
-                    now,
-                    str(error_code),
-                    now,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("metadata_json",))
 
-    def advance_consumer_checkpoint(
-        self,
-        consumer: str,
-        *,
-        event_id: int,
-        event_key: str,
-        expected_previous_event_id: int | None = None,
-        delivered_at: str | None = None,
-    ) -> tuple[dict[str, Any], bool]:
-        """CAS-advance a consumer cursor after idempotent event handling.
-
-        Returning ``False`` means another worker already moved the cursor or
-        the caller used a stale expected offset.  In both cases the monotonic
-        cursor is left untouched and replay remains safe.
-        """
-        key = _require_consumer_name(consumer)
-        event = int(event_id)
-        if event < 1 or not str(event_key).strip():
-            raise ValueError("event_id and event_key are required")
-        now = delivered_at or utc_now_iso()
-        with self.transaction() as conn:
-            event_row = conn.execute(
-                "SELECT event_key FROM official_asset_change_events WHERE event_id=?",
-                (event,),
-            ).fetchone()
-            if event_row is None:
-                raise KeyError(f"change event not found: {event}")
-            if str(event_row["event_key"]) != str(event_key):
-                raise ValueError("event_key does not match event_id")
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_checkpoints(
-                    consumer, schema_version, last_event_id, last_event_key,
-                    last_delivered_at, last_error_code, metadata_json,
-                    created_at, updated_at
-                ) VALUES(?, ?, 0, NULL, NULL, NULL, '{}', ?, ?)
-                ON CONFLICT(consumer) DO NOTHING
-                """,
-                (key, CONSUMER_CHECKPOINT_SCHEMA_VERSION, now, now),
-            )
-            current = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-            current_row = _require_row(current)
-            current_event = int(current_row["last_event_id"])
-            if event <= current_event:
-                return _decode_row(current_row, json_fields=("metadata_json",)), False
-            if expected_previous_event_id is not None and current_event != int(
-                expected_previous_event_id
-            ):
-                return _decode_row(current_row, json_fields=("metadata_json",)), False
-            conn.execute(
-                """
-                UPDATE official_asset_consumer_checkpoints
-                   SET last_event_id=?, last_event_key=?,
-                       last_delivered_at=?, last_error_code=NULL,
-                       updated_at=?
-                 WHERE consumer=? AND last_event_id=?
-                """,
-                (event, event_key, now, now, key, current_event),
-            )
-            updated = conn.execute(
-                "SELECT * FROM official_asset_consumer_checkpoints WHERE consumer=?",
-                (key,),
-            ).fetchone()
-        return _decode_row(_require_row(updated), json_fields=("metadata_json",)), True
 
     def acquire_read_lease(
         self,
@@ -5321,19 +3051,11 @@ class AnnouncementAssetRepository:
             ).fetchone()
             if blob is None:
                 raise KeyError(f"announcement blob not found: {normalized_hash}")
-            deleting = conn.execute(
-                """SELECT 1 FROM official_asset_deletion_intents
-                   WHERE blob_hash=? AND status='deleting' LIMIT 1""",
-                (normalized_hash,),
-            ).fetchone()
-            if deleting is not None:
-                raise RuntimeError("announcement blob deletion is in progress")
             conn.execute(
                 """INSERT INTO official_asset_retention_pins(
                        pin_id, blob_hash, pin_type, pin_key, owner, created_at,
-                       expires_at, blocks_primary_unlink, required_set_hold,
-                       metadata_json
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, 1, 0, ?)""",
+                       expires_at, metadata_json
+                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     lease_id,
                     normalized_hash,
@@ -5483,1058 +3205,42 @@ class AnnouncementAssetRepository:
             ).fetchone()
             if current is not None:
                 return str(current["availability"])
-            deletion = conn.execute(
-                """SELECT status FROM official_asset_deletion_intents
-                   WHERE predecessor_asset_id=?
-                   ORDER BY planned_at DESC, deletion_id DESC LIMIT 1""",
-                (normalized_id,),
-            ).fetchone()
-            if deletion is not None and deletion["status"] == "deleted":
-                return "deleted"
             decision = conn.execute(
                 """SELECT decision_kind FROM official_annual_report_decisions
                    WHERE predecessor_asset_id=?
                    ORDER BY decision_sequence DESC LIMIT 1""",
                 (normalized_id,),
             ).fetchone()
-        if decision is None and deletion is None:
+        if decision is None:
             return None
         if decision is not None and decision["decision_kind"] == "withdrawn_without_replacement":
             return "withdrawn"
         return "superseded"
 
-    def add_retention_pin(
-        self,
-        *,
-        blob_hash: str,
-        pin_type: str,
-        pin_key: str,
-        owner: str | None = None,
-        expires_at: str | None = None,
-        blocks_primary_unlink: bool = True,
-        required_set_hold: bool = False,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> str:
-        normalized_blob_hash = str(blob_hash or "").strip().lower()
-        normalized_pin_type = str(pin_type or "").strip()
-        normalized_pin_key = str(pin_key or "").strip()
-        normalized_owner = None if owner is None else str(owner).strip()
-        normalized_expiry = None if expires_at is None else str(expires_at).strip()
-        if (
-            not normalized_blob_hash
-            or not normalized_pin_type
-            or not normalized_pin_key
-        ):
-            raise ValueError("retention pin identity fields are required")
-        normalized_metadata = canonical_json(metadata or {})
-        now = utc_now_iso()
-        pin_id = stable_id(
-            "pin", normalized_blob_hash, normalized_pin_type, normalized_pin_key, now
-        )
-        with self.transaction() as conn:
-            existing = conn.execute(
-                """SELECT pin_id, owner, expires_at, metadata_json,
-                          blocks_primary_unlink, required_set_hold
-                   FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND pin_type=? AND pin_key=? AND released_at IS NULL""",
-                (normalized_blob_hash, normalized_pin_type, normalized_pin_key),
-            ).fetchone()
-            if existing is not None:
-                if int(existing["blocks_primary_unlink"]) != int(
-                    bool(blocks_primary_unlink)
-                ) or int(existing["required_set_hold"]) != int(bool(required_set_hold)):
-                    raise IdempotencyConflictError(
-                        "retention pin identity is bound to different transition flags"
-                    )
-                if (
-                    existing["owner"] != normalized_owner
-                    or existing["expires_at"] != normalized_expiry
-                    or existing["metadata_json"] != normalized_metadata
-                ):
-                    raise IdempotencyConflictError(
-                        "retention pin identity is bound to different metadata"
-                    )
-                return str(existing["pin_id"])
-            conn.execute(
-                """INSERT INTO official_asset_retention_pins(
-                       pin_id, blob_hash, pin_type, pin_key, owner, created_at,
-                       expires_at, blocks_primary_unlink, required_set_hold,
-                       metadata_json
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    pin_id,
-                    normalized_blob_hash,
-                    normalized_pin_type,
-                    normalized_pin_key,
-                    normalized_owner,
-                    now,
-                    normalized_expiry,
-                    int(bool(blocks_primary_unlink)),
-                    int(bool(required_set_hold)),
-                    normalized_metadata,
-                ),
-            )
-        return pin_id
 
-    def add_managed_alias_retention_pin(
-        self,
-        *,
-        blob_hash: str,
-        alias_path: str,
-        owner: str,
-        expires_at: str | None,
-        cutover_metadata: Mapping[str, Any],
-    ) -> str:
-        """Register a database-owned retention pin for a managed alias.
 
-        Alias ownership and cutover evidence are part of the pin's idempotent
-        identity.  Physical link counts are deliberately not consulted: the
-        catalog pin remains the deletion truth even on filesystems where
-        ``st_nlink`` is unavailable or stale.
-        """
-        alias = str(alias_path or "").strip()
-        alias_owner = str(owner or "").strip()
-        if not alias or not alias_owner:
-            raise ValueError("managed alias path and owner are required")
-        if expires_at is None or not str(expires_at).strip():
-            raise ValueError("managed alias expiry is required")
-        if not isinstance(cutover_metadata, Mapping) or not cutover_metadata:
-            raise ValueError("managed alias cutover metadata is required")
-        metadata = {
-            "alias_path": alias,
-            "content_hash": str(blob_hash or "").strip().lower(),
-            "cutover": dict(cutover_metadata),
-        }
-        return self.add_retention_pin(
-            blob_hash=blob_hash,
-            pin_type="managed_alias",
-            pin_key=alias,
-            owner=alias_owner,
-            expires_at=str(expires_at).strip(),
-            blocks_primary_unlink=True,
-            metadata=metadata,
-        )
 
-    def transition_retention_pin(
-        self,
-        pin_id: str,
-        *,
-        blocks_primary_unlink: bool | None = None,
-        release_required_set_hold: bool = False,
-    ) -> bool:
-        """Transition deletion-blocking and backup-required-set duties separately."""
-        if blocks_primary_unlink is None and not release_required_set_hold:
-            return False
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_retention_pins WHERE pin_id=?",
-                (pin_id,),
-            ).fetchone()
-            current = _require_row(row)
-            if current["released_at"] is not None:
-                return False
-            if current["pin_type"] == "recovery_predecessor":
-                raise PermissionError(
-                    "recovery predecessor pins transition only through pair closure"
-                )
-            new_blocks = (
-                int(current["blocks_primary_unlink"])
-                if blocks_primary_unlink is None
-                else int(bool(blocks_primary_unlink))
-            )
-            new_hold = (
-                0 if release_required_set_hold else int(current["required_set_hold"])
-            )
-            result = conn.execute(
-                """UPDATE official_asset_retention_pins
-                   SET blocks_primary_unlink=?, required_set_hold=?,
-                       required_set_released_at=CASE
-                           WHEN ?=1 AND required_set_released_at IS NULL THEN ?
-                           ELSE required_set_released_at
-                       END
-                   WHERE pin_id=? AND released_at IS NULL""",
-                (
-                    new_blocks,
-                    new_hold,
-                    int(bool(release_required_set_hold)),
-                    now,
-                    pin_id,
-                ),
-            )
-        return result.rowcount == 1
 
-    def release_retention_pin(self, pin_id: str) -> bool:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT pin_type, required_set_hold FROM official_asset_retention_pins WHERE pin_id=?",
-                (pin_id,),
-            ).fetchone()
-            if row is not None and (
-                row["pin_type"] == "recovery_predecessor"
-                or int(row["required_set_hold"] or 0) == 1
-            ):
-                raise PermissionError("permanent recovery holds cannot be released")
-            result = conn.execute(
-                """UPDATE official_asset_retention_pins
-                   SET released_at=?, required_set_hold=0,
-                       required_set_released_at=CASE
-                           WHEN required_set_hold=1 THEN ?
-                           ELSE required_set_released_at
-                       END
-                   WHERE pin_id=? AND released_at IS NULL""",
-                (now, now, pin_id),
-            )
-        return result.rowcount == 1
 
-    def release_retention_pin_by_key(
-        self,
-        *,
-        blob_hash: str,
-        pin_type: str,
-        pin_key: str,
-    ) -> bool:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                """SELECT pin_type, required_set_hold
-                   FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND pin_type=? AND pin_key=?
-                     AND released_at IS NULL""",
-                (blob_hash, pin_type, pin_key),
-            ).fetchone()
-            if row is not None and (
-                row["pin_type"] == "recovery_predecessor"
-                or int(row["required_set_hold"] or 0) == 1
-            ):
-                raise PermissionError("permanent recovery holds cannot be released")
-            result = conn.execute(
-                """UPDATE official_asset_retention_pins
-                   SET released_at=?, required_set_hold=0,
-                       required_set_released_at=CASE
-                           WHEN required_set_hold=1 THEN ?
-                           ELSE required_set_released_at
-                       END
-                   WHERE blob_hash=? AND pin_type=? AND pin_key=?
-                     AND released_at IS NULL""",
-                (now, now, blob_hash, pin_type, pin_key),
-            )
-        return result.rowcount == 1
 
-    def active_retention_pin_count(
-        self, blob_hash: str, *, as_of: str | None = None
-    ) -> int:
-        now = as_of or utc_now_iso()
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT COUNT(*) AS count FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND released_at IS NULL
-                     AND blocks_primary_unlink=1
-                     AND (expires_at IS NULL OR expires_at>?)""",
-                (blob_hash, now),
-            ).fetchone()
-        return int(_require_row(row)["count"])
 
-    def get_active_retention_pin(
-        self,
-        *,
-        blob_hash: str,
-        pin_type: str,
-        pin_key: str,
-        as_of: str | None = None,
-    ) -> dict[str, Any] | None:
-        """Return one exact active pin; same-hash pins never substitute for it."""
 
-        now = as_of or utc_now_iso()
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND pin_type=? AND pin_key=?
-                     AND released_at IS NULL
-                     AND blocks_primary_unlink=1
-                     AND (expires_at IS NULL OR expires_at>?)""",
-                (str(blob_hash), str(pin_type), str(pin_key), now),
-            ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("metadata_json",))
-        )
 
-    def active_required_set_hold_count(self, blob_hash: str) -> int:
-        """Return active backup/restore holds, independent of unlink blockers."""
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT COUNT(*) AS count FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND released_at IS NULL
-                     AND required_set_hold=1""",
-                (blob_hash,),
-            ).fetchone()
-        return int(_require_row(row)["count"])
 
-    def plan_deletion(
-        self,
-        *,
-        blob_hash: str,
-        managed_path: str,
-        predecessor_asset_id: str | None,
-        replacement_asset_id: str | None,
-        replacement_blob_hash: str | None,
-        reason: str,
-        recovery_pair_id: str | None = None,
-        recovery_pin_id: str | None = None,
-    ) -> str:
-        now = utc_now_iso()
-        deletion_id = stable_id(
-            "del", blob_hash, managed_path, replacement_asset_id or "", reason
-        )
-        with self.transaction() as conn:
-            conn.execute(
-                """
-                INSERT INTO official_asset_deletion_intents(
-                    deletion_id, schema_version, blob_hash, managed_path,
-                    predecessor_asset_id, replacement_asset_id,
-                    replacement_blob_hash, status, reason,
-                    recovery_pair_id, recovery_pin_id, planned_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, 'planned', ?, ?, ?, ?, ?)
-                ON CONFLICT(deletion_id) DO NOTHING
-                """,
-                (
-                    deletion_id,
-                    DELETION_INTENT_SCHEMA_VERSION,
-                    blob_hash,
-                    managed_path,
-                    predecessor_asset_id,
-                    replacement_asset_id,
-                    replacement_blob_hash,
-                    reason,
-                    recovery_pair_id,
-                    recovery_pin_id,
-                    now,
-                    now,
-                ),
-            )
-        return deletion_id
 
-    def bind_deletion_recovery_manifest(
-        self,
-        deletion_id: str,
-        *,
-        recovery_manifest_id: str,
-    ) -> bool:
-        """Bind the immutable recovery entry before primary unlink is admitted."""
-        manifest_id = str(recovery_manifest_id or "").strip()
-        if not manifest_id:
-            raise ValueError("recovery_manifest_id is required")
-        with self.transaction() as conn:
-            intent = conn.execute(
-                """SELECT * FROM official_asset_deletion_intents
-                   WHERE deletion_id=?""",
-                (deletion_id,),
-            ).fetchone()
-            current = _require_row(intent)
-            manifest = conn.execute(
-                """SELECT * FROM official_asset_recovery_manifest
-                   WHERE recovery_id=?""",
-                (manifest_id,),
-            ).fetchone()
-            entry = _require_row(manifest)
-            expected_kind = (
-                "withdrawal_tombstone"
-                if current["reason"] == "withdrawn_without_replacement"
-                else "correction_predecessor"
-            )
-            if (
-                entry["recovery_pair_id"] != current["recovery_pair_id"]
-                or entry["manifest_kind"] != expected_kind
-                or entry["content_hash"] != current["blob_hash"]
-                or entry["prior_path"] != current["managed_path"]
-                or entry["predecessor_asset_id"] != current["predecessor_asset_id"]
-                or entry["replacement_asset_id"] != current["replacement_asset_id"]
-                or entry["replacement_content_hash"]
-                != current["replacement_blob_hash"]
-            ):
-                raise ValueError("recovery manifest does not match deletion intent")
-            result = conn.execute(
-                """UPDATE official_asset_deletion_intents
-                   SET recovery_manifest_id=?, updated_at=?
-                   WHERE deletion_id=? AND recovery_manifest_id IS NULL
-                     AND status IN ('planned', 'failed')""",
-                (manifest_id, utc_now_iso(), deletion_id),
-            )
-        return result.rowcount == 1
 
-    def transition_deletion(
-        self,
-        deletion_id: str,
-        status: DeletionStatus,
-        *,
-        actor: str | None = None,
-        error_code: str | None = None,
-        retention_evidence: Mapping[str, Any] | None = None,
-        details: Mapping[str, Any] | None = None,
-        expected_lease_owner: str | None = None,
-        expected_lease_generation: int | None = None,
-    ) -> dict[str, Any]:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-            current = DeletionStatus(str(_require_row(row)["status"]))
-            if expected_lease_owner is not None and (
-                row["lease_owner"] != str(expected_lease_owner)
-                or int(row["lease_generation"] or 0)
-                != int(expected_lease_generation or 0)
-            ):
-                raise DeletionLeaseFenceError(
-                    "deletion lease owner or generation changed"
-                )
-            if (
-                status != current
-                and status not in _ALLOWED_DELETION_TRANSITIONS[current]
-            ):
-                raise ValueError(
-                    f"invalid deletion transition: {current.value}->{status.value}"
-                )
-            conn.execute(
-                """UPDATE official_asset_deletion_intents SET
-                       status=?, attempt=attempt+?, error_code=?,
-                       deleting_at=CASE WHEN ?='deleting' THEN COALESCE(deleting_at, ?) ELSE deleting_at END,
-                       deleted_at=CASE WHEN ?='deleted' THEN COALESCE(deleted_at, ?) ELSE deleted_at END,
-                       lease_owner=CASE WHEN ? IN ('deleted', 'failed') THEN NULL ELSE lease_owner END,
-                       lease_expires_at=CASE WHEN ? IN ('deleted', 'failed') THEN NULL ELSE lease_expires_at END,
-                       updated_at=? WHERE deletion_id=?""",
-                (
-                    status.value,
-                    int(status is DeletionStatus.DELETING),
-                    error_code,
-                    status.value,
-                    now,
-                    status.value,
-                    now,
-                    status.value,
-                    status.value,
-                    now,
-                    deletion_id,
-                ),
-            )
-            updated = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-            conn.execute(
-                """INSERT INTO official_asset_deletion_audit(
-                       deletion_id, status, blob_hash, managed_path,
-                       predecessor_asset_id, replacement_asset_id,
-                       replacement_blob_hash, reason, retention_evidence_json,
-                       actor, details_json, created_at
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    deletion_id,
-                    status.value,
-                    updated["blob_hash"],
-                    updated["managed_path"],
-                    updated["predecessor_asset_id"],
-                    updated["replacement_asset_id"],
-                    updated["replacement_blob_hash"],
-                    updated["reason"],
-                    canonical_json(retention_evidence or {}),
-                    actor,
-                    canonical_json(details or {}),
-                    now,
-                ),
-            )
-            if status is DeletionStatus.DELETED:
-                scope = conn.execute(
-                    """SELECT instrument_id, fiscal_year
-                       FROM effective_annual_reports WHERE asset_id=?""",
-                    (updated["replacement_asset_id"],),
-                ).fetchone()
-                if scope is not None:
-                    event_key = stable_id("event", "deleted", deletion_id)
-                    conn.execute(
-                        """INSERT OR IGNORE INTO official_asset_change_events(
-                               event_key, event_type, instrument_id, fiscal_year,
-                               asset_id, predecessor_asset_id, content_hash,
-                               trigger_origin, dispatch_policy_version,
-                               payload_json, created_at
-                           ) VALUES(?, 'deleted', ?, ?, ?, NULL, ?,
-                                    'physical_deletion', ?, ?, ?)""",
-                        (
-                            event_key,
-                            scope["instrument_id"],
-                            int(scope["fiscal_year"]),
-                            updated["predecessor_asset_id"],
-                            updated["blob_hash"],
-                            CONSUMER_DISPATCH_POLICY_VERSION,
-                            canonical_json(
-                                {
-                                    "schema_version": "official_asset_change_event.v1",
-                                    "deletion_id": deletion_id,
-                                    "replacement_asset_id": updated[
-                                        "replacement_asset_id"
-                                    ],
-                                    "reason": updated["reason"],
-                                }
-                            ),
-                            now,
-                        ),
-                    )
-        return _decode_row(_require_row(updated))
 
-    def claim_deletion(
-        self,
-        deletion_id: str,
-        *,
-        lease_owner: str,
-        lease_expires_at: str,
-        actor: str,
-        mount_evidence: Mapping[str, Any],
-        now: str | None = None,
-    ) -> bool:
-        timestamp = now or utc_now_iso()
-        owner = str(lease_owner or "").strip()
-        if not owner:
-            raise ValueError("lease_owner is required")
-        normalized_mount = _normalize_deletion_mount_evidence(mount_evidence)
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-            current = _require_row(row)
-            if current["status"] == DeletionStatus.DELETED.value:
-                return False
-            if (
-                current["lease_owner"]
-                and current["lease_owner"] != owner
-                and current["lease_expires_at"]
-                and _iso_after(current["lease_expires_at"], timestamp)
-            ):
-                return False
-            if current["status"] not in {
-                DeletionStatus.PLANNED.value,
-                DeletionStatus.DELETING.value,
-                DeletionStatus.FAILED.value,
-            }:
-                return False
-            active_pin = conn.execute(
-                """SELECT 1 FROM official_asset_retention_pins
-                   WHERE blob_hash=? AND released_at IS NULL
-                     AND blocks_primary_unlink=1
-                     AND (expires_at IS NULL OR expires_at>?) LIMIT 1""",
-                (current["blob_hash"], timestamp),
-            ).fetchone()
-            if active_pin is not None:
-                return False
-            existing_mount_key = current["operation_mount_filesystem_key"]
-            if existing_mount_key:
-                stored_mount = {
-                    "source": current["operation_mount_source"],
-                    "mount_point": current["operation_mount_point"],
-                    "fs_type": current["operation_mount_fs_type"],
-                    "device_id": current["operation_mount_device_id"],
-                    "filesystem_key": existing_mount_key,
-                }
-                if stored_mount != normalized_mount:
-                    return False
-            conn.execute(
-                """UPDATE official_asset_deletion_intents SET
-                       status='deleting', lease_owner=?, lease_expires_at=?,
-                       lease_generation=lease_generation+1,
-                       attempt=attempt+1, error_code=NULL,
-                       operation_mount_source=COALESCE(operation_mount_source, ?),
-                       operation_mount_point=COALESCE(operation_mount_point, ?),
-                       operation_mount_fs_type=COALESCE(operation_mount_fs_type, ?),
-                       operation_mount_device_id=COALESCE(operation_mount_device_id, ?),
-                       operation_mount_filesystem_key=COALESCE(operation_mount_filesystem_key, ?),
-                       operation_mount_captured_at=COALESCE(operation_mount_captured_at, ?),
-                       deleting_at=COALESCE(deleting_at, ?), updated_at=?
-                   WHERE deletion_id=?""",
-                (
-                    owner,
-                    lease_expires_at,
-                    normalized_mount["source"],
-                    normalized_mount["mount_point"],
-                    normalized_mount["fs_type"],
-                    normalized_mount["device_id"],
-                    normalized_mount["filesystem_key"],
-                    timestamp,
-                    timestamp,
-                    timestamp,
-                    deletion_id,
-                ),
-            )
-            conn.execute(
-                """INSERT INTO official_asset_deletion_audit(
-                       deletion_id, status, blob_hash, managed_path,
-                       predecessor_asset_id, replacement_asset_id,
-                       replacement_blob_hash, reason, retention_evidence_json,
-                       actor, details_json, created_at
-                   ) VALUES(?, 'deleting', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    deletion_id,
-                    current["blob_hash"],
-                    current["managed_path"],
-                    current["predecessor_asset_id"],
-                    current["replacement_asset_id"],
-                    current["replacement_blob_hash"],
-                    current["reason"],
-                    canonical_json({"operation_mount": normalized_mount}),
-                    actor,
-                    canonical_json({"operation_mount": normalized_mount}),
-                    timestamp,
-                ),
-            )
-        return True
 
-    def heartbeat_deletion(
-        self,
-        deletion_id: str,
-        *,
-        lease_owner: str,
-        lease_generation: int,
-        lease_expires_at: str,
-        now: str | None = None,
-    ) -> bool:
-        """Extend one deleting lease only for its current owner/generation."""
 
-        timestamp = now or utc_now_iso()
-        with self.transaction() as conn:
-            result = conn.execute(
-                """UPDATE official_asset_deletion_intents
-                   SET lease_expires_at=?, updated_at=?
-                   WHERE deletion_id=? AND status='deleting'
-                     AND lease_owner=? AND lease_generation=?""",
-                (
-                    lease_expires_at,
-                    timestamp,
-                    deletion_id,
-                    str(lease_owner),
-                    int(lease_generation),
-                ),
-            )
-        return result.rowcount == 1
 
-    def block_deletion_finalization(
-        self,
-        deletion_id: str,
-        *,
-        actor: str,
-        error_code: str,
-        details: Mapping[str, Any] | None = None,
-        expected_lease_owner: str | None = None,
-        expected_lease_generation: int | None = None,
-    ) -> dict[str, Any]:
-        """Keep an unlinked or uncertain intent retryable without claiming deletion."""
 
-        code = str(error_code or "").strip()
-        if not code:
-            raise ValueError("error_code is required")
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-            current = _require_row(row)
-            if expected_lease_owner is not None and (
-                current["lease_owner"] != str(expected_lease_owner)
-                or int(current["lease_generation"] or 0)
-                != int(expected_lease_generation or 0)
-            ):
-                raise DeletionLeaseFenceError(
-                    "deletion lease owner or generation changed"
-                )
-            if (
-                expected_lease_owner is None
-                and current["lease_owner"]
-                and current["lease_expires_at"]
-                and _iso_after(current["lease_expires_at"], now)
-            ):
-                raise DeletionLeaseFenceError(
-                    "active deletion lease cannot be cleared without its fencing token"
-                )
-            if current["status"] not in {
-                DeletionStatus.DELETING.value,
-                DeletionStatus.FAILED.value,
-            }:
-                raise ValueError("deletion finalization blocker requires deleting/failed state")
-            conn.execute(
-                """UPDATE official_asset_deletion_intents
-                   SET status='deleting', error_code=?, lease_owner=NULL,
-                       lease_expires_at=NULL,
-                       deleting_at=COALESCE(deleting_at, ?), updated_at=?
-                   WHERE deletion_id=? AND status IN ('deleting', 'failed')""",
-                (code, now, now, deletion_id),
-            )
-            conn.execute(
-                """INSERT INTO official_asset_deletion_audit(
-                       deletion_id, status, blob_hash, managed_path,
-                       predecessor_asset_id, replacement_asset_id,
-                       replacement_blob_hash, reason, retention_evidence_json,
-                       actor, details_json, created_at
-                   ) VALUES(?, 'deleting', ?, ?, ?, ?, ?, ?, '{}', ?, ?, ?)""",
-                (
-                    deletion_id,
-                    current["blob_hash"],
-                    current["managed_path"],
-                    current["predecessor_asset_id"],
-                    current["replacement_asset_id"],
-                    current["replacement_blob_hash"],
-                    current["reason"],
-                    actor,
-                    canonical_json(details or {}),
-                    now,
-                ),
-            )
-            updated = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-        return _decode_row(_require_row(updated))
 
-    def get_deletion(self, deletion_id: str) -> dict[str, Any] | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_deletion_intents WHERE deletion_id=?",
-                (deletion_id,),
-            ).fetchone()
-        return None if row is None else _decode_row(row)
 
-    def list_deletions(
-        self,
-        *,
-        statuses: Iterable[DeletionStatus] = (
-            DeletionStatus.PLANNED,
-            DeletionStatus.DELETING,
-            DeletionStatus.FAILED,
-        ),
-        limit: int = 100,
-    ) -> list[dict[str, Any]]:
-        values = tuple(status.value for status in statuses)
-        if not values:
-            return []
-        placeholders = ",".join("?" for _ in values)
-        with self.connection() as conn:
-            rows = conn.execute(
-                f"""SELECT * FROM official_asset_deletion_intents
-                    WHERE status IN ({placeholders})
-                    ORDER BY planned_at LIMIT ?""",
-                (*values, max(1, min(int(limit), 1000))),
-            ).fetchall()
-        return [_decode_row(row) for row in rows]
 
-    def list_deletion_audit(self, deletion_id: str) -> list[dict[str, Any]]:
-        with self.connection() as conn:
-            rows = conn.execute(
-                """SELECT * FROM official_asset_deletion_audit
-                   WHERE deletion_id=? ORDER BY audit_id""",
-                (deletion_id,),
-            ).fetchall()
-        return [
-            _decode_row(
-                row,
-                json_fields=("retention_evidence_json", "details_json"),
-            )
-            for row in rows
-        ]
 
-    def reserve_storage(
-        self,
-        *,
-        reservation_id: str,
-        filesystem_key: str,
-        planned_bytes: int,
-        lease_expires_at: str,
-        capacity_bytes: int,
-        hard_reserve_bytes: int,
-        operation_id: str | None = None,
-        operation_planned_limit_bytes: int | None = None,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> bool:
-        planned = int(planned_bytes)
-        if planned <= 0:
-            raise ValueError("planned_bytes must be positive")
-        if operation_planned_limit_bytes is not None and int(
-            operation_planned_limit_bytes
-        ) <= 0:
-            raise ValueError("operation planned byte limit must be positive")
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            conn.execute(
-                """UPDATE official_asset_storage_reservations
-                   SET status='expired', released_at=?
-                   WHERE filesystem_key=? AND status='active' AND lease_expires_at<=?""",
-                (now, filesystem_key, now),
-            )
-            row = conn.execute(
-                """SELECT COALESCE(SUM(planned_bytes), 0) AS reserved
-                   FROM official_asset_storage_reservations
-                   WHERE filesystem_key=? AND status='active'""",
-                (filesystem_key,),
-            ).fetchone()
-            reserved = int(_require_row(row)["reserved"])
-            if reserved + planned > int(capacity_bytes) - int(hard_reserve_bytes):
-                return False
-            if operation_id and operation_planned_limit_bytes is not None:
-                operation_row = conn.execute(
-                    """SELECT COALESCE(SUM(
-                               CASE WHEN status='active'
-                                    THEN MAX(planned_bytes, actual_bytes)
-                                    ELSE actual_bytes END
-                           ), 0) AS consumed
-                       FROM official_asset_storage_reservations
-                       WHERE operation_id=?""",
-                    (operation_id,),
-                ).fetchone()
-                operation_consumed = int(_require_row(operation_row)["consumed"])
-                if operation_consumed + planned > int(
-                    operation_planned_limit_bytes
-                ):
-                    return False
-            conn.execute(
-                """INSERT INTO official_asset_storage_reservations(
-                       reservation_id, filesystem_key, operation_id,
-                       planned_bytes, actual_bytes, status, lease_expires_at, created_at,
-                       metadata_json
-                   ) VALUES(?, ?, ?, ?, 0, 'active', ?, ?, ?)""",
-                (
-                    reservation_id,
-                    filesystem_key,
-                    operation_id,
-                    planned,
-                    lease_expires_at,
-                    now,
-                    canonical_json(metadata or {}),
-                ),
-            )
-        return True
 
-    def release_storage_reservation(
-        self, reservation_id: str, *, status: str = "released"
-    ) -> bool:
-        if status not in {"released", "completed", "failed", "cancelled", "expired"}:
-            raise ValueError("invalid reservation release status")
-        with self.transaction() as conn:
-            result = conn.execute(
-                """UPDATE official_asset_storage_reservations
-                   SET status=?, released_at=?
-                   WHERE reservation_id=? AND status='active'""",
-                (status, utc_now_iso(), reservation_id),
-            )
-        return result.rowcount == 1
 
-    def resize_storage_reservation(
-        self,
-        reservation_id: str,
-        *,
-        planned_bytes: int,
-        capacity_bytes: int,
-        hard_reserve_bytes: int,
-        operation_actual_limit_bytes: int | None = None,
-    ) -> bool:
-        """Atomically resize one active reservation without overcommitting space."""
-        planned = int(planned_bytes)
-        if planned <= 0:
-            raise ValueError("planned_bytes must be positive")
-        if operation_actual_limit_bytes is not None and int(
-            operation_actual_limit_bytes
-        ) <= 0:
-            raise ValueError("operation actual byte limit must be positive")
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            reservation = conn.execute(
-                """SELECT * FROM official_asset_storage_reservations
-                   WHERE reservation_id=? AND status='active'""",
-                (reservation_id,),
-            ).fetchone()
-            if reservation is None:
-                return False
-            conn.execute(
-                """UPDATE official_asset_storage_reservations
-                   SET actual_bytes=MAX(actual_bytes, ?)
-                   WHERE reservation_id=? AND status='active'""",
-                (planned, reservation_id),
-            )
-            conn.execute(
-                """UPDATE official_asset_storage_reservations
-                   SET status='expired', released_at=?
-                   WHERE filesystem_key=? AND reservation_id<>?
-                     AND status='active' AND lease_expires_at<=?""",
-                (
-                    now,
-                    reservation["filesystem_key"],
-                    reservation_id,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                """SELECT COALESCE(SUM(planned_bytes), 0) AS reserved
-                   FROM official_asset_storage_reservations
-                   WHERE filesystem_key=? AND reservation_id<>?
-                     AND status='active'""",
-                (reservation["filesystem_key"], reservation_id),
-            ).fetchone()
-            reserved_elsewhere = int(_require_row(row)["reserved"])
-            if reserved_elsewhere + planned > int(capacity_bytes) - int(
-                hard_reserve_bytes
-            ):
-                return False
-            if reservation["operation_id"] and operation_actual_limit_bytes is not None:
-                operation_row = conn.execute(
-                    """SELECT COALESCE(SUM(
-                               CASE WHEN status='active'
-                                    THEN MAX(planned_bytes, actual_bytes)
-                                    ELSE actual_bytes END
-                           ), 0) AS consumed
-                       FROM official_asset_storage_reservations
-                       WHERE operation_id=? AND reservation_id<>?""",
-                    (reservation["operation_id"], reservation_id),
-                ).fetchone()
-                operation_consumed = int(_require_row(operation_row)["consumed"])
-                if operation_consumed + planned > int(operation_actual_limit_bytes):
-                    return False
-            conn.execute(
-                """UPDATE official_asset_storage_reservations
-                   SET planned_bytes=?, actual_bytes=MAX(actual_bytes, ?)
-                   WHERE reservation_id=? AND status='active'""",
-                (planned, planned, reservation_id),
-            )
-        return True
 
-    def get_storage_reservation(self, reservation_id: str) -> dict[str, Any] | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_storage_reservations
-                   WHERE reservation_id=?""",
-                (reservation_id,),
-            ).fetchone()
-        return None if row is None else _decode_row(row, json_fields=("metadata_json",))
-
-    def append_capacity_override_audit(
-        self,
-        *,
-        authorization_id: str,
-        operation_id: str,
-        attachment_id: str,
-        principal: str,
-        permission_scope: str,
-        max_bytes: int,
-        requested_bytes: int,
-        outcome: str,
-        reason: str,
-        config_fingerprint: str,
-        evidence: Mapping[str, Any] | None = None,
-    ) -> int:
-        if outcome not in {"admitted", "consumed", "failed"}:
-            raise ValueError("invalid capacity override audit outcome")
-        with self.transaction() as conn:
-            cursor = conn.execute(
-                """INSERT INTO official_asset_capacity_override_audit(
-                       authorization_id, operation_id, attachment_id, principal,
-                       permission_scope, max_bytes, requested_bytes, outcome,
-                       reason, config_fingerprint, evidence_json, created_at
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    str(authorization_id),
-                    str(operation_id),
-                    str(attachment_id),
-                    str(principal),
-                    str(permission_scope),
-                    int(max_bytes),
-                    int(requested_bytes),
-                    outcome,
-                    str(reason),
-                    str(config_fingerprint),
-                    canonical_json(evidence or {}),
-                    utc_now_iso(),
-                ),
-            )
-        return int(cursor.lastrowid)
-
-    def list_capacity_override_audit(
-        self, *, operation_id: str | None = None, limit: int = 100
-    ) -> list[dict[str, Any]]:
-        params: list[Any] = []
-        where = ""
-        if operation_id is not None:
-            where = " WHERE operation_id=?"
-            params.append(str(operation_id))
-        params.append(max(1, min(int(limit), 1000)))
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_capacity_override_audit"
-                + where
-                + " ORDER BY audit_id LIMIT ?",
-                tuple(params),
-            ).fetchall()
-        return [_decode_row(row, json_fields=("evidence_json",)) for row in rows]
-
-    def append_storage_artifact_audit(
-        self, evidence: Mapping[str, Any]
-    ) -> dict[str, Any]:
-        artifact_type = str(evidence.get("artifact_type") or "").strip()
-        managed_path = str(evidence.get("managed_path") or "").strip()
-        status = str(evidence.get("status") or "").strip()
-        actor = str(evidence.get("actor") or "").strip()
-        if artifact_type not in {"part", "quarantine"}:
-            raise ValueError("invalid storage artifact audit type")
-        if status not in {"planned", "deleted", "failed"}:
-            raise ValueError("invalid storage artifact audit status")
-        if not managed_path or not actor:
-            raise ValueError("storage artifact audit path and actor are required")
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            cursor = conn.execute(
-                """INSERT INTO official_asset_storage_artifact_audit(
-                       artifact_type, managed_path, status, actor, owner,
-                       lease_generation, operation_id, attachment_id,
-                       content_hash, actual_bytes, reason, evidence_json,
-                       created_at
-                   ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    artifact_type,
-                    managed_path,
-                    status,
-                    actor,
-                    evidence.get("owner") or evidence.get("lease_owner"),
-                    evidence.get("lease_generation") or evidence.get("generation"),
-                    evidence.get("operation_id"),
-                    evidence.get("attachment_id"),
-                    evidence.get("content_hash"),
-                    evidence.get("actual_bytes"),
-                    evidence.get("reason"),
-                    canonical_json(evidence),
-                    now,
-                ),
-            )
-            row = conn.execute(
-                "SELECT * FROM official_asset_storage_artifact_audit WHERE audit_id=?",
-                (cursor.lastrowid,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("evidence_json",))
-
-    def list_storage_artifact_audit(
-        self, *, managed_path: str | None = None, limit: int = 100
-    ) -> list[dict[str, Any]]:
-        params: list[Any] = []
-        where = ""
-        if managed_path is not None:
-            where = " WHERE managed_path=?"
-            params.append(str(managed_path))
-        params.append(max(1, min(int(limit), 1000)))
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_storage_artifact_audit"
-                + where
-                + " ORDER BY audit_id LIMIT ?",
-                tuple(params),
-            ).fetchall()
-        return [_decode_row(row, json_fields=("evidence_json",)) for row in rows]
 
     def claim_discovery_state(
         self,
@@ -7515,188 +4221,9 @@ class AnnouncementAssetRepository:
             _decode_row(row, json_fields=("payload_json",)) for row in rows
         ]
 
-    def load_backup_protection_runtime_state(
-        self,
-        *,
-        config: Any,
-        now: str,
-    ) -> Any:
-        """Load and re-evaluate the durable global backup-write projection."""
 
-        from .config import BackupProtectionRuntimeState
 
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_operational_reports
-                   WHERE report_kind='backup_protection_runtime_state'
-                     AND scope_key='global'
-                   ORDER BY rowid DESC LIMIT 1"""
-            ).fetchone()
-        if row is None:
-            return BackupProtectionRuntimeState.fresh(config)
-        stored = _decode_row(row, json_fields=("payload_json",))
-        payload = dict(stored["payload"])
-        if payload.get("config_fingerprint") == config.evidence_fingerprint:
-            return BackupProtectionRuntimeState.from_mapping(
-                payload,
-                config=config,
-                now=now,
-            )
-        # A configuration change invalidates the prior protection envelope.
-        # Carry forward exposure conservatively and require a fresh verified
-        # closure under the new fingerprint before scheduled writes resume.
-        return BackupProtectionRuntimeState(
-            config_fingerprint=config.evidence_fingerprint,
-            unprotected_bytes=int(payload.get("unprotected_bytes") or 0),
-            accumulation_started_at=payload.get("accumulation_started_at"),
-            blocked=True,
-            blocker_reasons=("backup_protection_config_changed",),
-            last_backup_attempt_at=payload.get("last_backup_attempt_at"),
-            last_verified_backup_at=payload.get("last_verified_backup_at"),
-        ).evaluate(config=config, now=now)
 
-    def update_backup_protection_runtime_state(
-        self,
-        *,
-        config: Any,
-        observed_at: str,
-        unprotected_bytes: int | None = None,
-        absolute_unprotected_bytes: int | None = None,
-        verified_closure: bool | None = None,
-        expected_report_id: str | None = None,
-        enforce_expected_report: bool = False,
-    ) -> Any:
-        """Atomically append one backup-protection state transition."""
-
-        from .config import BackupProtectionRuntimeState
-
-        supplied = sum(
-            item is not None
-            for item in (
-                unprotected_bytes,
-                absolute_unprotected_bytes,
-                verified_closure,
-            )
-        )
-        if supplied != 1:
-            raise ValueError("exactly one backup protection transition is required")
-        with self.transaction() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_operational_reports
-                   WHERE report_kind='backup_protection_runtime_state'
-                     AND scope_key='global'
-                   ORDER BY rowid DESC LIMIT 1"""
-            ).fetchone()
-            current_report_id = None if row is None else str(row["report_id"])
-            if row is None:
-                state = BackupProtectionRuntimeState.fresh(config)
-            else:
-                payload = dict(
-                    _decode_row(row, json_fields=("payload_json",))["payload"]
-                )
-                if payload.get("config_fingerprint") == config.evidence_fingerprint:
-                    state = BackupProtectionRuntimeState.from_mapping(
-                        payload,
-                        config=config,
-                        now=observed_at,
-                    )
-                else:
-                    state = BackupProtectionRuntimeState(
-                        config_fingerprint=config.evidence_fingerprint,
-                        unprotected_bytes=int(payload.get("unprotected_bytes") or 0),
-                        accumulation_started_at=payload.get(
-                            "accumulation_started_at"
-                        ),
-                        blocked=True,
-                        blocker_reasons=("backup_protection_config_changed",),
-                        last_backup_attempt_at=payload.get("last_backup_attempt_at"),
-                        last_verified_backup_at=payload.get(
-                            "last_verified_backup_at"
-                        ),
-                    ).evaluate(config=config, now=observed_at)
-            if unprotected_bytes is not None:
-                state = state.record_unprotected_bytes(
-                    int(unprotected_bytes),
-                    observed_at=observed_at,
-                    config=config,
-                )
-            elif absolute_unprotected_bytes is not None:
-                measured = int(absolute_unprotected_bytes)
-                if measured < 0:
-                    raise ValueError("absolute unprotected bytes must be non-negative")
-                if measured > state.unprotected_bytes:
-                    state = state.record_unprotected_bytes(
-                        measured - state.unprotected_bytes,
-                        observed_at=observed_at,
-                        config=config,
-                    )
-                else:
-                    state = state.evaluate(config=config, now=observed_at)
-            else:
-                closure = bool(verified_closure)
-                if (
-                    closure
-                    and enforce_expected_report
-                    and current_report_id != expected_report_id
-                ):
-                    closure = False
-                state = state.record_backup_attempt(
-                    attempted_at=observed_at,
-                    verified_closure=closure,
-                    config=config,
-                )
-            payload = state.normalized_mapping()
-            report_id = stable_id(
-                "backup-protection-runtime-state",
-                observed_at,
-                uuid.uuid4().hex,
-            )
-            conn.execute(
-                """INSERT INTO official_asset_operational_reports(
-                       report_id, schema_version, report_kind, operation_id,
-                       scope_key, config_fingerprint, status, generated_at,
-                       payload_json, created_at
-                   ) VALUES(?, ?, 'backup_protection_runtime_state', NULL,
-                            'global', ?, ?, ?, ?, ?)""",
-                (
-                    report_id,
-                    state.schema_version,
-                    config.evidence_fingerprint,
-                    "blocked" if state.blocked else "ready",
-                    observed_at,
-                    canonical_json(payload),
-                    utc_now_iso(),
-                ),
-            )
-        return state
-
-    def backup_protection_runtime_token(self) -> str | None:
-        """Return the latest state row identity for backup-close CAS."""
-
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT report_id FROM official_asset_operational_reports
-                   WHERE report_kind='backup_protection_runtime_state'
-                     AND scope_key='global'
-                   ORDER BY rowid DESC LIMIT 1"""
-            ).fetchone()
-        return None if row is None else str(row["report_id"])
-
-    def measure_unprotected_blob_bytes(self, *, config: Any) -> int:
-        """Measure distinct canonical bytes lacking a current verified backup."""
-
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT COALESCE(SUM(blob.content_length), 0)
-                   FROM official_document_blobs AS blob
-                   LEFT JOIN official_asset_backup_state AS backup
-                     ON backup.content_hash=blob.content_hash
-                    AND backup.status='verified'
-                    AND backup.config_fingerprint=?
-                   WHERE backup.content_hash IS NULL""",
-                (config.evidence_fingerprint,),
-            ).fetchone()
-        return int(row[0] or 0)
 
     def upsert_universe_snapshot(self, snapshot: Mapping[str, Any]) -> dict[str, Any]:
         """Persist a versioned universe denominator and its freshness evidence."""
@@ -7714,14 +4241,27 @@ class AnnouncementAssetRepository:
                     created_at, updated_at
                 ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(snapshot_id) DO UPDATE SET
+                    master_data_version=excluded.master_data_version,
+                    master_data_last_success_at=excluded.master_data_last_success_at,
+                    snapshot_at=excluded.snapshot_at,
+                    freshness_limit_seconds=excluded.freshness_limit_seconds,
                     status=excluded.status,
                     source_complete=excluded.source_complete,
                     indeterminate_count=excluded.indeterminate_count,
                     eligible_count=excluded.eligible_count,
                     instrument_rows_json=excluded.instrument_rows_json,
                     indeterminate_rows_json=excluded.indeterminate_rows_json,
-                    metadata_json=excluded.metadata_json,
-                    paired_census_snapshot_id=excluded.paired_census_snapshot_id,
+                    metadata_json=CASE
+                        WHEN excluded.paired_census_snapshot_id IS NULL
+                         AND official_asset_universe_snapshots.paired_census_snapshot_id
+                             IS NOT NULL
+                        THEN official_asset_universe_snapshots.metadata_json
+                        ELSE excluded.metadata_json
+                    END,
+                    paired_census_snapshot_id=COALESCE(
+                        excluded.paired_census_snapshot_id,
+                        official_asset_universe_snapshots.paired_census_snapshot_id
+                    ),
                     updated_at=excluded.updated_at
                 """,
                 (
@@ -7792,6 +4332,12 @@ class AnnouncementAssetRepository:
                     metadata_json, created_at, updated_at
                 ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(census_snapshot_id) DO UPDATE SET
+                    source=excluded.source,
+                    query_boundary_json=excluded.query_boundary_json,
+                    completeness_watermark=excluded.completeness_watermark,
+                    source_version=excluded.source_version,
+                    snapshot_at=excluded.snapshot_at,
+                    raw_payload_hash=excluded.raw_payload_hash,
                     status=excluded.status,
                     instrument_rows_json=excluded.instrument_rows_json,
                     metadata_json=excluded.metadata_json,
@@ -7979,6 +4525,20 @@ class AnnouncementAssetRepository:
                         "bootstrap run identity conflict: " + ",".join(mismatches)
                     )
             else:
+                row = conn.execute(
+                    """SELECT * FROM official_asset_bootstrap_runs
+                       WHERE universe_snapshot_id=? AND as_of=?
+                         AND query_fingerprint=?""",
+                    (
+                        values["universe_snapshot_id"],
+                        values["as_of"],
+                        values["query_fingerprint"],
+                    ),
+                ).fetchone()
+                if row is not None:
+                    return _decode_row(
+                        row, json_fields=("scope_json", "checkpoint_json")
+                    ), False
                 conn.execute(
                     """INSERT INTO official_asset_bootstrap_runs(
                            operation_id, schema_version, universe_snapshot_id,
@@ -8236,581 +4796,16 @@ class AnnouncementAssetRepository:
             _decode_row(row, json_fields=("evidence_json",)) for row in rows
         ]
 
-    def upsert_backup_state(
-        self,
-        *,
-        content_hash: str,
-        config_fingerprint: str,
-        destination_identity: str,
-        failure_domain: str | None,
-        backup_path: str | None,
-        content_length: int,
-        status: str,
-        file_manifest_watermark: str | None,
-        catalog_snapshot_watermark: str | None,
-        verified_at: str | None,
-        error_code: str | None = None,
-    ) -> None:
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            conn.execute(
-                """
-                INSERT INTO official_asset_backup_state(
-                    content_hash, config_fingerprint, destination_identity, failure_domain,
-                    backup_path, content_length, status,
-                    file_manifest_watermark, catalog_snapshot_watermark,
-                    verified_at, error_code, created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(content_hash) DO UPDATE SET
-                    config_fingerprint=excluded.config_fingerprint,
-                    destination_identity=excluded.destination_identity,
-                    failure_domain=excluded.failure_domain,
-                    backup_path=excluded.backup_path,
-                    content_length=excluded.content_length,
-                    status=excluded.status,
-                    file_manifest_watermark=excluded.file_manifest_watermark,
-                    catalog_snapshot_watermark=excluded.catalog_snapshot_watermark,
-                    verified_at=excluded.verified_at,
-                    error_code=excluded.error_code,
-                    updated_at=excluded.updated_at
-                """,
-                (
-                    content_hash,
-                    str(config_fingerprint),
-                    destination_identity,
-                    failure_domain,
-                    backup_path,
-                    int(content_length),
-                    status,
-                    file_manifest_watermark,
-                    catalog_snapshot_watermark,
-                    verified_at,
-                    error_code,
-                    now,
-                    now,
-                ),
-            )
 
-    def get_backup_state(self, content_hash: str) -> dict[str, Any] | None:
-        with self.connection() as conn:
-            row = conn.execute(
-                """SELECT * FROM official_asset_backup_state
-                   WHERE content_hash=?""",
-                (str(content_hash),),
-            ).fetchone()
-        return None if row is None else _decode_row(row)
 
-    def backup_satisfies_deletion_gate(
-        self,
-        content_hash: str,
-        *,
-        primary_failure_domain: str | None,
-    ) -> bool:
-        with self.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM official_asset_backup_state WHERE content_hash=?",
-                (content_hash,),
-            ).fetchone()
-        if row is None:
-            return False
-        return bool(
-            row["status"] == "verified"
-            and row["verified_at"]
-            and row["file_manifest_watermark"]
-            and row["catalog_snapshot_watermark"]
-            and row["failure_domain"]
-            and row["failure_domain"] != primary_failure_domain
-        )
 
-    def upsert_consumer_processing(
-        self,
-        *,
-        asset_id: str,
-        consumer: str,
-        parser_version: str,
-        parameter_hash: str,
-        status: ConsumerProcessingStatus,
-        derived_identity: str | None = None,
-        error_code: str | None = None,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> str:
-        processing_id = stable_id(
-            "proc", asset_id, consumer, parser_version, parameter_hash
-        )
-        now = utc_now_iso()
-        metadata_value = dict(metadata or {})
-        with self.transaction() as conn:
-            effective_row = conn.execute(
-                "SELECT * FROM effective_annual_reports WHERE asset_id=?",
-                (asset_id,),
-            ).fetchone()
-            projection_policy_version = (
-                effective_row["canonical_projection_policy_version"]
-                if effective_row is not None
-                else None
-            )
-            evidence_set_hash = (
-                effective_row["evidence_set_hash"]
-                if effective_row is not None
-                else None
-            )
-            equivalent_source_filings_json = (
-                effective_row["equivalent_source_filings_json"]
-                if effective_row is not None
-                else "[]"
-            )
-            selector_kind = str(
-                metadata_value.get("selector_kind") or ""
-            ).strip().lower()
-            selector_scope_valid = self._consumer_selector_scope_is_valid_conn(
-                conn,
-                effective_row=effective_row,
-                metadata=metadata_value,
-            )
-            if selector_kind and not selector_scope_valid:
-                raise ValueError(
-                    "consumer selector evidence is missing, inconsistent, or in conflict scope"
-                )
-            if (
-                effective_row is not None
-                and effective_row["decision_state"]
-                in {
-                    EffectiveDecisionState.AMBIGUOUS.value,
-                    EffectiveDecisionState.PROVISIONAL.value,
-                }
-                and status
-                in {
-                    ConsumerProcessingStatus.QUEUED,
-                    ConsumerProcessingStatus.PROCESSING,
-                    ConsumerProcessingStatus.CURRENT,
-                }
-                and not selector_scope_valid
-            ):
-                raise ValueError(
-                    "default-effective consumer processing is suppressed while "
-                    "the annual-report decision is provisional or ambiguous"
-                )
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_processing(
-                    processing_id, schema_version, asset_id, consumer,
-                    parser_version, parameter_hash, status, derived_identity,
-                    error_code, canonical_projection_policy_version,
-                    evidence_set_hash, equivalent_source_filings_json,
-                    metadata_json, created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(asset_id, consumer, parser_version, parameter_hash)
-                DO UPDATE SET status=excluded.status,
-                              derived_identity=excluded.derived_identity,
-                              error_code=excluded.error_code,
-                              canonical_projection_policy_version=excluded.canonical_projection_policy_version,
-                              evidence_set_hash=excluded.evidence_set_hash,
-                              equivalent_source_filings_json=excluded.equivalent_source_filings_json,
-                              metadata_json=excluded.metadata_json,
-                              updated_at=excluded.updated_at
-                """,
-                (
-                    processing_id,
-                    CONSUMER_PROCESSING_SCHEMA_VERSION,
-                    asset_id,
-                    consumer,
-                    parser_version,
-                    parameter_hash,
-                    status.value,
-                    derived_identity,
-                    error_code,
-                    projection_policy_version,
-                    evidence_set_hash,
-                    equivalent_source_filings_json,
-                    canonical_json(metadata_value),
-                    now,
-                    now,
-                ),
-            )
-        return processing_id
 
-    def prepare_consumer_processing(
-        self,
-        *,
-        asset_id: str,
-        consumer: str,
-        parser_version: str,
-        parameter_hash: str,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        """Create or durably requeue one inactive processing identity."""
-        processing_id = stable_id(
-            "proc", asset_id, consumer, parser_version, parameter_hash
-        )
-        now = utc_now_iso()
-        metadata_value = dict(metadata or {})
-        with self.transaction() as conn:
-            effective_row = _require_row(
-                conn.execute(
-                    "SELECT * FROM effective_annual_reports WHERE asset_id=?",
-                    (asset_id,),
-                ).fetchone()
-            )
-            selector_kind = str(
-                metadata_value.get("selector_kind") or ""
-            ).strip().lower()
-            if selector_kind and not self._consumer_selector_scope_is_valid_conn(
-                conn,
-                effective_row=effective_row,
-                metadata=metadata_value,
-            ):
-                raise ValueError(
-                    "consumer selector evidence is missing, inconsistent, or in conflict scope"
-                )
-            if (
-                effective_row["decision_state"]
-                in {
-                    EffectiveDecisionState.AMBIGUOUS.value,
-                    EffectiveDecisionState.PROVISIONAL.value,
-                }
-                and not selector_kind
-            ):
-                raise ValueError(
-                    "default-effective consumer processing is suppressed while "
-                    "the annual-report decision is provisional or ambiguous"
-                )
-            conn.execute(
-                """
-                INSERT INTO official_asset_consumer_processing(
-                    processing_id, schema_version, asset_id, consumer,
-                    parser_version, parameter_hash, status, derived_identity,
-                    error_code, canonical_projection_policy_version,
-                    evidence_set_hash, equivalent_source_filings_json,
-                    metadata_json, created_at, updated_at
-                ) VALUES(?, ?, ?, ?, ?, ?, 'queued', NULL, NULL, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(asset_id, consumer, parser_version, parameter_hash)
-                DO UPDATE SET status=CASE
-                                  WHEN official_asset_consumer_processing.status
-                                       IN ('not_started', 'stale', 'failed')
-                                  THEN 'queued'
-                                  ELSE official_asset_consumer_processing.status
-                              END,
-                              error_code=CASE
-                                  WHEN official_asset_consumer_processing.status
-                                       IN ('not_started', 'stale', 'failed')
-                                  THEN NULL
-                                  ELSE official_asset_consumer_processing.error_code
-                              END,
-                              metadata_json=CASE
-                                  WHEN official_asset_consumer_processing.status
-                                       IN ('not_started', 'stale', 'failed')
-                                  THEN excluded.metadata_json
-                                  ELSE official_asset_consumer_processing.metadata_json
-                              END,
-                              updated_at=CASE
-                                  WHEN official_asset_consumer_processing.status
-                                       IN ('not_started', 'stale', 'failed')
-                                  THEN excluded.updated_at
-                                  ELSE official_asset_consumer_processing.updated_at
-                              END
-                """,
-                (
-                    processing_id,
-                    CONSUMER_PROCESSING_SCHEMA_VERSION,
-                    asset_id,
-                    str(consumer),
-                    str(parser_version),
-                    str(parameter_hash),
-                    effective_row["canonical_projection_policy_version"],
-                    effective_row["evidence_set_hash"],
-                    effective_row["equivalent_source_filings_json"],
-                    canonical_json(metadata_value),
-                    now,
-                    now,
-                ),
-            )
-            row = conn.execute(
-                """SELECT * FROM official_asset_consumer_processing
-                   WHERE processing_id=?""",
-                (processing_id,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("metadata_json",))
 
-    def claim_consumer_processing(
-        self,
-        processing_id: str,
-        *,
-        lease_owner: str,
-        lease_seconds: int,
-        max_attempts: int,
-    ) -> int | None:
-        """Claim queued or stale processing and return its fenced generation."""
-        owner = str(lease_owner or "").strip()
-        if not owner:
-            raise ValueError("consumer processing lease owner is required")
-        if int(lease_seconds) <= 0 or int(max_attempts) <= 0:
-            raise ValueError("consumer processing lease bounds must be positive")
-        now_time = datetime.now(timezone.utc)
-        now = now_time.isoformat()
-        lease_expires_at = (
-            now_time + timedelta(seconds=int(lease_seconds))
-        ).isoformat()
-        with self.transaction() as conn:
-            cursor = conn.execute(
-                """UPDATE official_asset_consumer_processing
-                   SET status='processing', lease_owner=?,
-                       lease_generation=lease_generation+1,
-                       lease_expires_at=?, heartbeat_at=?,
-                       attempt=attempt+1, max_attempts=?,
-                       started_at=COALESCE(started_at, ?),
-                       finished_at=NULL, updated_at=?
-                   WHERE processing_id=? AND attempt<? AND (
-                       status='queued' OR (
-                           status='processing' AND (
-                               lease_expires_at IS NULL OR lease_expires_at<=?
-                           )
-                       )
-                   )""",
-                (
-                    owner,
-                    lease_expires_at,
-                    now,
-                    int(max_attempts),
-                    now,
-                    now,
-                    processing_id,
-                    int(max_attempts),
-                    now,
-                ),
-            )
-            if int(cursor.rowcount or 0) != 1:
-                return None
-            row = conn.execute(
-                "SELECT lease_generation FROM official_asset_consumer_processing "
-                "WHERE processing_id=?",
-                (processing_id,),
-            ).fetchone()
-        return int(_require_row(row)["lease_generation"])
 
-    def heartbeat_consumer_processing(
-        self,
-        processing_id: str,
-        *,
-        lease_owner: str,
-        lease_generation: int,
-        lease_seconds: int,
-    ) -> bool:
-        """Extend only the currently fenced parser lease."""
-        now_time = datetime.now(timezone.utc)
-        now = now_time.isoformat()
-        expires = (now_time + timedelta(seconds=int(lease_seconds))).isoformat()
-        with self.transaction() as conn:
-            cursor = conn.execute(
-                """UPDATE official_asset_consumer_processing
-                   SET heartbeat_at=?, lease_expires_at=?, updated_at=?
-                   WHERE processing_id=? AND status='processing'
-                     AND lease_owner=? AND lease_generation=?""",
-                (
-                    now,
-                    expires,
-                    now,
-                    processing_id,
-                    str(lease_owner),
-                    int(lease_generation),
-                ),
-            )
-        return int(cursor.rowcount or 0) == 1
 
-    def transition_consumer_processing(
-        self,
-        processing_id: str,
-        *,
-        status: ConsumerProcessingStatus,
-        derived_identity: str | None = None,
-        error_code: str | None = None,
-        metadata: Mapping[str, Any] | None = None,
-        lease_owner: str | None = None,
-        lease_generation: int | None = None,
-    ) -> dict[str, Any]:
-        if status not in {
-            ConsumerProcessingStatus.CURRENT,
-            ConsumerProcessingStatus.STALE,
-            ConsumerProcessingStatus.FAILED,
-        }:
-            raise ValueError("consumer processing terminal transition is invalid")
-        now = utc_now_iso()
-        with self.transaction() as conn:
-            row = _require_row(
-                conn.execute(
-                    """SELECT * FROM official_asset_consumer_processing
-                       WHERE processing_id=?""",
-                    (processing_id,),
-                ).fetchone()
-            )
-            allowed_current = {"processing", "queued"}
-            if status is ConsumerProcessingStatus.STALE:
-                allowed_current.add("current")
-            if row["status"] not in allowed_current:
-                raise ValueError("consumer processing is not active")
-            if lease_owner is not None or lease_generation is not None:
-                if (
-                    lease_owner is None
-                    or lease_generation is None
-                    or row["lease_owner"] != str(lease_owner)
-                    or int(row["lease_generation"] or 0)
-                    != int(lease_generation)
-                ):
-                    raise ValueError("consumer processing lease was superseded")
-            conn.execute(
-                """UPDATE official_asset_consumer_processing
-                   SET status=?, derived_identity=?, error_code=?,
-                       metadata_json=?, lease_owner=NULL,
-                       lease_expires_at=NULL, heartbeat_at=NULL,
-                       finished_at=?, updated_at=? WHERE processing_id=?""",
-                (
-                    status.value,
-                    derived_identity,
-                    error_code,
-                    canonical_json(
-                        metadata
-                        if metadata is not None
-                        else _json_load(row["metadata_json"], {})
-                    ),
-                    now,
-                    now,
-                    processing_id,
-                ),
-            )
-            row = conn.execute(
-                """SELECT * FROM official_asset_consumer_processing
-                   WHERE processing_id=?""",
-                (processing_id,),
-            ).fetchone()
-        return _decode_row(_require_row(row), json_fields=("metadata_json",))
 
-    @staticmethod
-    def _consumer_selector_scope_is_valid_conn(
-        conn: sqlite3.Connection,
-        *,
-        effective_row: sqlite3.Row | None,
-        metadata: Mapping[str, Any],
-    ) -> bool:
-        selector_kind = str(metadata.get("selector_kind") or "").strip().lower()
-        if selector_kind not in {"exact_observation", "knowledge_cutoff"}:
-            return False
-        if effective_row is None:
-            return False
-        version_id = str(effective_row["version_id"] or "")
-        version_row = conn.execute(
-            "SELECT * FROM official_attachment_versions WHERE version_id=?",
-            (version_id,),
-        ).fetchone()
-        if version_row is None:
-            return False
-        if selector_kind == "exact_observation":
-            requested_version = str(metadata.get("observation_version") or "")
-            return bool(
-                requested_version
-                and requested_version == version_id
-                and version_row["content_hash"] == effective_row["content_hash"]
-            )
 
-        cutoff_value = metadata.get("knowledge_cutoff")
-        if not cutoff_value:
-            return False
-        try:
-            cutoff = _parse_iso_datetime(str(cutoff_value))
-            effective_available_at = _parse_iso_datetime(
-                str(
-                    version_row["version_available_at"]
-                    or version_row["observed_at"]
-                )
-            )
-        except (TypeError, ValueError):
-            return False
-        if effective_available_at > cutoff:
-            return False
 
-        decision_evidence = _json_load(
-            effective_row["decision_evidence_json"], {}
-        )
-        if not isinstance(decision_evidence, Mapping):
-            return False
-        scope_changing_observations = list(
-            decision_evidence.get("conflicting_observations") or []
-        )
-        pending = decision_evidence.get("pending_observation")
-        if isinstance(pending, Mapping):
-            scope_changing_observations.append(pending)
-        for observation in scope_changing_observations:
-            if not isinstance(observation, Mapping):
-                return False
-            if str(observation.get("candidate_id") or "") == version_id:
-                continue
-            available_at = observation.get("version_available_at")
-            if not available_at:
-                return False
-            try:
-                if _parse_iso_datetime(str(available_at)) <= cutoff:
-                    return False
-            except (TypeError, ValueError):
-                return False
-        return True
-
-    @classmethod
-    def _stale_default_consumer_processing_conn(
-        cls,
-        conn: sqlite3.Connection,
-        *,
-        report: EffectiveAnnualReport,
-        now: str,
-        error_code: str,
-    ) -> None:
-        rows = conn.execute(
-            """SELECT processing_id, metadata_json
-               FROM official_asset_consumer_processing
-               WHERE asset_id=? AND status IN ('queued', 'processing', 'current')""",
-            (report.asset_id,),
-        ).fetchall()
-        effective_row = conn.execute(
-            "SELECT * FROM effective_annual_reports WHERE asset_id=?",
-            (report.asset_id,),
-        ).fetchone()
-        for row in rows:
-            metadata = _json_load(row["metadata_json"], {})
-            if isinstance(
-                metadata, Mapping
-            ) and cls._consumer_selector_scope_is_valid_conn(
-                conn,
-                effective_row=effective_row,
-                metadata=metadata,
-            ):
-                continue
-            conn.execute(
-                """UPDATE official_asset_consumer_processing
-                   SET status='stale', error_code=?, updated_at=?
-                   WHERE processing_id=?""",
-                (str(error_code), now, row["processing_id"]),
-            )
-
-    def list_consumer_processing(
-        self,
-        *,
-        asset_id: str | None = None,
-        consumer: str | None = None,
-    ) -> list[dict[str, Any]]:
-        clauses: list[str] = []
-        params: list[Any] = []
-        if asset_id:
-            clauses.append("asset_id=?")
-            params.append(asset_id)
-        if consumer:
-            clauses.append("consumer=?")
-            params.append(consumer)
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
-        with self.connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM official_asset_consumer_processing"
-                + where
-                + " ORDER BY updated_at, processing_id",
-                tuple(params),
-            ).fetchall()
-        return [_decode_row(row, json_fields=("metadata_json",)) for row in rows]
 
     @staticmethod
     def _append_effective_decision_conn(
@@ -9010,12 +5005,6 @@ class AnnouncementAssetRepository:
             integrity_status=IntegrityStatus(row["integrity_status"]),
             first_available_at=row["first_available_at"],
             last_verified_at=row["last_verified_at"],
-            backup_status=row["backup_status"],
-            backup_verified_at=row["backup_verified_at"],
-            acquisition_origin=row["acquisition_origin"],
-            adopted_from_path=row["adopted_from_path"],
-            verification_evidence=_json_load(row["verification_evidence_json"], {}),
-            backup_evidence=_json_load(row["backup_evidence_json"], {}),
             schema_version=row["schema_version"],
         )
 
@@ -9199,111 +5188,9 @@ class AnnouncementAssetRepository:
             schema_version=row["schema_version"],
         )
 
-    @staticmethod
-    def _consumer_request_from_row(row: sqlite3.Row) -> OfficialAssetConsumerRequest:
-        return OfficialAssetConsumerRequest(
-            consumer_request_id=row["consumer_request_id"],
-            principal=row["principal"],
-            consumer=row["consumer"],
-            idempotency_key=row["idempotency_key"],
-            request_fingerprint=row["request_fingerprint"],
-            processing_fingerprint=row["processing_fingerprint"],
-            selector=_json_load(row["selector_json"], {}),
-            asset_request_id=row["asset_request_id"],
-            asset_id=row["asset_id"],
-            processing_id=row["processing_id"],
-            status=ConsumerRequestStatus(row["status"]),
-            result_state=ConsumerResultState(row["result_state"]),
-            result_identity=row["result_identity"],
-            resolved_source=row["resolved_source"],
-            resolved_source_announcement_id=row[
-                "resolved_source_announcement_id"
-            ],
-            resolved_attachment_id=row["resolved_attachment_id"],
-            resolved_observation_version=row["resolved_observation_version"],
-            resolved_content_hash=row["resolved_content_hash"],
-            resolved_report_period=row["resolved_report_period"],
-            reason_code=row["reason_code"],
-            retry_metadata=_json_load(row["retry_metadata_json"], {}),
-            diagnostics=_json_load(row["diagnostics_json"], {}),
-            metadata=_json_load(row["metadata_json"], {}),
-            processing_started_at=row["processing_started_at"],
-            finished_at=row["finished_at"],
-            stop_requested_at=row["stop_requested_at"],
-            cancelled_at=row["cancelled_at"],
-            expires_at=row["expires_at"],
-            expired_at=row["expired_at"],
-            tombstone_until=row["tombstone_until"],
-            retention_policy_version=row["retention_policy_version"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-            schema_version=row["schema_version"],
-        )
 
-    @staticmethod
-    def _recovery_manifest_from_row(
-        row: sqlite3.Row,
-    ) -> OfficialAssetRecoveryManifestEntry:
-        return OfficialAssetRecoveryManifestEntry(
-            recovery_id=row["recovery_id"],
-            manifest_kind=row["manifest_kind"],
-            manifest_version=int(row["manifest_version"]),
-            predecessor_asset_id=row["predecessor_asset_id"],
-            source=row["source"],
-            source_announcement_id=row["source_announcement_id"],
-            attachment_id=row["attachment_id"],
-            version_id=row["version_id"],
-            prior_path=row["prior_path"],
-            content_hash=row["content_hash"],
-            replacement_asset_id=row["replacement_asset_id"],
-            replacement_content_hash=row["replacement_content_hash"],
-            backup_object=row["backup_object"],
-            file_manifest_watermark=row["file_manifest_watermark"],
-            recovery_pair_id=row["recovery_pair_id"],
-            consumer=row["consumer"],
-            active_indefinitely=bool(row["active_indefinitely"]),
-            created_at=row["created_at"],
-            created_by=row["created_by"],
-            catalog_snapshot_watermark=row["catalog_snapshot_watermark"] or None,
-            evidence=_json_load(row["evidence_json"], {}),
-            schema_version=row["schema_version"],
-        )
 
-    @staticmethod
-    def _recovery_pair_closure_from_row(
-        row: sqlite3.Row,
-    ) -> OfficialAssetRecoveryPairClosure:
-        return OfficialAssetRecoveryPairClosure(
-            closure_id=row["closure_id"],
-            recovery_pair_id=row["recovery_pair_id"],
-            recovery_id=row["recovery_id"],
-            catalog_snapshot_identity=row["catalog_snapshot_identity"],
-            catalog_snapshot_hash=row["catalog_snapshot_hash"],
-            file_manifest_watermark=row["file_manifest_watermark"],
-            verified_at=row["verified_at"],
-            verified_by=row["verified_by"],
-            evidence=_json_load(row["evidence_json"], {}),
-            schema_version=row["schema_version"],
-        )
 
-    @staticmethod
-    def _backup_recovery_journal_from_row(
-        row: sqlite3.Row,
-    ) -> OfficialAssetBackupRecoveryJournalEntry:
-        return OfficialAssetBackupRecoveryJournalEntry(
-            journal_entry_id=row["journal_entry_id"],
-            journal_sequence=int(row["journal_sequence"]),
-            increment_kind=row["increment_kind"],
-            increment_identity=row["increment_identity"],
-            source_catalog_generation=row["source_catalog_generation"],
-            predecessor_watermark=row["predecessor_watermark"],
-            coverage_watermark=row["coverage_watermark"],
-            integrity_hash=row["integrity_hash"],
-            payload=_json_load(row["payload_json"], {}),
-            created_at=row["created_at"],
-            created_by=row["created_by"],
-            schema_version=row["schema_version"],
-        )
 
 
 def _require_row(row: sqlite3.Row | None) -> sqlite3.Row:
@@ -9312,44 +5199,10 @@ def _require_row(row: sqlite3.Row | None) -> sqlite3.Row:
     return row
 
 
-def _normalize_deletion_mount_evidence(
-    value: Mapping[str, Any],
-) -> dict[str, Any]:
-    source = str(value.get("source") or "").strip()
-    mount_point = str(value.get("mount_point") or "").strip()
-    fs_type = str(value.get("fs_type") or "").strip()
-    filesystem_key = str(value.get("filesystem_key") or "").strip()
-    try:
-        device_id = int(value.get("device_id"))
-    except (TypeError, ValueError) as exc:
-        raise ValueError("mount evidence requires an integer device_id") from exc
-    if not all((source, mount_point, fs_type, filesystem_key)):
-        raise ValueError("mount evidence fields are required")
-    expected_key = f"{source}|{mount_point}|{device_id}"
-    if filesystem_key != expected_key:
-        raise ValueError("mount filesystem_key does not match its identity fields")
-    return {
-        "source": source,
-        "mount_point": mount_point,
-        "fs_type": fs_type,
-        "device_id": device_id,
-        "filesystem_key": filesystem_key,
-    }
-
-
 def _require_effective(report: EffectiveAnnualReport | None) -> EffectiveAnnualReport:
     if report is None:
         raise ValueError("effective decision requires a predecessor or replacement")
     return report
-
-
-def _require_consumer_name(value: str) -> str:
-    consumer = str(value or "").strip()
-    if not consumer:
-        raise ValueError("consumer is required")
-    if len(consumer) > 200:
-        raise ValueError("consumer is too long")
-    return consumer
 
 
 def _json_load(value: Any, default: Any) -> Any:

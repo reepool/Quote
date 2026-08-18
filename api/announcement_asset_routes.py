@@ -20,7 +20,6 @@ from research.announcement_assets.repository import IdempotencyConflictError
 from .announcement_asset_models import (
     AcquisitionStatusValue,
     AnnualReportAssetListResponse,
-    AnnualReportConsumerRequestResponse,
     AnnualReportEffectiveResponse,
     AnnualReportEnsureRequestModel,
     AnnualReportEnsureResponse,
@@ -29,7 +28,6 @@ from .announcement_asset_models import (
     AnnualReportRecordStateValue,
     AnnualReportRequestResponse,
     AssetAvailabilityValue,
-    BusinessAnnualReportProcessRequest,
     IntegrityStatusValue,
 )
 
@@ -43,17 +41,10 @@ _ENSURE_RESPONSES = {
     **_ERROR_RESPONSES,
     202: {"model": AnnualReportEnsureResponse},
 }
-_CONSUMER_RESPONSES = {
-    **_ERROR_RESPONSES,
-    202: {"model": AnnualReportConsumerRequestResponse},
-}
-
 _PERMISSION_KEYS = {
     "annual_report_assets:acquire": "acquire",
     "annual_report_assets:read_content": "read_content",
     "annual_report_assets:operator": "operator",
-    "business_profile:process": "business_profile_process",
-    "broker_risk_control:process": "broker_risk_control_process",
 }
 
 
@@ -102,23 +93,6 @@ def _principal(request: Request, required_scope: str | None = None) -> str:
                 },
             )
     return principal
-
-
-def _has_scope(request: Request, scope: str) -> bool:
-    configured_names = getattr(request.state, "annual_report_permission_names", {})
-    effective_scope = configured_names.get(_PERMISSION_KEYS.get(scope, ""), scope)
-    permissions = getattr(request.state, "annual_report_permissions", frozenset())
-    return effective_scope in permissions
-
-
-def _require_consumer_query_scope(request: Request) -> bool:
-    is_operator = _has_scope(request, "annual_report_assets:operator")
-    if not is_operator and not any(
-        _has_scope(request, scope)
-        for scope in ("business_profile:process", "broker_risk_control:process")
-    ):
-        _principal(request, "business_profile:process")
-    return is_operator
 
 
 def _request_error(status_code: int, code: str, message: str, **details: Any) -> HTTPException:
@@ -287,117 +261,6 @@ def _json_with_headers(payload: dict[str, Any], status_code: int):
     return JSONResponse(status_code=status_code, content=content, headers=headers)
 
 
-async def _run_business_annual_report_command(
-    *,
-    request: Request,
-    instrument_id: str,
-    body: BusinessAnnualReportProcessRequest,
-    consumer: str,
-):
-    from fastapi.responses import JSONResponse
-
-    from research.announcement_assets import IdempotencyConflictError
-
-    principal = _principal(request, _consumer_permission(consumer))
-    if body.allow_network:
-        _principal(request, "annual_report_assets:acquire")
-    ensure_request = EnsureRequest(
-        instrument_id=instrument_id,
-        fiscal_year=body.fiscal_year,
-        source=body.source,
-        source_announcement_id=body.source_announcement_id,
-        attachment_id=body.attachment_id,
-        expected_content_hash=body.expected_content_hash,
-        observation_version=body.observation_version,
-        allow_network=body.allow_network,
-        integrity_level=body.integrity_level,
-        wait_seconds=body.wait_seconds,
-        principal=principal,
-        idempotency_key=request.headers.get("Idempotency-Key"),
-        knowledge_cutoff=body.knowledge_cutoff,
-    )
-    method = (
-        data_manager.process_shared_business_profile_annual_report
-        if consumer == "business_profile"
-        else data_manager.process_shared_broker_risk_control_annual_report
-    )
-    try:
-        result = await method(
-            ensure_request,
-            profile_name=body.processing_profile,
-            expected_processing_fingerprint=(
-                body.expected_processing_fingerprint
-            ),
-        )
-    except IdempotencyConflictError as exc:
-        raise _request_error(409, "idempotency_conflict", str(exc)) from exc
-    except ValueError as exc:
-        code = str(exc)
-        if code in {
-            "processing_fingerprint_mismatch",
-            "candidate_ambiguous",
-            "effective_state_conflict",
-        }:
-            raise _request_error(409, code, code) from exc
-        if code == "unknown_consumer_processing_profile":
-            raise _request_error(422, code, code) from exc
-        raise _request_error(422, "invalid_selector", str(exc)) from exc
-    except RuntimeError as exc:
-        raise _request_error(503, "asset_operation_blocked", str(exc)) from exc
-    status_code = int(result.pop("_http_status", 202))
-    consumer_request_id = str(result["consumer_request_id"])
-    headers = {
-        "Location": (
-            "/api/v1/research/annual-report-consumer-requests/"
-            + consumer_request_id
-        )
-    }
-    if status_code == 202:
-        headers["Retry-After"] = "5"
-    content = AnnualReportConsumerRequestResponse.model_validate(result).model_dump(
-        mode="json"
-    )
-    return JSONResponse(status_code=status_code, content=content, headers=headers)
-
-
-@router.post(
-    "/research/company/{instrument_id}/business-profile/annual-report-process",
-    response_model=AnnualReportConsumerRequestResponse,
-    responses=_CONSUMER_RESPONSES,
-    tags=["Annual Report Assets"],
-)
-async def process_business_profile_annual_report(
-    request: Request,
-    instrument_id: str,
-    body: BusinessAnnualReportProcessRequest,
-):
-    return await _run_business_annual_report_command(
-        request=request,
-        instrument_id=instrument_id,
-        body=body,
-        consumer="business_profile",
-    )
-
-
-@router.post(
-    "/research/company/{instrument_id}/broker-risk-control/annual-report-process",
-    response_model=AnnualReportConsumerRequestResponse,
-    responses=_CONSUMER_RESPONSES,
-    tags=["Annual Report Assets"],
-)
-async def process_broker_risk_control_annual_report(
-    request: Request,
-    instrument_id: str,
-    body: BusinessAnnualReportProcessRequest,
-):
-    return await _run_business_annual_report_command(
-        request=request,
-        instrument_id=instrument_id,
-        body=body,
-        consumer="broker_risk_control",
-    )
-
-
 @router.get(
     "/research/annual-report-asset-requests/{asset_request_id}",
     response_model=AnnualReportRequestResponse,
@@ -436,107 +299,6 @@ async def cancel_shared_annual_report_asset_request(
         )
     except KeyError as exc:
         raise _request_error(404, "not_found", "asset request was not found") from exc
-
-
-def _consumer_permission(consumer: str) -> str:
-    permissions = {
-        "business_profile": "business_profile:process",
-        "broker_risk_control": "broker_risk_control:process",
-    }
-    try:
-        return permissions[consumer]
-    except KeyError as exc:
-        raise _request_error(
-            409,
-            "consumer_contract_unavailable",
-            "consumer request has an unsupported owner",
-        ) from exc
-
-
-@router.get(
-    "/research/annual-report-consumer-requests/{consumer_request_id}",
-    response_model=AnnualReportConsumerRequestResponse,
-    responses=_ERROR_RESPONSES,
-    tags=["Annual Report Assets"],
-)
-async def get_shared_annual_report_consumer_request(
-    request: Request,
-    consumer_request_id: str,
-):
-    principal = _principal(request)
-    operator = _require_consumer_query_scope(request)
-    identity = await data_manager.get_shared_annual_report_consumer_request_identity(
-        consumer_request_id,
-        principal=None if operator else principal,
-    )
-    if identity is None:
-        raise _request_error(404, "not_found", "consumer request was not found")
-    if not operator and not _has_scope(
-        request, _consumer_permission(identity["consumer"])
-    ):
-        raise _request_error(404, "not_found", "consumer request was not found")
-    result = await data_manager.get_shared_annual_report_consumer_request(
-        consumer_request_id,
-        principal=principal,
-        operator=operator,
-    )
-    if result is None:
-        raise _request_error(404, "not_found", "consumer request was not found")
-    return result
-
-
-@router.delete(
-    "/research/annual-report-consumer-requests/{consumer_request_id}",
-    response_model=AnnualReportConsumerRequestResponse,
-    responses=_CONSUMER_RESPONSES,
-    tags=["Annual Report Assets"],
-)
-async def cancel_shared_annual_report_consumer_request(
-    request: Request,
-    consumer_request_id: str,
-):
-    from research.announcement_assets import ConsumerRequestNotCancellableError
-
-    principal = _principal(request)
-    operator = _require_consumer_query_scope(request)
-    identity = await data_manager.get_shared_annual_report_consumer_request_identity(
-        consumer_request_id,
-        principal=None if operator else principal,
-    )
-    if identity is None:
-        raise _request_error(404, "not_found", "consumer request was not found")
-    if not operator and not _has_scope(
-        request, _consumer_permission(identity["consumer"])
-    ):
-        raise _request_error(404, "not_found", "consumer request was not found")
-    try:
-        result, disposition = (
-            await data_manager.cancel_shared_annual_report_consumer_request(
-                consumer_request_id,
-                principal=principal,
-                operator=operator,
-            )
-        )
-    except KeyError as exc:
-        raise _request_error(404, "not_found", "consumer request was not found") from exc
-    except ConsumerRequestNotCancellableError as exc:
-        raise _request_error(
-            409,
-            "request_not_cancellable",
-            "consumer request cannot be cancelled in its current state",
-        ) from exc
-    if disposition == "stop_requested":
-        from fastapi.responses import JSONResponse
-
-        content = AnnualReportConsumerRequestResponse.model_validate(result).model_dump(
-            mode="json"
-        )
-        return JSONResponse(
-            status_code=202,
-            content=content,
-            headers={"Retry-After": "5"},
-        )
-    return result
 
 
 @router.get(

@@ -35,7 +35,6 @@ from .models import (
     AnnualReportVariant,
     AssetAvailability,
     BatchOutcome,
-    CapacityOverrideAuthorization,
     EffectiveAnnualReport,
     EffectiveDecisionState,
     EnsureDisposition,
@@ -55,7 +54,7 @@ from .models import (
     utc_now_iso,
 )
 from .repository import AnnouncementAssetRepository
-from .storage import ContentAddressedBlobStore, StorageCapacityAdmission
+from .storage import ContentAddressedBlobStore
 
 
 @dataclass(frozen=True)
@@ -202,27 +201,6 @@ class AnnouncementAssetService:
             ),
         )
 
-    def cleanup_quarantine(
-        self,
-        *,
-        authorized: bool,
-        actor: str,
-        max_items: int = 100,
-        older_than_seconds: int | None = None,
-        now: datetime | None = None,
-        after_unlink: Callable[[Mapping[str, object]], None] | None = None,
-    ) -> int:
-        """Run the bounded operator-only quarantine cleanup with durable audit."""
-
-        return self.blob_store.cleanup_quarantine(
-            authorized=authorized,
-            actor=actor,
-            audit=self.repository.append_storage_artifact_audit,
-            max_items=max_items,
-            older_than_seconds=older_than_seconds,
-            now=now,
-            after_unlink=after_unlink,
-        )
 
     def register_discovered_record(
         self,
@@ -278,16 +256,9 @@ class AnnouncementAssetService:
         lease_owner: str | None = None,
         knowledge_cutoff: str | None = None,
         operation_id: str | None = None,
-        capacity_override: CapacityOverrideAuthorization | None = None,
         scheduled_write: bool = False,
     ) -> EffectiveAnnualReport | None:
         """Acquire one attachment under a durable attachment-scoped lease."""
-        if capacity_override is not None:
-            self._validate_capacity_override(
-                capacity_override,
-                operation_id=operation_id,
-                attachment_id=attachment_id,
-            )
         owner = lease_owner or f"asset-worker-{uuid.uuid4().hex}"
         deadline = time.monotonic() + max(0.0, float(wait_seconds))
         while True:
@@ -371,7 +342,6 @@ class AnnouncementAssetService:
                 force_refresh=force_refresh,
                 knowledge_cutoff=knowledge_cutoff,
                 operation_id=operation_id,
-                capacity_override=capacity_override,
                 scheduled_write=scheduled_write,
             )
         finally:
@@ -523,21 +493,8 @@ class AnnouncementAssetService:
                 attachment,
                 attempt=attempt,
                 operation_id=operation_id,
-                capacity_override=None,
             ) as reservation:
-                capacity = self.blob_store.inspect_capacity(actual_length)
-                if not self.repository.resize_storage_reservation(
-                    reservation["reservation_id"],
-                    planned_bytes=actual_length,
-                    capacity_bytes=capacity.free_bytes,
-                    hard_reserve_bytes=self.config.storage.free_space_reserve_bytes,
-                    operation_actual_limit_bytes=(
-                        self.config.acquisition.max_task_actual_bytes
-                    ),
-                ):
-                    raise RuntimeError(
-                        "candidate verification reservation cannot be expanded"
-                    )
+                self.blob_store.preflight_capacity(actual_length)
                 temporary_path, mount = self.blob_store.write_candidate_part(
                     artifact_identity=observation_key,
                     content=result.content,
@@ -647,7 +604,6 @@ class AnnouncementAssetService:
         force_refresh: bool,
         knowledge_cutoff: str | None,
         operation_id: str | None,
-        capacity_override: CapacityOverrideAuthorization | None,
         scheduled_write: bool,
     ) -> EffectiveAnnualReport | None:
         """Retrieve one registered attachment, publish it, and recompute policy."""
@@ -706,7 +662,6 @@ class AnnouncementAssetService:
             attachment,
             attempt=attempt,
             operation_id=operation_id,
-            capacity_override=capacity_override,
         ) as reservation:
             return self._retrieve_publish_and_recompute(
                 attachment=attachment,
@@ -717,7 +672,6 @@ class AnnouncementAssetService:
                 lease_generation=lease_generation,
                 knowledge_cutoff=knowledge_cutoff,
                 operation_id=operation_id,
-                capacity_override=capacity_override,
                 suppress_unchanged_event=force_refresh,
                 scheduled_write=scheduled_write,
             )
@@ -733,7 +687,6 @@ class AnnouncementAssetService:
         lease_generation: int,
         knowledge_cutoff: str | None = None,
         operation_id: str | None = None,
-        capacity_override: CapacityOverrideAuthorization | None = None,
         suppress_unchanged_event: bool = False,
         scheduled_write: bool = False,
     ) -> EffectiveAnnualReport | None:
@@ -813,49 +766,7 @@ class AnnouncementAssetService:
             )
         if actual_length > self.config.storage.max_attachment_bytes:
             raise ValueError("attachment exceeds configured annual-report limit")
-        admission = reservation.get("capacity_admission")
-        capacity = (
-            self.blob_store.preflight_capacity(actual_length)
-            if capacity_override is None and admission is None
-            else self.blob_store.inspect_capacity(actual_length)
-        )
-        if self._capacity_block_reason(capacity) is not None:
-            if capacity_override is None:
-                raise RuntimeError(self._capacity_block_reason(capacity))
-            self._validate_capacity_override(
-                capacity_override,
-                operation_id=operation_id,
-                attachment_id=attachment.attachment_id,
-                requested_bytes=actual_length,
-            )
-            admission = StorageCapacityAdmission(
-                authorization_id=capacity_override.authorization_id,
-                operation_id=capacity_override.operation_id,
-                target_attachment_id=capacity_override.target_attachment_id,
-                filesystem_key=capacity.filesystem_key,
-                max_bytes=capacity_override.max_bytes,
-            )
-            reservation["capacity_admission"] = admission
-            if not reservation.get("override_audited"):
-                self._audit_capacity_override(
-                    capacity_override,
-                    requested_bytes=actual_length,
-                    outcome="admitted",
-                    capacity=capacity,
-                )
-                reservation["override_audited"] = True
-        if not self.repository.resize_storage_reservation(
-            reservation["reservation_id"],
-            planned_bytes=actual_length,
-            capacity_bytes=capacity.free_bytes,
-            hard_reserve_bytes=(
-                0
-                if admission is not None
-                else self.config.storage.free_space_reserve_bytes
-            ),
-            operation_actual_limit_bytes=self.config.acquisition.max_task_actual_bytes,
-        ):
-            raise RuntimeError("filings storage reservation cannot be expanded")
+        self.blob_store.preflight_capacity(actual_length)
 
         published = self.blob_store.publish_bytes(
             result.content,
@@ -864,17 +775,9 @@ class AnnouncementAssetService:
                 "owner": lease_owner,
                 "lease_generation": lease_generation,
                 "attachment_id": attachment.attachment_id,
-                "operation_id": reservation["reservation_id"],
+                "operation_id": operation_id,
             },
-            capacity_admission=admission,
         )
-        if admission is not None and capacity_override is not None:
-            self._audit_capacity_override(
-                capacity_override,
-                requested_bytes=actual_length,
-                outcome="consumed",
-                capacity=capacity,
-            )
         self.repository.register_blob(
             OfficialDocumentBlob(
                 content_hash=published.content_hash,
@@ -950,167 +853,21 @@ class AnnouncementAssetService:
         *,
         attempt: int,
         operation_id: str | None,
-        capacity_override: CapacityOverrideAuthorization | None,
     ) -> Iterator[dict[str, object]]:
+        """Apply the configured local storage bound before writing bytes."""
+        del attempt, operation_id
         planned = int(
             attachment.content_length_hint
             or self.config.storage.unknown_length_reservation_bytes
         )
         if planned > self.config.storage.max_attachment_bytes:
             raise ValueError("attachment length hint exceeds configured limit")
-        capacity = (
-            self.blob_store.preflight_capacity(planned)
-            if capacity_override is None
-            else self.blob_store.inspect_capacity(planned)
-        )
-        admission = None
-        block_reason = self._capacity_block_reason(capacity)
-        if block_reason is not None:
-            if capacity_override is None:
-                raise RuntimeError(block_reason)
-            self._validate_capacity_override(
-                capacity_override,
-                operation_id=operation_id,
-                attachment_id=attachment.attachment_id,
-                requested_bytes=planned,
-            )
-            admission = StorageCapacityAdmission(
-                authorization_id=capacity_override.authorization_id,
-                operation_id=capacity_override.operation_id,
-                target_attachment_id=capacity_override.target_attachment_id,
-                filesystem_key=capacity.filesystem_key,
-                max_bytes=capacity_override.max_bytes,
-            )
-            self._audit_capacity_override(
-                capacity_override,
-                requested_bytes=planned,
-                outcome="admitted",
-                capacity=capacity,
-            )
-        reservation_id = stable_id(
-            "storage-reservation",
-            attachment.attachment_id,
-            str(attempt),
-            uuid.uuid4().hex,
-        )
-        lease_expires_at = (
-            datetime.now(timezone.utc)
-            + timedelta(seconds=self.config.retry.lease_seconds)
-        ).isoformat()
-        if not self.repository.reserve_storage(
-            reservation_id=reservation_id,
-            filesystem_key=capacity.filesystem_key,
-            planned_bytes=planned,
-            lease_expires_at=lease_expires_at,
-            capacity_bytes=capacity.free_bytes,
-            hard_reserve_bytes=(
-                0
-                if admission is not None
-                else self.config.storage.free_space_reserve_bytes
-            ),
-            operation_id=operation_id,
-            operation_planned_limit_bytes=self.config.acquisition.max_task_planned_bytes,
-            metadata={
-                "attachment_id": attachment.attachment_id,
-                "content_length_hint": attachment.content_length_hint,
-                "warning": capacity.warning,
-                "capacity_override_authorization_id": (
-                    None if capacity_override is None else capacity_override.authorization_id
-                ),
-            },
-        ):
-            raise RuntimeError("filings storage reservation is blocked")
-        state: dict[str, object] = {
-            "reservation_id": reservation_id,
-            "status": "failed",
-            "capacity_admission": admission,
-            "override_audited": admission is not None,
-        }
-        try:
-            yield state
-        finally:
-            self.repository.release_storage_reservation(
-                reservation_id,
-                status=str(state["status"]),
-            )
+        self.blob_store.preflight_capacity(planned)
+        state: dict[str, object] = {"status": "failed"}
+        yield state
 
-    def _capacity_block_reason(self, capacity) -> str | None:
-        if capacity.projected_free_bytes < self.config.storage.free_space_reserve_bytes:
-            return "filings hard free-space reserve would be violated"
-        if capacity.projected_utilization >= self.config.storage.hard_stop_utilization:
-            return "filings hard utilization threshold would be violated"
-        return None
 
-    def _validate_capacity_override(
-        self,
-        authorization: CapacityOverrideAuthorization,
-        *,
-        operation_id: str | None,
-        attachment_id: str,
-        requested_bytes: int | None = None,
-    ) -> None:
-        policy = self.config.capacity_override
-        if not policy.enabled:
-            raise PermissionError("capacity override is disabled")
-        if not self.config.trusted_identity_enabled:
-            raise PermissionError("capacity override authorization boundary is unavailable")
-        if authorization.permission_scope != self.config.operator_permission:
-            raise PermissionError("capacity override operator permission is required")
-        if not operation_id or authorization.operation_id != str(operation_id):
-            raise PermissionError("capacity override operation scope mismatch")
-        if authorization.target_attachment_id != str(attachment_id):
-            raise PermissionError("capacity override target scope mismatch")
-        if authorization.max_bytes > policy.max_bytes:
-            raise PermissionError("capacity override exceeds configured byte bound")
-        issued = datetime.fromisoformat(
-            authorization.issued_at.replace("Z", "+00:00")
-        )
-        expires = datetime.fromisoformat(
-            authorization.expires_at.replace("Z", "+00:00")
-        )
-        now = datetime.now(timezone.utc)
-        if issued > now or expires <= now:
-            raise PermissionError("capacity override is not currently valid")
-        if (expires - issued).total_seconds() > policy.max_duration_seconds:
-            raise PermissionError("capacity override exceeds configured duration")
-        if requested_bytes is not None and int(requested_bytes) > authorization.max_bytes:
-            raise PermissionError("capacity override requested bytes exceed its bound")
-        operation = self.repository.get_operation(authorization.operation_id)
-        if operation is None:
-            raise PermissionError("capacity override operation does not exist")
-        if operation.status not in {
-            OperationStatus.QUEUED,
-            OperationStatus.RUNNING,
-            OperationStatus.BLOCKED,
-        }:
-            raise PermissionError("capacity override operation is terminal")
 
-    def _audit_capacity_override(
-        self,
-        authorization: CapacityOverrideAuthorization,
-        *,
-        requested_bytes: int,
-        outcome: str,
-        capacity,
-    ) -> None:
-        self.repository.append_capacity_override_audit(
-            authorization_id=authorization.authorization_id,
-            operation_id=authorization.operation_id,
-            attachment_id=authorization.target_attachment_id,
-            principal=authorization.principal,
-            permission_scope=authorization.permission_scope,
-            max_bytes=authorization.max_bytes,
-            requested_bytes=requested_bytes,
-            outcome=outcome,
-            reason=authorization.reason,
-            config_fingerprint=self.config.config_fingerprint,
-            evidence={
-                "filesystem_key": capacity.filesystem_key,
-                "free_bytes": capacity.free_bytes,
-                "projected_free_bytes": capacity.projected_free_bytes,
-                "projected_utilization": capacity.projected_utilization,
-            },
-        )
 
     def recompute_effective_report(
         self,

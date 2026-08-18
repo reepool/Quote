@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import io
-import json
-from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -12,10 +10,7 @@ import pytest
 from api.announcement_asset_models import AnnualReportEnsureRequestModel
 from api.announcement_asset_routes import _stream_validated_handle
 from api.app import app
-from research.announcement_assets import (
-    ConsumerRequestNotCancellableError,
-    IdempotencyConflictError,
-)
+from research.announcement_assets import IdempotencyConflictError
 from research.announcement_assets.access import (
     AssetContentGoneError,
     AssetContentIntegrityError,
@@ -37,8 +32,6 @@ def _trusted_config():
                                 "annual_report_assets:acquire",
                                 "annual_report_assets:read_content",
                                 "annual_report_assets:operator",
-                                "business_profile:process",
-                                "broker_risk_control:process",
                             ],
                         }
                     ],
@@ -340,20 +333,10 @@ async def test_authorization_unavailable_precedes_all_protected_resource_work(
         ),
     )
     asset_cancel = AsyncMock()
-    consumer_identity = AsyncMock()
-    business_command = AsyncMock()
     content = AsyncMock()
     monkeypatch.setattr(
         "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_asset_request",
         asset_cancel,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        consumer_identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        business_command,
     )
     monkeypatch.setattr(
         "api.announcement_asset_routes.data_manager.get_shared_annual_report_content",
@@ -365,13 +348,6 @@ async def test_authorization_unavailable_precedes_all_protected_resource_work(
             await client.delete(
                 "/api/v1/research/annual-report-asset-requests/private"
             ),
-            await client.delete(
-                "/api/v1/research/annual-report-consumer-requests/private"
-            ),
-            await client.post(
-                "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-                json={},
-            ),
             await client.get(
                 "/api/v1/research/annual-report-assets/private/content"
             ),
@@ -382,8 +358,6 @@ async def test_authorization_unavailable_precedes_all_protected_resource_work(
         response.json()["error_code"] for response in responses
     } == {"authorization_boundary_unavailable"}
     asset_cancel.assert_not_awaited()
-    consumer_identity.assert_not_awaited()
-    business_command.assert_not_awaited()
     content.assert_not_awaited()
 
 
@@ -724,18 +698,8 @@ def test_openapi_registers_shared_asset_resources():
     assert "/api/v1/research/company/{instrument_id}/annual-reports" in paths
     assert "/api/v1/research/company/{instrument_id}/annual-reports/ensure" in paths
     assert "/api/v1/research/annual-report-asset-requests/{asset_request_id}" in paths
-    assert (
-        "/api/v1/research/annual-report-consumer-requests/{consumer_request_id}"
-        in paths
-    )
-    assert (
-        "/api/v1/research/company/{instrument_id}/business-profile/annual-report-process"
-        in paths
-    )
-    assert (
-        "/api/v1/research/company/{instrument_id}/broker-risk-control/annual-report-process"
-        in paths
-    )
+    assert not any("annual-report-process" in path for path in paths)
+    assert not any("annual-report-consumer-requests" in path for path in paths)
     assert "/api/v1/research/annual-report-assets/{asset_id}/content" in paths
     asset_schema = schema["components"]["schemas"]["AnnualReportAssetResponse"]
     properties = asset_schema["properties"]
@@ -796,138 +760,8 @@ def test_openapi_registers_shared_asset_resources():
     assert "consumer_processing_status" in company_profile_schema["properties"]
 
 
-def test_annual_report_asset_openapi_snapshot_is_stable():
-    schema = app.openapi()
-    paths = schema["paths"]
-    expected = json.loads(
-        Path("tests/fixtures/annual_report_asset_openapi_v1.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    path_snapshot = {
-        path: sorted(method for method in paths[path] if method != "parameters")
-        for path in expected["paths"]
-    }
-    status_sources = {
-        "asset_request_delete": (
-            "/api/v1/research/annual-report-asset-requests/{asset_request_id}",
-            "delete",
-        ),
-        "asset_request_get": (
-            "/api/v1/research/annual-report-asset-requests/{asset_request_id}",
-            "get",
-        ),
-        "business_command": (
-            "/api/v1/research/company/{instrument_id}/business-profile/annual-report-process",
-            "post",
-        ),
-        "consumer_request_delete": (
-            "/api/v1/research/annual-report-consumer-requests/{consumer_request_id}",
-            "delete",
-        ),
-        "consumer_request_get": (
-            "/api/v1/research/annual-report-consumer-requests/{consumer_request_id}",
-            "get",
-        ),
-        "content_get": (
-            "/api/v1/research/annual-report-assets/{asset_id}/content",
-            "get",
-        ),
-        "effective_get": (
-            "/api/v1/research/company/{instrument_id}/annual-reports/effective",
-            "get",
-        ),
-        "ensure_post": (
-            "/api/v1/research/company/{instrument_id}/annual-reports/ensure",
-            "post",
-        ),
-        "list_get": (
-            "/api/v1/research/company/{instrument_id}/annual-reports",
-            "get",
-        ),
-        "readiness_get": (
-            "/api/v1/research/annual-report-assets/readiness",
-            "get",
-        ),
-    }
-    response_statuses = {
-        name: sorted(paths[path][method]["responses"])
-        for name, (path, method) in status_sources.items()
-    }
-
-    def enum_values(model: str, field: str) -> list[str]:
-        definition = schema["components"]["schemas"][model]["properties"][field]
-        if "enum" in definition:
-            return definition["enum"]
-        return next(item["enum"] for item in definition["anyOf"] if "enum" in item)
-
-    state_enums = {
-        "asset_availability": enum_values(
-            "AnnualReportAssetResponse", "asset_availability"
-        ),
-        "asset_request_status": enum_values(
-            "AnnualReportRequestResponse", "asset_request_status"
-        ),
-        "consumer_request_status": enum_values(
-            "AnnualReportConsumerRequestResponse", "consumer_request_status"
-        ),
-        "consumer_result_state": enum_values(
-            "AnnualReportConsumerRequestResponse", "consumer_result_state"
-        ),
-        "ensure_disposition": enum_values(
-            "AnnualReportEnsureResponse", "disposition"
-        ),
-        "exact_content_state": enum_values(
-            "AnnualReportAssetResponse", "exact_content_state"
-        ),
-        "operation_status": enum_values(
-            "AnnualReportRequestResponse", "operation_status"
-        ),
-    }
-    actual = {
-        "schema_version": "annual_report_asset_openapi_snapshot.v1",
-        "asset_response_fields": ["content_url"],
-        "paths": path_snapshot,
-        "response_statuses": response_statuses,
-        "state_enums": state_enums,
-    }
-    assert actual == expected
 
 
-def _consumer_request_payload(status: str = "pending_asset") -> dict:
-    return {
-        "consumer_request_id": "consumerreq-public",
-        "consumer": "business_profile",
-        "processing_fingerprint": "business-profile-v1",
-        "selector": {"instrument_id": "600000.SH", "fiscal_year": 2025},
-        "asset_request_id": "assetreq-public",
-        "asset_request_url": (
-            "/api/v1/research/annual-report-asset-requests/assetreq-public"
-        ),
-        "consumer_request_status": status,
-        "consumer_result_state": "unavailable",
-        "asset_id": None,
-        "result_identity": None,
-        "resolved_source": None,
-        "resolved_source_announcement_id": None,
-        "resolved_attachment_id": None,
-        "resolved_observation_version": None,
-        "resolved_content_hash": None,
-        "resolved_report_period": None,
-        "reason_code": None,
-        "retry_metadata": {},
-        "diagnostics": {},
-        "created_at": "2026-08-10T00:00:00+00:00",
-        "updated_at": "2026-08-10T00:00:00+00:00",
-        "processing_started_at": None,
-        "finished_at": None,
-        "stop_requested_at": None,
-        "cancelled_at": None,
-        "expires_at": "2026-08-17T00:00:00+00:00",
-        "expired_at": None,
-        "tombstone_until": None,
-        "retention_policy_version": "consumer_request_retention.v1",
-    }
 
 
 def _asset_request_payload(status: str = "active") -> dict:
@@ -952,84 +786,8 @@ def _asset_request_payload(status: str = "active") -> dict:
     }
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_status_is_owner_scoped(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    method = AsyncMock(return_value=_consumer_request_payload())
-    identity = AsyncMock(
-        return_value={"principal": "alice", "consumer": "business_profile"}
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "X-Annual-Report-Principal": "alice",
-            },
-        )
-
-    assert response.status_code == 200
-    assert response.json()["consumer_request_id"] == "consumerreq-public"
-    identity.assert_awaited_once_with("consumerreq-public", principal=None)
-    method.assert_awaited_once_with(
-        "consumerreq-public", principal="alice", operator=True
-    )
 
 
-@pytest.mark.asyncio
-async def test_consumer_owner_query_uses_owner_filter_without_operator_bypass(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def owner_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["business_profile:process"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        owner_config,
-    )
-    identity = AsyncMock(
-        return_value={"principal": "alice", "consumer": "business_profile"}
-    )
-    refresh = AsyncMock(return_value=_consumer_request_payload())
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        refresh,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 200
-    identity.assert_awaited_once_with("consumerreq-public", principal="alice")
-    refresh.assert_awaited_once_with(
-        "consumerreq-public", principal="alice", operator=False
-    )
 
 
 @pytest.mark.asyncio
@@ -1064,128 +822,10 @@ async def test_content_scope_denial_precedes_asset_lookup(monkeypatch):
     content.assert_not_awaited()
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_without_domain_scope_stops_before_identity_lookup(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def acquire_only_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["annual_report_assets:acquire"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        acquire_only_config,
-    )
-    identity = AsyncMock()
-    refresh = AsyncMock()
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        refresh,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
-            "/api/v1/research/annual-report-consumer-requests/private-id",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 403
-    identity.assert_not_awaited()
-    refresh.assert_not_awaited()
 
 
-@pytest.mark.asyncio
-async def test_wrong_consumer_scope_is_non_disclosing_and_does_not_refresh(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def business_only_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["business_profile:process"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        business_only_config,
-    )
-    identity = AsyncMock(
-        return_value={"principal": "alice", "consumer": "broker_risk_control"}
-    )
-    refresh = AsyncMock()
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        refresh,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
-            "/api/v1/research/annual-report-consumer-requests/private-id",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 404
-    identity.assert_awaited_once_with("private-id", principal="alice")
-    refresh.assert_not_awaited()
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_delete_returns_cancelled_without_asset_mutation(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    current = _consumer_request_payload()
-    cancelled = _consumer_request_payload("cancelled")
-    cancelled["cancelled_at"] = "2026-08-10T00:01:00+00:00"
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        AsyncMock(
-            return_value={"principal": "alice", "consumer": "business_profile"}
-        ),
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        AsyncMock(return_value=current),
-    )
-    cancel = AsyncMock(return_value=(cancelled, "cancelled"))
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_consumer_request",
-        cancel,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "X-Annual-Report-Principal": "alice",
-            },
-        )
-
-    assert response.status_code == 200
-    assert response.json()["consumer_request_status"] == "cancelled"
-    cancel.assert_awaited_once_with(
-        "consumerreq-public",
-        principal="alice",
-        operator=True,
-    )
 
 
 @pytest.mark.asyncio
@@ -1247,492 +887,30 @@ async def test_asset_request_delete_cross_owner_is_non_disclosing(monkeypatch):
     cancel.assert_awaited_once_with("private-request", principal="alice")
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_delete_accepts_domain_cooperative_stop(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def owner_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["business_profile:process"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        owner_config,
-    )
-    processing = _consumer_request_payload("processing")
-    processing["consumer_result_state"] = "reprocessing"
-    stopped = dict(processing)
-    stopped["stop_requested_at"] = "2026-08-10T00:01:00+00:00"
-    stopped["reason_code"] = "cooperative_stop_requested"
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        AsyncMock(
-            return_value={"principal": "alice", "consumer": "business_profile"}
-        ),
-    )
-    cancel = AsyncMock(return_value=(stopped, "stop_requested"))
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_consumer_request",
-        cancel,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 202
-    assert response.headers["retry-after"] == "5"
-    assert response.json()["consumer_request_status"] == "processing"
-    assert response.json()["stop_requested_at"] is not None
-    cancel.assert_awaited_once_with(
-        "consumerreq-public",
-        principal="alice",
-        operator=False,
-    )
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_delete_rejects_terminal_or_started_blocked(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        AsyncMock(
-            return_value={"principal": "alice", "consumer": "business_profile"}
-        ),
-    )
-    cancel = AsyncMock(
-        side_effect=ConsumerRequestNotCancellableError("request_not_cancellable")
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_consumer_request",
-        cancel,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 409
-    assert response.json()["error_code"] == "request_not_cancellable"
-    assert "consumerreq-public" not in response.text
 
 
-@pytest.mark.asyncio
-async def test_not_started_blocked_consumer_request_cancels_with_evidence(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        AsyncMock(
-            return_value={"principal": "alice", "consumer": "business_profile"}
-        ),
-    )
-    cancelled = _consumer_request_payload("cancelled")
-    cancelled["reason_code"] = "storage_reserve_exceeded"
-    cancelled["retry_metadata"] = {"resume_required": True, "attempt": 2}
-    cancelled["diagnostics"] = {"operator_action_required": "free_space"}
-    cancelled["cancelled_at"] = "2026-08-10T00:01:00+00:00"
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_consumer_request",
-        AsyncMock(return_value=(cancelled, "cancelled")),
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 200
-    assert response.json()["consumer_request_status"] == "cancelled"
-    assert response.json()["reason_code"] == "storage_reserve_exceeded"
-    assert response.json()["retry_metadata"] == {
-        "resume_required": True,
-        "attempt": 2,
-    }
-    assert response.json()["diagnostics"] == {
-        "operator_action_required": "free_space"
-    }
 
 
-@pytest.mark.asyncio
-async def test_consumer_request_delete_unknown_or_cross_owner_is_404(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def owner_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["business_profile:process"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        owner_config,
-    )
-    identity = AsyncMock(return_value=None)
-    cancel = AsyncMock()
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        identity,
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.cancel_shared_annual_report_consumer_request",
-        cancel,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.delete(
-            "/api/v1/research/annual-report-consumer-requests/private-request",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 404
-    assert response.json()["error_code"] == "not_found"
-    identity.assert_awaited_once_with("private-request", principal="alice")
-    cancel.assert_not_awaited()
 
 
-@pytest.mark.asyncio
-async def test_business_command_returns_consumer_location_and_retry_after(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    payload = _consumer_request_payload("pending_asset")
-    method = AsyncMock(return_value={**payload, "_http_status": 202})
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "X-Annual-Report-Principal": "alice",
-                "Idempotency-Key": "business-command-1",
-            },
-            json={"fiscal_year": 2025, "allow_network": True},
-        )
-
-    assert response.status_code == 202
-    assert response.headers["location"].endswith("consumerreq-public")
-    assert response.headers["retry-after"] == "5"
-    called_request = method.await_args.args[0]
-    assert called_request.principal == "alice"
-    assert called_request.idempotency_key == "business-command-1"
-    assert called_request.consumer is None
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    ("request_status", "result_state", "http_status", "has_retry_after"),
-    [
-        ("completed", "current", 200, False),
-        ("completed", "stale", 202, True),
-        ("processing", "reprocessing", 202, True),
-    ],
-)
-async def test_business_command_http_and_polling_headers_follow_result_state(
-    monkeypatch,
-    request_status,
-    result_state,
-    http_status,
-    has_retry_after,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    payload = _consumer_request_payload(request_status)
-    payload["consumer_result_state"] = result_state
-    if request_status == "completed":
-        payload["asset_id"] = "asset-current"
-        payload["result_identity"] = "result-current"
-    method = AsyncMock(return_value={**payload, "_http_status": http_status})
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={"Authorization": "Bearer test-secret"},
-            json={"fiscal_year": 2025, "allow_network": False},
-        )
-
-    assert response.status_code == http_status
-    assert response.headers["location"].endswith("consumerreq-public")
-    assert ("retry-after" in response.headers) is has_retry_after
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "conflict_code",
-    [
-        "candidate_ambiguous",
-        "effective_state_conflict",
-        "processing_fingerprint_mismatch",
-    ],
-)
-async def test_business_command_conflict_is_409_without_async_headers(
-    monkeypatch,
-    conflict_code,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    method = AsyncMock(side_effect=ValueError(conflict_code))
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={"Authorization": "Bearer test-secret"},
-            json={"fiscal_year": 2025, "allow_network": False},
-        )
-
-    assert response.status_code == 409
-    assert response.json()["error_code"] == conflict_code
-    assert "location" not in response.headers
-    assert "retry-after" not in response.headers
 
 
-@pytest.mark.asyncio
-async def test_business_command_unknown_processing_profile_is_422(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    method = AsyncMock(
-        side_effect=ValueError("unknown_consumer_processing_profile")
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(
-        transport=transport,
-        base_url="http://test",
-    ) as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={"Authorization": "Bearer test-secret"},
-            json={
-                "fiscal_year": 2025,
-                "allow_network": False,
-                "processing_profile": "unknown",
-            },
-        )
-
-    assert response.status_code == 422
-    assert response.json()["error_code"] == "unknown_consumer_processing_profile"
-    assert "location" not in response.headers
-    assert "retry-after" not in response.headers
 
 
-@pytest.mark.asyncio
-async def test_business_command_prework_blocker_is_503_without_async_headers(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    method = AsyncMock(side_effect=RuntimeError("archive_mount_unavailable"))
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={"Authorization": "Bearer test-secret"},
-            json={"fiscal_year": 2025, "allow_network": False},
-        )
-
-    assert response.status_code == 503
-    assert response.json()["error_code"] == "asset_operation_blocked"
-    assert "location" not in response.headers
-    assert "retry-after" not in response.headers
 
 
-@pytest.mark.asyncio
-async def test_post_acceptance_blocker_remains_queryable_with_http_200(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    payload = _consumer_request_payload("blocked")
-    payload["reason_code"] = "storage_reserve_exceeded"
-    payload["retry_metadata"] = {"operation_status": "blocked"}
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request_identity",
-        AsyncMock(
-            return_value={"principal": "alice", "consumer": "business_profile"}
-        ),
-    )
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.get_shared_annual_report_consumer_request",
-        AsyncMock(return_value=payload),
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
-            "/api/v1/research/annual-report-consumer-requests/consumerreq-public",
-            headers={"Authorization": "Bearer test-secret"},
-        )
-
-    assert response.status_code == 200
-    assert response.json()["consumer_request_status"] == "blocked"
-    assert response.json()["reason_code"] == "storage_reserve_exceeded"
-    assert response.json()["retry_metadata"] == {"operation_status": "blocked"}
-    assert "retry-after" not in response.headers
 
 
-@pytest.mark.asyncio
-async def test_terminal_missing_business_command_has_location_without_retry_after(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        _trusted_config,
-    )
-    payload = _consumer_request_payload("missing")
-    payload["asset_request_id"] = None
-    payload["asset_request_url"] = None
-    payload["reason_code"] = "network_disabled"
-    method = AsyncMock(return_value={**payload, "_http_status": 200})
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_broker_risk_control_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/broker-risk-control/annual-report-process",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "X-Annual-Report-Principal": "alice",
-                "Idempotency-Key": "broker-command-1",
-            },
-            json={"fiscal_year": 2025, "allow_network": False},
-        )
-
-    assert response.status_code == 200
-    assert response.headers["location"].endswith("consumerreq-public")
-    assert "retry-after" not in response.headers
 
 
-@pytest.mark.asyncio
-async def test_network_enabled_business_command_requires_separate_acquire_scope(
-    monkeypatch,
-):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def domain_only_config():
-        config = _trusted_config()
-        config.modules["official_announcement_assets"]["permissions"]["principals"][
-            0
-        ]["scopes"] = ["business_profile:process"]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        domain_only_config,
-    )
-    method = AsyncMock()
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "X-Annual-Report-Principal": "alice",
-            },
-            json={"fiscal_year": 2025, "allow_network": True},
-        )
-
-    assert response.status_code == 403
-    method.assert_not_awaited()
 
 
-@pytest.mark.asyncio
-async def test_configured_permission_names_authorize_domain_and_acquire(monkeypatch):
-    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "test-secret")
-
-    def custom_scope_config():
-        config = _trusted_config()
-        permissions = config.modules["official_announcement_assets"]["permissions"]
-        permissions["acquire"] = "custom:acquire"
-        permissions["business_profile_process"] = "custom:business-profile"
-        permissions["principals"][0]["scopes"] = [
-            "custom:acquire",
-            "custom:business-profile",
-        ]
-        return config
-
-    monkeypatch.setattr(
-        "api.middleware.config_manager.get_research_config",
-        custom_scope_config,
-    )
-    payload = _consumer_request_payload("pending_asset")
-    method = AsyncMock(return_value={**payload, "_http_status": 202})
-    monkeypatch.setattr(
-        "api.announcement_asset_routes.data_manager.process_shared_business_profile_annual_report",
-        method,
-    )
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.post(
-            "/api/v1/research/company/600000.SH/business-profile/annual-report-process",
-            headers={
-                "Authorization": "Bearer test-secret",
-                "Idempotency-Key": "custom-scope-command",
-            },
-            json={"fiscal_year": 2025, "allow_network": True},
-        )
-
-    assert response.status_code == 202
-    method.assert_awaited_once()
 
 
 def test_filing_id_alias_normalizes_to_canonical_source_identity():

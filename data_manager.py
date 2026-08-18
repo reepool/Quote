@@ -216,10 +216,6 @@ class DataManager:
         self._dcf_run_cache: Dict[str, Dict[str, Any]] = {}
         self._announcement_asset_access = None
         self._announcement_asset_access_signature: Optional[Tuple[str, str]] = None
-        self._announcement_consumer_coordinator = None
-        self._announcement_consumer_coordinator_signature: Optional[
-            Tuple[str, str]
-        ] = None
         self._announcement_asset_scheduler_commands = None
         self._announcement_asset_scheduler_commands_signature: Optional[
             Tuple[str, str]
@@ -227,9 +223,6 @@ class DataManager:
 
     def refresh_runtime_config(self) -> None:
         """Refresh config references cached on the long-lived DataManager."""
-        coordinator = self._announcement_consumer_coordinator
-        if coordinator is not None:
-            coordinator.close()
         self.research_config = self.config.get_research_config()
         self.telegram_enabled = self.config.get_nested('telegram_config.enabled', False)
         self.data_config = self.config.get_nested('data_config', {})
@@ -243,8 +236,6 @@ class DataManager:
         self._factor_activation_error = None
         self._announcement_asset_access = None
         self._announcement_asset_access_signature = None
-        self._announcement_consumer_coordinator = None
-        self._announcement_consumer_coordinator_signature = None
         self._announcement_asset_scheduler_commands = None
         self._announcement_asset_scheduler_commands_signature = None
         self.invalidate_factor_cache()
@@ -1103,451 +1094,6 @@ class DataManager:
             scope=scope,
             bounds=bounds,
             principal_id=principal_id,
-        )
-
-    def _get_announcement_consumer_coordinator(
-        self,
-        *,
-        initialize_schema: bool = False,
-    ):
-        """Build the durable front-facing consumer command coordinator lazily."""
-        from research.announcement_assets import (
-            AnnualReportConsumerRequestCoordinator,
-            ConsumerProcessingProfile,
-        )
-        from research.broker_risk_control import (
-            BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
-        )
-
-        access = self._get_announcement_asset_access(
-            initialize_schema=initialize_schema
-        )
-        modules = getattr(self.research_config, "modules", {}) or {}
-        profile_config = modules.get("business_profile_evidence", {}) or {}
-        financial_config = modules.get("financial_statements", {}) or {}
-        broker_config = modules.get(
-            "broker_risk_control_reports",
-            financial_config.get("broker_risk_control_reports", {}),
-        ) or {}
-        configuration_fingerprint = hashlib.sha256(
-            json.dumps(
-                {
-                    "business_profile": profile_config,
-                    "broker_risk_control": broker_config,
-                },
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                default=str,
-            ).encode("utf-8")
-        ).hexdigest()
-        signature = (
-            str(self._announcement_asset_access_signature),
-            configuration_fingerprint,
-        )
-        if (
-            self._announcement_consumer_coordinator is None
-            or self._announcement_consumer_coordinator_signature != signature
-        ):
-            previous_coordinator = self._announcement_consumer_coordinator
-            if previous_coordinator is not None:
-                previous_coordinator.close()
-
-            def business_profile_processor(asset, request):
-                return asyncio.run(
-                    self._process_business_profile_annual_report_asset(
-                        asset,
-                        request,
-                    )
-                )
-
-            def broker_processor(asset, request):
-                return self._process_broker_risk_control_annual_report_asset(
-                    asset,
-                    request,
-                )
-
-            self._announcement_consumer_coordinator = (
-                AnnualReportConsumerRequestCoordinator(
-                    access=access,
-                    profiles=(
-                        ConsumerProcessingProfile(
-                            consumer="business_profile",
-                            profile_name="default",
-                            parser_version="business_profile_annual_report_process.v1",
-                            parameters={
-                                "selection_policy": "latest_annual_only",
-                                "document_family": "annual_report",
-                                "configuration_fingerprint": configuration_fingerprint,
-                            },
-                            configuration_fingerprint=configuration_fingerprint,
-                            processor=business_profile_processor,
-                        ),
-                        ConsumerProcessingProfile(
-                            consumer="broker_risk_control",
-                            profile_name="default",
-                            parser_version=(
-                                BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
-                            ),
-                            parameters={
-                                "source_policy": "shared_effective_annual_report",
-                                "document_family": "annual_report",
-                                "configuration_fingerprint": configuration_fingerprint,
-                            },
-                            configuration_fingerprint=configuration_fingerprint,
-                            processor=broker_processor,
-                        ),
-                    ),
-                )
-            )
-            self._announcement_consumer_coordinator_signature = signature
-        return self._announcement_consumer_coordinator
-
-    async def _process_business_profile_annual_report_asset(
-        self,
-        asset: Mapping[str, Any],
-        request: Any,
-    ):
-        from research.announcement_assets import ConsumerProcessingOutcome
-        from research.announcement_assets.models import stable_id
-
-        module = self.research_config.modules.get("business_profile_evidence", {})
-        dependency = module.get("annual_report_asset_dependency", {}) or {}
-        mode = str(dependency.get("mode", "legacy")).strip().lower()
-        if mode not in {"dual_read", "shared_only"}:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code="business_profile_shared_cutover_disabled",
-            )
-        result = await self.run_business_profile_backfill(
-            knowledge_cutoff=request.knowledge_cutoff,
-            selection_policy="latest_annual_only",
-            instrument_ids=[str(asset["instrument_id"])],
-            bound_annual_report_asset=dict(asset),
-            force=False,
-        )
-        status = str(result.get("status") or result.get("pipeline_status") or "")
-        bound_result = dict(result.get("bound_shared_asset") or {})
-        binding_fields = (
-            "asset_id",
-            "observation_version",
-            "content_hash",
-        )
-        binding_matches = all(
-            str(bound_result.get(field) or "")
-            == str(asset.get(field) or "")
-            for field in binding_fields
-        )
-        if status in {"success", "completed"} and not binding_matches:
-            return ConsumerProcessingOutcome(
-                status="failed",
-                reason_code="business_profile_result_asset_binding_mismatch",
-                diagnostics={"status": status},
-                metadata={"business_result": result},
-            )
-        if status not in {"success", "completed"}:
-            return ConsumerProcessingOutcome(
-                status=(
-                    "blocked"
-                    if status in {"disabled", "not_ready", "blocked", "unavailable"}
-                    else "failed"
-                ),
-                reason_code=str(
-                    result.get("reason") or "business_profile_processing_failed"
-                ),
-                diagnostics={"status": status},
-                metadata={"business_result": result},
-            )
-        completion = self._business_profile_bound_result_completion(
-            asset,
-            result,
-        )
-        if not completion["ready"]:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code=str(
-                    completion.get("reason_code")
-                    or "business_profile_result_not_current"
-                ),
-                diagnostics={
-                    "status": status,
-                    "work_status": completion.get("work_status"),
-                    "work_stage": completion.get("work_stage"),
-                },
-                metadata={
-                    "business_result": result,
-                    "completion_validation": completion,
-                },
-            )
-        return ConsumerProcessingOutcome(
-            status="completed",
-            result_identity=str(completion["result_identity"]),
-            metadata={
-                "business_result": result,
-                "completion_validation": completion,
-            },
-        )
-
-    def _business_profile_bound_result_completion(
-        self,
-        asset: Mapping[str, Any],
-        result: Mapping[str, Any],
-    ) -> Dict[str, Any]:
-        """Prove one bound BP request reached evidence-backed publish completion."""
-
-        from research.announcement_assets.models import stable_id
-
-        if getattr(self, "research_storage", None) is None:
-            return {"ready": False, "reason_code": "research_storage_unavailable"}
-        enqueue = dict(result.get("enqueue") or {})
-        work_ids = [str(value) for value in enqueue.get("work_ids", []) if str(value)]
-        if len(work_ids) != 1:
-            return {
-                "ready": False,
-                "reason_code": "business_profile_completed_work_not_unique",
-                "work_id_count": len(work_ids),
-            }
-        work_id = work_ids[0]
-        with self.research_storage.get_connection() as conn:
-            self.research_storage._apply_pragmas(conn)
-            row = conn.execute(
-                "SELECT * FROM business_profile_work_items WHERE work_id=?",
-                (work_id,),
-            ).fetchone()
-        if row is None:
-            return {
-                "ready": False,
-                "reason_code": "business_profile_completed_work_missing",
-                "work_id": work_id,
-            }
-        work = dict(row)
-        try:
-            metadata = json.loads(work.pop("metadata_json") or "{}")
-        except (TypeError, ValueError, json.JSONDecodeError):
-            metadata = {}
-        metadata = dict(metadata) if isinstance(metadata, Mapping) else {}
-        binding = dict(metadata.get("bound_shared_asset") or {})
-        binding_matches = all(
-            str(binding.get(field) or "").strip().lower()
-            == str(asset.get(field) or "").strip().lower()
-            for field in ("asset_id", "observation_version", "content_hash")
-        )
-        stage_results = dict(metadata.get("stage_results") or {})
-        required_stages = ("acquire", "parse", "semantic", "publish")
-        stages_complete = all(
-            isinstance(stage_results.get(stage), Mapping)
-            and bool(stage_results.get(stage))
-            for stage in required_stages
-        )
-        successful_stage_statuses = {"completed", "success", "unchanged"}
-        upstream_stage_statuses = {
-            stage: str(
-                dict(stage_results.get(stage) or {}).get("pipeline_status")
-                or dict(stage_results.get(stage) or {}).get("status")
-                or ""
-            ).strip().lower()
-            for stage in ("acquire", "parse", "semantic")
-        }
-        upstream_stages_successful = all(
-            status in successful_stage_statuses
-            for status in upstream_stage_statuses.values()
-        )
-        from research.business_profile_async_production import _evidence_free_stage
-
-        evidence_free_stage = _evidence_free_stage(stage_results)
-        publish = dict(stage_results.get("publish") or {})
-        publish_status = str(
-            publish.get("pipeline_status") or publish.get("status") or ""
-        ).strip().lower()
-        ready = bool(
-            work.get("status") == "completed"
-            and work.get("stage") == "publish"
-            and work.get("completed_at")
-            and binding_matches
-            and stages_complete
-            and upstream_stages_successful
-            and evidence_free_stage is None
-            and publish_status in {"completed", "success"}
-        )
-        checkpoint_path = str(work.get("checkpoint_path") or "")
-        checkpoint_hash = None
-        if ready and checkpoint_path:
-            checkpoint = Path(checkpoint_path)
-            if checkpoint.is_file():
-                checkpoint_hash = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
-        if ready and not checkpoint_hash:
-            ready = False
-        result_identity = (
-            stable_id(
-                "business-profile-result",
-                work_id,
-                str(work.get("processing_identity_hash") or ""),
-                str(checkpoint_hash or ""),
-                str(asset.get("asset_id") or ""),
-                str(asset.get("observation_version") or ""),
-                str(asset.get("content_hash") or ""),
-            )
-            if ready
-            else None
-        )
-        return {
-            "ready": ready,
-            "reason_code": None if ready else "business_profile_result_not_current",
-            "work_id": work_id,
-            "work_status": work.get("status"),
-            "work_stage": work.get("stage"),
-            "completed_at": work.get("completed_at"),
-            "processing_identity_hash": work.get("processing_identity_hash"),
-            "shared_source_file_id": f"shared-asset:{asset.get('asset_id')}",
-            "binding_matches": binding_matches,
-            "stages_complete": stages_complete,
-            "upstream_stage_statuses": upstream_stage_statuses,
-            "upstream_stages_successful": upstream_stages_successful,
-            "evidence_free_stage": evidence_free_stage,
-            "publish_status": publish_status,
-            "checkpoint_hash": checkpoint_hash,
-            "result_identity": result_identity,
-        }
-
-    def _process_broker_risk_control_annual_report_asset(
-        self,
-        asset: Mapping[str, Any],
-        request: Any,
-    ):
-        from research.announcement_assets import ConsumerProcessingOutcome
-        from research.announcement_assets.models import stable_id
-
-        if self.research_storage is None:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code="research_storage_unavailable",
-            )
-        modules = self.research_config.modules
-        financial_cfg = modules.get("financial_statements", {}) or {}
-        broker_cfg = modules.get(
-            "broker_risk_control_reports",
-            financial_cfg.get("broker_risk_control_reports", {}),
-        ) or {}
-        dependency = broker_cfg.get("annual_report_asset_dependency", {}) or {}
-        mode = str(dependency.get("mode", "legacy")).strip().lower()
-        if mode not in {"dual_read", "shared_only"}:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code="broker_shared_cutover_disabled",
-            )
-        from research.broker_risk_control import (
-            BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-            BrokerRiskControlReportSyncService,
-            validate_broker_shared_asset_processing,
-        )
-        from scripts.dev_validation.backfill_broker_risk_control_reports import (
-            _financial_storage_scope,
-            select_broker_instruments,
-        )
-
-        instrument_id = str(asset.get("instrument_id") or "")
-        exchange = instrument_id.rsplit(".", 1)[-1].upper()
-        exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
-            exchange, exchange
-        )
-        instruments = select_broker_instruments(
-            self.db_ops,
-            exchanges=[exchange],
-            limit=0,
-            instrument_ids=[instrument_id],
-            storage=self.research_storage,
-            require_confirmed_scope=True,
-        )
-        if not instruments:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code="instrument_not_confirmed_listed_broker",
-            )
-        access = self._get_announcement_asset_access(initialize_schema=False)
-        archive_root = (
-            broker_cfg.get("storage", {}).get("archive_root")
-            or "data/filings/financial_statements/broker_risk_control"
-        )
-        service = BrokerRiskControlReportSyncService(
-            storage=self.research_storage,
-            announcement_service=None,
-            payload_fetcher=None,
-            archive_root=archive_root,
-            source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-            shared_asset_access=access,
-            annual_report_asset_mode="shared_only",
-        )
-        event = {
-            "event_type": "added",
-            "asset_id": asset.get("asset_id"),
-            "instrument_id": instrument_id,
-            "fiscal_year": asset.get("fiscal_year"),
-            "source": asset.get("source"),
-            "source_announcement_id": asset.get("source_announcement_id"),
-            "attachment_id": asset.get("attachment_id"),
-            "observation_version": asset.get("observation_version"),
-            "content_hash": asset.get("content_hash"),
-            "trigger_origin": "consumer_request",
-        }
-        with _financial_storage_scope(self.research_storage):
-            result = service.process_shared_asset_event(
-                event,
-                instrument=instruments[0],
-                tier="hot",
-                dry_run=False,
-                bound_asset=asset,
-            )
-        status = str(result.get("status") or "")
-        if status != "success" or int(result.get("parse_failures") or 0) > 0:
-            return ConsumerProcessingOutcome(
-                status="failed" if status == "failed" else "blocked",
-                reason_code="broker_risk_control_processing_failed",
-                diagnostics={"status": status},
-                metadata={"business_result": result},
-            )
-        with _financial_storage_scope(self.research_storage):
-            validation = validate_broker_shared_asset_processing(
-                self.research_storage,
-                asset,
-            )
-        if not validation["ready"]:
-            return ConsumerProcessingOutcome(
-                status="blocked",
-                reason_code=str(
-                    validation.get("reason_code")
-                    or "broker_shared_lineage_validation_failed"
-                ),
-                diagnostics={
-                    "status": status,
-                    "missing_required_facts": validation.get(
-                        "missing_required_facts", []
-                    ),
-                },
-                metadata={
-                    "business_result": result,
-                    "shared_lineage_validation": validation,
-                },
-            )
-        return ConsumerProcessingOutcome(
-            status="completed",
-            result_identity=stable_id(
-                "broker-risk-control-result",
-                asset.get("asset_id"),
-                asset.get("observation_version"),
-                asset.get("content_hash"),
-            ),
-            diagnostics={
-                "missing_required_facts": validation.get(
-                    "missing_required_facts", []
-                ),
-                "business_fact_complete": validation.get(
-                    "business_fact_complete", False
-                ),
-            },
-            metadata={
-                "business_result": result,
-                "shared_lineage_validation": validation,
-            },
         )
 
     def _get_or_create_llm_client(self):
@@ -4311,98 +3857,6 @@ class DataManager:
             principal=principal,
         )
 
-    async def get_shared_annual_report_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str,
-        operator: bool = False,
-    ) -> Optional[Dict[str, Any]]:
-        access = self._get_announcement_asset_access(initialize_schema=False)
-        if not access.repository.schema_initialized():
-            return None
-        coordinator = self._get_announcement_consumer_coordinator(
-            initialize_schema=False
-        )
-        return await asyncio.to_thread(
-            coordinator.refresh,
-            consumer_request_id,
-            principal=principal,
-            operator=operator,
-        )
-
-    async def get_shared_annual_report_consumer_request_identity(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: Optional[str],
-    ) -> Optional[Dict[str, str]]:
-        """Read authorization fields without expiring or advancing a request."""
-        access = self._get_announcement_asset_access(initialize_schema=False)
-        if not access.repository.schema_initialized():
-            return None
-        return await asyncio.to_thread(
-            access.repository.get_consumer_request_identity,
-            consumer_request_id,
-            principal=principal,
-        )
-
-    async def cancel_shared_annual_report_consumer_request(
-        self,
-        consumer_request_id: str,
-        *,
-        principal: str,
-        cooperative_stop_accepted: bool = False,
-        operator: bool = False,
-    ) -> tuple[Dict[str, Any], str]:
-        coordinator = self._get_announcement_consumer_coordinator(
-            initialize_schema=True
-        )
-        return await asyncio.to_thread(
-            coordinator.request_cancellation,
-            consumer_request_id,
-            principal=principal,
-            operator=operator,
-        )
-
-    async def process_shared_business_profile_annual_report(
-        self,
-        request: Any,
-        *,
-        profile_name: str = "default",
-        expected_processing_fingerprint: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        coordinator = self._get_announcement_consumer_coordinator(
-            initialize_schema=True
-        )
-        result = await asyncio.to_thread(
-            coordinator.start,
-            request,
-            consumer="business_profile",
-            profile_name=profile_name,
-            expected_processing_fingerprint=expected_processing_fingerprint,
-        )
-        return {**dict(result.projection), "_http_status": result.http_status}
-
-    async def process_shared_broker_risk_control_annual_report(
-        self,
-        request: Any,
-        *,
-        profile_name: str = "default",
-        expected_processing_fingerprint: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        coordinator = self._get_announcement_consumer_coordinator(
-            initialize_schema=True
-        )
-        result = await asyncio.to_thread(
-            coordinator.start,
-            request,
-            consumer="broker_risk_control",
-            profile_name=profile_name,
-            expected_processing_fingerprint=expected_processing_fingerprint,
-        )
-        return {**dict(result.projection), "_http_status": result.http_status}
-
     async def get_shared_annual_report_readiness(
         self,
         *,
@@ -4454,32 +3908,21 @@ class DataManager:
         *,
         limit: int = 100,
     ) -> Dict[str, Any]:
-        """Explicitly recover durable asset and consumer work after restart."""
+        """Explicitly recover durable asset acquisition work after restart."""
         bounded_limit = max(1, min(int(limit), 1000))
         access = self._get_announcement_asset_access(initialize_schema=False)
         if not access.repository.schema_initialized():
             return {
                 "asset_operation_ids": [],
-                "consumer_request_ids": [],
                 "resumed": 0,
             }
-        coordinator = self._get_announcement_consumer_coordinator(
-            initialize_schema=False
-        )
-        def resume_pending_work():
-            local_asset_ids = access.service.resume_pending_ensure_operations(
-                limit=bounded_limit,
-            )
-            local_consumer_ids = coordinator.resume_pending(limit=bounded_limit)
-            return local_asset_ids, local_consumer_ids
-
-        asset_operation_ids, consumer_request_ids = await asyncio.to_thread(
-            resume_pending_work
+        asset_operation_ids = await asyncio.to_thread(
+            access.service.resume_pending_ensure_operations,
+            limit=bounded_limit,
         )
         return {
             "asset_operation_ids": list(asset_operation_ids),
-            "consumer_request_ids": list(consumer_request_ids),
-            "resumed": len(asset_operation_ids) + len(consumer_request_ids),
+            "resumed": len(asset_operation_ids),
         }
 
     async def get_annual_report_asset(
@@ -4559,45 +4002,12 @@ class DataManager:
             if not access.repository.schema_initialized():
                 return payload
             knowledge_cutoff = f"{cutoff}T23:59:59+08:00"
-            def load_shared_lineage():
-                local_asset = access.get_effective_asset(
-                    normalized_id,
-                    knowledge_cutoff=knowledge_cutoff,
-                )
-                if local_asset is None or not local_asset.get("asset_id"):
-                    return local_asset, []
-                local_rows = access.repository.list_consumer_processing(
-                    asset_id=str(local_asset["asset_id"]),
-                    consumer="business_profile",
-                )
-                return local_asset, local_rows
-
-            asset, processing_rows = await asyncio.to_thread(load_shared_lineage)
+            asset = await asyncio.to_thread(
+                access.get_effective_asset,
+                normalized_id,
+                knowledge_cutoff=knowledge_cutoff,
+            )
             payload["source_assets"] = {"annual_report_asset": asset}
-            if asset is None or not asset.get("asset_id"):
-                return payload
-            if not processing_rows:
-                return payload
-            processing = processing_rows[-1]
-            processing_status = str(processing.get("status") or "not_started")
-            if processing_status == "current":
-                result_state = "current"
-            elif processing_status == "stale":
-                result_state = "stale"
-            elif processing_status == "failed" and processing.get(
-                "derived_identity"
-            ):
-                result_state = "stale"
-            else:
-                result_state = "reprocessing"
-            payload["consumer_processing_status"] = {
-                "consumer": "business_profile",
-                "processing_status": processing_status,
-                "consumer_result_state": result_state,
-                "parser_version": processing.get("parser_version"),
-                "reason_code": processing.get("error_code"),
-                "updated_at": processing.get("updated_at"),
-            }
         except (OSError, RuntimeError, ValueError) as exc:
             dm_logger.warning(
                 "[DataManager] shared annual-report lineage unavailable for %s: %s",
@@ -13187,11 +12597,6 @@ class DataManager:
 
     async def close(self) -> None:
         """安全关闭所有数据源连接，防止协程退出时 ResourceWarning"""
-        coordinator = self._announcement_consumer_coordinator
-        if coordinator is not None:
-            coordinator.close()
-            self._announcement_consumer_coordinator = None
-            self._announcement_consumer_coordinator_signature = None
         if self._llm_client is not None:
             try:
                 await self._llm_client.close()

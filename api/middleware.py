@@ -47,11 +47,7 @@ class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
             return False
         if "/annual-report-asset-requests/" in path:
             return True
-        if "/annual-report-consumer-requests/" in path:
-            return True
         if method.upper() == "POST" and path.endswith("/annual-reports/ensure"):
-            return True
-        if method.upper() == "POST" and path.endswith("/annual-report-process"):
             return True
         return "/annual-report-assets/" in path and path.endswith("/content")
 

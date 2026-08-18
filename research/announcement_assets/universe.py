@@ -81,6 +81,8 @@ class UniverseRepository(Protocol):
 
     def list_asset_coverage(self, universe_snapshot_id: str) -> list[Mapping[str, Any]]: ...
 
+    def get_latest_complete_universe_snapshot(self) -> Mapping[str, Any] | None: ...
+
     def upsert_asset_coverage(
         self,
         *,
@@ -362,13 +364,33 @@ class OfficialListedSecurityCensusBuilder:
             source_version,
             *(completeness_watermarks.get(exchange, "") for exchange in self.exchanges),
         )
+        membership_hash = hashlib.sha256(
+            canonical_json(
+                {
+                    "items": [
+                        {
+                            key: row.get(key)
+                            for key in (
+                                "instrument_id",
+                                "exchange",
+                                "type",
+                                "currency",
+                                "is_active",
+                            )
+                        }
+                        for row in sorted(
+                            normalized,
+                            key=lambda item: str(item["instrument_id"]),
+                        )
+                    ]
+                }
+            ).encode("utf-8")
+        ).hexdigest()
         census_id = stable_id(
             "listed-security-census",
             self.policy_version,
             source_version,
-            snapshot_at,
-            combined_raw_hash,
-            watermark,
+            membership_hash,
         )
         return ListedSecurityCensusSnapshot(
             census_snapshot_id=census_id,
@@ -762,15 +784,33 @@ class EligibilityPolicy:
         }
         if not complete and previous is not None and previous.is_complete:
             metadata["last_complete_snapshot_fallback"] = True
-        snapshot_id = stable_id(
-            "universe",
-            self.policy_version,
-            master_data_version or "unknown",
-            canonical_json(refresh_evidence or {}),
-            observed_at,
-            *(sorted(canonical_json(row) for row in eligible)),
-            *(sorted(canonical_json(row) for row in indeterminate)),
-        )
+        membership_hash = hashlib.sha256(
+            canonical_json(
+                {
+                    "eligible": [
+                        {
+                            key: row.get(key)
+                            for key in (
+                                "instrument_id",
+                                "exchange",
+                                "type",
+                                "currency",
+                                "is_active",
+                            )
+                        }
+                        for row in eligible
+                    ],
+                    "indeterminate": [
+                        {
+                            "instrument_id": row.get("instrument_id"),
+                            "reason": row.get("reason"),
+                        }
+                        for row in indeterminate
+                    ],
+                }
+            ).encode("utf-8")
+        ).hexdigest()
+        snapshot_id = stable_id("universe", self.policy_version, membership_hash)
         return UniverseSnapshot(
             snapshot_id=snapshot_id,
             policy_version=self.policy_version,
@@ -820,6 +860,18 @@ def persist_universe_snapshot_with_coverage(
         if snapshot.paired_census_snapshot_id != census.census_snapshot_id:
             raise ValueError("universe and census snapshot identities do not match")
         repository.upsert_listed_security_census_snapshot(census.to_mapping())
+    previous_snapshot = repository.get_latest_complete_universe_snapshot()
+    previous_coverage: dict[str, Mapping[str, Any]] = {}
+    if (
+        previous_snapshot is not None
+        and str(previous_snapshot["snapshot_id"]) != snapshot.snapshot_id
+    ):
+        previous_coverage = {
+            str(row["instrument_id"]): row
+            for row in repository.list_asset_coverage(
+                str(previous_snapshot["snapshot_id"])
+            )
+        }
     persisted = repository.upsert_universe_snapshot(snapshot.to_mapping())
     if not snapshot.is_complete:
         return persisted
@@ -831,6 +883,27 @@ def persist_universe_snapshot_with_coverage(
     for instrument in snapshot.instruments:
         instrument_id = str(instrument["instrument_id"])
         if instrument_id in existing:
+            continue
+        prior = previous_coverage.get(instrument_id)
+        if prior is not None:
+            repository.upsert_asset_coverage(
+                universe_snapshot_id=snapshot.snapshot_id,
+                instrument_id=instrument_id,
+                fiscal_year=prior.get("fiscal_year"),
+                status=str(prior["status"]),
+                as_of=str(prior["as_of"]),
+                expected_fiscal_year=prior.get("expected_fiscal_year"),
+                earliest_search_year=prior.get("earliest_search_year"),
+                evidence_expires_at=prior.get("evidence_expires_at"),
+                last_reconciled_at=prior.get("last_reconciled_at"),
+                retry_at=prior.get("retry_at"),
+                evidence={
+                    **dict(prior.get("evidence") or {}),
+                    "coverage_carried_from_snapshot_id": str(
+                        previous_snapshot["snapshot_id"]
+                    ),
+                },
+            )
             continue
         repository.upsert_asset_coverage(
             universe_snapshot_id=snapshot.snapshot_id,

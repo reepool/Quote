@@ -27,3 +27,9 @@
   backup/test artifacts from this change.
 - [x] 4.2 Run focused tests for local reuse, on-demand acquisition, correction
   selection, latest-only bootstrap, and daily discovery persistence.
+- [x] 4.3 Remove legacy migration, consumer parser orchestration, backup/capacity
+  code, obsolete documentation, and their dedicated tests.
+- [x] 4.4 Reuse unchanged universe/census snapshots and coverage instead of
+  writing full-market JSON and rows on every daily run.
+- [x] 4.5 Clean generated backup/test data and redundant live snapshot rows, then
+  complete one real bounded daily update without a failed or blocked operation.

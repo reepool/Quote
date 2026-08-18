@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime, timedelta, timezone
@@ -585,8 +584,6 @@ def _normalize_scope(scope: Mapping[str, Any]) -> Mapping[str, Any]:
         "cadence_fingerprint",
         "manual_only",
         "cron",
-        "content_hashes",
-        "deletion_ids",
     }
     unknown = set(scope) - allowed
     if unknown:
@@ -602,27 +599,6 @@ def _normalize_scope(scope: Mapping[str, Any]) -> Mapping[str, Any]:
                     for item in value
                 }
             )
-        elif name == "content_hashes":
-            if isinstance(value, (str, bytes)):
-                raise ValueError("content_hashes must be an array")
-            hashes = tuple(sorted({str(item).strip() for item in value}))
-            if any(not re.fullmatch(r"[0-9a-f]{64}", item) for item in hashes):
-                raise ValueError("content_hashes must contain canonical SHA-256 values")
-            normalized[name] = hashes
-        elif name == "deletion_ids":
-            if isinstance(value, (str, bytes)):
-                raise ValueError("deletion_ids must be an array")
-            identities = tuple(sorted({str(item).strip() for item in value}))
-            if any(
-                not item
-                or item in {".", ".."}
-                or "/" in item
-                or "\\" in item
-                or any(ord(character) < 32 for character in item)
-                for item in identities
-            ):
-                raise ValueError("deletion_ids contain an invalid identity")
-            normalized[name] = identities
         elif name in {
             "overlap_days",
             "catch_up_max_days",

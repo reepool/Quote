@@ -79,9 +79,6 @@ class DailyUpdateResult:
     missing_repairs_attempted: int = 0
     publication_reconciliations: int = 0
     period_reconciliations: int = 0
-    silent_update_verifications: int = 0
-    silent_update_changes: int = 0
-    silent_update_limitations: int = 0
     universe_snapshot_id: str | None = None
 
 
@@ -170,18 +167,9 @@ class AnnualReportDailyUpdater:
         lease_generation: int | None = None,
         repair: RepairCallable | None = None,
         universe_refresh: UniverseRefreshCallable | None = None,
-        consumer_dispatchers: Mapping[
-            str, Callable[[tuple[str, ...], str], Any]
-        ] | None = None,
     ) -> DailyUpdateResult:
         self._route_observations: list[Mapping[str, Any]] = []
         run_started = time.monotonic()
-        discovery_budget = _DiscoveryBudget(
-            max_windows=self.config.discovery.max_windows,
-            max_requests=self.config.discovery.max_requests,
-            max_elapsed_seconds=self.config.discovery.max_elapsed_seconds,
-            started_at=run_started,
-        )
         stage_started = run_started
         stage_timings: dict[str, float] = {}
         stage_log: list[Mapping[str, Any]] = []
@@ -217,6 +205,12 @@ class AnnualReportDailyUpdater:
             stage_timings=stage_timings,
             stage_log=stage_log,
             details={"snapshot_id": snapshot_id},
+        )
+        discovery_budget = _DiscoveryBudget(
+            max_windows=self.config.discovery.max_windows,
+            max_requests=self.config.discovery.max_requests,
+            max_elapsed_seconds=self.config.discovery.max_elapsed_seconds,
+            started_at=time.monotonic(),
         )
         managed_ids = {
             report.instrument_id
@@ -486,21 +480,9 @@ class AnnualReportDailyUpdater:
         errors.extend(withdrawal_result[2])
         blocking_reasons.extend(withdrawal_result[3])
 
-        # Withdrawal evidence must settle first so the silent-byte cohort never
-        # refreshes an attachment that this batch has just made non-effective.
-        silent_result = (
-            (0, 0, 0, [], 0)
-            if stop_requested
-            else self._run_silent_byte_verification(
-                cutoff=cutoff,
-                operation_id=operation_id,
-                excluded_attachment_ids=seen_attachment_ids,
-            )
-        )
-        errors.extend(silent_result[3])
         stage_started = self._complete_stage(
             operation_id=operation_id,
-            stage_name="withdrawal_and_silent_verification",
+            stage_name="withdrawal_reconciliation",
             operation_stage=OperationStage.VALIDATING,
             started_at=stage_started,
             stage_timings=stage_timings,
@@ -508,8 +490,6 @@ class AnnualReportDailyUpdater:
             details={
                 "withdrawal_scopes_reconciled": withdrawal_result[0],
                 "withdrawal_failures": withdrawal_result[1],
-                "silent_verifications": silent_result[0],
-                "silent_changes": silent_result[1],
             },
         )
 
@@ -559,54 +539,6 @@ class AnnualReportDailyUpdater:
             after_event_id=event_start, limit=1000
         )
         affected_asset_ids = tuple(self._completed_affected_asset_ids(affected_events))
-        consumer_results: dict[str, Mapping[str, Any]] = {}
-        dependency_policy = self.config.rollout.consumer_dependency_policy
-        for consumer, dispatcher in (consumer_dispatchers or {}).items():
-            if reason := stop_reason():
-                stop_requested = True
-                if reason not in errors:
-                    errors.append(reason)
-                break
-            consumer_name = str(consumer).strip()
-            if not consumer_name:
-                continue
-            if dependency_policy == "disabled":
-                consumer_results[consumer_name] = {"status": "skipped", "reason": "policy_disabled"}
-                continue
-            if dependency_policy == "wait_for_full_success" and outcome != "success":
-                consumer_results[consumer_name] = {
-                    "status": "skipped",
-                    "reason": "daily_outcome_not_full_success",
-                }
-                continue
-            if not affected_asset_ids:
-                consumer_results[consumer_name] = {
-                    "status": "skipped",
-                    "reason": "no_completed_final_assets",
-                }
-                continue
-            try:
-                dispatcher(affected_asset_ids, cutoff)
-            except Exception as exc:  # consumer failure must not regress asset state
-                LOGGER.exception("annual-report consumer dispatch failed: %s", consumer_name)
-                consumer_results[consumer_name] = {
-                    "status": "failed",
-                    "reason": f"consumer_dispatch:{type(exc).__name__}",
-                }
-            else:
-                consumer_results[consumer_name] = {
-                    "status": "dispatched",
-                    "asset_ids": list(affected_asset_ids),
-                }
-        self._complete_stage(
-            operation_id=operation_id,
-            stage_name="consumer_dispatch",
-            operation_stage=OperationStage.ACTIVATING,
-            started_at=stage_started,
-            stage_timings=stage_timings,
-            stage_log=stage_log,
-            details={"consumers": consumer_results},
-        )
         stage_timings["total"] = round(time.monotonic() - run_started, 6)
         affected_periods = classification_metrics["affected_periods"]
         ambiguous_count = sum(
@@ -667,34 +599,21 @@ class AnnualReportDailyUpdater:
             "fallback_substitution": "none",
             "affected_event_count": len(affected_events),
             "affected_asset_ids": list(affected_asset_ids),
-            "consumer_dependency_policy": dependency_policy,
-            "consumer_dependency_policy_version": (
-                "consumer_dependency_policy.v1"
-            ),
             "pending_correction_policy_version": (
                 self.config.provisional_result.policy_version
             ),
-            "consumer_results": consumer_results,
-            "silent_update_verifications": silent_result[0],
-            "silent_update_changes": silent_result[1],
-            "silent_update_unchanged": silent_result[2],
-            "silent_update_limitations": silent_result[4],
             "withdrawal_relations": withdrawal_relations,
             "withdrawal_scopes_reconciled": withdrawal_result[0],
             "withdrawal_failures": len(withdrawal_scope_errors)
             + withdrawal_result[1],
             "excluded_count": int(classification_metrics["excluded_count"]),
             "ambiguous_count": ambiguous_count,
-            "adoption_count": 0,
-            "adoption_failure_count": 0,
-            "adoption_stage": "not_applicable",
             "effective_additions": effective_additions,
             "effective_dereferences": effective_dereferences,
             "repair_cohorts": {
                 "missing": missing_repairs[0],
                 "long_publication": publication_reconciliations,
                 "managed_period": period_result[0],
-                "silent_verification": silent_result[0],
             },
             "stage_timings_seconds": stage_timings,
             "stage_log": stage_log,
@@ -738,9 +657,6 @@ class AnnualReportDailyUpdater:
             missing_repairs_attempted=missing_repairs[0],
             publication_reconciliations=publication_reconciliations,
             period_reconciliations=period_result[0],
-            silent_update_verifications=silent_result[0],
-            silent_update_changes=silent_result[1],
-            silent_update_limitations=silent_result[4],
             universe_snapshot_id=snapshot_id,
         )
         self._persist_daily_result(operation_id, result)
@@ -1724,7 +1640,14 @@ class AnnualReportDailyUpdater:
                         else latest_version.error_code or "attachment_not_valid"
                     )
                 if asset is None:
-                    raise RuntimeError("no_effective_asset")
+                    self.repository.finish_attachment_retry(
+                        attachment_id, success=True
+                    )
+                    if had_valid:
+                        reused += 1
+                    else:
+                        downloaded += 1
+                    continue
                 retry_metadata = retry.get("metadata") or {}
                 predecessor_pending_correction = (
                     retry_metadata.get("variant")
@@ -1737,9 +1660,14 @@ class AnnualReportDailyUpdater:
                     asset.decision_state is not EffectiveDecisionState.CURRENT
                     and not predecessor_pending_correction
                 ):
-                    raise RuntimeError(
-                        f"effective_decision_not_current:{asset.decision_state.value}"
+                    self.repository.finish_attachment_retry(
+                        attachment_id, success=True
                     )
+                    if had_valid:
+                        reused += 1
+                    else:
+                        downloaded += 1
+                    continue
                 if asset.availability.value != "local_valid":
                     raise RuntimeError(
                         f"effective_asset_not_local_valid:{asset.availability.value}"
@@ -1918,7 +1846,6 @@ class AnnualReportDailyUpdater:
                 "universe_indeterminate_count": len(candidate.indeterminate),
                 "new_listings": len(effective_ids - previous_ids),
                 "delistings": len(previous_ids - effective_ids),
-                "delisting_asset_deletions": 0,
             },
         )
 
@@ -2197,236 +2124,6 @@ class AnnualReportDailyUpdater:
         seen_attachment_ids.update(attachment_ids)
         return len(due), count, len(records), errors
 
-    def _run_silent_byte_verification(
-        self,
-        *,
-        cutoff: str,
-        operation_id: str | None,
-        excluded_attachment_ids: set[str] | None = None,
-    ) -> tuple[int, int, int, list[str], int]:
-        reports = self._all_effective_reports()
-        if not reports:
-            return 0, 0, 0, [], 0
-        if self.service.attachment_retriever is None:
-            return (
-                0,
-                0,
-                0,
-                ["silent_byte_verification:attachment_retriever_unavailable"],
-                len(reports),
-            )
-        cutoff_time = _parse_time(cutoff)
-        excluded = {
-            str(item).strip()
-            for item in (excluded_attachment_ids or set())
-            if str(item).strip()
-        }
-        candidates: list[tuple[str, int, str, Any, Mapping[str, Any]]] = []
-        for report in reports:
-            if (
-                str(report.attachment_id) in excluded
-                or str(report.source_announcement_id) in excluded
-            ):
-                continue
-            state = self.repository.get_period_reconciliation(
-                report.instrument_id,
-                report.fiscal_year,
-            )
-            if state is None:
-                # Assets first activated in this run have not entered the
-                # persisted managed-period queue yet. Verify them on a later
-                # cadence instead of downloading the same bytes twice now.
-                continue
-            checkpoint = dict(state.get("checkpoint") or {})
-            retry_at = checkpoint.get("silent_next_retry_at")
-            if retry_at and _parse_time(str(retry_at)) > cutoff_time:
-                continue
-            candidates.append(
-                (
-                    str(checkpoint.get("silent_verified_at") or ""),
-                    report.fiscal_year,
-                    report.instrument_id,
-                    report,
-                    state,
-                )
-            )
-        selected = sorted(candidates, key=lambda item: item[:3])[
-            : self.config.discovery.reconciliation_cohort_size
-        ]
-        changed = unchanged = limitations = 0
-        errors: list[str] = []
-        for _, _, _, report, state in selected:
-            if operation_stop_reason(operation_id) or (
-                operation_id
-                and self.repository.operation_stop_requested(operation_id)
-            ):
-                break
-            checkpoint = dict(state.get("checkpoint") or {})
-            before_hash = report.content_hash
-            try:
-                signal_result = self._probe_silent_version_signal(
-                    report=report,
-                    checkpoint=checkpoint,
-                )
-                if signal_result[0] == "unchanged":
-                    unchanged += 1
-                    checkpoint.update(
-                        {
-                            "silent_verified_at": cutoff,
-                            "silent_next_retry_at": (
-                                cutoff_time
-                                + timedelta(
-                                    days=self.config.discovery.reconciliation_max_cycle_days
-                                )
-                            ).isoformat(),
-                            "silent_status": "unchanged",
-                            "silent_strategy": signal_result[1],
-                            "silent_version_signal": signal_result[2],
-                        }
-                    )
-                    self.repository.upsert_period_reconciliation(
-                        instrument_id=report.instrument_id,
-                        fiscal_year=report.fiscal_year,
-                        status=str(state.get("status") or "queued"),
-                        next_retry_at=state.get("next_retry_at"),
-                        last_reconciled_at=state.get("last_reconciled_at"),
-                        checkpoint=checkpoint,
-                        error_code=state.get("last_error_code"),
-                    )
-                    continue
-                refreshed = self.service.acquire_attachment(
-                    report.attachment_id,
-                    force_refresh=True,
-                    wait_seconds=0,
-                    lease_owner=stable_id(
-                        "silent-byte-verifier",
-                        operation_id or "adhoc",
-                        report.asset_id,
-                        cutoff,
-                    ),
-                    knowledge_cutoff=cutoff,
-                    operation_id=operation_id,
-                    scheduled_write=True,
-                )
-                if refreshed is None or not refreshed.content_hash:
-                    raise RuntimeError("silent verification produced no valid asset")
-                if refreshed.content_hash == before_hash:
-                    unchanged += 1
-                else:
-                    changed += 1
-                checkpoint.update(
-                    {
-                        "silent_verified_at": cutoff,
-                        "silent_next_retry_at": (
-                            cutoff_time
-                            + timedelta(
-                                days=self.config.discovery.reconciliation_max_cycle_days
-                            )
-                        ).isoformat(),
-                        "silent_content_hash": refreshed.content_hash,
-                        "silent_status": (
-                            "changed"
-                            if refreshed.content_hash != before_hash
-                            else "unchanged"
-                        ),
-                        "silent_strategy": signal_result[1],
-                        "silent_version_signal": signal_result[2],
-                    }
-                )
-                error_code = state.get("last_error_code")
-            except (KeyError, OSError, RuntimeError, TypeError, ValueError) as exc:
-                limitations += 1
-                error_code = type(exc).__name__
-                checkpoint.update(
-                    {
-                        "silent_status": "retryable",
-                        "silent_next_retry_at": (
-                            cutoff_time
-                            + timedelta(
-                                seconds=self.config.retry.initial_backoff_seconds
-                            )
-                        ).isoformat(),
-                        "silent_error_code": error_code,
-                    }
-                )
-                errors.append(
-                    "silent_byte_verification:"
-                    f"{report.instrument_id}/{report.fiscal_year}:"
-                    f"{error_code}:{exc}"
-                )
-            self.repository.upsert_period_reconciliation(
-                instrument_id=report.instrument_id,
-                fiscal_year=report.fiscal_year,
-                status=str(state.get("status") or "queued"),
-                next_retry_at=state.get("next_retry_at"),
-                last_reconciled_at=state.get("last_reconciled_at"),
-                checkpoint=checkpoint,
-                error_code=error_code,
-            )
-        return len(selected), changed, unchanged, errors, limitations
-
-    def _probe_silent_version_signal(
-        self,
-        *,
-        report: Any,
-        checkpoint: Mapping[str, Any],
-    ) -> tuple[str, str, str | None]:
-        """Use a provider-declared signal when the retriever can prove it.
-
-        Any missing, malformed, or unsupported signal falls back to the same
-        bounded hash refresh used for providers without managed versioning.
-        """
-        provider = (
-            None
-            if self.acquisition_service is None
-            else self.acquisition_service.registry.get(report.source)
-        )
-        signal_name = (
-            None
-            if provider is None
-            else provider.capabilities.attachment_version_signal
-        )
-        retriever = self.service.attachment_retriever
-        probe = None if retriever is None else getattr(
-            retriever, "probe_version_signal", None
-        )
-        if signal_name is None or not callable(probe):
-            return "fallback", "bounded_hash_refresh", None
-        attachment = self.repository.get_attachment(report.attachment_id)
-        if attachment is None:
-            return "fallback", "bounded_hash_refresh", None
-        previous = str(checkpoint.get("silent_version_signal") or "").strip()
-        try:
-            evidence = probe(
-                report.source,
-                attachment,
-                signal_name=signal_name,
-                previous_signal=previous or None,
-            )
-        except (KeyError, OSError, RuntimeError, TypeError, ValueError):
-            return "fallback", "bounded_hash_refresh", previous or None
-        if not isinstance(evidence, Mapping):
-            return "fallback", "bounded_hash_refresh", previous or None
-        current = str(evidence.get("value") or "").strip()
-        status = str(evidence.get("status") or "").strip().lower()
-        strategy = f"provider_signal:{signal_name}"
-        if previous and current and current == previous and status == "unchanged":
-            return "unchanged", strategy, current
-        return "changed", strategy, current or previous or None
-
-    def _all_effective_reports(self) -> list[Any]:
-        reports: list[Any] = []
-        offset = 0
-        while True:
-            page = self.repository.list_effective_reports(
-                limit=1000,
-                offset=offset,
-            )
-            reports.extend(page)
-            if len(page) < 1000:
-                return reports
-            offset += len(page)
-
     def _repair_instrument(
         self,
         repair: RepairCallable,
@@ -2511,27 +2208,6 @@ class AnnualReportDailyUpdater:
                         "query_scope": "market",
                         "eligible": not reasons,
                         "reasons": tuple(reasons),
-                        "attachment_version_signal": (
-                            None
-                            if provider is None
-                            else provider.capabilities.attachment_version_signal
-                        ),
-                        "silent_update_strategy": (
-                            "unsupported"
-                            if self.service.attachment_retriever is None
-                            else (
-                                "provider_signal:"
-                                + str(provider.capabilities.attachment_version_signal)
-                                if provider is not None
-                                and provider.capabilities.attachment_version_signal
-                                else "bounded_hash_refresh"
-                            )
-                        ),
-                        "silent_update_readiness_limitation": (
-                            "attachment_retriever_unavailable"
-                            if self.service.attachment_retriever is None
-                            else None
-                        ),
                     }
                 )
         return tuple(matrix)

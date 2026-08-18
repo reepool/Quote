@@ -48,7 +48,6 @@ _STORAGE_BLOCK_PATTERNS = (
     "hard utilization",
     "reservation cannot be expanded",
     "storage reservation is blocked",
-    "backup reserve",
 )
 
 _OPERATOR_PATTERNS = (
@@ -94,7 +93,6 @@ _TRANSIENT_PATTERNS = (
     "connection error",
     "connection reset",
     "archive_mount_unavailable",
-    "backup_mount_unavailable",
     "nas unavailable",
 )
 

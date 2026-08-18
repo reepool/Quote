@@ -75,14 +75,9 @@ OperationStageValue = Literal[
     "not_applicable",
     "discovering",
     "reconciling",
-    "adopting",
     "downloading",
     "validating",
     "activating",
-    "deleting",
-    "backing_up",
-    "restoring",
-    "auditing",
 ]
 BatchOutcomeValue = Literal["success", "partial", "blocked", "failed"]
 ResultOriginValue = Literal["adopted", "downloaded", "repaired"]
@@ -133,14 +128,6 @@ class AnnualReportEnsureRequestModel(_StrictContract):
         if has_pin and not filing:
             raise ValueError("attachment observation pins require exact-filing identity")
         return self
-
-
-class BusinessAnnualReportProcessRequest(AnnualReportEnsureRequestModel):
-    """Versioned selector and processing-profile contract for business commands."""
-
-    consumer: None = None
-    processing_profile: str = "default"
-    expected_processing_fingerprint: str | None = None
 
 
 class AnnualReportAssetResponse(_StrictContract):
@@ -229,61 +216,6 @@ class AnnualReportRequestResponse(_StrictContract):
     expired_at: str | None = None
     tombstone_until: str | None = None
     retention_policy_version: str | None = None
-
-
-class AnnualReportConsumerRequestResponse(_StrictContract):
-    consumer_request_id: str
-    consumer: Literal["business_profile", "broker_risk_control"]
-    processing_fingerprint: str
-    selector: dict[str, Any] = Field(default_factory=dict)
-    asset_request_id: str | None = None
-    asset_request_url: str | None = None
-    consumer_request_status: Literal[
-        "pending_asset",
-        "not_started",
-        "queued",
-        "processing",
-        "completed",
-        "failed",
-        "missing",
-        "blocked",
-        "cancelled",
-        "expired",
-    ]
-    consumer_result_state: Literal[
-        "unavailable", "current", "stale", "reprocessing"
-    ]
-    asset_id: str | None = None
-    result_identity: str | None = None
-    resolved_source: str | None = None
-    resolved_source_announcement_id: str | None = None
-    resolved_attachment_id: str | None = None
-    resolved_observation_version: str | None = None
-    resolved_content_hash: str | None = None
-    resolved_report_period: str | None = None
-    resolved_variant: Literal["original", "correction"] | None = None
-    resolved_effective_decision_state: EffectiveDecisionStateValue | None = None
-    resolved_canonical_source_filing: dict[str, Any] | None = None
-    resolved_equivalent_source_filings: list[dict[str, Any]] = Field(
-        default_factory=list
-    )
-    resolved_projection_policy_version: str | None = None
-    resolved_evidence_set_hash: str | None = None
-    reason_code: str | None = None
-    retry_metadata: dict[str, Any] = Field(default_factory=dict)
-    diagnostics: dict[str, Any] = Field(default_factory=dict)
-    created_at: str
-    updated_at: str
-    processing_started_at: str | None = None
-    finished_at: str | None = None
-    stop_requested_at: str | None = None
-    cancelled_at: str | None = None
-    expires_at: str | None = None
-    expired_at: str | None = None
-    tombstone_until: str | None = None
-    retention_policy_version: Literal[
-        "consumer_request_retention.v1"
-    ] = "consumer_request_retention.v1"
 
 
 class AnnualReportReadinessResponse(_StrictContract):

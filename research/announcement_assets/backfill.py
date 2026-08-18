@@ -315,7 +315,7 @@ class AnnualReportBootstrap:
                 }
             ),
         )
-        self.repository.create_or_resume_bootstrap_run(
+        bootstrap_run, _ = self.repository.create_or_resume_bootstrap_run(
             operation_id=operation_id,
             universe_snapshot_id=snapshot.snapshot_id,
             scope=bootstrap_scope,
@@ -323,6 +323,7 @@ class AnnualReportBootstrap:
             evidence_visibility_cutoff=cutoff,
             query_fingerprint=query_fingerprint,
         )
+        operation_id = str(bootstrap_run["operation_id"])
         persist_universe_snapshot_with_coverage(
             self.repository,
             snapshot,
@@ -333,7 +334,6 @@ class AnnualReportBootstrap:
             for row in self.repository.list_latest_asset_coverage_for_query(
                 query_fingerprint
             )
-            if str(row["universe_snapshot_id"]) != snapshot.snapshot_id
         }
         target_ids = tuple(str(row["instrument_id"]) for row in snapshot.instruments)
         instrument_rows = {

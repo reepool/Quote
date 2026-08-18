@@ -55,18 +55,7 @@ async def test_business_profile_get_adds_zero_network_shared_asset_lineage():
         return_value=_profile_payload()
     )
     provider_trap = AsyncMock(side_effect=AssertionError("provider must not run"))
-    repository = SimpleNamespace(
-        schema_initialized=lambda: True,
-        list_consumer_processing=lambda **kwargs: [
-            {
-                "status": "current",
-                "parser_version": "business-profile-parser.v1",
-                "derived_identity": "profile-result-v1",
-                "error_code": None,
-                "updated_at": "2026-04-30T10:00:00+00:00",
-            }
-        ],
-    )
+    repository = SimpleNamespace(schema_initialized=lambda: True)
     asset = {
         "asset_id": "asset-current",
         "asset_availability": "local_valid",
@@ -110,14 +99,7 @@ async def test_business_profile_get_adds_zero_network_shared_asset_lineage():
         payload["source_assets"]["annual_report_asset"]["version_available_at"]
         == "2026-04-30T10:00:00+00:00"
     )
-    assert payload["consumer_processing_status"] == {
-        "consumer": "business_profile",
-        "processing_status": "current",
-        "consumer_result_state": "current",
-        "parser_version": "business-profile-parser.v1",
-        "reason_code": None,
-        "updated_at": "2026-04-30T10:00:00+00:00",
-    }
+    assert payload["consumer_processing_status"] is None
     provider_trap.assert_not_awaited()
 
 
@@ -140,25 +122,20 @@ async def test_business_profile_get_keeps_nullable_lineage_before_schema_exists(
 
 
 @pytest.mark.asyncio
-async def test_explicit_restart_recovery_resumes_asset_and_consumer_work():
+async def test_explicit_restart_recovery_resumes_asset_work():
     manager = object.__new__(DataManager)
     asset_resume = lambda **kwargs: ("operation-1", "operation-2")
-    consumer_resume = lambda **kwargs: ("consumer-request-1",)
     access = SimpleNamespace(
         repository=SimpleNamespace(schema_initialized=lambda: True),
         service=SimpleNamespace(resume_pending_ensure_operations=asset_resume),
     )
     manager._get_announcement_asset_access = lambda **kwargs: access
-    manager._get_announcement_consumer_coordinator = lambda **kwargs: SimpleNamespace(
-        resume_pending=consumer_resume
-    )
 
     result = await manager.resume_shared_annual_report_pending_work(limit=25)
 
     assert result == {
         "asset_operation_ids": ["operation-1", "operation-2"],
-        "consumer_request_ids": ["consumer-request-1"],
-        "resumed": 3,
+        "resumed": 2,
     }
 
 
@@ -179,75 +156,11 @@ async def test_explicit_restart_recovery_does_not_initialize_or_dispatch_empty_c
 
     assert result == {
         "asset_operation_ids": [],
-        "consumer_request_ids": [],
         "resumed": 0,
     }
 
 
 @pytest.mark.asyncio
-async def test_request_resources_delegate_owner_and_operator_context_separately(
-    monkeypatch,
-):
-    async def run_inline(function, *args, **kwargs):
-        return function(*args, **kwargs)
-
-    monkeypatch.setattr("data_manager.asyncio.to_thread", run_inline)
-    manager = object.__new__(DataManager)
-    calls: list[tuple] = []
-
-    class _Coordinator:
-        def refresh(self, request_id, *, principal, operator):
-            calls.append(("refresh", request_id, principal, operator))
-            return {
-                "consumer_request_id": request_id,
-                "consumer_request_status": "pending_asset",
-            }
-
-        def request_cancellation(self, request_id, *, principal, operator):
-            calls.append(("cancel", request_id, principal, operator))
-            return (
-                {
-                    "consumer_request_id": request_id,
-                    "consumer_request_status": "cancelled",
-                },
-                "cancelled",
-            )
-
-    repository = SimpleNamespace(schema_initialized=lambda: True)
-    manager._get_announcement_asset_access = lambda **kwargs: SimpleNamespace(
-        repository=repository
-    )
-    manager._get_announcement_consumer_coordinator = lambda **kwargs: _Coordinator()
-
-    owner_projection = await manager.get_shared_annual_report_consumer_request(
-        "consumer-owner",
-        principal="alice",
-        operator=False,
-    )
-    operator_projection = await manager.get_shared_annual_report_consumer_request(
-        "consumer-operator",
-        principal="operations",
-        operator=True,
-    )
-    cancelled, disposition = (
-        await manager.cancel_shared_annual_report_consumer_request(
-            "consumer-owner",
-            principal="alice",
-            operator=False,
-        )
-    )
-
-    assert owner_projection["consumer_request_id"] == "consumer-owner"
-    assert operator_projection["consumer_request_id"] == "consumer-operator"
-    assert cancelled["consumer_request_status"] == "cancelled"
-    assert disposition == "cancelled"
-    assert calls == [
-        ("refresh", "consumer-owner", "alice", False),
-        ("refresh", "consumer-operator", "operations", True),
-        ("cancel", "consumer-owner", "alice", False),
-    ]
-
-
 def _runtime_config(tmp_path: Path) -> AnnouncementAssetConfig:
     return AnnouncementAssetConfig.from_mapping(
         {
@@ -323,16 +236,7 @@ def test_enabled_access_lazily_binds_real_discovery_and_retrieval(
                     "archive_root": "data/filings/announcements",
                     "temp_root": "data/filings/announcements/tmp",
                     "quarantine_root": "data/filings/announcements/quarantine",
-                    "adoption_roots": [
-                        "data/filings/business_profile",
-                        "data/filings/financial_statements/broker_risk_control",
-                    ],
                     "require_mount": False,
-                },
-                "legacy_inventory": {
-                    **_runtime_config(Path.cwd()).normalized_mapping()[
-                        "legacy_inventory"
-                    ],
                 },
             }
         },
@@ -791,68 +695,8 @@ async def test_daily_runtime_entry_persists_schedule_and_executes_with_service_i
     assert call_order == ["preflight", "initialize_schema", "start", "execute"]
 
 
-@pytest.mark.asyncio
-async def test_manual_runtime_uses_authenticated_operator_identity(tmp_path):
-    manager = object.__new__(DataManager)
-    config = _runtime_config(tmp_path)
-    started = SimpleNamespace(
-        run_id="operation-manual",
-        reused=False,
-        config_version="config-v1",
-    )
-    completed = SimpleNamespace(
-        operation_id="operation-manual",
-        operation_type=INTEGRITY_AUDIT_JOB,
-        status=OperationStatus.COMPLETED,
-        stage=OperationStage.DISCOVERING,
-        outcome=BatchOutcome.SUCCESS,
-        attempt=1,
-        progress={},
-        diagnostics={},
-    )
-    commands = SimpleNamespace(
-        config=config,
-        repository=SimpleNamespace(initialize_schema=MagicMock()),
-        preflight_start=MagicMock(),
-        start=MagicMock(return_value=started),
-        execute=MagicMock(return_value=completed),
-    )
-    manager._get_announcement_asset_scheduler_commands = lambda **kwargs: commands
-
-    await manager.run_annual_report_asset_integrity_audit(
-        trigger_kind="manual",
-        principal_id="telegram:4242",
-    )
-
-    principal = commands.start.call_args.kwargs["principal"]
-    assert principal.principal_id == "telegram:4242"
-    assert principal.service_identity is False
-    commands.execute.assert_called_once_with(
-        "operation-manual", principal=principal
-    )
 
 
-@pytest.mark.asyncio
-async def test_manual_runtime_without_operator_identity_fails_before_schema(tmp_path):
-    manager = object.__new__(DataManager)
-    config = _runtime_config(tmp_path)
-    commands = SimpleNamespace(
-        config=config,
-        repository=SimpleNamespace(initialize_schema=MagicMock()),
-        preflight_start=MagicMock(),
-        start=MagicMock(),
-        execute=MagicMock(),
-    )
-    manager._get_announcement_asset_scheduler_commands = lambda **kwargs: commands
-
-    with pytest.raises(RuntimeError, match="manual_operator_identity_unavailable"):
-        await manager.run_annual_report_asset_integrity_audit(
-            trigger_kind="manual"
-        )
-
-    commands.repository.initialize_schema.assert_not_called()
-    commands.start.assert_not_called()
-    commands.execute.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -1022,33 +866,12 @@ async def test_invalid_job_requests_fail_preflight_before_schema_initialization(
         ),
         (
             ValueError,
-            "requires explicit deletion_ids",
-            {
-                "job_name": INTEGRITY_AUDIT_JOB,
-                "trigger_kind": "manual",
-                "principal_id": "operator:test",
-                "scope": {"content_hashes": ["a" * 64]},
-                "action_flags": {"delete": True},
-            },
-        ),
-        (
-            ValueError,
             "max_pages exceeds configured bound",
             {
                 "job_name": LATEST_BACKFILL_JOB,
                 "trigger_kind": "manual",
                 "principal_id": "operator:test",
                 "bounds": {"max_pages": config.discovery.max_pages + 1},
-            },
-        ),
-        (
-            ValueError,
-            "backup job does not support caller bounds",
-            {
-                "job_name": ARCHIVE_BACKUP_JOB,
-                "trigger_kind": "manual",
-                "principal_id": "operator:test",
-                "bounds": {"max_elapsed_seconds": 30},
             },
         ),
     )
@@ -1058,177 +881,3 @@ async def test_invalid_job_requests_fail_preflight_before_schema_initialization(
             await manager._start_and_execute_announcement_asset_job(**kwargs)
 
     repository.initialize_schema.assert_not_called()
-
-
-def test_production_operation_dispatches_all_four_real_service_adapters(
-    tmp_path,
-    monkeypatch,
-):
-    import research.announcement_assets as assets
-    import research.announcement_assets.backup as backup_module
-
-    config = _runtime_config(tmp_path)
-    access = SimpleNamespace(
-        config=config,
-        repository=object(),
-        service=SimpleNamespace(
-            acquisition_service=object(),
-            attachment_retriever=object(),
-        ),
-    )
-    manager = object.__new__(DataManager)
-    manager._get_announcement_asset_access = lambda **kwargs: access
-    snapshot = object()
-    manager._materialize_announcement_asset_universe = MagicMock(
-        return_value=snapshot
-    )
-    manager._refresh_announcement_asset_master_data = MagicMock()
-    manager._refresh_announcement_asset_listed_security_census = MagicMock()
-
-    runtime_service = SimpleNamespace(
-        acquisition_service=SimpleNamespace(
-            acquire=MagicMock(return_value="targeted-result")
-        )
-    )
-    service_factory = MagicMock(return_value=runtime_service)
-    monkeypatch.setattr(assets, "AnnouncementAssetService", service_factory)
-
-    bootstrap = MagicMock()
-    bootstrap.run.return_value = {"status": "success", "kind": "bootstrap"}
-    bootstrap_factory = MagicMock(return_value=bootstrap)
-    monkeypatch.setattr(assets, "AnnualReportBootstrap", bootstrap_factory)
-
-    daily = MagicMock()
-    daily.run.return_value = {"status": "success", "kind": "daily"}
-    daily_factory = MagicMock(return_value=daily)
-    monkeypatch.setattr(assets, "AnnualReportDailyUpdater", daily_factory)
-
-    audit = MagicMock()
-    audit.run.return_value = {"status": "success", "kind": "integrity"}
-    audit_factory = MagicMock(return_value=audit)
-    monkeypatch.setattr(
-        assets,
-        "AnnouncementAssetIntegrityAuditService",
-        audit_factory,
-    )
-
-    backup = MagicMock()
-    backup.run.return_value = {"status": "success", "kind": "backup"}
-    backup_factory = MagicMock(return_value=backup)
-    monkeypatch.setattr(
-        backup_module,
-        "AnnouncementAssetBackupService",
-        backup_factory,
-    )
-
-    def operation(job_name, scope):
-        return SimpleNamespace(
-            operation_id=f"operation-{job_name}",
-            operation_type=job_name,
-            scope=scope,
-            progress={},
-        )
-
-    bootstrap_result = manager._run_announcement_asset_operation(
-        operation(LATEST_BACKFILL_JOB, {"as_of": "2026-08-12"})
-    )
-    daily_result = manager._run_announcement_asset_operation(
-        operation(
-            DAILY_UPDATE_JOB,
-            {"run_cutoff": "2026-08-12T03:15:00+08:00"},
-        )
-    )
-    audit_result = manager._run_announcement_asset_operation(
-        operation(
-            INTEGRITY_AUDIT_JOB,
-            {
-                "read_only": True,
-                "content_hashes": (),
-                "deletion_ids": (),
-                "action_flags": {},
-            },
-        )
-    )
-    backup_result = manager._run_announcement_asset_operation(
-        operation(ARCHIVE_BACKUP_JOB, {})
-    )
-
-    assert bootstrap_result["kind"] == "bootstrap"
-    assert daily_result["kind"] == "daily"
-    assert audit_result["kind"] == "integrity"
-    assert backup_result["kind"] == "backup"
-    bootstrap.run.assert_called_once_with(
-        snapshot=snapshot,
-        as_of=date(2026, 8, 12),
-        repair=bootstrap.run.call_args.kwargs["repair"],
-        operation_id=f"operation-{LATEST_BACKFILL_JOB}",
-        elapsed_seconds_before_run=ANY,
-    )
-    repair = bootstrap.run.call_args.kwargs["repair"]
-    acquisition = runtime_service.acquisition_service
-    assert repair(
-        "600000.SH",
-        "sse",
-        "SSE",
-        "2024-01-01",
-        "2025-04-30",
-        2024,
-    ) == "targeted-result"
-    query = acquisition.acquire.call_args.args[0]
-    assert query.purpose_key == "official_announcement_assets"
-    assert query.source == "sse"
-    assert query.scope.instrument_id == "600000.SH"
-    assert query.scope.symbol == "600000"
-    assert query.scope.start_date == "2024-01-01"
-    assert query.scope.end_date == "2025-04-30"
-    assert query.scope.source_options == {"fiscal_year": 2024}
-    manager._refresh_announcement_asset_master_data.assert_called_once()
-    manager._refresh_announcement_asset_listed_security_census.assert_called_once()
-    daily_kwargs = daily.run.call_args.kwargs
-    assert daily_kwargs["operation_id"] == f"operation-{DAILY_UPDATE_JOB}"
-    assert callable(daily_kwargs["universe_refresh"])
-    audit.run.assert_called_once_with(
-        content_hashes=(),
-        deletion_ids=(),
-        action_flags={},
-        operator_authorized=False,
-        max_targets=config.discovery.max_instruments,
-        persist=False,
-        operation_id=f"operation-{INTEGRITY_AUDIT_JOB}",
-    )
-    backup.run.assert_called_once_with()
-
-
-def test_runtime_read_only_integrity_audit_does_not_persist_report(tmp_path):
-    config = _runtime_config(tmp_path)
-    repository = AnnouncementAssetRepository(tmp_path / "research.db")
-    repository.initialize_schema()
-    manager = object.__new__(DataManager)
-    manager._get_announcement_asset_access = lambda **kwargs: SimpleNamespace(
-        config=config,
-        repository=repository,
-        service=SimpleNamespace(
-            acquisition_service=None,
-            attachment_retriever=None,
-        ),
-    )
-    operation = SimpleNamespace(
-        operation_id="integrity-read-only",
-        operation_type=INTEGRITY_AUDIT_JOB,
-        scope={
-            "read_only": True,
-            "content_hashes": (),
-            "deletion_ids": (),
-            "action_flags": {},
-        },
-        progress={},
-    )
-
-    result = manager._run_announcement_asset_operation(operation)
-
-    assert result.read_only is True
-    assert result.status == "success"
-    assert result.report_id is None
-    assert repository.list_operational_reports(
-        report_kind="integrity_audit"
-    ) == []
