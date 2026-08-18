@@ -31,7 +31,7 @@
 | `system_health_check` | 监控 | 每小时 | 轻量检查，允许与其他任务并行 |
 | `trading_calendar_update` | 交易日历 | 每月 1 日 `01:00` | 月初轻量更新，早于月度修复 |
 | `weekly_data_maintenance` | 周维护 | 周日 `02:00` | 预留 5 小时，避开周日白天修复 |
-| `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
+| `database_backup` | 备份 | 周一 `01:15` | 独立于周末批处理窗口，按近期实际耗时预留至 `06:30` |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
 | `special_commodity_overseas_daily_price_sync` | 海外特殊商品日频价格 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
 | `special_commodity_industrial_indicator_sync` | 大宗商品非价格产业指标聚合 | 周一至周五 `16:30` | 单任务按 scope 独立调度 CBCFI 运价、CCTDA 环渤海港口库存和 NBS 原煤累计产量；三个 scope 均已完成生产与调度幂等验收 |

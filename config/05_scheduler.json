@@ -80,7 +80,7 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-sun",
-          "hour": 3,
+          "hour": 0,
           "minute": 15,
           "second": 0,
           "timezone": "Asia/Shanghai"
@@ -156,8 +156,8 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "sun",
-          "hour": 3,
-          "minute": 30,
+          "hour": 7,
+          "minute": 15,
           "second": 0
         },
         "max_instances": 1,
@@ -948,9 +948,9 @@
         "pre_run_notify": true,
         "trigger": {
           "type": "cron",
-          "day_of_week": "sat",
-          "hour": 3,
-          "minute": 30,
+          "day_of_week": "mon",
+          "hour": 1,
+          "minute": 15,
           "second": 0
         },
         "max_instances": 1,

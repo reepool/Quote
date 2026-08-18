@@ -22,16 +22,41 @@ def test_manual_only_job_without_trigger_has_no_next_run_time():
     assert manager.get_next_run_time("manual_job") is None
 
 
-def test_annual_asset_production_cron_triggers_use_shanghai_timezone():
+def test_annual_asset_production_cron_uses_shanghai_timezone():
     scheduler = json.loads(
         Path("config/05_scheduler.json").read_text(encoding="utf-8")
     )["scheduler_config"]["jobs"]
     manager = JobConfigManager(Mock())
 
-    for job_name in (
-        "annual_report_asset_daily_update",
-        "annual_report_asset_backup",
-    ):
-        trigger = manager._parse_trigger(scheduler[job_name]["trigger"])
-        assert trigger is not None
-        assert str(trigger.timezone) == "Asia/Shanghai"
+    trigger = manager._parse_trigger(
+        scheduler["annual_report_asset_daily_update"]["trigger"]
+    )
+
+    assert trigger is not None
+    assert str(trigger.timezone) == "Asia/Shanghai"
+
+
+def test_high_io_weekly_jobs_use_separate_production_windows():
+    jobs = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )["scheduler_config"]["jobs"]
+
+    annual = jobs["annual_report_asset_daily_update"]["trigger"]
+    tdx_weekly = jobs["a_share_tdx_corporate_action_weekly_full_refresh"]["trigger"]
+    database_backup = jobs["database_backup"]["trigger"]
+
+    assert (annual["day_of_week"], annual["hour"], annual["minute"]) == (
+        "mon-sun",
+        0,
+        15,
+    )
+    assert (
+        tdx_weekly["day_of_week"],
+        tdx_weekly["hour"],
+        tdx_weekly["minute"],
+    ) == ("sun", 7, 15)
+    assert (
+        database_backup["day_of_week"],
+        database_backup["hour"],
+        database_backup["minute"],
+    ) == ("mon", 1, 15)

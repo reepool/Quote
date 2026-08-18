@@ -116,7 +116,7 @@
 
 ## 5. 调度与旧入口清理
 
-- `database_backup` 是唯一生产备份周任务，默认每周六非交易主流程低峰时间执行。
+- `database_backup` 是唯一生产备份周任务，默认每周一 `01:15` 在非交易主流程低峰时间执行。
 - `weekly_data_maintenance` 不再直接调用 `data_manager.backup_data()`，也不再在报告里声明“数据库备份成功”。
 - `data_manager.backup_data()` 如仍需保留，只能作为兼容或手动工具，并应明确不属于生产周备份工作流；更推荐迁移到统一备份服务后删除旧实现。
 - 文档、配置样例、Telegram 任务说明必须同步到新入口和新配置。

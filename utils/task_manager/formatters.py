@@ -333,6 +333,7 @@ class TaskManagerFormatters:
             "利率与债券",
             "行业与指数",
             "股东与披露",
+            "公告管理",
             "财务与估值",
             "研究与风控",
             "数据质量与维护",
@@ -346,8 +347,16 @@ class TaskManagerFormatters:
     @staticmethod
     def _task_domain(job_id: str) -> str:
         job_id = job_id.lower()
-        if job_id == "a_share_cninfo_corporate_action_daily_sync":
+        if job_id in {
+            "a_share_cninfo_corporate_action_daily_sync",
+            "a_share_tdx_corporate_action_weekly_full_refresh",
+        }:
             return "A股行情与主数据"
+        if job_id in {
+            "annual_report_asset_daily_update",
+            "annual_report_asset_latest_backfill",
+        }:
+            return "公告管理"
         if any(key in job_id for key in ("futures", "commodity")):
             return "大宗商品市场"
         if job_id.startswith("fx_") or any(

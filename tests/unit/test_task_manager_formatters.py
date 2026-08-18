@@ -92,6 +92,35 @@ def test_status_summary_places_cninfo_daily_sync_in_a_share_market_group():
     assert "`/run a_share_cninfo_corporate_action_daily_sync`" in text
 
 
+def test_status_summary_groups_announcement_assets_and_tdx_weekly_refresh():
+    tasks = [
+        {
+            "job_id": "annual_report_asset_daily_update",
+            "description": "公告资产年报元数据发现与有效附件日更",
+            "next_run": "明天 00:15",
+            "status": "running",
+        },
+        {
+            "job_id": "a_share_tdx_corporate_action_weekly_full_refresh",
+            "description": "每周 TDX 分红配股送转参考全量刷新",
+            "next_run": "周日 07:15",
+            "status": "running",
+        },
+    ]
+
+    text = TaskManagerFormatters.format_task_status_summary(
+        tasks,
+        [],
+        total_tasks=2,
+    )
+
+    assert "**公告管理**" in text
+    assert "`/run annual_report_asset_daily_update`" in text
+    assert "**A股行情与主数据**" in text
+    assert "`/run a_share_tdx_corporate_action_weekly_full_refresh`" in text
+    assert "**其他**" not in text
+
+
 def test_status_summary_accepts_task_status_enum():
     class _Task:
         job_id = "hkex_instrument_master_sync"

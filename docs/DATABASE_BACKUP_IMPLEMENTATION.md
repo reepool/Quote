@@ -60,7 +60,7 @@
 
 ## 调度
 
-`config/05_scheduler.json` 中的 `database_backup` 是唯一生产周度备份任务，当前默认每周六 `03:30` 执行。
+`config/05_scheduler.json` 中的 `database_backup` 是唯一生产周度备份任务，当前默认每周一 `01:15` 执行，与周末批处理任务错峰。
 
 `weekly_data_maintenance` 不再调用旧备份入口，也不再在维护报告中宣称数据库备份成功；备份状态应以 `database_backup` 的每库通知和汇总报告为准。
 

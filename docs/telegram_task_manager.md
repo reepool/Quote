@@ -313,7 +313,7 @@ restart_system - 重启系统服务
 - **功能**: 检查上月数据缺口并自动修复
 
 ### 6. 数据库备份 (database_backup)
-- **执行时间**: 每周六 03:30
+- **执行时间**: 每周一 01:15
 - **功能**: 通过统一数据库备份工作流备份 `data/*.db` 下的生产 SQLite 数据库
 - **特点**: 配置化数据库清单、默认每库保留 3 个备份、SQLite online backup、每库完成通知、整轮汇总通知、大库 open-only 校验避免 NAS quick_check 长时间阻塞
 
@@ -349,7 +349,7 @@ restart_system - 重启系统服务
 • 特殊商品扩品候选目录 (special_commodity_series_catalog_sync) - 仅手工运行，不自动上线候选
 • 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00
-• 数据库备份任务 (database_backup) - 周六 03:30
+• 数据库备份任务 (database_backup) - 周一 01:15
 
 *可用的任务控制命令：*
 • /run <task_id> - 立即运行任务
