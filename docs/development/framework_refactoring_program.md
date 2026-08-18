@@ -292,16 +292,16 @@ W2 标识/主数据/股票日历
 
 | 工作流 | Change | 状态 | 依赖 |
 |---|---|---|---|
-| W1 | `consolidate-project-documentation` | proposed | 无 |
-| W2 | `unify-instrument-master-and-identity-boundaries` | proposed | W1 |
-| W3 | `unify-quote-maintenance-command-paths` | proposed | W2 |
-| W4 | `extract-research-application-services` | proposed | W2 |
-| W5 | `decompose-research-storage-repositories` | proposed | W4 |
-| W6 | `extract-corporate-action-application-services` | proposed | W2 |
-| W7 | `split-scheduler-domain-task-adapters` | proposed | W3、W4、W6 |
-| W8 | `retire-obsolete-entry-points-and-tools` | proposed | W1-W7 |
+| W1 | `consolidate-project-documentation` | apply-ready（0/16） | 无 |
+| W2 | `unify-instrument-master-and-identity-boundaries` | apply-ready（0/16） | W1 |
+| W3 | `unify-quote-maintenance-command-paths` | apply-ready（0/20） | W2 |
+| W4 | `extract-research-application-services` | apply-ready（0/19） | W2 |
+| W5 | `decompose-research-storage-repositories` | apply-ready（0/19） | W4 |
+| W6 | `extract-corporate-action-application-services` | apply-ready（0/18） | W2 |
+| W7 | `split-scheduler-domain-task-adapters` | apply-ready（0/19） | W3、W4、W6 |
+| W8 | `retire-obsolete-entry-points-and-tools` | apply-ready（0/16） | W1-W7 |
 
-状态只能使用 proposed、in-progress、blocked、complete、archived。每次只把能直接推进下一项未完成验收的 change 置为 in-progress。
+Program 状态使用 planned、apply-ready、active、blocked、complete、archived。OpenSpec CLI 会把“工件已齐全但尚无 task 完成”的 change 显示为 `in-progress`；本计划将 `completedTasks=0` 且尚未进入实施的 change 记为 apply-ready，而不是 active。任一时刻原则上只允许一个直接修改同一核心文件集合的 change 处于 active。
 
 ## 10. 非目标
 
