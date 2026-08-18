@@ -25,6 +25,9 @@ business-specific processing.
 - Only complete Chinese annual-report PDFs are eligible in V1.
 - Summaries, English versions, notices, presentations, audit-only documents,
   and semiannual/quarterly reports are excluded.
+- If an original annual-report title has no explicit fiscal year, infer year N
+  only from a valid Shanghai publication time in N+1. Do not apply this fallback
+  to corrections because they may revise older periods.
 - A valid correction replaces its predecessor for the same fiscal year.
 - Ambiguous candidates remain non-current until later evidence resolves them.
 - Historical rows may remain for audit, but API consumers see one current
@@ -42,6 +45,9 @@ PDF/hash, and return the local asset.
 
 Build the active SSE/SZSE/BSE A-share universe and search newest fiscal years
 first until one effective report is found or the bounded search is exhausted.
+`confirmed_missing` means that the bounded search completed without an eligible
+asset; `expected_period_coverage` separately distinguishes `not_due` new
+listings from a genuinely `overdue_missing` report.
 
 ### Daily Update
 

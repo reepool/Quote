@@ -680,9 +680,8 @@ class AnnualReportBootstrap:
                         ),
                         universe_snapshot_id=snapshot.snapshot_id,
                         as_of=as_of,
-                        listing_date=_parse_listing_date(
-                            instrument_rows[instrument_id].get("listing_date"),
-                            as_of,
+                        listing_date=_instrument_listing_date(
+                            instrument_rows[instrument_id], as_of
                         ),
                         repair=repair,
                         evidence_cutoff=cutoff,
@@ -744,9 +743,7 @@ class AnnualReportBootstrap:
                 for row in snapshot.instruments
                 if row["instrument_id"] == instrument_id
             )
-            listing_date = _parse_listing_date(
-                instrument_row.get("listing_date"), as_of
-            )
+            listing_date = _instrument_listing_date(instrument_row, as_of)
             bounds = derive_fiscal_year_search_bounds(
                 as_of=as_of,
                 listing_date=listing_date,
@@ -2046,6 +2043,23 @@ def _parse_listing_date(value: Any, fallback: date) -> date:
         except ValueError:
             pass
     return date(fallback.year - 30, 1, 1)
+
+
+def _instrument_listing_date(row: Mapping[str, Any], fallback: date) -> date:
+    listing_metadata = row.get("listing_metadata")
+    metadata_date = (
+        listing_metadata.get("listing_date")
+        if isinstance(listing_metadata, Mapping)
+        else None
+    )
+    return _parse_listing_date(
+        row.get("listing_date")
+        or row.get("listed_date")
+        or row.get("listed_at")
+        or row.get("list_date")
+        or metadata_date,
+        fallback,
+    )
 
 
 def _bootstrap_source_priority(

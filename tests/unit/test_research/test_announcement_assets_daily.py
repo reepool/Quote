@@ -16,7 +16,6 @@ from research.announcement_assets import (
     ContentAddressedBlobStore,
     EffectiveDecisionState,
     EligibilityPolicy,
-    EnsureRequest,
     ListedSecurityCensusSnapshot,
     OperationStage,
     daily_discovery_fingerprint,
@@ -1758,6 +1757,8 @@ def test_daily_rotating_missing_cohort_repairs_uncovered_instrument(tmp_path):
     assert repository.get_effective_report("600000.SH", 2025) is not None
     coverage = repository.list_asset_coverage(snapshot.snapshot_id)
     assert coverage[0]["status"] == "available"
+    assert coverage[0]["evidence"]["expected_period_coverage"] == "current"
+    assert coverage[0]["evidence"]["latest_winner_fiscal_year"] == 2025
 
 
 def test_daily_missing_repair_persists_fair_rotation(tmp_path):

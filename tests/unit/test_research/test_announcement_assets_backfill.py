@@ -2288,7 +2288,7 @@ def test_post_period_listing_can_be_confirmed_missing_without_overdue_credit(tmp
                     "type": "stock",
                     "currency": "CNY",
                     "is_active": True,
-                    "listing_date": "2026-01-15",
+                    "listed_date": "2026-01-15",
                 }
             ],
             master_data_version="master-v1",
@@ -2315,6 +2315,7 @@ def test_post_period_listing_can_be_confirmed_missing_without_overdue_credit(tmp
     assert coverage["evidence"]["asset_availability"] == "missing"
     assert coverage["evidence"]["latest_winner_fiscal_year"] is None
     assert coverage["evidence"]["expected_period_coverage"] == "not_due"
+    assert coverage["evidence"]["search_bounds"]["listing_date"] == "2026-01-15"
     assert coverage["evidence"]["terminal_evidence"]["kind"] == "confirmed_missing"
     assert coverage["evidence"]["retry_evidence"] is None
 

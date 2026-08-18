@@ -10,6 +10,7 @@ from research.announcement_assets import (
     AnnouncementAssetConfig,
     AnnouncementAssetRepository,
     AnnouncementAssetService,
+    AnnualReportClassifier,
 )
 from research.announcements import (
     AnnouncementAcquisitionConfig,
@@ -105,6 +106,50 @@ def _query() -> AnnouncementQuery:
             category="annual_report",
         ),
     )
+
+
+def test_classifier_infers_only_original_report_year_from_publication() -> None:
+    classifier = AnnualReportClassifier()
+    attachment = AnnouncementAttachment(
+        source_url="/files/report.pdf",
+        attachment_id="body-pdf",
+        media_type="application/pdf",
+    )
+
+    original = classifier.classify(
+        replace(
+            _record("cninfo"),
+            title="锦江酒店年报",
+            published_at="2026-01-01T00:30:00+08:00",
+        ),
+        attachment,
+    )
+    assert original.fiscal_year == 2025
+    assert original.report_period == "2025-12-31"
+    assert original.is_eligible is True
+    assert "fiscal_year_inferred_from_publication" in original.reasons
+
+    explicit = classifier.classify(
+        replace(
+            _record("cninfo"),
+            title="锦江酒店2023年年度报告",
+            published_at="2026-03-28T00:00:00+08:00",
+        ),
+        attachment,
+    )
+    assert explicit.fiscal_year == 2023
+
+    correction = classifier.classify(
+        replace(
+            _record("cninfo"),
+            title="锦江酒店年报（修订版）",
+            published_at="2026-03-28T00:00:00+08:00",
+        ),
+        attachment,
+    )
+    assert correction.fiscal_year is None
+    assert correction.is_eligible is False
+    assert "fiscal_year_unresolved" in correction.reasons
 
 
 def test_fallback_keeps_ordered_diagnostics_and_source_qualified_identity(tmp_path):

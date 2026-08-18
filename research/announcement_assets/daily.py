@@ -24,6 +24,7 @@ from .models import (
     BatchOutcome,
     CoverageStatus,
     EffectiveDecisionState,
+    ExpectedPeriodCoverage,
     OperationStage,
     OperationStatus,
     stable_id,
@@ -2019,6 +2020,14 @@ class AnnualReportDailyUpdater:
                 evidence={
                     **(row.get("evidence") or {}),
                     "asset_availability": "available",
+                    "expected_period_coverage": (
+                        ExpectedPeriodCoverage.CURRENT.value
+                        if report.fiscal_year == row.get("expected_fiscal_year")
+                        else (row.get("evidence") or {}).get(
+                            "expected_period_coverage"
+                        )
+                    ),
+                    "latest_winner_fiscal_year": report.fiscal_year,
                     "daily_repair_asset_id": report.asset_id,
                 },
             )

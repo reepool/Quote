@@ -29,6 +29,14 @@ newest valid complete correction over the original for the same fiscal year.
 - **THEN** the attachment is retained as metadata but is not an eligible current
   annual-report asset
 
+#### Scenario: Original annual-report title omits its fiscal year
+
+- **WHEN** an original full annual report has no explicit year in its title but
+  has a valid Shanghai publication time in calendar year N+1
+- **THEN** the classifier SHALL assign fiscal year N
+- **AND** the same fallback SHALL NOT be used for a correction with no explicit
+  fiscal year
+
 ### Requirement: Local-First On-Demand Acquisition API
 
 The system SHALL expose an API that checks local metadata and attachment integrity
@@ -58,6 +66,12 @@ found.
 - **WHEN** a prior run stopped after some instruments completed
 - **THEN** the next run reuses completed metadata/files and continues remaining
   instruments without redownloading valid assets
+
+#### Scenario: Instrument master uses the canonical listed-date field
+
+- **WHEN** the active A-share master provides `listed_date`
+- **THEN** bootstrap SHALL use it to distinguish a post-period new listing from
+  an overdue annual-report gap
 
 ### Requirement: Existing Asset Reuse
 

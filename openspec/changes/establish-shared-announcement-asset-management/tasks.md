@@ -33,3 +33,5 @@
   writing full-market JSON and rows on every daily run.
 - [x] 4.5 Clean generated backup/test data and redundant live snapshot rows, then
   complete one real bounded daily update without a failed or blocked operation.
+- [x] 4.6 Correct listed-date handling for new stocks and conservatively infer
+  fiscal years for original annual-report titles that omit the year.

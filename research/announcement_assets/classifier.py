@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import re
-from io import BytesIO
-from pathlib import Path
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from html import unescape
+from io import BytesIO
+from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from research.announcements import AnnouncementAttachment, AnnouncementRecord
 
@@ -89,6 +90,7 @@ _NOTICE_ONLY_MARKERS = (
 )
 _CORRECTION_NOTICE_RE = re.compile(r"关于(?:对)?[^。；;]*更正[^。；;]*公告")
 _HTML_TAG_RE = re.compile(r"<[^>]*>")
+_SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
 
 @dataclass(frozen=True)
@@ -175,16 +177,6 @@ class AnnualReportClassifier:
         lowered = combined.lower()
         reasons: list[str] = []
 
-        fiscal_year = _extract_fiscal_year(combined)
-        if fiscal_year is None:
-            reasons.append("fiscal_year_unresolved")
-        if not _looks_like_pdf(attachment):
-            reasons.append("attachment_not_pdf")
-        for marker in _HARD_EXCLUSIONS:
-            if marker.lower() in lowered:
-                reasons.append(f"excluded:{marker}")
-                break
-
         annual_marker = next(
             (marker for marker in _FULL_ANNUAL_MARKERS if marker in combined), None
         )
@@ -199,6 +191,22 @@ class AnnualReportClassifier:
             if correction_evidence
             else AnnualReportVariant.ORIGINAL
         )
+        fiscal_year = _extract_fiscal_year(combined)
+        fiscal_year_inferred = False
+        if fiscal_year is None and annual_marker and not correction_evidence:
+            fiscal_year = _infer_original_fiscal_year_from_publication(
+                record.published_at
+            )
+            fiscal_year_inferred = fiscal_year is not None
+        if fiscal_year is None:
+            reasons.append("fiscal_year_unresolved")
+        if not _looks_like_pdf(attachment):
+            reasons.append("attachment_not_pdf")
+        for marker in _HARD_EXCLUSIONS:
+            if marker.lower() in lowered:
+                reasons.append(f"excluded:{marker}")
+                break
+
         notice_only = (
             any(marker in combined for marker in _NOTICE_ONLY_MARKERS)
             or bool(_CORRECTION_NOTICE_RE.search(combined))
@@ -208,6 +216,8 @@ class AnnualReportClassifier:
 
         eligible = not reasons and fiscal_year is not None and annual_marker is not None
         if eligible:
+            if fiscal_year_inferred:
+                reasons.append("fiscal_year_inferred_from_publication")
             reasons.append(
                 "eligible_complete_correction"
                 if variant is AnnualReportVariant.CORRECTION
@@ -451,6 +461,16 @@ def _extract_fiscal_year(text: str) -> int | None:
     candidates = [int(match) for match in _FISCAL_YEAR_RE.findall(text)]
     valid = [year for year in candidates if 1990 <= year <= 2200]
     return valid[0] if valid else None
+
+
+def _infer_original_fiscal_year_from_publication(value: str | None) -> int | None:
+    """Infer N from an original annual report published in calendar year N+1."""
+
+    published_at = _normalized_timestamp(value)
+    if published_at is None:
+        return None
+    fiscal_year = published_at.astimezone(_SHANGHAI_TZ).year - 1
+    return fiscal_year if 1990 <= fiscal_year <= 2200 else None
 
 
 def _plain_source_text(value: object) -> str:

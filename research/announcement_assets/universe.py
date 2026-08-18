@@ -1061,7 +1061,12 @@ def _normalize_boolean(value: Any) -> bool | None:
 
 
 def _listing_date(row: Mapping[str, Any]) -> str | None:
-    value = row.get("listing_date") or row.get("listed_at") or row.get("list_date")
+    value = (
+        row.get("listing_date")
+        or row.get("listed_date")
+        or row.get("listed_at")
+        or row.get("list_date")
+    )
     text = str(value or "").strip()
     return text or None
 
