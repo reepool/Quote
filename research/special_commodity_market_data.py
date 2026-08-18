@@ -5454,7 +5454,11 @@ class NbsMonthlyIndustrialOutputProvider:
             self.source_cfg.get("listing_url")
             or "https://www.stats.gov.cn/sj/zxfb/"
         ).rstrip("/") + "/"
-        page_url = base_url if page == 1 else urljoin(base_url, f"index_{page}.html")
+        page_url = (
+            base_url
+            if page == 1
+            else urljoin(base_url, f"index_{page - 1}.html")
+        )
         response = _request_nbs_official_page(
             page_url,
             headers=self.headers,

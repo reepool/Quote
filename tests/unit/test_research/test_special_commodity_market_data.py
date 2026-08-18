@@ -1060,6 +1060,40 @@ def test_nbs_monthly_output_listing_ignores_unrelated_old_links(monkeypatch):
     assert oldest_publication == date(2026, 5, 18)
 
 
+def test_nbs_monthly_output_listing_uses_zero_based_archive_page_names(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["nbs_monthly_raw_coal_output"]
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+    requested_urls = []
+
+    def fake_request(url, **kwargs):
+        requested_urls.append(url)
+        return SimpleNamespace(
+            text="<html></html>",
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data._request_nbs_official_page",
+        fake_request,
+    )
+
+    for page in (1, 2, 3):
+        provider._listing_page(page)
+
+    assert requested_urls == [
+        "https://www.stats.gov.cn/sj/zxfb/",
+        "https://www.stats.gov.cn/sj/zxfb/index_1.html",
+        "https://www.stats.gov.cn/sj/zxfb/index_2.html",
+    ]
+
+
 def test_nbs_monthly_output_listing_rejects_access_challenge(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
