@@ -11,7 +11,6 @@ from research.announcement_assets import (
     AnnouncementAssetService,
     ContentAddressedBlobStore,
 )
-from research.announcement_assets.backup import AnnouncementAssetBackupService
 from research.announcement_assets.models import (
     OfficialAnnouncement,
     OfficialAnnouncementAttachment,
@@ -165,13 +164,6 @@ def test_typed_identifier_segment_rejects_unsafe_values(segment):
             kind="identifier",
             field_name="operation_id",
         )
-
-
-def test_backup_target_rejects_noncanonical_hash_before_filesystem_mutation(tmp_path):
-    with pytest.raises(ValueError, match="lowercase SHA-256"):
-        AnnouncementAssetBackupService._target_path(tmp_path, "A" * 64)
-
-    assert list(tmp_path.iterdir()) == []
 
 
 def test_quarantine_cleanup_keeps_evidence_when_mount_changes_before_unlink(

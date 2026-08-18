@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from unittest.mock import AsyncMock, Mock, mock_open, patch
+from unittest.mock import AsyncMock, Mock, call, mock_open, patch
 
 import pytest
 
@@ -285,7 +285,7 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
 
 
 @pytest.mark.asyncio
-async def test_sync_instrument_master_deactivates_delisting_prefixed_official_absence():
+async def test_sync_instrument_master_deactivates_delisting_named_official_absence():
     manager = _manager()
     before_rows = [
         {
@@ -302,6 +302,17 @@ async def test_sync_instrument_master_deactivates_delisting_prefixed_official_ab
         {
             'instrument_id': '600356.SH',
             'symbol': '600356',
+            'name': '样本退',
+            'exchange': 'SSE',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'sse_official',
+            'updated_at': '2026-07-07 20:00:00',
+        },
+        {
+            'instrument_id': '600357.SH',
+            'symbol': '600357',
             'name': '普通样本',
             'exchange': 'SSE',
             'type': 'stock',
@@ -324,8 +335,9 @@ async def test_sync_instrument_master_deactivates_delisting_prefixed_official_ab
     ]
     after_rows = [
         {**before_rows[0], 'status': 'delisted', 'is_active': 0},
-        before_rows[1],
+        {**before_rows[1], 'status': 'delisted', 'is_active': 0},
         before_rows[2],
+        before_rows[3],
     ]
     manager.db_ops = Mock()
     manager.db_ops.execute_read_query = AsyncMock(side_effect=[before_rows, after_rows])
@@ -353,18 +365,25 @@ async def test_sync_instrument_master_deactivates_delisting_prefixed_official_ab
         freshness_threshold_hours=9999,
     )
 
-    manager.db_ops.mark_instrument_delisted.assert_awaited_once_with(
-        '600355.SH',
-        delisted_date=None,
-        source='sse_official_current_list_absence',
-    )
-    assert result['summary']['deactivated_instruments'] == 1
-    assert result['exchanges']['SSE']['official_absent_delisting']['deactivated_count'] == 1
+    assert manager.db_ops.mark_instrument_delisted.await_args_list == [
+        call(
+            '600355.SH',
+            delisted_date=None,
+            source='sse_official_current_list_absence',
+        ),
+        call(
+            '600356.SH',
+            delisted_date=None,
+            source='sse_official_current_list_absence',
+        ),
+    ]
+    assert result['summary']['deactivated_instruments'] == 2
+    assert result['exchanges']['SSE']['official_absent_delisting']['deactivated_count'] == 2
     assert (
         result['exchanges']['SSE']['official_absent_delisting']['samples'][0]['last_quote_date']
         == '2026-07-03'
     )
-    assert result['exchanges']['SSE']['deactivated_samples'] == ['600355.SH']
+    assert result['exchanges']['SSE']['deactivated_samples'] == ['600355.SH', '600356.SH']
 
 
 @pytest.mark.asyncio

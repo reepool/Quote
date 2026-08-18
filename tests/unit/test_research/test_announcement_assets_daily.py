@@ -16,6 +16,7 @@ from research.announcement_assets import (
     ContentAddressedBlobStore,
     EffectiveDecisionState,
     EligibilityPolicy,
+    EnsureRequest,
     ListedSecurityCensusSnapshot,
     OperationStage,
     daily_discovery_fingerprint,
@@ -1761,6 +1762,52 @@ def test_daily_bootstrap_handoff_uses_compatible_watermark_with_overlap(tmp_path
     )
     assert result.status == "success"
     assert starts[0] == "2026-08-02T03:00:00+00:00"
+
+
+def test_same_day_daily_preserves_later_bootstrap_handoff_watermark(tmp_path):
+    config = _focused_config(tmp_path)
+    repository, service, _ = _service_bundle(tmp_path, config)
+    fingerprint = daily_discovery_fingerprint(
+        config=config, source="cninfo", exchange="SSE", scope_key="market"
+    )
+    handoff_cutoff = "2026-08-10T15:59:59.999999+00:00"
+    repository.upsert_discovery_state(
+        source="cninfo",
+        exchange="SSE",
+        category="annual_report",
+        scope_key="market",
+        config_fingerprint=fingerprint,
+        status="success",
+        is_complete=True,
+        covered_until=handoff_cutoff,
+        run_cutoff=handoff_cutoff,
+        checkpoint={"origin": "bootstrap_handoff"},
+    )
+    starts: list[str] = []
+
+    def discover(source, exchange, start, end, start_page, max_pages):
+        starts.append(start)
+        return ()
+
+    result = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    ).run(
+        run_cutoff="2026-08-10T11:00:00+00:00",
+        discover=discover,
+        active_instrument_ids=("600000.SH",),
+    )
+
+    state = repository.get_discovery_state(
+        source="cninfo",
+        exchange="SSE",
+        category="annual_report",
+        scope_key="market",
+        config_fingerprint=fingerprint,
+    )
+    assert result.status == "success"
+    assert starts[0] == "2026-08-07T15:59:59.999999+00:00"
+    assert state is not None
+    assert state["covered_until"] == handoff_cutoff
 
 
 def test_daily_resumes_pending_partitions_at_original_cutoff_before_new_window(

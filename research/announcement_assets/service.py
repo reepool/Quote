@@ -10,6 +10,7 @@ from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, is_dataclass, replace
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from threading import Lock
 
 from research.announcements import (
@@ -22,14 +23,11 @@ from research.announcements import (
     AnnouncementScope,
 )
 
-from .capacity_artifact import (
-    CapacityArtifactNotReadyError,
-    validate_capacity_artifact,
-)
 from .classifier import (
     AnnualReportCandidate,
     AnnualReportClassification,
     AnnualReportClassifier,
+    refine_classification_from_pdf,
     select_effective_candidate,
 )
 from .config import AnnouncementAssetConfig
@@ -240,6 +238,15 @@ class AnnouncementAssetService:
         for attachment in record.attachments:
             classification = self.classifier.classify(record, attachment)
             metadata = dict(attachment.raw_metadata)
+            mirror_chain_id = _shared_szse_mirror_chain_id(
+                source=record.source,
+                exchange=record.exchange,
+                instrument_id=instrument_id,
+                source_announcement_id=record.source_announcement_id,
+                published_at=record.published_at,
+            )
+            if mirror_chain_id is not None:
+                metadata.setdefault("legal_chain_id", mirror_chain_id)
             metadata["asset_classification"] = _classification_payload(classification)
             enriched = AnnouncementAttachment(
                 source_url=attachment.source_url,
@@ -272,6 +279,7 @@ class AnnouncementAssetService:
         knowledge_cutoff: str | None = None,
         operation_id: str | None = None,
         capacity_override: CapacityOverrideAuthorization | None = None,
+        scheduled_write: bool = False,
     ) -> EffectiveAnnualReport | None:
         """Acquire one attachment under a durable attachment-scoped lease."""
         if capacity_override is not None:
@@ -314,6 +322,12 @@ class AnnouncementAssetService:
                                 dict(attachment.metadata)
                             )
                         )
+                        if attachment is not None and classification is not None:
+                            classification = self._refine_attachment_classification(
+                                attachment,
+                                classification,
+                                blob.canonical_path,
+                            )
                         if (
                             announcement is not None
                             and announcement.instrument_id
@@ -328,7 +342,6 @@ class AnnouncementAssetService:
                             )
             if self.config.dry_run:
                 raise RuntimeError("annual_report_asset_dry_run_blocks_acquisition")
-            validate_capacity_artifact(self.config)
             lease_expires_at = (
                 datetime.now(timezone.utc)
                 + timedelta(seconds=self.config.retry.lease_seconds)
@@ -359,6 +372,7 @@ class AnnouncementAssetService:
                 knowledge_cutoff=knowledge_cutoff,
                 operation_id=operation_id,
                 capacity_override=capacity_override,
+                scheduled_write=scheduled_write,
             )
         finally:
             if lease_generation is not None:
@@ -401,7 +415,6 @@ class AnnouncementAssetService:
             return existing
         if self.config.dry_run:
             raise RuntimeError("annual_report_asset_dry_run_blocks_acquisition")
-        validate_capacity_artifact(self.config)
 
         attachment = self.repository.get_attachment(attachment_id)
         if attachment is None:
@@ -635,6 +648,7 @@ class AnnouncementAssetService:
         knowledge_cutoff: str | None,
         operation_id: str | None,
         capacity_override: CapacityOverrideAuthorization | None,
+        scheduled_write: bool,
     ) -> EffectiveAnnualReport | None:
         """Retrieve one registered attachment, publish it, and recompute policy."""
         if self.attachment_retriever is None:
@@ -659,7 +673,11 @@ class AnnouncementAssetService:
                     expected_length=blob.content_length,
                 )
                 if validation.status is IntegrityStatus.VALID:
-                    classification = _classification_from_metadata(attachment.metadata)
+                    classification = self._refine_attachment_classification(
+                        attachment,
+                        _classification_from_metadata(attachment.metadata),
+                        blob.canonical_path,
+                    )
                     if announcement.instrument_id and classification.fiscal_year:
                         return self.recompute_effective_report(
                             announcement.instrument_id,
@@ -701,6 +719,7 @@ class AnnouncementAssetService:
                 operation_id=operation_id,
                 capacity_override=capacity_override,
                 suppress_unchanged_event=force_refresh,
+                scheduled_write=scheduled_write,
             )
 
     def _retrieve_publish_and_recompute(
@@ -716,6 +735,7 @@ class AnnouncementAssetService:
         operation_id: str | None = None,
         capacity_override: CapacityOverrideAuthorization | None = None,
         suppress_unchanged_event: bool = False,
+        scheduled_write: bool = False,
     ) -> EffectiveAnnualReport | None:
         source_attachment = AnnouncementAttachment(
             source_url=attachment.source_url,
@@ -885,7 +905,11 @@ class AnnouncementAssetService:
                 metadata=diagnostics,
             )
         )
-        classification = _classification_from_metadata(attachment.metadata)
+        classification = self._refine_attachment_classification(
+            attachment,
+            _classification_from_metadata(attachment.metadata),
+            result.content,
+        )
         if not announcement.instrument_id or not classification.fiscal_year:
             reservation["status"] = "completed"
             return None
@@ -898,6 +922,26 @@ class AnnouncementAssetService:
         )
         reservation["status"] = "completed"
         return effective
+
+    def _refine_attachment_classification(
+        self,
+        attachment: OfficialAnnouncementAttachment,
+        classification: AnnualReportClassification,
+        pdf: bytes | str,
+    ) -> AnnualReportClassification:
+        refined = refine_classification_from_pdf(
+            classification,
+            Path(pdf) if isinstance(pdf, str) else pdf,
+        )
+        if refined == classification:
+            return classification
+        metadata = dict(attachment.metadata)
+        metadata["asset_classification"] = _classification_payload(refined)
+        self.repository.update_attachment_metadata(
+            attachment.attachment_id,
+            metadata,
+        )
+        return refined
 
     @contextmanager
     def _storage_reservation(
@@ -1476,15 +1520,6 @@ class AnnouncementAssetService:
                 availability=availability,
                 asset=asset,
                 reason_code="dry_run_blocks_network_acquisition",
-            )
-        try:
-            validate_capacity_artifact(self.config)
-        except CapacityArtifactNotReadyError:
-            return EnsureResult(
-                disposition=EnsureDisposition.LOCAL_MISS,
-                availability=availability,
-                asset=asset,
-                reason_code="capacity_artifact_not_ready",
             )
         scope = request.normalized_scope
         principal = str(request.principal or request.consumer or "internal").strip()
@@ -2284,13 +2319,168 @@ def _candidate_from_row(row: dict) -> AnnualReportCandidate:
         withdrawn=withdrawn,
         withdrawal_target_id=withdrawal_target,
         withdrawal_evidence_type=withdrawal_evidence_type,
-        legal_chain_id=metadata.get("legal_chain_id"),
+        legal_chain_id=(
+            metadata.get("legal_chain_id")
+            or _shared_szse_mirror_chain_id(
+                source=row.get("source"),
+                exchange=row.get("exchange"),
+                instrument_id=row.get("instrument_id"),
+                source_announcement_id=row.get("source_announcement_id"),
+                published_at=row.get("published_at"),
+            )
+            or _cninfo_same_title_revision_chain_id(
+                source=row.get("source"),
+                exchange=row.get("exchange"),
+                instrument_id=row.get("instrument_id"),
+                title=row.get("title"),
+                fiscal_year=classification.fiscal_year,
+                variant=classification.variant,
+                published_at=row.get("published_at"),
+                source_announcement_id=row.get("source_announcement_id"),
+            )
+            or _same_source_filing_chain_id(
+                source=row.get("source"),
+                exchange=row.get("exchange"),
+                instrument_id=row.get("instrument_id"),
+                source_announcement_id=row.get("source_announcement_id"),
+                published_at=row.get("published_at"),
+            )
+        ),
         legal_precedence=(
             int(metadata["legal_precedence"])
             if metadata.get("legal_precedence") is not None
-            else None
+            else _cninfo_announcement_precedence(
+                source=row.get("source"),
+                source_announcement_id=row.get("source_announcement_id"),
+                title=row.get("title"),
+                published_at=row.get("published_at"),
+            )
         ),
     )
+
+
+def _shared_szse_mirror_chain_id(
+    *,
+    source: object,
+    exchange: object,
+    instrument_id: object,
+    source_announcement_id: object,
+    published_at: object,
+) -> str | None:
+    """Bind CNInfo and SZSE mirrors carrying the same official announcement id."""
+
+    normalized_source = str(source or "").strip().lower()
+    normalized_exchange = str(exchange or "").strip().upper()
+    normalized_instrument = str(instrument_id or "").strip().upper()
+    announcement_id = str(source_announcement_id or "").strip()
+    published_date = str(published_at or "").strip()[:10]
+    if (
+        normalized_source not in {"cninfo", "szse"}
+        or normalized_exchange != "SZSE"
+        or not normalized_instrument
+        or not announcement_id.isdigit()
+        or len(published_date) != 10
+    ):
+        return None
+    return stable_id(
+        "szse-cninfo-mirror-chain",
+        normalized_instrument,
+        announcement_id,
+        published_date,
+    )
+
+
+def _same_source_filing_chain_id(
+    *,
+    source: object,
+    exchange: object,
+    instrument_id: object,
+    source_announcement_id: object,
+    published_at: object,
+) -> str | None:
+    """Bind URL variants of the same source-qualified legal filing."""
+
+    normalized_source = str(source or "").strip().lower()
+    normalized_exchange = str(exchange or "").strip().upper()
+    normalized_instrument = str(instrument_id or "").strip().upper()
+    announcement_id = str(source_announcement_id or "").strip()
+    published_date = str(published_at or "").strip()[:10]
+    if not all(
+        (
+            normalized_source,
+            normalized_exchange,
+            normalized_instrument,
+            announcement_id,
+        )
+    ) or len(published_date) != 10:
+        return None
+    return stable_id(
+        "same-source-filing-chain",
+        normalized_source,
+        normalized_exchange,
+        normalized_instrument,
+        announcement_id,
+        published_date,
+    )
+
+
+def _cninfo_same_title_revision_chain_id(
+    *,
+    source: object,
+    exchange: object,
+    instrument_id: object,
+    title: object,
+    fiscal_year: int | None,
+    variant: AnnualReportVariant | None,
+    published_at: object,
+    source_announcement_id: object,
+) -> str | None:
+    """Order exact-title same-day CNInfo republications by provider identity."""
+
+    normalized_source = str(source or "").strip().lower()
+    normalized_exchange = str(exchange or "").strip().upper()
+    normalized_instrument = str(instrument_id or "").strip().upper()
+    normalized_title = "".join(str(title or "").split())
+    published_date = str(published_at or "").strip()[:10]
+    announcement_id = str(source_announcement_id or "").strip()
+    if (
+        normalized_source != "cninfo"
+        or not normalized_exchange
+        or not normalized_instrument
+        or not normalized_title
+        or fiscal_year is None
+        or variant is None
+        or len(published_date) != 10
+        or not announcement_id.isdigit()
+    ):
+        return None
+    return stable_id(
+        "cninfo-same-title-revision-chain",
+        normalized_exchange,
+        normalized_instrument,
+        int(fiscal_year),
+        variant.value,
+        normalized_title,
+        published_date,
+    )
+
+
+def _cninfo_announcement_precedence(
+    *,
+    source: object,
+    source_announcement_id: object,
+    title: object,
+    published_at: object,
+) -> int | None:
+    announcement_id = str(source_announcement_id or "").strip()
+    if (
+        str(source or "").strip().lower() != "cninfo"
+        or not announcement_id.isdigit()
+        or not "".join(str(title or "").split())
+        or len(str(published_at or "").strip()[:10]) != 10
+    ):
+        return None
+    return int(announcement_id)
 
 
 def _apply_withdrawal_relations(

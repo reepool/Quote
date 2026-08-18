@@ -14,6 +14,7 @@ from research.announcement_assets import (
     AnnouncementAssetRepository,
     AnnouncementAssetService,
     AnnualReportBootstrap,
+    AssetAvailability,
     BootstrapWindow,
     ContentAddressedBlobStore,
     EligibilityPolicy,
@@ -24,6 +25,7 @@ from research.announcement_assets import (
     probe_mount_identity,
 )
 from research.announcement_assets.backfill import _source_exchange_routes
+from research.announcement_assets.daily import daily_discovery_fingerprint
 from research.announcement_assets.repository import BootstrapRunIdentityError
 from research.announcements import (
     AnnouncementAcquisitionConfig,
@@ -190,6 +192,50 @@ def test_bse_bootstrap_and_targeted_repair_use_only_cninfo_annual_route(tmp_path
     assert {kind for kind, _, _ in calls} == {"discover", "repair"}
 
 
+def test_full_market_targeted_repair_uses_only_the_instrument_exchange(tmp_path):
+    config = _config(tmp_path, targeted_repair_lookback_years=1)
+    config.filings_root.mkdir(parents=True)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    service = AnnouncementAssetService(repository=repository, config=config)
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "920001.BJ",
+                    "exchange": "BSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                    "listing_date": "2024-01-01",
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    repair_calls: list[tuple[str, str]] = []
+
+    AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: (),
+        repair=lambda instrument_id, source, exchange, *args: (
+            repair_calls.append((source, exchange)) or ()
+        ),
+    )
+
+    assert repair_calls
+    assert {exchange for _, exchange in repair_calls} == {"BSE"}
+    assert {source for source, _ in repair_calls} == {"cninfo", "bse"}
+
+
 def _config(
     tmp_path: Path,
     *,
@@ -199,37 +245,37 @@ def _config(
     provider_coverage_start_year: int = 2000,
 ) -> AnnouncementAssetConfig:
     mapping = {
-            "enabled": True,
-            "dry_run": False,
-            "paths": {
-                "filings_root": "data/filings",
-                "archive_root": "data/filings/announcements",
-                "temp_root": "data/filings/announcements/tmp",
-                "quarantine_root": "data/filings/announcements/quarantine",
-                "require_mount": False,
-            },
-            "storage": {
-                "warning_utilization": 0.98,
-                "hard_stop_utilization": 0.999,
-                "free_space_reserve_bytes": 1,
-                "max_attachment_bytes": 1024 * 1024,
-                "unknown_length_reservation_bytes": 4096,
-            },
-            "discovery": {
-                "initial_lookback_days": 30,
-                "reconciliation_lookback_days": 30,
-                "max_pages": 2,
-                "page_size": 10,
-                "max_requests": 100,
-                "max_windows": 2,
-                "max_instruments": 10,
-                # Keep the shared fixture insensitive to suite load. Dedicated
-                # budget tests use explicit bounds/clock control.
-                "max_elapsed_seconds": 600,
-                "targeted_repair_lookback_years": targeted_repair_lookback_years,
-                "provider_coverage_start_year": provider_coverage_start_year,
-            },
-        }
+        "enabled": True,
+        "dry_run": False,
+        "paths": {
+            "filings_root": "data/filings",
+            "archive_root": "data/filings/announcements",
+            "temp_root": "data/filings/announcements/tmp",
+            "quarantine_root": "data/filings/announcements/quarantine",
+            "require_mount": False,
+        },
+        "storage": {
+            "warning_utilization": 0.98,
+            "hard_stop_utilization": 0.999,
+            "free_space_reserve_bytes": 1,
+            "max_attachment_bytes": 1024 * 1024,
+            "unknown_length_reservation_bytes": 4096,
+        },
+        "discovery": {
+            "initial_lookback_days": 30,
+            "reconciliation_lookback_days": 30,
+            "max_pages": 2,
+            "page_size": 10,
+            "max_requests": 100,
+            "max_windows": 2,
+            "max_instruments": 10,
+            # Keep the shared fixture insensitive to suite load. Dedicated
+            # budget tests use explicit bounds/clock control.
+            "max_elapsed_seconds": 600,
+            "targeted_repair_lookback_years": targeted_repair_lookback_years,
+            "provider_coverage_start_year": provider_coverage_start_year,
+        },
+    }
     if source_routes is not None:
         mapping["acquisition"] = {
             "source_routes": list(source_routes),
@@ -366,7 +412,9 @@ def _paired(snapshot):
     return pair_with_listed_security_census(snapshot, census)
 
 
-def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(tmp_path):
+def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(
+    tmp_path,
+):
     config = _config(tmp_path)
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
@@ -379,15 +427,29 @@ def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(t
         blob_store=store,
         attachment_retriever=retriever,
     )
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [
-            {"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True},
-            {"instrument_id": "000001.SZ", "exchange": "SZSE", "type": "stock", "currency": "CNY", "is_active": True},
-        ],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                },
+                {
+                    "instrument_id": "000001.SZ",
+                    "exchange": "SZSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                },
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
     records = (
         _record("600000", 2024),
         _record("600000", 2025),
@@ -415,7 +477,9 @@ def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(t
     assert result.corrections_selected == 1
     assert result.downloaded == 2
     assert repository.get_effective_report("600000.SH", 2025) is not None
-    assert repository.get_effective_report("600000.SH", 2025).variant.value == "correction"
+    assert (
+        repository.get_effective_report("600000.SH", 2025).variant.value == "correction"
+    )
     assert repository.get_effective_report("600000.SH", 2024) is None
     assert repository.get_effective_report("000001.SZ", 2025) is not None
     assert len(retriever.calls) == 2
@@ -428,7 +492,26 @@ def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(t
     assert result.metrics["windows_incomplete"] == result.windows_incomplete
     assert result.metrics["total_bytes"] > 0
     assert result.metrics["free_space_bytes"] > 0
-    assert result.metrics["unprotected_bytes"] == result.metrics["total_bytes"]
+    handoff_fingerprint = daily_discovery_fingerprint(
+        config=config,
+        source="cninfo",
+        exchange="SSE",
+        scope_key="market",
+    )
+    handoff = repository.get_discovery_state(
+        source="cninfo",
+        exchange="SSE",
+        category="annual_report",
+        scope_key="market",
+        config_fingerprint=handoff_fingerprint,
+    )
+    assert handoff is not None
+    assert handoff["is_complete"] == 1
+    assert handoff["covered_until"] == "2026-08-10T15:59:59.999999+00:00"
+    assert handoff["checkpoint"]["origin"] == "bootstrap_handoff"
+    assert handoff["checkpoint"]["query_fingerprint"] == result.metrics[
+        "resume_identity"
+    ]["query_fingerprint"]
     persisted = repository.get_bootstrap_run(result.operation_id)
     assert persisted is not None
     report = persisted["checkpoint"]["result_report"]
@@ -437,7 +520,63 @@ def test_latest_only_bootstrap_downloads_one_latest_fiscal_year_per_instrument(t
     assert report["total_bytes"] == result.metrics["total_bytes"]
 
 
-def test_bootstrap_reuses_verified_attachment_on_resume(tmp_path):
+def test_bootstrap_report_metrics_include_more_than_one_repository_page(tmp_path):
+    report_count = 1001
+    reports = tuple(
+        SimpleNamespace(
+            instrument_id=f"instrument-{index}",
+            content_hash=f"{index:064x}",
+            availability=AssetAvailability.LOCAL_VALID,
+        )
+        for index in range(report_count)
+    )
+    blobs = {
+        report.content_hash: SimpleNamespace(
+            content_length=index + 1,
+            backup_status="pending",
+        )
+        for index, report in enumerate(reports)
+    }
+
+    class _PagedRepository:
+        def __init__(self):
+            self.page_calls = []
+
+        def list_effective_reports(self, *, limit=100, offset=0):
+            self.page_calls.append((limit, offset))
+            return list(reports[offset : offset + limit])
+
+        def get_blob(self, content_hash):
+            return blobs[content_hash]
+
+    config = _config(tmp_path)
+    config.filings_root.mkdir(parents=True)
+    repository = _PagedRepository()
+    bootstrap = AnnualReportBootstrap(
+        service=SimpleNamespace(),
+        repository=repository,
+        config=config,
+    )
+
+    metrics = bootstrap._bootstrap_report_metrics(
+        target_ids=tuple(report.instrument_id for report in reports),
+        universe_snapshot_id="snapshot-1",
+        operation_id="operation-1",
+        query_fingerprint="query-1",
+        cutoff="2026-08-10T00:00:00+00:00",
+        windows_completed=1,
+        windows_incomplete=0,
+        run_started=0.0,
+    )
+
+    expected_bytes = report_count * (report_count + 1) // 2
+    assert repository.page_calls == [(1000, 0), (1000, 1000)]
+    assert metrics["winner_count"] == report_count
+    assert metrics["duplicate_content_count"] == 0
+    assert metrics["total_bytes"] == expected_bytes
+
+
+def test_bootstrap_reuses_verified_attachment_on_resume(tmp_path, monkeypatch):
     config = _config(tmp_path)
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
@@ -451,14 +590,27 @@ def test_bootstrap_reuses_verified_attachment_on_resume(tmp_path):
         attachment_retriever=retriever,
     )
     record = _record("600000", 2025)
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+
+    discovery_calls = []
 
     def discover(source, exchange, start_date, end_date, start_page, max_pages):
+        discovery_calls.append((source, exchange, start_date, end_date))
         return (record,)
 
     bootstrap = AnnualReportBootstrap(
@@ -472,13 +624,39 @@ def test_bootstrap_reuses_verified_attachment_on_resume(tmp_path):
         windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
         discover=discover,
     )
+    first_discovery_count = len(discovery_calls)
+    monkeypatch.setattr(
+        service,
+        "acquire_attachment",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("unchanged covered asset must use fast resume")
+        ),
+    )
+    refreshed_snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v2",
+            master_data_last_success_at="2026-08-10T02:00:00+00:00",
+            snapshot_at="2026-08-10T03:00:00+00:00",
+        )
+    )
     second = bootstrap.run(
-        snapshot=snapshot,
+        snapshot=refreshed_snapshot,
         as_of=date(2026, 8, 10),
         windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
         discover=discover,
     )
     assert first.status == second.status == "success"
+    assert first_discovery_count > 0
+    assert len(discovery_calls) == first_discovery_count
     assert len(retriever.calls) == 1
     assert second.local_hits == 1
 
@@ -502,20 +680,22 @@ def test_bootstrap_does_not_credit_provisional_predecessor_as_available(tmp_path
         instrument_id="600000.SH",
     )
     assert service.acquire_attachment(registered[0].attachment_id) is not None
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [
-            {
-                "instrument_id": "600000.SH",
-                "exchange": "SSE",
-                "type": "stock",
-                "currency": "CNY",
-                "is_active": True,
-            }
-        ],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
     correction = _record("600000", 2025, correction=True)
 
     result = AnnualReportBootstrap(
@@ -540,10 +720,14 @@ def test_bootstrap_does_not_credit_provisional_predecessor_as_available(tmp_path
     assert coverage["evidence"]["asset_availability"] == "local_valid"
     assert coverage["evidence"]["expected_period_coverage"] == "incomplete"
     assert coverage["evidence"]["terminal_evidence"] is None
-    assert coverage["evidence"]["retry_evidence"]["reason"] == "latest_candidate_not_final"
+    assert (
+        coverage["evidence"]["retry_evidence"]["reason"] == "latest_candidate_not_final"
+    )
 
 
-def test_bootstrap_splits_page_bound_window_and_does_not_advance_partial_parent(tmp_path):
+def test_bootstrap_splits_page_bound_window_and_does_not_advance_partial_parent(
+    tmp_path,
+):
     config = _config(tmp_path)
     config = replace(
         config,
@@ -553,13 +737,28 @@ def test_bootstrap_splits_page_bound_window_and_does_not_advance_partial_parent(
     repository.initialize_schema()
     store = ContentAddressedBlobStore(config)
     store.prepare()
-    service = AnnouncementAssetService(repository=repository, config=config, blob_store=store, attachment_retriever=_Retriever())
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=_Retriever(),
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
     record = _record("600000", 2025)
     calls: list[tuple[str, str]] = []
 
@@ -567,7 +766,9 @@ def test_bootstrap_splits_page_bound_window_and_does_not_advance_partial_parent(
         calls.append((start_date, end_date))
         query = AnnouncementQuery(
             purpose_key="test",
-            scope=AnnouncementScope(exchange=exchange, start_date=start_date, end_date=end_date),
+            scope=AnnouncementScope(
+                exchange=exchange, start_date=start_date, end_date=end_date
+            ),
             source=source,
         )
         if start_date == "2026-01-01" and end_date == "2026-08-10":
@@ -610,23 +811,169 @@ def test_bootstrap_splits_page_bound_window_and_does_not_advance_partial_parent(
     assert repository.get_effective_report("600000.SH", 2025) is not None
 
 
+def test_bootstrap_resumes_dense_day_page_across_operations(tmp_path):
+    config = _config(
+        tmp_path,
+        source_routes=("cninfo",),
+        exchanges=("SSE",),
+    )
+    config = replace(
+        config,
+        discovery=replace(
+            config.discovery,
+            max_pages=1,
+            max_requests=1,
+            max_windows=4,
+        ),
+    )
+    config.filings_root.mkdir(parents=True)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    service = AnnouncementAssetService(repository=repository, config=config)
+    snapshot = _paired(
+        EligibilityPolicy(exchanges=("SSE",), max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    calls: list[int] = []
+
+    def discover(source, exchange, start_date, end_date, start_page, max_pages):
+        calls.append(start_page)
+        query = AnnouncementQuery(
+            purpose_key="dense-day-resume-test",
+            source=source,
+            scope=AnnouncementScope(
+                exchange=exchange,
+                start_date=start_date,
+                end_date=end_date,
+                start_page=start_page,
+                max_pages=max_pages,
+            ),
+        )
+        complete = start_page == 2
+        scan = AnnouncementScanResult(
+            source=source,
+            query=query,
+            status="success_empty" if complete else "degraded",
+            is_complete=complete,
+            stop_reason="empty_page" if complete else "max_pages_exhausted",
+            pages_scanned=1,
+            requests_made=1,
+            diagnostics={"next_page": None if complete else 2},
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status=scan.status,
+            selected_source=source,
+            scan_result=scan,
+        )
+
+    first = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-04-30", "2026-04-30"),),
+        discover=discover,
+        operation_id="bootstrap-dense-day-first",
+    )
+
+    assert first.windows_incomplete == 1
+    state = repository.list_discovery_states(category="annual_report")[0]
+    assert state["next_page"] == 2
+    assert state["checkpoint"]["pending_partitions"] == [
+        {
+            "start_date": "2026-04-30",
+            "end_date": "2026-04-30",
+            "start_page": 2,
+        }
+    ]
+    resumed_snapshot = _paired(
+        EligibilityPolicy(exchanges=("SSE",), max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T02:00:00+00:00",
+        )
+    )
+
+    second = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=resumed_snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-04-30", "2026-04-30"),),
+        discover=discover,
+        operation_id="bootstrap-dense-day-second",
+    )
+
+    assert calls == [1, 2]
+    assert second.windows_completed == 1
+    state = repository.list_discovery_states(category="annual_report")[0]
+    assert bool(state["is_complete"]) is True
+    assert state["next_page"] is None
+    assert state["checkpoint"]["pending_partitions"] == []
+
+
 def test_bootstrap_targeted_repair_finds_missing_instrument(tmp_path):
     config = _config(tmp_path)
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
     store = ContentAddressedBlobStore(config)
     store.prepare()
-    service = AnnouncementAssetService(repository=repository, config=config, blob_store=store, attachment_retriever=_Retriever())
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=_Retriever(),
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
     record = _record("600000", 2025)
 
     def repair(instrument_id, source, exchange, start_date, end_date, fiscal_year):
-        return (record,) if fiscal_year == 2025 and source == "cninfo" and exchange == "SSE" else ()
+        return (
+            (record,)
+            if fiscal_year == 2025 and source == "cninfo" and exchange == "SSE"
+            else ()
+        )
 
     result = AnnualReportBootstrap(
         service=service,
@@ -754,9 +1101,347 @@ def test_bootstrap_targeted_repair_stops_at_operation_request_bound(tmp_path):
     assert result.status == "partial"
     assert len(repair_calls) == 1
     assert result.metrics["operation_budget"]["requests"] == 2
-    assert result.metrics["operation_budget"]["stop_reason"] == (
-        "max_requests_reached"
+    assert result.metrics["operation_budget"]["stop_reason"] == ("max_requests_reached")
+
+
+def test_bootstrap_reuses_completed_targeted_repair_across_universe_snapshots(
+    tmp_path,
+):
+    config = _config(
+        tmp_path,
+        source_routes=("cninfo",),
+        exchanges=("SSE",),
+        targeted_repair_lookback_years=2,
     )
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    config.filings_root.mkdir(parents=True)
+    service = AnnouncementAssetService(repository=repository, config=config)
+    policy = EligibilityPolicy(max_freshness_hours=36)
+    instruments = [
+        {
+            "instrument_id": "600000.SH",
+            "exchange": "SSE",
+            "type": "stock",
+            "currency": "CNY",
+            "is_active": True,
+            "listing_date": "2020-01-01",
+        }
+    ]
+    first_snapshot = _paired(
+        policy.materialize(
+            instruments,
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    repair_calls: list[tuple[object, ...]] = []
+
+    def repair(*args):
+        repair_calls.append(args)
+        return ()
+
+    bootstrap = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    )
+    first = bootstrap.run(
+        snapshot=first_snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: (),
+        repair=repair,
+    )
+    first_call_count = len(repair_calls)
+    refreshed_snapshot = _paired(
+        policy.materialize(
+            instruments,
+            master_data_version="master-v2",
+            master_data_last_success_at="2026-08-10T02:00:00+00:00",
+            snapshot_at="2026-08-10T03:00:00+00:00",
+        )
+    )
+    second = bootstrap.run(
+        snapshot=refreshed_snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: (),
+        repair=repair,
+    )
+
+    assert first.status == second.status == "success"
+    assert first.confirmed_missing == second.confirmed_missing == 1
+    assert first_call_count > 0
+    assert len(repair_calls) == first_call_count
+    assert second.metrics["operation_budget"]["instruments"] == 0
+    coverage = repository.list_asset_coverage(refreshed_snapshot.snapshot_id)[0]
+    assert coverage["evidence"]["targeted_repair_checkpoint"]["completed_scopes"]
+
+
+def test_bootstrap_elapsed_bound_stops_before_attachment_acquisition(
+    tmp_path, monkeypatch
+):
+    config = _config(tmp_path, source_routes=("cninfo",), exchanges=("SSE",))
+    config = replace(
+        config,
+        discovery=replace(config.discovery, max_elapsed_seconds=1),
+    )
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=_Retriever(),
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    clock = [0.0]
+    monkeypatch.setattr(
+        "research.announcement_assets.backfill.monotonic", lambda: clock[0]
+    )
+    acquisition_calls: list[str] = []
+    monkeypatch.setattr(
+        service,
+        "acquire_attachment",
+        lambda attachment_id, **kwargs: acquisition_calls.append(attachment_id),
+    )
+
+    def discover(*args):
+        clock[0] = 2.0
+        return (_record("600000", 2025),)
+
+    result = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=discover,
+    )
+
+    assert result.status == "partial"
+    assert acquisition_calls == []
+    assert result.metrics["operation_budget"]["stop_reason"] == (
+        "max_elapsed_seconds_reached"
+    )
+
+
+def test_bootstrap_elapsed_bound_stops_candidate_verification(tmp_path, monkeypatch):
+    config = _config(tmp_path)
+    config = replace(
+        config,
+        discovery=replace(config.discovery, max_elapsed_seconds=1),
+    )
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    clock = [0.0]
+    monkeypatch.setattr(
+        "research.announcement_assets.backfill.monotonic", lambda: clock[0]
+    )
+
+    class SlowCandidateRetriever(_Retriever):
+        def retrieve(self, source, attachment, *, require_pdf=False):
+            result = super().retrieve(
+                source,
+                attachment,
+                require_pdf=require_pdf,
+            )
+            clock[0] = 2.0
+            return result
+
+    retriever = SlowCandidateRetriever()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=retriever,
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    records = (
+        _record("600000", 2025, source="cninfo"),
+        _record("600000", 2025, source="sse"),
+    )
+
+    result = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: records,
+    )
+
+    assert result.status == "partial"
+    assert len(retriever.calls) == 1
+    assert result.metrics["operation_budget"]["stop_reason"] == (
+        "max_elapsed_seconds_reached"
+    )
+
+
+def test_bootstrap_elapsed_bound_includes_pre_run_refresh_time(tmp_path, monkeypatch):
+    config = _config(tmp_path, source_routes=("cninfo",), exchanges=("SSE",))
+    config = replace(
+        config,
+        discovery=replace(config.discovery, max_elapsed_seconds=1),
+    )
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    config.filings_root.mkdir(parents=True)
+    service = AnnouncementAssetService(repository=repository, config=config)
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    monkeypatch.setattr("research.announcement_assets.backfill.monotonic", lambda: 10.0)
+    discovery_calls: list[tuple[object, ...]] = []
+
+    result = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: discovery_calls.append(args),
+        elapsed_seconds_before_run=1.0,
+    )
+
+    assert result.status == "partial"
+    assert discovery_calls == []
+    assert result.metrics["elapsed_seconds"] == 1.0
+    assert result.metrics["operation_budget"]["stop_reason"] == (
+        "max_elapsed_seconds_reached"
+    )
+
+
+def test_bootstrap_caps_provider_pages_to_remaining_request_budget(tmp_path):
+    config = _config(tmp_path, source_routes=("cninfo",), exchanges=("SSE",))
+    config = replace(
+        config,
+        discovery=replace(
+            config.discovery,
+            max_pages=2,
+            max_requests=3,
+            max_windows=10,
+        ),
+    )
+    config.filings_root.mkdir(parents=True)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    service = AnnouncementAssetService(repository=repository, config=config)
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    page_bounds: list[int] = []
+
+    def discover(source, exchange, start_date, end_date, start_page, max_pages):
+        page_bounds.append(max_pages)
+        query = AnnouncementQuery(
+            purpose_key="request-bound-test",
+            source=source,
+            scope=AnnouncementScope(
+                exchange=exchange,
+                start_date=start_date,
+                end_date=end_date,
+                max_pages=max_pages,
+            ),
+        )
+        scan = AnnouncementScanResult(
+            source=source,
+            query=query,
+            status="degraded",
+            records=(),
+            is_complete=False,
+            stop_reason="max_pages_exhausted",
+            requests_made=max_pages,
+        )
+        return AnnouncementRouteResult(
+            query=query,
+            status=scan.status,
+            selected_source=source,
+            scan_result=scan,
+        )
+
+    result = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=discover,
+    )
+
+    assert page_bounds == [2, 1]
+    assert result.metrics["operation_budget"]["requests"] == 3
+    assert result.metrics["operation_budget"]["stop_reason"] == ("max_requests_reached")
 
 
 def _repair_route_result(source, exchange, fiscal_year, *, complete):
@@ -785,9 +1470,7 @@ def _repair_route_result(source, exchange, fiscal_year, *, complete):
     )
 
 
-def _fallback_repair_route_result(
-    source, exchange, fiscal_year, *, equivalent: bool
-):
+def _fallback_repair_route_result(source, exchange, fiscal_year, *, equivalent: bool):
     query = AnnouncementQuery(
         purpose_key="targeted-repair-fallback-test",
         source=source,
@@ -830,9 +1513,7 @@ def _fallback_repair_route_result(
 
 
 @pytest.mark.parametrize("equivalent", (False, True))
-def test_targeted_repair_requires_audited_fallback_equivalence(
-    tmp_path, equivalent
-):
+def test_targeted_repair_requires_audited_fallback_equivalence(tmp_path, equivalent):
     config = _config(
         tmp_path,
         source_routes=("cninfo",),
@@ -890,10 +1571,7 @@ def test_targeted_repair_requires_audited_fallback_equivalence(
         assert scope["requested_source"] == "cninfo"
         assert scope["source"] == "sse"
         assert scope["route_equivalence_verified"] is True
-        assert (
-            scope["route_equivalence_reference"]
-            == "approved-equivalence-2026-08"
-        )
+        assert scope["route_equivalence_reference"] == "approved-equivalence-2026-08"
     else:
         assert result.status == "partial"
         assert result.confirmed_missing == 0
@@ -990,9 +1668,7 @@ def test_targeted_repair_stops_at_incomplete_newer_year(tmp_path):
 
     def repair(instrument_id, source, exchange, start_date, end_date, fiscal_year):
         calls.append((fiscal_year, source, exchange))
-        return _repair_route_result(
-            source, exchange, fiscal_year, complete=False
-        )
+        return _repair_route_result(source, exchange, fiscal_year, complete=False)
 
     result = AnnualReportBootstrap(
         service=service, repository=repository, config=config
@@ -1044,11 +1720,9 @@ def test_targeted_repair_resume_skips_completed_empty_scopes(tmp_path):
         nonlocal fail_second_scope
         key = (fiscal_year, source, exchange)
         call_counts[key] = call_counts.get(key, 0) + 1
-        if source == "cninfo" and exchange == "SZSE" and fail_second_scope:
+        if source == "sse" and exchange == "SSE" and fail_second_scope:
             fail_second_scope = False
-            return _repair_route_result(
-                source, exchange, fiscal_year, complete=False
-            )
+            return _repair_route_result(source, exchange, fiscal_year, complete=False)
         return _repair_route_result(source, exchange, fiscal_year, complete=True)
 
     bootstrap = AnnualReportBootstrap(
@@ -1074,7 +1748,7 @@ def test_targeted_repair_resume_skips_completed_empty_scopes(tmp_path):
     assert first.status == "partial"
     assert second.status == "success", second.errors
     assert call_counts[(2025, "cninfo", "SSE")] == 1
-    assert call_counts[(2025, "cninfo", "SZSE")] == 2
+    assert call_counts[(2025, "sse", "SSE")] == 2
     assert second.confirmed_missing == 1
 
 
@@ -1084,9 +1758,19 @@ def test_incomplete_provider_window_returns_partial_and_not_confirmed_success(tm
     repository.initialize_schema()
     store = ContentAddressedBlobStore(config)
     store.prepare()
-    service = AnnouncementAssetService(repository=repository, config=config, blob_store=store)
+    service = AnnouncementAssetService(
+        repository=repository, config=config, blob_store=store
+    )
     snapshot = EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
+        [
+            {
+                "instrument_id": "600000.SH",
+                "exchange": "SSE",
+                "type": "stock",
+                "currency": "CNY",
+                "is_active": True,
+            }
+        ],
         master_data_version="master-v1",
         master_data_last_success_at="2026-08-10T00:00:00+00:00",
         snapshot_at="2026-08-10T01:00:00+00:00",
@@ -1095,7 +1779,9 @@ def test_incomplete_provider_window_returns_partial_and_not_confirmed_success(tm
     def discover(source, exchange, start_date, end_date, start_page, max_pages):
         query = AnnouncementQuery(
             purpose_key="test",
-            scope=AnnouncementScope(exchange=exchange, start_date=start_date, end_date=end_date),
+            scope=AnnouncementScope(
+                exchange=exchange, start_date=start_date, end_date=end_date
+            ),
             source=source,
         )
         scan = AnnouncementScanResult(
@@ -1138,14 +1824,26 @@ def test_bootstrap_persists_fixed_cutoff_and_rejects_resume_identity_mix(tmp_pat
     repository.initialize_schema()
     store = ContentAddressedBlobStore(config)
     store.prepare()
-    service = AnnouncementAssetService(repository=repository, config=config, blob_store=store)
+    service = AnnouncementAssetService(
+        repository=repository, config=config, blob_store=store
+    )
     snapshot = EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
+        [
+            {
+                "instrument_id": "600000.SH",
+                "exchange": "SSE",
+                "type": "stock",
+                "currency": "CNY",
+                "is_active": True,
+            }
+        ],
         master_data_version="master-v1",
         master_data_last_success_at="2026-08-10T00:00:00+00:00",
         snapshot_at="2026-08-10T01:00:00+00:00",
     )
-    bootstrap = AnnualReportBootstrap(service=service, repository=repository, config=config)
+    bootstrap = AnnualReportBootstrap(
+        service=service, repository=repository, config=config
+    )
     operation_id = "bootstrap-fixed-cutoff"
     bootstrap.run(
         snapshot=snapshot,
@@ -1184,12 +1882,22 @@ def test_bootstrap_excludes_post_cutoff_publication_and_observation(tmp_path):
         blob_store=store,
         attachment_retriever=retriever,
     )
-    snapshot = _paired(EligibilityPolicy(max_freshness_hours=36).materialize(
-        [{"instrument_id": "600000.SH", "exchange": "SSE", "type": "stock", "currency": "CNY", "is_active": True}],
-        master_data_version="master-v1",
-        master_data_last_success_at="2026-08-10T00:00:00+00:00",
-        snapshot_at="2026-08-10T01:00:00+00:00",
-    ))
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
     post_cutoff = AnnouncementRecord(
         source="cninfo",
         source_announcement_id="600000-post-cutoff",
@@ -1198,14 +1906,18 @@ def test_bootstrap_excludes_post_cutoff_publication_and_observation(tmp_path):
         published_at="2026-08-11T01:00:00+00:00",
         exchange="SSE",
         symbols=("600000",),
-        attachments=(AnnouncementAttachment(
-            source_url="https://static.example/post-cutoff.pdf",
-            attachment_id="600000-post-cutoff",
-            name="600000-post-cutoff.pdf",
-            media_type="application/pdf",
-        ),),
+        attachments=(
+            AnnouncementAttachment(
+                source_url="https://static.example/post-cutoff.pdf",
+                attachment_id="600000-post-cutoff",
+                name="600000-post-cutoff.pdf",
+                media_type="application/pdf",
+            ),
+        ),
     )
-    result = AnnualReportBootstrap(service=service, repository=repository, config=config).run(
+    result = AnnualReportBootstrap(
+        service=service, repository=repository, config=config
+    ).run(
         snapshot=snapshot,
         as_of=date(2026, 8, 10),
         windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
@@ -1218,6 +1930,87 @@ def test_bootstrap_excludes_post_cutoff_publication_and_observation(tmp_path):
     assert result.downloaded == 0
     assert retriever.calls == []
     assert repository.get_effective_report("600000.SH", 2025) is None
+
+
+def test_bootstrap_counts_post_cutoff_download_then_reuses_it_at_later_cutoff(
+    tmp_path,
+):
+    config = _config(tmp_path)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    retriever = _Retriever(retrieved_at="2026-08-11T01:00:00+00:00")
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=retriever,
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    record = _record("600000", 2025)
+    bootstrap = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    )
+
+    first = bootstrap.run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: (record,),
+        operation_id="bootstrap-late-attachment-first",
+        evidence_cutoff="2026-08-10T12:00:00+00:00",
+    )
+
+    assert first.downloaded == 1
+    assert first.local_hits == 0
+    assert first.retryable == 1
+    first_coverage = repository.list_asset_coverage(first.universe_snapshot_id)[0]
+    assert (
+        first_coverage["evidence"]["retry_evidence"]["reason"]
+        == "attachment_observation_after_bootstrap_cutoff"
+    )
+    with repository.connection() as conn:
+        assert (
+            conn.execute(
+                """SELECT COUNT(*) FROM official_attachment_versions
+                   WHERE integrity_status='valid' AND content_hash IS NOT NULL"""
+            ).fetchone()[0]
+            == 1
+        )
+        assert conn.execute("SELECT COUNT(*) FROM official_document_blobs").fetchone()[0] == 1
+    assert repository.get_effective_report("600000.SH", 2025) is None
+
+    second = bootstrap.run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 11),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-11"),),
+        discover=lambda *args: (record,),
+        operation_id="bootstrap-late-attachment-second",
+        evidence_cutoff="2026-08-11T12:00:00+00:00",
+    )
+
+    assert second.downloaded == 0
+    assert second.local_hits == 1
+    assert second.metrics["coverage"]["available"] == 1
+    assert retriever.calls == [record.attachments[0].attachment_id]
 
 
 def test_bootstrap_ignores_withdrawal_published_after_fixed_cutoff(tmp_path):
@@ -1320,9 +2113,7 @@ def test_bootstrap_uses_first_observed_time_when_official_time_is_missing(tmp_pa
     late_first_observed = AnnouncementRecord(
         source="cninfo",
         source_announcement_id="600000-no-official-time",
-        announcement_key=build_announcement_key(
-            "cninfo", "600000-no-official-time"
-        ),
+        announcement_key=build_announcement_key("cninfo", "600000-no-official-time"),
         title="测试公司2025年年度报告",
         published_at=None,
         exchange="SSE",
@@ -1354,7 +2145,9 @@ def test_bootstrap_uses_first_observed_time_when_official_time_is_missing(tmp_pa
     assert retriever.calls == []
 
 
-def test_confirmed_missing_requires_complete_evidence_and_expiry_is_non_terminal(tmp_path):
+def test_confirmed_missing_requires_complete_evidence_and_expiry_is_non_terminal(
+    tmp_path,
+):
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
     with pytest.raises(ValueError, match="confirmed_missing evidence missing"):
@@ -1368,14 +2161,19 @@ def test_confirmed_missing_requires_complete_evidence_and_expiry_is_non_terminal
         )
 
     complete = {
-        "required_route_scope_set": [{
-            "source": "cninfo",
-            "exchange": "SSE",
-            "normalized_category": "annual_report",
-            "query_bounds": {"start_date": "2026-01-01", "end_date": "2026-08-10"},
-            "successful_empty_completion_watermark": "2026-08-10T12:00:00+00:00",
-            "page_or_subscope_completion": {"complete": True, "status": "success_empty"},
-        }],
+        "required_route_scope_set": [
+            {
+                "source": "cninfo",
+                "exchange": "SSE",
+                "normalized_category": "annual_report",
+                "query_bounds": {"start_date": "2026-01-01", "end_date": "2026-08-10"},
+                "successful_empty_completion_watermark": "2026-08-10T12:00:00+00:00",
+                "page_or_subscope_completion": {
+                    "complete": True,
+                    "status": "success_empty",
+                },
+            }
+        ],
         "listing_evidence": {"instrument_id": "600000.SH", "snapshot_id": "snapshot-1"},
         "bootstrap_as_of": "2026-08-10",
         "evidence_visibility_cutoff": "2026-08-10T12:00:00+00:00",
@@ -1472,10 +2270,7 @@ def test_bootstrap_reports_expected_period_boundary_independently_from_old_winne
     assert coverage["evidence"]["bootstrap_asset_status"] == "available"
     assert coverage["evidence"]["asset_availability"] == "local_valid"
     assert coverage["evidence"]["latest_winner_fiscal_year"] == 2024
-    assert (
-        coverage["evidence"]["expected_period_coverage"]
-        == expected_period_coverage
-    )
+    assert coverage["evidence"]["expected_period_coverage"] == expected_period_coverage
     assert coverage["evidence"]["terminal_evidence"]["kind"] == "verified_latest_winner"
     assert coverage["evidence"]["retry_evidence"] is None
 
@@ -1691,7 +2486,172 @@ def test_bootstrap_fails_closed_on_unproven_cross_source_equivalence(tmp_path):
     assert result.metrics["candidate_verification"]["blocked_instruments"] == 1
     assert result.metrics["candidate_verification"]["bytes_read"] > 0
     with repository.connection() as conn:
-        assert conn.execute("SELECT COUNT(*) FROM official_document_blobs").fetchone()[0] == 0
+        assert (
+            conn.execute("SELECT COUNT(*) FROM official_document_blobs").fetchone()[0]
+            == 0
+        )
+
+
+def test_bootstrap_uses_cninfo_mirror_for_shared_szse_announcement_id(tmp_path):
+    config = _config(
+        tmp_path,
+        source_routes=("cninfo", "szse"),
+        exchanges=("SZSE",),
+    )
+    config.filings_root.mkdir(parents=True)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    retriever = _Retriever(retrieved_at="2026-08-10T17:00:00+08:00")
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=retriever,
+    )
+    snapshot = _paired(
+        EligibilityPolicy(exchanges=("SZSE",), max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "000001.SZ",
+                    "exchange": "SZSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+
+    def mirror(source):
+        record = _record("000001", 2025, source=source)
+        official_id = "1225104629"
+        return replace(
+            record,
+            source_announcement_id=official_id,
+            announcement_key=build_announcement_key(source, official_id),
+            attachments=(
+                replace(
+                    record.attachments[0],
+                    attachment_id=official_id,
+                    source_url=f"https://static.example/{source}/{official_id}.pdf",
+                ),
+            ),
+            raw_payload={"announcementId": official_id},
+        )
+
+    records = {source: mirror(source) for source in ("cninfo", "szse")}
+    result = AnnualReportBootstrap(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-04-01", "2026-04-30"),),
+        discover=lambda source, *_args: (records[source],),
+    )
+
+    assert result.status == "success"
+    assert result.blocked == 0
+    assert result.downloaded == 1
+    assert len(retriever.calls) == 1
+    report = repository.get_effective_report("000001.SZ", 2025)
+    assert report is not None
+    announcement = repository.get_announcement(report.announcement_id)
+    assert announcement is not None
+    assert announcement.source == "cninfo"
+
+
+def test_bootstrap_compares_only_each_sources_latest_correction(tmp_path):
+    config = _config(tmp_path)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+
+    class RevisionMirrorRetriever(_Retriever):
+        def retrieve(self, source, attachment, *, require_pdf=False):
+            attachment_id = str(attachment.attachment_id or "unknown")
+            self.calls.append(attachment_id)
+            revision = b"new" if "-new" in attachment_id else b"old"
+            content = b"%PDF-1.4\n" + revision + b" revision\n%%EOF\n"
+            return AnnouncementRetrievalResult(
+                source=source,
+                attachment=attachment,
+                status="success",
+                content=content,
+                content_hash=hashlib.sha256(content).hexdigest(),
+                content_length=len(content),
+                final_url=attachment.source_url,
+                response_media_type="application/pdf",
+                retrieved_at=self.retrieved_at,
+                signature_status="valid_pdf",
+            )
+
+    retriever = RevisionMirrorRetriever()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=retriever,
+    )
+    snapshot = _paired(
+        EligibilityPolicy(max_freshness_hours=36).materialize(
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "currency": "CNY",
+                    "is_active": True,
+                }
+            ],
+            master_data_version="master-v1",
+            master_data_last_success_at="2026-08-10T00:00:00+00:00",
+            snapshot_at="2026-08-10T01:00:00+00:00",
+        )
+    )
+    records = tuple(
+        replace(
+            _record(
+                "600000",
+                2025,
+                correction=True,
+                source=source,
+                title_suffix=revision,
+            ),
+            published_at=published_at,
+        )
+        for revision, published_at in (
+            ("-old", "2026-05-15T01:00:00+00:00"),
+            ("-new", "2026-07-22T01:00:00+00:00"),
+        )
+        for source in ("cninfo", "sse")
+    )
+
+    result = AnnualReportBootstrap(
+        service=service, repository=repository, config=config
+    ).run(
+        snapshot=snapshot,
+        as_of=date(2026, 8, 10),
+        windows=(BootstrapWindow("2026-01-01", "2026-08-10"),),
+        discover=lambda *args: records,
+    )
+
+    assert result.status == "success"
+    assert result.blocked == 0
+    assert result.metrics["candidate_verification"]["blocked_instruments"] == 0
+    report = repository.get_effective_report("600000.SH", 2025)
+    assert report is not None
+    assert (
+        report.content_hash
+        == hashlib.sha256(b"%PDF-1.4\nnew revision\n%%EOF\n").hexdigest()
+    )
 
 
 def test_candidate_verification_rejects_small_remaining_budget_before_network(tmp_path):
@@ -1719,9 +2679,7 @@ def test_candidate_verification_rejects_small_remaining_budget_before_network(tm
         )
 
     assert retriever.calls == []
-    assert repository.get_latest_attachment_version(
-        registered[0].attachment_id
-    ) is None
+    assert repository.get_latest_attachment_version(registered[0].attachment_id) is None
 
 
 def test_bootstrap_verifies_equivalent_candidates_and_publishes_only_winner(tmp_path):
@@ -1787,7 +2745,9 @@ def test_bootstrap_verifies_equivalent_candidates_and_publishes_only_winner(tmp_
     assert all(row["content_hash"] is None for row in verified)
     assert len({row["content_hash_observed"] for row in verified}) == 1
     assert all(row["content_length_observed"] > 0 for row in verified)
-    assert all('"cleanup_outcome":"deleted"' in row["metadata_json"] for row in verified)
+    assert all(
+        '"cleanup_outcome":"deleted"' in row["metadata_json"] for row in verified
+    )
     assert blob_count == 1
 
 

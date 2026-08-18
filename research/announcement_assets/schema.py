@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = 22
+SCHEMA_VERSION = 23
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS official_asset_schema_versions (
@@ -195,7 +195,6 @@ CREATE TABLE IF NOT EXISTS official_asset_adoption_promotion_gates (
     evidence_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    FOREIGN KEY(asset_id) REFERENCES effective_annual_reports(asset_id),
     FOREIGN KEY(content_hash) REFERENCES official_document_blobs(content_hash)
 );
 
@@ -315,7 +314,6 @@ CREATE TABLE IF NOT EXISTS official_asset_consumer_requests (
     updated_at TEXT NOT NULL,
     FOREIGN KEY(asset_request_id)
         REFERENCES official_asset_operation_subscriptions(asset_request_id),
-    FOREIGN KEY(asset_id) REFERENCES effective_annual_reports(asset_id),
     UNIQUE(principal, idempotency_key)
 );
 

@@ -1,39 +1,42 @@
+# Change: Establish Shared Announcement Asset Management
+
 ## Why
 
-Official annual-report PDFs are already required by business-profile extraction and broker risk-control ingestion, but archive ownership, manifest semantics, revision handling, and download avoidance still depend on those business modules. A shared announcement-asset capability is now required so annual reports are discovered, downloaded, validated, retained, replaced, and served independently of whether any one consumer is enabled or production-ready.
+Annual reports are needed by more than one business module. Downloading and
+storing the same filing independently creates duplicate network requests,
+duplicate files, and inconsistent correction handling.
 
 ## What Changes
 
-- Introduce a business-neutral official announcement asset service built on the existing `research.announcements` provider, routing, checkpoint, and attachment-retrieval contracts.
-- Add an independent A-share annual-report daily task, enabled only after bootstrap/readiness gates pass, that discovers recent formal full annual reports and corrections, proactively downloads the selected effective winner (with a verified correction replacing its predecessor), and maintains one consumer-visible local effective attachment per instrument and fiscal year; non-winners and notice-only corrections remain metadata/evidence only.
-- Add a resumable latest-only historical backfill for the current active SSE, SZSE, and BSE stock universe. It publishes, retains, and counts coverage only for each instrument's latest available fiscal-year annual-report winner, preferring the newest valid correction; a bounded policy may temporarily verify competing source bytes when trusted hash/precedence evidence is absent, but non-winner bytes never become a second canonical asset. Verifiable older local files may still be registered for explicit period-specific zero-network reuse without expanding latest-only coverage.
-- Add local-first consumer APIs: read-only GETs remain zero-network; callers first reuse a verified local asset; when the current-policy winner is absent, an authorized explicit ensure may create or reuse a durable idempotent operation to discover, register, and download it without depending on business-profile scheduling. Exact superseded or withdrawn filing selectors resolve retained local bytes or metadata only; ordinary ensure does not recreate predecessors already removed by the version 1 retention policy.
-- Centralize formal annual-report classification, correction precedence, source-qualified identity, content hashing, atomic archive writes, integrity checks, acquisition leases, retry state, and deletion audit.
-- When a verified correction becomes effective, atomically switch the active record while persisting its replacement edge and replayable change-event outbox; create a physical deletion intent only when the predecessor is a distinct blob, while same-hash legal replacements use a non-unlink audit outcome. Remove any distinct superseded attachment (original or earlier correction) from the primary consumer-visible archive only when no non-recovery/deletion-blocking retention pin remains and both predecessor/replacement backup plus deletion gates pass. In version 1, “delete the predecessor” means unlinking that primary archive copy, not secure erasure from every backup medium: announcement metadata, hashes, replacement lineage, processing invalidation, deletion audit, and non-consumer-visible disaster-recovery bytes remain available only to the governed recovery workflow.
-- Reconcile and reuse valid annual-report files already stored under `data/filings/business_profile` and `data/filings/financial_statements/broker_risk_control`; do not redownload valid existing content during migration. A promoted legacy path becomes a hash-verified shared-custody file, and recoverable orphans may enter shadow state only after zero-attachment-download official metadata or audited operator evidence closes their identity.
-- Move business-profile and broker risk-control to the shared annual-report asset dependency while leaving their PDF parsing, derived artifacts, fact storage, review, and promotion semantics domain-owned.
-- Expose stable DataManager and FastAPI contracts for annual-report availability, effective-version metadata, integrity status, and bounded ensure/download requests so current and future AI/API callers can integrate without reading archive paths or business-profile tables directly.
-- Add independent default-disabled configuration, scheduler reporting, disk-space gates with concurrent byte reservations, paired database/file restore requirements, independent-failure-domain file backup, observability, reconciliation, and rollout controls. The first release covers formal annual reports and corrections; semiannual and other announcement types remain extension points and are not proactively downloaded by annual-report maintenance.
-- Define the future document-family acquisition-policy boundary explicitly: a later family may choose metadata-only, bounded explicit-universe proactive acquisition, or independently governed full-market proactive acquisition together with its own effective-version and retention rules. Version 1 proves only neutral policy representation and keeps all non-annual production attachment acquisition disabled.
-- Replace section-level traceability claims with a versioned bidirectional requirements-leaf-to-normative-clause registry and exact task/owner mappings. The existing version 1 registry is only the immutable-ID migration baseline; it is not release coverage evidence until task 1.8 completes the leaf-level migration and task 11.7 attaches reproducible acceptance evidence.
-- **BREAKING (internal ownership/cutover contract only)**: business consumers may no longer directly own or download formal annual-report attachments after migration. Legacy business-owned annual-report archive writes and duplicate active files are retired after reconciliation. Existing public API and business-fact contracts remain compatible; the new asset endpoints and lineage fields are additive.
+- Provide one shared announcement-asset module backed by SQLite metadata and a
+  content-addressed attachment archive under `data/filings/announcements`.
+- Support A-share annual reports first; other announcement types may be added
+  later without changing the V1 contract.
+- Run a daily discovery job for new annual reports and corrections.
+- Provide latest-only historical bootstrap for all active A shares.
+- Provide local-first on-demand API access for other business modules.
+- Reuse existing valid announcement files when they can be identified and
+  verified.
 
-## Capabilities
+## Explicitly Out Of Scope
 
-### New Capabilities
-- `official-announcement-assets`: Canonical announcement metadata, annual-report classification, local-first attachment acquisition, latest-effective revision management, storage, reuse, APIs, migration, and operational governance.
+- Backup, restore, disaster recovery, backup scheduling, or backup capacity
+  approval.
+- Web UI work; this project is consumed through APIs.
+- Business-profile or broker parser completion.
+- General traceability frameworks, release evidence matrices, and consumer
+  migration approval gates.
+- Downloading every announcement type or every historical annual report.
 
-### Modified Capabilities
-- `scheduler`: Adds independent annual-report latest-backfill and daily-update jobs with bounded discovery, resumable state, reporting, and business-independent enablement.
-- `broker-annual-report-risk-control-source`: Replaces broker-owned annual-report discovery/download/archive behavior with the shared asset service while preserving broker parsing and fact contracts.
-- `research-data-engine`: Adds stable business-facing and API-facing annual-report asset access and requires business-profile annual-report acquisition to use the shared dependency.
-- `data-storage-layout`: Defines the shared archive root, existing-file adoption, one-effective-file retention, disk gates, and file-backup expectations under the remounted `data/filings` volume.
+## Success Criteria
 
-## Impact
-
-- Affected code: `research/announcements`, the shared `research/announcement_assets/` package/repository/service, `research/business_profile_archive.py`, business-profile production orchestration, `research/broker_risk_control.py`, `data_manager.py`, FastAPI routes/models, scheduler tasks/configuration, research storage, validation scripts, and documentation.
-- Affected data: new canonical announcement/attachment/blob/current-effective and immutable effective-decision-history/processing-link state; adopted references to existing annual-report files; eventual removal of duplicate and superseded physical annual-report files after verified cutover.
-- Affected operations: one latest-only bootstrap, an independent daily metadata-and-attachment update, long-lookback late-revision reconciliation, on-demand acquisition, archive integrity audits, storage-watermark gates, and an incremental independent-failure-domain file-backup workflow separate from SQLite database backup.
-- Affected release governance: existing registry IDs must be preserved while migrating from coarse requirements-section bindings to bidirectional requirement-leaf and normative-clause evidence; no implementation or release coverage claim may rely on the legacy registry validator alone.
-- Public financial facts, DCF contracts, business-profile facts, and existing API responses remain compatible. New annual-report asset endpoints are additive.
-- Version 1 intentionally optimizes current/latest annual-report availability rather than historical point-in-time reconstruction of superseded physical PDFs; metadata and lineage remain auditable after physical predecessor deletion.
+1. A caller requesting an existing annual report receives the local asset with
+   zero provider requests.
+2. A caller requesting a missing annual report may create metadata and download
+   it through the shared module.
+3. Daily discovery persists new annual-report metadata and downloads eligible
+   full-report attachments.
+4. For one stock and fiscal year, only the newest valid full report or correction
+   is current.
+5. Latest-only bootstrap records one latest effective annual report or an
+   explicit missing/retry state for each active A-share instrument.

@@ -8,11 +8,8 @@ from datetime import datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from .capacity_artifact import CapacityArtifactNotReadyError, validate_capacity_artifact
 from .commands import (
-    ARCHIVE_BACKUP_JOB,
     DAILY_UPDATE_JOB,
-    INTEGRITY_AUDIT_JOB,
     LATEST_BACKFILL_JOB,
     AnnualReportSchedulerCommandService,
     CommandPrincipal,
@@ -65,41 +62,11 @@ def annual_report_scheduler_job_definitions(
             minimum_runs_per_calendar_day=config.daily_min_runs_per_calendar_day,
             cadence_fingerprint=daily_fingerprint,
         ),
-        SchedulerJobDefinition(
-            name=INTEGRITY_AUDIT_JOB,
-            enabled=(
-                execution_enabled
-                and config.jobs.integrity_enabled
-            ),
-            cron=(
-                config.jobs.integrity_cron
-                if not config.jobs.integrity_manual_only
-                else None
-            ),
-            manual_only=config.jobs.integrity_manual_only,
-        ),
-        SchedulerJobDefinition(
-            name=ARCHIVE_BACKUP_JOB,
-            enabled=(
-                execution_enabled
-                and config.scheduled_enabled
-                and config.jobs.backup_enabled
-                and config.backup.enabled
-            ),
-            cron=config.jobs.backup_cron,
-            manual_only=config.jobs.backup_manual_only,
-        ),
     )
 
 
 def _execution_gate_ready(config: AnnouncementAssetConfig) -> bool:
-    if not config.enabled or config.dry_run:
-        return False
-    try:
-        validate_capacity_artifact(config)
-    except (CapacityArtifactNotReadyError, OSError, RuntimeError):
-        return False
-    return True
+    return bool(config.enabled and not config.dry_run)
 
 
 @dataclass(frozen=True)
@@ -120,35 +87,6 @@ class AnnualReportCronAdapter:
             scope=_daily_scope(self.commands.config, scope),
             bounds=bounds,
         )
-
-    def start_backup(
-        self,
-        *,
-        scope: Mapping[str, Any] | None = None,
-        bounds: Mapping[str, int] | None = None,
-    ) -> JobStartResult:
-        return self.commands.start(
-            ARCHIVE_BACKUP_JOB,
-            principal=self.service_principal,
-            trigger_kind="cron",
-            scope=scope,
-            bounds=bounds,
-        )
-
-    def start_integrity_audit(
-        self,
-        *,
-        scope: Mapping[str, Any] | None = None,
-        bounds: Mapping[str, int] | None = None,
-    ) -> JobStartResult:
-        return self.commands.start(
-            INTEGRITY_AUDIT_JOB,
-            principal=self.service_principal,
-            trigger_kind="cron",
-            scope=scope,
-            bounds=bounds,
-        )
-
 
 @dataclass(frozen=True)
 class AnnualReportOperatorAdapter:

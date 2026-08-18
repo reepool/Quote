@@ -4,15 +4,13 @@ from dataclasses import replace
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 
 from data_manager import DataManager
 from research.announcement_assets import (
-    ARCHIVE_BACKUP_JOB,
     DAILY_UPDATE_JOB,
-    INTEGRITY_AUDIT_JOB,
     LATEST_BACKFILL_JOB,
     AnnouncementAssetConfig,
     AnnouncementAssetRepository,
@@ -361,7 +359,15 @@ def test_enabled_access_lazily_binds_real_discovery_and_retrieval(
     assert access.service.acquisition_service is acquisition
     assert access.service.attachment_retriever is retriever
     manager._build_official_announcement_acquisition_service.assert_called_once_with()
-    retrieval_factory.assert_called_once_with({"cninfo": {"enabled": True}})
+    retrieval_factory.assert_called_once_with(
+        {
+            "cninfo": {
+                "enabled": True,
+                "max_attachment_bytes": 1024 * 1024,
+            }
+        }
+    )
+    assert acquisition.config.provider_configs == {"cninfo": {"enabled": True}}
     assert not (tmp_path / "research.db").exists()
 
 
@@ -437,7 +443,7 @@ def test_asset_runtime_binds_exchange_routes_without_changing_other_purposes(
     )
 
 
-def test_scheduler_command_plane_registers_all_production_runners(tmp_path):
+def test_scheduler_command_plane_registers_shared_asset_runners(tmp_path):
     manager = object.__new__(DataManager)
     manager._announcement_asset_access_signature = ("research.db", "config")
     manager._announcement_asset_scheduler_commands = None
@@ -447,7 +453,6 @@ def test_scheduler_command_plane_registers_all_production_runners(tmp_path):
         config=config,
         repository=object(),
         service=SimpleNamespace(acquisition_service=object()),
-        readiness=lambda **kwargs: {"ready_for_daily": True, "blockers": ()},
     )
     manager._get_announcement_asset_access = lambda **kwargs: access
 
@@ -456,15 +461,13 @@ def test_scheduler_command_plane_registers_all_production_runners(tmp_path):
     assert set(commands.runners) == {
         LATEST_BACKFILL_JOB,
         DAILY_UPDATE_JOB,
-        INTEGRITY_AUDIT_JOB,
-        ARCHIVE_BACKUP_JOB,
     }
     assert all(
         runner == manager._run_announcement_asset_operation
         for runner in commands.runners.values()
     )
     assert commands.acquisition_service is access.service.acquisition_service
-    assert commands.readiness_gate(DAILY_UPDATE_JOB) == (True, ())
+    assert commands.readiness_gate is None
 
 
 def test_accepted_command_bounds_are_applied_to_worker_config(tmp_path):
@@ -537,6 +540,51 @@ def test_universe_freshness_fails_closed_without_authoritative_refresh_watermark
     assert snapshot.indeterminate[-1]["reason"] == (
         "missing_authoritative_master_refresh_watermark"
     )
+
+
+def test_universe_uses_persisted_authoritative_full_refresh_watermark(tmp_path):
+    config = _runtime_config(tmp_path)
+    completed_at = "2026-08-12T00:00:00+00:00"
+    repository = SimpleNamespace(
+        list_operational_reports=lambda **kwargs: [
+            {
+                "config_fingerprint": config.evidence_fingerprint,
+                "payload": {
+                    "status": "complete",
+                    "scope": "full_refresh",
+                    "source": "instrument_master_governance:a_share_stock",
+                    "watermark": "master-refresh-1",
+                    "exchanges": ["SSE"],
+                    "completed_at": completed_at,
+                },
+            }
+        ],
+        get_latest_complete_listed_security_census_snapshot=lambda: None,
+    )
+    manager = object.__new__(DataManager)
+    manager.db_ops = SimpleNamespace(
+        get_research_target_instruments_by_exchange_sync=lambda *args, **kwargs: [
+            {
+                "instrument_id": "600000.SH",
+                "exchange": "SSE",
+                "type": "stock",
+                "currency": "CNY",
+                "status": "listed",
+                "is_active": True,
+                "updated_at": "2026-07-01T00:00:00+00:00",
+            }
+        ]
+    )
+
+    snapshot = manager._materialize_announcement_asset_universe(
+        repository=repository,
+        config=config,
+        snapshot_at="2026-08-12T01:00:00+00:00",
+    )
+
+    assert snapshot.master_data_last_success_at == completed_at
+    assert snapshot.status == "complete"
+    assert snapshot.indeterminate == ()
 
 
 @pytest.mark.asyncio
@@ -1034,6 +1082,7 @@ def test_production_operation_dispatches_all_four_real_service_adapters(
     manager._materialize_announcement_asset_universe = MagicMock(
         return_value=snapshot
     )
+    manager._refresh_announcement_asset_master_data = MagicMock()
     manager._refresh_announcement_asset_listed_security_census = MagicMock()
 
     runtime_service = SimpleNamespace(
@@ -1113,6 +1162,7 @@ def test_production_operation_dispatches_all_four_real_service_adapters(
         as_of=date(2026, 8, 12),
         repair=bootstrap.run.call_args.kwargs["repair"],
         operation_id=f"operation-{LATEST_BACKFILL_JOB}",
+        elapsed_seconds_before_run=ANY,
     )
     repair = bootstrap.run.call_args.kwargs["repair"]
     acquisition = runtime_service.acquisition_service
@@ -1132,6 +1182,7 @@ def test_production_operation_dispatches_all_four_real_service_adapters(
     assert query.scope.start_date == "2024-01-01"
     assert query.scope.end_date == "2025-04-30"
     assert query.scope.source_options == {"fiscal_year": 2024}
+    manager._refresh_announcement_asset_master_data.assert_called_once()
     manager._refresh_announcement_asset_listed_security_census.assert_called_once()
     daily_kwargs = daily.run.call_args.kwargs
     assert daily_kwargs["operation_id"] == f"operation-{DAILY_UPDATE_JOB}"

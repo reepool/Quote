@@ -288,9 +288,18 @@ class DataManager:
                     acquisition_service,
                     config,
                 )
+                retrieval_configs = {
+                    source: {
+                        **dict(provider_config),
+                        "max_attachment_bytes": config.storage.max_attachment_bytes,
+                    }
+                    for source, provider_config in (
+                        acquisition_service.config.provider_configs.items()
+                    )
+                }
                 attachment_retriever = (
                     AnnouncementAttachmentRetriever.from_provider_configs(
-                        acquisition_service.config.provider_configs
+                        retrieval_configs
                     )
                 )
             else:
@@ -361,9 +370,7 @@ class DataManager:
     ):
         """Build the one durable command plane used by every runtime adapter."""
         from research.announcement_assets import (
-            ARCHIVE_BACKUP_JOB,
             DAILY_UPDATE_JOB,
-            INTEGRITY_AUDIT_JOB,
             LATEST_BACKFILL_JOB,
             AnnualReportSchedulerCommandService,
         )
@@ -389,19 +396,8 @@ class DataManager:
                 for job_name in (
                     LATEST_BACKFILL_JOB,
                     DAILY_UPDATE_JOB,
-                    INTEGRITY_AUDIT_JOB,
-                    ARCHIVE_BACKUP_JOB,
                 )
             }
-
-            def readiness_gate(job_name: str) -> tuple[bool, tuple[str, ...]]:
-                if job_name != DAILY_UPDATE_JOB:
-                    return True, ()
-                report = access.readiness(operator=False)
-                return (
-                    bool(report.get("ready_for_daily")),
-                    tuple(str(item) for item in report.get("blockers", ())),
-                )
 
             self._announcement_asset_scheduler_commands = (
                 AnnualReportSchedulerCommandService(
@@ -409,7 +405,6 @@ class DataManager:
                     config=access.config,
                     config_version=access.config.config_fingerprint,
                     runners=runners,
-                    readiness_gate=readiness_gate,
                     acquisition_service=access.service.acquisition_service,
                 )
             )
@@ -471,6 +466,102 @@ class DataManager:
             parsed = parsed.replace(tzinfo=timezone.utc)
         return parsed.astimezone(timezone.utc).isoformat()
 
+    @staticmethod
+    def _announcement_asset_master_refresh_evidence(
+        *,
+        repository: Any,
+        config: Any,
+    ) -> Optional[Dict[str, Any]]:
+        reader = getattr(repository, "list_operational_reports", None)
+        if reader is None:
+            return None
+        reports = reader(
+            report_kind="master_data_refresh_evidence",
+            scope_key="active_a_share",
+            limit=1,
+        )
+        if not reports:
+            return None
+        report = reports[0]
+        if report.get("config_fingerprint") != config.evidence_fingerprint:
+            return None
+        payload = report.get("payload")
+        return dict(payload) if isinstance(payload, Mapping) else None
+
+    def _refresh_announcement_asset_master_data(
+        self,
+        *,
+        repository: Any,
+        config: Any,
+        operation_id: str,
+    ) -> Dict[str, Any]:
+        """Run and persist one authoritative full A-share master refresh."""
+
+        from research.announcement_assets.models import canonical_json
+
+        result = asyncio.run(
+            self.run_master_governance(
+                [
+                    MasterGovernanceRequirement(
+                        scope="a_share_stock",
+                        exchanges=list(config.exchanges),
+                        instrument_types=["stock"],
+                        mode="force_refresh",
+                        job_name="annual_report_asset_universe_refresh",
+                        job_type="current",
+                        continue_on_error=False,
+                    )
+                ]
+            )
+        )
+        completed_exchanges = {
+            str(item).strip().upper()
+            for item in (result.get("summary") or {}).get("exchanges", ())
+            if str(item).strip()
+        }
+        expected_exchanges = {
+            str(item).strip().upper() for item in config.exchanges
+        }
+        if (
+            str(result.get("status") or "").lower() != "success"
+            or completed_exchanges != expected_exchanges
+            or result.get("errors")
+        ):
+            raise RuntimeError("authoritative A-share master refresh is incomplete")
+        completed_at = self._announcement_asset_timestamp(result.get("finished_at"))
+        if completed_at is None:
+            raise RuntimeError("authoritative A-share master refresh lacks completion time")
+        watermark = hashlib.sha256(
+            canonical_json(
+                {
+                    "schema_version": "announcement_asset_master_refresh.v1",
+                    "completed_at": completed_at,
+                    "exchanges": sorted(completed_exchanges),
+                    "summary": result.get("summary") or {},
+                    "source_priority": result.get("source_priority") or [],
+                }
+            ).encode("utf-8")
+        ).hexdigest()
+        evidence = {
+            "status": "complete",
+            "scope": "full_refresh",
+            "source": "instrument_master_governance:a_share_stock",
+            "watermark": watermark,
+            "exchanges": sorted(completed_exchanges),
+            "completed_at": completed_at,
+        }
+        repository.persist_operational_report(
+            report_kind="master_data_refresh_evidence",
+            schema_version="announcement_asset_master_refresh_evidence.v1",
+            config_fingerprint=config.evidence_fingerprint,
+            status="complete",
+            generated_at=completed_at,
+            payload=evidence,
+            operation_id=operation_id,
+            scope_key="active_a_share",
+        )
+        return evidence
+
     def _materialize_announcement_asset_universe(
         self,
         *,
@@ -505,13 +596,14 @@ class DataManager:
         source_complete = bool(rows) and all(
             counts.get(exchange, 0) > 0 for exchange in config.exchanges
         )
-        updated_at_values = [
-            value
-            for item in rows
-            if (value := self._announcement_asset_timestamp(item.get("updated_at")))
-        ]
+        master_refresh_evidence = self._announcement_asset_master_refresh_evidence(
+            repository=repository,
+            config=config,
+        )
         master_last_success_at = (
-            min(updated_at_values) if updated_at_values else None
+            None
+            if master_refresh_evidence is None
+            else str(master_refresh_evidence.get("completed_at") or "") or None
         )
         version_payload = {
             "schema_version": "announcement_asset_local_master.v1",
@@ -553,6 +645,7 @@ class DataManager:
             master_data_last_success_at=master_last_success_at,
             snapshot_at=snapshot_at,
             source_complete=source_complete,
+            master_data_refresh_evidence=master_refresh_evidence,
         )
         census_row = repository.get_latest_complete_listed_security_census_snapshot()
         if census_row is None:
@@ -700,18 +793,14 @@ class DataManager:
 
     def _run_announcement_asset_operation(self, operation: Any) -> Any:
         """Execute one already-claimed durable operation with real services."""
+        operation_execution_started = time.monotonic()
         from research.announcement_assets import (
-            ARCHIVE_BACKUP_JOB,
             DAILY_UPDATE_JOB,
-            INTEGRITY_AUDIT_JOB,
             LATEST_BACKFILL_JOB,
-            AnnouncementAssetIntegrityAuditService,
             AnnouncementAssetService,
             AnnualReportBootstrap,
             AnnualReportDailyUpdater,
-            ProductionIntegrityRepairHandlers,
         )
-        from research.announcement_assets.backup import AnnouncementAssetBackupService
 
         access = self._get_announcement_asset_access(initialize_schema=False)
         config = self._announcement_asset_bounded_config(access.config, operation)
@@ -733,12 +822,17 @@ class DataManager:
                 if as_of_value
                 else datetime.now(ZoneInfo(config.timezone)).date()
             )
-            snapshot_at = datetime.now(timezone.utc).isoformat()
+            self._refresh_announcement_asset_master_data(
+                repository=access.repository,
+                config=config,
+                operation_id=operation.operation_id,
+            )
             self._refresh_announcement_asset_listed_security_census(
                 repository=access.repository,
                 config=config,
-                snapshot_at=snapshot_at,
+                snapshot_at=datetime.now(timezone.utc).isoformat(),
             )
+            snapshot_at = datetime.now(timezone.utc).isoformat()
             snapshot = self._materialize_announcement_asset_universe(
                 repository=access.repository,
                 config=config,
@@ -786,24 +880,35 @@ class DataManager:
                 as_of=as_of,
                 repair=repair_missing_instrument,
                 operation_id=operation.operation_id,
+                elapsed_seconds_before_run=(
+                    time.monotonic() - operation_execution_started
+                ),
             )
         if operation.operation_type == DAILY_UPDATE_JOB:
             cutoff = scope.get("run_cutoff")
             census_refreshed = False
+            master_refreshed = False
 
             def refresh_universe(refresh_cutoff: str):
-                nonlocal census_refreshed
+                nonlocal census_refreshed, master_refreshed
+                if not master_refreshed:
+                    self._refresh_announcement_asset_master_data(
+                        repository=access.repository,
+                        config=config,
+                        operation_id=operation.operation_id,
+                    )
+                    master_refreshed = True
                 if not census_refreshed:
                     self._refresh_announcement_asset_listed_security_census(
                         repository=access.repository,
                         config=config,
-                        snapshot_at=refresh_cutoff,
+                        snapshot_at=datetime.now(timezone.utc).isoformat(),
                     )
                     census_refreshed = True
                 return self._materialize_announcement_asset_universe(
                     repository=access.repository,
                     config=config,
-                    snapshot_at=refresh_cutoff,
+                    snapshot_at=datetime.now(timezone.utc).isoformat(),
                 )
 
             return AnnualReportDailyUpdater(
@@ -816,45 +921,6 @@ class DataManager:
                 operation_id=operation.operation_id,
                 universe_refresh=refresh_universe,
             )
-        if operation.operation_type == INTEGRITY_AUDIT_JOB:
-            deletion_ids = tuple(scope.get("deletion_ids", ()))
-            action_flags = dict(scope.get("action_flags") or {})
-            read_only = bool(scope.get("read_only", True))
-            repair_handlers = {}
-            if not read_only:
-                repair_handlers = ProductionIntegrityRepairHandlers(
-                    repository=access.repository,
-                    config=config,
-                    service=service,
-                    operation_id=operation.operation_id,
-                    actor=str(operation.owner or operation.lease_owner or ""),
-                    request_fingerprint=str(
-                        scope.get("request_fingerprint") or ""
-                    ),
-                ).as_mapping()
-            return AnnouncementAssetIntegrityAuditService(
-                repository=access.repository,
-                config=config,
-                repair_handlers=repair_handlers,
-            ).run(
-                content_hashes=tuple(scope.get("content_hashes", ())),
-                deletion_ids=deletion_ids,
-                action_flags=action_flags,
-                operator_authorized=not read_only,
-                max_targets=int(
-                    scope.get("bounds", {}).get(
-                        "max_instruments",
-                        config.discovery.max_instruments,
-                    )
-                ),
-                persist=not read_only,
-                operation_id=operation.operation_id,
-            )
-        if operation.operation_type == ARCHIVE_BACKUP_JOB:
-            return AnnouncementAssetBackupService(
-                repository=access.repository,
-                config=config,
-            ).run()
         raise ValueError("unsupported annual-report asset operation")
 
     async def _start_and_execute_announcement_asset_job(
@@ -1035,64 +1101,6 @@ class DataManager:
             DAILY_UPDATE_JOB,
             trigger_kind=trigger_kind,
             scope=scope,
-            bounds=bounds,
-            principal_id=principal_id,
-        )
-
-    async def run_annual_report_asset_integrity_audit(
-        self,
-        *,
-        content_hashes: Sequence[str] = (),
-        deletion_ids: Sequence[str] = (),
-        action_flags: Optional[Mapping[str, bool]] = None,
-        bounds: Optional[Mapping[str, int]] = None,
-        trigger_kind: str = "manual",
-        principal_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        from research.announcement_assets import INTEGRITY_AUDIT_JOB
-
-        return await self._start_and_execute_announcement_asset_job(
-            INTEGRITY_AUDIT_JOB,
-            trigger_kind=trigger_kind,
-            scope={
-                "content_hashes": tuple(content_hashes),
-                "deletion_ids": tuple(deletion_ids),
-            },
-            bounds=bounds,
-            action_flags=action_flags,
-            principal_id=principal_id,
-        )
-
-    async def run_annual_report_asset_backup(
-        self,
-        *,
-        bounds: Optional[Mapping[str, int]] = None,
-        trigger_kind: str = "cron",
-        expected_recovery_policy: Optional[Mapping[str, str]] = None,
-        principal_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        from research.announcement_assets import ARCHIVE_BACKUP_JOB
-
-        commands = self._get_announcement_asset_scheduler_commands(
-            initialize_schema=False
-        )
-        expected = dict(expected_recovery_policy or {})
-        configured = {
-            "recovery_journal_retention_policy": (
-                commands.config.backup.recovery_journal_retention_policy
-            ),
-            "recovery_journal_integrity_policy": (
-                commands.config.backup.recovery_journal_integrity_policy
-            ),
-        }
-        if any(
-            value is not None and value != configured.get(key)
-            for key, value in expected.items()
-        ):
-            raise ValueError("annual-report backup recovery policy mismatch")
-        return await self._start_and_execute_announcement_asset_job(
-            ARCHIVE_BACKUP_JOB,
-            trigger_kind=trigger_kind,
             bounds=bounds,
             principal_id=principal_id,
         )
@@ -17101,7 +17109,7 @@ class DataManager:
         for instrument_id in sorted((before.get('active_ids') or set()) - official_ids):
             row = before_rows.get(instrument_id) or {}
             name = str(row.get('name') or '').strip()
-            if not name.startswith('退市'):
+            if not (name.startswith('退市') or name.endswith('退')):
                 continue
             result['checked_count'] += 1
             latest_quote_date = None

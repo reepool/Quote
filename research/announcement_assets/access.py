@@ -13,7 +13,6 @@ from typing import Any, BinaryIO
 
 from .config import AnnouncementAssetConfig
 from .models import AssetAvailability, EnsureRequest, IntegrityStatus, stable_id
-from .readiness import AnnouncementAssetReadinessService
 from .repository import AnnouncementAssetRepository
 from .service import AnnouncementAssetService
 from .storage import MountIdentity, probe_mount_identity
@@ -353,12 +352,51 @@ class AnnouncementAssetAccess:
         return self._consumer_request_projection(request), disposition
 
     def readiness(self, *, operator: bool = False) -> dict[str, Any]:
-        return asdict(
-            AnnouncementAssetReadinessService(
-                repository=self.repository,
-                config=self.config,
-            ).report(operator=operator)
+        total = 0
+        local_valid = 0
+        offset = 0
+        while True:
+            page = self.repository.list_effective_reports(limit=1000, offset=offset)
+            total += len(page)
+            local_valid += sum(
+                report.availability is AssetAvailability.LOCAL_VALID
+                for report in page
+            )
+            if len(page) < 1000:
+                break
+            offset += len(page)
+        recent_daily = self.repository.list_operations(
+            operation_type="annual_report_asset_daily_update",
+            limit=1,
         )
+        latest = recent_daily[0] if recent_daily else None
+        ready_for_daily = bool(
+            self.config.enabled
+            and self.config.scheduled_enabled
+            and self.config.jobs.daily_enabled
+            and not self.config.dry_run
+        )
+        blockers = [] if ready_for_daily else ["daily_job_disabled"]
+        summary = {
+            "effective_asset_count": total,
+            "local_valid_asset_count": local_valid,
+            "latest_daily_status": (
+                None if latest is None else latest.status.value
+            ),
+            "latest_daily_outcome": (
+                None if latest is None or latest.outcome is None else latest.outcome.value
+            ),
+        }
+        return {
+            "status": "ready" if ready_for_daily else "disabled",
+            "ready_for_reads": True,
+            "ready_for_daily": ready_for_daily,
+            "ready_for_deletion": False,
+            "blockers": blockers,
+            "warnings": [],
+            "summary": summary,
+            "operator_diagnostics": summary if operator else None,
+        }
 
     def content_handle(self, asset_id: str) -> dict[str, Any]:
         """Open a verified current asset under a deletion-blocking read lease."""

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+from io import BytesIO
+from pathlib import Path
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
@@ -50,6 +52,8 @@ _CORRECTION_EVIDENCE_MARKERS = (
 )
 _HARD_EXCLUSIONS = (
     "摘要",
+    "（英文）",
+    "(英文)",
     "英文版",
     "英文版本",
     "英文简版",
@@ -83,6 +87,7 @@ _NOTICE_ONLY_MARKERS = (
     "更正说明",
     "修订公告",
 )
+_CORRECTION_NOTICE_RE = re.compile(r"关于(?:对)?[^。；;]*更正[^。；;]*公告")
 _HTML_TAG_RE = re.compile(r"<[^>]*>")
 
 
@@ -194,9 +199,10 @@ class AnnualReportClassifier:
             if correction_evidence
             else AnnualReportVariant.ORIGINAL
         )
-        notice_only = any(
-            marker in combined for marker in _NOTICE_ONLY_MARKERS
-        ) and not any(marker in combined for marker in _CORRECTION_MARKERS)
+        notice_only = (
+            any(marker in combined for marker in _NOTICE_ONLY_MARKERS)
+            or bool(_CORRECTION_NOTICE_RE.search(combined))
+        ) and not any(marker in attachment_name for marker in _CORRECTION_MARKERS)
         if notice_only:
             reasons.append("correction_notice_without_full_replacement")
 
@@ -219,6 +225,48 @@ class AnnualReportClassifier:
             policy_version=self.policy_version,
             vocabulary_version=CLASSIFICATION_VOCABULARY_VERSION,
         )
+
+
+def refine_classification_from_pdf(
+    classification: AnnualReportClassification,
+    pdf: bytes | Path,
+) -> AnnualReportClassification:
+    """Reject a provider-mislabeled summary when the PDF title proves it."""
+
+    if not classification.is_eligible or not _pdf_first_page_is_annual_summary(pdf):
+        return classification
+    reasons = tuple(
+        reason
+        for reason in classification.reasons
+        if not reason.startswith("eligible_complete_")
+    ) + ("excluded:pdf_annual_report_summary",)
+    return AnnualReportClassification(
+        document_family=classification.document_family,
+        fiscal_year=classification.fiscal_year,
+        report_period=classification.report_period,
+        variant=classification.variant,
+        is_full_report=False,
+        is_eligible=False,
+        correction_evidence=classification.correction_evidence,
+        reasons=reasons,
+        policy_version=classification.policy_version,
+        vocabulary_version=classification.vocabulary_version,
+    )
+
+
+def _pdf_first_page_is_annual_summary(pdf: bytes | Path) -> bool:
+    try:
+        from pypdf import PdfReader
+        from pypdf.errors import PyPdfError
+
+        source = BytesIO(pdf) if isinstance(pdf, bytes) else str(pdf)
+        reader = PdfReader(source, strict=False)
+        if not reader.pages:
+            return False
+        text = re.sub(r"\s+", "", str(reader.pages[0].extract_text() or ""))
+    except (OSError, ValueError, TypeError, IndexError, KeyError, PyPdfError):
+        return False
+    return bool(re.search(r"\d{4}年年度报告摘要", text))
 
 
 def derive_fiscal_year_search_bounds(

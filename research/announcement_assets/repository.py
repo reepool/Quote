@@ -264,6 +264,7 @@ class AnnouncementAssetRepository:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self.connection() as conn:
             conn.executescript(SCHEMA_SQL)
+            self._migrate_historical_asset_reference_contract(conn)
             self._migrate_attachment_version_temporal_columns(conn)
             self._migrate_attachment_version_visibility(conn)
             self._migrate_effective_visibility_column(conn)
@@ -290,6 +291,165 @@ class AnnouncementAssetRepository:
                 (SCHEMA_VERSION, utc_now_iso()),
             )
             conn.commit()
+
+    @staticmethod
+    def _migrate_historical_asset_reference_contract(
+        conn: sqlite3.Connection,
+    ) -> None:
+        """Detach historical references from the mutable current projection."""
+
+        table_specs = {
+            "official_asset_adoption_promotion_gates": {
+                "create": """
+                    CREATE TABLE official_asset_adoption_promotion_gates (
+                        gate_id TEXT PRIMARY KEY,
+                        schema_version TEXT NOT NULL,
+                        asset_id TEXT NOT NULL,
+                        inventory_fingerprint TEXT NOT NULL,
+                        config_fingerprint TEXT NOT NULL,
+                        content_hash TEXT NOT NULL,
+                        content_length INTEGER NOT NULL CHECK(content_length > 0),
+                        canonical_path TEXT NOT NULL,
+                        mount_filesystem_key TEXT NOT NULL,
+                        custody_state TEXT NOT NULL CHECK(custody_state IN (
+                            'canonical', 'shared_controlled_legacy'
+                        )),
+                        status TEXT NOT NULL CHECK(status IN (
+                            'ready', 'consumed', 'invalidated'
+                        )),
+                        reconciled_at TEXT NOT NULL,
+                        expires_at TEXT NOT NULL,
+                        consumed_at TEXT,
+                        invalidated_at TEXT,
+                        invalidation_reason TEXT,
+                        evidence_json TEXT NOT NULL DEFAULT '{}',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL,
+                        FOREIGN KEY(content_hash)
+                            REFERENCES official_document_blobs(content_hash)
+                    )
+                """,
+                "indexes": (
+                    """CREATE INDEX idx_official_asset_adoption_gates_asset
+                       ON official_asset_adoption_promotion_gates(
+                           asset_id, status, reconciled_at
+                       )""",
+                ),
+            },
+            "official_asset_consumer_requests": {
+                "create": """
+                    CREATE TABLE official_asset_consumer_requests (
+                        consumer_request_id TEXT PRIMARY KEY,
+                        schema_version TEXT NOT NULL,
+                        principal TEXT NOT NULL,
+                        consumer TEXT NOT NULL,
+                        idempotency_key TEXT NOT NULL,
+                        request_fingerprint TEXT NOT NULL,
+                        processing_fingerprint TEXT NOT NULL,
+                        selector_json TEXT NOT NULL,
+                        asset_request_id TEXT,
+                        asset_id TEXT,
+                        processing_id TEXT,
+                        status TEXT NOT NULL CHECK(status IN (
+                            'pending_asset', 'not_started', 'queued', 'processing',
+                            'completed', 'failed', 'missing', 'blocked',
+                            'cancelled', 'expired'
+                        )),
+                        result_state TEXT NOT NULL CHECK(result_state IN (
+                            'unavailable', 'current', 'stale', 'reprocessing'
+                        )),
+                        result_identity TEXT,
+                        resolved_source TEXT,
+                        resolved_source_announcement_id TEXT,
+                        resolved_attachment_id TEXT,
+                        resolved_observation_version TEXT,
+                        resolved_content_hash TEXT,
+                        resolved_report_period TEXT,
+                        reason_code TEXT,
+                        retry_metadata_json TEXT NOT NULL DEFAULT '{}',
+                        diagnostics_json TEXT NOT NULL DEFAULT '{}',
+                        metadata_json TEXT NOT NULL DEFAULT '{}',
+                        processing_started_at TEXT,
+                        finished_at TEXT,
+                        stop_requested_at TEXT,
+                        cancelled_at TEXT,
+                        expires_at TEXT NOT NULL,
+                        expired_at TEXT,
+                        tombstone_until TEXT,
+                        retention_policy_version TEXT NOT NULL DEFAULT
+                            'consumer_request_retention.v1',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL,
+                        FOREIGN KEY(asset_request_id) REFERENCES
+                            official_asset_operation_subscriptions(asset_request_id),
+                        UNIQUE(principal, idempotency_key)
+                    )
+                """,
+                "indexes": (
+                    """CREATE INDEX idx_official_asset_consumer_requests_owner
+                       ON official_asset_consumer_requests(
+                           principal, status, updated_at
+                       )""",
+                    """CREATE INDEX idx_official_asset_consumer_requests_asset_request
+                       ON official_asset_consumer_requests(
+                           asset_request_id, status, updated_at
+                       )""",
+                ),
+            },
+        }
+        pending = []
+        for table, spec in table_specs.items():
+            foreign_keys = conn.execute(f"PRAGMA foreign_key_list({table})").fetchall()
+            if any(
+                str(row[2]) == "effective_annual_reports"
+                and str(row[3]) == "asset_id"
+                for row in foreign_keys
+            ):
+                pending.append((table, spec))
+        if not pending:
+            return
+
+        conn.commit()
+        conn.execute("PRAGMA foreign_keys=OFF")
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            for table, spec in pending:
+                legacy_table = f"{table}_legacy_effective_asset_fk"
+                conn.execute(f"ALTER TABLE {table} RENAME TO {legacy_table}")
+                conn.execute(str(spec["create"]))
+                old_columns = tuple(
+                    str(row[1])
+                    for row in conn.execute(
+                        f"PRAGMA table_info({legacy_table})"
+                    ).fetchall()
+                )
+                new_columns = tuple(
+                    str(row[1])
+                    for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
+                )
+                if old_columns != new_columns:
+                    raise RuntimeError(
+                        f"historical asset-reference migration column mismatch: {table}"
+                    )
+                columns_sql = ", ".join(old_columns)
+                conn.execute(
+                    f"INSERT INTO {table} ({columns_sql}) "
+                    f"SELECT {columns_sql} FROM {legacy_table}"
+                )
+                conn.execute(f"DROP TABLE {legacy_table}")
+                for index_sql in spec["indexes"]:
+                    conn.execute(str(index_sql))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.execute("PRAGMA foreign_keys=ON")
+        violations = conn.execute("PRAGMA foreign_key_check").fetchall()
+        if violations:
+            raise RuntimeError(
+                "historical asset-reference migration left foreign-key violations"
+            )
 
     def schema_initialized(self) -> bool:
         """Return whether the shared catalog tables exist without mutating SQLite."""
@@ -1185,6 +1345,31 @@ class AnnouncementAssetRepository:
             ).fetchone()
         return self._attachment_from_row(_require_row(row))
 
+    def update_attachment_metadata(
+        self,
+        attachment_id: str,
+        metadata: Mapping[str, object],
+        *,
+        updated_at: str | None = None,
+    ) -> OfficialAnnouncementAttachment:
+        updated = updated_at or utc_now_iso()
+        with self.transaction() as conn:
+            cursor = conn.execute(
+                """
+                UPDATE official_announcement_attachments
+                SET metadata_json=?, updated_at=?
+                WHERE attachment_id=?
+                """,
+                (canonical_json(metadata), updated, attachment_id),
+            )
+            if cursor.rowcount != 1:
+                raise KeyError(f"attachment not found: {attachment_id}")
+            row = conn.execute(
+                "SELECT * FROM official_announcement_attachments WHERE attachment_id=?",
+                (attachment_id,),
+            ).fetchone()
+        return self._attachment_from_row(_require_row(row))
+
     def get_announcement(self, announcement_id: str) -> OfficialAnnouncement | None:
         with self.connection() as conn:
             row = conn.execute(
@@ -1256,7 +1441,9 @@ class AnnouncementAssetRepository:
             )
             version_params: list[Any] = []
             if observation_cutoff is not None:
-                version_cutoff_clause += " AND v2.version_available_at<=?"
+                version_cutoff_clause += (
+                    " AND julianday(v2.version_available_at)<=julianday(?)"
+                )
                 version_params.append(str(observation_cutoff))
             rows = conn.execute(
                 f"""
@@ -3152,11 +3339,14 @@ class AnnouncementAssetRepository:
             clauses.append("e.fiscal_year=?")
             params.append(int(fiscal_year))
         if knowledge_cutoff is not None:
-            clauses.append("(e.published_at IS NULL OR e.published_at<=?)")
+            clauses.append(
+                "(e.published_at IS NULL "
+                "OR julianday(e.published_at)<=julianday(?))"
+            )
             params.append(knowledge_cutoff)
             clauses.append(
                 "(v.version_available_at IS NULL OR v.version_available_at='' "
-                "OR v.version_available_at<=?)"
+                "OR julianday(v.version_available_at)<=julianday(?))"
             )
             params.append(knowledge_cutoff)
         sql = (
@@ -7325,6 +7515,189 @@ class AnnouncementAssetRepository:
             _decode_row(row, json_fields=("payload_json",)) for row in rows
         ]
 
+    def load_backup_protection_runtime_state(
+        self,
+        *,
+        config: Any,
+        now: str,
+    ) -> Any:
+        """Load and re-evaluate the durable global backup-write projection."""
+
+        from .config import BackupProtectionRuntimeState
+
+        with self.connection() as conn:
+            row = conn.execute(
+                """SELECT * FROM official_asset_operational_reports
+                   WHERE report_kind='backup_protection_runtime_state'
+                     AND scope_key='global'
+                   ORDER BY rowid DESC LIMIT 1"""
+            ).fetchone()
+        if row is None:
+            return BackupProtectionRuntimeState.fresh(config)
+        stored = _decode_row(row, json_fields=("payload_json",))
+        payload = dict(stored["payload"])
+        if payload.get("config_fingerprint") == config.evidence_fingerprint:
+            return BackupProtectionRuntimeState.from_mapping(
+                payload,
+                config=config,
+                now=now,
+            )
+        # A configuration change invalidates the prior protection envelope.
+        # Carry forward exposure conservatively and require a fresh verified
+        # closure under the new fingerprint before scheduled writes resume.
+        return BackupProtectionRuntimeState(
+            config_fingerprint=config.evidence_fingerprint,
+            unprotected_bytes=int(payload.get("unprotected_bytes") or 0),
+            accumulation_started_at=payload.get("accumulation_started_at"),
+            blocked=True,
+            blocker_reasons=("backup_protection_config_changed",),
+            last_backup_attempt_at=payload.get("last_backup_attempt_at"),
+            last_verified_backup_at=payload.get("last_verified_backup_at"),
+        ).evaluate(config=config, now=now)
+
+    def update_backup_protection_runtime_state(
+        self,
+        *,
+        config: Any,
+        observed_at: str,
+        unprotected_bytes: int | None = None,
+        absolute_unprotected_bytes: int | None = None,
+        verified_closure: bool | None = None,
+        expected_report_id: str | None = None,
+        enforce_expected_report: bool = False,
+    ) -> Any:
+        """Atomically append one backup-protection state transition."""
+
+        from .config import BackupProtectionRuntimeState
+
+        supplied = sum(
+            item is not None
+            for item in (
+                unprotected_bytes,
+                absolute_unprotected_bytes,
+                verified_closure,
+            )
+        )
+        if supplied != 1:
+            raise ValueError("exactly one backup protection transition is required")
+        with self.transaction() as conn:
+            row = conn.execute(
+                """SELECT * FROM official_asset_operational_reports
+                   WHERE report_kind='backup_protection_runtime_state'
+                     AND scope_key='global'
+                   ORDER BY rowid DESC LIMIT 1"""
+            ).fetchone()
+            current_report_id = None if row is None else str(row["report_id"])
+            if row is None:
+                state = BackupProtectionRuntimeState.fresh(config)
+            else:
+                payload = dict(
+                    _decode_row(row, json_fields=("payload_json",))["payload"]
+                )
+                if payload.get("config_fingerprint") == config.evidence_fingerprint:
+                    state = BackupProtectionRuntimeState.from_mapping(
+                        payload,
+                        config=config,
+                        now=observed_at,
+                    )
+                else:
+                    state = BackupProtectionRuntimeState(
+                        config_fingerprint=config.evidence_fingerprint,
+                        unprotected_bytes=int(payload.get("unprotected_bytes") or 0),
+                        accumulation_started_at=payload.get(
+                            "accumulation_started_at"
+                        ),
+                        blocked=True,
+                        blocker_reasons=("backup_protection_config_changed",),
+                        last_backup_attempt_at=payload.get("last_backup_attempt_at"),
+                        last_verified_backup_at=payload.get(
+                            "last_verified_backup_at"
+                        ),
+                    ).evaluate(config=config, now=observed_at)
+            if unprotected_bytes is not None:
+                state = state.record_unprotected_bytes(
+                    int(unprotected_bytes),
+                    observed_at=observed_at,
+                    config=config,
+                )
+            elif absolute_unprotected_bytes is not None:
+                measured = int(absolute_unprotected_bytes)
+                if measured < 0:
+                    raise ValueError("absolute unprotected bytes must be non-negative")
+                if measured > state.unprotected_bytes:
+                    state = state.record_unprotected_bytes(
+                        measured - state.unprotected_bytes,
+                        observed_at=observed_at,
+                        config=config,
+                    )
+                else:
+                    state = state.evaluate(config=config, now=observed_at)
+            else:
+                closure = bool(verified_closure)
+                if (
+                    closure
+                    and enforce_expected_report
+                    and current_report_id != expected_report_id
+                ):
+                    closure = False
+                state = state.record_backup_attempt(
+                    attempted_at=observed_at,
+                    verified_closure=closure,
+                    config=config,
+                )
+            payload = state.normalized_mapping()
+            report_id = stable_id(
+                "backup-protection-runtime-state",
+                observed_at,
+                uuid.uuid4().hex,
+            )
+            conn.execute(
+                """INSERT INTO official_asset_operational_reports(
+                       report_id, schema_version, report_kind, operation_id,
+                       scope_key, config_fingerprint, status, generated_at,
+                       payload_json, created_at
+                   ) VALUES(?, ?, 'backup_protection_runtime_state', NULL,
+                            'global', ?, ?, ?, ?, ?)""",
+                (
+                    report_id,
+                    state.schema_version,
+                    config.evidence_fingerprint,
+                    "blocked" if state.blocked else "ready",
+                    observed_at,
+                    canonical_json(payload),
+                    utc_now_iso(),
+                ),
+            )
+        return state
+
+    def backup_protection_runtime_token(self) -> str | None:
+        """Return the latest state row identity for backup-close CAS."""
+
+        with self.connection() as conn:
+            row = conn.execute(
+                """SELECT report_id FROM official_asset_operational_reports
+                   WHERE report_kind='backup_protection_runtime_state'
+                     AND scope_key='global'
+                   ORDER BY rowid DESC LIMIT 1"""
+            ).fetchone()
+        return None if row is None else str(row["report_id"])
+
+    def measure_unprotected_blob_bytes(self, *, config: Any) -> int:
+        """Measure distinct canonical bytes lacking a current verified backup."""
+
+        with self.connection() as conn:
+            row = conn.execute(
+                """SELECT COALESCE(SUM(blob.content_length), 0)
+                   FROM official_document_blobs AS blob
+                   LEFT JOIN official_asset_backup_state AS backup
+                     ON backup.content_hash=blob.content_hash
+                    AND backup.status='verified'
+                    AND backup.config_fingerprint=?
+                   WHERE backup.content_hash IS NULL""",
+                (config.evidence_fingerprint,),
+            ).fetchone()
+        return int(row[0] or 0)
+
     def upsert_universe_snapshot(self, snapshot: Mapping[str, Any]) -> dict[str, Any]:
         """Persist a versioned universe denominator and its freshness evidence."""
         now = utc_now_iso()
@@ -7808,6 +8181,60 @@ class AnnouncementAssetRepository:
                     )
             output.append(item)
         return output
+
+    def get_latest_asset_coverage_for_query(
+        self,
+        *,
+        instrument_id: str,
+        query_fingerprint: str,
+    ) -> dict[str, Any] | None:
+        """Return the newest coverage checkpoint for one stable bootstrap query."""
+
+        with self.connection() as conn:
+            row = conn.execute(
+                """SELECT * FROM official_asset_coverage
+                   WHERE instrument_id=?
+                     AND json_extract(evidence_json, '$.query_fingerprint')=?
+                   ORDER BY updated_at DESC, universe_snapshot_id DESC
+                   LIMIT 1""",
+                (
+                    normalize_instrument_id(instrument_id),
+                    str(query_fingerprint),
+                ),
+            ).fetchone()
+        return (
+            None
+            if row is None
+            else _decode_row(row, json_fields=("evidence_json",))
+        )
+
+    def list_latest_asset_coverage_for_query(
+        self,
+        query_fingerprint: str,
+    ) -> list[dict[str, Any]]:
+        """Return one newest durable coverage checkpoint per instrument."""
+
+        with self.connection() as conn:
+            rows = conn.execute(
+                """WITH ranked AS (
+                       SELECT coverage.*,
+                              ROW_NUMBER() OVER (
+                                  PARTITION BY instrument_id
+                                  ORDER BY updated_at DESC,
+                                           universe_snapshot_id DESC
+                              ) AS query_rank
+                       FROM official_asset_coverage AS coverage
+                       WHERE json_extract(
+                           evidence_json, '$.query_fingerprint'
+                       )=?
+                   )
+                   SELECT * FROM ranked WHERE query_rank=1
+                   ORDER BY instrument_id""",
+                (str(query_fingerprint),),
+            ).fetchall()
+        return [
+            _decode_row(row, json_fields=("evidence_json",)) for row in rows
+        ]
 
     def upsert_backup_state(
         self,

@@ -23,6 +23,8 @@
 
 ## 开发
 - `docs/development/README.md`：开发说明与贡献入口
+- `docs/development/framework_audit_and_improvement_plan.md`：框架问题发现与改善方案（神对象、多出口、可复用未复用）
+- `docs/development/open_issues_backlog.md`：数据能力待办（主数据缺口、源端调研项）
 
 ## 说明
 - 若新增文档，请同步更新本索引。

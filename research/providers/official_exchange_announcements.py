@@ -116,12 +116,14 @@ class OfficialExchangeAnnouncementProvider:
         session: Optional[requests.Session] = None,
     ) -> None:
         if not config.enabled:
-            raise ValueError(f"official announcement provider is disabled: {config.source}")
+            raise ValueError(
+                f"official announcement provider is disabled: {config.source}"
+            )
         self.config = config
         self.source_name = config.source
-        self.endpoint_mode = str(
-            config.options.get("endpoint_mode") or "instrument"
-        ).strip().lower()
+        self.endpoint_mode = (
+            str(config.options.get("endpoint_mode") or "instrument").strip().lower()
+        )
         if self.endpoint_mode not in {"instrument", "recent_market"}:
             raise ValueError(
                 "official announcement endpoint_mode must be instrument or "
@@ -145,7 +147,8 @@ class OfficialExchangeAnnouncementProvider:
             supports_keyword_filter=True,
             supports_category_filter=(
                 config.exchange in {"SSE", "SZSE"}
-                or config.exchange == "BSE" and self.endpoint_mode == "instrument"
+                or config.exchange == "BSE"
+                and self.endpoint_mode == "instrument"
             ),
             cursor_kind="published_at",
             max_page_size=config.max_page_size,
@@ -176,8 +179,10 @@ class OfficialExchangeAnnouncementProvider:
         stop_reason = "max_pages_exhausted"
         is_complete = False
         reached_prior_cursor = False
+        start_page = max(1, int(scope.start_page))
+        last_page_scanned: Optional[int] = None
 
-        for page_num in range(1, scope.max_pages + 1):
+        for page_num in range(start_page, start_page + scope.max_pages):
             page_started = time.monotonic()
             LOGGER.info(
                 "official announcement page started: source=%s symbol=%s page=%s/%s effective_page_size=%s",
@@ -227,6 +232,7 @@ class OfficialExchangeAnnouncementProvider:
                 )
                 break
             pages_scanned += 1
+            last_page_scanned = page_num
             normalized_page_records = [
                 record
                 for row in rows
@@ -278,9 +284,7 @@ class OfficialExchangeAnnouncementProvider:
                 is_complete = True
                 stop_reason = "watermark_reached"
                 break
-            if self._page_reached_start_date(
-                normalized_page_records, scope.start_date
-            ):
+            if self._page_reached_start_date(normalized_page_records, scope.start_date):
                 is_complete = True
                 stop_reason = "requested_start_date_reached"
                 break
@@ -315,6 +319,14 @@ class OfficialExchangeAnnouncementProvider:
             if is_complete and not errors and max_published_at
             else None
         )
+        next_page = (
+            last_page_scanned + 1
+            if not is_complete
+            and not errors
+            and stop_reason == "max_pages_exhausted"
+            and last_page_scanned is not None
+            else None
+        )
         return AnnouncementScanResult(
             source=self.source_name,
             query=query,
@@ -331,16 +343,15 @@ class OfficialExchangeAnnouncementProvider:
             errors=tuple(errors),
             diagnostics={
                 "effective_page_size": page_size,
+                "start_page": start_page,
+                "last_page_scanned": last_page_scanned,
+                "next_page": next_page,
                 "endpoint_url": self.config.endpoint_url,
                 "endpoint_mode": self.endpoint_mode,
                 "requested_start_date": scope.start_date,
                 "requested_end_date": scope.end_date,
                 "observed_earliest_published_at": min(
-                    (
-                        record.published_at
-                        for record in records
-                        if record.published_at
-                    ),
+                    (record.published_at for record in records if record.published_at),
                     default=None,
                 ),
                 "keyword_filter_mode": (
@@ -450,18 +461,22 @@ class OfficialExchangeAnnouncementProvider:
         if self.config.exchange == "BSE":
             if self.endpoint_mode == "recent_market":
                 need_fields = self.config.options.get("need_fields") or [
-                    "companyCd", "companyName", "disclosureTitle",
-                    "disclosurePostTitle", "destFilePath", "publishDate",
-                    "xxfcbj", "fileExt", "xxzrlx",
+                    "companyCd",
+                    "companyName",
+                    "disclosureTitle",
+                    "disclosurePostTitle",
+                    "destFilePath",
+                    "publishDate",
+                    "xxfcbj",
+                    "fileExt",
+                    "xxzrlx",
                 ]
                 form_fields: List[tuple[str, Any]] = [
                     ("siteId", str(self.config.options.get("site_id", 6))),
                     ("flag", str(self.config.options.get("flag", 0))),
                     ("page", str(page_num - 1)),
                     ("companyCd", symbol or ""),
-                    ("isNewThree", str(
-                        self.config.options.get("is_new_three", "1")
-                    )),
+                    ("isNewThree", str(self.config.options.get("is_new_three", "1"))),
                     ("startTime", start_date or ""),
                     ("endTime", end_date or ""),
                     ("keyword", keyword or ""),
@@ -469,9 +484,7 @@ class OfficialExchangeAnnouncementProvider:
                 ]
                 for value in self.config.options.get("disclosure_type", []):
                     form_fields.append(("disclosureType[]", value))
-                for value in self.config.options.get(
-                    "disclosure_subtype", []
-                ):
+                for value in self.config.options.get("disclosure_subtype", []):
                     form_fields.append(("disclosureSubtype[]", value))
                 for value in self.config.options.get("xxfcbj", ["2"]):
                     form_fields.append(("xxfcbj[]", value))
@@ -559,15 +572,15 @@ class OfficialExchangeAnnouncementProvider:
                         "exchange announcement container "
                         f"data.content[{index}].disclosures is not a list"
                     )
-                rows.extend(self._dict_rows(
-                    disclosures,
-                    container=f"data.content[{index}].disclosures",
-                ))
+                rows.extend(
+                    self._dict_rows(
+                        disclosures,
+                        container=f"data.content[{index}].disclosures",
+                    )
+                )
             return rows
         candidates: List[tuple[str, Any]] = [
-            (key, payload[key])
-            for key in ("content", "data", "rows")
-            if key in payload
+            (key, payload[key]) for key in ("content", "data", "rows") if key in payload
         ]
         list_info = payload.get("listInfo")
         if isinstance(list_info, Mapping):
@@ -577,7 +590,9 @@ class OfficialExchangeAnnouncementProvider:
                 if key in list_info
             )
         elif "listInfo" in payload and list_info is not None:
-            raise ValueError("exchange announcement container listInfo is not an object")
+            raise ValueError(
+                "exchange announcement container listInfo is not an object"
+            )
         for container, candidate in candidates:
             if not isinstance(candidate, list):
                 continue
@@ -588,7 +603,9 @@ class OfficialExchangeAnnouncementProvider:
                 "exchange announcement containers have unsupported shapes: "
                 f"{containers}"
             )
-        raise ValueError("exchange announcement response has no supported row container")
+        raise ValueError(
+            "exchange announcement response has no supported row container"
+        )
 
     def _apply_local_filters(
         self,
@@ -607,13 +624,15 @@ class OfficialExchangeAnnouncementProvider:
         if self.config.exchange == "BSE" and self.endpoint_mode == "recent_market":
             if start_date:
                 output = [
-                    record for record in output
+                    record
+                    for record in output
                     if self._published_date(record) is not None
                     and self._published_date(record) >= date.fromisoformat(start_date)
                 ]
             if end_date:
                 output = [
-                    record for record in output
+                    record
+                    for record in output
                     if self._published_date(record) is not None
                     and self._published_date(record) <= date.fromisoformat(end_date)
                 ]
@@ -638,13 +657,19 @@ class OfficialExchangeAnnouncementProvider:
             raw_url = self._text(row.get("attachPath"))
             symbols = self._values(row.get("secCode"))
             raw_id = self._text(row.get("annId") or row.get("id"))
-            attachment_type = self._text(row.get("attachFormat")) or self._suffix(raw_url)
+            attachment_type = self._text(row.get("attachFormat")) or self._suffix(
+                raw_url
+            )
         else:
             title = self._text(
-                row.get("disclosureTitle") or row.get("title") or row.get("announcementTitle")
+                row.get("disclosureTitle")
+                or row.get("title")
+                or row.get("announcementTitle")
             )
             published_raw = self._text(
-                row.get("publishTime") or row.get("disclosureTime") or row.get("publishDate")
+                row.get("publishTime")
+                or row.get("disclosureTime")
+                or row.get("publishDate")
             )
             raw_url = self._text(
                 row.get("destFilePath") or row.get("attachPath") or row.get("url")
@@ -752,7 +777,8 @@ class OfficialExchangeAnnouncementProvider:
         if not start_date:
             return False
         published_dates = [
-            value for record in records
+            value
+            for record in records
             if (value := cls._published_date(record)) is not None
         ]
         return bool(published_dates) and min(published_dates) < date.fromisoformat(
@@ -775,7 +801,9 @@ class OfficialExchangeAnnouncementProvider:
         return None
 
     @staticmethod
-    def _deduplicate_records(records: List[AnnouncementRecord]) -> List[AnnouncementRecord]:
+    def _deduplicate_records(
+        records: List[AnnouncementRecord],
+    ) -> List[AnnouncementRecord]:
         output: Dict[str, AnnouncementRecord] = {}
         for record in records:
             output.setdefault(record.announcement_key, record)
@@ -788,9 +816,7 @@ class OfficialExchangeAnnouncementProvider:
         container: str,
     ) -> List[Dict[str, Any]]:
         if container not in payload:
-            raise ValueError(
-                f"exchange announcement response is missing {container}"
-            )
+            raise ValueError(f"exchange announcement response is missing {container}")
         return cls._dict_rows(payload[container], container=container)
 
     @staticmethod

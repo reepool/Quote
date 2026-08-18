@@ -251,8 +251,12 @@ def test_routing_uses_independent_provider_cursors_for_fallback_sources():
             ),
         ),
     )
-    primary_cursor = ProviderCursor(kind="published_at", value="2026-07-20T00:00:00+00:00")
-    backup_cursor = ProviderCursor(kind="published_at", value="2026-07-19T00:00:00+00:00")
+    primary_cursor = ProviderCursor(
+        kind="published_at", value="2026-07-20T00:00:00+00:00"
+    )
+    backup_cursor = ProviderCursor(
+        kind="published_at", value="2026-07-19T00:00:00+00:00"
+    )
 
     service.acquire(
         _query(cursor=primary_cursor),
@@ -276,7 +280,9 @@ def test_routing_never_reuses_primary_cursor_for_fallback_by_default():
             ),
         ),
     )
-    primary_cursor = ProviderCursor(kind="published_at", value="2026-07-20T00:00:00+00:00")
+    primary_cursor = ProviderCursor(
+        kind="published_at", value="2026-07-20T00:00:00+00:00"
+    )
 
     service.acquire(_query(cursor=primary_cursor))
 
@@ -412,12 +418,15 @@ def test_cninfo_transport_reports_retry_after_to_shared_throttle():
         adaptive_throttle=throttle,
     )
 
-    assert provider.transport._post(
-        "https://example.invalid",
-        data={},
-        headers={},
-        timeout=1,
-    ) is response
+    assert (
+        provider.transport._post(
+            "https://example.invalid",
+            data={},
+            headers={},
+            timeout=1,
+        )
+        is response
+    )
     assert throttle.waits == 1
     assert throttle.throttles == [(429, "30")]
     assert throttle.successes == 0
@@ -578,9 +587,9 @@ def test_cninfo_provider_removes_search_highlight_tags_from_titles():
 
 
 def test_cninfo_provider_retry_exhaustion_and_malformed_payload_are_failures():
-    failed = _cninfo_provider(
-        _Session(payloads=[TimeoutError("timed out")])
-    ).discover(_query())
+    failed = _cninfo_provider(_Session(payloads=[TimeoutError("timed out")])).discover(
+        _query()
+    )
     assert failed.status == "failed"
     assert failed.errors
     assert failed.is_complete is False
@@ -615,9 +624,7 @@ def test_cninfo_provider_reports_page_bound_as_incomplete():
     ]
     bounded = _cninfo_provider(
         _Session(payloads=[{"announcements": full_page}])
-    ).discover(
-        _query(page_size=30, max_pages=1)
-    )
+    ).discover(_query(page_size=30, max_pages=1))
     assert bounded.announcements_seen == 30
     assert bounded.is_complete is False
     assert bounded.status == "degraded"
@@ -635,9 +642,7 @@ def test_cninfo_provider_preflights_reported_total_before_page_bound():
         }
         for index in range(30)
     ]
-    session = _Session(
-        payloads=[{"announcements": full_page, "totalpages": "500"}]
-    )
+    session = _Session(payloads=[{"announcements": full_page, "totalpages": "500"}])
 
     result = _cninfo_provider(session).discover(
         _query(
@@ -676,9 +681,7 @@ def test_cninfo_provider_derives_total_pages_from_record_counts(
 
     result = _cninfo_provider(
         _Session(payloads=[{"announcements": full_page, **payload_totals}])
-    ).discover(
-        _query(page_size=30, max_pages=1, preflight_page_bound=True)
-    )
+    ).discover(_query(page_size=30, max_pages=1, preflight_page_bound=True))
 
     assert result.stop_reason == "estimated_pages_exceed_bound"
     assert result.diagnostics["total_pages"] == expected_total
@@ -730,14 +733,8 @@ def test_cninfo_provider_ignores_invalid_total_page_hints(invalid_total):
     ]
 
     result = _cninfo_provider(
-        _Session(
-            payloads=[
-                {"announcements": full_page, "totalpages": invalid_total}
-            ]
-        )
-    ).discover(
-        _query(page_size=30, max_pages=1, preflight_page_bound=True)
-    )
+        _Session(payloads=[{"announcements": full_page, "totalpages": invalid_total}])
+    ).discover(_query(page_size=30, max_pages=1, preflight_page_bound=True))
 
     assert result.stop_reason == "max_pages_exhausted"
     assert result.diagnostics["total_pages"] is None
@@ -789,9 +786,9 @@ def test_cninfo_provider_resumes_from_bounded_start_page():
 
 
 def test_cninfo_provider_reports_successful_empty_only_for_complete_scan():
-    result = _cninfo_provider(
-        _Session(payloads=[{"announcements": []}])
-    ).discover(_query())
+    result = _cninfo_provider(_Session(payloads=[{"announcements": []}])).discover(
+        _query()
+    )
     assert result.status == "success_empty"
     assert result.cursor_commit_allowed is True
 
@@ -985,9 +982,7 @@ def test_sse_provider_applies_declared_keyword_filter_locally():
         )
     )
 
-    assert [record.title for record in result.records] == [
-        "中国石化2025年半年度报告"
-    ]
+    assert [record.title for record in result.records] == ["中国石化2025年半年度报告"]
     assert result.diagnostics["keyword_filter_mode"] == "local_exact"
 
 
@@ -1002,7 +997,11 @@ def test_exchange_provider_rejects_unknown_object_payload(exchange):
             source=exchange.lower(),
             scope=AnnouncementScope(
                 exchange=exchange,
-                symbol="600000" if exchange == "SSE" else "000001" if exchange == "SZSE" else "920001",
+                symbol=(
+                    "600000"
+                    if exchange == "SSE"
+                    else "000001" if exchange == "SZSE" else "920001"
+                ),
             ),
         )
     )
@@ -1058,9 +1057,7 @@ def test_szse_provider_preserves_official_id_and_json_request():
 
 
 def test_szse_market_scope_uses_official_annual_category_parameters():
-    session = _ExchangeSession(
-        [_ExchangeResponse({"announceCount": 0, "data": []})]
-    )
+    session = _ExchangeSession([_ExchangeResponse({"announceCount": 0, "data": []})])
 
     result = _exchange_provider("SZSE", session).discover(
         AnnouncementQuery(
@@ -1079,6 +1076,46 @@ def test_szse_market_scope_uses_official_annual_category_parameters():
     assert session.calls[0]["json"]["stock"] == []
     assert session.calls[0]["json"]["channelCode"] == ["fixed_disc"]
     assert session.calls[0]["json"]["bigCategoryId"] == ["010301"]
+
+
+def test_szse_provider_resumes_from_requested_start_page():
+    def payload(announcement_id):
+        return {
+            "announceCount": 300,
+            "data": [
+                {
+                    "annId": announcement_id,
+                    "title": "测试公司2025年年度报告",
+                    "publishTime": "2026-04-30 00:00:00",
+                    "attachPath": f"/disc/{announcement_id}.PDF",
+                    "attachFormat": "PDF",
+                    "secCode": ["000001"],
+                }
+            ],
+        }
+
+    session = _ExchangeSession(
+        [_ExchangeResponse(payload(3)), _ExchangeResponse(payload(4))]
+    )
+    result = _exchange_provider("SZSE", session).discover(
+        AnnouncementQuery(
+            purpose_key="official_announcement_assets",
+            source="szse",
+            scope=AnnouncementScope(
+                exchange="SZSE",
+                category="annual_report",
+                start_page=3,
+                max_pages=2,
+            ),
+        )
+    )
+
+    assert [call["json"]["pageNum"] for call in session.calls] == [3, 4]
+    assert result.is_complete is False
+    assert result.stop_reason == "max_pages_exhausted"
+    assert result.diagnostics["start_page"] == 3
+    assert result.diagnostics["last_page_scanned"] == 4
+    assert result.diagnostics["next_page"] == 5
 
 
 def test_exchange_providers_map_combined_periodic_report_category():
@@ -1244,102 +1281,114 @@ def test_bse_provider_unwraps_live_jsonp_single_object_array():
 def test_bse_recent_market_provider_flattens_and_stops_at_date_boundary():
     newest = {
         "data": {
-            "content": [{
-                "disclosures": [{
-                    "disclosureId": "bse-new",
-                    "disclosureTitle": "乐创技术2025年年度权益分派实施公告",
-                    "publishDate": "2026-07-16",
-                    "destFilePath": "/disclosure/new.pdf",
-                    "companyCd": "920425",
-                    "fileExt": "pdf",
-                }],
-            }],
+            "content": [
+                {
+                    "disclosures": [
+                        {
+                            "disclosureId": "bse-new",
+                            "disclosureTitle": "乐创技术2025年年度权益分派实施公告",
+                            "publishDate": "2026-07-16",
+                            "destFilePath": "/disclosure/new.pdf",
+                            "companyCd": "920425",
+                            "fileExt": "pdf",
+                        }
+                    ],
+                }
+            ],
             "totalPages": 3,
         }
     }
     boundary = {
         "data": {
-            "content": [{
-                "disclosures": [
-                    {
-                        "disclosureId": "bse-in-range",
-                        "disclosureTitle": "测试公司权益分派实施公告",
-                        "publishDate": "2026-07-10",
-                        "destFilePath": "/disclosure/in-range.pdf",
-                        "companyCd": "920001",
-                    },
-                    {
-                        "disclosureId": "bse-old",
-                        "disclosureTitle": "测试公司权益分派实施公告",
-                        "publishDate": "2026-07-01",
-                        "destFilePath": "/disclosure/old.pdf",
-                        "companyCd": "920001",
-                    },
-                ],
-            }],
+            "content": [
+                {
+                    "disclosures": [
+                        {
+                            "disclosureId": "bse-in-range",
+                            "disclosureTitle": "测试公司权益分派实施公告",
+                            "publishDate": "2026-07-10",
+                            "destFilePath": "/disclosure/in-range.pdf",
+                            "companyCd": "920001",
+                        },
+                        {
+                            "disclosureId": "bse-old",
+                            "disclosureTitle": "测试公司权益分派实施公告",
+                            "publishDate": "2026-07-01",
+                            "destFilePath": "/disclosure/old.pdf",
+                            "companyCd": "920001",
+                        },
+                    ],
+                }
+            ],
             "totalPages": 3,
         }
     }
-    session = _ExchangeSession([
-        _ExchangeResponse(newest),
-        _ExchangeResponse(boundary),
-    ])
+    session = _ExchangeSession(
+        [
+            _ExchangeResponse(newest),
+            _ExchangeResponse(boundary),
+        ]
+    )
     provider = _exchange_provider(
         "BSE",
         session,
         options={"endpoint_mode": "recent_market", "xxfcbj": ["2"]},
     )
 
-    result = provider.discover(AnnouncementQuery(
-        purpose_key="a_share_bse_corporate_action_daily",
-        source="bse",
-        scope=AnnouncementScope(
-            exchange="BSE",
-            start_date="2026-07-05",
-            end_date="2026-07-20",
-            keyword="权益分派实施公告",
-            page_size=20,
-            max_pages=10,
-        ),
-    ))
+    result = provider.discover(
+        AnnouncementQuery(
+            purpose_key="a_share_bse_corporate_action_daily",
+            source="bse",
+            scope=AnnouncementScope(
+                exchange="BSE",
+                start_date="2026-07-05",
+                end_date="2026-07-20",
+                keyword="权益分派实施公告",
+                page_size=20,
+                max_pages=10,
+            ),
+        )
+    )
 
     assert result.status == "success"
     assert result.is_complete is True
     assert result.stop_reason == "requested_start_date_reached"
     assert result.pages_scanned == 2
     assert [record.source_announcement_id for record in result.records] == [
-        "bse-new", "bse-in-range",
+        "bse-new",
+        "bse-in-range",
     ]
     assert ("companyCd", "") in session.calls[0]["data"]
     assert ("xxfcbj[]", "2") in session.calls[0]["data"]
     assert ("needFields[]", "companyCd") in session.calls[0]["data"]
     assert not any(
-        key in {"xxfcbj", "needFields"}
-        for key, _value in session.calls[0]["data"]
+        key in {"xxfcbj", "needFields"} for key, _value in session.calls[0]["data"]
     )
 
 
 def test_bse_recent_market_provider_rejects_instrument_scope_before_network():
     payload = {
         "data": {
-            "content": [{
-                "disclosures": [
-                    {
-                        "disclosureId": "bse-1",
-                        "disclosureTitle": "甲公司权益分派实施公告",
-                        "publishDate": "2026-07-16",
-                        "destFilePath": "/one.pdf",
-                        "companyCd": "920001",
-                    },
-                    {
-                        "disclosureId": "bse-2",
-                        "disclosureTitle": "乙公司权益分派实施公告",
-                        "publishDate": "2026-07-16",
-                        "destFilePath": "/two.pdf",
-                        "companyCd": "920002",
-                    },
-                ],
-            }],
+            "content": [
+                {
+                    "disclosures": [
+                        {
+                            "disclosureId": "bse-1",
+                            "disclosureTitle": "甲公司权益分派实施公告",
+                            "publishDate": "2026-07-16",
+                            "destFilePath": "/one.pdf",
+                            "companyCd": "920001",
+                        },
+                        {
+                            "disclosureId": "bse-2",
+                            "disclosureTitle": "乙公司权益分派实施公告",
+                            "publishDate": "2026-07-16",
+                            "destFilePath": "/two.pdf",
+                            "companyCd": "920002",
+                        },
+                    ],
+                }
+            ],
             "totalPages": 1,
         }
     }
@@ -1354,15 +1403,17 @@ def test_bse_recent_market_provider_rejects_instrument_scope_before_network():
         AnnouncementQueryNotSupported,
         match="does not support instrument scope",
     ):
-        provider.discover(AnnouncementQuery(
-            purpose_key="unit_test",
-            source="bse",
-            scope=AnnouncementScope(
-                exchange="BSE",
-                symbol="920002",
-                keyword="权益分派实施公告",
-            ),
-        ))
+        provider.discover(
+            AnnouncementQuery(
+                purpose_key="unit_test",
+                source="bse",
+                scope=AnnouncementScope(
+                    exchange="BSE",
+                    symbol="920002",
+                    keyword="权益分派实施公告",
+                ),
+            )
+        )
 
     assert session.calls == []
 
@@ -1370,15 +1421,19 @@ def test_bse_recent_market_provider_rejects_instrument_scope_before_network():
 def test_bse_recent_market_skips_unrelated_page_rows_without_malformed_error():
     payload = {
         "data": {
-            "content": [{
-                "disclosures": [{
-                    "disclosureCode": "bse-live-code",
-                    "disclosureTitle": "其他公司年度报告",
-                    "publishDate": "2026-07-16",
-                    "destFilePath": "/other.pdf",
-                    "companyCd": "920001",
-                }],
-            }],
+            "content": [
+                {
+                    "disclosures": [
+                        {
+                            "disclosureCode": "bse-live-code",
+                            "disclosureTitle": "其他公司年度报告",
+                            "publishDate": "2026-07-16",
+                            "destFilePath": "/other.pdf",
+                            "companyCd": "920001",
+                        }
+                    ],
+                }
+            ],
             "totalPages": 1,
         }
     }
@@ -1386,14 +1441,16 @@ def test_bse_recent_market_skips_unrelated_page_rows_without_malformed_error():
         "BSE",
         _ExchangeSession([_ExchangeResponse(payload)]),
         options={"endpoint_mode": "recent_market"},
-    ).discover(AnnouncementQuery(
-        purpose_key="unit_test",
-        source="bse",
-        scope=AnnouncementScope(
-            exchange="BSE",
-            keyword="权益分派实施公告",
-        ),
-    ))
+    ).discover(
+        AnnouncementQuery(
+            purpose_key="unit_test",
+            source="bse",
+            scope=AnnouncementScope(
+                exchange="BSE",
+                keyword="权益分派实施公告",
+            ),
+        )
+    )
 
     assert result.status == "success_empty"
     assert result.is_complete is True
@@ -1403,15 +1460,19 @@ def test_bse_recent_market_skips_unrelated_page_rows_without_malformed_error():
 def test_bse_disclosure_code_is_used_as_stable_live_announcement_id():
     payload = {
         "data": {
-            "content": [{
-                "disclosures": [{
-                    "disclosureCode": "37936fe42e9649e8a88e37dd7555dbd7",
-                    "disclosureTitle": "测试公司2025年年度报告",
-                    "publishDate": "2026-03-30",
-                    "destFilePath": "/annual.pdf",
-                    "companyCd": "920833",
-                }],
-            }],
+            "content": [
+                {
+                    "disclosures": [
+                        {
+                            "disclosureCode": "37936fe42e9649e8a88e37dd7555dbd7",
+                            "disclosureTitle": "测试公司2025年年度报告",
+                            "publishDate": "2026-03-30",
+                            "destFilePath": "/annual.pdf",
+                            "companyCd": "920833",
+                        }
+                    ],
+                }
+            ],
             "totalPages": 1,
         }
     }
@@ -1419,11 +1480,13 @@ def test_bse_disclosure_code_is_used_as_stable_live_announcement_id():
         "BSE",
         _ExchangeSession([_ExchangeResponse(payload)]),
         options={"endpoint_mode": "recent_market"},
-    ).discover(AnnouncementQuery(
-        purpose_key="unit_test",
-        source="bse",
-        scope=AnnouncementScope(exchange="BSE"),
-    ))
+    ).discover(
+        AnnouncementQuery(
+            purpose_key="unit_test",
+            source="bse",
+            scope=AnnouncementScope(exchange="BSE"),
+        )
+    )
 
     assert result.records[0].source_announcement_id == (
         "37936fe42e9649e8a88e37dd7555dbd7"
@@ -1637,9 +1700,9 @@ def test_attachment_retrieval_rejects_oversize_empty_and_invalid_pdf():
     assert oversize.status == "failed"
     assert "attachment_size_limit_exceeded" in oversize.errors[0]
 
-    empty = _retriever(
-        _AttachmentSession([_AttachmentResponse(b"")])
-    ).retrieve("cninfo", AnnouncementAttachment(source_url="empty.pdf"))
+    empty = _retriever(_AttachmentSession([_AttachmentResponse(b"")])).retrieve(
+        "cninfo", AnnouncementAttachment(source_url="empty.pdf")
+    )
     assert empty.status == "failed"
     assert "attachment_empty" in empty.errors[0]
 
@@ -1663,12 +1726,14 @@ def test_attachment_retrieval_rejects_oversize_empty_and_invalid_pdf():
 
 def test_attachment_retrieval_accepts_trusted_historical_html():
     content = "<html><body>历史权益分派实施公告</body></html>".encode("utf-8")
-    session = _AttachmentSession([
-        _AttachmentResponse(
-            content,
-            headers={"Content-Type": "text/html; charset=utf-8"},
-        )
-    ])
+    session = _AttachmentSession(
+        [
+            _AttachmentResponse(
+                content,
+                headers={"Content-Type": "text/html; charset=utf-8"},
+            )
+        ]
+    )
     result = _retriever(session).retrieve(
         "cninfo",
         AnnouncementAttachment(source_url="finalpage/report.html"),
@@ -1680,10 +1745,12 @@ def test_attachment_retrieval_accepts_trusted_historical_html():
 
 
 def test_attachment_retrieval_classifies_terminal_missing_document_without_retry():
-    session = _AttachmentSession([
-        _AttachmentResponse(b"missing", status_code=404),
-        _AttachmentResponse(b"%PDF-should-not-be-used"),
-    ])
+    session = _AttachmentSession(
+        [
+            _AttachmentResponse(b"missing", status_code=404),
+            _AttachmentResponse(b"%PDF-should-not-be-used"),
+        ]
+    )
     result = _retriever(session, retries=2).retrieve(
         "cninfo",
         AnnouncementAttachment(source_url="finalpage/missing.html"),

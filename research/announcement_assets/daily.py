@@ -1035,6 +1035,17 @@ class AnnualReportDailyUpdater:
         # that window's cutoff first. The recursive follow-up must calculate
         # its overlap from the old cutoff, otherwise it skips a day.
         committed_cutoff = resume_cutoff if result.complete else cutoff
+        prior_covered = str(state.get("covered_until") or "") if state else ""
+        if (
+            result.complete
+            and prior_covered
+            and _parse_time(committed_cutoff) < _parse_time(prior_covered)
+        ):
+            # A same-day bootstrap handoff can use the local end-of-day as its
+            # watermark while the first cron run occurs earlier that day.
+            # The overlap is still scanned, but its earlier endpoint must not
+            # regress the already committed handoff coverage.
+            committed_cutoff = prior_covered
         try:
             self.repository.upsert_discovery_state(
                 source=source,
@@ -1697,6 +1708,7 @@ class AnnualReportDailyUpdater:
                 asset = self.service.acquire_attachment(
                     attachment_id,
                     operation_id=operation_id,
+                    scheduled_write=True,
                 )
                 latest_version = self.repository.get_latest_attachment_version(
                     attachment_id
@@ -2294,6 +2306,7 @@ class AnnualReportDailyUpdater:
                     ),
                     knowledge_cutoff=cutoff,
                     operation_id=operation_id,
+                    scheduled_write=True,
                 )
                 if refreshed is None or not refreshed.content_hash:
                     raise RuntimeError("silent verification produced no valid asset")

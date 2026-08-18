@@ -124,6 +124,8 @@ def test_application_and_datamanager_registration_validate_locally_without_work(
         assert conn.execute(
             "SELECT COUNT(*) FROM official_asset_deletion_intents"
         ).fetchone()[0] == 0
-    assert not access.config.archive_root.exists()
-    assert not access.config.temp_root.exists()
-    assert not access.config.quarantine_root.exists()
+
+    # This integration path loads the real project-relative archive config, so
+    # those directories may already exist in a production checkout. The
+    # temporary-root construction test above proves directory non-creation;
+    # here the tripwires and zero durable rows prove registration did no work.

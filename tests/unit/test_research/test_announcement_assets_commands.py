@@ -9,9 +9,7 @@ from time import sleep
 import pytest
 
 from research.announcement_assets.commands import (
-    ARCHIVE_BACKUP_JOB,
     DAILY_UPDATE_JOB,
-    INTEGRITY_AUDIT_JOB,
     LATEST_BACKFILL_JOB,
     AnnualReportSchedulerCommandService,
     AuthorizationBoundaryUnavailable,
@@ -429,8 +427,21 @@ def test_acquisition_work_fingerprint_covers_route_capability_integrity_and_boun
     )
 
 
+@pytest.mark.parametrize(
+    "blocker",
+    (
+        "bootstrap_incomplete",
+        "discovery_gaps_present",
+        "effective_blob_integrity_failure",
+        "storage_unavailable",
+        "backup_configuration_disabled",
+        "effective_blobs_unprotected",
+        "asset_adoption_promotion_incomplete",
+    ),
+)
 def test_command_service_blocks_latest_backfill_from_cron_and_daily_before_readiness(
     tmp_path,
+    blocker,
 ):
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
@@ -439,7 +450,7 @@ def test_command_service_blocks_latest_backfill_from_cron_and_daily_before_readi
         repository=repository,
         config=config,
         config_version="assets-config-v1",
-        readiness_gate=lambda job: (False, ("bootstrap_incomplete",)),
+        readiness_gate=lambda job: (False, (blocker,)),
     )
     principal = _service_principal()
     with pytest.raises(RuntimeError, match="manual_only"):
@@ -454,6 +465,7 @@ def test_command_service_blocks_latest_backfill_from_cron_and_daily_before_readi
             principal=principal,
             trigger_kind="cron",
         )
+    assert repository.list_operations(limit=10) == []
 
 
 def test_command_service_requires_trigger_identity_consistency_before_operation(

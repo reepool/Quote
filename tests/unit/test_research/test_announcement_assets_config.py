@@ -38,7 +38,42 @@ def test_required_config_fields_round_trip_and_enter_fingerprint():
     template = json.loads(
         Path("config/config-template.json.example").read_text(encoding="utf-8")
     )["research_config"]["modules"]["official_announcement_assets"]
-    assert production == template
+    production_policy = json.loads(json.dumps(production))
+    production_policy["enabled"] = False
+    production_policy["scheduled_enabled"] = False
+    production_policy["dry_run"] = True
+    production_policy["backup"]["enabled"] = False
+    production_policy["backup"]["scheduled_enabled"] = False
+    production_policy["jobs"]["daily_enabled"] = False
+    production_policy["jobs"]["backup_enabled"] = False
+    production_policy["permissions"]["trusted_identity_enabled"] = False
+    production_policy["permissions"]["principals"] = []
+    production_policy["discovery"]["max_requests"] = template["discovery"][
+        "max_requests"
+    ]
+    assert production_policy == template
+    assert production["enabled"] is True
+    assert production["scheduled_enabled"] is True
+    assert production["dry_run"] is False
+    assert production["backup"]["enabled"] is True
+    assert production["backup"]["scheduled_enabled"] is True
+    assert production["discovery"]["max_requests"] == 600
+    assert production["permissions"]["trusted_identity_enabled"] is True
+    assert {
+        item["principal"] for item in production["permissions"]["principals"]
+    } == {"Reepool", "service:annual-report-asset-scheduler"}
+
+
+def test_evidence_fingerprint_ignores_execution_request_batch_tuning():
+    production = _production_mapping()
+    baseline_mapping = json.loads(json.dumps(production))
+    baseline_mapping["discovery"]["max_requests"] = 300
+    baseline = AnnouncementAssetConfig.from_mapping(baseline_mapping)
+    tuned = json.loads(json.dumps(production))
+    changed = AnnouncementAssetConfig.from_mapping(tuned)
+
+    assert changed.config_fingerprint != baseline.config_fingerprint
+    assert changed.evidence_fingerprint == baseline.evidence_fingerprint
 
     required_discovery_fields = {
         "reconciliation_lookback_days",

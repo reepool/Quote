@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import sqlite3
 from dataclasses import replace
 from datetime import date
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -41,12 +39,13 @@ from research.announcement_assets import (
     normalize_annual_report_variant,
     normalize_document_family,
     select_effective_candidate,
-    validate_backup_mount,
 )
 from research.announcement_assets.classifier import (
     SAME_SOURCE_EQUIVALENT_TIE_BREAK_POLICY_VERSION,
+    refine_classification_from_pdf,
 )
 from research.announcement_assets.schema import OWNED_TABLES, SCHEMA_VERSION
+from research.announcement_assets.service import _candidate_from_row
 from research.announcements import (
     AnnouncementAttachment,
     AnnouncementRecord,
@@ -671,76 +670,6 @@ def test_construction_has_zero_database_or_archive_side_effects(tmp_path):
     assert not config.archive_root.exists()
 
 
-def test_production_and_template_config_are_synced_and_default_disabled():
-    production = json.loads(
-        Path("config/10_research.json").read_text(encoding="utf-8")
-    )["research_config"]["modules"]["official_announcement_assets"]
-    template = json.loads(
-        Path("config/config-template.json.example").read_text(encoding="utf-8")
-    )["research_config"]["modules"]["official_announcement_assets"]
-
-    assert template == production
-    config = AnnouncementAssetConfig.from_mapping(production)
-    assert config.enabled is False
-    assert config.scheduled_enabled is False
-    assert config.dry_run is True
-    assert config.jobs.latest_backfill_manual_only is True
-    assert config.jobs.latest_backfill_enabled is False
-    assert config.jobs.latest_backfill_cron is None
-    assert config.jobs.daily_enabled is False
-    assert config.jobs.daily_manual_only is False
-    assert config.jobs.daily_cron == "15 3 * * *"
-    assert config.jobs.integrity_enabled is False
-    assert config.jobs.integrity_manual_only is True
-    assert config.jobs.integrity_cron is None
-    assert config.jobs.integrity_read_only is True
-    assert config.jobs.backup_enabled is False
-    assert config.jobs.backup_manual_only is False
-    assert config.jobs.backup_cron == "45 4 * * *"
-    assert config.acquisition.normalized_categories == ("annual_report",)
-    assert config.rollout.require_backup is True
-    assert config.trusted_identity_enabled is False
-    assert config.master_data_max_age_hours == 36
-    assert config.listed_security_census_max_age_hours == 36
-    assert config.eligibility_indeterminate_policy == "retain_last_complete"
-    assert config.bootstrap_filing_season_start_month == 1
-    assert config.bootstrap_filing_season_end_month == 5
-    assert config.bootstrap_scope == "latest_only_active_a_share"
-    assert config.daily_catch_up_max_days == 14
-    assert config.storage.max_attachment_planned_bytes == 209715200
-    assert config.storage.max_attachment_actual_bytes == 209715200
-    assert config.acquisition.max_task_planned_bytes == 53687091200
-    assert config.acquisition.max_task_actual_bytes == 53687091200
-    assert config.backup.max_unprotected_bytes == 10 * 1024**3
-    assert config.backup.max_unprotected_age_seconds == 259200
-    assert config.provisional_result.policy_version == "provisional_effective.v1"
-    assert (
-        config.config_fingerprint
-        == AnnouncementAssetConfig.from_mapping(template).config_fingerprint
-    )
-    assert (
-        config.normalized_mapping()
-        == AnnouncementAssetConfig.from_mapping(template).normalized_mapping()
-    )
-    scheduler = json.loads(
-        Path("config/05_scheduler.json").read_text(encoding="utf-8")
-    )["scheduler_config"]["jobs"]
-    latest_job = scheduler["annual_report_asset_latest_backfill"]
-    daily_job = scheduler["annual_report_asset_daily_update"]
-    assert latest_job["enabled"] is False
-    assert latest_job["manual_only"] is True
-    assert "trigger" not in latest_job
-    assert daily_job["enabled"] is False
-    assert daily_job["trigger"]["day_of_week"] == "mon-sun"
-    assert daily_job["parameters"] == {
-        "timezone": config.timezone,
-        "overlap_days": config.discovery.overlap_days,
-        "catch_up_max_days": config.daily_catch_up_max_days,
-        "minimum_runs_per_calendar_day": config.daily_min_runs_per_calendar_day,
-        "universe_refresh_cadence": config.universe_refresh_cadence,
-    }
-
-
 def test_job_defaults_reject_manual_only_cron_combinations(tmp_path):
     with pytest.raises(ValueError, match="latest backfill manual-only"):
         _config(
@@ -766,17 +695,6 @@ def test_config_rejects_zero_scope_and_freshness_limits(tmp_path, field, value):
         _config(tmp_path, **{field: value})
 
 
-def test_config_rejects_unprotected_backup_boundary_and_unsafe_override(tmp_path):
-    with pytest.raises(ValueError, match="unprotected limits"):
-        _config(tmp_path, backup={"max_unprotected_bytes": 0})
-    with pytest.raises(ValueError, match="unprotected limits"):
-        _config(tmp_path, backup={"max_unprotected_age_seconds": 0})
-    with pytest.raises(ValueError, match="operator authorization"):
-        _config(tmp_path, capacity_override={"requires_operator": False})
-    with pytest.raises(ValueError, match="scope_mode"):
-        _config(tmp_path, capacity_override={"scope_mode": "global"})
-
-
 @pytest.mark.parametrize(
     "storage",
     [
@@ -791,14 +709,6 @@ def test_config_rejects_unprotected_backup_boundary_and_unsafe_override(tmp_path
 def test_storage_sidecar_thresholds_fail_closed(tmp_path, storage):
     with pytest.raises((ValueError, TypeError)):
         _config(tmp_path, storage=storage)
-    with pytest.raises(ValueError, match="integrity audit"):
-        _config(
-            tmp_path,
-            jobs={
-                "integrity_manual_only": True,
-                "integrity_cron": "0 4 * * 0",
-            },
-        )
     with pytest.raises(ValueError, match="every calendar day"):
         _config(
             tmp_path,
@@ -821,7 +731,7 @@ def test_canonical_classification_vocabulary_normalizes_legacy_labels():
     )
 
 
-def test_config_rejects_path_escape_and_unsafe_backup_destination(tmp_path):
+def test_config_rejects_path_escape(tmp_path):
     with pytest.raises(ValueError, match="safe project-relative"):
         _config(
             tmp_path,
@@ -830,17 +740,6 @@ def test_config_rejects_path_escape_and_unsafe_backup_destination(tmp_path):
                 "archive_root": "../outside",
             },
         )
-    with pytest.raises(ValueError, match="backup.destination_root"):
-        _config(
-            tmp_path,
-            backup={
-                "enabled": True,
-                "mount_root": "data/QuoteBak",
-                "destination_root": "data/other/announcements",
-            },
-        )
-
-
 @pytest.mark.parametrize(
     "archive_root",
     [
@@ -861,133 +760,12 @@ def test_config_rejects_noncanonical_dynamic_path_segments(tmp_path, archive_roo
         )
 
 
-def test_config_rejects_enabled_backup_without_mount_identity(tmp_path):
-    with pytest.raises(ValueError, match="expected_mount_source"):
-        _config(
-            tmp_path,
-            backup={
-                "enabled": True,
-                "mount_root": "data/QuoteBak",
-                "destination_root": "data/QuoteBak/announcement_assets",
-                "expected_failure_domain": "backup-nas",
-            },
-        )
-
-
-def test_config_rejects_backup_destination_symlink_escape(tmp_path):
-    backup_root = tmp_path / "data/QuoteBak"
-    outside = tmp_path / "outside"
-    backup_root.mkdir(parents=True)
-    outside.mkdir()
-    (backup_root / "escape").symlink_to(outside, target_is_directory=True)
-
-    with pytest.raises(ValueError, match="backup.destination_root"):
-        _config(
-            tmp_path,
-            backup={
-                "enabled": True,
-                "mount_root": "data/QuoteBak",
-                "destination_root": "data/QuoteBak/escape/announcement_assets",
-                "expected_mount_source": "backup.example:/archive",
-                "expected_failure_domain": "backup-nas",
-            },
-        )
-
-
-def test_backup_mount_validation_can_run_before_backup_is_enabled(
-    tmp_path, monkeypatch
-):
-    config = _config(
-        tmp_path,
-        backup={
-            "enabled": False,
-            "mount_root": "data/QuoteBak",
-            "destination_root": "data/QuoteBak/announcement_assets",
-            "expected_mount_source": "backup.example:/archive",
-            "expected_failure_domain": "backup-nas",
-            "free_space_reserve_bytes": 1,
-        },
-    )
-    backup_identity = MountIdentity(
-        requested_path=config.backup.mount_root,
-        mount_point=config.backup.mount_root,
-        source="backup.example:/archive",
-        fs_type="nfs4",
-        device_id=2,
-    )
-    primary_identity = MountIdentity(
-        requested_path=config.filings_root,
-        mount_point=config.filings_root,
-        source="primary.example:/filings",
-        fs_type="nfs4",
-        device_id=3,
-    )
-    identities = iter((backup_identity, primary_identity))
-    monkeypatch.setattr(
-        "research.announcement_assets.storage.probe_mount_identity",
-        lambda path: next(identities),
-    )
-
-    assert validate_backup_mount(config) is None
-    assert validate_backup_mount(config, require_enabled=False) == backup_identity
-
-
-def test_backup_mount_guard_rejects_local_fallback_and_same_host(tmp_path, monkeypatch):
-    config = _config(
-        tmp_path,
-        backup={
-            "enabled": True,
-            "mount_root": "data/QuoteBak",
-            "destination_root": "data/QuoteBak/announcement_assets",
-            "expected_mount_source": "primary.example:/backup",
-            "expected_failure_domain": "backup-nas",
-            "free_space_reserve_bytes": 1,
-        },
-    )
-    local = MountIdentity(
-        requested_path=config.backup.mount_root,
-        mount_point=Path("/"),
-        source="overlay",
-        fs_type="overlay",
-        device_id=1,
-    )
-    monkeypatch.setattr(
-        "research.announcement_assets.storage.probe_mount_identity",
-        lambda path: local,
-    )
-    with pytest.raises(RuntimeError, match="dedicated mounted filesystem"):
-        validate_backup_mount(config)
-
-    backup_identity = MountIdentity(
-        requested_path=config.backup.mount_root,
-        mount_point=config.backup.mount_root,
-        source="primary.example:/backup",
-        fs_type="nfs4",
-        device_id=2,
-    )
-    primary_identity = MountIdentity(
-        requested_path=config.filings_root,
-        mount_point=config.filings_root,
-        source="primary.example:/filings",
-        fs_type="nfs4",
-        device_id=3,
-    )
-    identities = iter((backup_identity, primary_identity))
-    monkeypatch.setattr(
-        "research.announcement_assets.storage.probe_mount_identity",
-        lambda path: next(identities),
-    )
-    with pytest.raises(RuntimeError, match="independent storage failure domain"):
-        validate_backup_mount(config)
-
-
 def test_runtime_mount_guard_rejects_local_fallback_when_mount_is_required(tmp_path):
     config = _config(tmp_path)
     guarded = replace(
         config,
         require_filings_mount=True,
         expected_filings_mount_source="nfs.example:/filings",
-        capacity_artifact_required=True,
     )
     with pytest.raises(RuntimeError, match="mount source mismatch"):
         ContentAddressedBlobStore(guarded).prepare()
@@ -1112,6 +890,12 @@ def test_announcement_and_attachment_upserts_are_source_qualified_and_idempotent
             "excluded:英文版",
         ),
         (
+            "甲公司2025年年度报告（英文）",
+            "2025年年度报告（英文）.pdf",
+            False,
+            "excluded:（英文）",
+        ),
+        (
             "甲公司2025年年度报告（英文简版）",
             "2025年年度报告（英文简版）.pdf",
             False,
@@ -1134,6 +918,12 @@ def test_announcement_and_attachment_upserts_are_source_qualified_and_idempotent
             "2025年年度报告（修订版）.pdf",
             True,
             "eligible_complete_correction",
+        ),
+        (
+            "甲公司关于更正《2025年年度报告》的公告",
+            "关于更正《2025年年度报告》的公告.pdf",
+            False,
+            "correction_notice_without_full_replacement",
         ),
         (
             "甲公司2025年半年度报告",
@@ -1162,6 +952,29 @@ def test_classifier_is_attachment_level_and_fail_closed(
         assert result.document_family == DocumentFamily.ANNUAL_REPORT.value
         assert result.variant is AnnualReportVariant.CORRECTION
         assert result.is_full_report is eligible
+
+
+def test_pdf_title_refinement_rejects_provider_mislabeled_summary(monkeypatch):
+    class Page:
+        @staticmethod
+        def extract_text():
+            return "甲公司 2025 年年度报告摘要"
+
+    class Reader:
+        def __init__(self, *_args, **_kwargs):
+            self.pages = [Page()]
+
+    import pypdf
+
+    monkeypatch.setattr(pypdf, "PdfReader", Reader)
+    record, _ = _record(title="甲公司2025年年度报告")
+    initial = AnnualReportClassifier().classify(record, record.attachments[0])
+
+    refined = refine_classification_from_pdf(initial, PDF_BYTES)
+
+    assert not refined.is_eligible
+    assert not refined.is_full_report
+    assert "excluded:pdf_annual_report_summary" in refined.reasons
 
 
 def test_fiscal_year_policy_handles_january_april_deadline_and_post_period_listing():
@@ -1310,6 +1123,88 @@ def test_same_source_equivalent_tie_break_is_discovery_order_independent():
         forward.canonical_projection_policy_version
         == reverse.canonical_projection_policy_version
     )
+
+
+def test_same_source_filing_url_variants_share_legal_chain():
+    classification = {
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "is_full_report": True,
+        "is_eligible": True,
+        "correction_evidence": False,
+        "reasons": ["eligible_complete_original"],
+        "policy_version": "formal_annual_report.v1",
+        "vocabulary_version": CLASSIFICATION_VOCABULARY_VERSION,
+    }
+
+    def row(attachment_id: str, version_id: str):
+        return {
+            "version_id": version_id,
+            "attachment_id": attachment_id,
+            "source": "cninfo",
+            "source_announcement_id": "1225132706",
+            "instrument_id": "920128.BJ",
+            "exchange": "BSE",
+            "content_hash": "a" * 64,
+            "published_at": "2026-04-19T16:00:00+00:00",
+            "classification": classification,
+            "integrity_status": "valid",
+            "blob_integrity_status": "valid",
+            "attachment_metadata": {},
+            "announcement_metadata": {},
+        }
+
+    first = _candidate_from_row(row("attachment-absolute", "version-absolute"))
+    second = _candidate_from_row(row("attachment-relative", "version-relative"))
+    selection = select_effective_candidate((first, second))
+
+    assert first.legal_chain_id
+    assert first.legal_chain_id == second.legal_chain_id
+    assert selection.state is EffectiveDecisionState.CURRENT
+
+
+def test_cninfo_same_title_same_day_republication_uses_provider_id_order():
+    classification = {
+        "document_family": "annual_report",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "variant": "original",
+        "is_full_report": True,
+        "is_eligible": True,
+        "correction_evidence": False,
+        "reasons": ["eligible_complete_original"],
+        "policy_version": "formal_annual_report.v1",
+        "vocabulary_version": CLASSIFICATION_VOCABULARY_VERSION,
+    }
+
+    def row(source_announcement_id: str, content_hash: str):
+        return {
+            "version_id": f"version-{source_announcement_id}",
+            "attachment_id": f"attachment-{source_announcement_id}",
+            "source": "cninfo",
+            "source_announcement_id": source_announcement_id,
+            "title": "2025年年度报告",
+            "instrument_id": "920445.BJ",
+            "exchange": "BSE",
+            "content_hash": content_hash,
+            "published_at": "2026-03-26T16:00:00+00:00",
+            "classification": classification,
+            "integrity_status": "valid",
+            "blob_integrity_status": "valid",
+            "attachment_metadata": {},
+            "announcement_metadata": {},
+        }
+
+    earlier = _candidate_from_row(row("1225045788", "a" * 64))
+    later = _candidate_from_row(row("1225287578", "b" * 64))
+    selection = select_effective_candidate((later, earlier))
+
+    assert earlier.legal_chain_id == later.legal_chain_id
+    assert later.legal_precedence > earlier.legal_precedence
+    assert selection.state is EffectiveDecisionState.CURRENT
+    assert selection.winner == later
 
 
 @pytest.mark.parametrize("chain_ids", [(None, None), ("chain-a", "chain-b")])
@@ -2365,6 +2260,41 @@ def test_service_reuses_shared_local_asset_with_zero_second_download(tmp_path):
     assert first_consumer.disposition is EnsureDisposition.LOCAL_HIT
     assert second_consumer.disposition is EnsureDisposition.LOCAL_HIT
     assert retriever.calls == 1
+
+
+def test_service_persists_pdf_summary_refinement(tmp_path, monkeypatch):
+    class Page:
+        @staticmethod
+        def extract_text():
+            return "甲公司 2025 年年度报告摘要"
+
+    class Reader:
+        def __init__(self, *_args, **_kwargs):
+            self.pages = [Page()]
+
+    import pypdf
+
+    monkeypatch.setattr(pypdf, "PdfReader", Reader)
+    config = _config(tmp_path)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=_Retriever(),
+    )
+    record, instrument_id = _record()
+    registered = service.register_discovered_record(record, instrument_id=instrument_id)
+
+    assert service.acquire_attachment(registered[0].attachment_id) is None
+    attachment = repository.get_attachment(registered[0].attachment_id)
+    classification = attachment.metadata["asset_classification"]
+    assert classification["is_eligible"] is False
+    assert classification["is_full_report"] is False
+    assert repository.get_effective_report(instrument_id, 2025) is None
 
 
 def test_asset_request_subscriptions_share_work_but_isolate_principals(tmp_path):

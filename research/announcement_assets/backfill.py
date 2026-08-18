@@ -6,6 +6,7 @@ import shutil
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import date, datetime, time, timedelta, timezone
+from pathlib import Path
 from time import monotonic
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -59,6 +60,10 @@ RepairCallable = Callable[
     [str, str, str, str, str, int],
     AnnouncementRouteResult | Iterable[Any],
 ]
+
+_PAGE_BOUND_REASONS = frozenset(
+    {"estimated_pages_exceed_bound", "max_pages_exhausted", "max_pages_reached"}
+)
 
 
 def _source_exchange_routes(
@@ -125,6 +130,21 @@ class _CandidateBlocker:
     candidates: tuple[AnnualReportCandidate, ...] = ()
 
 
+@dataclass(frozen=True)
+class _PendingDiscoveryPartition:
+    start_date: str
+    end_date: str
+    start_page: int = 1
+
+
+@dataclass(frozen=True)
+class _PartitionedDiscoveryResult:
+    status: str
+    complete: bool
+    records: tuple[Any, ...]
+    pending: tuple[_PendingDiscoveryPartition, ...] = ()
+
+
 @dataclass
 class _BootstrapBudget:
     """Operation-wide bounds shared by market and targeted bootstrap scopes."""
@@ -143,9 +163,14 @@ class _BootstrapBudget:
     targeted_requests: int = 0
     targeted_started_at: float | None = None
 
-    def stop_reason(self, *, include_windows: bool = True) -> str | None:
+    def elapsed_stop_reason(self) -> str | None:
         if monotonic() - self.started_at >= self.max_elapsed_seconds:
             return "max_elapsed_seconds_reached"
+        return None
+
+    def stop_reason(self, *, include_windows: bool = True) -> str | None:
+        if reason := self.elapsed_stop_reason():
+            return reason
         if self.requests >= self.max_requests:
             return "max_requests_reached"
         if include_windows and self.windows >= self.max_windows:
@@ -162,9 +187,7 @@ class _BootstrapBudget:
             return "targeted_repair_max_elapsed_seconds_reached"
         if self.targeted_requests >= self.targeted_max_requests:
             return "targeted_repair_max_requests_reached"
-        if self.instruments >= min(
-            self.max_instruments, self.targeted_max_instruments
-        ):
+        if self.instruments >= min(self.max_instruments, self.targeted_max_instruments):
             return "targeted_repair_max_instruments_reached"
         return None
 
@@ -174,9 +197,7 @@ class _BootstrapBudget:
             self.windows += 1
         return reason
 
-    def observe_result(
-        self, result: AnnouncementRouteResult | Iterable[Any]
-    ) -> int:
+    def observe_result(self, result: AnnouncementRouteResult | Iterable[Any]) -> int:
         if isinstance(result, AnnouncementRouteResult):
             requests = sum(item.requests_made for item in result.attempts)
             if requests == 0 and result.scan_result is not None:
@@ -221,24 +242,24 @@ class AnnualReportBootstrap:
         repair: RepairCallable | None = None,
         operation_id: str | None = None,
         evidence_cutoff: str | datetime | None = None,
+        elapsed_seconds_before_run: float = 0.0,
     ) -> BootstrapResult:
         """Execute bounded windows; no window or target is silently marked complete."""
         run_started = monotonic()
+        budget_started = run_started - max(0.0, float(elapsed_seconds_before_run))
         budget = _BootstrapBudget(
             max_requests=self.config.discovery.max_requests,
             max_windows=self.config.discovery.max_windows,
             max_instruments=self.config.discovery.max_instruments,
             max_elapsed_seconds=self.config.discovery.max_elapsed_seconds,
-            targeted_max_requests=(
-                self.config.discovery.targeted_repair_max_requests
-            ),
+            targeted_max_requests=(self.config.discovery.targeted_repair_max_requests),
             targeted_max_instruments=(
                 self.config.discovery.targeted_repair_max_instruments
             ),
             targeted_max_elapsed_seconds=(
                 self.config.discovery.targeted_repair_max_elapsed_seconds
             ),
-            started_at=run_started,
+            started_at=budget_started,
         )
         windows_to_run = tuple(windows or self._default_windows(as_of))
         operation_id = operation_id or stable_id(
@@ -273,7 +294,11 @@ class AnnualReportBootstrap:
                     "schema_version": "annual_report_bootstrap.v2",
                     "as_of": as_of.isoformat(),
                     "evidence_visibility_cutoff": cutoff,
-                    "scope": bootstrap_scope,
+                    "scope": {
+                        key: value
+                        for key, value in bootstrap_scope.items()
+                        if key != "snapshot_id"
+                    },
                     "config_fingerprint": self.config.config_fingerprint,
                     "route_fingerprints": [
                         daily_discovery_fingerprint(
@@ -303,6 +328,13 @@ class AnnualReportBootstrap:
             snapshot,
             as_of=as_of,
         )
+        prior_query_coverage = {
+            str(row["instrument_id"]): row
+            for row in self.repository.list_latest_asset_coverage_for_query(
+                query_fingerprint
+            )
+            if str(row["universe_snapshot_id"]) != snapshot.snapshot_id
+        }
         target_ids = tuple(str(row["instrument_id"]) for row in snapshot.instruments)
         instrument_rows = {
             str(row["instrument_id"]): row for row in snapshot.instruments
@@ -319,6 +351,9 @@ class AnnualReportBootstrap:
 
         def stop_reason() -> str | None:
             reason = operation_stop_reason(operation_id)
+            if reason is not None:
+                return reason
+            reason = budget.elapsed_stop_reason()
             if reason is not None:
                 return reason
             if durable_operation and self.repository.operation_stop_requested(
@@ -343,8 +378,11 @@ class AnnualReportBootstrap:
                     window_complete = False
                     break
                 base_fingerprint = daily_discovery_fingerprint(
-                    config=self.config, source=source, exchange=exchange,
-                    scope_key="market", acquisition_service=self.acquisition_service,
+                    config=self.config,
+                    source=source,
+                    exchange=exchange,
+                    scope_key="market",
+                    acquisition_service=self.acquisition_service,
                 )
                 fingerprint = stable_id(
                     "bootstrap-route",
@@ -357,7 +395,6 @@ class AnnualReportBootstrap:
                 )
                 scope_ref = stable_id(
                     "bootstrap-scope",
-                    operation_id,
                     query_fingerprint,
                     source,
                     exchange,
@@ -366,6 +403,42 @@ class AnnualReportBootstrap:
                 )
                 lease = None
                 try:
+                    existing_state = self.repository.get_discovery_state(
+                        source=source,
+                        exchange=exchange,
+                        category="annual_report",
+                        scope_key="market",
+                        config_fingerprint=fingerprint,
+                    )
+                    if (
+                        existing_state is not None
+                        and bool(existing_state.get("is_complete"))
+                        and str(existing_state.get("run_cutoff") or "") == cutoff
+                    ):
+                        checkpoint = dict(existing_state.get("checkpoint") or {})
+                        stored_evidence = checkpoint.get("route_evidence")
+                        evidence = (
+                            dict(stored_evidence)
+                            if isinstance(stored_evidence, Mapping)
+                            else _route_scope_evidence(
+                                source=source,
+                                exchange=exchange,
+                                window=window,
+                                cutoff=cutoff,
+                                query_fingerprint=query_fingerprint,
+                                operation_id=str(
+                                    checkpoint.get("bootstrap_operation_id")
+                                    or operation_id
+                                ),
+                                complete=True,
+                                status=str(existing_state.get("status") or "success"),
+                                records=(),
+                            )
+                        )
+                        route_evidence[
+                            str(evidence.get("scope_reference") or scope_ref)
+                        ] = evidence
+                        continue
                     claimed_at = datetime.now(timezone.utc)
                     lease = self.repository.claim_discovery_state(
                         source=source,
@@ -389,20 +462,29 @@ class AnnualReportBootstrap:
                         operation_id=operation_id,
                         observation_key=query_fingerprint,
                     )
-                    scan_status, complete, records = self._discover_partitioned(
+                    checkpoint = (
+                        dict(existing_state.get("checkpoint") or {})
+                        if existing_state
+                        else {}
+                    )
+                    scan_result = self._discover_partitioned(
                         source=source,
                         exchange=exchange,
                         window=window,
                         discover=discover,
                         budget=budget,
+                        pending=_pending_discovery_partitions(checkpoint),
                     )
+                    scan_status = scan_result.status
+                    complete = scan_result.complete
+                    records = scan_result.records
                     for record in records:
                         self.service.register_discovered_record(
                             record,
                             instrument_id=self._match_instrument(record, target_ids),
                         )
                     records_seen += len(records)
-                    route_evidence[scope_ref] = _route_scope_evidence(
+                    current_route_evidence = _route_scope_evidence(
                         source=source,
                         exchange=exchange,
                         window=window,
@@ -410,9 +492,11 @@ class AnnualReportBootstrap:
                         query_fingerprint=query_fingerprint,
                         operation_id=operation_id,
                         complete=complete,
-                        status=scan_status or ("success" if records else "success_empty"),
+                        status=scan_status
+                        or ("success" if records else "success_empty"),
                         records=records,
                     )
+                    route_evidence[scope_ref] = current_route_evidence
                     if complete:
                         self.repository.upsert_discovery_state(
                             source=source,
@@ -437,6 +521,8 @@ class AnnualReportBootstrap:
                                     "complete": True,
                                     "status": scan_status,
                                 },
+                                "pending_partitions": [],
+                                "route_evidence": current_route_evidence,
                             },
                             expected_lease_owner=lease["lease_owner"],
                             expected_lease_generation=lease["lease_generation"],
@@ -454,6 +540,11 @@ class AnnualReportBootstrap:
                             is_complete=False,
                             covered_until=lease.get("covered_until"),
                             run_cutoff=cutoff,
+                            next_page=(
+                                None
+                                if not scan_result.pending
+                                else scan_result.pending[0].start_page
+                            ),
                             checkpoint={
                                 "bootstrap_operation_id": operation_id,
                                 "query_fingerprint": query_fingerprint,
@@ -467,6 +558,14 @@ class AnnualReportBootstrap:
                                     "complete": False,
                                     "status": scan_status,
                                 },
+                                "pending_partitions": [
+                                    {
+                                        "start_date": item.start_date,
+                                        "end_date": item.end_date,
+                                        "start_page": item.start_page,
+                                    }
+                                    for item in scan_result.pending
+                                ],
                             },
                             gap_reason="discovery_incomplete",
                             expected_lease_owner=lease["lease_owner"],
@@ -534,6 +633,39 @@ class AnnualReportBootstrap:
                     break
                 if instrument_id in selected or instrument_id in candidate_blockers:
                     continue
+                prior_coverage = prior_query_coverage.get(instrument_id)
+                prior_evidence = (
+                    dict(prior_coverage.get("evidence") or {})
+                    if prior_coverage is not None
+                    else {}
+                )
+                prior_checkpoint = dict(
+                    prior_evidence.get("targeted_repair_checkpoint") or {}
+                )
+                if (
+                    prior_coverage is not None
+                    and prior_coverage.get("status")
+                    == CoverageStatus.CONFIRMED_MISSING.value
+                    and prior_checkpoint.get("completed_scopes")
+                ):
+                    repair_complete.add(instrument_id)
+                    for item in prior_checkpoint["completed_scopes"]:
+                        if not isinstance(item, Mapping):
+                            continue
+                        route = item.get("route_evidence")
+                        if isinstance(route, Mapping):
+                            repair_evidence.setdefault(instrument_id, []).append(
+                                dict(route)
+                            )
+                    self.repository.upsert_asset_coverage(
+                        universe_snapshot_id=snapshot.snapshot_id,
+                        instrument_id=instrument_id,
+                        status=CoverageStatus.RETRYABLE.value,
+                        as_of=as_of.isoformat(),
+                        expected_fiscal_year=as_of.year - 1,
+                        evidence=prior_evidence,
+                    )
+                    continue
                 budget_reason = budget.targeted_stop_reason()
                 if budget_reason is not None:
                     repair_incomplete.add(instrument_id)
@@ -543,6 +675,9 @@ class AnnualReportBootstrap:
                 try:
                     repaired = self._targeted_repair(
                         instrument_id=instrument_id,
+                        instrument_exchange=str(
+                            instrument_rows[instrument_id].get("exchange") or ""
+                        ),
                         universe_snapshot_id=snapshot.snapshot_id,
                         as_of=as_of,
                         listing_date=_parse_listing_date(
@@ -553,9 +688,7 @@ class AnnualReportBootstrap:
                         evidence_cutoff=cutoff,
                         operation_id=operation_id,
                         query_fingerprint=query_fingerprint,
-                        scope_evidence=repair_evidence.setdefault(
-                            instrument_id, []
-                        ),
+                        scope_evidence=repair_evidence.setdefault(instrument_id, []),
                         budget=budget,
                     )
                     if not repaired.complete:
@@ -579,6 +712,7 @@ class AnnualReportBootstrap:
                 blockers=candidate_blockers,
                 evidence_cutoff=cutoff,
                 operation_id=operation_id,
+                budget=budget,
             )
         )
         persisted_coverage = {
@@ -657,14 +791,12 @@ class AnnualReportBootstrap:
                         if missing_search_complete
                         else CoverageStatus.RETRYABLE
                     )
-                    expected = (
-                        _expected_period_coverage(
-                            bounds=bounds,
-                            listing_date=listing_date,
-                            latest_winner_fiscal_year=None,
-                            proof_complete=missing_search_complete,
-                        ).value
-                    )
+                    expected = _expected_period_coverage(
+                        bounds=bounds,
+                        listing_date=listing_date,
+                        latest_winner_fiscal_year=None,
+                        proof_complete=missing_search_complete,
+                    ).value
                     if status is CoverageStatus.RETRYABLE:
                         retry_evidence = {
                             "reason": (
@@ -685,49 +817,130 @@ class AnnualReportBootstrap:
                     ):
                         corrections_selected += 1
                     reports_selected += 1
-                    local_version = (
-                        self.repository.get_latest_valid_attachment_version(
-                            candidate.attachment_id
+                    prior_coverage = prior_query_coverage.get(instrument_id)
+                    prior_evidence = (
+                        dict(prior_coverage.get("evidence") or {})
+                        if prior_coverage is not None
+                        else {}
+                    )
+                    prior_terminal = dict(
+                        prior_evidence.get("terminal_evidence") or {}
+                    )
+                    current_asset = self.repository.get_effective_report(
+                        instrument_id,
+                        candidate_fiscal_year,
+                    )
+                    current_blob = (
+                        None
+                        if current_asset is None or not current_asset.content_hash
+                        else self.repository.get_blob(current_asset.content_hash)
+                    )
+                    file_matches = False
+                    if current_blob is not None:
+                        try:
+                            blob_path = Path(current_blob.canonical_path)
+                            file_matches = (
+                                blob_path.is_file()
+                                and blob_path.stat().st_size
+                                == current_blob.content_length
+                            )
+                        except OSError:
+                            file_matches = False
+                    reusable_asset = (
+                        current_asset
+                        if prior_coverage is not None
+                        and prior_coverage.get("status")
+                        == CoverageStatus.AVAILABLE.value
+                        and current_asset is not None
+                        and current_asset.decision_state
+                        is EffectiveDecisionState.CURRENT
+                        and current_asset.availability
+                        is AssetAvailability.LOCAL_VALID
+                        and current_asset.visibility_state == "production"
+                        and current_blob is not None
+                        and current_blob.integrity_status is IntegrityStatus.VALID
+                        and file_matches
+                        and candidate.attachment_id == current_asset.attachment_id
+                        and candidate.content_hash == current_asset.content_hash
+                        and candidate.source == current_asset.source
+                        and candidate.source_announcement_id
+                        == current_asset.source_announcement_id
+                        and prior_terminal.get("asset_id") == current_asset.asset_id
+                        and prior_terminal.get("attachment_id")
+                        == current_asset.attachment_id
+                        and prior_terminal.get("version_id")
+                        == current_asset.version_id
+                        and prior_terminal.get("content_hash")
+                        == current_asset.content_hash
+                        else None
+                    )
+                    acquired_version = None
+                    if reusable_asset is not None:
+                        local_version = None
+                        had_local_version = True
+                        asset = reusable_asset
+                        visible_observation = True
+                        local_hits += 1
+                    else:
+                        local_version = (
+                            self.repository.get_latest_valid_attachment_version(
+                                candidate.attachment_id
+                            )
                         )
-                    )
-                    had_local_version = local_version is not None
-                    asset = self.service.acquire_attachment(
-                        candidate.attachment_id,
-                        knowledge_cutoff=cutoff,
-                        operation_id=operation_id,
-                    )
-                    visible_candidate = self._select_latest_metadata(
-                        (instrument_id,), evidence_cutoff=cutoff
-                    ).get(instrument_id)
-                    visible_observation = bool(
-                        visible_candidate is not None
-                        and (
-                            (
-                                visible_candidate.version_available_at is not None
-                                and _timestamp_at_or_before(
-                                    visible_candidate.version_available_at, cutoff
+                        had_local_version = local_version is not None
+                        asset = self.service.acquire_attachment(
+                            candidate.attachment_id,
+                            knowledge_cutoff=cutoff,
+                            operation_id=operation_id,
+                            scheduled_write=True,
+                        )
+                        acquired_version = (
+                            self.repository.get_latest_valid_attachment_version(
+                                candidate.attachment_id
+                            )
+                        )
+                        if (
+                            acquired_version is not None
+                            and (
+                                local_version is None
+                                or acquired_version.version_id != local_version.version_id
+                            )
+                        ):
+                            downloaded += 1
+                        elif (
+                            had_local_version
+                            and asset is not None
+                            and asset.availability is AssetAvailability.LOCAL_VALID
+                        ):
+                            local_hits += 1
+                        visible_candidate = self._select_latest_metadata(
+                            (instrument_id,), evidence_cutoff=cutoff
+                        ).get(instrument_id)
+                        visible_observation = bool(
+                            visible_candidate is not None
+                            and (
+                                (
+                                    visible_candidate.version_available_at is not None
+                                    and _timestamp_at_or_before(
+                                        visible_candidate.version_available_at, cutoff
+                                    )
+                                )
+                                or (
+                                    local_version is not None
+                                    and local_version.retrieval_status == "adopted"
+                                    and visible_candidate.version_available_at is None
+                                    and _candidate_visible_at_cutoff(
+                                        visible_candidate, cutoff
+                                    )
                                 )
                             )
-                            or (
-                                local_version is not None
-                                and local_version.retrieval_status == "adopted"
-                                and visible_candidate.version_available_at is None
-                                and _candidate_visible_at_cutoff(
-                                    visible_candidate, cutoff
-                                )
-                            )
                         )
-                    )
                     if (
                         asset is not None
                         and asset.decision_state is EffectiveDecisionState.CURRENT
                         and asset.availability.value == "local_valid"
                         and visible_observation
                     ):
-                        if had_local_version:
-                            local_hits += 1
-                        else:
-                            downloaded += 1
                         status = CoverageStatus.AVAILABLE
                         latest_winner_fiscal_year = asset.fiscal_year
                         asset_availability = asset.availability.value
@@ -774,7 +987,7 @@ class AnnualReportBootstrap:
                             "candidate_fiscal_year": candidate_fiscal_year,
                             "candidate_attachment_id": candidate.attachment_id,
                         }
-                    if asset is not None and not visible_observation:
+                    if acquired_version is not None and not visible_observation:
                         # Retrieval can finish after a long-running bootstrap's
                         # fixed cutoff.  Keep metadata/bytes for daily discovery,
                         # but do not grant this run coverage credit.
@@ -845,13 +1058,15 @@ class AnnualReportBootstrap:
                         ),
                         **(
                             {"targeted_repair_checkpoint": prior_checkpoint}
-                            if status is CoverageStatus.RETRYABLE and prior_checkpoint
+                            if prior_checkpoint
                             else {}
                         ),
                     },
-                    evidence_expires_at=evidence_expires_at
-                    if status is CoverageStatus.CONFIRMED_MISSING
-                    else None,
+                    evidence_expires_at=(
+                        evidence_expires_at
+                        if status is CoverageStatus.CONFIRMED_MISSING
+                        else None
+                    ),
                     last_reconciled_at=as_of.isoformat(),
                 )
             except (KeyError, OSError, RuntimeError, TypeError, ValueError) as exc:
@@ -889,7 +1104,12 @@ class AnnualReportBootstrap:
         incomplete_targets = coverage_counts[CoverageStatus.INCOMPLETE.value]
         retryable_targets = coverage_counts[CoverageStatus.RETRYABLE.value]
         blocked_targets = coverage_counts[CoverageStatus.BLOCKED.value]
-        if stopped_reason or windows_incomplete or incomplete_targets or retryable_targets:
+        if (
+            stopped_reason
+            or windows_incomplete
+            or incomplete_targets
+            or retryable_targets
+        ):
             overall = "partial"
         elif blocked_targets:
             overall = "blocked"
@@ -899,6 +1119,21 @@ class AnnualReportBootstrap:
         if overall == "success" and not full_market_coverage_complete:
             overall = "partial"
             errors.append("full_market_census_pair_unavailable")
+        daily_handoff: tuple[dict[str, Any], ...] = ()
+        if overall == "success":
+            try:
+                daily_handoff = self._persist_daily_handoff(
+                    operation_id=operation_id,
+                    query_fingerprint=query_fingerprint,
+                    cutoff=cutoff,
+                    route_pairs=route_pairs,
+                )
+            except (OSError, RuntimeError, TypeError, ValueError) as exc:
+                overall = "partial"
+                errors.append(
+                    "bootstrap_daily_handoff_failed:"
+                    f"{type(exc).__name__}:{exc}"
+                )
         report_metrics = self._bootstrap_report_metrics(
             target_ids=target_ids,
             universe_snapshot_id=snapshot.snapshot_id,
@@ -907,7 +1142,7 @@ class AnnualReportBootstrap:
             cutoff=cutoff,
             windows_completed=windows_completed,
             windows_incomplete=windows_incomplete,
-            run_started=run_started,
+            run_started=budget_started,
         )
         final_checkpoint = {
             "query_fingerprint": query_fingerprint,
@@ -916,6 +1151,7 @@ class AnnualReportBootstrap:
             "route_scope_set": list(route_evidence.values()),
             "coverage_counts": coverage_counts,
             "full_market_coverage_complete": full_market_coverage_complete,
+            "daily_handoff": list(daily_handoff),
             "paired_census_snapshot_id": snapshot.paired_census_snapshot_id,
             "operation_budget": {
                 "requests": budget.requests,
@@ -960,6 +1196,7 @@ class AnnualReportBootstrap:
                 "coverage": coverage_counts,
                 "target_count": len(target_ids),
                 "full_market_coverage_complete": full_market_coverage_complete,
+                "daily_handoff": list(daily_handoff),
                 "paired_census_snapshot_id": snapshot.paired_census_snapshot_id,
                 "operation_budget": {
                     "requests": budget.requests,
@@ -967,9 +1204,7 @@ class AnnualReportBootstrap:
                     "instruments": budget.instruments,
                     "stop_reason": budget.stop_reason(),
                 },
-                "census_reconciliation": snapshot.metadata.get(
-                    "census_reconciliation"
-                ),
+                "census_reconciliation": snapshot.metadata.get("census_reconciliation"),
                 "candidate_verification": {
                     "policy_version": "bootstrap_candidate_verification.v1",
                     "mode": "bounded_temporary_verification_then_fail_closed",
@@ -980,6 +1215,104 @@ class AnnualReportBootstrap:
                 },
             },
         )
+
+    def _persist_daily_handoff(
+        self,
+        *,
+        operation_id: str,
+        query_fingerprint: str,
+        cutoff: str,
+        route_pairs: Sequence[tuple[str, str]],
+    ) -> tuple[dict[str, Any], ...]:
+        """Publish complete bootstrap coverage under the daily policy identity."""
+
+        handoff: list[dict[str, Any]] = []
+        for source, exchange in route_pairs:
+            fingerprint = daily_discovery_fingerprint(
+                config=self.config,
+                source=source,
+                exchange=exchange,
+                scope_key="market",
+                acquisition_service=self.acquisition_service,
+            )
+            existing = self.repository.get_discovery_state(
+                source=source,
+                exchange=exchange,
+                category="annual_report",
+                scope_key="market",
+                config_fingerprint=fingerprint,
+            )
+            if existing is not None:
+                prior_covered = existing.get("covered_until")
+                if (
+                    bool(existing.get("is_complete"))
+                    and not existing.get("gap_reason")
+                    and prior_covered
+                    and _parse_timestamp(str(prior_covered))
+                    >= _parse_timestamp(cutoff)
+                ):
+                    handoff.append(
+                        {
+                            "source": source,
+                            "exchange": exchange,
+                            "config_fingerprint": fingerprint,
+                            "covered_until": str(prior_covered),
+                            "reused_newer_watermark": True,
+                        }
+                    )
+                    continue
+                if not bool(existing.get("is_complete")) or existing.get("gap_reason"):
+                    raise RuntimeError(
+                        f"daily handoff scope is incomplete: {source}/{exchange}"
+                    )
+
+            claimed_at = datetime.now(timezone.utc)
+            owner = stable_id("bootstrap-daily-handoff", operation_id, source, exchange)
+            lease = self.repository.claim_discovery_state(
+                source=source,
+                exchange=exchange,
+                category="annual_report",
+                scope_key="market",
+                config_fingerprint=fingerprint,
+                lease_owner=owner,
+                lease_expires_at=(
+                    claimed_at + timedelta(seconds=self.config.retry.lease_seconds)
+                ).isoformat(),
+                now=claimed_at.isoformat(),
+                operation_id=operation_id,
+            )
+            committed = self.repository.upsert_discovery_state(
+                source=source,
+                exchange=exchange,
+                category="annual_report",
+                scope_key="market",
+                config_fingerprint=fingerprint,
+                status="success",
+                is_complete=True,
+                covered_until=cutoff,
+                run_cutoff=cutoff,
+                checkpoint={
+                    "origin": "bootstrap_handoff",
+                    "bootstrap_operation_id": operation_id,
+                    "query_fingerprint": query_fingerprint,
+                    "evidence_visibility_cutoff": cutoff,
+                    "daily_discovery_fingerprint": fingerprint,
+                },
+                expected_lease_owner=owner,
+                expected_lease_generation=int(lease["lease_generation"]),
+                expected_state_version=int(lease["state_version"]),
+                consumes_retry_budget=False,
+            )
+            handoff.append(
+                {
+                    "source": source,
+                    "exchange": exchange,
+                    "config_fingerprint": fingerprint,
+                    "covered_until": str(committed["covered_until"]),
+                    "reused_newer_watermark": False,
+                }
+            )
+        return tuple(handoff)
 
     def _bootstrap_report_metrics(
         self,
@@ -994,27 +1327,31 @@ class AnnualReportBootstrap:
         run_started: float,
     ) -> dict[str, Any]:
         target_set = set(target_ids)
-        reports = [
-            report
-            for report in self.repository.list_effective_reports(limit=1000)
-            if report.instrument_id in target_set
-        ]
-        content_hashes = [
-            str(report.content_hash)
-            for report in reports
-            if report.content_hash
-            and report.availability is AssetAvailability.LOCAL_VALID
-        ]
+        content_hashes: list[str] = []
+        page_size = 1000
+        offset = 0
+        while True:
+            page = self.repository.list_effective_reports(
+                limit=page_size,
+                offset=offset,
+            )
+            content_hashes.extend(
+                str(report.content_hash)
+                for report in page
+                if report.instrument_id in target_set
+                and report.content_hash
+                and report.availability is AssetAvailability.LOCAL_VALID
+            )
+            if len(page) < page_size:
+                break
+            offset += len(page)
         unique_hashes = set(content_hashes)
         total_bytes = 0
-        unprotected_bytes = 0
         for content_hash in unique_hashes:
             blob = self.repository.get_blob(content_hash)
             if blob is None:
                 continue
             total_bytes += int(blob.content_length)
-            if blob.backup_status not in {"verified", "protected"}:
-                unprotected_bytes += int(blob.content_length)
         usage = shutil.disk_usage(self.config.filings_root)
         return {
             "report_schema_version": "official_asset_bootstrap_result.v1",
@@ -1030,7 +1367,6 @@ class AnnualReportBootstrap:
             "windows_incomplete": windows_incomplete,
             "total_bytes": total_bytes,
             "free_space_bytes": int(usage.free),
-            "unprotected_bytes": unprotected_bytes,
             "elapsed_seconds": round(max(0.0, monotonic() - run_started), 6),
         }
 
@@ -1041,6 +1377,8 @@ class AnnualReportBootstrap:
         exchange: str,
         window: BootstrapWindow,
         discover: DiscoveryCallable | None,
+        max_pages: int,
+        start_page: int = 1,
     ) -> AnnouncementRouteResult | Iterable[Any]:
         if discover is not None:
             return discover(
@@ -1048,8 +1386,8 @@ class AnnualReportBootstrap:
                 exchange,
                 window.start_date,
                 window.end_date,
-                1,
-                self.config.discovery.max_pages,
+                start_page,
+                max_pages,
             )
         if self.acquisition_service is None:
             raise RuntimeError("bootstrap discovery service is not configured")
@@ -1062,7 +1400,8 @@ class AnnualReportBootstrap:
                 end_date=window.end_date,
                 category="annual_report",
                 page_size=self.config.discovery.page_size,
-                max_pages=self.config.discovery.max_pages,
+                max_pages=max_pages,
+                start_page=start_page,
             ),
         )
         return self.acquisition_service.acquire(query)
@@ -1075,64 +1414,104 @@ class AnnualReportBootstrap:
         window: BootstrapWindow,
         discover: DiscoveryCallable | None,
         budget: _BootstrapBudget,
-    ) -> tuple[str, bool, tuple[Any, ...]]:
-        result = self._discover(
-            source=source, exchange=exchange, window=window, discover=discover
+        pending: Sequence[_PendingDiscoveryPartition] = (),
+    ) -> _PartitionedDiscoveryResult:
+        queue = list(
+            pending or (_PendingDiscoveryPartition(window.start_date, window.end_date),)
         )
-        budget.observe_result(result)
-        status, complete, records = self._scan_payload(result)
-        if complete:
-            return status, True, records
-        reason = ""
-        if (
-            isinstance(result, AnnouncementRouteResult)
-            and result.scan_result is not None
-        ):
-            reason = str(result.scan_result.stop_reason or "")
-        if reason not in {
-            "estimated_pages_exceed_bound",
-            "max_pages_exhausted",
-            "max_pages_reached",
-        }:
-            return status, False, records
-        start = date.fromisoformat(window.start_date)
-        end = date.fromisoformat(window.end_date)
-        if start >= end:
-            # A dense single day must be retried through the provider's stable
-            # continuation; without one it remains an explicit blocker.
-            return "unsplittable_dense_day", False, records
-        midpoint = start + (end - start) // 2
-        children = (
-            BootstrapWindow(start.isoformat(), midpoint.isoformat()),
-            BootstrapWindow(
-                (midpoint + timedelta(days=1)).isoformat(), end.isoformat()
-            ),
-        )
-        child_records: list[Any] = list(records)
-        for child in children:
-            budget_reason = budget.reserve_window()
-            if budget_reason is not None:
-                return budget_reason, False, tuple(child_records)
-            child_status, child_complete, child_items = self._discover_partitioned(
+        records: list[Any] = []
+        last_status = "success_empty"
+        first_scope = True
+        while queue:
+            partition = queue.pop(0)
+            if not first_scope:
+                budget_reason = budget.reserve_window()
+                if budget_reason is not None:
+                    return _PartitionedDiscoveryResult(
+                        budget_reason,
+                        False,
+                        tuple(records),
+                        (partition, *queue),
+                    )
+            first_scope = False
+            remaining_requests = budget.max_requests - budget.requests
+            if remaining_requests <= 0:
+                return _PartitionedDiscoveryResult(
+                    "max_requests_reached",
+                    False,
+                    tuple(records),
+                    (partition, *queue),
+                )
+            child_window = BootstrapWindow(
+                partition.start_date,
+                partition.end_date,
+            )
+            result = self._discover(
                 source=source,
                 exchange=exchange,
-                window=child,
+                window=child_window,
                 discover=discover,
-                budget=budget,
+                max_pages=min(
+                    self.config.discovery.max_pages,
+                    remaining_requests,
+                ),
+                start_page=partition.start_page,
             )
-            child_records.extend(child_items)
-            if not child_complete:
-                return child_status, False, tuple(child_records)
-        return (
-            "success" if child_records else "success_empty",
+            budget.observe_result(result)
+            status, complete, child_records = self._scan_payload(result)
+            records.extend(child_records)
+            last_status = status
+            if complete:
+                continue
+            stop_reason, next_page = _bootstrap_scan_continuation(
+                result,
+                start_page=partition.start_page,
+            )
+            if stop_reason not in _PAGE_BOUND_REASONS:
+                return _PartitionedDiscoveryResult(
+                    status,
+                    False,
+                    tuple(records),
+                    (partition, *queue),
+                )
+            start = date.fromisoformat(partition.start_date)
+            end = date.fromisoformat(partition.end_date)
+            if start < end:
+                midpoint = start + (end - start) // 2
+                queue[0:0] = [
+                    _PendingDiscoveryPartition(start.isoformat(), midpoint.isoformat()),
+                    _PendingDiscoveryPartition(
+                        (midpoint + timedelta(days=1)).isoformat(),
+                        end.isoformat(),
+                    ),
+                ]
+                continue
+            if next_page is None or next_page <= partition.start_page:
+                return _PartitionedDiscoveryResult(
+                    "unsplittable_dense_day",
+                    False,
+                    tuple(records),
+                    (partition, *queue),
+                )
+            queue.insert(
+                0,
+                _PendingDiscoveryPartition(
+                    partition.start_date,
+                    partition.end_date,
+                    next_page,
+                ),
+            )
+        return _PartitionedDiscoveryResult(
+            "success" if records else last_status,
             True,
-            tuple(child_records),
+            tuple(records),
         )
 
     def _targeted_repair(
         self,
         *,
         instrument_id: str,
+        instrument_exchange: str,
         universe_snapshot_id: str,
         as_of: date,
         listing_date: date,
@@ -1158,15 +1537,9 @@ class AnnualReportBootstrap:
         upper_year = bounds.candidate_upper_year
         lower_year = bounds.earliest_search_year
         found: list[Any] = []
-        prior_coverage = next(
-            (
-                row
-                for row in self.repository.list_asset_coverage(
-                    universe_snapshot_id
-                )
-                if row["instrument_id"] == instrument_id
-            ),
-            None,
+        prior_coverage = self.repository.get_latest_asset_coverage_for_query(
+            instrument_id=instrument_id,
+            query_fingerprint=query_fingerprint,
         )
         prior_evidence = (
             dict(prior_coverage.get("evidence") or {})
@@ -1187,11 +1560,21 @@ class AnnualReportBootstrap:
             route = item.get("route_evidence")
             if isinstance(route, Mapping):
                 scope_evidence.append(dict(route))
-        for fiscal_year in range(upper_year, lower_year - 1, -1):
-            year_found = False
+        normalized_exchange = str(instrument_exchange or "").strip().upper()
+        route_pairs = tuple(
+            (source, exchange)
             for source, exchange in _source_exchange_routes(
                 self.config, self.acquisition_service
-            ):
+            )
+            if exchange == normalized_exchange
+        )
+        if not route_pairs:
+            raise ValueError(
+                f"no targeted repair route for instrument exchange: {normalized_exchange}"
+            )
+        for fiscal_year in range(upper_year, lower_year - 1, -1):
+            year_found = False
+            for source, exchange in route_pairs:
                 budget_reason = budget.targeted_stop_reason()
                 if budget_reason is not None:
                     return _TargetedRepairOutcome(
@@ -1205,7 +1588,6 @@ class AnnualReportBootstrap:
                 )
                 scope_key = stable_id(
                     "bootstrap-targeted-repair-scope",
-                    operation_id,
                     query_fingerprint,
                     instrument_id,
                     fiscal_year,
@@ -1310,6 +1692,14 @@ class AnnualReportBootstrap:
                 )
             if year_found:
                 break
+        self._persist_targeted_repair_checkpoint(
+            universe_snapshot_id=universe_snapshot_id,
+            instrument_id=instrument_id,
+            as_of=as_of,
+            query_fingerprint=query_fingerprint,
+            evidence_cutoff=evidence_cutoff,
+            completed_scopes=completed_scopes,
+        )
         return _TargetedRepairOutcome(records=tuple(found), complete=True)
 
     def _persist_targeted_repair_checkpoint(
@@ -1353,9 +1743,9 @@ class AnnualReportBootstrap:
                         (dict(item) for item in completed_scopes.values()),
                         key=lambda item: str(item["scope_key"]),
                     ),
-                    "blocked_scope": None
-                    if blocked_scope is None
-                    else dict(blocked_scope),
+                    "blocked_scope": (
+                        None if blocked_scope is None else dict(blocked_scope)
+                    ),
                 },
             },
         )
@@ -1415,21 +1805,21 @@ class AnnualReportBootstrap:
                 for row in rows
                 if _candidate_row_visible_at_cutoff(row, evidence_cutoff)
             ]
-            base_candidates = tuple(
-                _candidate_from_row(row) for row in visible_rows
-            )
+            base_candidates = tuple(_candidate_from_row(row) for row in visible_rows)
             candidates = _apply_withdrawal_relations(
                 visible_rows,
                 tuple(
-                    replace(
-                        candidate,
-                        content_hash=str(row["content_hash_observed"]),
-                        integrity_valid=True,
+                    (
+                        replace(
+                            candidate,
+                            content_hash=str(row["content_hash_observed"]),
+                            integrity_valid=True,
+                        )
+                        if row.get("retrieval_status") == "candidate_verified"
+                        and row.get("integrity_status") == IntegrityStatus.VALID.value
+                        and row.get("content_hash_observed")
+                        else candidate
                     )
-                    if row.get("retrieval_status") == "candidate_verified"
-                    and row.get("integrity_status") == IntegrityStatus.VALID.value
-                    and row.get("content_hash_observed")
-                    else candidate
                     for row, candidate in zip(visible_rows, base_candidates)
                 ),
             )
@@ -1458,8 +1848,19 @@ class AnnualReportBootstrap:
                 if item.classification.variant is AnnualReportVariant.CORRECTION
             ]
             pool = corrections or year_items
+            source_frontier: list[AnnualReportCandidate] = []
+            for source in sorted({item.source for item in pool}):
+                source_items = [item for item in pool if item.source == source]
+                newest_publication = max(
+                    _parse_timestamp(item.published_at) for item in source_items
+                )
+                source_frontier.extend(
+                    item
+                    for item in source_items
+                    if _parse_timestamp(item.published_at) == newest_publication
+                )
             unresolved = _unresolved_cross_source_competition(
-                pool,
+                source_frontier,
                 max_verification_bytes=(
                     self.config.storage.candidate_verification_max_bytes
                 ),
@@ -1477,6 +1878,8 @@ class AnnualReportBootstrap:
                 key=lambda item: (
                     _parse_timestamp(item.published_at),
                     int(item.legal_precedence or 0),
+                    bool(item.content_hash),
+                    _bootstrap_source_priority(self.config, item.source),
                     item.candidate_id,
                 ),
             )
@@ -1489,6 +1892,7 @@ class AnnualReportBootstrap:
         blockers: Mapping[str, _CandidateBlocker],
         evidence_cutoff: str | None,
         operation_id: str,
+        budget: _BootstrapBudget,
     ) -> tuple[
         dict[str, AnnualReportCandidate],
         dict[str, _CandidateBlocker],
@@ -1502,16 +1906,20 @@ class AnnualReportBootstrap:
         bytes_read = 0
         observations: list[dict[str, Any]] = []
         if self.service.attachment_retriever is None:
-            return resolved, remaining_blockers, {
-                "bytes_read": 0,
-                "observations": observations,
-            }
+            return (
+                resolved,
+                remaining_blockers,
+                {
+                    "bytes_read": 0,
+                    "observations": observations,
+                },
+            )
         for instrument_id, blocker in sorted(blockers.items()):
-            if operation_stop_reason(operation_id):
+            if operation_stop_reason(operation_id) or budget.elapsed_stop_reason():
                 break
             instrument_observations: list[dict[str, Any]] = []
             for candidate in blocker.candidates:
-                if operation_stop_reason(operation_id):
+                if operation_stop_reason(operation_id) or budget.elapsed_stop_reason():
                     break
                 if candidate.content_hash:
                     continue
@@ -1567,10 +1975,14 @@ class AnnualReportBootstrap:
                     "candidate_verification_observations": instrument_observations,
                 },
             )
-        return resolved, remaining_blockers, {
-            "bytes_read": bytes_read,
-            "observations": observations,
-        }
+        return (
+            resolved,
+            remaining_blockers,
+            {
+                "bytes_read": bytes_read,
+                "observations": observations,
+            },
+        )
 
     def _bootstrap_candidate_rows(
         self,
@@ -1613,7 +2025,18 @@ class AnnualReportBootstrap:
         start = as_of - timedelta(
             days=self.config.discovery.reconciliation_lookback_days
         )
-        return (BootstrapWindow(start.isoformat(), end.isoformat()),)
+        windows: list[BootstrapWindow] = []
+        cursor = start
+        while cursor <= end:
+            next_month = (
+                date(cursor.year + 1, 1, 1)
+                if cursor.month == 12
+                else date(cursor.year, cursor.month + 1, 1)
+            )
+            window_end = min(end, next_month - timedelta(days=1))
+            windows.append(BootstrapWindow(cursor.isoformat(), window_end.isoformat()))
+            cursor = window_end + timedelta(days=1)
+        return tuple(windows)
 
 
 def _parse_listing_date(value: Any, fallback: date) -> date:
@@ -1623,6 +2046,17 @@ def _parse_listing_date(value: Any, fallback: date) -> date:
         except ValueError:
             pass
     return date(fallback.year - 30, 1, 1)
+
+
+def _bootstrap_source_priority(
+    config: AnnouncementAssetConfig,
+    source: str,
+) -> int:
+    routes = tuple(config.acquisition.source_routes)
+    try:
+        return len(routes) - routes.index(str(source).strip().lower())
+    except ValueError:
+        return 0
 
 
 def _expected_period_coverage(
@@ -1713,9 +2147,7 @@ def _bootstrap_cutoff(
     else:
         text = str(explicit).strip()
         if len(text) == 10:
-            value = datetime.combine(
-                date.fromisoformat(text), time.max, tzinfo=zone
-            )
+            value = datetime.combine(date.fromisoformat(text), time.max, tzinfo=zone)
         else:
             value = datetime.fromisoformat(text.replace("Z", "+00:00"))
     if value.tzinfo is None:
@@ -1741,6 +2173,44 @@ def _timestamp_at_or_before(value: str | None, cutoff: str) -> bool:
 def _record_visible_at_cutoff(record: Any, cutoff: str) -> bool:
     published_at = getattr(record, "published_at", None)
     return bool(published_at) and _timestamp_at_or_before(str(published_at), cutoff)
+
+
+def _pending_discovery_partitions(
+    checkpoint: Mapping[str, Any],
+) -> tuple[_PendingDiscoveryPartition, ...]:
+    result: list[_PendingDiscoveryPartition] = []
+    for item in checkpoint.get("pending_partitions") or ():
+        if not isinstance(item, Mapping):
+            continue
+        start_date = str(item.get("start_date") or "")
+        end_date = str(item.get("end_date") or "")
+        if not start_date or not end_date:
+            continue
+        result.append(
+            _PendingDiscoveryPartition(
+                start_date=start_date,
+                end_date=end_date,
+                start_page=max(1, int(item.get("start_page") or 1)),
+            )
+        )
+    return tuple(result)
+
+
+def _bootstrap_scan_continuation(
+    result: AnnouncementRouteResult | Iterable[Any],
+    *,
+    start_page: int,
+) -> tuple[str, int | None]:
+    if not isinstance(result, AnnouncementRouteResult) or result.scan_result is None:
+        return "", None
+    scan = result.scan_result
+    next_page = scan.diagnostics.get("next_page")
+    if next_page is None and not scan.cursor_commit_allowed and scan.pages_scanned:
+        next_page = start_page + scan.pages_scanned
+    return (
+        str(scan.stop_reason or ""),
+        None if next_page is None else int(next_page),
+    )
 
 
 def _candidate_visible_at_cutoff(
@@ -1816,9 +2286,7 @@ def _route_scope_evidence(
             "end_date": window.end_date,
             "inclusive_cutoff": cutoff,
         },
-        "successful_empty_completion_watermark": (
-            cutoff if complete else None
-        ),
+        "successful_empty_completion_watermark": (cutoff if complete else None),
         "page_or_subscope_completion": {
             "complete": bool(complete),
             "status": status,
@@ -1834,16 +2302,20 @@ def _route_scope_evidence(
         "route_equivalence_verified": (
             False
             if inferred_unverified_fallback
-            else True
-            if route_result is None or not route_result.fallback_used
-            else equivalence is not None
+            else (
+                True
+                if route_result is None or not route_result.fallback_used
+                else equivalence is not None
+            )
         ),
         "route_equivalence_reference": (
             None
             if inferred_unverified_fallback
-            else scope_reference
-            if route_result is None or not route_result.fallback_used
-            else None if equivalence is None else equivalence["reference"]
+            else (
+                scope_reference
+                if route_result is None or not route_result.fallback_used
+                else None if equivalence is None else equivalence["reference"]
+            )
         ),
         "route_equivalence_policy_version": (
             None if equivalence is None else equivalence["policy_version"]
@@ -1861,9 +2333,9 @@ def _audited_route_equivalence(
     diagnostics = dict(result.diagnostics or {})
     evidence = diagnostics.get("route_equivalence")
     evidence = dict(evidence) if isinstance(evidence, Mapping) else {}
-    verified = diagnostics.get("query_equivalent") is True or evidence.get(
-        "verified"
-    ) is True
+    verified = (
+        diagnostics.get("query_equivalent") is True or evidence.get("verified") is True
+    )
     reference = str(
         diagnostics.get("route_equivalence_reference")
         or evidence.get("reference")
@@ -1937,9 +2409,7 @@ def _confirmed_missing_evidence(
             "bootstrap-route-capabilities", query_fingerprint
         ),
         "query_policy_fingerprint": query_fingerprint,
-        "classifier_fingerprint": stable_id(
-            "bootstrap-classifier", query_fingerprint
-        ),
+        "classifier_fingerprint": stable_id("bootstrap-classifier", query_fingerprint),
         "eligibility_fingerprint": stable_id(
             "bootstrap-eligibility", snapshot.snapshot_id, query_fingerprint
         ),

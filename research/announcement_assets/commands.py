@@ -11,7 +11,6 @@ from typing import Any
 
 from research.announcements import AnnouncementAcquisitionService
 
-from .capacity_artifact import validate_capacity_artifact
 from .config import AnnouncementAssetConfig
 from .models import (
     AssetOperation,
@@ -30,27 +29,13 @@ from .service import acquisition_work_fingerprint
 
 LATEST_BACKFILL_JOB = "annual_report_asset_latest_backfill"
 DAILY_UPDATE_JOB = "annual_report_asset_daily_update"
-INTEGRITY_AUDIT_JOB = "annual_report_asset_integrity_audit"
-ARCHIVE_BACKUP_JOB = "annual_report_asset_backup"
 SCHEDULER_SERVICE_PRINCIPAL = "service:annual-report-asset-scheduler"
 SUPPORTED_JOBS = frozenset(
     {
         LATEST_BACKFILL_JOB,
         DAILY_UPDATE_JOB,
-        INTEGRITY_AUDIT_JOB,
-        ARCHIVE_BACKUP_JOB,
     }
 )
-INTEGRITY_REPAIR_ACTIONS = frozenset(
-    {"network_repair", "quarantine", "link", "move", "delete"}
-)
-INTEGRITY_ACTION_TARGETS = {
-    "network_repair": "content_hashes",
-    "quarantine": "content_hashes",
-    "link": "content_hashes",
-    "move": "content_hashes",
-    "delete": "deletion_ids",
-}
 
 
 class AuthorizationBoundaryUnavailable(RuntimeError):
@@ -138,20 +123,8 @@ class AnnualReportSchedulerCommandService:
         job = _normalize_job(job_name)
         trigger = _normalize_trigger(trigger_kind)
         normalized_scope = _normalize_scope(scope or {})
-        normalized_actions = _normalize_action_flags(action_flags or {})
-        if normalized_actions and job != INTEGRITY_AUDIT_JOB:
-            raise ValueError("repair action flags are only valid for integrity audit")
-        if job != INTEGRITY_AUDIT_JOB and (
-            "content_hashes" in normalized_scope or "deletion_ids" in normalized_scope
-        ):
-            raise ValueError("integrity target scope is only valid for integrity audit")
-        if job == INTEGRITY_AUDIT_JOB:
-            if trigger == "cron" and any(normalized_actions.values()):
-                raise ValueError("scheduled integrity audit must remain read-only")
-            normalized_scope = self._normalize_integrity_scope(
-                normalized_scope,
-                normalized_actions,
-            )
+        if action_flags:
+            raise ValueError("announcement asset maintenance actions are not supported")
         self._validate_trigger(job, trigger, principal=principal)
         requested_exchanges = set(normalized_scope.get("exchanges", ()))
         requested_sources = set(normalized_scope.get("sources", ()))
@@ -162,10 +135,6 @@ class AnnualReportSchedulerCommandService:
         accepted_bounds = self._normalize_bounds(job, bounds or {})
         if self.config.dry_run:
             raise RuntimeError("annual_report_asset_dry_run_blocks_job_execution")
-        if trigger == "cron" or (
-            job == INTEGRITY_AUDIT_JOB and any(normalized_actions.values())
-        ):
-            validate_capacity_artifact(self.config)
         return JobStartPreflightResult(
             job_name=job,
             trigger_kind=trigger,
@@ -206,11 +175,7 @@ class AnnualReportSchedulerCommandService:
             scope=normalized_scope,
             config=self.config,
             accepted_bounds=accepted_bounds,
-            integrity_policy=(
-                "read_only_integrity_audit"
-                if job == INTEGRITY_AUDIT_JOB
-                else "hash_and_pdf_signature"
-            ),
+            integrity_policy="hash_and_pdf_signature",
             configuration_version=self.config_version,
             acquisition_service=self.acquisition_service,
         )
@@ -268,7 +233,6 @@ class AnnualReportSchedulerCommandService:
         operation = self._require_operation(run_id)
         if self.config.dry_run:
             raise RuntimeError("annual_report_asset_dry_run_blocks_job_execution")
-        validate_capacity_artifact(self.config)
         runner = self.runners.get(operation.operation_type)
         if runner is None:
             raise RuntimeError(
@@ -537,31 +501,12 @@ class AnnualReportSchedulerCommandService:
             and self.config.jobs.daily_enabled
         ):
             raise RuntimeError("daily_cron_disabled")
-        if job_name == ARCHIVE_BACKUP_JOB and not (
-            self.config.enabled
-            and self.config.scheduled_enabled
-            and self.config.jobs.backup_enabled
-            and self.config.backup.enabled
-            and self.config.backup.scheduled_enabled
-        ):
-            raise RuntimeError("backup_cron_disabled")
-        if job_name == INTEGRITY_AUDIT_JOB and not (
-            self.config.enabled
-            and self.config.scheduled_enabled
-            and self.config.jobs.integrity_enabled
-            and not self.config.jobs.integrity_manual_only
-        ):
-            raise RuntimeError("integrity_audit_cron_disabled")
 
     def _normalize_bounds(
         self,
         job_name: str,
         bounds: Mapping[str, int],
     ) -> Mapping[str, int]:
-        if job_name == ARCHIVE_BACKUP_JOB:
-            if bounds:
-                raise ValueError("backup job does not support caller bounds")
-            return {}
         limits = {
             "max_pages": self.config.discovery.max_pages,
             "max_requests": self.config.discovery.max_requests,
@@ -580,50 +525,6 @@ class AnnualReportSchedulerCommandService:
         if unknown:
             raise ValueError(f"unsupported job bounds: {sorted(unknown)}")
         return accepted
-
-    def _normalize_integrity_scope(
-        self,
-        scope: Mapping[str, Any],
-        action_flags: Mapping[str, bool],
-    ) -> Mapping[str, Any]:
-        normalized = dict(scope)
-        hashes = tuple(normalized.get("content_hashes", ()))
-        deletion_ids = tuple(normalized.get("deletion_ids", ()))
-        target_count = len(hashes) + len(deletion_ids)
-        requested_actions = tuple(
-            sorted(name for name, enabled in action_flags.items() if enabled)
-        )
-        if requested_actions and target_count == 0:
-            raise ValueError("destructive integrity actions require an explicit target scope")
-        for action in requested_actions:
-            required_target = INTEGRITY_ACTION_TARGETS[action]
-            if not normalized.get(required_target):
-                raise ValueError(
-                    f"integrity repair action {action} requires explicit "
-                    f"{required_target}"
-                )
-        required_target_names = {
-            INTEGRITY_ACTION_TARGETS[action] for action in requested_actions
-        }
-        provided_target_names = {
-            name
-            for name in ("content_hashes", "deletion_ids")
-            if normalized.get(name)
-        }
-        unused_target_names = provided_target_names - required_target_names
-        if requested_actions and unused_target_names:
-            raise ValueError(
-                "integrity repair scope contains targets not used by requested actions: "
-                + ", ".join(sorted(unused_target_names))
-            )
-        if target_count > self.config.discovery.max_instruments:
-            raise ValueError("integrity repair target scope exceeds configured bound")
-        normalized["read_only"] = not bool(requested_actions)
-        normalized["action_flags"] = {
-            name: bool(action_flags.get(name, False))
-            for name in sorted(INTEGRITY_REPAIR_ACTIONS)
-        }
-        return normalized
 
     def _require_operation(self, run_id: str) -> AssetOperation:
         operation = self.repository.get_operation(str(run_id).strip())
@@ -743,18 +644,6 @@ def _normalize_scope(scope: Mapping[str, Any]) -> Mapping[str, Any]:
             normalized[name] = None if value is None else str(value).strip()
         elif value is not None:
             normalized[name] = str(value).strip()
-    return normalized
-
-
-def _normalize_action_flags(value: Mapping[str, bool]) -> Mapping[str, bool]:
-    unknown = set(value) - INTEGRITY_REPAIR_ACTIONS
-    if unknown:
-        raise ValueError(f"unsupported integrity repair actions: {sorted(unknown)}")
-    normalized: dict[str, bool] = {}
-    for name, enabled in value.items():
-        if not isinstance(enabled, bool):
-            raise TypeError(f"integrity repair action {name} must be boolean")
-        normalized[name] = enabled
     return normalized
 
 

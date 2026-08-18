@@ -732,6 +732,8 @@ test(download): add unit tests for baostock source
 - [配置文档](../configuration/config_file.md)
 - [架构设计](../architecture.md)
 - [全域日更增量同步变更日志与水位需求](incremental_sync_change_watermarks_requirements.md)
+- [框架问题发现与改善方案](framework_audit_and_improvement_plan.md)
+- [待解决问题清单](open_issues_backlog.md)
 - [故障排除](../troubleshooting/faq.md)
 
 ### 工具和库

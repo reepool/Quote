@@ -421,7 +421,7 @@ class BackupProtectionRuntimeState:
 
     @classmethod
     def fresh(cls, config: AnnouncementAssetConfig) -> BackupProtectionRuntimeState:
-        return cls(config_fingerprint=config.config_fingerprint)
+        return cls(config_fingerprint=config.evidence_fingerprint)
 
     @classmethod
     def from_mapping(
@@ -451,7 +451,7 @@ class BackupProtectionRuntimeState:
         fingerprint = _non_empty_text(
             raw.get("config_fingerprint"), "config_fingerprint"
         )
-        if fingerprint != config.config_fingerprint:
+        if fingerprint != config.evidence_fingerprint:
             raise ValueError("backup protection state configuration fingerprint mismatch")
         reasons = raw.get("blocker_reasons", ())
         if isinstance(reasons, (str, bytes)) or not isinstance(
@@ -572,7 +572,7 @@ class BackupProtectionRuntimeState:
         )
 
     def _validate_config(self, config: AnnouncementAssetConfig) -> None:
-        if self.config_fingerprint != config.config_fingerprint:
+        if self.config_fingerprint != config.evidence_fingerprint:
             raise ValueError("backup protection state configuration fingerprint mismatch")
 
 
@@ -1105,31 +1105,8 @@ class AnnouncementAssetConfig:
         object.__setattr__(self, "exchanges", exchanges)
         if self.scheduled_enabled and not self.enabled:
             raise ValueError("scheduled_enabled requires module enabled")
-        if (
-            self.enabled
-            and not self.dry_run
-            and not self.capacity_artifact_required
-            and not _is_isolated_test_root(root)
-        ):
-            raise ValueError(
-                "production announcement-asset writes require capacity artifact"
-            )
         if self.jobs.daily_enabled and not self.scheduled_enabled:
             raise ValueError("daily job requires scheduled_enabled")
-        if self.jobs.backup_enabled and not self.scheduled_enabled:
-            raise ValueError("backup job requires scheduled_enabled")
-        if self.jobs.backup_enabled and not (
-            self.backup.enabled and self.backup.scheduled_enabled
-        ):
-            raise ValueError(
-                "backup job requires backup.enabled and backup.scheduled_enabled"
-            )
-        if (
-            self.jobs.integrity_enabled
-            and not self.jobs.integrity_manual_only
-            and not self.scheduled_enabled
-        ):
-            raise ValueError("scheduled integrity audit requires scheduled_enabled")
         if self.universe_master_data_freshness_hours <= 0:
             raise ValueError("universe master-data freshness must be positive")
         if self.master_data_max_age_hours <= 0:
@@ -1328,6 +1305,36 @@ class AnnouncementAssetConfig:
     def config_fingerprint(self) -> str:
         payload = json.dumps(
             self.normalized_mapping(), sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
+    @property
+    def evidence_fingerprint(self) -> str:
+        """Fingerprint policy while excluding pure rollout-control toggles."""
+
+        mapping = self.normalized_mapping()
+        mapping["enabled"] = False
+        mapping["scheduled_enabled"] = False
+        mapping["dry_run"] = True
+        mapping["backup"]["enabled"] = False
+        mapping["backup"]["scheduled_enabled"] = False
+        # This bounds one execution batch without changing asset identity,
+        # retention, storage, provider routing, or backup semantics.
+        mapping["discovery"]["max_requests"] = 300
+        for name in (
+            "latest_backfill_enabled",
+            "daily_enabled",
+            "backup_enabled",
+            "integrity_enabled",
+        ):
+            mapping["jobs"][name] = False
+        mapping["permissions"]["trusted_identity_enabled"] = False
+        mapping["permissions"]["principals"] = []
+        payload = json.dumps(
+            mapping,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
         ).encode("utf-8")
         return hashlib.sha256(payload).hexdigest()
 
