@@ -8,6 +8,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -17,6 +18,7 @@ from .models import (
     DocumentFamily,
     EnsureRequest,
     IntegrityStatus,
+    normalize_source,
     stable_id,
     utc_now_iso,
 )
@@ -57,6 +59,7 @@ class ControlledContentHandle:
         repository: AnnouncementAssetRepository,
         lease: dict[str, Any],
         ttl_seconds: int,
+        audit_access: bool = False,
     ) -> None:
         self._repository = repository
         self._lease_id = str(lease["pin_id"])
@@ -64,6 +67,7 @@ class ControlledContentHandle:
         metadata = dict(lease.get("metadata") or {})
         self._lease_generation = int(metadata.get("lease_generation") or 1)
         self._ttl_seconds = max(1, int(ttl_seconds))
+        self._audit_access = bool(audit_access)
         self._heartbeat_interval = max(1.0, self._ttl_seconds / 3.0)
         self._next_heartbeat = time.monotonic() + self._heartbeat_interval
         self._lease_lock = threading.RLock()
@@ -128,6 +132,7 @@ class ControlledContentHandle:
                         self._lease_id,
                         owner=self._lease_owner,
                         expected_generation=self._lease_generation,
+                        retain_audit=self._audit_access,
                     )
                     self._released = True
             finally:
@@ -453,7 +458,9 @@ class AnnouncementAssetAccess:
             "operator_diagnostics": summary if operator else None,
         }
 
-    def content_handle(self, asset_id: str) -> dict[str, Any]:
+    def content_handle(
+        self, asset_id: str, *, audit_access: bool = False
+    ) -> dict[str, Any]:
         """Open a verified current asset under a deletion-blocking read lease."""
 
         report = self.repository.get_effective_report_by_asset_id(asset_id)
@@ -496,6 +503,7 @@ class AnnouncementAssetAccess:
             owner_prefix=f"public-asset:{asset_id}",
             lease_metadata={"asset_id": asset_id, "scope": "public_current"},
             revalidate_reference=revalidate_current,
+            audit_access=audit_access,
         )
         return {
             "asset_id": report.asset_id,
@@ -509,7 +517,11 @@ class AnnouncementAssetAccess:
         }
 
     def exact_observation_handle(
-        self, request: EnsureRequest, *, authorized: bool = False
+        self,
+        request: EnsureRequest,
+        *,
+        authorized: bool = False,
+        audit_access: bool = False,
     ) -> dict[str, Any]:
         """Read one retained exact observation for an authorized internal caller.
 
@@ -529,33 +541,50 @@ class AnnouncementAssetAccess:
             raise ValueError(
                 "exact observation handle requires attachment, version, and hash pins"
             )
-        rows = self.repository.list_candidate_rows(
-            source=request.source,
-            source_announcement_id=request.source_announcement_id,
+        expected_source = normalize_source(request.source)
+        expected_filing_id = str(request.source_announcement_id).strip()
+        expected_attachment_id = str(request.attachment_id).strip()
+        expected_content_hash = str(request.expected_content_hash).strip().lower()
+        version = self.repository.get_attachment_version(
+            str(request.observation_version).strip()
         )
-        candidates = self.service._filter_exact_candidates(rows, request)
-        row = next(
-            (
-                item
-                for item in candidates
-                if str(request.attachment_id)
-                in {
-                    str(item.get("attachment_id") or ""),
-                    str(item.get("source_attachment_id") or ""),
-                }
-                and str(item.get("version_id")) == str(request.observation_version)
-            ),
-            None,
-        )
-        if row is None:
+        if version is None:
             raise FileNotFoundError("exact observation is not retained")
-        version = self.repository.get_attachment_version(str(row["version_id"]))
-        if version is None or version.visibility_state != "production":
+        if version.visibility_state != "production":
             raise FileNotFoundError("exact observation is not production-visible")
+        attachment = self.repository.get_attachment(version.attachment_id)
+        if attachment is None or expected_attachment_id not in {
+            attachment.attachment_id,
+            str(attachment.source_attachment_id or ""),
+        }:
+            raise FileNotFoundError("exact observation attachment pin failed")
+        announcement = self.repository.get_announcement(attachment.announcement_id)
+        if (
+            announcement is None
+            or announcement.source != expected_source
+            or announcement.source_announcement_id != expected_filing_id
+        ):
+            raise FileNotFoundError("exact observation filing pin failed")
+        if request.knowledge_cutoff is not None:
+            available_at = version.version_available_at or announcement.published_at
+            if available_at:
+                cutoff = datetime.fromisoformat(
+                    str(request.knowledge_cutoff).replace("Z", "+00:00")
+                )
+                available = datetime.fromisoformat(
+                    str(available_at).replace("Z", "+00:00")
+                )
+                if cutoff.tzinfo is None:
+                    cutoff = cutoff.replace(tzinfo=timezone.utc)
+                if available.tzinfo is None:
+                    available = available.replace(tzinfo=timezone.utc)
+                if available.astimezone(timezone.utc) > cutoff.astimezone(timezone.utc):
+                    raise FileNotFoundError(
+                        "exact observation was unavailable at knowledge cutoff"
+                    )
         if (
             version.integrity_status is not IntegrityStatus.VALID
-            or str(version.content_hash or "").lower()
-            != str(request.expected_content_hash).lower()
+            or str(version.content_hash or "").lower() != expected_content_hash
         ):
             raise FileNotFoundError("exact observation integrity pin failed")
         blob = self.repository.get_blob(str(version.content_hash))
@@ -564,12 +593,30 @@ class AnnouncementAssetAccess:
 
         def revalidate_exact() -> None:
             current_version = self.repository.get_attachment_version(version.version_id)
+            current_attachment = self.repository.get_attachment(version.attachment_id)
+            current_announcement = (
+                None
+                if current_attachment is None
+                else self.repository.get_announcement(
+                    current_attachment.announcement_id
+                )
+            )
             if (
                 current_version is None
                 or current_version.visibility_state != "production"
+                or current_version.attachment_id != attachment.attachment_id
                 or current_version.integrity_status is not IntegrityStatus.VALID
                 or str(current_version.content_hash or "").lower()
-                != str(request.expected_content_hash).lower()
+                != expected_content_hash
+                or current_attachment is None
+                or expected_attachment_id
+                not in {
+                    current_attachment.attachment_id,
+                    str(current_attachment.source_attachment_id or ""),
+                }
+                or current_announcement is None
+                or current_announcement.source != expected_source
+                or current_announcement.source_announcement_id != expected_filing_id
             ):
                 raise FileNotFoundError(
                     "exact observation is no longer retained and valid"
@@ -579,22 +626,23 @@ class AnnouncementAssetAccess:
             blob,
             owner_prefix=f"internal-observation:{version.version_id}",
             lease_metadata={
-                "attachment_id": row["attachment_id"],
+                "attachment_id": attachment.attachment_id,
                 "observation_version": version.version_id,
                 "scope": "internal_exact_observation",
             },
             revalidate_reference=revalidate_exact,
             missing_as_unavailable=True,
+            audit_access=audit_access,
         )
         return {
             "source": request.source,
             "source_announcement_id": request.source_announcement_id,
-            "attachment_id": row["attachment_id"],
+            "attachment_id": attachment.attachment_id,
             "observation_version": version.version_id,
             "content_hash": blob.content_hash,
             "content_length": blob.content_length,
             "media_type": "application/pdf",
-            "filename": f"{row['attachment_id']}.pdf",
+            "filename": f"{attachment.attachment_id}.pdf",
             "path": path,
             "file_handle": snapshot,
             "read_lease_id": lease["pin_id"],
@@ -608,6 +656,7 @@ class AnnouncementAssetAccess:
         lease_metadata: dict[str, Any],
         revalidate_reference: Callable[[], None],
         missing_as_unavailable: bool = False,
+        audit_access: bool = False,
     ) -> tuple[ControlledContentHandle, Path, dict[str, Any]]:
         ttl_seconds = max(1, int(self.config.retry.lease_seconds))
         lease_owner = f"{owner_prefix}:{uuid.uuid4().hex}"
@@ -615,12 +664,13 @@ class AnnouncementAssetAccess:
             blob_hash=blob.content_hash,
             owner=lease_owner,
             ttl_seconds=ttl_seconds,
-            metadata=lease_metadata,
+            metadata={**lease_metadata, "audit_access": bool(audit_access)},
         )
         snapshot = ControlledContentHandle(
             repository=self.repository,
             lease=lease,
             ttl_seconds=ttl_seconds,
+            audit_access=audit_access,
         )
         source: BinaryIO | None = None
         try:

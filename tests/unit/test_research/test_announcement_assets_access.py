@@ -18,6 +18,7 @@ from research.announcement_assets.models import (
     AssetAvailability,
     EnsureDisposition,
     EnsureRequest,
+    IntegrityStatus,
     OperationStatus,
 )
 from research.announcement_assets.repository import AnnouncementAssetRepository
@@ -253,7 +254,17 @@ def test_access_facade_returns_safe_local_projection_and_controlled_content(tmp_
     )
     assert handle.read() == PDF_BYTES
     handle.close()
-    assert repository.get_read_lease(handle.lease_id)["released_at"] is not None
+    assert repository.get_read_lease(handle.lease_id) is None
+
+    audited = access.content_handle(asset.asset_id, audit_access=True)
+    audited_lease_id = audited["read_lease_id"]
+    audited["file_handle"].close()
+    audited_lease = repository.get_read_lease(audited_lease_id)
+    assert audited_lease is not None
+    assert audited_lease["released_at"] is not None
+    assert audited_lease["metadata"]["audit_access"] is True
+    repository.initialize_schema()
+    assert repository.get_read_lease(audited_lease_id) is not None
 
 
 def test_asset_listing_includes_current_superseded_and_metadata_only_records(
@@ -1083,6 +1094,8 @@ def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
     original = service.register_discovered_record(_record(), instrument_id="600000.SH")
     original_asset = service.acquire_attachment(original[0].attachment_id)
     assert original_asset is not None and original_asset.content_hash
+    bound_version = repository.get_attachment_version(original_asset.version_id)
+    assert bound_version is not None
     correction = service.register_discovered_record(
         _record(
             source_id=correction_id,
@@ -1115,13 +1128,44 @@ def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
     assert gone.value.lifecycle_state == "superseded"
     with pytest.raises(PermissionError):
         access.exact_observation_handle(request)
+    repository.add_attachment_version(
+        replace(
+            bound_version,
+            version_id="newer-failed-version",
+            observation_key="newer-failed-observation",
+            content_hash=None,
+            retrieval_status="failed",
+            integrity_status=IntegrityStatus.UNREADABLE,
+            error_code="test_failure",
+            observed_at="2026-03-21T02:00:00+00:00",
+            version_available_at="2026-03-21T02:00:00+00:00",
+        )
+    )
     content = access.exact_observation_handle(request, authorized=True)
     assert content["content_hash"] == original_asset.content_hash
     assert content["file_handle"].read() == original_bytes
     lease_id = content["read_lease_id"]
     assert repository.get_read_lease(lease_id)["released_at"] is None
     content["file_handle"].close()
-    assert repository.get_read_lease(lease_id)["released_at"] is not None
+    assert repository.get_read_lease(lease_id) is None
+
+    repository.add_attachment_version(
+        replace(
+            bound_version,
+            version_id="newer-valid-version",
+            observation_key="newer-valid-observation",
+            observed_at="2026-03-22T02:00:00+00:00",
+            version_available_at="2026-03-22T02:00:00+00:00",
+        )
+    )
+    duplicate_observation = access.exact_observation_handle(request, authorized=True)
+    assert duplicate_observation["observation_version"] == original_asset.version_id
+    duplicate_observation["file_handle"].close()
+
+    normalized_source = access.exact_observation_handle(
+        replace(request, source=" CNINFO "), authorized=True
+    )
+    normalized_source["file_handle"].close()
 
     with pytest.raises(FileNotFoundError):
         access.exact_observation_handle(
@@ -1130,6 +1174,15 @@ def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
     with pytest.raises(FileNotFoundError):
         access.exact_observation_handle(
             replace(request, observation_version="missing-version"), authorized=True
+        )
+    with pytest.raises(FileNotFoundError):
+        access.exact_observation_handle(
+            replace(
+                request,
+                source_announcement_id="wrong-filing",
+                filing_id="wrong-filing",
+            ),
+            authorized=True,
         )
 
 

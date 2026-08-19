@@ -244,8 +244,19 @@ class AnnouncementAssetRepository:
             conn.execute(
                 """DELETE FROM official_asset_retention_pins
                    WHERE pin_type NOT IN ('effective_asset', 'active_reader')
-                      OR released_at IS NOT NULL
-                      OR (pin_type='active_reader' AND expires_at<=?)""",
+                      OR (
+                          released_at IS NOT NULL
+                          AND NOT (
+                              pin_type='active_reader'
+                              AND COALESCE(
+                                  json_extract(metadata_json, '$.audit_access'), 0
+                              )=1
+                          )
+                      )
+                      OR (
+                          pin_type='active_reader' AND released_at IS NULL
+                          AND expires_at<=?
+                      )""",
                 (utc_now_iso(),),
             )
             self._migrate_attachment_version_temporal_columns(conn)
@@ -3118,8 +3129,9 @@ class AnnouncementAssetRepository:
         *,
         owner: str,
         expected_generation: int,
+        retain_audit: bool = False,
     ) -> bool:
-        """Release one reader lease without permitting stale-owner cleanup."""
+        """Release a reader lease, retaining history only for explicit audit."""
 
         now = utc_now_iso()
         with self.transaction() as conn:
@@ -3135,18 +3147,31 @@ class AnnouncementAssetRepository:
                 metadata.get("lease_generation") or 0
             ) != int(expected_generation):
                 return False
-            result = conn.execute(
-                """UPDATE official_asset_retention_pins SET released_at=?
-                   WHERE pin_id=? AND pin_type=? AND owner=?
-                     AND released_at IS NULL AND metadata_json=?""",
-                (
-                    now,
-                    str(lease_id),
-                    READ_LEASE_PIN_TYPE,
-                    str(owner).strip(),
-                    row["metadata_json"],
-                ),
-            )
+            if retain_audit:
+                result = conn.execute(
+                    """UPDATE official_asset_retention_pins SET released_at=?
+                       WHERE pin_id=? AND pin_type=? AND owner=?
+                         AND released_at IS NULL AND metadata_json=?""",
+                    (
+                        now,
+                        str(lease_id),
+                        READ_LEASE_PIN_TYPE,
+                        str(owner).strip(),
+                        row["metadata_json"],
+                    ),
+                )
+            else:
+                result = conn.execute(
+                    """DELETE FROM official_asset_retention_pins
+                       WHERE pin_id=? AND pin_type=? AND owner=?
+                         AND released_at IS NULL AND metadata_json=?""",
+                    (
+                        str(lease_id),
+                        READ_LEASE_PIN_TYPE,
+                        str(owner).strip(),
+                        row["metadata_json"],
+                    ),
+                )
         return result.rowcount == 1
 
     def get_read_lease(self, lease_id: str) -> dict[str, Any] | None:

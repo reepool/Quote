@@ -3825,17 +3825,24 @@ class DataManager:
     async def get_shared_annual_report_content(
         self,
         asset_id: str,
+        *,
+        audit_access: bool = False,
     ) -> Dict[str, Any]:
         access = self._get_announcement_asset_access(initialize_schema=False)
         if not access.repository.schema_initialized():
             raise FileNotFoundError("annual-report catalog is not initialized")
-        return await asyncio.to_thread(access.content_handle, asset_id)
+        return await asyncio.to_thread(
+            access.content_handle,
+            asset_id,
+            audit_access=audit_access,
+        )
 
     async def get_shared_annual_report_exact_observation_content(
         self,
         request: Any,
         *,
         authorized_internal: bool = False,
+        audit_access: bool = False,
     ) -> Dict[str, Any]:
         """Open one retained exact observation through the non-public lease path."""
         if not authorized_internal:
@@ -3847,6 +3854,7 @@ class DataManager:
             access.exact_observation_handle,
             request,
             authorized=True,
+            audit_access=audit_access,
         )
 
     async def resume_shared_annual_report_pending_work(
