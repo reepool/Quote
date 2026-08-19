@@ -67,6 +67,87 @@ def _quote_database_path() -> str:
     )
 
 
+def _annual_report_asset_report_data(
+    job_name: str,
+    result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Project an announcement-asset execution into maintenance-report fields."""
+    progress = result.get("progress") if isinstance(result.get("progress"), dict) else {}
+    execution = (
+        progress.get("daily_result")
+        if isinstance(progress.get("daily_result"), dict)
+        else progress
+    )
+    diagnostics = (
+        result.get("diagnostics")
+        if isinstance(result.get("diagnostics"), dict)
+        else {}
+    )
+    errors = list(execution.get("errors") or diagnostics.get("errors") or [])
+    if diagnostics.get("error"):
+        error_type = diagnostics.get("error_type") or "error"
+        errors.append(f"{error_type}: {diagnostics['error']}")
+
+    timings = execution.get("stage_timings_seconds") or {}
+    duration = timings.get("total")
+    stage_log = execution.get("stage_log") or []
+    status = str(result.get("status") or "unknown")
+    outcome = str(result.get("outcome") or status)
+    downloaded = int(
+        execution.get("attachments_downloaded") or execution.get("downloaded") or 0
+    )
+    reused = int(
+        execution.get("attachments_reused") or execution.get("local_hits") or 0
+    )
+    attempted = int(
+        execution.get("attachments_attempted") or downloaded + reused
+    )
+    failures = int(
+        execution.get("attachment_failures") or execution.get("blocked") or 0
+    )
+
+    return {
+        "name": job_name,
+        "status": status,
+        "tasks_completed": len(stage_log),
+        "duration": "N/A" if duration is None else f"{float(duration):.1f}s",
+        "maintenance_tasks": [
+            {"task_name": "执行结果", "status": f"{status} / {outcome}"},
+            {
+                "task_name": "元数据登记",
+                "status": str(
+                    int(
+                        execution.get("metadata_registered")
+                        or execution.get("records_seen")
+                        or 0
+                    )
+                ),
+            },
+            {
+                "task_name": "附件处理",
+                "status": (
+                    f"尝试 {attempted}，下载 {downloaded}，复用 {reused}，失败 {failures}"
+                ),
+            },
+            {
+                "task_name": "待处理附件",
+                "status": str(
+                    int(
+                        execution.get("attachment_retries_queued")
+                        or execution.get("retryable")
+                        or 0
+                    )
+                ),
+            },
+            {
+                "task_name": "未完成原因",
+                "status": "；".join(str(item) for item in errors[:5]) or "无",
+            },
+        ],
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 def _disabled_backtest_stage(name: str) -> Dict[str, Any]:
     return {
         "stage": name,
@@ -4083,12 +4164,7 @@ class ScheduledTasks:
                 },
             }
         await self._send_task_report(
-            report_data={
-                "name": job_name,
-                "status": result.get("status"),
-                "result": result,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            },
+            report_data=_annual_report_asset_report_data(job_name, result),
             report_type="maintenance_report",
             task_name=job_name,
             job_config=job_config,

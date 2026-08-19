@@ -145,7 +145,7 @@
             "latest_backfill_cron": null,
             "daily_enabled": true,
             "daily_manual_only": false,
-            "daily_cron": "15 3 * * *"
+            "daily_cron": "15 0 * * *"
           },
           "permissions": {
             "trusted_identity_enabled": true,
@@ -153,6 +153,11 @@
               {
                 "principal": "Reepool",
                 "token_env": "ANNOUNCEMENT_ASSET_REEPOOL_TOKEN",
+                "scopes": ["annual_report_assets:operator"]
+              },
+              {
+                "principal": "telegram:471105519",
+                "token_env": "ANNOUNCEMENT_ASSET_TELEGRAM_REEPOOL_TOKEN",
                 "scopes": ["annual_report_assets:operator"]
               },
               {

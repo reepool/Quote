@@ -36,6 +36,28 @@ def test_annual_asset_production_cron_uses_shanghai_timezone():
     assert str(trigger.timezone) == "Asia/Shanghai"
 
 
+def test_annual_asset_runtime_config_matches_scheduler_and_trusts_telegram_operator():
+    scheduler_jobs = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )["scheduler_config"]["jobs"]
+    asset_config = json.loads(
+        Path("config/10_research.json").read_text(encoding="utf-8")
+    )["research_config"]["modules"]["official_announcement_assets"]
+
+    trigger = scheduler_jobs["annual_report_asset_daily_update"]["trigger"]
+    assert asset_config["jobs"]["daily_cron"] == (
+        f'{trigger["minute"]} {trigger["hour"]} * * *'
+    )
+
+    principals = {
+        item["principal"]: set(item["scopes"])
+        for item in asset_config["permissions"]["principals"]
+    }
+    assert principals["telegram:471105519"] == {
+        "annual_report_assets:operator"
+    }
+
+
 def test_high_io_weekly_jobs_use_separate_production_windows():
     jobs = json.loads(
         Path("config/05_scheduler.json").read_text(encoding="utf-8")
