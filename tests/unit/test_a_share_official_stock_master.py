@@ -1,3 +1,4 @@
+import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -9,6 +10,23 @@ from data_sources.source_factory import DataSourceFactory
 def _csv(path, text):
     path.write_text(text, encoding="utf-8")
     return str(path)
+
+
+def test_official_source_recreates_session_when_event_loop_changes():
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock")
+
+    asyncio.run(source.initialize())
+    original_session = source.session
+
+    async def reopen_and_close():
+        await source._ensure_session_for_running_loop()
+        assert source.session is not original_session
+        assert source._session_loop is asyncio.get_running_loop()
+        await source.close()
+
+    asyncio.run(reopen_and_close())
+
+    assert original_session.closed
 
 
 @pytest.mark.asyncio

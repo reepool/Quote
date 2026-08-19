@@ -7,6 +7,7 @@ AkShare/BaoStock; those remain downstream fallback sources in the shared route.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 from datetime import datetime
@@ -17,9 +18,9 @@ from typing import Any, Dict, Iterable, List, Optional
 import aiohttp
 import pandas as pd
 
-from .base_source import BaseDataSource, RateLimitConfig
 from utils import ds_logger, get_shanghai_time
 
+from .base_source import BaseDataSource, RateLimitConfig
 
 PARSER_VERSION = "a_share_exchange_official_stock_master.v1"
 
@@ -42,6 +43,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         self.supported_exchanges = ["SSE", "SZSE", "BSE"]
         self.parser_version = self.config.get("parser_version") or PARSER_VERSION
         self.timeout_sec = float(self.config.get("timeout_sec", 30) or 30)
+        self._session_loop = None
         self.user_agent = self.config.get(
             "user_agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -49,11 +51,25 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         )
 
     async def _initialize_impl(self):
+        await self._ensure_session_for_running_loop()
+
+    async def _ensure_session_for_running_loop(self) -> None:
+        running_loop = asyncio.get_running_loop()
+        session = self.session
+        if (
+            session is not None
+            and not session.closed
+            and self._session_loop is running_loop
+        ):
+            return
+        if session is not None and not session.closed:
+            await session.close()
         timeout = aiohttp.ClientTimeout(total=self.timeout_sec)
         self.session = aiohttp.ClientSession(
             timeout=timeout,
             headers={"User-Agent": self.user_agent},
         )
+        self._session_loop = running_loop
 
     async def get_instrument_list(
         self,
@@ -221,6 +237,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         headers: Optional[Dict[str, str]] = None,
     ) -> Optional[bytes]:
         try:
+            await self._ensure_session_for_running_loop()
             async with self.session.get(url, params=params, headers=headers) as response:
                 response.raise_for_status()
                 return await response.read()
@@ -230,6 +247,7 @@ class AShareOfficialStockMasterSource(BaseDataSource):
 
     async def _http_post(self, url: str, *, data: Dict[str, Any]) -> Optional[bytes]:
         try:
+            await self._ensure_session_for_running_loop()
             async with self.session.post(url, data=data) as response:
                 response.raise_for_status()
                 return await response.read()

@@ -105,10 +105,13 @@ class _DiscoveryBudget:
     windows: int = 0
     requests: int = 0
 
+    def remaining_requests(self) -> int:
+        return max(0, self.max_requests - self.requests)
+
     def can_start(self) -> bool:
         return (
             self.windows < self.max_windows
-            and self.requests < self.max_requests
+            and self.remaining_requests() > 0
             and time.monotonic() - self.started_at < self.max_elapsed_seconds
         )
 
@@ -123,7 +126,10 @@ class _DiscoveryBudget:
 
     def consume(self, payload: _ScanPayload) -> None:
         self.windows += 1
-        self.requests += max(1, payload.requests_made)
+        self.requests += min(
+            self.remaining_requests(),
+            max(1, payload.requests_made),
+        )
 
 
 @dataclass(frozen=True)
@@ -225,7 +231,7 @@ class AnnualReportDailyUpdater:
         empty_windows = 0
         errors: list[str] = []
         seen_attachment_ids: set[str] = set()
-        discovery_requests = discovery_partitions = dense_continuations = 0
+        discovery_partitions = dense_continuations = 0
         source_gaps: list[Mapping[str, Any]] = []
         blocking_reasons: list[str] = []
         stop_requested = False
@@ -270,6 +276,7 @@ class AnnualReportDailyUpdater:
                 stop_requested = True
                 errors.append(reason)
                 break
+            windows_before = discovery_budget.windows
             scope = self._run_discovery_scope(
                 source=source,
                 exchange=exchange,
@@ -281,9 +288,9 @@ class AnnualReportDailyUpdater:
                 operation_id=operation_id,
                 budget=discovery_budget,
             )
-            discovery_requests += scope.requests
-            discovery_partitions += max(0, scope.windows - 1)
-            if scope.windows > 1 and not scope.partitions:
+            scope_windows = discovery_budget.windows - windows_before
+            discovery_partitions += max(0, scope_windows - 1)
+            if scope_windows > 1 and not scope.partitions:
                 dense_continuations += 1
             records_seen += len(scope.records)
             if scope.catch_up_limited:
@@ -576,7 +583,7 @@ class AnnualReportDailyUpdater:
                 windows_incomplete == 0 and catch_up_pending_scopes == 0
             ),
             "attachment_retry_separate": True,
-            "discovery_requests": discovery_requests,
+            "discovery_requests": discovery_budget.requests,
             "adaptive_partitions": discovery_partitions,
             "dense_continuations": dense_continuations,
             "source_gaps": source_gaps,
@@ -1264,6 +1271,10 @@ class AnnualReportDailyUpdater:
                 stop_reason="discovery_budget_exhausted",
                 next_page=start_page,
             )
+        max_pages = min(
+            self.config.discovery.max_pages,
+            budget.remaining_requests(),
+        )
         if discover is not None:
             raw = discover(
                 source,
@@ -1271,7 +1282,7 @@ class AnnualReportDailyUpdater:
                 start,
                 end,
                 start_page,
-                self.config.discovery.max_pages,
+                max_pages,
             )
         else:
             if self.acquisition_service is None:
@@ -1286,7 +1297,7 @@ class AnnualReportDailyUpdater:
                     category="annual_report",
                     cursor=cursor,
                     page_size=self.config.discovery.page_size,
-                    max_pages=self.config.discovery.max_pages,
+                    max_pages=max_pages,
                     start_page=start_page,
                 ),
             )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import time
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -21,6 +22,7 @@ from research.announcement_assets import (
     daily_discovery_fingerprint,
     pair_with_listed_security_census,
 )
+from research.announcement_assets.daily import _DiscoveryBudget
 from research.announcement_assets.repository import DiscoveryStateFenceError
 from research.announcements import (
     AnnouncementAcquisitionConfig,
@@ -676,6 +678,7 @@ def _focused_config(
     *,
     max_windows: int = 4,
     max_pages: int = 1,
+    max_requests: int = 20,
     source_routes=("cninfo",),
     exchanges=("SSE",),
     reconciliation_lookback_days: int = 30,
@@ -708,7 +711,7 @@ def _focused_config(
                 "reconciliation_max_cycle_days": 30,
                 "max_pages": max_pages,
                 "page_size": page_size,
-                "max_requests": 20,
+                "max_requests": max_requests,
                 "max_windows": max_windows,
                 "max_instruments": 10,
                 "max_elapsed_seconds": 60,
@@ -849,6 +852,95 @@ def _route_result(
         selected_source=source,
         scan_result=scan,
     )
+
+
+def test_daily_discovery_caps_pages_to_remaining_request_budget_and_resumes(tmp_path):
+    config = _focused_config(
+        tmp_path,
+        max_windows=10,
+        max_pages=20,
+        max_requests=3,
+    )
+    repository, service, _ = _service_bundle(tmp_path, config)
+    updater = AnnualReportDailyUpdater(
+        service=service,
+        repository=repository,
+        config=config,
+    )
+    updater._route_observations = []
+    calls: list[tuple[int, int]] = []
+
+    def discover(source, exchange, start, end, start_page, max_pages):
+        calls.append((start_page, max_pages))
+        return _route_result(
+            source=source,
+            exchange=exchange,
+            start=start,
+            end=end,
+            complete=False,
+            start_page=start_page,
+            stop_reason="max_pages_exhausted",
+            next_page=start_page + max_pages,
+            pages_scanned=max_pages,
+        )
+
+    first_budget = _DiscoveryBudget(10, 3, 60, time.monotonic())
+    first = updater._discover_partitioned(
+        source="cninfo",
+        exchange="SSE",
+        start="2026-08-10T00:00:00+00:00",
+        end="2026-08-10T03:00:00+00:00",
+        discover=discover,
+        start_page=1,
+        cursor=None,
+        budget=first_budget,
+    )
+
+    assert calls == [(1, 3)]
+    assert first_budget.requests == 3
+    assert first.next_page == 4
+
+    second_budget = _DiscoveryBudget(10, 3, 60, time.monotonic())
+    second = updater._discover_partitioned(
+        source="cninfo",
+        exchange="SSE",
+        start="2026-08-10T00:00:00+00:00",
+        end="2026-08-10T03:00:00+00:00",
+        discover=discover,
+        start_page=first.next_page,
+        cursor=None,
+        budget=second_budget,
+    )
+
+    assert calls[-1] == (4, 3)
+    assert second_budget.requests == 3
+    assert second.next_page == 7
+
+
+def test_daily_reports_global_discovery_request_count_without_scope_double_count(tmp_path):
+    config = _focused_config(
+        tmp_path,
+        max_windows=4,
+        source_routes=("cninfo",),
+        exchanges=("SSE", "SZSE", "BSE"),
+    )
+    repository, service, _ = _service_bundle(tmp_path, config)
+    calls: list[tuple[str, str]] = []
+
+    result = AnnualReportDailyUpdater(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        run_cutoff="2026-08-10T03:00:00+00:00",
+        discover=lambda source, exchange, start, end, start_page, max_pages: (
+            calls.append((source, exchange)) or ()
+        ),
+        active_instrument_ids=("600000.SH",),
+    )
+
+    assert len(calls) == 4
+    assert result.metrics["discovery_requests"] == len(calls)
 
 
 def test_daily_dense_day_1500_records_uses_stable_continuation_and_commits(tmp_path):
