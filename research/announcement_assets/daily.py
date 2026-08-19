@@ -27,6 +27,7 @@ from .models import (
     ExpectedPeriodCoverage,
     OperationStage,
     OperationStatus,
+    canonical_json,
     stable_id,
 )
 from .operation_control import current_operation_fence, operation_stop_reason
@@ -44,7 +45,6 @@ from .service import (
     _withdrawal_evidence_type,
     _withdrawal_target_id,
     _withdrawal_target_matches,
-    acquisition_work_fingerprint,
 )
 from .universe import UniverseSnapshot, persist_universe_snapshot_with_coverage
 
@@ -801,6 +801,13 @@ class AnnualReportDailyUpdater:
             scope_key=scope_key,
             config_fingerprint=fingerprint,
         )
+        if prior_state is None:
+            prior_state = self._inherit_latest_complete_discovery_state(
+                source=source,
+                exchange=exchange,
+                scope_key=scope_key,
+                config_fingerprint=fingerprint,
+            )
         requested_cutoff = cutoff
         catch_up_limited = False
         if prior_state and bool(prior_state.get("is_complete")):
@@ -1063,6 +1070,63 @@ class AnnualReportDailyUpdater:
             )
             return _combine_scope_results(result, followup)
         return replace(result, catch_up_limited=catch_up_limited)
+
+    def _inherit_latest_complete_discovery_state(
+        self,
+        *,
+        source: str,
+        exchange: str,
+        scope_key: str,
+        config_fingerprint: str,
+    ) -> dict[str, Any] | None:
+        candidates = [
+            row
+            for row in self.repository.list_discovery_states(
+                category="annual_report",
+                scope_prefix=scope_key,
+            )
+            if str(row.get("source") or "") == source
+            and str(row.get("exchange") or "") == exchange
+            and str(row.get("scope_key") or "") == scope_key
+            and bool(row.get("is_complete"))
+            and not row.get("gap_reason")
+            and row.get("covered_until")
+        ]
+        if not candidates:
+            return None
+        inherited = max(
+            candidates,
+            key=lambda row: _parse_time(str(row["covered_until"])),
+        )
+        self.repository.upsert_discovery_state(
+            source=source,
+            exchange=exchange,
+            category="annual_report",
+            scope_key=scope_key,
+            config_fingerprint=config_fingerprint,
+            status="success",
+            is_complete=True,
+            covered_until=str(inherited["covered_until"]),
+            run_cutoff=str(
+                inherited.get("run_cutoff") or inherited["covered_until"]
+            ),
+            checkpoint={
+                "origin": "compatible_watermark_handoff",
+                "inherited_config_fingerprint": inherited.get(
+                    "config_fingerprint"
+                ),
+                "inherited_updated_at": inherited.get("updated_at"),
+            },
+            consumes_retry_budget=False,
+            project_parent_block=False,
+        )
+        return self.repository.get_discovery_state(
+            source=source,
+            exchange=exchange,
+            category="annual_report",
+            scope_key=scope_key,
+            config_fingerprint=config_fingerprint,
+        )
 
     def _discover_pending_partitions(
         self,
@@ -2434,9 +2498,9 @@ def daily_discovery_fingerprint(
     scope_key: str,
     acquisition_service: AnnouncementAcquisitionService | None = None,
 ) -> str:
-    return acquisition_work_fingerprint(
-        operation_type="annual_report_daily_discovery_scope",
-        scope={
+    payload = {
+        "fingerprint_version": "annual_report_daily_watermark.v2",
+        "scope": {
             "source": str(source).strip().lower(),
             "exchange": str(exchange).strip().upper(),
             "category": "annual_report",
@@ -2444,20 +2508,21 @@ def daily_discovery_fingerprint(
             "boundary_semantics": "inclusive/inclusive",
             "route_capability_matrix_version": ROUTE_CAPABILITY_MATRIX_VERSION,
         },
-        config=config,
-        accepted_bounds={
-            "max_pages": config.discovery.max_pages,
+        "discovery_semantics": {
             "page_size": config.discovery.page_size,
-            "max_requests": config.discovery.max_requests,
-            "max_windows": config.discovery.max_windows,
-            "max_instruments": config.discovery.max_instruments,
-            "max_elapsed_seconds": config.discovery.max_elapsed_seconds,
-            "max_attachment_bytes": config.storage.max_attachment_bytes,
-            "max_task_download_bytes": config.acquisition.max_task_download_bytes,
+            "source_routes": sorted(config.acquisition.source_routes),
+            "normalized_categories": sorted(
+                config.acquisition.normalized_categories
+            ),
+            "classifier_version": config.classifier_version,
+            "asset_policy_version": config.policy_version,
+            "instrument_type": config.instrument_type,
+            "active_only": config.active_only,
+            "universe_policy_version": config.universe_policy_version,
+            "timezone": config.timezone,
         },
-        integrity_policy="metadata_identity_and_range_coverage",
-        acquisition_service=acquisition_service,
-    )
+    }
+    return stable_id("annual-report-daily-watermark", canonical_json(payload))
 
 
 def _operation_fence_kwargs(operation_id: str) -> dict[str, Any]:

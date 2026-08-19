@@ -1292,6 +1292,9 @@ class TaskManagerHandlers:
                 operator_principal=f"telegram:{user_id}",
             )
 
+            if job_id.startswith("annual_report_asset_"):
+                return
+
             if success:
                 success_message = f"✅ *任务执行成功*\n\n任务ID: `{job_id}`{date_info}"
                 await self.task_manager.send_message(chat_id, success_message, parse_mode='markdown')

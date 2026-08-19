@@ -1959,6 +1959,64 @@ def test_daily_persists_provider_item_cursor_separately_from_range_coverage(tmp_
     )
 
 
+def test_daily_runtime_bounds_do_not_invalidate_discovery_watermark(tmp_path):
+    config = _focused_config(tmp_path, max_pages=20, max_requests=600)
+    changed_bounds = replace(
+        config,
+        discovery=replace(
+            config.discovery,
+            max_pages=5,
+            max_requests=50,
+            max_windows=8,
+            max_elapsed_seconds=300,
+        ),
+    )
+
+    assert daily_discovery_fingerprint(
+        config=changed_bounds,
+        source="cninfo",
+        exchange="SSE",
+        scope_key="market",
+    ) == daily_discovery_fingerprint(
+        config=config,
+        source="cninfo",
+        exchange="SSE",
+        scope_key="market",
+    )
+
+
+def test_daily_inherits_latest_complete_watermark_instead_of_initial_lookback(tmp_path):
+    config = _focused_config(tmp_path, overlap_days=3)
+    repository, service, _ = _service_bundle(tmp_path, config)
+    repository.upsert_discovery_state(
+        source="cninfo",
+        exchange="SSE",
+        category="annual_report",
+        scope_key="market",
+        config_fingerprint="previous-compatible-config",
+        status="success",
+        is_complete=True,
+        covered_until="2026-08-10T03:00:00+00:00",
+        run_cutoff="2026-08-10T03:00:00+00:00",
+        checkpoint={"origin": "previous_daily"},
+    )
+    starts: list[str] = []
+
+    AnnualReportDailyUpdater(
+        service=service,
+        repository=repository,
+        config=config,
+    ).run(
+        run_cutoff="2026-08-11T03:00:00+00:00",
+        discover=lambda source, exchange, start, end, start_page, max_pages: (
+            starts.append(start) or ()
+        ),
+        active_instrument_ids=("600000.SH",),
+    )
+
+    assert starts[0] == "2026-08-07T03:00:00+00:00"
+
+
 def test_discovery_state_fences_expired_worker_after_new_generation_commits(tmp_path):
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()

@@ -71,7 +71,7 @@ def _annual_report_asset_report_data(
     job_name: str,
     result: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """Project an announcement-asset execution into maintenance-report fields."""
+    """Project an announcement-asset execution into a business-facing report."""
     progress = result.get("progress") if isinstance(result.get("progress"), dict) else {}
     execution = (
         progress.get("daily_result")
@@ -90,7 +90,6 @@ def _annual_report_asset_report_data(
 
     timings = execution.get("stage_timings_seconds") or {}
     duration = timings.get("total")
-    stage_log = execution.get("stage_log") or []
     status = str(result.get("status") or "unknown")
     outcome = str(result.get("outcome") or status)
     downloaded = int(
@@ -105,47 +104,76 @@ def _annual_report_asset_report_data(
     failures = int(
         execution.get("attachment_failures") or execution.get("blocked") or 0
     )
+    metrics = (
+        execution.get("metrics")
+        if isinstance(execution.get("metrics"), dict)
+        else {}
+    )
+    bounds = (
+        progress.get("accepted_bounds")
+        if isinstance(progress.get("accepted_bounds"), dict)
+        else {}
+    )
+    result_headline, completion_summary = {
+        "success": ("✅ 全部完成", "本轮计划工作已全部完成。"),
+        "partial": (
+            "⚠️ 本轮已结束，工作未全部完成",
+            "已完成结果均已保存，未完成范围将在后续日更中续扫。",
+        ),
+        "blocked": ("⛔ 未完成，需要人工处理", "任务被阻塞，请根据原因处理。"),
+        "failed": ("❌ 执行失败", "任务未正常完成，请检查错误原因。"),
+    }.get(outcome, (f"ℹ️ 状态：{outcome}", "请检查任务详情。"))
+    requests = int(metrics.get("discovery_requests") or 0)
+    max_requests = int(bounds.get("max_requests") or 0)
+    windows_completed = int(execution.get("windows_completed") or 0)
+    windows_incomplete = int(execution.get("windows_incomplete") or 0)
+    records_seen = int(execution.get("records_seen") or 0)
+    queued = int(
+        execution.get("attachment_retries_queued")
+        or execution.get("retryable")
+        or 0
+    )
+    reason_lines = [
+        f"• {_annual_report_asset_reason_text(str(item))}" for item in errors[:5]
+    ]
 
     return {
-        "name": job_name,
+        "name": (
+            "年报公告日更报告"
+            if job_name == "annual_report_asset_daily_update"
+            else "年报公告历史回补报告"
+        ),
         "status": status,
-        "tasks_completed": len(stage_log),
-        "duration": "N/A" if duration is None else f"{float(duration):.1f}s",
-        "maintenance_tasks": [
-            {"task_name": "执行结果", "status": f"{status} / {outcome}"},
-            {
-                "task_name": "元数据登记",
-                "status": str(
-                    int(
-                        execution.get("metadata_registered")
-                        or execution.get("records_seen")
-                        or 0
-                    )
-                ),
-            },
-            {
-                "task_name": "附件处理",
-                "status": (
-                    f"尝试 {attempted}，下载 {downloaded}，复用 {reused}，失败 {failures}"
-                ),
-            },
-            {
-                "task_name": "待处理附件",
-                "status": str(
-                    int(
-                        execution.get("attachment_retries_queued")
-                        or execution.get("retryable")
-                        or 0
-                    )
-                ),
-            },
-            {
-                "task_name": "未完成原因",
-                "status": "；".join(str(item) for item in errors[:5]) or "无",
-            },
-        ],
+        "result_headline": result_headline,
+        "completion_summary": completion_summary,
+        "statistics_summary": (
+            f"• 耗时：{'未知' if duration is None else f'{float(duration):.1f} 秒'}\n"
+            f"• 公告发现：{requests} / {max_requests or '未设置'} 次请求，"
+            f"完成 {windows_completed} 个窗口，未完成 {windows_incomplete} 个\n"
+            f"• 公告记录：发现 {records_seen} 条，登记 "
+            f"{int(execution.get('metadata_registered') or records_seen)} 条\n"
+            f"• 附件处理：尝试 {attempted}，新下载 {downloaded}，"
+            f"本地复用 {reused}，失败 {failures}\n"
+            f"• 待处理附件：{queued}"
+        ),
+        "pending_summary": (
+            "无，当前发现范围已全部完成。"
+            if not errors and windows_incomplete == 0
+            else "\n".join(reason_lines)
+            or f"仍有 {windows_incomplete} 个发现窗口待续扫。"
+        ),
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
+
+
+def _annual_report_asset_reason_text(reason: str) -> str:
+    if "max_pages_exhausted" in reason:
+        return "公告分页尚未扫描完，已保存下一页位置，后续日更继续。"
+    if "discovery_budget_exhausted" in reason:
+        return "本轮公告发现请求达到上限，剩余范围已顺延到后续日更。"
+    if "universe" in reason:
+        return f"股票主数据刷新不完整：{reason}"
+    return reason
 
 
 def _disabled_backtest_stage(name: str) -> Dict[str, Any]:
@@ -4165,7 +4193,7 @@ class ScheduledTasks:
             }
         await self._send_task_report(
             report_data=_annual_report_asset_report_data(job_name, result),
-            report_type="maintenance_report",
+            report_type="annual_report_asset_report",
             task_name=job_name,
             job_config=job_config,
         )

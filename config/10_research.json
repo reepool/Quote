@@ -90,8 +90,8 @@
           },
           "discovery": {
             "overlap_days": 3,
-            "initial_lookback_days": 180,
-            "reconciliation_lookback_days": 400,
+            "initial_lookback_days": 14,
+            "reconciliation_lookback_days": 30,
             "reconciliation_max_cycle_days": 30,
             "max_pages": 20,
             "page_size": 30,

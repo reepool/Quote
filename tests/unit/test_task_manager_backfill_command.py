@@ -261,6 +261,8 @@ async def test_run_annual_report_job_propagates_telegram_operator_identity(monke
         include_dependencies=True,
         operator_principal="telegram:4242",
     )
+    assert task_manager.send_message.await_count == 1
+    assert "正在执行任务" in task_manager.send_message.await_args.args[1]
 
 
 @pytest.mark.asyncio

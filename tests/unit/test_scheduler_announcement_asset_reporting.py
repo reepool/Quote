@@ -27,13 +27,13 @@ def test_annual_report_asset_partial_report_renders_outcome_and_reasons():
         },
     )
 
-    rendered = generate_report("maintenance_report", report_data, "telegram")
+    rendered = generate_report("annual_report_asset_report", report_data, "telegram")
 
-    assert "completed / partial" in rendered
-    assert "元数据登记 - 状态: 6619" in rendered
-    assert "下载 162" in rendered
-    assert "待处理附件 - 状态: 3255" in rendered
-    assert "max_pages_exhausted" in rendered
+    assert "本轮已结束，工作未全部完成" in rendered
+    assert "公告记录：发现 0 条，登记 6619 条" in rendered
+    assert "新下载 162" in rendered
+    assert "待处理附件：3255" in rendered
+    assert "已保存下一页位置" in rendered
 
 
 def test_annual_report_asset_failed_report_renders_permission_error():
@@ -49,9 +49,9 @@ def test_annual_report_asset_failed_report_renders_permission_error():
         },
     )
 
-    rendered = generate_report("maintenance_report", report_data, "telegram")
+    rendered = generate_report("annual_report_asset_report", report_data, "telegram")
 
-    assert "failed / failed" in rendered
+    assert "执行失败" in rendered
     assert "PermissionError: principal_not_registered" in rendered
 
 
@@ -71,8 +71,9 @@ def test_annual_report_asset_backfill_report_uses_top_level_progress():
         },
     )
 
-    rendered = generate_report("maintenance_report", report_data, "telegram")
+    rendered = generate_report("annual_report_asset_report", report_data, "telegram")
 
-    assert "元数据登记 - 状态: 300" in rendered
-    assert "尝试 300，下载 20，复用 280" in rendered
-    assert "待处理附件 - 状态: 2" in rendered
+    assert "全部完成" in rendered
+    assert "公告记录：发现 300 条，登记 300 条" in rendered
+    assert "尝试 300，新下载 20，本地复用 280" in rendered
+    assert "待处理附件：2" in rendered
