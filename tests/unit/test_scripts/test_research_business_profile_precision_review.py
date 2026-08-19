@@ -40,8 +40,8 @@ def test_catalog_issue_cli_exports_review_package_and_promotion_evidence(tmp_pat
             "export-catalog-issues",
             "--research-db",
             str(research_db),
-            "--financials-db",
-            str(storage.financials_db_path),
+            "--announcement-assets-db",
+            str(storage.db_path),
         ]
     )
 

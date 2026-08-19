@@ -1,6 +1,4 @@
 import hashlib
-from pathlib import Path
-
 from research.business_profile_disclosure_planner import (
     BusinessProfileCoverageInspector,
     BusinessProfileDisclosurePlanner,
@@ -158,34 +156,6 @@ def test_specialist_rules_are_field_family_specific_and_bounded(tmp_path):
 
     assert [item["announcement_id"] for item in plan.included] == ["annual", "contract"]
     assert next(item for item in plan.omitted if item["announcement_id"] == "capacity")["decision_reason"] == "specialist_not_required_or_out_of_bound"
-
-
-def test_missing_local_report_is_acquired_only_when_planned(tmp_path):
-    annual = _candidate("annual", "某公司2025年年度报告", "2026-03-30")
-    unrelated = _candidate("unrelated", "关于召开股东大会的通知", "2026-04-01")
-    planner = _planner(tmp_path)
-    plan = planner.plan(
-        instrument_id="600000.SH",
-        field_family="atomic_activities",
-        knowledge_cutoff="2026-05-01",
-        discovered=[annual, unrelated],
-    )
-    calls = []
-
-    class _Archive:
-        def archive_candidates(self, instrument, selected, **kwargs):
-            calls.append((instrument, selected, kwargs))
-            return "archived"
-
-    result = planner.acquire_missing(
-        plan,
-        instrument={"instrument_id": "600000.SH", "symbol": "600000", "exchange": "SSE"},
-        candidates=[annual, unrelated],
-        archive_service=_Archive(),
-    )
-
-    assert result == "archived"
-    assert [item.announcement_id for item in calls[0][1]] == ["annual"]
 
 
 def test_future_disclosures_are_excluded_and_approved_coverage_short_circuits(tmp_path):

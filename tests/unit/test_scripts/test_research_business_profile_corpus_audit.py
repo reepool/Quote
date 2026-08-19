@@ -1,12 +1,15 @@
 import sqlite3
 
 from scripts.research_business_profile_corpus_audit import build_corpus_audit
+from tests.unit.test_research.announcement_asset_fixtures import (
+    register_shared_annual_report,
+)
 
 
 def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
     research_db = tmp_path / "research.db"
     quotes_db = tmp_path / "quotes.db"
-    financials_db = tmp_path / "financials.db"
+    announcement_assets_db = tmp_path / "announcement-assets.db"
     with sqlite3.connect(research_db) as conn:
         conn.executescript(
             """
@@ -52,45 +55,21 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
             ),
         )
         conn.commit()
-    with sqlite3.connect(financials_db) as conn:
-        conn.execute(
-            """
-            CREATE TABLE financial_source_files (
-                source_file_id TEXT, instrument_id TEXT, source TEXT,
-                report_period TEXT, report_type TEXT, filing_id TEXT,
-                source_url TEXT, archive_path TEXT, content_hash TEXT,
-                published_at TEXT, parser_version TEXT, status TEXT,
-                source_tier TEXT, schema_version TEXT,
-                supersedes_source_file_id TEXT, metadata_json TEXT
-            )
-            """
-        )
-        conn.execute(
-            "INSERT INTO financial_source_files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (
-                "file-1",
-                "600001.SH",
-                "cninfo",
-                "2024-12-31",
-                "annual_report",
-                "announcement-1",
-                "report.pdf",
-                "/archive/report.pdf",
-                "hash",
-                "2025-03-20",
-                "parser.v1",
-                "parsed",
-                "official_primary",
-                "business_profile_source_file_manifest.v1",
-                None,
-                "{}",
-            ),
-        )
-        conn.commit()
+    report_path = tmp_path / "report.pdf"
+    report_path.write_bytes(b"%PDF-corpus-audit")
+    register_shared_annual_report(
+        announcement_assets_db,
+        report_path,
+        asset_id="file-1",
+        instrument_id="600001.SH",
+        report_period="2024-12-31",
+        source_announcement_id="announcement-1",
+        published_at="2025-03-20T00:00:00+08:00",
+    )
 
     payload = build_corpus_audit(
         research_db=research_db,
-        financials_db=financials_db,
+        announcement_assets_db=announcement_assets_db,
         quotes_db=quotes_db,
         as_of_date="2025-12-31",
         expected_report_periods=["2024-12-31"],

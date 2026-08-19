@@ -176,7 +176,7 @@ manifest，本地归档路径不对外复制。引用页还必须落在 PDF 实�
 ```bash
 python scripts/research_business_profile_precision_review.py \
   --output /tmp/catalog-issues.json export-catalog-issues \
-  --research-db data/research.db --financials-db data/financials.db \
+  --research-db data/research.db --announcement-assets-db data/research.db \
   --instrument-id 000012.SZ --report-period 2025-12-31
 
 # 人工填写指定 row.review，不允许程序自动补 product_ids 或页码。

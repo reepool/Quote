@@ -36,13 +36,16 @@
 | `research/business_profile_governance.py` | 审批事实的时点解析和 DCF context | 已实现 |
 | `research/announcements/` | source-neutral 公告模型、provider 路由、保守 cursor/audit 和统一附件取回 | 已实现并完成业务迁移 |
 | `research/business_profile_discovery.py` | 提交画像 purpose query、执行业务标题分类并转换为画像候选 | 已接入通用公告模块 |
-| `research/business_profile_archive.py`、PDF artifacts | 画像不可变归档、manifest、更正 lineage 和关键 section artifact | 已实现，保持业务域所有权 |
+| `research/announcement_assets/` | 年报发现、有效修订选择、下载、完整性、原始 PDF 和恢复的唯一所有者 | 已实现，所有消费者 shared-only |
+| PDF/section/semantic artifacts | 画像页缓存、章节选段、LLM 结果和发布派生物 | 已实现，仅保存引用 shared asset id/hash 的业务派生物 |
 | scheduler | 自动批量维护 | 待 30 家 pilot gate 通过 |
 | 审核 CLI | candidate 审批、驳回、supersede | 待实现 |
 | 生产回补 | A 股数据填充 | 未开始 |
 
 已删除的旧实现：
 
+- `research/annual_report_assets.py`、`research/business_profile_archive.py`；
+- `research/business_profile_official_archive_sync.py` 及其脚本；
 - `business_profile_value_chain_rules.py`；
 - `business_profile_value_chain_rule_catalog.json`；
 - 对应词法规则测试。

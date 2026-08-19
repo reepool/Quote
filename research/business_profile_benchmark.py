@@ -10,15 +10,17 @@ from research.business_profile_corpus import FIRST_WAVE_INDUSTRY_GROUPS
 
 
 DEFAULT_BENCHMARK_INDUSTRY_GROUPS = tuple(FIRST_WAVE_INDUSTRY_GROUPS)
-BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION = "business_profile_source_file_manifest.v1"
+BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION = "business_profile_source_asset.v1"
 OFFICIAL_BUSINESS_PROFILE_SOURCES = {"cninfo", "sse", "szse", "bse"}
-OFFICIAL_BUSINESS_PROFILE_SOURCE_TIERS = {"official_primary", "official_backup"}
+OFFICIAL_BUSINESS_PROFILE_SOURCE_TIERS = {"shared_announcement_asset"}
 ELIGIBLE_BUSINESS_PROFILE_MANIFEST_STATUSES = {
     "archived",
     "archived_unchanged_content",
     "parsed",
     "partial",
     "ocr_required",
+    "verified",
+    "local_valid",
 }
 _SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 BENCHMARK_EVIDENCE_FLAGS = (
@@ -318,7 +320,7 @@ def _eligible_source_manifests(
             or not instrument_id
             or source not in OFFICIAL_BUSINESS_PROFILE_SOURCES
             or source_tier not in OFFICIAL_BUSINESS_PROFILE_SOURCE_TIERS
-            or schema_version != BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
+            or schema_version != BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION
             or status not in ELIGIBLE_BUSINESS_PROFILE_MANIFEST_STATUSES
             or not archive_path
             or not filing_id

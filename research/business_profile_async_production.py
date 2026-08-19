@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import functools
 import hashlib
 import json
 import logging
@@ -10,6 +11,7 @@ import os
 import threading
 import time
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -31,6 +33,25 @@ TERMINAL_STATUSES = (
 )
 AUTOMATIC_DOCUMENT_TYPES = ("annual_report", "annual_report_correction")
 _WRITE_COORDINATOR_CREATION_LOCK = threading.Lock()
+_ASYNC_IO_EXECUTOR = ThreadPoolExecutor(
+    max_workers=32,
+    thread_name_prefix="business-profile-io",
+)
+
+
+async def _run_thread_call(
+    func: Callable[..., Any], /, *args: Any, **kwargs: Any
+) -> Any:
+    """Run blocking work without relying on cross-thread event-loop callbacks."""
+
+    future = _ASYNC_IO_EXECUTOR.submit(functools.partial(func, *args, **kwargs))
+    try:
+        while not future.done():
+            await asyncio.sleep(0.01)
+        return future.result()
+    except asyncio.CancelledError:
+        future.cancel()
+        raise
 logger = logging.getLogger(__name__)
 
 
@@ -61,7 +82,9 @@ class BusinessProfileStorageReadiness:
     initialization_count: int
 
 
-def ensure_business_profile_storage_ready(storage: Any) -> BusinessProfileStorageReadiness:
+def ensure_business_profile_storage_ready(
+    storage: Any,
+) -> BusinessProfileStorageReadiness:
     """Run full schema/migration initialization once per storage-manager lifetime."""
 
     token = getattr(storage, "_business_profile_storage_readiness", None)
@@ -90,6 +113,7 @@ def ensure_business_profile_storage_ready(storage: Any) -> BusinessProfileStorag
         )
         setattr(storage, "_business_profile_storage_readiness", token)
         return token
+
 
 class BusinessProfileWriteCoordinator:
     """Serialize short SQLite transactions without serializing worker computation."""
@@ -177,14 +201,12 @@ class BusinessProfileWriteCoordinator:
             with self.write_scope():
                 return func(*args, **kwargs)
 
-        return await asyncio.to_thread(invoke)
+        return await _run_thread_call(invoke)
 
     def snapshot(self) -> dict[str, Any]:
         with self._metrics_lock:
             durations = tuple(self._transaction_durations)
-            elapsed = max(
-                0.0, time.monotonic() - self._observation_started_monotonic
-            )
+            elapsed = max(0.0, time.monotonic() - self._observation_started_monotonic)
             return {
                 "pending_writers": self._pending_writers,
                 "active_writers": self._active_writers,
@@ -200,9 +222,7 @@ class BusinessProfileWriteCoordinator:
                 "writer_lock_duty": round(
                     self._write_seconds / elapsed if elapsed else 0.0, 6
                 ),
-                "inter_write_idle_seconds": round(
-                    self._inter_write_idle_seconds, 6
-                ),
+                "inter_write_idle_seconds": round(self._inter_write_idle_seconds, 6),
                 "inter_write_seconds": self.inter_write_seconds,
             }
 
@@ -392,17 +412,13 @@ class BusinessProfileWorkRepository:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
             identity_clause = (
-                "AND processing_identity_hash = ?"
-                if processing_identity_hash
-                else ""
+                "AND processing_identity_hash = ?" if processing_identity_hash else ""
             )
             excluded = tuple(
                 sorted({str(value) for value in exclude_work_ids if str(value)})
             )
             exclusion_clause = (
-                "AND work_id NOT IN ("
-                + ",".join("?" for _ in excluded)
-                + ")"
+                "AND work_id NOT IN (" + ",".join("?" for _ in excluded) + ")"
                 if excluded
                 else ""
             )
@@ -465,9 +481,7 @@ class BusinessProfileWorkRepository:
         normalized_stage = _stage(stage)
         now_text = get_shanghai_time().isoformat()
         identity_clause = (
-            "AND processing_identity_hash = ?"
-            if processing_identity_hash
-            else ""
+            "AND processing_identity_hash = ?" if processing_identity_hash else ""
         )
         excluded = tuple(
             sorted({str(value) for value in exclude_work_ids if str(value)})
@@ -631,7 +645,9 @@ class BusinessProfileWorkRepository:
                 ),
             )
             conn.commit()
-        return "configuration_blocked" if int(cursor.rowcount or 0) == 1 else "lease_lost"
+        return (
+            "configuration_blocked" if int(cursor.rowcount or 0) == 1 else "lease_lost"
+        )
 
     def finalize_machine_rework(
         self,
@@ -674,10 +690,13 @@ class BusinessProfileWorkRepository:
         if context_retry_ready:
             automated_rework_counts["context_incomplete"] = context_retry_count + 1
             metadata["automated_rework_counts"] = automated_rework_counts
-        replay_ready = int(
-            dict(result.get("metrics") or {}).get("unit_rule_auto_approved") or 0
-        ) > 0
-        status = "retry_due" if replay_ready or context_retry_ready else "machine_rework"
+        replay_ready = (
+            int(dict(result.get("metrics") or {}).get("unit_rule_auto_approved") or 0)
+            > 0
+        )
+        status = (
+            "retry_due" if replay_ready or context_retry_ready else "machine_rework"
+        )
         next_stage = "parse" if context_retry_ready else stage
         reason_text = (
             "automatic_context_expansion_retry"
@@ -756,10 +775,9 @@ class BusinessProfileWorkRepository:
         bound_shared_asset = dict(
             (item.get("metadata") or {}).get("bound_shared_asset") or {}
         )
-        if (
-            str(frontier.get("status") or "") == "superseded"
-            and not bound_shared_asset
-        ):
+        if self.shared_asset_access is None:
+            return None
+        if str(frontier.get("status") or "") == "superseded" and not bound_shared_asset:
             raise RuntimeError(
                 f"business-profile bound frontier is superseded: {frontier_id}"
             )
@@ -792,164 +810,101 @@ class BusinessProfileWorkRepository:
         frontier["metadata"] = metadata if isinstance(metadata, Mapping) else {}
         return frontier
 
-    def get_usable_bound_manifest(
+    def get_bound_source_asset(
         self,
         work: str | Mapping[str, Any],
     ) -> dict[str, Any] | None:
-        """Return an integrity-verified annual-report asset matching the work identity."""
+        """Return an integrity-verified shared asset matching the work identity."""
 
         item = self.get(work) if isinstance(work, str) else dict(work)
         bound_shared_asset = dict(
             (item.get("metadata") or {}).get("bound_shared_asset") or {}
         )
-        if self.shared_asset_access is not None:
-            if bound_shared_asset:
-                binding = _normalize_bound_shared_asset(bound_shared_asset)
-                identity_mismatches = [
-                    field
-                    for field, work_field in (
-                        ("instrument_id", "instrument_id"),
-                        ("source", "source"),
-                        ("source_announcement_id", "announcement_id"),
-                        ("report_period", "report_period"),
-                    )
-                    if str(binding[field]) != str(item.get(work_field) or "")
-                ]
-                if identity_mismatches:
-                    raise RuntimeError(
-                        "business-profile work/shared-asset binding mismatch: "
-                        + ",".join(identity_mismatches)
-                    )
-                from research.announcement_assets import EnsureRequest
+        if bound_shared_asset:
+            binding = _normalize_bound_shared_asset(bound_shared_asset)
+            identity_mismatches = [
+                field
+                for field, work_field in (
+                    ("instrument_id", "instrument_id"),
+                    ("source", "source"),
+                    ("source_announcement_id", "announcement_id"),
+                    ("report_period", "report_period"),
+                )
+                if str(binding[field]) != str(item.get(work_field) or "")
+            ]
+            if identity_mismatches:
+                raise RuntimeError(
+                    "business-profile work/shared-asset binding mismatch: "
+                    + ",".join(identity_mismatches)
+                )
+            from research.announcement_assets import EnsureRequest
 
-                try:
-                    content = self.shared_asset_access.exact_observation_handle(
-                        EnsureRequest(
-                            instrument_id=binding["instrument_id"],
-                            source=binding["source"],
-                            source_announcement_id=binding[
-                                "source_announcement_id"
-                            ],
-                            attachment_id=binding["attachment_id"],
-                            expected_content_hash=binding["content_hash"],
-                            observation_version=binding["observation_version"],
-                            allow_network=False,
-                            knowledge_cutoff=(item.get("metadata") or {}).get(
-                                "knowledge_cutoff"
-                            ),
-                        ),
-                        authorized=True,
-                    )
-                except (FileNotFoundError, KeyError, RuntimeError, ValueError):
-                    return None
-                handle = content.get("file_handle")
-                if handle is not None:
-                    handle.close()
-                return {
-                    "schema_version": "business_profile_source_file_manifest.v1",
-                    "source_file_id": f"shared-asset:{binding['asset_id']}",
-                    "instrument_id": binding["instrument_id"],
-                    "report_period": binding["report_period"],
-                    "report_type": str(item.get("document_type") or ""),
-                    "filing_id": binding["source_announcement_id"],
-                    "source": binding["source"],
-                    "archive_path": str(content["path"]),
-                    "content_hash": binding["content_hash"],
-                    "content_length": content["content_length"],
-                    "published_at": binding.get("published_at"),
-                    "status": "verified",
-                    "integrity_status": "valid",
-                    "metadata": {
-                        "shared_asset_id": binding["asset_id"],
-                        "shared_attachment_id": binding["attachment_id"],
-                        "shared_observation_version": binding[
-                            "observation_version"
-                        ],
-                        "selector_kind": binding.get("selector_kind")
-                        or "default_effective",
-                    },
-                }
-            report_period = str(item.get("report_period") or "")
-            fiscal_year = int(report_period[:4]) if len(report_period) >= 4 else None
-            if fiscal_year is None:
-                return None
-            report = self.shared_asset_access.repository.get_effective_report(
-                str(item.get("instrument_id") or ""),
-                fiscal_year,
-                knowledge_cutoff=item.get("knowledge_cutoff"),
-            )
-            if (
-                report is None
-                or report.source != str(item.get("source") or "").strip().lower()
-                or report.source_announcement_id
-                != str(item.get("announcement_id") or "")
-            ):
-                return None
             try:
-                content = self.shared_asset_access.content_handle(report.asset_id)
-            except (FileNotFoundError, KeyError, RuntimeError):
-                from research.announcement_assets import EnsureRequest
-
-                try:
-                    content = self.shared_asset_access.exact_observation_handle(
-                        EnsureRequest(
-                            instrument_id=str(item.get("instrument_id") or ""),
-                            source=report.source,
-                            source_announcement_id=report.source_announcement_id,
-                            attachment_id=report.attachment_id,
-                            expected_content_hash=report.content_hash,
-                            observation_version=report.version_id,
-                            allow_network=False,
-                            knowledge_cutoff=item.get("knowledge_cutoff"),
+                content = self.shared_asset_access.exact_observation_handle(
+                    EnsureRequest(
+                        instrument_id=binding["instrument_id"],
+                        source=binding["source"],
+                        source_announcement_id=binding["source_announcement_id"],
+                        attachment_id=binding["attachment_id"],
+                        expected_content_hash=binding["content_hash"],
+                        observation_version=binding["observation_version"],
+                        allow_network=False,
+                        knowledge_cutoff=(item.get("metadata") or {}).get(
+                            "knowledge_cutoff"
                         ),
-                        authorized=True,
-                    )
-                except (FileNotFoundError, KeyError, RuntimeError, ValueError):
-                    return None
+                    ),
+                    authorized=True,
+                )
+            except (FileNotFoundError, KeyError, RuntimeError, ValueError):
+                return None
             handle = content.get("file_handle")
             if handle is not None:
                 handle.close()
             return {
-                "schema_version": "business_profile_source_file_manifest.v1",
-                "source_file_id": f"shared-asset:{report.asset_id}",
-                "instrument_id": report.instrument_id,
-                "report_period": report.report_period,
+                "schema_version": "business_profile_source_asset.v1",
+                "source_file_id": f"shared-asset:{binding['asset_id']}",
+                "source_asset_id": binding["asset_id"],
+                "instrument_id": binding["instrument_id"],
+                "report_period": binding["report_period"],
                 "report_type": str(item.get("document_type") or ""),
-                "filing_id": report.source_announcement_id,
-                "source": report.source,
+                "filing_id": binding["source_announcement_id"],
+                "source": binding["source"],
                 "archive_path": str(content["path"]),
-                "content_hash": report.content_hash,
+                "content_hash": binding["content_hash"],
                 "content_length": content["content_length"],
-                "published_at": report.published_at,
+                "published_at": binding.get("published_at"),
                 "status": "verified",
                 "integrity_status": "valid",
                 "metadata": {
-                    "shared_asset_id": report.asset_id,
-                    "shared_attachment_id": report.attachment_id,
-                    "shared_observation_version": report.version_id,
-                    "selector_kind": (
-                        "knowledge_cutoff"
-                        if item.get("knowledge_cutoff")
-                        else "default_effective"
-                    ),
+                    "shared_asset_id": binding["asset_id"],
+                    "shared_attachment_id": binding["attachment_id"],
+                    "shared_observation_version": binding["observation_version"],
+                    "selector_kind": binding.get("selector_kind")
+                    or "default_effective",
                 },
             }
-
-        from research.annual_report_assets import AnnualReportAssetCatalog
-
-        asset = AnnualReportAssetCatalog(self.storage).find_reusable_filing(
-            instrument_id=str(item.get("instrument_id") or ""),
-            report_period=str(item.get("report_period") or ""),
-            source=str(item.get("source") or "").strip().lower(),
-            filing_id=str(item.get("announcement_id") or ""),
-        )
-        if asset is None:
+        report_period = str(item.get("report_period") or "")
+        fiscal_year = int(report_period[:4]) if len(report_period) >= 4 else None
+        if fiscal_year is None:
             return None
-        if str(asset.get("report_type") or "") != str(
-            item.get("document_type") or ""
+        asset = self.shared_asset_access.get_effective_asset(
+            str(item.get("instrument_id") or ""),
+            fiscal_year=fiscal_year,
+            knowledge_cutoff=(item.get("metadata") or {}).get("knowledge_cutoff"),
+        )
+        if (
+            asset is None
+            or str(asset.get("source") or "")
+            != str(item.get("source") or "").strip().lower()
+            or str(asset.get("source_announcement_id") or "")
+            != str(item.get("announcement_id") or "")
         ):
             return None
-        return asset
+        from research.business_profile_source_assets import (
+            project_business_profile_source_asset,
+        )
+
+        return project_business_profile_source_asset(self.shared_asset_access, asset)
 
     def get_bound_asset_resolution(
         self,
@@ -958,12 +913,12 @@ class BusinessProfileWorkRepository:
         """Return an explicit local-only resolution for one bound filing."""
 
         item = self.get(work) if isinstance(work, str) else dict(work)
-        usable = self.get_usable_bound_manifest(item)
+        usable = self.get_bound_source_asset(item)
         if usable is not None:
             return {
                 "asset_availability": "local_valid",
                 "local_content_unavailable": False,
-                "manifest": usable,
+                "source_asset": usable,
                 "reason_code": None,
             }
         bound_shared_asset = dict(
@@ -974,15 +929,15 @@ class BusinessProfileWorkRepository:
                 "asset_availability": "missing",
                 "local_content_unavailable": True,
                 "asset": bound_shared_asset,
-                "manifest": None,
+                "source_asset": None,
                 "reason_code": "exact_filing_pin_unavailable",
             }
         if self.shared_asset_access is None:
             return {
                 "asset_availability": "missing",
                 "local_content_unavailable": True,
-                "manifest": None,
-                "reason_code": "legacy_manifest_missing",
+                "source_asset": None,
+                "reason_code": "shared_announcement_asset_access_unavailable",
             }
         from research.announcement_assets import EnsureRequest
 
@@ -1001,70 +956,11 @@ class BusinessProfileWorkRepository:
             "asset_availability": ensured.get("availability") or "missing",
             "local_content_unavailable": True,
             "asset": ensured.get("asset"),
-            "manifest": None,
+            "source_asset": None,
             "reason_code": ensured.get("reason_code") or "local_content_unavailable",
         }
 
-    def persist_bound_shared_manifest(
-        self,
-        work: str | Mapping[str, Any],
-        manifest: Mapping[str, Any],
-    ) -> str:
-        """Persist the exact shared-asset projection for downstream BP stages."""
-
-        item = self.get(work) if isinstance(work, str) else dict(work)
-        binding = _normalize_bound_shared_asset(
-            dict((item.get("metadata") or {}).get("bound_shared_asset") or {})
-        )
-        frontier = self.get_bound_frontier(item)
-        from research.business_profile_archive import (
-            BUSINESS_PROFILE_ARCHIVE_VERSION,
-            BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
-        )
-        from research.providers.base import FinancialSourceFileManifest
-
-        record = FinancialSourceFileManifest(
-            source=binding["source"],
-            source_mode="shared_announcement_asset",
-            source_tier=(
-                "official_primary"
-                if binding["source"] == "cninfo"
-                else "official_backup"
-            ),
-            instrument_id=binding["instrument_id"],
-            symbol=str(frontier.get("symbol") or ""),
-            exchange=str(frontier.get("exchange") or ""),
-            report_period=binding["report_period"],
-            report_type=str(item.get("document_type") or ""),
-            filing_id=binding["source_announcement_id"],
-            source_url=f"shared-asset://{binding['asset_id']}",
-            archive_path=str(manifest["archive_path"]),
-            content_hash=binding["content_hash"],
-            content_length=int(manifest["content_length"]),
-            published_at=binding.get("published_at"),
-            downloaded_at=get_shanghai_time().isoformat(),
-            parser_version=BUSINESS_PROFILE_ARCHIVE_VERSION,
-            source_file_id=f"shared-asset:{binding['asset_id']}",
-            status="archived",
-            schema_version=BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
-            metadata_json={
-                "shared_asset_id": binding["asset_id"],
-                "shared_attachment_id": binding["attachment_id"],
-                "shared_asset_observation_version": binding[
-                    "observation_version"
-                ],
-                "shared_asset_content_hash": binding["content_hash"],
-                "selector_kind": binding["selector_kind"],
-            },
-        )
-        repository = getattr(self.storage, "financial_statements", None)
-        if repository is not None and hasattr(
-            repository, "upsert_source_file_manifest"
-        ):
-            return str(repository.upsert_source_file_manifest(record))
-        return str(self.storage.upsert_financial_source_file_manifest(record))
-
-    def recover_completed_without_bound_manifest(
+    def recover_completed_without_bound_source_asset(
         self,
         *,
         work_ids: Sequence[str] = (),
@@ -1096,9 +992,7 @@ class BusinessProfileWorkRepository:
             ).fetchall()
         candidates = [_decode_work_row(row) for row in rows]
         defective = [
-            item
-            for item in candidates
-            if self.get_usable_bound_manifest(item) is None
+            item for item in candidates if self.get_bound_source_asset(item) is None
         ]
         now = get_shanghai_time().isoformat()
         recovery_token = hashlib.sha256(now.encode("utf-8")).hexdigest()[:12]
@@ -1112,7 +1006,7 @@ class BusinessProfileWorkRepository:
                 history = list(metadata.get("recovery_history") or [])
                 history.append(
                     {
-                        "reason": "completed_without_usable_bound_manifest",
+                        "reason": "completed_without_usable_bound_source_asset",
                         "recovered_at": now,
                         "from_stage": item.get("stage"),
                         "from_status": item.get("status"),
@@ -1173,12 +1067,12 @@ class BusinessProfileWorkRepository:
             affected_stage = _evidence_free_stage(stage_results)
             if affected_stage is None:
                 continue
-            if self.get_usable_bound_manifest(item) is not None:
+            if self.get_bound_source_asset(item) is not None:
                 candidates.append((item, affected_stage))
         now = get_shanghai_time().isoformat()
-        recovery_token = hashlib.sha256(
-            f"evidence:{now}".encode("utf-8")
-        ).hexdigest()[:12]
+        recovery_token = hashlib.sha256(f"evidence:{now}".encode("utf-8")).hexdigest()[
+            :12
+        ]
         recovered_ids: list[str] = []
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -1269,7 +1163,7 @@ class BusinessProfileWorkRepository:
             reasons = _structured_semantic_checkpoint_reasons(
                 Path(str(item.get("checkpoint_path") or ""))
             )
-            if not reasons or self.get_usable_bound_manifest(item) is None:
+            if not reasons or self.get_bound_source_asset(item) is None:
                 continue
             candidates.append((item, reasons))
         now = get_shanghai_time().isoformat()
@@ -1332,7 +1226,7 @@ class BusinessProfileWorkRepository:
         candidates = [
             item
             for item in (_decode_work_row(row) for row in rows)
-            if self.get_usable_bound_manifest(item) is not None
+            if self.get_bound_source_asset(item) is not None
         ]
         now = get_shanghai_time().isoformat()
         recovered_ids: list[str] = []
@@ -1386,7 +1280,9 @@ class BusinessProfileWorkRepository:
 
         marker = "stale semantic production checkpoint scope"
         identity_hash = (
-            _stable_hash(processing_identity) if processing_identity is not None else None
+            _stable_hash(processing_identity)
+            if processing_identity is not None
+            else None
         )
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -1398,11 +1294,7 @@ class BusinessProfileWorkRepository:
                 "AND last_error LIKE ? "
                 + ("AND processing_identity_hash = ? " if identity_hash else "")
                 + "ORDER BY work_id",
-                (
-                    (f"%{marker}%", identity_hash)
-                    if identity_hash
-                    else (f"%{marker}%",)
-                ),
+                ((f"%{marker}%", identity_hash) if identity_hash else (f"%{marker}%",)),
             ).fetchall()
         now = get_shanghai_time().isoformat()
         recovery_token = hashlib.sha256(
@@ -1545,7 +1437,7 @@ class BusinessProfileWorkRepository:
         """Resolve only runtime exceptions caused by the now-repaired missing document."""
 
         item = self.get(work) if isinstance(work, str) else dict(work)
-        if self.get_usable_bound_manifest(item) is None:
+        if self.get_bound_source_asset(item) is None:
             return 0
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -1615,9 +1507,7 @@ class BusinessProfileWorkRepository:
             "as_of": now,
             "total": sum(int(item["row_count"]) for item in groups),
             "running": sum(
-                int(item["row_count"])
-                for item in groups
-                if item["status"] == "running"
+                int(item["row_count"]) for item in groups if item["status"] == "running"
             ),
             "claimable": sum(
                 int(item["row_count"])
@@ -1654,9 +1544,7 @@ class BusinessProfileWorkRepository:
         processing_identity_hash: str | None = None,
     ) -> int:
         identity_clause = (
-            " AND processing_identity_hash = ?"
-            if processing_identity_hash
-            else ""
+            " AND processing_identity_hash = ?" if processing_identity_hash else ""
         )
         params: tuple[Any, ...] = (
             (_stage(stage), str(processing_identity_hash))
@@ -1913,22 +1801,16 @@ class BusinessProfileWorkRepository:
 
 
 class BusinessProfileFrontierBoundAcquirer:
-    """Archive the exact official document selected into durable work."""
+    """Resolve the exact shared annual-report asset selected into durable work."""
 
-    def __init__(self, *, repository: BusinessProfileWorkRepository, archive_service: Any):
+    def __init__(self, *, repository: BusinessProfileWorkRepository):
         self.repository = repository
-        self.archive_service = archive_service
 
     def acquire(self, work: Mapping[str, Any]) -> dict[str, Any]:
-        from research.business_profile_discovery import BusinessProfileDocumentCandidate
-        from research.business_profile_documents import classify_business_profile_document
-
         frontier = self.repository.get_bound_frontier(work)
         resolution = self.repository.get_bound_asset_resolution(work)
-        existing = resolution.get("manifest")
+        existing = resolution.get("source_asset")
         if existing is not None:
-            if (work.get("metadata") or {}).get("bound_shared_asset"):
-                self.repository.persist_bound_shared_manifest(work, existing)
             resolved = self.repository.resolve_missing_document_exceptions(work)
             return {
                 "status": "unchanged",
@@ -1950,64 +1832,14 @@ class BusinessProfileFrontierBoundAcquirer:
                 "reason_code": resolution.get("reason_code"),
                 "asset": resolution.get("asset"),
             }
-        title = str(frontier["title"])
-        classification = classify_business_profile_document(title, adjunct_type="PDF")
-        if (
-            not classification.selected
-            or classification.document_type != str(work.get("document_type") or "")
-        ):
-            raise RuntimeError(
-                "business-profile bound frontier classification mismatch: "
-                f"{frontier['frontier_id']}"
-            )
-        metadata = dict(frontier.get("metadata") or {})
-        candidate = BusinessProfileDocumentCandidate(
-            announcement_id=str(frontier["announcement_id"]),
-            title=title,
-            announcement_time=frontier.get("published_at"),
-            symbols=[str(frontier["symbol"])],
-            adjunct_url=str(frontier["source_url"]),
-            adjunct_type="PDF",
-            classification=classification,
-            selection_reasons=list(metadata.get("selection_reasons") or []),
-            source=str(frontier["source"]).strip().lower(),
-            source_tier=(
-                "official_primary"
-                if str(frontier["source"]).strip().lower() == "cninfo"
-                else "official_backup"
-            ),
-            raw_payload={"frontier_id": str(frontier["frontier_id"])},
-        )
-        instrument = {
-            "instrument_id": str(frontier["instrument_id"]),
-            "symbol": str(frontier["symbol"]),
-            "exchange": str(frontier["exchange"]),
-        }
-        archive = self.archive_service.archive_candidates(
-            instrument,
-            [candidate],
-            max_documents=1,
-            checkpoint_path=Path(str(work["checkpoint_path"])).with_suffix(
-                ".acquire.json"
-            ),
-        )
-        manifest = self.repository.get_usable_bound_manifest(work)
-        if manifest is None:
-            errors = "; ".join(
-                str(item.get("error") or "") for item in archive.errors
-            )
-            raise RuntimeError(
-                "business-profile bound acquisition produced no usable manifest: "
-                f"frontier_id={frontier['frontier_id']} errors={errors or 'unknown'}"
-            )
-        resolved = self.repository.resolve_missing_document_exceptions(work)
         return {
-            "status": "success",
+            "status": "metadata_only",
             "frontier_id": frontier["frontier_id"],
-            "source_file_id": manifest["source_file_id"],
-            "archive_path": manifest["archive_path"],
-            "archive": archive.to_dict(),
-            "resolved_missing_document_exceptions": resolved,
+            "asset_availability": resolution.get("asset_availability"),
+            "local_content_unavailable": True,
+            "reason_code": resolution.get("reason_code")
+            or "shared_annual_report_asset_not_ready",
+            "asset": resolution.get("asset"),
         }
 
 
@@ -2076,13 +1908,17 @@ class BusinessProfileAsyncProductionService:
         storage = getattr(self.repository, "storage", None)
         coordinated_writes = getattr(type(storage), "coordinated_writes", None)
         if not callable(coordinated_writes):
-            return await self.write_coordinator.run(func, *args, **kwargs)
+            def invoke_coordinated() -> Any:
+                with self.write_coordinator.write_scope():
+                    return func(*args, **kwargs)
+
+            return await _run_thread_call(invoke_coordinated)
 
         def invoke() -> Any:
             with storage.coordinated_writes(self.write_coordinator):
                 return func(*args, **kwargs)
 
-        return await asyncio.to_thread(invoke)
+        return await _run_thread_call(invoke)
 
     def _apply_writer_health(
         self, status: str, reason_codes: Sequence[str]
@@ -2112,7 +1948,11 @@ class BusinessProfileAsyncProductionService:
             > self.writer_p95_degraded_seconds
         ):
             reasons.append("writer_p95_exceeded")
-        return ("degraded" if reasons and status == "success" else status), reasons, writer
+        return (
+            ("degraded" if reasons and status == "success" else status),
+            reasons,
+            writer,
+        )
 
     async def run_daily(
         self,
@@ -2149,9 +1989,11 @@ class BusinessProfileAsyncProductionService:
         recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["duplicate_bundle"] = duplicate_recovery
-        recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
-            structured_recovery.get("requeued") or 0
-        ) + int(stale_scope_recovery.get("requeued") or 0)
+        recovery["requeued"] = (
+            int(recovery.get("requeued") or 0)
+            + int(structured_recovery.get("requeued") or 0)
+            + int(stale_scope_recovery.get("requeued") or 0)
+        )
         recovery["requeued"] += int(duplicate_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
@@ -2200,7 +2042,7 @@ class BusinessProfileAsyncProductionService:
             stage_budgets,
             processing_identity=processing_identity,
         )
-        health = await asyncio.to_thread(self.repository.health)
+        health = await _run_thread_call(self.repository.health)
         throughput = _business_profile_throughput(enqueue, workers)
         status, reason_codes = _business_profile_operation_status(
             discovery=discovery,
@@ -2252,7 +2094,8 @@ class BusinessProfileAsyncProductionService:
             raise ValueError(f"unsupported business-profile backfill policy: {policy}")
         if policy == "latest_annual_only":
             unsupported_types = sorted(
-                set(str(item) for item in document_types) - set(AUTOMATIC_DOCUMENT_TYPES)
+                set(str(item) for item in document_types)
+                - set(AUTOMATIC_DOCUMENT_TYPES)
             )
             if unsupported_types:
                 raise ValueError(
@@ -2303,9 +2146,11 @@ class BusinessProfileAsyncProductionService:
         recovery["contract"] = contract_recovery
         recovery["structured_semantic"] = structured_recovery
         recovery["duplicate_bundle"] = duplicate_recovery
-        recovery["requeued"] = int(recovery.get("requeued") or 0) + int(
-            structured_recovery.get("requeued") or 0
-        ) + int(stale_scope_recovery.get("requeued") or 0)
+        recovery["requeued"] = (
+            int(recovery.get("requeued") or 0)
+            + int(structured_recovery.get("requeued") or 0)
+            + int(stale_scope_recovery.get("requeued") or 0)
+        )
         recovery["requeued"] += int(duplicate_recovery.get("requeued") or 0)
         recovery["work_ids"] = sorted(
             {
@@ -2322,7 +2167,7 @@ class BusinessProfileAsyncProductionService:
                 register_business_profile_shared_annual_report_asset,
             )
 
-            await asyncio.to_thread(
+            await _run_thread_call(
                 register_business_profile_shared_annual_report_asset,
                 storage=self.repository.storage,
                 asset=bound_asset,
@@ -2420,7 +2265,7 @@ class BusinessProfileAsyncProductionService:
             "enqueue": enqueue,
             "workers": workers,
             "throughput": throughput,
-            "queue_health": await asyncio.to_thread(self.repository.health),
+            "queue_health": await _run_thread_call(self.repository.health),
             "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
@@ -2525,11 +2370,7 @@ class BusinessProfileAsyncProductionService:
     def _log_completion(self, report: Mapping[str, Any]) -> None:
         health = dict(report.get("queue_health") or {})
         writer = dict(report.get("writer") or {})
-        log = (
-            logger.warning
-            if str(report.get("status")) == "degraded"
-            else logger.info
-        )
+        log = logger.warning if str(report.get("status")) == "degraded" else logger.info
         log(
             "business-profile run end operation=%s status=%s elapsed_seconds=%s "
             "claimable=%s running=%s terminal=%s completed=%s "
@@ -2554,9 +2395,11 @@ class BusinessProfileAsyncProductionService:
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         processing_identity_hash = (
-            _stable_hash(processing_identity) if processing_identity is not None else None
+            _stable_hash(processing_identity)
+            if processing_identity is not None
+            else None
         )
-        semantic_depth = await asyncio.to_thread(
+        semantic_depth = await _run_thread_call(
             self.repository.claimable_count,
             "semantic",
             processing_identity_hash=processing_identity_hash,
@@ -2674,6 +2517,7 @@ class BusinessProfileAsyncProductionService:
             budget.max_elapsed_seconds,
             budget.high_water_mark,
         )
+
         def active_elapsed(now: float | None = None) -> float:
             current = time.monotonic() if now is None else now
             return active_work_seconds + (
@@ -2696,13 +2540,22 @@ class BusinessProfileAsyncProductionService:
                 result = dict(await self.stage_runner(stage, item))
                 quality = dict(result.get("quality") or {})
                 for key in (
-                    "blocking_machine_rework", "selected_documents", "selected_pages",
-                    "outline_pages_scoped", "evidence_records", "record_count",
-                    "verified_records", "empty_output_documents",
-                    "expected_non_disclosure_documents", "structured_fallback_required",
-                    "structured_fallback_calls", "structured_fallback_accepted_records",
-                    "structured_fallback_rejected", "page_artifact_cache_hits",
-                    "page_artifact_cache_misses", "pdf_parser_warning_count",
+                    "blocking_machine_rework",
+                    "selected_documents",
+                    "selected_pages",
+                    "outline_pages_scoped",
+                    "evidence_records",
+                    "record_count",
+                    "verified_records",
+                    "empty_output_documents",
+                    "expected_non_disclosure_documents",
+                    "structured_fallback_required",
+                    "structured_fallback_calls",
+                    "structured_fallback_accepted_records",
+                    "structured_fallback_rejected",
+                    "page_artifact_cache_hits",
+                    "page_artifact_cache_misses",
+                    "pdf_parser_warning_count",
                 ):
                     quality_totals[key] = quality_totals.get(key, 0) + int(
                         quality.get(key) or 0
@@ -2721,8 +2574,11 @@ class BusinessProfileAsyncProductionService:
                             quality_totals.get(key) or 0
                         ) + float(quality.get(key) or 0)
                 for counter_name in (
-                    "outline_sources", "outline_confidences", "empty_output_reasons",
-                    "blocked_configuration_reasons", "machine_rework_reasons",
+                    "outline_sources",
+                    "outline_confidences",
+                    "empty_output_reasons",
+                    "blocked_configuration_reasons",
+                    "machine_rework_reasons",
                 ):
                     target = quality_totals.setdefault(counter_name, {})
                     for label, count in dict(quality.get(counter_name) or {}).items():
@@ -2769,7 +2625,10 @@ class BusinessProfileAsyncProductionService:
                         else:
                             lease_conflicts += 1
                         return False
-                    if stage == "semantic" and "gateway_failure" in machine_rework_reasons:
+                    if (
+                        stage == "semantic"
+                        and "gateway_failure" in machine_rework_reasons
+                    ):
                         raise RuntimeError(
                             "business-profile semantic provider congestion: gateway_failure"
                         )
@@ -2781,7 +2640,9 @@ class BusinessProfileAsyncProductionService:
                     )
                 status = str(result.get("status") or "").lower()
                 if status not in {"success", "completed", "unchanged"}:
-                    raise RuntimeError(str(result.get("reason") or status or "stage_failed"))
+                    raise RuntimeError(
+                        str(result.get("reason") or status or "stage_failed")
+                    )
                 await self._run_storage_operation(
                     self.repository.acknowledge,
                     str(item["work_id"]),
@@ -2790,7 +2651,9 @@ class BusinessProfileAsyncProductionService:
                 )
                 completed += 1
             except Exception as exc:
-                congestion_failure = stage == "semantic" and _is_provider_congestion_error(exc)
+                congestion_failure = (
+                    stage == "semantic" and _is_provider_congestion_error(exc)
+                )
                 if congestion_failure:
                     provider_congestion_failures += 1
                 terminal_status = await self._run_storage_operation(
@@ -2808,18 +2671,27 @@ class BusinessProfileAsyncProductionService:
                 else:
                     failed += 1
                 errors.append(
-                    {"work_id": str(item["work_id"]), "error": f"{type(exc).__name__}: {exc}"[:1000]}
+                    {
+                        "work_id": str(item["work_id"]),
+                        "error": f"{type(exc).__name__}: {exc}"[:1000],
+                    }
                 )
                 logger.warning(
                     "business-profile work failed work_id=%s instrument_id=%s "
                     "stage=%s disposition=%s category=%s error=%s",
-                    item.get("work_id"), item.get("instrument_id"), stage,
-                    terminal_status, type(exc).__name__, str(exc).replace("\n", " ")[:1000],
+                    item.get("work_id"),
+                    item.get("instrument_id"),
+                    stage,
+                    terminal_status,
+                    type(exc).__name__,
+                    str(exc).replace("\n", " ")[:1000],
                 )
                 logger.debug(
                     "business-profile work failure traceback work_id=%s "
                     "instrument_id=%s stage=%s",
-                    item.get("work_id"), item.get("instrument_id"), stage,
+                    item.get("work_id"),
+                    item.get("instrument_id"),
+                    stage,
                     exc_info=True,
                 )
             finally:
@@ -2827,8 +2699,14 @@ class BusinessProfileAsyncProductionService:
                     "business-profile stage item stage=%s work_id=%s instrument_id=%s "
                     "duration_seconds=%.3f claimed=%s completed=%s retried=%s "
                     "terminal_failures=%s",
-                    stage, item.get("work_id"), item.get("instrument_id"),
-                    time.monotonic() - item_started, claimed, completed, retried, failed,
+                    stage,
+                    item.get("work_id"),
+                    item.get("instrument_id"),
+                    time.monotonic() - item_started,
+                    claimed,
+                    completed,
+                    retried,
+                    failed,
                 )
             return congestion_failure
 
@@ -2839,7 +2717,9 @@ class BusinessProfileAsyncProductionService:
                 budget_exhausted = active_elapsed(now) >= budget.max_elapsed_seconds
                 if stop_requested:
                     stopped = True
-                may_claim = not stopped and not budget_exhausted and claimed < budget.max_items
+                may_claim = (
+                    not stopped and not budget_exhausted and claimed < budget.max_items
+                )
                 available_slots = max(0, effective_concurrency - len(active_tasks))
                 items: Sequence[Mapping[str, Any]] = ()
                 if may_claim and available_slots:
@@ -2851,7 +2731,9 @@ class BusinessProfileAsyncProductionService:
                     probe = getattr(self.repository, "has_claimable", None)
                     claimable = True
                     if callable(probe):
-                        claimable = await asyncio.to_thread(probe, stage, **claim_kwargs)
+                        claimable = await _run_thread_call(
+                            probe, stage, **claim_kwargs
+                        )
                     if claimable:
                         items = await self._run_storage_operation(
                             self.repository.claim,
@@ -2896,11 +2778,11 @@ class BusinessProfileAsyncProductionService:
                 )
                 active_tasks = set(pending)
                 if done:
-                    congestion_failures = sum(
-                        [bool(await task) for task in done]
-                    )
+                    congestion_failures = sum([bool(await task) for task in done])
                     if not active_tasks and active_interval_started is not None:
-                        active_work_seconds += time.monotonic() - active_interval_started
+                        active_work_seconds += (
+                            time.monotonic() - active_interval_started
+                        )
                         active_interval_started = None
                     if stage == "semantic":
                         if congestion_failures:
@@ -2912,11 +2794,21 @@ class BusinessProfileAsyncProductionService:
                         "business-profile stage progress stage=%s finished=%s in_flight=%s "
                         "claimed=%s completed=%s retried=%s terminal_failures=%s "
                         "effective_concurrency=%s elapsed_seconds=%.3f active_seconds=%.3f",
-                        stage, len(done), len(active_tasks), claimed, completed, retried,
-                        failed, effective_concurrency, time.monotonic() - started,
+                        stage,
+                        len(done),
+                        len(active_tasks),
+                        claimed,
+                        completed,
+                        retried,
+                        failed,
+                        effective_concurrency,
+                        time.monotonic() - started,
                         active_elapsed(),
                     )
-                if time.monotonic() - last_progress_log >= self.progress_log_interval_seconds:
+                if (
+                    time.monotonic() - last_progress_log
+                    >= self.progress_log_interval_seconds
+                ):
                     last_progress_log = time.monotonic()
                     logger.info(
                         "business-profile stage heartbeat stage=%s elapsed_seconds=%.3f "
@@ -2924,10 +2816,19 @@ class BusinessProfileAsyncProductionService:
                         "completed=%s retried=%s terminal_failures=%s "
                         "configuration_blocked=%s queue_underfilled_slots=%s "
                         "claim_exclusions=%s writer=%s",
-                        stage, time.monotonic() - started, active_elapsed(),
-                        len(active_tasks), peak_in_flight, claimed, completed, retried,
-                        failed, configuration_blocked, underfilled_claim_slots,
-                        len(claimed_work_ids), self.write_coordinator.snapshot(),
+                        stage,
+                        time.monotonic() - started,
+                        active_elapsed(),
+                        len(active_tasks),
+                        peak_in_flight,
+                        claimed,
+                        completed,
+                        retried,
+                        failed,
+                        configuration_blocked,
+                        underfilled_claim_slots,
+                        len(claimed_work_ids),
+                        self.write_coordinator.snapshot(),
                     )
         except asyncio.CancelledError:
             for task in active_tasks:
@@ -3085,9 +2986,7 @@ def _normalize_bound_shared_asset(
             asset.get("source_announcement_id") or ""
         ).strip(),
         "attachment_id": str(asset.get("attachment_id") or "").strip(),
-        "observation_version": str(
-            asset.get("observation_version") or ""
-        ).strip(),
+        "observation_version": str(asset.get("observation_version") or "").strip(),
         "content_hash": str(asset.get("content_hash") or "").strip().lower(),
         "report_period": str(asset.get("report_period") or "").strip(),
         "published_at": asset.get("published_at"),
@@ -3113,14 +3012,14 @@ def _normalize_bound_shared_asset(
             "bound shared annual-report asset is incomplete: " + ",".join(missing)
         )
     if len(binding["content_hash"]) != 64 or any(
-        character not in "0123456789abcdef"
-        for character in binding["content_hash"]
+        character not in "0123456789abcdef" for character in binding["content_hash"]
     ):
         raise ValueError("bound shared annual-report content_hash is invalid")
     _date_text(binding["report_period"], "report_period")
-    if binding["fiscal_year"] < 1990 or int(binding["report_period"][:4]) != binding[
-        "fiscal_year"
-    ]:
+    if (
+        binding["fiscal_year"] < 1990
+        or int(binding["report_period"][:4]) != binding["fiscal_year"]
+    ):
         raise ValueError("bound shared annual-report fiscal year is invalid")
     return binding
 

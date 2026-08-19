@@ -14,8 +14,6 @@ from pypdf.generic import DictionaryObject, NameObject, StreamObject
 import research.business_profile_semantic_runtime as runtime_module
 from research.business_profile_activity_production import GovernedCounterpartyResolver
 from research.business_profile_governance import BusinessProfileRepository
-from research.business_profile_discovery import BusinessProfileDocumentCandidate
-from research.business_profile_documents import classify_business_profile_document
 from research.business_profile_promotion import FieldFamilyPromotionManifest
 from research.business_profile_semantic_pipeline import (
     BusinessProfileSemanticPipeline,
@@ -29,7 +27,6 @@ from research.business_profile_semantic_extraction import (
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
 )
 from research.business_profile_semantic_runtime import (
-    BusinessProfilePlannedDisclosureAcquirer,
     BusinessProfileSemanticRuntime,
     _normalized_value,
     _semantic_failure_reason,
@@ -193,7 +190,7 @@ def _manifest(path, content, *, instrument_id="601088.SH"):
         "published_at": "2026-03-30T10:00:00+08:00",
         "status": "verified",
         "source_tier": "official_primary",
-        "schema_version": "business_profile_source_file_manifest.v1",
+        "schema_version": "business_profile_source_asset.v1",
         "metadata": {"announcement_title": "2025 Annual Report"},
     }
 
@@ -787,193 +784,6 @@ def _deterministic_runtime(
     return repository, pipeline, scope
 
 
-def test_runtime_acquires_only_the_minimum_planned_missing_disclosure(tmp_path):
-    storage = _storage(tmp_path)
-    repository = BusinessProfileRepository(storage)
-    manifests = []
-    annual = BusinessProfileDocumentCandidate(
-        announcement_id="annual-2025",
-        title="某公司2025年年度报告",
-        announcement_time="2026-03-30",
-        symbols=["601088"],
-        adjunct_url="/annual.pdf",
-        adjunct_type="PDF",
-        classification=classify_business_profile_document(
-            "某公司2025年年度报告", adjunct_type="PDF"
-        ),
-        source="cninfo",
-        source_tier="official_primary",
-    )
-    unrelated = BusinessProfileDocumentCandidate(
-        announcement_id="meeting",
-        title="关于召开股东大会的通知",
-        announcement_time="2026-04-01",
-        symbols=["601088"],
-        adjunct_url="/meeting.pdf",
-        adjunct_type="PDF",
-        classification=classify_business_profile_document(
-            "关于召开股东大会的通知", adjunct_type="PDF"
-        ),
-        source="cninfo",
-        source_tier="official_primary",
-    )
-    archived = []
-    discovery_calls = []
-
-    class _Coordinator:
-        def discover_instrument(self, instrument, **kwargs):
-            assert instrument == {
-                "instrument_id": "601088.SH",
-                "symbol": "601088",
-                "exchange": "SSE",
-            }
-            assert kwargs["max_pages"] == 5
-            discovery_calls.append(instrument["instrument_id"])
-            return SimpleNamespace(status="success", candidates=[unrelated, annual])
-
-    class _Archive:
-        def archive_candidates(self, instrument, selected, **kwargs):
-            assert [item.announcement_id for item in selected] == ["annual-2025"]
-            content = b"%PDF-1.7 planned annual report"
-            path = tmp_path / "annual.pdf"
-            path.write_bytes(content)
-            row = _manifest(path, content)
-            row["source_file_id"] = "source-annual-2025"
-            row["filing_id"] = "annual-2025"
-            manifests.append(row)
-            archived.extend(item.announcement_id for item in selected)
-            return {"status": "success", "documents": 1, "scope": kwargs}
-
-    acquirer = BusinessProfilePlannedDisclosureAcquirer(
-        coordinator=_Coordinator(),
-        archive_service=_Archive(),
-        manifest_loader=lambda instrument_id: manifests,
-        checkpoint_root=tmp_path / "acquisition",
-    )
-    runtime = BusinessProfileSemanticRuntime(
-        repository=repository,
-        artifact_root=tmp_path / "artifacts",
-        manifest_loader=lambda instrument_id: manifests,
-        planned_disclosure_acquirer=acquirer,
-    )
-    pipeline = BusinessProfileSemanticPipeline(
-        config=SemanticProductionConfig(enabled=True),
-        checkpoint_store=SemanticProductionCheckpointStore(
-            tmp_path / "checkpoint.json"
-        ),
-        handlers=runtime.handlers(),
-    )
-
-    scope = replace(
-        _scope("atomic_activities"),
-        field_families=("atomic_activities", "named_relationships"),
-    )
-    result = pipeline.run("plan", scope=scope)
-    payload = runtime.stage_store.read(result["artifact"], expected_stage="plan")
-
-    assert archived == ["annual-2025"], payload
-    assert discovery_calls == ["601088.SH"]
-    assert result["metrics"]["acquisition_attempts"] == 1
-    assert result["metrics"]["acquired_plans"] == 1
-    assert [item["announcement_id"] for item in payload["plans"][0]["included"]] == [
-        "annual-2025"
-    ]
-    assert payload["plans"][0]["included"][0]["local_status"] == "verified"
-    rebound_revision = compute_business_profile_semantic_source_revision(
-        repository,
-        instruments=["601088.SH"],
-        field_families=["atomic_activities", "named_relationships"],
-        knowledge_cutoff="2026-08-01",
-        manifest_loader=lambda instrument_id: manifests,
-    )
-    checkpoint = pipeline.checkpoint_store.load()
-    assert checkpoint["scope"]["source_revision"] == rebound_revision
-    assert payload["scope_hash"] == checkpoint["scope_hash"]
-    report = BusinessProfileSemanticPipeline(
-        config=SemanticProductionConfig(enabled=True),
-        checkpoint_store=pipeline.checkpoint_store,
-        handlers=runtime.handlers(),
-    ).run(
-        "report",
-        scope=replace(scope, source_revision=rebound_revision),
-    )
-    assert report["completed_stages"] == ["plan"]
-
-    manifests.clear()
-    blocked_runtime = BusinessProfileSemanticRuntime(
-        repository=repository,
-        artifact_root=tmp_path / "blocked-artifacts",
-        manifest_loader=lambda instrument_id: manifests,
-        planned_disclosure_acquirer=acquirer,
-    )
-    blocked_pipeline = BusinessProfileSemanticPipeline(
-        config=SemanticProductionConfig(
-            enabled=True,
-            kill_switches={
-                "all_writes": False,
-                "network_calls": False,
-                "promotion": False,
-                "scope_widening": True,
-            },
-        ),
-        checkpoint_store=SemanticProductionCheckpointStore(
-            tmp_path / "blocked-checkpoint.json"
-        ),
-        handlers=blocked_runtime.handlers(),
-    )
-    blocked = blocked_pipeline.run("plan", scope=_scope("atomic_activities"))
-
-    assert blocked["metrics"]["acquisition_attempts"] == 0
-    assert archived == ["annual-2025"]
-
-
-def test_planned_acquisition_stops_new_network_calls_at_error_budget(tmp_path):
-    storage = _storage(tmp_path)
-    repository = BusinessProfileRepository(storage)
-    calls = []
-
-    class _FailingCoordinator:
-        def discover_instrument(self, instrument, **kwargs):
-            calls.append(instrument["instrument_id"])
-            raise RuntimeError("official discovery unavailable")
-
-    acquirer = BusinessProfilePlannedDisclosureAcquirer(
-        coordinator=_FailingCoordinator(),
-        archive_service=SimpleNamespace(),
-        manifest_loader=lambda instrument_id: [],
-        checkpoint_root=tmp_path / "acquisition",
-    )
-    runtime = BusinessProfileSemanticRuntime(
-        repository=repository,
-        artifact_root=tmp_path / "artifacts",
-        manifest_loader=lambda instrument_id: [],
-        planned_disclosure_acquirer=acquirer,
-    )
-    pipeline = BusinessProfileSemanticPipeline(
-        config=SemanticProductionConfig(
-            enabled=True,
-            budgets=SemanticProductionBudgets(max_errors=1),
-        ),
-        checkpoint_store=SemanticProductionCheckpointStore(
-            tmp_path / "checkpoint.json"
-        ),
-        handlers=runtime.handlers(),
-    )
-    scope = replace(
-        _scope("atomic_activities"),
-        instruments=("601088.SH", "600000.SH"),
-    )
-
-    result = pipeline.run("plan", scope=scope)
-
-    assert result["status"] == "stopped"
-    assert result["reason"] == "budget_exhausted:errors"
-    assert calls == ["601088.SH"]
-    assert result["metrics"]["acquisition_attempts"] == 1
-    assert result["metrics"]["errors"] == 1
-    assert "plan" not in result["completed_stages"]
-
-
 def test_source_revision_binds_selected_document_and_retry_generation(tmp_path):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
@@ -1283,7 +1093,9 @@ def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
         ),
         gateway=gateway,
     )
-    monkeypatch.setattr(runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], []))
+    monkeypatch.setattr(
+        runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], [])
+    )
 
     for stage in ("plan", "select"):
         assert pipeline.run(stage, scope=scope)["status"] == "success"
@@ -1338,9 +1150,9 @@ def test_partial_structured_fallback_persists_valid_rows_and_rework_diagnostics(
     assert len(repository.list_records("segments", instrument_id="601088.SH")) == 1
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert exceptions[-1]["reason_codes"] == ["partial_row_rejection"]
-    assert exceptions[-1]["metadata"]["diagnostics"]["row_rejections"][0][
-        "row_index"
-    ] == 1
+    assert (
+        exceptions[-1]["metadata"]["diagnostics"]["row_rejections"][0]["row_index"] == 1
+    )
 
 
 def test_partial_structured_fallback_retry_persists_newly_recovered_rows(
@@ -1409,9 +1221,7 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
     assert extracted["status"] == "success"
     assert extracted["quality"]["structured_fallback_calls"] == 1
     assert extracted["quality"]["structured_fallback_accepted_records"] == 1
-    fact = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )[0]
+    fact = repository.list_records("operating_facts", instrument_id="601088.SH")[0]
     assert fact["fact_type"] == "production_volume"
     assert fact["value_raw"] == 210.0
     assert fact["unit_raw"] == "万吨"
@@ -1427,17 +1237,18 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
     assert semantic_run["semantic_family_complete"] is True
     assert semantic_run["record_ids"]["operating_facts"] == [fact["record_id"]]
     assert semantic_run["evidence_ids"]
-    assert semantic_run["semantic_audit"]["diagnostics"]["semantic_result"][
-        "rows"
-    ][0]["unit_raw"] == "万吨"
+    assert (
+        semantic_run["semantic_audit"]["diagnostics"]["semantic_result"]["rows"][0][
+            "unit_raw"
+        ]
+        == "万吨"
+    )
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
     assert verified["quality"]["verified_records"] == 1
     assert len(gateway.requests) == 1
     assert pipeline.run("promote", scope=scope)["status"] == "success"
-    fact = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )[0]
+    fact = repository.list_records("operating_facts", instrument_id="601088.SH")[0]
     assert fact["review_status"] == "approved"
 
 
@@ -1464,9 +1275,7 @@ def test_semantic_unit_alias_absent_from_source_is_normalized(tmp_path, monkeypa
     extracted = pipeline.run("extract", scope=scope)
 
     assert extracted["status"] == "success"
-    fact = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )[0]
+    fact = repository.list_records("operating_facts", instrument_id="601088.SH")[0]
     assert fact["unit_raw"] == "万公吨"
     assert fact["unit_normalized"] == "tonne"
 
@@ -1499,9 +1308,7 @@ def test_unit_conversion_pending_persists_raw_row_without_blocking_stage(
     assert extracted["quality"]["stage_ready"] is True
     assert extracted["quality"]["blocking_machine_rework"] == 0
     assert extracted["metrics"]["semantic_rows_unit_pending"] == 1
-    assert repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    ) == []
+    assert repository.list_records("operating_facts", instrument_id="601088.SH") == []
     assert repository.list_exceptions(instrument_id="601088.SH") == []
     with repository.storage.get_connection() as conn:
         artifact = conn.execute(
@@ -1554,9 +1361,7 @@ def test_pending_unit_row_does_not_block_independently_convertible_row(
     for stage in ("plan", "select"):
         assert pipeline.run(stage, scope=scope)["status"] == "success"
     extracted = pipeline.run("extract", scope=scope)
-    facts = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )
+    facts = repository.list_records("operating_facts", instrument_id="601088.SH")
 
     assert extracted["status"] == "success"
     assert extracted["quality"]["stage_ready"] is True
@@ -1578,9 +1383,12 @@ def test_pending_unit_row_does_not_block_independently_convertible_row(
     assert verified["quality"]["verified_records"] == 1
     promoted = pipeline.run("promote", scope=scope)
     assert promoted["status"] == "success"
-    assert repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )[0]["review_status"] == "approved"
+    assert (
+        repository.list_records("operating_facts", instrument_id="601088.SH")[0][
+            "review_status"
+        ]
+        == "approved"
+    )
 
 
 def test_auto_approved_unit_rule_is_replayed_inline_without_extraction_retry(
@@ -1635,9 +1443,7 @@ def test_auto_approved_unit_rule_is_replayed_inline_without_extraction_retry(
     for stage in ("plan", "select"):
         assert pipeline.run(stage, scope=scope)["status"] == "success"
     extracted = pipeline.run("extract", scope=scope)
-    facts = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )
+    facts = repository.list_records("operating_facts", instrument_id="601088.SH")
 
     assert extracted["status"] == "success"
     assert extracted["quality"]["stage_ready"] is True
@@ -1739,9 +1545,7 @@ def test_composite_semantic_evidence_uses_complete_bundle_hash():
 
     assert evidence["evidence_text_hash"] == composite_hash
     assert evidence["metadata"]["composite_evidence"] is True
-    assert evidence["metadata"]["semantic_result"]["object_raw"] == (
-        "综合能源业务"
-    )
+    assert evidence["metadata"]["semantic_result"]["object_raw"] == ("综合能源业务")
 
 
 def test_ambiguous_structured_table_empty_model_output_remains_machine_rework(
@@ -1798,9 +1602,12 @@ def test_empty_atomic_activity_stays_resumable_with_semantic_audit(
     }
     exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
     assert exception["reason_codes"] == ["context_incomplete"]
-    assert exception["metadata"]["diagnostics"]["semantic_audit"][
-        "diagnostics"
-    ]["semantic_result"]["activities"] == []
+    assert (
+        exception["metadata"]["diagnostics"]["semantic_audit"]["diagnostics"][
+            "semantic_result"
+        ]["activities"]
+        == []
+    )
     with repository.storage.get_connection() as conn:
         run_metadata = json.loads(
             conn.execute(
@@ -1810,9 +1617,7 @@ def test_empty_atomic_activity_stays_resumable_with_semantic_audit(
     assert run_metadata["semantic_family_complete"] is False
 
 
-def test_empty_named_relationships_are_reusable_non_disclosure(
-    tmp_path, monkeypatch
-):
+def test_empty_named_relationships_are_reusable_non_disclosure(tmp_path, monkeypatch):
     gateway = _EmptyAtomicGateway()
     repository, pipeline, scope = _deterministic_runtime(
         tmp_path,
@@ -1886,7 +1691,9 @@ def test_ambiguous_structured_table_reports_configuration_blocker(
         config=config,
         gateway=gateway,
     )
-    monkeypatch.setattr(runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], []))
+    monkeypatch.setattr(
+        runtime_module, "parse_selected_tables", lambda *args, **kwargs: ([], [])
+    )
     for stage in ("plan", "select"):
         assert pipeline.run(stage, scope=scope)["status"] == "success"
 
@@ -2190,9 +1997,7 @@ def test_extract_stops_new_network_calls_when_token_budget_is_reached(
     assert len(payload["outputs"]) == 1
 
 
-def test_verify_uses_an_independent_field_family_token_budget(
-    tmp_path, monkeypatch
-):
+def test_verify_uses_an_independent_field_family_token_budget(tmp_path, monkeypatch):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     content = b"%PDF-1.7 verifier budget source"
@@ -2295,9 +2100,7 @@ def test_verify_failure_persists_llm_audit_and_counts_failed_call(
     exception = repository.list_exceptions(instrument_id="601088.SH")[-1]
     assert exception["reason_codes"] == ["gateway_failure"]
     diagnostics = exception["metadata"]["diagnostics"]
-    assert diagnostics["exception"]["transformation_stage"] == (
-        "semantic_verification"
-    )
+    assert diagnostics["exception"]["transformation_stage"] == ("semantic_verification")
     assert diagnostics["exception"]["error_type"] == "ValueError"
     assert diagnostics["semantic_audit"]["stage"] == "semantic_verification"
     assert diagnostics["semantic_audit"]["failure_category"] == (
@@ -2346,8 +2149,10 @@ def test_real_local_pdf_plan_select_and_hash_incremental_discovery(tmp_path):
             max_instruments=3,
             field_families=("structured_segments",),
             runtime_identities=scope.identities,
+            source_asset_loader=lambda _instrument_id: [manifest],
+            active_universe_loader=lambda: [{"instrument_id": "601088.SH"}],
         )
-        == ()
+        == ("601088.SH",)
     )
 
 
@@ -2434,7 +2239,7 @@ def test_storage_backed_discovery_is_hash_family_identity_and_retry_incremental(
             content_hash=document_hash,
             published_at="2026-03-30T10:00:00+08:00",
             status="verified",
-            schema_version="business_profile_source_file_manifest.v1",
+            schema_version="business_profile_source_asset.v1",
         )
     )
 
@@ -2445,6 +2250,12 @@ def test_storage_backed_discovery_is_hash_family_identity_and_retry_incremental(
             max_instruments=3,
             field_families=families,
             runtime_identities=runtime_identities,
+            source_asset_loader=lambda instrument_id: (
+                storage.financial_statements.get_source_file_manifests(
+                    instrument_id=instrument_id
+                )
+            ),
+            active_universe_loader=lambda: [{"instrument_id": "601088.SH"}],
         )
 
     assert discover(("structured_segments",)) == ("601088.SH",)
@@ -2543,7 +2354,7 @@ def test_discovery_tracks_each_minimum_plan_document_hash(tmp_path):
                 content_hash=content_hash,
                 published_at=published_at,
                 status="verified",
-                schema_version="business_profile_source_file_manifest.v1",
+                schema_version="business_profile_source_asset.v1",
             )
         )
     repository.persist_document_field_family_bundle(
@@ -2567,6 +2378,12 @@ def test_discovery_tracks_each_minimum_plan_document_hash(tmp_path):
         max_instruments=30,
         field_families=("tabular_operating_facts",),
         runtime_identities=identities,
+        source_asset_loader=lambda instrument_id: (
+            storage.financial_statements.get_source_file_manifests(
+                instrument_id=instrument_id
+            )
+        ),
+        active_universe_loader=lambda: [{"instrument_id": "601088.SH"}],
     ) == ("601088.SH",)
 
 

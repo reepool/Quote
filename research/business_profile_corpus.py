@@ -239,24 +239,48 @@ def load_business_profile_source_manifests(
     conn: sqlite3.Connection,
     instrument_ids: Sequence[str],
 ) -> List[Dict[str, Any]]:
-    """Load relevant official source manifests in bounded SQLite batches."""
+    """Load business-profile projections from shared annual-report assets."""
     if not instrument_ids:
         return []
     conn.row_factory = sqlite3.Row
+    schema_ready = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' "
+        "AND name='effective_annual_reports'"
+    ).fetchone()
+    if schema_ready is None:
+        return []
     output: List[Dict[str, Any]] = []
     for start in range(0, len(instrument_ids), 500):
         batch = list(instrument_ids[start : start + 500])
         placeholders = ",".join("?" for _ in batch)
         rows = conn.execute(
             f"""
-            SELECT source_file_id, instrument_id, source, report_period, report_type,
-                   filing_id, source_url, archive_path, content_hash, published_at,
-                   parser_version, status, source_tier, schema_version,
-                   supersedes_source_file_id, metadata_json
-            FROM financial_source_files
-            WHERE instrument_id IN ({placeholders})
-              AND source IN ('cninfo', 'sse', 'szse', 'bse')
-              AND schema_version = 'business_profile_source_file_manifest.v1'
+            SELECT 'shared-asset:' || asset.asset_id AS source_file_id,
+                   asset.instrument_id, asset.source, asset.report_period,
+                   CASE WHEN asset.variant = 'correction'
+                        THEN 'annual_report_correction'
+                        ELSE 'annual_report' END AS report_type,
+                   asset.source_announcement_id AS filing_id,
+                   NULL AS source_url, blob.canonical_path AS archive_path,
+                   asset.content_hash, asset.published_at,
+                   asset.schema_version AS parser_version,
+                   CASE WHEN asset.availability = 'local_valid'
+                        AND blob.integrity_status = 'valid'
+                        THEN 'verified' ELSE asset.availability END AS status,
+                   'shared_announcement_asset' AS source_tier,
+                   'business_profile_source_asset.v1' AS schema_version,
+                   asset.predecessor_asset_id AS supersedes_source_file_id,
+                   '{{"shared_asset_id":"' || asset.asset_id || '"}}'
+                       AS metadata_json
+            FROM effective_annual_reports AS asset
+            JOIN official_document_blobs AS blob
+              ON blob.content_hash = asset.content_hash
+            WHERE asset.instrument_id IN ({placeholders})
+              AND asset.visibility_state = 'production'
+              AND asset.document_family = 'annual_report'
+              AND asset.availability = 'local_valid'
+              AND blob.integrity_status = 'valid'
+              AND NULLIF(TRIM(blob.canonical_path), '') IS NOT NULL
             """,
             batch,
         ).fetchall()

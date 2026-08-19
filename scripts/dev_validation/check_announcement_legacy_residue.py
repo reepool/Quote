@@ -38,6 +38,14 @@ LEGACY_RUNTIME_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
         r"\bupsert_cninfo_announcement_scan_state\b",
         r"\bstore_cninfo_announcement_audit\b",
         r"\blist_cninfo_announcement_audit\b",
+        r"research\.annual_report_assets",
+        r"research\.business_profile_archive",
+        r"research\.business_profile_official_archive_sync",
+        r"\bBusinessProfileDocumentArchiveService\b",
+        r"\bAnnualReportAssetCatalog\b",
+        r"\bOfficialAnnualReportArchiveSync\b",
+        r"\bannual_report_asset_dependency\b",
+        r"\blegacy_semiannual_enabled\b",
     )
 )
 LEGACY_TABLE_PATTERNS: tuple[re.Pattern[str], ...] = (
@@ -47,6 +55,16 @@ LEGACY_TABLE_PATTERNS: tuple[re.Pattern[str], ...] = (
 OLD_CONFIG_PATTERNS: tuple[re.Pattern[str], ...] = (
     re.compile(r'"announcement_scan"\s*:'),
     re.compile(r'"official_exchange_backups"\s*:'),
+    re.compile(r'"annual_report_asset_dependency"\s*:'),
+    re.compile(r'"dual_read"\s*:'),
+    re.compile(r'"legacy_fallback_enabled"\s*:'),
+    re.compile(r'"legacy_writer_disabled"\s*:'),
+)
+RETIRED_ANNUAL_REPORT_PATHS = (
+    "research/annual_report_assets.py",
+    "research/business_profile_archive.py",
+    "research/business_profile_official_archive_sync.py",
+    "scripts/research_business_profile_official_archive_sync.py",
 )
 DIRECT_PROVIDER_IMPORT = re.compile(
     r"from\s+research\.providers\.cninfo_announcements\s+import"
@@ -68,8 +86,6 @@ PYTHON_SCAN_ROOTS = (
 DOMAIN_TRANSPORT_PATHS = (
     "research/business_profile_discovery.py",
     "research/business_profile_exchange_discovery.py",
-    "research/business_profile_archive.py",
-    "research/business_profile_official_archive_sync.py",
     "research/broker_risk_control.py",
     "data_sources/cninfo_corporate_action_documents.py",
     "data_sources/cninfo_special_action_resolution.py",
@@ -210,6 +226,16 @@ def scan_repository(root: Path) -> list[ResidueFinding]:
             category="duplicated_domain_transport",
         )
     )
+    for relative in RETIRED_ANNUAL_REPORT_PATHS:
+        if (root / relative).exists():
+            findings.append(
+                ResidueFinding(
+                    category="retired_annual_report_path",
+                    path=relative,
+                    line=1,
+                    match=relative,
+                )
+            )
     return sorted(
         findings,
         key=lambda item: (item.category, item.path, item.line, item.match),

@@ -19,10 +19,6 @@ from research.announcements import (
     build_announcement_key,
 )
 from research.announcements.categories import ANNUAL_REPORT_CATEGORY
-from research.business_profile_archive import (
-    BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
-    BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES,
-)
 from research.business_profile_documents import (
     business_profile_document_family,
     classify_business_profile_document,
@@ -89,9 +85,7 @@ class BusinessProfileAnnouncementFrontierRepository:
             }
         )
         now = get_shanghai_time().isoformat()
-        document_family = business_profile_document_family(
-            classification.document_type
-        )
+        document_family = business_profile_document_family(classification.document_type)
         metadata = {
             "schema_version": BUSINESS_PROFILE_FRONTIER_SCHEMA_VERSION,
             "document_family": document_family,
@@ -177,6 +171,7 @@ class BusinessProfileAnnouncementFrontierRepository:
                 status = "superseded"
             conn.commit()
         return status
+
     def pending_instruments(self, *, knowledge_cutoff: str) -> tuple[str, ...]:
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -192,35 +187,35 @@ class BusinessProfileAnnouncementFrontierRepository:
             ).fetchall()
         return tuple(str(row["instrument_id"]) for row in rows)
 
-    def mark_manifested_processed(self, instrument_ids: Iterable[str]) -> int:
-        """Mark only frontier items proven present in the immutable manifest."""
+    def mark_shared_assets_processed(
+        self,
+        instrument_ids: Iterable[str],
+        *,
+        shared_asset_access: Any,
+    ) -> int:
+        """Mark frontier items proven present in the authoritative asset catalog."""
 
         normalized = sorted(
             {str(item).strip() for item in instrument_ids if str(item).strip()}
         )
         if not normalized:
             return 0
-        manifest_repository = getattr(self.storage, "financial_statements", None)
-        manifests = (
-            manifest_repository.get_source_file_manifests()
-            if manifest_repository is not None
-            and hasattr(manifest_repository, "get_source_file_manifests")
-            else self.storage.get_financial_source_file_manifests()
-        )
-        manifested = {
-            (
-                str(item.get("instrument_id") or ""),
-                str(item.get("source") or "").lower(),
-                str(item.get("filing_id") or ""),
+        available: set[tuple[str, str, str]] = set()
+        for instrument_id in normalized:
+            projection = shared_asset_access.list_effective_assets(
+                instrument_id=instrument_id,
+                availability="local_valid",
+                limit=1000,
             )
-            for item in manifests
-            if item.get("schema_version") == BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
-            and str(item.get("status") or "")
-            in BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES
-            and item.get("content_hash")
-            and item.get("archive_path")
-        }
-        if not manifested:
+            available.update(
+                (
+                    str(item.get("instrument_id") or ""),
+                    str(item.get("source") or "").lower(),
+                    str(item.get("source_announcement_id") or ""),
+                )
+                for item in projection.get("items", ())
+            )
+        if not available:
             return 0
         placeholders = ",".join("?" for _ in normalized)
         now = get_shanghai_time().isoformat()
@@ -241,7 +236,7 @@ class BusinessProfileAnnouncementFrontierRepository:
                     str(row["source"]).lower(),
                     str(row["announcement_id"]),
                 )
-                in manifested
+                in available
             ]
             if not frontier_ids:
                 return 0
@@ -388,7 +383,10 @@ def discover_business_profile_shared_annual_reports(
         "errors": [],
     }
     for page in range(bounded_max_pages):
-        projection = shared_asset_access.list_assets(
+        projection = shared_asset_access.list_effective_assets(
+            document_family="annual_report",
+            knowledge_cutoff=cutoff,
+            availability="local_valid",
             limit=bounded_page_size,
             offset=page * bounded_page_size,
         )
@@ -398,7 +396,6 @@ def discover_business_profile_shared_annual_reports(
             if (
                 asset.get("document_family") != "annual_report"
                 or asset.get("availability") != "local_valid"
-                or str(asset.get("published_at") or "")[:10] > cutoff
             ):
                 continue
             try:
@@ -440,9 +437,7 @@ def register_business_profile_shared_annual_report_asset(
             asset.get("source_announcement_id") or ""
         ).strip(),
         "attachment_id": str(asset.get("attachment_id") or "").strip(),
-        "observation_version": str(
-            asset.get("observation_version") or ""
-        ).strip(),
+        "observation_version": str(asset.get("observation_version") or "").strip(),
         "content_hash": str(asset.get("content_hash") or "").strip().lower(),
     }
     missing = sorted(key for key, value in required.items() if not value)
@@ -455,12 +450,9 @@ def register_business_profile_shared_annual_report_asset(
             f"{required['asset_id'] or 'unknown'}:{details}"
         )
     if len(required["content_hash"]) != 64 or any(
-        character not in "0123456789abcdef"
-        for character in required["content_hash"]
+        character not in "0123456789abcdef" for character in required["content_hash"]
     ):
-        raise ValueError(
-            f"invalid shared content hash:{required['asset_id']}"
-        )
+        raise ValueError(f"invalid shared content hash:{required['asset_id']}")
     symbol, suffix = instrument_id.rsplit(".", 1)
     exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}.get(
         suffix.upper(), suffix.upper()
@@ -815,9 +807,7 @@ class BusinessProfileIndexDiscoveryService:
                     subreport.get("unmatched_symbols") or []
                 )
                 report["errors"].extend(subreport.get("errors") or [])
-                exchange_result = next(
-                    iter(subreport.get("exchanges") or []), {}
-                )
+                exchange_result = next(iter(subreport.get("exchanges") or []), {})
                 complete = bool(exchange_result.get("is_complete"))
                 window_result = {
                     **dict(exchange_result),
@@ -1165,6 +1155,7 @@ def load_active_a_share_universe(
 def build_business_profile_reconciliation_report(
     storage: Any,
     *,
+    shared_asset_access: Any,
     frequency: str,
     knowledge_cutoff: str | None = None,
 ) -> dict[str, Any]:
@@ -1176,37 +1167,31 @@ def build_business_profile_reconciliation_report(
     cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
     universe = load_active_a_share_universe(storage, knowledge_cutoff=cutoff)
     active_ids = {str(item["instrument_id"]) for item in universe}
-    manifest_repository = getattr(storage, "financial_statements", None)
-    manifests = (
-        manifest_repository.get_source_file_manifests()
-        if manifest_repository is not None
-        and hasattr(manifest_repository, "get_source_file_manifests")
-        else storage.get_financial_source_file_manifests()
-    )
-    business_manifests = [
-        dict(item)
-        for item in manifests
-        if item.get("schema_version") == BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
-        and str(item.get("status") or "") in BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES
-        and item.get("content_hash")
-        and item.get("archive_path")
-        and str(item.get("published_at") or "")[:10] <= cutoff
-    ]
-    manifest_ids = {
+    assets: list[dict[str, Any]] = []
+    offset = 0
+    while True:
+        page = shared_asset_access.list_effective_assets(
+            document_family="annual_report",
+            knowledge_cutoff=cutoff,
+            availability="local_valid",
+            limit=1000,
+            offset=offset,
+        )
+        items = [dict(item) for item in page.get("items", ())]
+        assets.extend(items)
+        if int(page.get("returned") or 0) < 1000:
+            break
+        offset += int(page["returned"])
+    asset_ids = {
         str(item.get("instrument_id") or "")
-        for item in business_manifests
+        for item in assets
         if str(item.get("instrument_id") or "")
     }
     expected_annual_period = expected_business_profile_annual_period(cutoff)
     current_annual_ids = {
         str(item.get("instrument_id") or "")
-        for item in business_manifests
+        for item in assets
         if str(item.get("report_period") or "")[:10] == expected_annual_period
-        and str(item.get("report_type") or "")
-        in {
-            "annual_report",
-            "annual_report_correction",
-        }
     }
     with storage.get_connection() as conn:
         storage._apply_pragmas(conn)
@@ -1236,7 +1221,7 @@ def build_business_profile_reconciliation_report(
                 (cutoff,),
             ).fetchone()[0]
         )
-    missing_manifest = sorted(active_ids - manifest_ids)
+    missing_asset = sorted(active_ids - asset_ids)
     missing_current_annual = sorted(active_ids - current_annual_ids)
     return {
         "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
@@ -1244,11 +1229,11 @@ def build_business_profile_reconciliation_report(
         "operation": f"{normalized_frequency}_reconciliation",
         "knowledge_cutoff": cutoff,
         "active_universe_count": len(active_ids),
-        "manifest_instrument_count": len(manifest_ids & active_ids),
+        "shared_asset_instrument_count": len(asset_ids & active_ids),
         "current_annual_period": expected_annual_period,
         "current_annual_instrument_count": len(current_annual_ids & active_ids),
-        "missing_manifest_count": len(missing_manifest),
-        "missing_manifest_sample": missing_manifest[:100],
+        "missing_shared_asset_count": len(missing_asset),
+        "missing_shared_asset_sample": missing_asset[:100],
         "missing_current_annual_count": len(missing_current_annual),
         "missing_current_annual_sample": missing_current_annual[:100],
         "frontier_status_counts": frontier_counts,
@@ -1265,113 +1250,6 @@ def expected_business_profile_annual_period(knowledge_cutoff: str) -> str:
     report_year = int(cutoff[:4])
     latest_due_annual_year = report_year - (1 if cutoff[5:10] >= "05-01" else 2)
     return f"{latest_due_annual_year}-12-31"
-
-
-def audit_business_profile_archive(
-    storage: Any,
-    *,
-    archive_root: str | Path,
-) -> dict[str, Any]:
-    """Classify official artifacts without granting deletion authority."""
-
-    root = Path(archive_root).resolve()
-    files = (
-        sorted(path.resolve() for path in root.rglob("*.pdf") if path.is_file())
-        if root.is_dir()
-        else []
-    )
-    file_hashes = {str(path): _file_hash(path) for path in files}
-    financial_path = Path(str(getattr(storage, "financials_db_path", "") or ""))
-    manifest_table_exists = False
-    if financial_path.is_file():
-        with sqlite3.connect(
-            f"file:{financial_path.resolve()}?mode=ro", uri=True
-        ) as conn:
-            manifest_table_exists = (
-                conn.execute(
-                    "SELECT 1 FROM sqlite_master WHERE type = 'table' "
-                    "AND name = 'financial_source_files'"
-                ).fetchone()
-                is not None
-            )
-    if not manifest_table_exists:
-        return {
-            "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
-            "status": "ungoverned_archive",
-            "manifest_table_exists": False,
-            "automatic_deletion_allowed": False,
-            "file_count": len(files),
-            "classifications": {
-                "active": [],
-                "superseded": [],
-                "duplicate": _duplicate_hash_groups(file_hashes),
-                "unreferenced": list(file_hashes),
-                "mismatched": [],
-                "missing": [],
-            },
-            "reason": "financial source manifest schema is absent",
-        }
-    repository = getattr(storage, "financial_statements", None)
-    manifests = (
-        repository.get_source_file_manifests()
-        if repository is not None and hasattr(repository, "get_source_file_manifests")
-        else storage.get_financial_source_file_manifests()
-    )
-    rows = [
-        dict(item)
-        for item in manifests
-        if item.get("schema_version") == BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
-    ]
-    superseded_ids = {
-        str(item.get("supersedes_source_file_id") or "")
-        for item in rows
-        if str(item.get("supersedes_source_file_id") or "")
-    }
-    referenced_paths: dict[str, dict[str, Any]] = {}
-    outside_root = []
-    for item in rows:
-        raw_path = str(item.get("archive_path") or "").strip()
-        if not raw_path:
-            continue
-        resolved = _resolve_archive_path(raw_path, archive_root=root)
-        if resolved is None:
-            outside_root.append(raw_path)
-            continue
-        referenced_paths[str(resolved)] = item
-    active = []
-    superseded = []
-    mismatched = []
-    missing = []
-    for path, item in referenced_paths.items():
-        source_file_id = str(item.get("source_file_id") or "")
-        expected_hash = str(item.get("content_hash") or "")
-        actual_hash = file_hashes.get(path)
-        if actual_hash is None:
-            missing.append(path)
-        elif expected_hash and actual_hash != expected_hash:
-            mismatched.append(path)
-        elif source_file_id in superseded_ids:
-            superseded.append(path)
-        else:
-            active.append(path)
-    unreferenced = sorted(set(file_hashes) - set(referenced_paths))
-    return {
-        "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
-        "status": "ready",
-        "manifest_table_exists": True,
-        "automatic_deletion_allowed": False,
-        "file_count": len(files),
-        "manifest_count": len(rows),
-        "classifications": {
-            "active": sorted(active),
-            "superseded": sorted(superseded),
-            "duplicate": _duplicate_hash_groups(file_hashes),
-            "unreferenced": unreferenced,
-            "mismatched": sorted({*mismatched, *outside_root}),
-            "missing": sorted(missing),
-        },
-        "reason": "official artifacts require explicit quarantine or cleanup approval",
-    }
 
 
 def _required_text(value: Mapping[str, Any], key: str) -> str:
@@ -1460,45 +1338,3 @@ def _canonical_json(value: Mapping[str, Any]) -> str:
 
 def _stable_hash(value: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
-
-
-def _file_hash(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def _resolve_archive_path(value: str, *, archive_root: Path) -> Path | None:
-    path = Path(value)
-    candidates = (
-        [path.resolve()]
-        if path.is_absolute()
-        else [path.resolve(), (archive_root / path).resolve()]
-    )
-    for candidate in candidates:
-        try:
-            candidate.relative_to(archive_root)
-        except ValueError:
-            continue
-        if candidate.is_file():
-            return candidate
-    for candidate in candidates:
-        try:
-            candidate.relative_to(archive_root)
-        except ValueError:
-            continue
-        return candidate
-    return None
-
-
-def _duplicate_hash_groups(file_hashes: Mapping[str, str]) -> list[dict[str, Any]]:
-    by_hash: dict[str, list[str]] = {}
-    for path, digest in file_hashes.items():
-        by_hash.setdefault(digest, []).append(path)
-    return [
-        {"content_hash": digest, "paths": sorted(paths)}
-        for digest, paths in sorted(by_hash.items())
-        if len(paths) > 1
-    ]

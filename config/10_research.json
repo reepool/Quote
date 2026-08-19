@@ -174,21 +174,6 @@
       },
       "business_profile_evidence": {
         "enabled": true,
-        "annual_report_asset_dependency": {
-          "enabled": true,
-          "legacy_fallback_enabled": true,
-          "mode": "dual_read",
-          "reconciliation_evidence_id": "annual-report-consumer-dependency-reconciliation-20260813-v3",
-          "legacy_writer_disabled": false,
-          "note": "Shared assets are read first; legacy fallback and writer remain enabled until the business-profile consumer completes its separate migration."
-        },
-        "archive": {
-          "archive_root": "data/filings/business_profile",
-          "checkpoint_root": "data/checkpoints/business_profile_official_archive",
-          "directory_template": "{year}/{market}",
-          "filename_template": "{instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf",
-          "note": "instrument_id is rendered as 600839_SH; annual and semiannual periods render as 2025Q4 and 2025Q2. content_hash is mandatory so corrections and changed attachments never overwrite prior official PDFs."
-        },
         "free_structured_sources": {
           "enabled": false,
           "candidate_only": true,
@@ -546,15 +531,6 @@
         },
         "broker_risk_control_reports": {
           "enabled": true,
-          "annual_report_asset_dependency": {
-            "enabled": true,
-            "legacy_fallback_enabled": true,
-            "legacy_semiannual_enabled": true,
-            "mode": "dual_read",
-            "reconciliation_evidence_id": "annual-report-consumer-dependency-reconciliation-20260813-v3",
-            "legacy_writer_disabled": false,
-            "note": "Shared annual reports are read first in dual-read mode; annual legacy fallback/writer and explicitly gated legacy semiannual processing remain until later cutover."
-          },
           "source_profile": "broker_annual_report_embedded_risk_control",
           "supplementary_source_profile": "broker_risk_control_report",
           "source_priority": [

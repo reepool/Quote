@@ -125,12 +125,13 @@ def _confirmed_missing_evidence_error(
         if not isinstance(scope, Mapping):
             return f"confirmed_missing route scope {index} is not an object"
         missing_scope = [
-            key for key in _CONFIRMED_MISSING_REQUIRED_SCOPE_FIELDS if not scope.get(key)
+            key
+            for key in _CONFIRMED_MISSING_REQUIRED_SCOPE_FIELDS
+            if not scope.get(key)
         ]
         if missing_scope:
-            return (
-                f"confirmed_missing route scope {index} missing: "
-                + ",".join(missing_scope)
+            return f"confirmed_missing route scope {index} missing: " + ",".join(
+                missing_scope
             )
         completion = scope.get("page_or_subscope_completion")
         if not isinstance(completion, Mapping) or not completion.get("complete"):
@@ -270,7 +271,6 @@ class AnnouncementAssetRepository:
             )
             conn.commit()
 
-
     def schema_initialized(self) -> bool:
         """Return whether the shared catalog tables exist without mutating SQLite."""
         if not self.db_path.exists():
@@ -297,9 +297,6 @@ class AnnouncementAssetRepository:
                 "ALTER TABLE official_asset_universe_snapshots "
                 "ADD COLUMN paired_census_snapshot_id TEXT"
             )
-
-
-
 
     @staticmethod
     def _migrate_attachment_version_temporal_columns(
@@ -526,7 +523,6 @@ class AnnouncementAssetRepository:
                 ),
             ),
         )
-
 
     @staticmethod
     def _migrate_effective_decision_history(conn: sqlite3.Connection) -> None:
@@ -843,7 +839,9 @@ class AnnouncementAssetRepository:
         published_at_precision = (
             "date"
             if "published_at_date_only" in record.diagnostics
-            else "instant" if record.published_at else None
+            else "instant"
+            if record.published_at
+            else None
         )
         provider_diagnostics = {
             "diagnostics": list(record.diagnostics),
@@ -1140,6 +1138,7 @@ class AnnouncementAssetRepository:
     def list_annual_report_asset_records(
         self,
         *,
+        document_family: str = "annual_report",
         instrument_id: str | None = None,
         fiscal_year: int | None = None,
         source: str | None = None,
@@ -1154,13 +1153,13 @@ class AnnouncementAssetRepository:
         """List current and historical annual-report filing records locally."""
         bounded_limit = max(1, min(int(limit), 1000))
         bounded_offset = max(0, int(offset))
-        clauses = [
-            "document_family='annual_report'",
-            "is_full_report=1",
-        ]
-        params: list[Any] = []
+        clauses = ["document_family=?", "is_full_report=1"]
+        params: list[Any] = [str(document_family).strip().lower()]
         for clause, value in (
-            ("instrument_id=?", normalize_instrument_id(instrument_id) if instrument_id else None),
+            (
+                "instrument_id=?",
+                normalize_instrument_id(instrument_id) if instrument_id else None,
+            ),
             ("fiscal_year=?", int(fiscal_year) if fiscal_year is not None else None),
             ("source=?", normalize_source(source) if source else None),
             (
@@ -1367,26 +1366,6 @@ class AnnouncementAssetRepository:
             ).fetchone()
         return None if row is None else self._blob_from_row(row)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def update_blob_integrity(
         self,
         content_hash: str,
@@ -1527,7 +1506,6 @@ class AnnouncementAssetRepository:
                 (attachment_id,),
             ).fetchone()
         return None if row is None else self._version_from_row(row)
-
 
     def acquire_attachment_lease(
         self,
@@ -1680,7 +1658,6 @@ class AnnouncementAssetRepository:
         if cutoff.tzinfo is None:
             cutoff = cutoff.replace(tzinfo=timezone.utc)
         return (cutoff - heartbeat).total_seconds() <= max(0, int(safety_grace_seconds))
-
 
     def upsert_effective_report(
         self, report: EffectiveAnnualReport
@@ -1942,7 +1919,6 @@ class AnnouncementAssetRepository:
             )
         return None, True
 
-
     def list_effective_decisions(
         self,
         *,
@@ -1982,11 +1958,15 @@ class AnnouncementAssetRepository:
         instrument_id: str,
         fiscal_year: int | None = None,
         *,
+        document_family: str = "annual_report",
         knowledge_cutoff: str | None = None,
         include_shadow: bool = False,
     ) -> EffectiveAnnualReport | None:
-        clauses = ["e.instrument_id=?"]
-        params: list[Any] = [normalize_instrument_id(instrument_id)]
+        clauses = ["e.instrument_id=?", "e.document_family=?"]
+        params: list[Any] = [
+            normalize_instrument_id(instrument_id),
+            str(document_family).strip().lower(),
+        ]
         if not include_shadow:
             clauses.append("e.visibility_state='production'")
         if fiscal_year is not None:
@@ -1994,8 +1974,7 @@ class AnnouncementAssetRepository:
             params.append(int(fiscal_year))
         if knowledge_cutoff is not None:
             clauses.append(
-                "(e.published_at IS NULL "
-                "OR julianday(e.published_at)<=julianday(?))"
+                "(e.published_at IS NULL OR julianday(e.published_at)<=julianday(?))"
             )
             params.append(knowledge_cutoff)
             clauses.append(
@@ -2029,14 +2008,15 @@ class AnnouncementAssetRepository:
         self,
         *,
         instrument_id: str | None = None,
+        document_family: str = "annual_report",
         source: str | None = None,
         availability: AssetAvailability | None = None,
         include_shadow: bool = False,
         limit: int = 100,
         offset: int = 0,
     ) -> list[EffectiveAnnualReport]:
-        clauses: list[str] = []
-        params: list[Any] = []
+        clauses: list[str] = ["document_family=?"]
+        params: list[Any] = [str(document_family).strip().lower()]
         if not include_shadow:
             clauses.append("visibility_state='production'")
         if instrument_id:
@@ -2048,6 +2028,13 @@ class AnnouncementAssetRepository:
         if availability:
             clauses.append("availability=?")
             params.append(availability.value)
+            if availability is AssetAvailability.LOCAL_VALID:
+                clauses.append(
+                    "EXISTS (SELECT 1 FROM official_document_blobs b "
+                    "WHERE b.content_hash=effective_annual_reports.content_hash "
+                    "AND b.integrity_status='valid' "
+                    "AND NULLIF(TRIM(b.canonical_path), '') IS NOT NULL)"
+                )
         where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
         params.extend((max(1, min(int(limit), 1000)), max(0, int(offset))))
         with self.connection() as conn:
@@ -2059,11 +2046,6 @@ class AnnouncementAssetRepository:
             ).fetchall()
         return [self._effective_from_row(row) for row in rows]
 
-
-
-
-
-
     def mark_effective_content_invalid(
         self,
         asset_id: str,
@@ -2074,7 +2056,9 @@ class AnnouncementAssetRepository:
         """Persist a fail-closed projection after an external file mutation."""
 
         if integrity_status in {IntegrityStatus.VALID, IntegrityStatus.UNCHECKED}:
-            raise ValueError("invalid content projection requires a failing integrity status")
+            raise ValueError(
+                "invalid content projection requires a failing integrity status"
+            )
         now = utc_now_iso()
         with self.transaction() as conn:
             row = conn.execute(
@@ -2128,7 +2112,9 @@ class AnnouncementAssetRepository:
         """Fail closed for every asset, version, and promotion gate sharing one blob."""
 
         if integrity_status in {IntegrityStatus.VALID, IntegrityStatus.UNCHECKED}:
-            raise ValueError("invalid content projection requires a failing integrity status")
+            raise ValueError(
+                "invalid content projection requires a failing integrity status"
+            )
         now = utc_now_iso()
         with self.transaction() as conn:
             self._mark_content_hash_invalid_conn(
@@ -2297,10 +2283,13 @@ class AnnouncementAssetRepository:
         ):
             raise ValueError("asset request identity fields are required")
         now = utc_now_iso()
-        active_expiry = expires_at or (
-            _parse_iso_datetime(now)
-            + timedelta(seconds=ASSET_REQUEST_ACTIVE_TTL_SECONDS)
-        ).isoformat()
+        active_expiry = (
+            expires_at
+            or (
+                _parse_iso_datetime(now)
+                + timedelta(seconds=ASSET_REQUEST_ACTIVE_TTL_SECONDS)
+            ).isoformat()
+        )
         if not _iso_after(active_expiry, now):
             raise ValueError("asset request expiry must be in the future")
         with self.transaction() as conn:
@@ -2604,14 +2593,6 @@ class AnnouncementAssetRepository:
             ).fetchall()
         return [self._subscription_from_row(row) for row in rows]
 
-
-
-
-
-
-
-
-
     def get_operation(self, operation_id: str) -> AssetOperation | None:
         with self.connection() as conn:
             row = conn.execute(
@@ -2884,8 +2865,7 @@ class AnnouncementAssetRepository:
                 or expected_lease_generation is not None
             )
             if fenced and (
-                expected_lease_owner is None
-                or expected_lease_generation is None
+                expected_lease_owner is None or expected_lease_generation is None
             ):
                 raise ValueError(
                     "expected lease owner and generation must be provided together"
@@ -3005,11 +2985,6 @@ class AnnouncementAssetRepository:
                 (max(0, int(after_event_id)), max(1, min(int(limit), 1000))),
             ).fetchall()
         return [_decode_row(row, json_fields=("payload_json",)) for row in rows]
-
-
-
-
-
 
     def acquire_read_lease(
         self,
@@ -3135,9 +3110,7 @@ class AnnouncementAssetRepository:
                 "SELECT * FROM official_asset_retention_pins WHERE pin_id=?",
                 (str(lease_id),),
             ).fetchone()
-        return _decode_row(
-            _require_row(refreshed), json_fields=("metadata_json",)
-        )
+        return _decode_row(_require_row(refreshed), json_fields=("metadata_json",))
 
     def release_read_lease(
         self,
@@ -3158,11 +3131,9 @@ class AnnouncementAssetRepository:
             if row is None or row["released_at"] is not None:
                 return False
             metadata = _json_load(row["metadata_json"], {})
-            if (
-                row["owner"] != str(owner).strip()
-                or int(metadata.get("lease_generation") or 0)
-                != int(expected_generation)
-            ):
+            if row["owner"] != str(owner).strip() or int(
+                metadata.get("lease_generation") or 0
+            ) != int(expected_generation):
                 return False
             result = conn.execute(
                 """UPDATE official_asset_retention_pins SET released_at=?
@@ -3185,11 +3156,7 @@ class AnnouncementAssetRepository:
                    WHERE pin_id=? AND pin_type=?""",
                 (str(lease_id), READ_LEASE_PIN_TYPE),
             ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("metadata_json",))
-        )
+        return None if row is None else _decode_row(row, json_fields=("metadata_json",))
 
     def get_asset_content_lifecycle_state(self, asset_id: str) -> str | None:
         """Return the public content lifecycle state for one stable asset id."""
@@ -3213,34 +3180,12 @@ class AnnouncementAssetRepository:
             ).fetchone()
         if decision is None:
             return None
-        if decision is not None and decision["decision_kind"] == "withdrawn_without_replacement":
+        if (
+            decision is not None
+            and decision["decision_kind"] == "withdrawn_without_replacement"
+        ):
             return "withdrawn"
         return "superseded"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def claim_discovery_state(
         self,
@@ -4217,13 +4162,7 @@ class AnnouncementAssetRepository:
                 + " ORDER BY generated_at DESC, report_id DESC LIMIT ?",
                 tuple(params),
             ).fetchall()
-        return [
-            _decode_row(row, json_fields=("payload_json",)) for row in rows
-        ]
-
-
-
-
+        return [_decode_row(row, json_fields=("payload_json",)) for row in rows]
 
     def upsert_universe_snapshot(self, snapshot: Mapping[str, Any]) -> dict[str, Any]:
         """Persist a versioned universe denominator and its freshness evidence."""
@@ -4345,7 +4284,9 @@ class AnnouncementAssetRepository:
                 """,
                 (
                     snapshot["census_snapshot_id"],
-                    snapshot.get("schema_version", "official_listed_security_census.v1"),
+                    snapshot.get(
+                        "schema_version", "official_listed_security_census.v1"
+                    ),
                     snapshot["source"],
                     canonical_json(snapshot["query_boundary"]),
                     snapshot["completeness_watermark"],
@@ -4366,7 +4307,11 @@ class AnnouncementAssetRepository:
             ).fetchone()
         return _decode_row(
             _require_row(row),
-            json_fields=("query_boundary_json", "instrument_rows_json", "metadata_json"),
+            json_fields=(
+                "query_boundary_json",
+                "instrument_rows_json",
+                "metadata_json",
+            ),
         )
 
     def get_listed_security_census_snapshot(
@@ -4482,9 +4427,7 @@ class AnnouncementAssetRepository:
             "universe_snapshot_id": str(universe_snapshot_id or "").strip(),
             "scope": dict(scope),
             "as_of": str(as_of or "").strip(),
-            "evidence_visibility_cutoff": str(
-                evidence_visibility_cutoff or ""
-            ).strip(),
+            "evidence_visibility_cutoff": str(evidence_visibility_cutoff or "").strip(),
             "query_fingerprint": str(query_fingerprint or "").strip(),
         }
         if not all(
@@ -4510,9 +4453,10 @@ class AnnouncementAssetRepository:
                     mismatches.append("universe_snapshot_id")
                 if row["as_of"] != values["as_of"]:
                     mismatches.append("as_of")
-                if row["evidence_visibility_cutoff"] != values[
-                    "evidence_visibility_cutoff"
-                ]:
+                if (
+                    row["evidence_visibility_cutoff"]
+                    != values["evidence_visibility_cutoff"]
+                ):
                     mismatches.append("evidence_visibility_cutoff")
                 if row["query_fingerprint"] != values["query_fingerprint"]:
                     mismatches.append("query_fingerprint")
@@ -4737,8 +4681,7 @@ class AnnouncementAssetRepository:
                 fingerprint_changed = False
                 if fingerprints:
                     fingerprint_changed = any(
-                        str(evidence.get(key) or "")
-                        != str(value or "")
+                        str(evidence.get(key) or "") != str(value or "")
                         for key, value in fingerprints.items()
                     )
                 if error or expired or fingerprint_changed:
@@ -4774,11 +4717,7 @@ class AnnouncementAssetRepository:
                     str(query_fingerprint),
                 ),
             ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(row, json_fields=("evidence_json",))
-        )
+        return None if row is None else _decode_row(row, json_fields=("evidence_json",))
 
     def list_latest_asset_coverage_for_query(
         self,
@@ -4804,20 +4743,7 @@ class AnnouncementAssetRepository:
                    ORDER BY instrument_id""",
                 (str(query_fingerprint),),
             ).fetchall()
-        return [
-            _decode_row(row, json_fields=("evidence_json",)) for row in rows
-        ]
-
-
-
-
-
-
-
-
-
-
-
+        return [_decode_row(row, json_fields=("evidence_json",)) for row in rows]
 
     @staticmethod
     def _append_effective_decision_conn(
@@ -5095,6 +5021,7 @@ class AnnouncementAssetRepository:
             ],
             evidence_set_hash=row["evidence_set_hash"],
             decision_evidence=_json_load(row["decision_evidence_json"], {}),
+            document_family=row["document_family"],
             visibility_state=row["visibility_state"],
             schema_version=row["schema_version"],
         )
@@ -5199,10 +5126,6 @@ class AnnouncementAssetRepository:
             cancelled_at=row["cancelled_at"],
             schema_version=row["schema_version"],
         )
-
-
-
-
 
 
 def _require_row(row: sqlite3.Row | None) -> sqlite3.Row:

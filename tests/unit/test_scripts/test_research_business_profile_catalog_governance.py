@@ -196,7 +196,7 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
             "reviewer",
             "--reason",
             "official report review",
-            "--financials-db",
+            "--announcement-assets-db",
             str(financials_db),
             "--official-evidence",
             str(evidence_path),
@@ -209,4 +209,6 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
     assert catalog["catalog_version"] == "business_profile_products.2026.4"
     assert audit["change_type"] == "add_normalized_exact_alias"
     assert audit["output_catalog_hash"]
-    assert audit["official_evidence"]["source_file_id"] == "source-1"
+    assert audit["official_evidence"]["source_file_id"] == (
+        "shared-asset:source-1"
+    )

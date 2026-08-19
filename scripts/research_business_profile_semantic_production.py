@@ -26,8 +26,14 @@ from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
     build_business_profile_counterparty_resolver,
-    build_business_profile_planned_disclosure_acquirer,
     compute_business_profile_semantic_source_revision,
+)
+from research.business_profile_source_assets import load_business_profile_source_assets
+from research.announcement_assets import (
+    AnnouncementAssetAccess,
+    AnnouncementAssetConfig,
+    AnnouncementAssetRepository,
+    AnnouncementAssetService,
 )
 from research.storage import ResearchStorageManager
 from utils.config_manager import UnifiedConfigManager
@@ -74,6 +80,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.mode != "report" and config.enabled:
         storage.initialize()
     repository = BusinessProfileRepository(storage)
+    asset_config = AnnouncementAssetConfig.from_research_config(
+        research_config,
+        project_root=ROOT_DIR,
+    )
+    asset_repository = AnnouncementAssetRepository(args.research_db)
+    asset_access = AnnouncementAssetAccess(
+        repository=asset_repository,
+        config=asset_config,
+        service=AnnouncementAssetService(
+            repository=asset_repository,
+            config=asset_config,
+        ),
+    )
+    source_asset_loader = lambda instrument_id: load_business_profile_source_assets(
+        asset_access,
+        instrument_id,
+        knowledge_cutoff=scope.knowledge_cutoff,
+    )
     llm_client = (
         LlmClient(unified_config.get_llm_config())
         if args.mode != "report"
@@ -94,17 +118,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.mode != "report" and "named_relationships" in scope.field_families
             else None
         ),
-        planned_disclosure_acquirer=(
-            build_business_profile_planned_disclosure_acquirer(
-                repository,
-                research_config=research_config,
-                checkpoint_root=args.checkpoint.parent / "acquisition",
-            )
-            if args.mode != "report"
-            and config.enabled
-            and not config.kill_switches["network_calls"]
-            else None
-        ),
+        planned_disclosure_acquirer=None,
+        manifest_loader=source_asset_loader,
     )
     source_revision = (
         str(
@@ -121,6 +136,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 instruments=scope.instruments,
                 field_families=scope.field_families,
                 knowledge_cutoff=scope.knowledge_cutoff,
+                manifest_loader=source_asset_loader,
                 max_documents=(
                     1
                     if config.kill_switches["scope_widening"]

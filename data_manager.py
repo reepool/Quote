@@ -3173,6 +3173,7 @@ class DataManager:
             BusinessProfileAsyncProductionService,
             BusinessProfileFrontierBoundAcquirer,
             BusinessProfileWorkRepository,
+            _run_thread_call,
             get_business_profile_write_coordinator,
         )
 
@@ -3183,19 +3184,16 @@ class DataManager:
 
         async def discovery_runner(**kwargs: Any) -> Mapping[str, Any]:
             category = str(kwargs.get("category") or "annual_report")
-            if (
-                category == "annual_report"
-                and business_profile_asset_mode == "shared_only"
-            ):
+            if category == "annual_report":
                 if shared_asset_access is None:
                     raise RuntimeError(
-                        "shared-only business-profile discovery has no asset access"
+                        "business-profile discovery has no shared asset access"
                     )
                 from research.business_profile_production_operations import (
                     discover_business_profile_shared_annual_reports,
                 )
 
-                return await asyncio.to_thread(
+                return await _run_thread_call(
                     discover_business_profile_shared_annual_reports,
                     storage=self.research_storage,
                     shared_asset_access=shared_asset_access,
@@ -3269,13 +3267,14 @@ class DataManager:
                 call_kwargs["source_file_ids"] = [
                     f"shared-asset:{bound_shared_asset['asset_id']}"
                 ]
+                call_kwargs["bound_annual_report_asset"] = bound_shared_asset
             acquisition = None
             if stage == "acquire":
                 def acquire_bound_frontier() -> Mapping[str, Any]:
                     with self.research_storage.coordinated_writes(write_coordinator):
                         return frontier_acquirer.acquire(item)
 
-                acquisition = await asyncio.to_thread(acquire_bound_frontier)
+                acquisition = await _run_thread_call(acquire_bound_frontier)
                 if (
                     bound_shared_asset
                     and acquisition.get("status") == "metadata_only"
@@ -3327,37 +3326,20 @@ class DataManager:
         )
         configured_storage = getattr(self.research_config, "storage", None)
         configured_db_path = getattr(configured_storage, "db_path", None)
-        business_profile_cfg = self.research_config.modules.get(
-            "business_profile_evidence", {}
-        )
-        business_profile_dependency = business_profile_cfg.get(
-            "annual_report_asset_dependency", {}
-        )
-        business_profile_asset_mode = str(
-            business_profile_dependency.get("mode", "legacy")
-        ).strip().lower()
-        shared_asset_access = (
-            self._get_announcement_asset_access(initialize_schema=True)
-            if business_profile_asset_mode in {"dual_read", "shared_only"}
-            and isinstance(configured_db_path, (str, os.PathLike))
-            else None
+        if not isinstance(configured_db_path, (str, os.PathLike)):
+            raise RuntimeError(
+                "business-profile production requires shared announcement asset storage"
+            )
+        shared_asset_access = self._get_announcement_asset_access(
+            initialize_schema=True
         )
         repository = BusinessProfileWorkRepository(
             self.research_storage,
             checkpoint_root=checkpoint_root,
             shared_asset_access=shared_asset_access,
         )
-        from research.business_profile_archive import (
-            BusinessProfileDocumentArchiveService,
-        )
-
         frontier_acquirer = BusinessProfileFrontierBoundAcquirer(
             repository=repository,
-            archive_service=BusinessProfileDocumentArchiveService.from_research_config(
-                storage=self.research_storage,
-                research_config=self.research_config,
-                shared_asset_access=shared_asset_access,
-            ),
         )
         service = BusinessProfileAsyncProductionService(
             repository=repository,
@@ -3408,9 +3390,8 @@ class DataManager:
         *,
         frequency: str,
         knowledge_cutoff: Optional[str] = None,
-        include_archive_audit: bool = False,
     ) -> Dict[str, Any]:
-        """Run read-only profile coverage and optional archive reconciliation."""
+        """Run read-only profile coverage against shared announcement assets."""
 
         if self.research_config is None or self.research_storage is None:
             return {"status": "unavailable", "reason": "research storage is not initialized"}
@@ -3427,25 +3408,18 @@ class DataManager:
                 "reason": "business profile reconciliation is disabled",
             }
         from research.business_profile_production_operations import (
-            audit_business_profile_archive,
             build_business_profile_reconciliation_report,
         )
 
         report = await asyncio.to_thread(
             build_business_profile_reconciliation_report,
             self.research_storage,
+            shared_asset_access=self._get_announcement_asset_access(
+                initialize_schema=False
+            ),
             frequency=frequency,
             knowledge_cutoff=knowledge_cutoff,
         )
-        if include_archive_audit:
-            archive = dict(module.get("archive") or {})
-            report["archive_audit"] = await asyncio.to_thread(
-                audit_business_profile_archive,
-                self.research_storage,
-                archive_root=archive.get(
-                    "archive_root", "data/filings/business_profile"
-                ),
-            )
         return report
 
     async def run_business_profile_semantic_production(
@@ -3464,6 +3438,7 @@ class DataManager:
         selection_policy: str = "latest_annual_only",
         write_coordinator: Optional[Any] = None,
         source_file_ids: Optional[List[str]] = None,
+        bound_annual_report_asset: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -3504,9 +3479,12 @@ class DataManager:
         from research.business_profile_semantic_runtime import (
             BusinessProfileSemanticRuntime,
             build_business_profile_counterparty_resolver,
-            build_business_profile_planned_disclosure_acquirer,
             compute_business_profile_semantic_source_revision,
             discover_business_profile_semantic_scope,
+        )
+        from research.business_profile_source_assets import (
+            load_business_profile_source_assets,
+            project_bound_business_profile_source_asset,
         )
         from research.business_profile_promotion import FieldFamilyPromotionManifest
         from utils.llm import LlmClient
@@ -3548,29 +3526,49 @@ class DataManager:
         normalized_source_file_ids = {
             str(item).strip() for item in (source_file_ids or []) if str(item).strip()
         }
+        shared_asset_access = self._get_announcement_asset_access(
+            initialize_schema=False
+        )
+        verified_asset_cache: Dict[str, Sequence[Mapping[str, Any]]] = {}
+        metadata_asset_cache: Dict[str, Sequence[Mapping[str, Any]]] = {}
 
         def manifest_loader(instrument_id: str) -> Sequence[Mapping[str, Any]]:
-            source_repository = getattr(
-                self.research_storage, "financial_statements", None
-            )
-            if source_repository is not None and hasattr(
-                source_repository, "get_source_file_manifests"
+            cached = verified_asset_cache.get(instrument_id)
+            if cached is not None:
+                return cached
+            if (
+                bound_annual_report_asset
+                and str(bound_annual_report_asset.get("instrument_id") or "")
+                == instrument_id
             ):
-                rows = source_repository.get_source_file_manifests(
-                    instrument_id=instrument_id
+                rows = (
+                    project_bound_business_profile_source_asset(
+                        shared_asset_access,
+                        bound_annual_report_asset,
+                        knowledge_cutoff=cutoff,
+                    ),
                 )
             else:
-                rows = self.research_storage.get_financial_source_file_manifests(
-                    instrument_id=instrument_id
+                rows = load_business_profile_source_assets(
+                    shared_asset_access,
+                    instrument_id,
+                    knowledge_cutoff=cutoff,
+                    source_file_ids=tuple(normalized_source_file_ids),
                 )
-            if not normalized_source_file_ids:
-                return rows
-            return tuple(
-                item
-                for item in rows
-                if str(item.get("source_file_id") or "")
-                in normalized_source_file_ids
-            )
+            verified_asset_cache[instrument_id] = rows
+            return rows
+
+        def metadata_loader(instrument_id: str) -> Sequence[Mapping[str, Any]]:
+            cached = metadata_asset_cache.get(instrument_id)
+            if cached is None:
+                cached = load_business_profile_source_assets(
+                    shared_asset_access,
+                    instrument_id,
+                    knowledge_cutoff=cutoff,
+                    verify_content=False,
+                )
+                metadata_asset_cache[instrument_id] = cached
+            return cached
         instruments = tuple(
             convert_to_database_format(item) for item in (instrument_ids or []) if item
         )
@@ -3581,6 +3579,7 @@ class DataManager:
                 max_instruments=max_instruments,
                 field_families=families,
                 runtime_identities=identities,
+                source_asset_loader=metadata_loader,
             )
             if not instruments:
                 return {
@@ -3641,15 +3640,6 @@ class DataManager:
                 else ""
             )
         )
-        planned_disclosure_acquirer = (
-            build_business_profile_planned_disclosure_acquirer(
-                repository,
-                research_config=self.research_config,
-                checkpoint_root=checkpoint_root / "acquisition",
-            )
-            if mode != "report" and not config.kill_switches["network_calls"]
-            else None
-        )
         runtime = BusinessProfileSemanticRuntime(
             repository=repository,
             artifact_root=checkpoint_root / "artifacts",
@@ -3663,7 +3653,7 @@ class DataManager:
                 if mode != "report" and "named_relationships" in families
                 else None
             ),
-            planned_disclosure_acquirer=planned_disclosure_acquirer,
+            planned_disclosure_acquirer=None,
             selection_policy=selection_policy,
             manifest_loader=manifest_loader,
         )
@@ -3720,59 +3710,15 @@ class DataManager:
 
                         BusinessProfileAnnouncementFrontierRepository(
                             self.research_storage
-                        ).mark_manifested_processed(scope.instruments)
+                        ).mark_shared_assets_processed(
+                            scope.instruments,
+                            shared_asset_access=shared_asset_access,
+                        )
                     return result
                 finally:
                     runtime.close()
 
         return await asyncio.to_thread(run_pipeline)
-
-    async def get_annual_report_assets(
-        self,
-        *,
-        instrument_id: Optional[str] = None,
-        report_period: Optional[str] = None,
-        filing_id: Optional[str] = None,
-        source: Optional[str] = None,
-        knowledge_cutoff: Optional[str] = None,
-        active_only: bool = False,
-        validate_files: bool = False,
-    ) -> List[Dict[str, Any]]:
-        """List reusable annual-report PDFs from the canonical manifest catalog."""
-
-        normalized_id = (
-            convert_to_database_format(instrument_id) if instrument_id else None
-        )
-        return await asyncio.to_thread(
-            self._get_annual_report_compatibility_catalog().list_assets,
-            instrument_id=normalized_id,
-            report_period=report_period,
-            filing_id=filing_id,
-            source=source,
-            knowledge_cutoff=knowledge_cutoff,
-            active_only=active_only,
-            validate_files=validate_files,
-        )
-
-    def _get_annual_report_compatibility_catalog(self):
-        """Return the migration adapter with explicit shared-repository wiring."""
-        storage = self._require_research_storage()
-        from research.annual_report_assets import AnnualReportAssetCatalog
-
-        modules = getattr(self.research_config, "modules", {}) or {}
-        business_profile = modules.get("business_profile_evidence", {}) or {}
-        dependency = business_profile.get("annual_report_asset_dependency", {}) or {}
-        mode = str(dependency.get("mode", "legacy")).strip().lower()
-        shared_access = None
-        if mode != "legacy":
-            shared_access = self._get_announcement_asset_access(
-                initialize_schema=False
-            )
-        return AnnualReportAssetCatalog(
-            storage,
-            shared_asset_access=shared_access,
-            mode=mode,
-        )
 
     async def list_shared_annual_report_assets(
         self,
@@ -3924,24 +3870,6 @@ class DataManager:
             "asset_operation_ids": list(asset_operation_ids),
             "resumed": len(asset_operation_ids),
         }
-
-    async def get_annual_report_asset(
-        self,
-        instrument_id: str,
-        *,
-        report_period: Optional[str] = None,
-        knowledge_cutoff: Optional[str] = None,
-        validate_file: bool = True,
-    ) -> Optional[Dict[str, Any]]:
-        """Return one latest reusable annual report, optionally for one period."""
-
-        return await asyncio.to_thread(
-            self._get_annual_report_compatibility_catalog().get_asset,
-            convert_to_database_format(instrument_id),
-            report_period=report_period,
-            knowledge_cutoff=knowledge_cutoff,
-            validate_file=validate_file,
-        )
 
     async def get_research_company_profile(
         self,
@@ -7311,14 +7239,8 @@ class DataManager:
             else include_standalone_supplement
         )
         tier = str(broker_cfg.get("storage", {}).get("incremental_tier") or "hot")
-        dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
-        annual_report_asset_mode = str(
-            dependency_cfg.get("mode", "legacy")
-        ).strip().lower()
-        shared_asset_access = (
-            self._get_announcement_asset_access(initialize_schema=True)
-            if annual_report_asset_mode in {"dual_read", "shared_only"}
-            else None
+        shared_asset_access = self._get_announcement_asset_access(
+            initialize_schema=True
         )
 
         from scripts.dev_validation.backfill_broker_risk_control_reports import (
@@ -7353,7 +7275,6 @@ class DataManager:
             archive_root=selected_archive_root,
             tier=tier,
             shared_asset_access=shared_asset_access,
-            annual_report_asset_mode=annual_report_asset_mode,
         )
         result["mode"] = "incremental_update"
         result["elapsed_seconds"] = round((datetime.now() - started_at).total_seconds(), 3)
@@ -11381,18 +11302,6 @@ class DataManager:
             "source_profile"
         ) != BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return True
-        research_config = getattr(self, "research_config", None)
-        modules = getattr(research_config, "modules", {}) or {}
-        financial_cfg = modules.get("financial_statements", {})
-        broker_cfg = modules.get(
-            "broker_risk_control_reports",
-            financial_cfg.get("broker_risk_control_reports", {}),
-        )
-        dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
-        dependency_mode = str(
-            dependency_cfg.get("mode", "legacy")
-        ).strip().lower()
-        shared_authoritative = dependency_mode == "shared_only"
         report_period = str(row.get("report_period") or "")
         try:
             fiscal_year = int(report_period[:4])
@@ -11401,17 +11310,15 @@ class DataManager:
         try:
             access = self._get_announcement_asset_access(initialize_schema=False)
             if not access.repository.schema_initialized():
-                return not shared_authoritative
+                return False
             report = access.repository.get_effective_report(
                 instrument_id,
                 fiscal_year,
             )
         except (AttributeError, OSError, RuntimeError, ValueError):
-            # Legacy-only deployments continue to use their existing lineage
-            # until the shared catalog is initialized for that instrument.
-            return not shared_authoritative
+            return False
         if report is None:
-            return not shared_authoritative
+            return False
         if report.decision_state in {
             EffectiveDecisionState.AMBIGUOUS,
             EffectiveDecisionState.PROVISIONAL,
@@ -11423,7 +11330,7 @@ class DataManager:
             or ""
         )
         if not source_asset_id:
-            return not shared_authoritative
+            return False
         if source_asset_id != report.asset_id:
             return False
         source_observation_version = str(

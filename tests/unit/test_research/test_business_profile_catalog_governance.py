@@ -16,6 +16,9 @@ from research.business_profile_catalog_governance import (
     validate_product_alias_official_evidence,
     write_product_alias_promotion,
 )
+from tests.unit.test_research.announcement_asset_fixtures import (
+    register_shared_annual_report,
+)
 from research.business_profile_product_catalog import (
     DEFAULT_PRODUCT_CATALOG_PATH,
     parse_business_product_catalog,
@@ -108,7 +111,7 @@ def _official_promotion_fixture(tmp_path):
         "revenue_share": 0.8,
         "official_documents": [
             {
-                "source_file_id": "source-1",
+                "source_file_id": "shared-asset:source-1",
                 "sha256": document_hash,
                 "instrument_id": "600001.SH",
                 "report_period": "2025-12-31",
@@ -128,59 +131,19 @@ def _official_promotion_fixture(tmp_path):
         ).encode("utf-8")
     ).hexdigest()
     financials_db = tmp_path / "financials.db"
-    with sqlite3.connect(financials_db) as conn:
-        conn.execute(
-            """
-            CREATE TABLE financial_source_files (
-                source_file_id TEXT PRIMARY KEY,
-                instrument_id TEXT,
-                source TEXT,
-                report_period TEXT,
-                report_type TEXT,
-                filing_id TEXT,
-                source_url TEXT,
-                archive_path TEXT,
-                content_hash TEXT,
-                published_at TEXT,
-                parser_version TEXT,
-                status TEXT,
-                source_tier TEXT,
-                schema_version TEXT,
-                supersedes_source_file_id TEXT,
-                metadata_json TEXT
-            )
-            """
-        )
-        conn.execute(
-            """
-            INSERT INTO financial_source_files
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                "source-1",
-                "600001.SH",
-                "cninfo",
-                "2025-12-31",
-                "annual_report",
-                "filing-1",
-                "https://example.test/official.pdf",
-                str(pdf_path),
-                document_hash,
-                "2026-03-31T00:00:00+08:00",
-                "business_profile_archive.v2",
-                "archived",
-                "official_primary",
-                "business_profile_source_file_manifest.v1",
-                None,
-                "{}",
-            ),
-        )
-        conn.commit()
+    register_shared_annual_report(
+        financials_db,
+        pdf_path,
+        asset_id="source-1",
+        instrument_id="600001.SH",
+        report_period="2025-12-31",
+        source_announcement_id="filing-1",
+    )
     evidence = {
         "schema_version": OFFICIAL_ALIAS_EVIDENCE_SCHEMA,
         "instrument_id": "600001.SH",
         "report_period": "2025-12-31",
-        "source_file_id": "source-1",
+        "source_file_id": "shared-asset:source-1",
         "official_document_sha256": document_hash,
         "official_page_numbers": [1],
         "official_label": "premium thermal coal",
@@ -502,7 +465,7 @@ def test_official_evidence_resolves_relative_archive_paths_from_explicit_base(
     )
     with sqlite3.connect(financials_db) as conn:
         conn.execute(
-            "UPDATE financial_source_files SET archive_path = ?",
+            "UPDATE official_document_blobs SET canonical_path = ?",
             ("official.pdf",),
         )
         conn.commit()

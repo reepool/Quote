@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import time
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -216,6 +215,13 @@ def test_access_facade_returns_safe_local_projection_and_controlled_content(tmp_
     listed = access.list_assets(instrument_id="600000.SH", fiscal_year=2025)
     assert listed["returned"] == 1
     assert "path" not in listed["items"][0]
+    effective = access.list_effective_assets(
+        instrument_id="600000.SH",
+        availability="local_valid",
+    )
+    assert effective["returned"] == 1
+    assert effective["items"][0]["asset_id"] == asset.asset_id
+    assert access.get_asset(asset.asset_id)["content_hash"] == asset.content_hash
     ensured = access.ensure(
         EnsureRequest(
             instrument_id="600000.SH",
@@ -236,12 +242,15 @@ def test_access_facade_returns_safe_local_projection_and_controlled_content(tmp_
     assert handle.lease_generation == 1
     assert handle.heartbeat()
     assert handle.lease_generation == 2
-    assert repository.heartbeat_read_lease(
-        handle.lease_id,
-        owner=lease["owner"],
-        expected_generation=1,
-        ttl_seconds=30,
-    ) is None
+    assert (
+        repository.heartbeat_read_lease(
+            handle.lease_id,
+            owner=lease["owner"],
+            expected_generation=1,
+            ttl_seconds=30,
+        )
+        is None
+    )
     assert handle.read() == PDF_BYTES
     handle.close()
     assert repository.get_read_lease(handle.lease_id)["released_at"] is not None
@@ -337,9 +346,7 @@ def test_asset_listing_includes_current_superseded_and_metadata_only_records(
     assert metadata["items"][0]["asset_id"] is None
     assert metadata["items"][0]["content_url"] is None
     assert metadata["items"][0]["observation_version"] is None
-    assert metadata["items"][0]["exact_content_state"] == (
-        "local_content_unavailable"
-    )
+    assert metadata["items"][0]["exact_content_state"] == ("local_content_unavailable")
     withdrawn = access.list_assets(
         source_announcement_id="600002-2025-withdrawn",
         effective_state="withdrawn",
@@ -348,6 +355,122 @@ def test_asset_listing_includes_current_superseded_and_metadata_only_records(
     assert withdrawn["items"][0]["effective_state"] == "withdrawn"
     assert withdrawn["items"][0]["effective_decision_state"] == "withdrawn"
     assert retriever.calls == 2
+
+
+def test_cutoff_effective_read_reconstructs_original_before_correction(tmp_path):
+    config = _config(tmp_path)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    original_bytes = b"%PDF-1.4\noriginal cutoff report\n%%EOF\n"
+    correction_bytes = b"%PDF-1.4\ncorrected cutoff report\n%%EOF\n"
+    retriever = _SelectiveRetriever(
+        payloads={
+            "600000-2025-original": original_bytes,
+            "600000-2025-correction": correction_bytes,
+        }
+    )
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=retriever,
+    )
+    original = service.register_discovered_record(
+        _record(
+            source_id="600000-2025-original",
+            published_at="2026-03-20T01:00:00+00:00",
+        ),
+        instrument_id="600000.SH",
+    )[0]
+    original_asset = service.acquire_attachment(original.attachment_id)
+    correction = service.register_discovered_record(
+        _record(
+            source_id="600000-2025-correction",
+            title="测试公司2025年年度报告（修订版）",
+            published_at="2026-04-20T01:00:00+00:00",
+        ),
+        instrument_id="600000.SH",
+    )[0]
+    correction_asset = service.acquire_attachment(correction.attachment_id)
+    access = AnnouncementAssetAccess(
+        repository=repository,
+        config=config,
+        service=service,
+    )
+
+    historical = access.get_effective_asset(
+        "600000.SH",
+        fiscal_year=2025,
+        knowledge_cutoff="2026-04-01",
+    )
+    current = access.get_effective_asset(
+        "600000.SH",
+        fiscal_year=2025,
+    )
+
+    assert original_asset is not None and correction_asset is not None
+    assert historical is not None
+    assert historical["asset_id"] == original_asset.asset_id
+    assert historical["content_hash"] == hashlib.sha256(original_bytes).hexdigest()
+    assert historical["content_url"] is None
+    assert current is not None
+    assert current["asset_id"] == correction_asset.asset_id
+    assert current["content_hash"] == hashlib.sha256(correction_bytes).hexdigest()
+
+
+def test_shared_access_classifies_and_selects_semiannual_report(tmp_path):
+    config = _config(tmp_path)
+    repository = AnnouncementAssetRepository(tmp_path / "research.db")
+    repository.initialize_schema()
+    store = ContentAddressedBlobStore(config)
+    store.prepare()
+    service = AnnouncementAssetService(
+        repository=repository,
+        config=config,
+        blob_store=store,
+        attachment_retriever=_Retriever(),
+    )
+    annual = service.register_discovered_record(
+        _record(
+            source_id="600000-2025-annual",
+            title="测试公司2025年年度报告",
+            published_at="2026-03-20T01:00:00+00:00",
+        ),
+        instrument_id="600000.SH",
+    )
+    annual_asset = service.acquire_attachment(annual[0].attachment_id)
+    registered = service.register_discovered_record(
+        _record(
+            source_id="600000-2025-semiannual",
+            title="测试公司2025年半年度报告",
+            published_at="2025-08-20T01:00:00+00:00",
+        ),
+        instrument_id="600000.SH",
+    )
+    assert registered[0].classification.document_family == "semiannual_report"
+    assert registered[0].classification.report_period == "2025-06-30"
+    service.acquire_attachment(registered[0].attachment_id)
+    access = AnnouncementAssetAccess(
+        repository=repository,
+        config=config,
+        service=service,
+    )
+
+    projection = access.list_effective_assets(
+        instrument_id="600000.SH",
+        document_family="semiannual_report",
+        availability="local_valid",
+    )
+
+    assert projection["returned"] == 1
+    assert projection["items"][0]["document_family"] == "semiannual_report"
+    assert projection["items"][0]["report_period"] == "2025-06-30"
+    current_annual = access.get_effective_asset("600000.SH", fiscal_year=2025)
+    assert annual_asset is not None and current_annual is not None
+    assert current_annual["asset_id"] == annual_asset.asset_id
+    assert current_annual["document_family"] == "annual_report"
 
 
 @pytest.mark.parametrize(
@@ -398,7 +521,9 @@ def test_asset_listing_pagination_is_stable_for_tied_publication_times(tmp_path)
             ),
             instrument_id="600000.SH",
         )
-    access = AnnouncementAssetAccess(repository=repository, config=config, service=service)
+    access = AnnouncementAssetAccess(
+        repository=repository, config=config, service=service
+    )
 
     first = access.list_assets(instrument_id="600000.SH", limit=2, offset=0)
     second = access.list_assets(instrument_id="600000.SH", limit=2, offset=2)
@@ -408,9 +533,7 @@ def test_asset_listing_pagination_is_stable_for_tied_publication_times(tmp_path)
     second_ids = [item["source_announcement_id"] for item in second["items"]]
     assert first_ids == ["600000-2025-a", "600000-2025-b"]
     assert second_ids == ["600000-2025-c"]
-    assert [item["source_announcement_id"] for item in repeated["items"]] == (
-        first_ids
-    )
+    assert [item["source_announcement_id"] for item in repeated["items"]] == (first_ids)
 
 
 @pytest.mark.parametrize(
@@ -509,8 +632,6 @@ def test_content_handle_rejects_mount_identity_change_and_releases_lease(
     assert active_readers == 0
 
 
-
-
 def test_content_handle_invalidates_every_effective_asset_sharing_corrupt_bytes(
     tmp_path,
 ):
@@ -550,12 +671,14 @@ def test_content_handle_invalidates_every_effective_asset_sharing_corrupt_bytes(
     with pytest.raises(RuntimeError, match="integrity failed"):
         access.content_handle(assets[0].asset_id)
 
-    assert repository.get_effective_report(
-        "600000.SH", 2025
-    ).availability is AssetAvailability.CORRUPT
-    assert repository.get_effective_report(
-        "600001.SH", 2025
-    ).availability is AssetAvailability.CORRUPT
+    assert (
+        repository.get_effective_report("600000.SH", 2025).availability
+        is AssetAvailability.CORRUPT
+    )
+    assert (
+        repository.get_effective_report("600001.SH", 2025).availability
+        is AssetAvailability.CORRUPT
+    )
 
 
 def test_access_facade_exposes_only_principal_request_handle(tmp_path):
@@ -577,9 +700,9 @@ def test_access_facade_exposes_only_principal_request_handle(tmp_path):
     assert created["disposition"] == "operation_created"
     assert created["asset_request_id"]
     assert "operation_id" not in created["request"]
-    assert access.get_asset_request(
-        created["asset_request_id"], principal="bob"
-    ) is None
+    assert (
+        access.get_asset_request(created["asset_request_id"], principal="bob") is None
+    )
 
 
 def test_request_projection_redacts_unapproved_operation_details(tmp_path):
@@ -741,9 +864,12 @@ def test_absent_exact_filing_uses_bounded_source_qualified_discovery(tmp_path):
     assert result.asset.source_announcement_id == "requested-filing"
     assert provider.calls == 1
     assert retriever.calls == 1
-    assert repository.list_candidate_rows(
-        source="cninfo", source_announcement_id="same-period-other-filing"
-    ) == []
+    assert (
+        repository.list_candidate_rows(
+            source="cninfo", source_announcement_id="same-period-other-filing"
+        )
+        == []
+    )
 
 
 def test_exact_discovery_never_substitutes_another_same_period_filing(tmp_path):
@@ -784,9 +910,12 @@ def test_exact_discovery_never_substitutes_another_same_period_filing(tmp_path):
     assert result.operation.status.value == "missing"
     assert provider.calls == 1
     assert retriever.calls == 0
-    assert repository.list_candidate_rows(
-        source="cninfo", source_announcement_id="other-filing"
-    ) == []
+    assert (
+        repository.list_candidate_rows(
+            source="cninfo", source_announcement_id="other-filing"
+        )
+        == []
+    )
 
 
 def test_exact_filing_pins_match_one_observation_and_fail_closed(tmp_path):
@@ -855,9 +984,7 @@ def test_non_effective_exact_filing_is_metadata_only_without_network_or_work(tmp
         blob_store=store,
         attachment_retriever=retriever,
     )
-    original = service.register_discovered_record(
-        _record(), instrument_id="600000.SH"
-    )
+    original = service.register_discovered_record(_record(), instrument_id="600000.SH")
     current = service.acquire_attachment(original[0].attachment_id)
     assert current is not None
     correction_id = "600000-2025-correction"
@@ -929,7 +1056,10 @@ def test_period_ensure_acquires_only_prospective_correction(tmp_path):
     assert result.operation.status.value == "failed"
     assert retriever.calls == 1
     assert retriever.attachment_ids == [correction_id]
-    assert repository.get_latest_valid_attachment_version(original[0].attachment_id) is None
+    assert (
+        repository.get_latest_valid_attachment_version(original[0].attachment_id)
+        is None
+    )
 
 
 def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
@@ -964,7 +1094,9 @@ def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
     correction_asset = service.acquire_attachment(correction[0].attachment_id)
     assert correction_asset is not None
     assert correction_asset.source_announcement_id == correction_id
-    access = AnnouncementAssetAccess(repository=repository, config=config, service=service)
+    access = AnnouncementAssetAccess(
+        repository=repository, config=config, service=service
+    )
     request = EnsureRequest(
         source="cninfo",
         source_announcement_id="600000-2025-annual",
@@ -1001,7 +1133,9 @@ def test_retained_predecessor_has_authorized_exact_observation_handle(tmp_path):
         )
 
 
-def test_inactive_instrument_discovery_is_bounded_and_does_not_touch_schedule_state(tmp_path):
+def test_inactive_instrument_discovery_is_bounded_and_does_not_touch_schedule_state(
+    tmp_path,
+):
     config = _config(tmp_path)
     repository = AnnouncementAssetRepository(tmp_path / "research.db")
     repository.initialize_schema()
@@ -1121,9 +1255,12 @@ def test_incomplete_exact_provider_scope_fails_closed_without_download(tmp_path)
     assert result.operation.reason_code == "ensure_execution_failed"
     assert provider.calls == 1
     assert retriever.calls == 0
-    assert repository.list_candidate_rows(
-        source="cninfo", source_announcement_id="requested-filing"
-    ) == []
+    assert (
+        repository.list_candidate_rows(
+            source="cninfo", source_announcement_id="requested-filing"
+        )
+        == []
+    )
 
 
 def test_ambiguous_period_candidates_block_without_any_attachment_download(tmp_path):
@@ -1161,8 +1298,6 @@ def test_ambiguous_period_candidates_block_without_any_attachment_download(tmp_p
     assert result.operation.status.value == "blocked"
     assert result.operation.reason_code == "candidate_not_effective"
     assert retriever.calls == 0
-
-
 
 
 def test_zero_wait_dispatches_background_work_and_keeps_same_handle(tmp_path):

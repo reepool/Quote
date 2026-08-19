@@ -37,6 +37,10 @@ _FULL_ANNUAL_MARKERS = (
     "年度报告",
     "年报",
 )
+_FULL_SEMIANNUAL_MARKERS = (
+    "半年度报告",
+    "半年报",
+)
 _CORRECTION_MARKERS = (
     "修订版",
     "修正版",
@@ -73,8 +77,6 @@ _HARD_EXCLUSIONS = (
     "说明会材料",
     "季度报告",
     "季报",
-    "半年度报告",
-    "半年报",
     "重大差错责任追究制度",
     "无法按期披露",
     "延期披露",
@@ -115,13 +117,15 @@ class AnnualReportClassification:
             # remains evidence, but can never become a full report below.
             object.__setattr__(self, "variant", AnnualReportVariant.CORRECTION)
         if self.is_eligible and (
-            family != DocumentFamily.ANNUAL_REPORT.value
+            family
+            not in {
+                DocumentFamily.ANNUAL_REPORT.value,
+                DocumentFamily.SEMIANNUAL_REPORT.value,
+            }
             or self.variant is None
             or not self.is_full_report
         ):
-            raise ValueError(
-                "eligible annual-report classification must be a complete annual report"
-            )
+            raise ValueError("eligible report classification must be a complete report")
         if self.is_full_report and family is None:
             raise ValueError("full report classification requires a document family")
 
@@ -177,11 +181,27 @@ class AnnualReportClassifier:
         lowered = combined.lower()
         reasons: list[str] = []
 
-        annual_marker = next(
-            (marker for marker in _FULL_ANNUAL_MARKERS if marker in combined), None
+        semiannual_marker = next(
+            (marker for marker in _FULL_SEMIANNUAL_MARKERS if marker in combined),
+            None,
         )
-        if annual_marker is None:
-            reasons.append("annual_report_marker_missing")
+        annual_marker = (
+            None
+            if semiannual_marker is not None
+            else next(
+                (marker for marker in _FULL_ANNUAL_MARKERS if marker in combined),
+                None,
+            )
+        )
+        document_family = (
+            DocumentFamily.SEMIANNUAL_REPORT.value
+            if semiannual_marker is not None
+            else DocumentFamily.ANNUAL_REPORT.value
+            if annual_marker is not None
+            else None
+        )
+        if document_family is None:
+            reasons.append("formal_report_marker_missing")
 
         correction_evidence = any(
             marker in combined for marker in _CORRECTION_EVIDENCE_MARKERS
@@ -193,9 +213,10 @@ class AnnualReportClassifier:
         )
         fiscal_year = _extract_fiscal_year(combined)
         fiscal_year_inferred = False
-        if fiscal_year is None and annual_marker and not correction_evidence:
+        if fiscal_year is None and document_family and not correction_evidence:
             fiscal_year = _infer_original_fiscal_year_from_publication(
-                record.published_at
+                record.published_at,
+                document_family=document_family,
             )
             fiscal_year_inferred = fiscal_year is not None
         if fiscal_year is None:
@@ -214,7 +235,9 @@ class AnnualReportClassifier:
         if notice_only:
             reasons.append("correction_notice_without_full_replacement")
 
-        eligible = not reasons and fiscal_year is not None and annual_marker is not None
+        eligible = (
+            not reasons and fiscal_year is not None and document_family is not None
+        )
         if eligible:
             if fiscal_year_inferred:
                 reasons.append("fiscal_year_inferred_from_publication")
@@ -224,10 +247,16 @@ class AnnualReportClassifier:
                 else "eligible_complete_original"
             )
         return AnnualReportClassification(
-            document_family="annual_report" if annual_marker else None,
+            document_family=document_family,
             fiscal_year=fiscal_year,
-            report_period=(f"{fiscal_year}-12-31" if fiscal_year is not None else None),
-            variant=variant if annual_marker else None,
+            report_period=(
+                None
+                if fiscal_year is None
+                else f"{fiscal_year}-06-30"
+                if document_family == DocumentFamily.SEMIANNUAL_REPORT.value
+                else f"{fiscal_year}-12-31"
+            ),
+            variant=variant if document_family else None,
             is_full_report=eligible,
             is_eligible=eligible,
             correction_evidence=correction_evidence,
@@ -243,7 +272,11 @@ def refine_classification_from_pdf(
 ) -> AnnualReportClassification:
     """Reject a provider-mislabeled summary when the PDF title proves it."""
 
-    if not classification.is_eligible or not _pdf_first_page_is_annual_summary(pdf):
+    if (
+        not classification.is_eligible
+        or classification.document_family != DocumentFamily.ANNUAL_REPORT.value
+        or not _pdf_first_page_is_annual_summary(pdf)
+    ):
         return classification
     reasons = tuple(
         reason
@@ -438,8 +471,7 @@ def _equivalent_source_filings(
             and candidate.content_hash == winner.content_hash
         )
         same_governed_chain = bool(
-            winner.legal_chain_id
-            and candidate.legal_chain_id == winner.legal_chain_id
+            winner.legal_chain_id and candidate.legal_chain_id == winner.legal_chain_id
         )
         if candidate.candidate_id != winner.candidate_id and not (
             same_hash or same_governed_chain
@@ -463,13 +495,22 @@ def _extract_fiscal_year(text: str) -> int | None:
     return valid[0] if valid else None
 
 
-def _infer_original_fiscal_year_from_publication(value: str | None) -> int | None:
-    """Infer N from an original annual report published in calendar year N+1."""
+def _infer_original_fiscal_year_from_publication(
+    value: str | None,
+    *,
+    document_family: str = DocumentFamily.ANNUAL_REPORT.value,
+) -> int | None:
+    """Infer the report year from the formal report's publication calendar."""
 
     published_at = _normalized_timestamp(value)
     if published_at is None:
         return None
-    fiscal_year = published_at.astimezone(_SHANGHAI_TZ).year - 1
+    publication_year = published_at.astimezone(_SHANGHAI_TZ).year
+    fiscal_year = (
+        publication_year
+        if document_family == DocumentFamily.SEMIANNUAL_REPORT.value
+        else publication_year - 1
+    )
     return fiscal_year if 1990 <= fiscal_year <= 2200 else None
 
 

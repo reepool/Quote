@@ -65,9 +65,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     promote.add_argument("--operator", required=True)
     promote.add_argument("--reason", required=True)
     promote.add_argument(
-        "--financials-db",
+        "--announcement-assets-db",
         type=Path,
-        default=ROOT_DIR / "data" / "financials.db",
+        default=ROOT_DIR / "data" / "research.db",
     )
     promote.add_argument(
         "--archive-path-base",
@@ -85,7 +85,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             source_path=args.source_catalog,
             output_path=args.output_catalog,
             manifest_path=args.manifest_output,
-            financials_db=args.financials_db,
+            financials_db=args.announcement_assets_db,
             official_evidence_path=args.official_evidence,
             archive_path_base=args.archive_path_base,
             expected_catalog_version=args.expected_version,

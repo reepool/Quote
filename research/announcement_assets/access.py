@@ -12,7 +12,14 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 from .config import AnnouncementAssetConfig
-from .models import AssetAvailability, EnsureRequest, IntegrityStatus, stable_id
+from .models import (
+    AssetAvailability,
+    DocumentFamily,
+    EnsureRequest,
+    IntegrityStatus,
+    stable_id,
+    utc_now_iso,
+)
 from .repository import AnnouncementAssetRepository
 from .service import AnnouncementAssetService
 from .storage import MountIdentity, probe_mount_identity
@@ -34,9 +41,7 @@ class AssetContentIntegrityError(RuntimeError):
 
     def __init__(self, integrity_status: str) -> None:
         self.integrity_status = str(integrity_status)
-        super().__init__(
-            f"annual-report blob integrity failed:{self.integrity_status}"
-        )
+        super().__init__(f"annual-report blob integrity failed:{self.integrity_status}")
 
 
 class AssetContentMountError(RuntimeError):
@@ -151,6 +156,7 @@ class AnnouncementAssetAccess:
         *,
         instrument_id: str | None = None,
         fiscal_year: int | None = None,
+        document_family: str = "annual_report",
         source: str | None = None,
         source_announcement_id: str | None = None,
         integrity: str | None = None,
@@ -165,6 +171,7 @@ class AnnouncementAssetAccess:
         records = self.repository.list_annual_report_asset_records(
             instrument_id=instrument_id,
             fiscal_year=fiscal_year,
+            document_family=document_family,
             source=source,
             source_announcement_id=source_announcement_id,
             integrity=integrity,
@@ -191,9 +198,11 @@ class AnnouncementAssetAccess:
         exact_content_state = (
             "local_valid"
             if record.get("asset_id") and availability == "local_valid"
-            else "retained_internal_only"
-            if record.get("content_hash") and record.get("integrity") == "valid"
-            else "local_content_unavailable"
+            else (
+                "retained_internal_only"
+                if record.get("content_hash") and record.get("integrity") == "valid"
+                else "local_content_unavailable"
+            )
         )
         asset_id = record.get("asset_id")
         content_url = (
@@ -220,7 +229,7 @@ class AnnouncementAssetAccess:
             "observation_version": observation_version,
             "version_available_at": record.get("version_available_at"),
             "published_at": record.get("published_at"),
-            "document_family": "annual_report",
+            "document_family": record.get("document_family") or "annual_report",
             "variant": record.get("variant") or "original",
             "is_full_report": True,
             "is_correction": record.get("variant") == "correction",
@@ -267,14 +276,83 @@ class AnnouncementAssetAccess:
         instrument_id: str,
         *,
         fiscal_year: int | None = None,
+        document_family: str = "annual_report",
         knowledge_cutoff: str | None = None,
     ) -> dict[str, Any] | None:
-        report = self.repository.get_effective_report(
-            instrument_id,
-            fiscal_year,
-            knowledge_cutoff=knowledge_cutoff,
-        )
+        if knowledge_cutoff is not None:
+            report = self.service.resolve_effective_report(
+                instrument_id,
+                fiscal_year=fiscal_year,
+                document_family=document_family,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+        elif document_family == DocumentFamily.ANNUAL_REPORT.value:
+            report = self.repository.get_effective_report(
+                instrument_id,
+                fiscal_year,
+                document_family=document_family,
+            )
+        else:
+            report = self.service.resolve_effective_report(
+                instrument_id,
+                fiscal_year=fiscal_year,
+                document_family=document_family,
+                knowledge_cutoff=utc_now_iso(),
+            )
         return None if report is None else self._asset_projection(report)
+
+    def get_asset(self, asset_id: str) -> dict[str, Any] | None:
+        """Return one production effective asset by its immutable asset id."""
+
+        report = self.repository.get_effective_report_by_asset_id(str(asset_id))
+        return None if report is None else self._asset_projection(report)
+
+    def list_effective_assets(
+        self,
+        *,
+        instrument_id: str | None = None,
+        document_family: str = "annual_report",
+        knowledge_cutoff: str | None = None,
+        source: str | None = None,
+        availability: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        """List authoritative effective annual reports without historical candidates."""
+
+        normalized_availability = (
+            None if availability is None else AssetAvailability(str(availability))
+        )
+        bounded_limit = max(1, min(int(limit), 1000))
+        bounded_offset = max(0, int(offset))
+        if (
+            knowledge_cutoff is None
+            and document_family == DocumentFamily.ANNUAL_REPORT.value
+        ):
+            reports = self.repository.list_effective_reports(
+                instrument_id=instrument_id,
+                document_family=document_family,
+                source=source,
+                availability=normalized_availability,
+                limit=bounded_limit,
+                offset=bounded_offset,
+            )
+        else:
+            reports = self.service.resolve_effective_reports(
+                knowledge_cutoff=(knowledge_cutoff or utc_now_iso()),
+                document_family=document_family,
+                instrument_id=instrument_id,
+                source=source,
+                availability=normalized_availability,
+                limit=bounded_limit,
+                offset=bounded_offset,
+            )
+        return {
+            "items": [self._asset_projection(report) for report in reports],
+            "returned": len(reports),
+            "limit": bounded_limit,
+            "offset": bounded_offset,
+        }
 
     def ensure(self, request: EnsureRequest) -> dict[str, Any]:
         result = self.service.ensure_annual_report(request)
@@ -282,17 +360,21 @@ class AnnouncementAssetAccess:
             "disposition": result.disposition.value,
             "asset_availability": result.availability.value,
             "availability": result.availability.value,
-            "asset": None
-            if result.asset is None
-            else self._asset_projection(result.asset),
-            "asset_request_id": None
-            if result.asset_request is None
-            else result.asset_request.asset_request_id,
-            "request": None
-            if result.asset_request is None
-            else self._asset_request_projection(
-                result.asset_request,
-                result.operation,
+            "asset": (
+                None if result.asset is None else self._asset_projection(result.asset)
+            ),
+            "asset_request_id": (
+                None
+                if result.asset_request is None
+                else result.asset_request.asset_request_id
+            ),
+            "request": (
+                None
+                if result.asset_request is None
+                else self._asset_request_projection(
+                    result.asset_request,
+                    result.operation,
+                )
             ),
             "reason_code": result.reason_code,
         }
@@ -333,8 +415,7 @@ class AnnouncementAssetAccess:
             page = self.repository.list_effective_reports(limit=1000, offset=offset)
             total += len(page)
             local_valid += sum(
-                report.availability is AssetAvailability.LOCAL_VALID
-                for report in page
+                report.availability is AssetAvailability.LOCAL_VALID for report in page
             )
             if len(page) < 1000:
                 break
@@ -354,11 +435,11 @@ class AnnouncementAssetAccess:
         summary = {
             "effective_asset_count": total,
             "local_valid_asset_count": local_valid,
-            "latest_daily_status": (
-                None if latest is None else latest.status.value
-            ),
+            "latest_daily_status": (None if latest is None else latest.status.value),
             "latest_daily_outcome": (
-                None if latest is None or latest.outcome is None else latest.outcome.value
+                None
+                if latest is None or latest.outcome is None
+                else latest.outcome.value
             ),
         }
         return {
@@ -377,14 +458,21 @@ class AnnouncementAssetAccess:
 
         report = self.repository.get_effective_report_by_asset_id(asset_id)
         if report is None:
-            lifecycle_state = self.repository.get_asset_content_lifecycle_state(asset_id)
+            lifecycle_state = self.repository.get_asset_content_lifecycle_state(
+                asset_id
+            )
             if lifecycle_state in {"superseded", "withdrawn", "deleted"}:
                 raise AssetContentGoneError(asset_id, lifecycle_state)
             raise KeyError("annual-report asset was not found")
         if report.availability is AssetAvailability.CORRUPT:
             raise AssetContentIntegrityError("catalog_corrupt")
-        if report.asset_id != asset_id or report.availability is not AssetAvailability.LOCAL_VALID:
-            raise FileNotFoundError("annual-report asset content is not locally available")
+        if (
+            report.asset_id != asset_id
+            or report.availability is not AssetAvailability.LOCAL_VALID
+        ):
+            raise FileNotFoundError(
+                "annual-report asset content is not locally available"
+            )
         if not report.content_hash:
             raise FileNotFoundError("annual-report asset has no content hash")
         blob = self.repository.get_blob(report.content_hash)
@@ -433,7 +521,11 @@ class AnnouncementAssetAccess:
             raise PermissionError("exact observation handle is internal-only")
         if not request.source or not request.source_announcement_id:
             raise ValueError("exact observation handle requires source-filing scope")
-        if not request.attachment_id or not request.observation_version or not request.expected_content_hash:
+        if (
+            not request.attachment_id
+            or not request.observation_version
+            or not request.expected_content_hash
+        ):
             raise ValueError(
                 "exact observation handle requires attachment, version, and hash pins"
             )
@@ -584,9 +676,7 @@ class AnnouncementAssetAccess:
                     reason=f"external_content_mutation:{validation_status}",
                 )
                 if validation_status == "missing" and missing_as_unavailable:
-                    raise FileNotFoundError(
-                        "exact observation bytes are unavailable"
-                    )
+                    raise FileNotFoundError("exact observation bytes are unavailable")
                 raise AssetContentIntegrityError(validation_status)
             final_mount = self._validated_filings_mount()
             if not self._same_mount(initial_mount, final_mount):
@@ -634,7 +724,11 @@ class AnnouncementAssetAccess:
             ) from exc
 
     def _asset_projection(self, report: Any) -> dict[str, Any]:
-        blob = self.repository.get_blob(report.content_hash) if report.content_hash else None
+        blob = (
+            self.repository.get_blob(report.content_hash)
+            if report.content_hash
+            else None
+        )
         version = self.repository.get_attachment_version(report.version_id)
         equivalent_source_filings = [
             asdict(item) for item in report.equivalent_source_filings
@@ -642,6 +736,8 @@ class AnnouncementAssetAccess:
         content_url = (
             f"/api/v1/research/annual-report-assets/{report.asset_id}/content"
             if report.availability is AssetAvailability.LOCAL_VALID
+            and report.decision_evidence.get("projection_kind")
+            != "knowledge_cutoff_read"
             else None
         )
         return {
@@ -704,12 +800,10 @@ class AnnouncementAssetAccess:
     def _asset_request_projection(subscription: Any, operation: Any) -> dict[str, Any]:
         authorization = dict(subscription.authorized_projection or {})
         allowed_progress = {
-            str(item)
-            for item in authorization.get("allowed_progress_fields", ())
+            str(item) for item in authorization.get("allowed_progress_fields", ())
         }
         allowed_diagnostics = {
-            str(item)
-            for item in authorization.get("allowed_diagnostics_fields", ())
+            str(item) for item in authorization.get("allowed_diagnostics_fields", ())
         }
         progress = (
             {}
@@ -738,19 +832,25 @@ class AnnouncementAssetAccess:
             "updated_at": subscription.updated_at,
             "cancelled_at": subscription.cancelled_at,
             "operation_status": None if operation is None else operation.status.value,
-            "operation_stage": None
-            if operation is None or operation.stage is None
-            else operation.stage.value,
-            "batch_outcome": None
-            if operation is None or operation.outcome is None
-            else operation.outcome.value,
+            "operation_stage": (
+                None
+                if operation is None or operation.stage is None
+                else operation.stage.value
+            ),
+            "batch_outcome": (
+                None
+                if operation is None or operation.outcome is None
+                else operation.outcome.value
+            ),
             "attempt": None if operation is None else operation.attempt,
             "next_retry_at": None if operation is None else operation.next_retry_at,
             "progress": progress,
             "result_asset_id": None if operation is None else operation.result_asset_id,
-            "result_origin": None
-            if operation is None or operation.result_origin is None
-            else operation.result_origin.value,
+            "result_origin": (
+                None
+                if operation is None or operation.result_origin is None
+                else operation.result_origin.value
+            ),
             "reason_code": None if operation is None else operation.reason_code,
             "diagnostics": diagnostics,
             "expires_at": subscription.expires_at,

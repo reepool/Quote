@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from concurrent.futures import Future, ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
@@ -27,6 +27,7 @@ from .classifier import (
     AnnualReportCandidate,
     AnnualReportClassification,
     AnnualReportClassifier,
+    WinnerSelection,
     refine_classification_from_pdf,
     select_effective_candidate,
 )
@@ -35,6 +36,7 @@ from .models import (
     AnnualReportVariant,
     AssetAvailability,
     BatchOutcome,
+    DocumentFamily,
     EffectiveAnnualReport,
     EffectiveDecisionState,
     EnsureDisposition,
@@ -201,7 +203,6 @@ class AnnouncementAssetService:
             ),
         )
 
-
     def register_discovered_record(
         self,
         record: AnnouncementRecord,
@@ -265,9 +266,7 @@ class AnnouncementAssetService:
             reusable = (
                 None
                 if force_refresh
-                else self.repository.get_latest_valid_attachment_version(
-                    attachment_id
-                )
+                else self.repository.get_latest_valid_attachment_version(attachment_id)
             )
             if reusable and reusable.content_hash:
                 blob = self.repository.get_blob(reusable.content_hash)
@@ -305,9 +304,9 @@ class AnnouncementAssetService:
                             and classification is not None
                             and classification.fiscal_year
                         ):
-                            return self.recompute_effective_report(
-                                announcement.instrument_id,
-                                classification.fiscal_year,
+                            return self._resolve_after_acquisition(
+                                instrument_id=announcement.instrument_id,
+                                classification=classification,
                                 preferred_version_id=reusable.version_id,
                                 knowledge_cutoff=knowledge_cutoff,
                             )
@@ -573,9 +572,7 @@ class AnnouncementAssetService:
                         temporary_path=str(temporary_path),
                         temporary_bytes=actual_length,
                         quarantine_path=(
-                            None
-                            if quarantine_path is None
-                            else str(quarantine_path)
+                            None if quarantine_path is None else str(quarantine_path)
                         ),
                         metadata={
                             "candidate_verification_policy_version": policy_version,
@@ -635,9 +632,9 @@ class AnnouncementAssetService:
                         blob.canonical_path,
                     )
                     if announcement.instrument_id and classification.fiscal_year:
-                        return self.recompute_effective_report(
-                            announcement.instrument_id,
-                            classification.fiscal_year,
+                        return self._resolve_after_acquisition(
+                            instrument_id=announcement.instrument_id,
+                            classification=classification,
                             preferred_version_id=reusable.version_id,
                             knowledge_cutoff=knowledge_cutoff,
                         )
@@ -751,16 +748,19 @@ class AnnouncementAssetService:
             )
             classification = _classification_from_metadata(attachment.metadata)
             if announcement.instrument_id and classification.fiscal_year:
-                return self.recompute_effective_report(
-                    announcement.instrument_id,
-                    classification.fiscal_year,
+                return self._resolve_after_acquisition(
+                    instrument_id=announcement.instrument_id,
+                    classification=classification,
                     knowledge_cutoff=knowledge_cutoff,
                     suppress_unchanged_event=suppress_unchanged_event,
                 )
             return None
 
         actual_length = len(result.content)
-        if result.content_length is not None and int(result.content_length) != actual_length:
+        if (
+            result.content_length is not None
+            and int(result.content_length) != actual_length
+        ):
             raise ValueError(
                 "attachment reported content length does not match streamed bytes"
             )
@@ -816,9 +816,9 @@ class AnnouncementAssetService:
         if not announcement.instrument_id or not classification.fiscal_year:
             reservation["status"] = "completed"
             return None
-        effective = self.recompute_effective_report(
-            announcement.instrument_id,
-            classification.fiscal_year,
+        effective = self._resolve_after_acquisition(
+            instrument_id=announcement.instrument_id,
+            classification=classification,
             preferred_version_id=version.version_id,
             knowledge_cutoff=knowledge_cutoff,
             suppress_unchanged_event=suppress_unchanged_event,
@@ -866,8 +866,33 @@ class AnnouncementAssetService:
         state: dict[str, object] = {"status": "failed"}
         yield state
 
-
-
+    def _resolve_after_acquisition(
+        self,
+        *,
+        instrument_id: str,
+        classification: AnnualReportClassification,
+        preferred_version_id: str | None = None,
+        knowledge_cutoff: str | None = None,
+        suppress_unchanged_event: bool = False,
+    ) -> EffectiveAnnualReport | None:
+        if classification.fiscal_year is None or classification.document_family is None:
+            return None
+        if classification.document_family == DocumentFamily.ANNUAL_REPORT.value:
+            return self.recompute_effective_report(
+                instrument_id,
+                classification.fiscal_year,
+                preferred_version_id=preferred_version_id,
+                knowledge_cutoff=knowledge_cutoff,
+                suppress_unchanged_event=suppress_unchanged_event,
+            )
+        if classification.document_family == DocumentFamily.SEMIANNUAL_REPORT.value:
+            return self.resolve_effective_report(
+                instrument_id,
+                fiscal_year=classification.fiscal_year,
+                document_family=classification.document_family,
+                knowledge_cutoff=(knowledge_cutoff or utc_now_iso()),
+            )
+        return None
 
     def recompute_effective_report(
         self,
@@ -880,17 +905,30 @@ class AnnouncementAssetService:
         suppress_unchanged_event: bool = False,
     ) -> EffectiveAnnualReport | None:
         del preferred_version_id  # Selection always considers all committed evidence.
+        evidence_cutoff = (
+            None
+            if knowledge_cutoff is None
+            else _inclusive_knowledge_cutoff(knowledge_cutoff)
+        )
         for _ in range(8):
             rows = self.repository.list_candidate_rows(
                 instrument_id=instrument_id,
                 fiscal_year=fiscal_year,
-                observation_cutoff=knowledge_cutoff,
+                observation_cutoff=evidence_cutoff,
             )
-            if knowledge_cutoff is not None:
+            rows = [
+                row
+                for row in rows
+                if _classification_from_payload(
+                    row.get("classification") or {}
+                ).document_family
+                == DocumentFamily.ANNUAL_REPORT.value
+            ]
+            if evidence_cutoff is not None:
                 rows = [
                     row
                     for row in rows
-                    if _row_evidence_visible_at(row, knowledge_cutoff)
+                    if _row_evidence_visible_at(row, evidence_cutoff)
                 ]
             candidates = _apply_withdrawal_relations(
                 rows,
@@ -1134,9 +1172,7 @@ class AnnouncementAssetService:
                         if provisional_policy_version
                         else None
                     ),
-                    "provisional_result_policy_version": (
-                        provisional_policy_version
-                    ),
+                    "provisional_result_policy_version": (provisional_policy_version),
                     "decision_policy_version": (
                         provisional_policy_version
                         or selection.canonical_projection_policy_version
@@ -1144,10 +1180,15 @@ class AnnouncementAssetService:
                     "policy_migration": migration_evidence,
                 },
             )
-            if suppress_unchanged_event and current_report is not None and replace(
-                current_report,
-                last_checked_at=report.last_checked_at,
-            ) == report:
+            if (
+                suppress_unchanged_event
+                and current_report is not None
+                and replace(
+                    current_report,
+                    last_checked_at=report.last_checked_at,
+                )
+                == report
+            ):
                 # A byte verification that resolves to the exact same immutable
                 # observation is a check, not an effective-asset change. Avoid
                 # manufacturing a repaired event/decision for unchanged bytes.
@@ -1161,6 +1202,223 @@ class AnnouncementAssetService:
             if activated:
                 return committed
         raise RuntimeError("effective annual-report activation remained contended")
+
+    def resolve_effective_reports(
+        self,
+        *,
+        knowledge_cutoff: str,
+        document_family: str = "annual_report",
+        instrument_id: str | None = None,
+        fiscal_year: int | None = None,
+        source: str | None = None,
+        availability: AssetAvailability | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[EffectiveAnnualReport]:
+        """Select immutable report assets from evidence visible at a cutoff.
+
+        This is deliberately read-only. Historical consumers must not rewrite
+        today's effective projection while reconstructing what was knowable at
+        an earlier date.
+        """
+
+        family = str(document_family or "").strip().lower()
+        if family not in {
+            DocumentFamily.ANNUAL_REPORT.value,
+            DocumentFamily.SEMIANNUAL_REPORT.value,
+        }:
+            raise ValueError(f"unsupported effective report family: {family}")
+        cutoff = _inclusive_knowledge_cutoff(knowledge_cutoff)
+        rows = self.repository.list_candidate_rows(
+            instrument_id=instrument_id,
+            fiscal_year=fiscal_year,
+            observation_cutoff=cutoff,
+        )
+        visible_rows = [
+            row
+            for row in rows
+            if _row_evidence_visible_at(row, cutoff)
+            and bool(str(row.get("canonical_path") or "").strip())
+            and _classification_from_payload(
+                row.get("classification") or {}
+            ).document_family
+            == family
+        ]
+        grouped: dict[tuple[str, int, str], list[dict[str, object]]] = {}
+        for row in visible_rows:
+            classification = _classification_from_payload(
+                row.get("classification") or {}
+            )
+            if classification.fiscal_year is None:
+                continue
+            key = (
+                str(row.get("instrument_id") or ""),
+                int(classification.fiscal_year),
+                str(classification.report_period or ""),
+            )
+            grouped.setdefault(key, []).append(row)
+
+        reports: list[EffectiveAnnualReport] = []
+        for (group_instrument_id, group_fiscal_year, _), group_rows in grouped.items():
+            candidates = _apply_withdrawal_relations(
+                group_rows,
+                tuple(_candidate_from_row(row) for row in group_rows),
+            )
+            selection = select_effective_candidate(candidates)
+            candidate = selection.winner
+            if (
+                candidate is None
+                and selection.state is EffectiveDecisionState.AMBIGUOUS
+            ):
+                candidate = selection.pending_candidate
+            if candidate is None:
+                continue
+            winner_row = next(
+                row
+                for row in group_rows
+                if (row.get("version_id") or row["attachment_id"])
+                == candidate.candidate_id
+            )
+            report = self._historical_effective_projection(
+                instrument_id=group_instrument_id,
+                fiscal_year=group_fiscal_year,
+                document_family=family,
+                row=winner_row,
+                selection=selection,
+                cutoff=cutoff,
+            )
+            if source and report.source != str(source).strip().lower():
+                continue
+            if availability is not None and report.availability is not availability:
+                continue
+            reports.append(report)
+
+        reports.sort(
+            key=lambda item: (
+                item.instrument_id,
+                -item.fiscal_year,
+                item.report_period,
+                item.published_at or "",
+                item.asset_id,
+            )
+        )
+        bounded_offset = max(0, int(offset))
+        bounded_limit = max(1, min(int(limit), 1000))
+        return reports[bounded_offset : bounded_offset + bounded_limit]
+
+    def resolve_effective_report(
+        self,
+        instrument_id: str,
+        *,
+        fiscal_year: int | None = None,
+        document_family: str = "annual_report",
+        knowledge_cutoff: str,
+    ) -> EffectiveAnnualReport | None:
+        reports = self.resolve_effective_reports(
+            knowledge_cutoff=knowledge_cutoff,
+            document_family=document_family,
+            instrument_id=instrument_id,
+            fiscal_year=fiscal_year,
+            limit=1,
+        )
+        return reports[0] if reports else None
+
+    def _historical_effective_projection(
+        self,
+        *,
+        instrument_id: str,
+        fiscal_year: int,
+        document_family: str,
+        row: Mapping[str, object],
+        selection: WinnerSelection,
+        cutoff: str,
+    ) -> EffectiveAnnualReport:
+        classification = _classification_from_payload(row.get("classification") or {})
+        canonical_filing = selection.canonical_source_filing
+        content_hash = row.get("content_hash")
+        candidate = selection.winner or selection.pending_candidate
+        if candidate is None:
+            raise ValueError("historical effective projection has no candidate")
+        availability = (
+            AssetAvailability.AMBIGUOUS
+            if selection.winner is None
+            and selection.state is EffectiveDecisionState.AMBIGUOUS
+            else AssetAvailability.BLOCKED
+            if selection.state
+            in {EffectiveDecisionState.AMBIGUOUS, EffectiveDecisionState.PROVISIONAL}
+            and not self.config.provisional_result.enabled
+            else AssetAvailability.LOCAL_VALID
+            if content_hash
+            and row.get("blob_integrity_status") == IntegrityStatus.VALID.value
+            else AssetAvailability.METADATA_ONLY
+        )
+        asset_id = stable_id(
+            "asset",
+            instrument_id,
+            fiscal_year,
+            row["attachment_id"],
+            row.get("version_id") or "metadata",
+        )
+        return EffectiveAnnualReport(
+            asset_id=asset_id,
+            instrument_id=instrument_id,
+            fiscal_year=fiscal_year,
+            report_period=(
+                classification.report_period
+                or (
+                    f"{fiscal_year}-06-30"
+                    if document_family == DocumentFamily.SEMIANNUAL_REPORT.value
+                    else f"{fiscal_year}-12-31"
+                )
+            ),
+            announcement_id=str(row["announcement_id"]),
+            attachment_id=str(row["attachment_id"]),
+            version_id=str(
+                row.get("version_id") or stable_id("metadata", row["attachment_id"])
+            ),
+            content_hash=None if content_hash is None else str(content_hash),
+            source=(
+                canonical_filing.source
+                if canonical_filing is not None
+                else str(row["source"])
+            ),
+            source_announcement_id=(
+                canonical_filing.source_announcement_id
+                if canonical_filing is not None
+                else str(row["source_announcement_id"])
+            ),
+            published_at=None
+            if row.get("published_at") is None
+            else str(row["published_at"]),
+            variant=classification.variant or AnnualReportVariant.ORIGINAL,
+            classifier_version=classification.policy_version,
+            decision_state=selection.state,
+            availability=availability,
+            predecessor_asset_id=None,
+            pending_candidate_id=(
+                None
+                if selection.pending_candidate is None
+                else selection.pending_candidate.candidate_id
+            ),
+            activated_at=(
+                None
+                if row.get("version_available_at") is None
+                else str(row["version_available_at"])
+            ),
+            last_checked_at=cutoff,
+            decision_reasons=selection.reasons,
+            equivalent_source_filings=selection.equivalent_source_filings,
+            canonical_projection_policy_version=(
+                selection.canonical_projection_policy_version
+            ),
+            evidence_set_hash=selection.evidence_set_hash,
+            decision_evidence={
+                "projection_kind": "knowledge_cutoff_read",
+                "knowledge_cutoff": cutoff,
+                "winner_version_id": candidate.candidate_id,
+            },
+            document_family=document_family,
+        )
 
     def _validate_provisional_policy_migration(
         self,
@@ -1216,10 +1474,18 @@ class AnnouncementAssetService:
         # context.  Branch on fiscal-year presence, otherwise an exact request
         # could accidentally return the stock's unrelated current report.
         if request.fiscal_year is not None:
-            asset = self.repository.get_effective_report(
-                request.instrument_id,
-                request.fiscal_year,
-                knowledge_cutoff=request.knowledge_cutoff,
+            asset = (
+                self.resolve_effective_report(
+                    request.instrument_id,
+                    fiscal_year=request.fiscal_year,
+                    document_family=DocumentFamily.ANNUAL_REPORT.value,
+                    knowledge_cutoff=request.knowledge_cutoff,
+                )
+                if request.knowledge_cutoff is not None
+                else self.repository.get_effective_report(
+                    request.instrument_id,
+                    request.fiscal_year,
+                )
             )
             if asset and self._asset_is_local_valid(asset):
                 return EnsureResult(
@@ -1230,7 +1496,20 @@ class AnnouncementAssetService:
             candidates = self.repository.list_candidate_rows(
                 instrument_id=request.instrument_id,
                 fiscal_year=request.fiscal_year,
+                observation_cutoff=(
+                    None
+                    if request.knowledge_cutoff is None
+                    else _inclusive_knowledge_cutoff(request.knowledge_cutoff)
+                ),
             )
+            candidates = [
+                row
+                for row in candidates
+                if _classification_from_payload(
+                    row.get("classification") or {}
+                ).document_family
+                == DocumentFamily.ANNUAL_REPORT.value
+            ]
         else:
             all_candidates = self.repository.list_candidate_rows(
                 source=request.source,
@@ -1451,9 +1730,7 @@ class AnnouncementAssetService:
         """
         bounded = max(1, min(int(limit), 1000))
         now_time = (
-            datetime.now(timezone.utc)
-            if now is None
-            else _ensure_discovery_cutoff(now)
+            datetime.now(timezone.utc) if now is None else _ensure_discovery_cutoff(now)
         )
         pending = self.repository.list_operations(
             operation_type="ensure_annual_report",
@@ -1607,9 +1884,7 @@ class AnnouncementAssetService:
         for this in-memory decision.  No verification state is persisted.
         """
         candidates = [
-            row
-            for row in rows
-            if (row.get("classification") or {}).get("is_eligible")
+            row for row in rows if (row.get("classification") or {}).get("is_eligible")
         ]
         if not candidates:
             return None
@@ -1669,13 +1944,15 @@ class AnnouncementAssetService:
             return None
         winner_id = selection.winner.attachment_id
         return next(
-            (row for row in candidates if str(row.get("attachment_id")) == str(winner_id)),
+            (
+                row
+                for row in candidates
+                if str(row.get("attachment_id")) == str(winner_id)
+            ),
             None,
         )
 
-    def _has_retained_exact_content(
-        self, candidates: Iterable[dict]
-    ) -> bool:
+    def _has_retained_exact_content(self, candidates: Iterable[dict]) -> bool:
         """Whether an exact non-effective observation still has valid local bytes."""
         for row in candidates:
             content_hash = str(row.get("content_hash") or "").strip().lower()
@@ -1761,9 +2038,7 @@ class AnnouncementAssetService:
                 "bounded exact-filing discovery requires instrument identity"
             )
         source = str(scope.get("source") or "").strip().lower()
-        source_announcement_id = str(
-            scope.get("source_announcement_id") or ""
-        ).strip()
+        source_announcement_id = str(scope.get("source_announcement_id") or "").strip()
         symbol, _, suffix = instrument_id.partition(".")
         exchange = {
             "SH": "SSE",
@@ -1852,11 +2127,11 @@ class AnnouncementAssetService:
         target_symbol = normalized_instrument.split(".", 1)[0]
         for record in records:
             record_symbols = {
-                str(value).strip().upper() for value in record.symbols if str(value).strip()
+                str(value).strip().upper()
+                for value in record.symbols
+                if str(value).strip()
             }
-            normalized_symbols = {
-                value.split(".", 1)[0] for value in record_symbols
-            }
+            normalized_symbols = {value.split(".", 1)[0] for value in record_symbols}
             if (
                 normalized_instrument not in record_symbols
                 and target_symbol not in normalized_symbols
@@ -1969,6 +2244,15 @@ def _ensure_discovery_cutoff(value: object) -> datetime:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed.astimezone(timezone.utc)
+
+
+def _inclusive_knowledge_cutoff(value: object) -> str:
+    """Treat a date-only financial cutoff as the complete Shanghai day."""
+
+    text = str(value or "").strip()
+    if len(text) == 10:
+        return f"{text}T23:59:59.999999+08:00"
+    return text
 
 
 def _row_evidence_visible_at(row: Mapping[str, object], cutoff: str) -> bool:
@@ -2162,14 +2446,17 @@ def _same_source_filing_chain_id(
     normalized_instrument = str(instrument_id or "").strip().upper()
     announcement_id = str(source_announcement_id or "").strip()
     published_date = str(published_at or "").strip()[:10]
-    if not all(
-        (
-            normalized_source,
-            normalized_exchange,
-            normalized_instrument,
-            announcement_id,
+    if (
+        not all(
+            (
+                normalized_source,
+                normalized_exchange,
+                normalized_instrument,
+                announcement_id,
+            )
         )
-    ) or len(published_date) != 10:
+        or len(published_date) != 10
+    ):
         return None
     return stable_id(
         "same-source-filing-chain",

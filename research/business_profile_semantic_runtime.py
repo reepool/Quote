@@ -21,9 +21,9 @@ from research.business_profile_activity_production import (
     GovernedCounterpartyResolver,
     classify_entity_resolution_exception,
 )
-from research.business_profile_archive import (
-    BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
-    BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES,
+from research.business_profile_source_assets import (
+    BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION,
+    BUSINESS_PROFILE_USABLE_SOURCE_ASSET_STATUSES,
 )
 from research.business_profile_deterministic_extraction import (
     locate_action_object_spans,
@@ -156,9 +156,11 @@ def compute_business_profile_semantic_source_revision(
 ) -> str:
     """Hash the selected official inputs and retry state bound to a checkpoint."""
 
-    loader = manifest_loader or (
-        lambda instrument_id: _load_source_manifests(repository.storage, instrument_id)
-    )
+    if manifest_loader is None:
+        raise ValueError(
+            "business-profile source revision requires shared asset loader"
+        )
+    loader = manifest_loader
     planner = BusinessProfileDisclosurePlanner(
         coverage_inspector=BusinessProfileCoverageInspector(repository),
         max_documents=max_documents,
@@ -173,7 +175,8 @@ def compute_business_profile_semantic_source_revision(
         manifests = [
             dict(item)
             for item in loader(instrument_id)
-            if item.get("schema_version") == "business_profile_source_file_manifest.v1"
+            if item.get("schema_version")
+            == BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION
         ]
         open_exceptions = repository.list_exceptions(
             instrument_id=instrument_id,
@@ -259,116 +262,6 @@ def compute_business_profile_semantic_source_revision(
     )
 
 
-class BusinessProfilePlannedDisclosureAcquirer:
-    """Discover and archive only disclosures selected by the minimum planner."""
-
-    def __init__(
-        self,
-        *,
-        coordinator: Any,
-        archive_service: Any,
-        manifest_loader: Callable[[str], Sequence[Mapping[str, Any]]],
-        checkpoint_root: str | Path,
-        page_size: int = 30,
-        max_pages: int = 5,
-    ) -> None:
-        self.coordinator = coordinator
-        self.archive_service = archive_service
-        self.manifest_loader = manifest_loader
-        self.checkpoint_root = Path(checkpoint_root)
-        self.page_size = max(1, int(page_size))
-        self.max_pages = max(1, int(max_pages))
-
-    def acquire(
-        self,
-        *,
-        planner: BusinessProfileDisclosurePlanner,
-        instrument_id: str,
-        field_family: str,
-        knowledge_cutoff: str,
-        manifests: Sequence[Mapping[str, Any]],
-        initial_plan: Any,
-    ) -> Any:
-        """Return a replanned disclosure set after bounded official acquisition."""
-
-        if initial_plan.coverage.complete:
-            return initial_plan
-        instrument = _instrument_identity(instrument_id)
-        resolution = self.coordinator.discover_instrument(
-            instrument,
-            end_date=knowledge_cutoff,
-            page_size=self.page_size,
-            max_pages=self.max_pages,
-            dry_run=True,
-        )
-        candidates = list(resolution.candidates)
-        if not candidates:
-            raise RuntimeError(
-                "planned disclosure discovery returned no official candidates: "
-                f"status={resolution.status} instrument={instrument_id}"
-            )
-        discovered_plan = planner.plan(
-            instrument_id=instrument_id,
-            field_family=field_family,
-            knowledge_cutoff=knowledge_cutoff,
-            manifests=manifests,
-            discovered=candidates,
-        )
-        planner.acquire_missing(
-            discovered_plan,
-            instrument=instrument,
-            candidates=candidates,
-            archive_service=self.archive_service,
-            checkpoint_path=self.checkpoint_root / f"{instrument_id}.json",
-        )
-        refreshed = [
-            dict(item)
-            for item in self.manifest_loader(instrument_id)
-            if item.get("schema_version") == "business_profile_source_file_manifest.v1"
-        ]
-        return planner.plan(
-            instrument_id=instrument_id,
-            field_family=field_family,
-            knowledge_cutoff=knowledge_cutoff,
-            manifests=refreshed,
-        )
-
-
-def build_business_profile_planned_disclosure_acquirer(
-    repository: BusinessProfileRepository,
-    *,
-    research_config: Any,
-    checkpoint_root: str | Path,
-) -> BusinessProfilePlannedDisclosureAcquirer:
-    """Build the production acquirer on the common announcement/archive boundary."""
-
-    from research.business_profile_archive import BusinessProfileDocumentArchiveService
-    from research.business_profile_discovery import (
-        BusinessProfileAnnouncementDiscoveryAdapter,
-    )
-    from research.business_profile_exchange_discovery import (
-        BusinessProfileDiscoveryCoordinator,
-    )
-
-    storage = repository.storage
-    coordinator = BusinessProfileDiscoveryCoordinator.from_research_config(
-        research_config,
-        primary_adapter=BusinessProfileAnnouncementDiscoveryAdapter(storage=storage),
-    )
-    archive_service = BusinessProfileDocumentArchiveService.from_research_config(
-        storage=storage,
-        research_config=research_config,
-    )
-    return BusinessProfilePlannedDisclosureAcquirer(
-        coordinator=coordinator,
-        archive_service=archive_service,
-        manifest_loader=lambda instrument_id: _load_source_manifests(
-            storage, instrument_id
-        ),
-        checkpoint_root=checkpoint_root,
-    )
-
-
 def discover_business_profile_semantic_scope(
     repository: BusinessProfileRepository,
     *,
@@ -377,6 +270,7 @@ def discover_business_profile_semantic_scope(
     field_families: Sequence[str],
     runtime_identities: Mapping[str, str],
     active_universe_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
+    source_asset_loader: Callable[[str], Sequence[Mapping[str, Any]]],
     advance_rotation: bool = True,
 ) -> tuple[str, ...]:
     """Find frontier changes, coverage gaps, stale facts, and retry-due issuers."""
@@ -387,26 +281,27 @@ def discover_business_profile_semantic_scope(
     )
 
     storage = repository.storage
-    manifest_repository = getattr(storage, "financial_statements", None)
-    manifests = (
-        manifest_repository.get_source_file_manifests()
-        if manifest_repository is not None
-        and hasattr(manifest_repository, "get_source_file_manifests")
-        else storage.get_financial_source_file_manifests()
-    )
     manifests_by_instrument: dict[str, list[dict[str, Any]]] = {}
-    for row in manifests:
-        if (
-            row.get("schema_version") != BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
-            or str(row.get("published_at") or "")[:10] > knowledge_cutoff
-            or str(row.get("status") or "")
-            not in BUSINESS_PROFILE_USABLE_MANIFEST_STATUSES
-            or not row.get("content_hash")
-        ):
+    universe_rows = (
+        active_universe_loader()
+        if active_universe_loader is not None
+        else load_active_a_share_universe(storage, knowledge_cutoff=knowledge_cutoff)
+    )
+    for instrument in universe_rows:
+        instrument_id = str(instrument.get("instrument_id") or "")
+        if not instrument_id:
             continue
-        instrument_id = str(row.get("instrument_id") or "")
-        if instrument_id:
-            manifests_by_instrument.setdefault(instrument_id, []).append(dict(row))
+        rows = [
+            dict(row)
+            for row in source_asset_loader(instrument_id)
+            if row.get("schema_version") == BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION
+            and str(row.get("published_at") or "")[:10] <= knowledge_cutoff
+            and str(row.get("status") or "")
+            in BUSINESS_PROFILE_USABLE_SOURCE_ASSET_STATUSES
+            and row.get("content_hash")
+        ]
+        if rows:
+            manifests_by_instrument[instrument_id] = rows
     document_families = set(field_families) & DOCUMENT_FAMILIES
     completed: set[tuple[str, str, str]] = set()
     with storage.get_connection() as conn:
@@ -695,9 +590,7 @@ class BusinessProfileSemanticRuntime:
             Mapping[str, FieldFamilyPromotionManifest | Mapping[str, Any]] | None
         ) = None,
         counterparty_resolver: GovernedCounterpartyResolver | None = None,
-        planned_disclosure_acquirer: (
-            BusinessProfilePlannedDisclosureAcquirer | None
-        ) = None,
+        planned_disclosure_acquirer: Any | None = None,
         selection_policy: str = "latest_annual_only",
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
@@ -712,7 +605,7 @@ class BusinessProfileSemanticRuntime:
         )
         self.llm_client = llm_client
         self._async_bridge = _RuntimeAsyncBridge()
-        self.manifest_loader = manifest_loader or self._load_manifests
+        self.manifest_loader = manifest_loader or (lambda _instrument_id: ())
         self.template_catalog = template_catalog or load_disclosure_template_catalog()
         self.promotion_manifests = RuntimePromotionManifestSet.from_mapping(
             promotion_manifests or {}
@@ -724,7 +617,9 @@ class BusinessProfileSemanticRuntime:
         self.selection_policy = str(selection_policy or "latest_annual_only")
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
-        self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(self.storage)
+        self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(
+            self.storage
+        )
         self.unit_rule_registry = BusinessProfileUnitRuleRegistry(
             self.storage,
             primitive_multipliers=governed_primitive_multipliers(),
@@ -816,7 +711,7 @@ class BusinessProfileSemanticRuntime:
                 dict(item)
                 for item in self.manifest_loader(instrument_id)
                 if item.get("schema_version")
-                == "business_profile_source_file_manifest.v1"
+                == BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION
             ]
             exceptions = self.repository.list_exceptions(
                 instrument_id=instrument_id,
@@ -872,7 +767,7 @@ class BusinessProfileSemanticRuntime:
                             dict(item)
                             for item in self.manifest_loader(instrument_id)
                             if item.get("schema_version")
-                            == "business_profile_source_file_manifest.v1"
+                            == BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION
                         ]
                         acquired_plans += int(
                             bool(plan.included)
@@ -1036,7 +931,9 @@ class BusinessProfileSemanticRuntime:
                         page_artifact_cache_hits += 1
                         outline_seconds = 0.0
                         page_timings = {}
-                    outline_sources[outline.source] = outline_sources.get(outline.source, 0) + 1
+                    outline_sources[outline.source] = (
+                        outline_sources.get(outline.source, 0) + 1
+                    )
                     outline_confidences[outline.confidence] = (
                         outline_confidences.get(outline.confidence, 0) + 1
                     )
@@ -1108,7 +1005,11 @@ class BusinessProfileSemanticRuntime:
                         plan["instrument_id"],
                         plan["field_family"],
                         document["identity"],
-                        "shared" if cached_document is not None else page_result.get("cache_status"),
+                        (
+                            "shared"
+                            if cached_document is not None
+                            else page_result.get("cache_status")
+                        ),
                         page_result.get("status"),
                         len(selected.sections),
                         sum(len(item.normalized_text) for item in selected.sections),
@@ -1189,7 +1090,9 @@ class BusinessProfileSemanticRuntime:
             "source_revision": effective_scope.source_revision,
             "quality": {
                 "stage": "select",
-                "stage_ready": bool(planned_documents == len(selected_items) and not machine_rework),
+                "stage_ready": bool(
+                    planned_documents == len(selected_items) and not machine_rework
+                ),
                 "blocking_machine_rework": len(machine_rework),
                 "selected_documents": len(selected_items),
                 "selected_pages": pages,
@@ -1254,9 +1157,16 @@ class BusinessProfileSemanticRuntime:
         # Reconcile it before claiming new semantic work so persisted artifacts
         # are replayed without another extraction request.
         try:
-            rule_reconciliation = self.unit_rule_registry.reconcile_deterministic_rules()
+            rule_reconciliation = (
+                self.unit_rule_registry.reconcile_deterministic_rules()
+            )
         except (OSError, ValueError, sqlite3.Error) as exc:
-            rule_reconciliation = {"scanned": 0, "resolved": 0, "superseded": 0, "replayed": 0}
+            rule_reconciliation = {
+                "scanned": 0,
+                "resolved": 0,
+                "superseded": 0,
+                "replayed": 0,
+            }
             logger.warning(
                 "business-profile unit-rule deterministic reconciliation failed "
                 "error_type=%s",
@@ -1387,12 +1297,16 @@ class BusinessProfileSemanticRuntime:
                                 "replay_conversion_failed": True,
                             },
                         )
-                        metrics["semantic_artifact_conversion_pending"] = int(
-                            metrics.get("semantic_artifact_conversion_pending") or 0
-                        ) + 1
-                        metrics["semantic_artifact_replay_failures"] = int(
-                            metrics.get("semantic_artifact_replay_failures") or 0
-                        ) + 1
+                        metrics["semantic_artifact_conversion_pending"] = (
+                            int(
+                                metrics.get("semantic_artifact_conversion_pending") or 0
+                            )
+                            + 1
+                        )
+                        metrics["semantic_artifact_replay_failures"] = (
+                            int(metrics.get("semantic_artifact_replay_failures") or 0)
+                            + 1
+                        )
                         metrics["errors"] += 1
                         metrics["structured_fallback_rejected"] += 1
                         diagnostics_payload = _runtime_failure_diagnostics(
@@ -1428,10 +1342,13 @@ class BusinessProfileSemanticRuntime:
                                 unit_conversion_pending,
                                 reason="unit_normalization_failed",
                             )
-                            metrics["semantic_artifact_conversion_pending"] = int(
-                                metrics.get("semantic_artifact_conversion_pending")
-                                or 0
-                            ) + 1
+                            metrics["semantic_artifact_conversion_pending"] = (
+                                int(
+                                    metrics.get("semantic_artifact_conversion_pending")
+                                    or 0
+                                )
+                                + 1
+                            )
                             metrics["semantic_rows_unit_pending"] = int(
                                 metrics.get("semantic_rows_unit_pending") or 0
                             ) + len(unit_conversion_pending)
@@ -1445,9 +1362,9 @@ class BusinessProfileSemanticRuntime:
                                 runtime_version=RUNTIME_SCHEMA_VERSION,
                                 saved_tokens=dict(replay.get("usage") or {}),
                             )
-                            metrics["semantic_artifact_replays"] = int(
-                                metrics.get("semantic_artifact_replays") or 0
-                            ) + 1
+                            metrics["semantic_artifact_replays"] = (
+                                int(metrics.get("semantic_artifact_replays") or 0) + 1
+                            )
                             metrics["semantic_replay_saved_tokens"] = int(
                                 metrics.get("semantic_replay_saved_tokens") or 0
                             ) + int(
@@ -1526,11 +1443,15 @@ class BusinessProfileSemanticRuntime:
                         )
                         structured_fallback_used = True
                         semantic_audit = envelope.audit.to_dict()
-                        artifact_identity = _structured_artifact_identity(item, selected)
+                        artifact_identity = _structured_artifact_identity(
+                            item, selected
+                        )
                         artifact = self.semantic_artifacts.receive(
                             artifact_identity,
                             response=envelope.validated_response,
-                            response_hash=str(semantic_audit.get("response_hash") or ""),
+                            response_hash=str(
+                                semantic_audit.get("response_hash") or ""
+                            ),
                             evidence_ids=[
                                 str(span.get("evidence_span_id"))
                                 for row in envelope.validated_response.get("rows", [])
@@ -1555,9 +1476,9 @@ class BusinessProfileSemanticRuntime:
                             **dict(semantic_audit),
                             "semantic_artifact_id": semantic_artifact_id,
                         }
-                        metrics["semantic_artifact_receipts"] = int(
-                            metrics.get("semantic_artifact_receipts") or 0
-                        ) + 1
+                        metrics["semantic_artifact_receipts"] = (
+                            int(metrics.get("semantic_artifact_receipts") or 0) + 1
+                        )
                         logger.info(
                             "business-profile semantic artifact received artifact_id=%s "
                             "instrument_id=%s field_family=%s response_hash=%s",
@@ -1591,9 +1512,12 @@ class BusinessProfileSemanticRuntime:
                                 selected,
                                 envelope.rows,
                             )
-                            metrics["semantic_artifact_inline_replays"] = int(
-                                metrics.get("semantic_artifact_inline_replays") or 0
-                            ) + 1
+                            metrics["semantic_artifact_inline_replays"] = (
+                                int(
+                                    metrics.get("semantic_artifact_inline_replays") or 0
+                                )
+                                + 1
+                            )
                         records_by_type = dict(conversion.records_by_type)
                         unit_conversion_pending = [
                             dict(pending.diagnostic)
@@ -1606,10 +1530,13 @@ class BusinessProfileSemanticRuntime:
                                 unit_conversion_pending,
                                 reason="unit_normalization_failed",
                             )
-                            metrics["semantic_artifact_conversion_pending"] = int(
-                                metrics.get("semantic_artifact_conversion_pending")
-                                or 0
-                            ) + 1
+                            metrics["semantic_artifact_conversion_pending"] = (
+                                int(
+                                    metrics.get("semantic_artifact_conversion_pending")
+                                    or 0
+                                )
+                                + 1
+                            )
                             metrics["semantic_rows_unit_pending"] = int(
                                 metrics.get("semantic_rows_unit_pending") or 0
                             ) + len(unit_conversion_pending)
@@ -1628,9 +1555,9 @@ class BusinessProfileSemanticRuntime:
                             if key != "evidence"
                         )
                         metrics["structured_fallback_accepted_records"] += accepted
-                        metrics["structured_fallback_rejected_rows"] += (
-                            rejected_row_count
-                        )
+                        metrics[
+                            "structured_fallback_rejected_rows"
+                        ] += rejected_row_count
                         metrics["tokens"] += float(
                             (semantic_audit.get("usage") or {}).get("total_tokens") or 0
                         )
@@ -1704,9 +1631,13 @@ class BusinessProfileSemanticRuntime:
                                     "error_type": type(exc).__name__,
                                 },
                             )
-                            metrics["semantic_artifact_conversion_pending"] = int(
-                                metrics.get("semantic_artifact_conversion_pending") or 0
-                            ) + 1
+                            metrics["semantic_artifact_conversion_pending"] = (
+                                int(
+                                    metrics.get("semantic_artifact_conversion_pending")
+                                    or 0
+                                )
+                                + 1
+                            )
                         if reason == "blocked_configuration":
                             blocker = _semantic_configuration_reason(exc)
                             blocked_configuration_reasons[blocker] = (
@@ -1908,9 +1839,7 @@ class BusinessProfileSemanticRuntime:
             for record_type, record in semantic_records:
                 records_by_type.setdefault(record_type, []).append(record)
             item_record_count = sum(
-                len(rows)
-                for key, rows in records_by_type.items()
-                if key != "evidence"
+                len(rows) for key, rows in records_by_type.items() if key != "evidence"
             )
             if item_record_count == 0:
                 if expected_non_disclosure:
@@ -1925,7 +1854,10 @@ class BusinessProfileSemanticRuntime:
                         item["field_family"],
                         expected_non_disclosure=1,
                     )
-                elif item["field_family"] in {"atomic_activities", "named_relationships"}:
+                elif item["field_family"] in {
+                    "atomic_activities",
+                    "named_relationships",
+                }:
                     empty_reason = "semantic_no_explicit_facts"
                     if item["field_family"] == "named_relationships":
                         # Named counterparties are not disclosed by every issuer.
@@ -2195,9 +2127,7 @@ class BusinessProfileSemanticRuntime:
                 "structured_fallback_required": int(
                     metrics["structured_fallback_required"]
                 ),
-                "structured_fallback_calls": int(
-                    metrics["structured_fallback_calls"]
-                ),
+                "structured_fallback_calls": int(metrics["structured_fallback_calls"]),
                 "structured_fallback_accepted_records": int(
                     metrics["structured_fallback_accepted_records"]
                 ),
@@ -2303,9 +2233,7 @@ class BusinessProfileSemanticRuntime:
                     budget_stop_reason = self._network_budget_stop_reason(
                         config=config,
                         checkpoint_metrics=checkpoint.get("metrics") or {},
-                        stage_metrics=by_field_family.get(
-                            output["field_family"], {}
-                        ),
+                        stage_metrics=by_field_family.get(output["field_family"], {}),
                         stage_started_at=stage_started_at,
                         field_family=output["field_family"],
                     )
@@ -2540,9 +2468,7 @@ class BusinessProfileSemanticRuntime:
                 for record_id in record_ids:
                     record = self._find_record(record_type, record_id)
                     verification = verification_by_id.get(record_id)
-                    verification_proof = dict(
-                        (verification or {}).get("proof") or {}
-                    )
+                    verification_proof = dict((verification or {}).get("proof") or {})
                     proof = (
                         not output["semantic"]
                         if verification is None
@@ -2629,9 +2555,6 @@ class BusinessProfileSemanticRuntime:
                 "by_field_family": by_field_family,
             },
         }
-
-    def _load_manifests(self, instrument_id: str) -> Sequence[Mapping[str, Any]]:
-        return _load_source_manifests(self.storage, instrument_id)
 
     def _revised_scope(
         self,
@@ -2859,9 +2782,9 @@ class BusinessProfileSemanticRuntime:
                         ),
                     )
                 )
-                metrics["unit_proposal_llm_calls"] = int(
-                    metrics.get("unit_proposal_llm_calls") or 0
-                ) + 1
+                metrics["unit_proposal_llm_calls"] = (
+                    int(metrics.get("unit_proposal_llm_calls") or 0) + 1
+                )
             except Exception as proposal_exc:
                 proposal = {
                     "source_unit": resolution.source_unit,
@@ -2886,9 +2809,9 @@ class BusinessProfileSemanticRuntime:
                 model_identity=str(semantic_audit.get("actual_model") or "") or None,
             )
             registered.append(rule)
-            metrics["unit_rule_proposals"] = int(
-                metrics.get("unit_rule_proposals") or 0
-            ) + 1
+            metrics["unit_rule_proposals"] = (
+                int(metrics.get("unit_rule_proposals") or 0) + 1
+            )
             rule_status = str(rule.get("status") or "unknown")
             metric_name = f"unit_rule_{rule_status}"
             metrics[metric_name] = int(metrics.get(metric_name) or 0) + 1
@@ -3647,8 +3570,7 @@ def _semantic_evidence(
     exact = assertion["evidence"]
     exact_spans = list(exact.get("evidence_spans") or [])
     primary_section_id = str(
-        (exact_spans[0] if exact_spans else {}).get("section_id")
-        or exact["section_id"]
+        (exact_spans[0] if exact_spans else {}).get("section_id") or exact["section_id"]
     )
     section = next(
         value for value in selected.sections if value.section_id == primary_section_id
@@ -3843,17 +3765,20 @@ def _semantic_segment_record(
         None if margin_raw is None else float(normalize_ratio(margin_raw, margin_unit))
     )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
-    record_id = "bp-segment-" + _stable_hash(
-        {
-            "document": item["document"]["identity"],
-            "segment_type": row["segment_type"],
-            "segment_name_raw": row["segment_name_raw"],
-            "evidence": row["evidence"],
-            "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-            "processing_contract": _structured_record_contract_identity(),
-            "unit_resolutions": unit_resolutions,
-        }
-    )[:24]
+    record_id = (
+        "bp-segment-"
+        + _stable_hash(
+            {
+                "document": item["document"]["identity"],
+                "segment_type": row["segment_type"],
+                "segment_name_raw": row["segment_name_raw"],
+                "evidence": row["evidence"],
+                "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+                "processing_contract": _structured_record_contract_identity(),
+                "unit_resolutions": unit_resolutions,
+            }
+        )[:24]
+    )
     segment_id, canonical_name = _canonical_segment_identity(
         str(row["segment_name_raw"]), str(row["segment_type"])
     )
@@ -3885,8 +3810,7 @@ def _semantic_segment_record(
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
             "semantic_synthesis": True,
             "semantic_summary_zh": row.get("semantic_summary_zh"),
-            "source_label_raw": row.get("source_label_raw")
-            or row["segment_name_raw"],
+            "source_label_raw": row.get("source_label_raw") or row["segment_name_raw"],
             "model_derived_hints": dict(row.get("model_derived_hints") or {}),
             "source_units": {
                 "revenue": row.get("revenue_unit_raw") or raw_unit,
@@ -3989,18 +3913,21 @@ def _semantic_operating_record(
         )
     )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
-    record_id = "bp-operating-" + _stable_hash(
-        {
-            "document": item["document"]["identity"],
-            "segment_name_raw": row["segment_name_raw"],
-            "fact_type": row["fact_type"],
-            "fact_scope": row["fact_scope"],
-            "evidence": row["evidence"],
-            "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-            "processing_contract": _structured_record_contract_identity(),
-            "unit_resolution": unit_resolution.to_dict(),
-        }
-    )[:24]
+    record_id = (
+        "bp-operating-"
+        + _stable_hash(
+            {
+                "document": item["document"]["identity"],
+                "segment_name_raw": row["segment_name_raw"],
+                "fact_type": row["fact_type"],
+                "fact_scope": row["fact_scope"],
+                "evidence": row["evidence"],
+                "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+                "processing_contract": _structured_record_contract_identity(),
+                "unit_resolution": unit_resolution.to_dict(),
+            }
+        )[:24]
+    )
     segment_id, canonical_name = _canonical_segment_identity(
         str(row["segment_name_raw"]), "product"
     )
@@ -4029,8 +3956,7 @@ def _semantic_operating_record(
             "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
             "semantic_synthesis": True,
             "semantic_summary_zh": row.get("semantic_summary_zh"),
-            "source_label_raw": row.get("source_label_raw")
-            or row["segment_name_raw"],
+            "source_label_raw": row.get("source_label_raw") or row["segment_name_raw"],
             "canonical_segment_name": canonical_name,
             "model_derived_hints": dict(row.get("model_derived_hints") or {}),
             "unit_resolution": unit_resolution.to_dict(),
@@ -4086,9 +4012,10 @@ def _apply_segment_reconciliation(
     metadata["numeric_reconciliation"] = result.to_dict()
     metadata["numeric_reconciliation_status"] = result.status
     metadata["numeric_reconciliation_executed"] = True
-    metadata["numeric_reconciliation_valid"] = (
-        result.passed or result.status in {"derived", "not_applicable"}
-    )
+    metadata["numeric_reconciliation_valid"] = result.passed or result.status in {
+        "derived",
+        "not_applicable",
+    }
     if result.status == "derived":
         metadata["derived_gross_margin"] = (
             str(result.calculated_value)
@@ -4111,9 +4038,11 @@ def _canonical_segment_identity(
             product_id = resolution.product_ids[0]
             product = load_business_product_catalog().require_product(product_id)
             return f"segment-product-{product_id}", product.label_zh
-    return "segment-" + _stable_hash(
-        {"segment_type": segment_type, "source_label": normalized}
-    )[:16], normalized
+    return (
+        "segment-"
+        + _stable_hash({"segment_type": segment_type, "source_label": normalized})[:16],
+        normalized,
+    )
 
 
 def _structured_record_contract_identity() -> dict[str, str]:
@@ -4346,15 +4275,6 @@ def _publication_gap_reason(exc: ValueError) -> str:
         "stale_product_commodity_catalog",
     }
     return reason if reason in supported else "catalog_proposal"
-
-
-def _load_source_manifests(
-    storage: Any, instrument_id: str
-) -> Sequence[Mapping[str, Any]]:
-    repository = getattr(storage, "financial_statements", None)
-    if repository is not None and hasattr(repository, "get_source_file_manifests"):
-        return repository.get_source_file_manifests(instrument_id=instrument_id)
-    return storage.get_financial_source_file_manifests(instrument_id=instrument_id)
 
 
 def _instrument_identity(instrument_id: str) -> dict[str, str]:

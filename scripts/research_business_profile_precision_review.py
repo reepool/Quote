@@ -30,14 +30,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     export = subparsers.add_parser("export")
     export.add_argument("--research-db", type=Path, required=True)
-    export.add_argument("--financials-db", type=Path, required=True)
+    export.add_argument("--announcement-assets-db", type=Path, required=True)
     export.add_argument("--instrument-id", action="append")
     export.add_argument("--report-period")
     export.add_argument("--minimum-revenue-share", type=float, default=0.01)
 
     catalog_issues = subparsers.add_parser("export-catalog-issues")
     catalog_issues.add_argument("--research-db", type=Path, required=True)
-    catalog_issues.add_argument("--financials-db", type=Path, required=True)
+    catalog_issues.add_argument("--announcement-assets-db", type=Path, required=True)
     catalog_issues.add_argument("--instrument-id", action="append")
     catalog_issues.add_argument("--report-period")
     catalog_issues.add_argument("--minimum-revenue-share", type=float, default=0.01)
@@ -53,7 +53,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     audit = subparsers.add_parser("audit")
     audit.add_argument("--research-db", type=Path, required=True)
-    audit.add_argument("--financials-db", type=Path, required=True)
+    audit.add_argument("--announcement-assets-db", type=Path, required=True)
     audit.add_argument("--report-period")
     audit.add_argument("--minimum-revenue-share", type=float, default=0.01)
     audit.add_argument(
@@ -80,7 +80,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.command == "export":
         payload = build_product_label_review_package(
             research_db=args.research_db,
-            financials_db=args.financials_db,
+            financials_db=args.announcement_assets_db,
             instrument_ids=args.instrument_id,
             report_period=args.report_period,
             minimum_revenue_share=args.minimum_revenue_share,
@@ -88,7 +88,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     elif args.command == "export-catalog-issues":
         payload = build_product_catalog_issue_review_package(
             research_db=args.research_db,
-            financials_db=args.financials_db,
+            financials_db=args.announcement_assets_db,
             instrument_ids=args.instrument_id,
             report_period=args.report_period,
             minimum_revenue_share=args.minimum_revenue_share,
@@ -97,7 +97,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     elif args.command == "audit":
         payload = audit_product_label_review_readiness(
             research_db=args.research_db,
-            financials_db=args.financials_db,
+            financials_db=args.announcement_assets_db,
             report_period=args.report_period,
             minimum_revenue_share=args.minimum_revenue_share,
             minimum_precision_lower_bound=args.minimum_precision_lower_bound,

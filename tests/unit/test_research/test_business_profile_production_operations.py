@@ -1,4 +1,3 @@
-import hashlib
 import sqlite3
 from types import SimpleNamespace
 
@@ -11,7 +10,6 @@ from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_production_operations import (
     BusinessProfileAnnouncementFrontierRepository,
     BusinessProfileIndexDiscoveryService,
-    audit_business_profile_archive,
     build_business_profile_reconciliation_report,
     discover_business_profile_shared_annual_reports,
 )
@@ -122,7 +120,12 @@ def test_shared_only_business_profile_discovery_uses_effective_assets_zero_provi
         def __init__(self):
             self.calls = []
 
-        def list_assets(self, *, limit, offset):
+        def list_effective_assets(self, **kwargs):
+            limit = kwargs["limit"]
+            offset = kwargs["offset"]
+            assert kwargs["document_family"] == "annual_report"
+            assert kwargs["knowledge_cutoff"] == "2026-04-30"
+            assert kwargs["availability"] == "local_valid"
             self.calls.append((limit, offset))
             if offset:
                 return {"items": []}
@@ -142,17 +145,6 @@ def test_shared_only_business_profile_discovery_uses_effective_assets_zero_provi
                         "content_hash": "a" * 64,
                         "published_at": "2026-03-30T08:00:00+08:00",
                         "is_correction": False,
-                    },
-                    {
-                        "asset_id": "asset-after-cutoff",
-                        "instrument_id": "600001.SH",
-                        "fiscal_year": 2025,
-                        "report_period": "2025-12-31",
-                        "document_family": "annual_report",
-                        "availability": "local_valid",
-                        "source": "cninfo",
-                        "source_announcement_id": "annual-after-cutoff",
-                        "published_at": "2026-05-02T08:00:00+08:00",
                     },
                 ]
             }
@@ -227,6 +219,7 @@ def test_scope_rotation_covers_active_issuers_without_manifests(tmp_path):
         "max_instruments": 2,
         "field_families": ("derived_value_chain_roles",),
         "runtime_identities": {"rules": "rules.v1"},
+        "source_asset_loader": lambda _instrument_id: (),
     }
 
     first = discover_business_profile_semantic_scope(repository, **kwargs)
@@ -369,8 +362,7 @@ def test_page_bound_discovery_splits_and_persists_date_windows(tmp_path):
         "business_profile_discovery_windows:SSE"
     )
     assert {
-        (item["start_date"], item["end_date"])
-        for item in state["pending_windows"]
+        (item["start_date"], item["end_date"]) for item in state["pending_windows"]
     } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
 
 
@@ -444,8 +436,7 @@ def test_dense_window_preflight_splits_after_first_page(tmp_path):
         "business_profile_discovery_windows:SSE"
     )
     assert {
-        (item["start_date"], item["end_date"])
-        for item in state["pending_windows"]
+        (item["start_date"], item["end_date"]) for item in state["pending_windows"]
     } == {("2026-04-01", "2026-04-15"), ("2026-04-16", "2026-04-30")}
     assert all("next_page" not in item for item in state["pending_windows"])
 
@@ -574,8 +565,7 @@ def test_closed_single_day_checkpoint_resumes_and_completes(tmp_path):
     ]
     assert [query.scope.start_page for query in single_day_queries] == [1, 3]
     assert all(
-        query.scope.preflight_page_bound is False
-        for query in single_day_queries
+        query.scope.preflight_page_bound is False for query in single_day_queries
     )
 
 
@@ -648,9 +638,10 @@ def test_current_day_window_ignores_persisted_page_offset(tmp_path):
 
     assert announcement_service.query.scope.start_page == 1
     assert report["page_resumes"] == 0
-    assert frontier.get_state("business_profile_discovery_windows:SSE")[
-        "pending_windows"
-    ] == []
+    assert (
+        frontier.get_state("business_profile_discovery_windows:SSE")["pending_windows"]
+        == []
+    )
 
 
 def test_complete_market_scan_runs_bounded_rotating_missing_company_repair(tmp_path):
@@ -747,28 +738,28 @@ def test_reconciliation_does_not_require_prior_year_annual_before_may(tmp_path):
             )
         ],
     )
-    storage.financial_statements = SimpleNamespace(
-        get_source_file_manifests=lambda: [
-            {
-                "schema_version": "business_profile_source_file_manifest.v1",
-                "instrument_id": "600000.SH",
-                "report_period": "2024-12-31",
-                "report_type": "annual_report",
-                "published_at": "2025-03-30",
-                "status": "verified",
-                "content_hash": "a" * 64,
-                "archive_path": "data/filings/business_profile/2024/SSE/report.pdf",
-            }
-        ]
+    shared_access = SimpleNamespace(
+        list_effective_assets=lambda **_kwargs: {
+            "returned": 1,
+            "items": [
+                {
+                    "instrument_id": "600000.SH",
+                    "report_period": "2024-12-31",
+                    "published_at": "2025-03-30",
+                }
+            ],
+        }
     )
 
     before_deadline = build_business_profile_reconciliation_report(
         storage,
+        shared_asset_access=shared_access,
         frequency="monthly",
         knowledge_cutoff="2026-04-30",
     )
     after_deadline = build_business_profile_reconciliation_report(
         storage,
+        shared_asset_access=shared_access,
         frequency="monthly",
         knowledge_cutoff="2026-05-01",
     )
@@ -851,12 +842,13 @@ def test_correction_frontier_converges_when_source_returns_newest_first(tmp_path
         }
     assert rows["annual-original"]["status"] == "superseded"
     assert rows["annual-correction"]["status"] == "pending"
-    assert rows["annual-correction"]["supersedes_frontier_id"] == (
-        rows["annual-original"]["frontier_id"]
+    assert (
+        rows["annual-correction"]["supersedes_frontier_id"]
+        == (rows["annual-original"]["frontier_id"])
     )
 
 
-def test_frontier_marks_only_manifested_announcements_processed(tmp_path):
+def test_frontier_marks_only_shared_asset_announcements_processed(tmp_path):
     storage = _storage(tmp_path)
     frontier = BusinessProfileAnnouncementFrontierRepository(storage)
     instrument = {
@@ -876,21 +868,24 @@ def test_frontier_marks_only_manifested_announcements_processed(tmp_path):
                 published_at="2026-04-02T08:00:00+08:00",
             ),
         )
-    storage.financial_statements = SimpleNamespace(
-        get_source_file_manifests=lambda: [
-            {
-                "schema_version": "business_profile_source_file_manifest.v1",
-                "instrument_id": "600000.SH",
-                "source": "cninfo",
-                "filing_id": "annual-2025",
-                "status": "archived_unchanged_content",
-                "content_hash": "a" * 64,
-                "archive_path": "data/filings/business_profile/2025/SSE/a.pdf",
-            }
-        ]
+    shared_access = SimpleNamespace(
+        list_effective_assets=lambda **_kwargs: {
+            "items": [
+                {
+                    "instrument_id": "600000.SH",
+                    "source": "cninfo",
+                    "source_announcement_id": "annual-2025",
+                }
+            ]
+        }
     )
 
-    assert frontier.mark_manifested_processed(["600000.SH"]) == 1
+    assert (
+        frontier.mark_shared_assets_processed(
+            ["600000.SH"], shared_asset_access=shared_access
+        )
+        == 1
+    )
     with storage.get_connection() as conn:
         statuses = {
             row["announcement_id"]: row["status"]
@@ -900,47 +895,3 @@ def test_frontier_marks_only_manifested_announcements_processed(tmp_path):
             ).fetchall()
         }
     assert statuses == {"annual-2025": "processed", "semiannual-2026": "pending"}
-
-
-def test_archive_audit_resolves_relative_paths_and_never_allows_deletion(tmp_path):
-    archive_root = tmp_path / "filings"
-    archive_root.mkdir()
-    pdf = archive_root / "annual.pdf"
-    pdf.write_bytes(b"%PDF-1.7\narchive")
-    digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
-    financials_db = tmp_path / "financials.db"
-    with sqlite3.connect(financials_db) as conn:
-        conn.execute("CREATE TABLE financial_source_files (source_file_id TEXT)")
-    storage = SimpleNamespace(
-        financials_db_path=str(financials_db),
-        financial_statements=SimpleNamespace(
-            get_source_file_manifests=lambda: [
-                {
-                    "schema_version": "business_profile_source_file_manifest.v1",
-                    "source_file_id": "source-1",
-                    "archive_path": "annual.pdf",
-                    "content_hash": digest,
-                    "supersedes_source_file_id": None,
-                }
-            ]
-        ),
-    )
-
-    report = audit_business_profile_archive(storage, archive_root=archive_root)
-
-    assert report["automatic_deletion_allowed"] is False
-    assert report["classifications"]["active"] == [str(pdf.resolve())]
-    assert report["classifications"]["unreferenced"] == []
-
-
-def test_archive_audit_without_manifest_schema_is_ungoverned(tmp_path):
-    archive_root = tmp_path / "filings"
-    archive_root.mkdir()
-    (archive_root / "annual.pdf").write_bytes(b"%PDF-1.7\narchive")
-    storage = SimpleNamespace(financials_db_path=str(tmp_path / "missing.db"))
-
-    report = audit_business_profile_archive(storage, archive_root=archive_root)
-
-    assert report["status"] == "ungoverned_archive"
-    assert report["manifest_table_exists"] is False
-    assert report["automatic_deletion_allowed"] is False

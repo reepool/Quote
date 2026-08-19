@@ -237,9 +237,8 @@ class AnnualReportDailyUpdater:
             if operation_id and self.repository.operation_stop_requested(operation_id):
                 return "operator_stop_requested"
             return None
-        universe_refresh_failed = bool(
-            universe_metrics.get("universe_refresh_failed")
-        )
+
+        universe_refresh_failed = bool(universe_metrics.get("universe_refresh_failed"))
         if universe_refresh_failed:
             refresh_error = str(
                 universe_metrics.get("universe_refresh_error")
@@ -336,8 +335,10 @@ class AnnualReportDailyUpdater:
             "annual-report daily stage started: stage=reconciliation cutoff=%s",
             cutoff,
         )
-        if not stop_requested and not (reason := stop_reason()) and (
-            discover is not None or self.acquisition_service is not None
+        if (
+            not stop_requested
+            and not (reason := stop_reason())
+            and (discover is not None or self.acquisition_service is not None)
         ):
             route = self._oldest_publication_reconciliation_route()
             if route is not None:
@@ -369,8 +370,7 @@ class AnnualReportDailyUpdater:
                         blocking_reasons.append(
                             "retry_exhausted"
                             if publication.status == "exhausted"
-                            else publication.stop_reason
-                            or "operator_action_required"
+                            else publication.stop_reason or "operator_action_required"
                         )
                     errors.append(
                         f"long_reconciliation:{source}/{exchange}: "
@@ -434,8 +434,12 @@ class AnnualReportDailyUpdater:
             stop_requested = True
             if reason not in errors:
                 errors.append(reason)
-        queued = 0 if stop_requested else self._queue_metadata_winners(
-            seen_attachment_ids, operation_id=operation_id
+        queued = (
+            0
+            if stop_requested
+            else self._queue_metadata_winners(
+                seen_attachment_ids, operation_id=operation_id
+            )
         )
         LOGGER.info(
             "annual-report daily stage started: stage=attachment_retry queued=%s",
@@ -531,9 +535,7 @@ class AnnualReportDailyUpdater:
                     OperationStatus.BLOCKED,
                     outcome=BatchOutcome.BLOCKED,
                     reason_code=reason_code,
-                    diagnostics={
-                        "retry_blockers": sorted(set(blocking_reasons))
-                    },
+                    diagnostics={"retry_blockers": sorted(set(blocking_reasons))},
                     **fence_kwargs,
                 )
         affected_events = self.repository.list_change_events(
@@ -546,9 +548,11 @@ class AnnualReportDailyUpdater:
             1
             for instrument_id, fiscal_year in affected_periods
             if (
-                (report := self.repository.get_effective_report(
-                    instrument_id, fiscal_year
-                ))
+                (
+                    report := self.repository.get_effective_report(
+                        instrument_id, fiscal_year
+                    )
+                )
                 is not None
                 and report.decision_state is EffectiveDecisionState.AMBIGUOUS
             )
@@ -605,8 +609,7 @@ class AnnualReportDailyUpdater:
             ),
             "withdrawal_relations": withdrawal_relations,
             "withdrawal_scopes_reconciled": withdrawal_result[0],
-            "withdrawal_failures": len(withdrawal_scope_errors)
-            + withdrawal_result[1],
+            "withdrawal_failures": len(withdrawal_scope_errors) + withdrawal_result[1],
             "excluded_count": int(classification_metrics["excluded_count"]),
             "ambiguous_count": ambiguous_count,
             "effective_additions": effective_additions,
@@ -674,8 +677,7 @@ class AnnualReportDailyUpdater:
             if (
                 not asset_id
                 or not isinstance(payload, Mapping)
-                or payload.get("decision_state")
-                != EffectiveDecisionState.CURRENT.value
+                or payload.get("decision_state") != EffectiveDecisionState.CURRENT.value
                 or payload.get("availability") != "local_valid"
             ):
                 continue
@@ -1332,9 +1334,7 @@ class AnnualReportDailyUpdater:
         for record in records:
             published = getattr(record, "published_at", None)
             if published and classification_metrics is not None:
-                delays = classification_metrics.setdefault(
-                    "provider_delay_seconds", []
-                )
+                delays = classification_metrics.setdefault("provider_delay_seconds", [])
                 if len(delays) < 1000:
                     delays.append(
                         max(0.0, (cutoff_time - _parse_time(published)).total_seconds())
@@ -1349,6 +1349,7 @@ class AnnualReportDailyUpdater:
                 self._update_classification_metrics(
                     registered,
                     instrument_id=instrument_id,
+                    allowed_families=self.config.acquisition.normalized_categories,
                     classification_metrics=classification_metrics,
                 )
                 continue
@@ -1360,9 +1361,15 @@ class AnnualReportDailyUpdater:
             self._update_classification_metrics(
                 registered,
                 instrument_id=instrument_id,
+                allowed_families=self.config.acquisition.normalized_categories,
                 classification_metrics=classification_metrics,
             )
-            attachment_ids.update(item.attachment_id for item in registered)
+            attachment_ids.update(
+                item.attachment_id
+                for item in registered
+                if item.classification.document_family
+                in self.config.acquisition.normalized_categories
+            )
             # Keep the source announcement identity in the same exclusion set
             # so a report activated by this batch is not immediately fetched
             # again by silent-byte verification.
@@ -1378,18 +1385,21 @@ class AnnualReportDailyUpdater:
         candidates: Iterable[Any],
         *,
         instrument_id: str | None,
+        allowed_families: Sequence[str],
         classification_metrics: dict[str, Any] | None,
     ) -> None:
         if classification_metrics is None:
             return
         periods = classification_metrics.setdefault("affected_periods", set())
+        allowed = set(allowed_families)
         for candidate in candidates:
             classification = candidate.classification
-            if not classification.is_eligible:
+            supported = classification.document_family in allowed
+            if not classification.is_eligible or not supported:
                 classification_metrics["excluded_count"] = (
                     int(classification_metrics.get("excluded_count", 0)) + 1
                 )
-            if instrument_id and classification.fiscal_year is not None:
+            if supported and instrument_id and classification.fiscal_year is not None:
                 periods.add((instrument_id, int(classification.fiscal_year)))
 
     @staticmethod
@@ -1541,16 +1551,12 @@ class AnnualReportDailyUpdater:
                 f"{relation_row.get('attachment_id')}"
             )
             if not target or not evidence_type:
-                errors.append(
-                    f"withdrawal_relation_incomplete:{relation_identity}"
-                )
+                errors.append(f"withdrawal_relation_incomplete:{relation_identity}")
                 continue
             matches: dict[str, tuple[str, int]] = {}
             for candidate_row in rows:
                 classification = candidate_row.get("classification") or {}
-                instrument_id = str(
-                    candidate_row.get("instrument_id") or ""
-                ).strip()
+                instrument_id = str(candidate_row.get("instrument_id") or "").strip()
                 fiscal_year = classification.get("fiscal_year")
                 if (
                     not classification.get("is_eligible")
@@ -1610,8 +1616,7 @@ class AnnualReportDailyUpdater:
         )
         for retry in retries:
             if operation_stop_reason(operation_id) or (
-                operation_id
-                and self.repository.operation_stop_requested(operation_id)
+                operation_id and self.repository.operation_stop_requested(operation_id)
             ):
                 break
             attachment_id = str(retry["attachment_id"])
@@ -1641,9 +1646,7 @@ class AnnualReportDailyUpdater:
                         else latest_version.error_code or "attachment_not_valid"
                     )
                 if asset is None:
-                    self.repository.finish_attachment_retry(
-                        attachment_id, success=True
-                    )
+                    self.repository.finish_attachment_retry(attachment_id, success=True)
                     if had_valid:
                         reused += 1
                     else:
@@ -1651,19 +1654,15 @@ class AnnualReportDailyUpdater:
                     continue
                 retry_metadata = retry.get("metadata") or {}
                 predecessor_pending_correction = (
-                    retry_metadata.get("variant")
-                    == AnnualReportVariant.ORIGINAL.value
-                    and asset.decision_state
-                    is EffectiveDecisionState.PROVISIONAL
+                    retry_metadata.get("variant") == AnnualReportVariant.ORIGINAL.value
+                    and asset.decision_state is EffectiveDecisionState.PROVISIONAL
                     and asset.availability.value == "local_valid"
                 )
                 if (
                     asset.decision_state is not EffectiveDecisionState.CURRENT
                     and not predecessor_pending_correction
                 ):
-                    self.repository.finish_attachment_retry(
-                        attachment_id, success=True
-                    )
+                    self.repository.finish_attachment_retry(attachment_id, success=True)
                     if had_valid:
                         reused += 1
                     else:
@@ -1762,7 +1761,9 @@ class AnnualReportDailyUpdater:
                     else "unavailable",
                     "universe_refresh_attempted_at": cutoff,
                     "universe_refresh_effective_at": (
-                        None if previous_row is None else previous_row.get("snapshot_at")
+                        None
+                        if previous_row is None
+                        else previous_row.get("snapshot_at")
                     ),
                     "paired_census_snapshot_id": previous_pair_id,
                     "universe_full_market_complete": _snapshot_row_full_market_complete(
@@ -1803,7 +1804,9 @@ class AnnualReportDailyUpdater:
                     "universe_refresh_error": f"{type(exc).__name__}:{exc}",
                     "universe_refresh_attempted_at": cutoff,
                     "universe_refresh_effective_at": (
-                        None if previous_row is None else previous_row.get("snapshot_at")
+                        None
+                        if previous_row is None
+                        else previous_row.get("snapshot_at")
                     ),
                     "paired_census_snapshot_id": previous_pair_id,
                     "universe_full_market_complete": _snapshot_row_full_market_complete(
@@ -2023,9 +2026,7 @@ class AnnualReportDailyUpdater:
                     "expected_period_coverage": (
                         ExpectedPeriodCoverage.CURRENT.value
                         if report.fiscal_year == row.get("expected_fiscal_year")
-                        else (row.get("evidence") or {}).get(
-                            "expected_period_coverage"
-                        )
+                        else (row.get("evidence") or {}).get("expected_period_coverage")
                     ),
                     "latest_winner_fiscal_year": report.fiscal_year,
                     "daily_repair_asset_id": report.asset_id,
@@ -2242,9 +2243,7 @@ def _window_start(
 ) -> str:
     if covered_until:
         try:
-            start = (
-                _parse_time(covered_until) - timedelta(days=overlap_days)
-            )
+            start = _parse_time(covered_until) - timedelta(days=overlap_days)
             cutoff_time = _parse_time(cutoff)
             return min(start, cutoff_time).isoformat()
         except ValueError:
@@ -2473,9 +2472,7 @@ def _snapshot_row_full_market_complete(row: Mapping[str, Any] | None) -> bool:
         return False
     metadata = row.get("metadata") or row.get("metadata_json") or {}
     reconciliation = (
-        metadata.get("census_reconciliation")
-        if isinstance(metadata, Mapping)
-        else None
+        metadata.get("census_reconciliation") if isinstance(metadata, Mapping) else None
     )
     return bool(
         isinstance(reconciliation, Mapping)

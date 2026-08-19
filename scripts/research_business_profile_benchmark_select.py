@@ -29,7 +29,7 @@ from research.business_profile_corpus import (
 def build_parser_benchmark(
     *,
     research_db: Path,
-    financials_db: Path,
+    announcement_assets_db: Path,
     quotes_db: Path,
     as_of_date: str,
     evidence_path: Optional[Path] = None,
@@ -48,9 +48,9 @@ def build_parser_benchmark(
         lifecycle,
         as_of_date=as_of_date,
     )
-    with _read_only_connection(financials_db) as financials_conn:
+    with _read_only_connection(announcement_assets_db) as asset_conn:
         source_manifests = load_business_profile_source_manifests(
-            financials_conn,
+            asset_conn,
             [str(item["instrument_id"]) for item in universe],
         )
     evidence = _load_evidence(evidence_path)
@@ -63,7 +63,7 @@ def build_parser_benchmark(
     return {
         "as_of_date": as_of_date,
         "research_db": str(research_db),
-        "financials_db": str(financials_db),
+        "announcement_assets_db": str(announcement_assets_db),
         "quotes_db": str(quotes_db),
         "evidence_path": str(evidence_path) if evidence_path else None,
         **result,
@@ -74,7 +74,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--research-db", type=Path, default=Path("data/research.db"))
     parser.add_argument(
-        "--financials-db", type=Path, default=Path("data/financials.db")
+        "--announcement-assets-db", type=Path, default=Path("data/research.db")
     )
     parser.add_argument("--quotes-db", type=Path, default=Path("data/quotes.db"))
     parser.add_argument("--as-of-date", default=date.today().isoformat())
@@ -84,7 +84,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
     payload = build_parser_benchmark(
         research_db=args.research_db,
-        financials_db=args.financials_db,
+        announcement_assets_db=args.announcement_assets_db,
         quotes_db=args.quotes_db,
         as_of_date=args.as_of_date,
         evidence_path=args.evidence,

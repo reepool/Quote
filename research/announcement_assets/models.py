@@ -134,7 +134,9 @@ class DocumentFamilyEffectiveVersionPolicy:
             )
         )
         if not rules:
-            raise ValueError("effective_version_policy.precedence_rules must be non-empty")
+            raise ValueError(
+                "effective_version_policy.precedence_rules must be non-empty"
+            )
         object.__setattr__(self, "precedence_rules", rules)
         object.__setattr__(
             self,
@@ -183,7 +185,9 @@ class DocumentFamilyEffectiveVersionPolicy:
             )
         rules = raw.get("precedence_rules", ())
         if isinstance(rules, (str, bytes)) or not isinstance(rules, (list, tuple)):
-            raise TypeError("effective_version_policy.precedence_rules must be an array")
+            raise TypeError(
+                "effective_version_policy.precedence_rules must be an array"
+            )
         return cls(
             policy_version=_policy_text(
                 raw.get("policy_version"), "effective_version_policy.policy_version"
@@ -208,7 +212,9 @@ class DocumentFamilyRetentionPolicy:
 
     def __post_init__(self) -> None:
         _policy_text(self.policy_version, "retention_policy.policy_version")
-        object.__setattr__(self, "mode", _policy_text(self.mode, "retention_policy.mode"))
+        object.__setattr__(
+            self, "mode", _policy_text(self.mode, "retention_policy.mode")
+        )
         if type(self.retain_metadata) is not bool:
             raise TypeError("retention_policy.retain_metadata must be a boolean")
         object.__setattr__(
@@ -260,7 +266,9 @@ class DocumentFamilyRetentionPolicy:
                 "retention_policy contains unknown fields: " + ", ".join(unknown)
             )
         return cls(
-            policy_version=_policy_text(raw.get("policy_version"), "retention_policy.policy_version"),
+            policy_version=_policy_text(
+                raw.get("policy_version"), "retention_policy.policy_version"
+            ),
             mode=_policy_text(raw.get("mode"), "retention_policy.mode"),
             retain_metadata=raw.get("retain_metadata", True),
             retain_superseded_bytes=raw.get(
@@ -310,7 +318,9 @@ class DocumentFamilyAcquisitionPolicy:
                 raise ValueError("unsupported acquisition_policy.scope") from exc
         if self.schema_version != ACQUISITION_POLICY_SCHEMA_VERSION:
             raise ValueError("unsupported acquisition_policy.schema_version")
-        if not isinstance(self.effective_version_policy, DocumentFamilyEffectiveVersionPolicy):
+        if not isinstance(
+            self.effective_version_policy, DocumentFamilyEffectiveVersionPolicy
+        ):
             object.__setattr__(
                 self,
                 "effective_version_policy",
@@ -338,29 +348,45 @@ class DocumentFamilyAcquisitionPolicy:
         for name in ("universe_policy_version", "governance_policy_version"):
             value = getattr(self, name)
             if value is not None:
-                object.__setattr__(self, name, _policy_text(value, f"acquisition_policy.{name}"))
-        environment = _policy_text(self.environment, "acquisition_policy.environment").lower()
+                object.__setattr__(
+                    self, name, _policy_text(value, f"acquisition_policy.{name}")
+                )
+        environment = _policy_text(
+            self.environment, "acquisition_policy.environment"
+        ).lower()
         if environment not in {"production", "test", "development"}:
-            raise ValueError("acquisition_policy.environment must be production, test, or development")
+            raise ValueError(
+                "acquisition_policy.environment must be production, test, or development"
+            )
         object.__setattr__(self, "environment", environment)
 
         if self.scope is DocumentFamilyAcquisitionScope.METADATA_ONLY:
             if self.proactive_enabled or self.explicit_universe:
-                raise ValueError("metadata_only policy cannot proactively acquire attachments")
+                raise ValueError(
+                    "metadata_only policy cannot proactively acquire attachments"
+                )
         elif self.scope is DocumentFamilyAcquisitionScope.BOUNDED_EXPLICIT_UNIVERSE:
             if not self.explicit_universe:
-                raise ValueError("bounded explicit-universe policy requires a non-empty universe")
+                raise ValueError(
+                    "bounded explicit-universe policy requires a non-empty universe"
+                )
             if not self.universe_policy_version:
-                raise ValueError("bounded explicit-universe policy requires universe_policy_version")
+                raise ValueError(
+                    "bounded explicit-universe policy requires universe_policy_version"
+                )
             if self.governance_policy_version:
-                raise ValueError("bounded explicit-universe policy cannot set governance_policy_version")
+                raise ValueError(
+                    "bounded explicit-universe policy cannot set governance_policy_version"
+                )
         else:
             if self.explicit_universe:
                 raise ValueError("full-market policy cannot carry an explicit universe")
             if not self.universe_policy_version:
                 raise ValueError("full-market policy requires universe_policy_version")
             if not self.governance_policy_version:
-                raise ValueError("full-market policy requires governance_policy_version")
+                raise ValueError(
+                    "full-market policy requires governance_policy_version"
+                )
         if (
             self.environment == "production"
             and family != DocumentFamily.ANNUAL_REPORT.value
@@ -404,10 +430,16 @@ class DocumentFamilyAcquisitionPolicy:
     def attachment_acquisition_allowed(self, instrument_id: str | None = None) -> bool:
         """Return whether this policy permits proactive bytes for one target."""
 
-        if not self.proactive_enabled or self.scope is DocumentFamilyAcquisitionScope.METADATA_ONLY:
+        if (
+            not self.proactive_enabled
+            or self.scope is DocumentFamilyAcquisitionScope.METADATA_ONLY
+        ):
             return False
         if self.scope is DocumentFamilyAcquisitionScope.BOUNDED_EXPLICIT_UNIVERSE:
-            return instrument_id is not None and str(instrument_id).strip() in self.explicit_universe
+            return (
+                instrument_id is not None
+                and str(instrument_id).strip() in self.explicit_universe
+            )
         # Even a governed full-market policy authorizes a concrete target, not
         # an unbounded caller operation with no instrument identity.
         return instrument_id is not None and bool(str(instrument_id).strip())
@@ -434,25 +466,35 @@ class DocumentFamilyAcquisitionPolicy:
                 "acquisition_policy contains unknown fields: " + ", ".join(unknown)
             )
         universe = raw.get("explicit_universe", ())
-        if isinstance(universe, (str, bytes)) or not isinstance(universe, (list, tuple)):
+        if isinstance(universe, (str, bytes)) or not isinstance(
+            universe, (list, tuple)
+        ):
             raise TypeError("acquisition_policy.explicit_universe must be an array")
         effective = raw.get("effective_version_policy")
         retention = raw.get("retention_policy")
         if not isinstance(effective, Mapping):
-            raise TypeError("acquisition_policy.effective_version_policy must be a mapping")
+            raise TypeError(
+                "acquisition_policy.effective_version_policy must be a mapping"
+            )
         if not isinstance(retention, Mapping):
             raise TypeError("acquisition_policy.retention_policy must be a mapping")
         return cls(
             schema_version=raw.get("schema_version", ACQUISITION_POLICY_SCHEMA_VERSION),
-            document_family=_policy_text(raw.get("document_family"), "acquisition_policy.document_family"),
-            policy_version=_policy_text(raw.get("policy_version"), "acquisition_policy.policy_version"),
+            document_family=_policy_text(
+                raw.get("document_family"), "acquisition_policy.document_family"
+            ),
+            policy_version=_policy_text(
+                raw.get("policy_version"), "acquisition_policy.policy_version"
+            ),
             scope=raw.get("scope"),
             proactive_enabled=raw.get("proactive_enabled", False),
             explicit_universe=tuple(universe),
             universe_policy_version=raw.get("universe_policy_version"),
             governance_policy_version=raw.get("governance_policy_version"),
             environment=raw.get("environment", "production"),
-            effective_version_policy=DocumentFamilyEffectiveVersionPolicy.from_mapping(effective),
+            effective_version_policy=DocumentFamilyEffectiveVersionPolicy.from_mapping(
+                effective
+            ),
             retention_policy=DocumentFamilyRetentionPolicy.from_mapping(retention),
         )
 
@@ -546,10 +588,6 @@ class AssetRequestStatus(_StringEnum):
     EXPIRED = "expired"
 
 
-
-
-
-
 ACTIVE_OPERATION_STATUSES = frozenset(
     {OperationStatus.QUEUED.value, OperationStatus.RUNNING.value}
 )
@@ -580,10 +618,6 @@ class ResultOrigin(_StringEnum):
     ADOPTED = "adopted"
     DOWNLOADED = "downloaded"
     REPAIRED = "repaired"
-
-
-
-
 
 
 class CoverageStatus(_StringEnum):
@@ -834,13 +868,8 @@ class EffectiveAnnualReport:
     )
     evidence_set_hash: str | None = None
     decision_evidence: Mapping[str, Any] = field(default_factory=dict)
+    document_family: str = DocumentFamily.ANNUAL_REPORT.value
     schema_version: str = EFFECTIVE_ANNUAL_REPORT_SCHEMA_VERSION
-
-    @property
-    def document_family(self) -> str:
-        """Effective rows are formal annual reports in version 1."""
-
-        return DocumentFamily.ANNUAL_REPORT.value
 
     @property
     def is_full_report(self) -> bool:
@@ -946,20 +975,6 @@ class AssetOperationSubscription:
     schema_version: str = OPERATION_SUBSCRIPTION_SCHEMA_VERSION
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @dataclass(frozen=True)
 class OfficialAssetChangeEvent:
     event_id: int | None
@@ -975,10 +990,6 @@ class OfficialAssetChangeEvent:
     trigger_origin: str = "unknown"
     dispatch_policy_version: str = "asset_change_event.v1"
     schema_version: str = CHANGE_EVENT_SCHEMA_VERSION
-
-
-
-
 
 
 @dataclass(frozen=True)
@@ -1004,8 +1015,6 @@ class OfficialAssetDiscoveryState:
     lease_generation: int = 0
     state_version: int = 0
     schema_version: str = DISCOVERY_STATE_SCHEMA_VERSION
-
-
 
 
 @dataclass(frozen=True)

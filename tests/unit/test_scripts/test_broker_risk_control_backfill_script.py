@@ -46,13 +46,15 @@ def _record(
         exchange=market,
         symbols=tuple(symbols),
         attachments=(
-            AnnouncementAttachment(
-                source_url=adjunct_url,
-                file_extension=adjunct_type,
-            ),
-        )
-        if adjunct_url
-        else (),
+            (
+                AnnouncementAttachment(
+                    source_url=adjunct_url,
+                    file_extension=adjunct_type,
+                ),
+            )
+            if adjunct_url
+            else ()
+        ),
         raw_payload=dict(raw_payload or {}),
     )
 
@@ -113,7 +115,9 @@ class _FakeStorage:
         self.manifests_written += 1
         return manifest.source_file_id or f"source-file-{self.manifests_written}"
 
-    def upsert_financial_numeric_facts(self, facts, *, ingestion_run_id=None, tier="hot"):
+    def upsert_financial_numeric_facts(
+        self, facts, *, ingestion_run_id=None, tier="hot"
+    ):
         self.facts_written += len(facts)
         return len(facts)
 
@@ -186,7 +190,12 @@ def test_default_window_uses_past_12_quarters():
 
 def test_select_broker_instruments_defaults_to_five():
     rows = [
-        {"instrument_id": instrument_id, "symbol": instrument_id[:6], "exchange": "SSE", "industry": "证券"}
+        {
+            "instrument_id": instrument_id,
+            "symbol": instrument_id[:6],
+            "exchange": "SSE",
+            "industry": "证券",
+        }
         for instrument_id in (
             "600030.SH",
             "600109.SH",
@@ -198,7 +207,14 @@ def test_select_broker_instruments_defaults_to_five():
             "600999.SH",
         )
     ]
-    rows.append({"instrument_id": "600061.SH", "symbol": "600061", "exchange": "SSE", "industry": "证券"})
+    rows.append(
+        {
+            "instrument_id": "600061.SH",
+            "symbol": "600061",
+            "exchange": "SSE",
+            "industry": "证券",
+        }
+    )
 
     selected = select_broker_instruments(
         _FakeDbOps({"SSE": rows}),
@@ -211,178 +227,17 @@ def test_select_broker_instruments_defaults_to_five():
     assert "600061.SH" not in {item["instrument_id"] for item in selected}
 
 
-def test_backfill_script_dry_run_parses_without_writes():
-    storage = _FakeStorage()
-    announcement_service = _FakeAnnouncementService(
-        [
-            _record(
-                announcement_id="annual-2025",
-                title="2025年年度报告",
-                announcement_time="2026-03-30",
-                market="SSE",
-                symbols=["600030"],
-                adjunct_url="/annual.pdf",
-                adjunct_type="PDF",
-            ),
-            _record(
-                announcement_id="risk-2025",
-                title="2025年度风险控制指标相关情况报告",
-                announcement_time="2026-03-30",
-                market="SSE",
-                symbols=["600030"],
-            ),
-        ]
-    )
-
-    result = run_broker_risk_control_backfill(
-        db_ops=_FakeDbOps(
-            {
-                "SSE": [
-                    {
-                        "instrument_id": "600030.SH",
-                        "symbol": "600030",
-                        "exchange": "SSE",
-                        "name": "中信证券",
-                        "industry": "证券",
-                    }
-                ]
-            }
-        ),
-        storage=storage,
-        exchanges=["SSE"],
-        as_of_date="2026-06-06",
-        limit_instruments=5,
-        announcement_service=announcement_service,
-        payload_fetcher=lambda record: _risk_control_text(),
-        write=False,
-    )
-
-    assert result["dry_run"] is True
-    assert result["announcement_scan"]["selected_announcements"] == 1
-    assert result["backfill"]["reports_parsed"] == 1
-    assert result["backfill"]["facts_parsed"] >= 2
-    assert result["backfill"]["facts_written"] == 0
-    assert storage.manifests_written == 0
-    assert storage.facts_written == 0
-
-
-def test_backfill_script_per_instrument_scan_keeps_full_broker_universe():
-    storage = _FakeStorage()
-    announcement_service = _FakeAnnouncementService(
-        [
-            _record(
-                announcement_id="annual-600030-2025",
-                title="2025年年度报告",
-                announcement_time="2026-03-30",
-                market="SSE",
-                symbols=["600030"],
-                adjunct_url="/annual-600030.pdf",
-                adjunct_type="PDF",
-            ),
-            _record(
-                announcement_id="annual-600109-2025",
-                title="2025年年度报告",
-                announcement_time="2026-03-30",
-                market="SSE",
-                symbols=["600109"],
-                adjunct_url="/annual-600109.pdf",
-                adjunct_type="PDF",
-                raw_payload={"market_scan": False},
-            ),
-        ]
-    )
-
-    result = run_broker_risk_control_backfill(
-        db_ops=_FakeDbOps(
-            {
-                "SSE": [
-                    {
-                        "instrument_id": "600030.SH",
-                        "symbol": "600030",
-                        "exchange": "SSE",
-                        "name": "中信证券",
-                        "industry": "证券",
-                    },
-                    {
-                        "instrument_id": "600109.SH",
-                        "symbol": "600109",
-                        "exchange": "SSE",
-                        "name": "国金证券",
-                        "industry": "证券",
-                    },
-                    {
-                        "instrument_id": "600061.SH",
-                        "symbol": "600061",
-                        "exchange": "SSE",
-                        "name": "国投资本",
-                        "industry": "证券",
-                    },
-                ]
-            }
-        ),
-        storage=storage,
-        exchanges=["SSE"],
-        as_of_date="2026-06-06",
-        limit_instruments=0,
-        announcement_service=announcement_service,
-        payload_fetcher=lambda record: _risk_control_text(),
-        write=False,
-    )
-
-    assert len(result["target_instruments"]) == 2
-    assert result["announcement_scan"]["selected_announcements"] == 2
-    per_instrument = result["announcement_scan"]["per_instrument_scan"]
-    assert per_instrument["enabled"] is True
-    assert per_instrument["attempted_instruments"] == 2
-    assert per_instrument["instruments_with_matches"] == 2
-    assert per_instrument["selected_announcements_added"] == 2
-    assert result["backfill"]["reports_parsed"] == 2
-
-
-def test_backfill_script_scan_only_skips_payload_fetch():
-    result = run_broker_risk_control_backfill(
-        db_ops=_FakeDbOps(
-            {
-                "SSE": [
-                    {
-                        "instrument_id": "600030.SH",
-                        "symbol": "600030",
-                        "exchange": "SSE",
-                        "industry": "证券",
-                    }
-                ]
-            }
-        ),
-        storage=_FakeStorage(),
-        exchanges=["SSE"],
-        as_of_date="2026-06-06",
-        announcement_service=_FakeAnnouncementService(
-            [
-                _record(
-                    announcement_id="risk-2025",
-                    title="2025年年度报告",
-                    announcement_time="2026-03-30",
-                    market="SSE",
-                    symbols=["600030"],
-                )
-            ]
-        ),
-        payload_fetcher=lambda record: (_ for _ in ()).throw(AssertionError("should not fetch")),
-        scan_only=True,
-    )
-
-    assert result["status"] == "scan_only"
-    assert result["backfill"]["reports_discovered"] == 1
-    assert result["backfill"]["reports_parsed"] == 0
-
-
 def test_shared_only_backfill_lists_local_assets_without_provider_scan():
     class _SharedAccess:
         def __init__(self):
             self.calls = []
 
-        def list_assets(self, *, instrument_id, limit):
-            self.calls.append((instrument_id, limit))
+        def list_effective_assets(
+            self, *, instrument_id, document_family, availability, limit
+        ):
+            self.calls.append((instrument_id, document_family, availability, limit))
+            if document_family != "annual_report":
+                return {"items": []}
             return {
                 "items": [
                     {
@@ -426,20 +281,24 @@ def test_shared_only_backfill_lists_local_assets_without_provider_scan():
         ),
         scan_only=True,
         shared_asset_access=shared,
-        annual_report_asset_mode="shared_only",
     )
 
-    assert shared.calls == [("600030.SH", 1000)]
-    assert result["announcement_scan"]["source_mode"] == (
-        "shared_announcement_asset"
-    )
+    assert shared.calls == [
+        ("600030.SH", "annual_report", "local_valid", 1000),
+        ("600030.SH", "semiannual_report", "local_valid", 1000),
+    ]
+    assert result["announcement_scan"]["source_mode"] == ("shared_announcement_asset")
     assert result["announcement_scan"]["selected_announcements"] == 1
     assert result["backfill"]["reports_discovered"] == 1
 
 
 def test_shared_asset_projection_preserves_exact_filing_identity():
     class _SharedAccess:
-        def list_assets(self, *, instrument_id, limit):
+        def list_effective_assets(
+            self, *, instrument_id, document_family, availability, limit
+        ):
+            if document_family != "annual_report":
+                return {"items": []}
             return {
                 "items": [
                     {
@@ -474,121 +333,52 @@ def test_shared_asset_projection_preserves_exact_filing_identity():
     assert record.source_announcement_id == "annual-correction"
     assert record.attachments[0].attachment_id == "attachment-correction"
     assert record.raw_payload["shared_asset_id"] == "asset-correction"
+    assert record.raw_payload["shared_asset_binding_mode"] == "exact_observation"
     assert "修订版" in record.title
 
 
-def test_standalone_supplement_only_parses_primary_net_capital_gaps():
-    storage = _FakeStorage()
-    records = [
-        _record(
-            announcement_id="annual-2025",
-            title="2025年年度报告",
-            announcement_time="2026-03-30",
-            market="SSE",
-            symbols=["600030"],
-            adjunct_url="/annual.pdf",
-            adjunct_type="PDF",
-        ),
-        _record(
-            announcement_id="risk-2025",
-            title="2025年度风险控制指标相关情况报告",
-            announcement_time="2026-03-30",
-            market="SSE",
-            symbols=["600030"],
-            adjunct_url="/risk.pdf",
-            adjunct_type="PDF",
-        ),
-    ]
-
-    def _payload(record):
-        if record.source_announcement_id == "annual-2025":
-            return _annual_without_net_capital_text()
-        return _risk_control_text()
-
-    result = run_broker_risk_control_backfill(
-        db_ops=_FakeDbOps(
-            {
-                "SSE": [
+def test_shared_asset_projection_accepts_semiannual_family():
+    class _SharedAccess:
+        def list_effective_assets(
+            self, *, instrument_id, document_family, availability, limit
+        ):
+            if document_family != "semiannual_report":
+                return {"items": []}
+            return {
+                "items": [
                     {
-                        "instrument_id": "600030.SH",
-                        "symbol": "600030",
-                        "exchange": "SSE",
-                        "name": "中信证券",
-                        "industry": "证券",
+                        "asset_id": "asset-semiannual",
+                        "instrument_id": instrument_id,
+                        "fiscal_year": 2025,
+                        "report_period": "2025-06-30",
+                        "document_family": "semiannual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "semiannual-2025",
+                        "attachment_id": "attachment-semiannual",
+                        "observation_version": "observation-semiannual",
+                        "content_hash": "c" * 64,
+                        "published_at": "2025-08-30T00:00:00+08:00",
+                        "is_correction": False,
                     }
                 ]
             }
-        ),
-        storage=storage,
-        exchanges=["SSE"],
-        as_of_date="2026-06-06",
-        announcement_service=_FakeAnnouncementService(records),
-        payload_fetcher=_payload,
-        write=False,
-        include_standalone_supplement=True,
-    )
 
-    supplement = result["backfill"]["supplementary_standalone"]
-    assert result["announcement_scan"]["standalone_supplement"]["selected_announcements"] == 1
-    assert result["announcement_scan"]["standalone_supplement"]["gap_fill_announcements"] == 1
-    assert supplement["reports_parsed"] == 1
-    assert supplement["primary_gap_filter"]["selected_records_count"] == 1
-    assert supplement["primary_gap_filter"]["missing_primary_pairs"] == [
-        {"instrument_id": "600030.SH", "report_period": "2025-12-31"}
-    ]
-
-
-def test_standalone_supplement_skips_primary_net_capital_covered_periods():
-    storage = _FakeStorage()
-    records = [
-        _record(
-            announcement_id="annual-2025",
-            title="2025年年度报告",
-            announcement_time="2026-03-30",
-            market="SSE",
-            symbols=["600030"],
-            adjunct_url="/annual.pdf",
-            adjunct_type="PDF",
-        ),
-        _record(
-            announcement_id="risk-2025",
-            title="2025年度风险控制指标相关情况报告",
-            announcement_time="2026-03-30",
-            market="SSE",
-            symbols=["600030"],
-            adjunct_url="/risk.pdf",
-            adjunct_type="PDF",
-        ),
-    ]
-
-    result = run_broker_risk_control_backfill(
-        db_ops=_FakeDbOps(
+    projection = load_shared_broker_annual_report_records(
+        _SharedAccess(),
+        instruments=[
             {
-                "SSE": [
-                    {
-                        "instrument_id": "600030.SH",
-                        "symbol": "600030",
-                        "exchange": "SSE",
-                        "name": "中信证券",
-                        "industry": "证券",
-                    }
-                ]
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
             }
-        ),
-        storage=storage,
-        exchanges=["SSE"],
-        as_of_date="2026-06-06",
-        announcement_service=_FakeAnnouncementService(records),
-        payload_fetcher=lambda record: _risk_control_text(),
-        write=False,
-        include_standalone_supplement=True,
+        ],
+        report_periods=["2025-06-30"],
     )
 
-    supplement = result["backfill"]["supplementary_standalone"]
-    assert result["announcement_scan"]["standalone_supplement"]["selected_announcements"] == 1
-    assert result["announcement_scan"]["standalone_supplement"]["gap_fill_announcements"] == 0
-    assert supplement["reports_parsed"] == 0
-    assert supplement["primary_gap_filter"]["selected_records_count"] == 0
+    record = projection["selected_records"][0]
+    assert record.title == "2025年半年度报告"
+    assert record.raw_payload["shared_asset_binding_mode"] == "exact_observation"
 
 
 def test_standalone_gap_filter_uses_existing_facts_for_unchanged_primary_reports():

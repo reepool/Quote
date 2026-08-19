@@ -10,9 +10,9 @@ from research.business_profile_activity_production import (
     ENTITY_RESOLUTION_POLICY_VERSION,
     ROLE_RULE_VERSION,
 )
-from research.business_profile_archive import (
-    BUSINESS_PROFILE_ARCHIVE_VERSION,
-    BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
+from research.announcement_assets.models import EFFECTIVE_ANNUAL_REPORT_SCHEMA_VERSION
+from research.business_profile_source_assets import (
+    BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION,
 )
 from research.business_profile_deterministic_extraction import (
     KEYWORD_SELECTOR_VERSION,
@@ -121,7 +121,9 @@ class BusinessProfileRolloutConfig:
         if phase is None:
             raise ValueError(f"unknown business-profile rollout phase: {phase_name}")
         if not self.enabled or not phase.enabled:
-            raise ValueError(f"business-profile rollout phase is disabled: {phase_name}")
+            raise ValueError(
+                f"business-profile rollout phase is disabled: {phase_name}"
+            )
         disabled_prerequisites = sorted(
             prerequisite
             for prerequisite in self._prerequisite_names(phase)
@@ -213,14 +215,18 @@ def parse_business_profile_rollout_config(
     active_phase = _required_text(payload, "active_phase")
     identity_mode = str(payload.get("runtime_identity_mode") or "").strip()
     if identity_mode not in {"derived", "explicit"}:
-        raise ValueError("business-profile runtime_identity_mode must be derived or explicit")
+        raise ValueError(
+            "business-profile runtime_identity_mode must be derived or explicit"
+        )
     raw_phases = payload.get("phases")
     if not isinstance(raw_phases, Mapping) or not raw_phases:
         raise ValueError("business-profile rollout phases are required")
     phases: dict[str, BusinessProfileRolloutPhase] = {}
     for name, raw in raw_phases.items():
         if not isinstance(raw, Mapping):
-            raise ValueError(f"business-profile rollout phase must be an object: {name}")
+            raise ValueError(
+                f"business-profile rollout phase must be an object: {name}"
+            )
         families = tuple(str(item).strip() for item in raw.get("field_families", ()))
         if not families or set(families) - FIELD_FAMILIES:
             raise ValueError(f"invalid field families for rollout phase: {name}")
@@ -234,9 +240,7 @@ def parse_business_profile_rollout_config(
             order=int(raw.get("order") or 0),
             field_families=families,
             promotion_enabled=raw.get("promotion_enabled") is True,
-            requires_passed_manifests=(
-                raw.get("requires_passed_manifests") is True
-            ),
+            requires_passed_manifests=(raw.get("requires_passed_manifests") is True),
             prerequisites=prerequisites,
             stage_budgets=stage_budgets,
         )
@@ -244,10 +248,12 @@ def parse_business_profile_rollout_config(
         raise ValueError("business-profile active rollout phase is missing")
     if set(phases) != set(ROLLOUT_PHASES):
         raise ValueError("business-profile rollout phases are incomplete")
-    ordered = [phase.name for phase in sorted(phases.values(), key=lambda item: item.order)]
-    if ordered != list(ROLLOUT_PHASES) or len({item.order for item in phases.values()}) != len(
-        phases
-    ):
+    ordered = [
+        phase.name for phase in sorted(phases.values(), key=lambda item: item.order)
+    ]
+    if ordered != list(ROLLOUT_PHASES) or len(
+        {item.order for item in phases.values()}
+    ) != len(phases):
         raise ValueError("business-profile rollout phase order is invalid")
     for phase in phases.values():
         if set(phase.prerequisites) - set(phases):
@@ -257,9 +263,7 @@ def parse_business_profile_rollout_config(
                 f"promotion rollout phase must require passed manifests: {phase.name}"
             )
         if any(phases[item].order >= phase.order for item in phase.prerequisites):
-            raise ValueError(
-                f"rollout prerequisite must precede phase: {phase.name}"
-            )
+            raise ValueError(f"rollout prerequisite must precede phase: {phase.name}")
     bootstrap = dict(payload.get("bootstrap") or {})
     selection_policy = str(bootstrap.get("selection_policy") or "").strip()
     if selection_policy not in SELECTION_POLICIES:
@@ -267,7 +271,9 @@ def parse_business_profile_rollout_config(
     if not bootstrap.get("start_date") and selection_policy != "latest_annual_only":
         raise ValueError("business-profile bootstrap start_date is required")
     bootstrap_types = {
-        str(item).strip() for item in bootstrap.get("document_types", ()) if str(item).strip()
+        str(item).strip()
+        for item in bootstrap.get("document_types", ())
+        if str(item).strip()
     }
     if selection_policy == "latest_annual_only" and bootstrap_types - {
         "annual_report",
@@ -310,7 +316,10 @@ def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str
     template_catalog = load_disclosure_template_catalog()
     return {
         "document": "|".join(
-            (BUSINESS_PROFILE_ARCHIVE_VERSION, BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION)
+            (
+                EFFECTIVE_ANNUAL_REPORT_SCHEMA_VERSION,
+                BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION,
+            )
         ),
         "section": "|".join(
             (
@@ -320,7 +329,9 @@ def derive_business_profile_runtime_identities(llm_config: Any) -> dict[str, str
             )
         ),
         "selector": "|".join((SELECTOR_VERSION, KEYWORD_SELECTOR_VERSION)),
-        "parser": "|".join((PARSER_VERSION, TABLE_PARSER_VERSION, RUNTIME_SCHEMA_VERSION)),
+        "parser": "|".join(
+            (PARSER_VERSION, TABLE_PARSER_VERSION, RUNTIME_SCHEMA_VERSION)
+        ),
         "schema": "|".join(
             (
                 BUSINESS_PROFILE_SEMANTIC_SCHEMA_SET_VERSION,
@@ -583,11 +594,9 @@ def build_business_profile_rollout_status(
         except (TypeError, json.JSONDecodeError):
             continue
         identity = dict(metadata.get("processing_identity") or {})
-        if (
-            identity.get("rollout_phase") != phase.name
-            or dict(identity.get("runtime_identities") or {})
-            != dict(runtime_identities)
-        ):
+        if identity.get("rollout_phase") != phase.name or dict(
+            identity.get("runtime_identities") or {}
+        ) != dict(runtime_identities):
             continue
         work_families = {
             str(item) for item in identity.get("field_families", ()) if str(item)
@@ -657,9 +666,7 @@ def build_business_profile_rollout_status(
         if isinstance(metadata.get("unit_resolution"), Mapping):
             resolutions.append(metadata["unit_resolution"])
         for resolution in resolutions:
-            runtime_rule_id = str(
-                dict(resolution or {}).get("runtime_rule_id") or ""
-            )
+            runtime_rule_id = str(dict(resolution or {}).get("runtime_rule_id") or "")
             if (
                 runtime_rule_id
                 and unit_rule_statuses.get(runtime_rule_id) != "auto_approved"
@@ -667,9 +674,7 @@ def build_business_profile_rollout_status(
                 unproved_publications += 1
                 break
     status["unproved_unit_publications"] = unproved_publications
-    status["repeated_conversion_llm_calls"] = int(
-        repeated_conversion_llm_calls or 0
-    )
+    status["repeated_conversion_llm_calls"] = int(repeated_conversion_llm_calls or 0)
     return status
 
 
@@ -781,9 +786,7 @@ def evaluate_business_profile_rollout_readiness(
     congestion_rate = int(gateway.get("provider_congestion_events") or 0) / max(
         1, admitted
     )
-    if congestion_rate > float(
-        readiness.get("maximum_gateway_congestion_rate", 1.0)
-    ):
+    if congestion_rate > float(readiness.get("maximum_gateway_congestion_rate", 1.0)):
         reasons.append("gateway_congestion_exceeded")
     minimum_family_ratio = float(
         readiness.get("minimum_field_family_completion_ratio", 1.0)
@@ -829,8 +832,7 @@ def evaluate_business_profile_rollout_readiness(
         "open_deep_review": int(status.get("open_deep_review") or 0),
         "open_machine_rework": int(status.get("open_machine_rework") or 0),
         "production_blockers": {
-            key: int(status.get(key) or 0)
-            for key, _, _ in blocker_thresholds
+            key: int(status.get(key) or 0) for key, _, _ in blocker_thresholds
         },
         "writer": writer,
         "gateway_admission": gateway,
@@ -839,16 +841,16 @@ def evaluate_business_profile_rollout_readiness(
     }
 
 
-def _parse_stage_budgets(
-    value: Any, phase_name: str
-) -> dict[str, dict[str, Any]]:
+def _parse_stage_budgets(value: Any, phase_name: str) -> dict[str, dict[str, Any]]:
     if not isinstance(value, Mapping) or set(value) != set(WORK_STAGES):
         raise ValueError(f"rollout phase stage budgets are incomplete: {phase_name}")
     budgets: dict[str, dict[str, Any]] = {}
     for stage in WORK_STAGES:
         raw = value.get(stage)
         if not isinstance(raw, Mapping):
-            raise ValueError(f"rollout stage budget must be an object: {phase_name}:{stage}")
+            raise ValueError(
+                f"rollout stage budget must be an object: {phase_name}:{stage}"
+            )
         payload = dict(raw)
         for key in (
             "max_items",

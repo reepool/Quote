@@ -1,5 +1,4 @@
 import copy
-import hashlib
 from pathlib import Path
 
 import pytest
@@ -18,7 +17,9 @@ from research.business_profile_precision_review import (
     wilson_lower_bound,
 )
 from research.business_profile_review import BusinessProfileReviewService
-from research.providers.base import FinancialSourceFileManifest
+from tests.unit.test_research.announcement_asset_fixtures import (
+    register_shared_annual_report,
+)
 from tests.unit.test_research.test_business_profile_governance import (
     _approved_evidence,
     _governed_upsert,
@@ -58,26 +59,16 @@ def _write_official_manifest(
     report_period="2025-12-31",
     report_type="annual_report",
 ):
-    content = pdf_path.read_bytes()
-    return storage.financial_statements.upsert_source_file_manifest(
-        FinancialSourceFileManifest(
-            source="cninfo",
-            source_mode="direct",
-            source_tier="official_primary",
-            instrument_id="601088.SH",
-            symbol="601088",
-            exchange="SSE",
-            report_period=report_period,
-            report_type=report_type,
-            filing_id=f"{report_type}-{report_period}",
-            source_url="https://example.test/official.pdf",
-            archive_path=str(pdf_path),
-            content_hash=hashlib.sha256(content).hexdigest(),
-            content_length=len(content),
-            parser_version="business_profile_archive.v2",
-            status="archived",
-            schema_version="business_profile_source_file_manifest.v1",
-        )
+    if report_type not in {"annual_report", "annual_report_correction"}:
+        return None
+    return register_shared_annual_report(
+        Path(storage.db_path),
+        pdf_path,
+        asset_id=f"{report_type}-{report_period}",
+        instrument_id="601088.SH",
+        report_period=report_period,
+        variant="correction" if "correction" in report_type else "original",
+        source_announcement_id=f"{report_type}-{report_period}",
     )
 
 
@@ -101,7 +92,7 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
 
     package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         report_period="2025-12-31",
     )
 
@@ -111,7 +102,7 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
     assert package["rows"][0]["candidate_product_ids"] == ["coal"]
     assert package["rows"][0]["official_documents"][0]["sha256"]
     assert package["rows"][0]["official_documents"][0]["source_tier"] == (
-        "official_primary"
+        "shared_announcement_asset"
     )
     assert package["scope"]["semantic_inference_performed"] is False
 
@@ -131,7 +122,7 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
     )
     reviewed_package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         report_period="2025-12-31",
     )
     assert reviewed_package["row_count"] == 0
@@ -145,7 +136,7 @@ def test_readiness_audit_reports_candidate_and_manifest_shortfalls(tmp_path):
 
     missing = audit_product_label_review_readiness(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         expected_industry_groups=[],
     )
 
@@ -166,7 +157,7 @@ def test_readiness_audit_reports_candidate_and_manifest_shortfalls(tmp_path):
     _write_official_manifest(storage, pdf_path)
     covered = audit_product_label_review_readiness(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         expected_industry_groups=[],
     )
 
@@ -208,11 +199,11 @@ def test_precision_rows_exclude_ambiguous_and_cross_source_duplicates(tmp_path):
     _write_official_manifest(storage, pdf_path)
     package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
     )
     readiness = audit_product_label_review_readiness(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         expected_industry_groups=[],
     )
 
@@ -304,7 +295,7 @@ def test_catalog_issue_review_package_exports_promotion_evidence(tmp_path):
 
     package = build_product_catalog_issue_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
     )
 
     assert package["status"] == "ready_for_human_review"
@@ -360,7 +351,7 @@ def test_catalog_issue_evidence_rejects_tampering_and_nonpromotion(tmp_path):
     _write_official_manifest(storage, pdf_path)
     package = build_product_catalog_issue_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
     )
     row = package["rows"][0]
     row["review"]["outcome"] = "defer"
@@ -452,7 +443,7 @@ def test_industry_coverage_requires_periodic_report_manifest(tmp_path):
     )
     without_periodic_report = audit_product_label_review_readiness(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         expected_industry_groups=["coal"],
     )
 
@@ -466,7 +457,7 @@ def test_industry_coverage_requires_periodic_report_manifest(tmp_path):
     _write_official_manifest(storage, annual_pdf)
     with_periodic_report = audit_product_label_review_readiness(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         expected_industry_groups=["coal"],
     )
 
@@ -486,7 +477,7 @@ def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_pa
 
     wrong_period = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         report_period="2025-12-31",
     )
     assert wrong_period["status"] == "incomplete"
@@ -498,7 +489,7 @@ def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_pa
     pdf_path.write_bytes(b"%PDF-tampered")
     mismatched = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         report_period="2025-12-31",
     )
     assert mismatched["status"] == "incomplete"
@@ -526,7 +517,7 @@ def test_review_package_ignores_invalid_manifest_outside_selected_period(tmp_pat
 
     package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
         report_period="2025-12-31",
     )
 
@@ -546,7 +537,7 @@ def test_review_evaluation_is_fail_closed_and_detects_source_tampering(tmp_path)
     _write_official_manifest(storage, pdf_path)
     package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
     )
 
     pending = evaluate_product_label_review(package)
@@ -587,7 +578,7 @@ def test_review_evaluation_blocks_excessive_exclusions(tmp_path):
     _write_official_manifest(storage, pdf_path)
     package = build_product_label_review_package(
         research_db=research_db,
-        financials_db=Path(storage.financials_db_path),
+        financials_db=Path(storage.db_path),
     )
     source = package["rows"][0]
     rows = []

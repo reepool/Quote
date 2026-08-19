@@ -4,7 +4,11 @@ import sqlite3
 from research.business_profile_corpus import (
     apply_instrument_lifecycle,
     list_first_wave_universe,
+    load_business_profile_source_manifests,
     summarize_corpus_readiness,
+)
+from tests.unit.test_research.announcement_asset_fixtures import (
+    register_shared_annual_report,
 )
 
 
@@ -160,6 +164,42 @@ def test_non_periodic_business_document_does_not_cover_expected_report():
 
     assert summary["source_manifest_count"] == 1
     assert summary["covered_expected_document_count"] == 0
+
+
+def test_source_manifest_loader_excludes_unusable_shared_blobs(tmp_path):
+    db_path = tmp_path / "research.db"
+    rows = (
+        ("asset-valid", "600001.SH", "local_valid", "valid", "valid.pdf"),
+        ("asset-metadata", "600002.SH", "metadata_only", "valid", "meta.pdf"),
+        ("asset-invalid", "600003.SH", "local_valid", "invalid", "invalid.pdf"),
+        ("asset-no-path", "600004.SH", "local_valid", "valid", "no-path.pdf"),
+    )
+    for asset_id, instrument_id, availability, integrity, filename in rows:
+        pdf_path = tmp_path / filename
+        pdf_path.write_bytes(f"%PDF-1.4\n{asset_id}\n%%EOF".encode())
+        register_shared_annual_report(
+            db_path,
+            pdf_path,
+            asset_id=asset_id,
+            instrument_id=instrument_id,
+            report_period="2025-12-31",
+            availability=availability,
+            integrity_status=integrity,
+        )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "UPDATE official_document_blobs SET canonical_path='' "
+            "WHERE content_hash=(SELECT content_hash FROM effective_annual_reports "
+            "WHERE asset_id='asset-no-path')"
+        )
+        manifests = load_business_profile_source_manifests(
+            conn,
+            [item[1] for item in rows],
+        )
+
+    assert [item["source_file_id"] for item in manifests] == [
+        "shared-asset:asset-valid"
+    ]
 
 
 def test_universe_filters_stock_lifecycle_at_requested_date():

@@ -2,11 +2,14 @@ import json
 import sqlite3
 
 from scripts.research_business_profile_benchmark_select import build_parser_benchmark
+from tests.unit.test_research.announcement_asset_fixtures import (
+    register_shared_annual_report,
+)
 
 
 def test_benchmark_command_builder_uses_read_only_point_in_time_universe(tmp_path):
     research_db = tmp_path / "research.db"
-    financials_db = tmp_path / "financials.db"
+    announcement_assets_db = tmp_path / "announcement-assets.db"
     quotes_db = tmp_path / "quotes.db"
     with sqlite3.connect(research_db) as conn:
         conn.executescript(
@@ -70,44 +73,22 @@ def test_benchmark_command_builder_uses_read_only_point_in_time_universe(tmp_pat
                 for index in range(1, 6)
             ],
         )
-    with sqlite3.connect(financials_db) as conn:
-        conn.execute(
-            """
-            CREATE TABLE financial_source_files (
-                source_file_id TEXT, instrument_id TEXT, source TEXT,
-                report_period TEXT, report_type TEXT, filing_id TEXT,
-                source_url TEXT, archive_path TEXT, content_hash TEXT,
-                published_at TEXT, parser_version TEXT, status TEXT,
-                source_tier TEXT, schema_version TEXT,
-                supersedes_source_file_id TEXT, metadata_json TEXT
-            )
-            """
-        )
-        conn.execute(
-            "INSERT INTO financial_source_files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (
-                "source-1",
-                "600001.SH",
-                "cninfo",
-                "2024-12-31",
-                "annual_report_correction",
-                "announcement-1",
-                "https://www.cninfo.com.cn/report.pdf",
-                "/archive/report.pdf",
-                "a" * 64,
-                "2025-03-20",
-                "business_profile_pdf_archive.v1",
-                "archived",
-                "official_primary",
-                "business_profile_source_file_manifest.v1",
-                None,
-                "{}",
-            ),
-        )
+    report_path = tmp_path / "report.pdf"
+    report_path.write_bytes(b"%PDF-benchmark")
+    register_shared_annual_report(
+        announcement_assets_db,
+        report_path,
+        asset_id="source-1",
+        instrument_id="600001.SH",
+        report_period="2024-12-31",
+        variant="correction",
+        source_announcement_id="announcement-1",
+        published_at="2025-03-20T00:00:00+08:00",
+    )
 
     payload = build_parser_benchmark(
         research_db=research_db,
-        financials_db=financials_db,
+        announcement_assets_db=announcement_assets_db,
         quotes_db=quotes_db,
         as_of_date="2025-12-31",
     )
@@ -127,7 +108,7 @@ def test_benchmark_command_builder_uses_read_only_point_in_time_universe(tmp_pat
                     "diversified_business": True,
                     "correction_report": True,
                     "complex_table": True,
-                    "source_document_ids": ["source-1"],
+                    "source_document_ids": ["shared-asset:source-1"],
                 }
             ]
         ),
@@ -135,7 +116,7 @@ def test_benchmark_command_builder_uses_read_only_point_in_time_universe(tmp_pat
     )
     validated = build_parser_benchmark(
         research_db=research_db,
-        financials_db=financials_db,
+        announcement_assets_db=announcement_assets_db,
         quotes_db=quotes_db,
         as_of_date="2025-12-31",
         evidence_path=evidence_path,

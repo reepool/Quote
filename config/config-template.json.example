@@ -1182,25 +1182,6 @@
           "read_content": "annual_report_assets:read_content",
           "operator": "annual_report_assets:operator"
         }
-      },
-      "business_profile_evidence": {
-        "annual_report_asset_dependency": {
-          "enabled": false,
-          "legacy_fallback_enabled": true,
-          "mode": "legacy",
-          "reconciliation_evidence_id": null,
-          "legacy_writer_disabled": false
-        }
-      },
-      "broker_risk_control_reports": {
-        "annual_report_asset_dependency": {
-          "enabled": false,
-          "legacy_fallback_enabled": true,
-          "legacy_semiannual_enabled": true,
-          "mode": "legacy",
-          "reconciliation_evidence_id": null,
-          "legacy_writer_disabled": false
-        }
       }
     }
   },

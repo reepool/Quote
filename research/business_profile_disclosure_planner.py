@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict, dataclass, field
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional, Sequence
 
@@ -401,42 +401,6 @@ class BusinessProfileDisclosurePlanner:
             return path
         path.write_bytes(encoded)
         return path
-
-    def acquire_missing(
-        self,
-        plan: DisclosurePlan,
-        *,
-        instrument: Mapping[str, Any],
-        candidates: Sequence[BusinessProfileDocumentCandidate],
-        archive_service: Any,
-        checkpoint_path: Optional[str | Path] = None,
-        parent_ingestion_run_id: Optional[int] = None,
-    ) -> Any:
-        """Archive only planned official attachments that are not verified locally."""
-
-        missing_ids = {
-            str(item["announcement_id"])
-            for item in plan.included
-            if item["local_status"] != "verified"
-        }
-        by_id = {item.announcement_id: item for item in candidates}
-        unresolved = sorted(missing_ids - set(by_id))
-        if unresolved:
-            raise ValueError(
-                "planned disclosures have no governed discovery candidate: "
-                + ", ".join(unresolved)
-            )
-        selected = [by_id[item_id] for item_id in sorted(missing_ids)]
-        if not selected:
-            return None
-        return archive_service.archive_candidates(
-            dict(instrument),
-            selected,
-            max_documents=min(self.max_documents, len(selected)),
-            checkpoint_path=checkpoint_path,
-            parent_ingestion_run_id=parent_ingestion_run_id,
-        )
-
 
 def _merge_documents(
     *,

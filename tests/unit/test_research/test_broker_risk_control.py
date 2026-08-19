@@ -103,7 +103,12 @@ def test_broker_risk_control_parser_normalizes_money_and_ratios():
     assert facts["core_net_capital"].fact_value == 2_500_500_000.0
     assert facts["risk_coverage_ratio"].fact_value == pytest.approx(3.1117)
     assert facts["capital_leverage_ratio"].fact_value == pytest.approx(0.182)
-    assert facts["broker_operational_risk_brokerage_net_revenue"].canonical_statement_family == "regulatory_risk_control"
+    assert (
+        facts[
+            "broker_operational_risk_brokerage_net_revenue"
+        ].canonical_statement_family
+        == "regulatory_risk_control"
+    )
     assert "brokerage_revenue" not in facts
     assert result.diagnostics["missing_required_facts"] == []
     assert result.diagnostics["report_scope"] == "parent_company"
@@ -347,13 +352,18 @@ def test_broker_risk_control_facts_write_and_query_hot_history(tmp_path):
         source="cninfo",
     )
 
-    written = storage.upsert_financial_numeric_facts(parsed.numeric_facts, tier="history")
+    written = storage.upsert_financial_numeric_facts(
+        parsed.numeric_facts, tier="history"
+    )
 
     assert written > 0
-    assert storage.get_financial_numeric_facts(
-        "600030.SH",
-        canonical_fact_name="net_capital",
-    ) == []
+    assert (
+        storage.get_financial_numeric_facts(
+            "600030.SH",
+            canonical_fact_name="net_capital",
+        )
+        == []
+    )
     historical = storage.get_financial_numeric_facts(
         "600030.SH",
         include_history=True,
@@ -429,11 +439,14 @@ def test_broker_risk_control_repair_replace_removes_stale_source_file_facts(tmp_
 
     assert replace_result["deleted"] == len(parsed.numeric_facts)
     assert replace_result["inserted"] == 0
-    assert storage.get_financial_numeric_facts(
-        "600030.SH",
-        include_history=True,
-        canonical_fact_name="net_capital",
-    ) == []
+    assert (
+        storage.get_financial_numeric_facts(
+            "600030.SH",
+            include_history=True,
+            canonical_fact_name="net_capital",
+        )
+        == []
+    )
     with sqlite3.connect(storage.db_path) as conn:
         delete_markers = conn.execute(
             """
@@ -514,11 +527,25 @@ def test_data_manager_enriches_dcf_bundle_with_local_net_capital():
     )
 
     assert enriched["latest_facts"]["net_capital"] == 260.0
-    assert enriched["lineage"]["broker_risk_control"]["source_profile"] == "broker_regulatory_financial_facts"
-    assert enriched["lineage"]["broker_risk_control"]["facts"]["net_capital"]["source_file_id"] == "risk-600030-2025"
+    assert (
+        enriched["lineage"]["broker_risk_control"]["source_profile"]
+        == "broker_regulatory_financial_facts"
+    )
+    assert (
+        enriched["lineage"]["broker_risk_control"]["facts"]["net_capital"][
+            "source_file_id"
+        ]
+        == "risk-600030-2025"
+    )
     assert result["status"] == "success"
-    assert result["broker_model_diagnostics"]["net_capital_report_scope"] == "parent_company"
-    assert "broker_net_capital_regulatory_scope_may_differ_from_accounting_equity" in result["warnings"]
+    assert (
+        result["broker_model_diagnostics"]["net_capital_report_scope"]
+        == "parent_company"
+    )
+    assert (
+        "broker_net_capital_regulatory_scope_may_differ_from_accounting_equity"
+        in result["warnings"]
+    )
 
 
 @pytest.mark.parametrize(
@@ -580,13 +607,7 @@ def test_data_manager_excludes_pending_annual_report_broker_facts_from_current_d
 
 def test_data_manager_shared_only_requires_exact_current_broker_fact_lineage():
     manager = object.__new__(DataManager)
-    manager.research_config = SimpleNamespace(
-        modules={
-            "broker_risk_control_reports": {
-                "annual_report_asset_dependency": {"mode": "shared_only"}
-            }
-        }
-    )
+    manager.research_config = SimpleNamespace(modules={})
 
     class _AssetRepository:
         @staticmethod
@@ -612,9 +633,7 @@ def test_data_manager_shared_only_requires_exact_current_broker_fact_lineage():
         },
     }
 
-    assert not manager._broker_risk_control_fact_is_current_eligible(
-        "600030.SH", base
-    )
+    assert not manager._broker_risk_control_fact_is_current_eligible("600030.SH", base)
     matching = {
         **base,
         "raw_fact": {
@@ -624,9 +643,7 @@ def test_data_manager_shared_only_requires_exact_current_broker_fact_lineage():
             "annual_report_content_hash": "d" * 64,
         },
     }
-    assert manager._broker_risk_control_fact_is_current_eligible(
-        "600030.SH", matching
-    )
+    assert manager._broker_risk_control_fact_is_current_eligible("600030.SH", matching)
     mismatched = {
         **matching,
         "raw_fact": {
@@ -666,9 +683,10 @@ def test_data_manager_uses_configured_broker_fact_source_priority():
         "raw_fact": {"source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE},
     }
 
-    assert manager._select_latest_broker_risk_control_fact(
-        [annual, supplementary]
-    ) is supplementary
+    assert (
+        manager._select_latest_broker_risk_control_fact([annual, supplementary])
+        is supplementary
+    )
 
 
 class _FakeSyncStorage:
@@ -682,7 +700,9 @@ class _FakeSyncStorage:
         return self.manifests
 
     def upsert_financial_source_file_manifest(self, manifest, *, ingestion_run_id=None):
-        source_file_id = manifest.source_file_id or f"manifest-{len(self.manifests) + 1}"
+        source_file_id = (
+            manifest.source_file_id or f"manifest-{len(self.manifests) + 1}"
+        )
         self.manifests.append(
             {
                 "source_file_id": source_file_id,
@@ -695,7 +715,9 @@ class _FakeSyncStorage:
         )
         return source_file_id
 
-    def upsert_financial_numeric_facts(self, facts, *, ingestion_run_id=None, tier="hot"):
+    def upsert_financial_numeric_facts(
+        self, facts, *, ingestion_run_id=None, tier="hot"
+    ):
         self.facts.extend(facts)
         return len(facts)
 
@@ -730,13 +752,15 @@ def _announcement_record(
         exchange="SSE",
         symbols=tuple(symbols),
         attachments=(
-            AnnouncementAttachment(
-                source_url=adjunct_url,
-                file_extension=adjunct_type,
-            ),
-        )
-        if adjunct_url
-        else (),
+            (
+                AnnouncementAttachment(
+                    source_url=adjunct_url,
+                    file_extension=adjunct_type,
+                ),
+            )
+            if adjunct_url
+            else ()
+        ),
     )
 
 
@@ -767,7 +791,14 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     )
 
     result = service.backfill(
-        instruments=[{"instrument_id": "600030.SH", "symbol": "600030", "exchange": "SSE", "industry_name": "证券"}],
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+                "industry_name": "证券",
+            }
+        ],
         report_periods=["2025-12-31"],
         announcement_records=[record, ignored],
     )
@@ -779,7 +810,14 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     assert result["filtered_announcements"] == 1
 
     deduped = service.backfill(
-        instruments=[{"instrument_id": "600030.SH", "symbol": "600030", "exchange": "SSE", "industry_name": "证券"}],
+        instruments=[
+            {
+                "instrument_id": "600030.SH",
+                "symbol": "600030",
+                "exchange": "SSE",
+                "industry_name": "证券",
+            }
+        ],
         report_periods=["2025-12-31"],
         announcement_records=[record],
     )
@@ -787,28 +825,43 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     assert deduped["facts_written"] == 0
 
 
-def test_broker_semiannual_skips_download_for_parsed_filing(tmp_path):
+def test_broker_semiannual_reads_shared_asset_without_direct_download(tmp_path):
     payload = _risk_control_text().encode("utf-8")
-    archive_path = tmp_path / "existing-semiannual.pdf"
-    archive_path.write_bytes(payload)
+    content_hash = hashlib.sha256(payload).hexdigest()
+
+    class _Shared:
+        def ensure(self, request):
+            return {
+                "availability": "local_valid",
+                "asset": {
+                    "asset_id": "shared-semiannual-2026",
+                    "instrument_id": "600030.SH",
+                    "fiscal_year": 2026,
+                    "report_period": "2026-06-30",
+                    "source": "cninfo",
+                    "source_announcement_id": "semiannual-2026",
+                    "attachment_id": "shared-semiannual-attachment",
+                    "observation_version": "shared-semiannual-observation",
+                    "content_hash": content_hash,
+                },
+            }
+
+        def content_handle(self, asset_id):
+            assert asset_id == "shared-semiannual-2026"
+            return {
+                "asset_id": asset_id,
+                "content_hash": content_hash,
+                "content_length": len(payload),
+                "file_handle": io.BytesIO(payload),
+            }
+
+    class _TextParser(BrokerRiskControlPdfFactParser):
+        def parse(self, value, **kwargs):
+            if isinstance(value, bytes):
+                value = value.decode("utf-8")
+            return super().parse(value, **kwargs)
+
     storage = _FakeSyncStorage()
-    storage.manifests.append(
-        {
-            "source_file_id": "existing-semiannual",
-            "instrument_id": "600030.SH",
-            "report_period": "2026-06-30",
-            "report_type": "semiannual",
-            "source": "cninfo",
-            "filing_id": "semiannual-2026",
-            "source_url": "/semiannual.pdf",
-            "source_mode": "direct",
-            "status": "parsed",
-            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
-            "archive_path": str(archive_path),
-            "content_hash": hashlib.sha256(payload).hexdigest(),
-            "content_length": len(payload),
-        }
-    )
     record = _announcement_record(
         announcement_id="semiannual-2026",
         title="2026年半年度报告",
@@ -821,13 +874,15 @@ def test_broker_semiannual_skips_download_for_parsed_filing(tmp_path):
     )
     service = BrokerRiskControlReportSyncService(
         storage=storage,
+        parser=_TextParser(
+            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        ),
         payload_fetcher=lambda _record: (_ for _ in ()).throw(
-            AssertionError("parsed filing must not be downloaded again")
+            AssertionError("formal semiannual reports must not be downloaded directly")
         ),
         archive_root=tmp_path,
         source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-        annual_report_asset_mode="legacy",
-        shared_annual_report_enabled=False,
+        shared_asset_access=_Shared(),
     )
 
     result = service.backfill(
@@ -844,15 +899,16 @@ def test_broker_semiannual_skips_download_for_parsed_filing(tmp_path):
     )
 
     assert result["status"] == "success"
-    assert result["unchanged_reports"] == 1
-    assert result["reports_parsed"] == 0
-    assert result["facts_written"] == 0
+    assert result["reports_parsed"] == 1
+    assert result["facts_written"] > 0
+    assert storage.manifests[0]["source_mode"] == "shared_announcement_asset"
+    assert storage.manifests[0]["metadata"]["shared_annual_report_asset"][
+        "asset_id"
+    ] == "shared-semiannual-2026"
 
 
-def test_broker_semiannual_retries_parse_failed_filing(tmp_path):
+def test_broker_semiannual_missing_shared_asset_ignores_legacy_manifest(tmp_path):
     payload = _risk_control_text().encode("utf-8")
-    archive_path = tmp_path / "failed-semiannual.pdf"
-    archive_path.write_bytes(payload)
     storage = _FakeSyncStorage()
     storage.manifests.append(
         {
@@ -866,12 +922,15 @@ def test_broker_semiannual_retries_parse_failed_filing(tmp_path):
             "source_mode": "direct",
             "status": "parse_failed",
             "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
-            "archive_path": str(archive_path),
+            "archive_path": str(tmp_path / "retired-semiannual.pdf"),
             "content_hash": hashlib.sha256(payload).hexdigest(),
             "content_length": len(payload),
         }
     )
-    fetches = []
+    class _SharedMiss:
+        def ensure(self, request):
+            return {"availability": "metadata_only", "asset": None}
+
     record = _announcement_record(
         announcement_id="semiannual-2026",
         title="2026年半年度报告",
@@ -884,11 +943,12 @@ def test_broker_semiannual_retries_parse_failed_filing(tmp_path):
     )
     service = BrokerRiskControlReportSyncService(
         storage=storage,
-        payload_fetcher=lambda _record: fetches.append(_record) or payload,
+        payload_fetcher=lambda _record: (_ for _ in ()).throw(
+            AssertionError("legacy semiannual downloader must not run")
+        ),
         archive_root=tmp_path,
         source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-        annual_report_asset_mode="legacy",
-        shared_annual_report_enabled=False,
+        shared_asset_access=_SharedMiss(),
     )
 
     result = service.backfill(
@@ -904,8 +964,10 @@ def test_broker_semiannual_retries_parse_failed_filing(tmp_path):
         announcement_records=[record],
     )
 
-    assert fetches == [record]
-    assert result["reports_parsed"] == 1
+    assert result["status"] == "partial"
+    assert result["retryable_pending_reports"] == 1
+    assert result["reports_parsed"] == 0
+    assert "not locally ready" in result["errors"][0]
 
 
 class _FakeAnnouncementService:
@@ -998,10 +1060,12 @@ def test_broker_risk_control_incremental_uses_common_announcement_storage():
     assert result["matching_announcements"] == 1
     assert result["retryable_pending_reports"] == 1
     assert storage.generic_state["scan_result"].source == "cninfo"
-    assert storage.generic_audits[0]["record"].source_announcement_id == "risk-common-2025"
+    assert (
+        storage.generic_audits[0]["record"].source_announcement_id == "risk-common-2025"
+    )
 
 
-def test_broker_service_reads_nested_financial_statement_dependency_config(
+def test_broker_annual_service_builds_shared_asset_access_by_default(
     monkeypatch,
 ):
     shared_access = object()
@@ -1012,18 +1076,7 @@ def test_broker_service_reads_nested_financial_statement_dependency_config(
     research_config = SimpleNamespace(
         sources={},
         routing={},
-        modules={
-            "financial_statements": {
-                "broker_risk_control_reports": {
-                    "annual_report_asset_dependency": {
-                        "enabled": True,
-                        "mode": "dual_read",
-                        "legacy_fallback_enabled": True,
-                        "legacy_semiannual_enabled": True,
-                    }
-                }
-            }
-        }
+        modules={},
     )
 
     service = BrokerRiskControlReportSyncService(
@@ -1034,10 +1087,6 @@ def test_broker_service_reads_nested_financial_statement_dependency_config(
     )
 
     assert service.shared_asset_access is shared_access
-    assert service.shared_annual_report_enabled is True
-    assert service.annual_report_asset_mode == "dual_read"
-    assert service.legacy_annual_report_fallback_enabled is True
-    assert service.legacy_semiannual_enabled is True
 
 
 def test_broker_risk_control_payload_uses_common_attachment_retriever():
@@ -1084,12 +1133,6 @@ def test_broker_annual_report_payload_reuses_shared_asset_without_legacy_downloa
     digest = hashlib.sha256(payload).hexdigest()
     path = tmp_path / "shared.pdf"
     path.write_bytes(payload)
-    blob = SimpleNamespace(
-        canonical_path=str(path),
-        content_hash=digest,
-        content_length=len(payload),
-    )
-    asset = SimpleNamespace(content_hash=digest)
 
     class _Shared:
         def __init__(self):
@@ -1275,188 +1318,6 @@ def test_broker_manifest_binds_shared_asset_observation_and_owns_no_pdf_path():
     assert lineage["variant"] == "correction"
 
 
-def test_shared_broker_asset_matches_legacy_parser_output_without_archive_copy(
-    tmp_path,
-):
-    payload = _risk_control_text().encode("utf-8")
-    digest = hashlib.sha256(payload).hexdigest()
-    record = _announcement_record(
-        announcement_id="annual-equivalent-2025",
-        title="2025年年度报告",
-        announcement_time="2026-03-30",
-        market="沪市",
-        symbols=["600030"],
-        adjunct_url="/annual.pdf",
-        adjunct_type="PDF",
-    )
-    instrument = {
-        "instrument_id": "600030.SH",
-        "symbol": "600030",
-        "exchange": "SSE",
-    }
-
-    class _TextParser(BrokerRiskControlPdfFactParser):
-        def parse(self, value, **kwargs):
-            if isinstance(value, bytes):
-                value = value.decode("utf-8")
-            return super().parse(value, **kwargs)
-
-    class _SharedAccess:
-        @staticmethod
-        def _asset():
-            return {
-                "asset_id": "asset-equivalent-2025",
-                "instrument_id": "600030.SH",
-                "fiscal_year": 2025,
-                "report_period": "2025-12-31",
-                "source": "cninfo",
-                "source_announcement_id": "annual-equivalent-2025",
-                "attachment_id": "attachment-equivalent-2025",
-                "observation_version": "observation-equivalent-2025",
-                "content_hash": digest,
-                "variant": "original",
-                "is_correction": False,
-                "published_at": "2026-03-30",
-                "availability": "local_valid",
-                "effective_decision_state": "current",
-            }
-
-        def ensure(self, request):
-            return {
-                "availability": "local_valid",
-                "asset": self._asset(),
-            }
-
-        def get_effective_asset(self, instrument_id, *, fiscal_year):
-            assert instrument_id == "600030.SH"
-            assert fiscal_year == 2025
-            return self._asset()
-
-        def content_handle(self, asset_id):
-            return {
-                "asset_id": asset_id,
-                "content_hash": digest,
-                "content_length": len(payload),
-                "path": tmp_path / "canonical.pdf",
-                "file_handle": io.BytesIO(payload),
-            }
-
-    shared_storage = _FakeSyncStorage()
-    shared_storage.manifests.append(
-        {
-            "source_file_id": "legacy-direct-manifest",
-            "content_hash": digest,
-            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
-            "source_mode": "direct",
-            "status": "parsed",
-            "metadata": {},
-        }
-    )
-    shared_storage.manifests.append(
-        {
-            "source_file_id": "stale-shared-manifest",
-            "content_hash": digest,
-            "parser_version": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
-            "source_mode": "shared_announcement_asset",
-            "status": "parsed",
-            "metadata": {
-                "shared_annual_report_asset": {
-                    "asset_id": "asset-equivalent-2025",
-                    "observation_version": "observation-stale-2025",
-                    "content_hash": digest,
-                }
-            },
-        }
-    )
-    shared_service = BrokerRiskControlReportSyncService(
-        storage=shared_storage,
-        parser=_TextParser(
-            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
-        ),
-        payload_fetcher=lambda _record: (_ for _ in ()).throw(
-            AssertionError("legacy downloader must not run")
-        ),
-        archive_root=tmp_path / "shared-broker-archive",
-        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-        shared_asset_access=_SharedAccess(),
-    )
-    legacy_service = BrokerRiskControlReportSyncService(
-        storage=_FakeSyncStorage(),
-        parser=_TextParser(
-            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
-        ),
-        payload_fetcher=lambda _record: payload,
-        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-        annual_report_asset_mode="legacy",
-        shared_annual_report_enabled=False,
-    )
-
-    shared_result = shared_service.backfill(
-        instruments=[instrument],
-        report_periods=["2025-12-31"],
-        announcement_records=[record],
-        dry_run=False,
-    )
-    legacy_result = legacy_service.backfill(
-        instruments=[instrument],
-        report_periods=["2025-12-31"],
-        announcement_records=[record],
-        dry_run=True,
-    )
-
-    assert shared_result["facts_parsed"] == legacy_result["facts_parsed"]
-    assert shared_result["report_summaries"] == legacy_result["report_summaries"]
-    assert shared_result["facts_written"] > 0
-    assert not (tmp_path / "shared-broker-archive").exists()
-    assert shared_storage.facts
-    assert all(
-        fact.raw_fact_json["annual_report_asset_id"] == "asset-equivalent-2025"
-        for fact in shared_storage.facts
-    )
-    assert all(
-        fact.raw_fact_json["annual_report_observation_version"]
-        == "observation-equivalent-2025"
-        for fact in shared_storage.facts
-    )
-
-    fact_count = len(shared_storage.facts)
-    repeated = shared_service.backfill(
-        instruments=[instrument],
-        report_periods=["2025-12-31"],
-        announcement_records=[record],
-        dry_run=False,
-    )
-    assert repeated["unchanged_reports"] == 1
-    assert repeated["reports_parsed"] == 0
-    assert repeated["facts_written"] == 0
-    assert len(shared_storage.facts) == fact_count
-
-    event_storage = _FakeSyncStorage()
-    event_service = BrokerRiskControlReportSyncService(
-        storage=event_storage,
-        parser=_TextParser(
-            parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
-        ),
-        payload_fetcher=lambda _record: (_ for _ in ()).throw(
-            AssertionError("event processing must not use legacy downloader")
-        ),
-        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
-        shared_asset_access=_SharedAccess(),
-    )
-    event_result = event_service.process_shared_asset_event(
-        {
-            "event_type": "replaced",
-            "asset_id": "asset-equivalent-2025",
-            "fiscal_year": 2025,
-        },
-        instrument=instrument,
-        dry_run=True,
-    )
-
-    assert event_result["facts_parsed"] == legacy_result["facts_parsed"]
-    assert event_result["report_summaries"] == legacy_result["report_summaries"]
-
-
 def test_broker_consumer_event_reads_exact_bound_observation_after_correction(tmp_path):
     payload = _risk_control_text().encode("utf-8")
     digest = hashlib.sha256(payload).hexdigest()
@@ -1565,6 +1426,7 @@ def test_shared_processing_validation_separates_lineage_from_business_completene
         "observation_version": asset["observation_version"],
         "content_hash": asset["content_hash"],
     }
+
     class _ValidationStorage(_FakeBrokerRiskControlStorage):
         def get_financial_numeric_facts(self, *args, **kwargs):
             return list(self.rows)
@@ -1600,7 +1462,9 @@ def test_shared_processing_validation_separates_lineage_from_business_completene
     assert validation["missing_required_facts"] == ["net_capital"]
     assert validation["business_fact_complete"] is False
     storage.rows[0]["canonical_fact_name"] = "net_capital"
-    storage.rows[0]["raw_fact"] = {"source_asset_lineage": {**lineage, "asset_id": "other"}}
+    storage.rows[0]["raw_fact"] = {
+        "source_asset_lineage": {**lineage, "asset_id": "other"}
+    }
     validation = validate_broker_shared_asset_processing(storage, asset)
     assert validation["ready"] is False
     assert validation["reason_code"] == "broker_fact_lineage_invalid"
@@ -1633,7 +1497,9 @@ def test_shared_processing_validation_separates_lineage_from_business_completene
 
 
 def test_broker_risk_control_artifact_classification_is_title_scoped():
-    assert is_broker_risk_control_title("2025年度<em>风险</em><em>控制</em><em>指标</em>相关情况报告")
+    assert is_broker_risk_control_title(
+        "2025年度<em>风险</em><em>控制</em><em>指标</em>相关情况报告"
+    )
     assert classify_broker_risk_control_artifact(
         "2025年度风险控制指标相关情况报告",
         adjunct_type="PDF",
@@ -1642,7 +1508,10 @@ def test_broker_risk_control_artifact_classification_is_title_scoped():
         "parser_candidate": BROKER_RISK_CONTROL_PARSER_VERSION,
         "source_profile": "broker_risk_control_report",
     }
-    assert classify_broker_risk_control_artifact("2025年年度报告", adjunct_type="PDF") is None
+    assert (
+        classify_broker_risk_control_artifact("2025年年度报告", adjunct_type="PDF")
+        is None
+    )
 
 
 def test_formal_annual_report_title_selection_excludes_non_reports():
@@ -1660,9 +1529,13 @@ def test_formal_annual_report_title_selection_excludes_non_reports():
     assert is_formal_broker_annual_or_semiannual_report_title("2025年半年度报告")
     assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度报告摘要")
     assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度审计报告")
-    assert not is_formal_broker_annual_or_semiannual_report_title("H股公告-二零二三年年度报告")
+    assert not is_formal_broker_annual_or_semiannual_report_title(
+        "H股公告-二零二三年年度报告"
+    )
     assert not is_formal_broker_annual_or_semiannual_report_title("二零二四年年度报告")
-    assert not is_formal_broker_annual_or_semiannual_report_title("2024年年度报告（可视版）")
+    assert not is_formal_broker_annual_or_semiannual_report_title(
+        "2024年年度报告（可视版）"
+    )
     assert not is_formal_broker_annual_or_semiannual_report_title(
         "2025年度提质增效重回报行动方案落实情况半年度报告"
     )
@@ -1670,10 +1543,13 @@ def test_formal_annual_report_title_selection_excludes_non_reports():
         "关于变更2024年半年度报告披露时间的提示性公告"
     )
     assert infer_broker_annual_report_period(record) == "2025-12-31"
-    assert classify_broker_annual_report_risk_control_artifact(
-        "2025年年度报告",
-        adjunct_type="PDF",
-    )["source_profile"] == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+    assert (
+        classify_broker_annual_report_risk_control_artifact(
+            "2025年年度报告",
+            adjunct_type="PDF",
+        )["source_profile"]
+        == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+    )
 
 
 def test_listed_broker_scope_gate_excludes_platform_candidates():

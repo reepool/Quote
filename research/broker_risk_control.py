@@ -25,13 +25,11 @@ from research.announcements import (
 )
 from research.financial_fact_aliases import describe_financial_numeric_fact_name
 from research.providers.base import (
-    FinancialFilingPayload,
     FinancialNumericFactSnapshot,
     FinancialSourceFileManifest,
 )
 from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.listed_broker_dealer_scope import (
-    enrich_instrument_with_broker_scope,
     is_confirmed_listed_broker_dealer,
     resolve_listed_broker_dealer_scope,
 )
@@ -42,9 +40,15 @@ from utils.config_manager import ResearchConfig, config_manager
 BROKER_RISK_CONTROL_SOURCE_PROFILE = "broker_risk_control_report"
 BROKER_RISK_CONTROL_ARTIFACT_KIND = "broker_risk_control_pdf"
 BROKER_RISK_CONTROL_PARSER_VERSION = "broker_risk_control_pdf.v1"
-BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE = "broker_annual_report_embedded_risk_control"
-BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = "broker_annual_or_semiannual_report_pdf"
-BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
+BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE = (
+    "broker_annual_report_embedded_risk_control"
+)
+BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = (
+    "broker_annual_or_semiannual_report_pdf"
+)
+BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = (
+    "broker_annual_report_embedded_risk_control_pdf.v1"
+)
 BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
 LOGGER = logging.getLogger(__name__)
 
@@ -115,12 +119,16 @@ def validate_broker_shared_asset_processing(
         raw_fact = fact.get("raw_fact") or {}
         dimensions = fact.get("dimensions") or {}
         lineages = (
-            raw_fact.get("source_asset_lineage")
-            if isinstance(raw_fact, Mapping)
-            else None,
-            dimensions.get("source_asset_lineage")
-            if isinstance(dimensions, Mapping)
-            else None,
+            (
+                raw_fact.get("source_asset_lineage")
+                if isinstance(raw_fact, Mapping)
+                else None
+            ),
+            (
+                dimensions.get("source_asset_lineage")
+                if isinstance(dimensions, Mapping)
+                else None
+            ),
         )
         if not all(
             isinstance(lineage, Mapping)
@@ -138,18 +146,18 @@ def validate_broker_shared_asset_processing(
         str(fact.get("canonical_fact_name") or fact.get("fact_name") or "")
         for fact in matching_facts
     }
-    missing_required = sorted(
-        set(BROKER_RISK_CONTROL_REQUIRED_FACTS) - canonical_facts
-    )
+    missing_required = sorted(set(BROKER_RISK_CONTROL_REQUIRED_FACTS) - canonical_facts)
     ready = bool(matching_facts) and invalid_lineage_count == 0
     return {
         "ready": ready,
         "reason_code": (
             None
             if ready
-            else "broker_fact_lineage_invalid"
-            if invalid_lineage_count
-            else "broker_fact_output_empty"
+            else (
+                "broker_fact_lineage_invalid"
+                if invalid_lineage_count
+                else "broker_fact_output_empty"
+            )
         ),
         "source_file_id": source_file_id,
         "fact_count": len(matching_facts),
@@ -173,9 +181,7 @@ def _normalize_bound_shared_annual_report_asset(
             asset.get("source_announcement_id") or ""
         ).strip(),
         "attachment_id": str(asset.get("attachment_id") or "").strip(),
-        "observation_version": str(
-            asset.get("observation_version") or ""
-        ).strip(),
+        "observation_version": str(asset.get("observation_version") or "").strip(),
         "content_hash": str(asset.get("content_hash") or "").strip().lower(),
         "report_period": str(asset.get("report_period") or "").strip(),
     }
@@ -199,8 +205,7 @@ def _normalize_bound_shared_annual_report_asset(
             + ",".join(missing)
         )
     if len(binding["content_hash"]) != 64 or any(
-        character not in "0123456789abcdef"
-        for character in binding["content_hash"]
+        character not in "0123456789abcdef" for character in binding["content_hash"]
     ):
         raise ValueError("bound broker shared annual-report content_hash is invalid")
     if (
@@ -262,7 +267,9 @@ def _announcement_source(record: AnnouncementRecord) -> str:
     return record.source
 
 
-def _announcement_attachment(record: AnnouncementRecord) -> Optional[AnnouncementAttachment]:
+def _announcement_attachment(
+    record: AnnouncementRecord,
+) -> Optional[AnnouncementAttachment]:
     attachments = record.attachments
     if attachments:
         return next(
@@ -382,17 +389,27 @@ BROKER_RISK_CONTROL_CANONICAL_FACTS: Dict[str, Dict[str, Any]] = {
     "proprietary_equity_securities_to_net_capital": {
         "semantic": "proprietary_equity_securities_and_derivatives_to_net_capital",
         "unit": "ratio",
-        "aliases": ["自营权益类证券及其衍生品/净资本", "自营权益类证券及证券衍生品/净资本"],
+        "aliases": [
+            "自营权益类证券及其衍生品/净资本",
+            "自营权益类证券及证券衍生品/净资本",
+        ],
     },
     "proprietary_non_equity_securities_to_net_capital": {
         "semantic": "proprietary_non_equity_securities_and_derivatives_to_net_capital",
         "unit": "ratio",
-        "aliases": ["自营非权益类证券及其衍生品/净资本", "自营非权益类证券及证券衍生品/净资本"],
+        "aliases": [
+            "自营非权益类证券及其衍生品/净资本",
+            "自营非权益类证券及证券衍生品/净资本",
+        ],
     },
     "margin_financing_to_net_capital": {
         "semantic": "margin_financing_including_securities_lending_to_net_capital",
         "unit": "ratio",
-        "aliases": ["融资（含融券）的金额/净资本", "融资含融券的金额/净资本", "融资融券金额/净资本"],
+        "aliases": [
+            "融资（含融券）的金额/净资本",
+            "融资含融券的金额/净资本",
+            "融资融券金额/净资本",
+        ],
     },
     "high_quality_liquid_assets": {
         "semantic": "high_quality_liquid_assets",
@@ -488,7 +505,9 @@ def is_broker_risk_control_title(
             "风险控制指标",
         )
     )
-    return any(str(pattern) and str(pattern).replace(" ", "") in text for pattern in patterns)
+    return any(
+        str(pattern) and str(pattern).replace(" ", "") in text for pattern in patterns
+    )
 
 
 def is_formal_broker_annual_or_semiannual_report_title(title: str) -> bool:
@@ -587,7 +606,9 @@ def is_broker_risk_control_instrument(
     return is_confirmed_listed_broker_dealer(instrument)
 
 
-def classify_broker_risk_control_artifact(title: str, *, adjunct_type: Optional[str] = None) -> Optional[Dict[str, Any]]:
+def classify_broker_risk_control_artifact(
+    title: str, *, adjunct_type: Optional[str] = None
+) -> Optional[Dict[str, Any]]:
     """Classify matching announcements as broker risk-control PDF artifacts."""
     if not is_broker_risk_control_title(title):
         return None
@@ -612,7 +633,11 @@ def classify_broker_annual_report_risk_control_artifact(
     type_text = str(adjunct_type or "").lower()
     if type_text and "pdf" not in type_text:
         return None
-    report_type = "semiannual" if "半年度报告" in _normalize_announcement_title(title) else "annual"
+    report_type = (
+        "semiannual"
+        if "半年度报告" in _normalize_announcement_title(title)
+        else "annual"
+    )
     return {
         "artifact_kind": BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND,
         "parser_candidate": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
@@ -709,7 +734,11 @@ class BrokerRiskControlPdfFactParser:
                 continue
             if len(canonical_matches) > 1:
                 ambiguous_rows.append(
-                    {"line_index": line_index, "line": line, "matches": canonical_matches}
+                    {
+                        "line_index": line_index,
+                        "line": line,
+                        "matches": canonical_matches,
+                    }
                 )
                 continue
             canonical_name = canonical_matches[0]
@@ -735,14 +764,16 @@ class BrokerRiskControlPdfFactParser:
                 )
                 continue
             unit = self._unit_for(canonical_name)
-            effective_source_unit, effective_unit_scale, unit_detection = self._effective_money_unit(
-                canonical_name,
-                value["value"],
-                source_unit=source_unit,
-                unit_scale=unit_scale,
-                rows=rows,
-                line_index=line_index,
-                line=line,
+            effective_source_unit, effective_unit_scale, unit_detection = (
+                self._effective_money_unit(
+                    canonical_name,
+                    value["value"],
+                    source_unit=source_unit,
+                    unit_scale=unit_scale,
+                    rows=rows,
+                    line_index=line_index,
+                    line=line,
+                )
             )
             canonical_value = self._normalize_value(
                 value,
@@ -916,7 +947,9 @@ class BrokerRiskControlPdfFactParser:
                 )
 
         missing_required = [
-            name for name in BROKER_RISK_CONTROL_REQUIRED_FACTS if name not in matched_rows
+            name
+            for name in BROKER_RISK_CONTROL_REQUIRED_FACTS
+            if name not in matched_rows
         ]
         diagnostics = {
             **text_diagnostics,
@@ -930,9 +963,7 @@ class BrokerRiskControlPdfFactParser:
             "licensed_broker_name": licensed_broker_name,
             "listed_broker_scope": listed_broker_scope,
             "source_asset_lineage": (
-                None
-                if source_asset_lineage is None
-                else dict(source_asset_lineage)
+                None if source_asset_lineage is None else dict(source_asset_lineage)
             ),
             "report_scope_uncertain": report_scope == "unknown",
             "candidate_row_count": len(rows),
@@ -944,7 +975,9 @@ class BrokerRiskControlPdfFactParser:
         }
         if source_unit is None:
             diagnostics["unknown_units"] = True
-        return BrokerRiskControlParseResult(numeric_facts=facts, diagnostics=diagnostics)
+        return BrokerRiskControlParseResult(
+            numeric_facts=facts, diagnostics=diagnostics
+        )
 
     def _build_fact_snapshot(
         self,
@@ -991,8 +1024,11 @@ class BrokerRiskControlPdfFactParser:
             report_type=report_type or "annual_risk_control",
             statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
             fact_name=fact_name,
-            canonical_fact_name=standard_metadata.get("canonical_fact_name") or canonical_name,
-            canonical_statement_family=standard_metadata.get("canonical_statement_family")
+            canonical_fact_name=standard_metadata.get("canonical_fact_name")
+            or canonical_name,
+            canonical_statement_family=standard_metadata.get(
+                "canonical_statement_family"
+            )
             or BROKER_RISK_CONTROL_STATEMENT_FAMILY,
             canonical_semantic=standard_metadata.get("canonical_semantic")
             or BROKER_RISK_CONTROL_CANONICAL_FACTS[canonical_name]["semantic"],
@@ -1000,7 +1036,11 @@ class BrokerRiskControlPdfFactParser:
             canonical_version=standard_metadata.get("canonical_version"),
             taxonomy_namespace=f"cninfo:{source_profile}",
             context_id=f"broker_risk_control:{report_period}:{canonical_name}",
-            unit=source_unit if unit == "CNY" else "percent" if value.get("percent") else "ratio",
+            unit=(
+                source_unit
+                if unit == "CNY"
+                else "percent" if value.get("percent") else "ratio"
+            ),
             period_end=report_period,
             instant=report_period,
             fact_value=canonical_value,
@@ -1030,9 +1070,7 @@ class BrokerRiskControlPdfFactParser:
                     else source_asset_lineage.get("effective_decision_state")
                 ),
                 "source_asset_lineage": (
-                    None
-                    if source_asset_lineage is None
-                    else dict(source_asset_lineage)
+                    None if source_asset_lineage is None else dict(source_asset_lineage)
                 ),
             },
             raw_fact_json={
@@ -1066,16 +1104,16 @@ class BrokerRiskControlPdfFactParser:
                     else source_asset_lineage.get("effective_decision_state")
                 ),
                 "source_asset_lineage": (
-                    None
-                    if source_asset_lineage is None
-                    else dict(source_asset_lineage)
+                    None if source_asset_lineage is None else dict(source_asset_lineage)
                 ),
                 "raw_line": line,
                 "line_index": line_index,
                 "extraction_strategy": extraction_strategy,
                 "standardized_fact": standard_metadata,
                 "risk_control_field_requiredness": (
-                    "required" if canonical_name in BROKER_RISK_CONTROL_REQUIRED_FACTS else "optional"
+                    "required"
+                    if canonical_name in BROKER_RISK_CONTROL_REQUIRED_FACTS
+                    else "optional"
                 ),
             },
             source=source,
@@ -1085,10 +1123,15 @@ class BrokerRiskControlPdfFactParser:
 
     def _extract_text(self, payload: bytes | str) -> tuple[str, Dict[str, Any]]:
         if isinstance(payload, str):
-            return payload, {"text_extraction": "provided_text", "unparseable_pages": []}
+            return payload, {
+                "text_extraction": "provided_text",
+                "unparseable_pages": [],
+            }
         try:
             from pypdf import PdfReader
-        except Exception as exc:  # pragma: no cover - exercised only when dependency is absent
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - exercised only when dependency is absent
             return "", {
                 "text_extraction": "failed",
                 "unparseable_pages": ["pypdf_unavailable"],
@@ -1154,19 +1197,23 @@ class BrokerRiskControlPdfFactParser:
             window = numeric_rows[start : start + len(self._FIXED_ORDER_EMBEDDED_FACTS)]
             if len(window) < minimum_rows:
                 continue
-            if not self._looks_like_fixed_order_risk_control_block(window, source_unit=source_unit):
+            if not self._looks_like_fixed_order_risk_control_block(
+                window, source_unit=source_unit
+            ):
                 continue
             result: List[Dict[str, Any]] = []
             for canonical_name, row in zip(self._FIXED_ORDER_EMBEDDED_FACTS, window):
                 first = row["numbers"][0]
-                row_source_unit, row_unit_scale, unit_detection = self._effective_money_unit(
-                    canonical_name,
-                    first["value"],
-                    source_unit=source_unit,
-                    unit_scale=unit_scale,
-                    rows=rows,
-                    line_index=int(row["line_index"]),
-                    line=str(row["line"]),
+                row_source_unit, row_unit_scale, unit_detection = (
+                    self._effective_money_unit(
+                        canonical_name,
+                        first["value"],
+                        source_unit=source_unit,
+                        unit_scale=unit_scale,
+                        rows=rows,
+                        line_index=int(row["line_index"]),
+                        line=str(row["line"]),
+                    )
                 )
                 result.append(
                     {
@@ -1216,13 +1263,19 @@ class BrokerRiskControlPdfFactParser:
         if any(gap <= 0 or gap > 4 for gap in gaps):
             return False
         first_values = [abs(float(row["numbers"][0]["value"])) for row in window[:10]]
-        core, subordinated, net_capital = first_values[0], first_values[1], first_values[2]
+        core, subordinated, net_capital = (
+            first_values[0],
+            first_values[1],
+            first_values[2],
+        )
         if net_capital <= 0:
             return False
         if abs((core + subordinated) - net_capital) / net_capital > 0.08:
             return False
         source_unit_known = source_unit in self._MONEY_UNITS
-        raw_amounts_look_absolute = all(value >= 100_000_000 for value in first_values[:6])
+        raw_amounts_look_absolute = all(
+            value >= 100_000_000 for value in first_values[:6]
+        )
         if not source_unit_known and not raw_amounts_look_absolute:
             return False
         risk_coverage, capital_leverage, lcr, nsfr = first_values[6:10]
@@ -1256,7 +1309,11 @@ class BrokerRiskControlPdfFactParser:
         if local_unit:
             return local_unit, self._MONEY_UNITS[local_unit], "local_context_unit"
         if source_unit in self._MONEY_UNITS:
-            return source_unit, unit_scale or self._MONEY_UNITS[source_unit], "document_unit"
+            return (
+                source_unit,
+                unit_scale or self._MONEY_UNITS[source_unit],
+                "document_unit",
+            )
         return source_unit, unit_scale, "unknown_unit"
 
     def _detect_local_money_unit(
@@ -1271,7 +1328,7 @@ class BrokerRiskControlPdfFactParser:
         if same_line:
             return same_line
         start = max(0, int(line_index) - 8)
-        for candidate in reversed(rows[start:int(line_index)]):
+        for candidate in reversed(rows[start : int(line_index)]):
             unit = self._money_unit_from_line(candidate)
             if unit:
                 return unit
@@ -1305,13 +1362,17 @@ class BrokerRiskControlPdfFactParser:
                 return "source_unit_unknown"
             if abs(canonical_value) > 10_000_000_000_000:
                 return "money_value_out_of_plausible_range"
-            if canonical_name in {
-                "net_capital",
-                "core_net_capital",
-                "regulatory_net_assets",
-                "risk_capital_reserve_total",
-                "balance_sheet_assets_total",
-            } and canonical_value < 100_000_000:
+            if (
+                canonical_name
+                in {
+                    "net_capital",
+                    "core_net_capital",
+                    "regulatory_net_assets",
+                    "risk_capital_reserve_total",
+                    "balance_sheet_assets_total",
+                }
+                and canonical_value < 100_000_000
+            ):
                 return "money_value_out_of_plausible_range"
         elif unit == "ratio":
             if canonical_value < 0:
@@ -1374,14 +1435,23 @@ class BrokerRiskControlPdfFactParser:
             and "net_capital" in matches
         ):
             matches.remove("net_capital")
-        if "regulatory_net_assets" in matches and "net_assets_to_liabilities" in matches:
+        if (
+            "regulatory_net_assets" in matches
+            and "net_assets_to_liabilities" in matches
+        ):
             matches.remove("regulatory_net_assets")
         return matches
 
-    def _extract_numeric_value(self, line: str, *, canonical_name: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    def _extract_numeric_value(
+        self, line: str, *, canonical_name: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
         search_text = line
         label_end = self._label_match_end(line, canonical_name) if canonical_name else 0
-        matches = [match for match in self._NUMBER_PATTERN.finditer(search_text) if match.start() >= label_end]
+        matches = [
+            match
+            for match in self._NUMBER_PATTERN.finditer(search_text)
+            if match.start() >= label_end
+        ]
         if not matches:
             matches = list(self._NUMBER_PATTERN.finditer(line))
         if not matches:
@@ -1404,7 +1474,9 @@ class BrokerRiskControlPdfFactParser:
     def _label_match_end(self, line: str, canonical_name: Optional[str]) -> int:
         if not canonical_name:
             return 0
-        labels = BROKER_RISK_CONTROL_CANONICAL_FACTS.get(canonical_name, {}).get("aliases", [])
+        labels = BROKER_RISK_CONTROL_CANONICAL_FACTS.get(canonical_name, {}).get(
+            "aliases", []
+        )
         candidates = [canonical_name, *labels]
         compact_line = re.sub(r"[\s　]+", "", line)
         best_end = 0
@@ -1445,7 +1517,9 @@ class BrokerRiskControlPdfFactParser:
         entries = []
         for canonical, spec in BROKER_RISK_CONTROL_CANONICAL_FACTS.items():
             labels = [canonical, *spec.get("aliases", [])]
-            escaped = [re.escape(str(label).replace(" ", "")) for label in labels if str(label)]
+            escaped = [
+                re.escape(str(label).replace(" ", "")) for label in labels if str(label)
+            ]
             entries.append((canonical, re.compile("|".join(escaped))))
         return sorted(entries, key=lambda item: len(item[1].pattern), reverse=True)
 
@@ -1517,90 +1591,12 @@ class BrokerRiskControlReportSyncService:
         replace_existing_facts: bool = False,
         shared_asset_access: Any | None = None,
         shared_asset_service: Any | None = None,
-        shared_annual_report_enabled: bool | None = None,
-        legacy_semiannual_enabled: bool | None = None,
-        annual_report_asset_mode: str | None = None,
     ) -> None:
         self.storage = storage
         self.research_config = research_config or config_manager.get_research_config()
-        explicit_shared_dependency = (
-            shared_asset_access is not None or shared_asset_service is not None
-        )
         if shared_asset_access is not None and shared_asset_service is not None:
             raise ValueError(
                 "provide shared_asset_access or shared_asset_service, not both"
-            )
-        modules = getattr(self.research_config, "modules", {}) or {}
-        financial_cfg = (
-            modules.get("financial_statements", {})
-            if isinstance(modules, Mapping)
-            else {}
-        )
-        broker_cfg = (
-            modules.get(
-                "broker_risk_control_reports",
-                financial_cfg.get("broker_risk_control_reports", {}),
-            )
-            if isinstance(modules, Mapping)
-            else {}
-        )
-        dependency_cfg = (
-            broker_cfg.get("annual_report_asset_dependency", {})
-            if isinstance(broker_cfg, Mapping)
-            else {}
-        )
-        if not isinstance(dependency_cfg, Mapping):
-            raise ValueError(
-                "broker_risk_control_reports.annual_report_asset_dependency "
-                "must be a mapping"
-            )
-        explicit_mode = annual_report_asset_mode is not None
-        dependency_mode = str(
-            annual_report_asset_mode
-            or (
-                "shared_only"
-                if explicit_shared_dependency
-                else dependency_cfg.get(
-                    "mode",
-                    "shared_only" if dependency_cfg.get("enabled", False) else "legacy",
-                )
-            )
-        ).strip().lower()
-        if dependency_mode not in {"legacy", "dual_read", "shared_only"}:
-            raise ValueError("invalid broker annual-report asset mode")
-        dependency_enabled = bool(
-            shared_annual_report_enabled
-            if shared_annual_report_enabled is not None
-            else dependency_mode in {"dual_read", "shared_only"}
-            if explicit_mode or explicit_shared_dependency
-            else dependency_cfg.get("enabled", False)
-        )
-        if (
-            not explicit_shared_dependency
-            and dependency_mode == "shared_only"
-            and (
-                not str(
-                    dependency_cfg.get("reconciliation_evidence_id") or ""
-                ).strip()
-                or dependency_cfg.get("legacy_writer_disabled") is not True
-            )
-        ):
-            raise ValueError(
-                "broker shared-only cutover requires reconciliation evidence "
-                "and legacy writer disablement"
-            )
-        if dependency_enabled != (dependency_mode in {"dual_read", "shared_only"}):
-            raise ValueError("broker annual-report mode conflicts with enabled flag")
-        legacy_annual_fallback = bool(
-            dependency_mode in {"legacy", "dual_read"}
-            if explicit_mode or explicit_shared_dependency
-            else dependency_cfg.get(
-                "legacy_fallback_enabled", dependency_mode != "shared_only"
-            )
-        )
-        if legacy_annual_fallback != (dependency_mode in {"legacy", "dual_read"}):
-            raise ValueError(
-                "broker annual-report mode conflicts with legacy fallback"
             )
         if shared_asset_access is None and shared_asset_service is not None:
             from research.announcement_assets import AnnouncementAssetAccess
@@ -1610,29 +1606,30 @@ class BrokerRiskControlReportSyncService:
                 config=shared_asset_service.config,
                 service=shared_asset_service,
             )
-        if shared_asset_access is None and dependency_enabled:
+        if (
+            shared_asset_access is None
+            and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        ):
             shared_asset_access = _build_shared_annual_report_access(
                 self.research_config
             )
         self.shared_asset_access = shared_asset_access
-        self.shared_annual_report_enabled = bool(dependency_enabled)
-        self.annual_report_asset_mode = dependency_mode
-        self.legacy_annual_report_fallback_enabled = legacy_annual_fallback
-        self.legacy_semiannual_enabled = (
-            bool(dependency_cfg.get("legacy_semiannual_enabled", True))
-            if legacy_semiannual_enabled is None
-            else bool(legacy_semiannual_enabled)
-        )
-        if self.shared_annual_report_enabled and self.shared_asset_access is None:
+        if (
+            self.shared_asset_access is None
+            and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        ):
             raise ValueError(
                 "shared annual-report dependency requires shared asset access"
             )
         acquisition_config = load_announcement_acquisition_config(self.research_config)
-        self.announcement_service = announcement_service or AnnouncementAcquisitionService(
-            registry=OfficialAnnouncementProviderRegistry(
-                research_config=self.research_config
-            ),
-            config=acquisition_config,
+        self.announcement_service = (
+            announcement_service
+            or AnnouncementAcquisitionService(
+                registry=OfficialAnnouncementProviderRegistry(
+                    research_config=self.research_config
+                ),
+                config=acquisition_config,
+            )
         )
         self.attachment_retriever = attachment_retriever or (
             None
@@ -1641,7 +1638,10 @@ class BrokerRiskControlReportSyncService:
                 acquisition_config.provider_configs
             )
         )
-        if parser is None and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+        if (
+            parser is None
+            and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        ):
             parser = BrokerRiskControlPdfFactParser(
                 parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
             )
@@ -1678,10 +1678,16 @@ class BrokerRiskControlReportSyncService:
         records = list(announcement_records or [])
         for record in records:
             instrument = self._resolve_record_instrument(record, instrument_by_symbol)
-            if instrument is None or not self._instrument_in_scope(instrument) or not self._record_matches(record):
+            if (
+                instrument is None
+                or not self._instrument_in_scope(instrument)
+                or not self._record_matches(record)
+            ):
                 result.filtered_announcements += 1
                 continue
-            if not self._record_period(record) in set(str(period) for period in report_periods):
+            if not self._record_period(record) in set(
+                str(period) for period in report_periods
+            ):
                 result.filtered_announcements += 1
                 continue
             self._process_record(
@@ -1693,7 +1699,11 @@ class BrokerRiskControlReportSyncService:
                 dry_run=dry_run,
             )
         result.reports_discovered = result.matching_announcements
-        result.missing_reports = max(0, result.target_instruments * result.target_periods - result.reports_discovered)
+        result.missing_reports = max(
+            0,
+            result.target_instruments * result.target_periods
+            - result.reports_discovered,
+        )
         if result.parse_failures or result.retryable_pending_reports:
             result.status = "partial"
         return result.to_dict()
@@ -1712,11 +1722,7 @@ class BrokerRiskControlReportSyncService:
         max_pages: int = 20,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
-        if (
-            self.source_profile
-            == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-            and self.annual_report_asset_mode == "shared_only"
-        ):
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             LOGGER.info(
                 "broker formal annual-report incremental scan skipped: "
                 "shared asset event is required"
@@ -1733,7 +1739,8 @@ class BrokerRiskControlReportSyncService:
             market=market,
             keyword=(
                 "年度报告"
-                if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                if self.source_profile
+                == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
                 else "风险控制指标"
             ),
             start_date=start_date,
@@ -1837,8 +1844,8 @@ class BrokerRiskControlReportSyncService:
     ) -> Dict[str, Any]:
         """Process one qualifying shared annual-report event through normal parsing."""
 
-        if not self.shared_annual_report_enabled or self.shared_asset_access is None:
-            raise RuntimeError("shared broker annual-report dependency is disabled")
+        if self.shared_asset_access is None:
+            raise RuntimeError("shared broker annual-report dependency is unavailable")
         event_type = str(event.get("event_type") or "").strip().lower()
         if event_type not in {"added", "replaced", "repaired"}:
             return BrokerRiskControlSyncResult(
@@ -1860,12 +1867,8 @@ class BrokerRiskControlReportSyncService:
         )
         if (
             not asset
-            or (
-                bound_asset is None
-                and asset.get("availability") != "local_valid"
-            )
-            or str(asset.get("asset_id") or "")
-            != str(event.get("asset_id") or "")
+            or (bound_asset is None and asset.get("availability") != "local_valid")
+            or str(asset.get("asset_id") or "") != str(event.get("asset_id") or "")
             or str(asset.get("instrument_id") or "") != instrument_id
             or int(asset.get("fiscal_year") or 0) != fiscal_year
         ):
@@ -1877,16 +1880,12 @@ class BrokerRiskControlReportSyncService:
                 errors=["shared asset event does not match the current local asset"],
             ).to_dict()
         source = str(asset.get("source") or "").strip().lower()
-        source_announcement_id = str(
-            asset.get("source_announcement_id") or ""
-        ).strip()
+        source_announcement_id = str(asset.get("source_announcement_id") or "").strip()
         attachment_id = str(asset.get("attachment_id") or asset["asset_id"])
         record = AnnouncementRecord(
             source=source,
             source_announcement_id=source_announcement_id,
-            announcement_key=build_announcement_key(
-                source, source_announcement_id
-            ),
+            announcement_key=build_announcement_key(source, source_announcement_id),
             title=(
                 f"{fiscal_year}年年度报告"
                 + ("（修订版）" if asset.get("is_correction") else "")
@@ -1933,14 +1932,11 @@ class BrokerRiskControlReportSyncService:
         record: AnnouncementRecord,
         instrument: Mapping[str, Any],
     ) -> tuple[bytes, dict[str, Any], dict[str, Any]] | None:
-        """Read a formal annual report from shared custody, if bound."""
+        """Read a formal annual or semiannual report from shared custody."""
 
         if (
-            not self.shared_annual_report_enabled
-            or self.shared_asset_access is None
-            or self.source_profile
-            != BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-            or "半年度报告" in _normalize_announcement_title(record.title)
+            self.shared_asset_access is None
+            or self.source_profile != BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
         ):
             return None
         instrument_id = str(instrument.get("instrument_id") or "").strip()
@@ -1997,9 +1993,7 @@ class BrokerRiskControlReportSyncService:
             return payload, asset, dict(content)
 
         access_config = getattr(self.shared_asset_access, "config", None)
-        wait_seconds = float(
-            getattr(access_config, "wait_seconds_maximum", 30.0)
-        )
+        wait_seconds = float(getattr(access_config, "wait_seconds_maximum", 30.0))
         ensured = self.shared_asset_access.ensure(
             EnsureRequest(
                 instrument_id=instrument_id,
@@ -2014,12 +2008,9 @@ class BrokerRiskControlReportSyncService:
         asset = ensured.get("asset")
         if not asset or ensured.get("availability") != "local_valid":
             return None
-        if (
-            str(asset.get("source") or "").strip().lower()
-            != _announcement_source(record)
-            or str(asset.get("source_announcement_id") or "")
-            != _announcement_id(record)
-        ):
+        if str(asset.get("source") or "").strip().lower() != _announcement_source(
+            record
+        ) or str(asset.get("source_announcement_id") or "") != _announcement_id(record):
             raise RuntimeError(
                 "shared broker annual-report selector resolved a different legal filing"
             )
@@ -2035,12 +2026,10 @@ class BrokerRiskControlReportSyncService:
             raise RuntimeError("shared broker annual-report length validation failed")
         return payload, dict(asset), dict(content)
 
-    def _formal_annual_uses_shared_assets(self, record: AnnouncementRecord) -> bool:
+    def _formal_report_uses_shared_assets(self, record: AnnouncementRecord) -> bool:
         return (
-            self.shared_annual_report_enabled
-            and self.source_profile
-            == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-            and "半年度报告" not in _normalize_announcement_title(record.title)
+            self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+            and is_formal_broker_annual_or_semiannual_report_title(record.title)
         )
 
     def _record_filter(self, record: AnnouncementRecord) -> List[str]:
@@ -2053,7 +2042,9 @@ class BrokerRiskControlReportSyncService:
     def _record_matches(self, record: AnnouncementRecord) -> bool:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
             return is_formal_broker_annual_or_semiannual_report_title(record.title)
-        return is_broker_risk_control_title(record.title, title_patterns=self.title_patterns)
+        return is_broker_risk_control_title(
+            record.title, title_patterns=self.title_patterns
+        )
 
     def _instrument_in_scope(self, instrument: Dict[str, Any]) -> bool:
         return is_broker_risk_control_instrument(
@@ -2088,20 +2079,10 @@ class BrokerRiskControlReportSyncService:
             if shared_asset is not None:
                 payload, shared_asset_lineage, shared_content = shared_asset
             else:
-                if (
-                    self._formal_annual_uses_shared_assets(record)
-                    and not self.legacy_annual_report_fallback_enabled
-                ):
+                if self._formal_report_uses_shared_assets(record):
                     raise RuntimeError(
-                        "shared broker annual-report asset is not locally ready"
+                        "shared broker annual/semiannual report asset is not locally ready"
                     )
-                if (
-                    self.source_profile
-                    == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-                    and "半年度报告" in _normalize_announcement_title(record.title)
-                    and not self.legacy_semiannual_enabled
-                ):
-                    raise RuntimeError("legacy broker semiannual acquisition is disabled")
                 existing_manifest = self._existing_direct_filing_manifest(
                     record,
                     instrument,
@@ -2176,7 +2157,9 @@ class BrokerRiskControlReportSyncService:
             shared_asset_lineage=shared_asset_lineage,
             shared_content=shared_content,
         )
-        if not self.force_reparse_existing and self._unchanged_manifest_exists(manifest, content_hash):
+        if not self.force_reparse_existing and self._unchanged_manifest_exists(
+            manifest, content_hash
+        ):
             result.unchanged_reports += 1
             LOGGER.info(
                 "broker risk-control report unchanged: instrument_id=%s symbol=%s report_period=%s announcement_id=%s content_hash=%s",
@@ -2199,7 +2182,9 @@ class BrokerRiskControlReportSyncService:
             scope_resolution = resolve_listed_broker_dealer_scope(instrument)
             listed_scope = scope_resolution.to_dict()
             licensed_broker_name = (
-                scope_resolution.entry.licensed_broker_name if scope_resolution.entry else None
+                scope_resolution.entry.licensed_broker_name
+                if scope_resolution.entry
+                else None
             )
             parsed = self.parser.parse(
                 payload,
@@ -2297,13 +2282,15 @@ class BrokerRiskControlReportSyncService:
             self.storage,
             "replace_financial_numeric_facts_for_source_file",
         ):
-            replace_result = self.storage.replace_financial_numeric_facts_for_source_file(
-                source_file_id,
-                parsed.numeric_facts,
-                ingestion_run_id=ingestion_run_id,
-                tier=tier,
-                parser_version=self.parser.parser_version,
-                statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
+            replace_result = (
+                self.storage.replace_financial_numeric_facts_for_source_file(
+                    source_file_id,
+                    parsed.numeric_facts,
+                    ingestion_run_id=ingestion_run_id,
+                    tier=tier,
+                    parser_version=self.parser.parser_version,
+                    statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
+                )
             )
             result.facts_written += int(replace_result.get("inserted") or 0)
             LOGGER.info(
@@ -2399,15 +2386,17 @@ class BrokerRiskControlReportSyncService:
             or [],
             "missing_required_facts": parsed.diagnostics.get("missing_required_facts")
             or [],
-            "net_capital": None
-            if net_capital is None
-            else {
-                "fact_value": net_capital.fact_value,
-                "value_text": net_capital.value_text,
-                "unit": net_capital.unit,
-                "unit_detection": net_capital.raw_fact_json.get("unit_detection"),
-                "line_index": net_capital.raw_fact_json.get("line_index"),
-            },
+            "net_capital": (
+                None
+                if net_capital is None
+                else {
+                    "fact_value": net_capital.fact_value,
+                    "value_text": net_capital.value_text,
+                    "unit": net_capital.unit,
+                    "unit_detection": net_capital.raw_fact_json.get("unit_detection"),
+                    "line_index": net_capital.raw_fact_json.get("line_index"),
+                }
+            ),
         }
 
     def _build_manifest(
@@ -2493,7 +2482,10 @@ class BrokerRiskControlReportSyncService:
         if self.archive_root is None:
             return None
         exchange = str(instrument.get("exchange") or "UNKNOWN")
-        symbol = str(instrument.get("symbol") or (record.symbols[0] if record.symbols else "UNKNOWN"))
+        symbol = str(
+            instrument.get("symbol")
+            or (record.symbols[0] if record.symbols else "UNKNOWN")
+        )
         filename = f"{symbol}_{report_period}_{_announcement_id(record)}.pdf"
         safe_filename = re.sub(r"[^0-9A-Za-z_.-]+", "_", filename)
         path = self.archive_root / exchange / symbol / safe_filename
@@ -2519,8 +2511,7 @@ class BrokerRiskControlReportSyncService:
         ]
         if manifest.source_mode != "shared_announcement_asset":
             return any(
-                row.get("status") in {"downloaded", "parsed"}
-                for row in matching_rows
+                row.get("status") in {"downloaded", "parsed"} for row in matching_rows
             )
 
         expected_lineage = (
@@ -2591,7 +2582,9 @@ class BrokerRiskControlReportSyncService:
             manifest_url = str(row.get("source_url") or "").strip()
             if source_url and manifest_url and source_url != manifest_url:
                 continue
-            if self.archive_root is not None and not self._manifest_archive_is_valid(row):
+            if self.archive_root is not None and not self._manifest_archive_is_valid(
+                row
+            ):
                 continue
             return row
         return None
@@ -2607,7 +2600,9 @@ class BrokerRiskControlReportSyncService:
             return False
         try:
             expected_length = manifest.get("content_length")
-            if expected_length is not None and path.stat().st_size != int(expected_length):
+            if expected_length is not None and path.stat().st_size != int(
+                expected_length
+            ):
                 return False
             digest = hashlib.sha256()
             with path.open("rb") as handle:
@@ -2640,14 +2635,20 @@ class BrokerRiskControlReportSyncService:
 
     def _classify_record(self, record: AnnouncementRecord) -> Dict[str, Any]:
         if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
-            return classify_broker_annual_report_risk_control_artifact(
+            return (
+                classify_broker_annual_report_risk_control_artifact(
+                    record.title,
+                    adjunct_type=_announcement_attachment_type(record),
+                )
+                or {}
+            )
+        payload = (
+            classify_broker_risk_control_artifact(
                 record.title,
                 adjunct_type=_announcement_attachment_type(record),
-            ) or {}
-        payload = classify_broker_risk_control_artifact(
-            record.title,
-            adjunct_type=_announcement_attachment_type(record),
-        ) or {}
+            )
+            or {}
+        )
         if payload:
             payload["source_priority"] = "supplementary"
         return payload

@@ -24,8 +24,17 @@ ALLOWED_EXCLUSION_REASON_CODES = {
     "official_report_not_disclosed",
     "source_row_out_of_scope",
 }
-OFFICIAL_DOCUMENT_STATUSES = {"archived", "archived_unchanged_content"}
-OFFICIAL_SOURCE_TIERS = {"official_primary", "official_backup"}
+OFFICIAL_DOCUMENT_STATUSES = {
+    "archived",
+    "archived_unchanged_content",
+    "verified",
+    "local_valid",
+}
+OFFICIAL_SOURCE_TIERS = {
+    "official_primary",
+    "official_backup",
+    "shared_announcement_asset",
+}
 CATALOG_REVIEW_DIAGNOSTICS = {
     "alias_not_found",
     "ambiguous_product_alias",

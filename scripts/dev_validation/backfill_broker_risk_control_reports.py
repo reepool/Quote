@@ -82,7 +82,11 @@ def build_default_announcement_window(
     end_date: Optional[str] = None,
 ) -> Dict[str, str]:
     """Build an inclusive announcement-date window for the last N quarters."""
-    resolved_end = _parse_date(end_date or as_of_date) if (end_date or as_of_date) else date.today()
+    resolved_end = (
+        _parse_date(end_date or as_of_date)
+        if (end_date or as_of_date)
+        else date.today()
+    )
     if start_date:
         resolved_start = _parse_date(start_date)
     else:
@@ -91,7 +95,10 @@ def build_default_announcement_window(
         start_year = start_index // 4
         start_quarter = start_index % 4
         resolved_start = date(start_year, start_quarter * 3 + 1, 1)
-    return {"start_date": resolved_start.isoformat(), "end_date": resolved_end.isoformat()}
+    return {
+        "start_date": resolved_start.isoformat(),
+        "end_date": resolved_end.isoformat(),
+    }
 
 
 def build_candidate_report_periods(
@@ -117,7 +124,11 @@ def build_candidate_report_periods(
         if cursor_quarter == 0:
             cursor_quarter = 4
             cursor_year -= 1
-    allowed = {str(item).strip().lower() for item in (report_period_types or []) if str(item).strip()}
+    allowed = {
+        str(item).strip().lower()
+        for item in (report_period_types or [])
+        if str(item).strip()
+    }
     if allowed:
         suffix_by_type = {
             "q1": "03-31",
@@ -150,8 +161,12 @@ def select_broker_instruments(
     require_confirmed_scope: bool = True,
 ) -> List[Dict[str, Any]]:
     """Select broker instruments from local master data."""
-    requested = {str(item).strip() for item in (instrument_ids or []) if str(item).strip()}
-    symbol_scope = {str(item).strip() for item in (candidate_symbols or []) if str(item).strip()}
+    requested = {
+        str(item).strip() for item in (instrument_ids or []) if str(item).strip()
+    }
+    symbol_scope = {
+        str(item).strip() for item in (candidate_symbols or []) if str(item).strip()
+    }
     selected: List[Dict[str, Any]] = []
     seen = set()
     for exchange in exchanges:
@@ -309,8 +324,10 @@ def scan_broker_risk_control_announcements(
         return [
             lambda record: (
                 ["broker_risk_control_title"]
-                    if is_broker_risk_control_title(record.title, title_patterns=title_patterns)
-                    else []
+                if is_broker_risk_control_title(
+                    record.title, title_patterns=title_patterns
+                )
+                else []
             )
         ]
 
@@ -325,8 +342,13 @@ def scan_broker_risk_control_announcements(
     )
     for exchange in exchanges:
         if exchange not in {"SSE", "SZSE", "BSE"}:
-            LOGGER.warning("broker risk-control market scan skipped: exchange=%s reason=market_config_missing", exchange)
-            market_scan_results.append({"exchange": exchange, "status": "market_config_missing"})
+            LOGGER.warning(
+                "broker risk-control market scan skipped: exchange=%s reason=market_config_missing",
+                exchange,
+            )
+            market_scan_results.append(
+                {"exchange": exchange, "status": "market_config_missing"}
+            )
             continue
         if skip_market_scan:
             LOGGER.info(
@@ -367,7 +389,10 @@ def scan_broker_risk_control_announcements(
         result = route_result.scan_result
         if result is None:
             market_scan_results.append(
-                {"exchange": exchange, "status": "announcement_route_returned_no_result"}
+                {
+                    "exchange": exchange,
+                    "status": "announcement_route_returned_no_result",
+                }
             )
             continue
         added = _append_selected(result.selected_records)
@@ -514,63 +539,68 @@ def load_shared_broker_annual_report_records(
         instrument_id = str(instrument.get("instrument_id") or "").strip()
         if not instrument_id:
             continue
-        projection = shared_asset_access.list_assets(
-            instrument_id=instrument_id,
-            limit=1000,
-        )
-        for asset in projection.get("items", ()):
-            if (
-                asset.get("document_family") != "annual_report"
-                or asset.get("availability") != "local_valid"
-                or str(asset.get("report_period") or "") not in allowed_periods
-            ):
-                continue
-            asset_id = str(asset.get("asset_id") or "")
-            if not asset_id or asset_id in seen_assets:
-                continue
-            seen_assets.add(asset_id)
-            source = str(asset.get("source") or "").strip().lower()
-            source_announcement_id = str(
-                asset.get("source_announcement_id") or ""
-            ).strip()
-            attachment_id = str(asset.get("attachment_id") or asset_id)
-            records.append(
-                AnnouncementRecord(
-                    source=source,
-                    source_announcement_id=source_announcement_id,
-                    announcement_key=build_announcement_key(
-                        source, source_announcement_id
-                    ),
-                    title=(
-                        f"{str(asset['report_period'])[:4]}年年度报告"
-                        + ("（修订版）" if asset.get("is_correction") else "")
-                    ),
-                    published_at=asset.get("published_at"),
-                    exchange=str(instrument.get("exchange") or "").upper() or None,
-                    market=str(instrument.get("exchange") or "").upper() or None,
-                    symbols=(str(instrument.get("symbol") or "").strip(),),
-                    attachments=(
-                        AnnouncementAttachment(
-                            source_url=f"shared-asset://{asset_id}",
-                            attachment_id=attachment_id,
-                            media_type="application/pdf",
-                            file_extension="pdf",
-                            raw_metadata={
-                                "shared_asset_id": asset_id,
-                                "observation_version": asset.get(
-                                    "observation_version"
-                                ),
-                                "content_hash": asset.get("content_hash"),
-                            },
-                        ),
-                    ),
-                    raw_payload={
-                        "shared_asset_id": asset_id,
-                        "shared_asset_projection": dict(asset),
-                    },
-                    selection_reasons=("shared_annual_report_asset",),
-                )
+        for document_family in ("annual_report", "semiannual_report"):
+            projection = shared_asset_access.list_effective_assets(
+                instrument_id=instrument_id,
+                document_family=document_family,
+                availability="local_valid",
+                limit=1000,
             )
+            for asset in projection.get("items", ()):
+                if str(asset.get("report_period") or "") not in allowed_periods:
+                    continue
+                asset_id = str(asset.get("asset_id") or "")
+                if not asset_id or asset_id in seen_assets:
+                    continue
+                seen_assets.add(asset_id)
+                source = str(asset.get("source") or "").strip().lower()
+                source_announcement_id = str(
+                    asset.get("source_announcement_id") or ""
+                ).strip()
+                attachment_id = str(asset.get("attachment_id") or asset_id)
+                records.append(
+                    AnnouncementRecord(
+                        source=source,
+                        source_announcement_id=source_announcement_id,
+                        announcement_key=build_announcement_key(
+                            source, source_announcement_id
+                        ),
+                        title=(
+                            f"{str(asset['report_period'])[:4]}年"
+                            + (
+                                "半年度报告"
+                                if document_family == "semiannual_report"
+                                else "年度报告"
+                            )
+                            + ("（修订版）" if asset.get("is_correction") else "")
+                        ),
+                        published_at=asset.get("published_at"),
+                        exchange=str(instrument.get("exchange") or "").upper() or None,
+                        market=str(instrument.get("exchange") or "").upper() or None,
+                        symbols=(str(instrument.get("symbol") or "").strip(),),
+                        attachments=(
+                            AnnouncementAttachment(
+                                source_url=f"shared-asset://{asset_id}",
+                                attachment_id=attachment_id,
+                                media_type="application/pdf",
+                                file_extension="pdf",
+                                raw_metadata={
+                                    "shared_asset_id": asset_id,
+                                    "observation_version": asset.get(
+                                        "observation_version"
+                                    ),
+                                    "content_hash": asset.get("content_hash"),
+                                },
+                            ),
+                        ),
+                        raw_payload={
+                            "shared_asset_id": asset_id,
+                            "shared_asset_projection": dict(asset),
+                            "shared_asset_binding_mode": "exact_observation",
+                        },
+                        selection_reasons=("shared_report_asset",),
+                    )
+                )
     records.sort(
         key=lambda item: (
             str(item.published_at or ""),
@@ -622,7 +652,6 @@ def run_broker_risk_control_backfill(
     tier: str = "history",
     repair_existing: bool = False,
     shared_asset_access: Any | None = None,
-    annual_report_asset_mode: str | None = None,
 ) -> Dict[str, Any]:
     """Run a broker risk-control report dry-run/backfill and return JSON-ready data."""
     window = build_default_announcement_window(
@@ -648,19 +677,8 @@ def run_broker_risk_control_backfill(
         ",".join(instrument_ids or []),
         scan_only,
     )
-    broker_cfg = data_manager.research_config.modules.get(
-        "broker_risk_control_reports", {}
-    )
-    dependency_cfg = broker_cfg.get("annual_report_asset_dependency", {})
-    dependency_mode = str(
-        annual_report_asset_mode
-        or dependency_cfg.get("mode", "legacy")
-    ).strip().lower()
-    if dependency_mode not in {"legacy", "dual_read", "shared_only"}:
-        raise ValueError("invalid broker annual-report asset mode")
     shared_only_annual = (
         source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-        and dependency_mode == "shared_only"
     )
     active_announcement_service = announcement_service
     if not shared_only_annual or include_standalone_supplement:
@@ -796,7 +814,6 @@ def run_broker_risk_control_backfill(
             force_reparse_existing=repair_existing,
             replace_existing_facts=repair_existing,
             shared_asset_access=shared_asset_access,
-            annual_report_asset_mode=dependency_mode,
         )
         with _financial_storage_scope(storage):
             service_result = service.backfill(
@@ -816,13 +833,15 @@ def run_broker_risk_control_backfill(
             service_result.get("retryable_pending_reports"),
         )
         if standalone_scan is not None:
-            standalone_gap_filter = filter_standalone_supplement_records_for_primary_gaps(
-                standalone_scan["selected_records"],
-                instruments=selected_instruments,
-                report_periods=periods,
-                primary_result=service_result,
-                primary_records=scan["selected_records"],
-                storage=storage,
+            standalone_gap_filter = (
+                filter_standalone_supplement_records_for_primary_gaps(
+                    standalone_scan["selected_records"],
+                    instruments=selected_instruments,
+                    report_periods=periods,
+                    primary_result=service_result,
+                    primary_records=scan["selected_records"],
+                    storage=storage,
+                )
             )
             LOGGER.info(
                 "broker risk-control standalone supplement parse start: candidate_reports=%s gap_fill_reports=%s dry_run=%s tier=history",
@@ -899,7 +918,9 @@ def run_broker_risk_control_backfill(
             "cninfo_org_id_resolution": org_resolution,
             "selected_announcements": len(scan["selected_records"]),
             "scan_results": scan["scan_results"],
-            "market_scan_results": scan.get("market_scan_results", scan["scan_results"]),
+            "market_scan_results": scan.get(
+                "market_scan_results", scan["scan_results"]
+            ),
             "per_instrument_scan": scan.get("per_instrument_scan"),
             "selected_preview": [
                 {
@@ -907,8 +928,11 @@ def run_broker_risk_control_backfill(
                     "title": record.title,
                     "report_period": (
                         infer_broker_annual_report_period(record)
-                        if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
-                        and is_formal_broker_annual_or_semiannual_report_title(record.title)
+                        if source_profile
+                        == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                        and is_formal_broker_annual_or_semiannual_report_title(
+                            record.title
+                        )
                         else infer_broker_risk_control_report_period(record)
                     ),
                     "announcement_time": _announcement_time(record),
@@ -927,17 +951,21 @@ def run_broker_risk_control_backfill(
                 else {
                     "enabled": True,
                     "selected_announcements": len(standalone_scan["selected_records"]),
-                    "gap_fill_announcements": None
-                    if standalone_gap_filter is None
-                    else len(standalone_gap_filter["selected_records"]),
+                    "gap_fill_announcements": (
+                        None
+                        if standalone_gap_filter is None
+                        else len(standalone_gap_filter["selected_records"])
+                    ),
                     "fallback_reason": "primary_missing_net_capital_only",
-                    "primary_gap_filter": None
-                    if standalone_gap_filter is None
-                    else {
-                        key: value
-                        for key, value in standalone_gap_filter.items()
-                        if key != "selected_records"
-                    },
+                    "primary_gap_filter": (
+                        None
+                        if standalone_gap_filter is None
+                        else {
+                            key: value
+                            for key, value in standalone_gap_filter.items()
+                            if key != "selected_records"
+                        }
+                    ),
                     "scan_results": standalone_scan["scan_results"],
                     "per_instrument_scan": standalone_scan.get("per_instrument_scan"),
                 }
@@ -963,7 +991,10 @@ def filter_standalone_supplement_records_for_primary_gaps(
         if item.get("symbol")
     }
     primary_pairs = {
-        (str(summary.get("instrument_id") or ""), str(summary.get("report_period") or ""))
+        (
+            str(summary.get("instrument_id") or ""),
+            str(summary.get("report_period") or ""),
+        )
         for summary in primary_result.get("report_summaries", []) or []
         if summary.get("instrument_id") and summary.get("report_period")
     }
@@ -986,7 +1017,10 @@ def filter_standalone_supplement_records_for_primary_gaps(
     }
     expected_pairs = primary_pairs or primary_record_pairs or all_candidate_pairs
     covered_pairs = {
-        (str(summary.get("instrument_id") or ""), str(summary.get("report_period") or ""))
+        (
+            str(summary.get("instrument_id") or ""),
+            str(summary.get("report_period") or ""),
+        )
         for summary in primary_result.get("report_summaries", []) or []
         if summary.get("net_capital")
         or "net_capital" in (summary.get("matched_canonical_facts") or [])
@@ -1030,9 +1064,11 @@ def filter_standalone_supplement_records_for_primary_gaps(
         "expected_pairs_source": (
             "primary_report_summaries"
             if primary_pairs
-            else "primary_announcement_records"
-            if primary_record_pairs
-            else "candidate_report_periods"
+            else (
+                "primary_announcement_records"
+                if primary_record_pairs
+                else "candidate_report_periods"
+            )
         ),
         "missing_primary_pairs": [
             {"instrument_id": instrument_id, "report_period": period}
@@ -1102,7 +1138,11 @@ def load_existing_broker_risk_control_records(
         if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
         else BROKER_RISK_CONTROL_PARSER_VERSION
     )
-    instrument_ids = [str(item.get("instrument_id") or "") for item in instruments if item.get("instrument_id")]
+    instrument_ids = [
+        str(item.get("instrument_id") or "")
+        for item in instruments
+        if item.get("instrument_id")
+    ]
     periods = [str(period) for period in report_periods if str(period)]
     if not instrument_ids or not periods or not hasattr(storage, "get_connection"):
         return {
@@ -1171,22 +1211,22 @@ def load_existing_broker_risk_control_records(
             published_at=str(item.get("published_at") or "") or None,
             market=str(announcement_record.get("market") or ""),
             exchange=str(item.get("exchange") or "") or None,
-            symbols=tuple(
-                announcement_record.get("symbols") or [item.get("symbol")]
-            ),
+            symbols=tuple(announcement_record.get("symbols") or [item.get("symbol")]),
             attachments=(
-                AnnouncementAttachment(
-                    source_url=source_url,
-                    resolved_url=(
-                        source_url
-                        if source_url.startswith(("http://", "https://"))
-                        else None
+                (
+                    AnnouncementAttachment(
+                        source_url=source_url,
+                        resolved_url=(
+                            source_url
+                            if source_url.startswith(("http://", "https://"))
+                            else None
+                        ),
+                        file_extension="PDF",
                     ),
-                    file_extension="PDF",
-                ),
-            )
-            if source_url
-            else (),
+                )
+                if source_url
+                else ()
+            ),
             selection_reasons=tuple(
                 announcement_record.get("selection_reasons")
                 or ["repair_existing_manifest"]
@@ -1280,9 +1320,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--per-instrument-page-size", type=int, default=30)
     parser.add_argument("--per-instrument-max-pages", type=int, default=6)
     parser.add_argument("--report-period-types", default="annual,semiannual")
-    parser.add_argument("--source-profile", default=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE)
+    parser.add_argument(
+        "--source-profile", default=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+    )
     parser.add_argument("--include-standalone-supplement", action="store_true")
-    parser.add_argument("--archive-root", default="data/filings/financial_statements/broker_risk_control")
+    parser.add_argument(
+        "--archive-root",
+        default="data/filings/financial_statements/broker_risk_control",
+    )
     parser.add_argument("--tier", default="history", choices=["hot", "history"])
     parser.add_argument("--scan-only", action="store_true")
     parser.add_argument(
@@ -1290,7 +1335,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Reparse existing archived manifests and replace facts instead of scanning CNInfo.",
     )
-    parser.add_argument("--write", action="store_true", help="Persist manifests, archived PDFs, and numeric facts.")
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="Persist manifests, archived PDFs, and numeric facts.",
+    )
     parser.add_argument("--output", default="")
     return parser
 
@@ -1302,7 +1351,9 @@ def main() -> int:
     )
     args = build_parser().parse_args()
     result = asyncio.run(_run(args))
-    payload = json.dumps(json_ready(result), ensure_ascii=False, indent=2, sort_keys=True)
+    payload = json.dumps(
+        json_ready(result), ensure_ascii=False, indent=2, sort_keys=True
+    )
     if args.output:
         Path(args.output).write_text(payload, encoding="utf-8")
     print(payload)

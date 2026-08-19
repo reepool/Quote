@@ -30,7 +30,7 @@ from research.business_profile_corpus import (
 def build_corpus_audit(
     *,
     research_db: Path,
-    financials_db: Path,
+    announcement_assets_db: Path,
     quotes_db: Path,
     as_of_date: str,
     annotation_root: Optional[Path] = None,
@@ -53,17 +53,17 @@ def build_corpus_audit(
             include_delisted=include_delisted,
         )
     manifests = []
-    if financials_db.exists():
-        with _read_only_connection(financials_db) as financials_conn:
+    if announcement_assets_db.exists():
+        with _read_only_connection(announcement_assets_db) as asset_conn:
             manifests = load_business_profile_source_manifests(
-                financials_conn,
+                asset_conn,
                 [str(item["instrument_id"]) for item in universe],
             )
     annotations = discover_annotation_files(annotation_root)
     return {
         "as_of_date": as_of_date,
         "research_db": str(research_db),
-        "financials_db": str(financials_db),
+        "announcement_assets_db": str(announcement_assets_db),
         "quotes_db": str(quotes_db),
         "annotation_root": str(annotation_root) if annotation_root else None,
         "readiness": summarize_corpus_readiness(
@@ -80,7 +80,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--research-db", type=Path, default=Path("data/research.db"))
     parser.add_argument(
-        "--financials-db", type=Path, default=Path("data/financials.db")
+        "--announcement-assets-db", type=Path, default=Path("data/research.db")
     )
     parser.add_argument("--quotes-db", type=Path, default=Path("data/quotes.db"))
     parser.add_argument("--as-of-date", default=date.today().isoformat())
@@ -99,7 +99,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     payload = build_corpus_audit(
         research_db=args.research_db,
-        financials_db=args.financials_db,
+        announcement_assets_db=args.announcement_assets_db,
         quotes_db=args.quotes_db,
         as_of_date=args.as_of_date,
         annotation_root=args.annotation_root,
