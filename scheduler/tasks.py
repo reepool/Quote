@@ -88,8 +88,19 @@ def _annual_report_asset_report_data(
         error_type = diagnostics.get("error_type") or "error"
         errors.append(f"{error_type}: {diagnostics['error']}")
 
-    timings = execution.get("stage_timings_seconds") or {}
+    metrics = (
+        execution.get("metrics")
+        if isinstance(execution.get("metrics"), dict)
+        else {}
+    )
+    timings = (
+        execution.get("stage_timings_seconds")
+        or metrics.get("stage_timings_seconds")
+        or {}
+    )
     duration = timings.get("total")
+    if duration is None:
+        duration = result.get("scheduler_elapsed_seconds")
     status = str(result.get("status") or "unknown")
     outcome = str(result.get("outcome") or status)
     downloaded = int(
@@ -103,11 +114,6 @@ def _annual_report_asset_report_data(
     )
     failures = int(
         execution.get("attachment_failures") or execution.get("blocked") or 0
-    )
-    metrics = (
-        execution.get("metrics")
-        if isinstance(execution.get("metrics"), dict)
-        else {}
     )
     bounds = (
         progress.get("accepted_bounds")
@@ -4195,6 +4201,7 @@ class ScheduledTasks:
             "[Scheduler] Starting shared annual-report asset job: %s",
             job_name,
         )
+        started_at = time_module.monotonic()
         try:
             result = await runner()
         except Exception as exc:
@@ -4212,6 +4219,13 @@ class ScheduledTasks:
                     "error": str(exc),
                 },
             }
+        result = {
+            **result,
+            "scheduler_elapsed_seconds": round(
+                time_module.monotonic() - started_at,
+                6,
+            ),
+        }
         await self._send_task_report(
             report_data=_annual_report_asset_report_data(job_name, result),
             report_type="annual_report_asset_report",

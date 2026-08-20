@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_sources.a_share_official_stock_master import AShareOfficialStockMasterSource
+from data_sources.base_source import RateLimitConfig
 from data_sources.source_factory import DataSourceFactory
 
 
@@ -27,6 +28,45 @@ def test_official_source_recreates_session_when_event_loop_changes():
     asyncio.run(reopen_and_close())
 
     assert original_session.closed
+
+
+@pytest.mark.asyncio
+async def test_official_source_retries_transient_http_failure():
+    class Response:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return False
+
+        def raise_for_status(self):
+            return None
+
+        async def read(self):
+            return b"official-master"
+
+    class FlakySession:
+        def __init__(self):
+            self.calls = 0
+
+        def request(self, method, url, **kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                raise OSError("temporary DNS failure")
+            return Response()
+
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        rate_limit_config=RateLimitConfig(retry_times=3, retry_interval=0),
+    )
+    session = FlakySession()
+    source.session = session
+    source._ensure_session_for_running_loop = AsyncMock()
+
+    payload = await source._http_get("https://query.sse.com.cn/example")
+
+    assert payload == b"official-master"
+    assert session.calls == 2
 
 
 @pytest.mark.asyncio

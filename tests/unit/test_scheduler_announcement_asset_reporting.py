@@ -21,7 +21,9 @@ def test_annual_report_asset_partial_report_renders_outcome_and_reasons():
                         "cninfo/SZSE: max_pages_exhausted",
                     ],
                     "stage_log": [{"stage": "universe"}, {"stage": "discovery"}],
-                    "stage_timings_seconds": {"total": 1086.8},
+                    "metrics": {
+                        "stage_timings_seconds": {"total": 1086.8},
+                    },
                 }
             },
         },
@@ -31,6 +33,7 @@ def test_annual_report_asset_partial_report_renders_outcome_and_reasons():
 
     assert "本轮已结束，工作未全部完成" in rendered
     assert "公告记录：发现 0 条，登记 6619 条" in rendered
+    assert "耗时：1086.8 秒" in rendered
     assert "新下载 162" in rendered
     assert "待处理附件：3255" in rendered
     assert "已保存下一页位置" in rendered
@@ -46,6 +49,7 @@ def test_annual_report_asset_failed_report_renders_permission_error():
                 "error_type": "PermissionError",
                 "error": "principal_not_registered",
             },
+            "scheduler_elapsed_seconds": 1.25,
         },
     )
 
@@ -53,6 +57,7 @@ def test_annual_report_asset_failed_report_renders_permission_error():
 
     assert "执行失败" in rendered
     assert "PermissionError: principal_not_registered" in rendered
+    assert "耗时：1.2 秒" in rendered
 
 
 def test_annual_report_asset_backfill_report_uses_top_level_progress():

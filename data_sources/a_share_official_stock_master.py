@@ -65,9 +65,11 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         if session is not None and not session.closed:
             await session.close()
         timeout = aiohttp.ClientTimeout(total=self.timeout_sec)
+        connector = aiohttp.TCPConnector(use_dns_cache=False)
         self.session = aiohttp.ClientSession(
             timeout=timeout,
             headers={"User-Agent": self.user_agent},
+            connector=connector,
         )
         self._session_loop = running_loop
 
@@ -236,24 +238,51 @@ class AShareOfficialStockMasterSource(BaseDataSource):
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Optional[bytes]:
-        try:
-            await self._ensure_session_for_running_loop()
-            async with self.session.get(url, params=params, headers=headers) as response:
-                response.raise_for_status()
-                return await response.read()
-        except Exception as exc:
-            ds_logger.warning("[A-share official master] GET failed for %s: %s", url, exc)
-            return None
+        return await self._http_request(
+            "GET",
+            url,
+            params=params,
+            headers=headers,
+        )
 
     async def _http_post(self, url: str, *, data: Dict[str, Any]) -> Optional[bytes]:
-        try:
-            await self._ensure_session_for_running_loop()
-            async with self.session.post(url, data=data) as response:
-                response.raise_for_status()
-                return await response.read()
-        except Exception as exc:
-            ds_logger.warning("[A-share official master] POST failed for %s: %s", url, exc)
-            return None
+        return await self._http_request("POST", url, data=data)
+
+    async def _http_request(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Optional[bytes]:
+        attempts = max(1, int(self.rate_limiter.config.retry_times))
+        retry_interval = max(0.0, float(self.rate_limiter.config.retry_interval))
+        for attempt in range(1, attempts + 1):
+            try:
+                await self._ensure_session_for_running_loop()
+                async with self.session.request(method, url, **kwargs) as response:
+                    response.raise_for_status()
+                    return await response.read()
+            except Exception as exc:
+                if attempt >= attempts:
+                    ds_logger.warning(
+                        "[A-share official master] %s failed for %s after %s attempts: %s",
+                        method,
+                        url,
+                        attempts,
+                        exc,
+                    )
+                    return None
+                ds_logger.warning(
+                    "[A-share official master] %s attempt %s/%s failed for %s: %s; retrying",
+                    method,
+                    attempt,
+                    attempts,
+                    url,
+                    exc,
+                )
+                if retry_interval:
+                    await asyncio.sleep(retry_interval)
+        return None
 
     def _normalize_stock_row(
         self,
