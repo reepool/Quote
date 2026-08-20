@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import sys
+import time
 import types
 from dataclasses import replace
 from datetime import date, datetime, timedelta
@@ -61,6 +62,7 @@ from research.providers.official_futures import (
     classify_official_futures_failure,
 )
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
+from utils.proxy_patch_runtime import AkshareProxyLease
 
 
 def _research_config(tmp_path):
@@ -607,6 +609,8 @@ def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path
     def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
         assert exchange == "DCE"
         assert trade_date == "2026-01-02"
+        self._increment_metric("DCE", "dce_proxy_lease_count", 1)
+        self._increment_metric("DCE", "dce_proxy_success_count", 1)
         return [
             _official_contract_row(
                 exchange="DCE",
@@ -639,6 +643,8 @@ def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path
     assert result["counts"]["instruments"] == 9
     assert result["counts"]["contracts_discovered"] == 1
     assert result["counts"]["would_write_contracts"] == 1
+    assert result["counts"]["dce_proxy_lease_count"] == 1
+    assert result["counts"]["dce_proxy_success_count"] == 1
     assert result["contracts"][0]["contract_id"] == "CNF.I.DCE.I2601"
     assert storage.list_contracts(exchange="DCE") == []
 
@@ -1185,6 +1191,7 @@ def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
 
     client = DceOfficialBrowserClient({
         "settle_seconds": 0,
+        "direct_attempts": 2,
         "retry_attempts": 2,
         "retry_backoff_seconds": 0,
         "browser_executable_path": "/tmp/fake-chrome",
@@ -1275,6 +1282,7 @@ def test_dce_browser_412_restarts_with_clean_session(monkeypatch):
 
     client = DceOfficialBrowserClient({
         "settle_seconds": 0,
+        "direct_attempts": 2,
         "retry_attempts": 3,
         "retry_backoff_seconds": 0,
         "browser_executable_path": "/tmp/fake-chrome",
@@ -1398,6 +1406,269 @@ def test_dce_browser_warmup_412_fails_after_readiness_timeout(monkeypatch):
 
     assert state["warmup_calls"] == 1
     assert state["requested_api_calls"] == 0
+
+
+def test_dce_browser_rotates_to_proxy_after_business_request_412_and_reuses_session(monkeypatch):
+    state = {"starts": 0, "warmups": 0, "business_calls": 0, "leases": 0}
+    metrics = {}
+    forwarders = []
+
+    class FakePage:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                state["warmups"] += 1
+                if self.route_number == 1:
+                    return json.dumps(
+                        {"status": 412, "ok": False, "text": "Precondition Failed"}
+                    )
+                return json.dumps(
+                    {"status": 200, "ok": True, "text": json.dumps({"success": True})}
+                )
+            state["business_calls"] += 1
+            if self.route_number == 2 and state["business_calls"] == 1:
+                return json.dumps(
+                    {"status": 412, "ok": False, "text": "Precondition Failed"}
+                )
+            return json.dumps(
+                {
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True, "data": []}),
+                }
+            )
+
+    class FakeBrowser:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def get(self, url):
+            return FakePage(self.route_number)
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        if state["starts"] == 2:
+            assert any(arg.startswith("--proxy-server=http://127.0.0.1:") for arg in kwargs["browser_args"])
+        return FakeBrowser(state["starts"])
+
+    class FakeForwarder:
+        def __init__(self, proxy_url, **kwargs):
+            assert "proxy-secret" in proxy_url
+            self.browser_proxy_url = "http://127.0.0.1:38123"
+            self.stopped = False
+            forwarders.append(self)
+
+        def start(self):
+            return None
+
+        def stop(self):
+            self.stopped = True
+
+    def fake_lease(**kwargs):
+        state["leases"] += 1
+        return AkshareProxyLease(
+            proxy_url="http://proxy-user:proxy-secret@proxy.example:8080",
+            user_agent="proxy-agent",
+        )
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr("research.providers.official_futures.acquire_akshare_proxy_lease", fake_lease)
+    monkeypatch.setattr("research.providers.official_futures.DceBrowserProxyForwarder", FakeForwarder)
+
+    client = DceOfficialBrowserClient(
+        {
+            "settle_seconds": 0,
+            "readiness_timeout_seconds": 0,
+            "readiness_poll_seconds": 0.01,
+            "business_readiness_timeout_seconds": 1,
+            "direct_attempts": 1,
+            "max_proxy_leases": 2,
+            "retry_backoff_seconds": 0,
+            "browser_executable_path": "/tmp/fake-chrome",
+        }
+    )
+    client.set_metric_callback(
+        lambda key, value: metrics.__setitem__(key, metrics.get(key, 0) + value)
+    )
+    try:
+        assert client.fetch_day_quotes_payload("2026-08-18")["success"] is True
+        assert client.fetch_day_quotes_payload("2026-08-19")["success"] is True
+    finally:
+        client.close()
+
+    assert state == {"starts": 2, "warmups": 2, "business_calls": 3, "leases": 1}
+    assert metrics["challenge_count"] == 2
+    assert metrics["dce_proxy_lease_count"] == 1
+    assert metrics["dce_proxy_success_count"] == 1
+    assert forwarders[0].stopped is True
+
+
+def test_dce_browser_circuit_breaks_after_bounded_proxy_routes_without_leaking_credentials(monkeypatch):
+    state = {"starts": 0, "leases": 0, "evaluations": 0}
+    metrics = {}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            state["evaluations"] += 1
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                return json.dumps(
+                    {"status": 200, "ok": True, "text": json.dumps({"success": True})}
+                )
+            return json.dumps({"status": 412, "ok": False, "text": "Precondition Failed"})
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser()
+
+    class FakeForwarder:
+        browser_proxy_url = "http://127.0.0.1:39123"
+
+        def __init__(self, proxy_url, **kwargs):
+            return None
+
+        def start(self):
+            return None
+
+        def stop(self):
+            return None
+
+    def fake_lease(**kwargs):
+        state["leases"] += 1
+        return AkshareProxyLease(
+            proxy_url=f"http://user:secret-{state['leases']}@proxy.example:8080",
+            user_agent="proxy-agent",
+        )
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr("research.providers.official_futures.acquire_akshare_proxy_lease", fake_lease)
+    monkeypatch.setattr("research.providers.official_futures.DceBrowserProxyForwarder", FakeForwarder)
+
+    client = DceOfficialBrowserClient(
+        {
+            "settle_seconds": 0,
+            "direct_attempts": 1,
+            "max_proxy_leases": 2,
+            "retry_backoff_seconds": 0,
+            "browser_executable_path": "/tmp/fake-chrome",
+        }
+    )
+    client.set_metric_callback(
+        lambda key, value: metrics.__setitem__(key, metrics.get(key, 0) + value)
+    )
+    try:
+        with pytest.raises(OfficialFuturesSourceUnavailable) as first_error:
+            client.fetch_day_quotes_payload("2026-08-18")
+        evaluations_after_first = state["evaluations"]
+        with pytest.raises(OfficialFuturesSourceUnavailable) as second_error:
+            client.fetch_day_quotes_payload("2026-08-19")
+    finally:
+        client.close()
+
+    assert state["starts"] == 3
+    assert state["leases"] == 2
+    assert state["evaluations"] == evaluations_after_first
+    assert "secret-" not in str(first_error.value)
+    assert "secret-" not in str(second_error.value)
+    assert metrics["dce_circuit_break_count"] == 1
+    assert metrics["dce_circuit_break_hit_count"] == 1
+
+
+def test_dce_browser_evaluation_timeout_is_hard_bounded_and_opens_circuit(monkeypatch):
+    metrics = {}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            await asyncio.sleep(10)
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient(
+        {
+            "settle_seconds": 0,
+            "readiness_timeout_seconds": 0.1,
+            "evaluate_timeout_seconds": 5,
+            "direct_attempts": 1,
+            "max_proxy_leases": 0,
+            "browser_executable_path": "/tmp/fake-chrome",
+        }
+    )
+    client.set_metric_callback(
+        lambda key, value: metrics.__setitem__(key, metrics.get(key, 0) + value)
+    )
+    started = time.monotonic()
+    try:
+        with pytest.raises(OfficialFuturesSourceUnavailable, match="timed out"):
+            client.fetch_day_quotes_payload("2026-08-19")
+    finally:
+        client.close()
+
+    assert time.monotonic() - started < 1
+    assert metrics["dce_browser_timeout_count"] == 1
+    assert metrics["dce_circuit_break_count"] == 1
+
+
+def test_non_dce_product_page_browser_fallback_does_not_use_dce_readiness(monkeypatch, tmp_path):
+    provider = OfficialFuturesMarketDataProvider(_research_config(tmp_path))
+    calls = []
+
+    class FakeProductPageBrowser:
+        def fetch_unprotected_page_html(self, url):
+            calls.append(url)
+            return "<html><body>official product rules</body></html>"
+
+    monkeypatch.setattr(
+        provider,
+        "_get_product_page_browser_client",
+        lambda: FakeProductPageBrowser(),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_get_dce_browser_client",
+        lambda: pytest.fail("non-DCE product fallback must not initialize DCE readiness"),
+    )
+
+    html = provider._fetch_product_rule_page_via_browser_if_supported(
+        "INE",
+        "https://www.ine.cn/products/sc/",
+        "SC",
+    )
+
+    assert "official product rules" in html
+    assert calls == ["https://www.ine.cn/products/sc/"]
 
 
 def test_dce_browser_page_html_waits_out_transient_challenge_shell(monkeypatch):
@@ -3843,6 +4114,61 @@ def test_official_calendar_backfill_writes_verified_rows_and_no_weekday_guess(mo
     assert storage.list_manual_calendar_reviews(status="review_required")[0]["metadata"]["unresolved_count"] == 1
 
 
+def test_official_calendar_backfill_reports_dce_browser_route_metrics(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "official_calendar_backfill": {
+            "retry_unresolved_passes": 0,
+            "retry_unresolved_pause_seconds": 0,
+        },
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def _probe(self, exchange, trade_date):
+        self._increment_metric("DCE", "challenge_count", 1)
+        self._increment_metric("DCE", "dce_proxy_lease_count", 2)
+        self._increment_metric("DCE", "dce_proxy_rotation_count", 1)
+        self._increment_metric("DCE", "dce_proxy_success_count", 1)
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=2,
+            source_interface="fixture",
+            evidence_url="https://official.example/20240603",
+            parser_version="fixture.v1",
+            payload_hash="hash-trading",
+        )
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day",
+        _probe,
+    )
+
+    result = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+    )
+
+    assert result["status"] == "success"
+    assert result["totals"]["challenge_count"] == 1
+    assert result["totals"]["dce_proxy_lease_count"] == 2
+    assert result["totals"]["dce_proxy_rotation_count"] == 1
+    assert result["totals"]["dce_proxy_success_count"] == 1
+    assert result["exchanges"][0]["dce_proxy_lease_count"] == 2
+
+
 def test_official_calendar_backfill_retries_unresolved_dates_at_task_end(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["trading_day_governance"] = {
@@ -5335,6 +5661,48 @@ def test_dce_browser_client_resolves_chrome_path_precedence(monkeypatch):
     monkeypatch.setenv("QUOTE_DCE_CHROME_PATH", "/env/chrome")
     assert DceOfficialBrowserClient({}).browser_executable_path == "/env/chrome"
     assert DceOfficialBrowserClient({"browser_executable_path": "/cfg/chrome"}).browser_executable_path == "/cfg/chrome"
+
+
+def test_dce_browser_ignores_proxy_user_agent_placeholder():
+    assert DceOfficialBrowserClient._is_usable_browser_user_agent("_") is False
+    assert DceOfficialBrowserClient._is_usable_browser_user_agent(
+        "Mozilla/5.0 Chrome/123.0 Safari/537.36"
+    ) is True
+
+
+def test_dce_browser_installs_proxy_lease_cookies_with_cdp(monkeypatch):
+    calls = []
+
+    class FakePage:
+        async def send(self, command):
+            calls.append(command)
+            return True
+
+    fake_network = types.SimpleNamespace(
+        set_cookie=lambda **kwargs: kwargs,
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "nodriver",
+        types.SimpleNamespace(cdp=types.SimpleNamespace(network=fake_network)),
+    )
+    client = DceOfficialBrowserClient({"evaluate_timeout_seconds": 1})
+
+    asyncio.run(
+        client._install_proxy_lease_cookies(
+            FakePage(),
+            "nid18=session-value; nid18_create_time=timestamp-value",
+        )
+    )
+
+    assert calls == [
+        {"name": "nid18", "value": "session-value", "url": "http://www.dce.com.cn"},
+        {
+            "name": "nid18_create_time",
+            "value": "timestamp-value",
+            "url": "http://www.dce.com.cn",
+        },
+    ]
 
 
 def test_dce_virtual_display_disables_displayfd_and_restores_env(monkeypatch):

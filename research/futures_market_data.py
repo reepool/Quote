@@ -6301,6 +6301,13 @@ class FuturesMasterGovernanceService:
                 "official_request_count": 0,
                 "challenge_count": 0,
                 "challenge_backoff_seconds": 0.0,
+                "dce_proxy_lease_count": 0,
+                "dce_proxy_rotation_count": 0,
+                "dce_proxy_success_count": 0,
+                "dce_proxy_failure_count": 0,
+                "dce_browser_timeout_count": 0,
+                "dce_circuit_break_count": 0,
+                "dce_circuit_break_hit_count": 0,
                 "batch_pause_count": 0,
                 "batch_pause_seconds": 0.0,
                 "retry_backoff_count": 0,
@@ -6572,6 +6579,16 @@ class FuturesMasterGovernanceService:
                 result["counts"]["challenge_backoff_seconds"] = float(
                     source_metrics.get("challenge_backoff_seconds", 0.0)
                 )
+                for metric_key in (
+                    "dce_proxy_lease_count",
+                    "dce_proxy_rotation_count",
+                    "dce_proxy_success_count",
+                    "dce_proxy_failure_count",
+                    "dce_browser_timeout_count",
+                    "dce_circuit_break_count",
+                    "dce_circuit_break_hit_count",
+                ):
+                    result["counts"][metric_key] = int(source_metrics.get(metric_key, 0))
                 result["counts"]["batch_pause_count"] = int(source_metrics.get("batch_pause_count", 0))
                 result["counts"]["batch_pause_seconds"] = float(source_metrics.get("batch_pause_seconds", 0.0))
                 result["counts"]["retry_backoff_count"] = int(source_metrics.get("retry_backoff_count", 0))
@@ -7283,6 +7300,13 @@ class FuturesOfficialCalendarBackfillService:
         total_requests = 0
         total_challenges = 0
         total_challenge_backoff_seconds = 0.0
+        total_dce_proxy_leases = 0
+        total_dce_proxy_rotations = 0
+        total_dce_proxy_successes = 0
+        total_dce_proxy_failures = 0
+        total_dce_browser_timeouts = 0
+        total_dce_circuit_breaks = 0
+        total_dce_circuit_break_hits = 0
         total_batch_pauses = 0
         total_batch_pause_seconds = 0.0
         total_rate_limits = 0
@@ -7349,6 +7373,13 @@ class FuturesOfficialCalendarBackfillService:
                     "retry_dates_resolved": 0,
                     "challenge_count": 0,
                     "challenge_backoff_seconds": 0.0,
+                    "dce_proxy_lease_count": 0,
+                    "dce_proxy_rotation_count": 0,
+                    "dce_proxy_success_count": 0,
+                    "dce_proxy_failure_count": 0,
+                    "dce_browser_timeout_count": 0,
+                    "dce_circuit_break_count": 0,
+                    "dce_circuit_break_hit_count": 0,
                     "batch_pause_count": 0,
                     "batch_pause_seconds": 0.0,
                     "rate_limit_count": 0,
@@ -7563,6 +7594,13 @@ class FuturesOfficialCalendarBackfillService:
                 exchange_metrics = _metric_delta(metrics_before, metrics_after)
                 result["challenge_count"] = int(exchange_metrics.get("challenge_count", 0))
                 result["challenge_backoff_seconds"] = float(exchange_metrics.get("challenge_backoff_seconds", 0.0))
+                result["dce_proxy_lease_count"] = int(exchange_metrics.get("dce_proxy_lease_count", 0))
+                result["dce_proxy_rotation_count"] = int(exchange_metrics.get("dce_proxy_rotation_count", 0))
+                result["dce_proxy_success_count"] = int(exchange_metrics.get("dce_proxy_success_count", 0))
+                result["dce_proxy_failure_count"] = int(exchange_metrics.get("dce_proxy_failure_count", 0))
+                result["dce_browser_timeout_count"] = int(exchange_metrics.get("dce_browser_timeout_count", 0))
+                result["dce_circuit_break_count"] = int(exchange_metrics.get("dce_circuit_break_count", 0))
+                result["dce_circuit_break_hit_count"] = int(exchange_metrics.get("dce_circuit_break_hit_count", 0))
                 result["batch_pause_count"] = int(exchange_metrics.get("batch_pause_count", 0))
                 result["batch_pause_seconds"] = float(exchange_metrics.get("batch_pause_seconds", 0.0))
                 result["retry_backoff_count"] = int(exchange_metrics.get("retry_backoff_count", 0))
@@ -7571,6 +7609,13 @@ class FuturesOfficialCalendarBackfillService:
                 result["rate_limit_backoff_seconds"] = float(exchange_metrics.get("rate_limit_backoff_seconds", 0.0))
                 total_challenges += int(result["challenge_count"])
                 total_challenge_backoff_seconds += float(result["challenge_backoff_seconds"])
+                total_dce_proxy_leases += int(result["dce_proxy_lease_count"])
+                total_dce_proxy_rotations += int(result["dce_proxy_rotation_count"])
+                total_dce_proxy_successes += int(result["dce_proxy_success_count"])
+                total_dce_proxy_failures += int(result["dce_proxy_failure_count"])
+                total_dce_browser_timeouts += int(result["dce_browser_timeout_count"])
+                total_dce_circuit_breaks += int(result["dce_circuit_break_count"])
+                total_dce_circuit_break_hits += int(result["dce_circuit_break_hit_count"])
                 total_batch_pauses += int(result["batch_pause_count"])
                 total_batch_pause_seconds += float(result["batch_pause_seconds"])
                 total_rate_limits += int(result["rate_limit_count"])
@@ -7665,6 +7710,13 @@ class FuturesOfficialCalendarBackfillService:
                 "truncated_dates": total_truncated_dates,
                 "challenge_count": total_challenges,
                 "challenge_backoff_seconds": total_challenge_backoff_seconds,
+                "dce_proxy_lease_count": total_dce_proxy_leases,
+                "dce_proxy_rotation_count": total_dce_proxy_rotations,
+                "dce_proxy_success_count": total_dce_proxy_successes,
+                "dce_proxy_failure_count": total_dce_proxy_failures,
+                "dce_browser_timeout_count": total_dce_browser_timeouts,
+                "dce_circuit_break_count": total_dce_circuit_breaks,
+                "dce_circuit_break_hit_count": total_dce_circuit_break_hits,
                 "batch_pause_count": total_batch_pauses,
                 "batch_pause_seconds": total_batch_pause_seconds,
                 "rate_limit_count": total_rate_limits,

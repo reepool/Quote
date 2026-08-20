@@ -113,3 +113,44 @@ def test_request_with_akshare_proxy_stops_after_rejected_exits(monkeypatch):
         )
 
     assert len(target_calls) == 2
+
+
+def test_acquire_akshare_proxy_lease_is_fresh_and_redacts_credentials(monkeypatch):
+    calls = []
+
+    class FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def get(self, url, **kwargs):
+            calls.append((url, kwargs))
+            return _FakeResponse(
+                {
+                    "proxy": "http://lease-user:lease-secret@proxy.example:8080",
+                    "ua": "lease-agent",
+                    "cookie": "private-cookie",
+                }
+            )
+
+    monkeypatch.setattr(
+        proxy_patch_runtime,
+        "_load_proxy_patch_config",
+        lambda source: {
+            "enabled": True,
+            "gateway": "proxy-auth.example",
+            "auth_token": "unit-test-token",
+        },
+    )
+    monkeypatch.setattr(requests, "_OriginalSession", FakeSession, raising=False)
+
+    first = proxy_patch_runtime.acquire_akshare_proxy_lease()
+    second = proxy_patch_runtime.acquire_akshare_proxy_lease()
+
+    assert len(calls) == 2
+    assert first.proxy_url == second.proxy_url
+    assert first.endpoint == "proxy.example:8080"
+    assert "lease-secret" not in repr(first)
+    assert "private-cookie" not in repr(first)

@@ -13,8 +13,9 @@ import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from http.cookies import SimpleCookie
 from html.parser import HTMLParser
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
 from urllib.parse import urljoin
 
 import requests
@@ -30,8 +31,10 @@ from research.futures_market_data import (
     infer_contract_month,
     make_futures_contract_id,
 )
+from research.providers.dce_browser_proxy import DceBrowserProxyForwarder
 from utils.config_manager import ResearchConfig
 from utils.http_transport import HttpTlsConfig, create_requests_session, request_get, request_post
+from utils.proxy_patch_runtime import AkshareProxyLease, acquire_akshare_proxy_lease
 
 
 OFFICIAL_FUTURES_PARSER_VERSION = "official_futures_daily.v1"
@@ -73,6 +76,10 @@ class DceOfficialBrowserClient:
             0.1,
             float(cfg.get("readiness_poll_seconds", 3)),
         )
+        self.business_readiness_timeout_seconds = max(
+            0.0,
+            float(cfg.get("business_readiness_timeout_seconds", 0)),
+        )
         self.page_settle_seconds = max(0.0, float(cfg.get("page_settle_seconds", min(self.settle_seconds, 2.0))))
         self.page_challenge_settle_seconds = max(
             0.0,
@@ -82,6 +89,21 @@ class DceOfficialBrowserClient:
         self.timeout_seconds = max(1.0, float(cfg.get("timeout_seconds", 30)))
         self.retry_attempts = max(1, int(cfg.get("retry_attempts", 3)))
         self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
+        self.direct_attempts = max(1, int(cfg.get("direct_attempts", 1)))
+        self.max_proxy_leases = max(0, int(cfg.get("max_proxy_leases", 0)))
+        self.proxy_auth_timeout_seconds = max(1.0, float(cfg.get("proxy_auth_timeout_seconds", 5)))
+        self.browser_start_timeout_seconds = max(
+            1.0,
+            float(cfg.get("browser_start_timeout_seconds", self.timeout_seconds)),
+        )
+        self.navigation_timeout_seconds = max(
+            1.0,
+            float(cfg.get("navigation_timeout_seconds", self.timeout_seconds)),
+        )
+        self.evaluate_timeout_seconds = max(
+            1.0,
+            float(cfg.get("evaluate_timeout_seconds", self.timeout_seconds)),
+        )
         self.virtual_display = cfg.get("virtual_display", "auto")
         self.display_size = tuple(cfg.get("display_size") or (1920, 1080))
         self.xvfb_retries = max(1, int(cfg.get("xvfb_retries", 3)))
@@ -95,6 +117,18 @@ class DceOfficialBrowserClient:
         self._browser: Any = None
         self._page: Any = None
         self._display: Any = None
+        self._proxy_forwarder: Optional[DceBrowserProxyForwarder] = None
+        self._pending_proxy_lease: Optional[AkshareProxyLease] = None
+        self._route_kind = ""
+        self._session_ready = False
+        self._direct_attempts_used = 0
+        self._proxy_leases_used = 0
+        self._circuit_error = ""
+        self._last_route_error_summary = ""
+        self._metric_callback: Optional[Callable[[str, float], None]] = None
+
+    def set_metric_callback(self, callback: Callable[[str, float], None]) -> None:
+        self._metric_callback = callback
 
     def fetch_day_quotes_payload(self, trade_date: str) -> Mapping[str, Any]:
         body = {
@@ -106,7 +140,13 @@ class DceOfficialBrowserClient:
             "optionSeries": "",
             "statisticsType": 0,
         }
-        return self._run(self._api("POST", "/dcereport/publicweb/dailystat/dayQuotes", body))
+        return self._run(
+            self._request_business_api(
+                "POST",
+                "/dcereport/publicweb/dailystat/dayQuotes",
+                body,
+            )
+        )
 
     def fetch_contract_info_payload(self) -> Mapping[str, Any]:
         body = {
@@ -114,11 +154,21 @@ class DceOfficialBrowserClient:
             "tradeType": "1",
             "varietyId": "all",
         }
-        return self._run(self._api("POST", "/dcereport/publicweb/tradepara/contractInfo", body))
+        return self._run(
+            self._request_business_api(
+                "POST",
+                "/dcereport/publicweb/tradepara/contractInfo",
+                body,
+            )
+        )
 
     def fetch_page_html(self, url: str) -> str:
         """Fetch a DCE official page after the site challenge has run in Chrome."""
-        return self._run(self._page_html(url))
+        return self._run(self._page_html_with_routes(url))
+
+    def fetch_unprotected_page_html(self, url: str) -> str:
+        """Fetch a non-DCE page without running DCE readiness probes."""
+        return self._run(self._unprotected_page_html(url))
 
     def close(self) -> None:
         if self._loop is None:
@@ -131,6 +181,11 @@ class DceOfficialBrowserClient:
             self._browser = None
             self._page = None
             self._display = None
+            self._proxy_forwarder = None
+
+    def _metric(self, key: str, value: float = 1.0) -> None:
+        if self._metric_callback is not None:
+            self._metric_callback(key, value)
 
     def _run(self, coro: Any) -> Any:
         try:
@@ -146,7 +201,12 @@ class DceOfficialBrowserClient:
             self._loop = asyncio.new_event_loop()
         return self._loop.run_until_complete(coro)
 
-    async def _ensure_started(self) -> None:
+    async def _ensure_started(
+        self,
+        *,
+        require_dce_readiness: bool = True,
+        initial_url: Optional[str] = None,
+    ) -> None:
         if self._page is not None:
             return
         try:
@@ -158,11 +218,24 @@ class DceOfficialBrowserClient:
         self._start_virtual_display_if_needed()
         kwargs: Dict[str, Any] = {
             "headless": self.headless,
-            "browser_args": self.browser_args,
+            "browser_args": list(self.browser_args),
             "sandbox": False,
             "no_sandbox": True,
             "lang": "zh-CN",
         }
+        if self._proxy_forwarder is not None:
+            kwargs["browser_args"].append(
+                f"--proxy-server={self._proxy_forwarder.browser_proxy_url}"
+            )
+            if (
+                self._pending_proxy_lease is not None
+                and self._is_usable_browser_user_agent(
+                    self._pending_proxy_lease.user_agent
+                )
+            ):
+                kwargs["browser_args"].append(
+                    f"--user-agent={self._pending_proxy_lease.user_agent}"
+                )
         if self.browser_executable_path:
             kwargs["browser_executable_path"] = self.browser_executable_path
         try:
@@ -176,9 +249,34 @@ class DceOfficialBrowserClient:
                 os.environ.get("DISPLAY") or "",
                 self.browser_args,
             )
-            self._browser = await uc.start(**kwargs)
-            self._page = await self._browser.get(self.bootstrap_page)
-            await self._page.sleep(self.settle_seconds)
+            self._browser = await asyncio.wait_for(
+                uc.start(**kwargs),
+                timeout=self.browser_start_timeout_seconds,
+            )
+            if self._pending_proxy_lease is not None and self._pending_proxy_lease.cookie:
+                self._page = await asyncio.wait_for(
+                    self._browser.get("about:blank"),
+                    timeout=self.navigation_timeout_seconds,
+                )
+                await self._install_proxy_lease_cookies(
+                    self._page,
+                    self._pending_proxy_lease.cookie,
+                )
+            self._page = await asyncio.wait_for(
+                self._browser.get(initial_url or self.bootstrap_page),
+                timeout=self.navigation_timeout_seconds,
+            )
+            if self.settle_seconds > 0:
+                await asyncio.wait_for(
+                    self._page.sleep(self.settle_seconds),
+                    timeout=self.navigation_timeout_seconds,
+                )
+        except asyncio.TimeoutError as exc:
+            self._metric("dce_browser_timeout_count")
+            await self._stop()
+            raise OfficialFuturesSourceUnavailable(
+                "official DCE browser startup/navigation timed out"
+            ) from exc
         except Exception as exc:
             await self._stop()
             raise OfficialFuturesSourceUnavailable(
@@ -186,11 +284,45 @@ class DceOfficialBrowserClient:
                 "QUOTE_DCE_CHROME_PATH/browser_executable_path: "
                 f"{type(exc).__name__}: {exc!r}"
             ) from exc
+        if require_dce_readiness:
+            try:
+                await self._wait_until_ready()
+            except Exception:
+                await self._stop()
+                raise
+
+    async def _install_proxy_lease_cookies(self, page: Any, cookie_header: str) -> None:
         try:
-            await self._wait_until_ready()
-        except Exception:
-            await self._stop()
-            raise
+            from nodriver import cdp
+        except Exception as exc:  # pragma: no cover - loaded with nodriver above
+            raise OfficialFuturesSourceUnavailable(
+                "DCE official browser could not load CDP cookie support"
+            ) from exc
+        cookies = SimpleCookie()
+        cookies.load(str(cookie_header or ""))
+        if not cookies:
+            raise OfficialFuturesSourceUnavailable(
+                "DCE proxy authorization returned unparseable cookie data"
+            )
+        for morsel in cookies.values():
+            await asyncio.wait_for(
+                page.send(
+                    cdp.network.set_cookie(
+                        name=morsel.key,
+                        value=morsel.value,
+                        url=self.base_url,
+                    )
+                ),
+                timeout=self.evaluate_timeout_seconds,
+            )
+
+    @staticmethod
+    def _is_usable_browser_user_agent(value: str) -> bool:
+        user_agent = str(value or "").strip()
+        return len(user_agent) >= 20 and any(
+            marker in user_agent.lower()
+            for marker in ("mozilla/", "chrome/", "safari/", "edge/")
+        )
 
     async def _wait_until_ready(self) -> None:
         """Wait for DCE's browser challenge to finish before calling business APIs."""
@@ -201,11 +333,11 @@ class DceOfficialBrowserClient:
         while True:
             attempt += 1
             try:
-                await self._api(
+                remaining = max(0.1, deadline - time.monotonic())
+                await self._api_once(
                     "GET",
                     "/dcereport/publicweb/maxTradeDate",
-                    allow_session_restart=False,
-                    max_attempts=1,
+                    evaluate_timeout_seconds=min(self.evaluate_timeout_seconds, remaining),
                 )
                 logger.info(
                     "[OfficialFutures] DCE browser challenge ready attempts=%s elapsed_seconds=%.1f",
@@ -218,6 +350,7 @@ class DceOfficialBrowserClient:
                 classification = classify_official_futures_failure(exc)
                 challenge_pending = (
                     classification.category == "dce_anti_bot_challenge"
+                    or classification.category == "timeout"
                     or self._is_in_page_fetch_failure(status=-1, text=last_error)
                 )
                 if not challenge_pending:
@@ -229,6 +362,11 @@ class DceOfficialBrowserClient:
                     return
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
+                    if classification.category == "timeout":
+                        raise OfficialFuturesSourceUnavailable(
+                            "official DCE browser readiness timed out within "
+                            f"{self.readiness_timeout_seconds:.1f}s"
+                        ) from exc
                     raise OfficialFuturesSourceUnavailable(
                         "official DCE browser challenge did not become ready within "
                         f"{self.readiness_timeout_seconds:.1f}s: {last_error}"
@@ -243,6 +381,170 @@ class DceOfficialBrowserClient:
                 )
                 await asyncio.sleep(sleep_seconds)
 
+    async def _request_business_api(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, Any]] = None,
+    ) -> Mapping[str, Any]:
+        if self._circuit_error:
+            self._metric("dce_circuit_break_hit_count")
+            raise OfficialFuturesSourceUnavailable(self._circuit_error)
+        if self._session_ready:
+            try:
+                return await self._api_once(method, path, body)
+            except Exception as exc:
+                if not self._is_route_failure(exc):
+                    raise
+                self._metric("dce_proxy_rotation_count" if self._route_kind == "proxy" else "dce_direct_failure_count")
+                await self._stop()
+                self._session_ready = False
+        while True:
+            route = await self._next_route()
+            if route is None:
+                suffix = (
+                    f"; last_error={self._last_route_error_summary}"
+                    if self._last_route_error_summary
+                    else ""
+                )
+                self._open_circuit(
+                    "official DCE anti-bot challenge routes exhausted after bounded "
+                    f"browser/proxy attempts{suffix}"
+                )
+                raise OfficialFuturesSourceUnavailable(self._circuit_error)
+            try:
+                await self._ensure_started()
+                payload = await self._wait_for_business_api(method, path, body)
+                self._session_ready = True
+                if self._route_kind == "proxy":
+                    self._metric("dce_proxy_success_count")
+                return payload
+            except Exception as exc:
+                if not self._is_route_failure(exc):
+                    await self._stop()
+                    raise
+                self._last_route_error_summary = self._safe_route_error_summary(exc)
+                if self._route_kind == "proxy":
+                    self._metric("dce_proxy_failure_count")
+                    if self._proxy_leases_used < self.max_proxy_leases:
+                        self._metric("dce_proxy_rotation_count")
+                else:
+                    self._metric("dce_direct_failure_count")
+                await self._stop()
+                self._session_ready = False
+                logger.warning(
+                    "[OfficialFutures] DCE browser route failed route=%s error_type=%s",
+                    self._route_kind or "direct",
+                    type(exc).__name__,
+                )
+
+    async def _wait_for_business_api(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, Any]],
+    ) -> Mapping[str, Any]:
+        deadline = time.monotonic() + self.business_readiness_timeout_seconds
+        while True:
+            try:
+                return await self._api_once(method, path, body)
+            except Exception as exc:
+                if not self._is_route_failure(exc):
+                    raise
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise
+                sleep_seconds = min(self.readiness_poll_seconds, remaining)
+                logger.info(
+                    "[OfficialFutures] DCE business readiness pending route=%s "
+                    "path=%s sleep_seconds=%.1f error=%s",
+                    self._route_kind or "direct",
+                    path,
+                    sleep_seconds,
+                    self._safe_route_error_summary(exc),
+                )
+                await asyncio.sleep(sleep_seconds)
+
+    async def _next_route(self) -> Optional[str]:
+        if self._direct_attempts_used < self.direct_attempts:
+            self._direct_attempts_used += 1
+            self._route_kind = "direct"
+            self._pending_proxy_lease = None
+            return self._route_kind
+        while self._proxy_leases_used < self.max_proxy_leases:
+            self._proxy_leases_used += 1
+            try:
+                lease = acquire_akshare_proxy_lease(timeout=self.proxy_auth_timeout_seconds)
+                self._pending_proxy_lease = lease
+                self._proxy_forwarder = DceBrowserProxyForwarder(
+                    lease.proxy_url,
+                    socket_timeout_seconds=self.timeout_seconds,
+                )
+                self._proxy_forwarder.start()
+                self._route_kind = "proxy"
+                self._metric("dce_proxy_lease_count")
+                return self._route_kind
+            except Exception as exc:
+                self._pending_proxy_lease = None
+                if self._proxy_forwarder is not None:
+                    self._proxy_forwarder.stop()
+                    self._proxy_forwarder = None
+                self._metric("dce_proxy_failure_count")
+                logger.warning(
+                    "[OfficialFutures] DCE proxy lease unavailable attempt=%s/%s error_type=%s",
+                    self._proxy_leases_used,
+                    self.max_proxy_leases,
+                    type(exc).__name__,
+                )
+        return None
+
+    def _open_circuit(self, reason: str) -> None:
+        self._circuit_error = str(reason)
+        self._metric("dce_circuit_break_count")
+
+    @staticmethod
+    def _safe_route_error_summary(exc: Exception) -> str:
+        text = str(exc).lower()
+        if "browser challenge did not become ready" in text:
+            return "browser challenge did not become ready"
+        if "failed to fetch" in text or "networkerror" in text:
+            return "browser in-page fetch failed"
+        if "timed out" in text or "timeout" in text:
+            return "browser operation timed out"
+        if "http 412" in text or "anti-bot challenge" in text:
+            return "DCE returned HTTP 412 anti-bot challenge"
+        if "non-json payload" in text:
+            return "DCE returned non-JSON payload"
+        if "http 639" in text:
+            return "proxy route returned HTTP 639"
+        return f"{type(exc).__name__} route failure"
+
+    @staticmethod
+    def _is_route_failure(exc: Exception) -> bool:
+        if isinstance(exc, asyncio.TimeoutError):
+            return True
+        text = str(exc).lower()
+        if "business failure" in text:
+            return False
+        if "requires optional dependency" in text or "needs pyvirtualdisplay" in text:
+            return False
+        return any(
+            marker in text
+            for marker in (
+                "anti-bot challenge",
+                "challenge did not become ready",
+                "http 412",
+                "http 639",
+                "failed to fetch",
+                "networkerror",
+                "timed out",
+                "timeout",
+                "non-json payload",
+                "browser session failed",
+                "browser startup/navigation",
+            )
+        )
+
     async def _api(
         self,
         method: str,
@@ -251,6 +553,18 @@ class DceOfficialBrowserClient:
         *,
         allow_session_restart: bool = True,
         max_attempts: Optional[int] = None,
+    ) -> Mapping[str, Any]:
+        if allow_session_restart is False:
+            return await self._api_once(method, path, body)
+        return await self._request_business_api(method, path, body)
+
+    async def _api_once(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, Any]] = None,
+        *,
+        evaluate_timeout_seconds: Optional[float] = None,
     ) -> Mapping[str, Any]:
         body_js = json.dumps(body, ensure_ascii=False) if body is not None else "null"
         script = f"""
@@ -270,62 +584,44 @@ class DceOfficialBrowserClient:
           }}
         }})()
         """
-        last_error = ""
-        attempt_limit = self.retry_attempts if max_attempts is None else max(1, int(max_attempts))
-        for attempt in range(1, attempt_limit + 1):
-            await self._ensure_started()
-            raw_result = await self._page.evaluate(script, await_promise=True, return_by_value=True)
-            response = json.loads(raw_result if isinstance(raw_result, str) else str(raw_result))
-            text = str(response.get("text") or "")
-            status = int(response.get("status") or -1)
-            if status == 200:
-                try:
-                    payload = json.loads(text)
-                except json.JSONDecodeError as exc:
-                    raise OfficialFuturesSourceUnavailable(
-                        f"official DCE {path} returned non-JSON payload: {text[:200]}"
-                    ) from exc
-                if payload.get("success") is True:
-                    return payload
+        await self._ensure_started()
+        try:
+            raw_result = await asyncio.wait_for(
+                self._page.evaluate(script, await_promise=True, return_by_value=True),
+                timeout=(
+                    self.evaluate_timeout_seconds
+                    if evaluate_timeout_seconds is None
+                    else max(0.1, float(evaluate_timeout_seconds))
+                ),
+            )
+        except asyncio.TimeoutError as exc:
+            self._metric("dce_browser_timeout_count")
+            raise OfficialFuturesSourceUnavailable(
+                f"official DCE {path} browser evaluation timed out"
+            ) from exc
+        response = json.loads(raw_result if isinstance(raw_result, str) else str(raw_result))
+        text = str(response.get("text") or "")
+        status = int(response.get("status") or -1)
+        if status == 200:
+            try:
+                payload = json.loads(text)
+            except json.JSONDecodeError as exc:
                 raise OfficialFuturesSourceUnavailable(
-                    f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
-                )
-            last_error = f"HTTP {status}: {text[:200]}"
-            # DCE returns its JavaScript challenge page with HTTP 412 until the
-            # real browser session is ready. Repeating the request in the same
-            # invalidated page context cannot solve it, but a clean browser
-            # session may recover after completing the challenge again.
-            if status == 412:
-                if allow_session_restart and attempt < attempt_limit:
-                    logger.warning(
-                        "[OfficialFutures] DCE API challenge returned after readiness; "
-                        "restarting browser session path=%s attempt=%s next_attempt=%s",
-                        path,
-                        attempt,
-                        attempt + 1,
-                    )
-                    await self._stop()
-                    if self.retry_backoff_seconds > 0:
-                        await asyncio.sleep(self.retry_backoff_seconds)
-                    continue
-                raise OfficialFuturesSourceUnavailable(
-                    f"official DCE {path} anti-bot challenge: {last_error}"
-                )
-            if attempt < attempt_limit:
-                if allow_session_restart and self._is_in_page_fetch_failure(status=status, text=text):
-                    logger.warning(
-                        "[OfficialFutures] DCE in-page fetch failed; restarting browser session path=%s attempt=%s next_attempt=%s error=%s",
-                        path,
-                        attempt,
-                        attempt + 1,
-                        last_error,
-                    )
-                    await self._stop()
-                    if self.retry_backoff_seconds > 0:
-                        await asyncio.sleep(self.retry_backoff_seconds)
-                    continue
-                if self.retry_backoff_seconds > 0:
-                    await asyncio.sleep(self.retry_backoff_seconds)
+                    f"official DCE {path} returned non-JSON payload: {text[:200]}"
+                ) from exc
+            if payload.get("success") is True:
+                return payload
+            raise OfficialFuturesSourceUnavailable(
+                f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
+            )
+        last_error = f"HTTP {status}: {text[:200]}"
+        if status == 412:
+            self._metric("challenge_count")
+            raise OfficialFuturesSourceUnavailable(
+                f"official DCE {path} anti-bot challenge: {last_error}"
+            )
+        if self._is_in_page_fetch_failure(status=status, text=text):
+            self._metric("challenge_count")
         raise OfficialFuturesSourceUnavailable(f"official DCE {path} request failed: {last_error}")
 
     @staticmethod
@@ -337,12 +633,45 @@ class DceOfficialBrowserClient:
             or "networkerror" in text_lower
         )
 
+    async def _page_html_with_routes(self, url: str) -> str:
+        contract_info_body = {
+            "lang": "zh",
+            "tradeType": "1",
+            "varietyId": "all",
+        }
+        while True:
+            if not self._session_ready:
+                await self._request_business_api(
+                    "POST",
+                    "/dcereport/publicweb/tradepara/contractInfo",
+                    contract_info_body,
+                )
+            try:
+                return await self._page_html(url)
+            except Exception as exc:
+                if not self._is_route_failure(exc):
+                    raise
+                if self._route_kind == "proxy":
+                    self._metric("dce_proxy_rotation_count")
+                await self._stop()
+                self._session_ready = False
+
+    async def _unprotected_page_html(self, url: str) -> str:
+        await self._ensure_started(
+            require_dce_readiness=False,
+            initial_url="about:blank",
+        )
+        return await self._page_html(url)
+
     async def _page_html(self, url: str) -> str:
         await self._ensure_started()
         last_error = ""
         for attempt in range(1, self.retry_attempts + 1):
             try:
-                self._page = await self._browser.get(str(url))
+                self._page = await asyncio.wait_for(
+                    self._browser.get(str(url)),
+                    timeout=self.navigation_timeout_seconds,
+                )
                 for poll_attempt in range(1, self.page_challenge_poll_attempts + 1):
                     sleep_seconds = (
                         self.page_settle_seconds
@@ -350,10 +679,16 @@ class DceOfficialBrowserClient:
                         else self.page_challenge_settle_seconds
                     )
                     if sleep_seconds > 0:
-                        await self._page.sleep(sleep_seconds)
-                    raw_result = await self._page.evaluate(
-                        "document.documentElement ? document.documentElement.outerHTML : ''",
-                        return_by_value=True,
+                        await asyncio.wait_for(
+                            self._page.sleep(sleep_seconds),
+                            timeout=self.navigation_timeout_seconds,
+                        )
+                    raw_result = await asyncio.wait_for(
+                        self._page.evaluate(
+                            "document.documentElement ? document.documentElement.outerHTML : ''",
+                            return_by_value=True,
+                        ),
+                        timeout=self.evaluate_timeout_seconds,
                     )
                     html = str(raw_result or "")
                     if not html.strip():
@@ -371,6 +706,9 @@ class DceOfficialBrowserClient:
                         continue
                     if "<html" in html[:500].lower() or html.strip():
                         return html
+            except asyncio.TimeoutError:
+                self._metric("dce_browser_timeout_count")
+                last_error = "browser page operation timed out"
             except Exception as exc:
                 last_error = str(exc)
             if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
@@ -379,12 +717,23 @@ class DceOfficialBrowserClient:
 
     async def _stop(self) -> None:
         if self._browser is not None:
-            self._browser.stop()
+            try:
+                self._browser.stop()
+            except Exception:
+                logger.debug("[OfficialFutures] DCE browser stop failed", exc_info=True)
         self._browser = None
         self._page = None
         if self._display is not None:
-            self._display.stop()
+            try:
+                self._display.stop()
+            except Exception:
+                logger.debug("[OfficialFutures] DCE virtual display stop failed", exc_info=True)
         self._display = None
+        if self._proxy_forwarder is not None:
+            self._proxy_forwarder.stop()
+        self._proxy_forwarder = None
+        self._pending_proxy_lease = None
+        self._session_ready = False
 
     def _start_virtual_display_if_needed(self) -> None:
         if self._display is not None:
@@ -576,6 +925,7 @@ class OfficialFuturesMarketDataProvider:
         self._request_counts_by_exchange: Dict[str, int] = {}
         self._metrics: Dict[str, Dict[str, float]] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
+        self._product_page_browser_client: Optional[DceOfficialBrowserClient] = None
         self._dce_executor: Optional[ThreadPoolExecutor] = None
         self._root_symbol_exchange_map: Optional[Dict[str, str]] = None
 
@@ -1956,7 +2306,9 @@ class OfficialFuturesMarketDataProvider:
         if exchange_key not in {"SHFE", "INE", "CZCE"}:
             return ""
         try:
-            html = self._get_product_page_browser_client().fetch_page_html(str(url or ""))
+            html = self._get_product_page_browser_client().fetch_unprotected_page_html(
+                str(url or "")
+            )
         except Exception as exc:
             logger.warning(
                 "[OfficialFutures] browser product-page fallback failed exchange=%s symbol=%s url=%s error=%s",
@@ -2416,11 +2768,24 @@ class OfficialFuturesMarketDataProvider:
     def _get_dce_browser_client(self) -> "DceOfficialBrowserClient":
         if self._dce_browser_client is None:
             self._dce_browser_client = DceOfficialBrowserClient(self.dce_browser_cfg)
+            set_metric_callback = getattr(self._dce_browser_client, "set_metric_callback", None)
+            if callable(set_metric_callback):
+                set_metric_callback(
+                    lambda key, value: self._increment_metric("DCE", key, value)
+                )
         return self._dce_browser_client
 
     def _get_product_page_browser_client(self) -> "DceOfficialBrowserClient":
-        """Return the browser-assisted official page client used by product-spec adapters."""
-        return self._get_dce_browser_client()
+        """Return a browser that does not depend on DCE challenge readiness."""
+        if self._product_page_browser_client is None:
+            self._product_page_browser_client = DceOfficialBrowserClient(
+                {
+                    **self.dce_browser_cfg,
+                    "max_proxy_leases": 0,
+                    "direct_attempts": 1,
+                }
+            )
+        return self._product_page_browser_client
 
     def _get_dce_executor(self) -> ThreadPoolExecutor:
         if self._dce_executor is None:
@@ -2431,6 +2796,9 @@ class OfficialFuturesMarketDataProvider:
         return self._dce_executor
 
     def close(self) -> None:
+        if self._product_page_browser_client is not None:
+            self._product_page_browser_client.close()
+            self._product_page_browser_client = None
         if self._dce_executor is not None:
             if self._dce_browser_client is not None:
                 future = self._dce_executor.submit(self._dce_browser_client.close)
@@ -2981,6 +3349,14 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
             is_retryable=False,
             suspected_local_ip_risk_control=False,
             summary="DCE returned its browser challenge HTML; complete the challenge in a real browser session before calling the API",
+            evidence=evidence,
+        )
+    if "dce" in lowered and "routes exhausted" in lowered:
+        return OfficialFuturesFailureClassification(
+            category="dce_anti_bot_challenge",
+            is_retryable=False,
+            suspected_local_ip_risk_control=True,
+            summary="DCE direct and proxy browser routes were exhausted for this run",
             evidence=evidence,
         )
     if any(marker in lowered for marker in anti_bot_markers):

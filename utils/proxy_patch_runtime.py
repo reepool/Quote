@@ -11,6 +11,7 @@ from __future__ import annotations
 import importlib
 import json
 import logging
+from urllib.parse import urlsplit
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional
@@ -41,6 +42,22 @@ _YFINANCE_STATE = ProxyPatchState(target="yfinance")
 
 class ProxyResponseRejectedError(RuntimeError):
     """All acquired proxy exits returned a response rejected by the caller."""
+
+
+@dataclass(frozen=True)
+class AkshareProxyLease:
+    """One short-lived proxy authorization response with credential-safe repr."""
+
+    proxy_url: str = field(repr=False)
+    user_agent: str
+    cookie: str = field(default="", repr=False)
+
+    @property
+    def endpoint(self) -> str:
+        parsed = urlsplit(self.proxy_url)
+        if not parsed.hostname or not parsed.port:
+            return "unknown"
+        return f"{parsed.hostname}:{parsed.port}"
 
 
 def install_akshare_proxy_patch(*, required: bool = False) -> ProxyPatchState:
@@ -172,6 +189,49 @@ def request_with_akshare_proxy(
             "akshare proxy exits returned rejected response bodies"
         ) from last_error
     raise RuntimeError("akshare proxy fallback exhausted") from last_error
+
+
+def acquire_akshare_proxy_lease(*, timeout: float = 5.0) -> AkshareProxyLease:
+    """Acquire a fresh proxy lease without using the patch package's TTL cache."""
+    config = _load_proxy_patch_config("akshare")
+    gateway = str(config.get("gateway") or "").strip()
+    auth_token = str(config.get("auth_token") or "").strip()
+    if not config.get("enabled", False) or not gateway or not auth_token:
+        raise RuntimeError("akshare proxy fallback is not fully configured")
+
+    import requests
+
+    try:
+        proxy_patch = importlib.import_module("akshare_proxy_patch")
+        patch_version = str(getattr(proxy_patch, "__version__", "0.5.0"))
+    except ImportError:
+        patch_version = "0.5.0"
+    session_class = getattr(requests, "_OriginalSession", requests.Session)
+    auth_url = f"http://{gateway}:47001/api/akshare-auth"
+    with session_class() as session:
+        response = session.get(
+            auth_url,
+            params={"token": auth_token, "version": patch_version},
+            timeout=(min(1.5, timeout), max(1.5, timeout)),
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+    proxy_url = str(payload.get("proxy") or "").strip()
+    user_agent = str(payload.get("ua") or "").strip()
+    parsed = urlsplit(proxy_url)
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or not parsed.port
+        or not user_agent
+    ):
+        raise RuntimeError("proxy authorization returned incomplete data")
+    return AkshareProxyLease(
+        proxy_url=proxy_url,
+        user_agent=user_agent,
+        cookie=str(payload.get("cookie") or "").strip(),
+    )
 
 
 def _install_patch(

@@ -659,12 +659,19 @@ def test_futures_official_calendar_report_includes_failure_samples():
                 "request_count": 11,
                 "challenge_count": 1,
                 "challenge_backoff_seconds": 20,
+                "dce_proxy_lease_count": 2,
+                "dce_proxy_rotation_count": 1,
+                "dce_proxy_success_count": 1,
+                "dce_proxy_failure_count": 1,
+                "dce_browser_timeout_count": 0,
+                "dce_circuit_break_count": 0,
+                "dce_circuit_break_hit_count": 0,
                 "batch_pause_count": 0,
                 "batch_pause_seconds": 0,
             },
             "exchanges": [
                 {
-                    "exchange": "GFEX",
+                    "exchange": "DCE",
                     "rows_written": 0,
                     "trading_days": 9,
                     "closed_days": 1,
@@ -672,13 +679,17 @@ def test_futures_official_calendar_report_includes_failure_samples():
                     "future_dates_unresolved": 0,
                     "challenge_count": 1,
                     "challenge_backoff_seconds": 20,
+                    "dce_proxy_lease_count": 2,
+                    "dce_proxy_rotation_count": 1,
+                    "dce_proxy_success_count": 1,
+                    "dce_proxy_failure_count": 1,
                     "batch_pause_count": 0,
                     "batch_pause_seconds": 0,
                     "latest_verified_date": "2024-01-10",
                     "failure_samples": [
                         {
                             "trade_date": "2024-01-11",
-                            "reason": "gfex_html_challenge http_status=567",
+                            "reason": "official DCE anti-bot challenge HTTP 412",
                         }
                     ],
                 }
@@ -689,7 +700,11 @@ def test_futures_official_calendar_report_includes_failure_samples():
     assert "失败样本" in report
     assert "challenge_count: `1`" in report
     assert "challenges=1" in report
-    assert "GFEX 2024-01-11: gfex_html_challenge http_status=567" in report
+    assert "dce_proxy_leases: `2`" in report
+    assert "dce_proxy_rotations: `1`" in report
+    assert "proxy_successes=1" in report
+    assert "proxy_failures=1" in report
+    assert "DCE 2024-01-11: official DCE anti-bot challenge HTTP 412" in report
 
 
 def test_futures_official_calendar_report_separates_truncated_dates_from_failures():
