@@ -23,6 +23,7 @@ def test_annual_report_asset_partial_report_renders_outcome_and_reasons():
                     "stage_log": [{"stage": "universe"}, {"stage": "discovery"}],
                     "metrics": {
                         "stage_timings_seconds": {"total": 1086.8},
+                        "attachment_retry_backlog": 3440,
                     },
                 }
             },
@@ -35,7 +36,7 @@ def test_annual_report_asset_partial_report_renders_outcome_and_reasons():
     assert "公告记录：发现 0 条，登记 6619 条" in rendered
     assert "耗时：1086.8 秒" in rendered
     assert "新下载 162" in rendered
-    assert "待处理附件：3255" in rendered
+    assert "附件队列：本轮新增 3255，当前积压 3440" in rendered
     assert "已保存下一页位置" in rendered
 
 
@@ -80,5 +81,5 @@ def test_annual_report_asset_backfill_report_uses_top_level_progress():
 
     assert "全部完成" in rendered
     assert "公告记录：发现 300 条，登记 300 条" in rendered
-    assert "尝试 300，新下载 20，本地复用 280" in rendered
-    assert "待处理附件：2" in rendered
+    assert "队列处理 300，新下载 20，本地或等价复用 280" in rendered
+    assert "附件队列：本轮新增 2，当前积压 2" in rendered

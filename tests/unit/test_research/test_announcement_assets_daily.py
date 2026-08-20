@@ -744,6 +744,126 @@ def _service_bundle(tmp_path: Path, config, retriever=None):
     return repository, service, retriever
 
 
+def test_latest_read_uses_fiscal_year_not_historical_correction_publish_time(
+    tmp_path,
+):
+    config = _focused_config(tmp_path)
+    repository, service, _ = _service_bundle(tmp_path, config)
+    latest = service.register_discovered_record(
+        _record_at("latest-2025", fiscal_year=2025),
+        instrument_id="600000.SH",
+    )[0]
+    historical_correction = service.register_discovered_record(
+        _record_at(
+            "historical-2019-correction",
+            fiscal_year=2019,
+            correction=True,
+            published_at="2026-04-29T01:00:00+00:00",
+        ),
+        instrument_id="600000.SH",
+    )[0]
+
+    service.acquire_attachment(latest.attachment_id)
+    service.acquire_attachment(historical_correction.attachment_id)
+
+    current = repository.get_effective_report("600000.SH")
+    historical = repository.get_effective_report("600000.SH", 2019)
+    assert current is not None and current.fiscal_year == 2025
+    assert historical is not None
+    assert historical.variant is AnnualReportVariant.CORRECTION
+
+
+def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
+    config = _focused_config(tmp_path)
+    repository, service, retriever = _service_bundle(tmp_path, config)
+    current = service.register_discovered_record(
+        _record_at("current-2025"), instrument_id="600000.SH"
+    )[0]
+    service.acquire_attachment(current.attachment_id)
+    duplicate_record = replace(
+        _record_at("current-2025"),
+        source="szse",
+        announcement_key=build_announcement_key("szse", "current-2025"),
+        exchange="SZSE",
+        attachments=(
+            AnnouncementAttachment(
+                source_url="https://static.example/current-2025-mirror.pdf",
+                attachment_id="current-2025-mirror",
+                name="current-2025-mirror.pdf",
+                media_type="application/pdf",
+            ),
+        ),
+    )
+    duplicate = service.register_discovered_record(
+        duplicate_record, instrument_id="600000.SH"
+    )[0]
+    updater = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    )
+    calls_before = len(retriever.calls)
+    discovery_result = updater.run(
+        run_cutoff="2026-08-09T03:00:00+00:00",
+        discover=lambda *args: (duplicate_record,),
+        active_instrument_ids=("600000.SH",),
+    )
+    assert len(retriever.calls) == calls_before
+    assert discovery_result.attachment_retries_queued == 0
+    assert discovery_result.attachments_downloaded == 0
+    assert repository.get_attachment_retry(duplicate.attachment_id) is None
+
+    repository.enqueue_attachment_retry(
+        attachment_id=duplicate.attachment_id,
+        source="cninfo",
+        metadata={
+            "instrument_id": "600000.SH",
+            "fiscal_year": 2025,
+            "candidate_id": duplicate.attachment_id,
+            "variant": "original",
+        },
+    )
+    calls_before = len(retriever.calls)
+
+    result = updater.run(
+        run_cutoff="2026-08-10T03:00:00+00:00",
+        discover=lambda *args: (),
+        active_instrument_ids=("600000.SH",),
+    )
+
+    assert len(retriever.calls) == calls_before
+    assert result.attachments_downloaded == 0
+    assert result.attachments_reused == 1
+    assert result.metrics["attachment_retries_deduplicated"] == 1
+    assert result.metrics["attachment_retry_backlog"] == 0
+    assert repository.get_attachment_retry(duplicate.attachment_id)["status"] == (
+        "completed"
+    )
+
+    repository.enqueue_attachment_retry(
+        attachment_id=duplicate.attachment_id,
+        source="szse",
+        metadata={
+            "instrument_id": "600000.SH",
+            "fiscal_year": 2025,
+            "candidate_id": "concurrent-observation",
+            "variant": "original",
+        },
+    )
+    repository.claim_attachment_retry(
+        duplicate.attachment_id,
+        now="2026-08-11T02:00:00+00:00",
+    )
+    concurrent_result = updater.run(
+        run_cutoff="2026-08-11T03:00:00+00:00",
+        discover=lambda *args: (),
+        active_instrument_ids=("600000.SH",),
+    )
+    assert len(retriever.calls) == calls_before
+    assert concurrent_result.metrics["attachment_retry_backlog"] == 1
+    assert repository.get_attachment_retry(duplicate.attachment_id)["status"] == (
+        "running"
+    )
+
+
 def _record_at(
     source_id: str,
     *,

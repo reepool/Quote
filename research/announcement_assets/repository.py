@@ -6,7 +6,7 @@ import hashlib
 import json
 import sqlite3
 import uuid
-from collections.abc import Generator, Mapping, Sequence
+from collections.abc import Generator, Iterable, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
@@ -3938,7 +3938,7 @@ class AnnouncementAssetRepository:
         if due_at is not None:
             clauses.append("(next_retry_at IS NULL OR next_retry_at<=?)")
             params.append(due_at)
-        params.append(max(1, min(int(limit), 1000)))
+        params.append(max(1, min(int(limit), 10000)))
         with self.connection() as conn:
             rows = conn.execute(
                 "SELECT * FROM official_asset_attachment_retries WHERE "
@@ -3947,6 +3947,34 @@ class AnnouncementAssetRepository:
                 tuple(params),
             ).fetchall()
         return [_decode_row(row, json_fields=("metadata_json",)) for row in rows]
+
+    def complete_attachment_retries(self, attachment_ids: Iterable[str]) -> int:
+        """Complete locally satisfied queue items in one transaction."""
+        ids = tuple(dict.fromkeys(str(item) for item in attachment_ids if item))
+        if not ids:
+            return 0
+        now = utc_now_iso()
+        with self.transaction() as conn:
+            before = conn.total_changes
+            conn.executemany(
+                """UPDATE official_asset_attachment_retries
+                   SET status='completed', next_retry_at=NULL, completed_at=?,
+                       updated_at=?
+                   WHERE attachment_id=?
+                     AND status IN ('queued', 'retryable')""",
+                ((now, now, attachment_id) for attachment_id in ids),
+            )
+            return conn.total_changes - before
+
+    def count_attachment_retries(self) -> int:
+        """Return the current attachment queue depth."""
+        with self.connection() as conn:
+            row = conn.execute(
+                """SELECT COUNT(*) AS count
+                   FROM official_asset_attachment_retries
+                   WHERE status IN ('queued', 'retryable', 'running')"""
+            ).fetchone()
+        return int(_require_row(row)["count"])
 
     def upsert_period_reconciliation(
         self,

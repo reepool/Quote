@@ -7,6 +7,7 @@ import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -453,7 +454,7 @@ class AnnualReportDailyUpdater:
             queued,
         )
         acquisition = (
-            (0, 0, 0, 0, 0, [], [])
+            (0, 0, 0, 0, 0, [], [], 0)
             if stop_requested
             else self._process_attachment_retries(
                 cutoff=cutoff,
@@ -583,6 +584,8 @@ class AnnualReportDailyUpdater:
                 windows_incomplete == 0 and catch_up_pending_scopes == 0
             ),
             "attachment_retry_separate": True,
+            "attachment_retry_backlog": self.repository.count_attachment_retries(),
+            "attachment_retries_deduplicated": acquisition[7],
             "discovery_requests": discovery_budget.requests,
             "adaptive_partitions": discovery_partitions,
             "dense_continuations": dense_continuations,
@@ -1573,7 +1576,34 @@ class AnnualReportDailyUpdater:
                 if candidate.attachment_id in seen:
                     continue
                 seen.add(candidate.attachment_id)
-                self.repository.enqueue_attachment_retry(
+                current = self.repository.get_effective_report(
+                    instrument_id, fiscal_year
+                )
+                if self._effective_report_satisfies_candidate(
+                    current,
+                    attachment_id=candidate.attachment_id,
+                    source=candidate.source,
+                    source_announcement_id=candidate.source_announcement_id,
+                    published_at=candidate.published_at,
+                    variant=candidate.classification.variant,
+                ):
+                    existing_retry = self.repository.get_attachment_retry(
+                        candidate.attachment_id
+                    )
+                    if existing_retry and existing_retry["status"] in {
+                        "queued",
+                        "retryable",
+                    }:
+                        self.repository.finish_attachment_retry(
+                            candidate.attachment_id,
+                            success=True,
+                            project_parent_block=False,
+                        )
+                    continue
+                existing_retry = self.repository.get_attachment_retry(
+                    candidate.attachment_id
+                )
+                queued_retry = self.repository.enqueue_attachment_retry(
                     attachment_id=candidate.attachment_id,
                     source=candidate.source,
                     operation_id=operation_id,
@@ -1592,8 +1622,101 @@ class AnnualReportDailyUpdater:
                         ),
                     },
                 )
-                queued += 1
+                if queued_retry["status"] in {"queued", "retryable"} and (
+                    existing_retry is None
+                    or existing_retry["status"] not in {"queued", "retryable", "running"}
+                ):
+                    queued += 1
         return queued
+
+    def _effective_report_satisfies_candidate(
+        self,
+        current: Any,
+        *,
+        attachment_id: str,
+        source: str,
+        source_announcement_id: str,
+        published_at: str | None,
+        variant: AnnualReportVariant,
+    ) -> bool:
+        """Return whether a valid period asset makes acquisition unnecessary."""
+        if (
+            current is None
+            or current.availability.value != "local_valid"
+            or not current.content_hash
+        ):
+            return False
+        blob = self.repository.get_blob(current.content_hash)
+        if blob is None or not blob.canonical_path:
+            return False
+        try:
+            path = Path(blob.canonical_path)
+            if not path.is_file() or path.stat().st_size != blob.content_length:
+                return False
+        except OSError:
+            return False
+        if current.attachment_id == attachment_id or (
+            current.source == source
+            and current.source_announcement_id == source_announcement_id
+        ):
+            return True
+        if (
+            {current.source, source} == {"cninfo", "szse"}
+            and current.source_announcement_id == source_announcement_id
+            and current.published_at
+            and published_at
+            and _parse_time(current.published_at).date()
+            == _parse_time(published_at).date()
+        ):
+            return True
+        if current.variant is AnnualReportVariant.CORRECTION:
+            if variant is AnnualReportVariant.ORIGINAL:
+                return True
+            return self._published_before(
+                published_at, current.published_at
+            )
+        if variant is AnnualReportVariant.CORRECTION:
+            return False
+        return self._published_before(
+            published_at, current.published_at
+        )
+
+    @staticmethod
+    def _published_before(candidate: str | None, current: str | None) -> bool:
+        if not candidate or not current:
+            return False
+        return _parse_time(candidate) < _parse_time(current)
+
+    def _retry_is_satisfied(self, retry: Mapping[str, Any]) -> bool:
+        metadata = retry.get("metadata") or {}
+        instrument_id = str(metadata.get("instrument_id") or "").strip()
+        fiscal_year = metadata.get("fiscal_year")
+        variant = metadata.get("variant")
+        attachment_id = str(retry.get("attachment_id") or "")
+        if not instrument_id or fiscal_year is None or not variant or not attachment_id:
+            return False
+        try:
+            fiscal_year = int(fiscal_year)
+            normalized_variant = AnnualReportVariant(str(variant))
+        except (TypeError, ValueError):
+            return False
+        attachment = self.repository.get_attachment(attachment_id)
+        if attachment is None:
+            return False
+        announcement = self.repository.get_announcement(attachment.announcement_id)
+        if announcement is None:
+            return False
+        current = self.repository.get_effective_report(
+            instrument_id, fiscal_year
+        )
+        return self._effective_report_satisfies_candidate(
+            current,
+            attachment_id=attachment_id,
+            source=announcement.source,
+            source_announcement_id=announcement.source_announcement_id,
+            published_at=announcement.published_at,
+            variant=normalized_variant,
+        )
 
     def _withdrawal_reconciliation_scopes(
         self,
@@ -1681,8 +1804,13 @@ class AnnualReportDailyUpdater:
 
     def _process_attachment_retries(
         self, *, cutoff: str, operation_id: str | None
-    ) -> tuple[int, int, int, int, int, list[str], list[str]]:
-        attempted = downloaded = reused = failures = corrections = 0
+    ) -> tuple[int, int, int, int, int, list[str], list[str], int]:
+        deduplicated = self._complete_satisfied_attachment_retries(
+            cutoff=cutoff,
+            operation_id=operation_id,
+        )
+        attempted = reused = deduplicated
+        downloaded = failures = corrections = 0
         errors: list[str] = []
         blocking_reasons: list[str] = []
         retries = self.repository.list_attachment_retries(
@@ -1690,6 +1818,8 @@ class AnnualReportDailyUpdater:
             limit=self.config.discovery.max_instruments,
         )
         for retry in retries:
+            if retry["status"] == "running":
+                continue
             if operation_stop_reason(operation_id) or (
                 operation_id and self.repository.operation_stop_requested(operation_id)
             ):
@@ -1793,7 +1923,27 @@ class AnnualReportDailyUpdater:
             corrections,
             errors,
             blocking_reasons,
+            deduplicated,
         )
+
+    def _complete_satisfied_attachment_retries(
+        self, *, cutoff: str, operation_id: str | None
+    ) -> int:
+        """Complete locally satisfied retries without spending download budget."""
+        satisfied: list[str] = []
+        for retry in self.repository.list_attachment_retries(
+            due_at=cutoff,
+            limit=10000,
+        ):
+            if retry["status"] == "running":
+                continue
+            if operation_stop_reason(operation_id) or (
+                operation_id and self.repository.operation_stop_requested(operation_id)
+            ):
+                break
+            if self._retry_is_satisfied(retry):
+                satisfied.append(str(retry["attachment_id"]))
+        return self.repository.complete_attachment_retries(satisfied)
 
     def _refresh_universe(
         self,

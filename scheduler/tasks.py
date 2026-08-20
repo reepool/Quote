@@ -134,10 +134,14 @@ def _annual_report_asset_report_data(
     windows_completed = int(execution.get("windows_completed") or 0)
     windows_incomplete = int(execution.get("windows_incomplete") or 0)
     records_seen = int(execution.get("records_seen") or 0)
-    queued = int(
+    newly_queued = int(
         execution.get("attachment_retries_queued")
         or execution.get("retryable")
         or 0
+    )
+    backlog_value = metrics.get("attachment_retry_backlog")
+    queue_backlog = (
+        newly_queued if backlog_value is None else int(backlog_value)
     )
     reason_lines = [
         f"• {_annual_report_asset_reason_text(str(item))}" for item in errors[:5]
@@ -158,9 +162,9 @@ def _annual_report_asset_report_data(
             f"完成 {windows_completed} 个窗口，未完成 {windows_incomplete} 个\n"
             f"• 公告记录：发现 {records_seen} 条，登记 "
             f"{int(execution.get('metadata_registered') or records_seen)} 条\n"
-            f"• 附件处理：尝试 {attempted}，新下载 {downloaded}，"
-            f"本地复用 {reused}，失败 {failures}\n"
-            f"• 待处理附件：{queued}"
+            f"• 附件处理：队列处理 {attempted}，新下载 {downloaded}，"
+            f"本地或等价复用 {reused}，失败 {failures}\n"
+            f"• 附件队列：本轮新增 {newly_queued}，当前积压 {queue_backlog}"
         ),
         "pending_summary": (
             "无，当前发现范围已全部完成。"
