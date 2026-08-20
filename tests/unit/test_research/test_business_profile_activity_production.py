@@ -296,3 +296,44 @@ def test_anonymous_disclosure_creates_concentration_fact_without_edge():
     assert record_type == "operating_facts"
     assert fact["fact_type"] == "customer_concentration_share"
     assert fact["metadata"]["no_relationship_edge_created"] is True
+
+
+def test_distinct_anonymous_concentrations_in_same_evidence_have_distinct_ids():
+    producer = BusinessProfileActivityProducer(_Repository())
+    common = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "sells_to",
+        "anonymous": True,
+        "object_raw": "收入",
+        "scope_id": "601088.SH",
+        "confidence": 1.0,
+    }
+
+    _, top_five = producer.build_relationship_or_concentration_candidate(
+        {
+            **common,
+            "counterparty_name_raw": "前五大客户",
+            "disclosed_share": 0.595,
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("前五大客户"),
+        evidence_id="evidence-major-customers",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    _, related_parties = producer.build_relationship_or_concentration_candidate(
+        {
+            **common,
+            "counterparty_name_raw": "关联方",
+            "disclosed_share": 0.323,
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("关联方"),
+        evidence_id="evidence-major-customers",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+
+    assert top_five["record_id"] != related_parties["record_id"]
+    assert top_five["fact_scope"] != related_parties["fact_scope"]
+    assert top_five["metadata"]["anonymous_label"] == "前五大客户"
+    assert related_parties["metadata"]["anonymous_label"] == "关联方"

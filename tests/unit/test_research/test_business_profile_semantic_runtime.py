@@ -559,7 +559,8 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                 request,
             )
         payload = json.loads(request.messages[-1].content)
-        quote = "客户A销售占比为25%"
+        top_five_quote = "前五大客户销售占比为59.5%"
+        related_party_quote = "关联方销售占比为32.3%"
         return _response(
             {
                 "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
@@ -570,13 +571,27 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                     {
                         "subject_scope": "issuer",
                         "relationship_type": "sells_to",
-                        "counterparty_name_raw": "客户A",
-                        "semantic_summary_zh": "前五名客户销售占比",
+                        "counterparty_name_raw": "前五大客户",
+                        "semantic_summary_zh": "前五大客户销售占比为59.5%",
                         "anonymous": True,
-                        "disclosed_share": 0.25,
-                        "object_raw": None,
-                        "evidence_span_ids": _request_span_ids(payload, quote),
-                    }
+                        "disclosed_share": 0.595,
+                        "object_raw": "收入",
+                        "evidence_span_ids": _request_span_ids(
+                            payload, top_five_quote
+                        ),
+                    },
+                    {
+                        "subject_scope": "issuer",
+                        "relationship_type": "sells_to",
+                        "counterparty_name_raw": "关联方",
+                        "semantic_summary_zh": "关联方销售占比为32.3%",
+                        "anonymous": True,
+                        "disclosed_share": 0.323,
+                        "object_raw": "收入",
+                        "evidence_span_ids": _request_span_ids(
+                            payload, related_party_quote
+                        ),
+                    },
                 ],
             },
             request,
@@ -2635,7 +2650,7 @@ def test_unique_exact_counterparty_is_verified_and_promoted(tmp_path, monkeypatc
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
-def test_anonymous_concentration_bypasses_entity_resolution_and_is_promoted(
+def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     tmp_path, monkeypatch
 ):
     class FailingResolver:
@@ -2650,7 +2665,7 @@ def test_anonymous_concentration_bypasses_entity_resolution_and_is_promoted(
         [],
         promote=True,
         gateway=_AnonymousRelationshipGateway(),
-        text="主要业务：客户A销售占比为25%。",
+        text="主要业务：前五大客户销售占比为59.5%，关联方销售占比为32.3%。",
         counterparty_resolver=FailingResolver(),
     )
 
@@ -2658,11 +2673,14 @@ def test_anonymous_concentration_bypasses_entity_resolution_and_is_promoted(
     assert pipeline.run("promote", scope=scope)["status"] == "success"
 
     facts = repository.list_records("operating_facts", instrument_id="601088.SH")
-    assert len(gateway.requests) == 2
-    assert len(facts) == 1
-    assert facts[0]["fact_type"] == "customer_concentration_share"
-    assert facts[0]["value_normalized"] == 0.25
-    assert facts[0]["review_status"] == "approved"
+    assert len(gateway.requests) == 3
+    assert len(facts) == 2
+    assert {fact["fact_type"] for fact in facts} == {
+        "customer_concentration_share"
+    }
+    assert {fact["value_normalized"] for fact in facts} == {0.595, 0.323}
+    assert len({fact["fact_scope"] for fact in facts}) == 2
+    assert {fact["review_status"] for fact in facts} == {"approved"}
     assert repository.list_records("relationships", instrument_id="601088.SH") == []
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 

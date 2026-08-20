@@ -197,6 +197,16 @@ class BusinessProfileActivityProducer:
                 raise ValueError(
                     "anonymous relationship disclosed_share must be a finite fraction"
                 )
+            anonymous_label = _required_text(assertion, "counterparty_name_raw")
+            object_raw = str(assertion.get("object_raw") or "").strip() or None
+            fact_scope = _stable_id(
+                "anonymous-concentration-scope",
+                {
+                    "scope_id": assertion.get("scope_id"),
+                    "anonymous_label": anonymous_label,
+                    "object_raw": object_raw,
+                },
+            )
             record = {
                 "record_id": _stable_id(
                     "anonymous-concentration",
@@ -204,7 +214,7 @@ class BusinessProfileActivityProducer:
                         "instrument_id": instrument_id,
                         "report_period": report_period,
                         "relationship_type": relationship_type,
-                        "scope_id": assertion.get("scope_id"),
+                        "fact_scope": fact_scope,
                         "evidence_id": evidence_id,
                     },
                 ),
@@ -221,7 +231,7 @@ class BusinessProfileActivityProducer:
                 "unit_raw": "fraction",
                 "value_normalized": normalized_share,
                 "unit_normalized": "fraction",
-                "fact_scope": str(assertion.get("scope_id") or "company"),
+                "fact_scope": fact_scope,
                 "currency": None,
                 "equity_basis": "consolidated_100_percent",
                 "evidence_id": evidence_id,
@@ -232,7 +242,9 @@ class BusinessProfileActivityProducer:
                 "version": 1,
                 "metadata": {
                     "run_id": run_id,
-                    "anonymous_label": assertion.get("counterparty_name_raw"),
+                    "scope_id": assertion.get("scope_id"),
+                    "anonymous_label": anonymous_label,
+                    "object_raw": object_raw,
                     "no_relationship_edge_created": True,
                     "numeric_reconciliation": {
                         "schema_version": "business_profile_ratio_validation.v1",

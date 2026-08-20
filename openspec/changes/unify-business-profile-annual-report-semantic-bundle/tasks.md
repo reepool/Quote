@@ -21,3 +21,4 @@
 - [x] 4.1 Add runtime tests proving one LLM call yields two independently persisted field-family results and restart replay does not call the LLM.
 - [x] 4.2 Run focused selector, extraction, artifact, runtime, async, and rollout regressions plus compile, lint, and OpenSpec validation.
 - [x] 4.3 Review only blocking defects, update task status, commit the isolated change, and push it to the configured upstream.
+- [x] 4.4 Preserve multiple distinct anonymous concentration facts supported by the same evidence span, and add a production-shaped regression test.
