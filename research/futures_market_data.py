@@ -7312,6 +7312,7 @@ class FuturesOfficialCalendarBackfillService:
         total_rate_limits = 0
         total_rate_limit_backoff_seconds = 0.0
         total_truncated_dates = 0
+        total_preserved_verified = 0
         max_total_days = int(max_days) if max_days else None
 
         try:
@@ -7365,6 +7366,8 @@ class FuturesOfficialCalendarBackfillService:
                     "future_dates_unresolved": exchange_future_unresolved,
                     "not_yet_due_dates": 0,
                     "repaired_dates": [],
+                    "preserved_verified_dates": [],
+                    "preserved_probe_failures": [],
                     "invalidated_weak_dates": [],
                     "request_count": 0,
                     "latest_verified_date": None,
@@ -7436,6 +7439,32 @@ class FuturesOfficialCalendarBackfillService:
                             verified_by_date[key] = calendar_day
                             if calendar_day.metadata.get("calendar_repair"):
                                 result["repaired_dates"].append(key)
+                        elif self._is_strong_verified_calendar_row(existing_by_date.get(key)):
+                            verified_by_date[key] = self._calendar_day_from_existing(
+                                existing_by_date[key]
+                            )
+                            result["preserved_verified_dates"].append(key)
+                            result["preserved_probe_failures"].append(
+                                {
+                                    "trade_date": key,
+                                    "reason": self._probe_unresolved_reason(
+                                        key,
+                                        probe,
+                                        publication,
+                                    ),
+                                }
+                            )
+                            logger.warning(
+                                "[FuturesOfficialCalendarBackfill] current probe unresolved; "
+                                "preserving strong official evidence exchange=%s trade_date=%s "
+                                "classification_rule=%s reason=%s",
+                                exchange,
+                                key,
+                                (existing_by_date[key].get("metadata") or {}).get(
+                                    "classification_rule"
+                                ),
+                                probe.failure_reason or probe.status,
+                            )
                         else:
                             unresolved_reasons[key] = self._probe_unresolved_reason(
                                 key,
@@ -7566,6 +7595,7 @@ class FuturesOfficialCalendarBackfillService:
                     for key in remaining_weak_dates:
                         self.storage.delete_trading_calendar_day(exchange, key)
                 result["invalidated_weak_dates"] = remaining_weak_dates
+                result["preserved_verified"] = len(result["preserved_verified_dates"])
                 calendar_days = [verified_by_date[key] for key in sorted(verified_by_date)]
                 result["trading_days"] = sum(1 for item in calendar_days if item.is_trading_day)
                 result["closed_days"] = sum(1 for item in calendar_days if not item.is_trading_day)
@@ -7620,6 +7650,7 @@ class FuturesOfficialCalendarBackfillService:
                 total_batch_pause_seconds += float(result["batch_pause_seconds"])
                 total_rate_limits += int(result["rate_limit_count"])
                 total_rate_limit_backoff_seconds += float(result["rate_limit_backoff_seconds"])
+                total_preserved_verified += int(result["preserved_verified"])
                 if calendar_days and not dry_run:
                     result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
                     total_written += int(result["rows_written"])
@@ -7721,6 +7752,7 @@ class FuturesOfficialCalendarBackfillService:
                 "batch_pause_seconds": total_batch_pause_seconds,
                 "rate_limit_count": total_rate_limits,
                 "rate_limit_backoff_seconds": total_rate_limit_backoff_seconds,
+                "preserved_verified": total_preserved_verified,
             },
             "warnings": (
                 ["future_dates_require_official_notice_evidence"]
@@ -7756,6 +7788,37 @@ class FuturesOfficialCalendarBackfillService:
             "official_empty_payload_before_reliable_history_start",
             "official_no_report_before_reliable_history_start",
         }
+
+    @staticmethod
+    def _is_strong_verified_calendar_row(row: Optional[Mapping[str, Any]]) -> bool:
+        if not row or str(row.get("quality_flag") or "") != "backfilled_verified":
+            return False
+        classification_rule = str(
+            (row.get("metadata") or {}).get("classification_rule") or ""
+        )
+        return classification_rule in {
+            "official_daily_rows",
+            "official_holiday_notice",
+            "official_temporary_closure_notice",
+            "official_closure_notice",
+        }
+
+    @staticmethod
+    def _calendar_day_from_existing(row: Mapping[str, Any]) -> FuturesTradingCalendarDay:
+        return FuturesTradingCalendarDay(
+            exchange=str(row.get("exchange") or ""),
+            trade_date=str(row.get("trade_date") or ""),
+            is_trading_day=bool(row.get("is_trading_day")),
+            timezone=str(row.get("timezone") or "Asia/Shanghai"),
+            session_type=str(row.get("session_type") or ""),
+            source_profile=str(row.get("source_profile") or ""),
+            quality_flag=str(row.get("quality_flag") or ""),
+            parser_version=str(row.get("parser_version") or ""),
+            evidence_url=str(row.get("evidence_url") or ""),
+            notice_id=str(row.get("notice_id") or ""),
+            manual_override_id=str(row.get("manual_override_id") or ""),
+            metadata=dict(row.get("metadata") or {}),
+        )
 
     def _weekend_calendar_day(
         self,

@@ -249,6 +249,9 @@
           "timeout_seconds": 20,
           "direct_attempts": 1,
           "max_proxy_leases": 5,
+          "max_total_proxy_leases": 15,
+          "session_request_retry_attempts": 1,
+          "business_request_interval_seconds": 2,
           "proxy_auth_timeout_seconds": 5,
           "browser_start_timeout_seconds": 15,
           "navigation_timeout_seconds": 10,
@@ -258,7 +261,7 @@
           "page_challenge_poll_attempts": 3,
           "retry_attempts": 3,
           "retry_backoff_seconds": 2,
-          "note": "DCE official JSON endpoints require a real headed Chrome session. The client tries direct egress once, then uses up to five fresh akshare_proxy_patch leases through a loopback HTTP/CONNECT forwarder. A requested dayQuotes or contractInfo response, not maxTradeDate alone, validates the reusable session; hard operation timeouts and a run-scoped circuit breaker bound failures."
+          "note": "DCE official JSON endpoints require a real headed Chrome session. The client tries direct egress once, then uses up to five fresh akshare_proxy_patch leases per recovery cycle and at most fifteen leases per provider run through a loopback HTTP/CONNECT forwarder. A validated proxy session gets one refresh/retry before rotation, and successful business requests are spaced by two seconds; hard operation timeouts and a run-scoped circuit breaker bound failures."
         },
         "note": "Preferred first-hand route for domestic futures daily contract bars. Main-continuous series are constructed locally by open-interest priority; AkShare remains fallback for unsupported, empty, or failed official requests."
       },

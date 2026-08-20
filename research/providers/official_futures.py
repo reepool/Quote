@@ -91,6 +91,18 @@ class DceOfficialBrowserClient:
         self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
         self.direct_attempts = max(1, int(cfg.get("direct_attempts", 1)))
         self.max_proxy_leases = max(0, int(cfg.get("max_proxy_leases", 0)))
+        self.max_total_proxy_leases = max(
+            self.max_proxy_leases,
+            int(cfg.get("max_total_proxy_leases", self.max_proxy_leases)),
+        )
+        self.session_request_retry_attempts = max(
+            0,
+            int(cfg.get("session_request_retry_attempts", 0)),
+        )
+        self.business_request_interval_seconds = max(
+            0.0,
+            float(cfg.get("business_request_interval_seconds", 0)),
+        )
         self.proxy_auth_timeout_seconds = max(1.0, float(cfg.get("proxy_auth_timeout_seconds", 5)))
         self.browser_start_timeout_seconds = max(
             1.0,
@@ -123,6 +135,8 @@ class DceOfficialBrowserClient:
         self._session_ready = False
         self._direct_attempts_used = 0
         self._proxy_leases_used = 0
+        self._recovery_proxy_leases_used = 0
+        self._last_business_request_completed_at: Optional[float] = None
         self._circuit_error = ""
         self._last_route_error_summary = ""
         self._metric_callback: Optional[Callable[[str, float], None]] = None
@@ -390,13 +404,30 @@ class DceOfficialBrowserClient:
         if self._circuit_error:
             self._metric("dce_circuit_break_hit_count")
             raise OfficialFuturesSourceUnavailable(self._circuit_error)
+        await self._wait_for_business_request_slot()
         if self._session_ready:
             try:
-                return await self._api_once(method, path, body)
+                payload = await self._api_once(method, path, body)
+                self._record_business_request_success()
+                return payload
             except Exception as exc:
                 if not self._is_route_failure(exc):
                     raise
-                self._metric("dce_proxy_rotation_count" if self._route_kind == "proxy" else "dce_direct_failure_count")
+                self._last_route_error_summary = self._safe_route_error_summary(exc)
+                if self._route_kind == "proxy":
+                    recovered = await self._retry_validated_proxy_session(
+                        method,
+                        path,
+                        body,
+                    )
+                    if recovered is not None:
+                        self._record_business_request_success()
+                        return recovered
+                    self._metric("dce_proxy_failure_count")
+                    if self._can_acquire_proxy_lease():
+                        self._metric("dce_proxy_rotation_count")
+                else:
+                    self._metric("dce_direct_failure_count")
                 await self._stop()
                 self._session_ready = False
         while True:
@@ -418,6 +449,7 @@ class DceOfficialBrowserClient:
                 self._session_ready = True
                 if self._route_kind == "proxy":
                     self._metric("dce_proxy_success_count")
+                self._record_business_request_success()
                 return payload
             except Exception as exc:
                 if not self._is_route_failure(exc):
@@ -426,7 +458,7 @@ class DceOfficialBrowserClient:
                 self._last_route_error_summary = self._safe_route_error_summary(exc)
                 if self._route_kind == "proxy":
                     self._metric("dce_proxy_failure_count")
-                    if self._proxy_leases_used < self.max_proxy_leases:
+                    if self._can_acquire_proxy_lease():
                         self._metric("dce_proxy_rotation_count")
                 else:
                     self._metric("dce_direct_failure_count")
@@ -437,6 +469,58 @@ class DceOfficialBrowserClient:
                     self._route_kind or "direct",
                     type(exc).__name__,
                 )
+
+    async def _retry_validated_proxy_session(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, Any]],
+    ) -> Optional[Mapping[str, Any]]:
+        for attempt in range(1, self.session_request_retry_attempts + 1):
+            try:
+                self._session_ready = False
+                self._page = await asyncio.wait_for(
+                    self._browser.get(self.bootstrap_page),
+                    timeout=self.navigation_timeout_seconds,
+                )
+                if self.settle_seconds > 0:
+                    await asyncio.wait_for(
+                        self._page.sleep(self.settle_seconds),
+                        timeout=self.navigation_timeout_seconds,
+                    )
+                await self._wait_until_ready()
+                payload = await self._wait_for_business_api(method, path, body)
+                self._session_ready = True
+                logger.info(
+                    "[OfficialFutures] DCE validated proxy session recovered attempt=%s path=%s",
+                    attempt,
+                    path,
+                )
+                return payload
+            except Exception as exc:
+                if not self._is_route_failure(exc):
+                    raise
+                self._last_route_error_summary = self._safe_route_error_summary(exc)
+                logger.warning(
+                    "[OfficialFutures] DCE validated proxy session recovery failed "
+                    "attempt=%s/%s error_type=%s",
+                    attempt,
+                    self.session_request_retry_attempts,
+                    type(exc).__name__,
+                )
+        return None
+
+    async def _wait_for_business_request_slot(self) -> None:
+        if self._last_business_request_completed_at is None:
+            return
+        elapsed = time.monotonic() - self._last_business_request_completed_at
+        wait_seconds = self.business_request_interval_seconds - elapsed
+        if wait_seconds > 0:
+            await asyncio.sleep(wait_seconds)
+
+    def _record_business_request_success(self) -> None:
+        self._last_business_request_completed_at = time.monotonic()
+        self._recovery_proxy_leases_used = 0
 
     async def _wait_for_business_api(
         self,
@@ -471,8 +555,9 @@ class DceOfficialBrowserClient:
             self._route_kind = "direct"
             self._pending_proxy_lease = None
             return self._route_kind
-        while self._proxy_leases_used < self.max_proxy_leases:
+        while self._can_acquire_proxy_lease():
             self._proxy_leases_used += 1
+            self._recovery_proxy_leases_used += 1
             try:
                 lease = acquire_akshare_proxy_lease(timeout=self.proxy_auth_timeout_seconds)
                 self._pending_proxy_lease = lease
@@ -492,11 +577,17 @@ class DceOfficialBrowserClient:
                 self._metric("dce_proxy_failure_count")
                 logger.warning(
                     "[OfficialFutures] DCE proxy lease unavailable attempt=%s/%s error_type=%s",
-                    self._proxy_leases_used,
+                    self._recovery_proxy_leases_used,
                     self.max_proxy_leases,
                     type(exc).__name__,
                 )
         return None
+
+    def _can_acquire_proxy_lease(self) -> bool:
+        return (
+            self._recovery_proxy_leases_used < self.max_proxy_leases
+            and self._proxy_leases_used < self.max_total_proxy_leases
+        )
 
     def _open_circuit(self, reason: str) -> None:
         self._circuit_error = str(reason)
@@ -542,6 +633,7 @@ class DceOfficialBrowserClient:
                 "non-json payload",
                 "browser session failed",
                 "browser startup/navigation",
+                "target navigated or closed",
             )
         )
 
@@ -3311,6 +3403,14 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
             summary="DNS resolution failed",
             evidence=evidence,
         )
+    if "dce" in lowered and "routes exhausted" in lowered:
+        return OfficialFuturesFailureClassification(
+            category="dce_anti_bot_challenge",
+            is_retryable=False,
+            suspected_local_ip_risk_control=True,
+            summary="DCE direct and proxy browser routes were exhausted for this run",
+            evidence=evidence,
+        )
     if "timed out" in lowered or "timeout" in lowered or "read timed out" in lowered:
         return OfficialFuturesFailureClassification(
             category="timeout",
@@ -3349,14 +3449,6 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
             is_retryable=False,
             suspected_local_ip_risk_control=False,
             summary="DCE returned its browser challenge HTML; complete the challenge in a real browser session before calling the API",
-            evidence=evidence,
-        )
-    if "dce" in lowered and "routes exhausted" in lowered:
-        return OfficialFuturesFailureClassification(
-            category="dce_anti_bot_challenge",
-            is_retryable=False,
-            suspected_local_ip_risk_control=True,
-            summary="DCE direct and proxy browser routes were exhausted for this run",
             evidence=evidence,
         )
     if any(marker in lowered for marker in anti_bot_markers):

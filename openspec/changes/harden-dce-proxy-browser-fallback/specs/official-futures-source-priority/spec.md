@@ -22,3 +22,13 @@ The system SHALL access protected DCE official endpoints with a real browser, SH
 - **WHEN** direct or proxy DCE attempts succeed, fail, time out, rotate, or circuit-break
 - **THEN** the system SHALL record corresponding route metrics
 - **AND** it SHALL NOT expose proxy credentials, authorization tokens, or full proxy URLs in logs or results
+
+#### Scenario: A validated proxy session later stalls
+- **WHEN** a proxy session has completed a DCE business request and a subsequent request times out or receives challenge evidence
+- **THEN** the system SHALL refresh and retry the request once in the same proxy session
+- **AND** if that retry fails, a new recovery cycle SHALL receive the configured per-recovery proxy allowance
+- **AND** all recovery cycles together SHALL remain within the configured run-wide proxy lease cap
+
+#### Scenario: Consecutive DCE business dates are requested
+- **WHEN** the provider reuses a validated DCE session for another business date
+- **THEN** it SHALL enforce the configured minimum interval from the previous business-request completion

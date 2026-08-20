@@ -34,9 +34,14 @@ DCE's Ruishu protection requires a real headed Chrome session, but challenge com
 
 6. **Do not reuse the DCE client for other exchanges.** DCE `contractInfo` and DCE product pages use the validated DCE session. Generic product-page fallback uses direct HTTP/browser behavior scoped to its exchange and cannot call DCE readiness.
 
+7. **Bound each recovery cycle separately from the whole run.** A proxy that has completed a business request proves that at least one route was usable, but that session can later stall or be challenged. The client retries one transient business failure in the same proxy session after refreshing the DCE page. If recovery still requires rotation, it receives a fresh per-recovery lease allowance while a larger run-wide cap prevents unbounded proxy acquisition. Successful business requests are paced from the previous completion time.
+
+8. **Preserve existing strong calendar evidence on probe outages.** A rolling repair probe that fails cannot invalidate an existing `backfilled_verified` row supported by official market rows or an official closure notice. The backfill keeps that date verified, records that the current probe failed, and blocks only dates without strong evidence. Route exhaustion is classified before its nested timeout summary so outer retries cannot repeat an already-open circuit.
+
 ## Risks / Trade-offs
 
 - **[A proxy lease may be unavailable or also risk-controlled]** -> Rotate only a bounded number of leases, then keep dates unresolved and expose sanitized diagnostics.
 - **[A hung browser operation may leave Chrome processes behind]** -> Stop the browser and loopback forwarder whenever an operation times out or a route is rotated.
 - **[The upstream proxy may see credentials or traffic]** -> Credentials are sent only to the configured upstream proxy; logs and browser arguments contain only the local loopback endpoint.
 - **[Circuit breaking may skip a later date that could succeed]** -> Scope the breaker to one provider instance/run; the next scheduled or manual run gets a fresh attempt.
+- **[A previously healthy proxy can fail on the next date]** -> Retry once in the same session, then use a fresh bounded recovery allowance without exceeding the run-wide lease cap.

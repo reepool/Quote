@@ -18,3 +18,10 @@
 - [x] 4.1 Configure bounded direct/proxy attempts and operation timeouts for production DCE access.
 - [x] 4.2 Add focused unit tests for proxy forwarding, lease rotation, business-request validation, hard timeouts, circuit breaking, safe diagnostics, and exchange isolation.
 - [x] 4.3 Run targeted futures provider tests and validate the OpenSpec change.
+
+## 5. Production Follow-up
+
+- [x] 5.1 Recover a previously validated proxy session with one same-session retry and fresh bounded per-recovery leases under a run-wide cap.
+- [x] 5.2 Classify DCE route exhaustion before nested timeout text so the open circuit is not retried.
+- [x] 5.3 Preserve existing strong calendar evidence when a rolling repair probe is unresolved and expose preserved-evidence diagnostics.
+- [x] 5.4 Add focused regressions, run live read-only DCE validation, and revalidate the OpenSpec change.
