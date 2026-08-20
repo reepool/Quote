@@ -945,6 +945,51 @@ def test_daily_reuses_local_mirror_when_canonical_announcement_id_differs(tmp_pa
     assert repository.get_latest_valid_attachment_version(mirror.attachment_id) is None
 
 
+def test_daily_candidate_selection_never_reads_unrelated_history(
+    tmp_path, monkeypatch
+):
+    config = _focused_config(tmp_path)
+    repository, service, _ = _service_bundle(tmp_path, config)
+    for index in range(25):
+        symbol = f"{600100 + index:06d}"
+        service.register_discovered_record(
+            _record_at(f"unrelated-{index}", symbol=symbol),
+            instrument_id=f"{symbol}.SH",
+        )
+    relevant = _record_at("relevant-2025")
+    original_list_candidate_rows = repository.list_candidate_rows
+    candidate_queries = []
+
+    def tracked_list_candidate_rows(**kwargs):
+        candidate_queries.append(dict(kwargs))
+        return original_list_candidate_rows(**kwargs)
+
+    monkeypatch.setattr(
+        repository,
+        "list_candidate_rows",
+        tracked_list_candidate_rows,
+    )
+
+    result = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    ).run(
+        run_cutoff="2026-08-20T07:10:39+00:00",
+        discover=lambda *args: (relevant,),
+        active_instrument_ids=("600000.SH",),
+    )
+
+    assert result.status == "success"
+    assert result.metrics["affected_period_count"] == 1
+    assert candidate_queries
+    assert all(
+        query.get("instrument_id")
+        or query.get("source_announcement_id")
+        or query.get("attachment_ids") is not None
+        for query in candidate_queries
+    )
+    assert not any(query == {} for query in candidate_queries)
+
+
 def _record_at(
     source_id: str,
     *,

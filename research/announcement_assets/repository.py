@@ -1043,6 +1043,7 @@ class AnnouncementAssetRepository:
         fiscal_year: int | None = None,
         source: str | None = None,
         source_announcement_id: str | None = None,
+        attachment_ids: Iterable[str] | None = None,
         observation_cutoff: str | None = None,
         include_shadow: bool = False,
     ) -> list[dict[str, Any]]:
@@ -1063,6 +1064,18 @@ class AnnouncementAssetRepository:
         if source_announcement_id:
             clauses.append("a.source_announcement_id=?")
             params.append(str(source_announcement_id).strip())
+        normalized_attachment_ids = tuple(
+            dict.fromkeys(str(item).strip() for item in attachment_ids or () if item)
+        )
+        if attachment_ids is not None and not normalized_attachment_ids:
+            return []
+        if normalized_attachment_ids:
+            clauses.append(
+                "aa.attachment_id IN ("
+                + ",".join("?" for _ in normalized_attachment_ids)
+                + ")"
+            )
+            params.extend(normalized_attachment_ids)
         if not include_shadow:
             clauses.append(
                 "(NOT EXISTS (SELECT 1 FROM official_attachment_versions av "
@@ -4702,14 +4715,34 @@ class AnnouncementAssetRepository:
         self,
         universe_snapshot_id: str,
         *,
+        instrument_ids: Iterable[str] | None = None,
         now: str | None = None,
         fingerprints: Mapping[str, str] | None = None,
     ) -> list[dict[str, Any]]:
+        normalized_instrument_ids = tuple(
+            dict.fromkeys(
+                normalize_instrument_id(str(item))
+                for item in instrument_ids or ()
+                if item
+            )
+        )
+        if instrument_ids is not None and not normalized_instrument_ids:
+            return []
+        clauses = ["universe_snapshot_id=?"]
+        params: list[Any] = [universe_snapshot_id]
+        if normalized_instrument_ids:
+            clauses.append(
+                "instrument_id IN ("
+                + ",".join("?" for _ in normalized_instrument_ids)
+                + ")"
+            )
+            params.extend(normalized_instrument_ids)
         with self.connection() as conn:
             rows = conn.execute(
-                """SELECT * FROM official_asset_coverage
-                   WHERE universe_snapshot_id=? ORDER BY instrument_id""",
-                (universe_snapshot_id,),
+                "SELECT * FROM official_asset_coverage WHERE "
+                + " AND ".join(clauses)
+                + " ORDER BY instrument_id",
+                tuple(params),
             ).fetchall()
         output: list[dict[str, Any]] = []
         for row in rows:

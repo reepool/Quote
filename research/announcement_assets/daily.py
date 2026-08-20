@@ -205,6 +205,12 @@ class AnnualReportDailyUpdater:
             explicit_ids=active_instrument_ids,
             refresh=universe_refresh,
         )
+        new_listing_ids = tuple(universe_metrics.get("new_listing_ids") or ())
+        universe_metrics = {
+            key: value
+            for key, value in universe_metrics.items()
+            if key != "new_listing_ids"
+        }
         stage_started = self._complete_stage(
             operation_id=operation_id,
             stage_name="universe",
@@ -442,17 +448,29 @@ class AnnualReportDailyUpdater:
             stop_requested = True
             if reason not in errors:
                 errors.append(reason)
+        affected_periods = {
+            (str(instrument_id), int(fiscal_year))
+            for instrument_id, fiscal_year in classification_metrics["affected_periods"]
+        }
+        queue_started = time.monotonic()
         queued = (
             0
             if stop_requested
             else self._queue_metadata_winners(
-                seen_attachment_ids, operation_id=operation_id
+                seen_attachment_ids,
+                affected_periods=affected_periods,
+                operation_id=operation_id,
             )
         )
+        attachment_substage_timings = {
+            "candidate_selection": round(time.monotonic() - queue_started, 6)
+        }
         LOGGER.info(
             "annual-report daily stage started: stage=attachment_retry queued=%s",
             queued,
         )
+        retry_periods = self._due_attachment_retry_periods(cutoff)
+        acquisition_started = time.monotonic()
         acquisition = (
             (0, 0, 0, 0, 0, [], [], 0)
             if stop_requested
@@ -461,8 +479,28 @@ class AnnualReportDailyUpdater:
                 operation_id=operation_id,
             )
         )
+        attachment_substage_timings["queue_processing"] = round(
+            time.monotonic() - acquisition_started, 6
+        )
+        coverage_instrument_ids = {
+            instrument_id for instrument_id, _ in affected_periods | retry_periods
+        }
+        coverage_instrument_ids.update(
+            instrument_id for instrument_id, _ in withdrawal_scopes
+        )
+        coverage_instrument_ids.update(
+            str(item) for item in new_listing_ids
+        )
+        coverage_started = time.monotonic()
         if snapshot_id:
-            self._refresh_coverage_availability(snapshot_id, cutoff)
+            self._refresh_coverage_availability(
+                snapshot_id,
+                cutoff,
+                instrument_ids=coverage_instrument_ids,
+            )
+        attachment_substage_timings["coverage_refresh"] = round(
+            time.monotonic() - coverage_started, 6
+        )
         errors.extend(acquisition[5])
         blocking_reasons.extend(acquisition[6])
 
@@ -586,6 +624,9 @@ class AnnualReportDailyUpdater:
             "attachment_retry_separate": True,
             "attachment_retry_backlog": self.repository.count_attachment_retries(),
             "attachment_retries_deduplicated": acquisition[7],
+            "attachment_substage_timings_seconds": attachment_substage_timings,
+            "affected_period_count": len(affected_periods | retry_periods),
+            "coverage_instruments_refreshed": len(coverage_instrument_ids),
             "discovery_requests": discovery_budget.requests,
             "adaptive_partitions": discovery_partitions,
             "dense_continuations": dense_continuations,
@@ -1499,9 +1540,22 @@ class AnnualReportDailyUpdater:
         }
 
     def _queue_metadata_winners(
-        self, attachment_ids: set[str], *, operation_id: str | None
+        self,
+        attachment_ids: set[str],
+        *,
+        affected_periods: set[tuple[str, int]],
+        operation_id: str | None,
     ) -> int:
-        all_rows = self.repository.list_candidate_rows()
+        if not attachment_ids or not affected_periods:
+            return 0
+        all_rows = [
+            row
+            for instrument_id, fiscal_year in sorted(affected_periods)
+            for row in self.repository.list_candidate_rows(
+                instrument_id=instrument_id,
+                fiscal_year=fiscal_year,
+            )
+        ]
         resolved_candidates = _apply_withdrawal_relations(
             all_rows,
             tuple(_candidate_from_row(row) for row in all_rows),
@@ -1798,13 +1852,15 @@ class AnnualReportDailyUpdater:
         attachment_ids: set[str],
     ) -> tuple[set[tuple[str, int]], int, list[str]]:
         """Resolve new source-qualified withdrawal evidence to period scopes."""
-        rows = self.repository.list_candidate_rows()
+        if not attachment_ids:
+            return set(), 0, []
+        relation_rows = self.repository.list_candidate_rows(
+            attachment_ids=attachment_ids,
+        )
         scopes: set[tuple[str, int]] = set()
         errors: list[str] = []
         relation_count = 0
-        for relation_row in rows:
-            if str(relation_row.get("attachment_id")) not in attachment_ids:
-                continue
+        for relation_row in relation_rows:
             attachment_metadata = relation_row.get("attachment_metadata") or {}
             announcement_metadata = relation_row.get("announcement_metadata") or {}
             target = _withdrawal_target_id(
@@ -1826,8 +1882,19 @@ class AnnualReportDailyUpdater:
             if not target or not evidence_type:
                 errors.append(f"withdrawal_relation_incomplete:{relation_identity}")
                 continue
+            relation_instrument_id = str(
+                relation_row.get("instrument_id") or ""
+            ).strip()
+            if not relation_instrument_id:
+                errors.append(
+                    f"withdrawal_target_unresolved:{relation_identity}:{target}"
+                )
+                continue
+            candidate_rows = self.repository.list_candidate_rows(
+                instrument_id=relation_instrument_id,
+            )
             matches: dict[str, tuple[str, int]] = {}
-            for candidate_row in rows:
+            for candidate_row in candidate_rows:
                 classification = candidate_row.get("classification") or {}
                 instrument_id = str(candidate_row.get("instrument_id") or "").strip()
                 fiscal_year = classification.get("fiscal_year")
@@ -1854,6 +1921,23 @@ class AnnualReportDailyUpdater:
                 continue
             scopes.add(next(iter(matches.values())))
         return scopes, relation_count, errors
+
+    def _due_attachment_retry_periods(self, cutoff: str) -> set[tuple[str, int]]:
+        periods: set[tuple[str, int]] = set()
+        for retry in self.repository.list_attachment_retries(
+            due_at=cutoff,
+            limit=10000,
+        ):
+            metadata = retry.get("metadata") or {}
+            instrument_id = str(metadata.get("instrument_id") or "").strip()
+            fiscal_year = metadata.get("fiscal_year")
+            if not instrument_id or fiscal_year is None:
+                continue
+            try:
+                periods.add((instrument_id, int(fiscal_year)))
+            except (TypeError, ValueError):
+                continue
+        return periods
 
     def _reconcile_withdrawal_scopes(
         self,
@@ -2049,6 +2133,7 @@ class AnnualReportDailyUpdater:
                         "paired_census_snapshot_id": None,
                         "universe_full_market_complete": False,
                         "new_listings": 0,
+                        "new_listing_ids": [],
                         "delistings": 0,
                     },
                 )
@@ -2070,6 +2155,7 @@ class AnnualReportDailyUpdater:
                         previous_row
                     ),
                     "new_listings": 0,
+                    "new_listing_ids": [],
                     "delistings": 0,
                 },
             )
@@ -2114,6 +2200,7 @@ class AnnualReportDailyUpdater:
                     ),
                     "universe_indeterminate_count": 0,
                     "new_listings": 0,
+                    "new_listing_ids": [],
                     "delistings": 0,
                 },
             )
@@ -2149,6 +2236,7 @@ class AnnualReportDailyUpdater:
                 "universe_full_market_complete": candidate.is_full_market_complete,
                 "universe_indeterminate_count": len(candidate.indeterminate),
                 "new_listings": len(effective_ids - previous_ids),
+                "new_listing_ids": sorted(effective_ids - previous_ids),
                 "delistings": len(previous_ids - effective_ids),
             },
         )
@@ -2269,8 +2357,19 @@ class AnnualReportDailyUpdater:
         seen_attachment_ids.update(attachment_ids)
         return len(targets), count, len(records), errors
 
-    def _refresh_coverage_availability(self, snapshot_id: str, cutoff: str) -> None:
-        for row in self.repository.list_asset_coverage(snapshot_id):
+    def _refresh_coverage_availability(
+        self,
+        snapshot_id: str,
+        cutoff: str,
+        *,
+        instrument_ids: set[str],
+    ) -> None:
+        if not instrument_ids:
+            return
+        for row in self.repository.list_asset_coverage(
+            snapshot_id,
+            instrument_ids=instrument_ids,
+        ):
             instrument_id = str(row["instrument_id"])
             reports = self.repository.list_effective_reports(
                 instrument_id=instrument_id, limit=1
