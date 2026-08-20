@@ -8,14 +8,18 @@ import pytest
 from research.business_profile_disclosure_templates import (
     load_disclosure_template_catalog,
 )
-from research.business_profile_section_selection import BusinessProfileSectionSelector
+from research.business_profile_section_selection import (
+    ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+    BusinessProfileSectionSelector,
+)
 from research.business_profile_semantic_extraction import (
-    BusinessProfileSemanticExtractor,
-    BusinessProfileSemanticPolicy,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    BusinessProfileSemanticExtractor,
+    BusinessProfileSemanticPolicy,
     _bounded_semantic_result,
     _build_evidence_span_catalog,
+    build_semantic_extraction_request,
     deterministic_semantic_verification_decision,
 )
 from utils.llm import LlmResponse, LlmUsage
@@ -251,6 +255,112 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     assert "公司生产动力煤" in audits[0]["diagnostics"]["resolved_evidence"][0][
         "quote"
     ]
+
+
+@pytest.mark.asyncio
+async def test_joint_annual_report_extraction_returns_both_atomic_families_once():
+    selected = _selected(
+        "公司从事的主要业务：公司生产动力煤并向甲公司销售动力煤。",
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+    )
+
+    def response_factory(request):
+        payload = json.loads(request.messages[-1].content)
+        span_id = payload["evidence_spans"][0]["evidence_span_id"]
+        return {
+            "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "activities": [
+                {
+                    "subject_scope": "issuer",
+                    "action": "produces",
+                    "object_raw": "动力煤",
+                    "semantic_summary_zh": "公司生产动力煤",
+                    "value": None,
+                    "unit": None,
+                    "evidence_span_ids": [span_id],
+                }
+            ],
+            "relationships": [
+                {
+                    "subject_scope": "issuer",
+                    "relationship_type": "sells_to",
+                    "counterparty_name_raw": "甲公司",
+                    "object_raw": "动力煤",
+                    "semantic_summary_zh": "公司向甲公司销售动力煤",
+                    "evidence_span_ids": [span_id],
+                }
+            ],
+        }
+
+    gateway = _RequestAwareGateway(response_factory)
+    extractor = BusinessProfileSemanticExtractor(
+        gateway,
+        policy=BusinessProfileSemanticPolicy(max_items_per_response=1),
+    )
+    result = await extractor.extract_async(
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(gateway.requests) == 1
+    assert len(result.activities) == 1
+    assert len(result.relationships) == 1
+    assert result.validated_response["activities"][0]["semantic_summary_zh"] == (
+        "公司生产动力煤"
+    )
+    request_payload = json.loads(gateway.requests[0].messages[-1].content)
+    assert request_payload["field_family"] == ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY
+
+
+def test_joint_request_identity_and_replay_are_deterministic_without_gateway_call():
+    selected = _selected(
+        "公司从事的主要业务：公司生产动力煤。",
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+    )
+    context = build_semantic_extraction_request(
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+    span_id = context.payload["evidence_spans"][0]["evidence_span_id"]
+    response = {
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "activities": [
+            {
+                "subject_scope": "issuer",
+                "action": "produces",
+                "object_raw": "动力煤",
+                "semantic_summary_zh": "公司生产动力煤",
+                "value": None,
+                "unit": None,
+                "evidence_span_ids": [span_id],
+            }
+        ],
+        "relationships": [],
+    }
+    gateway = _FakeGateway([])
+
+    replay = BusinessProfileSemanticExtractor(gateway).replay_validated_response(
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+        response_data=response,
+        saved_usage={"total_tokens": 120},
+    )
+
+    assert gateway.requests == []
+    assert replay.audit.status == "replayed"
+    assert replay.audit.input_hash == context.input_hash
+    assert replay.audit.diagnostics["saved_usage"] == {"total_tokens": 120}
+    assert replay.activities[0]["object_raw"] == "动力煤"
 
 
 @pytest.mark.asyncio

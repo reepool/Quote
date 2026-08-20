@@ -15,16 +15,16 @@ import research.business_profile_semantic_runtime as runtime_module
 from research.business_profile_activity_production import GovernedCounterpartyResolver
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_promotion import FieldFamilyPromotionManifest
+from research.business_profile_semantic_extraction import (
+    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+)
 from research.business_profile_semantic_pipeline import (
     BusinessProfileSemanticPipeline,
     SemanticProductionBudgets,
     SemanticProductionCheckpointStore,
     SemanticProductionConfig,
     SemanticProductionScope,
-)
-from research.business_profile_semantic_extraction import (
-    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
-    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
 )
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
@@ -33,8 +33,6 @@ from research.business_profile_semantic_runtime import (
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
 )
-
-
 from research.providers.base import FinancialSourceFileManifest
 from research.storage import ResearchStorageManager
 from utils.config_manager import (
@@ -289,6 +287,7 @@ class _FakeGateway:
                     "subject_scope": "issuer",
                     "action": "produces",
                     "object_raw": "动力煤",
+                    "semantic_summary_zh": "公司生产动力煤",
                     "value": None,
                     "unit": None,
                     "evidence_span_ids": _request_span_ids(payload, quote),
@@ -533,6 +532,7 @@ class _RelationshipGateway(_FakeGateway):
                     "relationship_type": "sells_to",
                     "counterparty_name_raw": "客户股份有限公司",
                     "object_raw": "动力煤",
+                    "semantic_summary_zh": "公司向客户股份有限公司销售动力煤",
                     "evidence_span_ids": _request_span_ids(payload, quote),
                 }
             ],
@@ -571,6 +571,7 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                         "subject_scope": "issuer",
                         "relationship_type": "sells_to",
                         "counterparty_name_raw": "客户A",
+                        "semantic_summary_zh": "前五名客户销售占比",
                         "anonymous": True,
                         "disclosed_share": 0.25,
                         "object_raw": None,
@@ -611,6 +612,7 @@ class _ProductionAndSalesGateway(_FakeGateway):
                     "subject_scope": "issuer",
                     "action": action,
                     "object_raw": "动力煤",
+                    "semantic_summary_zh": quote,
                     "value": None,
                     "unit": None,
                     "evidence_span_ids": _request_span_ids(payload, quote),
@@ -840,6 +842,62 @@ def test_source_revision_binds_selected_document_and_retry_generation(tmp_path):
             _scope("atomic_activities"), source_revision=retry_revision
         ).scope_hash
     )
+
+
+def test_joint_semantic_families_call_llm_once_and_restart_from_artifact(
+    tmp_path, monkeypatch
+):
+    gateway = _FakeGateway()
+    repository, pipeline, single_scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="公司从事的主要业务：公司生产动力煤。",
+        gateway=gateway,
+    )
+    scope = replace(
+        single_scope,
+        field_families=("atomic_activities", "named_relationships"),
+        promotion_manifest_hashes={},
+    )
+
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    first = pipeline.run("extract", scope=scope)
+
+    assert first["status"] == "success"
+    assert first["metrics"].get("joint_semantic_llm_calls") == 1, first
+    assert first["metrics"]["joint_semantic_sibling_reuses"] == 1
+    assert first["metrics"]["joint_semantic_saved_llm_calls"] == 1
+    assert len(gateway.requests) == 1
+    assert len(repository.list_records("activities", instrument_id="601088.SH")) == 1
+    with repository.storage.get_connection() as conn:
+        artifact_count = conn.execute(
+            "SELECT COUNT(*) FROM business_profile_semantic_artifacts "
+            "WHERE field_family = 'annual_report_semantic_bundle'"
+        ).fetchone()[0]
+    assert artifact_count == 1
+
+    restarted = BusinessProfileSemanticPipeline(
+        config=pipeline.config,
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "restart-checkpoint.json"
+        ),
+        handlers=pipeline.handlers,
+    )
+    restarted_scope = replace(
+        scope,
+        identities={**scope.identities, "model": "model.v2"},
+    )
+    for stage in ("plan", "select"):
+        assert restarted.run(stage, scope=restarted_scope)["status"] == "success"
+    replayed = restarted.run("extract", scope=restarted_scope)
+
+    assert replayed["status"] == "success"
+    assert replayed["metrics"]["joint_semantic_durable_replays"] == 1
+    assert replayed["metrics"]["joint_semantic_sibling_reuses"] == 1
+    assert replayed["metrics"]["joint_semantic_saved_llm_calls"] == 2
+    assert len(gateway.requests) == 1
 
 
 def test_due_context_rework_expands_lineaged_pages_and_recovers(tmp_path, monkeypatch):
@@ -2495,7 +2553,9 @@ def test_semantic_runtime_promotes_only_after_independent_verification(
     )
     assert len(gateway.requests) == 2
     extraction_payload = json.loads(gateway.requests[0].messages[-1].content)
-    assert len(extraction_payload["evidence_spans"][0]["text"]) < len(text) / 2
+    extraction_text = extraction_payload["evidence_spans"][0]["text"]
+    assert "行业背景与一般风险说明" in extraction_text
+    assert "公司生产动力煤并销售动力煤" in extraction_text
     assert len(activities) == len(evidence) == len(approved) == 1
     assert activities[0]["review_status"] == "approved"
     assert evidence[0]["review_status"] == "approved"

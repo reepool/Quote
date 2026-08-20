@@ -10,7 +10,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, MutableMapping
 
-
 PIPELINE_SCHEMA_VERSION = "business_profile_semantic_pipeline.v1"
 CHECKPOINT_SCHEMA_VERSION = "business_profile_semantic_checkpoint.v1"
 PIPELINE_STAGES = ("plan", "select", "extract", "verify", "promote")
@@ -549,6 +548,18 @@ class BusinessProfileSemanticPipeline:
                     metrics.get("deterministic_completed") or 0
                 ),
                 "llm_calls": int(metrics.get("llm_calls") or 0),
+                "joint_semantic_llm_calls": int(
+                    metrics.get("joint_semantic_llm_calls") or 0
+                ),
+                "joint_semantic_durable_replays": int(
+                    metrics.get("joint_semantic_durable_replays") or 0
+                ),
+                "joint_semantic_sibling_reuses": int(
+                    metrics.get("joint_semantic_sibling_reuses") or 0
+                ),
+                "joint_semantic_saved_llm_calls": int(
+                    metrics.get("joint_semantic_saved_llm_calls") or 0
+                ),
                 "semantic_rows_accepted": int(
                     metrics.get("semantic_rows_accepted") or 0
                 ),

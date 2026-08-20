@@ -1,6 +1,6 @@
 {
   "schema_version": "business_profile_disclosure_template_catalog.v1",
-  "catalog_version": "business_profile_disclosure_templates.2026.1",
+  "catalog_version": "business_profile_disclosure_templates.2026.2",
   "fact_catalog_version": "business_profile_facts.2026.2",
   "templates": [
     {
@@ -87,12 +87,17 @@
         }
       ],
       "section_aliases": {
+        "industry_context": ["报告期内公司所处行业情况", "公司所处行业情况", "行业基本情况", "行业发展情况", "industry overview"],
         "principal_business": ["主要业务", "主营业务", "公司从事的主要业务", "principal business"],
-        "business_model": ["经营模式", "主要经营模式", "business model"],
+        "products_and_applications": ["主要产品及用途", "主要产品及应用", "主要产品和服务", "产品及应用领域", "产品用途", "products and applications"],
+        "business_model": ["经营模式", "主要经营模式", "公司主要经营模式", "盈利模式", "business model"],
         "segment_information": ["分部信息", "分部报告", "分行业", "分产品", "分地区", "segment information"],
         "revenue_cost_analysis": ["营业收入和营业成本", "主营业务分析", "收入和成本分析", "revenue and cost"],
         "production_sales_inventory": ["产销量", "生产量", "销售量", "库存量", "production and sales"],
+        "procurement_and_costs": ["采购模式", "采购情况", "原材料采购", "销售模式", "purchase and sales"],
         "cost_composition": ["成本构成", "成本分析", "主要成本构成", "cost composition"],
+        "orders": ["订单情况", "在手订单", "新增订单", "重大合同", "orders on hand"],
+        "major_customers_suppliers": ["主要销售客户", "主要客户情况", "主要供应商情况", "前五名客户", "前五名供应商", "major customers and suppliers"],
         "major_projects": ["重大项目", "主要项目", "在建工程", "major projects"],
         "derivatives_and_hedging": ["套期保值", "期货和衍生品", "衍生工具", "hedging", "derivatives"]
       },

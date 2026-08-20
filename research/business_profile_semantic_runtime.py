@@ -21,12 +21,7 @@ from research.business_profile_activity_production import (
     GovernedCounterpartyResolver,
     classify_entity_resolution_exception,
 )
-from research.business_profile_source_assets import (
-    BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION,
-    BUSINESS_PROFILE_USABLE_SOURCE_ASSET_STATUSES,
-)
 from research.business_profile_deterministic_extraction import (
-    locate_action_object_spans,
     parse_selected_tables,
 )
 from research.business_profile_disclosure_planner import (
@@ -43,40 +38,49 @@ from research.business_profile_exposure_production import (
 )
 from research.business_profile_fact_catalog import load_business_fact_catalog
 from research.business_profile_governance import BusinessProfileRepository
-from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
-from research.business_profile_product_catalog import (
-    load_business_product_catalog,
-    normalize_product_alias,
-)
 from research.business_profile_numeric_reconciliation import (
     NUMERIC_RECONCILIATION_VERSION,
     normalize_ratio,
     reconcile_gross_margin,
+)
+from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+from research.business_profile_product_catalog import (
+    load_business_product_catalog,
+    normalize_product_alias,
 )
 from research.business_profile_promotion import (
     BusinessProfilePromotionService,
     FieldFamilyPromotionManifest,
     PromotionContext,
 )
+from research.business_profile_report_outline import locate_business_profile_outline
 from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_section_selection import (
+    ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
     BusinessProfileSectionSelector,
     BusinessProfileSelectedSectionStore,
     SelectedSection,
     SelectedSectionArtifact,
-)
-from research.business_profile_report_outline import locate_business_profile_outline
-from research.business_profile_semantic_extraction import (
-    BusinessProfileSemanticExtractor,
-    STRUCTURED_EXTRACTION_PROMPT_VERSION,
-    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-    deterministic_semantic_verification_decision,
+    semantic_selection_family,
 )
 from research.business_profile_semantic_artifacts import (
     BusinessProfileSemanticArtifactRepository,
     SemanticArtifactIdentity,
 )
+from research.business_profile_semantic_extraction import (
+    SEMANTIC_EXTRACTION_PROMPT_VERSION,
+    SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    STRUCTURED_EXTRACTION_PROMPT_VERSION,
+    STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    BusinessProfileSemanticExtractor,
+    build_semantic_extraction_request,
+    deterministic_semantic_verification_decision,
+)
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
+from research.business_profile_source_assets import (
+    BUSINESS_PROFILE_SOURCE_ASSET_SCHEMA_VERSION,
+    BUSINESS_PROFILE_USABLE_SOURCE_ASSET_STATUSES,
+)
 from research.business_profile_temporal import derive_report_observation_interval
 from research.business_profile_unit_conversions import (
     UnitResolution,
@@ -90,10 +94,9 @@ from research.business_profile_unit_registry import (
 )
 from utils.date_utils import get_shanghai_time
 
-
 logger = logging.getLogger(__name__)
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v5"
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v6"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
@@ -953,13 +956,16 @@ class BusinessProfileSemanticRuntime:
                         if "context_incomplete" in due_rework
                         else None
                     )
+                    selection_family = semantic_selection_family(
+                        plan["field_family"]
+                    )
                     if prior is None:
                         selection_started = time.monotonic()
                         selected = selector.select(
                             artifact=pdf_artifact,
                             instrument_id=plan["instrument_id"],
                             source_document_id=document["identity"],
-                            field_family=plan["field_family"],
+                            field_family=selection_family,
                             templates=templates,
                             page_scope=outline.page_numbers,
                         )
@@ -970,7 +976,7 @@ class BusinessProfileSemanticRuntime:
                             artifact=pdf_artifact,
                             instrument_id=plan["instrument_id"],
                             source_document_id=document["identity"],
-                            field_family=plan["field_family"],
+                            field_family=selection_family,
                             templates=templates,
                             page_scope=outline.page_numbers,
                         )
@@ -1051,6 +1057,7 @@ class BusinessProfileSemanticRuntime:
                     {
                         "instrument_id": plan["instrument_id"],
                         "field_family": plan["field_family"],
+                        "selection_family": selection_family,
                         "document": document,
                         "page_artifact_hash": page_result["artifact_hash"],
                         "page_artifact_path": page_result["artifact_path"],
@@ -1153,6 +1160,7 @@ class BusinessProfileSemanticRuntime:
             "machine_rework_recovered": 0,
             "by_field_family": {},
         }
+        joint_semantic_cache: dict[str, tuple[Any, str]] = {}
         # A catalog release may make an older quarantined proposal provable.
         # Reconcile it before claiming new semantic work so persisted artifacts
         # are replayed without another extraction request.
@@ -1217,7 +1225,6 @@ class BusinessProfileSemanticRuntime:
                 continue
             templates = self._templates_for(item["document"], item["instrument_id"])
             tables, diagnostics = parse_selected_tables(selected, templates=templates)
-            spans = locate_action_object_spans(selected)
             records_by_type: dict[str, list[dict[str, Any]]] = {}
             semantic_audit: Mapping[str, Any] | None = None
             semantic_records: list[tuple[str, dict[str, Any]]] = []
@@ -1682,56 +1689,179 @@ class BusinessProfileSemanticRuntime:
                 elif deterministic_count == 0:
                     expected_non_disclosure = True
             elif item["field_family"] in {"atomic_activities", "named_relationships"}:
-                if config.kill_switches["network_calls"] or self.llm_client is None:
-                    reason = (
-                        "semantic_network_disabled"
-                        if config.kill_switches["network_calls"]
-                        else "semantic_gateway_unavailable"
-                    )
-                    blocked_configuration_reasons[reason] = (
-                        blocked_configuration_reasons.get(reason, 0) + 1
-                    )
-                    metrics["configuration_blocked_documents"] += 1
-                    _increment_family_metrics(
-                        metrics["by_field_family"],
-                        item["field_family"],
-                        configuration_blocked=1,
-                    )
-                    break
-                budget_stop_reason = self._network_budget_stop_reason(
-                    config=config,
-                    checkpoint_metrics=checkpoint.get("metrics") or {},
-                    stage_metrics=metrics,
-                    stage_started_at=stage_started_at,
-                    field_family=item["field_family"],
-                )
-                if budget_stop_reason:
-                    break
                 semantic_audits = []
                 semantic_metrics_recorded = False
+                llm_call_started = False
                 extractor = BusinessProfileSemanticExtractor(
                     self.llm_client,
                     audit_sink=semantic_audits.append,
                 )
-                metrics["llm_calls"] += 1
-                _increment_family_metrics(
-                    metrics["by_field_family"],
-                    item["field_family"],
-                    llm_calls=1,
-                )
                 try:
-                    envelope = self._async_bridge.run(
-                        extractor.extract_async(
-                            field_family=item["field_family"],
-                            instrument_id=item["instrument_id"],
-                            report_period=str(item["document"]["report_period"]),
-                            selected=selected,
-                            candidate_spans=[vars(span) for span in spans],
+                    # The joint bundle is already chapter-scoped and page-ranked.
+                    # Action-only span hints would drop customer/supplier sections.
+                    candidate_span_payload: list[dict[str, Any]] = []
+                    request_context = build_semantic_extraction_request(
+                        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+                        instrument_id=item["instrument_id"],
+                        report_period=str(item["document"]["report_period"]),
+                        selected=selected,
+                        candidate_spans=candidate_span_payload,
+                    )
+                    artifact_identity = _joint_semantic_artifact_identity(
+                        item,
+                        selected,
+                        request_context,
+                    )
+                    cache_key = artifact_identity.input_hash
+                    cached = joint_semantic_cache.get(cache_key)
+                    if cached is not None:
+                        envelope, semantic_artifact_id = cached
+                        metrics["joint_semantic_sibling_reuses"] = int(
+                            metrics.get("joint_semantic_sibling_reuses") or 0
+                        ) + 1
+                        metrics["joint_semantic_saved_llm_calls"] = int(
+                            metrics.get("joint_semantic_saved_llm_calls") or 0
+                        ) + 1
+                        reuse_source = "in_run"
+                    else:
+                        replay = self.semantic_artifacts.find_replay(artifact_identity)
+                        if replay is not None:
+                            semantic_artifact_id = str(replay["artifact_id"])
+                            envelope = extractor.replay_validated_response(
+                                field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+                                instrument_id=item["instrument_id"],
+                                report_period=str(item["document"]["report_period"]),
+                                selected=selected,
+                                response_data=dict(replay.get("response") or {}),
+                                candidate_spans=candidate_span_payload,
+                                saved_usage=dict(replay.get("usage") or {}),
+                            )
+                            metrics["joint_semantic_durable_replays"] = int(
+                                metrics.get("joint_semantic_durable_replays") or 0
+                            ) + 1
+                            metrics["joint_semantic_saved_llm_calls"] = int(
+                                metrics.get("joint_semantic_saved_llm_calls") or 0
+                            ) + 1
+                            reuse_source = "durable"
+                        else:
+                            if (
+                                config.kill_switches["network_calls"]
+                                or self.llm_client is None
+                            ):
+                                reason = (
+                                    "semantic_network_disabled"
+                                    if config.kill_switches["network_calls"]
+                                    else "semantic_gateway_unavailable"
+                                )
+                                blocked_configuration_reasons[reason] = (
+                                    blocked_configuration_reasons.get(reason, 0) + 1
+                                )
+                                metrics["configuration_blocked_documents"] += 1
+                                _increment_family_metrics(
+                                    metrics["by_field_family"],
+                                    item["field_family"],
+                                    configuration_blocked=1,
+                                )
+                                break
+                            budget_stop_reason = self._network_budget_stop_reason(
+                                config=config,
+                                checkpoint_metrics=checkpoint.get("metrics") or {},
+                                stage_metrics=metrics,
+                                stage_started_at=stage_started_at,
+                                field_family=item["field_family"],
+                            )
+                            if budget_stop_reason:
+                                break
+                            metrics["llm_calls"] += 1
+                            llm_call_started = True
+                            metrics["joint_semantic_llm_calls"] = int(
+                                metrics.get("joint_semantic_llm_calls") or 0
+                            ) + 1
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                llm_calls=1,
+                            )
+                            envelope = self._async_bridge.run(
+                                extractor.extract_async(
+                                    field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+                                    instrument_id=item["instrument_id"],
+                                    report_period=str(
+                                        item["document"]["report_period"]
+                                    ),
+                                    selected=selected,
+                                    candidate_spans=candidate_span_payload,
+                                )
+                            )
+                            semantic_audit = envelope.audit.to_dict()
+                            artifact = self.semantic_artifacts.receive(
+                                artifact_identity,
+                                response=envelope.validated_response,
+                                response_hash=str(
+                                    semantic_audit.get("response_hash") or ""
+                                ),
+                                evidence_ids=[
+                                    str(span.evidence_span_id)
+                                    for span in request_context.evidence_spans
+                                ],
+                                model_profile=str(
+                                    semantic_audit.get("profile") or ""
+                                )
+                                or None,
+                                actual_model=str(
+                                    semantic_audit.get("actual_model") or ""
+                                )
+                                or None,
+                                usage=dict(semantic_audit.get("usage") or {}),
+                                authority={
+                                    "source_fields": "authoritative",
+                                    "model_derived_hints": "diagnostic_only",
+                                    "consumer_field_families": [
+                                        "atomic_activities",
+                                        "named_relationships",
+                                    ],
+                                },
+                            )
+                            semantic_artifact_id = str(artifact["artifact_id"])
+                            reuse_source = "llm"
+                        joint_semantic_cache[cache_key] = (
+                            envelope,
+                            semantic_artifact_id,
                         )
+                    logger.info(
+                        "business-profile joint semantic response instrument_id=%s "
+                        "source_document_id=%s consumer_field_family=%s source=%s "
+                        "artifact_id=%s activities=%s relationships=%s",
+                        item.get("instrument_id"),
+                        item["document"].get("identity"),
+                        item.get("field_family"),
+                        reuse_source,
+                        semantic_artifact_id,
+                        len(envelope.activities),
+                        len(envelope.relationships),
                     )
                     semantic_audit = envelope.audit.to_dict()
-                    records_by_type, semantic_records, semantic_exceptions = (
-                        self._semantic_records(item, selected, envelope)
+                    semantic_audit["semantic_artifact_id"] = semantic_artifact_id
+                    semantic_audit["joint_response_source"] = reuse_source
+                    if reuse_source != "llm":
+                        semantic_audit["status"] = "replayed"
+                        semantic_audit["saved_usage"] = dict(
+                            semantic_audit.get("usage") or {}
+                        )
+                        semantic_audit["usage"] = {
+                            "input_tokens": 0,
+                            "output_tokens": 0,
+                            "total_tokens": 0,
+                        }
+                    records_by_type, semantic_records, semantic_exceptions = self._semantic_records(
+                        item,
+                        selected,
+                        envelope,
+                        record_types=(
+                            ("activities",)
+                            if item["field_family"] == "atomic_activities"
+                            else ("relationships",)
+                        ),
                     )
                     semantic_family_complete = not semantic_exceptions
                     exceptions.extend(semantic_exceptions)
@@ -1766,7 +1896,7 @@ class BusinessProfileSemanticRuntime:
                                 item["field_family"],
                                 semantic_audit,
                             )
-                    else:
+                    elif llm_call_started:
                         metrics["llm_calls"] -= 1
                         _increment_family_metrics(
                             metrics["by_field_family"],
@@ -2830,6 +2960,8 @@ class BusinessProfileSemanticRuntime:
         item: Mapping[str, Any],
         selected: SelectedSectionArtifact,
         envelope: Any,
+        *,
+        record_types: Sequence[str] = ("activities", "relationships"),
     ) -> tuple[
         dict[str, list[dict[str, Any]]],
         list[tuple[str, dict[str, Any]]],
@@ -2840,9 +2972,22 @@ class BusinessProfileSemanticRuntime:
         output: list[tuple[str, dict[str, Any]]] = []
         exceptions: list[dict[str, Any]] = []
         product_catalog = load_business_product_catalog()
-        assertions = [
-            ("activities", assertion) for assertion in envelope.activities
-        ] + [("relationships", assertion) for assertion in envelope.relationships]
+        selected_types = set(record_types)
+        assertions = (
+            [
+                ("activities", assertion)
+                for assertion in envelope.activities
+            ]
+            if "activities" in selected_types
+            else []
+        ) + (
+            [
+                ("relationships", assertion)
+                for assertion in envelope.relationships
+            ]
+            if "relationships" in selected_types
+            else []
+        )
         for record_type, raw in assertions:
             assertion = dict(raw)
             evidence = _semantic_evidence(item, selected, assertion)
@@ -3475,6 +3620,36 @@ def _structured_artifact_identity(
         input_hash=_stable_hash(input_scope),
         prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
         schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    )
+
+
+def _joint_semantic_artifact_identity(
+    item: Mapping[str, Any],
+    selected: SelectedSectionArtifact,
+    request_context: Any,
+) -> SemanticArtifactIdentity:
+    document = item["document"]
+    return SemanticArtifactIdentity(
+        instrument_id=str(item["instrument_id"]),
+        source_document_id=str(document["identity"]),
+        document_hash=str(document.get("content_hash") or ""),
+        report_period=str(document["report_period"]),
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+        evidence_scope_hash=_stable_hash(
+            [
+                {
+                    "evidence_span_id": span.evidence_span_id,
+                    "section_id": span.section_id,
+                    "section_hash": span.section_hash,
+                    "normalized_start": span.normalized_start,
+                    "normalized_end": span.normalized_end,
+                }
+                for span in request_context.evidence_spans
+            ]
+        ),
+        input_hash=str(request_context.input_hash),
+        prompt_version=SEMANTIC_EXTRACTION_PROMPT_VERSION,
+        schema_version=SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     )
 
 

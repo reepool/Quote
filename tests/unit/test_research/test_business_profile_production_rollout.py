@@ -80,7 +80,7 @@ def test_runtime_identity_is_derived_and_explicit_values_must_match():
     assert first == second
     assert set(first) == RUNTIME_IDENTITY_KEYS
     assert "business_profile_semantic_schemas.v2" in first["schema"]
-    assert "business_profile_atomic_extraction.v4" in first["schema"]
+    assert "business_profile_atomic_extraction.v5" in first["schema"]
     assert "business_profile_structured_extraction.v4" in first["schema"]
     assert "business_profile_structured_extraction.v4" in first["policy"]
     assert "logical_profile=semantic_extraction" in first["model"]

@@ -6,10 +6,14 @@ from research.business_profile_deterministic_extraction import (
     locate_action_object_spans,
     parse_selected_tables,
 )
-from research.business_profile_disclosure_templates import load_disclosure_template_catalog
+from research.business_profile_disclosure_templates import (
+    load_disclosure_template_catalog,
+)
 from research.business_profile_section_selection import (
+    ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
     BusinessProfileSectionSelector,
     BusinessProfileSelectedSectionStore,
+    semantic_selection_family,
     structured_source_document_decision,
 )
 
@@ -183,6 +187,53 @@ def test_page_scope_excludes_toc_and_out_of_chapter_context():
     )
 
     assert [item.page_number for item in selected.sections] == [3, 4]
+
+
+def test_semantic_output_families_share_one_chapter_scoped_bundle():
+    artifact = _artifact(
+        "目录 公司从事的主要业务 主要供应商情况",
+        "公司治理 主要客户情况",
+        "报告期内公司所处行业情况：行业需求保持稳定。",
+        "公司从事的主要业务及主要产品和服务：生产并销售煤炭。",
+        "公司主要经营模式：采购原料、组织生产并向客户销售。",
+        "订单情况及主要销售客户：在手订单充足，向甲公司销售产品。",
+        "财务附注 主要业务 主要客户情况",
+    )
+    selector = BusinessProfileSectionSelector(context_pages=0, max_pages=6)
+
+    activity_family = semantic_selection_family("atomic_activities")
+    relationship_family = semantic_selection_family("named_relationships")
+    activity = selector.select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-joint",
+        field_family=activity_family,
+        templates=_templates(),
+        page_scope=(3, 4, 5, 6),
+    )
+    relationship = selector.select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-joint",
+        field_family=relationship_family,
+        templates=_templates(),
+        page_scope=(3, 4, 5, 6),
+    )
+
+    assert activity_family == ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY
+    assert relationship_family == ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY
+    assert activity.artifact_hash == relationship.artifact_hash
+    assert activity.bundle["bundle_id"] == relationship.bundle["bundle_id"]
+    assert [item.page_number for item in activity.sections] == [3, 4, 5, 6]
+    assert len({item.page_number for item in activity.sections}) == 4
+    assert any(
+        reason.startswith("heading_alias:industry_context")
+        for reason in activity.bundle["selector_reasons"]
+    )
+    assert any(
+        reason.startswith("heading_alias:major_customers_suppliers")
+        for reason in activity.bundle["selector_reasons"]
+    )
 
 
 def test_explicit_pages_cannot_escape_page_scope():

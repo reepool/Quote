@@ -13,11 +13,19 @@ from typing import Any, Iterable, Mapping, Optional, Sequence
 
 from research.business_profile_disclosure_templates import ResolvedDisclosureTemplate
 from research.business_profile_semantic_contracts import BusinessProfileFieldFamily
-from research.business_profile_semantic_schemas import validate_business_profile_artifact
+from research.business_profile_semantic_schemas import (
+    validate_business_profile_artifact,
+)
 
-
-SELECTOR_VERSION = "business_profile_field_family_selector.v1"
+SELECTOR_VERSION = "business_profile_field_family_selector.v2"
 SELECTED_SECTION_ARTIFACT_VERSION = "business_profile_selected_sections.v1"
+ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY = "annual_report_semantic_bundle"
+SEMANTIC_OUTPUT_FIELD_FAMILIES = frozenset(
+    {
+        BusinessProfileFieldFamily.ATOMIC_ACTIVITIES.value,
+        BusinessProfileFieldFamily.NAMED_RELATIONSHIPS.value,
+    }
+)
 
 _FIELD_FAMILY_SECTION_KEYS: dict[str, frozenset[str]] = {
     BusinessProfileFieldFamily.STRUCTURED_SEGMENTS.value: frozenset(
@@ -46,7 +54,32 @@ _FIELD_FAMILY_SECTION_KEYS: dict[str, frozenset[str]] = {
         }
     ),
     BusinessProfileFieldFamily.NAMED_RELATIONSHIPS.value: frozenset(
-        {"principal_business", "business_model"}
+        {
+            "principal_business",
+            "products_and_applications",
+            "business_model",
+            "orders",
+            "major_customers_suppliers",
+        }
+    ),
+    ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY: frozenset(
+        {
+            "industry_context",
+            "principal_business",
+            "products_and_applications",
+            "business_model",
+            "revenue_cost_analysis",
+            "production_sales_inventory",
+            "procurement_and_costs",
+            "cost_composition",
+            "orders",
+            "major_customers_suppliers",
+            "resources_and_reserves",
+            "major_projects",
+            "derivatives_and_hedging",
+            "coal_operations",
+            "coal_resources",
+        }
     ),
     BusinessProfileFieldFamily.DERIVED_VALUE_CHAIN_ROLES.value: frozenset(
         {"principal_business", "business_model", "production_sales_inventory"}
@@ -140,7 +173,7 @@ class BusinessProfileSectionSelector:
         previous_bundle_id: Optional[str] = None,
         expansion_reason: Optional[str] = None,
     ) -> SelectedSectionArtifact:
-        family = BusinessProfileFieldFamily(field_family).value
+        family = _selection_family(field_family)
         all_pages = _artifact_pages(artifact)
         scope = {int(value) for value in page_scope if int(value) > 0}
         pages_by_number = {int(page["page_number"]): page for page in all_pages}
@@ -437,6 +470,26 @@ def structured_source_document_decision(
             else "aggregator_candidates_narrow_selection_only"
         ),
     }
+
+
+def semantic_selection_family(field_family: str | BusinessProfileFieldFamily) -> str:
+    """Map semantic output families to their shared annual-report input bundle."""
+
+    normalized = (
+        field_family.value
+        if isinstance(field_family, BusinessProfileFieldFamily)
+        else str(field_family or "").strip()
+    )
+    if normalized in SEMANTIC_OUTPUT_FIELD_FAMILIES:
+        return ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY
+    return normalized
+
+
+def _selection_family(field_family: str | BusinessProfileFieldFamily) -> str:
+    normalized = semantic_selection_family(field_family)
+    if normalized == ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY:
+        return normalized
+    return BusinessProfileFieldFamily(normalized).value
 
 
 def _artifact_pages(artifact: Any) -> list[dict[str, Any]]:
