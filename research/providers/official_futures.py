@@ -1109,6 +1109,14 @@ class OfficialFuturesMarketDataProvider:
         mode: str = "direct",
     ) -> List[OfficialFuturesContractBar]:
         """Synchronous variant for CLI diagnostics and backfill preflight."""
+        if str(exchange or "").upper() == "DCE" and self.dce_browser_enabled:
+            future = self._get_dce_executor().submit(
+                self._fetch_exchange_contract_bars_sync,
+                exchange,
+                trade_date,
+                mode,
+            )
+            return future.result()
         return self._fetch_exchange_contract_bars_sync(exchange, trade_date, mode)
 
     def build_series_artifacts_from_contract_rows(
@@ -1242,6 +1250,20 @@ class OfficialFuturesMarketDataProvider:
         a trading day once and later reuse the same source interface for all
         varieties without issuing per-series duplicate requests.
         """
+        if str(exchange or "").upper() == "DCE" and self.dce_browser_enabled:
+            future = self._get_dce_executor().submit(
+                self._probe_exchange_trading_day,
+                exchange,
+                trade_date,
+            )
+            return future.result()
+        return self._probe_exchange_trading_day(exchange, trade_date)
+
+    def _probe_exchange_trading_day(
+        self,
+        exchange: str,
+        trade_date: str,
+    ) -> OfficialFuturesDailyProbeResult:
         exchange_key = str(exchange or "").upper()
         day_key = _date_key(trade_date)
         if exchange_key not in self.supported_exchanges or exchange_key not in self.enabled_exchanges:
@@ -1507,6 +1529,21 @@ class OfficialFuturesMarketDataProvider:
         target_symbols: Optional[Sequence[str]] = None,
     ) -> Dict[str, FuturesProductSpec]:
         """Fetch exchange-normalized root-product specifications when available."""
+        exchange_key = str(exchange or "").upper()
+        if exchange_key == "DCE" and self.dce_browser_enabled:
+            future = self._get_dce_executor().submit(
+                self._fetch_exchange_product_specs_sync,
+                exchange_key,
+                target_symbols,
+            )
+            return future.result()
+        return self._fetch_exchange_product_specs_sync(exchange_key, target_symbols)
+
+    def _fetch_exchange_product_specs_sync(
+        self,
+        exchange: str,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
         exchange_key = str(exchange or "").upper()
         if exchange_key == "DCE":
             configured = self._configured_product_specs(exchange_key)

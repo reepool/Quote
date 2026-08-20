@@ -3032,15 +3032,15 @@ def _summarize_futures_master_governance_results(results: List[Dict[str, Any]]) 
         summaries.append({
             "exchange": item.get("exchange"),
             "status": status,
-            "counts": {
-                "master_discovery_candidates": item_counts.get("master_discovery_candidates", 0),
-                "master_discovery_pending_review": item_counts.get("master_discovery_pending_review", 0),
-                "master_discovery_auto_promoted": item_counts.get("master_discovery_auto_promoted", 0),
-                "contracts_discovered": item_counts.get("contracts_discovered", 0),
-                "contracts_written": item_counts.get("contracts_written", 0),
-            },
+            "source_profile": item.get("source_profile"),
+            "start_date": item.get("start_date"),
+            "end_date": item.get("end_date"),
+            "dry_run": item.get("dry_run"),
+            "calendar": dict(item.get("calendar") or {}),
+            "counts": dict(item_counts),
             "blockers": item.get("blockers") or [],
             "warnings": item.get("warnings") or [],
+            "reason": item.get("reason"),
         })
     if any(status == "blocked" for status in statuses):
         aggregate_status = "blocked"
@@ -9113,12 +9113,20 @@ class ScheduledTasks:
     ) -> bool:
         """商品期货行情日更任务。"""
         self._active_tasks.add('futures_market_data_sync')
+        official_provider = None
         try:
             master_results: List[Dict[str, Any]] = []
             blocked_calendar_exchanges: List[str] = []
+            blocked_master_exchanges: List[str] = []
             effective_scope_id = scope_id
             effective_scope_ids = scope_ids
             effective_exchanges = exchanges
+            if requires_trading_calendar_backfill or requires_master_data_governance:
+                from research.providers.official_futures import OfficialFuturesMarketDataProvider
+
+                official_provider = OfficialFuturesMarketDataProvider(
+                    data_manager.research_config
+                )
             if requires_trading_day_governance:
                 calendar_start_date = start_date or end_date
                 calendar_end_date = end_date or start_date
@@ -9143,6 +9151,7 @@ class ScheduledTasks:
                         start_date=calendar_start_date,
                         end_date=calendar_end_date,
                         dry_run=dry_run,
+                        official_provider=official_provider,
                     )
                     scheduler_logger.info(
                         "[Scheduler] Futures official calendar preflight done status=%s exchanges=%s start=%s end=%s totals=%s",
@@ -9315,6 +9324,7 @@ class ScheduledTasks:
                                     end_date=dates[-1],
                                     dry_run=dry_run,
                                     max_days=master_governance_max_days,
+                                    official_provider=official_provider,
                                 )
                             )
                     else:
@@ -9331,6 +9341,7 @@ class ScheduledTasks:
                                 end_date=master_end_date,
                                 dry_run=dry_run,
                                 max_days=master_governance_max_days,
+                                official_provider=official_provider,
                             )
                         )
                     blocked_master_results = [
@@ -9338,45 +9349,61 @@ class ScheduledTasks:
                         if item.get("status") == "blocked"
                     ]
                     if blocked_master_results and not dry_run:
-                        blocker_lines = [
-                            f"{item.get('exchange', 'N/A')}: "
-                            + "; ".join(item.get("blockers") or [item.get("reason") or "blocked"])
+                        blocked_master_exchanges = sorted({
+                            exchange.strip().upper()
                             for item in blocked_master_results
+                            for exchange in str(item.get("exchange") or "").split(",")
+                            if exchange.strip()
+                        })
+                        governed_exchanges = sorted({
+                            exchange.strip().upper()
+                            for item in master_results
+                            for exchange in str(item.get("exchange") or "").split(",")
+                            if exchange.strip()
+                        })
+                        runnable_master_exchanges = [
+                            exchange
+                            for exchange in (
+                                list(effective_exchanges or [])
+                                or sorted(exchange_dates)
+                                or governed_exchanges
+                            )
+                            if str(exchange).upper() not in blocked_master_exchanges
                         ]
-                        master_result = {
-                            "status": "blocked",
-                            "domain": "futures_master_governance",
-                            "exchange": ",".join(
-                                str(item.get("exchange") or "N/A") for item in blocked_master_results
-                            ),
-                            "source_profile": "exchange_official_daily_contract_discovery",
-                            "start_date": master_start_date,
-                            "end_date": master_end_date,
-                            "dry_run": dry_run,
-                            "counts": {},
-                            "contracts": [],
-                            "blockers": blocker_lines,
-                            "warnings": [],
-                        }
-                        await self._send_task_report(
-                            report_data={
-                                'name': '商品期货主数据治理前置检查报告',
-                                'content': _format_futures_market_data_scheduler_report(master_result),
-                                'status': 'error',
-                                'tasks_completed': 0,
-                                'duration': 'N/A',
-                                'maintenance_tasks': [
-                                    {
-                                        'task_name': 'futures_master_governance',
-                                        'status': "; ".join(master_result.get("blockers") or ["blocked"]),
-                                    }
-                                ],
-                            },
-                            report_type='maintenance_report',
-                            task_name='商品期货主数据治理前置检查',
-                            job_config=job_config,
+                        report_status = "warning" if runnable_master_exchanges else "error"
+                        for blocked_result in blocked_master_results:
+                            await self._send_task_report(
+                                report_data={
+                                    'name': '商品期货主数据治理前置检查报告',
+                                    'content': _format_futures_market_data_scheduler_report(blocked_result),
+                                    'status': report_status,
+                                    'tasks_completed': len(runnable_master_exchanges),
+                                    'duration': 'N/A',
+                                    'maintenance_tasks': [
+                                        {
+                                            'task_name': 'futures_master_governance',
+                                            'status': "; ".join(
+                                                blocked_result.get("blockers")
+                                                or [blocked_result.get("reason") or "blocked"]
+                                            ),
+                                        }
+                                    ],
+                                },
+                                report_type='maintenance_report',
+                                task_name='商品期货主数据治理前置检查',
+                                job_config=job_config,
+                            )
+                        if not runnable_master_exchanges:
+                            return False
+                        scheduler_logger.warning(
+                            "[Scheduler] Futures master governance partially blocked; "
+                            "continuing with runnable exchanges blocked=%s runnable=%s",
+                            blocked_master_exchanges,
+                            runnable_master_exchanges,
                         )
-                        return False
+                        effective_scope_id = None
+                        effective_scope_ids = None
+                        effective_exchanges = runnable_master_exchanges
             result = await data_manager.run_futures_market_data_sync(
                 scope_id=effective_scope_id,
                 scope_ids=effective_scope_ids,
@@ -9389,6 +9416,7 @@ class ScheduledTasks:
                 end_date=end_date,
                 mode=mode,
                 dry_run=dry_run,
+                official_provider=official_provider,
             )
             if master_results:
                 master_governance_summary = _summarize_futures_master_governance_results(master_results)
@@ -9427,6 +9455,7 @@ class ScheduledTasks:
                         or []
                     ),
                 }
+            preflight_context_changed = False
             if blocked_calendar_exchanges:
                 result["calendar_preflight"] = {
                     "status": "blocked",
@@ -9436,6 +9465,18 @@ class ScheduledTasks:
                 if status == "success":
                     status = "partial"
                 result["status"] = status
+                preflight_context_changed = True
+            if blocked_master_exchanges:
+                result["master_preflight"] = {
+                    "status": "blocked",
+                    "blocked_exchanges": blocked_master_exchanges,
+                    "continued_exchanges": effective_exchanges or [],
+                }
+                if status == "success":
+                    status = "partial"
+                result["status"] = status
+                preflight_context_changed = True
+            if preflight_context_changed:
                 try:
                     run_id = result.get("run_id")
                     if run_id is not None:
@@ -9519,6 +9560,14 @@ class ScheduledTasks:
             )
             return False
         finally:
+            if official_provider is not None:
+                try:
+                    await asyncio.to_thread(official_provider.close)
+                except Exception as close_error:
+                    scheduler_logger.warning(
+                        "[Scheduler] Failed to close task-scoped futures official provider: %s",
+                        close_error,
+                    )
             self._active_tasks.discard('futures_market_data_sync')
 
     async def fx_master_sync(self, job_config: Optional[JobConfig] = None) -> bool:

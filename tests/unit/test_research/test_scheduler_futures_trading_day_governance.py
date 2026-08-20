@@ -1204,12 +1204,24 @@ def test_futures_market_data_sync_runs_master_governance_per_exchange():
     assert "master_discovery_auto_promoted: `2`" in report_data["content"]
 
 
-def test_futures_market_data_sync_blocks_when_one_exchange_master_governance_blocks():
+def test_futures_market_data_sync_continues_other_exchange_when_master_governance_blocks(
+    monkeypatch,
+):
     task = ScheduledTasks()
 
     from scheduler import tasks as scheduler_tasks_module
+    from research.providers import official_futures as official_futures_module
 
     data_manager = scheduler_tasks_module.data_manager
+    shared_provider = MagicMock()
+    monkeypatch.setattr(
+        official_futures_module,
+        "OfficialFuturesMarketDataProvider",
+        MagicMock(return_value=shared_provider),
+    )
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(
+        return_value={"status": "success"}
+    )
     data_manager.run_futures_trading_day_governance = AsyncMock(
         return_value={
             "status": "success",
@@ -1226,11 +1238,48 @@ def test_futures_market_data_sync_blocks_when_one_exchange_master_governance_blo
     )
     data_manager.run_futures_master_governance = AsyncMock(
         side_effect=[
-            {"status": "blocked", "exchange": "DCE", "blockers": ["no_dce_contracts_discovered"]},
+            {
+                "status": "blocked",
+                "domain": "futures_master_governance",
+                "exchange": "DCE",
+                "source_profile": "exchange_official_daily_contract_discovery",
+                "start_date": "2026-06-16",
+                "end_date": "2026-06-19",
+                "dry_run": False,
+                "calendar": {
+                    "verified_trading_days": 4,
+                    "first_trade_date": "2026-06-16",
+                    "last_trade_date": "2026-06-19",
+                },
+                "counts": {
+                    "official_request_count": 8,
+                    "failed_trade_dates": 4,
+                    "dce_proxy_lease_count": 3,
+                    "dce_proxy_rotation_count": 2,
+                    "dce_proxy_failure_count": 3,
+                },
+                "contracts": [],
+                "blockers": ["no_dce_contracts_discovered"],
+                "warnings": [
+                    {"trade_date": "2026-06-19", "reason": "DCE routes exhausted"}
+                ],
+                "reason": "no_dce_contracts_discovered",
+            },
             {"status": "success", "exchange": "GFEX", "blockers": []},
         ]
     )
-    data_manager.run_futures_market_data_sync = AsyncMock(return_value={"status": "success"})
+    data_manager.run_futures_market_data_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "run_id": 326,
+            "totals": {"inserted": 1, "changed": 0, "unchanged": 0, "failed": 0},
+            "scope_selection": {"exchanges": ["GFEX"]},
+            "trading_day_governance": {"status": "success", "target_date_count": 1},
+            "series": [],
+        }
+    )
+    storage = MagicMock()
+    monkeypatch.setattr(data_manager, "_require_futures_storage", MagicMock(return_value=storage))
     task._send_task_report = AsyncMock(return_value=True)
 
     result = _run(
@@ -1243,5 +1292,107 @@ def test_futures_market_data_sync_blocks_when_one_exchange_master_governance_blo
 
     assert result is False
     assert data_manager.run_futures_master_governance.await_count == 2
-    data_manager.run_futures_market_data_sync.assert_not_awaited()
+    calendar_provider = data_manager.run_futures_official_calendar_backfill.await_args.kwargs[
+        "official_provider"
+    ]
+    master_providers = [
+        call.kwargs["official_provider"]
+        for call in data_manager.run_futures_master_governance.await_args_list
+    ]
+    sync_kwargs = data_manager.run_futures_market_data_sync.await_args.kwargs
+    assert calendar_provider is shared_provider
+    assert all(provider is shared_provider for provider in master_providers)
+    assert sync_kwargs["official_provider"] is shared_provider
+    assert sync_kwargs["exchanges"] == ["GFEX"]
+    assert task._send_task_report.await_count == 2
+    blocked_report = task._send_task_report.await_args_list[0].kwargs["report_data"]
+    assert blocked_report["status"] == "warning"
+    assert "verified_trading_days: `4`" in blocked_report["content"]
+    assert "official_request_count: `8`" in blocked_report["content"]
+    assert "dce_proxy_leases: `3`" in blocked_report["content"]
+    assert "DCE routes exhausted" in blocked_report["content"]
+    persisted = storage.finish_ingestion_run.call_args.kwargs
+    assert persisted["status"] == "partial"
+    assert persisted["metadata"]["master_preflight"] == {
+        "status": "blocked",
+        "blocked_exchanges": ["DCE"],
+        "continued_exchanges": ["GFEX"],
+    }
+    dce_summary = persisted["metadata"]["master_data_governance"]["results"][0]
+    assert dce_summary["calendar"]["verified_trading_days"] == 4
+    assert dce_summary["counts"]["official_request_count"] == 8
+    shared_provider.close.assert_called_once_with()
     assert "futures_market_data_sync" not in task._active_tasks
+
+
+def test_futures_market_data_sync_reports_original_result_when_composite_master_scope_blocks(
+    monkeypatch,
+):
+    task = ScheduledTasks()
+
+    from scheduler import tasks as scheduler_tasks_module
+    from research.providers import official_futures as official_futures_module
+
+    data_manager = scheduler_tasks_module.data_manager
+    shared_provider = MagicMock()
+    monkeypatch.setattr(
+        official_futures_module,
+        "OfficialFuturesMarketDataProvider",
+        MagicMock(return_value=shared_provider),
+    )
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(
+        return_value={"status": "success"}
+    )
+    data_manager.run_futures_trading_day_governance = AsyncMock(
+        return_value={
+            "status": "success",
+            "target_date_expansion": {
+                "status": "success",
+                "target_dates_by_exchange": {"DCE": ["2026-08-20"]},
+                "target_date_count": 1,
+                "skipped_date_count": 0,
+            },
+        }
+    )
+    data_manager.run_futures_master_governance = AsyncMock(
+        return_value={
+            "status": "blocked",
+            "domain": "futures_master_governance",
+            "exchange": "DCE,GFEX",
+            "source_profile": "exchange_official_daily_contract_discovery",
+            "start_date": "2026-08-20",
+            "end_date": "2026-08-20",
+            "dry_run": False,
+            "calendar": {"verified_trading_days": 1},
+            "counts": {
+                "official_request_count": 2,
+                "failed_trade_dates": 1,
+                "dce_circuit_break_count": 1,
+            },
+            "contracts": [],
+            "blockers": ["no_dce_contracts_discovered"],
+            "warnings": [],
+            "reason": "no_dce_contracts_discovered",
+        }
+    )
+    data_manager.run_futures_market_data_sync = AsyncMock()
+    task._send_task_report = AsyncMock(return_value=True)
+
+    result = _run(
+        task.futures_market_data_sync(
+            exchanges=["DCE", "GFEX"],
+            dry_run=False,
+            requires_trading_calendar_backfill=False,
+            requires_trading_day_governance=False,
+            requires_master_data_governance=True,
+        )
+    )
+
+    assert result is False
+    data_manager.run_futures_market_data_sync.assert_not_awaited()
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "error"
+    assert "verified_trading_days: `1`" in report["content"]
+    assert "official_request_count: `2`" in report["content"]
+    assert "dce_circuit_breaks: `1`" in report["content"]
+    shared_provider.close.assert_called_once_with()

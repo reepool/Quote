@@ -7727,12 +7727,17 @@ class DataManager:
         end_date: Optional[str] = None,
         mode: str = "direct",
         dry_run: bool = False,
+        official_provider: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Run futures market-data sync into the dedicated futures database."""
         storage = self._require_futures_storage()
         from research.futures_market_data import FuturesMarketDataSyncService
 
-        service = FuturesMarketDataSyncService(storage, self.research_config)
+        service = FuturesMarketDataSyncService(
+            storage,
+            self.research_config,
+            official_provider=official_provider,
+        )
         return await service.sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
@@ -8450,6 +8455,7 @@ class DataManager:
         end_date: Optional[str] = None,
         dry_run: bool = False,
         max_days: Optional[int] = None,
+        official_provider: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Backfill futures exchange calendars from official daily evidence only."""
         storage = self._require_futures_storage()
@@ -8461,6 +8467,7 @@ class DataManager:
                 storage,
                 self.research_config,
                 module_cfg,
+                official_provider=official_provider,
             ).run(
                 scope_id=scope_id,
                 scope_ids=scope_ids,
@@ -8491,6 +8498,7 @@ class DataManager:
         end_date: Optional[str] = None,
         dry_run: bool = True,
         max_days: Optional[int] = None,
+        official_provider: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Govern futures instruments, series, and contracts before futures price sync."""
         storage = self._require_futures_storage()
@@ -8502,6 +8510,7 @@ class DataManager:
                 storage,
                 self.research_config,
                 module_cfg,
+                official_provider=official_provider,
             ).run(
                 scope_id=scope_id,
                 scope_ids=scope_ids,

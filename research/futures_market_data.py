@@ -6160,10 +6160,13 @@ class FuturesMasterGovernanceService:
         storage: FuturesStorageManager,
         research_config: ResearchConfig,
         module_cfg: Optional[Dict[str, Any]] = None,
+        *,
+        official_provider: Optional[Any] = None,
     ):
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+        self.official_provider = official_provider
         master_cfg = self.module_cfg.get("master_data") if isinstance(self.module_cfg, dict) else {}
         if not isinstance(master_cfg, dict):
             master_cfg = {}
@@ -6338,7 +6341,8 @@ class FuturesMasterGovernanceService:
                 OfficialFuturesSourceUnavailable,
             )
 
-            provider = OfficialFuturesMarketDataProvider(self.research_config)
+            provider = self.official_provider or OfficialFuturesMarketDataProvider(self.research_config)
+            owns_provider = self.official_provider is None
             try:
                 metrics_before = _provider_metrics_for_exchange(provider, exchange)
                 logger.info(
@@ -6594,7 +6598,8 @@ class FuturesMasterGovernanceService:
                 result["counts"]["retry_backoff_count"] = int(source_metrics.get("retry_backoff_count", 0))
                 result["counts"]["retry_backoff_seconds"] = float(source_metrics.get("retry_backoff_seconds", 0.0))
             finally:
-                provider.close()
+                if owns_provider:
+                    provider.close()
         except Exception as exc:
             return self._blocked(
                 reason=f"{exchange.lower()}_contract_discovery_failed: {exc}",
@@ -7180,11 +7185,13 @@ class FuturesOfficialCalendarBackfillService:
         module_cfg: Optional[Dict[str, Any]] = None,
         *,
         now_provider: Callable[[], datetime] = get_shanghai_time,
+        official_provider: Optional[Any] = None,
     ):
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
         self.now_provider = now_provider
+        self.official_provider = official_provider
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}
         self.repair_lookback_days, self.publication_policy = _load_futures_publication_policy(
             self.module_cfg
@@ -7286,7 +7293,8 @@ class FuturesOfficialCalendarBackfillService:
 
         today = run_at.date().isoformat()
         probe_end = min(requested_end, today)
-        provider = OfficialFuturesMarketDataProvider(self.research_config)
+        provider = self.official_provider or OfficialFuturesMarketDataProvider(self.research_config)
+        owns_provider = self.official_provider is None
         governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
 
         exchange_results: List[Dict[str, Any]] = []
@@ -7706,9 +7714,10 @@ class FuturesOfficialCalendarBackfillService:
                 )
                 exchange_results.append(result)
         finally:
-            close = getattr(provider, "close", None)
-            if callable(close):
-                close()
+            if owns_provider:
+                close = getattr(provider, "close", None)
+                if callable(close):
+                    close()
 
         overall_status = "success"
         if total_blocking_unresolved:
@@ -8366,10 +8375,12 @@ class FuturesMarketDataSyncService:
         research_config: ResearchConfig,
         *,
         now_provider: Callable[[], datetime] = get_shanghai_time,
+        official_provider: Optional[Any] = None,
     ):
         self.storage = storage
         self.research_config = research_config
         self.now_provider = now_provider
+        self.official_provider = official_provider
         self.module_cfg = research_config.modules.get("commodity_market_data", {})
         _, self.publication_policy = _load_futures_publication_policy(self.module_cfg)
         sync_cfg = self.module_cfg.get("market_data_sync", {}) if isinstance(self.module_cfg, dict) else {}
@@ -8898,7 +8909,11 @@ class FuturesMarketDataSyncService:
                 OfficialFuturesSourceUnavailable,
             )
 
-            official_provider = OfficialFuturesMarketDataProvider(self.research_config)
+            official_provider = (
+                self.official_provider
+                or OfficialFuturesMarketDataProvider(self.research_config)
+            )
+            owns_official_provider = self.official_provider is None
             fallback_provider = AkshareFuturesMarketDataProvider(self.research_config)
             official_enabled = self._source_enabled("exchange_official", default=False)
             fallback_enabled = self._source_enabled("akshare_futures", default=True)
@@ -9413,9 +9428,10 @@ class FuturesMarketDataSyncService:
                 "exchange_completeness": exchange_completeness,
                 "series": series_results,
             }
-            close = getattr(official_provider, "close", None)
-            if callable(close):
-                await asyncio.to_thread(close)
+            if owns_official_provider:
+                close = getattr(official_provider, "close", None)
+                if callable(close):
+                    await asyncio.to_thread(close)
             self.storage.finish_ingestion_run(run_id, status=status, metadata=result)
             logger.info(
                 "[FuturesMarketDataSync] done run_id=%s status=%s dry_run=%s fetched=%s "
@@ -9436,7 +9452,7 @@ class FuturesMarketDataSyncService:
             )
             return result
         except Exception as exc:
-            if "official_provider" in locals():
+            if "official_provider" in locals() and owns_official_provider:
                 close = getattr(official_provider, "close", None)
                 if callable(close):
                     await asyncio.to_thread(close)

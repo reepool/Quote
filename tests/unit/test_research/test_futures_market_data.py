@@ -1341,6 +1341,58 @@ def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
     assert "no report" not in str(exc_info.value)
 
 
+def test_dce_sync_entries_use_provider_owned_worker_thread(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "dce_browser": {"enabled": True},
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    worker_names = []
+
+    def record_worker():
+        import threading
+
+        worker_names.append(threading.current_thread().name)
+
+    def fake_fetch(exchange, trade_date, mode):
+        record_worker()
+        return []
+
+    def fake_probe(exchange, trade_date):
+        record_worker()
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=1,
+            source_interface="fixture",
+            evidence_url="https://official.example/dce",
+            parser_version="fixture.v1",
+        )
+
+    def fake_specs(exchange, target_symbols=None):
+        record_worker()
+        return {}
+
+    monkeypatch.setattr(provider, "_fetch_exchange_contract_bars_sync", fake_fetch)
+    monkeypatch.setattr(provider, "_probe_exchange_trading_day", fake_probe)
+    monkeypatch.setattr(provider, "_fetch_exchange_product_specs_sync", fake_specs)
+    try:
+        assert provider.fetch_exchange_contract_bars_sync("DCE", "2026-08-20") == []
+        assert provider.probe_exchange_trading_day("DCE", "2026-08-20").is_trading_day is True
+        assert provider.fetch_exchange_product_specs_sync("DCE") == {}
+    finally:
+        provider.close()
+
+    assert len(worker_names) == 3
+    assert all(name.startswith("dce-official-provider") for name in worker_names)
+
+
 def test_dce_browser_412_restarts_with_clean_session(monkeypatch):
     state = {"starts": 0, "warmup_calls": 0, "requested_api_calls": 0}
 

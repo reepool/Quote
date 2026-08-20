@@ -31,3 +31,9 @@
 - [x] 6.1 Let the DCE browser client own its bounded request lifecycle instead of applying the generic non-cancelling 20-second sync timeout.
 - [x] 6.2 Rotate HTTP 407/expired proxy authorization routes and sanitize credential-bearing upstream errors before logs and results.
 - [x] 6.3 Add focused regressions, run a read-only DCE sync-path validation, and revalidate the OpenSpec change.
+
+## 7. Scheduled Phase Continuity Follow-up
+
+- [x] 7.1 Keep one scheduled-task provider across calendar, master, and price phases while serializing all DCE browser calls on its owned worker thread.
+- [x] 7.2 Continue runnable exchanges when another exchange's master governance blocks, and preserve the original blocked diagnostics in reports and ingestion metadata.
+- [x] 7.3 Add focused lifecycle and scheduler regressions, run targeted validation, and revalidate the OpenSpec change.
