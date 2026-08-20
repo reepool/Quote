@@ -337,3 +337,20 @@ def test_distinct_anonymous_concentrations_in_same_evidence_have_distinct_ids():
     assert top_five["fact_scope"] != related_parties["fact_scope"]
     assert top_five["metadata"]["anonymous_label"] == "前五大客户"
     assert related_parties["metadata"]["anonymous_label"] == "关联方"
+
+    _, top_five_alias = producer.build_relationship_or_concentration_candidate(
+        {
+            **common,
+            "counterparty_name_raw": "前五名客户",
+            "object_raw": "营业收入",
+            "disclosed_share": 0.61,
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("前五名客户"),
+        evidence_id="evidence-major-customers-next-year",
+        run_id="run-2",
+        data_available_date="2027-03-28",
+    )
+
+    assert top_five_alias["fact_scope"] == top_five["fact_scope"]
+    assert top_five_alias["metadata"]["anonymous_label_key"] == "top_five_customers"
+    assert top_five_alias["metadata"]["object_key"] == "revenue"

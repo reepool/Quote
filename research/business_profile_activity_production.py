@@ -28,6 +28,25 @@ RELATIONSHIP_DIRECTIONS = {
     "receives_service_from": "inbound",
 }
 
+_ANONYMOUS_CONCENTRATION_LABEL_ALIASES = {
+    "前五大客户": "top_five_customers",
+    "前五名客户": "top_five_customers",
+    "前五客户": "top_five_customers",
+    "前五大供应商": "top_five_suppliers",
+    "前五名供应商": "top_five_suppliers",
+    "前五供应商": "top_five_suppliers",
+    "关联方": "related_parties",
+}
+
+_ANONYMOUS_CONCENTRATION_OBJECT_ALIASES = {
+    "收入": "revenue",
+    "营业收入": "revenue",
+    "销售收入": "revenue",
+    "采购": "procurement",
+    "采购额": "procurement",
+    "采购总额": "procurement",
+}
+
 
 @dataclass(frozen=True)
 class EntityResolution:
@@ -199,12 +218,18 @@ class BusinessProfileActivityProducer:
                 )
             anonymous_label = _required_text(assertion, "counterparty_name_raw")
             object_raw = str(assertion.get("object_raw") or "").strip() or None
+            anonymous_label_key = _anonymous_concentration_key(
+                anonymous_label, _ANONYMOUS_CONCENTRATION_LABEL_ALIASES
+            )
+            object_key = _anonymous_concentration_key(
+                object_raw, _ANONYMOUS_CONCENTRATION_OBJECT_ALIASES
+            )
             fact_scope = _stable_id(
                 "anonymous-concentration-scope",
                 {
                     "scope_id": assertion.get("scope_id"),
-                    "anonymous_label": anonymous_label,
-                    "object_raw": object_raw,
+                    "anonymous_label_key": anonymous_label_key,
+                    "object_key": object_key,
                 },
             )
             record = {
@@ -244,7 +269,9 @@ class BusinessProfileActivityProducer:
                     "run_id": run_id,
                     "scope_id": assertion.get("scope_id"),
                     "anonymous_label": anonymous_label,
+                    "anonymous_label_key": anonymous_label_key,
                     "object_raw": object_raw,
+                    "object_key": object_key,
                     "no_relationship_edge_created": True,
                     "numeric_reconciliation": {
                         "schema_version": "business_profile_ratio_validation.v1",
@@ -597,6 +624,20 @@ def _required_choice(value: Mapping[str, Any], key: str, allowed: set[str]) -> s
     if text not in allowed:
         raise ValueError(f"unsupported {key}: {text}")
     return text
+
+
+def _anonymous_concentration_key(
+    value: Any,
+    aliases: Mapping[str, str],
+) -> str | None:
+    normalized = "".join(
+        character.lower()
+        for character in str(value or "").strip()
+        if character.isalnum()
+    )
+    if not normalized:
+        return None
+    return aliases.get(normalized, normalized)
 
 
 def _stable_id(prefix: str, value: Any) -> str:
