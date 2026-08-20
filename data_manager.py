@@ -501,6 +501,7 @@ class DataManager:
                         job_name="annual_report_asset_universe_refresh",
                         job_type="current",
                         continue_on_error=False,
+                        options={"enrich_from_backup_sources": False},
                     )
                 ]
             )
@@ -17426,6 +17427,7 @@ class DataManager:
         include_pytdx_validation: Optional[bool] = None,
         timeout_sec: Optional[int] = None,
         freshness_threshold_hours: Optional[int] = None,
+        enrich_from_backup_sources: bool = True,
     ) -> Dict[str, Any]:
         """Refresh A-share stock master data and return structured diagnostics."""
         config = self._get_instrument_master_sync_config()
@@ -17495,6 +17497,7 @@ class DataManager:
                     exchange,
                     force_refresh=True,
                     instrument_types=['stock'],
+                    enrich_from_backup_sources=enrich_from_backup_sources,
                 )
                 if effective_timeout:
                     instruments = await asyncio.wait_for(fetch_coro, timeout=effective_timeout)

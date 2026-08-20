@@ -155,7 +155,11 @@ async def test_official_primary_does_not_union_fallback_only_rows():
     }
     factory.db_ops.save_instrument_list = AsyncMock(return_value=True)
 
-    result = await factory.get_instrument_list("SSE", force_refresh=True, instrument_types=["stock"])
+    result = await factory.get_instrument_list(
+        "SSE",
+        force_refresh=True,
+        instrument_types=["stock"],
+    )
     diagnostics = factory.get_last_instrument_list_diagnostics("SSE", ["stock"])
 
     assert len(result) == 60
@@ -163,6 +167,39 @@ async def test_official_primary_does_not_union_fallback_only_rows():
     assert result[0]["industry"] == "行业"
     assert diagnostics["selected_source_authority"] == "official_with_fallback_fields"
     assert "600999.SH" in diagnostics["fallback_only_ids"]
+
+
+@pytest.mark.asyncio
+async def test_official_primary_can_skip_backup_enrichment():
+    official_rows = _rows("sse_official", 60, missing_industry=True)
+    official = _InstrumentSource(
+        "exchange_official_a_stock", official_rows, official=True
+    )
+    backup = _InstrumentSource("baostock_a_stock", _rows("baostock", 60))
+    backup.get_instrument_list = AsyncMock(return_value=backup.rows)
+
+    factory = DataSourceFactory(Mock())
+    factory.routing = {
+        "instrument_list": {"a_stock": ["exchange_official", "baostock"]}
+    }
+    factory.source_instances_by_region = {
+        "a_stock": {
+            "exchange_official": official,
+            "baostock": backup,
+        }
+    }
+    factory.db_ops.save_instrument_list = AsyncMock(return_value=True)
+
+    result = await factory.get_instrument_list(
+        "SSE",
+        force_refresh=True,
+        instrument_types=["stock"],
+        enrich_from_backup_sources=False,
+    )
+
+    assert len(result) == 60
+    assert result[0]["industry"] == ""
+    backup.get_instrument_list.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -181,7 +218,12 @@ async def test_official_failure_falls_back_to_baostock_before_akshare():
     }
     factory.db_ops.save_instrument_list = AsyncMock(return_value=True)
 
-    result = await factory.get_instrument_list("SSE", force_refresh=True, instrument_types=["stock"])
+    result = await factory.get_instrument_list(
+        "SSE",
+        force_refresh=True,
+        instrument_types=["stock"],
+        enrich_from_backup_sources=False,
+    )
     diagnostics = factory.get_last_instrument_list_diagnostics("SSE", ["stock"])
 
     assert result[0]["source"] == "baostock"

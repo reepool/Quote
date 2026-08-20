@@ -337,20 +337,24 @@ class AShareStockPolicy:
             if fresh is not None:
                 return fresh
 
-        result = await self.manager.sync_instrument_master(
-            exchanges,
-            include_pytdx_validation=(
+        sync_kwargs = {
+            "include_pytdx_validation": (
                 requirement.include_pytdx_validation
                 if requirement.include_pytdx_validation is not None
                 else self.config.get("pytdx_validation_enabled", False)
             ),
-            timeout_sec=(
+            "timeout_sec": (
                 requirement.timeout_sec
                 if requirement.timeout_sec is not None
                 else self.config.get("timeout_sec")
             ),
-            freshness_threshold_hours=freshness_hours,
-        )
+            "freshness_threshold_hours": freshness_hours,
+        }
+        if "enrich_from_backup_sources" in requirement.options:
+            sync_kwargs["enrich_from_backup_sources"] = bool(
+                requirement.options["enrich_from_backup_sources"]
+            )
+        result = await self.manager.sync_instrument_master(exchanges, **sync_kwargs)
         result["action"] = "synced"
         result.setdefault("reason", "master_sync_executed")
         return result

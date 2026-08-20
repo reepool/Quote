@@ -769,14 +769,20 @@ class DataSourceFactory:
                         validator_name,
                     )
 
-    async def get_instrument_list(self, exchange: str, force_refresh: bool = False,
-                                  instrument_types: List[str] = None) -> List[Dict[str, Any]]:
+    async def get_instrument_list(
+        self,
+        exchange: str,
+        force_refresh: bool = False,
+        instrument_types: List[str] = None,
+        enrich_from_backup_sources: bool = True,
+    ) -> List[Dict[str, Any]]:
         """获取交易品种列表 - 智能降级策略
 
         Args:
             exchange: 交易所代码
             force_refresh: 是否强制刷新
             instrument_types: 要获取的品种类型列表, 如 ['stock', 'index', 'etf']
+            enrich_from_backup_sources: 官方源成功后是否使用备源补充非生命周期字段
         """
         exchange = exchange.upper()
 
@@ -866,7 +872,10 @@ class DataSourceFactory:
                 # 第三步：尝试从其他品种源补充或交叉诊断。
                 # 官方源成功时，备源不得把官方 current list 缺失的代码并集补入 active
                 # universe；只能补充非生命周期字段并记录 fallback-only 候选。
-                for backup_source in backup_sources:
+                enrichment_sources = (
+                    backup_sources if enrich_from_backup_sources else []
+                )
+                for backup_source in enrichment_sources:
                     try:
                         ds_logger.info(f"[DataSourceFactory] Fetching instruments from backup_source {backup_source.name} for {exchange}...")
                         diagnostics['attempted_sources'].append(self._source_base_name(backup_source))

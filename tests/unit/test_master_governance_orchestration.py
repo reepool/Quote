@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -129,6 +130,33 @@ def test_requirement_from_config_rejects_unknown_keys():
             {"scope": "a_share_stock", "unexpected": True},
             job_name="daily_data_update",
         )
+
+
+def test_annual_report_master_refresh_skips_backup_enrichment():
+    manager = _manager()
+    manager.run_master_governance = AsyncMock(return_value={
+        "status": "success",
+        "finished_at": "2026-08-20T17:20:11+08:00",
+        "summary": {"exchanges": ["SSE", "SZSE", "BSE"]},
+        "source_priority": ["exchange_official"],
+        "errors": [],
+    })
+    repository = Mock()
+    config = SimpleNamespace(
+        exchanges=("SSE", "SZSE", "BSE"),
+        evidence_fingerprint="annual-report-config",
+    )
+
+    manager._refresh_announcement_asset_master_data(
+        repository=repository,
+        config=config,
+        operation_id="op-test",
+    )
+
+    requirements = manager.run_master_governance.await_args.args[0]
+    assert len(requirements) == 1
+    assert requirements[0].options == {"enrich_from_backup_sources": False}
+    repository.persist_operational_report.assert_called_once()
 
 
 def test_hkex_requirement_keeps_lifecycle_mode_under_force_refresh_override():
@@ -277,6 +305,40 @@ async def test_a_share_stock_adapter_preserves_bse_and_fallback_warnings():
         include_pytdx_validation=False,
         timeout_sec=30,
         freshness_threshold_hours=48,
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_share_stock_adapter_can_skip_backup_enrichment():
+    manager = Mock()
+    manager.sync_instrument_master = AsyncMock(return_value={
+        "status": "success",
+        "summary": {"exchanges": ["SSE"], "active_count": 2314},
+        "exchanges": {"SSE": {"status": "success"}},
+        "warnings": [],
+        "errors": [],
+    })
+    policy = AShareStockPolicy(manager, {
+        "reuse_fresh_master": False,
+        "pytdx_validation_enabled": False,
+        "timeout_sec": 30,
+        "freshness_threshold_hours": 48,
+    })
+
+    await policy.execute(MasterGovernanceRequirement(
+        scope="a_share_stock",
+        exchanges=["SSE"],
+        instrument_types=["stock"],
+        mode="force_refresh",
+        options={"enrich_from_backup_sources": False},
+    ))
+
+    manager.sync_instrument_master.assert_awaited_once_with(
+        ["SSE"],
+        include_pytdx_validation=False,
+        timeout_sec=30,
+        freshness_threshold_hours=48,
+        enrich_from_backup_sources=False,
     )
 
 

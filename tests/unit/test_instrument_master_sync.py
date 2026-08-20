@@ -281,6 +281,7 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
         'SSE',
         force_refresh=True,
         instrument_types=['stock'],
+        enrich_from_backup_sources=True,
     )
 
 
