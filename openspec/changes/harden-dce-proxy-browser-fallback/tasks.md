@@ -25,3 +25,9 @@
 - [x] 5.2 Classify DCE route exhaustion before nested timeout text so the open circuit is not retried.
 - [x] 5.3 Preserve existing strong calendar evidence when a rolling repair probe is unresolved and expose preserved-evidence diagnostics.
 - [x] 5.4 Add focused regressions, run live read-only DCE validation, and revalidate the OpenSpec change.
+
+## 6. Sync Timeout And Proxy Expiry Follow-up
+
+- [x] 6.1 Let the DCE browser client own its bounded request lifecycle instead of applying the generic non-cancelling 20-second sync timeout.
+- [x] 6.2 Rotate HTTP 407/expired proxy authorization routes and sanitize credential-bearing upstream errors before logs and results.
+- [x] 6.3 Add focused regressions, run a read-only DCE sync-path validation, and revalidate the OpenSpec change.

@@ -38,6 +38,8 @@ DCE's Ruishu protection requires a real headed Chrome session, but challenge com
 
 8. **Preserve existing strong calendar evidence on probe outages.** A rolling repair probe that fails cannot invalidate an existing `backfilled_verified` row supported by official market rows or an official closure notice. The backfill keeps that date verified, records that the current probe failed, and blocks only dates without strong evidence. Route exhaustion is classified before its nested timeout summary so outer retries cannot repeat an already-open circuit.
 
+9. **Keep DCE timeout ownership inside the browser client.** The generic market-data source timeout cannot safely cancel a DCE request running in a single-worker executor; timing out the await leaves Chrome running and causes later dates to time out while queued behind it. DCE exchange payload calls therefore await the provider's bounded browser route lifecycle without the generic outer `wait_for`. Proxy HTTP 407/expired-authorization responses invalidate the current route immediately, rotate within the existing lease bounds, and are reduced to credential-free diagnostics before any log or result boundary.
+
 ## Risks / Trade-offs
 
 - **[A proxy lease may be unavailable or also risk-controlled]** -> Rotate only a bounded number of leases, then keep dates unresolved and expose sanitized diagnostics.
@@ -45,3 +47,5 @@ DCE's Ruishu protection requires a real headed Chrome session, but challenge com
 - **[The upstream proxy may see credentials or traffic]** -> Credentials are sent only to the configured upstream proxy; logs and browser arguments contain only the local loopback endpoint.
 - **[Circuit breaking may skip a later date that could succeed]** -> Scope the breaker to one provider instance/run; the next scheduled or manual run gets a fresh attempt.
 - **[A previously healthy proxy can fail on the next date]** -> Retry once in the same session, then use a fresh bounded recovery allowance without exceeding the run-wide lease cap.
+- **[A caller timeout cannot stop a running browser thread]** -> Do not apply the generic source timeout to DCE browser payload calls; retain hard browser operation bounds and the run-scoped circuit breaker inside the DCE client.
+- **[An upstream proxy can return credentials in a 407 body]** -> Treat 407/expired authorization as a route failure and sanitize it before logging, classification evidence, or persisted result metadata.

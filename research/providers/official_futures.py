@@ -361,6 +361,10 @@ class DceOfficialBrowserClient:
                 return
             except Exception as exc:
                 last_error = str(exc)
+                if self._is_proxy_authorization_failure(exc):
+                    raise
+                if "target navigated or closed" in last_error.lower():
+                    raise
                 classification = classify_official_futures_failure(exc)
                 challenge_pending = (
                     classification.category == "dce_anti_bot_challenge"
@@ -596,6 +600,8 @@ class DceOfficialBrowserClient:
     @staticmethod
     def _safe_route_error_summary(exc: Exception) -> str:
         text = str(exc).lower()
+        if DceOfficialBrowserClient._is_proxy_authorization_failure(exc):
+            return "proxy authorization expired (HTTP 407)"
         if "browser challenge did not become ready" in text:
             return "browser challenge did not become ready"
         if "failed to fetch" in text or "networkerror" in text:
@@ -625,7 +631,10 @@ class DceOfficialBrowserClient:
                 "anti-bot challenge",
                 "challenge did not become ready",
                 "http 412",
+                "http 407",
                 "http 639",
+                "proxy authorization expired",
+                "authorization is out of time",
                 "failed to fetch",
                 "networkerror",
                 "timed out",
@@ -635,6 +644,15 @@ class DceOfficialBrowserClient:
                 "browser startup/navigation",
                 "target navigated or closed",
             )
+        )
+
+    @staticmethod
+    def _is_proxy_authorization_failure(exc: Any) -> bool:
+        text = str(exc or "").lower()
+        return (
+            "http 407" in text
+            or "proxy authorization expired" in text
+            or "authorization is out of time" in text
         )
 
     async def _api(
@@ -711,6 +729,10 @@ class DceOfficialBrowserClient:
             self._metric("challenge_count")
             raise OfficialFuturesSourceUnavailable(
                 f"official DCE {path} anti-bot challenge: {last_error}"
+            )
+        if status == 407 or self._is_proxy_authorization_failure(text):
+            raise OfficialFuturesSourceUnavailable(
+                f"official DCE {path} proxy authorization expired: HTTP 407"
             )
         if self._is_in_page_fetch_failure(status=status, text=text):
             self._metric("challenge_count")
@@ -3382,9 +3404,39 @@ def _official_daily_url(exchange: str, trade_date: str) -> str:
     return ""
 
 
+def _sanitize_official_futures_error_text(value: Any) -> str:
+    text = str(value or "")
+    lowered = text.lower()
+    proxy_auth_failure = (
+        "http 407" in lowered
+        or "proxy authorization expired" in lowered
+        or "authorization is out of time" in lowered
+        or "userpass" in lowered
+    )
+    if proxy_auth_failure:
+        if "routes exhausted" in lowered:
+            prefix = text.split("; last_error=", 1)[0]
+            return f"{prefix}; last_error=proxy authorization expired (HTTP 407)"
+        return "official DCE proxy authorization expired: HTTP 407"
+    text = re.sub(
+        r"(?i)(https?://)[^\s/@]+@",
+        r"\1***:***@",
+        text,
+    )
+    text = re.sub(r"(?i)\buserpass\s+[^\s,;]+", "userpass ***", text)
+    text = re.sub(
+        r"(?i)\b(proxy-authorization|authorization|auth_token)\s*[:=]\s*[^\s,;]+",
+        r"\1: ***",
+        text,
+    )
+    return text
+
+
 def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> OfficialFuturesFailureClassification:
     """Classify official-source failures for operator diagnostics."""
-    text = f"{error or ''} {payload_text or ''}".strip()
+    text = _sanitize_official_futures_error_text(
+        f"{error or ''} {payload_text or ''}".strip()
+    )
     lowered = text.lower()
     evidence: Dict[str, Any] = {"raw": text[:1000]}
     if "network is unreachable" in lowered or "errno 101" in lowered:
@@ -3409,6 +3461,21 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
             is_retryable=False,
             suspected_local_ip_risk_control=True,
             summary="DCE direct and proxy browser routes were exhausted for this run",
+            evidence=evidence,
+        )
+    if (
+        "dce" in lowered
+        and (
+            "http 407" in lowered
+            or "proxy authorization expired" in lowered
+            or "authorization is out of time" in lowered
+        )
+    ):
+        return OfficialFuturesFailureClassification(
+            category="dce_proxy_authorization_expired",
+            is_retryable=False,
+            suspected_local_ip_risk_control=False,
+            summary="DCE proxy authorization expired; rotate to a fresh bounded proxy lease",
             evidence=evidence,
         )
     if "timed out" in lowered or "timeout" in lowered or "read timed out" in lowered:

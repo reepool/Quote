@@ -32,3 +32,8 @@ The system SHALL access protected DCE official endpoints with a real browser, SH
 #### Scenario: Consecutive DCE business dates are requested
 - **WHEN** the provider reuses a validated DCE session for another business date
 - **THEN** it SHALL enforce the configured minimum interval from the previous business-request completion
+
+#### Scenario: A proxy authorization expires
+- **WHEN** a DCE browser route receives HTTP 407 or equivalent expired proxy authorization evidence
+- **THEN** the provider SHALL invalidate and rotate that proxy route within the configured bounds
+- **AND** logs, classifications, and results SHALL contain only a credential-free route summary

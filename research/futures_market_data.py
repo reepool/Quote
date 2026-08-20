@@ -9085,13 +9085,11 @@ class FuturesMarketDataSyncService:
                                             },
                                             force=True,
                                         )
-                                    exchange_rows = await asyncio.wait_for(
-                                        official_provider.fetch_exchange_contract_bars(
-                                            exchange,
-                                            target_date,
-                                            mode=mode,
-                                        ),
-                                        timeout=self._request_timeout_seconds("exchange_official"),
+                                    exchange_rows = await self._fetch_official_exchange_rows(
+                                        official_provider,
+                                        exchange,
+                                        target_date,
+                                        mode=mode,
                                     )
                                     official_exchange_cache[cache_key] = list(exchange_rows)
                                 except OfficialFuturesSourceUnavailable as exc:
@@ -9466,6 +9464,28 @@ class FuturesMarketDataSyncService:
         except (TypeError, ValueError):
             value = 30.0
         return max(1.0, value)
+
+    async def _fetch_official_exchange_rows(
+        self,
+        provider: Any,
+        exchange: str,
+        trade_date: str,
+        *,
+        mode: str,
+    ) -> List[Any]:
+        request = provider.fetch_exchange_contract_bars(
+            exchange,
+            trade_date,
+            mode=mode,
+        )
+        if str(exchange).upper() == "DCE" and bool(
+            getattr(provider, "dce_browser_enabled", False)
+        ):
+            return await request
+        return await asyncio.wait_for(
+            request,
+            timeout=self._request_timeout_seconds("exchange_official"),
+        )
 
 
 def normalize_provider_bars(

@@ -1144,6 +1144,85 @@ def test_dce_browser_waits_for_warmup_fetch_to_recover(monkeypatch):
     assert state["warmup_calls"] == 2
 
 
+def test_dce_browser_rotates_route_when_readiness_target_is_closed(monkeypatch):
+    state = {"starts": 0, "leases": 0, "business_calls": 0}
+
+    class FakePage:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                if self.route_number == 1:
+                    raise RuntimeError("Inspected target navigated or closed [code: -32000]")
+                return json.dumps({
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True}),
+                })
+            state["business_calls"] += 1
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
+            })
+
+    class FakeBrowser:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def get(self, url):
+            return FakePage(self.route_number)
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser(state["starts"])
+
+    class FakeForwarder:
+        browser_proxy_url = "http://127.0.0.1:38123"
+
+        def __init__(self, proxy_url, **kwargs):
+            return None
+
+        def start(self):
+            return None
+
+        def stop(self):
+            return None
+
+    def fake_lease(**kwargs):
+        state["leases"] += 1
+        return AkshareProxyLease(
+            proxy_url="http://user:secret@proxy.example:8080",
+            user_agent="proxy-agent",
+        )
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr("research.providers.official_futures.acquire_akshare_proxy_lease", fake_lease)
+    monkeypatch.setattr("research.providers.official_futures.DceBrowserProxyForwarder", FakeForwarder)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "direct_attempts": 1,
+        "max_proxy_leases": 1,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        payload = client.fetch_day_quotes_payload("2026-08-19")
+    finally:
+        client.close()
+
+    assert payload == {"success": True, "data": []}
+    assert state == {"starts": 2, "leases": 1, "business_calls": 1}
+
+
 def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
     state = {"starts": 0, "requested_api_calls": 0}
 
@@ -1226,6 +1305,19 @@ def test_dce_routes_exhausted_with_nested_timeout_is_non_retryable():
     assert classification.category == "dce_anti_bot_challenge"
     assert classification.is_retryable is False
     assert classification.suspected_local_ip_risk_control is True
+
+
+def test_dce_proxy_407_classification_redacts_upstream_credentials():
+    classification = classify_official_futures_failure(
+        "official DCE request failed: HTTP 407 proxy authorization expired, "
+        "userpass SECRET-USER:SECRET-PASSWORD, client ip 192.0.2.1"
+    )
+
+    assert classification.category == "dce_proxy_authorization_expired"
+    assert classification.is_retryable is False
+    assert classification.evidence["raw"] == (
+        "official DCE proxy authorization expired: HTTP 407"
+    )
 
 
 def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
@@ -1711,6 +1803,105 @@ def test_dce_browser_opens_fresh_proxy_recovery_cycle_with_run_wide_cap(monkeypa
 
     assert state["leases"] == 2
     assert state["starts"] == 3
+
+
+def test_dce_browser_rotates_expired_proxy_without_logging_credentials(
+    monkeypatch,
+    caplog,
+):
+    state = {"starts": 0, "leases": 0}
+    secret = "EXPIRED-USER:EXPIRED-PASSWORD"
+
+    class FakePage:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                if self.route_number == 1:
+                    return json.dumps(
+                        {"status": 412, "ok": False, "text": "Precondition Failed"}
+                    )
+                if self.route_number == 2:
+                    return json.dumps(
+                        {
+                            "status": 407,
+                            "ok": False,
+                            "text": (
+                                "proxy authorization expired, authorization is out of time, "
+                                f"userpass {secret}, client ip 192.0.2.1"
+                            ),
+                        }
+                    )
+            return json.dumps(
+                {
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True, "data": []}),
+                }
+            )
+
+    class FakeBrowser:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def get(self, url):
+            return FakePage(self.route_number)
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser(state["starts"])
+
+    class FakeForwarder:
+        browser_proxy_url = "http://127.0.0.1:38123"
+
+        def __init__(self, proxy_url, **kwargs):
+            return None
+
+        def start(self):
+            return None
+
+        def stop(self):
+            return None
+
+    def fake_lease(**kwargs):
+        state["leases"] += 1
+        return AkshareProxyLease(
+            proxy_url=f"http://user:secret-{state['leases']}@proxy.example:8080",
+            user_agent="proxy-agent",
+        )
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr("research.providers.official_futures.acquire_akshare_proxy_lease", fake_lease)
+    monkeypatch.setattr("research.providers.official_futures.DceBrowserProxyForwarder", FakeForwarder)
+    caplog.set_level("INFO", logger="research.providers.official_futures")
+
+    client = DceOfficialBrowserClient(
+        {
+            "settle_seconds": 0,
+            "readiness_timeout_seconds": 0,
+            "business_readiness_timeout_seconds": 0,
+            "direct_attempts": 1,
+            "max_proxy_leases": 2,
+            "max_total_proxy_leases": 2,
+            "browser_executable_path": "/tmp/fake-chrome",
+        }
+    )
+    try:
+        assert client.fetch_day_quotes_payload("2026-08-19")["success"] is True
+    finally:
+        client.close()
+
+    assert state == {"starts": 3, "leases": 2}
+    assert secret not in caplog.text
+    assert "192.0.2.1" not in caplog.text
 
 
 def test_dce_browser_circuit_breaks_after_bounded_proxy_routes_without_leaking_credentials(monkeypatch):
@@ -6211,6 +6402,38 @@ async def test_futures_market_data_sync_writes_fixture_bars(monkeypatch, tmp_pat
     assert result["totals"]["inserted"] == 1
     assert storage.get_price_bars(series_id)[0]["close"] == 11
     assert storage.get_cycle_diagnostics(series_id)
+
+
+@pytest.mark.asyncio
+async def test_futures_sync_dce_browser_request_owns_its_timeout(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    service = FuturesMarketDataSyncService(storage, config)
+    service._request_timeout_seconds = lambda profile: 0.01
+
+    class FakeProvider:
+        dce_browser_enabled = True
+
+        async def fetch_exchange_contract_bars(self, exchange, trade_date, *, mode="direct"):
+            await asyncio.sleep(0.03)
+            return [f"{exchange}:{trade_date}"]
+
+    provider = FakeProvider()
+    assert await service._fetch_official_exchange_rows(
+        provider,
+        "DCE",
+        "2026-08-19",
+        mode="direct",
+    ) == ["DCE:2026-08-19"]
+
+    provider.dce_browser_enabled = False
+    with pytest.raises(asyncio.TimeoutError):
+        await service._fetch_official_exchange_rows(
+            provider,
+            "SHFE",
+            "2026-08-19",
+            mode="direct",
+        )
 
 
 @pytest.mark.asyncio
