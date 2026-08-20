@@ -328,6 +328,79 @@ def test_claimable_depth_filters_obsolete_processing_identity(tmp_path):
     assert queue.claimable_count("semantic", processing_identity_hash=current_hash) == 2
 
 
+def test_queue_health_filters_obsolete_processing_identity(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-obsolete"),
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-current"),
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'terminal_failure' "
+            "WHERE policy = 'latest_annual_only'"
+        )
+        current_hash = conn.execute(
+            "SELECT processing_identity_hash FROM business_profile_work_items "
+            "WHERE policy = 'expanded'"
+        ).fetchone()[0]
+        conn.commit()
+
+    assert queue.health()["terminal"] == 1
+    current_health = queue.health(processing_identity_hash=current_hash)
+    assert current_health["terminal"] == 0
+    assert current_health["claimable"] == 2
+
+
+def test_queue_health_filters_other_instruments_with_same_identity(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    identity = _processing_identity("model-current")
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+        instrument_ids=("600000.SH",),
+        document_types=("annual_report",),
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items "
+            "SET status = 'terminal_failure', instrument_id = '000001.SZ' "
+            "WHERE policy = 'latest_annual_only'"
+        )
+        identity_hash = conn.execute(
+            "SELECT processing_identity_hash FROM business_profile_work_items "
+            "WHERE policy = 'expanded'"
+        ).fetchone()[0]
+        conn.commit()
+
+    scoped = queue.health(
+        processing_identity_hash=identity_hash,
+        instrument_ids=("600000.SH",),
+    )
+
+    assert scoped["terminal"] == 0
+    assert scoped["claimable"] == 2
+
+
 def test_claimable_probe_obeys_due_time_expired_lease_and_exclusions(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -544,6 +617,69 @@ def test_bound_shared_asset_does_not_drift_to_later_effective_correction(tmp_pat
     assert len(exact_requests) == 1
     assert exact_requests[0].observation_version == "observation-original-2025"
     assert exact_requests[0].expected_content_hash == "a" * 64
+
+
+def test_historical_effective_projection_opens_its_exact_observation(tmp_path):
+    storage = _storage(tmp_path)
+    historical = {
+        "asset_id": "asset-historical-projection",
+        "instrument_id": "601088.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "source": "cninfo",
+        "source_announcement_id": "annual-601088-2025",
+        "attachment_id": "attachment-601088-2025",
+        "observation_version": "observation-601088-2025",
+        "content_hash": "c" * 64,
+        "published_at": "2026-03-22T08:00:00+08:00",
+        "is_correction": False,
+    }
+    exact_requests = []
+
+    class _SharedAccess:
+        def get_effective_asset(self, instrument_id, **kwargs):
+            assert instrument_id == "601088.SH"
+            assert kwargs == {
+                "fiscal_year": 2025,
+                "knowledge_cutoff": "2026-08-20",
+            }
+            return historical
+
+        def content_handle(self, _asset_id):
+            raise AssertionError(
+                "historical projection ids are not persisted current asset ids"
+            )
+
+        def exact_observation_handle(self, request, *, authorized):
+            assert authorized is True
+            exact_requests.append(request)
+            return {
+                "path": tmp_path / "601088-2025.pdf",
+                "content_length": 456,
+                "file_handle": io.BytesIO(b"%PDF-historical"),
+            }
+
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+        shared_asset_access=_SharedAccess(),
+    )
+    manifest = queue.get_bound_source_asset(
+        {
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "document_type": "annual_report",
+            "source": "cninfo",
+            "announcement_id": "annual-601088-2025",
+            "metadata": {"knowledge_cutoff": "2026-08-20"},
+        }
+    )
+
+    assert manifest is not None
+    assert manifest["source_asset_id"] == "asset-historical-projection"
+    assert manifest["metadata"]["selector_kind"] == "bound_exact_observation"
+    assert len(exact_requests) == 1
+    assert exact_requests[0].observation_version == "observation-601088-2025"
 
 
 def test_stale_scope_recovery_requeues_terminal_items_without_content_attempts(
@@ -2423,6 +2559,85 @@ def test_data_manager_shared_only_discovery_never_calls_business_profile_provide
     assert result["operation"] == "shared_annual_report_discovery"
     assert result["provider_requests"] == 0
     manager.run_business_profile_index_discovery.assert_not_awaited()
+
+
+def test_data_manager_targeted_backfill_scopes_discovery_and_reconciliation_access(
+    tmp_path,
+    monkeypatch,
+):
+    from contextlib import nullcontext
+
+    import research.business_profile_async_production as async_module
+    import research.business_profile_production_operations as operations_module
+
+    storage = Mock()
+    storage.coordinated_writes.return_value = nullcontext()
+
+    async def run_inline(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr(asyncio, "to_thread", run_inline)
+    monkeypatch.setattr(
+        async_module,
+        "ensure_business_profile_storage_ready",
+        lambda _storage: None,
+    )
+    monkeypatch.setattr(
+        async_module,
+        "get_business_profile_write_coordinator",
+        lambda *_args, **_kwargs: object(),
+    )
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = storage
+    manager.research_config = SimpleNamespace(
+        enabled=True,
+        modules={
+            "business_profile_evidence": {
+                "enabled": True,
+                "semantic_production": {"enabled": True},
+                "production_operations": {
+                    "async_production_enabled": True,
+                    "use_rollout_config": False,
+                },
+            }
+        },
+    )
+    service = SimpleNamespace(
+        run_backfill=AsyncMock(
+            return_value={
+                "status": "success",
+                "queue_health": {"claimable": 0, "running": 0, "terminal": 0},
+            }
+        )
+    )
+    manager._build_business_profile_async_service = Mock(
+        return_value=(service, {"rules": "v1"})
+    )
+    shared_access = SimpleNamespace()
+    manager._get_announcement_asset_access = Mock(return_value=shared_access)
+    reconciliation = Mock(return_value={"status": "success"})
+    monkeypatch.setattr(
+        operations_module,
+        "build_business_profile_reconciliation_report",
+        reconciliation,
+    )
+
+    result = asyncio.run(
+        manager.run_business_profile_backfill(
+            knowledge_cutoff="2026-08-20",
+            selection_policy="expanded",
+            instrument_ids=["601088.SH"],
+            start_date="2026-01-01",
+            document_types=["annual_report", "annual_report_correction"],
+            field_families=["atomic_activities", "named_relationships"],
+            runtime_identities={"rules": "v1"},
+        )
+    )
+
+    assert result["reconciliation"]["status"] == "success"
+    discovery_kwargs = service.run_backfill.await_args.kwargs["discovery_kwargs"]
+    assert discovery_kwargs["instrument_ids"] == ["601088.SH"]
+    assert reconciliation.call_args.kwargs["shared_asset_access"] is shared_access
 
 
 def test_data_manager_stage_runner_uses_work_bound_cutoff(tmp_path):

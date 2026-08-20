@@ -173,6 +173,108 @@ def test_shared_only_business_profile_discovery_uses_effective_assets_zero_provi
     assert not list(tmp_path.rglob("*.pdf"))
 
 
+def test_shared_discovery_filters_each_explicit_instrument_without_market_paging(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+
+    class _SharedAccess:
+        def __init__(self):
+            self.calls = []
+
+        def list_effective_assets(self, **kwargs):
+            self.calls.append(dict(kwargs))
+            instrument_id = kwargs["instrument_id"]
+            return {
+                "items": [
+                    {
+                        "asset_id": f"asset-{instrument_id}",
+                        "instrument_id": instrument_id,
+                        "fiscal_year": 2025,
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": f"annual-{instrument_id}",
+                        "attachment_id": f"attachment-{instrument_id}",
+                        "observation_version": f"observation-{instrument_id}",
+                        "content_hash": "a" * 64,
+                        "published_at": "2026-03-30T08:00:00+08:00",
+                        "is_correction": False,
+                    }
+                ]
+            }
+
+    shared = _SharedAccess()
+    result = discover_business_profile_shared_annual_reports(
+        storage=storage,
+        shared_asset_access=shared,
+        knowledge_cutoff="2026-08-20",
+        instrument_ids=("601088.SH", "000001.SZ", "601088.SH"),
+        page_size=100,
+        max_pages=100,
+    )
+
+    assert result["status"] == "success"
+    assert result["filter_mode"] == "targeted_shared_effective_assets"
+    assert result["pages_scanned"] == 2
+    assert result["selected_announcements"] == 2
+    assert [call["instrument_id"] for call in shared.calls] == [
+        "000001.SZ",
+        "601088.SH",
+    ]
+    assert all(call["offset"] == 0 for call in shared.calls)
+    assert all(call["limit"] == 100 for call in shared.calls)
+
+
+def test_targeted_shared_discovery_paginates_within_the_requested_instrument(
+    tmp_path,
+):
+    storage = _storage(tmp_path)
+    calls = []
+
+    class _SharedAccess:
+        def list_effective_assets(self, **kwargs):
+            calls.append(dict(kwargs))
+            if kwargs["offset"]:
+                return {"items": []}
+            return {
+                "items": [
+                    {
+                        "asset_id": "asset-601088-2025",
+                        "instrument_id": "601088.SH",
+                        "fiscal_year": 2025,
+                        "report_period": "2025-12-31",
+                        "document_family": "annual_report",
+                        "availability": "local_valid",
+                        "source": "cninfo",
+                        "source_announcement_id": "annual-601088-2025",
+                        "attachment_id": "attachment-601088-2025",
+                        "observation_version": "observation-601088-2025",
+                        "content_hash": "b" * 64,
+                        "published_at": "2026-03-30T08:00:00+08:00",
+                        "is_correction": False,
+                    }
+                ]
+            }
+
+    result = discover_business_profile_shared_annual_reports(
+        storage=storage,
+        shared_asset_access=_SharedAccess(),
+        knowledge_cutoff="2026-08-20",
+        instrument_ids=("601088.SH",),
+        page_size=1,
+        max_pages=2,
+    )
+
+    assert result["status"] == "success"
+    assert [call["instrument_id"] for call in calls] == [
+        "601088.SH",
+        "601088.SH",
+    ]
+    assert [call["offset"] for call in calls] == [0, 1]
+
+
 def test_scope_rotation_covers_active_issuers_without_manifests(tmp_path):
     storage = _storage(tmp_path)
     _quotes(

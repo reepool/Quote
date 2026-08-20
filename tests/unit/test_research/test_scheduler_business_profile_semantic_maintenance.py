@@ -427,6 +427,73 @@ def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
     )
 
 
+def test_scheduler_marks_degraded_terminal_backfill_as_failed(tmp_path, monkeypatch):
+    task = _task()
+    store = BusinessProfileBackfillControlStore(tmp_path / "checkpoints")
+    manager = Mock()
+    manager.run_business_profile_backfill = AsyncMock(
+        return_value={
+            "status": "degraded",
+            "reason": "terminal_work_items_present",
+            "queue_health": {"claimable": 0, "running": 0, "terminal": 1},
+            "throughput": {"worker_completed": 0},
+        }
+    )
+    monkeypatch.setattr(task_module, "data_manager", manager)
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: store,
+    )
+
+    success = asyncio.run(
+        task.business_profile_backfill(
+            selection_policy="expanded",
+            instrument_ids=["601088.SH"],
+            start_date="2026-01-01",
+            document_types=["annual_report"],
+            field_families=["atomic_activities"],
+        )
+    )
+
+    assert success is False
+    progress = store.status()
+    assert progress["state"] == "failed"
+    assert progress["phase"] is None
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "error"
+    assert report["maintenance_tasks"][0]["status"] == (
+        "terminal_work_items_present"
+    )
+
+
+def test_scheduler_reports_nonterminal_degraded_backfill_as_warning(
+    tmp_path,
+    monkeypatch,
+):
+    task = _task()
+    manager = Mock()
+    manager.run_business_profile_backfill = AsyncMock(
+        return_value={
+            "status": "degraded",
+            "reason": "writer_p95_exceeded",
+            "queue_health": {"claimable": 1, "running": 0, "terminal": 0},
+        }
+    )
+    monkeypatch.setattr(task_module, "data_manager", manager)
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: BusinessProfileBackfillControlStore(tmp_path / "checkpoints"),
+    )
+
+    success = asyncio.run(task.business_profile_backfill())
+
+    assert success is True
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "warning"
+
+
 def test_scheduler_continuous_backfill_runs_until_phase_ready(tmp_path, monkeypatch):
     task = _task()
     store = BusinessProfileBackfillControlStore(tmp_path / "checkpoints")

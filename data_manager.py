@@ -2737,6 +2737,9 @@ class DataManager:
             result["reconciliation"] = await asyncio.to_thread(
                 build_business_profile_reconciliation_report,
                 self.research_storage,
+                shared_asset_access=self._get_announcement_asset_access(
+                    initialize_schema=False
+                ),
                 frequency="annual",
                 knowledge_cutoff=cutoff,
             )
@@ -2999,6 +3002,7 @@ class DataManager:
             "start_date": start_date,
             "end_date": end_date or cutoff,
             "exchanges": backfill_exchanges,
+            "instrument_ids": list(instrument_ids or ()),
             "page_size": int(
                 (rollout.bootstrap.get("page_size") if rollout else None) or 30
             ),
@@ -3057,6 +3061,9 @@ class DataManager:
             result["reconciliation"] = await asyncio.to_thread(
                 build_business_profile_reconciliation_report,
                 self.research_storage,
+                shared_asset_access=self._get_announcement_asset_access(
+                    initialize_schema=False
+                ),
                 frequency="annual",
                 knowledge_cutoff=cutoff,
             )
@@ -3201,6 +3208,7 @@ class DataManager:
                     knowledge_cutoff=str(
                         kwargs.get("end_date") or cutoff
                     ),
+                    instrument_ids=tuple(kwargs.get("instrument_ids") or ()),
                     page_size=int(kwargs.get("page_size", 500)),
                     max_pages=int(kwargs.get("max_pages_per_market", 20)),
                 )

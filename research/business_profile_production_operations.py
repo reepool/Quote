@@ -359,6 +359,7 @@ def discover_business_profile_shared_annual_reports(
     storage: Any,
     shared_asset_access: Any,
     knowledge_cutoff: str,
+    instrument_ids: Sequence[str] = (),
     page_size: int = 500,
     max_pages: int = 20,
 ) -> dict[str, Any]:
@@ -368,12 +369,19 @@ def discover_business_profile_shared_annual_reports(
     bounded_page_size = max(1, min(int(page_size), 1000))
     bounded_max_pages = max(1, min(int(max_pages), 100))
     frontier = BusinessProfileAnnouncementFrontierRepository(storage)
+    targeted_instruments = tuple(
+        sorted({str(item).strip() for item in instrument_ids if str(item).strip()})
+    )
     report = {
         "schema_version": BUSINESS_PROFILE_OPERATIONS_SCHEMA_VERSION,
         "status": "success",
         "operation": "shared_annual_report_discovery",
         "category": ANNUAL_REPORT_CATEGORY,
-        "filter_mode": "shared_effective_assets_only",
+        "filter_mode": (
+            "targeted_shared_effective_assets"
+            if targeted_instruments
+            else "shared_effective_assets_only"
+        ),
         "provider_requests": 0,
         "attachment_downloads": 0,
         "pages_scanned": 0,
@@ -382,16 +390,8 @@ def discover_business_profile_shared_annual_reports(
         "frontier_changed": 0,
         "errors": [],
     }
-    for page in range(bounded_max_pages):
-        projection = shared_asset_access.list_effective_assets(
-            document_family="annual_report",
-            knowledge_cutoff=cutoff,
-            availability="local_valid",
-            limit=bounded_page_size,
-            offset=page * bounded_page_size,
-        )
-        assets = list(projection.get("items", ()))
-        report["pages_scanned"] += 1
+
+    def register_assets(assets: Sequence[Mapping[str, Any]]) -> None:
         for asset in assets:
             if (
                 asset.get("document_family") != "annual_report"
@@ -412,11 +412,45 @@ def discover_business_profile_shared_annual_reports(
                 report["frontier_inserted"] += 1
             elif status == "changed":
                 report["frontier_changed"] += 1
-        if len(assets) < bounded_page_size:
-            break
+
+    if targeted_instruments:
+        for instrument_id in targeted_instruments:
+            for page in range(bounded_max_pages):
+                projection = shared_asset_access.list_effective_assets(
+                    instrument_id=instrument_id,
+                    document_family="annual_report",
+                    knowledge_cutoff=cutoff,
+                    availability="local_valid",
+                    limit=bounded_page_size,
+                    offset=page * bounded_page_size,
+                )
+                assets = list(projection.get("items", ()))
+                report["pages_scanned"] += 1
+                register_assets(assets)
+                if len(assets) < bounded_page_size:
+                    break
+            else:
+                report["status"] = "partial"
+                report["errors"].append(
+                    f"shared asset pagination bound reached:{instrument_id}"
+                )
     else:
-        report["status"] = "partial"
-        report["errors"].append("shared asset pagination bound reached")
+        for page in range(bounded_max_pages):
+            projection = shared_asset_access.list_effective_assets(
+                document_family="annual_report",
+                knowledge_cutoff=cutoff,
+                availability="local_valid",
+                limit=bounded_page_size,
+                offset=page * bounded_page_size,
+            )
+            assets = list(projection.get("items", ()))
+            report["pages_scanned"] += 1
+            register_assets(assets)
+            if len(assets) < bounded_page_size:
+                break
+        else:
+            report["status"] = "partial"
+            report["errors"].append("shared asset pagination bound reached")
     if report["errors"] and report["status"] == "success":
         report["status"] = "partial"
     return report

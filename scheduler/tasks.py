@@ -8295,11 +8295,16 @@ class ScheduledTasks:
             "business-profile-"
             + get_shanghai_time().strftime("%Y%m%d%H%M%S%f")
         )
+        expanded = str(selection_policy or "").strip() == "expanded"
         active_phase = str(
             rollout_phase
-            or config_manager.get_nested(
-                "business_profile_rollout.active_phase",
-                "",
+            or (
+                ""
+                if expanded
+                else config_manager.get_nested(
+                    "business_profile_rollout.active_phase",
+                    "",
+                )
             )
             or ""
         )
@@ -8350,6 +8355,8 @@ class ScheduledTasks:
         )
         self._active_tasks.add(task_id)
         try:
+            warning_completed = False
+            task_completed = False
             if continuous:
                 from research.business_profile_backfill_control import (
                     ContinuousBackfillOptions,
@@ -8421,14 +8428,28 @@ class ScheduledTasks:
                     lambda: store.should_stop(run_id) is not None
                 )
                 result_status = str(result.get("status") or "failed").lower()
-                success = result_status in {
-                    "success",
-                    "degraded",
-                    "disabled",
-                    "stopped",
-                }
+                terminal_items = int(
+                    (result.get("queue_health") or {}).get("terminal") or 0
+                )
+                warning_completed = (
+                    result_status == "degraded" and terminal_items == 0
+                )
+                success = (
+                    result_status in {"success", "disabled", "stopped"}
+                    and terminal_items == 0
+                )
+                completed = success or warning_completed
+                result_reason = str(
+                    result.get("reason")
+                    or ",".join(
+                        str(item)
+                        for item in result.get("reason_codes") or ()
+                        if str(item)
+                    )
+                    or result_status
+                )
                 progress_state = "stopped" if result_status == "stopped" else (
-                    "completed" if success else "failed"
+                    "completed" if completed else "failed"
                 )
                 progress = store.finish(
                     run_id,
@@ -8437,13 +8458,21 @@ class ScheduledTasks:
                         "operator_stop_requested"
                         if result_status == "stopped"
                         else "single_batch_complete"
-                        if success
-                        else str(result.get("reason") or result_status)
+                        if completed
+                        else result_reason
                     ],
                     latest_result=result,
                 )
                 result["continuous_progress"] = progress
+                task_completed = completed
             outcome = str(result.get("status") or progress.get("state") or "unknown")
+            report_status = (
+                "warning"
+                if not continuous and warning_completed
+                else "success"
+                if success
+                else "error"
+            )
             await self._send_task_report(
                 report_data={
                     "name": (
@@ -8451,7 +8480,7 @@ class ScheduledTasks:
                         if continuous
                         else "业务画像手工回补报告"
                     ),
-                    "status": "success" if success else "error",
+                    "status": report_status,
                     "tasks_completed": _business_profile_completed_items(result),
                     "duration": (
                         f"{time_module.monotonic() - started_monotonic:.3f}s"
@@ -8459,7 +8488,15 @@ class ScheduledTasks:
                     "maintenance_tasks": [
                         {
                             "task_name": task_id,
-                            "status": result.get("reason") or result.get("status"),
+                            "status": (
+                                result.get("reason")
+                                or ",".join(
+                                    str(item)
+                                    for item in result.get("reason_codes") or ()
+                                    if str(item)
+                                )
+                                or result.get("status")
+                            ),
                         }
                     ],
                     "business_profile_async_production": result,
@@ -8473,7 +8510,7 @@ class ScheduledTasks:
                 ),
                 job_config=job_config,
             )
-            return success
+            return task_completed if not continuous else success
         except asyncio.CancelledError:
             outcome = "interrupted"
             store.finish(

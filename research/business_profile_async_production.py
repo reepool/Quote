@@ -901,10 +901,14 @@ class BusinessProfileWorkRepository:
         ):
             return None
         from research.business_profile_source_assets import (
-            project_business_profile_source_asset,
+            project_bound_business_profile_source_asset,
         )
 
-        return project_business_profile_source_asset(self.shared_asset_access, asset)
+        return project_bound_business_profile_source_asset(
+            self.shared_asset_access,
+            asset,
+            knowledge_cutoff=(item.get("metadata") or {}).get("knowledge_cutoff"),
+        )
 
     def get_bound_asset_resolution(
         self,
@@ -1478,17 +1482,37 @@ class BusinessProfileWorkRepository:
             conn.commit()
         return max(0, int(cursor.rowcount or 0))
 
-    def health(self) -> dict[str, Any]:
+    def health(
+        self,
+        *,
+        processing_identity_hash: str | None = None,
+        instrument_ids: Sequence[str] = (),
+    ) -> dict[str, Any]:
         now = get_shanghai_time().isoformat()
+        clauses: list[str] = []
+        params: list[Any] = []
+        if processing_identity_hash:
+            clauses.append("processing_identity_hash = ?")
+            params.append(str(processing_identity_hash))
+        normalized_instruments = tuple(
+            sorted({str(item).strip() for item in instrument_ids if str(item).strip()})
+        )
+        if normalized_instruments:
+            placeholders = ",".join("?" for _ in normalized_instruments)
+            clauses.append(f"instrument_id IN ({placeholders})")
+            params.extend(normalized_instruments)
+        where_clause = " WHERE " + " AND ".join(clauses) if clauses else ""
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             rows = conn.execute(
-                """
+                f"""
                 SELECT stage, status, COUNT(*) AS row_count,
                        MIN(created_at) AS oldest_created_at
                 FROM business_profile_work_items
+                {where_clause}
                 GROUP BY stage, status ORDER BY stage, status
-                """
+                """,
+                tuple(params),
             ).fetchall()
         now_value = get_shanghai_time()
         groups = []
@@ -2042,7 +2066,10 @@ class BusinessProfileAsyncProductionService:
             stage_budgets,
             processing_identity=processing_identity,
         )
-        health = await _run_thread_call(self.repository.health)
+        health = await _run_thread_call(
+            self.repository.health,
+            processing_identity_hash=_stable_hash(processing_identity),
+        )
         throughput = _business_profile_throughput(enqueue, workers)
         status, reason_codes = _business_profile_operation_status(
             discovery=discovery,
@@ -2265,7 +2292,11 @@ class BusinessProfileAsyncProductionService:
             "enqueue": enqueue,
             "workers": workers,
             "throughput": throughput,
-            "queue_health": await _run_thread_call(self.repository.health),
+            "queue_health": await _run_thread_call(
+                self.repository.health,
+                processing_identity_hash=_stable_hash(processing_identity),
+                instrument_ids=instrument_ids,
+            ),
             "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
