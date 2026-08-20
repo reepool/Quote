@@ -207,6 +207,7 @@ async def run_batches(
     request_interval_seconds: Optional[float],
     checkpoint_path: Optional[Path] = None,
     include_batch_details: bool = False,
+    required_core_facts: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     started_at = time.perf_counter()
     if not report_periods:
@@ -257,6 +258,7 @@ async def run_batches(
                     db_path=db_path,
                     request_timeout_seconds=request_timeout_seconds,
                     request_interval_seconds=request_interval_seconds,
+                    required_core_facts=required_core_facts,
                 ),
                 timeout=float(batch_timeout_seconds),
             )
@@ -267,6 +269,7 @@ async def run_batches(
                 if item.get("status") != "passed"
             ]
             failed_instrument_periods = result.get("failed_instrument_periods", [])
+            acquisition = result.get("official_acquisition") or {}
             batch_result = {
                 "batch_index": index,
                 "status": batch_status,
@@ -288,6 +291,7 @@ async def run_batches(
                 "elapsed_seconds": round(time.perf_counter() - batch_started_at, 3),
                 "failed_instruments": sorted(set(failed_instruments)),
                 "failed_instrument_periods": failed_instrument_periods,
+                "official_acquisition": acquisition,
                 "sync_summary": _sync_summary(result.get("sync", {})),
                 "period_summaries": _period_summaries(result.get("period_results", [])),
             }
@@ -448,6 +452,37 @@ async def run_batches(
         "failed_instruments": failed_instruments,
         "failed_instrument_period_count": len(failed_instrument_periods),
         "failed_instrument_periods": failed_instrument_periods,
+        "official_acquisition": {
+            "instrument_period_count": sum(
+                int((batch.get("official_acquisition") or {}).get("instrument_period_count") or 0)
+                for batch in batch_results
+            ),
+            "parsed_instrument_period_count": sum(
+                int((batch.get("official_acquisition") or {}).get("parsed_instrument_period_count") or 0)
+                for batch in batch_results
+            ),
+            "strict_ready_instrument_period_count": sum(
+                int((batch.get("official_acquisition") or {}).get("strict_ready_instrument_period_count") or 0)
+                for batch in batch_results
+            ),
+            "partial_instrument_period_count": sum(
+                int((batch.get("official_acquisition") or {}).get("partial_instrument_period_count") or 0)
+                for batch in batch_results
+            ),
+            "numeric_fact_count": sum(
+                int((batch.get("official_acquisition") or {}).get("numeric_fact_count") or 0)
+                for batch in batch_results
+            ),
+            "missing_required_core_facts": sorted(
+                {
+                    fact
+                    for batch in batch_results
+                    for fact in (batch.get("official_acquisition") or {}).get(
+                        "missing_required_core_facts", []
+                    )
+                }
+            ),
+        },
         "elapsed_seconds": round(elapsed_seconds, 3),
         "throughput_instruments_per_minute": round(
             (len(pending_ids) / elapsed_seconds * 60.0)
@@ -705,6 +740,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--request-timeout-seconds", type=float, default=8.0)
     parser.add_argument("--request-interval-seconds", type=float, default=0.2)
     parser.add_argument(
+        "--required-core-facts",
+        help="Comma-separated production canonical core facts used for strict readiness.",
+    )
+    parser.add_argument(
         "--db-path",
         type=Path,
         default=_default_db_path(),
@@ -750,6 +789,11 @@ def main() -> int:
             request_interval_seconds=args.request_interval_seconds,
             checkpoint_path=args.checkpoint_path,
             include_batch_details=args.include_batch_details,
+            required_core_facts=(
+                [part.strip() for part in args.required_core_facts.split(",") if part.strip()]
+                if args.required_core_facts
+                else None
+            ),
         )
     )
     print(json.dumps(json_ready(result), ensure_ascii=False, indent=2, sort_keys=True))

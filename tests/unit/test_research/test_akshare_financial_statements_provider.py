@@ -1,8 +1,118 @@
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
+import requests
 
 from research.providers.akshare_financial_statements import AkshareFinancialStatementsProvider
+
+
+class _SinaResponse:
+    def __init__(self, *, body: bytes, status_code: int = 200, content_type: str = "application/json"):
+        self.content = body
+        self.status_code = status_code
+        self.headers = {"Content-Type": content_type}
+        self.encoding = "utf-8"
+
+
+class _SinaSession:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = []
+
+    def get(self, url, **kwargs):
+        self.calls.append((url, kwargs))
+        response = self.responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+
+def _sina_payload() -> bytes:
+    return (
+        '{"result":{"status":{"code":0},"data":{"report_date":'
+        '[{"date_value":"20260630"}],"report_list":{"20260630":{'
+        '"data_source":"定期报告","is_audit":"未审计",'
+        '"publish_date":"20260820","rCurrency":"CNY",'
+        '"rType":"合并期末","update_time":1787127123,"data":['
+        '{"item_title":"总资产","item_value":"123.45"}]}}}}}'
+    ).encode("utf-8")
+
+
+def test_sina_report_adapter_parses_valid_json_and_applies_timeout():
+    provider = AkshareFinancialStatementsProvider(
+        {"request_timeout_seconds": 7.0, "retry_attempts": 2}
+    )
+    session = _SinaSession([_SinaResponse(body=_sina_payload())])
+    provider._sina_session = session
+
+    frame = provider._fetch_sina_financial_report(
+        stock="sz300540", statement="资产负债表"
+    )
+
+    assert frame.loc[0, "报告日"] == "20260630"
+    assert frame.loc[0, "总资产"] == 123.45
+    assert session.calls[0][1]["timeout"] == 7.0
+
+
+@pytest.mark.parametrize(
+    "first_response",
+    [
+        _SinaResponse(body=b""),
+        _SinaResponse(body=b"<html>busy</html>", content_type="text/html"),
+        _SinaResponse(body=b"not-json", content_type="application/json"),
+        _SinaResponse(body=b"busy", status_code=503, content_type="text/plain"),
+    ],
+)
+def test_sina_report_adapter_retries_transient_responses(first_response):
+    provider = AkshareFinancialStatementsProvider(
+        {"retry_attempts": 2, "retry_backoff_seconds": 0.0}
+    )
+    session = _SinaSession(
+        [first_response, _SinaResponse(body=_sina_payload())]
+    )
+    provider._sina_session = session
+
+    result = provider._request_sina_financial_json(stock="sz300540", source="fzb")
+
+    assert result["result"]["status"]["code"] == 0
+    assert len(session.calls) == 2
+
+
+def test_sina_report_adapter_reports_compact_final_diagnostic():
+    provider = AkshareFinancialStatementsProvider(
+        {"retry_attempts": 2, "retry_backoff_seconds": 0.0}
+    )
+    body = (b"<html>" + b"x" * 400 + b"</html>")
+    provider._sina_session = _SinaSession(
+        [
+            _SinaResponse(body=body, content_type="text/html"),
+            _SinaResponse(body=body, content_type="text/html"),
+        ]
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        provider._request_sina_financial_json(stock="sz300540", source="fzb")
+
+    message = str(exc_info.value)
+    assert "attempts=2" in message
+    assert "content_type=text/html" in message
+    assert len(message) < 400
+
+
+def test_sina_report_adapter_retries_timeout():
+    provider = AkshareFinancialStatementsProvider(
+        {"retry_attempts": 2, "retry_backoff_seconds": 0.0}
+    )
+    session = _SinaSession(
+        [requests.Timeout("timed out"), _SinaResponse(body=_sina_payload())]
+    )
+    provider._sina_session = session
+
+    result = provider._request_sina_financial_json(stock="sz300540", source="fzb")
+
+    assert result["result"]["status"]["code"] == 0
+    assert len(session.calls) == 2
 
 
 def test_akshare_financial_statements_provider_uses_local_core_order_when_enabled():
@@ -175,6 +285,12 @@ def test_akshare_financial_statements_provider_falls_back_to_sina_report(monkeyp
 
     monkeypatch.setattr(
         provider,
+        "_fetch_sina_financial_report",
+        lambda *, stock, statement: _sina_report(stock=stock, symbol=statement),
+    )
+
+    monkeypatch.setattr(
+        provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
             stock_balance_sheet_by_report_em=_eastmoney_failure,
@@ -287,6 +403,12 @@ def test_akshare_financial_statements_provider_merges_target_period_statement_ga
                 }
             ]
         )
+
+    monkeypatch.setattr(
+        provider,
+        "_fetch_sina_financial_report",
+        lambda *, stock, statement: _sina_report(stock=stock, symbol=statement),
+    )
 
     monkeypatch.setattr(
         provider,
@@ -409,6 +531,12 @@ def test_akshare_financial_statements_provider_merges_missing_fields_from_sina(
                 ]
             )
         return pd.DataFrame()
+
+    monkeypatch.setattr(
+        provider,
+        "_fetch_sina_financial_report",
+        lambda *, stock, statement: _sina_report(stock=stock, symbol=statement),
+    )
 
     monkeypatch.setattr(
         provider,

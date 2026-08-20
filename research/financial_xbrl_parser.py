@@ -428,6 +428,23 @@ class FinancialCninfoData20StructuredJsonFactParser:
                     )
                 )
 
+        derived_equity = self._derive_parent_equity(
+            facts,
+            source_file_id=source_file_id,
+            instrument_id=instrument_id,
+            symbol=symbol,
+            exchange=exchange,
+            report_period=report_period,
+            report_type=report_type,
+            source=source,
+            source_mode=source_mode,
+            path=path,
+            period_bucket=period_bucket,
+            period_year=period_year,
+        )
+        if derived_equity is not None:
+            facts.append(derived_equity)
+
         return FinancialXbrlParseResult(
             numeric_facts=facts,
             diagnostics={
@@ -444,6 +461,83 @@ class FinancialCninfoData20StructuredJsonFactParser:
                 "skipped_non_numeric_facts": skipped_non_numeric,
                 "skipped_missing_period": skipped_missing_period,
                 "parse_status": "parsed" if facts else "no_numeric_facts",
+            },
+        )
+
+    def _derive_parent_equity(
+        self,
+        facts: List[FinancialNumericFactSnapshot],
+        *,
+        source_file_id: str,
+        instrument_id: str,
+        symbol: str,
+        exchange: str,
+        report_period: str,
+        report_type: Optional[str],
+        source: str,
+        source_mode: str,
+        path: str,
+        period_bucket: str,
+        period_year: str,
+    ) -> Optional[FinancialNumericFactSnapshot]:
+        by_canonical = {
+            str(fact.canonical_fact_name or ""): fact
+            for fact in facts
+            if fact.fact_value is not None
+        }
+        if "equity_parent" in by_canonical:
+            return None
+        total = by_canonical.get("equity_total")
+        minority = by_canonical.get("minority_equity")
+        if total is None or minority is None:
+            return None
+        metadata = describe_financial_numeric_fact_name("归属于母公司所有者权益合计")
+        value = float(total.fact_value) - float(minority.fact_value)
+        return FinancialNumericFactSnapshot(
+            source_file_id=source_file_id,
+            instrument_id=instrument_id,
+            symbol=symbol,
+            exchange=exchange,
+            report_period=report_period,
+            report_type=report_type,
+            statement_family="balance_sheet",
+            fact_name="归属于母公司所有者权益合计（推导）",
+            canonical_fact_name="equity_parent",
+            canonical_statement_family=metadata.get("canonical_statement_family"),
+            canonical_semantic=metadata.get("canonical_semantic"),
+            canonical_unit=metadata.get("canonical_unit"),
+            canonical_version=metadata.get("canonical_version"),
+            taxonomy_namespace=f"cninfo:data20:{path.rsplit('/', 1)[-1]}:derived",
+            context_id=(
+                f"cninfo_data20:{path}:{period_bucket}:{period_year}:"
+                "equity_total_minus_minority_equity"
+            ),
+            unit="CNY",
+            fact_value=value,
+            value_text=str(value),
+            source=source,
+            source_mode=source_mode,
+            parser_version=self.parser_version,
+            raw_fact_json={
+                "path": path,
+                "period_bucket": period_bucket,
+                "period_year": period_year,
+                "derivation_method": "equity_total_minus_minority_equity",
+                "derived_from": [
+                    {
+                        "canonical_fact_name": total.canonical_fact_name,
+                        "fact_name": total.fact_name,
+                        "fact_value": total.fact_value,
+                        "context_id": total.context_id,
+                    },
+                    {
+                        "canonical_fact_name": minority.canonical_fact_name,
+                        "fact_name": minority.fact_name,
+                        "fact_value": minority.fact_value,
+                        "context_id": minority.context_id,
+                    },
+                ],
+                "standardized_fact": metadata,
             },
         )
 

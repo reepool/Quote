@@ -112,6 +112,9 @@ def test_financial_disclosure_report_includes_expired_pending_and_source_degrada
                 "cninfo_attempts": 1,
                 "cninfo_successes": 0,
                 "cninfo_batch_successes": 0,
+                "cninfo_parsed_instrument_periods": 0,
+                "cninfo_numeric_facts": 0,
+                "cninfo_source_failures": 1,
                 "cninfo_missing_or_ambiguous": 1,
                 "fallback_attempts": 1,
                 "fallback_successes": 1,
@@ -140,18 +143,24 @@ def test_financial_disclosure_report_marks_successful_fallback_collection():
             "source_routing": {
                 "cninfo_attempts": 1,
                 "cninfo_successes": 0,
+                "cninfo_parsed_instrument_periods": 1,
+                "cninfo_numeric_facts": 24,
+                "cninfo_source_failures": 0,
+                "cninfo_missing_required_core_facts": ["equity_parent"],
                 "fallback_attempts": 1,
                 "fallback_successes": 1,
-                "final_source": "fallback",
+                "final_source": "mixed",
                 "source_collection_complete": True,
-                "errors": ["cninfo_data20:SZSE:2026-06-30:degraded:failed=1/1"],
+                "errors": [],
             },
         }
     )
 
     assert "结论: ✅ *成功*" in text
-    assert "数据来源: fallback（Sina/THS，非 CNInfo）" in text
-    assert "最终数据采集已完成" in text
+    assert "数据来源: CNInfo + fallback（Sina/THS）" in text
+    assert "解析成功 1" in text
+    assert "CNInfo待补字段: equity_parent" in text
+    assert "补数源警告:" not in text
 
 
 def test_financial_statements_catchup_task_passes_incremental_controls(monkeypatch):
@@ -371,6 +380,9 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
                 "cninfo_attempts": 1,
                 "cninfo_successes": 0,
                 "cninfo_batch_successes": 1,
+                "cninfo_parsed_instrument_periods": 1,
+                "cninfo_numeric_facts": 24,
+                "cninfo_source_failures": 0,
                 "cninfo_missing_or_ambiguous": 1,
                 "fallback_attempts": 1,
                 "fallback_successes": 0,
@@ -394,8 +406,9 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
     assert "待退市风险 1" in report_data["content"]
     assert "过滤噪声 2" in report_data["content"]
     assert "旧噪声过滤 2" in report_data["content"]
-    assert "CNInfo尝试 1" in report_data["content"]
-    assert "批处理通过 1" in report_data["content"]
+    assert "CNInfo请求 1" in report_data["content"]
+    assert "解析成功 1" in report_data["content"]
+    assert "数值事实 24" in report_data["content"]
     assert "fallback尝试 1" in report_data["content"]
     assert "不会改写股票主数据退市状态" in report_data["content"]
     assert "financial_disclosure_incremental_sync" not in task._active_tasks

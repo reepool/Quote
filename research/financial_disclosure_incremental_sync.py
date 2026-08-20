@@ -1448,17 +1448,32 @@ class FinancialDisclosureIncrementalSyncService:
             "cninfo_successes",
             "cninfo_batch_successes",
             "cninfo_failed_instrument_periods",
+            "cninfo_source_failures",
+            "cninfo_parsed_instrument_periods",
+            "cninfo_partial_instrument_periods",
+            "cninfo_numeric_facts",
             "cninfo_missing_or_ambiguous",
             "fallback_attempts",
             "fallback_successes",
         ):
             merged[key] = int(merged.get(key, 0) or 0) + int(right.get(key, 0) or 0)
         merged["errors"] = list(merged.get("errors") or []) + list(right.get("errors") or [])
+        merged["cninfo_missing_required_core_facts"] = sorted(
+            {
+                str(item)
+                for source in (left, right)
+                for item in source.get("cninfo_missing_required_core_facts", [])
+                if str(item)
+            }
+        )
         merged["source_order"] = list(right.get("source_order") or merged.get("source_order") or [])
         merged["fallback_sources"] = list(
             right.get("fallback_sources") or merged.get("fallback_sources") or []
         )
         cninfo_successes = int(merged.get("cninfo_successes", 0) or 0)
+        cninfo_parsed = int(
+            merged.get("cninfo_parsed_instrument_periods", 0) or 0
+        )
         fallback_successes = int(merged.get("fallback_successes", 0) or 0)
         cninfo_attempts = int(merged.get("cninfo_attempts", 0) or 0)
         fallback_attempts = int(merged.get("fallback_attempts", 0) or 0)
@@ -1466,7 +1481,7 @@ class FinancialDisclosureIncrementalSyncService:
         attempted = max(cninfo_attempts, fallback_attempts)
         if completed <= 0:
             final_source = "none"
-        elif cninfo_successes and fallback_successes:
+        elif (cninfo_successes or cninfo_parsed) and fallback_successes:
             final_source = "mixed"
         elif cninfo_successes:
             final_source = "cninfo"

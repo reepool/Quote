@@ -75,6 +75,11 @@ class FinancialMaintenanceRepairRouter:
             "cninfo_successes": 0,
             "cninfo_batch_successes": 0,
             "cninfo_failed_instrument_periods": 0,
+            "cninfo_source_failures": 0,
+            "cninfo_parsed_instrument_periods": 0,
+            "cninfo_partial_instrument_periods": 0,
+            "cninfo_numeric_facts": 0,
+            "cninfo_missing_required_core_facts": [],
             "cninfo_missing_or_ambiguous": 0,
             "fallback_attempts": 0,
             "fallback_successes": 0,
@@ -115,6 +120,7 @@ class FinancialMaintenanceRepairRouter:
                 db_path=db_path,
                 request_interval_seconds=request_interval_seconds,
                 request_timeout_seconds=request_timeout_seconds,
+                required_core_facts=required_core_facts,
             )
             cninfo_ready_keys = self._ready_target_keys(
                 targets,
@@ -132,6 +138,19 @@ class FinancialMaintenanceRepairRouter:
                     "cninfo_failed_instrument_periods": cninfo_summary.get(
                         "failed_instrument_periods",
                         0,
+                    ),
+                    "cninfo_source_failures": cninfo_summary.get(
+                        "source_failures", 0
+                    ),
+                    "cninfo_parsed_instrument_periods": cninfo_summary.get(
+                        "parsed_instrument_periods", 0
+                    ),
+                    "cninfo_partial_instrument_periods": cninfo_summary.get(
+                        "partial_instrument_periods", 0
+                    ),
+                    "cninfo_numeric_facts": cninfo_summary.get("numeric_facts", 0),
+                    "cninfo_missing_required_core_facts": cninfo_summary.get(
+                        "missing_required_core_facts", []
                     ),
                     "cninfo_missing_or_ambiguous": max(
                         0,
@@ -202,6 +221,9 @@ class FinancialMaintenanceRepairRouter:
     def _finalize_source_summary(summary: Dict[str, Any]) -> None:
         """Derive final collection state independently from source health."""
         cninfo_successes = int(summary.get("cninfo_successes", 0) or 0)
+        cninfo_parsed = int(
+            summary.get("cninfo_parsed_instrument_periods", 0) or 0
+        )
         fallback_successes = int(summary.get("fallback_successes", 0) or 0)
         cninfo_attempts = int(summary.get("cninfo_attempts", 0) or 0)
         fallback_attempts = int(summary.get("fallback_attempts", 0) or 0)
@@ -209,7 +231,7 @@ class FinancialMaintenanceRepairRouter:
         attempted = max(cninfo_attempts, fallback_attempts)
         if completed <= 0:
             final_source = "none"
-        elif cninfo_successes and fallback_successes:
+        elif (cninfo_successes or cninfo_parsed) and fallback_successes:
             final_source = "mixed"
         elif cninfo_successes:
             final_source = "cninfo"
@@ -283,11 +305,17 @@ class FinancialMaintenanceRepairRouter:
         db_path: Path,
         request_interval_seconds: float,
         request_timeout_seconds: float,
+        required_core_facts: Sequence[str],
     ) -> Dict[str, Any]:
         if not targets:
             return {
                 "attempts": 0,
                 "successes": 0,
+                "source_failures": 0,
+                "parsed_instrument_periods": 0,
+                "partial_instrument_periods": 0,
+                "numeric_facts": 0,
+                "missing_required_core_facts": [],
                 "missing_or_ambiguous": 0,
                 "errors": [],
             }
@@ -298,6 +326,11 @@ class FinancialMaintenanceRepairRouter:
         attempts = len(targets)
         batch_successes = 0
         failed_instrument_periods = 0
+        parsed_instrument_periods = 0
+        partial_instrument_periods = 0
+        numeric_facts = 0
+        missing_required_core_facts: set[str] = set()
+        source_failures = 0
         errors: List[str] = []
         grouped: Dict[Tuple[str, str], List[FinancialMaintenanceRepairTarget]] = {}
         for target in targets:
@@ -323,29 +356,55 @@ class FinancialMaintenanceRepairRouter:
                         ),
                         request_timeout_seconds=request_timeout_seconds,
                         request_interval_seconds=request_interval_seconds,
+                        required_core_facts=list(required_core_facts),
                         checkpoint_path=temp_dir
                         / f"{exchange}_{report_period}.checkpoint.json",
                         include_batch_details=False,
                     )
                     failed_count = int(result.get("failed_instrument_period_count") or 0)
+                    acquisition = result.get("official_acquisition") or {}
+                    parsed_instrument_periods += int(
+                        acquisition.get("parsed_instrument_period_count") or 0
+                    )
+                    partial_instrument_periods += int(
+                        acquisition.get("partial_instrument_period_count") or 0
+                    )
+                    numeric_facts += int(acquisition.get("numeric_fact_count") or 0)
+                    missing_required_core_facts.update(
+                        str(item)
+                        for item in acquisition.get("missing_required_core_facts", [])
+                        if str(item)
+                    )
                     failed_instrument_periods += failed_count
                     batch_successes += max(
                         0,
                         len(period_targets) - failed_count,
                     )
-                    if result.get("status") not in {"passed", "success"}:
+                    transport_failed = max(
+                        0,
+                        len(period_targets)
+                        - int(acquisition.get("parsed_instrument_period_count") or 0),
+                    )
+                    source_failures += transport_failed
+                    if transport_failed:
                         errors.append(
                             "cninfo_data20:"
-                            f"{exchange}:{report_period}:{result.get('status')}"
-                            f":failed={failed_count}/{len(period_targets)}"
+                            f"{exchange}:{report_period}:source_failed"
+                            f":failed={transport_failed}/{len(period_targets)}"
                         )
                 except Exception as exc:
                     failed_instrument_periods += len(period_targets)
+                    source_failures += len(period_targets)
                     errors.append(f"cninfo_data20:{exchange}:{report_period}:{exc}")
         return {
             "attempts": attempts,
             "batch_successes": batch_successes,
             "failed_instrument_periods": failed_instrument_periods,
+            "source_failures": source_failures,
+            "parsed_instrument_periods": parsed_instrument_periods,
+            "partial_instrument_periods": partial_instrument_periods,
+            "numeric_facts": numeric_facts,
+            "missing_required_core_facts": sorted(missing_required_core_facts),
             "missing_or_ambiguous": max(0, attempts - batch_successes),
             "errors": errors[:10],
         }

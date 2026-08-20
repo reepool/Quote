@@ -5,13 +5,17 @@ AkShare-backed financial statements provider.
 from __future__ import annotations
 
 import asyncio
+import json
+import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+import requests
 
 from research.financial_fact_aliases import describe_core_financial_fact_alias
 from utils import dm_logger
+from utils.http_transport import create_requests_session
 from .akshare_support import load_akshare
 from .base import (
     BaseFinancialStatementsProvider,
@@ -28,6 +32,15 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
     source_name = "akshare"
     supported_modes = {"direct", "proxy_patch"}
     _supported_statement_interfaces = {"sina_report", "ths_report", "eastmoney_report"}
+    _sina_report_url = (
+        "https://quotes.sina.cn/cn/api/openapi.php/"
+        "CompanyFinanceService.getFinanceReport2022"
+    )
+    _sina_statement_source = {
+        "资产负债表": "fzb",
+        "利润表": "lrb",
+        "现金流量表": "llb",
+    }
 
     _report_period_aliases = (
         "REPORT_DATE",
@@ -202,6 +215,22 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
 
     def __init__(self, provider_config: Optional[Dict[str, Any]] = None):
         self.provider_config = provider_config or {}
+        self.request_timeout_seconds = float(
+            self.provider_config.get("request_timeout_seconds", 20.0)
+        )
+        self.request_interval_seconds = float(
+            self.provider_config.get("request_interval_seconds", 0.0)
+        )
+        self.retry_attempts = max(
+            1, int(self.provider_config.get("retry_attempts", 2) or 1)
+        )
+        self.retry_backoff_seconds = max(
+            0.0, float(self.provider_config.get("retry_backoff_seconds", 0.5) or 0.0)
+        )
+        self._sina_session = create_requests_session(
+            headers={"User-Agent": "QuoteResearch/akshare-financial-statements"}
+        )
+        self._sina_last_request_at: Optional[float] = None
         self.statement_interface_order = self._resolve_statement_interface_order(
             self._configured_statement_interface_order()
         )
@@ -468,18 +497,9 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             if symbol is None:
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
             return (
-                akshare_module.stock_financial_report_sina(
-                    stock=symbol,
-                    symbol="资产负债表",
-                ),
-                akshare_module.stock_financial_report_sina(
-                    stock=symbol,
-                    symbol="利润表",
-                ),
-                akshare_module.stock_financial_report_sina(
-                    stock=symbol,
-                    symbol="现金流量表",
-                ),
+                self._fetch_sina_financial_report(stock=symbol, statement="资产负债表"),
+                self._fetch_sina_financial_report(stock=symbol, statement="利润表"),
+                self._fetch_sina_financial_report(stock=symbol, statement="现金流量表"),
             )
 
         if statement_interface == "eastmoney_report":
@@ -514,6 +534,119 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             )
 
         raise ValueError(f"unsupported AkShare statement interface: {statement_interface}")
+
+    def _fetch_sina_financial_report(
+        self,
+        *,
+        stock: str,
+        statement: str,
+    ) -> pd.DataFrame:
+        source = self._sina_statement_source[statement]
+        payload = self._request_sina_financial_json(stock=stock, source=source)
+        try:
+            data = payload["result"]["data"]
+            report_dates = [item["date_value"] for item in data["report_date"]]
+            report_list = data["report_list"]
+        except (KeyError, TypeError) as exc:
+            raise ValueError(
+                f"sina_report invalid_schema stock={stock} statement={source}"
+            ) from exc
+
+        rows: List[Dict[str, Any]] = []
+        for report_date in report_dates:
+            report = report_list.get(report_date) or {}
+            row = {
+                str(item.get("item_title") or ""): pd.to_numeric(
+                    item.get("item_value"), errors="coerce"
+                )
+                for item in report.get("data") or []
+                if str(item.get("item_title") or "")
+            }
+            row.update(
+                {
+                    "报告日": report_date,
+                    "数据源": report.get("data_source"),
+                    "是否审计": report.get("is_audit"),
+                    "公告日期": report.get("publish_date"),
+                    "币种": report.get("rCurrency"),
+                    "类型": report.get("rType"),
+                    "更新日期": self._sina_update_time(report.get("update_time")),
+                }
+            )
+            rows.append(row)
+        return pd.DataFrame(rows)
+
+    def _request_sina_financial_json(
+        self,
+        *,
+        stock: str,
+        source: str,
+    ) -> Dict[str, Any]:
+        params = {
+            "paperCode": stock,
+            "source": source,
+            "type": "0",
+            "page": "1",
+            "num": "1000",
+        }
+        last_diagnostic = "no_response"
+        for attempt in range(1, self.retry_attempts + 1):
+            self._pace_sina_request()
+            try:
+                response = self._sina_session.get(
+                    self._sina_report_url,
+                    params=params,
+                    timeout=self.request_timeout_seconds,
+                )
+                content_type = str(response.headers.get("Content-Type") or "")
+                body = bytes(response.content or b"")
+                prefix = self._response_prefix(body)
+                last_diagnostic = (
+                    f"status={response.status_code} content_type={content_type or 'unknown'} "
+                    f"body_prefix={prefix}"
+                )
+                if response.status_code >= 400:
+                    raise requests.HTTPError(last_diagnostic, response=response)
+                if not body.strip():
+                    raise ValueError(f"empty_response {last_diagnostic}")
+                if "json" not in content_type.lower() and not body.lstrip().startswith(
+                    (b"{", b"[")
+                ):
+                    raise ValueError(f"non_json_response {last_diagnostic}")
+                payload = json.loads(body.decode(getattr(response, "encoding", None) or "utf-8"))
+                if not isinstance(payload, dict):
+                    raise ValueError(f"non_object_json {last_diagnostic}")
+                return payload
+            except (requests.RequestException, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+                last_diagnostic = str(exc) or last_diagnostic
+                if attempt >= self.retry_attempts:
+                    break
+                if self.retry_backoff_seconds > 0:
+                    time.sleep(self.retry_backoff_seconds * (2 ** (attempt - 1)))
+        raise ValueError(
+            f"sina_report request_failed stock={stock} statement={source} "
+            f"attempts={self.retry_attempts} {last_diagnostic}"
+        )
+
+    def _pace_sina_request(self) -> None:
+        now = time.monotonic()
+        if self._sina_last_request_at is not None and self.request_interval_seconds > 0:
+            remaining = self.request_interval_seconds - (now - self._sina_last_request_at)
+            if remaining > 0:
+                time.sleep(remaining)
+        self._sina_last_request_at = time.monotonic()
+
+    @staticmethod
+    def _response_prefix(content: bytes, *, limit: int = 160) -> str:
+        text = content[:limit].decode("utf-8", errors="replace")
+        return repr(" ".join(text.split()))
+
+    @staticmethod
+    def _sina_update_time(value: Any) -> Optional[str]:
+        try:
+            return datetime.fromtimestamp(float(value)).isoformat()
+        except (TypeError, ValueError, OSError, OverflowError):
+            return None
 
     def _build_bundles(
         self,

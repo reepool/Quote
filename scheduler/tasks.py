@@ -2605,18 +2605,31 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
     if source_routing:
         lines.append(
             "补数源: "
-            f"CNInfo尝试 {source_routing.get('cninfo_attempts', 0)}，"
-            f"ready {source_routing.get('cninfo_successes', 0)}，"
-            f"批处理通过 {source_routing.get('cninfo_batch_successes', 0)}，"
-            f"缺失/歧义 {source_routing.get('cninfo_missing_or_ambiguous', 0)}；"
+            f"CNInfo请求 {source_routing.get('cninfo_attempts', 0)}，"
+            f"解析成功 {source_routing.get('cninfo_parsed_instrument_periods', 0)}，"
+            f"数值事实 {source_routing.get('cninfo_numeric_facts', 0)}，"
+            f"完整ready {source_routing.get('cninfo_successes', 0)}，"
+            f"待fallback {source_routing.get('cninfo_missing_or_ambiguous', 0)}，"
+            f"源失败 {source_routing.get('cninfo_source_failures', 0)}；"
             f"Sina/THS fallback尝试 {source_routing.get('fallback_attempts', 0)}，"
             f"成功 {source_routing.get('fallback_successes', 0)}"
         )
+        missing_official_facts = source_routing.get(
+            "cninfo_missing_required_core_facts"
+        ) or []
+        if missing_official_facts:
+            lines.append(
+                "CNInfo待补字段: "
+                + "，".join(str(item) for item in missing_official_facts)
+            )
         final_source = str(source_routing.get("final_source") or "").lower()
         if not final_source:
             cninfo_successes = int(source_routing.get("cninfo_successes", 0) or 0)
+            cninfo_parsed = int(
+                source_routing.get("cninfo_parsed_instrument_periods", 0) or 0
+            )
             fallback_successes = int(source_routing.get("fallback_successes", 0) or 0)
-            if cninfo_successes and fallback_successes:
+            if (cninfo_successes or cninfo_parsed) and fallback_successes:
                 final_source = "mixed"
             elif cninfo_successes:
                 final_source = "cninfo"

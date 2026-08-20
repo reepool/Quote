@@ -1230,6 +1230,130 @@ def test_repair_router_uses_fresh_readiness_after_external_write(tmp_path, monke
     assert result["fallback_attempts"] == 0
 
 
+def test_repair_router_keeps_partial_cninfo_and_falls_back_for_missing_fact(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _FakeStorage(
+        ready=False,
+        numeric_rows=[
+            {
+                "canonical_fact_name": "total_assets",
+                "source": "cninfo",
+                "parser_version": "cninfo_data20_structured_json_facts.v1",
+                "raw_fact": {"source_profile": "cninfo_data20"},
+                "value": 100.0,
+            }
+        ],
+        missing_fields=[{"canonical_fact": "equity_parent"}],
+    )
+    router = FinancialMaintenanceRepairRouter(
+        storage=storage,
+        research_config=_research_config(tmp_path),
+    )
+    target = FinancialMaintenanceRepairTarget(
+        instrument_id="002731.SZ",
+        symbol="002731",
+        exchange="SZSE",
+        report_period="2026-06-30",
+        profile="nonbank",
+    )
+
+    async def _fake_cninfo(**kwargs):
+        assert kwargs["required_core_facts"] == ["total_assets", "equity_parent"]
+        return {
+            "attempts": 1,
+            "batch_successes": 0,
+            "failed_instrument_periods": 1,
+            "source_failures": 0,
+            "parsed_instrument_periods": 1,
+            "partial_instrument_periods": 1,
+            "numeric_facts": 24,
+            "missing_required_core_facts": ["equity_parent"],
+            "errors": [],
+        }
+
+    async def _fake_fallback(**kwargs):
+        storage.financial_statements.ready = True
+        storage.financial_statements.missing_fields = []
+
+    router._run_cninfo_data20_import = _fake_cninfo
+    monkeypatch.setattr(
+        "research.financial_statement_maintenance_repair.ResearchStorageManager",
+        lambda research_config: storage,
+    )
+    monkeypatch.setattr(
+        "scripts.dev_validation.validate_sina_ths_local_core_dryrun.run_local_core_dryrun",
+        _fake_fallback,
+    )
+
+    result = _run(
+        router.repair_targets(
+            targets=[target],
+            required_core_facts=["total_assets", "equity_parent"],
+            mapping_version="test",
+            db_path=tmp_path / "financials.db",
+            request_interval_seconds=0.0,
+            request_timeout_seconds=1.0,
+        )
+    )
+
+    assert result["cninfo_parsed_instrument_periods"] == 1
+    assert result["cninfo_source_failures"] == 0
+    assert result["cninfo_missing_required_core_facts"] == ["equity_parent"]
+    assert result["fallback_attempts"] == 1
+    assert result["fallback_successes"] == 1
+    assert result["final_source"] == "mixed"
+    assert result["errors"] == []
+
+
+def test_official_validation_uses_cninfo_numeric_facts_for_readiness():
+    from scripts.dev_validation.validate_sse_official_financial_json_live import (
+        _validate_instrument_core_facts,
+    )
+
+    class _FinancialStatements:
+        @staticmethod
+        def get_core_facts(*args, **kwargs):
+            return [
+                {
+                    "facts": {
+                        "total_assets": 100.0,
+                        "net_income_parent": None,
+                    }
+                }
+            ]
+
+        @staticmethod
+        def get_numeric_facts(*args, **kwargs):
+            return [
+                {
+                    "canonical_fact_name": "net_income_parent",
+                    "fact_value": 12.0,
+                    "source": "cninfo",
+                    "parser_version": "cninfo_data20_structured_json_facts.v1",
+                }
+            ]
+
+    storage = type("_Storage", (), {"financial_statements": _FinancialStatements()})()
+
+    result = _validate_instrument_core_facts(
+        storage=storage,
+        instrument_id="600519.SH",
+        report_period="2026-06-30",
+        required_core_facts=["total_assets", "net_income_parent", "equity_parent"],
+        official_source="cninfo",
+        parser_profile="cninfo_data20_structured_json_facts.v1",
+    )
+
+    assert result["present_required_core_facts"] == [
+        "total_assets",
+        "net_income_parent",
+    ]
+    assert result["missing_required_core_facts"] == ["equity_parent"]
+    assert result["official_parsed"] is True
+
+
 def test_candidate_profile_uses_storage_industry_membership(tmp_path):
     storage = _FakeStorage(
         ready=True,

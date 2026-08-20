@@ -293,6 +293,60 @@ def test_structured_dispatcher_maps_cninfo_share_capital_as_amount():
     assert fact.canonical_fact_name != "shares_outstanding"
 
 
+def test_cninfo_total_equity_does_not_silently_populate_parent_equity():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            '{"path":"/financialData/getBalanceSheets","code":200,'
+            '"data":{"records":[{"middle":['
+            '{"index":"所有者权益","2026":54821400.0}]}]}}'
+        ).encode("utf-8"),
+        artifact_kind="structured_json",
+        source_file_id="file-cninfo-equity-total",
+        instrument_id="000001.SZ",
+        symbol="000001",
+        exchange="SZSE",
+        report_period="2026-06-30",
+        source="cninfo",
+    )
+
+    facts = {fact.canonical_fact_name: fact for fact in result.numeric_facts}
+
+    assert facts["equity_total"].fact_value == 548214000000.0
+    assert "equity_parent" not in facts
+
+
+def test_cninfo_derives_parent_equity_only_from_total_and_minority_equity():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            '{"path":"/financialData/getBalanceSheets","code":200,'
+            '"data":{"records":[{"middle":['
+            '{"index":"所有者权益","2026":1000.0},'
+            '{"index":"少数股东权益","2026":125.0}]}]}}'
+        ).encode("utf-8"),
+        artifact_kind="structured_json",
+        source_file_id="file-cninfo-equity-derived",
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        report_period="2026-06-30",
+        source="cninfo",
+    )
+
+    facts = {fact.canonical_fact_name: fact for fact in result.numeric_facts}
+    derived = facts["equity_parent"]
+
+    assert derived.fact_value == 8750000.0
+    assert derived.canonical_semantic == "parent_attributable_equity"
+    assert (
+        derived.raw_fact_json["derivation_method"]
+        == "equity_total_minus_minority_equity"
+    )
+    assert [
+        item["canonical_fact_name"]
+        for item in derived.raw_fact_json["derived_from"]
+    ] == ["equity_total", "minority_equity"]
+
+
 def test_cninfo_data20_json_classifies_as_structured_payload():
     classification = classify_official_filing_response(
         (

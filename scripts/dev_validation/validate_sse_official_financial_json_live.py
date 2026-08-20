@@ -233,6 +233,8 @@ async def run_validation(
             instrument_id=instrument_id,
             report_period=normalized_period,
             required_core_facts=required,
+            official_source=official_source,
+            parser_profile=structured_parser_profile,
         )
         for instrument_id in instrument_ids
         for normalized_period in normalized_periods
@@ -245,8 +247,12 @@ async def run_validation(
             "instrument_id": item["instrument_id"],
             "report_period": item["report_period"],
             "blockers": item["blockers"],
+            "missing_required_core_facts": item.get("missing_required_core_facts", []),
         }
         for item in failed_instruments
+    ]
+    parsed_instrument_periods = [
+        item for item in instrument_results if item.get("official_parsed")
     ]
     first_result = instrument_results[0]
     total_numeric_facts_written = sum(
@@ -331,6 +337,26 @@ async def run_validation(
         "sample_core_facts": first_result["sample_core_facts"],
         "core_row_count": sum(item["core_row_count"] for item in instrument_results),
         "failed_instrument_periods": failed_instrument_periods,
+        "official_acquisition": {
+            "instrument_period_count": len(instrument_results),
+            "parsed_instrument_period_count": len(parsed_instrument_periods),
+            "strict_ready_instrument_period_count": len(instrument_results)
+            - len(failed_instruments),
+            "partial_instrument_period_count": len(
+                [item for item in parsed_instrument_periods if item["status"] != "passed"]
+            ),
+            "numeric_fact_count": sum(
+                int(item.get("official_numeric_fact_count") or 0)
+                for item in instrument_results
+            ),
+            "missing_required_core_facts": sorted(
+                {
+                    fact
+                    for item in failed_instrument_periods
+                    for fact in item.get("missing_required_core_facts", [])
+                }
+            ),
+        },
         "instrument_results": instrument_results,
         "period_results": [
             {
@@ -369,6 +395,8 @@ def _validate_instrument_core_facts(
     instrument_id: str,
     report_period: str,
     required_core_facts: List[str],
+    official_source: str,
+    parser_profile: str,
 ) -> Dict[str, Any]:
     core_rows = storage.financial_statements.get_core_facts(
         instrument_id,
@@ -381,6 +409,25 @@ def _validate_instrument_core_facts(
         if core_rows
         else {}
     )
+    official_rows = [
+        row
+        for row in storage.financial_statements.get_numeric_facts(
+            instrument_id,
+            include_history=True,
+            report_period=report_period,
+        )
+        if str(row.get("source") or "").lower() == str(official_source).lower()
+        and (
+            str(row.get("parser_version") or "") == parser_profile
+            or parser_profile in str(row.get("parser_version") or "")
+        )
+    ]
+    for row in official_rows:
+        canonical = str(row.get("canonical_fact_name") or "")
+        value = row.get("fact_value")
+        if canonical in required_core_facts and value is not None:
+            if core_facts.get(canonical) is None:
+                core_facts[canonical] = value
     present_required = [
         field for field in required_core_facts if core_facts.get(field) is not None
     ]
@@ -408,6 +455,8 @@ def _validate_instrument_core_facts(
             if core_facts.get(field) is not None
         },
         "core_row_count": len(core_rows),
+        "official_parsed": bool(official_rows),
+        "official_numeric_fact_count": len(official_rows),
     }
 
 
