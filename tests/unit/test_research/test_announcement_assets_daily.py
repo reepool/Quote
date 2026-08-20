@@ -864,6 +864,87 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
     )
 
 
+def test_daily_reuses_local_mirror_when_canonical_announcement_id_differs(tmp_path):
+    config = _focused_config(tmp_path)
+    repository, service, retriever = _service_bundle(tmp_path, config)
+    published_at = "2026-04-28T16:00:00+00:00"
+    local_record = replace(
+        _record_at(
+            "1225248562",
+            symbol="301396",
+            published_at=published_at,
+        ),
+        exchange="SZSE",
+    )
+    local = service.register_discovered_record(
+        local_record, instrument_id="301396.SZ"
+    )[0]
+    service.acquire_attachment(local.attachment_id)
+
+    canonical_record = replace(
+        _record_at(
+            "1225248531",
+            symbol="301396",
+            published_at=published_at,
+        ),
+        exchange="SZSE",
+    )
+    canonical = service.register_discovered_record(
+        canonical_record, instrument_id="301396.SZ"
+    )[0]
+    service.acquire_attachment(canonical.attachment_id)
+    current = repository.get_effective_report("301396.SZ", 2025)
+    assert current is not None
+    assert current.source_announcement_id == "1225248531"
+
+    szse_mirror_record = replace(
+        local_record,
+        source="szse",
+        announcement_key=build_announcement_key("szse", "1225248562"),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=(
+                    "https://disc.static.szse.cn/disc/2026/1225248562.pdf"
+                ),
+                attachment_id="szse-1225248562",
+                name="szse-1225248562.pdf",
+                media_type="application/pdf",
+            ),
+        ),
+    )
+    mirror = service.register_discovered_record(
+        szse_mirror_record, instrument_id="301396.SZ"
+    )[0]
+    repository.enqueue_attachment_retry(
+        attachment_id=mirror.attachment_id,
+        source="szse",
+        metadata={
+            "instrument_id": "301396.SZ",
+            "fiscal_year": 2025,
+            "candidate_id": mirror.attachment_id,
+            "variant": "original",
+        },
+    )
+    calls_before = len(retriever.calls)
+
+    result = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    ).run(
+        run_cutoff="2026-08-20T04:44:50+00:00",
+        discover=lambda *args: (),
+        active_instrument_ids=("301396.SZ",),
+    )
+
+    assert len(retriever.calls) == calls_before
+    assert result.attachments_downloaded == 0
+    assert result.attachments_reused == 1
+    assert result.metrics["attachment_retries_deduplicated"] == 1
+    assert repository.get_attachment_retry(mirror.attachment_id)["status"] == (
+        "completed"
+    )
+    assert repository.get_latest_valid_attachment_version(mirror.attachment_id) is None
+
+
 def _record_at(
     source_id: str,
     *,

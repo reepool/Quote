@@ -1669,6 +1669,15 @@ class AnnualReportDailyUpdater:
             == _parse_time(published_at).date()
         ):
             return True
+        if self._has_valid_local_official_mirror(
+            current,
+            attachment_id=attachment_id,
+            source=source,
+            source_announcement_id=source_announcement_id,
+            published_at=published_at,
+            variant=variant,
+        ):
+            return True
         if current.variant is AnnualReportVariant.CORRECTION:
             if variant is AnnualReportVariant.ORIGINAL:
                 return True
@@ -1680,6 +1689,72 @@ class AnnualReportDailyUpdater:
         return self._published_before(
             published_at, current.published_at
         )
+
+    def _has_valid_local_official_mirror(
+        self,
+        current: Any,
+        *,
+        attachment_id: str,
+        source: str,
+        source_announcement_id: str,
+        published_at: str | None,
+        variant: AnnualReportVariant,
+    ) -> bool:
+        """Return whether the exact CNInfo/SZSE mirror is already local."""
+        if source not in {"cninfo", "szse"} or not source_announcement_id:
+            return False
+        rows = self.repository.list_candidate_rows(
+            instrument_id=current.instrument_id,
+            fiscal_year=current.fiscal_year,
+            source_announcement_id=source_announcement_id,
+        )
+        target = next(
+            (
+                row
+                for row in rows
+                if str(row.get("attachment_id") or "") == attachment_id
+                and str(row.get("source") or "") == source
+            ),
+            None,
+        )
+        target_chain = str(
+            ((target or {}).get("attachment_metadata") or {}).get("legal_chain_id")
+            or ""
+        )
+        if not target_chain:
+            return False
+        target_date = _parse_time(published_at).date() if published_at else None
+        for row in rows:
+            if str(row.get("attachment_id") or "") == attachment_id:
+                continue
+            mirror_source = str(row.get("source") or "")
+            if {source, mirror_source} != {"cninfo", "szse"}:
+                continue
+            metadata = row.get("attachment_metadata") or {}
+            classification = row.get("classification") or {}
+            mirror_published_at = row.get("published_at")
+            if (
+                str(metadata.get("legal_chain_id") or "") != target_chain
+                or str(classification.get("variant") or "") != variant.value
+                or not mirror_published_at
+                or target_date is None
+                or _parse_time(str(mirror_published_at)).date() != target_date
+                or row.get("retrieval_status") != "success"
+                or row.get("integrity_status") != "valid"
+                or row.get("blob_integrity_status") != "valid"
+                or not row.get("content_hash")
+                or not row.get("canonical_path")
+            ):
+                continue
+            try:
+                path = Path(str(row["canonical_path"]))
+                if path.is_file() and path.stat().st_size == int(
+                    row.get("content_length") or -1
+                ):
+                    return True
+            except (OSError, TypeError, ValueError):
+                continue
+        return False
 
     @staticmethod
     def _published_before(candidate: str | None, current: str | None) -> bool:
