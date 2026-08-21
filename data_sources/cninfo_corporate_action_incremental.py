@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v5"
+    "cninfo_corporate_action_daily_title_trigger_v6"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -141,6 +141,42 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
         for marker in _GENUINE_DISTRIBUTION_IMPLEMENTATION_MARKERS
     ):
         return None
+    if (
+        "业绩补偿款" in normalized_title
+        and any(
+            marker in normalized_title
+            for marker in ("支付", "收到", "收讫", "到账")
+        )
+        and not any(
+            marker in normalized_title
+            for marker in (
+                "补偿股份",
+                "股份补偿",
+                "股份赠与",
+                "股份注销",
+                "回购注销",
+                "转增",
+                "送股",
+            )
+        )
+    ):
+        return "cash_performance_compensation_payment"
+    if (
+        "限售股份" in normalized_title
+        and "上市流通" in normalized_title
+        and not any(
+            marker in normalized_title
+            for marker in (
+                "转增股本实施",
+                "转增股份实施",
+                "股份到账",
+                "股权登记",
+                "除权",
+                "除息",
+            )
+        )
+    ):
+        return "restricted_shares_listing_circulation"
     if any(marker in normalized_title for marker in _PRE_RESTRUCTURING_MARKERS):
         return "pre_restructuring_stage"
     if _has_convertible_bond_conversion_language(normalized_title):
