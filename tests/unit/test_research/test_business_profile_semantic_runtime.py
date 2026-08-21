@@ -2150,6 +2150,102 @@ def test_verify_uses_an_independent_field_family_token_budget(tmp_path, monkeypa
     }
 
 
+def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
+    tmp_path, monkeypatch
+):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    content = b"%PDF-1.7 resumable verifier budget source"
+    pdf = tmp_path / "annual.pdf"
+    pdf.write_bytes(content)
+    manifest = _manifest(pdf, content)
+    text = "主要业务：公司生产动力煤。公司销售动力煤。"
+    page_hash = hashlib.sha256(text.encode()).hexdigest()
+    monkeypatch.setattr(
+        runtime_module,
+        "ensure_archived_pdf_page_artifact",
+        lambda document: {
+            "artifact": {
+                "source_content_hash": document["content_hash"],
+                "pages": [
+                    {
+                        "page_number": 1,
+                        "text": text,
+                        "text_hash": page_hash,
+                        "page_artifact_hash": page_hash,
+                        "native_text_status": "extracted",
+                        "ocr_required": False,
+                    }
+                ],
+            },
+            "artifact_path": str(tmp_path / "page.json.gz"),
+            "artifact_hash": hashlib.sha256(b"resumable-verifier-page").hexdigest(),
+            "status": "written",
+        },
+    )
+    gateway = _ProductionAndSalesGateway()
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository,
+        artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
+        manifest_loader=lambda instrument_id: [manifest],
+    )
+    pipeline = BusinessProfileSemanticPipeline(
+        config=SemanticProductionConfig(
+            enabled=True,
+            budgets=SemanticProductionBudgets(max_tokens=40),
+        ),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
+        handlers=runtime.handlers(),
+    )
+    scope = _scope("atomic_activities")
+
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    first = pipeline.run("verify", scope=scope)
+
+    assert first["status"] == "stopped"
+    assert first["reason"] == "budget_exhausted:tokens"
+    assert len(gateway.requests) == 2
+    partial_reference = pipeline.checkpoint_store.load()["artifacts"]["verify"]
+    partial = runtime.stage_store.read(partial_reference, expected_stage="verify")
+    assert len(partial["verifications"]) == 1
+    assert partial["resume"] == {
+        "reused_verifications": 0,
+        "new_verifications": 1,
+        "batch_llm_calls": 1,
+        "batch_tokens": 40,
+    }
+
+    resumed = pipeline.run("resume", scope=scope)
+
+    assert resumed["status"] == "success"
+    assert resumed["completed_stages"] == ["plan", "select", "extract", "verify"]
+    assert resumed["metrics"]["verified_records"] == 2
+    assert resumed["metrics"]["verification_checkpoint_replays"] == 1
+    assert resumed["metrics"]["verification_reused_records"] == 1
+    assert resumed["metrics"]["verification_saved_llm_calls"] == 1
+    assert len(gateway.requests) == 3
+    verifier_target_ids = [
+        json.loads(request.messages[-1].content)["target_id"]
+        for request in gateway.requests
+        if request.metadata["stage"] == "semantic_verification"
+    ]
+    assert len(verifier_target_ids) == len(set(verifier_target_ids)) == 2
+    final_reference = pipeline.checkpoint_store.load()["artifacts"]["verify"]
+    final = runtime.stage_store.read(final_reference, expected_stage="verify")
+    assert len(final["verifications"]) == 2
+    assert final["budget_stop_reason"] is None
+    assert final["resume"] == {
+        "reused_verifications": 1,
+        "new_verifications": 1,
+        "batch_llm_calls": 1,
+        "batch_tokens": 40,
+    }
+
+
 def test_verify_failure_persists_llm_audit_and_counts_failed_call(
     tmp_path, monkeypatch
 ):

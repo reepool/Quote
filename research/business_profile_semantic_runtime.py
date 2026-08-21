@@ -557,6 +557,18 @@ class ContentAddressedStageArtifactStore:
         return dict(body["payload"])
 
 
+def _read_prior_stage_artifact(
+    stage_store: ContentAddressedStageArtifactStore,
+    checkpoint: Mapping[str, Any],
+    *,
+    stage: str,
+) -> dict[str, Any] | None:
+    reference = dict((checkpoint.get("artifacts") or {}).get(stage) or {})
+    if not reference:
+        return None
+    return stage_store.read(reference, expected_stage=stage)
+
+
 @dataclass(frozen=True)
 class RuntimePromotionManifestSet:
     manifests: Mapping[str, FieldFamilyPromotionManifest]
@@ -2278,7 +2290,26 @@ class BusinessProfileSemanticRuntime:
         extracted = self.stage_store.read(
             checkpoint["artifacts"]["extract"], expected_stage="extract"
         )
+        prior_verify = _read_prior_stage_artifact(
+            self.stage_store,
+            checkpoint,
+            stage="verify",
+        )
         verifications: list[dict[str, Any]] = []
+        verified_target_ids: set[str] = set()
+        for item in (prior_verify or {}).get("verifications") or []:
+            if not isinstance(item, Mapping):
+                continue
+            target_id = str(item.get("target_id") or "")
+            if not target_id or target_id in verified_target_ids:
+                continue
+            verifications.append(dict(item))
+            verified_target_ids.add(target_id)
+        resumed_verification_count = len(verified_target_ids)
+        resumed_llm_verification_count = sum(
+            1 for item in verifications if isinstance(item.get("audit"), Mapping)
+        )
+        new_verified_records = 0
         machine_rework = list(extracted.get("machine_rework") or [])
         inherited_rework_count = len(machine_rework)
         llm_calls = 0
@@ -2289,6 +2320,11 @@ class BusinessProfileSemanticRuntime:
         configuration_stop_requested = False
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
+        if resumed_verification_count:
+            logger.info(
+                "business-profile semantic verification resume reused_records=%s",
+                resumed_verification_count,
+            )
         for output in extracted["outputs"]:
             selected = _load_selected(
                 self.section_store, output["selected_artifact_path"]
@@ -2306,6 +2342,8 @@ class BusinessProfileSemanticRuntime:
                     "operating_facts": "concentration",
                 }[record_type]
                 for target_id in output["record_ids"].get(record_type, []):
+                    if target_id in verified_target_ids:
+                        continue
                     target = self._find_record(record_type, target_id)
                     verification_target = _verification_target(target)
                     if (
@@ -2330,6 +2368,8 @@ class BusinessProfileSemanticRuntime:
                                 },
                             }
                         )
+                        verified_target_ids.add(target_id)
+                        new_verified_records += 1
                         continue
                     bypass = deterministic_semantic_verification_decision(
                         verification_target
@@ -2343,6 +2383,8 @@ class BusinessProfileSemanticRuntime:
                                 "proof": bypass,
                             }
                         )
+                        verified_target_ids.add(target_id)
+                        new_verified_records += 1
                         continue
                     if config.kill_switches["network_calls"] or self.llm_client is None:
                         reason = (
@@ -2442,6 +2484,8 @@ class BusinessProfileSemanticRuntime:
                     verifications.append(
                         {**dict(verification), "audit": audit.to_dict()}
                     )
+                    verified_target_ids.add(target_id)
+                    new_verified_records += 1
                     tokens += int((audit.usage or {}).get("total_tokens") or 0)
                     _increment_family_metrics(
                         by_field_family,
@@ -2474,13 +2518,24 @@ class BusinessProfileSemanticRuntime:
                 "exceptions": list(extracted.get("exceptions") or []),
                 "budget_stop_reason": budget_stop_reason,
                 "persisted_exceptions": persisted_exceptions,
+                "resume": {
+                    "reused_verifications": resumed_verification_count,
+                    "new_verifications": new_verified_records,
+                    "batch_llm_calls": llm_calls,
+                    "batch_tokens": tokens,
+                },
             },
         )
         metrics = {
             "llm_calls": llm_calls,
             "tokens": tokens,
             "errors": errors,
-            "verified_records": len(verifications),
+            "verified_records": new_verified_records,
+            "verification_checkpoint_replays": int(
+                resumed_verification_count > 0
+            ),
+            "verification_reused_records": resumed_verification_count,
+            "verification_saved_llm_calls": resumed_llm_verification_count,
             "blocking_machine_rework": len(machine_rework),
             "configuration_blocked_documents": sum(
                 blocked_configuration_reasons.values()

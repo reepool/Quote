@@ -262,6 +262,15 @@ fallback 均已删除，缺失资产只能由共享公告资产 ensure/backfill 
 输入；同一天出现修订公告或到期机器返工时会生成新范围，不会误复用完成态
 检查点。出现 stale checkpoint 时应重新执行 `plan`，不能修改检查点绕过校验。
 
+`semantic_production.budgets.max_tokens` 是单个字段族在一次语义阶段运行中的累计
+LLM token 软上限，不是单次请求的输出 token 上限，也不是一家公司整个生命周期的
+总额度。运行时在发起下一次网络请求前检查额度，因此实际批次可能比配置值多出最后
+一次调用的用量。达到额度后，阶段会持久化已完成核验并安全退出；下一次恢复跳过已
+完成的 `target_id`，只为剩余记录开启新的有界批次。报告中的 `tokens`、`llm_calls`、
+`verification_checkpoint_replays`、`verification_reused_records` 和
+`verification_saved_llm_calls` 用于观察真实分布后再调整额度。不得通过取消上限来
+处理无法续传或重复调用问题。
+
 ## 4. Kill Switch
 
 `semantic_production.kill_switches` 提供四个独立开关：

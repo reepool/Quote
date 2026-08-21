@@ -22,3 +22,6 @@
 - [x] 4.2 Run focused selector, extraction, artifact, runtime, async, and rollout regressions plus compile, lint, and OpenSpec validation.
 - [x] 4.3 Review only blocking defects, update task status, commit the isolated change, and push it to the configured upstream.
 - [x] 4.4 Preserve multiple distinct anonymous concentration facts supported by the same evidence span, and add a production-shaped regression test.
+- [x] 4.5 Resume partial semantic verification by target identifier without repeating completed LLM calls, and expose replay and per-batch usage metrics.
+- [x] 4.6 Document the token budget as a resumable per-field-family stage-run guard and add a production-shaped budget-resume regression.
+- [x] 4.7 Run focused regressions and OpenSpec validation, review blocking defects, commit the isolated repair, and push it upstream.

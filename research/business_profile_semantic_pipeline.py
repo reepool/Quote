@@ -541,6 +541,15 @@ class BusinessProfileSemanticPipeline:
                 "evidence_records": int(metrics.get("evidence_records") or 0),
                 "record_count": int(metrics.get("record_count") or 0),
                 "verified_records": int(metrics.get("verified_records") or 0),
+                "verification_checkpoint_replays": int(
+                    metrics.get("verification_checkpoint_replays") or 0
+                ),
+                "verification_reused_records": int(
+                    metrics.get("verification_reused_records") or 0
+                ),
+                "verification_saved_llm_calls": int(
+                    metrics.get("verification_saved_llm_calls") or 0
+                ),
                 "blocking_machine_rework": int(
                     metrics.get("blocking_machine_rework") or 0
                 ),

@@ -48,6 +48,12 @@ The system SHALL persist each validated joint response before field-family conve
 - **THEN** the retry loads and validates the persisted response
 - **AND** does not repeat extraction or discard the successful sibling result
 
+#### Scenario: Independent verification reaches its batch token budget
+- **WHEN** verification persists some target decisions and stops before the next LLM call because the current field-family batch reaches its token budget
+- **THEN** the next resume loads the prior verify artifact and skips every completed target identifier
+- **AND** applies a fresh bounded batch budget only to unfinished verification calls
+- **AND** the final verify artifact contains one decision for every target without duplicate LLM calls
+
 #### Scenario: Evidence or prompt changes
 - **WHEN** the document hash, selected evidence, request payload, prompt version, or schema version changes
 - **THEN** the prior response is not replayed as an exact match
@@ -77,3 +83,8 @@ The semantic stage SHALL report joint requests, durable replays, in-run sibling 
 #### Scenario: One report completes both semantic families
 - **WHEN** both field families consume one joint response successfully
 - **THEN** metrics report one joint LLM request, one sibling reuse, and two independently completed field families
+
+#### Scenario: Verification resumes from a partial artifact
+- **WHEN** a verification batch resumes after a token-budget stop
+- **THEN** metrics distinguish cumulative LLM calls and tokens from checkpoint-replayed verification records
+- **AND** the stage artifact records reused records, newly verified records, batch calls, and batch tokens

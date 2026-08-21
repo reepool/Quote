@@ -58,6 +58,8 @@ For an `atomic_activities` work item, runtime conversion consumes only `activiti
 
 A joint response may legitimately have an empty `relationships[]`, while an annual report with no activity remains a missing-context condition under existing rules. The runtime therefore preserves field-family-specific empty-result semantics even though both arrays came from one response. Failed local conversion does not invalidate or discard the persisted model response.
 
+Independent verification is also resumable at target granularity. A token limit is a soft, per-field-family, per-stage-run guard checked before the next network request; it is not a per-call output limit or a lifetime cap for the company. Each partial verify artifact retains completed target decisions. A retry reuses those decisions, starts a fresh bounded batch for unfinished targets, and keeps cumulative token and call totals observable. The guard remains enabled so a provider or retry defect cannot create unbounded spend.
+
 ## Risks / Trade-offs
 
 - [A joint request has a larger output schema] -> Keep the existing input/output bounds, deduplicate pages, and cap each output array independently.
