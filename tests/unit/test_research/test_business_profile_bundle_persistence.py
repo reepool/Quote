@@ -55,9 +55,16 @@ def _evidence(evidence_id="evidence-1"):
         "availability_quality": "actual",
         "evidence_text_hash": "evidence-hash",
         "extraction_method": "native_text",
+        "parser_version": "business_profile_semantic_runtime.v6",
         "confidence": 1.0,
         "review_status": "candidate",
-        "metadata": {},
+        "metadata": {
+            "promotion_validation": {
+                "catalog_versions": {
+                    "product": "business_profile_products.2026.3",
+                }
+            }
+        },
     }
 
 
@@ -265,3 +272,118 @@ def test_bundle_foreign_key_and_terminal_state_races_roll_back(tmp_path):
             },
         )
     assert repository.list_records("activities") == []
+
+
+def _system_promote(repository, record_type, record_id):
+    from research.business_profile_review import BusinessProfileReviewService
+
+    candidate = repository.get_record(record_type, record_id)
+    BusinessProfileReviewService(repository).system_promote_record(
+        record_type,
+        record_id,
+        field_family="atomic_activities",
+        policy_version="test.v1",
+        gate_manifest_hash="gates",
+        reviewer_version="v1",
+        expected_updated_at=candidate["updated_at"],
+        evidence_references=[],
+    )
+
+
+def test_terminal_bundle_replay_ignores_processing_identity_and_preserves_rows(
+    tmp_path,
+):
+    repository, storage = _repository(tmp_path)
+    repository.persist_document_field_family_bundle(
+        run=_run(),
+        records_by_type={
+            "evidence": [_evidence()],
+            "activities": [_activity()],
+        },
+    )
+    _system_promote(repository, "evidence", "evidence-1")
+    _system_promote(repository, "activities", "activity-1")
+    approved_evidence = repository.get_record("evidence", "evidence-1")
+    approved_activity = repository.get_record("activities", "activity-1")
+
+    replay_evidence = _evidence()
+    replay_evidence.update(
+        parser_version="business_profile_semantic_runtime.v7",
+        extraction_method="semantic_evidence_spans",
+        confidence=0.99,
+        metadata={
+            "promotion_validation": {
+                "catalog_versions": {
+                    "product": "business_profile_products.2026.4",
+                }
+            }
+        },
+    )
+    replay_activity = _activity(run_id="run-2")
+    replay_activity.update(
+        extraction_method="semantic_verified_v2",
+        confidence=0.99,
+        lineage_hash="new-runtime-lineage",
+        metadata={"runtime_schema_version": "business_profile_semantic_runtime.v7"},
+    )
+
+    result = repository.persist_document_field_family_bundle(
+        run=_run("run-2"),
+        records_by_type={
+            "evidence": [replay_evidence],
+            "activities": [replay_activity],
+        },
+    )
+
+    assert result["status"] == "completed"
+    assert repository.get_record("evidence", "evidence-1") == approved_evidence
+    assert repository.get_record("activities", "activity-1") == approved_activity
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        assert conn.execute(
+            "SELECT status FROM business_profile_semantic_runs WHERE run_id = 'run-2'"
+        ).fetchone()[0] == "completed"
+
+
+@pytest.mark.parametrize(
+    ("record_type", "mutation"),
+    [
+        ("evidence", lambda row: row.update(evidence_text_hash="changed-evidence")),
+        ("evidence", lambda row: row.update(page_number=99)),
+        ("evidence", lambda row: row.update(section_path="changed-section")),
+        ("activities", lambda row: row.update(value=999.0)),
+    ],
+)
+def test_terminal_bundle_replay_rejects_source_or_business_changes(
+    tmp_path,
+    record_type,
+    mutation,
+):
+    repository, storage = _repository(tmp_path)
+    repository.persist_document_field_family_bundle(
+        run=_run(),
+        records_by_type={
+            "evidence": [_evidence()],
+            "activities": [_activity()],
+        },
+    )
+    _system_promote(repository, "evidence", "evidence-1")
+    _system_promote(repository, "activities", "activity-1")
+    replay_evidence = _evidence()
+    replay_activity = _activity(run_id="run-2")
+    mutation(replay_evidence if record_type == "evidence" else replay_activity)
+
+    with pytest.raises(ValueError, match="terminal-state race"):
+        repository.persist_document_field_family_bundle(
+            run=_run("run-2"),
+            records_by_type={
+                "evidence": [replay_evidence],
+                "activities": [replay_activity],
+            },
+        )
+
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_semantic_runs WHERE run_id = 'run-2'"
+        ).fetchone()[0] == 0

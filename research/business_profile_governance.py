@@ -23,6 +23,19 @@ BUSINESS_PROFILE_SCORE_VERSION = "business_profile_model_score.v1"
 REVIEW_STATUSES = {"candidate", "held", "approved", "rejected", "superseded"}
 NON_CANDIDATE_REVIEW_STATUSES = REVIEW_STATUSES - {"candidate"}
 MAX_BUSINESS_PROFILE_BULK_RECORDS = 5000
+TERMINAL_REPLAY_PROVENANCE_FIELDS = {
+    "review_status",
+    "reviewed_by",
+    "reviewed_at",
+    "run_id",
+    "parser_version",
+    "extraction_method",
+    "confidence",
+    "lineage_hash",
+    "metadata_json",
+    "created_at",
+    "updated_at",
+}
 MATERIAL_PROFILE_EVENT_TYPES = {
     "reverse_merger",
     "major_asset_restructuring",
@@ -759,18 +772,11 @@ class BusinessProfileRepository:
 
     @staticmethod
     def _terminal_content_hash(spec: Dict[str, Any], row: Dict[str, Any]) -> str:
-        ignored = {
-            "review_status",
-            "reviewed_by",
-            "reviewed_at",
-            "created_at",
-            "updated_at",
-        }
         return _stable_hash(
             {
                 column: row.get(column)
                 for column in spec["columns"]
-                if column not in ignored
+                if column not in TERMINAL_REPLAY_PROVENANCE_FIELDS
             }
         )
 
