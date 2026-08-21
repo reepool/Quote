@@ -454,6 +454,7 @@ def _merge_worker_counters(
         for key in (
             "claimed",
             "completed",
+            "finalized",
             "retried",
             "terminal_failures",
             "lease_conflicts",

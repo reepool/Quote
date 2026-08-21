@@ -42,12 +42,37 @@ def test_production_rollout_starts_in_structured_shadow_with_bounded_budgets():
         "tabular_operating_facts",
     )
     assert phase.promotion_enabled is False
-    assert set(phase.stage_budgets) == {"acquire", "parse", "semantic", "publish"}
+    assert set(phase.stage_budgets) == {
+        "acquire",
+        "parse",
+        "semantic",
+        "verify",
+        "publish",
+    }
     assert phase.stage_budgets["parse"]["max_concurrency"] == 4
     assert phase.stage_budgets["semantic"]["max_concurrency"] == 20
+    assert phase.stage_budgets["verify"]["max_concurrency"] == 20
     assert rollout.phases["daily_incremental"].enabled is False
     assert rollout.bootstrap["selection_policy"] == "latest_annual_only"
     assert rollout.bootstrap["start_date"] is None
+
+
+def test_targeted_complete_phase_keeps_full_market_shadow_default():
+    rollout = parse_business_profile_rollout_config(_payload())
+    phase = rollout.phase("semantic_complete_targeted")
+
+    assert rollout.active_phase == "structured_shadow"
+    assert phase.promotion_enabled is True
+    assert phase.field_families == (
+        "atomic_activities",
+        "named_relationships",
+        "derived_value_chain_roles",
+        "commodity_exposure_facts",
+        "commodity_exposure_publication",
+    )
+    assert phase.stage_budgets["verify"]["max_concurrency"] == 20
+    assert phase.stage_budgets["publish"]["max_concurrency"] == 1
+    assert set(rollout.manifests_for(phase)) == set(phase.field_families)
 
 
 def test_expanded_rollout_bootstrap_still_requires_start_date():

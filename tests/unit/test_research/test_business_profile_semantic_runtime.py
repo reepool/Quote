@@ -645,6 +645,26 @@ class _ProductionAndSalesGateway(_FakeGateway):
         )
 
 
+class _ConcurrentProductionAndSalesGateway(_ProductionAndSalesGateway):
+    def __init__(self):
+        super().__init__()
+        self.active_verifications = 0
+        self.peak_verifications = 0
+
+    async def complete(self, request):
+        if request.metadata["stage"] != "semantic_verification":
+            return await super().complete(request)
+        self.active_verifications += 1
+        self.peak_verifications = max(
+            self.peak_verifications, self.active_verifications
+        )
+        try:
+            await asyncio.sleep(0.01)
+            return await super().complete(request)
+        finally:
+            self.active_verifications -= 1
+
+
 class _VerifierFailureGateway(_FakeGateway):
     async def complete(self, request):
         if request.metadata["stage"] == "semantic_verification":
@@ -1873,11 +1893,11 @@ def test_verifier_authentication_failure_is_a_configuration_blocker(
     assert verified["status"] == "stopped"
     assert verified["reason"].startswith("blocked_configuration:verify:")
     assert verified["quality"]["blocked_configuration_reasons"] == {
-        "llm_authentication_error": 1
+        "llm_authentication_error": 2
     }
     assert verified["quality"]["blocking_machine_rework"] == 0
     assert verified["metrics"]["errors"] == 0
-    assert len(gateway.requests) == 2
+    assert len(gateway.requests) == 3
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
@@ -2150,6 +2170,34 @@ def test_verify_uses_an_independent_field_family_token_budget(tmp_path, monkeypa
     }
 
 
+def test_verify_runs_independent_targets_in_a_bounded_concurrent_wave(
+    tmp_path, monkeypatch
+):
+    gateway = _ConcurrentProductionAndSalesGateway()
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="主要业务：公司生产动力煤。公司销售动力煤。",
+        gateway=gateway,
+        config=SemanticProductionConfig(
+            enabled=True,
+            budgets=SemanticProductionBudgets(
+                max_tokens=50_000,
+                max_concurrency=2,
+            ),
+        ),
+    )
+
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    result = pipeline.run("verify", scope=scope)
+
+    assert result["status"] == "success"
+    assert result["metrics"]["verified_records"] == 2
+    assert gateway.peak_verifications == 2
+
+
 def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
     tmp_path, monkeypatch
 ):
@@ -2193,7 +2241,10 @@ def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
     pipeline = BusinessProfileSemanticPipeline(
         config=SemanticProductionConfig(
             enabled=True,
-            budgets=SemanticProductionBudgets(max_tokens=40),
+            budgets=SemanticProductionBudgets(
+                max_tokens=40,
+                max_concurrency=1,
+            ),
         ),
         checkpoint_store=SemanticProductionCheckpointStore(
             tmp_path / "checkpoint.json"
@@ -2275,6 +2326,15 @@ def test_verify_failure_persists_llm_audit_and_counts_failed_call(
     assert diagnostics["semantic_audit"]["failure_category"] == (
         "gateway_or_validation_failure"
     )
+
+    resumed = pipeline.run("resume", scope=scope)
+    assert resumed["status"] == "stopped"
+    runtime = pipeline.handlers["verify"].__self__
+    resumed_artifact = runtime.stage_store.read(
+        pipeline.checkpoint_store.load()["artifacts"]["verify"],
+        expected_stage="verify",
+    )
+    assert len(resumed_artifact["machine_rework"]) == 1
 
 
 def test_real_local_pdf_plan_select_and_hash_incremental_discovery(tmp_path):
@@ -3088,6 +3148,17 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         "ambiguous_or_unsupported_exposure_direction",
         "ambiguous_or_unpromoted_product_commodity_mapping",
     }
+    assert promoted["quality"] == {
+        "stage": "promote",
+        "stage_ready": True,
+        "candidate_records": 2,
+        "verified_records": 2,
+        "promoted_records": 2,
+        "value_chain_roles_published": 1,
+        "commodity_exposure_facts_published": 2,
+        "commodity_exposures_published": 0,
+        "publication_gaps": 2,
+    }
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert {item["reason_codes"][0] for item in exceptions} == {
         "ambiguous_or_unsupported_exposure_direction",
@@ -3101,6 +3172,73 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     assert report["derived_value_chain_roles"]["auto_promoted"] == 1
     assert report["commodity_exposure_facts"]["auto_promoted"] == 2
     assert report["commodity_exposure_publication"]["auto_promoted"] == 0
+
+    checkpoint = pipeline.checkpoint_store.load()
+    verified = runtime.stage_store.read(
+        checkpoint["artifacts"]["verify"], expected_stage="verify"
+    )
+    verified["machine_rework"] = [
+        {"target_id": "shared-gap", "reason_code": "verification_failed"}
+    ]
+    checkpoint["artifacts"]["verify"] = runtime.stage_store.write(
+        "verify", verified
+    )
+    monkeypatch.setattr(
+        runtime,
+        "_derive_and_publish",
+        lambda scope: {
+            "roles": [
+                {
+                    "decision": {
+                        "target_type": "value_chain_roles",
+                        "target_id": "role-approved",
+                        "classification": "unchanged",
+                    },
+                    "promoted": True,
+                },
+                {
+                    "decision": {
+                        "target_type": "value_chain_roles",
+                        "target_id": "shared-gap",
+                        "classification": "quick_review",
+                    },
+                    "promoted": False,
+                },
+            ],
+            "exposure_facts": [
+                {
+                    "decision": {
+                        "target_type": "exposure_facts",
+                        "target_id": "fact-approved",
+                        "classification": "unchanged",
+                    },
+                    "promoted": True,
+                }
+            ],
+            "publications": [
+                {"status": "unchanged", "fact_id": "fact-approved"},
+                {"status": "input_gap", "fact_id": "shared-gap"},
+            ],
+            "gaps": [
+                {
+                    "field_family": "derived_value_chain_roles",
+                    "target_id": "shared-gap",
+                }
+            ],
+        },
+    )
+
+    rerun = runtime.promote(
+        scope=scope,
+        config=pipeline.config,
+        checkpoint=checkpoint,
+    )
+
+    assert rerun["quality"]["promoted_records"] == 2
+    assert rerun["quality"]["value_chain_roles_published"] == 1
+    assert rerun["quality"]["commodity_exposure_facts_published"] == 1
+    assert rerun["quality"]["commodity_exposures_published"] == 1
+    assert rerun["quality"]["publication_gaps"] == 1
 
 
 def test_revised_scope_preserves_expanded_selection_policy(tmp_path, monkeypatch):

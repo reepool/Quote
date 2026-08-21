@@ -2834,6 +2834,16 @@ class DataManager:
         semantic = dict(module.get("semantic_production") or {})
         phase_name = str(rollout_phase or "").strip()
         requested_policy = str(selection_policy or "").strip()
+        requested_families = {
+            str(item).strip() for item in (field_families or ()) if str(item).strip()
+        }
+        if (
+            not phase_name
+            and requested_policy == "expanded"
+            and instrument_ids
+            and "atomic_activities" in requested_families
+        ):
+            phase_name = "semantic_complete_targeted"
         use_rollout = bool(phase_name) or (
             operations.get("use_rollout_config") is True
             and requested_policy != "expanded"
@@ -2873,7 +2883,9 @@ class DataManager:
             end_date = end_date or rollout.bootstrap.get("end_date")
             if not document_types:
                 document_types = list(rollout.bootstrap.get("document_types") or [])
-            if not field_families:
+            if phase.name == "semantic_complete_targeted":
+                field_families = list(phase.field_families)
+            elif not field_families:
                 field_families = list(phase.field_families)
             semantic["promotion_enabled"] = phase.promotion_enabled
             semantic["promotion_manifests"] = manifests
@@ -2995,7 +3007,7 @@ class DataManager:
                     "max_elapsed_seconds": 600,
                     "high_water_mark": 1000,
                 }
-                for stage in ("acquire", "parse", "semantic", "publish")
+                for stage in ("acquire", "parse", "semantic", "verify", "publish")
             }
         )
         discovery_kwargs = {
@@ -3048,6 +3060,21 @@ class DataManager:
             should_stop=should_stop,
             bound_annual_report_asset=bound_annual_report_asset,
         )
+        result["effective_rollout_phase"] = phase.name if phase is not None else None
+        publication_summary = dict(result.get("publication_summary") or {})
+        if (
+            result.get("execution_mode") == "complete_publication"
+            and int(publication_summary.get("publication_gaps") or 0) > 0
+        ):
+            result["status"] = "degraded"
+            result["reason_codes"] = list(
+                dict.fromkeys(
+                    [
+                        *list(result.get("reason_codes") or []),
+                        "partial_publication_gaps",
+                    ]
+                )
+            )
         if derived_bootstrap_start:
             result["bootstrap_start"] = {
                 "mode": "current_filing_season",
@@ -3242,7 +3269,8 @@ class DataManager:
                 "acquire": "plan",
                 "parse": "select",
                 "semantic": "extract",
-                "publish": "verify",
+                "verify": "verify",
+                "publish": "promote",
             }[stage]
             selection_policy = str(item.get("policy") or "latest_annual_only")
             if item.get("work_id"):
@@ -3308,25 +3336,20 @@ class DataManager:
             )
             if acquisition is not None:
                 result = {**result, "bound_acquisition": dict(acquisition)}
-            if (
-                stage != "publish"
-                or not bool(semantic.get("promotion_enabled"))
-                or result.get("status") not in {"success", "completed", "unchanged"}
-            ):
-                return result
-            promotion = await self.run_business_profile_semantic_production(
-                mode="promote",
-                write_coordinator=write_coordinator,
-                **call_kwargs,
-            )
-            if promotion.get("status") not in {"success", "completed", "unchanged"}:
+            if stage == "verify" and not bool(semantic.get("promotion_enabled")):
                 return {
-                    "status": "failed",
-                    "reason": "business_profile_promotion_failed",
-                    "verification": result,
-                    "promotion": promotion,
+                    **result,
+                    "finalize_work": True,
+                    "execution_mode": "candidate_only",
                 }
-            return {**result, "promotion": promotion}
+            return {
+                **result,
+                "execution_mode": (
+                    "complete_publication"
+                    if bool(semantic.get("promotion_enabled"))
+                    else "candidate_only"
+                ),
+            }
 
         checkpoint_root = Path(
             operations.get("checkpoint_root")

@@ -23,7 +23,7 @@ from utils.date_utils import get_shanghai_time
 
 WORK_SCHEMA_VERSION = "business_profile_work_item.v1"
 ASYNC_REPORT_SCHEMA_VERSION = "business_profile_async_production_report.v1"
-WORK_STAGES = ("acquire", "parse", "semantic", "publish")
+WORK_STAGES = ("acquire", "parse", "semantic", "verify", "publish")
 CLAIMABLE_STATUSES = ("pending", "retry_due")
 TERMINAL_STATUSES = (
     "completed",
@@ -99,6 +99,7 @@ def ensure_business_profile_storage_ready(
         if isinstance(token, BusinessProfileStorageReadiness):
             return token
         storage.initialize()
+        _migrate_unfinished_legacy_publish_items(storage)
         initialized_at = get_shanghai_time().isoformat()
         identity = _stable_hash(
             {
@@ -113,6 +114,64 @@ def ensure_business_profile_storage_ready(
         )
         setattr(storage, "_business_profile_storage_readiness", token)
         return token
+
+
+def _migrate_unfinished_legacy_publish_items(storage: Any) -> dict[str, int]:
+    """Move pre-five-stage unfinished publish work to its checkpoint-safe stage."""
+
+    now = get_shanghai_time().isoformat()
+    moved_to_verify = retained_publish = 0
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        table = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+            "AND name = 'business_profile_work_items'"
+        ).fetchone()
+        if table is None:
+            return {"moved_to_verify": 0, "retained_publish": 0}
+        conn.execute("BEGIN IMMEDIATE")
+        rows = conn.execute(
+            "SELECT work_id, checkpoint_path FROM business_profile_work_items "
+            "WHERE stage = 'publish' "
+            "AND status NOT IN ('completed', 'superseded', 'machine_rework', "
+            "'terminal_failure') "
+            "AND (status != 'running' OR lease_expires_at IS NULL "
+            "OR lease_expires_at <= ?)",
+            (now,),
+        ).fetchall()
+        for row in rows:
+            completed_stages: set[str] = set()
+            try:
+                payload = json.loads(
+                    Path(str(row["checkpoint_path"])).read_text(encoding="utf-8")
+                )
+                if isinstance(payload, Mapping):
+                    completed_stages = {
+                        str(stage) for stage in payload.get("completed_stages") or ()
+                    }
+            except (OSError, TypeError, ValueError, json.JSONDecodeError):
+                pass
+            if "verify" in completed_stages:
+                retained_publish += 1
+                continue
+            cursor = conn.execute(
+                "UPDATE business_profile_work_items SET stage = 'verify', "
+                "updated_at = ? WHERE work_id = ? AND stage = 'publish'",
+                (now, row["work_id"]),
+            )
+            moved_to_verify += int(cursor.rowcount or 0)
+        conn.commit()
+    if moved_to_verify or retained_publish:
+        logger.info(
+            "business-profile legacy publish migration moved_to_verify=%s "
+            "retained_publish=%s",
+            moved_to_verify,
+            retained_publish,
+        )
+    return {
+        "moved_to_verify": moved_to_verify,
+        "retained_publish": retained_publish,
+    }
 
 
 class BusinessProfileWriteCoordinator:
@@ -525,7 +584,9 @@ class BusinessProfileWorkRepository:
         stage = _stage(item["stage"])
         now = get_shanghai_time().isoformat()
         stage_index = WORK_STAGES.index(stage)
-        completed = stage_index == len(WORK_STAGES) - 1
+        completed = bool(result.get("finalize_work")) or (
+            stage_index == len(WORK_STAGES) - 1
+        )
         next_stage = stage if completed else WORK_STAGES[stage_index + 1]
         metadata = {
             **dict(item.get("metadata") or {}),
@@ -2292,6 +2353,8 @@ class BusinessProfileAsyncProductionService:
             "enqueue": enqueue,
             "workers": workers,
             "throughput": throughput,
+            "execution_mode": _business_profile_execution_mode(workers),
+            "publication_summary": _business_profile_publication_summary(workers),
             "queue_health": await _run_thread_call(
                 self.repository.health,
                 processing_identity_hash=_stable_hash(processing_identity),
@@ -2458,6 +2521,13 @@ class BusinessProfileAsyncProductionService:
                         "status": "deferred",
                         "reason": "no_stage_budget",
                     }
+                if stage == "publish" and budget.max_concurrency != 1:
+                    budget = StageBudget(
+                        max_items=budget.max_items,
+                        max_concurrency=1,
+                        max_elapsed_seconds=budget.max_elapsed_seconds,
+                        high_water_mark=budget.high_water_mark,
+                    )
                 if stage == "acquire" and acquire_backpressured:
                     logger.warning(
                         "business-profile stage backpressured stage=acquire "
@@ -2517,13 +2587,14 @@ class BusinessProfileAsyncProductionService:
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         started = time.monotonic()
-        claimed = completed = retried = failed = lease_conflicts = 0
+        claimed = completed = finalized = retried = failed = lease_conflicts = 0
         configuration_blocked = 0
         machine_rework_deferred = 0
         artifact_replay_deferred = 0
         context_reselect_deferred = 0
         claimed_work_ids: set[str] = set()
         quality_totals: dict[str, Any] = {}
+        execution_modes: set[str] = set()
         errors: list[dict[str, str]] = []
         stopped = False
         effective_concurrency = budget.max_concurrency
@@ -2558,7 +2629,7 @@ class BusinessProfileAsyncProductionService:
             )
 
         async def run_one(item: Mapping[str, Any]) -> bool:
-            nonlocal completed, retried, failed, lease_conflicts
+            nonlocal completed, finalized, retried, failed, lease_conflicts
             nonlocal configuration_blocked, machine_rework_deferred
             nonlocal artifact_replay_deferred, context_reselect_deferred
             nonlocal provider_congestion_failures, active_work_seconds
@@ -2569,6 +2640,9 @@ class BusinessProfileAsyncProductionService:
                 active_interval_started = item_started
             try:
                 result = dict(await self.stage_runner(stage, item))
+                execution_mode = str(result.get("execution_mode") or "").strip()
+                if execution_mode:
+                    execution_modes.add(execution_mode)
                 quality = dict(result.get("quality") or {})
                 for key in (
                     "blocking_machine_rework",
@@ -2591,6 +2665,18 @@ class BusinessProfileAsyncProductionService:
                     quality_totals[key] = quality_totals.get(key, 0) + int(
                         quality.get(key) or 0
                     )
+                for key in (
+                    "candidate_records",
+                    "promoted_records",
+                    "value_chain_roles_published",
+                    "commodity_exposure_facts_published",
+                    "commodity_exposures_published",
+                    "publication_gaps",
+                ):
+                    if key in quality:
+                        quality_totals[key] = quality_totals.get(key, 0) + int(
+                            quality.get(key) or 0
+                        )
                 for key in (
                     "pdf_hash_read_seconds",
                     "pdf_cache_read_seconds",
@@ -2657,7 +2743,7 @@ class BusinessProfileAsyncProductionService:
                             lease_conflicts += 1
                         return False
                     if (
-                        stage == "semantic"
+                        stage in {"semantic", "verify"}
                         and "gateway_failure" in machine_rework_reasons
                     ):
                         raise RuntimeError(
@@ -2681,9 +2767,12 @@ class BusinessProfileAsyncProductionService:
                     result=result,
                 )
                 completed += 1
+                if result.get("finalize_work") is True:
+                    finalized += 1
             except Exception as exc:
                 congestion_failure = (
-                    stage == "semantic" and _is_provider_congestion_error(exc)
+                    stage in {"semantic", "verify"}
+                    and _is_provider_congestion_error(exc)
                 )
                 if congestion_failure:
                     provider_congestion_failures += 1
@@ -2815,7 +2904,7 @@ class BusinessProfileAsyncProductionService:
                             time.monotonic() - active_interval_started
                         )
                         active_interval_started = None
-                    if stage == "semantic":
+                    if stage in {"semantic", "verify"}:
                         if congestion_failures:
                             provider_congestion_events += 1
                             effective_concurrency = max(1, effective_concurrency // 2)
@@ -2871,6 +2960,7 @@ class BusinessProfileAsyncProductionService:
             "stop_requested": stopped,
             "claimed": claimed,
             "completed": completed,
+            "finalized": finalized,
             "retried": retried,
             "terminal_failures": failed,
             "lease_conflicts": lease_conflicts,
@@ -2885,6 +2975,13 @@ class BusinessProfileAsyncProductionService:
             "active_work_seconds": round(active_elapsed(), 3),
             "errors": errors[:20],
             "quality": quality_totals,
+            "execution_mode": (
+                next(iter(execution_modes))
+                if len(execution_modes) == 1
+                else "mixed"
+                if execution_modes
+                else None
+            ),
             "elapsed_seconds": round(time.monotonic() - started, 3),
             "writer": self.write_coordinator.snapshot(),
             "gateway_admission": {
@@ -2992,6 +3089,8 @@ def parse_stage_budgets(value: Mapping[str, Any] | None) -> dict[str, StageBudge
             max_elapsed_seconds=float(payload.get("max_elapsed_seconds", 300.0)),
             high_water_mark=int(payload.get("high_water_mark", 1000)),
         )
+    if "verify" not in output and "semantic" in output:
+        output["verify"] = output["semantic"]
     return output
 
 
@@ -3245,7 +3344,7 @@ def _is_provider_congestion_error(exc: Exception) -> bool:
 def _evidence_free_stage(stage_results: Mapping[str, Any]) -> str | None:
     """Return the earliest stage proven to have blocked evidence production."""
 
-    for stage in ("parse", "semantic", "publish"):
+    for stage in ("parse", "semantic", "verify", "publish"):
         raw_result = stage_results.get(stage)
         if not isinstance(raw_result, Mapping) or not raw_result:
             continue
@@ -3273,7 +3372,8 @@ def _write_recovery_checkpoint(
     pipeline_stage = {
         "parse": "select",
         "semantic": "extract",
-        "publish": "verify",
+        "verify": "verify",
+        "publish": "promote",
     }.get(affected_stage)
     if pipeline_stage is None or not source.is_file():
         return False
@@ -3351,12 +3451,54 @@ def _business_profile_throughput(
         stage: int(dict(result or {}).get("completed") or 0)
         for stage, result in workers.items()
     }
+    finalized_before_publish = int(
+        dict(workers.get("verify") or {}).get("finalized") or 0
+    )
     return {
         "enqueued": int(enqueue.get("inserted") or 0),
         "requeued": int(enqueue.get("reset") or 0),
         "superseded": int(enqueue.get("superseded") or 0),
-        "worker_completed": int(stage_completed.get("publish") or 0),
+        "worker_completed": (
+            int(stage_completed.get("publish") or 0) + finalized_before_publish
+        ),
         "stage_completed": stage_completed,
+    }
+
+
+def _business_profile_execution_mode(
+    workers: Mapping[str, Mapping[str, Any]],
+) -> str:
+    for stage in ("publish", "verify"):
+        mode = str(dict(workers.get(stage) or {}).get("execution_mode") or "").strip()
+        if mode:
+            return mode
+    return "unknown"
+
+
+def _business_profile_publication_summary(
+    workers: Mapping[str, Mapping[str, Any]],
+) -> dict[str, int]:
+    semantic = dict(dict(workers.get("semantic") or {}).get("quality") or {})
+    verify = dict(dict(workers.get("verify") or {}).get("quality") or {})
+    publish = dict(dict(workers.get("publish") or {}).get("quality") or {})
+    return {
+        "candidate_records": int(
+            publish.get("candidate_records") or semantic.get("record_count") or 0
+        ),
+        "verified_records": int(
+            publish.get("verified_records") or verify.get("verified_records") or 0
+        ),
+        "promoted_records": int(publish.get("promoted_records") or 0),
+        "value_chain_roles_published": int(
+            publish.get("value_chain_roles_published") or 0
+        ),
+        "commodity_exposure_facts_published": int(
+            publish.get("commodity_exposure_facts_published") or 0
+        ),
+        "commodity_exposures_published": int(
+            publish.get("commodity_exposures_published") or 0
+        ),
+        "publication_gaps": int(publish.get("publication_gaps") or 0),
     }
 
 

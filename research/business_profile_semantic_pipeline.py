@@ -21,11 +21,11 @@ class SemanticProductionBudgets:
     max_documents: int = 3
     max_pages: int = 40
     max_characters: int = 120_000
-    max_tokens: int = 20_000
+    max_tokens: int = 50_000
     max_cost: float = 5.0
     max_elapsed_seconds: float = 900.0
     max_errors: int = 10
-    max_concurrency: int = 2
+    max_concurrency: int = 20
 
 
 @dataclass(frozen=True)
@@ -264,6 +264,11 @@ class BusinessProfileSemanticPipeline:
                 payload=dict(payload or {}),
                 checkpoint=dict(checkpoint),
                 config=self.config,
+                persist_stage_progress=lambda artifact: self._persist_stage_progress(
+                    checkpoint,
+                    stage=stage,
+                    artifact=artifact,
+                ),
             )
         )
         self._rebind_checkpoint_source_revision(checkpoint, scope, result)
@@ -342,7 +347,12 @@ class BusinessProfileSemanticPipeline:
                 existing["scope"] = existing_scope
                 self.checkpoint_store.save(existing)
             if existing.get("budgets_hash") != budgets_hash:
-                raise ValueError("stale semantic production checkpoint budgets")
+                if existing.get("budgets_hash") not in _relaxed_budget_hashes(
+                    self.config.budgets
+                ):
+                    raise ValueError("stale semantic production checkpoint budgets")
+                existing["budgets_hash"] = budgets_hash
+                self.checkpoint_store.save(existing)
             return existing
         checkpoint = {
             "schema_version": CHECKPOINT_SCHEMA_VERSION,
@@ -365,6 +375,20 @@ class BusinessProfileSemanticPipeline:
         }
         self.checkpoint_store.save(checkpoint)
         return checkpoint
+
+    def _persist_stage_progress(
+        self,
+        checkpoint: MutableMapping[str, Any],
+        *,
+        stage: str,
+        artifact: Mapping[str, Any],
+    ) -> None:
+        """Persist a resumable partial stage artifact without completing the stage."""
+
+        checkpoint["artifacts"][stage] = dict(artifact)
+        checkpoint["status"] = "partial"
+        checkpoint["stopped_reason"] = None
+        self.checkpoint_store.save(checkpoint)
 
     @staticmethod
     def _resolve_stage(mode: str, checkpoint: Mapping[str, Any]) -> str | None:
@@ -743,6 +767,34 @@ def _stable_hash(value: Any) -> str:
             default=str,
         ).encode("utf-8")
     ).hexdigest()
+
+
+def _relaxed_budget_hashes(
+    current: SemanticProductionBudgets,
+) -> set[str]:
+    """Return known production hashes that differ only by a tighter LLM guard."""
+
+    current_payload = asdict(current)
+    hashes: set[str] = set()
+    for max_tokens, max_concurrency in (
+        (20_000, 2),
+        (20_000, 10),
+        (20_000, 20),
+        (50_000, 10),
+    ):
+        if (
+            max_tokens > current.max_tokens
+            or max_concurrency > current.max_concurrency
+        ):
+            continue
+        payload = {
+            **current_payload,
+            "max_tokens": max_tokens,
+            "max_concurrency": max_concurrency,
+        }
+        if payload != current_payload:
+            hashes.add(_stable_hash(payload))
+    return hashes
 
 
 def _logical_scope_payload(

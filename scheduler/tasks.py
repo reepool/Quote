@@ -547,6 +547,21 @@ def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
     )
     throughput = dict(latest.get("throughput") or {})
     enqueue = dict(latest.get("enqueue") or {})
+    reconciliation = dict(latest.get("reconciliation") or {})
+    publication = dict(latest.get("publication_summary") or {})
+    phase = (
+        progress.get("phase")
+        or latest.get("effective_rollout_phase")
+        or dict(latest.get("rollout") or {}).get("phase")
+        or "N/A"
+    )
+    coverage_ratio = readiness.get("current_annual_coverage_ratio")
+    if coverage_ratio is None:
+        active_count = int(reconciliation.get("active_universe_count") or 0)
+        current_count = int(
+            reconciliation.get("current_annual_instrument_count") or 0
+        )
+        coverage_ratio = current_count / active_count if active_count else 0.0
     worker_text = "，".join(
         f"{stage}:完成{int(dict(values or {}).get('completed') or 0)}"
         f"/重试{int(dict(values or {}).get('retried') or 0)}"
@@ -556,19 +571,29 @@ def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
     return (
         f"状态: {progress.get('state', 'unknown')}\n"
         f"run_id: {progress.get('run_id') or 'N/A'}\n"
-        f"阶段: {progress.get('phase') or 'N/A'}\n"
+        f"阶段: {phase}\n"
+        f"执行模式: {latest.get('execution_mode') or 'unknown'}\n"
         f"循环: {int(progress.get('cycle') or 0)}，空转: "
         f"{int(progress.get('idle_cycles') or 0)}\n"
         f"heartbeat_age_seconds: {progress.get('heartbeat_age_seconds')}\n"
-        f"队列: claimable={int(queue.get('claimable') or 0)}，"
+        f"队列(当前处理身份): claimable={int(queue.get('claimable') or 0)}，"
         f"running={int(queue.get('running') or 0)}，"
         f"terminal={int(queue.get('terminal') or 0)}\n"
         f"当前年报覆盖率: "
-        f"{float(readiness.get('current_annual_coverage_ratio') or 0):.2%}\n"
+        f"{float(coverage_ratio or 0):.2%}\n"
         f"phase_ready: {bool(readiness.get('phase_ready'))}\n"
         f"本批: 入队{int(throughput.get('enqueued') or enqueue.get('inserted') or 0)}，"
         f"完整完成{int(throughput.get('worker_completed') or 0)}\n"
         f"累计: {worker_text}\n"
+        f"语义结果: 候选{int(publication.get('candidate_records') or 0)}，"
+        f"已核验{int(publication.get('verified_records') or 0)}，"
+        f"已晋级{int(publication.get('promoted_records') or 0)}\n"
+        f"正式发布: 价值链角色"
+        f"{int(publication.get('value_chain_roles_published') or 0)}，"
+        f"商品暴露事实"
+        f"{int(publication.get('commodity_exposure_facts_published') or 0)}，"
+        f"商品暴露{int(publication.get('commodity_exposures_published') or 0)}，"
+        f"剩余缺口{int(publication.get('publication_gaps') or 0)}\n"
         f"原因: {','.join(str(item) for item in reasons) or '无'}"
     )
 
@@ -577,7 +602,9 @@ def _business_profile_completed_items(result: Dict[str, Any]) -> int:
     progress = dict(result.get("continuous_progress") or {})
     cumulative = dict(progress.get("cumulative_workers") or {})
     if cumulative:
-        return int(dict(cumulative.get("publish") or {}).get("completed") or 0)
+        return int(dict(cumulative.get("publish") or {}).get("completed") or 0) + int(
+            dict(cumulative.get("verify") or {}).get("finalized") or 0
+        )
     return int((result.get("throughput") or {}).get("worker_completed") or 0)
 
 
@@ -4710,12 +4737,22 @@ class ScheduledTasks:
                 for item in (report_data.get("detail_messages") or [])[:20]
                 if str(item).strip()
             ]
+            report_status = str(report_data.get("status") or "").strip().lower()
+            detail_level = (
+                "success"
+                if report_status == "success"
+                else "warning"
+                if report_status in {"warning", "degraded", "partial"}
+                else "error"
+                if report_status in {"error", "failed", "blocked"}
+                else "info"
+            )
             for index, detail_message in enumerate(detail_messages, start=1):
                 try:
                     await asyncio.wait_for(
                         self.bot.send_data_notification(
                             detail_message,
-                            level="warning",
+                            level=detail_level,
                         ),
                         timeout=report_timeout_seconds,
                     )

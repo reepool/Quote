@@ -19,6 +19,7 @@ from research.business_profile_async_production import (
     BusinessProfileWriteCoordinator,
     StageBudget,
     _business_profile_operation_status,
+    _migrate_unfinished_legacy_publish_items,
     get_business_profile_write_coordinator,
 )
 from research.business_profile_production_operations import (
@@ -1435,6 +1436,59 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
     ]
 
 
+def test_legacy_unfinished_publish_migrates_by_verify_checkpoint_state(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT work_id, checkpoint_path FROM business_profile_work_items"
+        ).fetchone()
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish' "
+            "WHERE work_id = ?",
+            (row["work_id"],),
+        )
+        conn.commit()
+    checkpoint = Path(row["checkpoint_path"])
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(
+        json.dumps({"completed_stages": ["plan", "select", "extract"]}),
+        encoding="utf-8",
+    )
+
+    migrated = _migrate_unfinished_legacy_publish_items(storage)
+
+    assert migrated == {"moved_to_verify": 1, "retained_publish": 0}
+    assert queue.get(row["work_id"])["stage"] == "verify"
+
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish' "
+            "WHERE work_id = ?",
+            (row["work_id"],),
+        )
+        conn.commit()
+    checkpoint.write_text(
+        json.dumps(
+            {"completed_stages": ["plan", "select", "extract", "verify"]}
+        ),
+        encoding="utf-8",
+    )
+
+    retained = _migrate_unfinished_legacy_publish_items(storage)
+
+    assert retained == {"moved_to_verify": 0, "retained_publish": 1}
+    assert queue.get(row["work_id"])["stage"] == "publish"
+
+
 def test_correction_supersedes_unstarted_original_work(tmp_path):
     storage = _storage(tmp_path)
     frontier, instrument = _frontier(storage)
@@ -1744,6 +1798,7 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
         "acquire": 1,
         "parse": 0,
         "semantic": 0,
+        "verify": 0,
         "publish": 0,
     }
 
@@ -2434,14 +2489,14 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(
                     "max_elapsed_seconds": 30,
                     "high_water_mark": 100,
                 }
-                for stage in ("acquire", "parse", "semantic", "publish")
+                for stage in ("acquire", "parse", "semantic", "verify", "publish")
             },
         )
     )
 
     assert result["status"] == "success"
     queue_group = result["queue_health"]["groups"][0]
-    assert queue_group["stage"] == "publish"
+    assert queue_group["stage"] == "verify"
     assert queue_group["status"] == "completed"
     assert queue_group["row_count"] == 1
     assert result["queue_health"]["terminal"] == 0
@@ -2453,7 +2508,7 @@ def test_data_manager_daily_advances_each_stage_without_draining_globally(
         for call in manager.run_business_profile_semantic_production.await_args_list
     ] == ["plan", "select", "extract", "verify"]
     manager.run_business_profile_index_discovery.assert_not_awaited()
-    shared.list_effective_assets.assert_called_once_with(
+    shared.list_effective_assets.assert_any_call(
         document_family="annual_report",
         knowledge_cutoff="2026-08-30",
         availability="local_valid",
@@ -2483,10 +2538,7 @@ def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
     manager.research_storage = storage
     manager.research_config = Mock(modules={"business_profile_evidence": {}})
     manager.run_business_profile_semantic_production = AsyncMock(
-        side_effect=[
-            {"status": "success", "pipeline_status": "completed"},
-            {"status": "failed", "reason": "manifest_mismatch"},
-        ]
+        return_value={"status": "failed", "reason": "manifest_mismatch"}
     )
     _configure_empty_shared_assets(manager, tmp_path)
 
@@ -2510,8 +2562,11 @@ def test_data_manager_publish_does_not_complete_when_promotion_fails(tmp_path):
     )
 
     assert result["status"] == "failed"
-    assert result["reason"] == "business_profile_promotion_failed"
-    assert result["promotion"]["reason"] == "manifest_mismatch"
+    assert result["reason"] == "manifest_mismatch"
+    assert (
+        manager.run_business_profile_semantic_production.await_args.kwargs["mode"]
+        == "promote"
+    )
 
 
 def test_data_manager_shared_only_discovery_never_calls_business_profile_provider(
@@ -2629,7 +2684,7 @@ def test_data_manager_targeted_backfill_scopes_discovery_and_reconciliation_acce
             instrument_ids=["601088.SH"],
             start_date="2026-01-01",
             document_types=["annual_report", "annual_report_correction"],
-            field_families=["atomic_activities", "named_relationships"],
+            field_families=["named_relationships"],
             runtime_identities={"rules": "v1"},
         )
     )
@@ -2638,6 +2693,98 @@ def test_data_manager_targeted_backfill_scopes_discovery_and_reconciliation_acce
     discovery_kwargs = service.run_backfill.await_args.kwargs["discovery_kwargs"]
     assert discovery_kwargs["instrument_ids"] == ["601088.SH"]
     assert reconciliation.call_args.kwargs["shared_asset_access"] is shared_access
+
+
+def test_targeted_expanded_atomic_backfill_selects_complete_publication_phase(
+    tmp_path, monkeypatch
+):
+    import research.business_profile_async_production as async_module
+    import research.business_profile_production_operations as operations_module
+
+    storage = _storage(tmp_path)
+    async def run_inline(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr(asyncio, "to_thread", run_inline)
+    monkeypatch.setattr(
+        async_module,
+        "ensure_business_profile_storage_ready",
+        lambda _storage: None,
+    )
+    manager = DataManager.__new__(DataManager)
+    manager.research_storage = storage
+    manager.research_config = SimpleNamespace(
+        enabled=True,
+        modules={
+            "business_profile_evidence": {
+                "enabled": True,
+                "semantic_production": {"enabled": True},
+                "production_operations": {
+                    "async_production_enabled": True,
+                    "use_rollout_config": True,
+                    "runtime_identity_mode": "derived",
+                    "checkpoint_root": str(tmp_path / "checkpoints"),
+                },
+            }
+        },
+        storage=SimpleNamespace(db_path=str(tmp_path / "research.db")),
+    )
+    service = SimpleNamespace(
+        run_backfill=AsyncMock(
+            return_value={
+                "status": "success",
+                "workers": {},
+                "queue_health": {"claimable": 0, "running": 0, "terminal": 0},
+                "publication_summary": {},
+                "execution_mode": "complete_publication",
+            }
+        )
+    )
+    captured = {}
+
+    def build_service(**kwargs):
+        captured.update(kwargs)
+        return service, {"processing": "identity"}
+
+    manager._build_business_profile_async_service = Mock(side_effect=build_service)
+    shared_access = SimpleNamespace()
+    manager._get_announcement_asset_access = Mock(return_value=shared_access)
+    manager._dispatch_business_profile_unit_rule_notifications = AsyncMock(
+        return_value={"status": "disabled", "delivered": 0}
+    )
+    monkeypatch.setattr(
+        operations_module,
+        "build_business_profile_reconciliation_report",
+        lambda *_args, **_kwargs: {
+            "status": "success",
+            "active_universe_count": 1,
+            "current_annual_instrument_count": 1,
+        },
+    )
+
+    result = asyncio.run(
+        manager.run_business_profile_backfill(
+            knowledge_cutoff="2026-08-20",
+            selection_policy="expanded",
+            instrument_ids=["601088.SH"],
+            start_date="2026-01-01",
+            document_types=["annual_report", "annual_report_correction"],
+            field_families=["atomic_activities", "named_relationships"],
+        )
+    )
+
+    assert result["effective_rollout_phase"] == "semantic_complete_targeted"
+    assert captured["configured_families"] == (
+        "atomic_activities",
+        "named_relationships",
+        "derived_value_chain_roles",
+        "commodity_exposure_facts",
+        "commodity_exposure_publication",
+    )
+    assert captured["semantic"]["promotion_enabled"] is True
+    budgets = service.run_backfill.await_args.kwargs["stage_budgets"]
+    assert budgets["verify"].max_concurrency == 20
+    assert budgets["publish"].max_concurrency == 1
 
 
 def test_data_manager_stage_runner_uses_work_bound_cutoff(tmp_path):

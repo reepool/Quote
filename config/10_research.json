@@ -245,11 +245,11 @@
             "max_documents": 3,
             "max_pages": 40,
             "max_characters": 120000,
-            "max_tokens": 20000,
+            "max_tokens": 50000,
             "max_cost": 5.0,
             "max_elapsed_seconds": 900.0,
             "max_errors": 10,
-            "max_concurrency": 10
+            "max_concurrency": 20
           },
           "thresholds": {
             "max_unsupported_output_rate": 0.01,

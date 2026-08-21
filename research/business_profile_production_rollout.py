@@ -62,6 +62,7 @@ ROLLOUT_PHASES = (
     "semantic_shadow",
     "semantic_promotion",
     "derived_publication",
+    "semantic_complete_targeted",
     "daily_incremental",
 )
 FIELD_FAMILIES = frozenset(
@@ -90,7 +91,8 @@ RUNTIME_IDENTITY_KEYS = frozenset(
         "policy",
     }
 )
-WORK_STAGES = ("acquire", "parse", "semantic", "publish")
+WORK_STAGES = ("acquire", "parse", "semantic", "verify", "publish")
+LEGACY_WORK_STAGES = ("acquire", "parse", "semantic", "publish")
 
 
 @dataclass(frozen=True)
@@ -842,11 +844,18 @@ def evaluate_business_profile_rollout_readiness(
 
 
 def _parse_stage_budgets(value: Any, phase_name: str) -> dict[str, dict[str, Any]]:
-    if not isinstance(value, Mapping) or set(value) != set(WORK_STAGES):
+    stage_keys = frozenset(value) if isinstance(value, Mapping) else frozenset()
+    if not isinstance(value, Mapping) or stage_keys not in {
+        frozenset(WORK_STAGES),
+        frozenset(LEGACY_WORK_STAGES),
+    }:
         raise ValueError(f"rollout phase stage budgets are incomplete: {phase_name}")
+    normalized = dict(value)
+    if "verify" not in normalized:
+        normalized["verify"] = dict(normalized["semantic"])
     budgets: dict[str, dict[str, Any]] = {}
     for stage in WORK_STAGES:
-        raw = value.get(stage)
+        raw = normalized.get(stage)
         if not isinstance(raw, Mapping):
             raise ValueError(
                 f"rollout stage budget must be an object: {phase_name}:{stage}"

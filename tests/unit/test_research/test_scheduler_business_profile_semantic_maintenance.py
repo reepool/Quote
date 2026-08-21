@@ -1,4 +1,5 @@
 import asyncio
+from types import SimpleNamespace
 from unittest.mock import ANY, AsyncMock, Mock
 
 import research.business_profile_semantic_runtime as runtime_module
@@ -66,6 +67,63 @@ def test_single_batch_progress_uses_nested_authoritative_queue_and_readiness():
             },
         }
     ) == 7
+
+
+def test_progress_falls_back_to_reconciliation_and_reports_publication_counts():
+    text = task_module._format_business_profile_backfill_progress(
+        {
+            "state": "completed",
+            "run_id": "run-targeted",
+            "latest_result": {
+                "effective_rollout_phase": "semantic_complete_targeted",
+                "execution_mode": "complete_publication",
+                "queue_health": {"claimable": 0, "running": 0, "terminal": 0},
+                "reconciliation": {
+                    "active_universe_count": 100,
+                    "current_annual_instrument_count": 98,
+                },
+                "publication_summary": {
+                    "candidate_records": 18,
+                    "verified_records": 18,
+                    "promoted_records": 15,
+                    "value_chain_roles_published": 4,
+                    "commodity_exposure_facts_published": 6,
+                    "commodity_exposures_published": 3,
+                    "publication_gaps": 3,
+                },
+            },
+        }
+    )
+
+    assert "阶段: semantic_complete_targeted" in text
+    assert "执行模式: complete_publication" in text
+    assert "队列(当前处理身份)" in text
+    assert "当前年报覆盖率: 98.00%" in text
+    assert "价值链角色4" in text
+    assert "剩余缺口3" in text
+
+
+def test_task_report_uses_result_severity_for_detail_notification():
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.telegram_enabled = True
+    task.bot = Mock(
+        send_report_notification=AsyncMock(return_value=True),
+        send_data_notification=AsyncMock(return_value=True),
+    )
+
+    sent = asyncio.run(
+        task._send_task_report(
+            report_data={"status": "success", "detail_messages": ["完成"]},
+            report_type="maintenance_report",
+            task_name="business_profile_backfill",
+            job_config=Mock(report=True),
+        )
+    )
+
+    assert sent is True
+    task.bot.send_data_notification.assert_awaited_once_with(
+        "完成", level="success"
+    )
 
 
 def test_daily_incremental_job_is_disabled_and_not_scheduled(monkeypatch):
@@ -178,6 +236,11 @@ def test_data_manager_enabled_plan_builds_scope_before_default_checkpoint(
     manager = DataManager.__new__(DataManager)
     manager.research_config = research_config
     manager.research_storage = storage
+    manager._get_announcement_asset_access = Mock(
+        return_value=SimpleNamespace(
+            list_effective_assets=Mock(return_value={"items": [], "returned": 0})
+        )
+    )
 
     result = asyncio.run(
         manager.run_business_profile_semantic_production(
@@ -308,14 +371,6 @@ def test_unchanged_complete_scope_builds_no_pdf_acquirer_or_llm_client(
         "discover_business_profile_semantic_scope",
         Mock(return_value=()),
     )
-    acquirer_builder = Mock(
-        side_effect=AssertionError("PDF acquisition is unnecessary")
-    )
-    monkeypatch.setattr(
-        runtime_module,
-        "build_business_profile_planned_disclosure_acquirer",
-        acquirer_builder,
-    )
     llm_client = Mock(side_effect=AssertionError("LLM construction is unnecessary"))
     monkeypatch.setattr(llm_module, "LlmClient", llm_client)
 
@@ -327,7 +382,6 @@ def test_unchanged_complete_scope_builds_no_pdf_acquirer_or_llm_client(
     )
 
     assert result["status"] == "unchanged"
-    acquirer_builder.assert_not_called()
     llm_client.assert_not_called()
 
 

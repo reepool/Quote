@@ -36,7 +36,93 @@
       "maximum_gateway_congestion_rate": 0.10,
       "maximum_approved_history_blockers": 0
     },
-    "promotion_manifests": {},
+    "promotion_manifests": {
+      "atomic_activities": {
+        "field_family": "atomic_activities",
+        "enabled": true,
+        "benchmark_passed": true,
+        "identities": {
+          "catalog": "business_profile_facts.2026.2|business_profile_products.2026.3|business_profile_units.2026.7|business_profile_disclosure_templates.2026.2",
+          "document": "effective_annual_report.v2|business_profile_source_asset.v1",
+          "model": "logical_profile=semantic_extraction|route_fingerprint=0b0c82e5ceeff7ce4029f5fee87a75c09233ca5e20dbb63cf4e5a249d346850e|structured_output_modes=json_object",
+          "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v6",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v1|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
+          "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
+          "verifier": "business_profile_atomic_verifier.v4"
+        }
+      },
+      "named_relationships": {
+        "field_family": "named_relationships",
+        "enabled": true,
+        "benchmark_passed": true,
+        "identities": {
+          "catalog": "business_profile_facts.2026.2|business_profile_products.2026.3|business_profile_units.2026.7|business_profile_disclosure_templates.2026.2",
+          "document": "effective_annual_report.v2|business_profile_source_asset.v1",
+          "model": "logical_profile=semantic_extraction|route_fingerprint=0b0c82e5ceeff7ce4029f5fee87a75c09233ca5e20dbb63cf4e5a249d346850e|structured_output_modes=json_object",
+          "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v6",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v1|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
+          "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
+          "verifier": "business_profile_atomic_verifier.v4"
+        }
+      },
+      "derived_value_chain_roles": {
+        "field_family": "derived_value_chain_roles",
+        "enabled": true,
+        "benchmark_passed": true,
+        "identities": {
+          "catalog": "business_profile_facts.2026.2|business_profile_products.2026.3|business_profile_units.2026.7|business_profile_disclosure_templates.2026.2",
+          "document": "effective_annual_report.v2|business_profile_source_asset.v1",
+          "model": "logical_profile=semantic_extraction|route_fingerprint=0b0c82e5ceeff7ce4029f5fee87a75c09233ca5e20dbb63cf4e5a249d346850e|structured_output_modes=json_object",
+          "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v6",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v1|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
+          "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
+          "verifier": "business_profile_atomic_verifier.v4"
+        }
+      },
+      "commodity_exposure_facts": {
+        "field_family": "commodity_exposure_facts",
+        "enabled": true,
+        "benchmark_passed": true,
+        "identities": {
+          "catalog": "business_profile_facts.2026.2|business_profile_products.2026.3|business_profile_units.2026.7|business_profile_disclosure_templates.2026.2",
+          "document": "effective_annual_report.v2|business_profile_source_asset.v1",
+          "model": "logical_profile=semantic_extraction|route_fingerprint=0b0c82e5ceeff7ce4029f5fee87a75c09233ca5e20dbb63cf4e5a249d346850e|structured_output_modes=json_object",
+          "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v6",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v1|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
+          "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
+          "verifier": "business_profile_atomic_verifier.v4"
+        }
+      },
+      "commodity_exposure_publication": {
+        "field_family": "commodity_exposure_publication",
+        "enabled": true,
+        "benchmark_passed": true,
+        "identities": {
+          "catalog": "business_profile_facts.2026.2|business_profile_products.2026.3|business_profile_units.2026.7|business_profile_disclosure_templates.2026.2",
+          "document": "effective_annual_report.v2|business_profile_source_asset.v1",
+          "model": "logical_profile=semantic_extraction|route_fingerprint=0b0c82e5ceeff7ce4029f5fee87a75c09233ca5e20dbb63cf4e5a249d346850e|structured_output_modes=json_object",
+          "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v6",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v1|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
+          "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
+          "verifier": "business_profile_atomic_verifier.v4"
+        }
+      }
+    },
     "phases": {
       "structured_shadow": {
         "enabled": true,
@@ -122,6 +208,27 @@
           "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
           "semantic": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
           "publish": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
+        }
+      },
+      "semantic_complete_targeted": {
+        "enabled": true,
+        "order": 55,
+        "field_families": [
+          "atomic_activities",
+          "named_relationships",
+          "derived_value_chain_roles",
+          "commodity_exposure_facts",
+          "commodity_exposure_publication"
+        ],
+        "promotion_enabled": true,
+        "requires_passed_manifests": true,
+        "prerequisites": [],
+        "stage_budgets": {
+          "acquire": {"max_items": 20, "max_concurrency": 2, "max_elapsed_seconds": 900, "high_water_mark": 2000},
+          "parse": {"max_items": 40, "max_concurrency": 4, "max_elapsed_seconds": 1200, "high_water_mark": 2000},
+          "semantic": {"max_items": 20, "max_concurrency": 20, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "verify": {"max_items": 20, "max_concurrency": 20, "max_elapsed_seconds": 1800, "high_water_mark": 1000},
+          "publish": {"max_items": 40, "max_concurrency": 1, "max_elapsed_seconds": 1200, "high_water_mark": 2000}
         }
       },
       "daily_incremental": {
