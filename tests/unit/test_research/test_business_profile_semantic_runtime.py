@@ -28,10 +28,15 @@ from research.business_profile_semantic_pipeline import (
 )
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
+    _expanded_action_verification_target,
     _normalized_value,
     _semantic_failure_reason,
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
+)
+from research.business_profile_section_selection import (
+    SelectedSection,
+    SelectedSectionArtifact,
 )
 from research.providers.base import FinancialSourceFileManifest
 from research.storage import ResearchStorageManager
@@ -679,6 +684,164 @@ class _VerifierAuthenticationGateway(_ProductionAndSalesGateway):
             self.requests.append(request)
             raise LlmAuthenticationError("LLM authentication failed")
         return await super().complete(request)
+
+
+def test_action_only_verification_failure_expands_bounded_annual_report_context(
+    tmp_path,
+):
+    table_text = "外购煤 百万吨 98.6"
+    context_text = "2025年外购煤销售量及采购价格下降，公司持续开展外购煤采购。"
+    sections = tuple(
+        SelectedSection(
+            section_id=f"section-{page}-{index}",
+            page_number=page,
+            section_key="coal_operations",
+            text=text,
+            normalized_text=text,
+            normalized_start=0,
+            normalized_end=len(text),
+            page_hash=hashlib.sha256(text.encode()).hexdigest(),
+            section_hash=hashlib.sha256(text.encode()).hexdigest(),
+            selector_reasons=("test",),
+            quality="native",
+        )
+        for index, (page, text) in enumerate(
+            (
+                (21, table_text),
+                (22, context_text),
+                (22, "外购煤采购补充说明。"),
+            )
+        )
+    )
+    selected = SelectedSectionArtifact(
+        artifact_version="business_profile_selected_sections.v1",
+        bundle={},
+        sections=sections,
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash="selected-hash",
+    )
+    target = {
+        "target_type": "activity",
+        "selected": selected,
+        "verification_target": {
+            "activity_id": "activity-external-coal",
+            "action": "purchases",
+            "object_raw": "外购煤",
+            "evidence": {
+                "evidence_spans": [
+                    {
+                        "section_id": "section-21-0",
+                        "page_number": 21,
+                        "section_hash": sections[0].section_hash,
+                        "quote": table_text,
+                        "quote_hash": hashlib.sha256(table_text.encode()).hexdigest(),
+                    }
+                ]
+            },
+        },
+    }
+    failed_action = {
+        "decision": "insufficient_evidence",
+        "checks": {
+            "subject": True,
+            "action": False,
+            "object": True,
+            "scope": True,
+            "period": True,
+            "evidence": True,
+        },
+    }
+
+    expanded = _expanded_action_verification_target(target, failed_action)
+
+    assert expanded is not None
+    spans = expanded["evidence"]["evidence_spans"]
+    assert len(spans) == 2
+    assert spans[1]["page_number"] == 22
+    assert "外购煤" in spans[1]["quote"]
+    assert "采购" in spans[1]["quote"]
+    assert (
+        _expanded_action_verification_target(
+            {
+                **target,
+                "verification_target": {
+                    **target["verification_target"],
+                    "action": "hedges",
+                },
+            },
+            failed_action,
+        )
+        is None
+    )
+
+    class ActionContextGateway:
+        def __init__(self):
+            self.requests = []
+
+        async def complete(self, request):
+            self.requests.append(request)
+            payload = json.loads(request.messages[-1].content)
+            expanded_context = len(payload["isolated_evidence"]["spans"]) > 1
+            return _response(
+                {
+                    "decision": (
+                        "confirmed" if expanded_context else "insufficient_evidence"
+                    ),
+                    "checks": {
+                        "subject": True,
+                        "action": expanded_context,
+                        "object": True,
+                        "scope": True,
+                        "period": True,
+                        "evidence": True,
+                    },
+                },
+                request,
+            )
+
+    gateway = ActionContextGateway()
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
+    )
+    outcome = asyncio.run(runtime._verify_wave_async([target]))[0]
+
+    assert outcome["verification"]["decision"] == "confirmed"
+    assert [item["kind"] for item in outcome["verification"]["attempts"]] == [
+        "isolated_evidence",
+        "bounded_action_context",
+    ]
+    assert outcome["retry_calls"] == 1
+    assert outcome["usage_tokens"] == 80
+    assert len(gateway.requests) == 2
+
+    class FailingExpandedContextGateway(ActionContextGateway):
+        async def complete(self, request):
+            if self.requests:
+                self.requests.append(request)
+                raise RuntimeError("expanded verification unavailable")
+            return await super().complete(request)
+
+    failing_gateway = FailingExpandedContextGateway()
+    failing_runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path / "failing")),
+        artifact_root=tmp_path / "failing-artifacts",
+        llm_client=failing_gateway,
+    )
+    failed = asyncio.run(failing_runtime._verify_wave_async([target]))[0]
+
+    assert isinstance(failed["exception"], RuntimeError)
+    assert [item["kind"] for item in failed["audit"]["attempts"]] == [
+        "isolated_evidence",
+        "bounded_action_context",
+    ]
+    assert failed["audit"]["attempts"][0]["verification"]["decision"] == (
+        "insufficient_evidence"
+    )
+    assert failed["audit"]["attempts"][1]["verification"] is None
+    assert failed["retry_calls"] == 1
 
 
 def _relationship_runtime(
@@ -2869,7 +3032,10 @@ def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path
     resolved = resolver.resolve("浦发银行股份有限公司", knowledge_cutoff="2026-01-01")
     assert resolved.status == "resolved"
     assert resolved.entity_id == "600000.SH"
-    assert resolver.resolve("腾讯控股有限公司").status == "unresolved"
+    external = resolver.resolve("腾讯控股有限公司")
+    assert external.status == "resolved"
+    assert external.entity_id.startswith("local-entity:")
+    assert external.basis == "official_filing_exact_name"
 
 
 def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_path):
@@ -2975,20 +3141,22 @@ def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_
     assert resolver.resolve("上海浦东发展银行股份有限公司").entity_id == "600000.SH"
 
 
-def test_unresolved_counterparty_is_machine_rework_without_orphan_evidence(
+def test_disclosed_complete_counterparty_is_published_without_master_registration(
     tmp_path, monkeypatch
 ):
-    repository, _, _, gateway = _relationship_runtime(
-        tmp_path, monkeypatch, [], promote=False
+    repository, pipeline, scope, gateway = _relationship_runtime(
+        tmp_path, monkeypatch, [], promote=True
     )
 
-    exceptions = repository.list_exceptions(instrument_id="601088.SH")
-    assert len(gateway.requests) == 1
-    assert len(exceptions) == 1
-    assert exceptions[0]["tier"] == "machine_rework"
-    assert exceptions[0]["reason_codes"] == ["catalog_proposal"]
-    assert repository.list_records("relationships", instrument_id="601088.SH") == []
-    assert repository.list_records("evidence", instrument_id="601088.SH") == []
+    assert pipeline.run("verify", scope=scope)["status"] == "success"
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+    relationships = repository.list_records("relationships", instrument_id="601088.SH")
+    assert len(gateway.requests) == 2
+    assert len(relationships) == 1
+    assert relationships[0]["counterparty_entity_id"].startswith("local-entity:")
+    assert relationships[0]["resolution_basis"] == "official_filing_exact_name"
+    assert relationships[0]["review_status"] == "approved"
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
 def test_network_kill_switch_makes_zero_gateway_calls_without_business_rework(
@@ -3135,7 +3303,11 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         item["activity_id"] for item in activities
     }
     assert all(item["review_status"] == "approved" for item in facts)
-    assert repository.list_records("exposures", instrument_id="601088.SH") == []
+    exposures = repository.list_records("exposures", instrument_id="601088.SH")
+    assert len(exposures) == 1
+    assert exposures[0]["commodity_id"] == "COMMODITY.coal.thermal_coal"
+    assert exposures[0]["price_series_id"] is None
+    assert exposures[0]["metadata"]["market_series_status"] == "unresolved"
 
     promoted_payload = runtime.stage_store.read(
         promoted["artifact"],
@@ -3143,11 +3315,13 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     )
     publication_results = promoted_payload["derived"]["publications"]
     assert len(publication_results) == 2
-    assert all(item["status"] == "input_gap" for item in publication_results)
-    assert {item["reason"] for item in publication_results} == {
-        "ambiguous_or_unsupported_exposure_direction",
-        "ambiguous_or_unpromoted_product_commodity_mapping",
+    assert {item["status"] for item in publication_results} == {
+        "input_gap",
+        "published",
     }
+    assert [
+        item["reason"] for item in publication_results if item["status"] == "input_gap"
+    ] == ["ambiguous_or_unsupported_exposure_direction"]
     assert promoted["quality"] == {
         "stage": "promote",
         "stage_ready": True,
@@ -3156,22 +3330,21 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         "promoted_records": 2,
         "value_chain_roles_published": 1,
         "commodity_exposure_facts_published": 2,
-        "commodity_exposures_published": 0,
-        "publication_gaps": 2,
+        "commodity_exposures_published": 1,
+        "publication_gaps": 1,
     }
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert {item["reason_codes"][0] for item in exceptions} == {
         "ambiguous_or_unsupported_exposure_direction",
-        "ambiguous_or_unpromoted_product_commodity_mapping",
     }
     runtime._derive_and_publish(scope)
-    assert len(repository.list_exceptions(instrument_id="601088.SH")) == 2
+    assert len(repository.list_exceptions(instrument_id="601088.SH")) == 1
     report = pipeline.run("report", scope=scope)["metrics"]["by_field_family"]
     assert report["atomic_activities"]["llm_calls"] == 3
     assert report["atomic_activities"]["candidates"] == 2
     assert report["derived_value_chain_roles"]["auto_promoted"] == 1
     assert report["commodity_exposure_facts"]["auto_promoted"] == 2
-    assert report["commodity_exposure_publication"]["auto_promoted"] == 0
+    assert report["commodity_exposure_publication"]["auto_promoted"] == 1
 
     checkpoint = pipeline.checkpoint_store.load()
     verified = runtime.stage_store.read(

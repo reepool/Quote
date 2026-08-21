@@ -22,6 +22,7 @@ from utils.date_utils import get_shanghai_time
 REVIEW_DECISIONS = {"held", "approved", "rejected", "superseded"}
 SYSTEM_PROMOTION_SCHEMA_VERSION = "business_profile_system_promotion.v1"
 SYSTEM_PROMOTION_REVIEWER_PREFIX = "system:business_profile_auto_promotion."
+SYSTEM_REOPEN_SCHEMA_VERSION = "business_profile_system_reopen.v1"
 OFFICIAL_EVIDENCE_SOURCE_TIERS = {
     "official_backup",
     "official_filing",
@@ -211,6 +212,65 @@ class BusinessProfileReviewService:
             metadata=promotion_metadata,
             _system_promotion=True,
         )
+
+    def system_reopen_rejected_record(
+        self,
+        record_type: str,
+        record_id: str,
+        *,
+        expected_updated_at: str,
+        reason: str,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Reopen an obsolete machine rejection while preserving audit history."""
+
+        spec = self._record_spec(record_type)
+        now = get_shanghai_time().isoformat()
+        operation_id = f"bp-review-op-{uuid.uuid4().hex}"
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = self._load_review_row(conn, spec, record_id)
+                if row is None:
+                    raise ValueError(
+                        f"business profile record not found: {record_type}:{record_id}"
+                    )
+                self._validate_no_prior_human_decision(
+                    conn, record_type=record_type, record_id=record_id
+                )
+                self._validate_expected_review_state(
+                    row,
+                    expected_status="rejected",
+                    expected_updated_at=str(expected_updated_at or "").strip(),
+                )
+                audit = self._update_review_status(
+                    conn,
+                    spec=spec,
+                    record_type=record_type,
+                    row=row,
+                    new_status="candidate",
+                    operation_id=operation_id,
+                    reviewer=SYSTEM_PROMOTION_REVIEWER_PREFIX + "reopen.v1",
+                    reason=str(
+                        reason or "current automatic verification supersedes rejection"
+                    ),
+                    evidence_references=(),
+                    replacement_record_id=None,
+                    metadata={
+                        **dict(metadata or {}),
+                        "system_reopen": {
+                            "schema_version": SYSTEM_REOPEN_SCHEMA_VERSION,
+                            "prior_status": "rejected",
+                        },
+                    },
+                    now=now,
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return audit
 
     def list_review_audit(
         self,

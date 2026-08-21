@@ -9,7 +9,6 @@ from typing import Any, Mapping, Sequence
 
 from research.business_profile_product_catalog import (
     BusinessProductCatalog,
-    ProductCommodityMapping,
     load_business_product_catalog,
 )
 from research.business_profile_review import BusinessProfileReviewService
@@ -51,8 +50,8 @@ class ResolvedCommodityMapping:
     product_id: str
     exposure_role: str
     commodity_id: str
-    price_series_id: str
-    reference_type: str
+    price_series_id: str | None
+    reference_type: str | None
 
 
 class BusinessProfileExposureFactProducer:
@@ -133,7 +132,7 @@ class BusinessProfileExposureFactProducer:
 
 
 class GovernedCommodityMappingResolver:
-    """Resolve only one promoted, current product-to-series mapping."""
+    """Resolve commodity identity separately from an executable price series."""
 
     def __init__(self, catalog: BusinessProductCatalog | None = None):
         self.catalog = catalog or load_business_product_catalog()
@@ -156,21 +155,25 @@ class GovernedCommodityMappingResolver:
             exposure_role=exposure_role,
             evidence_requirement=evidence_requirement,
         )
-        eligible = [item for item in candidates if not item.candidate_only]
-        if len(eligible) != 1:
+        commodity_ids = {item.commodity_id for item in candidates}
+        if len(candidates) != 1 or len(commodity_ids) != 1:
             raise ValueError("ambiguous_or_unpromoted_product_commodity_mapping")
-        mapping = eligible[0]
-        if mapping.ambiguity_policy != "single_target" or len(mapping.targets) != 1:
-            raise ValueError("ambiguous_product_commodity_mapping")
-        target = mapping.targets[0]
+        mapping = candidates[0]
+        executable = (
+            not mapping.candidate_only
+            and mapping.ambiguity_policy == "single_target"
+            and len(mapping.targets) == 1
+            and bool(mapping.targets[0].price_series_id)
+        )
+        target = mapping.targets[0] if executable else None
         return ResolvedCommodityMapping(
             mapping_id=mapping.mapping_id,
             catalog_version=self.catalog.catalog_version,
             product_id=product_id,
             exposure_role=exposure_role,
             commodity_id=mapping.commodity_id,
-            price_series_id=str(target.price_series_id),
-            reference_type=target.reference_type,
+            price_series_id=str(target.price_series_id) if target else None,
+            reference_type=target.reference_type if target else None,
         )
 
 
@@ -412,6 +415,9 @@ class BusinessProfileExposurePublisher:
             "legacy_compatibility_status": "componentized",
             "metadata": {
                 "mapping_reference_type": mapping.reference_type,
+                "market_series_status": (
+                    "resolved" if mapping.price_series_id else "unresolved"
+                ),
                 "unknown_materiality_preserved": fact.get("share") is None,
                 "basic_publication_excludes_optional_assumptions": not assumption_ids,
                 "required_assumption_types": list(required_assumption_types),

@@ -1,7 +1,7 @@
 {
   "schema_version": "business_profile_product_catalog.v3",
-  "catalog_version": "business_profile_products.2026.3",
-  "released_on": "2026-08-04",
+  "catalog_version": "business_profile_products.2026.4",
+  "released_on": "2026-08-21",
   "document_applicable_from": "2021-01-01",
   "document_applicable_to": null,
   "products": [
@@ -36,6 +36,7 @@
     {"product_id": "chemical.methanol", "label_zh": "甲醇", "label_en": "Methanol", "product_kind": "finished_product", "industry_groups": ["basic_chemical"]},
     {"product_id": "polymer.pvc", "label_zh": "聚氯乙烯", "label_en": "PVC", "product_kind": "finished_product", "industry_groups": ["basic_chemical"]},
     {"product_id": "polymer.lldpe", "label_zh": "线性低密度聚乙烯", "label_en": "LLDPE", "product_kind": "finished_product", "industry_groups": ["petrochemical", "basic_chemical"]},
+    {"product_id": "polymer.polyethylene", "label_zh": "聚乙烯", "label_en": "Polyethylene", "product_kind": "finished_product", "industry_groups": ["petrochemical", "basic_chemical"], "notes": "Generic polyethylene identity; no unique market series is implied."},
     {"product_id": "polymer.polypropylene", "label_zh": "聚丙烯", "label_en": "Polypropylene", "product_kind": "finished_product", "industry_groups": ["petrochemical", "basic_chemical"]},
     {"product_id": "chemical.styrene", "label_zh": "苯乙烯", "label_en": "Styrene", "product_kind": "intermediate", "industry_groups": ["petrochemical", "basic_chemical"]},
     {"product_id": "chemical.soda_ash", "label_zh": "纯碱", "label_en": "Soda ash", "product_kind": "finished_product", "industry_groups": ["basic_chemical", "building_material"]},
@@ -85,6 +86,7 @@
     {"alias_id": "chemical.methanol", "alias": "甲醇", "normalized_alias": "甲醇", "product_ids": ["chemical.methanol"], "industry_groups": ["basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
     {"alias_id": "polymer.pvc", "alias": "PVC", "normalized_alias": "pvc", "product_ids": ["polymer.pvc"], "industry_groups": ["basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
     {"alias_id": "polymer.lldpe", "alias": "LLDPE", "normalized_alias": "lldpe", "product_ids": ["polymer.lldpe"], "industry_groups": ["petrochemical", "basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
+    {"alias_id": "polymer.pe", "alias": "聚乙烯", "normalized_alias": "聚乙烯", "product_ids": ["polymer.polyethylene"], "industry_groups": ["petrochemical", "basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
     {"alias_id": "polymer.pp", "alias": "聚丙烯", "normalized_alias": "聚丙烯", "product_ids": ["polymer.polypropylene"], "industry_groups": ["petrochemical", "basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
     {"alias_id": "chemical.styrene", "alias": "苯乙烯", "normalized_alias": "苯乙烯", "product_ids": ["chemical.styrene"], "industry_groups": ["petrochemical", "basic_chemical"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
     {"alias_id": "chemical.soda_ash", "alias": "纯碱", "normalized_alias": "纯碱", "product_ids": ["chemical.soda_ash"], "industry_groups": ["basic_chemical", "building_material"], "match_mode": "normalized_exact", "review_policy": "auto_candidate_if_unique"},
@@ -133,6 +135,7 @@
     {"mapping_id": "chemical.methanol.revenue", "product_id": "chemical.methanol", "commodity_id": "COMMODITY.chemical.methanol", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.MA.CZCE", "priority": 1}, {"reference_type": "special_commodity", "reference_id": "CN.CHEMICAL.METHANOL.SPOT", "priority": 2}], "ambiguity_policy": "one_to_many_review", "evidence_requirement": "explicit_product", "candidate_only": true},
     {"mapping_id": "polymer.pvc.revenue", "product_id": "polymer.pvc", "commodity_id": "COMMODITY.polymer.pvc", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.V.DCE", "priority": 1}, {"reference_type": "special_commodity", "reference_id": "CN.CHEMICAL.PVC.SPOT", "priority": 2}], "ambiguity_policy": "one_to_many_review", "evidence_requirement": "explicit_product", "candidate_only": true},
     {"mapping_id": "polymer.lldpe.revenue", "product_id": "polymer.lldpe", "commodity_id": "COMMODITY.polymer.lldpe", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.L.DCE", "priority": 1}], "ambiguity_policy": "single_target", "evidence_requirement": "explicit_product", "candidate_only": true},
+    {"mapping_id": "polymer.pe.revenue", "product_id": "polymer.polyethylene", "commodity_id": "COMMODITY.polymer.polyethylene", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.L.DCE", "priority": 1}], "ambiguity_policy": "single_target", "evidence_requirement": "explicit_product", "candidate_only": true},
     {"mapping_id": "polymer.pp.revenue", "product_id": "polymer.polypropylene", "commodity_id": "COMMODITY.polymer.polypropylene", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.PP.DCE", "priority": 1}, {"reference_type": "special_commodity", "reference_id": "CN.CHEMICAL.POLYPROPYLENE.SPOT", "priority": 2}], "ambiguity_policy": "one_to_many_review", "evidence_requirement": "explicit_product", "candidate_only": true},
     {"mapping_id": "chemical.styrene.revenue", "product_id": "chemical.styrene", "commodity_id": "COMMODITY.chemical.styrene", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.EB.DCE", "priority": 1}, {"reference_type": "special_commodity", "reference_id": "CN.CHEMICAL.STYRENE.SPOT", "priority": 2}], "ambiguity_policy": "one_to_many_review", "evidence_requirement": "explicit_product", "candidate_only": true},
     {"mapping_id": "chemical.soda_ash.revenue", "product_id": "chemical.soda_ash", "commodity_id": "COMMODITY.chemical.soda_ash", "exposure_role": "revenue", "targets": [{"reference_type": "futures_instrument", "reference_id": "CNF.SA.CZCE", "priority": 1}, {"reference_type": "special_commodity", "reference_id": "CN.CHEMICAL.SODA_ASH.SPOT", "priority": 2}], "ambiguity_policy": "one_to_many_review", "evidence_requirement": "explicit_product", "candidate_only": true},

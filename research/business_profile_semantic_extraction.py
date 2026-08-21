@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 SEMANTIC_EXTRACTION_SCHEMA_VERSION = "business_profile_atomic_extraction.v5"
 SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v5"
-SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v4"
+SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v5"
 STRUCTURED_EXTRACTION_SCHEMA_VERSION = "business_profile_structured_extraction.v4"
 STRUCTURED_EXTRACTION_PROMPT_VERSION = "business_profile_structured_extraction.v4"
 _LEGACY_SEMANTIC_SCHEMA_VERSIONS = {

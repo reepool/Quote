@@ -139,6 +139,68 @@ def test_human_hold_blocks_system_promotion_but_can_be_resolved_by_human(tmp_pat
     assert repository.list_records("evidence")[0]["review_status"] == "approved"
 
 
+def test_machine_rejection_can_be_audited_and_reopened_but_human_rejection_cannot(
+    tmp_path,
+):
+    repository, _ = _repository(tmp_path)
+    review = BusinessProfileReviewService(repository)
+    repository.upsert("evidence", _candidate_evidence("machine-rejected"))
+    candidate = repository.get_record("evidence", "machine-rejected")
+    review.review_record(
+        "evidence",
+        "machine-rejected",
+        decision="rejected",
+        reviewer="system:legacy-verifier",
+        reason="legacy verifier rejected isolated evidence",
+        expected_review_status="candidate",
+        expected_updated_at=candidate["updated_at"],
+        _system_promotion=True,
+    )
+    rejected = repository.get_record("evidence", "machine-rejected")
+
+    reopen = review.system_reopen_rejected_record(
+        "evidence",
+        "machine-rejected",
+        expected_updated_at=rejected["updated_at"],
+        reason="current filing context confirms the evidence",
+    )
+
+    assert reopen["prior_status"] == "rejected"
+    assert reopen["new_status"] == "candidate"
+    assert (
+        repository.get_record("evidence", "machine-rejected")["review_status"]
+        == "candidate"
+    )
+    assert (
+        len(
+            review.list_review_audit(
+                record_type="evidence", record_id="machine-rejected"
+            )
+        )
+        == 2
+    )
+
+    repository.upsert("evidence", _candidate_evidence("human-rejected"))
+    candidate = repository.get_record("evidence", "human-rejected")
+    review.review_record(
+        "evidence",
+        "human-rejected",
+        decision="rejected",
+        reviewer="analyst@example",
+        reason="manual rejection",
+        expected_review_status="candidate",
+        expected_updated_at=candidate["updated_at"],
+    )
+    rejected = repository.get_record("evidence", "human-rejected")
+    with pytest.raises(ValueError, match="prior human decision"):
+        review.system_reopen_rejected_record(
+            "evidence",
+            "human-rejected",
+            expected_updated_at=rejected["updated_at"],
+            reason="automatic retry",
+        )
+
+
 class _CountingStorage:
     def __init__(self, storage):
         self._storage = storage

@@ -5,12 +5,13 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
 ACTIVITY_PRODUCTION_SCHEMA_VERSION = "business_profile_activity_production.v1"
 ROLE_RULE_VERSION = "business_profile_activity_role_rules.v1"
-ENTITY_RESOLUTION_POLICY_VERSION = "business_profile_entity_resolution.v1"
+ENTITY_RESOLUTION_POLICY_VERSION = "business_profile_entity_resolution.v2"
 
 ACTIVITY_ROLE_RULES = {
     "extracts": "producer",
@@ -119,7 +120,32 @@ class GovernedCounterpartyResolver:
         ]
         if alias_matches:
             return _resolution(alias_matches, "approved_exact_alias")
+        disclosed_legal_name = _normalized_complete_legal_name(name)
+        if disclosed_legal_name:
+            return EntityResolution(
+                "resolved",
+                "local-entity:"
+                + hashlib.sha256(disclosed_legal_name.encode("utf-8")).hexdigest()[:24],
+                disclosed_legal_name,
+                "official_filing_exact_name",
+            )
         return EntityResolution("unresolved", None, None, None)
+
+
+def _normalized_complete_legal_name(value: str) -> str | None:
+    """Accept a disclosed legal name without claiming registry-level identity."""
+
+    normalized = re.sub(r"[\s\u3000]+", "", str(value or ""))
+    if len(normalized) < 6 or re.search(r"[A-Za-z0-9]$", normalized):
+        return None
+    return (
+        normalized
+        if re.search(
+            r"(?:股份有限公司|有限责任公司|集团有限公司|有限公司|集团公司)$",
+            normalized,
+        )
+        else None
+    )
 
 
 class BusinessProfileActivityProducer:

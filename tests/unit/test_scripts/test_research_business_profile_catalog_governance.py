@@ -44,7 +44,7 @@ def test_audit_cli_reads_candidate_segments_from_research_db(tmp_path):
                         "source_name": "eastmoney_main_composition",
                         "source_row_key": "row-1",
                         "industry_group": "coal",
-                        "product_catalog_version": ("business_profile_products.2026.3"),
+                        "product_catalog_version": ("business_profile_products.2026.4"),
                         "product_resolution": {
                             "normalized_alias": "待治理产品",
                             "product_ids": [],
@@ -181,11 +181,11 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
             "--manifest-output",
             str(manifest),
             "--expected-version",
-            "business_profile_products.2026.3",
-            "--new-version",
             "business_profile_products.2026.4",
+            "--new-version",
+            "business_profile_products.2026.5",
             "--released-on",
-            "2026-08-05",
+            "2026-08-22",
             "--alias",
             "premium thermal coal",
             "--product-id",
@@ -206,7 +206,7 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
     catalog = json.loads(output.read_text(encoding="utf-8"))
     audit = json.loads(manifest.read_text(encoding="utf-8"))
     assert result == 0
-    assert catalog["catalog_version"] == "business_profile_products.2026.4"
+    assert catalog["catalog_version"] == "business_profile_products.2026.5"
     assert audit["change_type"] == "add_normalized_exact_alias"
     assert audit["output_catalog_hash"]
     assert audit["official_evidence"]["source_file_id"] == (

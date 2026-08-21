@@ -54,6 +54,20 @@ def test_exact_entity_resolution_and_ambiguity_fail_closed():
     assert exception["ranked_local_choices"] == ["entity-a", "entity-b"]
 
 
+def test_official_filing_legal_name_gets_stable_local_identity():
+    resolver = GovernedCounterpartyResolver(entities=[])
+
+    first = resolver.resolve("内蒙古蒙东矿建工程有限公司")
+    repeated = resolver.resolve("内蒙古蒙东矿建工程有限公司")
+
+    assert first.status == "resolved"
+    assert first.entity_id == repeated.entity_id
+    assert first.entity_id.startswith("local-entity:")
+    assert first.normalized_name == "内蒙古蒙东矿建工程有限公司"
+    assert first.basis == "official_filing_exact_name"
+    assert resolver.resolve("第一大供应商").status == "unresolved"
+
+
 def test_activity_candidate_is_atomic_and_role_is_derived_locally():
     producer = BusinessProfileActivityProducer(_Repository())
     activity = producer.build_activity_candidate(

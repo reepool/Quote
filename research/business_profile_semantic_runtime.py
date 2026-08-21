@@ -96,7 +96,7 @@ from utils.date_utils import get_shanghai_time
 
 logger = logging.getLogger(__name__)
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v6"
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v7"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
@@ -2289,28 +2289,82 @@ class BusinessProfileSemanticRuntime:
     ) -> list[dict[str, Any]]:
         async def verify_one(target: Mapping[str, Any]) -> dict[str, Any]:
             semantic_audits: list[Mapping[str, Any]] = []
+            attempts: list[dict[str, Any]] = []
+            attempt_kind = "isolated_evidence"
             try:
-                verification, audit = await BusinessProfileSemanticExtractor(
+                extractor = BusinessProfileSemanticExtractor(
                     self.llm_client,
                     audit_sink=semantic_audits.append,
-                ).verify_async(
+                )
+                verification, audit = await extractor.verify_async(
                     target_type=str(target["target_type"]),
                     target=dict(target["verification_target"]),
                     selected=target["selected"],
                 )
+                attempts.append(
+                    {
+                        "kind": "isolated_evidence",
+                        "verification": dict(verification),
+                        "audit": audit.to_dict(),
+                    }
+                )
+                expanded_target = _expanded_action_verification_target(
+                    target, verification
+                )
+                if expanded_target is not None:
+                    attempt_kind = "bounded_action_context"
+                    verification, audit = await extractor.verify_async(
+                        target_type=str(target["target_type"]),
+                        target=expanded_target,
+                        selected=target["selected"],
+                    )
+                    attempts.append(
+                        {
+                            "kind": "bounded_action_context",
+                            "verification": dict(verification),
+                            "audit": audit.to_dict(),
+                        }
+                    )
                 return {
                     "target": target,
                     "verification": {
                         **dict(verification),
                         "audit": audit.to_dict(),
+                        "attempts": attempts,
                     },
                     "audit": audit.to_dict(),
+                    "retry_calls": len(attempts) - 1,
+                    "usage_tokens": sum(
+                        int((item.get("usage") or {}).get("total_tokens") or 0)
+                        for item in semantic_audits
+                    ),
                 }
             except Exception as exc:
+                failure_audit = (
+                    dict(semantic_audits[-1]) if semantic_audits else {}
+                )
+                if failure_audit:
+                    attempts.append(
+                        {
+                            "kind": attempt_kind,
+                            "verification": None,
+                            "audit": failure_audit,
+                            "error": {
+                                "error_type": type(exc).__name__,
+                                "error_message": str(exc).replace("\n", " ")[:1000],
+                            },
+                        }
+                    )
+                    failure_audit = {**failure_audit, "attempts": attempts}
                 return {
                     "target": target,
                     "exception": exc,
-                    "audit": dict(semantic_audits[-1]) if semantic_audits else None,
+                    "audit": failure_audit or None,
+                    "retry_calls": max(0, len(semantic_audits) - 1),
+                    "usage_tokens": sum(
+                        int((item.get("usage") or {}).get("total_tokens") or 0)
+                        for item in semantic_audits
+                    ),
                 }
 
         return list(await asyncio.gather(*(verify_one(target) for target in targets)))
@@ -2516,15 +2570,15 @@ class BusinessProfileSemanticRuntime:
                         target = dict(outcome["target"])
                         target_id = str(target["target_id"])
                         semantic_audit = outcome.get("audit")
-                        usage_tokens = int(
-                            ((semantic_audit or {}).get("usage") or {}).get(
-                                "total_tokens"
-                            )
-                            or 0
-                        )
+                        retry_calls = int(outcome.get("retry_calls") or 0)
+                        llm_calls += retry_calls
+                        usage_tokens = int(outcome.get("usage_tokens") or 0)
                         tokens += usage_tokens
                         _increment_family_metrics(
-                            by_field_family, family, tokens=usage_tokens
+                            by_field_family,
+                            family,
+                            llm_calls=retry_calls,
+                            tokens=usage_tokens,
                         )
                         if "exception" not in outcome:
                             verifications.append(dict(outcome["verification"]))
@@ -2751,17 +2805,16 @@ class BusinessProfileSemanticRuntime:
                 raise ValueError(f"promotion manifest hash mismatch for {family}")
             for evidence_id in output["evidence_ids"]:
                 evidence = self._find_record("evidence", evidence_id)
-                if evidence["review_status"] == "candidate":
-                    decisions.append(
-                        self._promote_record(
-                            "evidence",
-                            evidence,
-                            family=family,
-                            manifest=manifest,
-                            scope=scope,
-                            semantic_proof=True,
-                        )
+                decisions.append(
+                    self._promote_record(
+                        "evidence",
+                        evidence,
+                        family=family,
+                        manifest=manifest,
+                        scope=scope,
+                        semantic_proof=True,
                     )
+                )
             for record_type, record_ids in output["record_ids"].items():
                 for record_id in record_ids:
                     record = self._find_record(record_type, record_id)
@@ -3411,6 +3464,33 @@ class BusinessProfileSemanticRuntime:
         semantic_proof: bool,
         exception_reasons: tuple[str, ...] = (),
     ) -> dict[str, Any]:
+        if record["review_status"] == "rejected" and semantic_proof is True:
+            target_id = _record_id(record_type, record)
+            try:
+                self.promotion_service.review_service.system_reopen_rejected_record(
+                    record_type,
+                    target_id,
+                    expected_updated_at=str(record.get("updated_at") or ""),
+                    reason="current immutable filing evidence passed automatic verification",
+                    metadata={
+                        "field_family": family,
+                        "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
+                    },
+                )
+            except ValueError as exc:
+                if "prior human decision blocks automatic promotion" not in str(exc):
+                    raise
+                return {
+                    "decision": {
+                        "target_type": record_type,
+                        "target_id": target_id,
+                        "classification": "deep_review",
+                        "reason_codes": ["prior_human_decision"],
+                    },
+                    "promoted": False,
+                    "field_family": family,
+                }
+            record = self._find_record(record_type, target_id)
         if record["review_status"] != "candidate":
             target_id = _record_id(record_type, record)
             return {
@@ -3929,6 +4009,125 @@ def _load_selected(
         expansion_reason=raw.get("expansion_reason"),
         artifact_hash=raw["artifact_hash"],
     )
+
+
+_ACTION_CONTEXT_TERMS: dict[str, tuple[str, ...]] = {
+    "purchases": ("采购", "外购", "购入", "购买"),
+    "sells": ("销售", "出售", "销往"),
+    "produces": ("生产", "产量", "产能"),
+    "consumes": ("消耗", "耗用", "使用"),
+    "extracts": ("开采", "采掘", "采出"),
+    "processes": ("加工", "洗选", "处理"),
+}
+
+
+def _expanded_action_verification_target(
+    target: Mapping[str, Any],
+    verification: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Add bounded filing context when only an activity action lacks support."""
+
+    if str(target.get("target_type") or "") != "activity":
+        return None
+    checks = dict(verification.get("checks") or {})
+    if verification.get("decision") == "confirmed" or checks.get("action") is not False:
+        return None
+    if any(checks.get(key) is not True for key in checks if key != "action"):
+        return None
+    verification_target = dict(target.get("verification_target") or {})
+    action = str(verification_target.get("action") or "")
+    object_raw = str(verification_target.get("object_raw") or "").strip()
+    action_terms = _ACTION_CONTEXT_TERMS.get(action, ())
+    if not object_raw or not action_terms:
+        return None
+    evidence = dict(verification_target.get("evidence") or {})
+    spans = [dict(item) for item in evidence.get("evidence_spans") or []]
+    if not spans:
+        spans = [
+            {
+                "section_id": evidence.get("section_id"),
+                "page_number": evidence.get("page_number"),
+                "quote": evidence.get("quote"),
+                "quote_hash": evidence.get("quote_hash"),
+                "section_hash": evidence.get("section_hash"),
+            }
+        ]
+    original_span_count = len(spans)
+    source_pages = {
+        int(item["page_number"])
+        for item in spans
+        if item.get("page_number") is not None
+    }
+    if not source_pages:
+        return None
+    existing = {
+        (str(item.get("section_id") or ""), str(item.get("quote_hash") or ""))
+        for item in spans
+    }
+    selected: SelectedSectionArtifact = target["selected"]
+    candidates = []
+    for section in selected.sections:
+        text = section.normalized_text
+        object_at = text.find(object_raw)
+        action_matches = [
+            (text.find(term), term) for term in action_terms if term in text
+        ]
+        if object_at < 0 or not action_matches:
+            continue
+        distance = min(
+            (abs(section.page_number - page) for page in source_pages),
+        )
+        if distance > 2:
+            continue
+        action_at, action_term = min(action_matches)
+        context_start = min(object_at, action_at)
+        context_end = max(
+            object_at + len(object_raw),
+            action_at + len(action_term),
+        )
+        if context_end - context_start > 1200:
+            continue
+        candidates.append(
+            (
+                distance,
+                section.page_number,
+                section,
+                context_start,
+                context_end,
+                action_term,
+            )
+        )
+    ordered_candidates = sorted(
+        candidates,
+        key=lambda item: (item[0], item[1], item[2].section_id),
+    )
+    for _, _, section, context_start, context_end, action_term in ordered_candidates[:2]:
+        start = max(0, context_start - 300)
+        end = min(len(section.normalized_text), start + 1200)
+        if end < context_end:
+            end = context_end
+            start = max(0, end - 1200)
+        quote = section.normalized_text[start:end]
+        quote_hash = hashlib.sha256(quote.encode("utf-8")).hexdigest()
+        key = (section.section_id, quote_hash)
+        if object_raw not in quote or action_term not in quote or key in existing:
+            continue
+        spans.append(
+            {
+                "section_id": section.section_id,
+                "page_number": section.page_number,
+                "section_hash": section.section_hash,
+                "quote": quote,
+                "quote_hash": quote_hash,
+            }
+        )
+        existing.add(key)
+    if len(spans) == original_span_count:
+        return None
+    evidence["evidence_spans"] = spans
+    evidence["composite"] = len(spans) > 1
+    verification_target["evidence"] = evidence
+    return verification_target
 
 
 def _structured_fallback_reason(

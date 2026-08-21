@@ -28,10 +28,10 @@ def _known_price_series():
 def test_default_product_catalog_covers_first_wave_industries():
     catalog = load_business_product_catalog()
 
-    assert catalog.catalog_version == "business_profile_products.2026.3"
-    assert len(catalog.products) == 40
-    assert len(catalog.aliases) == 48
-    assert len(catalog.commodity_mappings) == 44
+    assert catalog.catalog_version == "business_profile_products.2026.4"
+    assert len(catalog.products) == 41
+    assert len(catalog.aliases) == 49
+    assert len(catalog.commodity_mappings) == 45
     assert {
         industry for product in catalog.products for industry in product.industry_groups
     } == INDUSTRY_GROUPS
@@ -85,6 +85,23 @@ def test_product_without_market_series_is_preserved_without_mapping():
 
     assert cement.label_zh == "水泥"
     assert mappings == ()
+
+
+def test_generic_polyethylene_is_distinct_from_lldpe_price_series():
+    catalog = load_business_product_catalog()
+
+    resolution = catalog.resolve_alias("聚乙烯", industry_group="petrochemical")
+    mapping = catalog.commodity_candidates(
+        "polymer.polyethylene",
+        exposure_role="revenue",
+        evidence_requirement="explicit_product",
+    )
+
+    assert resolution.product_ids == ("polymer.polyethylene",)
+    assert resolution.review_required is False
+    assert len(mapping) == 1
+    assert mapping[0].commodity_id == "COMMODITY.polymer.polyethylene"
+    assert mapping[0].candidate_only is True
 
 
 def test_same_product_supports_role_specific_revenue_and_cost_candidates():

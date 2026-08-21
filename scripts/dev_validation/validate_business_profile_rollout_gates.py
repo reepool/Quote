@@ -359,7 +359,7 @@ def _run_rollback_drill(path: Path) -> bool:
                 "field_family": "atomic_activities",
                 "bundle_hash": "rollback-bundle",
                 "fact_catalog_version": "business_profile_facts.2026.2",
-                "product_catalog_version": "business_profile_products.2026.3",
+                "product_catalog_version": "business_profile_products.2026.4",
                 "metadata": {"drill": "foreign_key_rollback"},
             },
             records_by_type={

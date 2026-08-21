@@ -67,16 +67,22 @@ def _catalog(
     )
 
 
-def _approved_sales_activity(repository):
+def _approved_sales_activity(
+    repository,
+    *,
+    activity_id="activity-coking-coal-sales",
+    object_raw="coking coal",
+    object_id="coal.coking_coal",
+):
     payload = {
-        "activity_id": "activity-coking-coal-sales",
+        "activity_id": activity_id,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "subject_scope": "consolidated_group",
         "action": "sells",
         "object_type": "product",
-        "object_raw": "coking coal",
-        "object_id": "coal.coking_coal",
+        "object_raw": object_raw,
+        "object_id": object_id,
         "segment_id": "coal",
         "value": 100.0,
         "unit": "tonne",
@@ -134,21 +140,27 @@ def test_fact_production_rejects_candidate_activity(tmp_path):
         )
 
 
-def test_mapping_resolution_fails_closed_for_unpromoted_ambiguous_and_stale():
-    with pytest.raises(ValueError, match="unpromoted"):
-        GovernedCommodityMappingResolver(_catalog(candidate_only=True)).resolve(
-            product_id="coal.coking_coal",
-            exposure_role="revenue",
-            evidence_requirement="explicit_product",
-            knowledge_cutoff="2026-04-01",
-        )
-    with pytest.raises(ValueError, match="ambiguous"):
-        GovernedCommodityMappingResolver(_catalog(targets=2)).resolve(
-            product_id="coal.coking_coal",
-            exposure_role="revenue",
-            evidence_requirement="explicit_product",
-            knowledge_cutoff="2026-04-01",
-        )
+def test_mapping_resolution_preserves_identity_without_unique_market_series():
+    candidate = GovernedCommodityMappingResolver(_catalog(candidate_only=True)).resolve(
+        product_id="coal.coking_coal",
+        exposure_role="revenue",
+        evidence_requirement="explicit_product",
+        knowledge_cutoff="2026-04-01",
+    )
+    multi_target = GovernedCommodityMappingResolver(_catalog(targets=2)).resolve(
+        product_id="coal.coking_coal",
+        exposure_role="revenue",
+        evidence_requirement="explicit_product",
+        knowledge_cutoff="2026-04-01",
+    )
+
+    assert candidate.commodity_id == "COMMODITY.coal.coking_coal"
+    assert candidate.price_series_id is None
+    assert multi_target.commodity_id == "COMMODITY.coal.coking_coal"
+    assert multi_target.price_series_id is None
+
+
+def test_mapping_resolution_still_fails_closed_for_stale_catalog():
     with pytest.raises(ValueError, match="stale"):
         GovernedCommodityMappingResolver(_catalog(applicable_to="2025-12-31")).resolve(
             product_id="coal.coking_coal",
@@ -156,6 +168,73 @@ def test_mapping_resolution_fails_closed_for_unpromoted_ambiguous_and_stale():
             evidence_requirement="explicit_product",
             knowledge_cutoff="2026-04-01",
         )
+
+
+@pytest.mark.parametrize(
+    ("object_raw", "product_id", "commodity_id"),
+    [
+        ("聚乙烯", "polymer.polyethylene", "COMMODITY.polymer.polyethylene"),
+        ("聚丙烯", "polymer.polypropylene", "COMMODITY.polymer.polypropylene"),
+    ],
+)
+def test_known_commodity_identity_publishes_without_forcing_market_series(
+    tmp_path, object_raw, product_id, commodity_id
+):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(
+        repository,
+        activity_id=f"activity-{product_id}",
+        object_raw=object_raw,
+        object_id=product_id,
+    )
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(
+        repository,
+        "exposure_facts",
+        fact["fact_id"],
+        references=["evidence-2025-ar"],
+    )
+
+    published = BusinessProfileExposurePublisher(repository).publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+    )["exposure"]
+
+    assert published["commodity_id"] == commodity_id
+    assert published["price_series_id"] is None
+    assert published["metadata"]["market_series_status"] == "unresolved"
+
+
+def test_composite_process_fact_survives_without_false_commodity_mapping(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(
+        repository,
+        activity_id="activity-coal-to-olefins",
+        object_raw="煤制烯烃",
+        object_id=None,
+    )
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(
+        repository,
+        "exposure_facts",
+        fact["fact_id"],
+        references=["evidence-2025-ar"],
+    )
+
+    with pytest.raises(ValueError, match="product_mapping_required"):
+        BusinessProfileExposurePublisher(repository).publish_basic(
+            fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        )
+
+    persisted = repository.get_record("exposure_facts", fact["fact_id"])
+    assert persisted["review_status"] == "approved"
+    assert persisted["object_raw"] == "煤制烯烃"
+    assert persisted["product_id"] is None
 
 
 def test_assumption_writer_rejects_llm_and_accepts_calibration(tmp_path):
