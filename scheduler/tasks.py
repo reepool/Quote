@@ -106,6 +106,11 @@ def _annual_report_asset_report_data(
     downloaded = int(
         execution.get("attachments_downloaded") or execution.get("downloaded") or 0
     )
+    unique_download_contents = int(
+        metrics.get("unique_download_contents")
+        if metrics.get("unique_download_contents") is not None
+        else downloaded
+    )
     reused = int(
         execution.get("attachments_reused") or execution.get("local_hits") or 0
     )
@@ -162,7 +167,8 @@ def _annual_report_asset_report_data(
             f"完成 {windows_completed} 个窗口，未完成 {windows_incomplete} 个\n"
             f"• 公告记录：发现 {records_seen} 条，登记 "
             f"{int(execution.get('metadata_registered') or records_seen)} 条\n"
-            f"• 附件处理：队列处理 {attempted}，新下载 {downloaded}，"
+            f"• 附件处理：队列处理 {attempted}，网络下载 {downloaded}，"
+            f"唯一内容 {unique_download_contents}，"
             f"本地或等价复用 {reused}，失败 {failures}\n"
             f"• 附件队列：本轮新增 {newly_queued}，当前积压 {queue_backlog}"
         ),

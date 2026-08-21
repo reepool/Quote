@@ -472,7 +472,7 @@ class AnnualReportDailyUpdater:
         retry_periods = self._due_attachment_retry_periods(cutoff)
         acquisition_started = time.monotonic()
         acquisition = (
-            (0, 0, 0, 0, 0, [], [], 0)
+            (0, 0, 0, 0, 0, [], [], 0, 0)
             if stop_requested
             else self._process_attachment_retries(
                 cutoff=cutoff,
@@ -624,6 +624,7 @@ class AnnualReportDailyUpdater:
             "attachment_retry_separate": True,
             "attachment_retry_backlog": self.repository.count_attachment_retries(),
             "attachment_retries_deduplicated": acquisition[7],
+            "unique_download_contents": acquisition[8],
             "attachment_substage_timings_seconds": attachment_substage_timings,
             "affected_period_count": len(affected_periods | retry_periods),
             "coverage_instruments_refreshed": len(coverage_instrument_ids),
@@ -1573,7 +1574,7 @@ class AnnualReportDailyUpdater:
             groups.setdefault(
                 (instrument_id, candidate.classification.fiscal_year), []
             ).append(candidate)
-        queued = 0
+        queued_work: set[str] = set()
         for (instrument_id, fiscal_year), candidates in groups.items():
             preferred_variant = (
                 AnnualReportVariant.CORRECTION
@@ -1680,8 +1681,10 @@ class AnnualReportDailyUpdater:
                     existing_retry is None
                     or existing_retry["status"] not in {"queued", "retryable", "running"}
                 ):
-                    queued += 1
-        return queued
+                    queued_work.add(
+                        str(candidate.legal_chain_id or candidate.attachment_id)
+                    )
+        return len(queued_work)
 
     def _effective_report_satisfies_candidate(
         self,
@@ -1715,7 +1718,11 @@ class AnnualReportDailyUpdater:
         ):
             return True
         if (
-            {current.source, source} == {"cninfo", "szse"}
+            _is_cninfo_exchange_mirror_pair(
+                current.source,
+                source,
+                instrument_id=current.instrument_id,
+            )
             and current.source_announcement_id == source_announcement_id
             and current.published_at
             and published_at
@@ -1754,8 +1761,8 @@ class AnnualReportDailyUpdater:
         published_at: str | None,
         variant: AnnualReportVariant,
     ) -> bool:
-        """Return whether the exact CNInfo/SZSE mirror is already local."""
-        if source not in {"cninfo", "szse"} or not source_announcement_id:
+        """Return whether the exact CNInfo/exchange mirror is already local."""
+        if source not in {"cninfo", "sse", "szse", "bse"} or not source_announcement_id:
             return False
         rows = self.repository.list_candidate_rows(
             instrument_id=current.instrument_id,
@@ -1782,7 +1789,11 @@ class AnnualReportDailyUpdater:
             if str(row.get("attachment_id") or "") == attachment_id:
                 continue
             mirror_source = str(row.get("source") or "")
-            if {source, mirror_source} != {"cninfo", "szse"}:
+            if not _is_cninfo_exchange_mirror_pair(
+                source,
+                mirror_source,
+                instrument_id=current.instrument_id,
+            ):
                 continue
             metadata = row.get("attachment_metadata") or {}
             classification = row.get("classification") or {}
@@ -1963,13 +1974,14 @@ class AnnualReportDailyUpdater:
 
     def _process_attachment_retries(
         self, *, cutoff: str, operation_id: str | None
-    ) -> tuple[int, int, int, int, int, list[str], list[str], int]:
+    ) -> tuple[int, int, int, int, int, list[str], list[str], int, int]:
         deduplicated = self._complete_satisfied_attachment_retries(
             cutoff=cutoff,
             operation_id=operation_id,
         )
         attempted = reused = deduplicated
         downloaded = failures = corrections = 0
+        unique_download_contents: set[str] = set()
         errors: list[str] = []
         blocking_reasons: list[str] = []
         retries = self.repository.list_attachment_retries(
@@ -1983,6 +1995,19 @@ class AnnualReportDailyUpdater:
                 operation_id and self.repository.operation_stop_requested(operation_id)
             ):
                 break
+            # A CNInfo record and its exchange mirror can enter the same batch.
+            # Recheck after each successful acquisition so the mirror remains a
+            # fallback on failure without causing a second network download.
+            if self._retry_is_satisfied(retry):
+                self.repository.finish_attachment_retry(
+                    str(retry["attachment_id"]),
+                    success=True,
+                    project_parent_block=False,
+                )
+                attempted += 1
+                reused += 1
+                deduplicated += 1
+                continue
             attachment_id = str(retry["attachment_id"])
             claimed = self.repository.claim_attachment_retry(attachment_id, now=cutoff)
             attempted += 1
@@ -2009,6 +2034,8 @@ class AnnualReportDailyUpdater:
                         if latest_version is None
                         else latest_version.error_code or "attachment_not_valid"
                     )
+                if not had_valid and latest_version.content_hash:
+                    unique_download_contents.add(latest_version.content_hash)
                 if asset is None:
                     self.repository.finish_attachment_retry(attachment_id, success=True)
                     if had_valid:
@@ -2083,6 +2110,7 @@ class AnnualReportDailyUpdater:
             errors,
             blocking_reasons,
             deduplicated,
+            len(unique_download_contents),
         )
 
     def _complete_satisfied_attachment_retries(
@@ -2778,6 +2806,28 @@ def _match_instrument(record: Any, instrument_ids: Sequence[str]) -> str | None:
         if instrument_id.split(".", 1)[0] in symbols:
             return instrument_id
     return None
+
+
+def _is_cninfo_exchange_mirror_pair(
+    first: object,
+    second: object,
+    *,
+    instrument_id: object,
+) -> bool:
+    sources = {
+        str(first or "").strip().lower(),
+        str(second or "").strip().lower(),
+    }
+    expected_source = {
+        ".SH": "sse",
+        ".SZ": "szse",
+        ".BJ": "bse",
+    }.get(str(instrument_id or "").strip().upper()[-3:])
+    return bool(
+        expected_source
+        and len(sources) == 2
+        and sources == {"cninfo", expected_source}
+    )
 
 
 def _parse_time(value: str | None) -> datetime:

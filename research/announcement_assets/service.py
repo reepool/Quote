@@ -217,7 +217,7 @@ class AnnouncementAssetService:
         for attachment in record.attachments:
             classification = self.classifier.classify(record, attachment)
             metadata = dict(attachment.raw_metadata)
-            mirror_chain_id = _shared_szse_mirror_chain_id(
+            mirror_chain_id = _shared_official_mirror_chain_id(
                 source=record.source,
                 exchange=record.exchange,
                 instrument_id=instrument_id,
@@ -2362,7 +2362,7 @@ def _candidate_from_row(row: dict) -> AnnualReportCandidate:
         withdrawal_evidence_type=withdrawal_evidence_type,
         legal_chain_id=(
             metadata.get("legal_chain_id")
-            or _shared_szse_mirror_chain_id(
+            or _shared_official_mirror_chain_id(
                 source=row.get("source"),
                 exchange=row.get("exchange"),
                 instrument_id=row.get("instrument_id"),
@@ -2400,7 +2400,7 @@ def _candidate_from_row(row: dict) -> AnnualReportCandidate:
     )
 
 
-def _shared_szse_mirror_chain_id(
+def _shared_official_mirror_chain_id(
     *,
     source: object,
     exchange: object,
@@ -2408,23 +2408,29 @@ def _shared_szse_mirror_chain_id(
     source_announcement_id: object,
     published_at: object,
 ) -> str | None:
-    """Bind CNInfo and SZSE mirrors carrying the same official announcement id."""
+    """Bind CNInfo and exchange mirrors carrying the same official filing id."""
 
     normalized_source = str(source or "").strip().lower()
     normalized_exchange = str(exchange or "").strip().upper()
     normalized_instrument = str(instrument_id or "").strip().upper()
     announcement_id = str(source_announcement_id or "").strip()
     published_date = str(published_at or "").strip()[:10]
+    official_source = {
+        "SSE": "sse",
+        "SZSE": "szse",
+        "BSE": "bse",
+    }.get(normalized_exchange)
     if (
-        normalized_source not in {"cninfo", "szse"}
-        or normalized_exchange != "SZSE"
+        official_source is None
+        or normalized_source not in {"cninfo", official_source}
         or not normalized_instrument
-        or not announcement_id.isdigit()
+        or not announcement_id
+        or announcement_id.lower().startswith("derived-")
         or len(published_date) != 10
     ):
         return None
     return stable_id(
-        "szse-cninfo-mirror-chain",
+        f"{official_source}-cninfo-mirror-chain",
         normalized_instrument,
         announcement_id,
         published_date,

@@ -777,11 +777,11 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
     config = _focused_config(tmp_path)
     repository, service, retriever = _service_bundle(tmp_path, config)
     current = service.register_discovered_record(
-        _record_at("current-2025"), instrument_id="600000.SH"
+        _record_at("current-2025", symbol="000001"), instrument_id="000001.SZ"
     )[0]
     service.acquire_attachment(current.attachment_id)
     duplicate_record = replace(
-        _record_at("current-2025"),
+        _record_at("current-2025", symbol="000001"),
         source="szse",
         announcement_key=build_announcement_key("szse", "current-2025"),
         exchange="SZSE",
@@ -795,7 +795,7 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
         ),
     )
     duplicate = service.register_discovered_record(
-        duplicate_record, instrument_id="600000.SH"
+        duplicate_record, instrument_id="000001.SZ"
     )[0]
     updater = AnnualReportDailyUpdater(
         service=service, repository=repository, config=config
@@ -804,7 +804,7 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
     discovery_result = updater.run(
         run_cutoff="2026-08-09T03:00:00+00:00",
         discover=lambda *args: (duplicate_record,),
-        active_instrument_ids=("600000.SH",),
+        active_instrument_ids=("000001.SZ",),
     )
     assert len(retriever.calls) == calls_before
     assert discovery_result.attachment_retries_queued == 0
@@ -815,7 +815,7 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
         attachment_id=duplicate.attachment_id,
         source="cninfo",
         metadata={
-            "instrument_id": "600000.SH",
+            "instrument_id": "000001.SZ",
             "fiscal_year": 2025,
             "candidate_id": duplicate.attachment_id,
             "variant": "original",
@@ -826,7 +826,7 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
     result = updater.run(
         run_cutoff="2026-08-10T03:00:00+00:00",
         discover=lambda *args: (),
-        active_instrument_ids=("600000.SH",),
+        active_instrument_ids=("000001.SZ",),
     )
 
     assert len(retriever.calls) == calls_before
@@ -842,7 +842,7 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
         attachment_id=duplicate.attachment_id,
         source="szse",
         metadata={
-            "instrument_id": "600000.SH",
+            "instrument_id": "000001.SZ",
             "fiscal_year": 2025,
             "candidate_id": "concurrent-observation",
             "variant": "original",
@@ -855,13 +855,135 @@ def test_daily_completes_equivalent_backlog_without_redownloading(tmp_path):
     concurrent_result = updater.run(
         run_cutoff="2026-08-11T03:00:00+00:00",
         discover=lambda *args: (),
-        active_instrument_ids=("600000.SH",),
+        active_instrument_ids=("000001.SZ",),
     )
     assert len(retriever.calls) == calls_before
     assert concurrent_result.metrics["attachment_retry_backlog"] == 1
     assert repository.get_attachment_retry(duplicate.attachment_id)["status"] == (
         "running"
     )
+
+
+@pytest.mark.parametrize(
+    ("exchange", "official_source", "symbol", "instrument_id"),
+    (
+        ("SSE", "sse", "600000", "600000.SH"),
+        ("SZSE", "szse", "000001", "000001.SZ"),
+        ("BSE", "bse", "920001", "920001.BJ"),
+    ),
+)
+def test_daily_downloads_cninfo_exchange_mirror_only_once_in_same_batch(
+    tmp_path,
+    exchange,
+    official_source,
+    symbol,
+    instrument_id,
+):
+    config = _focused_config(
+        tmp_path,
+        source_routes=("cninfo", official_source),
+        exchanges=(exchange,),
+    )
+    repository, service, retriever = _service_bundle(tmp_path, config)
+    source_id = "1225486021"
+    cninfo_record = replace(
+        _record_at(source_id, symbol=symbol, correction=True),
+        exchange=exchange,
+    )
+    official_record = replace(
+        cninfo_record,
+        source=official_source,
+        announcement_key=build_announcement_key(official_source, source_id),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=f"https://official.example/{source_id}.pdf",
+                attachment_id=f"{official_source}-{source_id}",
+                name=f"{official_source}-{source_id}.pdf",
+                media_type="application/pdf",
+            ),
+        ),
+    )
+
+    result = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    ).run(
+        run_cutoff="2026-08-21T03:00:00+00:00",
+        discover=lambda *args: (cninfo_record, official_record),
+        active_instrument_ids=(instrument_id,),
+    )
+
+    assert result.status == "success"
+    assert len(retriever.calls) == 1
+    assert result.attachments_attempted == 2
+    assert result.attachments_downloaded == 1
+    assert result.attachments_reused == 1
+    assert result.attachment_retries_queued == 1
+    assert result.metrics["attachment_retries_deduplicated"] == 1
+    assert result.metrics["unique_download_contents"] == 1
+    assert repository.count_attachment_retries() == 0
+    current = repository.get_effective_report(instrument_id, 2025)
+    assert current is not None and current.availability.value == "local_valid"
+
+
+def test_daily_uses_second_mirror_when_first_download_fails(tmp_path):
+    class FailedFirstRetriever(_Retriever):
+        def retrieve(self, source, attachment, *, require_pdf=False):
+            if not self.calls:
+                self.calls.append(attachment.attachment_id)
+                return AnnouncementRetrievalResult(
+                    source=source,
+                    attachment=attachment,
+                    status="failed",
+                    errors=("temporary_provider_failure",),
+                )
+            return super().retrieve(
+                source,
+                attachment,
+                require_pdf=require_pdf,
+            )
+
+    config = _focused_config(
+        tmp_path,
+        source_routes=("cninfo", "szse"),
+        exchanges=("SZSE",),
+    )
+    repository, service, retriever = _service_bundle(
+        tmp_path,
+        config,
+        FailedFirstRetriever(),
+    )
+    source_id = "1225486021"
+    cninfo_record = replace(
+        _record_at(source_id, symbol="000001", correction=True),
+        exchange="SZSE",
+    )
+    official_record = replace(
+        cninfo_record,
+        source="szse",
+        announcement_key=build_announcement_key("szse", source_id),
+        attachments=(
+            AnnouncementAttachment(
+                source_url=f"https://official.example/{source_id}.pdf",
+                attachment_id=f"szse-{source_id}",
+                name=f"szse-{source_id}.pdf",
+                media_type="application/pdf",
+            ),
+        ),
+    )
+
+    result = AnnualReportDailyUpdater(
+        service=service, repository=repository, config=config
+    ).run(
+        run_cutoff="2026-08-21T03:00:00+00:00",
+        discover=lambda *args: (cninfo_record, official_record),
+        active_instrument_ids=("000001.SZ",),
+    )
+
+    assert len(retriever.calls) == 2
+    assert result.attachments_downloaded == 1
+    assert result.attachment_failures == 1
+    current = repository.get_effective_report("000001.SZ", 2025)
+    assert current is not None and current.availability.value == "local_valid"
 
 
 def test_daily_reuses_local_mirror_when_canonical_announcement_id_differs(tmp_path):
