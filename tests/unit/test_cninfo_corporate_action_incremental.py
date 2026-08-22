@@ -114,6 +114,8 @@ def test_daily_title_trigger_accepts_implemented_corporate_actions(title):
         "关于文科转债转股数量累计达到转股前公司已发行股份总额10%的公告",
         "关于可转换公司债券累计转股进展的公告",
         "关于2025年度公司业绩补偿款支付完毕的公告",
+        "关于重大资产购买剩余交易对价支付完成的公告",
+        "关于支付现金购买资产交易对价付清的公告",
         (
             "华泰联合证券有限责任公司关于江西正邦科技股份有限公司"
             "重整投资人受让资本公积转增的部分限售股份上市流通的核查意见"
@@ -138,6 +140,14 @@ def test_daily_title_trigger_rejects_unrelated_disclosures(title):
         (
             "关于2025年度公司业绩补偿款支付完毕的公告",
             "deterministic_exclusion:cash_performance_compensation_payment",
+        ),
+        (
+            "关于重大资产购买剩余交易对价支付完成的公告",
+            "deterministic_exclusion:cash_asset_acquisition_consideration_payment",
+        ),
+        (
+            "关于支付现金购买资产交易对价付清的公告",
+            "deterministic_exclusion:cash_asset_acquisition_consideration_payment",
         ),
         (
             (
@@ -172,6 +182,16 @@ def test_distribution_implementation_precedes_convertible_price_exclusion():
 
     assert decision["selected"] is True
     assert decision["source_profiles"] == ["cninfo_dividend"]
+
+
+def test_share_reform_consideration_payment_remains_exceptional():
+    decision = classify_daily_corporate_action_title(
+        "股权分置改革对价支付实施公告"
+    )
+
+    assert decision["selected"] is True
+    assert decision["requires_semantic_review"] is True
+    assert "对价" in decision["exceptional_markers"]
 
 
 def test_actual_debt_to_equity_notice_remains_exceptional():
@@ -884,6 +904,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                 "600006.SH",
                 "000711.SZ",
                 "002157.SZ",
+                "002289.SZ",
                 "300707.SZ",
             ],
             "pending_candidate_reasons": {
@@ -895,6 +916,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                 "600006.SH": "unmatched_special_announcement",
                 "000711.SZ": "unmatched_special_announcement",
                 "002157.SZ": "unmatched_special_announcement",
+                "002289.SZ": "unmatched_special_announcement",
                 "300707.SZ": "unmatched_special_announcement",
             },
             "pending_special_announcements_by_instrument": {
@@ -935,6 +957,12 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
                         "重整投资人受让资本公积转增的部分限售股份上市流通的核查意见"
                     ),
                 }],
+                "002289.SZ": [{
+                    "announcement_key": "asset-consideration-payment-1",
+                    "title": (
+                        "关于重大资产购买剩余交易对价支付完成的公告"
+                    ),
+                }],
                 "300707.SZ": [{
                     "announcement_key": "convertible-price-1",
                     "title": (
@@ -961,6 +989,7 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
             "600006.SH",
             "000711.SZ",
             "002157.SZ",
+            "002289.SZ",
             "300707.SZ",
         )
     }
@@ -1018,11 +1047,11 @@ async def test_scan_revalidates_legacy_special_announcement_carryovers():
     assert result["announcement_source_profiles"] == {
         "600005.SH": ["cninfo_dividend"],
     }
-    assert result["carryover_revalidation"]["evaluated"] == 8
-    assert result["carryover_revalidation"]["excluded"] == 5
+    assert result["carryover_revalidation"]["evaluated"] == 9
+    assert result["carryover_revalidation"]["excluded"] == 6
     assert result["carryover_revalidation"][
         "cleared_candidate_instruments"
-    ] == 5
+    ] == 6
     assert result["carryover_revalidation"]["rerouted_structured"] == 1
     assert result["carryover_revalidation"]["retained_exceptional"] == 1
     assert result["carryover_revalidation"]["retained_missing_title"] == 1

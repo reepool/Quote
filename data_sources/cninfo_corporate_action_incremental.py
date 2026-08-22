@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v6"
+    "cninfo_corporate_action_daily_title_trigger_v7"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -123,6 +123,18 @@ _CONVERTIBLE_BOND_MARKERS = (
     "可转换公司债券",
     "转债",
 )
+_ASSET_ACQUISITION_CONTEXT_MARKERS = (
+    "重大资产购买",
+    "支付现金购买资产",
+)
+_TRANSACTION_CONSIDERATION_PAYMENT_MARKERS = (
+    "交易对价支付",
+    "交易对价付款",
+    "交易对价付清",
+    "交易对价履行完毕",
+    "支付交易对价",
+    "付清交易对价",
+)
 
 
 def _has_convertible_bond_conversion_language(
@@ -177,6 +189,17 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
         )
     ):
         return "restricted_shares_listing_circulation"
+    if (
+        any(
+            marker in normalized_title
+            for marker in _ASSET_ACQUISITION_CONTEXT_MARKERS
+        )
+        and any(
+            marker in normalized_title
+            for marker in _TRANSACTION_CONSIDERATION_PAYMENT_MARKERS
+        )
+    ):
+        return "cash_asset_acquisition_consideration_payment"
     if any(marker in normalized_title for marker in _PRE_RESTRUCTURING_MARKERS):
         return "pre_restructuring_stage"
     if _has_convertible_bond_conversion_language(normalized_title):
