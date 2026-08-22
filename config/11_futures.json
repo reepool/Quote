@@ -355,6 +355,9 @@
           "INE",
           "CZCE"
         ],
+        "refresh_existing_on_governance_by_exchange": {
+          "DCE": false
+        },
         "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE uses the same official page family with browser fallback for challenge handling. CZCE first attempts browser-assisted listed-product page discovery after static WAF/challenge responses, preserves official product entry URL/title/context evidence, and uses official FutureDataReferenceData.xml for product name, code, currency, quote unit, trading unit, and tick size."
       },
       "enabled_exchanges": [

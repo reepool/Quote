@@ -663,6 +663,10 @@ def test_futures_official_calendar_report_includes_failure_samples():
                 "dce_proxy_rotation_count": 1,
                 "dce_proxy_success_count": 1,
                 "dce_proxy_failure_count": 1,
+                "dce_proxy_expired_count": 1,
+                "dce_route_rate_limit_count": 2,
+                "dce_payload_request_count": 3,
+                "dce_payload_cache_hit_count": 4,
                 "dce_browser_timeout_count": 0,
                 "dce_circuit_break_count": 0,
                 "dce_circuit_break_hit_count": 0,
@@ -683,6 +687,10 @@ def test_futures_official_calendar_report_includes_failure_samples():
                     "dce_proxy_rotation_count": 1,
                     "dce_proxy_success_count": 1,
                     "dce_proxy_failure_count": 1,
+                    "dce_proxy_expired_count": 1,
+                    "dce_route_rate_limit_count": 2,
+                    "dce_payload_request_count": 3,
+                    "dce_payload_cache_hit_count": 4,
                     "batch_pause_count": 0,
                     "batch_pause_seconds": 0,
                     "latest_verified_date": "2024-01-10",
@@ -704,6 +712,11 @@ def test_futures_official_calendar_report_includes_failure_samples():
     assert "dce_proxy_rotations: `1`" in report
     assert "proxy_successes=1" in report
     assert "proxy_failures=1" in report
+    assert "dce_proxy_expired: `1`" in report
+    assert "dce_route_rate_limits: `2`" in report
+    assert "dce_payload_requests: `3`" in report
+    assert "dce_payload_cache_hits: `4`" in report
+    assert "payload_cache_hits=4" in report
     assert "DCE 2024-01-11: official DCE anti-bot challenge HTTP 412" in report
 
 

@@ -668,7 +668,16 @@ def test_gfex_master_governance_dry_run_discovers_without_writing(monkeypatch, t
 
 def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
-    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "refresh_existing_on_governance_by_exchange": {"DCE": False},
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
     config.modules["commodity_market_data"]["sources"] = {
         "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
     }
@@ -703,6 +712,13 @@ def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path
         "fetch_exchange_contract_bars_sync",
         fake_fetch_exchange_contract_bars_sync,
     )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        lambda *args, **kwargs: pytest.fail(
+            "routine DCE governance must not refresh existing product specs"
+        ),
+    )
 
     result = FuturesMasterGovernanceService(
         storage,
@@ -733,7 +749,11 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
     module_cfg["master_data_discovery"] = {
         "enabled": True,
         "auto_promote_high_confidence": True,
-        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["DCE"]},
+        "official_product_spec_enrichment": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "refresh_existing_on_governance_by_exchange": {"DCE": False},
+        },
         "enabled_exchanges": ["DCE"],
         "adapters": {
             "DCE": {
@@ -763,6 +783,7 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
             quality_flag="backfilled_verified",
         )
     ])
+    product_spec_calls = []
 
     def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
         return [
@@ -776,6 +797,7 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
         ]
 
     def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
+        product_spec_calls.append((exchange, tuple(target_symbols or ())))
         return {
             "BZ": FuturesProductSpec(
                 exchange="DCE",
@@ -816,6 +838,7 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
     assert result["counts"]["auto_promoted_reprocessed_varieties"] == 1
     assert result["counts"]["contracts_discovered"] == 1
     assert result["counts"]["contracts_written"] == 1
+    assert product_spec_calls == [("DCE", ("BZ",))]
     assert storage.get_instrument("CNF.BZ.DCE")["unit"] == "CNY/ton"
     contract = storage.list_contracts(exchange="DCE")[0]
     assert contract["contract_id"] == "CNF.BZ.DCE.BZ2601"
@@ -2130,6 +2153,114 @@ def test_dce_browser_rotates_expired_proxy_without_logging_credentials(
     assert state == {"starts": 3, "leases": 2}
     assert secret not in caplog.text
     assert "192.0.2.1" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("route_failure_text", "expected_metric"),
+    [
+        ("ip expired", "dce_proxy_expired_count"),
+        ("request too frequent", "dce_route_rate_limit_count"),
+    ],
+)
+def test_dce_browser_rotates_expired_or_throttled_validated_proxy_immediately(
+    monkeypatch,
+    route_failure_text,
+    expected_metric,
+):
+    state = {"starts": 0, "leases": 0, "route_gets": {}, "business_calls": {}}
+    metrics = {}
+
+    class FakePage:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                status = 412 if self.route_number == 1 else 200
+                return json.dumps({
+                    "status": status,
+                    "ok": status == 200,
+                    "text": json.dumps({"success": True}) if status == 200 else "Precondition Failed",
+                })
+            calls = state["business_calls"].get(self.route_number, 0) + 1
+            state["business_calls"][self.route_number] = calls
+            if self.route_number == 2 and calls == 2:
+                return json.dumps({"status": 403, "ok": False, "text": route_failure_text})
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
+            })
+
+    class FakeBrowser:
+        def __init__(self, route_number):
+            self.route_number = route_number
+
+        async def get(self, url):
+            state["route_gets"][self.route_number] = (
+                state["route_gets"].get(self.route_number, 0) + 1
+            )
+            return FakePage(self.route_number)
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser(state["starts"])
+
+    class FakeForwarder:
+        browser_proxy_url = "http://127.0.0.1:38123"
+
+        def __init__(self, proxy_url, **kwargs):
+            return None
+
+        def start(self):
+            return None
+
+        def stop(self):
+            return None
+
+    def fake_lease(**kwargs):
+        state["leases"] += 1
+        return AkshareProxyLease(
+            proxy_url=f"http://user:secret-{state['leases']}@proxy.example:8080",
+            user_agent="proxy-agent",
+        )
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr("research.providers.official_futures.acquire_akshare_proxy_lease", fake_lease)
+    monkeypatch.setattr("research.providers.official_futures.DceBrowserProxyForwarder", FakeForwarder)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "readiness_timeout_seconds": 0,
+        "business_readiness_timeout_seconds": 0,
+        "direct_attempts": 1,
+        "max_proxy_leases": 2,
+        "max_total_proxy_leases": 2,
+        "session_request_retry_attempts": 1,
+        "business_request_interval_seconds": 0,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    client.set_metric_callback(
+        lambda key, value: metrics.__setitem__(key, metrics.get(key, 0) + value)
+    )
+    try:
+        assert client.fetch_day_quotes_payload("2026-08-20")["success"] is True
+        assert client.fetch_day_quotes_payload("2026-08-21")["success"] is True
+    finally:
+        client.close()
+
+    assert state["starts"] == 3
+    assert state["leases"] == 2
+    assert state["route_gets"][2] == 1
+    assert metrics[expected_metric] == 1
+    assert metrics["dce_proxy_rotation_count"] == 1
 
 
 def test_dce_browser_circuit_breaks_after_bounded_proxy_routes_without_leaking_credentials(monkeypatch):
@@ -4754,6 +4885,10 @@ def test_official_calendar_backfill_reports_dce_browser_route_metrics(monkeypatc
         self._increment_metric("DCE", "dce_proxy_lease_count", 2)
         self._increment_metric("DCE", "dce_proxy_rotation_count", 1)
         self._increment_metric("DCE", "dce_proxy_success_count", 1)
+        self._increment_metric("DCE", "dce_proxy_expired_count", 1)
+        self._increment_metric("DCE", "dce_route_rate_limit_count", 1)
+        self._increment_metric("DCE", "dce_payload_request_count", 1)
+        self._increment_metric("DCE", "dce_payload_cache_hit_count", 1)
         return OfficialFuturesDailyProbeResult(
             exchange=exchange,
             trade_date=trade_date,
@@ -4786,6 +4921,10 @@ def test_official_calendar_backfill_reports_dce_browser_route_metrics(monkeypatc
     assert result["totals"]["dce_proxy_lease_count"] == 2
     assert result["totals"]["dce_proxy_rotation_count"] == 1
     assert result["totals"]["dce_proxy_success_count"] == 1
+    assert result["totals"]["dce_proxy_expired_count"] == 1
+    assert result["totals"]["dce_route_rate_limit_count"] == 1
+    assert result["totals"]["dce_payload_request_count"] == 1
+    assert result["totals"]["dce_payload_cache_hit_count"] == 1
     assert result["exchanges"][0]["dce_proxy_lease_count"] == 2
 
 
@@ -6352,6 +6491,93 @@ def test_official_futures_provider_dce_uses_browser_client(monkeypatch, tmp_path
         ("fetch", "20240603"),
         ("close", None),
     ]
+
+
+def test_official_futures_provider_reuses_dce_payload_across_phases(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "request_interval_seconds_by_exchange": {"DCE": 0},
+            "dce_browser": {"enabled": True},
+        }
+    }
+    calls = []
+    payload = {
+        "success": True,
+        "data": [{
+            "variety": "铁矿石",
+            "contractId": "i2409",
+            "open": "800",
+            "high": "810",
+            "low": "790",
+            "close": "805",
+            "clearPrice": "803",
+            "volumn": "1000",
+            "openInterest": "2000",
+            "turnover": "123456",
+        }],
+    }
+
+    class FakeDceBrowserClient:
+        def fetch_day_quotes_payload(self, trade_date):
+            calls.append(trade_date)
+            return payload
+
+        def close(self):
+            return None
+
+    provider = OfficialFuturesMarketDataProvider(config)
+    monkeypatch.setattr(provider, "_get_dce_browser_client", lambda: FakeDceBrowserClient())
+    try:
+        probe = provider.probe_exchange_trading_day("DCE", "2024-06-03")
+        rows = provider.fetch_exchange_contract_bars_sync("DCE", "2024-06-03")
+    finally:
+        provider.close()
+
+    assert probe.status == "trading"
+    assert len(rows) == 1
+    assert calls == ["20240603"]
+    metrics = provider.snapshot_metrics()["DCE"]
+    assert metrics["dce_payload_request_count"] == 1
+    assert metrics["dce_payload_cache_hit_count"] == 1
+
+
+def test_official_futures_provider_dce_browser_failure_has_no_outer_retry(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "retry_attempts": 3,
+            "rate_limit_retry_attempts_by_exchange": {"DCE": 2},
+            "rate_limit_backoff_seconds_by_exchange": {"DCE": 60},
+            "dce_browser": {"enabled": True},
+        }
+    }
+    calls = {"count": 0}
+    sleeps = []
+
+    class FakeDceBrowserClient:
+        def fetch_day_quotes_payload(self, trade_date):
+            calls["count"] += 1
+            raise OfficialFuturesSourceUnavailable(
+                "official DCE dayQuotes proxy route rate limited"
+            )
+
+    provider = OfficialFuturesMarketDataProvider(config)
+    monkeypatch.setattr(provider, "_get_dce_browser_client", lambda: FakeDceBrowserClient())
+    monkeypatch.setattr("research.providers.official_futures.time.sleep", lambda seconds: sleeps.append(seconds))
+
+    with pytest.raises(OfficialFuturesSourceUnavailable, match="proxy route rate limited"):
+        provider._request_exchange_payload(None, "DCE", "2024-06-03")
+
+    assert calls["count"] == 1
+    assert sleeps == []
 
 
 def test_dce_browser_client_resolves_chrome_path_precedence(monkeypatch):

@@ -60,3 +60,38 @@ The system SHALL require successful official contract discovery for every verifi
 - **WHEN** every verified trading date is successfully discovered
 - **THEN** lifecycle inference MAY update the observed window
 - **AND** any inferred inactive boundary SHALL record the official evidence-complete-through date
+
+### Requirement: DCE route expiry has one bounded retry owner
+The system SHALL treat explicit proxy expiry and proxy-route throttling as failures of the current DCE route and SHALL keep bounded retry ownership inside the DCE browser client.
+
+#### Scenario: A validated proxy reports that its IP expired
+- **WHEN** a DCE business response reports `HTTP 403 ip expired`
+- **THEN** the client SHALL invalidate that browser/proxy route immediately
+- **AND** it SHALL NOT retry the same browser session
+- **AND** it SHALL rotate to a fresh lease within the configured run-wide bounds
+- **AND** diagnostics SHALL expose only a credential-free proxy-expiry classification
+
+#### Scenario: A proxy route is throttled
+- **WHEN** a DCE business response reports that the request is too frequent for the current route
+- **THEN** the client SHALL invalidate and rotate that route immediately
+- **AND** the outer official provider SHALL NOT repeat the browser request or apply its generic rate-limit backoff
+
+### Requirement: Scheduled DCE phases reuse official daily payloads
+The task-scoped official provider SHALL cache each successful DCE `dayQuotes` payload by normalized trade date for the lifetime of that provider instance.
+
+#### Scenario: Calendar and master request the same DCE date
+- **WHEN** calendar probing has already fetched a successful DCE daily payload and master governance requests the same date
+- **THEN** master governance SHALL reuse the cached payload
+- **AND** no additional browser business request SHALL be issued for that date
+- **AND** request and cache-hit metrics SHALL distinguish the two events
+
+### Requirement: Routine DCE governance avoids stable product-page refresh
+The system SHALL allow routine master governance to skip official product-spec refresh for already governed exchange products without disabling discovery enrichment.
+
+#### Scenario: Existing DCE products are governed during a daily task
+- **WHEN** DCE existing-product refresh is disabled by production configuration
+- **THEN** governance SHALL scan official daily contract rows without first requesting DCE contract-info or product pages
+
+#### Scenario: A new DCE variety appears in daily rows
+- **WHEN** daily contract discovery observes an unknown DCE variety
+- **THEN** governance SHALL still request targeted official product enrichment for that variety

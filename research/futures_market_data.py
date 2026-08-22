@@ -6308,6 +6308,10 @@ class FuturesMasterGovernanceService:
                 "dce_proxy_rotation_count": 0,
                 "dce_proxy_success_count": 0,
                 "dce_proxy_failure_count": 0,
+                "dce_proxy_expired_count": 0,
+                "dce_route_rate_limit_count": 0,
+                "dce_payload_request_count": 0,
+                "dce_payload_cache_hit_count": 0,
                 "dce_browser_timeout_count": 0,
                 "dce_circuit_break_count": 0,
                 "dce_circuit_break_hit_count": 0,
@@ -6356,18 +6360,38 @@ class FuturesMasterGovernanceService:
                     for item in instruments
                     if str(item.symbol or "").strip()
                 })
-                discovery_service.load_official_product_specs(
-                    exchange,
-                    provider,
-                    warnings=result["warnings"],
-                    target_symbols=existing_root_symbols or None,
+                enrichment_cfg = (
+                    discovery_service.discovery_cfg.get("official_product_spec_enrichment")
+                    or {}
                 )
-                instruments, series, refresh_counts = self._refresh_existing_master_data(
-                    exchange=exchange,
-                    instruments=instruments,
-                    series=series,
-                    discovery_service=discovery_service,
+                refresh_existing_cfg = enrichment_cfg.get(
+                    "refresh_existing_on_governance_by_exchange"
                 )
+                refresh_existing = True
+                if isinstance(refresh_existing_cfg, Mapping):
+                    refresh_existing = bool(
+                        refresh_existing_cfg.get(exchange, True)
+                    )
+                if refresh_existing:
+                    discovery_service.load_official_product_specs(
+                        exchange,
+                        provider,
+                        warnings=result["warnings"],
+                        target_symbols=existing_root_symbols or None,
+                    )
+                    instruments, series, refresh_counts = self._refresh_existing_master_data(
+                        exchange=exchange,
+                        instruments=instruments,
+                        series=series,
+                        discovery_service=discovery_service,
+                    )
+                else:
+                    refresh_counts = {"instruments": 0, "series": 0}
+                    logger.info(
+                        "[FuturesMasterGovernance] routine existing product spec refresh skipped "
+                        "exchange=%s",
+                        exchange,
+                    )
                 result["counts"]["refreshed_instruments"] = refresh_counts["instruments"]
                 result["counts"]["refreshed_series"] = refresh_counts["series"]
                 result["counts"]["instruments"] = len(instruments)
@@ -6588,6 +6612,10 @@ class FuturesMasterGovernanceService:
                     "dce_proxy_rotation_count",
                     "dce_proxy_success_count",
                     "dce_proxy_failure_count",
+                    "dce_proxy_expired_count",
+                    "dce_route_rate_limit_count",
+                    "dce_payload_request_count",
+                    "dce_payload_cache_hit_count",
                     "dce_browser_timeout_count",
                     "dce_circuit_break_count",
                     "dce_circuit_break_hit_count",
@@ -7341,6 +7369,10 @@ class FuturesOfficialCalendarBackfillService:
         total_dce_proxy_rotations = 0
         total_dce_proxy_successes = 0
         total_dce_proxy_failures = 0
+        total_dce_proxy_expired = 0
+        total_dce_route_rate_limits = 0
+        total_dce_payload_requests = 0
+        total_dce_payload_cache_hits = 0
         total_dce_browser_timeouts = 0
         total_dce_circuit_breaks = 0
         total_dce_circuit_break_hits = 0
@@ -7417,6 +7449,10 @@ class FuturesOfficialCalendarBackfillService:
                     "dce_proxy_rotation_count": 0,
                     "dce_proxy_success_count": 0,
                     "dce_proxy_failure_count": 0,
+                    "dce_proxy_expired_count": 0,
+                    "dce_route_rate_limit_count": 0,
+                    "dce_payload_request_count": 0,
+                    "dce_payload_cache_hit_count": 0,
                     "dce_browser_timeout_count": 0,
                     "dce_circuit_break_count": 0,
                     "dce_circuit_break_hit_count": 0,
@@ -7665,6 +7701,10 @@ class FuturesOfficialCalendarBackfillService:
                 result["dce_proxy_rotation_count"] = int(exchange_metrics.get("dce_proxy_rotation_count", 0))
                 result["dce_proxy_success_count"] = int(exchange_metrics.get("dce_proxy_success_count", 0))
                 result["dce_proxy_failure_count"] = int(exchange_metrics.get("dce_proxy_failure_count", 0))
+                result["dce_proxy_expired_count"] = int(exchange_metrics.get("dce_proxy_expired_count", 0))
+                result["dce_route_rate_limit_count"] = int(exchange_metrics.get("dce_route_rate_limit_count", 0))
+                result["dce_payload_request_count"] = int(exchange_metrics.get("dce_payload_request_count", 0))
+                result["dce_payload_cache_hit_count"] = int(exchange_metrics.get("dce_payload_cache_hit_count", 0))
                 result["dce_browser_timeout_count"] = int(exchange_metrics.get("dce_browser_timeout_count", 0))
                 result["dce_circuit_break_count"] = int(exchange_metrics.get("dce_circuit_break_count", 0))
                 result["dce_circuit_break_hit_count"] = int(exchange_metrics.get("dce_circuit_break_hit_count", 0))
@@ -7680,6 +7720,10 @@ class FuturesOfficialCalendarBackfillService:
                 total_dce_proxy_rotations += int(result["dce_proxy_rotation_count"])
                 total_dce_proxy_successes += int(result["dce_proxy_success_count"])
                 total_dce_proxy_failures += int(result["dce_proxy_failure_count"])
+                total_dce_proxy_expired += int(result["dce_proxy_expired_count"])
+                total_dce_route_rate_limits += int(result["dce_route_rate_limit_count"])
+                total_dce_payload_requests += int(result["dce_payload_request_count"])
+                total_dce_payload_cache_hits += int(result["dce_payload_cache_hit_count"])
                 total_dce_browser_timeouts += int(result["dce_browser_timeout_count"])
                 total_dce_circuit_breaks += int(result["dce_circuit_break_count"])
                 total_dce_circuit_break_hits += int(result["dce_circuit_break_hit_count"])
@@ -7783,6 +7827,10 @@ class FuturesOfficialCalendarBackfillService:
                 "dce_proxy_rotation_count": total_dce_proxy_rotations,
                 "dce_proxy_success_count": total_dce_proxy_successes,
                 "dce_proxy_failure_count": total_dce_proxy_failures,
+                "dce_proxy_expired_count": total_dce_proxy_expired,
+                "dce_route_rate_limit_count": total_dce_route_rate_limits,
+                "dce_payload_request_count": total_dce_payload_requests,
+                "dce_payload_cache_hit_count": total_dce_payload_cache_hits,
                 "dce_browser_timeout_count": total_dce_browser_timeouts,
                 "dce_circuit_break_count": total_dce_circuit_breaks,
                 "dce_circuit_break_hit_count": total_dce_circuit_break_hits,

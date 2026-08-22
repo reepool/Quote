@@ -11,6 +11,8 @@ DCE official endpoints now require both successful execution of the exchange Jav
 - Keep non-DCE product-page browser fallback independent from DCE challenge readiness.
 - Report DCE challenge, proxy lease/rotation/outcome, timeout, and circuit-break diagnostics while preserving unresolved/partial results for dates that cannot be verified.
 - Block only the affected exchange when contract discovery leaves verified trading dates unresolved, and never shorten instrument lifecycles from an incomplete scan.
+- Treat short-lived proxy expiry and route-level throttling as immediate route failures, keep browser retries inside the DCE client, and reuse each successful daily payload across task phases.
+- Skip routine DCE product-page refresh for already governed products while retaining targeted official enrichment for newly observed varieties.
 
 ## Capabilities
 
@@ -26,6 +28,6 @@ None.
 
 ## Impact
 
-- Affects `research/providers/official_futures.py`, DCE source configuration in `config/11_futures.json`, and focused futures provider tests.
+- Affects `research/providers/official_futures.py`, `research/futures_market_data.py`, DCE source configuration in `config/11_futures.json`, and focused futures provider tests.
 - Reuses the existing `akshare_proxy_patch` configuration and keeps `OfficialFuturesMarketDataProvider` as the sole official DCE ingestion owner.
 - Does not change storage schemas, public task commands, calendar evidence rules, or fallback source provenance.

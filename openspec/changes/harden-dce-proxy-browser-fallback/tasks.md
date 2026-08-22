@@ -43,3 +43,10 @@
 - [x] 8.1 Block an exchange before all master writes when any verified contract-discovery date remains unresolved, while retaining the original diagnostics.
 - [x] 8.2 Record complete lifecycle evidence and ignore recent weak lifecycle boundaries that would hide current target dates.
 - [x] 8.3 Add focused regressions, run targeted futures validation, and revalidate the OpenSpec change.
+
+## 9. Short-Lived Route And Request Reuse Follow-up
+
+- [x] 9.1 Rotate explicit DCE proxy expiry and route-throttling responses immediately with credential-free metrics.
+- [x] 9.2 Make the DCE browser client the sole retry owner and cache successful task-scoped daily payloads by trade date.
+- [x] 9.3 Skip routine DCE enrichment for existing products while preserving targeted enrichment for unknown varieties.
+- [x] 9.4 Add focused regressions, run read-only DCE validation, and revalidate the OpenSpec change.

@@ -361,7 +361,7 @@ class DceOfficialBrowserClient:
                 return
             except Exception as exc:
                 last_error = str(exc)
-                if self._is_proxy_authorization_failure(exc):
+                if self._requires_immediate_route_rotation(exc):
                     raise
                 if "target navigated or closed" in last_error.lower():
                     raise
@@ -419,14 +419,15 @@ class DceOfficialBrowserClient:
                     raise
                 self._last_route_error_summary = self._safe_route_error_summary(exc)
                 if self._route_kind == "proxy":
-                    recovered = await self._retry_validated_proxy_session(
-                        method,
-                        path,
-                        body,
-                    )
-                    if recovered is not None:
-                        self._record_business_request_success()
-                        return recovered
+                    if not self._requires_immediate_route_rotation(exc):
+                        recovered = await self._retry_validated_proxy_session(
+                            method,
+                            path,
+                            body,
+                        )
+                        if recovered is not None:
+                            self._record_business_request_success()
+                            return recovered
                     self._metric("dce_proxy_failure_count")
                     if self._can_acquire_proxy_lease():
                         self._metric("dce_proxy_rotation_count")
@@ -539,6 +540,8 @@ class DceOfficialBrowserClient:
             except Exception as exc:
                 if not self._is_route_failure(exc):
                     raise
+                if self._requires_immediate_route_rotation(exc):
+                    raise
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise
@@ -601,7 +604,10 @@ class DceOfficialBrowserClient:
     def _safe_route_error_summary(exc: Exception) -> str:
         text = str(exc).lower()
         if DceOfficialBrowserClient._is_proxy_authorization_failure(exc):
-            return "proxy authorization expired (HTTP 407)"
+            status = "403" if "http 403" in text or "ip expired" in text else "407"
+            return f"proxy authorization expired (HTTP {status})"
+        if DceOfficialBrowserClient._is_proxy_route_rate_limit_failure(exc):
+            return "proxy route rate limited"
         if "browser challenge did not become ready" in text:
             return "browser challenge did not become ready"
         if "failed to fetch" in text or "networkerror" in text:
@@ -635,6 +641,11 @@ class DceOfficialBrowserClient:
                 "http 639",
                 "proxy authorization expired",
                 "authorization is out of time",
+                "ip expired",
+                "request too frequent",
+                "proxy route rate limited",
+                "访问过于频繁",
+                "请求过于频繁",
                 "failed to fetch",
                 "networkerror",
                 "timed out",
@@ -653,6 +664,24 @@ class DceOfficialBrowserClient:
             "http 407" in text
             or "proxy authorization expired" in text
             or "authorization is out of time" in text
+            or "ip expired" in text
+        )
+
+    @staticmethod
+    def _is_proxy_route_rate_limit_failure(exc: Any) -> bool:
+        text = str(exc or "").lower()
+        return (
+            "request too frequent" in text
+            or "proxy route rate limited" in text
+            or "访问过于频繁" in text
+            or "请求过于频繁" in text
+        )
+
+    @classmethod
+    def _requires_immediate_route_rotation(cls, exc: Any) -> bool:
+        return (
+            cls._is_proxy_authorization_failure(exc)
+            or cls._is_proxy_route_rate_limit_failure(exc)
         )
 
     async def _api(
@@ -731,8 +760,15 @@ class DceOfficialBrowserClient:
                 f"official DCE {path} anti-bot challenge: {last_error}"
             )
         if status == 407 or self._is_proxy_authorization_failure(text):
+            self._metric("dce_proxy_expired_count")
+            failure_status = status if status > 0 else 407
             raise OfficialFuturesSourceUnavailable(
-                f"official DCE {path} proxy authorization expired: HTTP 407"
+                f"official DCE {path} proxy authorization expired: HTTP {failure_status}"
+            )
+        if self._is_proxy_route_rate_limit_failure(text):
+            self._metric("dce_route_rate_limit_count")
+            raise OfficialFuturesSourceUnavailable(
+                f"official DCE {path} proxy route rate limited"
             )
         if self._is_in_page_fetch_failure(status=status, text=text):
             self._metric("challenge_count")
@@ -1038,6 +1074,7 @@ class OfficialFuturesMarketDataProvider:
         self._last_request_started_at = 0.0
         self._request_counts_by_exchange: Dict[str, int] = {}
         self._metrics: Dict[str, Dict[str, float]] = {}
+        self._dce_day_quotes_payload_cache: Dict[str, Any] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
         self._product_page_browser_client: Optional[DceOfficialBrowserClient] = None
         self._dce_executor: Optional[ThreadPoolExecutor] = None
@@ -1374,6 +1411,25 @@ class OfficialFuturesMarketDataProvider:
         exchange: str,
         trade_date: str,
     ) -> Any:
+        exchange = str(exchange or "").upper()
+        if exchange == "DCE" and self.dce_browser_enabled:
+            day_key = _date_key(trade_date)
+            if day_key in self._dce_day_quotes_payload_cache:
+                self._increment_metric(exchange, "dce_payload_cache_hit_count", 1)
+                return self._dce_day_quotes_payload_cache[day_key]
+            self._wait_for_request_slot(exchange)
+            self._increment_metric(exchange, "dce_payload_request_count", 1)
+            try:
+                payload = self._get_dce_browser_client().fetch_day_quotes_payload(
+                    _compact_date(day_key)
+                )
+            except Exception as exc:
+                raise OfficialFuturesSourceUnavailable(
+                    f"official DCE request failed for {day_key}: {exc}"
+                ) from exc
+            self._dce_day_quotes_payload_cache[day_key] = payload
+            return payload
+
         last_error: Optional[Exception] = None
         challenge_retry_limit = self._challenge_retry_attempts_for_exchange(exchange)
         rate_limit_retry_limit = self._rate_limit_retry_attempts_for_exchange(exchange)
@@ -1403,8 +1459,6 @@ class OfficialFuturesMarketDataProvider:
                     response.raise_for_status()
                     return response.json()
                 if exchange == "DCE":
-                    if self.dce_browser_enabled:
-                        return self._get_dce_browser_client().fetch_day_quotes_payload(_compact_date(trade_date))
                     return self._request_dce_payload_direct(session, trade_date)
                 if exchange == "CZCE":
                     day = _compact_date(trade_date)
@@ -3448,13 +3502,15 @@ def _sanitize_official_futures_error_text(value: Any) -> str:
         "http 407" in lowered
         or "proxy authorization expired" in lowered
         or "authorization is out of time" in lowered
+        or "ip expired" in lowered
         or "userpass" in lowered
     )
     if proxy_auth_failure:
+        status = "403" if "http 403" in lowered or "ip expired" in lowered else "407"
         if "routes exhausted" in lowered:
             prefix = text.split("; last_error=", 1)[0]
-            return f"{prefix}; last_error=proxy authorization expired (HTTP 407)"
-        return "official DCE proxy authorization expired: HTTP 407"
+            return f"{prefix}; last_error=proxy authorization expired (HTTP {status})"
+        return f"official DCE proxy authorization expired: HTTP {status}"
     text = re.sub(
         r"(?i)(https?://)[^\s/@]+@",
         r"\1***:***@",
