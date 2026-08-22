@@ -24295,6 +24295,7 @@ class DataManager:
         deferred_semantic_event_keys_by_instrument: Dict[
             str, Set[str]
         ] = defaultdict(set)
+        announcement_xdxr_cases_by_id: Dict[str, Dict[str, Any]] = {}
         matched_records_by_exchange: Dict[str, List[Any]] = defaultdict(list)
         matched_instruments_by_record: Dict[str, Set[str]] = defaultdict(set)
         route_results: Dict[str, Any] = {}
@@ -24341,6 +24342,16 @@ class DataManager:
                 )
             if state:
                 state_metadata = state.get("metadata") or {}
+                for case in state_metadata.get("announcement_xdxr_cases") or ():
+                    if not isinstance(case, Mapping):
+                        continue
+                    case_id = str(case.get("case_id") or "").strip()
+                    instrument_id = str(case.get("instrument_id") or "").strip()
+                    if (
+                        case_id
+                        and instrument_id in active_instruments
+                    ):
+                        announcement_xdxr_cases_by_id[case_id] = dict(case)
                 deferred_factor_ids.update(
                     str(item).strip()
                     for item in state_metadata.get(
@@ -24699,6 +24710,9 @@ class DataManager:
                 )
                 if event_keys
             },
+            "announcement_xdxr_cases": list(
+                announcement_xdxr_cases_by_id.values()
+            ),
             "pages_scanned": pages_scanned,
             "announcements_seen": announcements_seen,
             "matched_announcements": sum(
@@ -24740,6 +24754,9 @@ class DataManager:
         pending_semantic_event_keys_by_instrument: Optional[
             Mapping[str, Sequence[str]]
         ] = None,
+        announcement_xdxr_cases: Optional[
+            Sequence[Mapping[str, Any]]
+        ] = None,
         pending_factor_instrument_ids: Optional[List[str]] = None,
         active_instruments: Dict[str, Dict[str, str]],
     ) -> Dict[str, int]:
@@ -24759,6 +24776,11 @@ class DataManager:
             discovery.get("matched_instruments_by_record") or {}
         )
         pending_by_exchange: Dict[str, List[str]] = defaultdict(list)
+        active_ids_by_exchange: Dict[str, Set[str]] = defaultdict(set)
+        for instrument_id, instrument in active_instruments.items():
+            exchange = str(instrument.get("exchange") or "")
+            if exchange:
+                active_ids_by_exchange[exchange].add(instrument_id)
         for instrument_id in pending_candidate_ids:
             exchange = str(
                 (active_instruments.get(instrument_id) or {}).get("exchange") or ""
@@ -24832,6 +24854,12 @@ class DataManager:
                             pending_by_exchange.get(exchange) or []
                         )
                     },
+                    "announcement_xdxr_cases": [
+                        dict(case)
+                        for case in announcement_xdxr_cases or ()
+                        if str(case.get("instrument_id") or "").strip()
+                        in active_ids_by_exchange.get(exchange, set())
+                    ],
                     "pending_factor_instrument_ids": sorted(
                         set(pending_factor_instrument_ids or [])
                     ),
@@ -25102,6 +25130,141 @@ class DataManager:
         pipeline_download_concurrency: int,
         pipeline_document_parse_concurrency: int,
         pipeline_progress_interval_seconds: float,
+        tdx_result: Optional[Mapping[str, Any]] = None,
+        announcement_xdxr_llm_mode: str = "disabled",
+        announcement_xdxr_llm_profile: str = "semantic_extraction",
+        announcement_xdxr_low_likelihood: float = 0.15,
+        announcement_xdxr_high_likelihood: float = 0.80,
+        announcement_xdxr_confidence_floor: float = 0.70,
+        announcement_xdxr_max_cases: int = 20,
+        announcement_xdxr_max_announcements_per_case: int = 5,
+    ) -> Dict[str, Any]:
+        """Combine structured-event governance with announcement-only triage."""
+        from data_sources.cninfo_announcement_xdxr_triage import (
+            AnnouncementXdxrTriageConfig,
+            CninfoAnnouncementDocumentLoader,
+            CninfoAnnouncementXdxrDailyGovernanceService,
+            CninfoAnnouncementXdxrClassifier,
+            CninfoAnnouncementXdxrTriageService,
+            build_source_reactivation_signals,
+        )
+
+        announcement_scan = (
+            announcement_governance_context.get("announcement_scan") or {}
+            if announcement_governance_context
+            else {}
+        )
+        normalized_mode = str(announcement_xdxr_llm_mode or "").strip().lower()
+        config = AnnouncementXdxrTriageConfig(
+            mode=normalized_mode,
+            profile=announcement_xdxr_llm_profile,
+            low_likelihood=announcement_xdxr_low_likelihood,
+            high_likelihood=announcement_xdxr_high_likelihood,
+            confidence_floor=announcement_xdxr_confidence_floor,
+            max_cases=announcement_xdxr_max_cases,
+            max_announcements_per_case=(
+                announcement_xdxr_max_announcements_per_case
+            ),
+        )
+        source_signals = (
+            build_source_reactivation_signals(
+                cninfo_result=cninfo_result,
+                tdx_result=tdx_result or {},
+                reconciliation=(rebuild_result.get("reconciliation") or {}),
+            )
+            if config.mode != "disabled"
+            else {}
+        )
+        if config.mode == "active":
+            announcement_scan = (
+                CninfoAnnouncementXdxrDailyGovernanceService.prepare_structured_scan(
+                    announcement_scan,
+                    source_signals_by_instrument=source_signals,
+                    max_announcements_per_case=(
+                        config.max_announcements_per_case
+                    ),
+                )
+            )
+        structured_context = (
+            {
+                **dict(announcement_governance_context),
+                "announcement_scan": announcement_scan,
+            }
+            if announcement_governance_context
+            else None
+        )
+        structured = await self._govern_cninfo_daily_structured_anomalies(
+            start_date=start_date,
+            end_date=end_date,
+            exchanges=exchanges,
+            cninfo_result=cninfo_result,
+            announcement_governance_context=structured_context,
+            rebuild_result=rebuild_result,
+            enabled=enabled,
+            max_events=max_events,
+            profile=profile,
+            download_documents=download_documents,
+            run_ocr=run_ocr,
+            auto_promote_validated=auto_promote_validated,
+            title_max_concurrency=title_max_concurrency,
+            pipeline_mode=pipeline_mode,
+            pipeline_llm_concurrency=pipeline_llm_concurrency,
+            pipeline_download_concurrency=pipeline_download_concurrency,
+            pipeline_document_parse_concurrency=(
+                pipeline_document_parse_concurrency
+            ),
+            pipeline_progress_interval_seconds=(
+                pipeline_progress_interval_seconds
+            ),
+        )
+        classifier = None
+        document_loader = None
+        if config.mode != "disabled":
+            classifier = CninfoAnnouncementXdxrClassifier(
+                self._get_or_create_llm_client(),
+                profile=config.profile,
+            )
+            document_loader = CninfoAnnouncementDocumentLoader(
+                db_ops=self.db_ops,
+                research_config=self.research_config,
+            ).load
+        triage_service = CninfoAnnouncementXdxrTriageService(
+            config=config,
+            classifier=classifier,
+            document_loader=document_loader,
+        )
+        return await CninfoAnnouncementXdxrDailyGovernanceService(
+            triage_service
+        ).govern(
+            structured,
+            announcement_scan=announcement_scan,
+            cninfo_result=cninfo_result,
+            tdx_result=tdx_result or {},
+            rebuild_result=rebuild_result,
+            source_signals_by_instrument=source_signals,
+        )
+
+    async def _govern_cninfo_daily_structured_anomalies(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        exchanges: List[str],
+        cninfo_result: Mapping[str, Any],
+        announcement_governance_context: Optional[Mapping[str, Any]],
+        rebuild_result: Mapping[str, Any],
+        enabled: bool,
+        max_events: int,
+        profile: str,
+        download_documents: bool,
+        run_ocr: bool,
+        auto_promote_validated: bool,
+        title_max_concurrency: int,
+        pipeline_mode: str,
+        pipeline_llm_concurrency: int,
+        pipeline_download_concurrency: int,
+        pipeline_document_parse_concurrency: int,
+        pipeline_progress_interval_seconds: float,
     ) -> Dict[str, Any]:
         """Run bounded semantic governance only for deterministic anomalies."""
         from data_sources.cninfo_corporate_action_incremental import (
@@ -25219,6 +25382,15 @@ class DataManager:
                     announcement_key = str(
                         getattr(record, "announcement_key", "") or ""
                     ).strip()
+                    attachments = tuple(
+                        getattr(record, "attachments", ()) or ()
+                    )
+                    attachment_url = None
+                    if attachments:
+                        attachment_url = (
+                            getattr(attachments[0], "resolved_url", None)
+                            or getattr(attachments[0], "source_url", None)
+                        )
                     for instrument_id in matched_instruments_by_record.get(
                         getattr(record, "announcement_key", ""), ()
                     ):
@@ -25235,6 +25407,7 @@ class DataManager:
                                 else None
                             ),
                             "title": str(getattr(record, "title", "") or ""),
+                            "attachment_url": attachment_url,
                             "exceptional_markers": sorted({
                                 str(item).strip()
                                 for item in (
@@ -25305,6 +25478,13 @@ class DataManager:
                 "unmatched_instrument_ids": sorted(
                     exceptional_announcements_by_instrument
                 ),
+                "unmatched_special_announcements_by_instrument": {
+                    instrument_id: list(items.values())
+                    for instrument_id, items in sorted(
+                        exceptional_announcements_by_instrument.items()
+                    )
+                },
+                "matched_exceptional_announcement_keys": [],
                 "deferred_special_announcements_by_instrument": {
                     instrument_id: list(items.values())
                     for instrument_id, items in sorted(
@@ -25336,6 +25516,33 @@ class DataManager:
                 )
             },
         )
+        unmatched_special_announcements: Dict[
+            str, Dict[str, Dict[str, Any]]
+        ] = defaultdict(dict)
+        for item in association["unmatched_announcements"]:
+            instrument_id = str(item.get("instrument_id") or "").strip()
+            announcement_key = str(
+                item.get("announcement_key") or ""
+            ).strip()
+            if instrument_id and announcement_key:
+                unmatched_special_announcements[instrument_id][
+                    announcement_key
+                ] = {
+                    key: value
+                    for key, value in dict(item).items()
+                    if key != "instrument_id"
+                }
+        unmatched_announcement_keys = {
+            announcement_key
+            for items in unmatched_special_announcements.values()
+            for announcement_key in items
+        }
+        matched_exceptional_announcement_keys = sorted({
+            announcement_key
+            for items in exceptional_announcements_by_instrument.values()
+            for announcement_key in items
+            if announcement_key not in unmatched_announcement_keys
+        })
         conflict_event_keys = {
             str(event_key).strip()
             for conflict in (
@@ -25475,6 +25682,15 @@ class DataManager:
             "unmatched_instrument_ids": association[
                 "unmatched_instrument_ids"
             ],
+            "unmatched_special_announcements_by_instrument": {
+                instrument_id: list(items.values())
+                for instrument_id, items in sorted(
+                    unmatched_special_announcements.items()
+                )
+            },
+            "matched_exceptional_announcement_keys": (
+                matched_exceptional_announcement_keys
+            ),
             "deferred_special_announcements_by_instrument": (
                 deferred_special_lineage
             ),
@@ -26095,6 +26311,13 @@ class DataManager:
         anomaly_llm_pipeline_download_concurrency: int = 8,
         anomaly_llm_pipeline_document_parse_concurrency: int = 8,
         anomaly_llm_pipeline_progress_interval_seconds: float = 30.0,
+        announcement_xdxr_llm_mode: str = "disabled",
+        announcement_xdxr_llm_profile: str = "semantic_extraction",
+        announcement_xdxr_low_likelihood: float = 0.15,
+        announcement_xdxr_high_likelihood: float = 0.80,
+        announcement_xdxr_confidence_floor: float = 0.70,
+        announcement_xdxr_max_cases: int = 20,
+        announcement_xdxr_max_announcements_per_case: int = 5,
     ) -> Dict[str, Any]:
         """Incrementally refresh events and rebuild only affected factor paths."""
         from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
@@ -26705,6 +26928,7 @@ class DataManager:
             cninfo_result=cninfo_result,
             announcement_governance_context=announcement_governance_context,
             rebuild_result=rebuild_result,
+            tdx_result=tdx_result,
             enabled=bool(anomaly_llm_enabled),
             max_events=int(anomaly_llm_max_events),
             profile=anomaly_llm_profile,
@@ -26729,12 +26953,32 @@ class DataManager:
             pipeline_progress_interval_seconds=float(
                 anomaly_llm_pipeline_progress_interval_seconds
             ),
+            announcement_xdxr_llm_mode=announcement_xdxr_llm_mode,
+            announcement_xdxr_llm_profile=announcement_xdxr_llm_profile,
+            announcement_xdxr_low_likelihood=float(
+                announcement_xdxr_low_likelihood
+            ),
+            announcement_xdxr_high_likelihood=float(
+                announcement_xdxr_high_likelihood
+            ),
+            announcement_xdxr_confidence_floor=float(
+                announcement_xdxr_confidence_floor
+            ),
+            announcement_xdxr_max_cases=int(announcement_xdxr_max_cases),
+            announcement_xdxr_max_announcements_per_case=int(
+                announcement_xdxr_max_announcements_per_case
+            ),
         )
         stage_durations["anomaly_llm_seconds"] = (
             time.monotonic() - anomaly_started_at
         )
+        inactive_announcement_ids = set(
+            (
+                anomaly_governance.get("announcement_only_triage") or {}
+            ).get("inactive_instrument_ids") or ()
+        )
         pending_candidate_ids = sorted({
-            *pending_candidate_ids,
+            *(set(pending_candidate_ids) - inactive_announcement_ids),
             *(anomaly_governance.get("deferred_instrument_ids") or []),
         })
         promoted_instrument_ids = set(
@@ -27113,6 +27357,10 @@ class DataManager:
                             anomaly_governance.get(
                                 "deferred_semantic_event_keys_by_instrument"
                             ) or {}
+                        ),
+                        announcement_xdxr_cases=(
+                            anomaly_governance.get("announcement_xdxr_cases")
+                            or []
                         ),
                         pending_factor_instrument_ids=sorted(pending_factor_ids),
                         active_instruments=announcement_governance_context[
@@ -27599,6 +27847,27 @@ class DataManager:
                 "anomaly_llm_pipeline_mode": anomaly_llm_pipeline_mode,
                 "anomaly_llm_pipeline_llm_concurrency": int(
                     anomaly_llm_pipeline_llm_concurrency
+                ),
+                "announcement_xdxr_llm_mode": str(
+                    announcement_xdxr_llm_mode
+                ),
+                "announcement_xdxr_llm_profile": str(
+                    announcement_xdxr_llm_profile
+                ),
+                "announcement_xdxr_low_likelihood": float(
+                    announcement_xdxr_low_likelihood
+                ),
+                "announcement_xdxr_high_likelihood": float(
+                    announcement_xdxr_high_likelihood
+                ),
+                "announcement_xdxr_confidence_floor": float(
+                    announcement_xdxr_confidence_floor
+                ),
+                "announcement_xdxr_max_cases": int(
+                    announcement_xdxr_max_cases
+                ),
+                "announcement_xdxr_max_announcements_per_case": int(
+                    announcement_xdxr_max_announcements_per_case
                 ),
             },
             "candidate_discovery": discovery_result,
@@ -36686,9 +36955,11 @@ class DataManager:
             'errors': [],
             'samples': [],
             'event_instrument_ids': [],
+            'event_dates_by_instrument': {},
             'pending_factor_instrument_ids': [],
         }
         event_instrument_ids: Set[str] = set()
+        event_dates_by_instrument: Dict[str, Set[str]] = defaultdict(set)
         pending_factor_instrument_ids: Set[str] = set()
 
         for exchange in exchanges:
@@ -36799,6 +37070,11 @@ class DataManager:
                         self._date_from_any(row.get('ex_date'))
                         for row in raw_rows
                     }
+                    event_dates_by_instrument[instrument_id].update(
+                        event_date.isoformat()
+                        for event_date in event_dates
+                        if event_date is not None
+                    )
                     existing_rows = await self.db_ops.execute_read_query(
                         """
                         SELECT ex_date, pre_close, validation_result
@@ -36931,6 +37207,13 @@ class DataManager:
         result['samples'] = result['samples'][:20]
         result['errors'] = result['errors'][:50]
         result['event_instrument_ids'] = sorted(event_instrument_ids)
+        result['event_dates_by_instrument'] = {
+            instrument_id: sorted(event_dates)
+            for instrument_id, event_dates in sorted(
+                event_dates_by_instrument.items()
+            )
+            if event_dates
+        }
         result['pending_factor_instrument_ids'] = sorted(
             pending_factor_instrument_ids
         )

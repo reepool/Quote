@@ -730,6 +730,12 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
         pending_semantic_event_keys_by_instrument={
             "600001.SH": ["event-1"]
         },
+        announcement_xdxr_cases=[{
+            "case_id": "case-1",
+            "instrument_id": "600001.SH",
+            "routing_status": "inactive_watch",
+            "announcements": [],
+        }],
         pending_factor_instrument_ids=["600000.SH"],
         active_instruments=active_instruments,
     )
@@ -782,6 +788,14 @@ async def test_market_announcement_scan_maps_activity_and_persists_governance():
     assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
         "pending_semantic_event_keys_by_instrument"
     ] == {"600001.SH": ["event-1"]}
+    assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
+        "announcement_xdxr_cases"
+    ] == [{
+        "case_id": "case-1",
+        "instrument_id": "600001.SH",
+        "routing_status": "inactive_watch",
+        "announcements": [],
+    }]
     assert storage.upsert_announcement_scan_state.call_args.kwargs["metadata"][
         "selection_policy_version"
     ] == DAILY_TITLE_TRIGGER_POLICY_VERSION

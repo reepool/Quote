@@ -179,6 +179,11 @@
 
 验收：状态和权威表可从一份文档及代码入口解释；原方法成为薄转发或删除；因子结果与迁移前一致。
 
+局部纵向切片：`triage-announcement-only-xdxr-candidates` 在现有公司行动日更
+owner 内增加公告-only 案例聚合、可切换 LLM 分流、inactive watch 和权威证据
+唤醒；不创建合成 CNInfo 事件、不写 canonical 因子，也不提前实施本 W6 的
+应用服务整体拆分。
+
 ### W7 Scheduler 域适配器
 
 **Change**：`split-scheduler-domain-task-adapters`

@@ -6,10 +6,10 @@ import pytest
 
 from scheduler.tasks import (
     ScheduledTasks,
-    _format_a_share_canonical_factor_selection_report,
     _format_a_share_canonical_factor_promotion_report,
-    _format_a_share_factor_rebuild_report,
+    _format_a_share_canonical_factor_selection_report,
     _format_a_share_canonical_storage_report,
+    _format_a_share_factor_rebuild_report,
     _format_cninfo_primary_factor_report,
     data_manager,
 )
@@ -679,6 +679,22 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
                 "auto_promotion": {"promoted": 1},
                 "review_workload": {"remaining_manual_review": 1},
             },
+            "announcement_only_triage": {
+                "mode": "shadow",
+                "execution_status": "success",
+                "case_count": 2,
+                "processed_case_count": 1,
+                "announcement_count": 3,
+                "routing_counts": {
+                    "active_probable_xdxr": 1,
+                    "active_uncertain": 1,
+                    "active_pending": 0,
+                    "inactive_watch": 0,
+                },
+                "reactivated_case_count": 1,
+                "primary_evidence_change_count": 1,
+                "error_count": 0,
+            },
         },
         "execution_status": {
             "primary": "success",
@@ -740,6 +756,9 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
         "incomplete_structured_event:1"
     ) in report
     assert "processed=2, analyzed=2, promoted=1, manual=1" in report
+    assert "公告语义分流: `mode=shadow, execution=success, cases=2" in report
+    assert "processed=1, announcements=3, probable=1, uncertain=1" in report
+    assert "pending=0, inactive=0, reactivated=1, primary_changes=1" in report
     assert "reason=predecessor_watermark_stale" in report
     assert "workflow_deferred=True, actionable_retry=0" in report
     assert "因子重试队列: `status=success, actionable=2`" in report

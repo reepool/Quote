@@ -1737,6 +1737,20 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"errors={anomaly_counts.get('errors', 0)}, "
             f"document_failures={anomaly_counts.get('document_failures', 0)}"
             "`",
+            "公告语义分流: `"
+            f"mode={(anomaly.get('announcement_only_triage') or {}).get('mode', 'disabled')}, "
+            f"execution={(anomaly.get('announcement_only_triage') or {}).get('execution_status', 'N/A')}, "
+            f"cases={(anomaly.get('announcement_only_triage') or {}).get('case_count', 0)}, "
+            f"processed={(anomaly.get('announcement_only_triage') or {}).get('processed_case_count', 0)}, "
+            f"announcements={(anomaly.get('announcement_only_triage') or {}).get('announcement_count', 0)}, "
+            f"probable={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_probable_xdxr', 0)}, "
+            f"uncertain={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_uncertain', 0)}, "
+            f"pending={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_pending', 0)}, "
+            f"inactive={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('inactive_watch', 0)}, "
+            f"reactivated={(anomaly.get('announcement_only_triage') or {}).get('reactivated_case_count', 0)}, "
+            f"primary_changes={(anomaly.get('announcement_only_triage') or {}).get('primary_evidence_change_count', 0)}, "
+            f"errors={(anomaly.get('announcement_only_triage') or {}).get('error_count', 0)}"
+            "`",
             "阶段耗时: `"
             f"discovery={float(stage_durations.get('candidate_discovery_seconds', 0) or 0):.1f}s, "
             f"cninfo={float(stage_durations.get('cninfo_refresh_seconds', 0) or 0):.1f}s, "
@@ -7231,6 +7245,13 @@ class ScheduledTasks:
         anomaly_llm_pipeline_download_concurrency: int = 8,
         anomaly_llm_pipeline_document_parse_concurrency: int = 8,
         anomaly_llm_pipeline_progress_interval_seconds: float = 30.0,
+        announcement_xdxr_llm_mode: str = "shadow",
+        announcement_xdxr_llm_profile: str = "semantic_extraction",
+        announcement_xdxr_low_likelihood: float = 0.15,
+        announcement_xdxr_high_likelihood: float = 0.80,
+        announcement_xdxr_confidence_floor: float = 0.70,
+        announcement_xdxr_max_cases: int = 20,
+        announcement_xdxr_max_announcements_per_case: int = 5,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
         """Refresh incremental CNInfo candidates and affected factor paths."""
@@ -7284,6 +7305,23 @@ class ScheduledTasks:
                 ),
                 anomaly_llm_pipeline_progress_interval_seconds=float(
                     anomaly_llm_pipeline_progress_interval_seconds
+                ),
+                announcement_xdxr_llm_mode=announcement_xdxr_llm_mode,
+                announcement_xdxr_llm_profile=announcement_xdxr_llm_profile,
+                announcement_xdxr_low_likelihood=float(
+                    announcement_xdxr_low_likelihood
+                ),
+                announcement_xdxr_high_likelihood=float(
+                    announcement_xdxr_high_likelihood
+                ),
+                announcement_xdxr_confidence_floor=float(
+                    announcement_xdxr_confidence_floor
+                ),
+                announcement_xdxr_max_cases=int(
+                    announcement_xdxr_max_cases
+                ),
+                announcement_xdxr_max_announcements_per_case=int(
+                    announcement_xdxr_max_announcements_per_case
                 ),
             )
             result.setdefault("backtest_stages", {})[

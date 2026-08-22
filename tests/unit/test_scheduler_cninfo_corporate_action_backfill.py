@@ -6,8 +6,8 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 import pytest
-import scheduler.tasks as scheduler_tasks
 
+import scheduler.tasks as scheduler_tasks
 from scheduler.tasks import (
     ScheduledTasks,
     _format_a_share_cninfo_corporate_action_report,
@@ -379,6 +379,15 @@ def test_cninfo_primary_daily_job_is_bounded_and_single_instance():
     assert job["parameters"]["anomaly_llm_max_events"] == 50
     assert job["parameters"]["anomaly_llm_title_max_concurrency"] == 50
     assert job["parameters"]["anomaly_llm_pipeline_llm_concurrency"] == 50
+    assert job["parameters"]["announcement_xdxr_llm_mode"] == "shadow"
+    assert job["parameters"]["announcement_xdxr_low_likelihood"] == 0.15
+    assert job["parameters"]["announcement_xdxr_high_likelihood"] == 0.8
+    assert job["parameters"]["announcement_xdxr_confidence_floor"] == 0.7
+    assert job["parameters"]["announcement_xdxr_max_cases"] == 20
+    assert (
+        job["parameters"]["announcement_xdxr_max_announcements_per_case"]
+        == 5
+    )
     assert job["parameters"]["tdx_refresh_mode"] == "targeted"
     assert job["parameters"]["tdx_rotating_sample_size"] == 100
     assert config["scheduler_config"]["jobs"][
@@ -420,6 +429,8 @@ async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(mon
     )
     assert maintenance.await_args.kwargs["anomaly_llm_enabled"] is True
     assert maintenance.await_args.kwargs["anomaly_llm_max_events"] == 50
+    assert maintenance.await_args.kwargs["announcement_xdxr_llm_mode"] == "shadow"
+    assert maintenance.await_args.kwargs["announcement_xdxr_max_cases"] == 20
     assert (
         maintenance.await_args.kwargs[
             "anomaly_llm_pipeline_llm_concurrency"

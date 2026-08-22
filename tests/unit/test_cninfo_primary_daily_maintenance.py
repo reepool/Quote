@@ -1,3 +1,4 @@
+import json
 from dataclasses import replace
 from datetime import date
 from types import SimpleNamespace
@@ -6,6 +7,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from data_manager import DataManager
+from data_sources.cninfo_corporate_action_documents import CorporateActionPageText
 from research.announcements import (
     AnnouncementAttachment,
     AnnouncementQuery,
@@ -14,7 +16,37 @@ from research.announcements import (
     AnnouncementScope,
     build_announcement_key,
 )
-from data_sources.cninfo_corporate_action_documents import CorporateActionPageText
+
+
+class _AnnouncementOnlyTriageClient:
+    def __init__(self, *, likelihood: float, confidence: float = 0.95):
+        self.likelihood = likelihood
+        self.confidence = confidence
+        self.complete = AsyncMock(side_effect=self._complete)
+
+    async def _complete(self, request):
+        payload = json.loads(request.messages[1].content)
+        primary = payload["announcements"][-1]["announcement_key"]
+        return SimpleNamespace(
+            data={
+                "schema_version": "cninfo_announcement_xdxr_triage.v1",
+                "case_id": payload["case_id"],
+                "disposition": (
+                    "probable_xdxr" if self.likelihood >= 0.5 else "non_xdxr"
+                ),
+                "xdxr_likelihood": self.likelihood,
+                "judgment_confidence": self.confidence,
+                "event_stage": "unrelated",
+                "action_family": payload["action_family"],
+                "primary_announcement_key": primary,
+                "supporting_announcement_keys": [],
+                "rationale": "fixture judgment",
+            },
+            model="fixture-model",
+            request_id="request-id",
+            request_hash="request-hash",
+            response_hash="response-hash",
+        )
 
 
 def _mock_bse_official_refresh(manager, *, status="success"):
@@ -645,6 +677,131 @@ async def test_unmatched_special_workload_counts_announcements_not_instruments()
 
     assert result["unmatched_special_announcement_count"] == 2
     assert result["unmatched_instrument_ids"] == ["600000.SH"]
+
+
+@pytest.mark.asyncio
+async def test_announcement_only_disabled_restores_deterministic_title_queue():
+    manager = DataManager()
+    manager._get_or_create_llm_client = Mock()
+    context = {
+        "announcement_scan": {
+            "matched_records_by_exchange": {},
+            "matched_instruments_by_record": {},
+            "announcement_xdxr_cases": [{
+                "case_id": "case-1",
+                "instrument_id": "600000.SH",
+                "action_family": "restructuring",
+                "routing_status": "inactive_watch",
+                "announcements": [{
+                    "announcement_key": "announcement-1",
+                    "announcement_date": "2026-07-29",
+                    "title": "重整计划资本公积转增股本实施公告",
+                }],
+            }],
+        }
+    }
+
+    result = await manager._govern_cninfo_daily_anomalies(**_anomaly_kwargs(
+        announcement_governance_context=context,
+        announcement_xdxr_llm_mode="disabled",
+    ))
+
+    triage = result["announcement_only_triage"]
+    assert triage["execution_status"] == "disabled"
+    assert triage["reactivated_case_count"] == 0
+    assert triage["cases"][0]["routing_status"] == "active_pending"
+    assert result["unmatched_instrument_ids"] == ["600000.SH"]
+    manager._get_or_create_llm_client.assert_not_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["disabled", "shadow"])
+async def test_non_active_announcement_triage_does_not_inject_structured_evidence(
+    monkeypatch, mode
+):
+    prepare_structured_scan = Mock()
+    monkeypatch.setattr(
+        "data_sources.cninfo_announcement_xdxr_triage."
+        "CninfoAnnouncementXdxrDailyGovernanceService.prepare_structured_scan",
+        prepare_structured_scan,
+    )
+    manager = DataManager()
+    manager._get_or_create_llm_client = Mock(return_value=SimpleNamespace())
+    manager._govern_cninfo_daily_structured_anomalies = AsyncMock(return_value={
+        "status": "success",
+        "execution_status": "skipped",
+        "unmatched_special_announcements_by_instrument": {},
+        "deferred_special_announcements_by_instrument": {},
+    })
+
+    await manager._govern_cninfo_daily_anomalies(**_anomaly_kwargs(
+        cninfo_result={
+            "checkpoint_id": "daily-run-1",
+            "inserted_instrument_ids": ["600000.SH"],
+            "persisted_event_keys_by_instrument": {
+                "600000.SH": ["event-1"],
+            },
+        },
+        announcement_governance_context={"announcement_scan": {
+            "announcement_xdxr_cases": [],
+        }},
+        announcement_xdxr_llm_mode=mode,
+    ))
+
+    prepare_structured_scan.assert_not_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("mode", "expected_routing", "expected_unmatched"),
+    [
+        ("shadow", "active_pending", ["600000.SH"]),
+        ("active", "inactive_watch", []),
+    ],
+)
+async def test_announcement_only_llm_routing_isolated_from_event_and_factor_writes(
+    mode, expected_routing, expected_unmatched
+):
+    manager = DataManager()
+    manager._llm_client = _AnnouncementOnlyTriageClient(likelihood=0.02)
+    manager.db_ops = Mock()
+    manager.db_ops.get_corporate_action_document_bundle = AsyncMock(return_value={
+        "items": [{
+            "content_hash": "document-hash",
+            "source_url": "https://example.test/announcement-1.pdf",
+            "pages": [{"text": "本次为普通债务清偿，不涉及股东权益分派。"}],
+        }]
+    })
+    manager.db_ops.save_corporate_action_observations = AsyncMock()
+    manager.db_ops.save_adjustment_factors = AsyncMock()
+    manager.analyze_cninfo_corporate_action_candidates = AsyncMock()
+    record = SimpleNamespace(
+        title="关于清偿债务执行完毕的公告",
+        announcement_key="announcement-1",
+        published_at="2026-07-29T01:00:00+00:00",
+        attachments=(),
+    )
+    context = {
+        "announcement_scan": {
+            "matched_records_by_exchange": {"SSE": [record]},
+            "matched_instruments_by_record": {
+                "announcement-1": {"600000.SH"}
+            },
+        }
+    }
+
+    result = await manager._govern_cninfo_daily_anomalies(**_anomaly_kwargs(
+        announcement_governance_context=context,
+        announcement_xdxr_llm_mode=mode,
+    ))
+
+    triage = result["announcement_only_triage"]
+    assert triage["processed_case_count"] == 1
+    assert triage["cases"][0]["routing_status"] == expected_routing
+    assert result["unmatched_instrument_ids"] == expected_unmatched
+    manager.analyze_cninfo_corporate_action_candidates.assert_not_awaited()
+    manager.db_ops.save_corporate_action_observations.assert_not_awaited()
+    manager.db_ops.save_adjustment_factors.assert_not_awaited()
 
 
 @pytest.mark.asyncio

@@ -144,6 +144,13 @@
           "anomaly_llm_pipeline_download_concurrency": 8,
           "anomaly_llm_pipeline_document_parse_concurrency": 8,
           "anomaly_llm_pipeline_progress_interval_seconds": 30,
+          "announcement_xdxr_llm_mode": "shadow",
+          "announcement_xdxr_llm_profile": "semantic_extraction",
+          "announcement_xdxr_low_likelihood": 0.15,
+          "announcement_xdxr_high_likelihood": 0.8,
+          "announcement_xdxr_confidence_floor": 0.7,
+          "announcement_xdxr_max_cases": 20,
+          "announcement_xdxr_max_announcements_per_case": 5,
           "max_runtime_seconds": 21600
         }
       },
