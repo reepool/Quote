@@ -28,8 +28,11 @@ from research.business_profile_semantic_pipeline import (
 )
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
+    _bind_promotion_validation,
     _expanded_action_verification_target,
     _normalized_value,
+    _select_current_semantic_activities,
+    _semantic_relationship_assertion_ids,
     _semantic_failure_reason,
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
@@ -59,6 +62,208 @@ def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
         _semantic_failure_reason(ValueError("unsupported ratio unit: （%）"))
         == "unit_normalization_failed"
     )
+
+
+def test_derived_validation_uses_current_catalog_without_mutating_evidence():
+    evidence = {
+        "metadata": {
+            "promotion_validation": {
+                "official_identity_verified": True,
+                "artifact_quality_verified": True,
+                "exact_evidence_verified": True,
+                "catalog_versions": {
+                    "fact": "old-facts",
+                    "product": "old-products",
+                    "unit": "old-units",
+                },
+            }
+        }
+    }
+    record = {
+        "data_available_date": "2026-03-30",
+        "knowledge_from": "2026-03-30",
+        "metadata": {},
+    }
+
+    _bind_promotion_validation(record, evidence)
+
+    current = runtime_module._current_catalog_versions()
+    assert record["metadata"]["promotion_validation"]["catalog_versions"] == current
+    assert evidence["metadata"]["promotion_validation"]["catalog_versions"] == {
+        "fact": "old-facts",
+        "product": "old-products",
+        "unit": "old-units",
+    }
+
+
+def test_current_activity_selection_prefers_canonical_mapping():
+    base = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "evidence_id": "evidence-1",
+        "subject_scope": "consolidated_group",
+        "action": "sells",
+        "object_type": "product",
+        "object_raw": "聚乙烯",
+        "segment_id": None,
+        "geography": "中国",
+        "value": 373.9,
+        "unit": "千吨",
+        "share": None,
+        "business_regime_id": "regime-2025",
+        "knowledge_from": "2026-03-30",
+        "version": 1,
+    }
+    old = {
+        **base,
+        "activity_id": "activity-old",
+        "object_id": None,
+        "updated_at": "2026-08-20T00:00:00+08:00",
+    }
+    mapped = {
+        **base,
+        "activity_id": "activity-mapped",
+        "object_id": "polymer.polyethylene",
+        "updated_at": "2026-08-19T00:00:00+08:00",
+    }
+    subsidiary = {
+        **mapped,
+        "activity_id": "activity-subsidiary",
+        "subject_scope": "named_subsidiary",
+    }
+    overseas = {
+        **mapped,
+        "activity_id": "activity-overseas",
+        "geography": "海外",
+    }
+    prior_regime = {
+        **mapped,
+        "activity_id": "activity-prior-regime",
+        "business_regime_id": "regime-2024",
+    }
+
+    selected = _select_current_semantic_activities(
+        [old, mapped, subsidiary, overseas, prior_regime]
+    )
+
+    assert [item["activity_id"] for item in selected] == [
+        "activity-mapped",
+        "activity-subsidiary",
+        "activity-overseas",
+        "activity-prior-regime",
+    ]
+
+
+def test_legacy_relationship_reconstructs_exact_semantic_assertion_ids():
+    evidence = {
+        "quote": "本集团向示例供应商采购原料",
+        "quote_hash": "quote-hash",
+    }
+    record = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "buys_from",
+        "counterparty_name_raw": "示例供应商有限公司",
+        "anonymous": 0,
+        "disclosed_share": 0.015,
+        "object_raw": "采购",
+        "metadata": {"exact_evidence": evidence},
+    }
+    expected = tuple(
+        hashlib.sha256(
+            json.dumps(
+                {
+                    "instrument_id": "601088.SH",
+                    "report_period": "2025-12-31",
+                    "subject_scope": subject_scope,
+                    "relationship_type": "buys_from",
+                    "counterparty_name_raw": "示例供应商有限公司",
+                    "anonymous": False,
+                    "disclosed_share": 0.015,
+                    "object_raw": "采购",
+                    "evidence": evidence,
+                    "semantic_synthesis": True,
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        for subject_scope in ("issuer", "consolidated_group")
+    )
+
+    assert _semantic_relationship_assertion_ids(record) == expected
+    record["metadata"]["semantic_assertion_id"] = "persisted-assertion-id"
+    assert _semantic_relationship_assertion_ids(record) == (
+        "persisted-assertion-id",
+    )
+
+
+def test_latest_selected_artifact_query_returns_completed_document_match(tmp_path):
+    storage = _storage(tmp_path)
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(storage),
+        artifact_root=tmp_path / "artifacts",
+    )
+    text = "报告期内公司从事煤炭生产与销售。"
+    section_hash = hashlib.sha256(text.encode()).hexdigest()
+    selected = SelectedSectionArtifact(
+        artifact_version="business_profile_selected_sections.v1",
+        bundle={
+            "source_document_id": "document-2025",
+            "field_family": "atomic_activities",
+        },
+        sections=(
+            SelectedSection(
+                section_id="section-1",
+                page_number=1,
+                section_key="business_overview",
+                text=text,
+                normalized_text=text,
+                normalized_start=0,
+                normalized_end=len(text),
+                page_hash=section_hash,
+                section_hash=section_hash,
+                selector_reasons=("test",),
+                quality="native",
+            ),
+        ),
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash="selected-artifact-hash",
+    )
+    selected_path, _ = runtime.section_store.write(selected)
+    now = "2026-03-30T10:00:00+08:00"
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        conn.execute(
+            "INSERT INTO business_profile_semantic_runs ("
+            "run_id, instrument_id, source_document_id, field_family, status, "
+            "bundle_hash, metadata_json, started_at, completed_at, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?)",
+            (
+                "run-selected-artifact",
+                "601088.SH",
+                "document-2025",
+                "atomic_activities",
+                "bundle-hash",
+                json.dumps({"selected_artifact_path": str(selected_path)}),
+                now,
+                now,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+
+    recovered = runtime._latest_selected_artifact(
+        instrument_id="601088.SH",
+        field_family="atomic_activities",
+        source_document_id="document-2025",
+    )
+
+    assert recovered is not None
+    assert recovered.artifact_hash == "selected-artifact-hash"
 
 
 def test_structured_record_ids_rotate_without_changing_stable_segment_identity(
@@ -2965,6 +3170,7 @@ def test_unique_exact_counterparty_is_verified_and_promoted(tmp_path, monkeypatc
     assert len(relationships) == len(evidence) == 1
     assert relationships[0]["counterparty_entity_id"] == "entity-customer"
     assert relationships[0]["resolution_basis"] == "exact_legal_name"
+    assert relationships[0]["metadata"]["semantic_assertion_id"]
     assert relationships[0]["review_status"] == "approved"
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
@@ -3314,14 +3520,11 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         expected_stage="promote",
     )
     publication_results = promoted_payload["derived"]["publications"]
-    assert len(publication_results) == 2
-    assert {item["status"] for item in publication_results} == {
-        "input_gap",
-        "published",
-    }
+    assert len(publication_results) == 1
+    assert {item["status"] for item in publication_results} == {"published"}
     assert [
         item["reason"] for item in publication_results if item["status"] == "input_gap"
-    ] == ["ambiguous_or_unsupported_exposure_direction"]
+    ] == []
     assert promoted["quality"] == {
         "stage": "promote",
         "stage_ready": True,
@@ -3331,14 +3534,29 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
         "value_chain_roles_published": 1,
         "commodity_exposure_facts_published": 2,
         "commodity_exposures_published": 1,
-        "publication_gaps": 1,
+        "publication_gaps": 0,
     }
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
-    assert {item["reason_codes"][0] for item in exceptions} == {
-        "ambiguous_or_unsupported_exposure_direction",
-    }
-    runtime._derive_and_publish(scope)
+    assert exceptions == []
+    stale_activity = next(
+        item for item in activities if item["action"] == "produces"
+    )
+    runtime._persist_runtime_exception(
+        {
+            "instrument_id": "601088.SH",
+            "field_family": "derived_value_chain_roles",
+            "source_document_id": stale_activity["evidence_id"],
+            "target_id": stale_activity["activity_id"],
+            "tier": "machine_rework",
+            "reason_code": "transformation_lineage_missing",
+            "evidence_reference": stale_activity["evidence_id"],
+        },
+        scope=scope,
+        manifest=manifests["derived_value_chain_roles"],
+    )
     assert len(repository.list_exceptions(instrument_id="601088.SH")) == 1
+    runtime._derive_and_publish(scope)
+    assert repository.list_exceptions(instrument_id="601088.SH") == []
     report = pipeline.run("report", scope=scope)["metrics"]["by_field_family"]
     assert report["atomic_activities"]["llm_calls"] == 3
     assert report["atomic_activities"]["candidates"] == 2

@@ -371,6 +371,7 @@ class BusinessProfileReviewService:
             FROM business_profile_review_audit
             WHERE record_type = ? AND record_id = ?
               AND reviewer NOT LIKE 'system:%'
+              AND reviewer NOT LIKE 'automation:%'
             ORDER BY reviewed_at DESC, audit_id DESC
             LIMIT 1
             """,

@@ -273,6 +273,35 @@ class BusinessProfilePromotionService:
             ).fetchall()
         return [_decode_exception(dict(row)) for row in rows]
 
+    def resolve_open_exceptions_for_target(
+        self,
+        *,
+        target_id: str,
+        field_family: str | None = None,
+        target_type: str | None = None,
+    ) -> int:
+        """Resolve stale exceptions after the represented target converges."""
+
+        clauses = ["target_id = ?", "status = 'open'"]
+        params: list[Any] = [str(target_id)]
+        if field_family:
+            clauses.append("field_family = ?")
+            params.append(str(field_family))
+        if target_type:
+            clauses.append("target_type = ?")
+            params.append(str(target_type))
+        now = get_shanghai_time().isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                "UPDATE business_profile_exceptions "
+                "SET status = 'resolved', resolved_at = ?, updated_at = ? "
+                f"WHERE {' AND '.join(clauses)}",
+                (now, now, *params),
+            )
+            conn.commit()
+        return max(0, int(cursor.rowcount or 0))
+
     def _upsert_exception(
         self,
         context: PromotionContext,
@@ -311,6 +340,19 @@ class BusinessProfilePromotionService:
                             "gate_signature": gate_signature,
                         }
                     )[:24]
+                )
+                conn.execute(
+                    "UPDATE business_profile_exceptions "
+                    "SET status = 'resolved', resolved_at = ?, updated_at = ? "
+                    "WHERE target_type = ? AND target_id = ? "
+                    "AND status = 'open' AND exception_id <> ?",
+                    (
+                        now.isoformat(),
+                        now.isoformat(),
+                        context.target_type,
+                        context.target_id,
+                        exception_id,
+                    ),
                 )
                 schema_payload = {
                     "schema_version": "business_profile_exception.v1",
@@ -393,16 +435,10 @@ class BusinessProfilePromotionService:
         return _decode_exception(dict(row))
 
     def _resolve_open_exceptions(self, context: PromotionContext) -> None:
-        now = get_shanghai_time().isoformat()
-        with self.storage.get_connection() as conn:
-            self.storage._apply_pragmas(conn)
-            conn.execute(
-                "UPDATE business_profile_exceptions "
-                "SET status = 'resolved', resolved_at = ?, updated_at = ? "
-                "WHERE target_type = ? AND target_id = ? AND status = 'open'",
-                (now, now, context.target_type, context.target_id),
-            )
-            conn.commit()
+        self.resolve_open_exceptions_for_target(
+            target_id=context.target_id,
+            target_type=context.target_type,
+        )
 
 
 def _decode_exception(row: dict[str, Any]) -> dict[str, Any]:

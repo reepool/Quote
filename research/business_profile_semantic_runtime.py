@@ -2825,22 +2825,30 @@ class BusinessProfileSemanticRuntime:
                         if verification is None
                         else verification.get("decision") == "confirmed"
                     )
-                    decisions.append(
-                        self._promote_record(
-                            record_type,
-                            record,
-                            family=family,
-                            manifest=manifest,
-                            scope=scope,
-                            semantic_proof=proof,
-                            exception_reasons=tuple(
-                                str(item)
-                                for item in verification_proof.get(
-                                    "promotion_block_reasons", []
-                                )
-                            ),
-                        )
+                    promotion = self._promote_record(
+                        record_type,
+                        record,
+                        family=family,
+                        manifest=manifest,
+                        scope=scope,
+                        semantic_proof=proof,
+                        exception_reasons=tuple(
+                            str(item)
+                            for item in verification_proof.get(
+                                "promotion_block_reasons", []
+                            )
+                        ),
                     )
+                    decisions.append(promotion)
+                    if record_type == "relationships" and promotion.get("promoted"):
+                        for semantic_assertion_id in (
+                            _semantic_relationship_assertion_ids(record)
+                        ):
+                            self.promotion_service.resolve_open_exceptions_for_target(
+                                target_id=semantic_assertion_id,
+                                target_type="document_field_family",
+                                field_family=family,
+                            )
         derived = self._derive_and_publish(scope)
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
@@ -2918,7 +2926,7 @@ class BusinessProfileSemanticRuntime:
             for index, item in enumerate(decisions)
             if item.get("decision", {}).get("target_type") != "evidence"
             and item.get("decision", {}).get("classification")
-            in {"quick_review", "deep_review"}
+            in {"machine_rework", "quick_review", "deep_review"}
         }
         gap_targets.update(
             str(item.get("target_id") or f"verification:{index}")
@@ -2935,7 +2943,7 @@ class BusinessProfileSemanticRuntime:
                 )
                 for index, item in enumerate(items)
                 if item.get("decision", {}).get("classification")
-                in {"quick_review", "deep_review"}
+                in {"machine_rework", "quick_review", "deep_review"}
             )
         gap_targets.update(
             str(item.get("fact_id") or f"commodity_exposure_publication:{index}")
@@ -3362,6 +3370,7 @@ class BusinessProfileSemanticRuntime:
                 ]
                 record["metadata"].update(
                     {
+                        "semantic_assertion_id": assertion["relationship_id"],
                         "semantic_synthesis": True,
                         "semantic_contract": (
                             "semantic_synthesis_independent_from_transcription.v1"
@@ -3596,9 +3605,13 @@ class BusinessProfileSemanticRuntime:
             "gaps": [],
         }
         for instrument_id in scope.instruments:
-            activities = self.repository.get_approved_as_of(
+            approved_activities = self.repository.get_approved_as_of(
                 "activities", instrument_id=instrument_id, cutoff=scope.knowledge_cutoff
             )
+            activities = _select_current_semantic_activities(approved_activities)
+            active_activity_ids = {
+                str(item.get("activity_id") or "") for item in activities
+            }
             if "derived_value_chain_roles" in scope.field_families:
                 operating_facts = self.repository.get_approved_as_of(
                     "operating_facts",
@@ -3641,16 +3654,23 @@ class BusinessProfileSemanticRuntime:
                     self.repository.upsert("value_chain_roles", role)
                     current = self._find_record("value_chain_roles", role["record_id"])
                     if manifest is not None:
-                        result["roles"].append(
-                            self._promote_record(
-                                "value_chain_roles",
-                                current,
-                                family="derived_value_chain_roles",
-                                manifest=manifest,
-                                scope=scope,
-                                semantic_proof=True,
-                            )
+                        promotion = self._promote_record(
+                            "value_chain_roles",
+                            current,
+                            family="derived_value_chain_roles",
+                            manifest=manifest,
+                            scope=scope,
+                            semantic_proof=True,
                         )
+                        result["roles"].append(promotion)
+                        if promotion.get("promoted"):
+                            for activity_id in (
+                                role.get("metadata") or {}
+                            ).get("supporting_activity_ids") or ():
+                                self.promotion_service.resolve_open_exceptions_for_target(
+                                    target_id=str(activity_id),
+                                    field_family="derived_value_chain_roles",
+                                )
             if "commodity_exposure_facts" in scope.field_families:
                 manifest = self.promotion_manifests.get("commodity_exposure_facts")
                 producer = BusinessProfileExposureFactProducer(self.repository)
@@ -3690,14 +3710,38 @@ class BusinessProfileSemanticRuntime:
                     instrument_id=instrument_id,
                     cutoff=scope.knowledge_cutoff,
                 )
+                current_facts = [
+                    fact
+                    for fact in facts
+                    if str(fact.get("activity_id") or "") in active_activity_ids
+                ]
+                publication_facts = _select_current_publication_facts(current_facts)
+                publication_fact_ids = {
+                    str(fact.get("fact_id") or "") for fact in publication_facts
+                }
                 for fact in facts:
+                    if str(fact.get("fact_id") or "") in publication_fact_ids:
+                        continue
+                    self.promotion_service.resolve_open_exceptions_for_target(
+                        target_id=str(fact["fact_id"]),
+                        field_family="commodity_exposure_publication",
+                    )
+                for fact in publication_facts:
                     try:
-                        result["publications"].append(
-                            publisher.publish_basic(
-                                fact_id=fact["fact_id"],
-                                knowledge_cutoff=scope.knowledge_cutoff,
-                            )
+                        publication = publisher.publish_basic(
+                            fact_id=fact["fact_id"],
+                            knowledge_cutoff=scope.knowledge_cutoff,
                         )
+                        result["publications"].append(publication)
+                        if publication.get("status") in {
+                            "published",
+                            "unchanged",
+                            "fact_only",
+                        }:
+                            self.promotion_service.resolve_open_exceptions_for_target(
+                                target_id=str(fact["fact_id"]),
+                                field_family="commodity_exposure_publication",
+                            )
                     except ValueError as exc:
                         reason = _publication_gap_reason(exc)
                         persisted = self._persist_runtime_exception(
@@ -4725,6 +4769,7 @@ def _bind_promotion_validation(
     )
     metadata["promotion_validation"] = {
         **evidence_validation,
+        "catalog_versions": _current_catalog_versions(),
         "temporal_scope_valid": _temporal_scope_is_current(
             record, str(record.get("data_available_date") or "9999-12-31")
         ),
@@ -4737,6 +4782,114 @@ def _bind_promotion_validation(
         ),
         "no_conflicts": not bool(metadata.get("publication_blocker")),
     }
+
+
+def _select_current_semantic_activities(
+    activities: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Prefer the most normalized version of an exact filing assertion."""
+
+    selected: dict[tuple[Any, ...], Mapping[str, Any]] = {}
+    for activity in activities:
+        key = (
+            str(activity.get("instrument_id") or ""),
+            str(activity.get("report_period") or ""),
+            str(activity.get("evidence_id") or ""),
+            str(activity.get("subject_scope") or ""),
+            str(activity.get("action") or ""),
+            str(activity.get("object_type") or ""),
+            normalize_product_alias(activity.get("object_raw")),
+            str(activity.get("segment_id") or ""),
+            str(activity.get("geography") or ""),
+            activity.get("value"),
+            str(activity.get("unit") or ""),
+            activity.get("share"),
+            str(activity.get("business_regime_id") or ""),
+        )
+        current = selected.get(key)
+        rank = _semantic_activity_rank(activity)
+        if current is None or rank > _semantic_activity_rank(current):
+            selected[key] = activity
+    return [dict(item) for item in selected.values()]
+
+
+def _semantic_relationship_assertion_ids(
+    record: Mapping[str, Any],
+) -> tuple[str, ...]:
+    """Return exact current or reconstructable legacy semantic assertion IDs."""
+
+    metadata = record.get("metadata") or {}
+    persisted = str(metadata.get("semantic_assertion_id") or "").strip()
+    if persisted:
+        return (persisted,)
+    evidence = metadata.get("exact_evidence")
+    required = (
+        "instrument_id",
+        "report_period",
+        "relationship_type",
+        "counterparty_name_raw",
+    )
+    if not isinstance(evidence, Mapping) or any(not record.get(key) for key in required):
+        return ()
+    base = {
+        "instrument_id": str(record["instrument_id"]),
+        "report_period": str(record["report_period"]),
+        "relationship_type": str(record["relationship_type"]),
+        "counterparty_name_raw": str(record["counterparty_name_raw"]),
+        "anonymous": bool(record.get("anonymous")),
+        "disclosed_share": record.get("disclosed_share"),
+        "object_raw": str(record.get("object_raw") or "").strip() or None,
+        "evidence": dict(evidence),
+        "semantic_synthesis": True,
+    }
+    return tuple(
+        _stable_hash({**base, "subject_scope": subject_scope})
+        for subject_scope in ("issuer", "consolidated_group")
+    )
+
+
+def _semantic_activity_rank(activity: Mapping[str, Any]) -> tuple[Any, ...]:
+    return (
+        bool(str(activity.get("object_id") or "").strip()),
+        str(activity.get("knowledge_from") or ""),
+        int(activity.get("version") or 0),
+        str(activity.get("updated_at") or ""),
+        str(activity.get("activity_id") or ""),
+    )
+
+
+def _select_current_publication_facts(
+    facts: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Prefer sales over production for the same positive product exposure."""
+
+    sales_keys = {
+        _positive_product_exposure_key(fact)
+        for fact in facts
+        if str((fact.get("metadata") or {}).get("source_activity_action") or "")
+        == "sells"
+        and str(fact.get("product_id") or "").strip()
+    }
+    return [
+        dict(fact)
+        for fact in facts
+        if not (
+            str((fact.get("metadata") or {}).get("source_activity_action") or "")
+            == "produces"
+            and str(fact.get("product_id") or "").strip()
+            and _positive_product_exposure_key(fact) in sales_keys
+        )
+    ]
+
+
+def _positive_product_exposure_key(fact: Mapping[str, Any]) -> tuple[str, ...]:
+    return (
+        str(fact.get("instrument_id") or ""),
+        str(fact.get("report_period") or ""),
+        str(fact.get("product_id") or ""),
+        str(fact.get("segment_id") or ""),
+        str(fact.get("fact_scope") or ""),
+    )
 
 
 def _current_catalog_versions() -> dict[str, str]:

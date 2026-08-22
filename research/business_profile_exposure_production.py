@@ -24,6 +24,7 @@ PUBLICATION_POLICY_VERSION = "business_profile_exposure_publication.v1"
 
 _ACTION_ROLES = {
     "sells": ("revenue", "positive", "explicit_product"),
+    "produces": ("revenue", "positive", "explicit_product"),
     "purchases": ("feedstock_cost", "negative", "explicit_raw_material"),
     "consumes": ("feedstock_cost", "negative", "explicit_raw_material"),
 }
@@ -298,7 +299,11 @@ class BusinessProfileExposurePublisher:
         exposure_role, direction, evidence_requirement = _ACTION_ROLES[action]
         product_id = str(fact.get("product_id") or "").strip()
         if not product_id:
-            raise ValueError("product_mapping_required")
+            return {
+                "status": "fact_only",
+                "fact": fact,
+                "reason": "commodity_identity_unresolved",
+            }
         mapping = self.mapping_resolver.resolve(
             product_id=product_id,
             exposure_role=exposure_role,

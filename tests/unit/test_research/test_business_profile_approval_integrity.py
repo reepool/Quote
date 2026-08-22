@@ -201,6 +201,32 @@ def test_machine_rejection_can_be_audited_and_reopened_but_human_rejection_canno
         )
 
 
+def test_automation_rejection_is_not_misclassified_as_human_review(tmp_path):
+    repository, _ = _repository(tmp_path)
+    review = BusinessProfileReviewService(repository)
+    repository.upsert("evidence", _candidate_evidence("automation-rejected"))
+    candidate = repository.get_record("evidence", "automation-rejected")
+    review.review_record(
+        "evidence",
+        "automation-rejected",
+        decision="rejected",
+        reviewer="automation:business_profile_contract_recovery.v1",
+        reason="obsolete contract",
+        expected_review_status="candidate",
+        expected_updated_at=candidate["updated_at"],
+    )
+    rejected = repository.get_record("evidence", "automation-rejected")
+
+    reopen = review.system_reopen_rejected_record(
+        "evidence",
+        "automation-rejected",
+        expected_updated_at=rejected["updated_at"],
+        reason="current verified evidence supersedes automated rejection",
+    )
+
+    assert reopen["new_status"] == "candidate"
+
+
 class _CountingStorage:
     def __init__(self, storage):
         self._storage = storage

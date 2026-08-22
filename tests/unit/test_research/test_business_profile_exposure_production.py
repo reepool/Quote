@@ -73,13 +73,14 @@ def _approved_sales_activity(
     activity_id="activity-coking-coal-sales",
     object_raw="coking coal",
     object_id="coal.coking_coal",
+    action="sells",
 ):
     payload = {
         "activity_id": activity_id,
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "subject_scope": "consolidated_group",
-        "action": "sells",
+        "action": action,
         "object_type": "product",
         "object_raw": object_raw,
         "object_id": object_id,
@@ -207,7 +208,7 @@ def test_known_commodity_identity_publishes_without_forcing_market_series(
     assert published["metadata"]["market_series_status"] == "unresolved"
 
 
-def test_composite_process_fact_survives_without_false_commodity_mapping(tmp_path):
+def test_composite_process_fact_is_retained_without_false_publication_gap(tmp_path):
     repository = BusinessProfileRepository(_storage(tmp_path))
     _approved_evidence(repository)
     activity = _approved_sales_activity(
@@ -226,15 +227,45 @@ def test_composite_process_fact_survives_without_false_commodity_mapping(tmp_pat
         references=["evidence-2025-ar"],
     )
 
-    with pytest.raises(ValueError, match="product_mapping_required"):
-        BusinessProfileExposurePublisher(repository).publish_basic(
-            fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
-        )
+    result = BusinessProfileExposurePublisher(repository).publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+    )
 
     persisted = repository.get_record("exposure_facts", fact["fact_id"])
+    assert result["status"] == "fact_only"
+    assert result["reason"] == "commodity_identity_unresolved"
     assert persisted["review_status"] == "approved"
     assert persisted["object_raw"] == "煤制烯烃"
     assert persisted["product_id"] is None
+
+
+def test_mapped_production_activity_publishes_positive_output_exposure(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(
+        repository,
+        activity_id="activity-coking-coal-production",
+        action="produces",
+    )
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(
+        repository,
+        "exposure_facts",
+        fact["fact_id"],
+        references=["evidence-2025-ar"],
+    )
+
+    exposure = BusinessProfileExposurePublisher(
+        repository,
+        mapping_resolver=GovernedCommodityMappingResolver(_catalog()),
+    ).publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+    )["exposure"]
+
+    assert exposure["exposure_role"] == "revenue"
+    assert exposure["direction"] == "positive"
 
 
 def test_assumption_writer_rejects_llm_and_accepts_calibration(tmp_path):

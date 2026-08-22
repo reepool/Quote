@@ -203,6 +203,65 @@ def test_machine_rework_retries_are_bounded_and_clean_recovery_resolves_queue(tm
     assert resolved[0]["resolved_at"] is not None
 
 
+def test_new_gate_signature_supersedes_prior_open_exception(tmp_path):
+    repository, _ = _repository(tmp_path)
+    repository.upsert("evidence", _candidate_evidence())
+    candidate = repository.list_records("evidence")[0]
+    manifest = _manifest()
+    service = BusinessProfilePromotionService(BusinessProfileReviewService(repository))
+
+    service.process(
+        _context(candidate, manifest, gates=_gates(artifact_quality=False)),
+        manifest,
+    )
+    service.process(
+        _context(candidate, manifest, gates=_gates(catalogs_current=False)),
+        manifest,
+    )
+
+    assert len(service.list_exceptions(status="open")) == 1
+    assert len(service.list_exceptions(status="resolved")) == 1
+
+
+def test_exact_catalog_proposal_resolves_without_closing_evidence_sibling(tmp_path):
+    repository, _ = _repository(tmp_path)
+    repository.upsert("evidence", _candidate_evidence())
+    candidate = repository.list_records("evidence")[0]
+    manifest = _manifest(field_family="named_relationships")
+    service = BusinessProfilePromotionService(BusinessProfileReviewService(repository))
+    service.process(
+        _context(
+            candidate,
+            manifest,
+            target_type="document_field_family",
+            target_id="raw-relationship-proposal",
+            exception_reasons=("catalog_proposal",),
+        ),
+        manifest,
+    )
+    service.process(
+        _context(
+            candidate,
+            manifest,
+            target_type="document_field_family",
+            target_id="other-relationship-proposal",
+            exception_reasons=("catalog_proposal",),
+        ),
+        manifest,
+    )
+
+    resolved = service.resolve_open_exceptions_for_target(
+        target_id="raw-relationship-proposal",
+        field_family="named_relationships",
+        target_type="document_field_family",
+    )
+
+    assert resolved == 1
+    assert [item["target_id"] for item in service.list_exceptions(status="open")] == [
+        "other-relationship-proposal"
+    ]
+
+
 def test_quick_and_deep_review_queues_keep_evidence_and_ranked_choices(tmp_path):
     repository, _ = _repository(tmp_path)
     repository.upsert("evidence", _candidate_evidence())
@@ -235,15 +294,13 @@ def test_quick_and_deep_review_queues_keep_evidence_and_ranked_choices(tmp_path)
     assert deep["exception"]["tier"] == "deep_review"
     assert deep["exception"]["gate_signature"] == deep["decision"]["gate_signature"]
     assert deep["exception"]["exception_id"] != quick["exception"]["exception_id"]
-    assert len(service.list_exceptions(status="open")) == 2
+    assert len(service.list_exceptions(status="open")) == 1
+    assert len(service.list_exceptions(status="resolved")) == 1
     repository_exceptions = repository.list_exceptions(
         instrument_id=candidate["instrument_id"],
         target_type="evidence",
     )
-    assert {item["tier"] for item in repository_exceptions} == {
-        "quick_review",
-        "deep_review",
-    }
+    assert {item["tier"] for item in repository_exceptions} == {"deep_review"}
     assert repository_exceptions[0]["reason_codes"]
 
 
