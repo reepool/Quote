@@ -503,9 +503,87 @@ def test_master_governance_metadata_lifecycle_uses_observed_contract_window():
 
     assert inactive_metadata["lifecycle"]["status"] == "observed_inactive"
     assert inactive_metadata["lifecycle"]["valid_to"] == "2016-04-08"
+    assert inactive_metadata["lifecycle"]["evidence_complete_through"] == "2026-06-23"
     assert inactive_metadata["lifecycle"]["reason"] == "no_contract_rows_after_last_observed_in_governance_window"
     assert active_metadata["lifecycle"]["status"] == "observed_active"
     assert active_metadata["lifecycle"]["valid_to"] is None
+
+
+def test_recent_weak_lifecycle_boundary_does_not_hide_current_target_date():
+    instrument = FuturesInstrument(
+        instrument_id="CNF.I.DCE",
+        symbol="I",
+        name="DCE Iron Ore",
+        exchange="DCE",
+        category="ferrous",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+        metadata={
+            "lifecycle": {
+                "status": "observed_inactive",
+                "valid_from": "2026-08-17",
+                "valid_to": "2026-08-20",
+                "source": "futures_contracts_observed_window",
+                "reason": "no_contract_rows_after_last_observed_in_governance_window",
+            }
+        },
+    )
+    series = FuturesSeries(
+        series_id="CNF.I.DCE.main",
+        instrument_id="CNF.I.DCE",
+        symbol="I0",
+        series_type="main_continuous",
+        source_profile="exchange_official",
+        source="exchange_official",
+        source_interface="official_dce_day_quotes",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+    )
+    target_dates = [
+        "2026-08-17",
+        "2026-08-18",
+        "2026-08-19",
+        "2026-08-20",
+        "2026-08-21",
+    ]
+
+    filtered, lifecycle = _series_lifecycle_filter(
+        series,
+        target_dates,
+        {instrument.instrument_id: instrument},
+        {
+            instrument.instrument_id: {
+                "valid_from": "2026-08-17",
+                "valid_to": "2026-08-20",
+                "source": "futures_contracts_observed_window",
+                "contract_count": 232,
+            }
+        },
+    )
+    complete_instrument = replace(
+        instrument,
+        metadata={
+            "lifecycle": {
+                **instrument.metadata["lifecycle"],
+                "evidence_complete_through": "2026-08-21",
+            }
+        },
+    )
+    complete_filtered, complete_lifecycle = _series_lifecycle_filter(
+        series,
+        target_dates,
+        {complete_instrument.instrument_id: complete_instrument},
+    )
+
+    assert filtered == target_dates
+    assert lifecycle is not None
+    assert lifecycle["status"] == "weak_lifecycle_ignored"
+    assert lifecycle["filtered_target_dates"] == len(target_dates)
+    assert complete_filtered == target_dates[:-1]
+    assert complete_lifecycle is not None
+    assert complete_lifecycle["status"] == "lifecycle_clipped"
 
 
 def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
@@ -905,6 +983,104 @@ def test_dce_master_governance_retries_failed_trade_dates(monkeypatch, tmp_path)
     assert result["counts"]["failed_trade_dates"] == 0
     assert result["warnings"] == []
     assert calls == {"2026-01-02": 2, "2026-01-03": 1}
+
+
+def test_dce_master_governance_blocks_without_writes_when_dates_remain_unresolved(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data"] = {
+        "contract_discovery_retry": {
+            "retry_passes": 1,
+            "retry_pause_seconds": 0,
+        }
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    instrument = next(
+        item for item in registry["instruments"] if item.instrument_id == "CNF.I.DCE"
+    )
+    instrument = replace(
+        instrument,
+        metadata={"sentinel": "preserve", **dict(instrument.metadata or {})},
+    )
+    series = next(
+        item for item in registry["series"] if item.series_id == "CNF.I.DCE.main"
+    )
+    storage.upsert_instruments_and_series([instrument], [series])
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date=trade_date,
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+        for trade_date in ("2026-08-17", "2026-08-18", "2026-08-19")
+    ])
+    before_instrument = storage.get_instrument(instrument.instrument_id)
+    before_series = storage.get_series(series.series_id)
+    calls = {}
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        calls[trade_date] = calls.get(trade_date, 0) + 1
+        if trade_date != "2026-08-17":
+            raise OfficialFuturesSourceUnavailable("DCE routes exhausted")
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="I",
+                contract="I2609",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        lambda self, exchange, target_symbols=None: {},
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        instrument_ids=[instrument.instrument_id],
+        start_date="2026-08-17",
+        end_date="2026-08-19",
+        dry_run=False,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["counts"]["official_request_count"] == 5
+    assert result["counts"]["failed_trade_dates"] == 2
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["counts"]["contracts_written"] == 0
+    assert result["blockers"] == [
+        "incomplete_dce_contract_discovery:2026-08-18,2026-08-19"
+    ]
+    assert calls == {
+        "2026-08-17": 1,
+        "2026-08-18": 2,
+        "2026-08-19": 2,
+    }
+    assert storage.get_instrument(instrument.instrument_id) == before_instrument
+    assert storage.get_series(series.series_id) == before_series
+    assert storage.list_contracts(exchange="DCE") == []
 
 
 def test_dce_master_governance_reports_product_spec_enrichment_failure(monkeypatch, tmp_path):

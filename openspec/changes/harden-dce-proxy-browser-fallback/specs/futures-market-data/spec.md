@@ -40,3 +40,23 @@ The scheduled futures daily task SHALL reuse one provider-scoped DCE browser rou
 - **WHEN** no requested exchange remains runnable after master governance
 - **THEN** price synchronization SHALL NOT start
 - **AND** the scheduler SHALL report each original blocked governance result without replacing its diagnostics with zero-valued synthetic data
+
+### Requirement: Incomplete master evidence cannot shorten futures lifecycles
+The system SHALL require successful official contract discovery for every verified trading date in the governance window before persisting master or lifecycle changes.
+
+#### Scenario: A verified DCE date remains unresolved after bounded retries
+- **WHEN** DCE contract discovery succeeds for some verified dates but one or more verified dates remain unresolved
+- **THEN** DCE master governance SHALL return `blocked`
+- **AND** it SHALL retain the real failed dates, partial contract count, route metrics, warnings, and blockers
+- **AND** it SHALL NOT write instruments, series, discoveries, or contracts from that incomplete scan
+- **AND** the scheduler SHALL exclude DCE while continuing other runnable exchanges
+
+#### Scenario: A previous outage produced a recent weak lifecycle boundary
+- **WHEN** an observed lifecycle boundary falls inside the current target window but lacks evidence that official discovery was complete through the target end
+- **THEN** market-data synchronization SHALL NOT use that boundary to remove target dates
+- **AND** the completeness result SHALL continue to expose the missing date until authoritative data is written
+
+#### Scenario: Contract discovery completes for the whole governance window
+- **WHEN** every verified trading date is successfully discovered
+- **THEN** lifecycle inference MAY update the observed window
+- **AND** any inferred inactive boundary SHALL record the official evidence-complete-through date

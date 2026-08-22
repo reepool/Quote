@@ -6617,6 +6617,35 @@ class FuturesMasterGovernanceService:
                 }
                 for trade_date, reason in sorted(failed_fetches.items())
             )
+            contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
+            result["counts"]["contracts_discovered"] = len(contracts)
+            result["contracts"] = [
+                {
+                    "contract_id": item.contract_id,
+                    "instrument_id": item.instrument_id,
+                    "exchange_contract_code": item.exchange_contract_code,
+                    "contract_month": item.contract_month,
+                    "first_observed_trade_date": item.metadata.get("first_observed_trade_date"),
+                    "last_observed_trade_date": item.metadata.get("last_observed_trade_date"),
+                }
+                for item in contracts[:50]
+            ]
+            failed_dates = sorted(failed_fetches)
+            blocker = (
+                f"incomplete_{exchange.lower()}_contract_discovery:"
+                + ",".join(failed_dates)
+            )
+            result["status"] = "blocked"
+            result["blockers"].append(blocker)
+            result["reason"] = blocker
+            logger.warning(
+                "[FuturesMasterGovernance] blocked incomplete official discovery exchange=%s "
+                "failed_dates=%s contracts_discovered=%s writes_suppressed=True",
+                exchange,
+                failed_dates,
+                len(contracts),
+            )
+            return result
 
         if unmapped_varieties:
             logger.info(
@@ -8009,6 +8038,9 @@ def _instrument_lifecycle_from_metadata(metadata: Mapping[str, Any]) -> Optional
                 "valid_to": valid_to,
                 "source": str(lifecycle.get("source") or "instrument_master_lifecycle"),
                 "reason": str(lifecycle.get("reason") or ""),
+                "evidence_complete_through": _date_key_or_none(
+                    lifecycle.get("evidence_complete_through")
+                ),
                 "lineage": lifecycle.get("lineage") or {},
             }
 
@@ -8081,6 +8113,7 @@ def _metadata_with_observed_contract_lifecycle(
         "status": status,
         "valid_from": observed_from,
         "valid_to": observed_to if (inactive or legacy) else None,
+        "evidence_complete_through": scan_end,
         "source": "futures_contracts_observed_window",
         "reason": (
             "legacy_product_successor_lineage"
@@ -8177,14 +8210,35 @@ def _series_lifecycle_filter(
 
     valid_from = lifecycle.get("valid_from")
     valid_to = lifecycle.get("valid_to")
+    target_start = _date_key(min(target_dates))
+    target_end = _date_key(max(target_dates))
+    evidence_complete_through = _date_key_or_none(
+        lifecycle.get("evidence_complete_through")
+    )
+    if (
+        str(lifecycle.get("source") or "") == "futures_contracts_observed_window"
+        and valid_to
+        and target_start <= valid_to < target_end
+        and (
+            not evidence_complete_through
+            or evidence_complete_through < target_end
+        )
+    ):
+        return list(target_dates), {
+            "status": "weak_lifecycle_ignored",
+            "reason": "recent_lifecycle_boundary_lacks_complete_official_evidence",
+            "instrument_lifecycle": lifecycle,
+            "target_start": target_start,
+            "target_end": target_end,
+            "original_target_dates": len(target_dates),
+            "filtered_target_dates": len(target_dates),
+        }
     filtered_dates = [
         item
         for item in target_dates
         if (not valid_from or _date_key(item) >= valid_from)
         and (not valid_to or _date_key(item) <= valid_to)
     ]
-    target_start = _date_key(min(target_dates))
-    target_end = _date_key(max(target_dates))
     if not filtered_dates:
         return [], {
             "status": "lifecycle_skip",

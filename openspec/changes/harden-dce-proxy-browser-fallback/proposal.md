@@ -10,6 +10,7 @@ DCE official endpoints now require both successful execution of the exchange Jav
 - Apply hard timeouts to browser startup, navigation, and in-page evaluation so a failed DCE route cannot multiply into a long per-date delay.
 - Keep non-DCE product-page browser fallback independent from DCE challenge readiness.
 - Report DCE challenge, proxy lease/rotation/outcome, timeout, and circuit-break diagnostics while preserving unresolved/partial results for dates that cannot be verified.
+- Block only the affected exchange when contract discovery leaves verified trading dates unresolved, and never shorten instrument lifecycles from an incomplete scan.
 
 ## Capabilities
 

@@ -42,6 +42,8 @@ DCE's Ruishu protection requires a real headed Chrome session, but challenge com
 
 10. **Reuse one task-scoped provider without crossing browser event-loop threads.** Scheduled calendar repair, master governance, and price sync borrow one official provider so a validated DCE route is not discarded between phases. Both synchronous and asynchronous DCE payload entry points dispatch browser work to that provider's existing single-worker executor. Borrowing services do not close the provider; the scheduler closes it once after every exit path. If one exchange's master governance is blocked, the scheduler reports the original result, removes only that exchange from the runnable scope, and continues the remaining exchanges with an overall partial result.
 
+11. **Require complete contract-discovery evidence before lifecycle mutation.** A verified trading date whose official contract request remains unresolved makes that exchange's master result blocked. The service retains the real request, route, warning, and partial-discovery diagnostics but performs no instrument, series, discovery, or contract writes. Only a complete scan may infer an observed inactive lifecycle, and that lifecycle records the date through which official evidence was complete. A recent lifecycle boundary without that completeness marker is weak evidence and cannot remove dates inside the current sync window; this prevents previously persisted outage-derived boundaries from hiding a real missing date.
+
 ## Risks / Trade-offs
 
 - **[A proxy lease may be unavailable or also risk-controlled]** -> Rotate only a bounded number of leases, then keep dates unresolved and expose sanitized diagnostics.
@@ -52,3 +54,4 @@ DCE's Ruishu protection requires a real headed Chrome session, but challenge com
 - **[A caller timeout cannot stop a running browser thread]** -> Do not apply the generic source timeout to DCE browser payload calls; retain hard browser operation bounds and the run-scoped circuit breaker inside the DCE client.
 - **[An upstream proxy can return credentials in a 407 body]** -> Treat 407/expired authorization as a route failure and sanitize it before logging, classification evidence, or persisted result metadata.
 - **[A shared browser loop is used from different scheduler worker threads]** -> Route every DCE sync call through the provider-owned single-worker executor and close the task-scoped provider on that executor exactly once.
+- **[A partial master scan resembles a delisted product]** -> Treat any unresolved verified date as exchange-blocking and prohibit all master writes from that scan; only complete evidence can shorten a lifecycle.

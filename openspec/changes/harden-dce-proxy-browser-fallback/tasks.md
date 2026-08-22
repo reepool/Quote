@@ -37,3 +37,9 @@
 - [x] 7.1 Keep one scheduled-task provider across calendar, master, and price phases while serializing all DCE browser calls on its owned worker thread.
 - [x] 7.2 Continue runnable exchanges when another exchange's master governance blocks, and preserve the original blocked diagnostics in reports and ingestion metadata.
 - [x] 7.3 Add focused lifecycle and scheduler regressions, run targeted validation, and revalidate the OpenSpec change.
+
+## 8. Incomplete Master Evidence Follow-up
+
+- [x] 8.1 Block an exchange before all master writes when any verified contract-discovery date remains unresolved, while retaining the original diagnostics.
+- [x] 8.2 Record complete lifecycle evidence and ignore recent weak lifecycle boundaries that would hide current target dates.
+- [x] 8.3 Add focused regressions, run targeted futures validation, and revalidate the OpenSpec change.
