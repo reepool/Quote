@@ -1405,6 +1405,33 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
         processing_identity={"rules": "v1"},
         max_attempts=1,
     )
+    with storage.get_connection() as conn:
+        checkpoint_path = Path(
+            conn.execute(
+                "SELECT checkpoint_path FROM business_profile_work_items"
+            ).fetchone()[0]
+        )
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint_path.write_text(
+        json.dumps(
+            {
+                "completed_stages": [
+                    "plan",
+                    "select",
+                    "extract",
+                    "verify",
+                    "promote",
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET metadata_json = ?",
+            (json.dumps({"stage_results": {"publish": {"status": "success"}}}),),
+        )
+        conn.commit()
     claimed = queue.claim(
         "acquire",
         limit=1,
@@ -1421,19 +1448,73 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
     result = queue.enqueue_latest_annual(
         knowledge_cutoff="2026-08-30",
         processing_identity={"rules": "v1"},
-        max_attempts=1,
+        max_attempts=5,
         force=True,
     )
 
     assert result["reset"] == 1
+    assert result["checkpoint_rotated"] == 1
     assert result["inserted"] == 0
     with storage.get_connection() as conn:
         rows = conn.execute(
-            "SELECT work_id, stage, status FROM business_profile_work_items"
+            "SELECT work_id, stage, status, max_attempts, checkpoint_path, metadata_json "
+            "FROM business_profile_work_items"
         ).fetchall()
-    assert [dict(row) for row in rows] == [
-        {"work_id": claimed["work_id"], "stage": "acquire", "status": "pending"}
+    assert len(rows) == 1
+    row = dict(rows[0])
+    assert row["work_id"] == claimed["work_id"]
+    assert row["stage"] == "acquire"
+    assert row["status"] == "pending"
+    assert row["max_attempts"] == 5
+    assert row["checkpoint_path"] != str(checkpoint_path)
+    assert not Path(row["checkpoint_path"]).exists()
+    metadata = json.loads(row["metadata_json"])
+    assert metadata["recovery_history"][-1]["reason"] == (
+        "force_replay_checkpoint_rotated"
+    )
+    assert metadata["recovery_history"][-1]["from_stage"] == "acquire"
+    assert metadata["recovery_history"][-1]["invalidated_stage_result_names"] == [
+        "publish"
     ]
+    assert "stage_results" not in metadata
+    assert checkpoint_path.exists()
+
+
+def test_force_replay_refreshes_work_cutoff(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-20",
+        processing_identity={"rules": "v1"},
+        max_attempts=1,
+    )
+    claimed = queue.claim(
+        "acquire",
+        limit=1,
+        lease_owner="worker",
+        lease_seconds=30,
+    )[0]
+    queue.fail(
+        claimed["work_id"],
+        lease_owner="worker",
+        error="permanent",
+        retryable=False,
+    )
+
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        max_attempts=1,
+        force=True,
+    )
+
+    item = queue.get(claimed["work_id"])
+    assert item["metadata"]["knowledge_cutoff"] == "2026-08-30"
+    assert item["metadata"]["processing_identity"] == {"rules": "v1"}
 
 
 def test_legacy_unfinished_publish_migrates_by_verify_checkpoint_state(tmp_path):

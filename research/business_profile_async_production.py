@@ -1706,6 +1706,7 @@ class BusinessProfileWorkRepository:
         )
         now = get_shanghai_time().isoformat()
         inserted = reused = superseded = identity_superseded = reset = 0
+        checkpoint_rotated = 0
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -1723,7 +1724,7 @@ class BusinessProfileWorkRepository:
                 )
                 checkpoint = self.checkpoint_root / f"{work_id}.json"
                 existing = conn.execute(
-                    "SELECT status, metadata_json, checkpoint_path "
+                    "SELECT stage, status, metadata_json, checkpoint_path "
                     "FROM business_profile_work_items WHERE work_id = ?",
                     (work_id,),
                 ).fetchone()
@@ -1758,14 +1759,66 @@ class BusinessProfileWorkRepository:
                             (_canonical_json(existing_metadata), now, work_id),
                         )
                     if force and existing_status in TERMINAL_STATUSES:
+                        invalidated_stage_results = existing_metadata.pop(
+                            "stage_results", {}
+                        )
+                        previous_checkpoint = Path(
+                            str(existing["checkpoint_path"] or checkpoint)
+                        )
+                        replay_token = hashlib.sha256(
+                            f"force:{work_id}:{now}".encode("utf-8")
+                        ).hexdigest()[:12]
+                        checkpoint = _rotated_checkpoint_path(
+                            previous_checkpoint,
+                            checkpoint_root=self.checkpoint_root,
+                            work_id=work_id,
+                            token=f"force-replay-{replay_token}",
+                        )
+                        history = list(existing_metadata.get("recovery_history") or [])
+                        history.append(
+                            {
+                                "reason": "force_replay_checkpoint_rotated",
+                                "recovered_at": now,
+                                "from_stage": str(existing["stage"]),
+                                "from_status": existing_status,
+                                "from_checkpoint_path": str(previous_checkpoint),
+                                "to_checkpoint_path": str(checkpoint),
+                                "invalidated_stage_result_names": sorted(
+                                    str(stage)
+                                    for stage in dict(
+                                        invalidated_stage_results
+                                        if isinstance(
+                                            invalidated_stage_results, Mapping
+                                        )
+                                        else {}
+                                    )
+                                ),
+                            }
+                        )
+                        existing_metadata["recovery_history"] = history[-10:]
+                        existing_metadata["knowledge_cutoff"] = knowledge_cutoff
+                        existing_metadata["processing_identity"] = dict(
+                            processing_identity
+                        )
+                        if normalized_binding is not None:
+                            existing_metadata["bound_shared_asset"] = normalized_binding
                         conn.execute(
                             "UPDATE business_profile_work_items SET stage = 'acquire', "
                             "status = 'pending', attempt_count = 0, next_attempt_at = NULL, "
+                            "max_attempts = ?, "
                             "lease_owner = NULL, lease_expires_at = NULL, last_error = NULL, "
-                            "completed_at = NULL, updated_at = ? WHERE work_id = ?",
-                            (now, work_id),
+                            "completed_at = NULL, checkpoint_path = ?, metadata_json = ?, "
+                            "updated_at = ? WHERE work_id = ?",
+                            (
+                                max(1, int(max_attempts)),
+                                str(checkpoint),
+                                _canonical_json(existing_metadata),
+                                now,
+                                work_id,
+                            ),
                         )
                         reset += 1
+                        checkpoint_rotated += 1
                     else:
                         reused += 1
                 else:
@@ -1861,11 +1914,12 @@ class BusinessProfileWorkRepository:
                         )
                         superseded += int(cursor.rowcount or 0)
             conn.commit()
-        result = {
+        result: dict[str, Any] = {
             "eligible": len(rows),
             "inserted": inserted,
             "reused": reused,
             "reset": reset,
+            "checkpoint_rotated": checkpoint_rotated,
             "superseded": superseded,
             "identity_superseded": identity_superseded,
         }
@@ -2116,11 +2170,12 @@ class BusinessProfileAsyncProductionService:
         )
         logger.info(
             "business-profile enqueue eligible=%s inserted=%s reused=%s reset=%s "
-            "superseded=%s",
+            "checkpoint_rotated=%s superseded=%s",
             int(enqueue.get("eligible") or 0),
             int(enqueue.get("inserted") or 0),
             int(enqueue.get("reused") or 0),
             int(enqueue.get("reset") or 0),
+            int(enqueue.get("checkpoint_rotated") or 0),
             int(enqueue.get("superseded") or 0),
         )
         workers = await self._run_workers(
@@ -2323,11 +2378,12 @@ class BusinessProfileAsyncProductionService:
             )
         logger.info(
             "business-profile enqueue eligible=%s inserted=%s reused=%s reset=%s "
-            "superseded=%s",
+            "checkpoint_rotated=%s superseded=%s",
             int(enqueue.get("eligible") or 0),
             int(enqueue.get("inserted") or 0),
             int(enqueue.get("reused") or 0),
             int(enqueue.get("reset") or 0),
+            int(enqueue.get("checkpoint_rotated") or 0),
             int(enqueue.get("superseded") or 0),
         )
         workers = await self._run_workers(
