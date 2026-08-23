@@ -75,3 +75,14 @@ The system SHALL retrieve the latest selected semantic artifact for a context-re
 #### Scenario: Context-incomplete retry loads prior selection
 - **WHEN** a context-incomplete machine retry requests the latest completed selected artifact for one instrument, family, and source document
 - **THEN** the query executes without syntax error and returns the latest matching artifact when present
+
+### Requirement: Recovered candidates invalidate completed stage output
+The system SHALL invalidate stale semantic, verification, and publication stage output when automated contract recovery reopens a record, including when the work item is already `retry_due`, and SHALL publish or report the reopened candidate before declaring the run successful.
+
+#### Scenario: Force rerun follows automated contract recovery
+- **WHEN** contract recovery reopens an operating fact and requeues its work item before a targeted `force=true` run
+- **THEN** the work item receives a fresh checkpoint, the reopened fact is verified and considered for promotion, and the task does not report success from an empty stale checkpoint
+
+#### Scenario: Recovered candidate succeeds
+- **WHEN** the reopened candidate passes its current applicable catalog, evidence, numeric, temporal, and semantic gates
+- **THEN** it becomes approved and all open machine-rework exceptions for that exact target are resolved

@@ -34,6 +34,8 @@ from research.business_profile_semantic_runtime import (
     _select_current_semantic_activities,
     _semantic_relationship_assertion_ids,
     _semantic_failure_reason,
+    _catalog_version_scope,
+    _catalogs_current,
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
 )
@@ -94,6 +96,50 @@ def test_derived_validation_uses_current_catalog_without_mutating_evidence():
         "product": "old-products",
         "unit": "old-units",
     }
+
+
+def test_operating_fact_catalog_gate_ignores_unrelated_product_release():
+    recorded = {
+        "fact": "business_profile_facts.2026.2",
+        "product": "business_profile_products.2026.3",
+        "unit": "business_profile_units.2026.7",
+    }
+    current = {
+        **recorded,
+        "product": "business_profile_products.2026.4",
+    }
+
+    assert _catalog_version_scope("operating_facts", "tabular_operating_facts") == {
+        "fact",
+        "unit",
+    }
+    assert _catalogs_current(
+        recorded,
+        current,
+        required_keys=_catalog_version_scope(
+            "operating_facts", "tabular_operating_facts"
+        ),
+    ) is True
+
+
+def test_exposure_catalog_gate_requires_product_release():
+    recorded = {
+        "fact": "business_profile_facts.2026.2",
+        "product": "business_profile_products.2026.3",
+        "unit": "business_profile_units.2026.7",
+    }
+    current = {
+        **recorded,
+        "product": "business_profile_products.2026.4",
+    }
+
+    assert _catalogs_current(
+        recorded,
+        current,
+        required_keys=_catalog_version_scope(
+            "exposure_facts", "commodity_exposure_facts"
+        ),
+    ) is False
 
 
 def test_current_activity_selection_prefers_canonical_mapping():
@@ -771,6 +817,8 @@ class _AnonymousRelationshipGateway(_FakeGateway):
         payload = json.loads(request.messages[-1].content)
         top_five_quote = "前五大客户销售占比为59.5%"
         related_party_quote = "关联方销售占比为32.3%"
+        top_five_supplier_quote = "前五大供应商采购占比为25.8%"
+        related_party_supplier_quote = "关联方采购占比为14.4%"
         return _response(
             {
                 "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
@@ -800,6 +848,30 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                         "object_raw": "收入",
                         "evidence_span_ids": _request_span_ids(
                             payload, related_party_quote
+                        ),
+                    },
+                    {
+                        "subject_scope": "issuer",
+                        "relationship_type": "buys_from",
+                        "counterparty_name_raw": "前五大供应商",
+                        "semantic_summary_zh": "前五大供应商采购占比为25.8%",
+                        "anonymous": True,
+                        "disclosed_share": 0.258,
+                        "object_raw": "采购额",
+                        "evidence_span_ids": _request_span_ids(
+                            payload, top_five_supplier_quote
+                        ),
+                    },
+                    {
+                        "subject_scope": "issuer",
+                        "relationship_type": "buys_from",
+                        "counterparty_name_raw": "关联方",
+                        "semantic_summary_zh": "关联方采购占比为14.4%",
+                        "anonymous": True,
+                        "disclosed_share": 0.144,
+                        "object_raw": "采购额",
+                        "evidence_span_ids": _request_span_ids(
+                            payload, related_party_supplier_quote
                         ),
                     },
                 ],
@@ -3190,24 +3262,69 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
         [],
         promote=True,
         gateway=_AnonymousRelationshipGateway(),
-        text="主要业务：前五大客户销售占比为59.5%，关联方销售占比为32.3%。",
+        text=(
+            "主要业务：前五大客户销售占比为59.5%，关联方销售占比为32.3%；"
+            "前五大供应商采购占比为25.8%，关联方采购占比为14.4%。"
+        ),
         counterparty_resolver=FailingResolver(),
     )
 
     assert pipeline.run("verify", scope=scope)["status"] == "success"
+    candidates = repository.list_records(
+        "operating_facts", instrument_id="601088.SH"
+    )
+    stale_target_ids = {
+        fact["record_id"]
+        for fact in sorted(candidates, key=lambda item: item["record_id"])[:3]
+    }
+    with repository.storage.get_connection() as conn:
+        conn.executemany(
+            "INSERT INTO business_profile_exceptions ("
+            "exception_id, target_type, target_id, instrument_id, field_family, "
+            "tier, reason_codes_json, gate_signature, gate_manifest_hash, "
+            "created_at, updated_at"
+            ") VALUES (?, 'operating_facts', ?, '601088.SH', "
+            "'named_relationships', 'machine_rework', ?, ?, 'stale-manifest', ?, ?)",
+            [
+                (
+                    f"stale-catalog-{index}",
+                    fact["record_id"],
+                    json.dumps(["failed_gate:catalogs_current"]),
+                    f"stale-gate-{index}",
+                    "2026-08-20T00:00:00+08:00",
+                    "2026-08-20T00:00:00+08:00",
+                )
+                for index, fact in enumerate(
+                    fact
+                    for fact in candidates
+                    if fact["record_id"] in stale_target_ids
+                )
+            ],
+        )
+        conn.commit()
     assert pipeline.run("promote", scope=scope)["status"] == "success"
 
     facts = repository.list_records("operating_facts", instrument_id="601088.SH")
-    assert len(gateway.requests) == 3
-    assert len(facts) == 2
+    assert len(gateway.requests) == 5
+    assert len(facts) == 4
     assert {fact["fact_type"] for fact in facts} == {
-        "customer_concentration_share"
+        "customer_concentration_share",
+        "supplier_concentration_share",
     }
-    assert {fact["value_normalized"] for fact in facts} == {0.595, 0.323}
-    assert len({fact["fact_scope"] for fact in facts}) == 2
+    assert {fact["value_normalized"] for fact in facts} == {
+        0.595,
+        0.323,
+        0.258,
+        0.144,
+    }
+    assert len({fact["fact_scope"] for fact in facts}) == 4
     assert {fact["review_status"] for fact in facts} == {"approved"}
     assert repository.list_records("relationships", instrument_id="601088.SH") == []
-    assert repository.list_exceptions(instrument_id="601088.SH") == []
+    assert repository.list_exceptions(instrument_id="601088.SH", status="open") == []
+    resolved = repository.list_exceptions(
+        instrument_id="601088.SH", status="resolved"
+    )
+    assert {item["target_id"] for item in resolved} == stale_target_ids
 
 
 def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path):

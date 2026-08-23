@@ -3528,6 +3528,13 @@ class BusinessProfileSemanticRuntime:
             or {}
         )
         expected_catalog_versions = _current_catalog_versions()
+        # Catalog versions are scoped by the data contract.  Operating facts
+        # (for example customer/supplier concentration) do not contain a
+        # product mapping, so a product-catalog release must not invalidate
+        # an otherwise current fact.  Exposure records, on the other hand,
+        # do depend on the product catalog and continue to require all three
+        # versions.
+        catalog_scope = _catalog_version_scope(record_type, family)
         evidence_approved = record_type == "evidence" or (
             evidence is not None and evidence.get("review_status") == "approved"
         )
@@ -3556,7 +3563,11 @@ class BusinessProfileSemanticRuntime:
                 and evidence.get("section_path")
                 and evidence_validation.get("exact_evidence_verified") is True
             ),
-            "catalogs_current": catalog_versions == expected_catalog_versions,
+            "catalogs_current": _catalogs_current(
+                catalog_versions,
+                expected_catalog_versions,
+                required_keys=catalog_scope,
+            ),
             "temporal_scope": bool(
                 validation.get("temporal_scope_valid") is True
                 and _temporal_scope_is_current(record, scope.knowledge_cutoff)
@@ -4898,6 +4909,41 @@ def _current_catalog_versions() -> dict[str, str]:
         "product": load_business_product_catalog().catalog_version,
         "unit": load_unit_conversion_catalog().catalog_version,
     }
+
+
+def _catalog_version_scope(record_type: str, field_family: str) -> frozenset[str]:
+    """Return catalog dimensions that can affect a candidate's meaning.
+
+    Concentration and other tabular operating facts are facts about revenue,
+    procurement, or counterparties; they do not resolve a commodity/product.
+    Keeping their gate independent of the product catalog prevents an
+    unrelated product-catalog release from blocking publication.  Commodity
+    exposure records retain the full gate because their product mapping is a
+    publication dependency.
+    """
+
+    if record_type == "operating_facts" or field_family == "tabular_operating_facts":
+        return frozenset({"fact", "unit"})
+    if record_type in {"exposure_facts", "commodity_exposures"} or field_family in {
+        "commodity_exposure_facts",
+        "commodity_exposure_publication",
+    }:
+        return frozenset({"fact", "product", "unit"})
+    return frozenset({"fact", "product", "unit"})
+
+
+def _catalogs_current(
+    recorded: Mapping[str, Any],
+    expected: Mapping[str, Any],
+    *,
+    required_keys: frozenset[str],
+) -> bool:
+    """Compare only catalog versions required by the candidate contract."""
+
+    return bool(required_keys) and all(
+        str(recorded.get(key) or "") == str(expected.get(key) or "")
+        for key in required_keys
+    )
 
 
 def _temporal_scope_is_current(

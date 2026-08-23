@@ -31,7 +31,7 @@ class BusinessProfileContractRecovery:
         self.review = BusinessProfileReviewService(repository)
 
     def run(self, *, limit: int = 5000) -> dict[str, Any]:
-        rejected = approved_blockers = requeued = scanned = 0
+        rejected = reopened = approved_blockers = requeued = scanned = 0
         affected: list[dict[str, str]] = []
         for record_type in ("segments", "operating_facts"):
             rows = [
@@ -85,11 +85,47 @@ class BusinessProfileContractRecovery:
                         "instrument_id": str(row.get("instrument_id") or ""),
                     }
                 )
+            # A previous version of this audit incorrectly rejected semantic
+            # relationship/concentration facts as obsolete structured rows.
+            # Reopen only that automation-owned rejection; human decisions
+            # remain protected by system_reopen_rejected_record().
+            for row in self._recoverable_rejected_rows(record_type, limit=limit):
+                scanned += 1
+                if obsolete_contract_reasons(record_type, row):
+                    continue
+                record_id = str(row[self.repository._TABLES[record_type]["pk"]])
+                try:
+                    self.review.system_reopen_rejected_record(
+                        record_type,
+                        record_id,
+                        expected_updated_at=str(row["updated_at"]),
+                        reason=(
+                            "current contract no longer classifies this record as "
+                            "obsolete"
+                        ),
+                        metadata={"contract_audit_version": CONTRACT_AUDIT_VERSION},
+                    )
+                except ValueError:
+                    # Prior human decisions and concurrent state changes are
+                    # intentionally left untouched.
+                    continue
+                reopened += 1
+                requeued += self._requeue_semantic(
+                    row, ("contract_recovery_reopened",)
+                )
+                affected.append(
+                    {
+                        "record_type": record_type,
+                        "record_id": record_id,
+                        "instrument_id": str(row.get("instrument_id") or ""),
+                    }
+                )
         unit_recovery = self.recover_unit_blocked(limit=20)
         return {
             "schema_version": CONTRACT_AUDIT_VERSION,
             "scanned": scanned,
             "rejected": rejected,
+            "reopened": reopened,
             "approved_history_blockers": approved_blockers,
             "requeued": requeued,
             "affected": affected[:100],
@@ -141,6 +177,26 @@ class BusinessProfileContractRecovery:
                 f"SELECT * FROM {spec['table']} WHERE {' AND '.join(clauses)} "
                 f"ORDER BY updated_at, {spec['pk']} LIMIT ?",
                 params,
+            ).fetchall()
+        return [
+            self.repository._decode_row(dict(row), spec["json"]) for row in rows
+        ]
+
+    def _recoverable_rejected_rows(
+        self, record_type: str, *, limit: int
+    ) -> list[dict[str, Any]]:
+        """Find records rejected by the old automated contract audit."""
+
+        spec = self.repository._TABLES[record_type]
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                f"SELECT r.* FROM {spec['table']} r WHERE r.review_status = 'rejected' "
+                "AND EXISTS (SELECT 1 FROM business_profile_review_audit a "
+                "WHERE a.record_type = ? AND a.record_id = r." + spec["pk"] + " "
+                "AND a.reviewer = ? AND a.decision = 'rejected') "
+                f"ORDER BY r.updated_at, r.{spec['pk']} LIMIT ?",
+                (record_type, f"automation:{CONTRACT_AUDIT_VERSION}", max(1, min(int(limit), 10000))),
             ).fetchall()
         return [
             self.repository._decode_row(dict(row), spec["json"]) for row in rows
@@ -391,7 +447,15 @@ def obsolete_contract_reasons(
         reasons.append("numeric_reconciliation_not_executed")
     if metadata.get("numeric_reconciliation_valid") is not True:
         reasons.append("numeric_reconciliation_invalid")
-    if metadata.get("semantic_synthesis") is True:
+    # Relationship/concentration candidates are semantic synthesis records,
+    # but they are not structured-table extraction records.  They have no
+    # structured schema/source-label contract and must not be rejected for
+    # lacking those fields.
+    structured_contract = metadata.get("semantic_synthesis") is True and (
+        record_type != "operating_facts"
+        or metadata.get("structured_schema_version") is not None
+    )
+    if structured_contract:
         if (
             metadata.get("structured_schema_version")
             != STRUCTURED_EXTRACTION_SCHEMA_VERSION

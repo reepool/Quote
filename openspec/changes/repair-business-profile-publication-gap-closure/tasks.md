@@ -24,3 +24,9 @@
 - [x] 4.2 Run OpenSpec validation and review only current-task diffs for blocking defects
 - [x] 4.3 Run a non-production representative end-to-end fixture proving zero false publication gaps
 - [x] 4.4 Commit and push only this change, excluding pre-existing workspace modifications
+
+## 5. Recovery Replay Closure
+
+- [x] 5.1 Rotate stale checkpoints for forced `retry_due` recovery work and preserve audit history
+- [x] 5.2 Promote reopened concentration facts and resolve their exact stale exceptions
+- [x] 5.3 Add focused recovery/force-replay regression coverage and run the representative 601088.SH acceptance path

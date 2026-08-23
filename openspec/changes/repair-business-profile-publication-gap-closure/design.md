@@ -63,6 +63,12 @@ This retains audit history while preventing stale open backlogs. It avoids broad
 
 Any non-promoted current candidate in machine, quick, or deep review counts once by target ID. Published, unchanged, and fact-only outcomes do not count. Runtime input gaps count once by fact ID. Resolved or inactive historical exceptions do not affect the current batch count.
 
+### Forced contract recovery invalidates completed output
+
+The contract audit reopens only records rejected by its own versioned automation identity and leaves operator decisions unchanged. It requeues affected work as `semantic/retry_due`. A targeted `force=true` enqueue treats that state as replayable, rotates to a new checkpoint, clears persisted stage results, and restarts at `acquire`; active `running` leases and ordinary `pending` work remain untouched. The previous checkpoint and a bounded recovery-history entry are retained for audit.
+
+Alternative considered: resume the recovered item from its semantic stage. Rejected because the completed checkpoint can contain zero-candidate semantic, verification, and publication output produced before the record was reopened.
+
 ## Risks / Trade-offs
 
 - [Duplicate selection could collapse two genuinely distinct identical disclosures in one evidence span] -> The key includes subject scope, action, object type, segment, geography, value, unit, share, business regime, report period, and evidence ID; only exact semantic duplicates are collapsed.

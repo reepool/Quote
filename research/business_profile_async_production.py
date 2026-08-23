@@ -31,6 +31,7 @@ TERMINAL_STATUSES = (
     "superseded",
     "terminal_failure",
 )
+FORCE_REPLAYABLE_STATUSES = (*TERMINAL_STATUSES, "retry_due")
 AUTOMATIC_DOCUMENT_TYPES = ("annual_report", "annual_report_correction")
 _WRITE_COORDINATOR_CREATION_LOCK = threading.Lock()
 _ASYNC_IO_EXECUTOR = ThreadPoolExecutor(
@@ -1758,7 +1759,7 @@ class BusinessProfileWorkRepository:
                             "updated_at = ? WHERE work_id = ?",
                             (_canonical_json(existing_metadata), now, work_id),
                         )
-                    if force and existing_status in TERMINAL_STATUSES:
+                    if force and existing_status in FORCE_REPLAYABLE_STATUSES:
                         invalidated_stage_results = existing_metadata.pop(
                             "stage_results", {}
                         )

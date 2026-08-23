@@ -10,6 +10,7 @@ The targeted `business_profile_backfill` path now completes extraction, verifica
 - Define deterministic exposure direction for production activities and publish commodity identity independently from optional executable price-series selection.
 - Make publication-gap counts reflect all and only unresolved current-run gaps.
 - Repair the selected-artifact recovery query and add regression coverage for the observed recovery path.
+- Reopen concentration facts rejected by the obsolete automated contract audit and force recovered `retry_due` work onto a fresh checkpoint.
 
 ## Capabilities
 
@@ -23,6 +24,6 @@ None.
 
 ## Impact
 
-- Affected modules: `research/business_profile_semantic_runtime.py`, `research/business_profile_exposure_production.py`, `research/business_profile_review.py`, and their focused tests.
+- Affected modules: `research/business_profile_semantic_runtime.py`, `research/business_profile_async_production.py`, `research/business_profile_contract_recovery.py`, `research/business_profile_exposure_production.py`, `research/business_profile_review.py`, and their focused tests.
 - Existing Telegram command, scheduler job, shared annual-report asset path, database schema, and single-writer contract remain unchanged.
 - No new service, queue, database table, external dependency, or alternate publication path is introduced.

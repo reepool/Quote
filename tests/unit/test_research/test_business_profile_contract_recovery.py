@@ -5,6 +5,7 @@ import pytest
 
 from research.business_profile_contract_recovery import (
     BusinessProfileContractRecovery,
+    obsolete_contract_reasons,
 )
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_review import BusinessProfileReviewService
@@ -107,6 +108,32 @@ def _mark_segment_current(storage, record_id):
             (json.dumps(metadata, ensure_ascii=False), record_id),
         )
         conn.commit()
+
+
+def _add_concentration_fact(repository, *, record_id="concentration-1"):
+    repository.upsert(
+        "operating_facts",
+        {
+            "record_id": record_id,
+            "instrument_id": "600000.SH",
+            "report_period": "2025-12-31",
+            "fact_type": "customer_concentration_share",
+            "value_raw": 0.595,
+            "unit_raw": "fraction",
+            "value_normalized": 0.595,
+            "unit_normalized": "fraction",
+            "fact_scope": "top_five_customers",
+            "evidence_id": "evidence-1",
+            "data_available_date": "2026-03-20",
+            "confidence": 1.0,
+            "review_status": "candidate",
+            "metadata": {
+                "semantic_synthesis": True,
+                "numeric_reconciliation_executed": True,
+                "numeric_reconciliation_valid": True,
+            },
+        },
+    )
 
 
 def _add_work(storage, *, work_id="work-1", status="completed"):
@@ -218,6 +245,72 @@ def test_contract_recovery_rejects_inconsistent_candidate_once(tmp_path):
         ).fetchone()
     assert audit_count == 1
     assert tuple(work) == ("semantic", "retry_due")
+
+
+def test_relationship_concentration_fact_is_not_a_structured_contract_row():
+    record = {
+        "metadata": {
+            "semantic_synthesis": True,
+            "numeric_reconciliation_executed": True,
+            "numeric_reconciliation_valid": True,
+        }
+    }
+
+    assert obsolete_contract_reasons("operating_facts", record) == ()
+
+
+def test_structured_operating_fact_still_uses_structured_contract():
+    record = {
+        "metadata": {
+            "semantic_synthesis": True,
+            "structured_schema_version": "obsolete.v1",
+            "source_label_raw": "",
+            "numeric_reconciliation_executed": True,
+            "numeric_reconciliation_valid": True,
+        }
+    }
+
+    assert obsolete_contract_reasons("operating_facts", record) == (
+        "structured_schema_obsolete",
+        "source_label_contract_obsolete",
+    )
+
+
+def test_contract_recovery_reopens_automation_rejected_concentration_fact(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _add_evidence(repository)
+    _add_concentration_fact(repository)
+    _add_work(storage)
+    review = BusinessProfileReviewService(repository)
+    fact = repository.get_record("operating_facts", "concentration-1")
+    review.review_record(
+        "operating_facts",
+        "concentration-1",
+        decision="rejected",
+        reviewer="automation:business_profile_contract_recovery.v1",
+        reason="obsolete production contract: structured_schema_obsolete",
+        expected_review_status="candidate",
+        expected_updated_at=fact["updated_at"],
+    )
+
+    result = BusinessProfileContractRecovery(repository).run()
+
+    assert result["rejected"] == 0
+    assert result["reopened"] == 1
+    assert result["requeued"] == 1
+    assert (
+        repository.get_record("operating_facts", "concentration-1")[
+            "review_status"
+        ]
+        == "candidate"
+    )
+    with storage.get_connection() as conn:
+        work = conn.execute(
+            "SELECT stage, status, lease_owner, lease_expires_at "
+            "FROM business_profile_work_items WHERE work_id = 'work-1'"
+        ).fetchone()
+    assert tuple(work) == ("semantic", "retry_due", None, None)
 
 
 def test_contract_recovery_preserves_approved_history_and_deduplicates_blocker(tmp_path):

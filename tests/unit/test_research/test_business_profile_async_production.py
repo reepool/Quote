@@ -1480,6 +1480,87 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
     assert checkpoint_path.exists()
 
 
+def test_force_rotates_retry_due_checkpoint_requeued_by_contract_recovery(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        instrument_ids=("600000.SH",),
+        start_date="2026-01-01",
+        document_types=("annual_report", "annual_report_correction"),
+    )
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT work_id, checkpoint_path FROM business_profile_work_items"
+        ).fetchone()
+        checkpoint_path = Path(row["checkpoint_path"])
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'semantic', "
+            "status = 'retry_due', lease_owner = NULL, lease_expires_at = NULL, "
+            "metadata_json = ? WHERE work_id = ?",
+            (
+                json.dumps(
+                    {
+                        "stage_results": {
+                            "semantic": {"status": "success", "candidate_records": 0},
+                            "verify": {"status": "success", "verified_records": 0},
+                            "publish": {"status": "success", "promoted_records": 0},
+                        }
+                    }
+                ),
+                row["work_id"],
+            ),
+        )
+        conn.commit()
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint_path.write_text(
+        json.dumps(
+            {
+                "completed_stages": [
+                    "plan",
+                    "select",
+                    "extract",
+                    "verify",
+                    "promote",
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+        instrument_ids=("600000.SH",),
+        start_date="2026-01-01",
+        document_types=("annual_report", "annual_report_correction"),
+        force=True,
+    )
+
+    assert result["reset"] == 1
+    assert result["checkpoint_rotated"] == 1
+    assert result["reused"] == 0
+    recovered = queue.get(row["work_id"])
+    assert recovered["stage"] == "acquire"
+    assert recovered["status"] == "pending"
+    assert recovered["checkpoint_path"] != str(checkpoint_path)
+    assert "stage_results" not in recovered["metadata"]
+    history = recovered["metadata"]["recovery_history"][-1]
+    assert history["from_stage"] == "semantic"
+    assert history["from_status"] == "retry_due"
+    assert history["invalidated_stage_result_names"] == [
+        "publish",
+        "semantic",
+        "verify",
+    ]
+    assert checkpoint_path.exists()
+
+
 def test_force_replay_refreshes_work_cutoff(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
