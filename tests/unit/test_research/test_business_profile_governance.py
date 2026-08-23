@@ -6,6 +6,7 @@ import pytest
 from research.business_profile_governance import (
     BusinessProfileRepository,
     BusinessProfileResolver,
+    _derive_profile_and_market_link_status,
 )
 from research.business_profile_review import BusinessProfileReviewService
 from research.storage import ResearchStorageManager
@@ -188,6 +189,38 @@ def test_repository_rejects_unknown_fields_before_persistence(tmp_path):
     with pytest.raises(ValueError, match="unknown fields"):
         repository.upsert("evidence", evidence)
     assert repository.list_records("evidence") == []
+
+
+@pytest.mark.parametrize(
+    ("facts", "exposures", "mappings", "profile_status", "market_status"),
+    [
+        (0, [], [], "not_ready", "not_applicable"),
+        (1, [{"exposure_id": "e1"}], [], "ready", "unlinked"),
+        (
+            1,
+            [{"exposure_id": "e1"}, {"exposure_id": "e2"}],
+            [{"source_exposure_id": "e1"}],
+            "ready",
+            "partial",
+        ),
+        (
+            1,
+            [{"exposure_id": "e1"}],
+            [{"source_exposure_id": "e1"}],
+            "ready",
+            "direct_linked",
+        ),
+    ],
+)
+def test_profile_and_market_link_status_matrix(
+    facts, exposures, mappings, profile_status, market_status
+):
+    result = _derive_profile_and_market_link_status(
+        approved_company_fact_count=facts,
+        approved_exposures=exposures,
+        executable_company_mappings=mappings,
+    )
+    assert result[:2] == (profile_status, market_status)
 
 
 def test_resolver_reports_migration_required_without_mutating_legacy_database(tmp_path):
@@ -665,6 +698,7 @@ def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
     )
 
     assert context["status"] == "ready"
+    assert context["market_link_status"] == "direct_linked"
     assert [item["exposure_id"] for item in context["approved_exposures"]] == [
         "exposure-coal-approved"
     ]
@@ -721,6 +755,65 @@ def test_approved_special_commodity_series_is_executable(tmp_path):
         "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY"
     ]
     assert context["readiness"]["executable_mapping_count"] == 1
+    assert context["market_link_status"] == "direct_linked"
+
+
+def test_approved_profile_without_market_link_is_ready_but_unlinked(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(
+        repository,
+        "value_chain_roles",
+        {
+            "record_id": "role-processor",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "role": "processor",
+            "materiality": "high",
+            "mapping_basis": "company_disclosure",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2026-03-28",
+            "confidence": 0.95,
+            "review_status": "approved",
+            "valid_from": "2026-03-28",
+        },
+    )
+    _governed_upsert(
+        repository,
+        "exposures",
+        {
+            "exposure_id": "exposure-unlinked-product",
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "scope_type": "company",
+            "scope_id": "601088.SH",
+            "commodity_id": "company_specific_grade",
+            "exposure_role": "revenue",
+            "direction": "positive",
+            "mapping_basis": "company_disclosure",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2026-03-28",
+            "confidence": 0.95,
+            "review_status": "approved",
+            "effective_from": "2026-03-28",
+        },
+    )
+
+    context = BusinessProfileResolver(repository).resolve(
+        "601088.SH", as_of_date="2026-04-30"
+    )
+
+    assert context["status"] == "ready"
+    assert context["market_link_status"] == "unlinked"
+    assert context["readiness"]["status"] == "ready"
+    assert context["readiness"]["market_link"] == {
+        "status": "unlinked",
+        "approved_exposure_count": 1,
+        "executable_mapping_count": 0,
+        "unresolved_exposure_ids": ["exposure-unlinked-product"],
+    }
+    assert context["approved_exposures"][0]["commodity_id"] == "company_specific_grade"
 
 
 def test_approved_fact_with_unapproved_evidence_is_not_valuation_eligible(tmp_path):

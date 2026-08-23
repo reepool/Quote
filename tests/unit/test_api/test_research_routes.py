@@ -1410,6 +1410,7 @@ class TestResearchRoutes:
             return_value={
                 "schema_version": "company_business_profile.v1",
                 "status": "industry_fallback",
+                "market_link_status": "not_applicable",
                 "instrument_id": "601088.SH",
                 "data_available_cutoff": "2026-04-30",
                 "industry_default_profile": {"mapping_scope_id": "煤炭"},
@@ -1446,6 +1447,7 @@ class TestResearchRoutes:
 
         assert isinstance(response, ResearchCompanyBusinessProfileResponse)
         assert response.model_recommendation == "industry_default"
+        assert response.market_link_status == "not_applicable"
         assert response.exceptions[0]["tier"] == "machine_rework"
         assert response.source_assets is None
         assert response.consumer_processing_status is None
@@ -1477,6 +1479,7 @@ class TestResearchRoutes:
         mock_dm.get_research_company_commodity_exposures = AsyncMock(
             return_value={
                 "status": "ready",
+                "market_link_status": "unlinked",
                 "instrument_id": "601088.SH",
                 "data_available_cutoff": "2026-04-30",
                 "approved_exposures": [{"exposure_id": "coal"}],
@@ -1505,6 +1508,7 @@ class TestResearchRoutes:
         assert isinstance(response, ResearchCompanyCommodityExposureResponse)
         assert response.approved_exposures[0]["exposure_id"] == "coal"
         assert response.approved_exposure_facts[0]["fact_id"] == "fact-1"
+        assert response.market_link_status == "unlinked"
 
     @patch("api.routes.data_manager")
     def test_get_research_business_profile_review_queue_success(self, mock_dm):

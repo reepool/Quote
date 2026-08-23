@@ -68,6 +68,37 @@ def _stable_hash(payload: Any) -> str:
     return hashlib.sha256(_json_dumps(payload).encode("utf-8")).hexdigest()
 
 
+def _derive_profile_and_market_link_status(
+    *,
+    approved_company_fact_count: int,
+    approved_exposures: Sequence[Mapping[str, Any]],
+    executable_company_mappings: Sequence[Mapping[str, Any]],
+) -> tuple[str, str, List[str]]:
+    """Keep semantic profile readiness independent from market enrichment."""
+
+    exposure_count = len(approved_exposures)
+    executable_count = len(executable_company_mappings)
+    if not exposure_count:
+        market_status = "not_applicable"
+    elif executable_count == exposure_count:
+        market_status = "direct_linked"
+    elif executable_count:
+        market_status = "partial"
+    else:
+        market_status = "unlinked"
+    linked_ids = {
+        str(item.get("source_exposure_id") or "")
+        for item in executable_company_mappings
+    }
+    unresolved_ids = [
+        str(item.get("exposure_id"))
+        for item in approved_exposures
+        if str(item.get("exposure_id") or "") not in linked_ids
+    ]
+    profile_status = "ready" if approved_company_fact_count else "not_ready"
+    return profile_status, market_status, unresolved_ids
+
+
 def _collapse_identical_bundle_records(
     record_type: str,
     prepared: Sequence[Dict[str, Any]],
@@ -104,6 +135,7 @@ def build_empty_business_profile_context(
     payload: Dict[str, Any] = {
         "schema_version": BUSINESS_PROFILE_SCHEMA_VERSION,
         "status": "not_ready",
+        "market_link_status": "not_applicable",
         "instrument_id": instrument_id,
         "data_available_cutoff": _date_key(as_of_date) or str(as_of_date),
         "industry_default_profile": {},
@@ -1465,19 +1497,37 @@ class BusinessProfileResolver:
                 "mappings": [item.get("mapping_id") for item in selected_mappings],
             }
         )
-        profile_payload["status"] = (
-            "ready" if executable_company else "industry_fallback" if industry_mappings else "not_ready"
+        approved_company_fact_count = sum(len(values) for values in approved.values())
+        approved_exposure_count = len(approved["exposures"])
+        profile_status, market_link_status, unresolved_exposure_ids = (
+            _derive_profile_and_market_link_status(
+                approved_company_fact_count=approved_company_fact_count,
+                approved_exposures=approved["exposures"],
+                executable_company_mappings=executable_company,
+            )
         )
+        executable_company_count = len(executable_company)
+        # Profile readiness answers whether the company facts are usable.  A
+        # missing market series is optional downstream enrichment and must not
+        # hide otherwise approved business, supply-chain, or exposure facts.
+        profile_payload["status"] = profile_status
+        profile_payload["market_link_status"] = market_link_status
         profile_payload["readiness"] = {
             "status": profile_payload["status"],
             "storage_status": "ready",
             "temporal_coverage": temporal_coverage,
-            "approved_company_fact_count": sum(len(values) for values in approved.values()),
-            "approved_company_exposure_count": len(approved["exposures"]),
+            "approved_company_fact_count": approved_company_fact_count,
+            "approved_company_exposure_count": approved_exposure_count,
             "active_business_regime_id": active_regime_id,
             "approved_profile_event_count": len(lifecycle["approved_events"]),
             "industry_mapping_count": len(industry_mappings),
             "executable_mapping_count": len(selected_mappings),
+            "market_link": {
+                "status": market_link_status,
+                "approved_exposure_count": approved_exposure_count,
+                "executable_mapping_count": executable_company_count,
+                "unresolved_exposure_ids": unresolved_exposure_ids,
+            },
             "input_gaps": sorted(set(
                 mapping_gaps
                 + lifecycle["blockers"]
@@ -1837,6 +1887,7 @@ class BusinessProfileResolver:
                     "confidence": exposure.get("confidence"),
                     "source": "approved_company_business_profile",
                     "market_data_family": market_data_family,
+                    "source_exposure_id": exposure.get("exposure_id"),
                     "valid_from": exposure.get("effective_from"),
                     "valid_to": exposure.get("effective_to"),
                     "lineage_hash": exposure.get("lineage_hash"),

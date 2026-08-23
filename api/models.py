@@ -781,6 +781,10 @@ class ResearchCompanyBusinessProfileResponse(BaseModel):
 
     schema_version: str = Field(..., description="画像结构版本")
     status: str = Field(..., description="画像就绪状态")
+    market_link_status: str = Field(
+        "not_applicable",
+        description="商品暴露行情链接状态，不决定画像是否就绪",
+    )
     instrument_id: str = Field(..., description="交易品种ID")
     data_available_cutoff: str = Field(..., description="数据可得日截止")
     industry_default_profile: Dict[str, Any] = Field(default_factory=dict)
@@ -820,6 +824,10 @@ class ResearchCompanyCommodityExposureResponse(BaseModel):
     """公司商品暴露与可执行映射。"""
 
     status: str
+    market_link_status: str = Field(
+        "not_applicable",
+        description="商品暴露行情链接状态，不决定画像是否就绪",
+    )
     instrument_id: str
     data_available_cutoff: str
     approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)

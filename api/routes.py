@@ -1056,7 +1056,11 @@ async def get_research_company_business_profile(
     as_of_date: Optional[date] = Query(None, description="估值日/数据可得日截止"),
     include_candidates: bool = Query(True, description="是否包含候选事实诊断"),
 ):
-    """读取本地、时点化且可审计的公司业务画像。"""
+    """读取本地、时点化且可审计的公司业务画像。
+
+    `status` 表示画像事实是否就绪；商品行情链接由
+    `market_link_status` 单独表示，未链接不会隐藏已批准的画像事实。
+    """
     try:
         target_date = _normalize_optional_query(as_of_date)
         payload = await data_manager.get_research_company_business_profile(
@@ -1113,7 +1117,7 @@ async def get_research_company_commodity_exposures(
     as_of_date: Optional[date] = Query(None, description="估值日/数据可得日截止"),
     include_candidates: bool = Query(True, description="是否包含候选暴露"),
 ):
-    """读取公司商品暴露、行业默认和 DCF 可执行映射。"""
+    """读取公司商品暴露、可选行情链接、行业默认和 DCF 可执行映射。"""
     try:
         target_date = _normalize_optional_query(as_of_date)
         payload = await data_manager.get_research_company_commodity_exposures(

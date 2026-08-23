@@ -4022,6 +4022,7 @@ class DataManager:
         )
         return {
             "status": context.get("status"),
+            "market_link_status": context.get("market_link_status", "not_applicable"),
             "instrument_id": context.get("instrument_id"),
             "data_available_cutoff": context.get("data_available_cutoff"),
             "approved_exposures": context.get("approved_exposures") or [],
