@@ -107,6 +107,15 @@ def test_classifier_auto_promotes_only_complete_current_boolean_gates():
         ),
         manifest,
     )
+    insufficient_evidence = classifier.classify(
+        _context(
+            candidate,
+            manifest,
+            gates={**_gates(), "semantic_proof": False},
+            exception_reasons=("context_incomplete",),
+        ),
+        manifest,
+    )
 
     assert passed["classification"] == "auto_promoted"
     assert passed["reason_codes"] == []
@@ -116,6 +125,7 @@ def test_classifier_auto_promotes_only_complete_current_boolean_gates():
     assert "runtime_identity_mismatch" in stale["reason_codes"]
     assert partial["classification"] == "machine_rework"
     assert blocked["classification"] == "machine_rework"
+    assert insufficient_evidence["classification"] == "machine_rework"
 
 
 @pytest.mark.parametrize(

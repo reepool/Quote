@@ -3128,6 +3128,11 @@ def _business_profile_operation_status(
     for counter, reason in counter_reasons:
         if any(int(result.get(counter) or 0) > 0 for result in workers.values()):
             reason_codes.append(reason)
+    if any(
+        int(dict(result.get("quality") or {}).get("publication_gaps") or 0) > 0
+        for result in workers.values()
+    ):
+        reason_codes.append("publication_gaps")
     if stopped:
         return "stopped", ["stop_requested", *reason_codes]
     return ("degraded" if reason_codes else "success"), reason_codes

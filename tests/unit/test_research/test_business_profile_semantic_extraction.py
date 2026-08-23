@@ -13,6 +13,7 @@ from research.business_profile_section_selection import (
     BusinessProfileSectionSelector,
 )
 from research.business_profile_semantic_extraction import (
+    DETERMINISTIC_VERIFICATION_PROOF_VERSION,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
     BusinessProfileSemanticExtractor,
@@ -941,6 +942,74 @@ async def test_independent_verifier_agreement_and_conflict_are_lineaged():
     assert audits[0]["diagnostics"]["isolated_evidence"][0]["text"]
 
 
+@pytest.mark.asyncio
+async def test_independent_verifier_rejects_decision_check_contradiction():
+    selected = _selected()
+    extraction = await BusinessProfileSemanticExtractor(
+        _FakeGateway([_activity_response(selected)])
+    ).extract_async(
+        field_family="atomic_activities",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+    target = dict(extraction.activities[0])
+    gateway = _FakeGateway(
+        [
+            {
+                "decision": "confirmed",
+                "checks": {
+                    "subject": True,
+                    "action": True,
+                    "object": False,
+                    "scope": True,
+                    "period": True,
+                    "evidence": True,
+                },
+            }
+        ]
+    )
+
+    with pytest.raises(ValueError, match="confirmed requires all checks"):
+        await BusinessProfileSemanticExtractor(gateway).verify_async(
+            target_type="activity", target=target, selected=selected
+        )
+
+
+@pytest.mark.asyncio
+async def test_concentration_without_readable_scope_fails_before_llm_call():
+    text = "主要业务：本集团对关联方的采购额占全年采购总额的14.4%。"
+    selected = _selected(text, field_family="named_relationships")
+    section = selected.sections[0]
+    target = {
+        "record_id": "anonymous-concentration-legacy",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "derivation_method": "semantic_synthesis",
+        "fact_type": "supplier_concentration_share",
+        "value_raw": 0.144,
+        "unit_raw": "fraction",
+        "value_normalized": 0.144,
+        "unit_normalized": "fraction",
+        "fact_scope": "anonymous-concentration-scope:" + "a" * 32,
+        "metadata": {"object_raw": "采购额"},
+        "evidence": {
+            "section_id": section.section_id,
+            "page_number": section.page_number,
+            "quote": text,
+            "quote_hash": hashlib.sha256(text.encode()).hexdigest(),
+        },
+    }
+    gateway = _FakeGateway([])
+
+    with pytest.raises(ValueError, match="context incomplete.*scope_label_raw"):
+        await BusinessProfileSemanticExtractor(gateway).verify_async(
+            target_type="concentration", target=target, selected=selected
+        )
+
+    assert gateway.requests == []
+
+
 def test_deterministic_parser_proof_always_stays_out_of_semantic_verifier():
     complete = deterministic_semantic_verification_decision(
         {
@@ -960,13 +1029,27 @@ def test_deterministic_parser_proof_always_stays_out_of_semantic_verifier():
             "parser_manifest_promoted": True,
         }
     )
+    semantic_synthesis = deterministic_semantic_verification_decision(
+        {
+            "derivation_method": "semantic_synthesis",
+            "exact_evidence_valid": True,
+            "numeric_reconciliation_executed": True,
+            "numeric_reconciliation_valid": True,
+            "parser_manifest_promoted": True,
+        }
+    )
 
     assert complete["skip_semantic_verifier"] is True
+    assert complete["proof_version"] == DETERMINISTIC_VERIFICATION_PROOF_VERSION
     assert complete["canonical_promotion_allowed"] is True
     assert incomplete["skip_semantic_verifier"] is True
+    assert incomplete["proof_version"] == DETERMINISTIC_VERIFICATION_PROOF_VERSION
     assert incomplete["canonical_promotion_allowed"] is False
     assert incomplete["reason"] == "deterministic_proof_held_locally"
     assert incomplete["promotion_block_reasons"] == ["numeric_validation_failed"]
+    assert semantic_synthesis["skip_semantic_verifier"] is False
+    assert semantic_synthesis["canonical_promotion_allowed"] is False
+    assert semantic_synthesis["reason"] == "independent_semantic_verification_required"
 
 
 @pytest.mark.asyncio

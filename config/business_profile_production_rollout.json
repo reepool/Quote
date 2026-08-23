@@ -51,7 +51,7 @@
           "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
-          "verifier": "business_profile_atomic_verifier.v5"
+          "verifier": "business_profile_atomic_verifier.v6"
         }
       },
       "named_relationships": {
@@ -68,7 +68,7 @@
           "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
-          "verifier": "business_profile_atomic_verifier.v5"
+          "verifier": "business_profile_atomic_verifier.v6"
         }
       },
       "derived_value_chain_roles": {
@@ -85,7 +85,7 @@
           "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
-          "verifier": "business_profile_atomic_verifier.v5"
+          "verifier": "business_profile_atomic_verifier.v6"
         }
       },
       "commodity_exposure_facts": {
@@ -102,7 +102,7 @@
           "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
-          "verifier": "business_profile_atomic_verifier.v5"
+          "verifier": "business_profile_atomic_verifier.v6"
         }
       },
       "commodity_exposure_publication": {
@@ -119,7 +119,7 @@
           "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pypdf.v2|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
-          "verifier": "business_profile_atomic_verifier.v5"
+          "verifier": "business_profile_atomic_verifier.v6"
         }
       }
     },

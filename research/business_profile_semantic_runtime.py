@@ -68,8 +68,10 @@ from research.business_profile_semantic_artifacts import (
     SemanticArtifactIdentity,
 )
 from research.business_profile_semantic_extraction import (
+    DETERMINISTIC_VERIFICATION_PROOF_VERSION,
     SEMANTIC_EXTRACTION_PROMPT_VERSION,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    SEMANTIC_VERIFIER_PROMPT_VERSION,
     STRUCTURED_EXTRACTION_PROMPT_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
     BusinessProfileSemanticExtractor,
@@ -2387,6 +2389,8 @@ class BusinessProfileSemanticRuntime:
         for item in (prior_verify or {}).get("verifications") or []:
             if not isinstance(item, Mapping):
                 continue
+            if not _verification_result_is_current(item):
+                continue
             target_id = str(item.get("target_id") or "")
             if not target_id or target_id in verified_target_ids:
                 continue
@@ -2451,34 +2455,29 @@ class BusinessProfileSemanticRuntime:
                         continue
                     target = self._find_record(record_type, target_id)
                     verification_target = _verification_target(target)
-                    deterministic_proof = None
-                    if (
-                        record_type in {"segments", "operating_facts"}
-                        and verification_target.get("derivation_method")
-                        == "semantic_synthesis"
-                        and verification_target.get("exact_evidence_valid") is True
-                        and verification_target.get("numeric_reconciliation_executed")
-                        is True
-                        and verification_target.get("numeric_reconciliation_valid")
-                        is True
-                    ):
-                        deterministic_proof = {
-                            "skip_semantic_verifier": True,
-                            "reason": "validated_structured_semantic_candidate",
-                            "canonical_promotion_allowed": True,
-                        }
-                    else:
-                        bypass = deterministic_semantic_verification_decision(
-                            verification_target
-                        )
-                        if bypass["skip_semantic_verifier"]:
-                            deterministic_proof = bypass
+                    bypass = deterministic_semantic_verification_decision(
+                        verification_target
+                    )
+                    deterministic_proof = (
+                        bypass if bypass["skip_semantic_verifier"] else None
+                    )
                     if deterministic_proof is not None:
+                        machine_rework[:] = [
+                            item
+                            for item in machine_rework
+                            if str(item.get("target_id") or "") != target_id
+                        ]
                         verifications.append(
                             {
                                 "target_type": target_type,
                                 "target_id": target_id,
-                                "decision": "confirmed",
+                                "decision": (
+                                    "confirmed"
+                                    if deterministic_proof[
+                                        "canonical_promotion_allowed"
+                                    ]
+                                    else "held"
+                                ),
                                 "proof": deterministic_proof,
                             }
                         )
@@ -2820,11 +2819,19 @@ class BusinessProfileSemanticRuntime:
                     record = self._find_record(record_type, record_id)
                     verification = verification_by_id.get(record_id)
                     verification_proof = dict((verification or {}).get("proof") or {})
-                    proof = (
-                        not output["semantic"]
-                        if verification is None
-                        else verification.get("decision") == "confirmed"
+                    proof = _verification_allows_promotion(
+                        verification,
                     )
+                    exception_reasons = [
+                        str(item)
+                        for item in verification_proof.get(
+                            "promotion_block_reasons", []
+                        )
+                    ]
+                    if verification is None or verification.get("decision") == (
+                        "insufficient_evidence"
+                    ):
+                        exception_reasons.append("context_incomplete")
                     promotion = self._promote_record(
                         record_type,
                         record,
@@ -2832,12 +2839,7 @@ class BusinessProfileSemanticRuntime:
                         manifest=manifest,
                         scope=scope,
                         semantic_proof=proof,
-                        exception_reasons=tuple(
-                            str(item)
-                            for item in verification_proof.get(
-                                "promotion_block_reasons", []
-                            )
-                        ),
+                        exception_reasons=tuple(exception_reasons),
                     )
                     decisions.append(promotion)
                     if record_type == "relationships" and promotion.get("promoted"):
@@ -3502,6 +3504,11 @@ class BusinessProfileSemanticRuntime:
             record = self._find_record(record_type, target_id)
         if record["review_status"] != "candidate":
             target_id = _record_id(record_type, record)
+            if record["review_status"] == "approved":
+                self.promotion_service.resolve_open_exceptions_for_target(
+                    target_id=target_id,
+                    target_type=record_type,
+                )
             return {
                 "decision": {
                     "target_type": record_type,
@@ -4769,6 +4776,50 @@ def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:
     )
     target["evidence"] = metadata.get("exact_evidence")
     return target
+
+
+def _verification_result_is_current(
+    verification: Mapping[str, Any],
+) -> bool:
+    proof = verification.get("proof")
+    if isinstance(proof, Mapping):
+        # Local proofs describe mutable parser, unit, and manifest state. They
+        # are cheap to recompute and must not be carried across verify resumes.
+        return False
+    if verification.get("prompt_version") != SEMANTIC_VERIFIER_PROMPT_VERSION:
+        return False
+    checks = verification.get("checks")
+    if not isinstance(checks, Mapping) or set(checks) != {
+        "subject",
+        "action",
+        "object",
+        "scope",
+        "period",
+        "evidence",
+    }:
+        return False
+    all_confirmed = all(value is True for value in checks.values())
+    return (verification.get("decision") == "confirmed") == all_confirmed
+
+
+def _verification_allows_promotion(
+    verification: Mapping[str, Any] | None,
+) -> bool:
+    if verification is None:
+        return False
+    proof = verification.get("proof")
+    if isinstance(proof, Mapping):
+        return bool(
+            proof.get("proof_version")
+            == DETERMINISTIC_VERIFICATION_PROOF_VERSION
+            and proof.get("skip_semantic_verifier") is True
+            and proof.get("canonical_promotion_allowed") is True
+            and not list(proof.get("promotion_block_reasons") or [])
+        )
+    return bool(
+        _verification_result_is_current(verification)
+        and verification.get("decision") == "confirmed"
+    )
 
 
 def _bind_promotion_validation(

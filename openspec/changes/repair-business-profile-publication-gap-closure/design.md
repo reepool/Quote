@@ -15,13 +15,14 @@ The 601088.SH acceptance run completed every stage but exposed related closure d
 - Preserve valid coarse or composite facts without treating them as failed commodity publications.
 - Automatically close machine exceptions when the exact target, evidence-backed relationship, or replacement fact has succeeded.
 - Keep gap counts aligned with unresolved actionable results.
+- Make independent verification evaluate the filing assertion rather than opaque storage identifiers, and make promotion consume only a self-consistent proof.
 
 **Non-Goals:**
 
-- No database migration, new queue, new LLM call, new catalog-management framework, or new manual-review workflow.
+- No database migration, new queue, new LLM request type, new catalog-management framework, or new manual-review workflow. Existing semantic-synthesis rows may now make the already-governed independent-verifier call that they previously skipped incorrectly.
 - No rewriting of approved evidence metadata or production history.
 - No forced mapping from a broad process label to a specific tradable commodity or price series.
-- No changes to the Telegram command, scheduler contract, annual-report asset manager, or LLM prompt contract.
+- No changes to the Telegram command, scheduler contract, annual-report asset manager, extraction prompt, or output fields requested from the extraction LLM.
 
 ## Decisions
 
@@ -69,16 +70,32 @@ The contract audit reopens only records rejected by its own versioned automation
 
 Alternative considered: resume the recovered item from its semantic stage. Rejected because the completed checkpoint can contain zero-candidate semantic, verification, and publication output produced before the record was reopened.
 
+### Verification uses business labels and a program-enforced proof contract
+
+Independent verification receives the original Chinese anonymous scope label and business object retained in candidate metadata. Stable hashes remain record identities only and are not presented as semantic claims. A verifier response is accepted only when `confirmed` has all six checks true, while a non-confirmed decision has at least one failed check. Promotion independently applies the same rule; deterministic proofs require `canonical_promotion_allowed=true`.
+
+If a legacy anonymous concentration lacks its readable label, verification omits the opaque scope identity and fails closed instead of asking the LLM to interpret a hash. Deterministic proofs carry an explicit proof version and are recomputed from the current parser, unit, evidence, and manifest state whenever verify resumes; only semantic LLM results with the current verifier identity are reused.
+
+`semantic_synthesis` rows remain semantic conclusions even when their numbers and evidence references pass deterministic checks. They therefore use the independent verifier. Only records produced by a promoted deterministic parser may bypass the LLM verifier, and a locally blocked proof is represented as `held` rather than a contradictory confirmed decision.
+
+Promotion never infers proof from the document-level `semantic` marker. Every business record must carry either a current independent-verifier result or a current versioned deterministic proof. When a deterministic proof is recomputed on resume, it replaces stale verify-stage machine rework for that exact target so a recovered local result cannot remain blocked by obsolete retry state.
+
+The verifier identity advances to v6 because the input and acceptance contract changed. This intentionally prevents old verifier artifacts and queued processing identities from being treated as equivalent to the repaired contract. Shared annual-report and PDF artifacts remain reusable, so identity rotation does not require duplicate source downloads.
+
 ## Risks / Trade-offs
 
 - [Duplicate selection could collapse two genuinely distinct identical disclosures in one evidence span] -> The key includes subject scope, action, object type, segment, geography, value, unit, share, business regime, report period, and evidence ID; only exact semantic duplicates are collapsed.
 - [Fact-only outcomes can hide missing catalog coverage] -> The result preserves an explicit reason in the stage artifact and logs, while only known product IDs with broken mappings remain actionable failures.
 - [Several relationships can share one evidence span] -> Each promoted relationship carries its source semantic assertion ID and closes only that exact proposal target.
 - [Existing stale exceptions remain until a rerun] -> The targeted rerun is the migration mechanism; no direct production-data rewrite is required.
+- [Verifier identity rotation supersedes old queued work identities] -> Correctness requires the changed proof contract to be distinguishable; source PDF/page assets remain content-addressed and reusable, and superseded work remains auditable.
+- [Recomputing deterministic proofs increases resume work] -> The calculation is local and does not invoke the LLM; it prevents stale held or allowed decisions after local rules change.
+- [Semantic-synthesis rows require an additional verifier request] -> The call uses the existing bounded verifier pool and resumable checkpoint; only truly deterministic parser results retain the zero-LLM verification path.
+- [Strict per-record proof can expose previously hidden missing-verification states] -> This is intentional fail-closed behavior; the resumable verify stage must produce the missing proof rather than promotion guessing from document metadata.
 
 ## Migration Plan
 
-1. Deploy code and tests without schema or configuration migration.
+1. Deploy code, verifier v6 rollout identities, and tests without a database schema migration.
 2. Rerun the existing targeted 601088.SH command with `force=true`.
 3. Confirm all stages complete, current queue terminal count is zero, valid exposure facts are approved, known commodity identities are published, and actionable `publication_gaps` is zero.
 4. Confirm stale duplicate/catalog proposal exceptions are resolved and no extraction LLM replay occurs when durable artifacts remain valid.

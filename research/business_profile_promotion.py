@@ -161,6 +161,17 @@ class BusinessProfilePromotionClassifier:
             classification = "machine_rework"
         elif simple_reasons and simple_reasons.issubset(_QUICK_REVIEW_REASONS):
             classification = "quick_review"
+        elif (
+            "semantic_proof" in simple_reasons
+            and simple_reasons - {"semantic_proof"}
+            and (simple_reasons - {"semantic_proof"}).issubset(
+                _MACHINE_REWORK_REASONS
+            )
+        ):
+            # A deterministic proof held by a local gate is machine-reworkable.
+            # A semantic verifier rejection has no companion machine reason and
+            # remains deep review.
+            classification = "machine_rework"
         elif any(
             item.startswith(("missing_gate:", "unknown_gate:")) for item in reason_codes
         ):

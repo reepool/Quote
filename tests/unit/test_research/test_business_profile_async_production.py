@@ -2032,6 +2032,21 @@ def test_operation_status_allows_healthy_bounded_backlog():
     assert reason_codes == []
 
 
+def test_operation_status_degrades_for_actionable_publication_gaps():
+    status, reason_codes = _business_profile_operation_status(
+        discovery={"status": "success"},
+        workers={
+            "publish": {
+                "status": "success",
+                "quality": {"publication_gaps": 1},
+            }
+        },
+    )
+
+    assert status == "degraded"
+    assert reason_codes == ["publication_gaps"]
+
+
 def test_backfill_emits_lifecycle_and_inflight_progress_logs(
     tmp_path, caplog, monkeypatch
 ):

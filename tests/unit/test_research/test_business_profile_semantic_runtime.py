@@ -16,8 +16,11 @@ from research.business_profile_activity_production import GovernedCounterpartyRe
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_promotion import FieldFamilyPromotionManifest
 from research.business_profile_semantic_extraction import (
+    DETERMINISTIC_VERIFICATION_PROOF_VERSION,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+    SEMANTIC_VERIFIER_PROMPT_VERSION,
     STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    _verification_claim,
 )
 from research.business_profile_semantic_pipeline import (
     BusinessProfileSemanticPipeline,
@@ -34,6 +37,8 @@ from research.business_profile_semantic_runtime import (
     _select_current_semantic_activities,
     _semantic_relationship_assertion_ids,
     _semantic_failure_reason,
+    _verification_allows_promotion,
+    _verification_result_is_current,
     _catalog_version_scope,
     _catalogs_current,
     compute_business_profile_semantic_source_revision,
@@ -66,6 +71,80 @@ def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
     )
 
 
+def test_only_current_self_consistent_verification_can_be_reused_or_promoted():
+    checks = {
+        "subject": True,
+        "action": True,
+        "object": True,
+        "scope": True,
+        "period": True,
+        "evidence": True,
+    }
+    current = {
+        "decision": "confirmed",
+        "checks": checks,
+        "prompt_version": SEMANTIC_VERIFIER_PROMPT_VERSION,
+    }
+    old = {**current, "prompt_version": "business_profile_atomic_verifier.v5"}
+    contradictory = {
+        **current,
+        "checks": {**checks, "object": False},
+    }
+    stale_local_proof = {
+        "decision": "confirmed",
+        "proof": {
+            "skip_semantic_verifier": True,
+            "canonical_promotion_allowed": True,
+        },
+    }
+    current_local_proof = {
+        "decision": "confirmed",
+        "proof": {
+            "proof_version": DETERMINISTIC_VERIFICATION_PROOF_VERSION,
+            "skip_semantic_verifier": True,
+            "canonical_promotion_allowed": True,
+            "promotion_block_reasons": [],
+        },
+    }
+
+    assert _verification_result_is_current(current) is True
+    assert _verification_allows_promotion(current) is True
+    assert _verification_result_is_current(old) is False
+    assert _verification_allows_promotion(old) is False
+    assert _verification_result_is_current(contradictory) is False
+    assert (
+        _verification_allows_promotion(contradictory) is False
+    )
+    assert _verification_result_is_current(stale_local_proof) is False
+    assert (
+        _verification_allows_promotion(stale_local_proof) is False
+    )
+    assert _verification_result_is_current(current_local_proof) is False
+    assert _verification_allows_promotion(current_local_proof) is True
+    assert _verification_allows_promotion(None) is False
+
+
+def test_concentration_verification_never_uses_opaque_scope_as_semantics():
+    target = {
+        "record_id": "bp-operating-opaque",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "fact_type": "supplier_concentration_share",
+        "value_raw": 0.144,
+        "unit_raw": "fraction",
+        "value_normalized": 0.144,
+        "unit_normalized": "fraction",
+        "fact_scope": "anonymous-concentration-scope:" + "a" * 32,
+        "metadata": {"object_raw": "采购额"},
+    }
+
+    claim = _verification_claim("concentration", target)
+
+    assert claim["object_raw"] == "采购额"
+    assert "fact_scope" not in claim
+    assert "scope_label_raw" not in claim
+
+
 def test_derived_validation_uses_current_catalog_without_mutating_evidence():
     evidence = {
         "metadata": {
@@ -96,6 +175,59 @@ def test_derived_validation_uses_current_catalog_without_mutating_evidence():
         "product": "old-products",
         "unit": "old-units",
     }
+
+
+def test_unchanged_approved_record_resolves_its_stale_open_exception(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    scope_without_manifest = _scope("named_relationships")
+    manifest = FieldFamilyPromotionManifest(
+        field_family="named_relationships",
+        enabled=True,
+        benchmark_passed=True,
+        identities=scope_without_manifest.identities,
+    )
+    scope = _scope("named_relationships", manifest)
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository,
+        artifact_root=tmp_path / "artifacts",
+    )
+    target_id = "relationship-approved-with-stale-exception"
+    now = "2026-08-23T12:00:00+08:00"
+    with repository.storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_exceptions ("
+            "exception_id, target_type, target_id, instrument_id, field_family, "
+            "tier, reason_codes_json, gate_signature, gate_manifest_hash, "
+            "created_at, updated_at"
+            ") VALUES (?, 'relationships', ?, '601088.SH', "
+            "'named_relationships', 'deep_review', ?, ?, ?, ?, ?)",
+            (
+                "stale-approved-exception",
+                target_id,
+                json.dumps(["failed_gate:semantic_proof"]),
+                "stale-approved-gate",
+                manifest.manifest_hash,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+
+    result = runtime._promote_record(
+        "relationships",
+        {"relationship_id": target_id, "review_status": "approved"},
+        family="named_relationships",
+        manifest=manifest,
+        scope=scope,
+        semantic_proof=True,
+    )
+
+    assert result["decision"]["classification"] == "unchanged"
+    assert result["promoted"] is True
+    assert repository.list_exceptions(status="open") == []
+    assert {
+        item["exception_id"] for item in repository.list_exceptions(status="resolved")
+    } == {"stale-approved-exception"}
 
 
 def test_operating_fact_catalog_gate_ignores_unrelated_product_release():
@@ -561,6 +693,21 @@ class _FakeGateway:
 class _StructuredSegmentGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return _response(
+                {
+                    "decision": "confirmed",
+                    "checks": {
+                        "subject": True,
+                        "action": True,
+                        "object": True,
+                        "scope": True,
+                        "period": True,
+                        "evidence": True,
+                    },
+                },
+                request,
+            )
         payload = json.loads(request.messages[-1].content)
         quote = "煤炭 100 60 40%"
         return _response(
@@ -592,6 +739,21 @@ class _StructuredSegmentGateway(_FakeGateway):
 class _StructuredOperatingGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return _response(
+                {
+                    "decision": "confirmed",
+                    "checks": {
+                        "subject": True,
+                        "action": True,
+                        "object": True,
+                        "scope": True,
+                        "period": True,
+                        "evidence": True,
+                    },
+                },
+                request,
+            )
         payload = json.loads(request.messages[-1].content)
         quote = "煤炭 200 210 50"
         return _response(
@@ -622,6 +784,8 @@ class _StructuredOperatingGateway(_FakeGateway):
 class _NormalizedUnitOperatingGateway(_StructuredOperatingGateway):
     async def complete(self, request):
         response = await super().complete(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return response
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         data["rows"][0]["unit_raw"] = "万公吨"
         raw = json.dumps(data, ensure_ascii=False)
@@ -636,6 +800,8 @@ class _NormalizedUnitOperatingGateway(_StructuredOperatingGateway):
 class _UnsupportedUnitOperatingGateway(_StructuredOperatingGateway):
     async def complete(self, request):
         response = await super().complete(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return response
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         data["rows"][0]["unit_raw"] = "未治理质量单位"
         raw = json.dumps(data, ensure_ascii=False)
@@ -650,6 +816,8 @@ class _UnsupportedUnitOperatingGateway(_StructuredOperatingGateway):
 class _MixedUnitOperatingGateway(_StructuredOperatingGateway):
     async def complete(self, request):
         response = await super().complete(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return response
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         pending = dict(data["rows"][0])
         pending.update(
@@ -674,6 +842,8 @@ class _MixedUnitOperatingGateway(_StructuredOperatingGateway):
 class _PartialStructuredSegmentGateway(_StructuredSegmentGateway):
     async def complete(self, request):
         response = await super().complete(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return response
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         invalid = dict(data["rows"][0])
         invalid["gross_margin"] = 40.0
@@ -690,6 +860,8 @@ class _PartialStructuredSegmentGateway(_StructuredSegmentGateway):
 class _RecoveringStructuredSegmentGateway(_StructuredSegmentGateway):
     async def complete(self, request):
         response = await super().complete(request)
+        if request.metadata["stage"] == "semantic_verification":
+            return response
         data = json.loads(json.dumps(response.data, ensure_ascii=False))
         if len(self.requests) == 1:
             invalid = dict(data["rows"][0])
@@ -794,6 +966,27 @@ class _RelationshipGateway(_FakeGateway):
             ],
         }
         return _response(data, request)
+
+
+class _InsufficientRelationshipGateway(_RelationshipGateway):
+    async def complete(self, request):
+        if request.metadata["stage"] != "semantic_verification":
+            return await super().complete(request)
+        self.requests.append(request)
+        return _response(
+            {
+                "decision": "insufficient_evidence",
+                "checks": {
+                    "subject": True,
+                    "action": True,
+                    "object": True,
+                    "scope": True,
+                    "period": True,
+                    "evidence": False,
+                },
+            },
+            request,
+        )
 
 
 class _AnonymousRelationshipGateway(_FakeGateway):
@@ -1572,6 +1765,7 @@ def test_unpromoted_deterministic_parser_record_never_calls_verifier_or_promotes
     verification = pipeline.handlers["verify"].__self__.stage_store.read(
         verification_artifact, expected_stage="verify"
     )["verifications"][0]
+    assert verification["decision"] == "held"
     assert verification["proof"]["canonical_promotion_allowed"] is False
 
     promoted = pipeline.run("promote", scope=scope)
@@ -1582,10 +1776,53 @@ def test_unpromoted_deterministic_parser_record_never_calls_verifier_or_promotes
     assert any(
         item["decision"]["classification"] == "machine_rework"
         and "manifest_not_promoted" in item["decision"]["reason_codes"]
+        and "failed_gate:semantic_proof" in item["decision"]["reason_codes"]
         for item in promotion_artifact["decisions"]
     )
     held = repository.list_records("segments", instrument_id="601088.SH")[0]
     assert held["review_status"] != "approved"
+
+
+def test_recomputed_deterministic_proof_removes_stale_verify_rework(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息\n"
+            "|分产品|营业收入（万元）|营业成本（万元）|毛利率|\n"
+            "|煤炭|100|60|40%|"
+        ),
+    )
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    segment = repository.list_records("segments", instrument_id="601088.SH")[0]
+    target_id = segment["record_id"]
+    runtime = pipeline.handlers["verify"].__self__
+    checkpoint = pipeline.checkpoint_store.load()
+    checkpoint["artifacts"]["verify"] = runtime.stage_store.write(
+        "verify",
+        {
+            "runtime_schema_version": runtime_module.RUNTIME_SCHEMA_VERSION,
+            "scope_hash": scope.scope_hash,
+            "verifications": [],
+            "machine_rework": [
+                {"target_id": target_id, "reason_code": "gateway_failure"}
+            ],
+            "exceptions": [],
+        },
+    )
+    pipeline.checkpoint_store.save(checkpoint)
+
+    verified = pipeline.run("verify", scope=scope)
+
+    assert verified["status"] == "success"
+    artifact = runtime.stage_store.read(verified["artifact"], expected_stage="verify")
+    assert artifact["machine_rework"] == []
+    assert artifact["verifications"][0]["target_id"] == target_id
+    assert artifact["verifications"][0]["decision"] == "confirmed"
 
 
 def test_structured_empty_output_reports_expected_non_disclosure(tmp_path, monkeypatch):
@@ -1645,8 +1882,9 @@ def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
 
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
+    assert len(gateway.requests) == 2
+    assert gateway.requests[-1].metadata["stage"] == "semantic_verification"
     assert verified["quality"]["verified_records"] == 1
-    assert len(gateway.requests) == 1
     assert pipeline.run("promote", scope=scope)["status"] == "success"
     segment = repository.list_records("segments", instrument_id="601088.SH")[0]
     assert segment["review_status"] == "approved"
@@ -1779,7 +2017,8 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
     assert verified["quality"]["verified_records"] == 1
-    assert len(gateway.requests) == 1
+    assert len(gateway.requests) == 2
+    assert gateway.requests[-1].metadata["stage"] == "semantic_verification"
     assert pipeline.run("promote", scope=scope)["status"] == "success"
     fact = repository.list_records("operating_facts", instrument_id="601088.SH")[0]
     assert fact["review_status"] == "approved"
@@ -3247,6 +3486,38 @@ def test_unique_exact_counterparty_is_verified_and_promoted(tmp_path, monkeypatc
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
+def test_insufficient_verifier_context_routes_to_machine_rework(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope, _gateway = _relationship_runtime(
+        tmp_path,
+        monkeypatch,
+        [
+            {
+                "entity_id": "entity-customer",
+                "legal_name": "客户股份有限公司",
+                "valid_from": "2000-01-01",
+            }
+        ],
+        promote=True,
+        gateway=_InsufficientRelationshipGateway(),
+    )
+
+    assert pipeline.run("verify", scope=scope)["status"] == "success"
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+
+    relationship = repository.list_records(
+        "relationships", instrument_id="601088.SH"
+    )[0]
+    assert relationship["review_status"] == "candidate"
+    exception = repository.list_exceptions(
+        instrument_id="601088.SH", status="open"
+    )[0]
+    assert exception["tier"] == "machine_rework"
+    assert "context_incomplete" in exception["reason_codes"]
+    assert "failed_gate:semantic_proof" in exception["reason_codes"]
+
+
 def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     tmp_path, monkeypatch
 ):
@@ -3270,6 +3541,19 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     )
 
     assert pipeline.run("verify", scope=scope)["status"] == "success"
+    verification_payloads = [
+        json.loads(request.messages[-1].content)
+        for request in gateway.requests
+        if request.metadata["stage"] == "semantic_verification"
+    ]
+    related_purchase_claim = next(
+        payload["claim"]
+        for payload in verification_payloads
+        if payload["claim"].get("value_normalized") == 0.144
+    )
+    assert related_purchase_claim["scope_label_raw"] == "关联方"
+    assert related_purchase_claim["object_raw"] == "采购额"
+    assert "fact_scope" not in related_purchase_claim
     candidates = repository.list_records(
         "operating_facts", instrument_id="601088.SH"
     )

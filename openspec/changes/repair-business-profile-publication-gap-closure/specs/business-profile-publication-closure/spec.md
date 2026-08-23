@@ -86,3 +86,53 @@ The system SHALL invalidate stale semantic, verification, and publication stage 
 #### Scenario: Recovered candidate succeeds
 - **WHEN** the reopened candidate passes its current applicable catalog, evidence, numeric, temporal, and semantic gates
 - **THEN** it becomes approved and all open machine-rework exceptions for that exact target are resolved
+
+### Requirement: Human-readable independent verification claims
+The system SHALL verify semantic business assertions using their original readable filing labels and SHALL NOT use opaque stable identifiers as substitutes for scope or object meaning.
+
+#### Scenario: Anonymous concentration is independently verified
+- **WHEN** an anonymous concentration candidate retains `关联方` and `采购额` in its persisted metadata while its stable `fact_scope` is an internal hash
+- **THEN** the verifier claim contains the readable scope and object labels, omits the opaque scope hash as semantic content, and can confirm the explicit filing assertion
+
+### Requirement: Program-enforced semantic proof consistency
+The system SHALL accept and promote a semantic verification only when its decision, component checks, verifier identity, and proof type form one internally consistent current proof.
+
+#### Scenario: Confirmed response contains a failed check
+- **WHEN** the verifier returns `confirmed` while any required semantic check is false
+- **THEN** the response is rejected through the existing retry and machine-rework path and the candidate is not promoted
+
+#### Scenario: Deterministic proof is held locally
+- **WHEN** deterministic verification skips the LLM but reports `canonical_promotion_allowed=false`
+- **THEN** the candidate is not promoted even if its envelope decision is recorded as confirmed
+
+#### Scenario: Repaired concentration set converges
+- **WHEN** the four explicit 601088.SH customer, supplier, and related-party concentration assertions pass the current verifier contract
+- **THEN** all four facts are approved and no open promotion exception remains for them
+
+#### Scenario: Legacy concentration has no readable scope label
+- **WHEN** an anonymous concentration retains only an opaque stable scope identity
+- **THEN** the verifier request omits that identity as semantic content and the record fails closed until readable filing context is available
+
+#### Scenario: Local deterministic state changes after a partial verify
+- **WHEN** a deterministic candidate's parser, unit, evidence, or manifest state changes before verify resumes
+- **THEN** the system recomputes the local proof and does not reuse the prior allow-or-hold decision
+
+#### Scenario: LLM semantic synthesis passes numeric checks
+- **WHEN** a segment or operating fact was semantically synthesized by an LLM and its values pass programmatic reconciliation
+- **THEN** the values remain program-validated but the business meaning still requires current independent semantic verification
+
+#### Scenario: Deterministic parser proof is locally blocked
+- **WHEN** a deterministic parser candidate fails evidence, numeric, or parser-manifest eligibility
+- **THEN** its local verification outcome is `held`, it is not sent to the LLM, and it is routed to machine rework rather than promotion
+
+#### Scenario: Verification result is missing
+- **WHEN** a business record reaches promotion without either a current semantic verification or a current deterministic proof
+- **THEN** the system fails closed, does not infer permission from document-level extraction metadata, and routes the missing stage result to bounded automatic rework
+
+#### Scenario: Deterministic verification recovers after local rules change
+- **WHEN** a resumed deterministic candidate now produces a current local proof after an older verify attempt left machine rework for the same target
+- **THEN** the current proof replaces the stale verify state and the old machine rework no longer blocks the stage
+
+#### Scenario: Verifier reports insufficient filing context
+- **WHEN** the independent verifier returns `insufficient_evidence` rather than an explicit semantic conflict
+- **THEN** the candidate enters bounded automatic context rework instead of being sent directly to manual deep review

@@ -30,3 +30,17 @@
 - [x] 5.1 Rotate stale checkpoints for forced `retry_due` recovery work and preserve audit history
 - [x] 5.2 Promote reopened concentration facts and resolve their exact stale exceptions
 - [x] 5.3 Add focused recovery/force-replay regression coverage and run the representative 601088.SH acceptance path
+
+## 6. Verification Contract Closure
+
+- [x] 6.1 Send readable anonymous concentration scope and object labels instead of stable hashes
+- [x] 6.2 Reject verifier decisions that contradict their component checks
+- [x] 6.3 Require a valid semantic or deterministic proof at promotion and version the repaired verifier contract
+- [x] 6.4 Prove four 601088.SH concentration facts promote with zero open exceptions and run focused regression tests
+- [x] 6.5 Report a successful publish stage with actionable gaps as degraded instead of a false overall success
+- [x] 6.6 Keep opaque concentration identities out of verifier semantics and recompute local deterministic proofs on resume
+- [x] 6.7 Remove the semantic-synthesis verifier bypass and make local held decisions internally consistent
+- [x] 6.8 Require an explicit current proof for every promoted business record
+- [x] 6.9 Replace stale verify machine rework when deterministic proof is recomputed
+- [x] 6.10 Reject legacy concentrations without a readable scope before consuming an LLM call
+- [x] 6.11 Route insufficient verifier context through bounded automatic rework
