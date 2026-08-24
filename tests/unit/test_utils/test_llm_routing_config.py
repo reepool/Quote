@@ -411,10 +411,9 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     members = config.pools["shared_semantic"].members
     assert [member.source_label for member in members] == [
         "scorpio:gpt-5.6-luna",
-        "scorpio:deepseek-v4-flash-0731",
     ]
-    assert [member.weight for member in members] == [1, 1]
-    assert config.pools["shared_semantic"].failover.enabled is True
+    assert [member.weight for member in members] == [1]
+    assert config.pools["shared_semantic"].failover.enabled is False
     profiles = config.profiles
     assert profiles["semantic_extraction__scorpio_grok"].enabled is False
     assert (
@@ -425,13 +424,13 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert (
         profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
     )
-    assert profiles["semantic_extraction__scorpio_deepseek"].enabled is True
+    assert profiles["semantic_extraction__scorpio_deepseek"].enabled is False
     assert profiles["semantic_extraction__scorpio_deepseek"].max_concurrency == 20
     assert config.provider_resources["scorpio:deepseek"].hard_max_concurrency == 20
     assert config.provider_resources["scorpio:deepseek"].default_bulk_concurrency == 18
     assert (
         profiles["corporate_action_title_classification__scorpio_deepseek"].enabled
-        is True
+        is False
     )
     assert profiles["semantic_extraction__scorpio_grok"].api_key_env == (
         "QUOTE_LLM_SCORPIO_GROK_API_KEY"
@@ -455,21 +454,19 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_supports_luna_deepseek_equal_weight_pool():
+def test_repository_llm_config_routes_shared_semantic_only_to_luna():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
 
     config = LlmConfig.from_mapping(raw)
 
     assert config.is_logical_profile_enabled("semantic_extraction") is True
-    assert pool["failover"]["enabled"] is True
+    assert pool["failover"]["enabled"] is False
     assert [
         profile.name for profile in config.concrete_profiles_for("semantic_extraction")
     ] == [
         "semantic_extraction__scorpio_luna",
-        "semantic_extraction__scorpio_deepseek",
     ]
     assert [member.weight for member in config.pools["shared_semantic"].members] == [
-        1,
         1,
     ]
