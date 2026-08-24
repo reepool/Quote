@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import hashlib
 import json
 import logging
 import os
+import queue
 import re
 import sqlite3
+import threading
 import time
 import unicodedata
 from dataclasses import dataclass, replace
@@ -670,6 +673,17 @@ class BusinessProfileSemanticRuntime:
             self._async_bridge.run(close())
         self._async_bridge.close()
 
+    def _scoped_exception_backlog(self, scope: Any, *, limit: int = 10000) -> int:
+        """Count only open exceptions that belong to the active run scope."""
+
+        families = {str(item) for item in scope.field_families}
+        return sum(
+            1
+            for item in self.repository.list_exceptions(status="open", limit=limit)
+            if str(item.get("instrument_id") or "") in set(scope.instruments)
+            and (not families or str(item.get("field_family") or "") in families)
+        )
+
     def rebuild_publications(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
         config: SemanticProductionConfig = kwargs["config"]
@@ -849,9 +863,7 @@ class BusinessProfileSemanticRuntime:
                 "reused_results": sum(
                     bool((plan.get("coverage") or {}).get("complete")) for plan in plans
                 ),
-                "exception_backlog": len(
-                    self.repository.list_exceptions(status="open", limit=10000)
-                ),
+                "exception_backlog": self._scoped_exception_backlog(scope),
                 "acquisition_attempts": acquisition_attempts,
                 "acquired_plans": acquired_plans,
                 "errors": acquisition_errors,
@@ -978,9 +990,7 @@ class BusinessProfileSemanticRuntime:
                         if "context_incomplete" in due_rework
                         else None
                     )
-                    selection_family = semantic_selection_family(
-                        plan["field_family"]
-                    )
+                    selection_family = semantic_selection_family(plan["field_family"])
                     if prior is None:
                         selection_started = time.monotonic()
                         selected = selector.select(
@@ -1738,12 +1748,12 @@ class BusinessProfileSemanticRuntime:
                     cached = joint_semantic_cache.get(cache_key)
                     if cached is not None:
                         envelope, semantic_artifact_id = cached
-                        metrics["joint_semantic_sibling_reuses"] = int(
-                            metrics.get("joint_semantic_sibling_reuses") or 0
-                        ) + 1
-                        metrics["joint_semantic_saved_llm_calls"] = int(
-                            metrics.get("joint_semantic_saved_llm_calls") or 0
-                        ) + 1
+                        metrics["joint_semantic_sibling_reuses"] = (
+                            int(metrics.get("joint_semantic_sibling_reuses") or 0) + 1
+                        )
+                        metrics["joint_semantic_saved_llm_calls"] = (
+                            int(metrics.get("joint_semantic_saved_llm_calls") or 0) + 1
+                        )
                         reuse_source = "in_run"
                     else:
                         replay = self.semantic_artifacts.find_replay(artifact_identity)
@@ -1758,12 +1768,14 @@ class BusinessProfileSemanticRuntime:
                                 candidate_spans=candidate_span_payload,
                                 saved_usage=dict(replay.get("usage") or {}),
                             )
-                            metrics["joint_semantic_durable_replays"] = int(
-                                metrics.get("joint_semantic_durable_replays") or 0
-                            ) + 1
-                            metrics["joint_semantic_saved_llm_calls"] = int(
-                                metrics.get("joint_semantic_saved_llm_calls") or 0
-                            ) + 1
+                            metrics["joint_semantic_durable_replays"] = (
+                                int(metrics.get("joint_semantic_durable_replays") or 0)
+                                + 1
+                            )
+                            metrics["joint_semantic_saved_llm_calls"] = (
+                                int(metrics.get("joint_semantic_saved_llm_calls") or 0)
+                                + 1
+                            )
                             reuse_source = "durable"
                         else:
                             if (
@@ -1796,9 +1808,9 @@ class BusinessProfileSemanticRuntime:
                                 break
                             metrics["llm_calls"] += 1
                             llm_call_started = True
-                            metrics["joint_semantic_llm_calls"] = int(
-                                metrics.get("joint_semantic_llm_calls") or 0
-                            ) + 1
+                            metrics["joint_semantic_llm_calls"] = (
+                                int(metrics.get("joint_semantic_llm_calls") or 0) + 1
+                            )
                             _increment_family_metrics(
                                 metrics["by_field_family"],
                                 item["field_family"],
@@ -1826,9 +1838,7 @@ class BusinessProfileSemanticRuntime:
                                     str(span.evidence_span_id)
                                     for span in request_context.evidence_spans
                                 ],
-                                model_profile=str(
-                                    semantic_audit.get("profile") or ""
-                                )
+                                model_profile=str(semantic_audit.get("profile") or "")
                                 or None,
                                 actual_model=str(
                                     semantic_audit.get("actual_model") or ""
@@ -1875,15 +1885,17 @@ class BusinessProfileSemanticRuntime:
                             "output_tokens": 0,
                             "total_tokens": 0,
                         }
-                    records_by_type, semantic_records, semantic_exceptions = self._semantic_records(
-                        item,
-                        selected,
-                        envelope,
-                        record_types=(
-                            ("activities",)
-                            if item["field_family"] == "atomic_activities"
-                            else ("relationships",)
-                        ),
+                    records_by_type, semantic_records, semantic_exceptions = (
+                        self._semantic_records(
+                            item,
+                            selected,
+                            envelope,
+                            record_types=(
+                                ("activities",)
+                                if item["field_family"] == "atomic_activities"
+                                else ("relationships",)
+                            ),
+                        )
                     )
                     semantic_family_complete = not semantic_exceptions
                     exceptions.extend(semantic_exceptions)
@@ -2297,87 +2309,77 @@ class BusinessProfileSemanticRuntime:
         self,
         targets: Sequence[Mapping[str, Any]],
     ) -> list[dict[str, Any]]:
-        async def verify_one(target: Mapping[str, Any]) -> dict[str, Any]:
-            semantic_audits: list[Mapping[str, Any]] = []
-            attempts: list[dict[str, Any]] = []
-            attempt_kind = "isolated_evidence"
-            try:
-                extractor = BusinessProfileSemanticExtractor(
-                    self.llm_client,
-                    audit_sink=semantic_audits.append,
+        semantic_audits: list[Mapping[str, Any]] = []
+        try:
+            extractor = BusinessProfileSemanticExtractor(
+                self.llm_client,
+                audit_sink=semantic_audits.append,
+            )
+            verifications, audit = await extractor.verify_batch_async(targets=targets)
+            by_target_id = {
+                str(item.get("target_id") or ""): item for item in verifications
+            }
+            audit_payload = audit.to_dict()
+            usage_tokens = int(
+                (audit_payload.get("usage") or {}).get("total_tokens") or 0
+            )
+            outcomes: list[dict[str, Any]] = []
+            for target in targets:
+                verification_target = dict(target.get("verification_target") or {})
+                target_id = str(
+                    target.get("target_id")
+                    or verification_target.get("activity_id")
+                    or verification_target.get("relationship_id")
+                    or verification_target.get("record_id")
+                    or ""
                 )
-                verification, audit = await extractor.verify_async(
-                    target_type=str(target["target_type"]),
-                    target=dict(target["verification_target"]),
-                    selected=target["selected"],
-                )
-                attempts.append(
+                verification = by_target_id.get(target_id)
+                if verification is None:
+                    outcomes.append(
+                        {
+                            "target": target,
+                            "exception": ValueError(
+                                f"semantic verification batch omitted target_id={target_id}"
+                            ),
+                            "audit": audit_payload,
+                            "retry_calls": 0,
+                            "usage_tokens": 0,
+                            "batch_llm_calls": 1 if target is targets[0] else 0,
+                        }
+                    )
+                    continue
+                outcomes.append(
                     {
-                        "kind": "isolated_evidence",
-                        "verification": dict(verification),
-                        "audit": audit.to_dict(),
+                        "target": target,
+                        "verification": {
+                            **dict(verification),
+                            "audit": audit_payload,
+                            "attempts": [{"kind": "batched", "audit": audit_payload}],
+                        },
+                        "audit": audit_payload,
+                        "retry_calls": 0,
+                        "usage_tokens": usage_tokens if target is targets[0] else 0,
+                        "batch_llm_calls": 1 if target is targets[0] else 0,
                     }
                 )
-                expanded_target = _expanded_action_verification_target(
-                    target, verification
-                )
-                if expanded_target is not None:
-                    attempt_kind = "bounded_action_context"
-                    verification, audit = await extractor.verify_async(
-                        target_type=str(target["target_type"]),
-                        target=expanded_target,
-                        selected=target["selected"],
-                    )
-                    attempts.append(
-                        {
-                            "kind": "bounded_action_context",
-                            "verification": dict(verification),
-                            "audit": audit.to_dict(),
-                        }
-                    )
-                return {
-                    "target": target,
-                    "verification": {
-                        **dict(verification),
-                        "audit": audit.to_dict(),
-                        "attempts": attempts,
-                    },
-                    "audit": audit.to_dict(),
-                    "retry_calls": len(attempts) - 1,
-                    "usage_tokens": sum(
-                        int((item.get("usage") or {}).get("total_tokens") or 0)
-                        for item in semantic_audits
-                    ),
-                }
-            except Exception as exc:
-                failure_audit = (
-                    dict(semantic_audits[-1]) if semantic_audits else {}
-                )
-                if failure_audit:
-                    attempts.append(
-                        {
-                            "kind": attempt_kind,
-                            "verification": None,
-                            "audit": failure_audit,
-                            "error": {
-                                "error_type": type(exc).__name__,
-                                "error_message": str(exc).replace("\n", " ")[:1000],
-                            },
-                        }
-                    )
-                    failure_audit = {**failure_audit, "attempts": attempts}
-                return {
+            return outcomes
+        except Exception as exc:
+            failure_audit = dict(semantic_audits[-1]) if semantic_audits else {}
+            usage_tokens = int(
+                (failure_audit.get("usage") or {}).get("total_tokens") or 0
+            )
+            attempted_calls = 1 if failure_audit else 0
+            return [
+                {
                     "target": target,
                     "exception": exc,
                     "audit": failure_audit or None,
-                    "retry_calls": max(0, len(semantic_audits) - 1),
-                    "usage_tokens": sum(
-                        int((item.get("usage") or {}).get("total_tokens") or 0)
-                        for item in semantic_audits
-                    ),
+                    "retry_calls": 0,
+                    "usage_tokens": usage_tokens if target is targets[0] else 0,
+                    "batch_llm_calls": (attempted_calls if target is targets[0] else 0),
                 }
-
-        return list(await asyncio.gather(*(verify_one(target) for target in targets)))
+                for target in targets
+            ]
 
     def verify(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -2405,9 +2407,12 @@ class BusinessProfileSemanticRuntime:
             verifications.append(dict(item))
             verified_target_ids.add(target_id)
         resumed_verification_count = len(verified_target_ids)
-        resumed_llm_verification_count = sum(
-            1 for item in verifications if isinstance(item.get("audit"), Mapping)
-        )
+        resumed_llm_request_hashes = {
+            str((item.get("audit") or {}).get("request_hash") or "")
+            for item in verifications
+            if isinstance(item.get("audit"), Mapping)
+            and str((item.get("audit") or {}).get("request_hash") or "")
+        }
         new_verified_records = 0
         machine_rework = list(extracted.get("machine_rework") or [])
         inherited_rework_keys = {
@@ -2426,18 +2431,33 @@ class BusinessProfileSemanticRuntime:
         llm_calls = 0
         tokens = 0
         errors = 0
+        llm_latency_ms = 0.0
+        llm_failovers = 0.0
+        llm_attempts = 0.0
         by_field_family: dict[str, dict[str, float]] = {}
         blocked_configuration_reasons: dict[str, int] = {}
         configuration_stop_requested = False
         stage_started_at = self.clock()
         budget_stop_reason: str | None = None
-        pending_by_family: dict[str, list[dict[str, Any]]] = {}
+        pending_by_batch: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
         target_order: dict[str, int] = {}
 
         if resumed_verification_count:
             logger.info(
                 "business-profile semantic verification resume reused_records=%s",
                 resumed_verification_count,
+            )
+
+        def clear_resolved_rework(target_id: str, field_family: str) -> None:
+            machine_rework[:] = [
+                item
+                for item in machine_rework
+                if str(item.get("target_id") or "") != target_id
+            ]
+            self.promotion_service.resolve_open_exceptions_for_target(
+                target_id=target_id,
+                target_type="document_field_family",
+                field_family=field_family,
             )
 
         for output in extracted["outputs"]:
@@ -2470,11 +2490,7 @@ class BusinessProfileSemanticRuntime:
                         bypass if bypass["skip_semantic_verifier"] else None
                     )
                     if deterministic_proof is not None:
-                        machine_rework[:] = [
-                            item
-                            for item in machine_rework
-                            if str(item.get("target_id") or "") != target_id
-                        ]
+                        clear_resolved_rework(target_id, family)
                         verifications.append(
                             {
                                 "target_type": target_type,
@@ -2492,7 +2508,38 @@ class BusinessProfileSemanticRuntime:
                         verified_target_ids.add(target_id)
                         new_verified_records += 1
                         continue
-                    pending_by_family.setdefault(family, []).append(
+                    program_proof = _program_validation_decision(
+                        verification_target,
+                        target_type=target_type,
+                    )
+                    if program_proof.get("classification") == "validated":
+                        clear_resolved_rework(target_id, family)
+                        verifications.append(
+                            {
+                                "target_type": target_type,
+                                "target_id": target_id,
+                                "decision": "validated",
+                                "proof": program_proof,
+                            }
+                        )
+                        verified_target_ids.add(target_id)
+                        new_verified_records += 1
+                        continue
+                    document = dict(output.get("document") or {})
+                    batch_key = (
+                        family,
+                        str(
+                            target.get("instrument_id")
+                            or output.get("instrument_id")
+                            or ""
+                        ),
+                        str(
+                            document.get("identity")
+                            or document.get("report_period")
+                            or ""
+                        ),
+                    )
+                    pending_by_batch.setdefault(batch_key, []).append(
                         {
                             "output": output,
                             "field_family": family,
@@ -2503,7 +2550,7 @@ class BusinessProfileSemanticRuntime:
                         }
                     )
 
-        pending_count = sum(len(items) for items in pending_by_family.values())
+        pending_count = sum(len(items) for items in pending_by_batch.values())
         if pending_count and (
             config.kill_switches["network_calls"] or self.llm_client is None
         ):
@@ -2513,7 +2560,11 @@ class BusinessProfileSemanticRuntime:
                 else "semantic_gateway_unavailable"
             )
             blocked_configuration_reasons[reason] = pending_count
-            for family, items in pending_by_family.items():
+            for (
+                family,
+                _instrument_id,
+                _document_id,
+            ), items in pending_by_batch.items():
                 _increment_family_metrics(
                     by_field_family,
                     family,
@@ -2551,101 +2602,137 @@ class BusinessProfileSemanticRuntime:
             return artifact
 
         if not configuration_stop_requested:
-            wave_size = max(1, int(config.budgets.max_concurrency))
-            for family, family_targets in pending_by_family.items():
+            for (
+                family,
+                _instrument_id,
+                _document_id,
+            ), family_targets in pending_by_batch.items():
                 family_stop_reason: str | None = None
-                for start in range(0, len(family_targets), wave_size):
-                    family_stop_reason = self._network_budget_stop_reason(
-                        config=config,
-                        checkpoint_metrics=checkpoint.get("metrics") or {},
-                        stage_metrics=by_field_family.get(family, {}),
-                        stage_started_at=stage_started_at,
-                        field_family=family,
-                    )
-                    if family_stop_reason:
-                        budget_stop_reason = budget_stop_reason or family_stop_reason
-                        break
-                    wave = family_targets[start : start + wave_size]
-                    llm_calls += len(wave)
+                family_stop_reason = self._network_budget_stop_reason(
+                    config=config,
+                    checkpoint_metrics=checkpoint.get("metrics") or {},
+                    stage_metrics=by_field_family.get(family, {}),
+                    stage_started_at=stage_started_at,
+                    field_family=family,
+                )
+                if family_stop_reason:
+                    budget_stop_reason = budget_stop_reason or family_stop_reason
+                    break
+                # Extraction caps report records at 50. Keep the complete
+                # family in one request so verification cannot fan out into
+                # one request per activity/relationship.
+                batch = family_targets[:50]
+                overflow_targets = family_targets[50:]
+                outcomes = self._async_bridge.run(self._verify_wave_async(batch))
+                batch_calls = sum(
+                    int(outcome.get("batch_llm_calls") or 0) for outcome in outcomes
+                )
+                llm_calls += batch_calls
+                _increment_family_metrics(
+                    by_field_family, family, llm_calls=batch_calls
+                )
+                batch_audit = next(
+                    (
+                        dict(outcome["audit"])
+                        for outcome in outcomes
+                        if isinstance(outcome.get("audit"), Mapping)
+                    ),
+                    None,
+                )
+                if batch_audit is not None:
+                    llm_latency_ms += float(batch_audit.get("latency_ms") or 0)
+                    llm_failovers += float(batch_audit.get("failover_count") or 0)
+                    llm_attempts += float(batch_audit.get("attempts") or 0)
+                for outcome in outcomes:
+                    target = dict(outcome["target"])
+                    target_id = str(target["target_id"])
+                    semantic_audit = outcome.get("audit")
+                    retry_calls = int(outcome.get("retry_calls") or 0)
+                    llm_calls += retry_calls
+                    usage_tokens = int(outcome.get("usage_tokens") or 0)
+                    tokens += usage_tokens
                     _increment_family_metrics(
-                        by_field_family, family, llm_calls=len(wave)
+                        by_field_family,
+                        family,
+                        llm_calls=retry_calls,
+                        tokens=usage_tokens,
                     )
-                    outcomes = self._async_bridge.run(
-                        self._verify_wave_async(wave)
-                    )
-                    for outcome in outcomes:
-                        target = dict(outcome["target"])
-                        target_id = str(target["target_id"])
-                        semantic_audit = outcome.get("audit")
-                        retry_calls = int(outcome.get("retry_calls") or 0)
-                        llm_calls += retry_calls
-                        usage_tokens = int(outcome.get("usage_tokens") or 0)
-                        tokens += usage_tokens
-                        _increment_family_metrics(
-                            by_field_family,
-                            family,
-                            llm_calls=retry_calls,
-                            tokens=usage_tokens,
-                        )
-                        if "exception" not in outcome:
-                            verifications.append(dict(outcome["verification"]))
-                            verified_target_ids.add(target_id)
-                            new_verified_records += 1
-                            machine_rework[:] = [
-                                item
-                                for item in machine_rework
-                                if str(item.get("target_id") or "") != target_id
-                            ]
-                            continue
-                        exc = outcome["exception"]
-                        reason = _semantic_failure_reason(exc)
-                        if reason == "blocked_configuration":
-                            blocker = _semantic_configuration_reason(exc)
-                            blocked_configuration_reasons[blocker] = (
-                                blocked_configuration_reasons.get(blocker, 0) + 1
-                            )
-                            _increment_family_metrics(
-                                by_field_family,
-                                family,
-                                configuration_blocked=1,
-                            )
-                            configuration_stop_requested = True
-                            continue
-                        errors += 1
-                        failure_diagnostics = _runtime_failure_diagnostics(
-                            exc,
-                            transformation_stage="semantic_verification",
-                            semantic_audit=semantic_audit,
-                        )
-                        exception = _rework_item(
-                            target["output"],
-                            target["output"]["document"],
-                            reason,
-                            target_id,
-                            diagnostics=failure_diagnostics,
-                        )
-                        machine_rework[:] = [
-                            item
-                            for item in machine_rework
-                            if str(item.get("target_id") or "") != target_id
-                        ]
-                        machine_rework.append(exception)
-                        new_machine_rework.append(exception)
-                        _log_runtime_semantic_failure(
-                            target["output"],
-                            reason=reason,
-                            exc=exc,
-                            diagnostics=failure_diagnostics,
+                    if "exception" not in outcome:
+                        verifications.append(dict(outcome["verification"]))
+                        verified_target_ids.add(target_id)
+                        new_verified_records += 1
+                        clear_resolved_rework(target_id, family)
+                        continue
+                    exc = outcome["exception"]
+                    reason = _semantic_failure_reason(exc)
+                    if reason == "blocked_configuration":
+                        blocker = _semantic_configuration_reason(exc)
+                        blocked_configuration_reasons[blocker] = (
+                            blocked_configuration_reasons.get(blocker, 0) + 1
                         )
                         _increment_family_metrics(
                             by_field_family,
                             family,
-                            machine_rework=1,
-                            errors=1,
+                            configuration_blocked=1,
                         )
-                    write_progress()
-                    if configuration_stop_requested:
-                        break
+                        configuration_stop_requested = True
+                        continue
+                    errors += 1
+                    failure_diagnostics = _runtime_failure_diagnostics(
+                        exc,
+                        transformation_stage="semantic_verification",
+                        semantic_audit=semantic_audit,
+                    )
+                    exception = _rework_item(
+                        target["output"],
+                        target["output"]["document"],
+                        reason,
+                        target_id,
+                        diagnostics=failure_diagnostics,
+                    )
+                    machine_rework[:] = [
+                        item
+                        for item in machine_rework
+                        if str(item.get("target_id") or "") != target_id
+                    ]
+                    machine_rework.append(exception)
+                    new_machine_rework.append(exception)
+                    _log_runtime_semantic_failure(
+                        target["output"],
+                        reason=reason,
+                        exc=exc,
+                        diagnostics=failure_diagnostics,
+                    )
+                    _increment_family_metrics(
+                        by_field_family,
+                        family,
+                        machine_rework=1,
+                        errors=1,
+                    )
+                for overflow_target in overflow_targets:
+                    overflow_id = str(overflow_target.get("target_id") or "")
+                    overflow_exception = _rework_item(
+                        overflow_target["output"],
+                        overflow_target["output"]["document"],
+                        "verification_batch_overflow",
+                        overflow_id,
+                        diagnostics={
+                            "batch_limit": 50,
+                            "target_id": overflow_id,
+                            "message": (
+                                "report/family ambiguity batch exceeded the bounded "
+                                "verification request size"
+                            ),
+                        },
+                    )
+                    machine_rework.append(overflow_exception)
+                    new_machine_rework.append(overflow_exception)
+                    _increment_family_metrics(
+                        by_field_family,
+                        family,
+                        machine_rework=1,
+                    )
+                write_progress()
                 if configuration_stop_requested or family_stop_reason == (
                     "budget_exhausted:elapsed_seconds"
                 ):
@@ -2690,12 +2777,13 @@ class BusinessProfileSemanticRuntime:
             "llm_calls": llm_calls,
             "tokens": tokens,
             "errors": errors,
+            "llm_latency_ms": llm_latency_ms,
+            "llm_failovers": llm_failovers,
+            "llm_attempts": llm_attempts,
             "verified_records": new_verified_records,
-            "verification_checkpoint_replays": int(
-                resumed_verification_count > 0
-            ),
+            "verification_checkpoint_replays": int(resumed_verification_count > 0),
             "verification_reused_records": resumed_verification_count,
-            "verification_saved_llm_calls": resumed_llm_verification_count,
+            "verification_saved_llm_calls": len(resumed_llm_request_hashes),
             "blocking_machine_rework": len(machine_rework),
             "configuration_blocked_documents": sum(
                 blocked_configuration_reasons.values()
@@ -2851,9 +2939,9 @@ class BusinessProfileSemanticRuntime:
                     )
                     decisions.append(promotion)
                     if record_type == "relationships" and promotion.get("promoted"):
-                        for semantic_assertion_id in (
-                            _semantic_relationship_assertion_ids(record)
-                        ):
+                        for (
+                            semantic_assertion_id
+                        ) in _semantic_relationship_assertion_ids(record):
                             self.promotion_service.resolve_open_exceptions_for_target(
                                 target_id=semantic_assertion_id,
                                 target_type="document_field_family",
@@ -2918,9 +3006,7 @@ class BusinessProfileSemanticRuntime:
             and item.get("promoted") is True
             for item in decisions
         )
-        published_roles = sum(
-            item.get("promoted") is True for item in derived["roles"]
-        )
+        published_roles = sum(item.get("promoted") is True for item in derived["roles"])
         published_exposure_facts = sum(
             item.get("promoted") is True for item in derived["exposure_facts"]
         )
@@ -2929,10 +3015,7 @@ class BusinessProfileSemanticRuntime:
             for item in derived["publications"]
         )
         gap_targets = {
-            str(
-                item.get("decision", {}).get("target_id")
-                or f"decision:{index}"
-            )
+            str(item.get("decision", {}).get("target_id") or f"decision:{index}")
             for index, item in enumerate(decisions)
             if item.get("decision", {}).get("target_type") != "evidence"
             and item.get("decision", {}).get("classification")
@@ -2947,10 +3030,7 @@ class BusinessProfileSemanticRuntime:
             ("commodity_exposure_facts", derived["exposure_facts"]),
         ):
             gap_targets.update(
-                str(
-                    item.get("decision", {}).get("target_id")
-                    or f"{family}:{index}"
-                )
+                str(item.get("decision", {}).get("target_id") or f"{family}:{index}")
                 for index, item in enumerate(items)
                 if item.get("decision", {}).get("classification")
                 in {"machine_rework", "quick_review", "deep_review"}
@@ -2984,9 +3064,7 @@ class BusinessProfileSemanticRuntime:
                 "auto_promoted": classifications.count("auto_promoted"),
                 "quick_review": classifications.count("quick_review"),
                 "deep_review": classifications.count("deep_review"),
-                "exception_backlog": len(
-                    self.repository.list_exceptions(status="open", limit=10000)
-                ),
+                "exception_backlog": self._scoped_exception_backlog(scope),
                 "candidate_valuation_leakage": 0,
                 "by_field_family": by_field_family,
             },
@@ -3428,9 +3506,7 @@ class BusinessProfileSemanticRuntime:
                     data_available_date=str(item["document"]["published_at"])[:10],
                 )
             )
-            record.setdefault("metadata", {})["exact_evidence"] = assertion[
-                "evidence"
-            ]
+            record.setdefault("metadata", {})["exact_evidence"] = assertion["evidence"]
             record["metadata"].update(
                 {
                     "semantic_assertion_id": assertion["relationship_id"],
@@ -3743,9 +3819,9 @@ class BusinessProfileSemanticRuntime:
                         )
                         result["roles"].append(promotion)
                         if promotion.get("promoted"):
-                            for activity_id in (
-                                role.get("metadata") or {}
-                            ).get("supporting_activity_ids") or ():
+                            for activity_id in (role.get("metadata") or {}).get(
+                                "supporting_activity_ids"
+                            ) or ():
                                 self.promotion_service.resolve_open_exceptions_for_target(
                                     target_id=str(activity_id),
                                     field_family="derived_value_chain_roles",
@@ -4224,7 +4300,9 @@ def _expanded_action_verification_target(
         candidates,
         key=lambda item: (item[0], item[1], item[2].section_id),
     )
-    for _, _, section, context_start, context_end, action_term in ordered_candidates[:2]:
+    for _, _, section, context_start, context_end, action_term in ordered_candidates[
+        :2
+    ]:
         start = max(0, context_start - 300)
         end = min(len(section.normalized_text), start + 1200)
         if end < context_end:
@@ -5054,6 +5132,11 @@ def _verification_target(record: Mapping[str, Any]) -> dict[str, Any]:
         or metadata.get("parser_manifest_promoted")
         or validation.get("parser_manifest_promoted")
     )
+    target["catalogs_current"] = (
+        dict(validation.get("catalog_versions") or {}) == _current_catalog_versions()
+    )
+    target["temporal_scope_valid"] = validation.get("temporal_scope_valid") is True
+    target["no_conflicts"] = validation.get("no_conflicts") is True
     target["evidence"] = metadata.get("exact_evidence")
     return target
 
@@ -5082,6 +5165,91 @@ def _verification_result_is_current(
     return (verification.get("decision") == "confirmed") == all_confirmed
 
 
+def _program_validation_decision(
+    target: Mapping[str, Any], *, target_type: str
+) -> dict[str, Any]:
+    """Classify records that are complete and locally supportable.
+
+    This is deliberately conservative: it only removes a semantic verifier
+    call when the extraction contract supplies every required claim field, the
+    exact evidence binding is valid, and deterministic numeric/unit checks (if
+    applicable) have already passed. It does not infer a new fact.
+    """
+
+    missing: list[str] = []
+    if not str(target.get("instrument_id") or "").strip():
+        missing.append("instrument_id")
+    if not str(target.get("report_period") or "").strip():
+        missing.append("report_period")
+    if not bool(target.get("exact_evidence_valid")):
+        missing.append("exact_evidence")
+    if target.get("catalogs_current") is not True:
+        missing.append("catalogs_current")
+    if target.get("temporal_scope_valid") is not True:
+        missing.append("temporal_scope")
+    if target.get("no_conflicts") is not True:
+        missing.append("conflicts")
+    ambiguity_reasons = list(
+        (target.get("metadata") or {}).get("semantic_ambiguity_reasons") or []
+    )
+    missing.extend(str(item) for item in ambiguity_reasons if str(item).strip())
+    if target_type == "activity":
+        for key in ("subject_scope", "action", "object_raw"):
+            if not str(target.get(key) or "").strip():
+                missing.append(key)
+    elif target_type == "relationship":
+        for key in ("subject_scope", "relationship_type", "object_raw"):
+            if not str(target.get(key) or "").strip():
+                missing.append(key)
+    elif target_type == "segment":
+        if not str(target.get("segment_name_raw") or "").strip():
+            missing.append("segment_name_raw")
+    elif target_type == "concentration":
+        if not str(
+            target.get("fact_scope") or target.get("scope_label_raw") or ""
+        ).strip():
+            missing.append("scope")
+    has_numeric = any(
+        target.get(key) is not None
+        for key in ("value", "value_raw", "revenue", "segment_cost", "gross_margin")
+    )
+    if has_numeric and (
+        target.get("numeric_reconciliation_executed") is not True
+        or target.get("numeric_reconciliation_valid") is not True
+    ):
+        missing.append("numeric_reconciliation")
+    metadata = target.get("metadata") or {}
+    blocker = str(
+        metadata.get("publication_blocker") or target.get("publication_blocker") or ""
+    )
+    if blocker:
+        missing.append(blocker)
+    if missing:
+        return {
+            "proof_version": "business_profile_program_validation.v1",
+            "classification": "ambiguous",
+            "canonical_promotion_allowed": False,
+            "promotion_block_reasons": sorted(set(missing)),
+            "skip_semantic_verifier": False,
+        }
+    return {
+        "proof_version": "business_profile_program_validation.v1",
+        "classification": "validated",
+        "canonical_promotion_allowed": True,
+        "promotion_block_reasons": [],
+        "skip_semantic_verifier": True,
+        "checks": {
+            "schema": True,
+            "evidence": True,
+            "issuer_period": True,
+            "numeric_units": True,
+            "catalogs": True,
+            "temporal_scope": True,
+            "conflicts": True,
+        },
+    }
+
+
 def _verification_allows_promotion(
     verification: Mapping[str, Any] | None,
 ) -> bool:
@@ -5091,7 +5259,10 @@ def _verification_allows_promotion(
     if isinstance(proof, Mapping):
         return bool(
             proof.get("proof_version")
-            == DETERMINISTIC_VERIFICATION_PROOF_VERSION
+            in {
+                DETERMINISTIC_VERIFICATION_PROOF_VERSION,
+                "business_profile_program_validation.v1",
+            }
             and proof.get("skip_semantic_verifier") is True
             and proof.get("canonical_promotion_allowed") is True
             and not list(proof.get("promotion_block_reasons") or [])
@@ -5149,7 +5320,9 @@ def _semantic_relationship_assertion_ids(
         "relationship_type",
         "counterparty_name_raw",
     )
-    if not isinstance(evidence, Mapping) or any(not record.get(key) for key in required):
+    if not isinstance(evidence, Mapping) or any(
+        not record.get(key) for key in required
+    ):
         return ()
     base = {
         "instrument_id": str(record["instrument_id"]),
@@ -5525,21 +5698,129 @@ def _semantic_configuration_reason(exc: Exception) -> str:
 
 
 class _RuntimeAsyncBridge:
-    """Keep async provider resources on one loop for a synchronous pipeline run."""
+    """Keep all business-profile gateway calls on one process-local loop."""
+
+    _shared_loop: asyncio.AbstractEventLoop | None = None
+    _shared_thread: threading.Thread | None = None
+    _submission_queue: (
+        queue.Queue[tuple[Any, concurrent.futures.Future[Any]]] | None
+    ) = None
+    _stop_event: threading.Event | None = None
+    _lock = threading.RLock()
+    _instances = 0
 
     def __init__(self) -> None:
-        self._loop: asyncio.AbstractEventLoop | None = None
+        self._closed = False
+        with _RuntimeAsyncBridge._lock:
+            _RuntimeAsyncBridge._instances += 1
+
+    @classmethod
+    def _ensure_shared_loop(cls) -> asyncio.AbstractEventLoop:
+        with cls._lock:
+            if (
+                cls._shared_loop is not None
+                and not cls._shared_loop.is_closed()
+                and cls._shared_thread is not None
+                and cls._shared_thread.is_alive()
+                and cls._submission_queue is not None
+                and cls._stop_event is not None
+            ):
+                return cls._shared_loop
+
+            ready = threading.Event()
+            holder: dict[str, asyncio.AbstractEventLoop] = {}
+            submissions: queue.Queue[tuple[Any, concurrent.futures.Future[Any]]] = (
+                queue.Queue()
+            )
+            stop_event = threading.Event()
+
+            def run_loop() -> None:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                holder["loop"] = loop
+                ready.set()
+
+                async def execute(
+                    awaitable: Any,
+                    result: concurrent.futures.Future[Any],
+                ) -> None:
+                    try:
+                        value = await awaitable
+                    except asyncio.CancelledError:
+                        result.cancel()
+                        raise
+                    except Exception as exc:
+                        result.set_exception(exc)
+                    else:
+                        result.set_result(value)
+
+                async def pump() -> None:
+                    active: set[asyncio.Task[Any]] = set()
+                    while not stop_event.is_set() or not submissions.empty() or active:
+                        while True:
+                            try:
+                                awaitable, result = submissions.get_nowait()
+                            except queue.Empty:
+                                break
+                            task = asyncio.create_task(execute(awaitable, result))
+                            active.add(task)
+                            task.add_done_callback(active.discard)
+                        await asyncio.sleep(0.001 if active else 0.01)
+
+                try:
+                    loop.run_until_complete(pump())
+                finally:
+                    loop.close()
+
+            thread = threading.Thread(
+                target=run_loop,
+                name="business-profile-llm-loop",
+                daemon=True,
+            )
+            cls._shared_thread = thread
+            thread.start()
+            ready.wait()
+            loop = holder["loop"]
+            cls._shared_loop = loop
+            cls._submission_queue = submissions
+            cls._stop_event = stop_event
+            return loop
 
     def run(self, awaitable: Any) -> Any:
-        if self._loop is None:
-            self._loop = asyncio.new_event_loop()
-        return self._loop.run_until_complete(awaitable)
+        if self._closed:
+            raise RuntimeError("business-profile async bridge is closed")
+        loop = self._ensure_shared_loop()
+        if threading.current_thread() is _RuntimeAsyncBridge._shared_thread:
+            raise RuntimeError(
+                "business-profile async bridge cannot synchronously wait on its own loop"
+            )
+        result: concurrent.futures.Future[Any] = concurrent.futures.Future()
+        with _RuntimeAsyncBridge._lock:
+            submissions = _RuntimeAsyncBridge._submission_queue
+            if submissions is None or loop is not _RuntimeAsyncBridge._shared_loop:
+                raise RuntimeError("business-profile async bridge loop is unavailable")
+            submissions.put((awaitable, result))
+        return result.result()
 
     def close(self) -> None:
-        if self._loop is None:
-            return
-        self._loop.close()
-        self._loop = None
+        thread: threading.Thread | None = None
+        stop_event: threading.Event | None = None
+        with _RuntimeAsyncBridge._lock:
+            if self._closed:
+                return
+            self._closed = True
+            _RuntimeAsyncBridge._instances = max(0, _RuntimeAsyncBridge._instances - 1)
+            if _RuntimeAsyncBridge._instances == 0:
+                thread = _RuntimeAsyncBridge._shared_thread
+                stop_event = _RuntimeAsyncBridge._stop_event
+                _RuntimeAsyncBridge._shared_loop = None
+                _RuntimeAsyncBridge._shared_thread = None
+                _RuntimeAsyncBridge._submission_queue = None
+                _RuntimeAsyncBridge._stop_event = None
+        if stop_event is not None:
+            stop_event.set()
+        if thread is not None and thread is not threading.current_thread():
+            thread.join()
 
 
 def _canonical_json(value: Any) -> str:
@@ -5588,6 +5869,14 @@ def _accumulate_semantic_usage_and_spans(
 ) -> None:
     tokens = float((audit.get("usage") or {}).get("total_tokens") or 0)
     metrics["tokens"] += tokens
+    latency_ms = float(audit.get("latency_ms") or 0)
+    metrics["llm_latency_ms"] = float(metrics.get("llm_latency_ms") or 0) + latency_ms
+    metrics["llm_failovers"] = float(metrics.get("llm_failovers") or 0) + float(
+        audit.get("failover_count") or 0
+    )
+    metrics["llm_attempts"] = float(metrics.get("llm_attempts") or 0) + float(
+        audit.get("attempts") or 0
+    )
     _increment_family_metrics(
         metrics["by_field_family"],
         family,

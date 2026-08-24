@@ -1,0 +1,12 @@
+{
+  "schema_version": "business_profile_offline_eval.v1",
+  "cases": [
+    {"case_id": "manufacturing", "industry": "制造业", "file": "manufacturing.json"},
+    {"case_id": "energy", "industry": "能源", "file": "energy.json"},
+    {"case_id": "pharmaceuticals", "industry": "医药", "file": "pharmaceuticals.json"},
+    {"case_id": "finance", "industry": "金融", "file": "finance.json"},
+    {"case_id": "consumer", "industry": "消费", "file": "consumer.json"},
+    {"case_id": "mining", "industry": "矿业", "file": "mining.json"},
+    {"case_id": "diversified", "industry": "多业务集团", "file": "diversified.json"}
+  ]
+}

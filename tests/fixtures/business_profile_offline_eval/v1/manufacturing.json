@@ -1,0 +1,1 @@
+{"case_id":"manufacturing","sections":[{"section_key":"main_business","text":"公司主要从事工业设备制造，生产压缩机并向客户销售。"}],"expected":{"activities":[{"action":"produces","object_raw":"压缩机"},{"action":"sells","object_raw":"压缩机"}],"relationships":[]}}

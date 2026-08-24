@@ -1,0 +1,1 @@
+{"case_id":"diversified","sections":[{"section_key":"main_business","text":"集团业务包括房地产开发、物业服务和新能源汽车零部件制造。"}],"expected":{"activities":[{"action":"produces","object_raw":"新能源汽车零部件"}],"relationships":[],"expected_ambiguity":true}}

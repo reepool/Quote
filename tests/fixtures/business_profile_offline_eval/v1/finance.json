@@ -1,0 +1,1 @@
+{"case_id":"finance","sections":[{"section_key":"main_business","text":"公司为客户提供贷款、支付结算和财富管理服务。"}],"expected":{"activities":[{"action":"provides_service","object_raw":"贷款"},{"action":"provides_service","object_raw":"支付结算"}],"relationships":[]}}

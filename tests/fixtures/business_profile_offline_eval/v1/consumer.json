@@ -1,0 +1,1 @@
+{"case_id":"consumer","sections":[{"section_key":"main_business","text":"公司生产瓶装饮料并通过经销商和零售渠道销售。"}],"expected":{"activities":[{"action":"produces","object_raw":"瓶装饮料"},{"action":"sells","object_raw":"瓶装饮料"}],"relationships":[{"relationship_type":"sells_to","counterparty_raw":"经销商"}]}}

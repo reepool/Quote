@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from io import BytesIO
 from types import SimpleNamespace
@@ -15,6 +16,10 @@ import research.business_profile_semantic_runtime as runtime_module
 from research.business_profile_activity_production import GovernedCounterpartyResolver
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_promotion import FieldFamilyPromotionManifest
+from research.business_profile_section_selection import (
+    SelectedSection,
+    SelectedSectionArtifact,
+)
 from research.business_profile_semantic_extraction import (
     DETERMINISTIC_VERIFICATION_PROOF_VERSION,
     SEMANTIC_EXTRACTION_SCHEMA_VERSION,
@@ -34,21 +39,17 @@ from research.business_profile_semantic_runtime import (
     _atomic_activity_fact_type,
     _atomic_activity_operating_fact,
     _bind_promotion_validation,
+    _catalog_version_scope,
+    _catalogs_current,
     _expanded_action_verification_target,
     _normalized_value,
     _select_current_semantic_activities,
-    _semantic_relationship_assertion_ids,
     _semantic_failure_reason,
+    _semantic_relationship_assertion_ids,
     _verification_allows_promotion,
     _verification_result_is_current,
-    _catalog_version_scope,
-    _catalogs_current,
     compute_business_profile_semantic_source_revision,
     discover_business_profile_semantic_scope,
-)
-from research.business_profile_section_selection import (
-    SelectedSection,
-    SelectedSectionArtifact,
 )
 from research.providers.base import FinancialSourceFileManifest
 from research.storage import ResearchStorageManager
@@ -58,6 +59,37 @@ from utils.config_manager import (
     ResearchStorageConfig,
 )
 from utils.llm import LlmAuthenticationError, LlmResponse, LlmUsage
+
+
+def test_runtime_async_bridge_accepts_concurrent_thread_submissions():
+    bridges = [
+        runtime_module._RuntimeAsyncBridge(),
+        runtime_module._RuntimeAsyncBridge(),
+    ]
+    state = {"active": 0, "peak": 0, "loop_ids": set()}
+
+    async def probe(value):
+        state["loop_ids"].add(id(asyncio.get_running_loop()))
+        state["active"] += 1
+        state["peak"] = max(state["peak"], state["active"])
+        try:
+            await asyncio.sleep(0.03)
+            return value
+        finally:
+            state["active"] -= 1
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(bridge.run, probe(index))
+                for index, bridge in enumerate(bridges)
+            ]
+            assert [future.result(timeout=2) for future in futures] == [0, 1]
+        assert state["peak"] == 2
+        assert len(state["loop_ids"]) == 1
+    finally:
+        for bridge in bridges:
+            bridge.close()
 
 
 def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
@@ -114,13 +146,9 @@ def test_only_current_self_consistent_verification_can_be_reused_or_promoted():
     assert _verification_result_is_current(old) is False
     assert _verification_allows_promotion(old) is False
     assert _verification_result_is_current(contradictory) is False
-    assert (
-        _verification_allows_promotion(contradictory) is False
-    )
+    assert _verification_allows_promotion(contradictory) is False
     assert _verification_result_is_current(stale_local_proof) is False
-    assert (
-        _verification_allows_promotion(stale_local_proof) is False
-    )
+    assert _verification_allows_promotion(stale_local_proof) is False
     assert _verification_result_is_current(current_local_proof) is False
     assert _verification_allows_promotion(current_local_proof) is True
     assert _verification_allows_promotion(None) is False
@@ -247,13 +275,16 @@ def test_operating_fact_catalog_gate_ignores_unrelated_product_release():
         "fact",
         "unit",
     }
-    assert _catalogs_current(
-        recorded,
-        current,
-        required_keys=_catalog_version_scope(
-            "operating_facts", "tabular_operating_facts"
-        ),
-    ) is True
+    assert (
+        _catalogs_current(
+            recorded,
+            current,
+            required_keys=_catalog_version_scope(
+                "operating_facts", "tabular_operating_facts"
+            ),
+        )
+        is True
+    )
 
 
 def test_exposure_catalog_gate_requires_product_release():
@@ -267,13 +298,16 @@ def test_exposure_catalog_gate_requires_product_release():
         "product": "business_profile_products.2026.4",
     }
 
-    assert _catalogs_current(
-        recorded,
-        current,
-        required_keys=_catalog_version_scope(
-            "exposure_facts", "commodity_exposure_facts"
-        ),
-    ) is False
+    assert (
+        _catalogs_current(
+            recorded,
+            current,
+            required_keys=_catalog_version_scope(
+                "exposure_facts", "commodity_exposure_facts"
+            ),
+        )
+        is False
+    )
 
 
 def test_current_activity_selection_prefers_canonical_mapping():
@@ -559,9 +593,7 @@ def test_atomic_unknown_unit_preserves_raw_fact_as_pending():
     assert fact["unit_raw"] == "未治理单位"
     assert fact["value_normalized"] is None
     assert fact["unit_normalized"] is None
-    assert fact["metadata"]["unit_resolution_status"] == (
-        "unit_resolution_pending"
-    )
+    assert fact["metadata"]["unit_resolution_status"] == ("unit_resolution_pending")
     assert fact["metadata"]["publication_blocker"] == "unit_resolution_pending"
 
 
@@ -605,9 +637,7 @@ def test_legacy_relationship_reconstructs_exact_semantic_assertion_ids():
 
     assert _semantic_relationship_assertion_ids(record) == expected
     record["metadata"]["semantic_assertion_id"] = "persisted-assertion-id"
-    assert _semantic_relationship_assertion_ids(record) == (
-        "persisted-assertion-id",
-    )
+    assert _semantic_relationship_assertion_ids(record) == ("persisted-assertion-id",)
 
 
 def test_latest_selected_artifact_query_returns_completed_document_match(tmp_path):
@@ -872,6 +902,24 @@ def _request_span_ids(payload, *required_texts):
     return ids
 
 
+def _batch_verification_decision(target_id, *, decision="supported", failed=()):
+    failed_aspects = tuple(failed)
+    return {
+        "target_id": target_id,
+        "decision": decision,
+        "checks": {
+            key: key not in failed_aspects
+            for key in ("subject", "action", "object", "scope", "period", "evidence")
+        },
+        "failed_aspects": list(failed_aspects),
+        "reason_zh": (
+            "公告证据完整支持该业务断言"
+            if decision == "supported"
+            else "公告证据不足以支持该业务断言"
+        ),
+    }
+
+
 class _FakeGateway:
     def __init__(self):
         self.requests = []
@@ -885,6 +933,19 @@ class _FakeGateway:
         assert running_loop is self.loop
         self.requests.append(request)
         if request.metadata["stage"] == "semantic_verification":
+            payload = json.loads(request.messages[-1].content)
+            if payload.get("records"):
+                decisions = [
+                    _batch_verification_decision(item["target_id"])
+                    for item in payload["records"]
+                ]
+                return _response(
+                    {
+                        "schema_version": "business_profile_semantic_batch_verifier.v1",
+                        "decisions": decisions,
+                    },
+                    request,
+                )
             data = {
                 "decision": "confirmed",
                 "checks": {
@@ -1226,6 +1287,18 @@ class _AnonymousRelationshipGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
         if request.metadata["stage"] == "semantic_verification":
+            payload = json.loads(request.messages[-1].content)
+            if payload.get("records"):
+                return _response(
+                    {
+                        "schema_version": "business_profile_semantic_batch_verifier.v1",
+                        "decisions": [
+                            _batch_verification_decision(item["target_id"])
+                            for item in payload["records"]
+                        ],
+                    },
+                    request,
+                )
             return _response(
                 {
                     "decision": "confirmed",
@@ -1260,9 +1333,7 @@ class _AnonymousRelationshipGateway(_FakeGateway):
                         "anonymous": True,
                         "disclosed_share": 0.595,
                         "object_raw": "收入",
-                        "evidence_span_ids": _request_span_ids(
-                            payload, top_five_quote
-                        ),
+                        "evidence_span_ids": _request_span_ids(payload, top_five_quote),
                     },
                     {
                         "subject_scope": "issuer",
@@ -1310,6 +1381,18 @@ class _ProductionAndSalesGateway(_FakeGateway):
     async def complete(self, request):
         self.requests.append(request)
         if request.metadata["stage"] == "semantic_verification":
+            payload = json.loads(request.messages[-1].content)
+            if payload.get("records"):
+                return _response(
+                    {
+                        "schema_version": "business_profile_semantic_batch_verifier.v1",
+                        "decisions": [
+                            _batch_verification_decision(item["target_id"])
+                            for item in payload["records"]
+                        ],
+                    },
+                    request,
+                )
             return _response(
                 {
                     "decision": "confirmed",
@@ -1485,20 +1568,11 @@ def test_action_only_verification_failure_expands_bounded_annual_report_context(
         async def complete(self, request):
             self.requests.append(request)
             payload = json.loads(request.messages[-1].content)
-            expanded_context = len(payload["isolated_evidence"]["spans"]) > 1
+            target_id = payload["records"][0]["target_id"]
             return _response(
                 {
-                    "decision": (
-                        "confirmed" if expanded_context else "insufficient_evidence"
-                    ),
-                    "checks": {
-                        "subject": True,
-                        "action": expanded_context,
-                        "object": True,
-                        "scope": True,
-                        "period": True,
-                        "evidence": True,
-                    },
+                    "schema_version": "business_profile_semantic_batch_verifier.v1",
+                    "decisions": [_batch_verification_decision(target_id)],
                 },
                 request,
             )
@@ -1512,20 +1586,15 @@ def test_action_only_verification_failure_expands_bounded_annual_report_context(
     outcome = asyncio.run(runtime._verify_wave_async([target]))[0]
 
     assert outcome["verification"]["decision"] == "confirmed"
-    assert [item["kind"] for item in outcome["verification"]["attempts"]] == [
-        "isolated_evidence",
-        "bounded_action_context",
-    ]
-    assert outcome["retry_calls"] == 1
-    assert outcome["usage_tokens"] == 80
-    assert len(gateway.requests) == 2
+    assert [item["kind"] for item in outcome["verification"]["attempts"]] == ["batched"]
+    assert outcome["retry_calls"] == 0
+    assert outcome["usage_tokens"] == 40
+    assert len(gateway.requests) == 1
 
     class FailingExpandedContextGateway(ActionContextGateway):
         async def complete(self, request):
-            if self.requests:
-                self.requests.append(request)
-                raise RuntimeError("expanded verification unavailable")
-            return await super().complete(request)
+            self.requests.append(request)
+            raise RuntimeError("batch verification unavailable")
 
     failing_gateway = FailingExpandedContextGateway()
     failing_runtime = BusinessProfileSemanticRuntime(
@@ -1536,15 +1605,8 @@ def test_action_only_verification_failure_expands_bounded_annual_report_context(
     failed = asyncio.run(failing_runtime._verify_wave_async([target]))[0]
 
     assert isinstance(failed["exception"], RuntimeError)
-    assert [item["kind"] for item in failed["audit"]["attempts"]] == [
-        "isolated_evidence",
-        "bounded_action_context",
-    ]
-    assert failed["audit"]["attempts"][0]["verification"]["decision"] == (
-        "insufficient_evidence"
-    )
-    assert failed["audit"]["attempts"][1]["verification"] is None
-    assert failed["retry_calls"] == 1
+    assert failed["audit"]["stage"] == "semantic_verification_batch"
+    assert failed["retry_calls"] == 0
 
 
 def _relationship_runtime(
@@ -1685,6 +1747,20 @@ def _deterministic_runtime(
         handlers=runtime.handlers(),
     )
     return repository, pipeline, scope
+
+
+def _force_program_ambiguity(monkeypatch, reason="semantic_context_ambiguous"):
+    monkeypatch.setattr(
+        runtime_module,
+        "_program_validation_decision",
+        lambda target, *, target_type: {
+            "proof_version": "business_profile_program_validation.v1",
+            "classification": "ambiguous",
+            "canonical_promotion_allowed": False,
+            "promotion_block_reasons": [reason],
+            "skip_semantic_verifier": False,
+        },
+    )
 
 
 def test_source_revision_binds_selected_document_and_retry_generation(tmp_path):
@@ -2116,8 +2192,7 @@ def test_ambiguous_structured_table_uses_bounded_semantic_fallback(
 
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
-    assert len(gateway.requests) == 2
-    assert gateway.requests[-1].metadata["stage"] == "semantic_verification"
+    assert len(gateway.requests) == 1
     assert verified["quality"]["verified_records"] == 1
     assert pipeline.run("promote", scope=scope)["status"] == "success"
     segment = repository.list_records("segments", instrument_id="601088.SH")[0]
@@ -2251,8 +2326,7 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
     verified = pipeline.run("verify", scope=scope)
     assert verified["status"] == "success"
     assert verified["quality"]["verified_records"] == 1
-    assert len(gateway.requests) == 2
-    assert gateway.requests[-1].metadata["stage"] == "semantic_verification"
+    assert len(gateway.requests) == 1
     assert pipeline.run("promote", scope=scope)["status"] == "success"
     fact = repository.list_records("operating_facts", instrument_id="601088.SH")[0]
     assert fact["review_status"] == "approved"
@@ -2790,6 +2864,7 @@ def test_atomic_llm_authentication_failure_is_a_configuration_blocker(
 def test_verifier_authentication_failure_is_a_configuration_blocker(
     tmp_path, monkeypatch
 ):
+    _force_program_ambiguity(monkeypatch)
     gateway = _VerifierAuthenticationGateway()
     repository, pipeline, scope = _deterministic_runtime(
         tmp_path,
@@ -2810,7 +2885,7 @@ def test_verifier_authentication_failure_is_a_configuration_blocker(
     }
     assert verified["quality"]["blocking_machine_rework"] == 0
     assert verified["metrics"]["errors"] == 0
-    assert len(gateway.requests) == 3
+    assert len(gateway.requests) == 2
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
@@ -3003,7 +3078,9 @@ def test_extract_stops_new_network_calls_when_token_budget_is_reached(
     assert len(payload["outputs"]) == 1
 
 
-def test_verify_uses_an_independent_field_family_token_budget(tmp_path, monkeypatch):
+def test_verify_program_validates_safe_records_without_spending_llm_tokens(
+    tmp_path, monkeypatch
+):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     content = b"%PDF-1.7 verifier budget source"
@@ -3058,36 +3135,31 @@ def test_verify_uses_an_independent_field_family_token_budget(tmp_path, monkeypa
     result = pipeline.run("verify", scope=scope)
 
     assert result["status"] == "success"
-    assert result["metrics"]["llm_calls"] == 3
-    assert len(gateway.requests) == 3
+    assert result["metrics"]["llm_calls"] == 1
+    assert len(gateway.requests) == 1
     assert "verify" in result["completed_stages"]
     artifact = pipeline.checkpoint_store.load()["artifacts"]["verify"]
     payload = runtime.stage_store.read(artifact, expected_stage="verify")
     assert payload["budget_stop_reason"] is None
     assert len(payload["verifications"]) == 2
-    verifier_payload = json.loads(gateway.requests[1].messages[-1].content)
-    assert set(verifier_payload) == {
-        "target_type",
-        "target_id",
-        "instrument_id",
-        "report_period",
-        "claim",
-        "isolated_evidence",
+    assert {item["decision"] for item in payload["verifications"]} == {"validated"}
+    assert {item["proof"]["proof_version"] for item in payload["verifications"]} == {
+        "business_profile_program_validation.v1"
     }
-    assert verifier_payload["claim"] == {
-        "subject_scope": "issuer",
-        "action": "produces",
-        "object_raw": "动力煤",
-        "value": None,
-        "unit": None,
+    assert payload["resume"] == {
+        "reused_verifications": 0,
+        "new_verifications": 2,
+        "batch_llm_calls": 0,
+        "batch_tokens": 0,
     }
 
 
-def test_verify_runs_independent_targets_in_a_bounded_concurrent_wave(
+def test_verify_ambiguous_targets_use_one_batch_without_nested_fanout(
     tmp_path, monkeypatch
 ):
+    _force_program_ambiguity(monkeypatch)
     gateway = _ConcurrentProductionAndSalesGateway()
-    repository, pipeline, scope = _deterministic_runtime(
+    _repository, pipeline, scope = _deterministic_runtime(
         tmp_path,
         monkeypatch,
         family="atomic_activities",
@@ -3108,12 +3180,47 @@ def test_verify_runs_independent_targets_in_a_bounded_concurrent_wave(
 
     assert result["status"] == "success"
     assert result["metrics"]["verified_records"] == 2
-    assert gateway.peak_verifications == 2
+    assert gateway.peak_verifications == 1
+    assert len(gateway.requests) == 2
+    verifier_payload = json.loads(gateway.requests[1].messages[-1].content)
+    assert len(verifier_payload["records"]) == 2
+    artifact = pipeline.checkpoint_store.load()["artifacts"]["verify"]
+    verified = pipeline.handlers["verify"].__self__.stage_store.read(
+        artifact, expected_stage="verify"
+    )
+    assert {item["batch_size"] for item in verified["verifications"]} == {2}
+    assert len({item["request_hash"] for item in verified["verifications"]}) == 1
 
 
-def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
+def test_verify_resumes_partial_batch_without_repeating_completed_targets(
     tmp_path, monkeypatch
 ):
+    _force_program_ambiguity(monkeypatch)
+
+    class PartialBatchGateway(_ProductionAndSalesGateway):
+        def __init__(self):
+            super().__init__()
+            self.verification_calls = 0
+
+        async def complete(self, request):
+            if request.metadata["stage"] != "semantic_verification":
+                return await super().complete(request)
+            self.requests.append(request)
+            self.verification_calls += 1
+            payload = json.loads(request.messages[-1].content)
+            records = payload["records"]
+            returned = records[:1] if self.verification_calls == 1 else records
+            return _response(
+                {
+                    "schema_version": "business_profile_semantic_batch_verifier.v1",
+                    "decisions": [
+                        _batch_verification_decision(item["target_id"])
+                        for item in returned
+                    ],
+                },
+                request,
+            )
+
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     content = b"%PDF-1.7 resumable verifier budget source"
@@ -3144,7 +3251,7 @@ def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
             "status": "written",
         },
     )
-    gateway = _ProductionAndSalesGateway()
+    gateway = PartialBatchGateway()
     runtime = BusinessProfileSemanticRuntime(
         repository=repository,
         artifact_root=tmp_path / "artifacts",
@@ -3155,7 +3262,7 @@ def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
         config=SemanticProductionConfig(
             enabled=True,
             budgets=SemanticProductionBudgets(
-                max_tokens=40,
+                max_tokens=50_000,
                 max_concurrency=1,
             ),
         ),
@@ -3171,7 +3278,7 @@ def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
     first = pipeline.run("verify", scope=scope)
 
     assert first["status"] == "stopped"
-    assert first["reason"] == "budget_exhausted:tokens"
+    assert first["reason"].startswith("quality_gate:verify:")
     assert len(gateway.requests) == 2
     partial_reference = pipeline.checkpoint_store.load()["artifacts"]["verify"]
     partial = runtime.stage_store.read(partial_reference, expected_stage="verify")
@@ -3182,37 +3289,40 @@ def test_verify_resumes_token_bounded_batch_without_repeating_completed_targets(
         "batch_llm_calls": 1,
         "batch_tokens": 40,
     }
+    assert len(partial["machine_rework"]) == 1
+
+    first_payload = json.loads(gateway.requests[1].messages[-1].content)
+    first_success_id = first_payload["records"][0]["target_id"]
+    first_missing_id = first_payload["records"][1]["target_id"]
 
     resumed = pipeline.run("resume", scope=scope)
 
     assert resumed["status"] == "success"
-    assert resumed["completed_stages"] == ["plan", "select", "extract", "verify"]
-    assert resumed["metrics"]["verified_records"] == 2
-    assert resumed["metrics"]["verification_checkpoint_replays"] == 1
-    assert resumed["metrics"]["verification_reused_records"] == 1
-    assert resumed["metrics"]["verification_saved_llm_calls"] == 1
     assert len(gateway.requests) == 3
-    verifier_target_ids = [
-        json.loads(request.messages[-1].content)["target_id"]
-        for request in gateway.requests
-        if request.metadata["stage"] == "semantic_verification"
+    resumed_payload = json.loads(gateway.requests[2].messages[-1].content)
+    assert [item["target_id"] for item in resumed_payload["records"]] == [
+        first_missing_id
     ]
-    assert len(verifier_target_ids) == len(set(verifier_target_ids)) == 2
     final_reference = pipeline.checkpoint_store.load()["artifacts"]["verify"]
     final = runtime.stage_store.read(final_reference, expected_stage="verify")
-    assert len(final["verifications"]) == 2
-    assert final["budget_stop_reason"] is None
+    assert {item["target_id"] for item in final["verifications"]} == {
+        first_success_id,
+        first_missing_id,
+    }
+    assert final["machine_rework"] == []
     assert final["resume"] == {
         "reused_verifications": 1,
         "new_verifications": 1,
         "batch_llm_calls": 1,
         "batch_tokens": 40,
     }
+    assert repository.list_exceptions(instrument_id="601088.SH", status="open") == []
 
 
 def test_verify_failure_persists_llm_audit_and_counts_failed_call(
     tmp_path, monkeypatch
 ):
+    _force_program_ambiguity(monkeypatch)
     gateway = _VerifierFailureGateway()
     repository, pipeline, scope = _deterministic_runtime(
         tmp_path,
@@ -3235,7 +3345,7 @@ def test_verify_failure_persists_llm_audit_and_counts_failed_call(
     diagnostics = exception["metadata"]["diagnostics"]
     assert diagnostics["exception"]["transformation_stage"] == ("semantic_verification")
     assert diagnostics["exception"]["error_type"] == "ValueError"
-    assert diagnostics["semantic_audit"]["stage"] == "semantic_verification"
+    assert diagnostics["semantic_audit"]["stage"] == "semantic_verification_batch"
     assert diagnostics["semantic_audit"]["failure_category"] == (
         "gateway_or_validation_failure"
     )
@@ -3284,18 +3394,15 @@ def test_real_local_pdf_plan_select_and_hash_incremental_discovery(tmp_path):
     assert len(selected_payload["selected"]) == 1
     assert selected_payload["selected"][0]["page_artifact_hash"]
     assert selected_payload["selected"][0]["selected_artifact_hash"]
-    assert (
-        discover_business_profile_semantic_scope(
-            repository,
-            knowledge_cutoff="2026-08-01",
-            max_instruments=3,
-            field_families=("structured_segments",),
-            runtime_identities=scope.identities,
-            source_asset_loader=lambda _instrument_id: [manifest],
-            active_universe_loader=lambda: [{"instrument_id": "601088.SH"}],
-        )
-        == ("601088.SH",)
-    )
+    assert discover_business_profile_semantic_scope(
+        repository,
+        knowledge_cutoff="2026-08-01",
+        max_instruments=3,
+        field_families=("structured_segments",),
+        runtime_identities=scope.identities,
+        source_asset_loader=lambda _instrument_id: [manifest],
+        active_universe_loader=lambda: [{"instrument_id": "601088.SH"}],
+    ) == ("601088.SH",)
 
 
 def test_select_shares_page_artifact_across_field_families(tmp_path, monkeypatch):
@@ -3562,9 +3669,7 @@ def test_shadow_selection_failure_persists_machine_rework_without_promotion_mani
     assert exception["next_retry_at"] is not None
 
 
-def test_semantic_runtime_promotes_only_after_independent_verification(
-    tmp_path, monkeypatch
-):
+def test_semantic_runtime_promotes_after_program_validation(tmp_path, monkeypatch):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
     content = b"%PDF-1.7 synthetic archived source"
@@ -3635,7 +3740,7 @@ def test_semantic_runtime_promotes_only_after_independent_verification(
     approved = repository.get_approved_as_of(
         "activities", instrument_id="601088.SH", cutoff="2026-08-01"
     )
-    assert len(gateway.requests) == 2
+    assert len(gateway.requests) == 1
     extraction_payload = json.loads(gateway.requests[0].messages[-1].content)
     extraction_text = extraction_payload["evidence_spans"][0]["text"]
     assert "行业背景与一般风险说明" in extraction_text
@@ -3720,9 +3825,7 @@ def test_unique_exact_counterparty_is_verified_and_promoted(tmp_path, monkeypatc
     assert repository.list_exceptions(instrument_id="601088.SH") == []
 
 
-def test_insufficient_verifier_context_routes_to_machine_rework(
-    tmp_path, monkeypatch
-):
+def test_insufficient_verifier_context_routes_to_machine_rework(tmp_path, monkeypatch):
     repository, pipeline, scope, _gateway = _relationship_runtime(
         tmp_path,
         monkeypatch,
@@ -3740,13 +3843,11 @@ def test_insufficient_verifier_context_routes_to_machine_rework(
     assert pipeline.run("verify", scope=scope)["status"] == "success"
     assert pipeline.run("promote", scope=scope)["status"] == "success"
 
-    relationship = repository.list_records(
-        "relationships", instrument_id="601088.SH"
-    )[0]
+    relationship = repository.list_records("relationships", instrument_id="601088.SH")[
+        0
+    ]
     assert relationship["review_status"] == "candidate"
-    exception = repository.list_exceptions(
-        instrument_id="601088.SH", status="open"
-    )[0]
+    exception = repository.list_exceptions(instrument_id="601088.SH", status="open")[0]
     assert exception["tier"] == "machine_rework"
     assert "context_incomplete" in exception["reason_codes"]
     assert "failed_gate:semantic_proof" in exception["reason_codes"]
@@ -3775,22 +3876,13 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     )
 
     assert pipeline.run("verify", scope=scope)["status"] == "success"
-    verification_payloads = [
-        json.loads(request.messages[-1].content)
-        for request in gateway.requests
-        if request.metadata["stage"] == "semantic_verification"
-    ]
-    related_purchase_claim = next(
-        payload["claim"]
-        for payload in verification_payloads
-        if payload["claim"].get("value_normalized") == 0.144
+    candidates = repository.list_records("operating_facts", instrument_id="601088.SH")
+    related_purchase = next(
+        fact for fact in candidates if fact.get("value_normalized") == 0.144
     )
-    assert related_purchase_claim["scope_label_raw"] == "关联方"
-    assert related_purchase_claim["object_raw"] == "采购额"
-    assert "fact_scope" not in related_purchase_claim
-    candidates = repository.list_records(
-        "operating_facts", instrument_id="601088.SH"
-    )
+    assert related_purchase["metadata"]["anonymous_label"] == "关联方"
+    assert related_purchase["metadata"]["object_raw"] == "采购额"
+    assert related_purchase["fact_scope"].startswith("anonymous-concentration-scope:")
     stale_target_ids = {
         fact["record_id"]
         for fact in sorted(candidates, key=lambda item: item["record_id"])[:3]
@@ -3813,9 +3905,7 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
                     "2026-08-20T00:00:00+08:00",
                 )
                 for index, fact in enumerate(
-                    fact
-                    for fact in candidates
-                    if fact["record_id"] in stale_target_ids
+                    fact for fact in candidates if fact["record_id"] in stale_target_ids
                 )
             ],
         )
@@ -3823,7 +3913,7 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     assert pipeline.run("promote", scope=scope)["status"] == "success"
 
     facts = repository.list_records("operating_facts", instrument_id="601088.SH")
-    assert len(gateway.requests) == 5
+    assert len(gateway.requests) == 1
     assert len(facts) == 4
     assert {fact["fact_type"] for fact in facts} == {
         "customer_concentration_share",
@@ -3839,9 +3929,7 @@ def test_distinct_anonymous_concentrations_bypass_resolution_and_are_promoted(
     assert {fact["review_status"] for fact in facts} == {"approved"}
     assert repository.list_records("relationships", instrument_id="601088.SH") == []
     assert repository.list_exceptions(instrument_id="601088.SH", status="open") == []
-    resolved = repository.list_exceptions(
-        instrument_id="601088.SH", status="resolved"
-    )
+    resolved = repository.list_exceptions(instrument_id="601088.SH", status="resolved")
     assert {item["target_id"] for item in resolved} == stale_target_ids
 
 
@@ -4173,9 +4261,7 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     }
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert exceptions == []
-    stale_activity = next(
-        item for item in activities if item["action"] == "produces"
-    )
+    stale_activity = next(item for item in activities if item["action"] == "produces")
     runtime._persist_runtime_exception(
         {
             "instrument_id": "601088.SH",
@@ -4193,7 +4279,7 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     runtime._derive_and_publish(scope)
     assert repository.list_exceptions(instrument_id="601088.SH") == []
     report = pipeline.run("report", scope=scope)["metrics"]["by_field_family"]
-    assert report["atomic_activities"]["llm_calls"] == 3
+    assert report["atomic_activities"]["llm_calls"] == 1
     assert report["atomic_activities"]["candidates"] == 2
     assert report["derived_value_chain_roles"]["auto_promoted"] == 1
     assert report["commodity_exposure_facts"]["auto_promoted"] == 2
@@ -4206,9 +4292,7 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     verified["machine_rework"] = [
         {"target_id": "shared-gap", "reason_code": "verification_failed"}
     ]
-    checkpoint["artifacts"]["verify"] = runtime.stage_store.write(
-        "verify", verified
-    )
+    checkpoint["artifacts"]["verify"] = runtime.stage_store.write("verify", verified)
     monkeypatch.setattr(
         runtime,
         "_derive_and_publish",

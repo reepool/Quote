@@ -111,6 +111,31 @@ class _RequestAwareGateway:
         return _response(self.response_factory(request))
 
 
+def _batch_verification_response(request):
+    payload = json.loads(request.messages[-1].content)
+    checks = {
+        "subject": True,
+        "action": True,
+        "object": True,
+        "scope": True,
+        "period": True,
+        "evidence": True,
+    }
+    return {
+        "schema_version": "business_profile_semantic_batch_verifier.v1",
+        "decisions": [
+            {
+                "target_id": record["target_id"],
+                "decision": "supported",
+                "checks": checks,
+                "failed_aspects": [],
+                "reason_zh": "公告证据完整支持该业务断言",
+            }
+            for record in payload["records"]
+        ],
+    }
+
+
 def _structured_response(
     selected,
     *,
@@ -148,7 +173,8 @@ def _activity_response(selected, *, quote=None, span_ids=None, extra=None):
         "object_raw": "动力煤",
         "value": None,
         "unit": None,
-        "evidence_span_ids": span_ids or _evidence_span_ids(
+        "evidence_span_ids": span_ids
+        or _evidence_span_ids(
             selected,
             contains=exact_quote,
         ),
@@ -188,8 +214,7 @@ def test_persisted_semantic_result_has_row_string_and_total_bounds():
     bounded = _bounded_semantic_result(
         {
             "rows": [
-                {f"field_{field}": "x" * 1000 for field in range(80)}
-                for _ in range(60)
+                {f"field_{field}": "x" * 1000 for field in range(80)} for _ in range(60)
             ]
         }
     )
@@ -204,15 +229,19 @@ def test_persisted_semantic_result_has_row_string_and_total_bounds():
 async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     selected = _selected()
     audits = []
-    gateway = _FakeGateway([replace(
-        _response(_activity_response(selected)),
-        source_label="pipio:grok-4.5",
-        logical_profile="semantic_extraction",
-        selected_profile="semantic__pipio_grok",
-        route_fingerprint="route-v1",
-        failover_count=1,
-        attempts=({"source_label": "pipio:grok-4.5", "status": "success"},),
-    )])
+    gateway = _FakeGateway(
+        [
+            replace(
+                _response(_activity_response(selected)),
+                source_label="pipio:grok-4.5",
+                logical_profile="semantic_extraction",
+                selected_profile="semantic__pipio_grok",
+                route_fingerprint="route-v1",
+                failover_count=1,
+                attempts=({"source_label": "pipio:grok-4.5", "status": "success"},),
+            )
+        ]
+    )
     extractor = BusinessProfileSemanticExtractor(gateway, audit_sink=audits.append)
 
     result = await extractor.extract_async(
@@ -237,25 +266,28 @@ async def test_atomic_extraction_uses_common_profile_and_local_exact_evidence():
     assert result.audit.failover_count == 1
     assert result.audit.usage["total_tokens"] == 120
     assert audits[0]["response_hash"]
-    assert audits[0]["diagnostics"]["semantic_result"]["activities"][0][
-        "object_raw"
-    ] == "动力煤"
+    assert (
+        audits[0]["diagnostics"]["semantic_result"]["activities"][0]["object_raw"]
+        == "动力煤"
+    )
     assert audits[0]["diagnostics"]["evidence_span_catalog"][0][
         "evidence_span_id"
     ].startswith("span-")
-    assert "公司生产动力煤" in audits[0]["diagnostics"][
-        "evidence_span_catalog"
-    ][0]["text_excerpt"]
-    assert len(
-        json.dumps(
-            audits[0]["diagnostics"],
-            ensure_ascii=False,
-            sort_keys=True,
+    assert (
+        "公司生产动力煤"
+        in audits[0]["diagnostics"]["evidence_span_catalog"][0]["text_excerpt"]
+    )
+    assert (
+        len(
+            json.dumps(
+                audits[0]["diagnostics"],
+                ensure_ascii=False,
+                sort_keys=True,
+            )
         )
-    ) <= 100_000
-    assert "公司生产动力煤" in audits[0]["diagnostics"]["resolved_evidence"][0][
-        "quote"
-    ]
+        <= 100_000
+    )
+    assert "公司生产动力煤" in audits[0]["diagnostics"]["resolved_evidence"][0]["quote"]
 
 
 @pytest.mark.asyncio
@@ -387,8 +419,7 @@ async def test_semantic_lifecycle_and_bounded_result_are_logged(caplog, monkeypa
     assert any("business-profile llm start" in message for message in messages)
     assert any("status=completed" in message for message in messages)
     assert any(
-        "llm semantic result" in message and "动力煤" in message
-        for message in messages
+        "llm semantic result" in message and "动力煤" in message for message in messages
     )
     assert any(
         "llm evidence catalog" in message and "公司生产动力煤" in message
@@ -404,9 +435,7 @@ async def test_structured_extraction_accepts_exact_evidence_and_bounded_numbers(
     )
     gateway = _FakeGateway([_structured_response(selected)])
 
-    result = await BusinessProfileSemanticExtractor(
-        gateway
-    ).extract_structured_async(
+    result = await BusinessProfileSemanticExtractor(gateway).extract_structured_async(
         field_family="structured_segments",
         instrument_id="601088.SH",
         report_period="2025-12-31",
@@ -752,7 +781,9 @@ async def test_structured_extraction_rejects_percentage_scale_but_accepts_summar
 async def test_unknown_span_fails_whole_batch_and_records_stable_failure():
     selected = _selected()
     audits = []
-    gateway = _FakeGateway([_activity_response(selected, span_ids=["span-" + "0" * 24])])
+    gateway = _FakeGateway(
+        [_activity_response(selected, span_ids=["span-" + "0" * 24])]
+    )
     extractor = BusinessProfileSemanticExtractor(gateway, audit_sink=audits.append)
 
     with pytest.raises(ValueError, match="identifier is unknown"):
@@ -940,6 +971,51 @@ async def test_independent_verifier_agreement_and_conflict_are_lineaged():
     assert confirmed["request_hash"]
     assert audits[0]["diagnostics"]["semantic_result"]["decision"] == "confirmed"
     assert audits[0]["diagnostics"]["isolated_evidence"][0]["text"]
+
+
+@pytest.mark.asyncio
+async def test_ten_report_replay_uses_one_batch_verification_call_per_report():
+    selected = _selected()
+    section = selected.sections[0]
+    gateway = _RequestAwareGateway(_batch_verification_response)
+    extractor = BusinessProfileSemanticExtractor(gateway)
+    for report_index in range(10):
+        targets = []
+        for target_index in range(2):
+            target_id = f"activity-{report_index}-{target_index}"
+            target = {
+                "activity_id": target_id,
+                "instrument_id": f"TEST{report_index:02d}.SH",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": "produces" if target_index == 0 else "sells",
+                "object_raw": "测试产品",
+                "evidence": {
+                    "section_id": section.section_id,
+                    "page_number": section.page_number,
+                    "section_hash": section.section_hash,
+                    "quote": section.normalized_text,
+                    "quote_hash": hashlib.sha256(
+                        section.normalized_text.encode()
+                    ).hexdigest(),
+                },
+            }
+            targets.append(
+                {
+                    "target_type": "activity",
+                    "target_id": target_id,
+                    "verification_target": target,
+                    "selected": selected,
+                }
+            )
+        decisions, _audit = await extractor.verify_batch_async(targets=targets)
+        assert len(decisions) == 2
+
+    assert len(gateway.requests) == 10
+    assert all(
+        len(json.loads(request.messages[-1].content)["records"]) == 2
+        for request in gateway.requests
+    )
 
 
 @pytest.mark.asyncio
