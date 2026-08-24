@@ -232,7 +232,13 @@ class BusinessProfileSemanticPipeline:
             return self._report(checkpoint)
         if self.config.kill_switches["all_writes"]:
             return self._stop(checkpoint, "kill_switch:all_writes")
-        existing_stop_reason = self._budget_stop_reason(checkpoint.get("metrics") or {})
+        # Checkpoint metrics are cumulative observability data.  Network and
+        # stage budgets are enforced by the runtime while a stage is active;
+        # replaying a partial checkpoint must not be rejected for time or
+        # tokens spent by an earlier attempt.
+        existing_stop_reason = self._quality_stop_reason(
+            checkpoint.get("metrics") or {}
+        )
         if existing_stop_reason:
             return self._stop(checkpoint, existing_stop_reason)
         if normalized_mode == "rebuild-publications":
@@ -280,7 +286,7 @@ class BusinessProfileSemanticPipeline:
         )
         checkpoint["metrics"] = metrics
         result_status = str(result.get("status") or "").strip().lower()
-        stop_reason = self._budget_stop_reason(metrics)
+        stop_reason = self._quality_stop_reason(metrics)
         if result_status in {"interrupted", "cancelled", "stopped"}:
             checkpoint["artifacts"][stage] = result.get("artifact")
             return self._stop(
@@ -476,27 +482,14 @@ class BusinessProfileSemanticPipeline:
         checkpoint["scope_hash"] = rebound_scope.scope_hash
         checkpoint["scope"]["source_revision"] = rebound_scope.source_revision
 
-    def _budget_stop_reason(self, metrics: Mapping[str, Any]) -> str | None:
-        budgets = self.config.budgets
-        capacity_comparisons = (
-            ("documents", budgets.max_documents),
-            ("pages", budgets.max_pages),
-            ("characters", budgets.max_characters),
-        )
-        for key, maximum in capacity_comparisons:
-            if float(metrics.get(key) or 0) > float(maximum):
-                return f"budget_exhausted:{key}"
-        consumable_comparisons = (
-            # Token limits are enforced by the runtime before each field-family
-            # request. The checkpoint keeps cumulative usage for observability,
-            # but one completed family must not block another unfinished family.
-            ("cost", budgets.max_cost),
-            ("elapsed_seconds", budgets.max_elapsed_seconds),
-            ("errors", budgets.max_errors),
-        )
-        for key, maximum in consumable_comparisons:
-            if float(metrics.get(key) or 0) >= float(maximum):
-                return f"budget_exhausted:{key}"
+    def _quality_stop_reason(self, metrics: Mapping[str, Any]) -> str | None:
+        """Return persistent quality stops, excluding stage-scoped backlogs.
+
+        Exception backlog is evaluated by the active runtime stage, where its
+        report and processing identity are available.  Persisted checkpoint
+        totals cannot safely be reused as a recovery gate.
+        """
+
         thresholds = self.config.thresholds
         for key, maximum in (
             ("unsupported_output_rate", thresholds.max_unsupported_output_rate),
@@ -505,11 +498,6 @@ class BusinessProfileSemanticPipeline:
         ):
             if float(metrics.get(key) or 0) > float(maximum):
                 return f"quality_stop:{key}"
-        if (
-            int(metrics.get("exception_backlog") or 0)
-            > thresholds.max_exception_backlog
-        ):
-            return "quality_stop:exception_backlog"
         return None
 
     def _stop(

@@ -33,6 +33,7 @@ from research.business_profile_semantic_pipeline import (
     SemanticProductionCheckpointStore,
     SemanticProductionConfig,
     SemanticProductionScope,
+    SemanticProductionThresholds,
 )
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
@@ -103,6 +104,115 @@ def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
         _semantic_failure_reason(ValueError("unsupported ratio unit: （%）"))
         == "unit_normalization_failed"
     )
+
+
+def test_scoped_exception_backlog_ignores_historical_reports_and_identities(tmp_path):
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+    )
+    scope = _scope("atomic_activities")
+    identities = dict(scope.identities)
+    runtime.repository.list_exceptions = Mock(
+        return_value=[
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "tier": "machine_rework",
+                "metadata": {
+                    "source_document_id": "current-report",
+                    "runtime_identities": identities,
+                },
+            },
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "tier": "machine_rework",
+                "metadata": {
+                    "source_document_id": "historical-report",
+                    "runtime_identities": identities,
+                },
+            },
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "tier": "machine_rework",
+                "metadata": {
+                    "source_document_id": "current-report",
+                    "runtime_identities": {**identities, "parser": "parser.v0"},
+                },
+            },
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "tier": "deep_review",
+                "metadata": {"source_document_id": "current-report"},
+            },
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "tier": "machine_rework",
+                "metadata": {"source_document_id": "current-report"},
+            },
+        ]
+    )
+
+    backlog = runtime._scoped_exception_backlog(
+        scope,
+        plans=[
+            {
+                "instrument_id": "601088.SH",
+                "field_family": "atomic_activities",
+                "included": [{"identity": "current-report"}],
+            }
+        ],
+    )
+
+    assert backlog == 2
+
+
+def test_network_budget_ignores_elapsed_time_from_prior_checkpoint(tmp_path):
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+        clock=lambda: 101.0,
+    )
+
+    assert runtime._network_budget_stop_reason(
+        config=SemanticProductionConfig(
+            enabled=True,
+            budgets=SemanticProductionBudgets(max_elapsed_seconds=10),
+        ),
+        checkpoint_metrics={"elapsed_seconds": 3_600},
+        stage_metrics={},
+        stage_started_at=100.0,
+    ) is None
+
+
+def test_plan_returns_quality_stop_for_current_scoped_exception_backlog(
+    tmp_path, monkeypatch
+):
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+    )
+    monkeypatch.setattr(
+        runtime, "_scoped_exception_backlog", lambda *_args, **_kwargs: 3
+    )
+
+    result = runtime.plan(
+        scope=_scope("atomic_activities"),
+        config=SemanticProductionConfig(
+            enabled=True,
+            thresholds=SemanticProductionThresholds(max_exception_backlog=2),
+        ),
+        checkpoint={"metrics": {}},
+    )
+
+    assert result["quality"] == {
+        "stage_ready": False,
+        "blocking_machine_rework": 3,
+    }
 
 
 def test_only_current_self_consistent_verification_can_be_reused_or_promoted():
@@ -2912,11 +3022,11 @@ def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
 
     current = repository.get_record("segments", segment["record_id"])
     assert current["review_status"] == "candidate"
-    reason_codes = repository.list_exceptions(instrument_id="601088.SH")[0][
-        "reason_codes"
-    ]
+    exception = repository.list_exceptions(instrument_id="601088.SH")[0]
+    reason_codes = exception["reason_codes"]
     assert "failed_gate:numeric_reconciliation" in reason_codes
     assert "failed_gate:temporal_scope" in reason_codes
+    assert exception["metadata"]["source_document_id"] == "source-2025"
 
 
 def test_deterministic_operating_table_normalizes_volume_and_unknown_unit_rolls_back(

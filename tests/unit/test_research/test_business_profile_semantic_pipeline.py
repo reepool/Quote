@@ -210,6 +210,62 @@ def test_cumulative_tokens_remain_observable_without_pipeline_stop(tmp_path):
     assert result["completed_stages"] == ["plan"]
 
 
+def test_historical_elapsed_metrics_do_not_block_checkpoint_recovery(tmp_path):
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(budgets=SemanticProductionBudgets(max_elapsed_seconds=10)),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
+        handlers=_handlers(
+            {
+                "plan": {
+                    "status": "success",
+                    "artifact": {"plan": "hash"},
+                    "metrics": {"elapsed_seconds": 900},
+                }
+            }
+        ),
+    )
+
+    first = pipeline.run("plan", scope=_scope())
+    resumed = pipeline.run("resume", scope=_scope())
+
+    assert first["status"] == "success"
+    assert first["metrics"]["elapsed_seconds"] >= 900
+    assert resumed["status"] == "success"
+    assert resumed["stage"] == "select"
+
+
+def test_stage_scoped_exception_backlog_remains_a_recovery_gate(tmp_path):
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(
+            thresholds=SemanticProductionThresholds(max_exception_backlog=2)
+        ),
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "checkpoint.json"
+        ),
+        handlers=_handlers(
+            {
+                "plan": {
+                    "status": "success",
+                    "artifact": {"plan": "hash"},
+                    "metrics": {"exception_backlog": 3},
+                    "quality": {
+                        "stage_ready": False,
+                        "blocking_machine_rework": 3,
+                    },
+                }
+            }
+        ),
+    )
+
+    result = pipeline.run("plan", scope=_scope())
+
+    assert result["status"] == "stopped"
+    assert result["reason"].startswith("quality_gate:plan:")
+    assert result["completed_stages"] == []
+
+
 def test_report_aggregates_denominators_and_rates_by_field_family(tmp_path):
     pipeline = BusinessProfileSemanticPipeline(
         config=_config(),

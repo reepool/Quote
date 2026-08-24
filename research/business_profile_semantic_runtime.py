@@ -673,16 +673,59 @@ class BusinessProfileSemanticRuntime:
             self._async_bridge.run(close())
         self._async_bridge.close()
 
-    def _scoped_exception_backlog(self, scope: Any, *, limit: int = 10000) -> int:
-        """Count only open exceptions that belong to the active run scope."""
+    def _scoped_exception_backlog(
+        self,
+        scope: Any,
+        *,
+        plans: Sequence[Mapping[str, Any]],
+        limit: int = 10000,
+    ) -> int:
+        """Count blocking rework only for selected reports in this run.
 
-        families = {str(item) for item in scope.field_families}
-        return sum(
-            1
-            for item in self.repository.list_exceptions(status="open", limit=limit)
-            if str(item.get("instrument_id") or "") in set(scope.instruments)
-            and (not families or str(item.get("field_family") or "") in families)
-        )
+        The exception table is intentionally historical.  A processing gate
+        must therefore require the current instrument, field family, selected
+        report identity, and (when recorded) the current runtime identities.
+        Older rows without identities remain compatible only when their report
+        identity exactly matches a selected report.
+        """
+
+        selected_documents: dict[tuple[str, str], set[str]] = {}
+        for plan in plans:
+            key = (
+                str(plan.get("instrument_id") or ""),
+                str(plan.get("field_family") or ""),
+            )
+            identities = {
+                str(document.get("identity") or "")
+                for document in plan.get("included") or ()
+                if str(document.get("identity") or "")
+            }
+            if identities:
+                selected_documents.setdefault(key, set()).update(identities)
+
+        if not selected_documents:
+            return 0
+        current_identities = dict(scope.identities)
+        count = 0
+        for exception in self.repository.list_exceptions(status="open", limit=limit):
+            if str(exception.get("tier") or "") != "machine_rework":
+                continue
+            key = (
+                str(exception.get("instrument_id") or ""),
+                str(exception.get("field_family") or ""),
+            )
+            allowed_documents = selected_documents.get(key)
+            if not allowed_documents:
+                continue
+            metadata = exception.get("metadata") or {}
+            source_document_id = str(metadata.get("source_document_id") or "")
+            if source_document_id not in allowed_documents:
+                continue
+            recorded_identities = metadata.get("runtime_identities") or {}
+            if recorded_identities and dict(recorded_identities) != current_identities:
+                continue
+            count += 1
+        return count
 
     def rebuild_publications(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -863,7 +906,9 @@ class BusinessProfileSemanticRuntime:
                 "reused_results": sum(
                     bool((plan.get("coverage") or {}).get("complete")) for plan in plans
                 ),
-                "exception_backlog": self._scoped_exception_backlog(scope),
+                "exception_backlog": self._scoped_exception_backlog(
+                    scope, plans=plans
+                ),
                 "acquisition_attempts": acquisition_attempts,
                 "acquired_plans": acquired_plans,
                 "errors": acquisition_errors,
@@ -872,6 +917,13 @@ class BusinessProfileSemanticRuntime:
         }
         if budget_stop_reason:
             result["reason"] = budget_stop_reason
+        elif result["metrics"]["exception_backlog"] > (
+            config.thresholds.max_exception_backlog
+        ):
+            result["quality"] = {
+                "stage_ready": False,
+                "blocking_machine_rework": result["metrics"]["exception_backlog"],
+            }
         return result
 
     def select(self, **kwargs: Any) -> Mapping[str, Any]:
@@ -2848,9 +2900,9 @@ class BusinessProfileSemanticRuntime:
     ) -> str | None:
         """Return the consumable budget that forbids the next network request."""
 
-        elapsed = float(checkpoint_metrics.get("elapsed_seconds") or 0) + max(
-            0.0, self.clock() - stage_started_at
-        )
+        # A durable checkpoint can span many independent worker attempts.
+        # Only the active stage's wall time belongs to this request budget.
+        elapsed = max(0.0, self.clock() - stage_started_at)
         family_metrics = (
             dict((stage_metrics.get("by_field_family") or {}).get(field_family) or {})
             if field_family and "by_field_family" in stage_metrics
@@ -3064,7 +3116,6 @@ class BusinessProfileSemanticRuntime:
                 "auto_promoted": classifications.count("auto_promoted"),
                 "quick_review": classifications.count("quick_review"),
                 "deep_review": classifications.count("deep_review"),
-                "exception_backlog": self._scoped_exception_backlog(scope),
                 "candidate_valuation_leakage": 0,
                 "by_field_family": by_field_family,
             },
@@ -3662,6 +3713,11 @@ class BusinessProfileSemanticRuntime:
             if record_type == "evidence"
             else self.repository.get_record("evidence", evidence_id)
         )
+        source_document_id = str(
+            record.get("source_document_id")
+            or (evidence or {}).get("source_document_id")
+            or ""
+        )
         metadata = dict(record.get("metadata") or {})
         validation = dict(metadata.get("promotion_validation") or {})
         evidence_metadata = dict((evidence or {}).get("metadata") or {})
@@ -3747,6 +3803,7 @@ class BusinessProfileSemanticRuntime:
                 runtime_identities=scope.identities,
                 evidence_references=tuple(value for value in (evidence_id,) if value),
                 exception_reasons=exception_reasons,
+                metadata={"source_document_id": source_document_id},
             ),
             manifest,
         )
