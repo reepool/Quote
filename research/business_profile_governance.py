@@ -6,7 +6,7 @@ import hashlib
 import json
 import sqlite3
 from datetime import date
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 from research.business_profile_temporal import (
     BusinessProfileTemporalClass,
@@ -14,12 +14,16 @@ from research.business_profile_temporal import (
     get_business_profile_supersession_column,
 )
 from research.business_profile_fact_catalog import load_business_fact_catalog
-from research.business_profile_product_catalog import load_business_product_catalog
+from research.business_profile_product_catalog import (
+    load_business_product_catalog,
+    normalize_product_alias,
+)
 from utils.date_utils import get_shanghai_time
 
 
 BUSINESS_PROFILE_SCHEMA_VERSION = "company_business_profile.v2"
 BUSINESS_PROFILE_SCORE_VERSION = "business_profile_model_score.v1"
+BUSINESS_PROFILE_MEASUREMENT_CONTRACT_VERSION = "business_profile_measurements.v1"
 REVIEW_STATUSES = {"candidate", "held", "approved", "rejected", "superseded"}
 NON_CANDIDATE_REVIEW_STATUSES = REVIEW_STATUSES - {"candidate"}
 MAX_BUSINESS_PROFILE_BULK_RECORDS = 5000
@@ -99,6 +103,93 @@ def _derive_profile_and_market_link_status(
     return profile_status, market_status, unresolved_ids
 
 
+def _build_business_profile_measurement_contract(
+    operating_facts: Sequence[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Describe measurement authority and legacy activity linkage for API clients."""
+
+    fact_count = len(operating_facts)
+    activity_derived_facts = [
+        fact
+        for fact in operating_facts
+        if isinstance(fact.get("metadata"), dict)
+        and (
+            bool(str(fact["metadata"].get("source_activity_id") or "").strip())
+            or fact["metadata"].get("measurement_authority")
+            == "llm_source_fields_program_normalized"
+        )
+    ]
+    activity_derived_count = len(activity_derived_facts)
+    linked_count = sum(
+        bool(
+            str(
+                (fact.get("metadata") or {}).get("source_activity_id") or ""
+                if isinstance(fact.get("metadata"), dict)
+                else ""
+            ).strip()
+        )
+        for fact in activity_derived_facts
+    )
+    if activity_derived_count == 0:
+        linkage_status = "not_applicable"
+    elif linked_count == activity_derived_count:
+        linkage_status = "linked"
+    elif linked_count:
+        linkage_status = "partially_linked"
+    else:
+        linkage_status = "unlinked"
+    return {
+        "contract_version": BUSINESS_PROFILE_MEASUREMENT_CONTRACT_VERSION,
+        "authoritative_measurements_path": (
+            "company_specific_profile.operating_facts"
+        ),
+        "activity_measurement_role": "compatibility_projection",
+        "operating_fact_activity_link_field": "metadata.source_activity_id",
+        "operating_fact_count": fact_count,
+        "activity_derived_operating_fact_count": activity_derived_count,
+        "linked_activity_derived_operating_fact_count": linked_count,
+        "standalone_operating_fact_count": fact_count - activity_derived_count,
+        "linkage_status": linkage_status,
+    }
+
+
+def select_current_business_profile_activities(
+    activities: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Prefer the most normalized version of an exact filing activity."""
+
+    def rank(activity: Mapping[str, Any]) -> tuple[Any, ...]:
+        return (
+            bool(str(activity.get("object_id") or "").strip()),
+            str(activity.get("knowledge_from") or ""),
+            int(activity.get("version") or 0),
+            str(activity.get("updated_at") or ""),
+            str(activity.get("activity_id") or ""),
+        )
+
+    selected: Dict[tuple[Any, ...], Mapping[str, Any]] = {}
+    for activity in activities:
+        key = (
+            str(activity.get("instrument_id") or ""),
+            str(activity.get("report_period") or ""),
+            str(activity.get("evidence_id") or ""),
+            str(activity.get("subject_scope") or ""),
+            str(activity.get("action") or ""),
+            str(activity.get("object_type") or ""),
+            normalize_product_alias(activity.get("object_raw")),
+            str(activity.get("segment_id") or ""),
+            str(activity.get("geography") or ""),
+            activity.get("value"),
+            str(activity.get("unit") or ""),
+            activity.get("share"),
+            str(activity.get("business_regime_id") or ""),
+        )
+        current = selected.get(key)
+        if current is None or rank(activity) > rank(current):
+            selected[key] = activity
+    return [dict(item) for item in selected.values()]
+
+
 def _collapse_identical_bundle_records(
     record_type: str,
     prepared: Sequence[Dict[str, Any]],
@@ -149,6 +240,7 @@ def build_empty_business_profile_context(
             "commodity_exposure_facts": [],
             "commodity_exposures": [],
         },
+        "measurement_contract": _build_business_profile_measurement_contract([]),
         "segment_profiles": [],
         "approved_exposures": [],
         "candidate_exposures": [],
@@ -1433,6 +1525,10 @@ class BusinessProfileResolver:
                         f"inactive_business_regime:{fact_type}:{self._record_id(fact)}"
                     )
 
+        approved["activities"] = select_current_business_profile_activities(
+            approved["activities"]
+        )
+
         temporal_coverage = self._temporal_coverage(
             approved=approved,
             candidates=candidates,
@@ -1471,6 +1567,9 @@ class BusinessProfileResolver:
                 "commodity_exposure_facts": approved["exposure_facts"],
                 "commodity_exposures": approved["exposures"],
             },
+            "measurement_contract": _build_business_profile_measurement_contract(
+                approved["operating_facts"]
+            ),
             "segment_profiles": approved["segments"],
             "approved_exposures": approved["exposures"],
             "candidate_exposures": candidates["exposures"] if include_candidates else [],

@@ -6,7 +6,10 @@ import pytest
 from research.business_profile_governance import (
     BusinessProfileRepository,
     BusinessProfileResolver,
+    _build_business_profile_measurement_contract,
     _derive_profile_and_market_link_status,
+    build_empty_business_profile_context,
+    select_current_business_profile_activities,
 )
 from research.business_profile_review import BusinessProfileReviewService
 from research.storage import ResearchStorageManager
@@ -96,6 +99,115 @@ def _approved_evidence(instrument_id="601088.SH"):
         "review_status": "approved",
         "metadata": {"source_priority": 1},
     }
+
+
+@pytest.mark.parametrize(
+    ("facts", "expected_status", "expected_linked"),
+    [
+        ([], "not_applicable", 0),
+        (
+            [{"metadata": {"source_activity_id": "activity-1"}}],
+            "linked",
+            1,
+        ),
+        (
+            [
+                {"metadata": {"source_activity_id": "activity-1"}},
+                {
+                    "metadata": {
+                        "measurement_authority": (
+                            "llm_source_fields_program_normalized"
+                        )
+                    }
+                },
+            ],
+            "partially_linked",
+            1,
+        ),
+        (
+            [
+                {
+                    "metadata": {
+                        "measurement_authority": (
+                            "llm_source_fields_program_normalized"
+                        )
+                    }
+                }
+            ],
+            "unlinked",
+            0,
+        ),
+    ],
+)
+def test_business_profile_measurement_contract_linkage_status(
+    facts, expected_status, expected_linked
+):
+    contract = _build_business_profile_measurement_contract(facts)
+
+    assert contract["authoritative_measurements_path"] == (
+        "company_specific_profile.operating_facts"
+    )
+    assert contract["activity_measurement_role"] == "compatibility_projection"
+    assert contract["operating_fact_activity_link_field"] == (
+        "metadata.source_activity_id"
+    )
+    assert contract["operating_fact_count"] == len(facts)
+    assert contract["linked_activity_derived_operating_fact_count"] == expected_linked
+    assert contract["linkage_status"] == expected_status
+
+
+def test_empty_business_profile_exposes_measurement_contract():
+    context = build_empty_business_profile_context(
+        "601088.SH", as_of_date="2026-08-24"
+    )
+
+    assert context["status"] == "not_ready"
+    assert context["measurement_contract"]["linkage_status"] == "not_applicable"
+    assert context["measurement_contract"]["operating_fact_count"] == 0
+
+
+def test_standalone_operating_facts_do_not_require_activity_links():
+    contract = _build_business_profile_measurement_contract(
+        [{"metadata": {"semantic_synthesis": True}}]
+    )
+
+    assert contract["operating_fact_count"] == 1
+    assert contract["activity_derived_operating_fact_count"] == 0
+    assert contract["standalone_operating_fact_count"] == 1
+    assert contract["linkage_status"] == "not_applicable"
+
+
+def test_current_activity_selection_prefers_catalog_normalized_replay():
+    shared = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "evidence_id": "evidence-2025-ar",
+        "subject_scope": "consolidated_group",
+        "action": "sells",
+        "object_type": "product",
+        "object_raw": "聚乙烯",
+        "segment_id": None,
+        "geography": None,
+        "value": 373.9,
+        "unit": "千吨",
+        "share": None,
+        "business_regime_id": None,
+        "knowledge_from": "2026-03-30",
+        "version": 1,
+    }
+
+    selected = select_current_business_profile_activities(
+        [
+            {**shared, "activity_id": "legacy", "object_id": None},
+            {
+                **shared,
+                "activity_id": "normalized",
+                "object_id": "polymer.polyethylene",
+            },
+        ]
+    )
+
+    assert [item["activity_id"] for item in selected] == ["normalized"]
 
 
 def _governed_upsert(repository, record_type, record):

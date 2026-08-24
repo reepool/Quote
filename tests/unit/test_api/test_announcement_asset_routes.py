@@ -758,6 +758,34 @@ def test_openapi_registers_shared_asset_resources():
     ]
     assert "source_assets" in company_profile_schema["properties"]
     assert "consumer_processing_status" in company_profile_schema["properties"]
+    assert "measurement_contract" in company_profile_schema["properties"]
+    company_specific_ref = company_profile_schema["properties"][
+        "company_specific_profile"
+    ]["$ref"]
+    company_specific_schema = schema["components"]["schemas"][
+        company_specific_ref.rsplit("/", 1)[-1]
+    ]
+    assert set(company_specific_schema["properties"]) >= {
+        "operating_facts",
+        "activities",
+        "value_chain_roles",
+        "supply_chain_relationships",
+        "commodity_exposure_facts",
+        "commodity_exposures",
+    }
+    assert company_specific_schema["additionalProperties"] is True
+    measurement_ref = company_profile_schema["properties"]["measurement_contract"][
+        "$ref"
+    ]
+    measurement_schema = schema["components"]["schemas"][
+        measurement_ref.rsplit("/", 1)[-1]
+    ]
+    assert measurement_schema["properties"]["linkage_status"]["enum"] == [
+        "not_applicable",
+        "linked",
+        "partially_linked",
+        "unlinked",
+    ]
 
 
 

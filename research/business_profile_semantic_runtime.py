@@ -37,7 +37,10 @@ from research.business_profile_exposure_production import (
     BusinessProfileExposurePublisher,
 )
 from research.business_profile_fact_catalog import load_business_fact_catalog
-from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_governance import (
+    BusinessProfileRepository,
+    select_current_business_profile_activities,
+)
 from research.business_profile_numeric_reconciliation import (
     NUMERIC_RECONCILIATION_VERSION,
     normalize_ratio,
@@ -158,6 +161,7 @@ def compute_business_profile_semantic_source_revision(
     max_documents: int = 3,
     max_specialist_documents: int = 1,
     selection_policy: str = "latest_annual_only",
+    reprocess_complete_coverage: bool = False,
 ) -> str:
     """Hash the selected official inputs and retry state bound to a checkpoint."""
 
@@ -171,6 +175,7 @@ def compute_business_profile_semantic_source_revision(
         max_documents=max_documents,
         max_specialist_documents=max_specialist_documents,
         selection_policy=selection_policy,
+        reprocess_complete_coverage=reprocess_complete_coverage,
     )
     document_families = sorted(set(field_families) & DOCUMENT_FAMILIES)
     derived_inputs: dict[str, tuple[str, ...]] = {}
@@ -609,6 +614,7 @@ class BusinessProfileSemanticRuntime:
         counterparty_resolver: GovernedCounterpartyResolver | None = None,
         planned_disclosure_acquirer: Any | None = None,
         selection_policy: str = "latest_annual_only",
+        reprocess_complete_coverage: bool = False,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository = repository
@@ -632,6 +638,7 @@ class BusinessProfileSemanticRuntime:
         )
         self.planned_disclosure_acquirer = planned_disclosure_acquirer
         self.selection_policy = str(selection_policy or "latest_annual_only")
+        self.reprocess_complete_coverage = bool(reprocess_complete_coverage)
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
         self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(
@@ -716,6 +723,7 @@ class BusinessProfileSemanticRuntime:
                 else min(1, config.budgets.max_documents - 1)
             ),
             selection_policy=self.selection_policy,
+            reprocess_complete_coverage=self.reprocess_complete_coverage,
         )
         plans: list[dict[str, Any]] = []
         acquisition_attempts = 0
@@ -3012,6 +3020,7 @@ class BusinessProfileSemanticRuntime:
                     else min(1, config.budgets.max_documents - 1)
                 ),
                 selection_policy=self.selection_policy,
+                reprocess_complete_coverage=self.reprocess_complete_coverage,
             ),
         )
 
@@ -5121,29 +5130,7 @@ def _select_current_semantic_activities(
     activities: Sequence[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     """Prefer the most normalized version of an exact filing assertion."""
-
-    selected: dict[tuple[Any, ...], Mapping[str, Any]] = {}
-    for activity in activities:
-        key = (
-            str(activity.get("instrument_id") or ""),
-            str(activity.get("report_period") or ""),
-            str(activity.get("evidence_id") or ""),
-            str(activity.get("subject_scope") or ""),
-            str(activity.get("action") or ""),
-            str(activity.get("object_type") or ""),
-            normalize_product_alias(activity.get("object_raw")),
-            str(activity.get("segment_id") or ""),
-            str(activity.get("geography") or ""),
-            activity.get("value"),
-            str(activity.get("unit") or ""),
-            activity.get("share"),
-            str(activity.get("business_regime_id") or ""),
-        )
-        current = selected.get(key)
-        rank = _semantic_activity_rank(activity)
-        if current is None or rank > _semantic_activity_rank(current):
-            selected[key] = activity
-    return [dict(item) for item in selected.values()]
+    return select_current_business_profile_activities(activities)
 
 
 def _semantic_relationship_assertion_ids(
@@ -5178,16 +5165,6 @@ def _semantic_relationship_assertion_ids(
     return tuple(
         _stable_hash({**base, "subject_scope": subject_scope})
         for subject_scope in ("issuer", "consolidated_group")
-    )
-
-
-def _semantic_activity_rank(activity: Mapping[str, Any]) -> tuple[Any, ...]:
-    return (
-        bool(str(activity.get("object_id") or "").strip()),
-        str(activity.get("knowledge_from") or ""),
-        int(activity.get("version") or 0),
-        str(activity.get("updated_at") or ""),
-        str(activity.get("activity_id") or ""),
     )
 
 

@@ -234,6 +234,7 @@ class BusinessProfileDisclosurePlanner:
         max_documents: int = 3,
         max_specialist_documents: int = 1,
         selection_policy: str = "latest_annual_only",
+        reprocess_complete_coverage: bool = False,
     ) -> None:
         if max_documents < 1:
             raise ValueError("max_documents must be positive")
@@ -251,6 +252,7 @@ class BusinessProfileDisclosurePlanner:
                 f"unsupported business-profile disclosure policy: {selection_policy}"
             )
         self.selection_policy = normalized_policy
+        self.reprocess_complete_coverage = bool(reprocess_complete_coverage)
 
     def plan(
         self,
@@ -282,7 +284,7 @@ class BusinessProfileDisclosurePlanner:
             _decision(item, "future_knowledge_excluded") for item in future
         ]
 
-        if coverage.complete:
+        if coverage.complete and not self.reprocess_complete_coverage:
             omitted.extend(_decision(item, "approved_coverage_complete") for item in eligible)
         else:
             annuals = _active_periodic_documents(eligible, "annual_report")

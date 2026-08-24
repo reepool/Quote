@@ -179,6 +179,42 @@ def test_future_disclosures_are_excluded_and_approved_coverage_short_circuits(tm
     assert plan.omitted[0]["decision_reason"] == "future_knowledge_excluded"
 
 
+def test_reprocess_complete_coverage_selects_effective_annual(tmp_path):
+    repository = _Repository(
+        approved={
+            "activities": [
+                {"report_period": "2025-12-31", "data_available_date": "2026-03-30"}
+            ]
+        }
+    )
+    annual = _manifest(
+        tmp_path,
+        "sf-annual",
+        "annual",
+        "浦发银行2025年年度报告",
+        "2025-12-31",
+        "2026-03-30",
+    )
+
+    plan = _planner(
+        tmp_path,
+        repository=repository,
+        reprocess_complete_coverage=True,
+    ).plan(
+        instrument_id="600000.SH",
+        field_family="atomic_activities",
+        knowledge_cutoff="2026-08-30",
+        manifests=[annual],
+    )
+
+    assert plan.coverage.complete is True
+    assert [item["announcement_id"] for item in plan.included] == ["annual"]
+    assert not any(
+        item["decision_reason"] == "approved_coverage_complete"
+        for item in plan.omitted
+    )
+
+
 def test_coverage_reports_candidates_and_open_exceptions_without_treating_them_as_approved():
     repository = _Repository(
         candidates={"relationships": [{"relationship_id": "candidate-1"}]}

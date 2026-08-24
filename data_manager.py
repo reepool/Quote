@@ -3296,6 +3296,11 @@ class DataManager:
                 "promotion_manifests": dict(
                     semantic.get("promotion_manifests") or {}
                 ),
+                "reprocess_complete_coverage": bool(
+                    dict(item.get("metadata") or {}).get(
+                        "reprocess_complete_coverage"
+                    )
+                ),
             }
             bound_shared_asset = dict(
                 (item.get("metadata") or {}).get("bound_shared_asset") or {}
@@ -3471,6 +3476,7 @@ class DataManager:
         write_coordinator: Optional[Any] = None,
         source_file_ids: Optional[List[str]] = None,
         bound_annual_report_asset: Optional[Mapping[str, Any]] = None,
+        reprocess_complete_coverage: bool = False,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -3666,6 +3672,7 @@ class DataManager:
                         else min(1, config.budgets.max_documents - 1)
                     ),
                     selection_policy=selection_policy,
+                    reprocess_complete_coverage=reprocess_complete_coverage,
                     manifest_loader=manifest_loader,
                 )
                 if mode != "report"
@@ -3687,6 +3694,7 @@ class DataManager:
             ),
             planned_disclosure_acquirer=None,
             selection_policy=selection_policy,
+            reprocess_complete_coverage=reprocess_complete_coverage,
             manifest_loader=manifest_loader,
         )
 

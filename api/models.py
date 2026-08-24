@@ -776,6 +776,52 @@ class ResearchBusinessProfileConsumerProcessingStatus(BaseModel):
     updated_at: Optional[str] = None
 
 
+class ResearchCompanySpecificBusinessProfile(BaseModel):
+    """Company-specific facts currently exposed by the governed profile."""
+
+    business_regime: Optional[Dict[str, Any]] = None
+    segments: List[Dict[str, Any]] = Field(default_factory=list)
+    operating_facts: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Authoritative complete collection of disclosed measurements",
+    )
+    activities: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Business actions; value/unit are compatibility projections only",
+    )
+    value_chain_roles: List[Dict[str, Any]] = Field(default_factory=list)
+    supply_chain_relationships: List[Dict[str, Any]] = Field(default_factory=list)
+    commodity_exposure_facts: List[Dict[str, Any]] = Field(default_factory=list)
+    commodity_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchBusinessProfileMeasurementContract(BaseModel):
+    """Measurement authority and activity-link compatibility contract."""
+
+    contract_version: Literal["business_profile_measurements.v1"] = (
+        "business_profile_measurements.v1"
+    )
+    authoritative_measurements_path: Literal[
+        "company_specific_profile.operating_facts"
+    ] = "company_specific_profile.operating_facts"
+    activity_measurement_role: Literal["compatibility_projection"] = (
+        "compatibility_projection"
+    )
+    operating_fact_activity_link_field: Literal["metadata.source_activity_id"] = (
+        "metadata.source_activity_id"
+    )
+    operating_fact_count: int = Field(0, ge=0)
+    activity_derived_operating_fact_count: int = Field(0, ge=0)
+    linked_activity_derived_operating_fact_count: int = Field(0, ge=0)
+    standalone_operating_fact_count: int = Field(0, ge=0)
+    linkage_status: Literal[
+        "not_applicable", "linked", "partially_linked", "unlinked"
+    ] = "not_applicable"
+
+
 class ResearchCompanyBusinessProfileResponse(BaseModel):
     """公司业务画像治理上下文。"""
 
@@ -788,7 +834,13 @@ class ResearchCompanyBusinessProfileResponse(BaseModel):
     instrument_id: str = Field(..., description="交易品种ID")
     data_available_cutoff: str = Field(..., description="数据可得日截止")
     industry_default_profile: Dict[str, Any] = Field(default_factory=dict)
-    company_specific_profile: Dict[str, Any] = Field(default_factory=dict)
+    company_specific_profile: ResearchCompanySpecificBusinessProfile = Field(
+        default_factory=ResearchCompanySpecificBusinessProfile
+    )
+    measurement_contract: ResearchBusinessProfileMeasurementContract = Field(
+        default_factory=ResearchBusinessProfileMeasurementContract,
+        description="Operating-fact authority and activity compatibility linkage",
+    )
     segment_profiles: List[Dict[str, Any]] = Field(default_factory=list)
     approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)

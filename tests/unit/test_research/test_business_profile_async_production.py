@@ -174,6 +174,38 @@ def test_enqueue_current_identity_supersedes_obsolete_failed_work(tmp_path):
     assert [tuple(row) for row in groups] == [("pending", 1), ("superseded", 1)]
 
 
+def test_new_runtime_identity_reprocesses_completed_coverage(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-obsolete"),
+    )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET stage = 'publish', "
+            "status = 'completed'"
+        )
+        conn.commit()
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity("model-current"),
+    )
+
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT metadata_json FROM business_profile_work_items "
+            "WHERE status = 'pending'"
+        ).fetchone()
+    assert json.loads(row["metadata_json"])["reprocess_complete_coverage"] is True
+
+
 def test_newer_latest_annual_supersedes_older_terminal_work(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -1476,6 +1508,7 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
     assert metadata["recovery_history"][-1]["invalidated_stage_result_names"] == [
         "publish"
     ]
+    assert metadata["reprocess_complete_coverage"] is True
     assert "stage_results" not in metadata
     assert checkpoint_path.exists()
 

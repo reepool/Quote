@@ -1801,6 +1801,7 @@ class BusinessProfileWorkRepository:
                         existing_metadata["processing_identity"] = dict(
                             processing_identity
                         )
+                        existing_metadata["reprocess_complete_coverage"] = True
                         if normalized_binding is not None:
                             existing_metadata["bound_shared_asset"] = normalized_binding
                         conn.execute(
@@ -1823,12 +1824,22 @@ class BusinessProfileWorkRepository:
                     else:
                         reused += 1
                 else:
+                    prior_completed_identity = conn.execute(
+                        "SELECT 1 FROM business_profile_work_items "
+                        "WHERE frontier_id = ? AND policy = ? "
+                        "AND processing_identity_hash <> ? "
+                        "AND status = 'completed' LIMIT 1",
+                        (row["frontier_id"], policy, identity_hash),
+                    ).fetchone()
                     metadata = {
                         "schema_version": WORK_SCHEMA_VERSION,
                         "title": row.get("title"),
                         "published_at": row.get("published_at"),
                         "knowledge_cutoff": knowledge_cutoff,
                         "processing_identity": dict(processing_identity),
+                        "reprocess_complete_coverage": bool(
+                            force or prior_completed_identity is not None
+                        ),
                     }
                     if normalized_binding is not None:
                         metadata["bound_shared_asset"] = normalized_binding

@@ -1415,6 +1415,21 @@ class TestResearchRoutes:
                 "data_available_cutoff": "2026-04-30",
                 "industry_default_profile": {"mapping_scope_id": "煤炭"},
                 "company_specific_profile": {},
+                "measurement_contract": {
+                    "contract_version": "business_profile_measurements.v1",
+                    "authoritative_measurements_path": (
+                        "company_specific_profile.operating_facts"
+                    ),
+                    "activity_measurement_role": "compatibility_projection",
+                    "operating_fact_activity_link_field": (
+                        "metadata.source_activity_id"
+                    ),
+                    "operating_fact_count": 0,
+                    "activity_derived_operating_fact_count": 0,
+                    "linked_activity_derived_operating_fact_count": 0,
+                    "standalone_operating_fact_count": 0,
+                    "linkage_status": "not_applicable",
+                },
                 "segment_profiles": [],
                 "approved_exposures": [],
                 "candidate_exposures": [],
@@ -1448,6 +1463,8 @@ class TestResearchRoutes:
         assert isinstance(response, ResearchCompanyBusinessProfileResponse)
         assert response.model_recommendation == "industry_default"
         assert response.market_link_status == "not_applicable"
+        assert response.measurement_contract.linkage_status == "not_applicable"
+        assert response.company_specific_profile.operating_facts == []
         assert response.exceptions[0]["tier"] == "machine_rework"
         assert response.source_assets is None
         assert response.consumer_processing_status is None
