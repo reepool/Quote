@@ -31,6 +31,8 @@ from research.business_profile_semantic_pipeline import (
 )
 from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
+    _atomic_activity_fact_type,
+    _atomic_activity_operating_fact,
     _bind_promotion_validation,
     _expanded_action_verification_target,
     _normalized_value,
@@ -330,6 +332,237 @@ def test_current_activity_selection_prefers_canonical_mapping():
         "activity-overseas",
         "activity-prior-regime",
     ]
+
+
+def test_atomic_sales_measurements_group_into_one_activity_and_two_facts(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository,
+        artifact_root=tmp_path / "artifacts",
+    )
+    text = "LED芯片及外延片 销售量23,634,408片 销售收入1,392,187,620.56元"
+    text_hash = hashlib.sha256(text.encode()).hexdigest()
+    section = SelectedSection(
+        section_id="section-led-sales",
+        page_number=38,
+        section_key="operating_analysis",
+        text=text,
+        normalized_text=text,
+        normalized_start=0,
+        normalized_end=len(text),
+        page_hash=text_hash,
+        section_hash=text_hash,
+        selector_reasons=("test",),
+        quality="native",
+    )
+    selected = SelectedSectionArtifact(
+        artifact_version="business_profile_selected_sections.v1",
+        bundle={"bundle_id": "bundle-led-sales"},
+        sections=(section,),
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash="selected-led-sales",
+    )
+    exact_evidence = {
+        "section_id": section.section_id,
+        "page_number": section.page_number,
+        "section_hash": section.section_hash,
+        "quote": text,
+        "quote_hash": text_hash,
+    }
+
+    def assertion(assertion_id, label, summary, value, unit):
+        return {
+            "activity_id": assertion_id,
+            "instrument_id": "300708.SZ",
+            "report_period": "2025-12-31",
+            "subject_scope": "issuer",
+            "action": "sells",
+            "object_raw": "LED芯片及外延片",
+            "source_label_raw": label,
+            "semantic_summary_zh": summary,
+            "source_value": value,
+            "source_unit_raw": unit,
+            "value": value,
+            "unit": unit,
+            "model_derived_hints": {},
+            "evidence": exact_evidence,
+        }
+
+    item = {
+        "instrument_id": "300708.SZ",
+        "field_family": "atomic_activities",
+        "selected_artifact_hash": selected.artifact_hash,
+        "document": {
+            "identity": "shared-asset:300708-2025",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-20T18:00:00+08:00",
+            "content_hash": "a" * 64,
+            "source": "cninfo",
+            "source_tier": "official_filing",
+            "document_type": "annual_report",
+            "title": "2025年年度报告",
+            "metadata": {},
+        },
+    }
+    envelope = SimpleNamespace(
+        activities=(
+            assertion(
+                "semantic-led-sales-volume",
+                "销售量",
+                "2025年公司销售LED芯片及外延片23,634,408片。",
+                23634408,
+                "片",
+            ),
+            assertion(
+                "semantic-led-sales-revenue",
+                "销售收入",
+                "2025年公司销售LED芯片及外延片实现销售收入1,392,187,620.56元。",
+                1392187620.56,
+                "元",
+            ),
+        ),
+        relationships=(),
+    )
+
+    evidence_records, converted, exceptions = runtime._semantic_records(
+        item,
+        selected,
+        envelope,
+        record_types=("activities",),
+    )
+    activities = [record for kind, record in converted if kind == "activities"]
+    facts = [record for kind, record in converted if kind == "operating_facts"]
+
+    assert exceptions == []
+    assert len(evidence_records["evidence"]) == 1
+    assert len(activities) == 1
+    assert len(facts) == 2
+    assert {fact["fact_type"] for fact in facts} == {
+        "sales_volume",
+        "sales_revenue",
+    }
+    assert len({fact["record_id"] for fact in facts}) == 2
+    assert {fact["metadata"]["source_activity_id"] for fact in facts} == {
+        activities[0]["activity_id"]
+    }
+    assert activities[0]["value"] == 23634408
+    assert activities[0]["unit"] == "片"
+    assert activities[0]["metadata"]["measurement_projection_fact_type"] == (
+        "sales_volume"
+    )
+    assert activities[0]["metadata"]["semantic_assertion_ids"] == [
+        "semantic-led-sales-volume",
+        "semantic-led-sales-revenue",
+    ]
+    activities[0]["run_id"] = "run-300708-grouped"
+    persisted = repository.persist_document_field_family_bundle(
+        run={
+            "run_id": "run-300708-grouped",
+            "instrument_id": "300708.SZ",
+            "source_document_id": item["document"]["identity"],
+            "field_family": "atomic_activities",
+            "bundle_hash": selected.artifact_hash,
+            "fact_catalog_version": "business_profile_facts.2026.3",
+            "product_catalog_version": "business_profile_products.2026.4",
+            "metadata": {"document_hash": item["document"]["content_hash"]},
+        },
+        records_by_type={
+            "evidence": evidence_records["evidence"],
+            "activities": activities,
+            "operating_facts": facts,
+        },
+    )
+    assert persisted["activity_count"] == 1
+    assert persisted["fact_count"] == 2
+
+
+@pytest.mark.parametrize(
+    ("source_label", "action", "unit", "expected"),
+    [
+        ("生产量", "produces", "片", "production_volume"),
+        ("库存量", "stores", "片", "inventory_volume"),
+        ("采购量", "purchases", "万吨", "purchase_volume"),
+        ("采购额", "purchases", "元", "purchase_amount"),
+        ("销售收入", "sells", "元", "sales_revenue"),
+        ("其他披露指标", "transports", "万吨", "other_measurement"),
+    ],
+)
+def test_atomic_measurement_classification_is_program_owned(
+    source_label, action, unit, expected
+):
+    assert (
+        _atomic_activity_fact_type(
+            {
+                "source_label_raw": source_label,
+                "action": action,
+                "source_unit_raw": unit,
+            }
+        )
+        == expected
+    )
+
+
+def test_atomic_measurement_classification_uses_approved_runtime_unit_rule():
+    assert (
+        _atomic_activity_fact_type(
+            {
+                "source_label_raw": "报告期指标",
+                "action": "sells",
+                "source_unit_raw": "自定义货币单位",
+            },
+            runtime_unit_rules=(
+                {
+                    "rule_id": "runtime:custom-currency",
+                    "normalized_lexeme": "自定义货币单位",
+                    "dimension": "currency",
+                    "canonical_unit": "CNY",
+                    "multiplier": "1",
+                    "status": "auto_approved",
+                },
+            ),
+        )
+        == "sales_revenue"
+    )
+
+
+def test_atomic_unknown_unit_preserves_raw_fact_as_pending():
+    item = {
+        "instrument_id": "300708.SZ",
+        "document": {
+            "identity": "shared-asset:300708-2025",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-20T18:00:00+08:00",
+        },
+    }
+    assertion = {
+        "activity_id": "semantic-unknown-unit",
+        "action": "sells",
+        "object_raw": "测试产品",
+        "source_label_raw": "销售量",
+        "semantic_summary_zh": "报告期销售测试产品12未治理单位。",
+        "source_value": 12,
+        "source_unit_raw": "未治理单位",
+        "model_derived_hints": {},
+        "evidence": {"section_id": "section-1", "quote_hash": "b" * 64},
+    }
+
+    fact = _atomic_activity_operating_fact(
+        item,
+        assertion,
+        activity_id="activity-unknown-unit",
+        evidence_id="evidence-unknown-unit",
+    )
+
+    assert fact["fact_type"] == "sales_volume"
+    assert fact["value_raw"] == 12
+    assert fact["unit_raw"] == "未治理单位"
+    assert fact["value_normalized"] is None
+    assert fact["unit_normalized"] is None
+    assert fact["metadata"]["unit_resolution_status"] == (
+        "unit_resolution_pending"
+    )
+    assert fact["metadata"]["publication_blocker"] == "unit_resolution_pending"
 
 
 def test_legacy_relationship_reconstructs_exact_semantic_assertion_ids():
@@ -1565,6 +1798,7 @@ def test_joint_semantic_families_call_llm_once_and_restart_from_artifact(
     assert replayed["metrics"]["joint_semantic_durable_replays"] == 1
     assert replayed["metrics"]["joint_semantic_sibling_reuses"] == 1
     assert replayed["metrics"]["joint_semantic_saved_llm_calls"] == 2
+    assert replayed["metrics"]["tokens"] == 0
     assert len(gateway.requests) == 1
 
 

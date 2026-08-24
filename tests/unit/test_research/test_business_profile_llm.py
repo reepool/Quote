@@ -46,7 +46,7 @@ def test_llm_interface_accepts_strict_candidate_report():
         captured.update({"url": url, "headers": headers, "payload": payload, "timeout": timeout})
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.2",
+            "fact_catalog_version": "business_profile_facts.2026.3",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -94,10 +94,10 @@ def test_llm_interface_accepts_strict_candidate_report():
         message for message in captured["payload"]["messages"] if message.get("role") == "user"
     )
     user_payload = json.loads(user_message["content"])
-    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.2"
+    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.3"
     assert any(item["field_id"] == "segment.name" for item in user_payload["fact_fields"])
     assert result.report["facts"][0]["review_status"] == "candidate"
-    assert result.fact_catalog_version == "business_profile_facts.2026.2"
+    assert result.fact_catalog_version == "business_profile_facts.2026.3"
     assert result.request_hash
     assert result.response_hash
     assert result.model == "provider-model-v2"
@@ -126,7 +126,7 @@ def test_llm_interface_rejects_unknown_evidence_and_inferred_relationship():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.2",
+            "fact_catalog_version": "business_profile_facts.2026.3",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [],
@@ -164,7 +164,7 @@ def test_llm_interface_rejects_unknown_fact_catalog_field():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.2",
+            "fact_catalog_version": "business_profile_facts.2026.3",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -229,7 +229,7 @@ def test_llm_interface_rejects_candidate_numeric_fact_without_unit():
     def transport(url, headers, payload, timeout):
         report = {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.2",
+            "fact_catalog_version": "business_profile_facts.2026.3",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [
@@ -267,7 +267,7 @@ def test_llm_interface_rejects_unknown_units_and_model_supplied_governed_ids():
     def report_with_fact(fact):
         return {
             "schema_version": "business_profile_llm_report.v1",
-            "fact_catalog_version": "business_profile_facts.2026.2",
+            "fact_catalog_version": "business_profile_facts.2026.3",
             "instrument_id": "601088.SH",
             "report_period": "2025-12-31",
             "facts": [fact],
@@ -334,7 +334,7 @@ def test_llm_interface_rejects_unknown_units_and_model_supplied_governed_ids():
 async def test_injected_gateway_uses_logical_profile_and_propagates_source_lineage():
     report = {
         "schema_version": "business_profile_llm_report.v1",
-        "fact_catalog_version": "business_profile_facts.2026.2",
+        "fact_catalog_version": "business_profile_facts.2026.3",
         "instrument_id": "601088.SH",
         "report_period": "2025-12-31",
         "facts": [],

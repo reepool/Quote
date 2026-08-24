@@ -1,7 +1,7 @@
 {
   "schema_version": "business_profile_disclosure_template_catalog.v1",
   "catalog_version": "business_profile_disclosure_templates.2026.2",
-  "fact_catalog_version": "business_profile_facts.2026.2",
+  "fact_catalog_version": "business_profile_facts.2026.3",
   "templates": [
     {
       "template_id": "common_periodic_report.v1",

@@ -34,6 +34,7 @@ UNIT_DIMENSIONS = {
     "price_per_unit",
     "ratio",
     "resource_quantity",
+    "source_reported",
     "text",
     "volume",
 }
@@ -316,7 +317,7 @@ def _parse_definition(
     )
 
     numeric = value_type in {"decimal", "integer", "ratio"}
-    if numeric and not canonical_units:
+    if numeric and not canonical_units and unit_dimension != "source_reported":
         raise ValueError(
             f"business fact catalog fields[{index}] numeric field requires canonical_units"
         )

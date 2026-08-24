@@ -111,7 +111,7 @@ def test_writer_creates_candidate_evidence_and_segments_without_exposures(tmp_pa
     assert mapped["profit_share"] == 0.9
     assert mapped["gross_margin"] == 0.4
     assert mapped["metadata"]["fact_catalog_version"] == (
-        "business_profile_facts.2026.2"
+        "business_profile_facts.2026.3"
     )
     assert "cost" not in mapped["metadata"]
     assert mapped["metadata"]["commodity_mapping_candidates"]

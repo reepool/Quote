@@ -98,7 +98,7 @@ from utils.date_utils import get_shanghai_time
 
 logger = logging.getLogger(__name__)
 
-RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v7"
+RUNTIME_SCHEMA_VERSION = "business_profile_semantic_runtime.v8"
 STAGE_ARTIFACT_SCHEMA_VERSION = "business_profile_semantic_stage_artifact.v1"
 LOCAL_DERIVED_FAMILIES = {
     "derived_value_chain_roles",
@@ -3271,25 +3271,13 @@ class BusinessProfileSemanticRuntime:
         exceptions: list[dict[str, Any]] = []
         product_catalog = load_business_product_catalog()
         selected_types = set(record_types)
-        assertions = (
-            [
-                ("activities", assertion)
-                for assertion in envelope.activities
-            ]
-            if "activities" in selected_types
-            else []
-        ) + (
-            [
-                ("relationships", assertion)
-                for assertion in envelope.relationships
-            ]
-            if "relationships" in selected_types
-            else []
-        )
-        for record_type, raw in assertions:
-            assertion = dict(raw)
-            evidence = _semantic_evidence(item, selected, assertion)
-            if record_type == "activities":
+        if "activities" in selected_types:
+            groups: dict[
+                tuple[Any, ...], list[tuple[dict[str, Any], dict[str, Any]]]
+            ] = {}
+            for raw in envelope.activities:
+                assertion = dict(raw)
+                evidence = _semantic_evidence(item, selected, assertion)
                 evidence_by_id[evidence["evidence_id"]] = evidence
                 resolution = product_catalog.resolve_alias(assertion["object_raw"])
                 assertion.update(
@@ -3303,84 +3291,148 @@ class BusinessProfileSemanticRuntime:
                         "confidence": 1.0,
                     }
                 )
+                groups.setdefault(_semantic_activity_group_key(assertion), []).append(
+                    (assertion, evidence)
+                )
+
+            runtime_unit_rules = self.unit_rule_registry.overlay_rules()
+            for grouped in groups.values():
+                projection_assertion, projection_evidence = min(
+                    grouped,
+                    key=lambda entry: _semantic_activity_projection_rank(
+                        entry[0], runtime_unit_rules=runtime_unit_rules
+                    ),
+                )
                 record = self.activity_producer.build_activity_candidate(
-                    assertion,
-                    evidence_id=evidence["evidence_id"],
+                    projection_assertion,
+                    evidence_id=projection_evidence["evidence_id"],
                     run_id="pending",
                     data_available_date=str(item["document"]["published_at"])[:10],
                     extraction_method="semantic_pending_verification",
                 )
+                assertion_ids = list(
+                    dict.fromkeys(
+                        str(assertion.get("activity_id") or "")
+                        for assertion, _evidence in grouped
+                        if str(assertion.get("activity_id") or "")
+                    )
+                )
+                evidence_ids = list(
+                    dict.fromkeys(
+                        evidence["evidence_id"] for _assertion, evidence in grouped
+                    )
+                )
+                projection_fact_type = (
+                    _atomic_activity_fact_type(
+                        projection_assertion,
+                        runtime_unit_rules=runtime_unit_rules,
+                    )
+                    if _has_atomic_measurement(projection_assertion)
+                    else None
+                )
                 record["metadata"].update(
                     {
-                        "exact_evidence": assertion["evidence"],
+                        "exact_evidence": projection_assertion["evidence"],
                         "selected_artifact_hash": selected.artifact_hash,
+                        "semantic_assertion_id": (
+                            str(projection_assertion.get("activity_id") or "") or None
+                        ),
+                        "semantic_assertion_ids": assertion_ids,
+                        "supporting_evidence_ids": evidence_ids,
                         "semantic_synthesis": True,
                         "semantic_contract": (
                             "semantic_synthesis_independent_from_transcription.v1"
                         ),
+                        "measurement_authority": "company_operating_facts",
+                        "measurement_projection_compatibility": bool(
+                            projection_fact_type
+                        ),
+                        "measurement_projection_fact_type": projection_fact_type,
+                        "measurement_projection_semantic_assertion_id": (
+                            str(projection_assertion.get("activity_id") or "") or None
+                        ),
                     }
                 )
-                _bind_promotion_validation(record, evidence)
+                _bind_promotion_validation(record, projection_evidence)
                 output.append(("activities", record))
-            else:
-                anonymous = assertion.get("anonymous") is True
-                resolution = (
-                    EntityResolution("unresolved", None, None, None)
-                    if anonymous
-                    else self.counterparty_resolver.resolve(
-                        str(assertion["counterparty_name_raw"]),
-                        knowledge_cutoff=str(item["document"]["published_at"])[:10],
-                    )
-                )
-                if not anonymous:
-                    exception = classify_entity_resolution_exception(resolution)
-                    if exception is not None:
-                        reason = (
-                            "entity_ambiguity"
-                            if exception["tier"] == "quick_review"
-                            else "catalog_proposal"
-                        )
-                        exceptions.append(
-                            {
-                                "instrument_id": item["instrument_id"],
-                                "field_family": item["field_family"],
-                                "source_document_id": item["document"]["identity"],
-                                "target_id": str(assertion["relationship_id"]),
-                                "tier": exception["tier"],
-                                "reason_code": reason,
-                                "ranked_choices": exception["ranked_local_choices"],
-                                "evidence_reference": evidence["evidence_id"],
-                            }
-                        )
+
+                for assertion, evidence in grouped:
+                    if not _has_atomic_measurement(assertion):
                         continue
-                evidence_by_id[evidence["evidence_id"]] = evidence
-                record_type, record = (
-                    self.activity_producer.build_relationship_or_concentration_candidate(
-                        {
-                            **assertion,
-                            "confidence": 1.0,
-                            "scope_id": item["instrument_id"],
-                        },
-                        resolution=resolution,
+                    fact = _atomic_activity_operating_fact(
+                        item,
+                        assertion,
+                        activity_id=record["activity_id"],
                         evidence_id=evidence["evidence_id"],
-                        run_id="pending",
-                        data_available_date=str(item["document"]["published_at"])[:10],
+                        runtime_unit_rules=runtime_unit_rules,
                     )
+                    _bind_promotion_validation(fact, evidence)
+                    output.append(("operating_facts", fact))
+
+        relationships = (
+            envelope.relationships if "relationships" in selected_types else ()
+        )
+        for raw in relationships:
+            assertion = dict(raw)
+            evidence = _semantic_evidence(item, selected, assertion)
+            anonymous = assertion.get("anonymous") is True
+            resolution = (
+                EntityResolution("unresolved", None, None, None)
+                if anonymous
+                else self.counterparty_resolver.resolve(
+                    str(assertion["counterparty_name_raw"]),
+                    knowledge_cutoff=str(item["document"]["published_at"])[:10],
                 )
-                record.setdefault("metadata", {})["exact_evidence"] = assertion[
-                    "evidence"
-                ]
-                record["metadata"].update(
+            )
+            if not anonymous:
+                exception = classify_entity_resolution_exception(resolution)
+                if exception is not None:
+                    reason = (
+                        "entity_ambiguity"
+                        if exception["tier"] == "quick_review"
+                        else "catalog_proposal"
+                    )
+                    exceptions.append(
+                        {
+                            "instrument_id": item["instrument_id"],
+                            "field_family": item["field_family"],
+                            "source_document_id": item["document"]["identity"],
+                            "target_id": str(assertion["relationship_id"]),
+                            "tier": exception["tier"],
+                            "reason_code": reason,
+                            "ranked_choices": exception["ranked_local_choices"],
+                            "evidence_reference": evidence["evidence_id"],
+                        }
+                    )
+                    continue
+            evidence_by_id[evidence["evidence_id"]] = evidence
+            record_type, record = (
+                self.activity_producer.build_relationship_or_concentration_candidate(
                     {
-                        "semantic_assertion_id": assertion["relationship_id"],
-                        "semantic_synthesis": True,
-                        "semantic_contract": (
-                            "semantic_synthesis_independent_from_transcription.v1"
-                        ),
-                    }
+                        **assertion,
+                        "confidence": 1.0,
+                        "scope_id": item["instrument_id"],
+                    },
+                    resolution=resolution,
+                    evidence_id=evidence["evidence_id"],
+                    run_id="pending",
+                    data_available_date=str(item["document"]["published_at"])[:10],
                 )
-                _bind_promotion_validation(record, evidence)
-                output.append((record_type, record))
+            )
+            record.setdefault("metadata", {})["exact_evidence"] = assertion[
+                "evidence"
+            ]
+            record["metadata"].update(
+                {
+                    "semantic_assertion_id": assertion["relationship_id"],
+                    "semantic_synthesis": True,
+                    "semantic_contract": (
+                        "semantic_synthesis_independent_from_transcription.v1"
+                    ),
+                }
+            )
+            _bind_promotion_validation(record, evidence)
+            output.append((record_type, record))
         records["evidence"] = list(evidence_by_id.values())
         return records, output, exceptions
 
@@ -4578,6 +4630,225 @@ def _operating_records(
             }
         )
     return output
+
+
+_PHYSICAL_ACTIVITY_FACT_TYPES = frozenset(
+    {
+        "sales_volume",
+        "production_volume",
+        "inventory_volume",
+        "purchase_volume",
+        "reserve_or_resource",
+    }
+)
+
+
+def _semantic_activity_group_key(assertion: Mapping[str, Any]) -> tuple[Any, ...]:
+    return (
+        str(assertion.get("instrument_id") or ""),
+        str(assertion.get("report_period") or ""),
+        str(assertion.get("subject_scope") or ""),
+        str(assertion.get("action") or ""),
+        str(assertion.get("object_type") or ""),
+        normalize_product_alias(assertion.get("object_raw")),
+        str(assertion.get("object_id") or ""),
+        str(assertion.get("segment_id") or ""),
+        str(assertion.get("geography") or ""),
+        str(assertion.get("business_regime_id") or ""),
+    )
+
+
+def _has_atomic_measurement(assertion: Mapping[str, Any]) -> bool:
+    value = assertion.get("source_value")
+    if value is None:
+        value = assertion.get("value")
+    unit = str(assertion.get("source_unit_raw") or assertion.get("unit") or "").strip()
+    return value is not None and bool(unit)
+
+
+def _semantic_activity_projection_rank(
+    assertion: Mapping[str, Any],
+    *,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
+) -> tuple[int]:
+    if not _has_atomic_measurement(assertion):
+        return (2,)
+    if (
+        _atomic_activity_fact_type(assertion, runtime_unit_rules=runtime_unit_rules)
+        in _PHYSICAL_ACTIVITY_FACT_TYPES
+    ):
+        return (0,)
+    return (1,)
+
+
+def _atomic_activity_fact_type(
+    assertion: Mapping[str, Any],
+    *,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
+) -> str:
+    label = re.sub(
+        r"\s+",
+        "",
+        str(assertion.get("source_label_raw") or ""),
+    )
+    for markers, fact_type in (
+        (("销售收入", "销售额", "营业收入"), "sales_revenue"),
+        (("采购金额", "采购额", "购买金额", "采购成本"), "purchase_amount"),
+        (("采购量", "购买量", "购入量", "外购量"), "purchase_volume"),
+        (("销售量", "销量"), "sales_volume"),
+        (("生产量", "产量"), "production_volume"),
+        (("库存量", "存货量"), "inventory_volume"),
+        (("储量", "资源量"), "reserve_or_resource"),
+    ):
+        if any(marker in label for marker in markers):
+            return fact_type
+
+    action = str(assertion.get("action") or "")
+    unit = str(assertion.get("source_unit_raw") or assertion.get("unit") or "").strip()
+    is_currency = (
+        _atomic_unit_dimension(unit, runtime_unit_rules=runtime_unit_rules)
+        == "currency"
+    )
+    if action == "sells":
+        return "sales_revenue" if is_currency else "sales_volume"
+    if action == "produces":
+        return "production_volume"
+    if action == "stores":
+        return "inventory_volume"
+    if action == "purchases":
+        return "purchase_amount" if is_currency else "purchase_volume"
+    return "other_measurement"
+
+
+def _atomic_unit_dimension(
+    unit: str,
+    *,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
+) -> str | None:
+    if not unit:
+        return None
+    try:
+        _value, _normalized_unit, resolution = _normalized_value_with_resolution(
+            1.0, unit, runtime_rules=runtime_unit_rules
+        )
+    except UnitResolutionPendingError:
+        return None
+    return resolution.dimension
+
+
+def _atomic_activity_operating_fact(
+    item: Mapping[str, Any],
+    assertion: Mapping[str, Any],
+    *,
+    activity_id: str,
+    evidence_id: str,
+    runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
+    value_raw = assertion.get("source_value")
+    if value_raw is None:
+        value_raw = assertion.get("value")
+    unit_raw = str(
+        assertion.get("source_unit_raw") or assertion.get("unit") or ""
+    ).strip()
+    if value_raw is None or not unit_raw:
+        raise ValueError("atomic activity operating fact requires raw value and unit")
+    value = float(value_raw)
+    fact_type = _atomic_activity_fact_type(
+        assertion, runtime_unit_rules=runtime_unit_rules
+    )
+    object_raw = str(assertion.get("object_raw") or "").strip()
+    source_label = str(assertion.get("source_label_raw") or "").strip()
+    semantic_assertion_id = str(assertion.get("activity_id") or "").strip()
+    fact_scope = f"{object_raw}:{source_label or assertion.get('action') or fact_type}"
+    row = {
+        "value": value,
+        "unit_raw": unit_raw,
+        "segment_name_raw": object_raw,
+        "fact_type": fact_type,
+        "fact_scope": fact_scope,
+        "source_label_raw": source_label or fact_scope,
+        "semantic_summary_zh": assertion.get("semantic_summary_zh"),
+        "model_derived_hints": dict(assertion.get("model_derived_hints") or {}),
+        "evidence": assertion["evidence"],
+    }
+    try:
+        record = _semantic_operating_record(
+            item,
+            row,
+            evidence_id,
+            runtime_unit_rules=runtime_unit_rules,
+        )
+    except UnitResolutionPendingError as exc:
+        start, end = derive_report_observation_interval(
+            item["document"]["report_period"]
+        )
+        segment_id, canonical_name = _canonical_segment_identity(object_raw, "product")
+        record = {
+            "instrument_id": item["instrument_id"],
+            "report_period": item["document"]["report_period"],
+            "segment_id": segment_id,
+            "fact_type": fact_type,
+            "value_raw": value,
+            "unit_raw": unit_raw,
+            "value_normalized": None,
+            "unit_normalized": None,
+            "fact_scope": fact_scope,
+            "equity_basis": "source_reported_unknown",
+            "evidence_id": evidence_id,
+            "data_available_date": str(item["document"]["published_at"])[:10],
+            "confidence": 1.0,
+            "review_status": "candidate",
+            "valid_from": start,
+            "valid_to": end,
+            "knowledge_from": str(item["document"]["published_at"])[:10],
+            "version": 1,
+            "metadata": {
+                "derivation_method": "semantic_synthesis",
+                "structured_schema_version": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+                "semantic_synthesis": True,
+                "semantic_summary_zh": assertion.get("semantic_summary_zh"),
+                "source_label_raw": source_label or fact_scope,
+                "canonical_segment_name": canonical_name,
+                "model_derived_hints": dict(assertion.get("model_derived_hints") or {}),
+                "unit_resolution": exc.resolution.to_dict(),
+                "unit_resolution_status": "unit_resolution_pending",
+                "numeric_reconciliation_status": "unit_resolution_pending",
+                "numeric_reconciliation_valid": False,
+                "numeric_reconciliation_executed": True,
+                "publication_blocker": "unit_resolution_pending",
+                "parser_manifest_promoted": False,
+                "exact_evidence_valid": True,
+            },
+        }
+
+    record["record_id"] = (
+        "bp-operating-"
+        + _stable_hash(
+            {
+                "source_document_id": item["document"]["identity"],
+                "source_activity_id": activity_id,
+                "semantic_assertion_id": semantic_assertion_id,
+                "fact_type": fact_type,
+                "value_raw": value_raw,
+                "unit_raw": unit_raw,
+                "evidence_id": evidence_id,
+                "processing_contract": _structured_record_contract_identity(),
+            }
+        )[:24]
+    )
+    record.setdefault("metadata", {}).update(
+        {
+            "source_activity_id": activity_id,
+            "semantic_assertion_id": semantic_assertion_id,
+            "object_raw": object_raw,
+            "source_label_raw": source_label or fact_scope,
+            "source_value_raw": value_raw,
+            "source_unit_raw": unit_raw,
+            "exact_evidence": assertion["evidence"],
+            "measurement_authority": "llm_source_fields_program_normalized",
+        }
+    )
+    return record
 
 
 def _semantic_operating_record(

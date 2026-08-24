@@ -38,7 +38,7 @@ def _run(run_id="run-1"):
         "source_document_id": "annual-report-2025",
         "field_family": "atomic_activities",
         "bundle_hash": "bundle-hash",
-        "fact_catalog_version": "business_profile_facts.2026.2",
+        "fact_catalog_version": "business_profile_facts.2026.3",
         "product_catalog_version": "business_profile_products.2026.4",
         "metadata": {"document_hash": "document-hash"},
     }

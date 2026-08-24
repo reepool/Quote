@@ -18,7 +18,7 @@ def test_default_catalog_covers_governed_record_types_and_dcf_fields():
     catalog = load_business_fact_catalog()
 
     assert catalog.schema_version == "business_profile_fact_catalog.v1"
-    assert catalog.catalog_version == "business_profile_facts.2026.2"
+    assert catalog.catalog_version == "business_profile_facts.2026.3"
     assert {definition.record_type for definition in catalog.definitions} == {
         "segments",
         "operating_facts",
@@ -28,6 +28,10 @@ def test_default_catalog_covers_governed_record_types_and_dcf_fields():
     assert {
         "segment.revenue",
         "operating.production_volume",
+        "operating.sales_revenue",
+        "operating.purchase_amount",
+        "operating.purchase_volume",
+        "operating.other_measurement",
         "operating.unit_cost",
         "operating.reserve_or_resource",
         "role.value_chain",
@@ -38,6 +42,9 @@ def test_default_catalog_covers_governed_record_types_and_dcf_fields():
     dcf_fields = catalog.list_definitions(dcf_eligibility="approved_only")
     assert dcf_fields
     assert all(definition.requires_human_review for definition in dcf_fields)
+    other = catalog.require("operating.other_measurement")
+    assert other.unit_dimension == "source_reported"
+    assert other.canonical_units == ()
 
 
 def test_sensitive_fields_are_manual_and_keep_prohibited_inferences():
@@ -146,6 +153,6 @@ def test_catalog_version_and_document_applicability_fail_closed():
         load_business_fact_catalog(document_date="2020-12-31")
 
     catalog = load_business_fact_catalog(document_date="2025-12-31")
-    assert catalog.catalog_version == "business_profile_facts.2026.2"
-    assert catalog.released_on == "2026-07-17"
+    assert catalog.catalog_version == "business_profile_facts.2026.3"
+    assert catalog.released_on == "2026-08-24"
     assert catalog.document_applicable_from == "2021-01-01"

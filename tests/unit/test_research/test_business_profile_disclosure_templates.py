@@ -27,8 +27,8 @@ def _fact_field_ids():
 def test_default_catalog_covers_common_and_six_industry_templates():
     catalog = load_disclosure_template_catalog()
 
-    assert catalog.catalog_version == "business_profile_disclosure_templates.2026.1"
-    assert catalog.fact_catalog_version == "business_profile_facts.2026.2"
+    assert catalog.catalog_version == "business_profile_disclosure_templates.2026.2"
+    assert catalog.fact_catalog_version == "business_profile_facts.2026.3"
     assert len(catalog.templates) == 7
     assert {
         industry

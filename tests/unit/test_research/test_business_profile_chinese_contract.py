@@ -11,7 +11,7 @@ from research.business_profile_unit_conversions import load_unit_conversion_cata
 def _report(fact):
     return {
         "schema_version": LLM_REPORT_SCHEMA_VERSION,
-        "fact_catalog_version": "business_profile_facts.2026.2",
+        "fact_catalog_version": "business_profile_facts.2026.3",
         "instrument_id": "600403.SH",
         "report_period": "2025-12-31",
         "facts": [fact],
