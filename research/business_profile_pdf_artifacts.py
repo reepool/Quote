@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import gzip
 import hashlib
-import io
 import json
 import logging
 import os
@@ -295,6 +294,7 @@ class BusinessProfilePdfArtifactExtractor:
         self,
         *,
         extractor_version: str = BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION,
+        engine_profile: str = "pypdf_native",
         low_text_character_threshold: int = DEFAULT_LOW_TEXT_CHARACTER_THRESHOLD,
         glyph_decoding_ratio_threshold: float = (
             DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD
@@ -305,6 +305,7 @@ class BusinessProfilePdfArtifactExtractor:
         self.extractor_version = str(extractor_version).strip()
         if not self.extractor_version:
             raise ValueError("extractor_version is required")
+        self.engine_profile = str(engine_profile).strip() or "pypdf_native"
         self.low_text_character_threshold = max(0, int(low_text_character_threshold))
         self.glyph_decoding_ratio_threshold = float(glyph_decoding_ratio_threshold)
         if not 0 <= self.glyph_decoding_ratio_threshold <= 1:
@@ -355,64 +356,39 @@ class BusinessProfilePdfArtifactExtractor:
                 parameter_hash=parameter_hash,
                 failure_class="invalid_pdf_signature",
             )
-        try:
-            from pypdf import PdfReader
-        except ImportError:
+        from research.document_processing.pdf import DEFAULT_PROFILES, PdfParseRequest, build_router
+
+        profile = DEFAULT_PROFILES.get(self.engine_profile)
+        if profile is None:
             return self._failure_artifact(
                 source_file_id=source_file_id,
                 source_pdf_path=source_pdf_path,
                 source_content_hash=content_hash,
                 parameter_hash=parameter_hash,
-                failure_class="pypdf_unavailable",
+                failure_class="unsupported_engine_profile",
             )
-        try:
-            reader = PdfReader(io.BytesIO(content_bytes), strict=False)
-        except Exception as exc:
+        result = build_router(profile).parse(PdfParseRequest(content=content_bytes, profile=profile))
+        if result.status == "failed":
+            code = result.diagnostics[0].code if result.diagnostics else "malformed_pdf"
+            failure_class = {
+                "native_runtime_unavailable": "pypdf_unavailable",
+                "encrypted_password_required": "encrypted_password_required",
+                "empty_pdf": "empty_pdf",
+                "malformed_page_tree": "malformed_page_tree",
+                "invalid_pdf_signature": "invalid_pdf_signature",
+            }.get(code, "malformed_pdf")
             return self._failure_artifact(
                 source_file_id=source_file_id,
                 source_pdf_path=source_pdf_path,
                 source_content_hash=content_hash,
                 parameter_hash=parameter_hash,
-                failure_class="malformed_pdf",
-                error=exc,
+                failure_class=failure_class,
+                encrypted=code == "encrypted_password_required",
+                error=RuntimeError(result.diagnostics[0].message if result.diagnostics else code),
             )
 
-        encrypted = bool(reader.is_encrypted)
-        if encrypted:
-            try:
-                decrypt_result = reader.decrypt("")
-            except Exception as exc:
-                return self._failure_artifact(
-                    source_file_id=source_file_id,
-                    source_pdf_path=source_pdf_path,
-                    source_content_hash=content_hash,
-                    parameter_hash=parameter_hash,
-                    failure_class="encrypted_password_required",
-                    error=exc,
-                    encrypted=True,
-                )
-            if not decrypt_result:
-                return self._failure_artifact(
-                    source_file_id=source_file_id,
-                    source_pdf_path=source_pdf_path,
-                    source_content_hash=content_hash,
-                    parameter_hash=parameter_hash,
-                    failure_class="encrypted_password_required",
-                    encrypted=True,
-                )
-
-        try:
-            page_count = len(reader.pages)
-        except Exception as exc:
-            return self._failure_artifact(
-                source_file_id=source_file_id,
-                source_pdf_path=source_pdf_path,
-                source_content_hash=content_hash,
-                parameter_hash=parameter_hash,
-                failure_class="malformed_page_tree",
-                error=exc,
-                encrypted=encrypted,
-            )
+        encrypted = any(item.code == "encrypted_password_required" for item in result.diagnostics)
+        page_count = result.page_count
         if page_count < 1:
             return self._failure_artifact(
                 source_file_id=source_file_id,
@@ -428,17 +404,20 @@ class BusinessProfilePdfArtifactExtractor:
         parser_diagnostics: List[BusinessProfileParserDiagnostic] = []
         extraction_error_pages: List[int] = []
         glyph_decoding_pages: List[int] = []
-        for page_number, page in enumerate(reader.pages, start=1):
+        for shared_page in result.pages:
+            page_number = shared_page.page_number
             page_errors: List[str] = []
-            try:
-                text = page.extract_text() or ""
-                native_text_status = "extracted" if text.strip() else "empty"
-            except Exception as exc:
-                text = ""
+            text = shared_page.text or ""
+            native_text_status = "extracted" if text.strip() else "empty"
+            if shared_page.quality_status == "native_text_mapping_error":
+                native_text_status = "glyph_decoding_error"
+                glyph_decoding_pages.append(page_number)
+                page_errors.extend(item.message or item.code for item in shared_page.diagnostics if item.code == "native_text_mapping_error")
+            elif shared_page.quality_status == "ocr_failure":
                 native_text_status = "extraction_error"
-                page_errors.append(f"{type(exc).__name__}: {exc}")
                 extraction_error_pages.append(page_number)
-            width, height = self._page_dimensions(page)
+                page_errors.extend(item.message or item.code for item in shared_page.diagnostics)
+            width, height = shared_page.width_points, shared_page.height_points
             non_whitespace = len(re.sub(r"\s+", "", text))
             suspicious_glyphs = self._suspicious_glyph_count(text)
             suspicious_glyph_ratio = (

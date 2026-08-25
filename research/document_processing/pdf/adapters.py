@@ -122,6 +122,42 @@ class PdfInspectorNativeAdapter:
             return NativeResult(0, (), (PdfDiagnostic("alternate_native_extraction_error", f"{type(exc).__name__}: {exc}", severity="error"),), "pdf-inspector-error")
 
 
+class PdfInspectorOcrAdapter:
+    """Optional pdf-inspector OCR boundary; offline mode never downloads models."""
+
+    name = "pdf-inspector-ocr"
+
+    def __init__(self, *, offline: bool = True, model_directory: str | None = None) -> None:
+        self.offline = offline
+        self.model_directory = model_directory
+
+    @staticmethod
+    def available() -> bool:
+        return importlib.util.find_spec("pdf_inspector") is not None
+
+    def extract_pages(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
+        if not self.available():
+            raise RuntimeError("pdf-inspector OCR runtime is not installed")
+        import pdf_inspector
+
+        result = pdf_inspector.process_pdf_with_ocr_bytes(
+            content,
+            mode="force",
+            page_numbers=list(pages),
+            dpi=float(request.profile.limits.render_dpi),
+            model_directory=self.model_directory,
+            offline=self.offline,
+        )
+        output: dict[int, OcrPage] = {}
+        by_page = {int(item.page_number): item for item in result.pages}
+        for page_number in pages:
+            item = by_page.get(page_number)
+            text = str(getattr(item, "markdown", "") or "").strip() if item else ""
+            diagnostics = () if text else (PdfDiagnostic("ocr_empty", "pdf-inspector OCR returned no text", page_number, "error"),)
+            output[page_number] = OcrPage(text, None, float(getattr(result, "ocr_time_ms", 0.0) or 0.0) / 1000.0, diagnostics, {"component": "pdf-inspector-ocr", "processing_time_ms": getattr(result, "processing_time_ms", None)})
+        return output
+
+
 def _normalise_paddle_result(result: Any) -> tuple[str, float | None, list[dict[str, Any]]]:
     """Accept common PaddleOCR 2.x/3.x result shapes without leaking them."""
     texts: list[str] = []

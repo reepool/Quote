@@ -1,0 +1,162 @@
+{
+  "bounded": true,
+  "failures": [],
+  "max_cases": 3,
+  "max_pages": 3,
+  "report": {
+    "case_count": 3,
+    "corpus_hash": "83487a980854de612519785f7320bd0c97d1e63e73eaad32ff9e92059bb24696",
+    "profiles": [
+      {
+        "cases": 3,
+        "chinese_exact_match": null,
+        "confidence_coverage": null,
+        "cpu_seconds": 0.5584491440000003,
+        "documents_per_minute": 321.80367086985615,
+        "heading_match": null,
+        "low_quality_recall": null,
+        "mapping_error_pages": 0,
+        "mapping_error_recall": null,
+        "model_load_seconds": 0.0,
+        "native_seconds": 0.22880019061267376,
+        "numeric_exact_match": null,
+        "ocr_pages": 0,
+        "ocr_pages_per_second": 0.0,
+        "ocr_seconds": 0,
+        "ocr_time_share": 0.0,
+        "p50_seconds": 0.12933930568397045,
+        "p95_seconds": 0.12933930568397045,
+        "pages_per_minute": 965.4110126095686,
+        "profile": "pypdf_native",
+        "queue_wait_seconds": 0.0,
+        "results": [
+          {
+            "case_id": "000717_SZ_2025Q4_1225158456_94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+            "chinese_exact_match": null,
+            "confidence_coverage": null,
+            "cpu_seconds": 0.32155695500000014,
+            "diagnostics": [],
+            "elapsed_seconds": 0.32245261315256357,
+            "expected_mapping_error_pages": null,
+            "heading_match": null,
+            "low_quality_recall": null,
+            "mapping_error_pages": 0,
+            "mapping_error_recall": null,
+            "model_load_seconds": 0.0,
+            "native_seconds": 0.07254613796249032,
+            "numeric_exact_match": null,
+            "ocr_pages": 0,
+            "ocr_seconds": 0,
+            "page_count": 217,
+            "page_text_hashes": [
+              "a1efeb382d03c57e4dd530ec0b3e85a2a63fa237c251c0406ad2760ed7191d34",
+              "7d40ffb07c6ee5c05500b44b09541592007cf7d6f95da461926c81b42ca6fa34",
+              "082a1c4fc9e1fd7b6e98ce49b19d3d36a13c9428e4190b7b8c9f423189e1642e"
+            ],
+            "processed_pages": 3,
+            "profile": "pypdf_native",
+            "queue_wait_seconds": 0.0,
+            "rss_delta_bytes": 12414976,
+            "status": "success",
+            "table_structure_match": null,
+            "warnings": 0
+          },
+          {
+            "case_id": "000717_SZ_2025Q2_1224574957_13e3e2487398310a49987e19de48873a1b293846fcd89164b58fc20f55344bfb",
+            "chinese_exact_match": null,
+            "confidence_coverage": null,
+            "cpu_seconds": 0.10755685300000017,
+            "diagnostics": [],
+            "elapsed_seconds": 0.10755533631891012,
+            "expected_mapping_error_pages": null,
+            "heading_match": null,
+            "low_quality_recall": null,
+            "mapping_error_pages": 0,
+            "mapping_error_recall": null,
+            "model_load_seconds": 0.0,
+            "native_seconds": 0.07117232866585255,
+            "numeric_exact_match": null,
+            "ocr_pages": 0,
+            "ocr_seconds": 0,
+            "page_count": 164,
+            "page_text_hashes": [
+              "871c5d45e4f9f7cd49a1496daa33b8605d4797bd9aa99af70a561ada20d17f25",
+              "4b14d8e40e2dc45c4446f4ef8d64ee1ba78a28be2b3f267b6cd8eec36f957c79",
+              "972d8a6122860a007349c7fa05c220b1b0917e799c8fab74adb94469f01234f1"
+            ],
+            "processed_pages": 3,
+            "profile": "pypdf_native",
+            "queue_wait_seconds": 0.0,
+            "rss_delta_bytes": 1622016,
+            "status": "success",
+            "table_structure_match": null,
+            "warnings": 0
+          },
+          {
+            "case_id": "000510_SZ_2025Q4_1225190142_15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8",
+            "chinese_exact_match": null,
+            "confidence_coverage": null,
+            "cpu_seconds": 0.12933533600000002,
+            "diagnostics": [],
+            "elapsed_seconds": 0.12933930568397045,
+            "expected_mapping_error_pages": null,
+            "heading_match": null,
+            "low_quality_recall": null,
+            "mapping_error_pages": 0,
+            "mapping_error_recall": null,
+            "model_load_seconds": 0.0,
+            "native_seconds": 0.08508172398433089,
+            "numeric_exact_match": null,
+            "ocr_pages": 0,
+            "ocr_seconds": 0,
+            "page_count": 199,
+            "page_text_hashes": [
+              "4a2d4de190681798a7acd41177b1e639400767ad4c6327986bc25d2cf57cd59b",
+              "2a5da3c768bd7a51222f06965251b73bcf2c18357a4e4ff6089ea40eb67ca063",
+              "2a48cd931ea882ec08c04d21788f2c4fd1223ead9c7d9a99a684463561212f95"
+            ],
+            "processed_pages": 3,
+            "profile": "pypdf_native",
+            "queue_wait_seconds": 0.0,
+            "rss_delta_bytes": 2433024,
+            "status": "success",
+            "table_structure_match": null,
+            "warnings": 0
+          }
+        ],
+        "rss_delta_bytes": 12414976,
+        "success_rate": 1.0,
+        "table_structure_match": null
+      }
+    ],
+    "read_only": true,
+    "schema_version": "pdf-evaluation.v3",
+    "strata": {
+      "bounded": true,
+      "case_count": 3,
+      "counts": {
+        "native": 3
+      },
+      "missing_classes": [
+        "scanned",
+        "mixed",
+        "low_quality",
+        "glyph_encoding",
+        "viewer_readable_native_mapping_corrupt",
+        "table",
+        "chinese_announcement"
+      ],
+      "required_classes": [
+        "native",
+        "scanned",
+        "mixed",
+        "low_quality",
+        "glyph_encoding",
+        "viewer_readable_native_mapping_corrupt",
+        "table",
+        "chinese_announcement"
+      ]
+    }
+  },
+  "status": "passed"
+}

@@ -13,9 +13,9 @@ from .core import (
     compute_content_hash,
     detect_text_quality,
 )
-from .adapters import PaddleOcrAdapter, PdfInspectorNativeAdapter
+from .adapters import PaddleOcrAdapter, PdfInspectorNativeAdapter, PdfInspectorOcrAdapter
 from .profiles import DEFAULT_PROFILES, build_router, profile_from_mapping, resolve_profile
-from .evaluation import MANDATORY_600036_CASE, PdfAcceptanceGates, PdfEvaluationCase, assess_report, evaluate_cases, load_manifest, write_report
+from .evaluation import MANDATORY_600036_CASE, PdfAcceptanceGates, PdfEvaluationCase, assess_report, build_archive_manifest, evaluate_cases, load_manifest, probe_ocr_components, run_bounded_canary, stratify_cases, write_report
 
 __all__ = [
     "PDF_PARSER_SCHEMA_VERSION",
@@ -31,6 +31,7 @@ __all__ = [
     "detect_text_quality",
     "PaddleOcrAdapter",
     "PdfInspectorNativeAdapter",
+    "PdfInspectorOcrAdapter",
     "DEFAULT_PROFILES",
     "profile_from_mapping",
     "build_router",
@@ -38,7 +39,11 @@ __all__ = [
     "PdfEvaluationCase",
     "PdfAcceptanceGates",
     "load_manifest",
+    "build_archive_manifest",
+    "stratify_cases",
     "evaluate_cases",
+    "run_bounded_canary",
+    "probe_ocr_components",
     "assess_report",
     "write_report",
     "MANDATORY_600036_CASE",

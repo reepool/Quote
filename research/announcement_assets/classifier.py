@@ -7,7 +7,6 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from html import unescape
-from io import BytesIO
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -312,15 +311,13 @@ def refine_classification_from_pdf(
 
 def _pdf_first_page_is_annual_summary(pdf: bytes | Path) -> bool:
     try:
-        from pypdf import PdfReader
-        from pypdf.errors import PyPdfError
-
-        source = BytesIO(pdf) if isinstance(pdf, bytes) else str(pdf)
-        reader = PdfReader(source, strict=False)
-        if not reader.pages:
+        from research.document_processing.pdf import PdfParseRequest, PdfRouter
+        payload = pdf if isinstance(pdf, bytes) else Path(pdf).read_bytes()
+        result = PdfRouter().parse(PdfParseRequest(content=payload, target_pages=(1,)))
+        if not result.pages:
             return False
-        text = re.sub(r"\s+", "", str(reader.pages[0].extract_text() or ""))
-    except (OSError, ValueError, TypeError, IndexError, KeyError, PyPdfError):
+        text = re.sub(r"\s+", "", str(result.pages[0].text or ""))
+    except (OSError, ValueError, TypeError, IndexError, KeyError):
         return False
     return bool(re.search(r"\d{4}年年度报告摘要", text))
 

@@ -35,10 +35,20 @@ discovers or downloads assets. It reports per-profile success rate, OCR page
 count, and P50/P95 latency; benchmark reports must keep source text out of
 shared artifacts.
 
+The evaluator also records Chinese/numeric exact-match, heading/table
+evidence, confidence coverage, low-quality recall, OCR time share, pages per
+second, P50/P95 tail latency, queue wait, model warm-up, CPU and RSS deltas.
+`run_bounded_canary` limits cases/pages and returns a fail-closed status before
+any wider rollout. `probe_ocr_components` records local availability for
+PP-OCR, PP-Structure, pdf-inspector OCR, and Tesseract/OCRmyPDF without model
+downloads.
+
 The mandatory 600036.SH fixture is classified as
 `viewer_readable_native_mapping_corrupt`. Its non-empty but unrelated-script
 text must not be promoted as usable native evidence; alternate-native recovery
-is attempted before governed OCR.
+is attempted before governed OCR. The local corpus currently has native/text
+based and this mapping-corrupt class; scanned/table gold labels remain an
+explicit evaluation gap when no archived fixture is available.
 
 ## Rollback
 

@@ -12,7 +12,7 @@ import json
 import re
 import time
 from dataclasses import dataclass, field
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 import pandas as pd

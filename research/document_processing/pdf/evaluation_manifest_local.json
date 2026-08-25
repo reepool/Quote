@@ -1,0 +1,169 @@
+{
+  "cases": [
+    {
+      "case_id": "000717_SZ_2025Q4_1225158456_94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000717_SZ_2025Q4_1225158456_94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55.pdf",
+      "content_hash": "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "000717_SZ_2025Q2_1224574957_13e3e2487398310a49987e19de48873a1b293846fcd89164b58fc20f55344bfb",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000717_SZ_2025Q2_1224574957_13e3e2487398310a49987e19de48873a1b293846fcd89164b58fc20f55344bfb.pdf",
+      "content_hash": "13e3e2487398310a49987e19de48873a1b293846fcd89164b58fc20f55344bfb",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "000510_SZ_2025Q4_1225190142_15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000510_SZ_2025Q4_1225190142_15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8.pdf",
+      "content_hash": "15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "002446_SZ_2025Q4_1225214263_1210ee1cd530c2ea1a33dddc3657efcf77ccae1358b848969e52fa4e9885242d",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/002446_SZ_2025Q4_1225214263_1210ee1cd530c2ea1a33dddc3657efcf77ccae1358b848969e52fa4e9885242d.pdf",
+      "content_hash": "1210ee1cd530c2ea1a33dddc3657efcf77ccae1358b848969e52fa4e9885242d",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "301263_SZ_2025Q4_1225206675_d553adfed7bf728205a22d7dbc5e465b59ce1f2801535ef59c758ddca03485d1",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/301263_SZ_2025Q4_1225206675_d553adfed7bf728205a22d7dbc5e465b59ce1f2801535ef59c758ddca03485d1.pdf",
+      "content_hash": "d553adfed7bf728205a22d7dbc5e465b59ce1f2801535ef59c758ddca03485d1",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "000886_SZ_2025Q4_1225164399_cf1fcba152392d86bc0b14d65499eb1a05e4e86870db59a783e62bbe6bba0f24",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000886_SZ_2025Q4_1225164399_cf1fcba152392d86bc0b14d65499eb1a05e4e86870db59a783e62bbe6bba0f24.pdf",
+      "content_hash": "cf1fcba152392d86bc0b14d65499eb1a05e4e86870db59a783e62bbe6bba0f24",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "000818_SZ_2025Q4_1225240204_450a267c5f6297dbb9e09387e9d36931cc5fddacb58cd67f5490529dfc167b03",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000818_SZ_2025Q4_1225240204_450a267c5f6297dbb9e09387e9d36931cc5fddacb58cd67f5490529dfc167b03.pdf",
+      "content_hash": "450a267c5f6297dbb9e09387e9d36931cc5fddacb58cd67f5490529dfc167b03",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "002149_SZ_2025Q4_1225216013_988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/002149_SZ_2025Q4_1225216013_988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca.pdf",
+      "content_hash": "988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "300381_SZ_2025Q4_1225182960_f5939346c54d7ba0be399319a54f6f673dc51274bb17b6be8122330d193eaaba",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/300381_SZ_2025Q4_1225182960_f5939346c54d7ba0be399319a54f6f673dc51274bb17b6be8122330d193eaaba.pdf",
+      "content_hash": "f5939346c54d7ba0be399319a54f6f673dc51274bb17b6be8122330d193eaaba",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "000952_SZ_2025Q4_1225180988_46008d5a0af87ab86a372c2d668f1bc2c86eca231939decc97de5ff5585fbad7",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000952_SZ_2025Q4_1225180988_46008d5a0af87ab86a372c2d668f1bc2c86eca231939decc97de5ff5585fbad7.pdf",
+      "content_hash": "46008d5a0af87ab86a372c2d668f1bc2c86eca231939decc97de5ff5585fbad7",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "300255_SZ_2025Q4_1225224647_542a641a46975d8a763815943c33372705a3701ae61747dfb6b5331306c354bb",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/300255_SZ_2025Q4_1225224647_542a641a46975d8a763815943c33372705a3701ae61747dfb6b5331306c354bb.pdf",
+      "content_hash": "542a641a46975d8a763815943c33372705a3701ae61747dfb6b5331306c354bb",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "002743_SZ_2025Q4_1225245600_e0e3e2ba40d9087614235cd2ffd107d325174aedd9092f4a3ffef866551106de",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/002743_SZ_2025Q4_1225245600_e0e3e2ba40d9087614235cd2ffd107d325174aedd9092f4a3ffef866551106de.pdf",
+      "content_hash": "e0e3e2ba40d9087614235cd2ffd107d325174aedd9092f4a3ffef866551106de",
+      "document_class": "text_based",
+      "announcement_id": null,
+      "instrument": null,
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79",
+      "pdf_path": "data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf",
+      "content_hash": "abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79",
+      "document_class": "viewer_readable_native_mapping_corrupt",
+      "announcement_id": "ann_e9a7df3862148a4699fd3a36284fe1c7",
+      "instrument": "600036.SH",
+      "page_count": 350,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "002376_SZ_2025Q4_1225167537_90950afd8cfe3e3c09a644a69096f5155a3aa90339e859e76f1c5118035cdfa2",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/002376_SZ_2025Q4_1225167537_90950afd8cfe3e3c09a644a69096f5155a3aa90339e859e76f1c5118035cdfa2.pdf",
+      "content_hash": "90950afd8cfe3e3c09a644a69096f5155a3aa90339e859e76f1c5118035cdfa2",
+      "document_class": "mixed",
+      "announcement_id": null,
+      "instrument": "002376.SZ",
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    },
+    {
+      "case_id": "001322_SZ_2025Q4_1225227844_3eafe7cc25c27854fdf6851da76d847545034512407cc929187f554bd9cacab4",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/001322_SZ_2025Q4_1225227844_3eafe7cc25c27854fdf6851da76d847545034512407cc929187f554bd9cacab4.pdf",
+      "content_hash": "3eafe7cc25c27854fdf6851da76d847545034512407cc929187f554bd9cacab4",
+      "document_class": "scanned",
+      "announcement_id": null,
+      "instrument": "001322.SZ",
+      "page_count": null,
+      "gold": {},
+      "target_pages": []
+    }
+  ]
+}

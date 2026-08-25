@@ -324,3 +324,15 @@ def test_archived_manifest_page_artifact_is_hash_bound_and_reused(tmp_path):
     source_path.write_bytes(content + b"changed")
     with pytest.raises(RuntimeError, match="hash mismatch"):
         ensure_archived_pdf_page_artifact(manifest)
+
+
+def test_600036_mapping_corruption_is_ocr_required_not_not_disclosed():
+    path = Path("data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf")
+    if not path.exists():
+        pytest.skip("optional archived 600036.SH fixture is not present")
+    artifact = BusinessProfilePdfArtifactExtractor().extract_file(path, source_file_id="600036.SH")
+    assert artifact.status == "ocr_required"
+    assert artifact.page_count == 350
+    assert sum(page.native_text_status == "glyph_decoding_error" for page in artifact.pages) >= 300
+    assert len(artifact.heading_index) == 0
+    assert not any(d.outcome == "not_disclosed" for d in artifact.parser_diagnostics)

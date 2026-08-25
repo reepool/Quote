@@ -14,6 +14,7 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, date
+from io import BytesIO
 from typing import Any, Dict, Iterable, List, Optional
 
 import pandas as pd
