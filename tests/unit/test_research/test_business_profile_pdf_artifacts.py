@@ -124,6 +124,21 @@ def test_glyph_decoding_failure_is_distinct_and_queues_target_page_for_ocr():
     ]
 
 
+def test_mojibake_letters_are_detected_without_heading_match():
+    # This resembles a broken ToUnicode map: valid Unicode letters from
+    # unrelated scripts, with no Chinese glyphs and no replacement character.
+    content = _pdf_bytes(["àáâä 2025 çéêë ìíîï"])
+    artifact = BusinessProfilePdfArtifactExtractor(
+        low_text_character_threshold=1,
+        glyph_decoding_ratio_threshold=0.05,
+    ).extract_bytes(content)
+
+    assert artifact.pages[0].native_text_status == "glyph_decoding_error"
+    assert artifact.pages[0].ocr_required is True
+    assert artifact.pages[0].field_relevant is False
+    assert artifact.diagnostics["glyph_decoding_pages"] == [1]
+
+
 def test_downstream_diagnostics_keep_parse_failures_separate_from_not_disclosed():
     table_failure = build_table_parse_failure_diagnostic(
         page_numbers=[8, 7, 8],

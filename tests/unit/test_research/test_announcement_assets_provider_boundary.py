@@ -152,6 +152,26 @@ def test_classifier_infers_only_original_report_year_from_publication() -> None:
     assert "fiscal_year_unresolved" in correction.reasons
 
 
+@pytest.mark.parametrize(
+    "title",
+    [
+        "港股公告：2025年年报",
+        "H股公告-2025年年度报告",
+        "中船防务H股公告_2025年年度报告",
+    ],
+)
+def test_classifier_excludes_explicit_h_share_annual_report_titles(title: str) -> None:
+    classifier = AnnualReportClassifier()
+    classification = classifier.classify(
+        replace(_record("cninfo"), title=title),
+        _record("cninfo").attachments[0],
+    )
+
+    assert classification.is_eligible is False
+    assert classification.is_full_report is False
+    assert any(reason.startswith("excluded:") for reason in classification.reasons)
+
+
 def test_fallback_keeps_ordered_diagnostics_and_source_qualified_identity(tmp_path):
     primary = _BoundaryProvider(
         "primary",

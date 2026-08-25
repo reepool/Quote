@@ -19,7 +19,10 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 
 BUSINESS_PROFILE_PDF_ARTIFACT_SCHEMA_VERSION = "business_profile_pdf_artifact.v2"
-BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION = "business_profile_pypdf.v2"
+# v3 detects valid-Unicode mojibake (for example a broken ToUnicode map), not
+# only replacement/control characters.  The version invalidates old manifests
+# whose page-level diagnostics under-reported these pages.
+BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION = "business_profile_pypdf.v3"
 DEFAULT_LOW_TEXT_CHARACTER_THRESHOLD = 40
 DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD = 0.05
 DEFAULT_GLYPH_DECODING_MIN_CHARACTERS = 3
@@ -455,9 +458,13 @@ class BusinessProfilePdfArtifactExtractor:
             heading_index.extend(matches)
             low_text = non_whitespace < self.low_text_character_threshold
             field_relevant = bool(matches) or page_number in target_pages
-            ocr_required = field_relevant and (
-                low_text
-                or native_text_status in {"extraction_error", "glyph_decoding_error"}
+            # A glyph-decoding failure is unsafe regardless of whether the
+            # heading matcher could recognize the page.  Requiring a heading
+            # here would leave garbled table-of-contents pages out of OCR and
+            # prevent section discovery entirely.
+            ocr_required = (
+                native_text_status in {"extraction_error", "glyph_decoding_error"}
+                or field_relevant and low_text
             )
             page_payload = {
                 "page_number": page_number,
@@ -696,13 +703,31 @@ class BusinessProfilePdfArtifactExtractor:
 
     @staticmethod
     def _suspicious_glyph_count(value: str) -> int:
+        text = str(value or "")
         suspicious = 0
-        for character in str(value or ""):
+        for character in text:
             if character.isspace():
                 continue
             category = unicodedata.category(character)
             if character == "\ufffd" or category in {"Cc", "Co", "Cs"}:
                 suspicious += 1
+        # Broken ToUnicode maps often produce letters from unrelated scripts
+        # (e.g. Kannada, Georgian, or Ethiopic) rather than replacement
+        # characters.  Chinese annual reports normally contain CJK text; a
+        # page with several non-ASCII alphabetic glyphs and no CJK glyphs is a
+        # strong, parser-local signal of mojibake.  Keep ASCII/English pages
+        # valid and avoid treating numeric tables as encoding failures.
+        cjk_count = sum(
+            0x3400 <= ord(character) <= 0x9FFF for character in text
+        )
+        non_ascii_letters = sum(
+            character.isalpha() and ord(character) > 127 and not (
+                0x3400 <= ord(character) <= 0x9FFF
+            )
+            for character in text
+        )
+        if cjk_count == 0 and non_ascii_letters >= 3:
+            suspicious += non_ascii_letters
         return suspicious
 
     @staticmethod

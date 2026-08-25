@@ -2313,6 +2313,8 @@ def _classification_from_payload(raw: dict | object) -> AnnualReportClassificati
         is_eligible=bool(value.get("is_eligible", False)),
         correction_evidence=bool(value.get("correction_evidence", False)),
         reasons=tuple(str(item) for item in value.get("reasons", ())),
+        # A missing version denotes a legacy payload.  It must not inherit the
+        # current classifier identity without actually being reclassified.
         policy_version=str(value.get("policy_version") or "formal_annual_report.v1"),
         vocabulary_version=str(
             value.get("vocabulary_version") or "official_document_classification.v1"

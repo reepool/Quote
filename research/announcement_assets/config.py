@@ -486,7 +486,7 @@ class AnnouncementAssetConfig:
     listed_security_census_max_age_hours: int = 36
     eligibility_indeterminate_policy: str = "retain_last_complete"
     overdue_missing_readiness_policy: str = "degraded"
-    classifier_version: str = "formal_annual_report.v1"
+    classifier_version: str = "formal_annual_report.v2"
     policy_version: str = "annual_report_asset_policy.v1"
     timezone: str = "Asia/Shanghai"
     bootstrap_scope: str = "latest_only_active_a_share"
@@ -905,7 +905,7 @@ class AnnouncementAssetConfig:
                 raw.get("overdue_missing_readiness_policy", "degraded")
             ),
             classifier_version=_non_empty_text(
-                raw.get("classifier_version", "formal_annual_report.v1"),
+                raw.get("classifier_version", "formal_annual_report.v2"),
                 "classifier_version",
             ),
             policy_version=_non_empty_text(

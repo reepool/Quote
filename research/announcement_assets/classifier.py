@@ -26,7 +26,10 @@ from .models import (
     source_filing_evidence_hash,
 )
 
-DEFAULT_CLASSIFIER_VERSION = "formal_annual_report.v1"
+# v2 excludes explicit H-share filings returned by CNInfo market queries.
+# The version participates in acquisition fingerprints so existing winners are
+# re-evaluated under the corrected policy instead of remaining silently stale.
+DEFAULT_CLASSIFIER_VERSION = "formal_annual_report.v2"
 DEFAULT_FISCAL_POLICY_VERSION = "annual_report_fiscal_bounds.v1"
 SAME_SOURCE_EQUIVALENT_TIE_BREAK_POLICY_VERSION = (
     "same_source_equivalent_filing_tie_break.v1"
@@ -82,6 +85,16 @@ _HARD_EXCLUSIONS = (
     "延期披露",
     "取消披露",
     "自愿性披露公告",
+    # CNInfo can return H-share filings in an SSE/SZSE market query for
+    # dual-listed issuers, sometimes carrying the A-share symbol as well.
+    # These explicit title markers identify the H-share document and must not
+    # become the effective A-share annual report.
+    "港股公告",
+    "港股年报",
+    "港股报告",
+    "h股公告",
+    "h股年报",
+    "h股报告",
 )
 _NOTICE_ONLY_MARKERS = (
     "更正公告",

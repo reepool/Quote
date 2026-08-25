@@ -49,7 +49,7 @@
           "instrument_type": "stock",
           "active_only": true,
           "universe_policy_version": "a_share_active.v1",
-          "classifier_version": "formal_annual_report.v1",
+          "classifier_version": "formal_annual_report.v2",
           "policy_version": "annual_report_asset_policy.v1",
           "timezone": "Asia/Shanghai",
           "bootstrap_scope": "latest_only_active_a_share",
