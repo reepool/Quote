@@ -20,6 +20,12 @@ model. Configure `max_ocr_pages`, `max_document_seconds`, `render_dpi`, batch
 size, queue size, and concurrency through `PdfResourceLimits`. Missing OCR
 runtimes produce typed `ocr_unavailable`/`ocr_deferred` results.
 
+Quote's CPU environment has `paddlepaddle==3.3.1`, `paddleocr==3.7.0`,
+`pdf-inspector==1.17.0`, and `pypdfium2` installed. Set
+`PADDLE_PDX_CACHE_HOME` to a writable model-cache directory on workers (for
+example `/var/cache/quote/paddlex`); the adapter also defaults to a temporary
+cache when unset.
+
 ## Evaluation
 
 Use `research.document_processing.pdf.evaluation.load_manifest` with an
