@@ -7245,7 +7245,7 @@ class ScheduledTasks:
         anomaly_llm_pipeline_download_concurrency: int = 8,
         anomaly_llm_pipeline_document_parse_concurrency: int = 8,
         anomaly_llm_pipeline_progress_interval_seconds: float = 30.0,
-        announcement_xdxr_llm_mode: str = "shadow",
+        announcement_xdxr_llm_mode: str = "active",
         announcement_xdxr_llm_profile: str = "semantic_extraction",
         announcement_xdxr_low_likelihood: float = 0.15,
         announcement_xdxr_high_likelihood: float = 0.80,
