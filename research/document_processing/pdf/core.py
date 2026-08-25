@@ -85,7 +85,7 @@ class PdfParseRequest:
     content: bytes
     expected_content_hash: Optional[str] = None
     target_pages: tuple[int, ...] = ()
-    profile: PdfProfile = field(default_factory=PdfProfile)
+    profile: PdfProfile = field(default_factory=lambda: _resolve_default_profile())
     parameter_overrides: Mapping[str, Any] = field(default_factory=dict)
 
     @property
@@ -109,6 +109,15 @@ class PdfParseRequest:
         if any(page < 1 for page in pages):
             raise ValueError("target_pages must be one-based positive integers")
         object.__setattr__(self, "target_pages", pages)
+
+
+def _resolve_default_profile() -> PdfProfile:
+    """Resolve the configured rollout profile without importing it at module load."""
+    try:
+        from .profiles import resolve_profile
+    except ImportError:
+        return PdfProfile()
+    return resolve_profile()
 
 
 @dataclass(frozen=True)

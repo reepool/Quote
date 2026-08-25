@@ -294,7 +294,7 @@ class BusinessProfilePdfArtifactExtractor:
         self,
         *,
         extractor_version: str = BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION,
-        engine_profile: str = "pypdf_native",
+        engine_profile: str | None = None,
         low_text_character_threshold: int = DEFAULT_LOW_TEXT_CHARACTER_THRESHOLD,
         glyph_decoding_ratio_threshold: float = (
             DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD
@@ -305,7 +305,11 @@ class BusinessProfilePdfArtifactExtractor:
         self.extractor_version = str(extractor_version).strip()
         if not self.extractor_version:
             raise ValueError("extractor_version is required")
-        self.engine_profile = str(engine_profile).strip() or "pypdf_native"
+        if engine_profile is None:
+            from research.document_processing.pdf import resolve_profile
+            self.engine_profile = resolve_profile().name
+        else:
+            self.engine_profile = str(engine_profile).strip() or "pypdf_native"
         self.low_text_character_threshold = max(0, int(low_text_character_threshold))
         self.glyph_decoding_ratio_threshold = float(glyph_decoding_ratio_threshold)
         if not 0 <= self.glyph_decoding_ratio_threshold <= 1:

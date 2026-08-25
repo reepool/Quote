@@ -116,6 +116,11 @@ def test_profile_rollout_can_be_changed_without_consumer_code(monkeypatch) -> No
         resolve_profile()
 
 
+def test_default_parse_request_uses_configured_rollout_profile(monkeypatch) -> None:
+    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdf_inspector_paddleocr")
+    assert PdfParseRequest(content=b"%PDF-1.4").profile.name == "pdf_inspector_paddleocr"
+
+
 def test_paddle_adapter_reuses_session_and_batches_pages() -> None:
     class FakeSession:
         def __init__(self):
