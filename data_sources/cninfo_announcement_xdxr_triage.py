@@ -1027,6 +1027,23 @@ class CninfoAnnouncementXdxrDailyGovernanceService:
             structured.get("matched_exceptional_announcement_keys") or ()
         )
         for case in existing_cases:
+            retained_announcements = [
+                dict(item)
+                for item in case.get("announcements") or ()
+                if isinstance(item, Mapping)
+                and not self._is_deterministically_excluded(
+                    item,
+                    classify_daily_corporate_action_title,
+                    structured_announcement_keys,
+                )
+            ]
+            if retained_announcements and len(retained_announcements) < len(
+                case.get("announcements") or ()
+            ):
+                self._refresh_case_after_announcement_filter(
+                    case,
+                    retained_announcements,
+                )
             case_keys = {
                 str(item.get("announcement_key") or "").strip()
                 for item in case.get("announcements") or ()
@@ -1048,10 +1065,26 @@ class CninfoAnnouncementXdxrDailyGovernanceService:
             ):
                 case["routing_status"] = "deterministic_excluded"
 
+        unmatched_by_instrument = {
+            str(instrument_id): [
+                dict(item)
+                for item in items or ()
+                if isinstance(item, Mapping)
+                and not self._is_deterministically_excluded(
+                    item,
+                    classify_daily_corporate_action_title,
+                    structured_announcement_keys,
+                )
+            ]
+            for instrument_id, items in (
+                structured.get(
+                    "unmatched_special_announcements_by_instrument"
+                ) or {}
+            ).items()
+        }
+
         triage = await self.triage_service.triage(
-            structured.get(
-                "unmatched_special_announcements_by_instrument"
-            ) or {},
+            unmatched_by_instrument,
             existing_cases=existing_cases,
             source_signals_by_instrument=(
                 source_signals_by_instrument
@@ -1102,6 +1135,67 @@ class CninfoAnnouncementXdxrDailyGovernanceService:
             "announcement_only_triage": triage,
             "announcement_xdxr_cases": triage["cases"],
         }
+
+    @staticmethod
+    def _is_deterministically_excluded(
+        announcement: Mapping[str, Any],
+        classifier: Any,
+        structured_announcement_keys: set[str],
+    ) -> bool:
+        announcement_key = str(
+            announcement.get("announcement_key") or ""
+        ).strip()
+        if announcement_key in structured_announcement_keys:
+            return False
+        decision = classifier(announcement.get("title"))
+        return (
+            not decision.get("selected")
+            and str(decision.get("reason") or "").startswith(
+                "deterministic_exclusion:"
+            )
+        )
+
+    @staticmethod
+    def _refresh_case_after_announcement_filter(
+        case: dict[str, Any],
+        announcements: Sequence[Mapping[str, Any]],
+    ) -> None:
+        retained = [dict(item) for item in announcements]
+        case["announcements"] = retained
+        dates = [
+            str(item.get("announcement_date") or "")
+            for item in retained
+            if str(item.get("announcement_date") or "").strip()
+        ]
+        case["first_announcement_date"] = min(dates) if dates else None
+        case["latest_announcement_date"] = max(dates) if dates else None
+        keys = {
+            str(item.get("announcement_key") or "").strip()
+            for item in retained
+        }
+        primary = str(case.get("primary_announcement_key") or "").strip()
+        if primary not in keys:
+            case["primary_announcement_key"] = max(
+                retained,
+                key=_announcement_sort_key,
+            )["announcement_key"]
+        case["supporting_announcement_keys"] = [
+            str(item).strip()
+            for item in case.get("supporting_announcement_keys") or ()
+            if str(item).strip() in keys
+        ]
+        case["evidence_hash"] = stable_hash({
+            "case_id": case.get("case_id"),
+            "announcements": [
+                {
+                    "announcement_key": item.get("announcement_key"),
+                    "title": item.get("title"),
+                    "announcement_date": item.get("announcement_date"),
+                    "content_hash": item.get("content_hash"),
+                }
+                for item in retained
+            ],
+        })
 
     @staticmethod
     def _merge_deferred_special(

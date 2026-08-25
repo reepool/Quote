@@ -316,6 +316,59 @@ async def test_shadow_keeps_title_excluded_case_out_of_deterministic_queue():
     classifier.classify.assert_not_awaited()
 
 
+@pytest.mark.asyncio
+async def test_shadow_removes_newly_excluded_announcement_from_existing_case():
+    case = build_announcement_xdxr_cases({
+        "600807.SH": [
+            _announcement(
+                "review",
+                "中德证券关于济南高新股权分置改革限售股上市流通的核查意见",
+                "2026-08-25",
+            ),
+            _announcement(
+                "listing",
+                "济高发展股改限售股上市流通公告",
+                "2026-08-25",
+            ),
+        ]
+    })[0]
+    classifier = SimpleNamespace(
+        classify=AsyncMock(side_effect=lambda current_case, documents, **_: _decision(
+            current_case,
+            likelihood=0.1,
+            confidence=0.9,
+        ))
+    )
+    service = CninfoAnnouncementXdxrDailyGovernanceService(
+        CninfoAnnouncementXdxrTriageService(
+            config=AnnouncementXdxrTriageConfig(mode="shadow"),
+            classifier=classifier,
+            document_loader=AsyncMock(return_value={"text": "公告正文"}),
+        )
+    )
+
+    result = await service.govern(
+        {
+            "status": "success",
+            "execution_status": "skipped",
+            "unmatched_special_announcements_by_instrument": {
+                "600807.SH": case["announcements"]
+            },
+            "deferred_special_announcements_by_instrument": {},
+        },
+        announcement_scan={"announcement_xdxr_cases": [case]},
+        cninfo_result={},
+        tdx_result={},
+        rebuild_result={},
+    )
+
+    triage_case = result["announcement_xdxr_cases"][0]
+    assert [item["announcement_key"] for item in triage_case["announcements"]] == [
+        "listing"
+    ]
+    assert classifier.classify.await_count == 1
+
+
 def test_source_signal_exposes_best_case_evidence_to_structured_governance():
     case = build_announcement_xdxr_cases({
         "600000.SH": [
