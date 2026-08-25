@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -14,6 +15,8 @@ from research.document_processing.pdf import (
     PdfProfile,
     PdfResourceLimits,
     PdfRouter,
+    PdfiumNativeAdapter,
+    PypdfNativeAdapter,
     detect_text_quality,
     profile_from_mapping,
     resolve_profile,
@@ -80,10 +83,11 @@ def test_600036_fixture_is_mapping_corrupt_when_archived() -> None:
     path = Path("data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf")
     if not path.exists():
         pytest.skip("optional archived 600036.SH fixture is not present")
-    result = PdfRouter().parse(PdfParseRequest(content=path.read_bytes(), profile=PdfProfile(name="fixture-diagnostic")))
+    # Keep this regression focused on the known pypdf defect; PDFium-first is
+    # expected to recover these same pages and is covered by the promotion gold.
+    result = PdfRouter(native=PypdfNativeAdapter()).parse(PdfParseRequest(content=path.read_bytes(), target_pages=(19, 41), profile=PdfProfile(name="fixture-diagnostic", native_engines=("pypdf",))))
     assert result.page_count == 350
-    assert sum(page.quality_status == "native_text_mapping_error" for page in result.pages) >= 300
-    assert all(page.quality_status != "usable" for page in result.pages if page.page_number > 10)
+    assert all(page.quality_status == "native_text_mapping_error" for page in result.pages)
 
 
 class _FakeNative:
@@ -108,15 +112,15 @@ class _FakeOcr:
 
 
 def test_router_prefers_alternate_native_then_selective_ocr() -> None:
-    profile = PdfProfile(name="test", alternate_native_engine="pdf-inspector", ocr_engine="paddleocr", limits=PdfResourceLimits(max_ocr_pages=1))
-    result = PdfRouter(native=_FakeNative(), alternate_native=_FakeAlternate(), ocr=_FakeOcr()).parse(PdfParseRequest(content=_blank_pdf(2), profile=profile))
+    profile = PdfProfile(name="test", native_engines=("first", "second"), ocr_engine="paddleocr", limits=PdfResourceLimits(max_ocr_pages=1))
+    result = PdfRouter(native_chain=(_FakeNative(), _FakeAlternate()), ocr=_FakeOcr()).parse(PdfParseRequest(content=_blank_pdf(2), profile=profile))
     assert result.pages[0].extraction_method == "native_text"
     assert result.pages[1].extraction_method == "alternate_native"
     assert not any(page.extraction_method == "ocr" for page in result.pages)
 
 
 def test_native_first_does_not_create_ocr_work_and_preserves_failed_candidate():
-    profile = PdfProfile(name="native-first", alternate_native_engine="pdf-inspector", ocr_engine="paddleocr")
+    profile = PdfProfile(name="native-first", native_engines=("first",), ocr_engine="paddleocr")
     ocr = _FakeOcr()
     result = PdfRouter(native=_FakeNative(), alternate_native=None, ocr=ocr).parse(
         PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="section_extract", recovery_policy="native_first")
@@ -156,10 +160,10 @@ def test_cache_backend_reuses_successful_ocr_page():
             self.values = {}
 
         def get(self, identity):
-            return self.values.get(tuple(sorted(identity.items())))
+            return self.values.get(json.dumps(identity, sort_keys=True, default=list))
 
         def put(self, identity, page_result):
-            self.values[tuple(sorted(identity.items()))] = page_result
+            self.values[json.dumps(identity, sort_keys=True, default=list)] = page_result
 
     cache = Cache()
     profile = PdfProfile(name="cache", ocr_engine="paddleocr", min_text_characters=1)
@@ -187,12 +191,12 @@ def test_missing_ocr_runtime_is_typed_and_profile_switch_is_config_only() -> Non
     profile = profile_from_mapping("test", {"ocr_engine": "paddleocr", "ocr_model_cache_dir": "/tmp/quote-paddlex-test", "limits": {"max_ocr_pages": 1}})
     assert profile.name == "test"
     assert profile.ocr_model_cache_dir == "/tmp/quote-paddlex-test"
-    assert DEFAULT_PROFILES["pypdf_paddleocr"].fallback_profile == "pypdf_native"
+    assert DEFAULT_PROFILES["pdfium_paddleocr_cpu"].fallback_profile == "pdfium_native"
 
 
 def test_profile_rollout_can_be_changed_without_consumer_code(monkeypatch) -> None:
-    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdf_inspector_paddleocr")
-    assert resolve_profile().name == "pdf_inspector_paddleocr"
+    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdfium_native")
+    assert resolve_profile().name == "pdfium_native"
     monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "unknown")
     with pytest.raises(ValueError, match="unknown PDF engine profile"):
         resolve_profile()
@@ -201,23 +205,23 @@ def test_profile_rollout_can_be_changed_without_consumer_code(monkeypatch) -> No
 def test_gpu_canary_profile_fails_closed_without_approval(monkeypatch) -> None:
     monkeypatch.delenv("QUOTE_PDF_GPU_CANARY_APPROVED", raising=False)
     with pytest.raises(ValueError, match="GPU PDF profile requires"):
-        resolve_profile("pypdf_paddleocr_gpu_canary")
+        resolve_profile("pdfium_paddleocr_gpu")
 
 
 def test_gpu_canary_profile_rejects_incomplete_approval_report(monkeypatch, tmp_path) -> None:
     report = tmp_path / "approval.json"
-    report.write_text('{"schema_version":"pdf-gpu-canary-approval.v1","profile":"pypdf_paddleocr_gpu_canary","corpus_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","gpu_canary_approved":true,"checks":{"cuda_runtime":true}}', encoding="utf-8")
+    report.write_text('{"schema_version":"pdf-gpu-canary-approval.v1","profile":"pdfium_paddleocr_gpu","corpus_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","gpu_canary_approved":true,"checks":{"cuda_runtime":true}}', encoding="utf-8")
     monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_APPROVED", "1")
     monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_REPORT", str(report))
     with pytest.raises(ValueError, match="has not passed every gate"):
-        resolve_profile("pypdf_paddleocr_gpu_canary")
+        resolve_profile("pdfium_paddleocr_gpu")
 
 
 def test_gpu_canary_profile_rejects_approval_for_other_corpus(monkeypatch, tmp_path) -> None:
     report = tmp_path / "approval.json"
     report.write_text(json.dumps({
         "schema_version": "pdf-gpu-canary-approval.v1",
-        "profile": "pypdf_paddleocr_gpu_canary",
+        "profile": "pdfium_paddleocr_gpu",
         "corpus_hash": "a" * 64,
         "gpu_canary_approved": True,
         "checks": {name: True for name in GPU_CANARY_REQUIRED_CHECKS},
@@ -225,17 +229,17 @@ def test_gpu_canary_profile_rejects_approval_for_other_corpus(monkeypatch, tmp_p
     monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_APPROVED", "1")
     monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_REPORT", str(report))
     with pytest.raises(ValueError, match="has not passed every gate"):
-        resolve_profile("pypdf_paddleocr_gpu_canary")
+        resolve_profile("pdfium_paddleocr_gpu")
 
 
 def test_ocr_cache_directory_can_be_supplied_by_runtime_config(monkeypatch) -> None:
     monkeypatch.setenv("QUOTE_PDF_OCR_CACHE_DIR", "/tmp/quote-pdf-cache")
-    assert resolve_profile("pypdf_paddleocr").ocr_model_cache_dir == "/tmp/quote-pdf-cache"
+    assert resolve_profile("pdfium_paddleocr_cpu").ocr_model_cache_dir == "/tmp/quote-pdf-cache"
 
 
 def test_default_parse_request_uses_configured_rollout_profile(monkeypatch) -> None:
-    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdf_inspector_paddleocr")
-    assert PdfParseRequest(content=b"%PDF-1.4").profile.name == "pdf_inspector_paddleocr"
+    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdfium_native")
+    assert PdfParseRequest(content=b"%PDF-1.4").profile.name == "pdfium_native"
 
 
 def test_paddle_adapter_reuses_session_and_batches_pages() -> None:
@@ -345,3 +349,118 @@ def test_hard_timeout_rejects_unpicklable_custom_renderer() -> None:
             [1],
             request=PdfParseRequest(content=b"%PDF-1.4", profile=PdfProfile(name="custom-renderer")),
         )
+
+
+def test_expected_chinese_script_rejects_numeric_residue_but_keeps_english_configurable() -> None:
+    chinese = PdfProfile(name="chinese", expected_script="cjk", min_text_characters=5)
+    numeric_result = PdfRouter(native=_StaticNative({1: "2025 90,676 5.0%"})).parse(
+        PdfParseRequest(content=_blank_pdf(), profile=chinese, target_pages=(1,))
+    )
+    assert numeric_result.pages[0].selected_method == "none"
+    assert numeric_result.pages[0].quality_status == "native_text_expected_script_missing"
+    english = PdfProfile(name="english", expected_script="latin", min_text_characters=5)
+    english_result = PdfRouter(native=_StaticNative({1: "Annual report 2025"})).parse(
+        PdfParseRequest(content=_blank_pdf(), profile=english, target_pages=(1,))
+    )
+    assert english_result.pages[0].selected_method == "native_text"
+
+
+def test_ordered_native_chain_batches_failed_pages_and_short_circuits_usable_pages() -> None:
+    fallback = _RecordingNative({2: "中文恢复", 3: "中文恢复"})
+    profile = PdfProfile(name="chain", native_engines=("first", "second"), expected_script="cjk", min_text_characters=2)
+    result = PdfRouter(native_chain=(_StaticNative({1: "中文可用", 2: "", 3: ""}), fallback)).parse(
+        PdfParseRequest(content=_blank_pdf(3), profile=profile, target_pages=(3, 1, 2))
+    )
+    assert fallback.calls == [(2, 3)]
+    assert result.returned_pages == (1, 2, 3)
+    assert result.pages[0].selected_method == "native_text"
+    assert all(page.selected_method == "alternate_native" for page in result.pages[1:])
+
+
+def test_force_ocr_keeps_first_native_diagnostic_and_skips_later_native_engines() -> None:
+    fallback = _RecordingNative({1: "不应调用"})
+    profile = PdfProfile(name="force", native_engines=("first", "second"), ocr_engine="paddleocr", expected_script="cjk", min_text_characters=3)
+    class ChineseOcr(_FakeOcr):
+        def extract_pages(self, content, pages, *, request):
+            return {page: OcrPage("中文 OCR 恢复", 0.95, 0.01) for page in pages}
+
+    result = PdfRouter(native_chain=(_StaticNative({1: "中文原生文本"}), fallback), ocr=ChineseOcr()).parse(
+        PdfParseRequest(content=_blank_pdf(), profile=profile, target_pages=(1,), ocr_mode="section_extract", recovery_policy="force_ocr")
+    )
+    assert fallback.calls == []
+    assert result.pages[0].selected_method == "ocr"
+    assert len(result.pages[0].candidates) == 2
+
+
+def test_pdfium_adapter_extracts_stable_requested_pages_once(monkeypatch) -> None:
+    import research.document_processing.pdf.core as core
+
+    calls = []
+    original = core.PdfiumNativeAdapter.extract
+
+    def wrapped(self, content, *, target_pages=()):
+        calls.append(tuple(target_pages))
+        return original(self, content, target_pages=target_pages)
+
+    monkeypatch.setattr(core.PdfiumNativeAdapter, "extract", wrapped)
+    result = PdfRouter(native=PdfiumNativeAdapter()).parse(
+        PdfParseRequest(content=_blank_pdf(2), profile=PdfProfile(name="pdfium", native_engines=("pypdfium2",)), target_pages=(2, 1))
+    )
+    assert calls == [(1, 2)]
+    assert result.returned_pages == (1, 2)
+
+
+def test_external_worker_protocol_uses_pdfium_images_and_preserves_identity(tmp_path) -> None:
+    worker = tmp_path / "worker.py"
+    worker.write_text(
+        "import json,sys\n"
+        "payload=json.load(sys.stdin)\n"
+        "if '--probe' in sys.argv: print(json.dumps({'protocol':'quote-pdf-ocr-worker.v1','healthy':True,'cuda_available':False})); raise SystemExit(0)\n"
+        "print(json.dumps({'protocol':'quote-pdf-ocr-worker.v1','runtime':payload['runtime'],'device':'cpu','inference_config':{},'pages':[{'page_number':x['page_number'],'text':'中文 OCR 文本','confidence':0.99,'elapsed_seconds':0.01,'image_sha256':x['image_sha256'],'paddle_version':'3.3.1','paddleocr_version':'3.7.0','model':'PP-OCRv6','diagnostics':[]} for x in payload['pages']]}))\n",
+        encoding="utf-8",
+    )
+    command = (sys.executable, str(worker))
+    profile = PdfProfile(name="worker", ocr_engine="paddleocr", expected_script="cjk", min_text_characters=3, ocr_worker_command=command, ocr_runtime="isolated-cpu-paddle-3.3.1")
+    adapter = PaddleOcrAdapter(worker_command=command)
+    result = adapter.extract_pages(_blank_pdf(), [1], request=PdfParseRequest(content=_blank_pdf(), profile=profile))
+    assert result[1].text == "中文 OCR 文本"
+    assert result[1].provenance["renderer"] == "pypdfium2"
+    assert len(result[1].provenance["image_sha256"]) == 64
+
+
+def test_external_worker_malformed_response_fails_closed(tmp_path) -> None:
+    worker = tmp_path / "bad_worker.py"
+    worker.write_text("print('not-json')\n", encoding="utf-8")
+    command = (sys.executable, str(worker))
+    profile = PdfProfile(name="worker", ocr_engine="paddleocr", ocr_worker_command=command)
+    result = PaddleOcrAdapter(worker_command=command).extract_pages(
+        _blank_pdf(), [1], request=PdfParseRequest(content=_blank_pdf(), profile=profile)
+    )
+    assert result[1].diagnostics[0].code == "ocr_worker_malformed_response"
+
+
+class _StaticNative:
+    name = "static"
+
+    def __init__(self, pages):
+        self.pages = pages
+
+    def extract(self, content, *, target_pages=()):
+        requested = tuple(target_pages) or tuple(self.pages)
+        return NativeResult(
+            3,
+            tuple(NativePage(number, self.pages.get(number, ""), 0.01) for number in requested),
+            engine_version="static-v1",
+        )
+
+
+class _RecordingNative(_StaticNative):
+    name = "recording"
+
+    def __init__(self, pages):
+        super().__init__(pages)
+        self.calls = []
+
+    def extract(self, content, *, target_pages=()):
+        self.calls.append(tuple(target_pages))
+        return super().extract(content, target_pages=target_pages)

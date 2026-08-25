@@ -26,8 +26,8 @@ from typing import (
     Sequence,
 )
 
-PDF_PARSER_SCHEMA_VERSION = "shared_pdf.v2"
-PDF_PARSER_VERSION = "shared-pdf-pypdf.v1"
+PDF_PARSER_SCHEMA_VERSION = "shared_pdf.v3"
+PDF_PARSER_VERSION = "shared-pdf-router.v3"
 
 
 def compute_content_hash(content: bytes) -> str:
@@ -85,8 +85,7 @@ DEFAULT_MODE_BUDGETS: Mapping[str, "PdfResourceLimits"] = {
 @dataclass(frozen=True)
 class PdfProfile:
     name: str = "pypdf_native"
-    native_engine: str = "pypdf"
-    alternate_native_engine: Optional[str] = None
+    native_engines: tuple[str, ...] = ("pypdf",)
     ocr_engine: Optional[str] = None
     enabled: bool = True
     rollout_state: str = "active"
@@ -102,6 +101,31 @@ class PdfProfile:
     mode_budgets: Mapping[str, PdfResourceLimits] = field(default_factory=dict)
     ocr_min_confidence: float = 0.60
     ocr_device: str = "cpu"
+    expected_script: str = "auto"
+    min_expected_script_characters: int = 1
+    ocr_runtime: str = "quote-local"
+    ocr_fallback_runtime: Optional[str] = None
+    ocr_worker_command: tuple[str, ...] = ()
+    ocr_fallback_worker_command: tuple[str, ...] = ()
+    ocr_fallback_failure_codes: tuple[str, ...] = (
+        "ocr_unavailable",
+        "ocr_runtime_unavailable",
+        "ocr_worker_startup_failed",
+        "ocr_model_unhealthy",
+    )
+    ocr_inference_config: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        engines = tuple(str(engine).strip() for engine in self.native_engines if str(engine).strip())
+        if not engines:
+            raise ValueError("native_engines must contain at least one engine")
+        if len(set(engines)) != len(engines):
+            raise ValueError("native_engines must not contain duplicates")
+        if self.min_expected_script_characters < 1:
+            raise ValueError("min_expected_script_characters must be positive")
+        object.__setattr__(self, "native_engines", engines)
+        object.__setattr__(self, "ocr_worker_command", tuple(self.ocr_worker_command))
+        object.__setattr__(self, "ocr_fallback_worker_command", tuple(self.ocr_fallback_worker_command))
 
 
 @dataclass(frozen=True)
@@ -274,7 +298,13 @@ class OcrPage:
     structured_format: Optional[str] = None
 
 
-def detect_text_quality(text: str, *, min_characters: int = 20) -> tuple[str, tuple[PdfDiagnostic, ...]]:
+def detect_text_quality(
+    text: str,
+    *,
+    min_characters: int = 20,
+    expected_script: str = "auto",
+    min_expected_script_characters: int = 1,
+) -> tuple[str, tuple[PdfDiagnostic, ...]]:
     """Classify native text, including valid-Unicode ToUnicode mojibake.
 
     The mapping check intentionally does not depend on U+FFFD or heading
@@ -285,7 +315,9 @@ def detect_text_quality(text: str, *, min_characters: int = 20) -> tuple[str, tu
     compact = re.sub(r"\s+", "", value)
     if not compact:
         return "empty", (PdfDiagnostic("empty_page", "native extraction returned no text"),)
-    controls = sum(1 for ch in compact if unicodedata.category(ch).startswith("C"))
+    # Private-use glyphs commonly encode checkboxes in normal filings. Only
+    # actual control/format code points are a decoding failure signal.
+    controls = sum(1 for ch in compact if unicodedata.category(ch) in {"Cc", "Cf"})
     replacement = value.count("\ufffd")
     cjk = sum(1 for ch in compact if "CJK UNIFIED" in unicodedata.name(ch, ""))
     letters = sum(1 for ch in compact if unicodedata.category(ch).startswith("L"))
@@ -307,6 +339,19 @@ def detect_text_quality(text: str, *, min_characters: int = 20) -> tuple[str, tu
     if len(compact) < min_characters:
         diagnostics.append(PdfDiagnostic("low_text_page", "native text below configured quality threshold", details={"characters": len(compact), "threshold": min_characters}))
         return "low_text", tuple(diagnostics)
+    if expected_script.lower() in {"cjk", "chinese", "zh"} and cjk < min_expected_script_characters:
+        diagnostics.append(
+            PdfDiagnostic(
+                "native_text_expected_script_missing",
+                "native text does not contain the configured Chinese-script evidence",
+                details={
+                    "expected_script": expected_script,
+                    "cjk_characters": cjk,
+                    "threshold": min_expected_script_characters,
+                },
+            )
+        )
+        return "native_text_expected_script_missing", tuple(diagnostics)
     return "usable", tuple(diagnostics)
 
 
@@ -354,15 +399,97 @@ class PypdfNativeAdapter:
                         pages.append(NativePage(number, "", time.perf_counter() - page_started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),)))
                 return NativeResult(count, tuple(pages), tuple(document_diags), self.version)
         except Exception as exc:
-            return NativeResult(0, (), (PdfDiagnostic("malformed_pdf", f"{type(exc).__name__}: {exc}", severity="error"),), self.version)
+            message = f"{type(exc).__name__}: {exc}"
+            code = "encrypted_password_required" if "password" in message.lower() else "malformed_pdf"
+            return NativeResult(0, (), (PdfDiagnostic(code, message, severity="error"),), self.version)
+
+
+class PdfiumNativeAdapter:
+    """PDFium text extractor using one open document per adapter request."""
+
+    name = "pypdfium2"
+
+    @property
+    def version(self) -> str:
+        try:
+            from importlib.metadata import version
+
+            return f"pypdfium2-{version('pypdfium2')}"
+        except Exception:
+            return "pypdfium2-unknown"
+
+    def extract(self, content: bytes, *, target_pages: Sequence[int] = ()) -> NativeResult:
+        raw = bytes(content)
+        if not raw.lstrip().startswith(b"%PDF-"):
+            return NativeResult(0, (), (PdfDiagnostic("invalid_pdf_signature", "input does not start with %PDF-", severity="error"),), self.version)
+        try:
+            import pypdfium2 as pdfium
+        except ImportError as exc:
+            return NativeResult(0, (), (PdfDiagnostic("native_runtime_unavailable", str(exc), severity="error"),), self.version)
+        document = None
+        try:
+            document = pdfium.PdfDocument(raw)
+            count = len(document)
+            if count < 1:
+                return NativeResult(0, (), (PdfDiagnostic("empty_pdf", "PDF contains no pages", severity="error"),), self.version)
+            requested = tuple(sorted(set(int(page) for page in target_pages))) if target_pages else tuple(range(1, count + 1))
+            pages: list[NativePage] = []
+            diagnostics: list[PdfDiagnostic] = []
+            for number in requested:
+                if number < 1 or number > count:
+                    diagnostics.append(PdfDiagnostic("target_page_out_of_range", f"page {number} is outside 1..{count}", number, "error"))
+                    continue
+                started = time.perf_counter()
+                page = text_page = None
+                try:
+                    page = document.get_page(number - 1)
+                    text_page = page.get_textpage()
+                    text = text_page.get_text_range() or ""
+                    width, height = page.get_size()
+                    pages.append(NativePage(number, text, time.perf_counter() - started, width_points=float(width), height_points=float(height)))
+                except Exception as exc:
+                    pages.append(NativePage(number, "", time.perf_counter() - started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),)))
+                finally:
+                    if text_page is not None:
+                        text_page.close()
+                    if page is not None:
+                        page.close()
+            return NativeResult(count, tuple(pages), tuple(diagnostics), self.version)
+        except Exception as exc:
+            message = f"{type(exc).__name__}: {exc}"
+            code = "encrypted_password_required" if "password" in message.lower() else "malformed_pdf"
+            return NativeResult(0, (), (PdfDiagnostic(code, message, severity="error"),), self.version)
+        finally:
+            if document is not None:
+                document.close()
 
 
 class PdfRouter:
-    """Native-first router with optional alternate-native and OCR adapters."""
+    """Page-level native chain with bounded optional OCR recovery.
 
-    def __init__(self, *, native: Optional[NativeAdapter] = None, alternate_native: Optional[NativeAdapter] = None, ocr: Optional[OcrAdapter] = None, quality_detector: Callable[..., tuple[str, tuple[PdfDiagnostic, ...]]] = detect_text_quality) -> None:
-        self.native = native or PypdfNativeAdapter()
-        self.alternate_native = alternate_native
+    ``native`` and ``alternate_native`` remain accepted during the migration so
+    existing consumers can move to ``native_chain`` without a flag day.
+    """
+
+    def __init__(
+        self,
+        *,
+        native_chain: Optional[Sequence[NativeAdapter]] = None,
+        native: Optional[NativeAdapter] = None,
+        alternate_native: Optional[NativeAdapter] = None,
+        ocr: Optional[OcrAdapter] = None,
+        quality_detector: Callable[..., tuple[str, tuple[PdfDiagnostic, ...]]] = detect_text_quality,
+    ) -> None:
+        chain = tuple(native_chain or ())
+        if not chain:
+            chain = (native or PdfiumNativeAdapter(),)
+            if alternate_native is not None:
+                chain += (alternate_native,)
+        if not chain:
+            raise ValueError("native_chain must contain at least one adapter")
+        self.native_chain = chain
+        self.native = chain[0]
+        self.alternate_native = chain[1] if len(chain) > 1 else None
         self.ocr = ocr
         self.quality_detector = quality_detector
 
@@ -371,58 +498,52 @@ class PdfRouter:
         profile = request.profile
         if not profile.enabled or profile.rollout_state == "disabled":
             return self._failed(request, "profile_disabled", "PDF profile is disabled", started)
-        native = self.native.extract(request.content, target_pages=request.target_pages)
+        native = self.native_chain[0].extract(request.content, target_pages=request.target_pages)
         if native.page_count == 0:
             return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, 0, (), "failed", native.diagnostics, time.perf_counter() - started, requested_pages=request.requested_pages)
         limit = profile.limits.max_pages
         pages = list(native.pages[:limit]) if limit else list(native.pages)
         results: dict[int, PdfPageResult] = {}
-        ocr_targets: list[int] = []
-        alternate_targets: list[int] = []
         explicit_targets = set(request.target_pages)
         allow_ocr = request.ocr_mode != "none" and request.recovery_policy != "native_first"
-        for item in pages:
-            quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
-            all_diags = tuple(item.diagnostics) + tuple(diags)
-            needs_recovery = quality in {"empty", "low_text", "native_text_mapping_error"}
-            requested = item.page_number in explicit_targets
-            needs_ocr = allow_ocr and requested and (request.recovery_policy == "force_ocr" or needs_recovery)
-            if quality == "native_text_mapping_error" and self.alternate_native and profile.alternate_native_engine and request.recovery_policy != "force_ocr":
-                alternate_targets.append(item.page_number)
-            elif needs_ocr:
-                ocr_targets.append(item.page_number)
-            native_candidate = self._candidate("native_text", item.text, quality, item.elapsed_seconds, all_diags)
-            results[item.page_number] = self._page_from_candidates(
-                item.page_number,
-                (native_candidate,),
-                quality if quality == "usable" else quality,
-                all_diags,
-                item.elapsed_seconds,
-                ocr_required=needs_recovery,
-                width_points=item.width_points,
-                height_points=item.height_points,
-                selected=("native_text", item.text) if quality == "usable" else None,
-                cache_identity=self._cache_identity(request, item.page_number, native.engine_version),
-            )
-        if alternate_targets and self.alternate_native:
-            alternate = self.alternate_native.extract(request.content, target_pages=alternate_targets)
-            alternate_by_page = {item.page_number: item for item in alternate.pages}
-            for item in alternate.pages:
-                quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
-                previous = results[item.page_number]
-                alternate_candidate = self._candidate("alternate_native", item.text, quality, item.elapsed_seconds, diags, provenance={"engine": getattr(self.alternate_native, "name", "alternate_native")})
-                candidates = previous.candidates + (alternate_candidate,)
-                if quality == "usable":
-                    results[item.page_number] = self._page_from_candidates(item.page_number, candidates, quality, previous.diagnostics + tuple(diags), item.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, selected=("alternate_native", item.text), cache_identity=previous.cache_identity)
-                elif allow_ocr and item.page_number in explicit_targets:
-                    ocr_targets.append(item.page_number)
-                else:
-                    results[item.page_number] = self._page_from_candidates(item.page_number, candidates, quality, previous.diagnostics + tuple(diags), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
-            for number in set(alternate_targets) - set(alternate_by_page):
-                previous = results[number]
-                diagnostic = PdfDiagnostic("alternate_native_extraction_failed", "alternate-native adapter returned no page", number, "error")
-                candidate = PdfCandidate("alternate_native", "", "", "alternate_native_failure", False, elapsed_seconds=0.0, diagnostics=(diagnostic,))
-                results[number] = self._page_from_candidates(number, previous.candidates + (candidate,), previous.quality_status, previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
+        pending = {item.page_number for item in pages}
+        native_attempts: list[NativeResult] = [native]
+        for index, adapter in enumerate(self.native_chain):
+            if not pending or (index and request.recovery_policy == "force_ocr"):
+                break
+            attempt = native_attempts[0] if index == 0 else adapter.extract(request.content, target_pages=tuple(sorted(pending)))
+            if index:
+                native_attempts.append(attempt)
+            by_page = {item.page_number: item for item in attempt.pages}
+            for number in tuple(sorted(pending)):
+                item = by_page.get(number)
+                method = "native_text" if index == 0 else "alternate_native"
+                engine = getattr(adapter, "name", profile.native_engines[min(index, len(profile.native_engines) - 1)])
+                if item is None:
+                    diagnostic = PdfDiagnostic("native_adapter_missing_page", "native adapter returned no page result", number, "error", {"engine": engine})
+                    candidate = self._candidate(method, "", "native_extraction_failure", 0.0, (diagnostic,), provenance={"engine": engine, "engine_version": attempt.engine_version, "chain_index": index})
+                    previous = results.get(number)
+                    candidates = (previous.candidates if previous else ()) + (candidate,)
+                    results[number] = self._page_from_candidates(number, candidates, "native_extraction_failure", (previous.diagnostics if previous else ()) + (diagnostic,), previous.elapsed_seconds if previous else 0.0, True, previous.width_points if previous else None, previous.height_points if previous else None, cache_identity=self._cache_identity(request, number, attempt.engine_version))
+                    continue
+                quality, detected = self._quality(item.text, profile)
+                diagnostics = tuple(item.diagnostics) + tuple(detected)
+                candidate = self._candidate(method, item.text, quality, item.elapsed_seconds, diagnostics, provenance={"engine": engine, "engine_version": attempt.engine_version, "chain_index": index})
+                previous = results.get(number)
+                candidates = (previous.candidates if previous else ()) + (candidate,)
+                selected = (method, item.text) if quality == "usable" and request.recovery_policy != "force_ocr" else None
+                results[number] = self._page_from_candidates(number, candidates, quality, (previous.diagnostics if previous else ()) + diagnostics, item.elapsed_seconds, quality != "usable" or request.recovery_policy == "force_ocr", item.width_points, item.height_points, selected=selected, provenance=(candidate.provenance,), cache_identity=self._cache_identity(request, number, attempt.engine_version))
+                if quality == "usable" and request.recovery_policy != "force_ocr":
+                    pending.discard(number)
+            # Later adapters receive only pages failed by all preceding engines.
+            if index == 0 and request.recovery_policy == "force_ocr":
+                break
+        if request.recovery_policy == "force_ocr":
+            ocr_targets = sorted(explicit_targets & set(results))
+        elif allow_ocr:
+            ocr_targets = sorted(number for number in pending if number in explicit_targets)
+        else:
+            ocr_targets = []
         all_ocr_targets = sorted(set(ocr_targets))
         limits = self._effective_limits(request)
         queue_targets = all_ocr_targets[: limits.max_queue_size]
@@ -466,7 +587,7 @@ class PdfRouter:
                     results[number] = self._page_from_candidates(number, previous.candidates, "ocr_failure", previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
                     continue
                 previous = results[number]
-                quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
+                quality, diags = self._quality(item.text, profile)
                 provenance = {"engine": getattr(self.ocr, "name", profile.ocr_engine), "mode": request.ocr_mode, **dict(item.provenance)}
                 diagnostics = previous.diagnostics + tuple(item.diagnostics) + tuple(diags)
                 diagnostic_codes = {item.code for item in item.diagnostics}
@@ -510,6 +631,18 @@ class PdfRouter:
         text_hash = compute_content_hash(text.encode("utf-8"))
         return PdfCandidate(method, text, text_hash, quality, quality in {"usable", "ocr_success"}, confidence, elapsed, diagnostics, dict(provenance or {}))
 
+    def _quality(self, text: str, profile: PdfProfile) -> tuple[str, tuple[PdfDiagnostic, ...]]:
+        """Invoke legacy injected detectors while supplying the new policy."""
+        try:
+            return self.quality_detector(
+                text,
+                min_characters=profile.min_text_characters,
+                expected_script=profile.expected_script,
+                min_expected_script_characters=profile.min_expected_script_characters,
+            )
+        except TypeError:
+            return self.quality_detector(text, min_characters=profile.min_text_characters)
+
     @classmethod
     def _page_from_candidates(cls, number: int, candidates: tuple[PdfCandidate, ...], status: str, diagnostics: tuple[PdfDiagnostic, ...], elapsed: float, ocr_required: bool, width_points: Optional[float] = None, height_points: Optional[float] = None, *, selected: Optional[tuple[str, str]] = None, confidence: Optional[float] = None, provenance: tuple[Mapping[str, Any], ...] = (), cache_identity: Optional[Mapping[str, Any]] = None, cache_status: str = "cache_miss", structured_payload: Any = None, structured_format: Optional[str] = None) -> PdfPageResult:
         method, text = selected if selected else ("none", "")
@@ -533,6 +666,14 @@ class PdfRouter:
             "engine_version": engine_version,
             "model_version": model_version,
             "parser_config_version": profile.parser_config_version,
+            "native_chain": profile.native_engines,
+            "expected_script": profile.expected_script,
+            "renderer": "pypdfium2",
+            "renderer_version": profile.engine_versions.get("pypdfium2", "5.13.0"),
+            "ocr_runtime": profile.ocr_runtime,
+            "ocr_device": profile.ocr_device,
+            "ocr_fallback_runtime": profile.ocr_fallback_runtime,
+            "inference_config_hash": _stable_hash(dict(profile.ocr_inference_config)),
         }
 
     @staticmethod

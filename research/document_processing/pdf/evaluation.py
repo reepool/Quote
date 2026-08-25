@@ -69,6 +69,8 @@ class PdfEvaluationResult:
     table_structure_match: float | None = None
     low_quality_recall: float | None = None
     ocr_page_seconds: tuple[float, ...] = ()
+    native_selection_match: float | None = None
+    negative_ocr_match: bool | None = None
 
 
 def load_manifest(path: str | Path) -> tuple[PdfEvaluationCase, ...]:
@@ -207,21 +209,28 @@ def evaluate_cases(
             expected_mapping = case.gold.get("expected_mapping_corrupt_pages")
             actual_text = "\n".join(page.text for page in result.pages)
             expected_text = str(case.gold.get("expected_text", ""))
-            expected_numeric = str(case.gold.get("expected_numeric", ""))
+            raw_numeric = case.gold.get("expected_numeric", ())
+            expected_numeric = (str(raw_numeric),) if isinstance(raw_numeric, (str, int, float)) else tuple(str(value) for value in raw_numeric)
             chinese_exact = _character_recall(actual_text, expected_text) if expected_text else None
-            numeric_exact = 1.0 if expected_numeric and expected_numeric in actual_text else (0.0 if expected_numeric else None)
+            numeric_exact = _fraction_present(actual_text, expected_numeric) if expected_numeric else None
             expected_headings = tuple(str(item) for item in case.gold.get("expected_headings", ()))
             expected_table_cells = tuple(str(item) for item in case.gold.get("expected_table_cells", ()))
             expected_low_quality = {int(item) for item in case.gold.get("expected_low_quality_pages", ())}
+            expected_native = {int(item) for item in case.gold.get("native_selected_pages", ())}
+            negative_ocr = {int(item) for item in case.gold.get("negative_ocr_pages", ())}
             heading_match = _fraction_present(actual_text, expected_headings) if expected_headings else None
             table_match = _fraction_present(actual_text, expected_table_cells) if expected_table_cells else None
             low_quality_pages = {page.page_number for page in result.pages if page.quality_status in {"empty", "low_text", "native_text_mapping_error", "ocr_low_quality", "ocr_failure"}}
             low_quality_recall = len(low_quality_pages & expected_low_quality) / len(expected_low_quality) if expected_low_quality else None
+            selected_native = {page.page_number for page in result.pages if page.selected_method in {"native_text", "alternate_native"}}
+            ocr_pages_selected = {page.page_number for page in result.pages if page.selected_method == "ocr"}
+            native_selection_match = len(selected_native & expected_native) / len(expected_native) if expected_native else None
+            negative_ocr_match = not bool(ocr_pages_selected & negative_ocr) if negative_ocr else None
             confidence_values = [page.confidence for page in result.pages if page.extraction_method == "ocr"]
             confidence_coverage = sum(value is not None for value in confidence_values) / len(confidence_values) if confidence_values else None
             model_load_seconds = max((float(item.get("warmup_seconds", 0.0)) for page in result.pages for item in page.provenance if isinstance(item, Mapping)), default=0.0)
             ocr_page_seconds = tuple(page.elapsed_seconds for page in result.pages if page.extraction_method == "ocr")
-            results.append(PdfEvaluationResult(case.case_id, profile.name, result.status, elapsed, result.page_count, len(result.pages), sum(page.extraction_method == "ocr" for page in result.pages), tuple(item.code for item in result.diagnostics), tuple(page.text_hash for page in result.pages), sum(page.elapsed_seconds for page in result.pages if page.extraction_method != "ocr"), sum(ocr_page_seconds), sum(len(page.diagnostics) for page in result.pages), mapping_pages, expected_mapping, mapping_pages / expected_mapping if expected_mapping else None, chinese_exact, numeric_exact, cpu_elapsed, rss_delta, 0.0, model_load_seconds, confidence_coverage, heading_match, table_match, low_quality_recall, ocr_page_seconds))
+            results.append(PdfEvaluationResult(case.case_id, profile.name, result.status, elapsed, result.page_count, len(result.pages), sum(page.extraction_method == "ocr" for page in result.pages), tuple(item.code for item in result.diagnostics), tuple(page.text_hash for page in result.pages), sum(page.elapsed_seconds for page in result.pages if page.extraction_method != "ocr"), sum(ocr_page_seconds), sum(len(page.diagnostics) for page in result.pages), mapping_pages, expected_mapping, mapping_pages / expected_mapping if expected_mapping else None, chinese_exact, numeric_exact, cpu_elapsed, rss_delta, 0.0, model_load_seconds, confidence_coverage, heading_match, table_match, low_quality_recall, ocr_page_seconds, native_selection_match, negative_ocr_match))
     grouped: dict[str, list[PdfEvaluationResult]] = {}
     for item in results:
         grouped.setdefault(item.profile, []).append(item)
@@ -230,7 +239,7 @@ def evaluate_cases(
         latencies = [item.elapsed_seconds for item in items]
         ocr_page_latencies = [value for item in items for value in item.ocr_page_seconds]
         ocr_seconds = sum(item.ocr_seconds for item in items)
-        profiles_report.append({"profile": name, "cases": len(items), "success_rate": sum(item.status == "success" for item in items) / len(items), "p50_seconds": statistics.median(latencies), "p95_seconds": _p95(latencies), "ocr_page_p50_seconds": statistics.median(ocr_page_latencies) if ocr_page_latencies else None, "ocr_page_p95_seconds": _p95(ocr_page_latencies) if ocr_page_latencies else None, "ocr_pages": sum(item.ocr_pages for item in items), "native_seconds": sum(item.native_seconds for item in items), "ocr_seconds": ocr_seconds, "ocr_time_share": ocr_seconds / max(sum(latencies), 0.001), "ocr_pages_per_second": sum(item.ocr_pages for item in items) / max(ocr_seconds, 0.001), "documents_per_minute": len(items) / max(sum(latencies), 0.001) * 60.0, "pages_per_minute": sum(item.processed_pages for item in items) / max(sum(latencies), 0.001) * 60.0, "cpu_seconds": sum(item.cpu_seconds or 0.0 for item in items), "rss_delta_bytes": max((item.rss_delta_bytes or 0 for item in items), default=0), "queue_wait_seconds": sum(item.queue_wait_seconds for item in items), "model_load_seconds": sum(item.model_load_seconds for item in items), "confidence_coverage": statistics.mean(item.confidence_coverage for item in items if item.confidence_coverage is not None) if any(item.confidence_coverage is not None for item in items) else None, "heading_match": statistics.mean(item.heading_match for item in items if item.heading_match is not None) if any(item.heading_match is not None for item in items) else None, "table_structure_match": statistics.mean(item.table_structure_match for item in items if item.table_structure_match is not None) if any(item.table_structure_match is not None for item in items) else None, "low_quality_recall": statistics.mean(item.low_quality_recall for item in items if item.low_quality_recall is not None) if any(item.low_quality_recall is not None for item in items) else None, "mapping_error_pages": sum(item.mapping_error_pages for item in items), "mapping_error_recall": statistics.mean(item.mapping_error_recall for item in items if item.mapping_error_recall is not None) if any(item.mapping_error_recall is not None for item in items) else None, "chinese_exact_match": statistics.mean(item.chinese_exact_match for item in items if item.chinese_exact_match is not None) if any(item.chinese_exact_match is not None for item in items) else None, "numeric_exact_match": statistics.mean(item.numeric_exact_match for item in items if item.numeric_exact_match is not None) if any(item.numeric_exact_match is not None for item in items) else None, "results": [asdict(item) for item in items]})
+        profiles_report.append({"profile": name, "cases": len(items), "success_rate": sum(item.status == "success" for item in items) / len(items), "p50_seconds": statistics.median(latencies), "p95_seconds": _p95(latencies), "ocr_page_p50_seconds": statistics.median(ocr_page_latencies) if ocr_page_latencies else None, "ocr_page_p95_seconds": _p95(ocr_page_latencies) if ocr_page_latencies else None, "ocr_pages": sum(item.ocr_pages for item in items), "native_seconds": sum(item.native_seconds for item in items), "ocr_seconds": ocr_seconds, "ocr_time_share": ocr_seconds / max(sum(latencies), 0.001), "ocr_pages_per_second": sum(item.ocr_pages for item in items) / max(ocr_seconds, 0.001), "documents_per_minute": len(items) / max(sum(latencies), 0.001) * 60.0, "pages_per_minute": sum(item.processed_pages for item in items) / max(sum(latencies), 0.001) * 60.0, "cpu_seconds": sum(item.cpu_seconds or 0.0 for item in items), "rss_delta_bytes": max((item.rss_delta_bytes or 0 for item in items), default=0), "queue_wait_seconds": sum(item.queue_wait_seconds for item in items), "model_load_seconds": sum(item.model_load_seconds for item in items), "confidence_coverage": statistics.mean(item.confidence_coverage for item in items if item.confidence_coverage is not None) if any(item.confidence_coverage is not None for item in items) else None, "heading_match": statistics.mean(item.heading_match for item in items if item.heading_match is not None) if any(item.heading_match is not None for item in items) else None, "table_structure_match": statistics.mean(item.table_structure_match for item in items if item.table_structure_match is not None) if any(item.table_structure_match is not None for item in items) else None, "low_quality_recall": statistics.mean(item.low_quality_recall for item in items if item.low_quality_recall is not None) if any(item.low_quality_recall is not None for item in items) else None, "native_selection_match": statistics.mean(item.native_selection_match for item in items if item.native_selection_match is not None) if any(item.native_selection_match is not None for item in items) else None, "negative_ocr_match": all(item.negative_ocr_match is not False for item in items), "mapping_error_pages": sum(item.mapping_error_pages for item in items), "mapping_error_recall": statistics.mean(item.mapping_error_recall for item in items if item.mapping_error_recall is not None) if any(item.mapping_error_recall is not None for item in items) else None, "chinese_exact_match": statistics.mean(item.chinese_exact_match for item in items if item.chinese_exact_match is not None) if any(item.chinese_exact_match is not None for item in items) else None, "numeric_exact_match": statistics.mean(item.numeric_exact_match for item in items if item.numeric_exact_match is not None) if any(item.numeric_exact_match is not None for item in items) else None, "results": [asdict(item) for item in items]})
     corpus_contract = json.dumps(
         [asdict(case) for case in bounded_cases],
         ensure_ascii=False,
@@ -238,7 +247,7 @@ def evaluate_cases(
         separators=(",", ":"),
     ).encode("utf-8")
     corpus_hash = compute_content_hash(corpus_contract)
-    return {"schema_version": "pdf-evaluation.v4", "read_only": True, "corpus_hash": corpus_hash, "case_count": len(bounded_cases), "strata": stratify_cases(bounded_cases), "capabilities": probe_ocr_components(), "profiles": profiles_report}
+    return {"schema_version": "pdf-evaluation.v5", "read_only": True, "corpus_hash": corpus_hash, "case_count": len(bounded_cases), "strata": stratify_cases(bounded_cases), "capabilities": probe_ocr_components(profiles), "profiles": profiles_report}
 
 
 @dataclass(frozen=True)
@@ -293,34 +302,35 @@ def run_bounded_canary(
     return {"status": "failed" if failures else "passed", "bounded": True, "max_cases": max_cases, "max_pages": max_pages, "report": report, "failures": failures}
 
 
-def probe_ocr_components() -> dict[str, dict[str, Any]]:
-    """Return local capability evidence without downloading models or touching production."""
-    cuda_available = False
-    paddle_version = None
-    paddle_cuda_compiled = None
-    cuda_device_count = 0
-    try:
-        import paddle
+def probe_ocr_components(profiles: Sequence[PdfProfile] = ()) -> dict[str, dict[str, Any]]:
+    """Return capability evidence without importing Paddle into Quote.
 
-        paddle_version = getattr(paddle, "__version__", None)
-        paddle_cuda_compiled = bool(getattr(paddle, "is_compiled_with_cuda", lambda: False)())
-        cuda_device_count = int(paddle.device.cuda.device_count()) if paddle_cuda_compiled else 0
-        cuda_available = paddle_cuda_compiled and cuda_device_count > 0
-    except Exception:
-        pass
+    CUDA capability is worker-owned. Distribution metadata is sufficient for a
+    local inventory; configured GPU profiles invoke their external worker's
+    probe command instead of importing a potentially conflicting wheel here.
+    """
+    paddle_version = _distribution_version("paddlepaddle") or _distribution_version("paddlepaddle-gpu")
+    worker_probes: dict[str, Any] = {}
+    for profile in profiles:
+        if profile.ocr_device.startswith("gpu") and profile.ocr_worker_command:
+            from .adapters import PaddleOcrAdapter
+
+            worker_probes[profile.name] = PaddleOcrAdapter.probe_runtime(profile)
+    gpu_probe = next((probe for probe in worker_probes.values() if probe.get("cuda_available")), None)
     runtime = {
         "python": platform.python_version(),
         "platform": platform.platform(),
         "paddle_version": paddle_version,
-        "paddle_cuda_compiled": paddle_cuda_compiled,
-        "cuda_available": cuda_available,
-        "cuda_device_count": cuda_device_count,
-        "device": "gpu" if cuda_available else "cpu",
+        "paddle_cuda_compiled": None,
+        "cuda_available": bool(gpu_probe),
+        "cuda_device_count": int(gpu_probe.get("cuda_device_count", 0)) if gpu_probe else 0,
+        "device": "gpu" if gpu_probe else "unprobed",
         "paddleocr_version": _distribution_version("paddleocr"),
         "pypdfium2_version": _distribution_version("pypdfium2"),
         "pdf_inspector_version": _distribution_version("pdf-inspector"),
         "model_cache_dir": os.environ.get("PADDLE_PDX_CACHE_HOME") or os.environ.get("QUOTE_PDF_OCR_CACHE_DIR"),
         "nvidia_smi": _nvidia_smi_summary(),
+        "worker_probes": worker_probes,
     }
     return {
         "runtime": runtime,

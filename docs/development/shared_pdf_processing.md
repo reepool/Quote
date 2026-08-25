@@ -6,17 +6,19 @@ table interpretation, evidence gates, and database writes.
 
 ## Profiles
 
-- `pypdf_native`: native diagnostics only.
-- `pypdf_paddleocr`: pypdf native first, optional alternate-native recovery,
-  then page-selective PaddleOCR. This is the initial integration profile.
-- `pdf_inspector_paddleocr`: shadow/evaluation profile; it is not enabled by
-  default until the same-corpus gates pass.
-- `pypdf_paddleocr_gpu_canary`: explicit CUDA canary. It is rejected unless
-  both a passing frozen-corpus approval report and a visible CUDA Paddle
-  runtime are present.
+- `pdfium_native`: production native profile, ordered `pypdfium2 -> pypdf`.
+- `pypdf_native`: configuration-only rollback profile.
+- `pdfium_paddleocr_cpu`: PDFium-first native chain with an isolated CPU OCR
+  worker for explicit page recovery.
+- `pdfium_paddleocr_gpu`: canary-only GPU worker profile. It is rejected unless
+  a new expanded PDFium-rendered approval and a healthy isolated worker exist.
+
+`pdf-inspector` is no longer a production native engine. It remains installed
+only for existing evaluator/classifier/OCR roles until those roles have a
+separate retirement decision.
 
 For a canary, set `QUOTE_PDF_ENGINE_PROFILE` to a validated profile name. An
-unset value resolves to `pypdf_native`; unknown or disabled values fail closed.
+unset value resolves to `pdfium_native`; unknown or disabled values fail closed.
 
 OCR is page-addressable and lazy. Native pages do not render or load an OCR
 model. Configure `max_ocr_pages`, `max_document_seconds`, `render_dpi`, batch
@@ -38,8 +40,10 @@ are combined using the smaller limit. The default mode budgets are 5 pages / 180
 seconds for `toc_probe`, 20 pages / 900 seconds for `section_extract`, and 8
 pages / 600 seconds for `table_extract`.
 
-Quote's CPU environment has `paddlepaddle==3.3.1`, `paddleocr==3.7.0`,
-`pdf-inspector==1.17.0`, and `pypdfium2` installed. Production workers should
+Quote's native environment has direct `pypdfium2==5.13.0` and `pypdf`. OCR
+workers outside Quote use matched `paddlepaddle==3.3.1` /
+`paddleocr==3.7.0` versions for both GPU and CPU. `pdf-inspector==1.17.0`
+remains only for non-native consumers. Production workers should
 set `PADDLE_PDX_CACHE_HOME` or `ocr_model_cache_dir` in the selected profile to
 a persistent writable model-cache directory (for example
 `/var/cache/quote/paddlex`). The adapter rejects a configured non-writable
@@ -61,10 +65,14 @@ numeric, and TOC gold. The reports are:
 - `pdf_page_recovery_gpu_evaluation_20260825.json`
 - `pdf_page_recovery_gpu_canary_approval_20260825.json`
 
-Quote's normal environment deliberately remains on the CPU package and the
-default profile remains `pypdf_native`. A deployment-specific GPU environment
-must replace, not coexist with, the CPU Paddle package and install the official
-CUDA 11.8 wheel from
+This artifact proves runtime viability only; it does not approve
+`pdfium_paddleocr_gpu`. A new approval must bind the expanded corpus,
+PDFium-rendered image hashes, profile, model, and inference configuration.
+Quote must never import CUDA Paddle to probe it. Configure worker commands with
+`QUOTE_PDF_GPU_OCR_WORKER` and `QUOTE_PDF_CPU_OCR_WORKER`; the adapter sends
+PNG images only, so workers never open PDFs or depend on PyMuPDF.
+
+The deployment-specific GPU worker must install the official CUDA 11.8 wheel from
 `https://www.paddlepaddle.org.cn/packages/stable/cu118/`. Validate it before
 starting Quote:
 
@@ -85,19 +93,21 @@ After the device, GPU Paddle runtime, and persistent writable model cache are
 available, enable only the explicit canary:
 
 ```bash
-export QUOTE_PDF_ENGINE_PROFILE=pypdf_paddleocr_gpu_canary
+export QUOTE_PDF_ENGINE_PROFILE=pdfium_paddleocr_gpu
 export QUOTE_PDF_GPU_CANARY_APPROVED=1
 export QUOTE_PDF_GPU_CANARY_REPORT=/path/to/pdf_page_recovery_gpu_canary_approval_20260825.json
 export QUOTE_PDF_OCR_CACHE_DIR=/var/cache/quote/paddlex
 ```
 
-The approval report is corpus- and gate-bound. A missing/failed report, CPU-only
-Paddle installation, or invisible GPU causes profile resolution to fail closed;
-there is no automatic GPU rollout.
+The approval report is corpus-, renderer-, runtime-, and gate-bound. A
+missing/failed report, CPU-only Paddle installation, unavailable worker, or
+invisible GPU causes profile resolution to fail closed; there is no automatic
+GPU rollout. The known lab Paddle 2.6.2/2.7.3 `inflateReset2`/IR failures are
+comparative evidence and are not a production fallback path.
 
 Business-profile extraction forwards `target_page_numbers` to the shared
 router. The selected engine profile is part of the artifact parameter hash,
-so switching from `pypdf_native` to `pypdf_paddleocr` cannot reuse an artifact
+so switching from `pypdf_native` to `pdfium_native` cannot reuse an artifact
 created by the other profile. Each page artifact records the selected
 `extraction_method`, OCR confidence, and engine/model provenance.
 
@@ -114,18 +124,21 @@ The evaluator also records Chinese/numeric exact-match, heading/table
 evidence, confidence coverage, low-quality recall, OCR time share, pages per
 second, P50/P95 tail latency, queue wait, model warm-up, CPU and RSS deltas.
 `run_bounded_canary` limits cases/pages and returns a fail-closed status before
-any wider rollout. `probe_ocr_components` records local availability for
-PP-OCR, PP-Structure, pdf-inspector OCR, and Tesseract/OCRmyPDF without model
-downloads.
+any wider rollout. `probe_ocr_components` records worker-owned PP-OCR and
+PP-Structure availability without importing CUDA Paddle into Quote.
+
+The native promotion manifest is
+`pdf_native_promotion_manifest_20260826.json`, with its read-only result in
+`pdf_native_promotion_evaluation_20260826.json`. PDFium-first passed the
+expanded native Chinese, numeric, heading, table/read-order, and mixed-page
+negative-OCR checks; pypdf remains the rollback baseline.
 
 The mandatory 600036.SH fixture is classified as
 `viewer_readable_native_mapping_corrupt`. Its non-empty but unrelated-script
-text must not be promoted as usable native evidence; alternate-native recovery
-is attempted before governed OCR. The local corpus now covers native/text,
-scanned, mixed, and this mapping-corrupt class. The scanned and mixed probe
-pages were established with bounded read-only probes; numeric/table gold for
-those reports remains a business-evaluation follow-up and was not guessed by
-the shared module.
+text must not be promoted as usable native evidence. The local corpus covers
+native/text, scanned, mixed, and this mapping-corrupt class. The archived
+001322 copy has a readable text layer despite its scanned source label, so its
+forced-OCR gold does not claim native failure for every page.
 
 ## Handoff boundary
 

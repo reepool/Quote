@@ -6,12 +6,16 @@ usable on workers that do not install PaddleOCR or pdf-inspector.
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import importlib.util
+import json
 import logging
 import multiprocessing
 import os
 import pickle
 import queue
+import subprocess
 import tempfile
 import threading
 import time
@@ -22,6 +26,13 @@ from typing import Any, Mapping, Sequence
 from .core import OcrPage, PdfDiagnostic, PdfParseRequest
 
 logger = logging.getLogger(__name__)
+
+
+class _OcrWorkerError(RuntimeError):
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
 
 
 def _paddle_device() -> str:
@@ -37,28 +48,59 @@ def _paddle_device() -> str:
 class PaddleOcrAdapter:
     """Page-addressable PaddleOCR adapter with bounded worker sessions.
 
-    The adapter accepts an injected ``page_renderer`` so deployments can use
-    PDFium, PyMuPDF, or another renderer without coupling the shared contract.
-    Each worker lazily creates and then reuses one model session.
+    Quote-side rendering uses PDFium. Production Paddle imports stay in an
+    explicitly configured external worker command; the in-process path is
+    retained only for injected test sessions and local compatibility.
     """
 
     name = "paddleocr"
-    version = "paddleocr-adapter.v1"
+    version = "paddleocr-adapter.v2"
+    worker_protocol_version = "quote-pdf-ocr-worker.v1"
 
-    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None, device: str = "cpu", process_worker: Any = None) -> None:
+    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None, device: str = "cpu", process_worker: Any = None, worker_command: Sequence[str] = (), fallback_worker_command: Sequence[str] = ()) -> None:
         self.page_renderer = page_renderer or _render_pdfium_page
+        self._default_renderer = page_renderer is None
         self._ocr = ocr_instance
         self._process_worker = process_worker
         self.model_cache_dir = model_cache_dir
         self.device = str(device or "cpu")
         self.structure = structure
+        self.worker_command = tuple(str(item) for item in worker_command)
+        self.fallback_worker_command = tuple(str(item) for item in fallback_worker_command)
         self._warmup_seconds = 0.0
         self._session_lock = threading.Lock()
         self._session_local = threading.local()
 
     @property
     def available(self) -> bool:
-        return self._ocr is not None or importlib.util.find_spec("paddleocr") is not None
+        return self._ocr is not None or bool(self.worker_command) or importlib.util.find_spec("paddleocr") is not None
+
+    @classmethod
+    def probe_runtime(cls, profile) -> Mapping[str, Any]:
+        """Probe an isolated worker without importing Paddle in Quote."""
+        command = tuple(profile.ocr_worker_command)
+        if not command:
+            return {"healthy": False, "cuda_available": False, "diagnostic": "ocr_worker_command is not configured"}
+        try:
+            completed = subprocess.run(
+                [*command, "--probe"],
+                input=json.dumps({"protocol": cls.worker_protocol_version, "runtime": profile.ocr_runtime, "model_cache_dir": profile.ocr_model_cache_dir}),
+                capture_output=True,
+                text=True,
+                timeout=20.0,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return {"healthy": False, "cuda_available": False, "diagnostic": f"{type(exc).__name__}: {exc}"}
+        if completed.returncode != 0:
+            return {"healthy": False, "cuda_available": False, "diagnostic": completed.stderr.strip()[:500] or "worker exited non-zero"}
+        try:
+            payload = json.loads(completed.stdout)
+        except ValueError:
+            return {"healthy": False, "cuda_available": False, "diagnostic": "worker returned malformed probe response"}
+        if payload.get("protocol") != cls.worker_protocol_version:
+            return {"healthy": False, "cuda_available": False, "diagnostic": "worker protocol mismatch"}
+        return dict(payload)
 
     def _session(self) -> Any:
         if self._ocr is not None:
@@ -92,6 +134,14 @@ class PaddleOcrAdapter:
     def extract_pages(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         if not pages:
             return {}
+        if self.worker_command:
+            return self._extract_pages_with_external_worker(content, pages, request=request)
+        if self._ocr is None and request.profile.ocr_runtime.startswith("isolated-"):
+            return self._worker_error_pages(
+                pages,
+                _OcrWorkerError("ocr_worker_startup_failed", "isolated OCR worker command is not configured"),
+                request,
+            )
         if self._ocr is None and request.profile.limits.enforce_hard_timeout:
             if self._process_worker is None:
                 try:
@@ -115,6 +165,120 @@ class PaddleOcrAdapter:
         for output in outputs:
             merged.update(output)
         return merged
+
+    def _extract_pages_with_external_worker(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
+        """Render once in Quote and send image-only work to an isolated runtime."""
+        started = time.monotonic()
+        try:
+            images = _render_pdfium_batch(content, pages, request.profile.limits.render_dpi)
+        except Exception as exc:
+            diagnostic = PdfDiagnostic("ocr_render_failure", f"{type(exc).__name__}: {exc}", severity="error")
+            return {int(page): OcrPage("", None, 0.0, (diagnostic,), {"runtime": request.profile.ocr_runtime}) for page in pages}
+        try:
+            output = self._invoke_external_worker(self.worker_command, images, request, timeout=max(0.1, request.profile.limits.max_document_seconds))
+        except _OcrWorkerError as exc:
+            if self.fallback_worker_command and exc.code in request.profile.ocr_fallback_failure_codes:
+                remaining = request.profile.limits.max_document_seconds - (time.monotonic() - started)
+                if remaining > 0:
+                    try:
+                        output = self._invoke_external_worker(self.fallback_worker_command, images, request, timeout=remaining, runtime=request.profile.ocr_fallback_runtime)
+                        output = {
+                            number: OcrPage(
+                                item.text,
+                                item.confidence,
+                                item.elapsed_seconds,
+                                item.diagnostics + (PdfDiagnostic("ocr_primary_runtime_failed", exc.message, number, "warning"),),
+                                {**dict(item.provenance), "fallback_from_runtime": request.profile.ocr_runtime, "fallback_reason": exc.code},
+                                item.structured_payload,
+                                item.structured_format,
+                            )
+                            for number, item in output.items()
+                        }
+                    except _OcrWorkerError as fallback_exc:
+                        return self._worker_error_pages(pages, fallback_exc, request, attempted_runtime=request.profile.ocr_fallback_runtime)
+                else:
+                    return self._worker_error_pages(pages, _OcrWorkerError("ocr_document_timeout", "OCR document budget exhausted before CPU fallback"), request)
+            else:
+                return self._worker_error_pages(pages, exc, request)
+        return output
+
+    def _invoke_external_worker(self, command: Sequence[str], images: Mapping[int, bytes], request: PdfParseRequest, *, timeout: float, runtime: str | None = None) -> Mapping[int, OcrPage]:
+        payload = {
+            "protocol": self.worker_protocol_version,
+            "runtime": runtime or request.profile.ocr_runtime,
+            "device": self.device,
+            "structure": self.structure,
+            "model_cache_dir": self.model_cache_dir,
+            "inference_config": dict(request.profile.ocr_inference_config),
+            "pages": [
+                {
+                    "page_number": number,
+                    "image_png_base64": base64.b64encode(image).decode("ascii"),
+                    "image_sha256": hashlib.sha256(image).hexdigest(),
+                }
+                for number, image in sorted(images.items())
+            ],
+        }
+        try:
+            completed = subprocess.run(
+                [*command, "--ocr"], input=json.dumps(payload), capture_output=True, text=True, timeout=timeout, check=False
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise _OcrWorkerError("ocr_timeout", f"worker exceeded original timeout: {exc}") from exc
+        except OSError as exc:
+            raise _OcrWorkerError("ocr_worker_startup_failed", f"{type(exc).__name__}: {exc}") from exc
+        if completed.returncode != 0:
+            code = "ocr_worker_crashed" if completed.returncode < 0 else "ocr_worker_failure"
+            raise _OcrWorkerError(code, completed.stderr.strip()[:500] or "worker exited non-zero")
+        try:
+            response = json.loads(completed.stdout)
+        except ValueError as exc:
+            raise _OcrWorkerError("ocr_worker_malformed_response", "worker did not return JSON") from exc
+        if response.get("protocol") != self.worker_protocol_version:
+            raise _OcrWorkerError("ocr_worker_malformed_response", "worker protocol mismatch")
+        items = response.get("pages")
+        if not isinstance(items, list):
+            raise _OcrWorkerError("ocr_worker_malformed_response", "worker response has no pages list")
+        expected = set(images)
+        output: dict[int, OcrPage] = {}
+        for item in items:
+            if not isinstance(item, Mapping) or int(item.get("page_number", 0)) not in expected:
+                raise _OcrWorkerError("ocr_worker_malformed_response", "worker returned invalid page identity")
+            number = int(item["page_number"])
+            if number in output:
+                raise _OcrWorkerError("ocr_worker_malformed_response", "worker returned duplicate page")
+            text = str(item.get("text", ""))
+            confidence = item.get("confidence")
+            if confidence is not None:
+                confidence = float(confidence)
+            diagnostics = tuple(PdfDiagnostic(**diag) for diag in item.get("diagnostics", ()) if isinstance(diag, Mapping))
+            output[number] = OcrPage(text, confidence, float(item.get("elapsed_seconds", 0.0)), diagnostics, {
+                "engine": "paddleocr",
+                "engine_version": item.get("paddleocr_version"),
+                "paddle_version": item.get("paddle_version"),
+                "runtime": response.get("runtime"),
+                "device": response.get("device"),
+                "renderer": "pypdfium2",
+                "renderer_version": "5.13.0",
+                "render_dpi": request.profile.limits.render_dpi,
+                "image_sha256": item.get("image_sha256"),
+                "model": item.get("model"),
+                "model_version": item.get("model_version"),
+                "inference_config": response.get("inference_config", {}),
+            })
+        if set(output) != expected:
+            raise _OcrWorkerError("ocr_worker_malformed_response", "worker omitted requested page")
+        return output
+
+    @staticmethod
+    def _worker_error_pages(pages: Sequence[int], error: "_OcrWorkerError", request: PdfParseRequest, *, attempted_runtime: str | None = None) -> Mapping[int, OcrPage]:
+        return {
+            int(page): OcrPage("", None, 0.0, (PdfDiagnostic(error.code, error.message, int(page), "error"),), {
+                "runtime": attempted_runtime or request.profile.ocr_runtime,
+                "worker_error": error.code,
+            })
+            for page in pages
+        }
 
     def _extract_pages_with_process_timeouts(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         """Run bounded persistent workers that can be terminated on page timeout."""
@@ -432,3 +596,36 @@ def _render_pdfium_page(content: bytes, page_number: int, dpi: int) -> Any:
         except Exception:
             pass
         document.close()
+
+
+def _render_pdfium_batch(content: bytes, pages: Sequence[int], dpi: int) -> Mapping[int, bytes]:
+    """Render a bounded OCR batch once with the authoritative PDFium input."""
+    try:
+        import pypdfium2 as pdfium
+    except ImportError as exc:
+        raise RuntimeError("pypdfium2 is required for PaddleOCR page rendering") from exc
+    import io
+
+    document = pdfium.PdfDocument(bytes(content))
+    output: dict[int, bytes] = {}
+    try:
+        count = len(document)
+        for number in sorted(set(int(page) for page in pages)):
+            if number < 1 or number > count:
+                raise ValueError(f"page {number} is outside 1..{count}")
+            page = bitmap = image = None
+            try:
+                page = document.get_page(number - 1)
+                bitmap = page.render(scale=float(dpi) / 72.0)
+                image = bitmap.to_pil()
+                buffer = io.BytesIO()
+                image.save(buffer, format="PNG")
+                output[number] = buffer.getvalue()
+            finally:
+                if image is not None:
+                    image.close()
+                if page is not None:
+                    page.close()
+    finally:
+        document.close()
+    return output

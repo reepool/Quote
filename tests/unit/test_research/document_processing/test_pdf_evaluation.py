@@ -70,7 +70,7 @@ def test_evaluation_reports_accuracy_efficiency_and_resource_metrics(tmp_path) -
 
     report = evaluate_cases([case], [PdfProfile(name="test")], router_factory=router_factory)
     profile = report["profiles"][0]
-    assert report["schema_version"] == "pdf-evaluation.v4"
+    assert report["schema_version"] == "pdf-evaluation.v5"
     assert profile["documents_per_minute"] > 0
     assert profile["chinese_exact_match"] == 1.0
     assert profile["numeric_exact_match"] == 1.0
@@ -109,7 +109,7 @@ def test_bounded_canary_is_fail_closed_and_component_probe_is_local(tmp_path) ->
     assert result["bounded"] is True
     components = probe_ocr_components()
     assert {"paddleocr_ppocr", "paddleocr_pp_structure", "pdf_inspector_ocr", "tesseract_ocrmypdf", "runtime"} <= set(components)
-    assert components["runtime"]["device"] in {"cpu", "gpu"}
+    assert components["runtime"]["device"] in {"unprobed", "gpu"}
 
 
 def test_gpu_canary_approval_requires_runtime_quality_and_latency_gates() -> None:

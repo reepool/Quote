@@ -1,0 +1,5 @@
+# Install in a virtual environment outside Quote conda.
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+pypillow>=10.0
+numpy>=1.26,<3
