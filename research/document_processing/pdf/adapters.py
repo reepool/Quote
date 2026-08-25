@@ -21,6 +21,16 @@ from .core import OcrPage, PdfDiagnostic, PdfParseRequest
 logger = logging.getLogger(__name__)
 
 
+def _paddle_device() -> str:
+    """Return the active Paddle device without making runtime availability fatal."""
+    try:
+        import paddle
+
+        return str(paddle.device.get_device())
+    except Exception:
+        return "unknown"
+
+
 class PaddleOcrAdapter:
     """Page-addressable PaddleOCR adapter with bounded worker sessions.
 
@@ -30,6 +40,7 @@ class PaddleOcrAdapter:
     """
 
     name = "paddleocr"
+    version = "paddleocr-adapter.v1"
 
     def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None) -> None:
         self.page_renderer = page_renderer or _render_pdfium_page
@@ -123,12 +134,14 @@ class PaddleOcrAdapter:
                 {
                     "component": "pp-structure" if self.structure else "pp-ocr",
                     "engine": "paddleocr",
+                    "engine_version": self.version,
                     "model": request.profile.engine_versions.get("paddleocr_model", "PP-OCRv6"),
                     "model_version": request.profile.engine_versions.get("paddleocr_model_version"),
                     "blocks": blocks,
                     "batch_size": len(batch_pages),
                     "warmup_seconds": self._warmup_seconds,
                     "model_cache_dir": self.model_cache_dir or os.environ.get("PADDLE_PDX_CACHE_HOME"),
+                    "device": _paddle_device(),
                 },
             )
         return output

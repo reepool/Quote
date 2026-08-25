@@ -421,7 +421,16 @@ class BusinessProfilePdfArtifactExtractor:
             page_number = shared_page.page_number
             page_errors: List[str] = []
             text = shared_page.text or ""
-            native_text_status = "extracted" if text.strip() else "empty"
+            native_candidate_text = next(
+                (
+                    candidate.text
+                    for candidate in shared_page.candidates
+                    if candidate.method == "native_text"
+                ),
+                "",
+            )
+            diagnostic_text = native_candidate_text or text
+            native_text_status = "extracted" if diagnostic_text.strip() else "empty"
             if shared_page.quality_status == "native_text_mapping_error":
                 native_text_status = "glyph_decoding_error"
                 glyph_decoding_pages.append(page_number)
@@ -431,8 +440,8 @@ class BusinessProfilePdfArtifactExtractor:
                 extraction_error_pages.append(page_number)
                 page_errors.extend(item.message or item.code for item in shared_page.diagnostics)
             width, height = shared_page.width_points, shared_page.height_points
-            non_whitespace = len(re.sub(r"\s+", "", text))
-            suspicious_glyphs = self._suspicious_glyph_count(text)
+            non_whitespace = len(re.sub(r"\s+", "", diagnostic_text))
+            suspicious_glyphs = self._suspicious_glyph_count(diagnostic_text)
             suspicious_glyph_ratio = (
                 suspicious_glyphs / non_whitespace if non_whitespace else 0.0
             )

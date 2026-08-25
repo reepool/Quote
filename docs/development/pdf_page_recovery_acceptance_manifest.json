@@ -1,0 +1,50 @@
+{
+  "schema_version": "pdf-page-recovery-acceptance.v1",
+  "read_only": true,
+  "cases": [
+    {
+      "case_id": "600036.SH-2025-annual-report",
+      "pdf_path": "data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf",
+      "content_hash": "abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79",
+      "document_class": "viewer_readable_native_mapping_corrupt",
+      "instrument": "600036.SH",
+      "page_count": 350,
+      "target_pages": [2],
+      "gold": {
+        "expected_headings": ["第三章 管理层讨论与分析", "3.6 分部经营业绩"],
+        "toc_physical_page": 2,
+        "max_full_document_ocr_pages": 20
+      }
+    },
+    {
+      "case_id": "001322.SZ-2025-annual-report",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/001322_SZ_2025Q4_1225227844_3eafe7cc25c27854fdf6851da76d847545034512407cc929187f554bd9cacab4.pdf",
+      "content_hash": "3eafe7cc25c27854fdf6851da76d847545034512407cc929187f554bd9cacab4",
+      "document_class": "scanned",
+      "instrument": "001322.SZ",
+      "page_count": 209,
+      "target_pages": [],
+      "gold": {}
+    },
+    {
+      "case_id": "002376.SZ-2025-annual-report",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/002376_SZ_2025Q4_1225167537_90950afd8cfe3e3c09a644a69096f5155a3aa90339e859e76f1c5118035cdfa2.pdf",
+      "content_hash": "90950afd8cfe3e3c09a644a69096f5155a3aa90339e859e76f1c5118035cdfa2",
+      "document_class": "mixed",
+      "instrument": "002376.SZ",
+      "page_count": 216,
+      "target_pages": [],
+      "gold": {}
+    },
+    {
+      "case_id": "000717.SZ-2025-annual-report-baseline",
+      "pdf_path": "data/filings/business_profile/2025/SZSE/000717_SZ_2025Q4_1225158456_94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55.pdf",
+      "content_hash": "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+      "document_class": "text_based",
+      "instrument": "000717.SZ",
+      "page_count": 217,
+      "target_pages": [],
+      "gold": {}
+    }
+  ]
+}

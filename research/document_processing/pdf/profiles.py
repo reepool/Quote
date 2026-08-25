@@ -6,7 +6,7 @@ from dataclasses import fields
 import os
 from typing import Any, Mapping
 
-from .core import PdfProfile, PdfResourceLimits
+from .core import DEFAULT_MODE_BUDGETS, PdfProfile, PdfResourceLimits
 
 
 def profile_from_mapping(name: str, raw: Mapping[str, Any]) -> PdfProfile:
@@ -17,11 +17,19 @@ def profile_from_mapping(name: str, raw: Mapping[str, Any]) -> PdfProfile:
     if unknown_limits:
         raise ValueError(f"unknown PDF resource limits: {sorted(unknown_limits)}")
     limits = PdfResourceLimits(**limits_raw)
+    mode_budgets_raw = dict(raw.get("mode_budgets") or {})
+    unknown_modes = set(mode_budgets_raw) - set(DEFAULT_MODE_BUDGETS)
+    if unknown_modes:
+        raise ValueError(f"unknown PDF OCR modes: {sorted(unknown_modes)}")
+    mode_budgets = {
+        mode: PdfResourceLimits(**dict(values))
+        for mode, values in mode_budgets_raw.items()
+    }
     allowed = {item.name for item in fields(PdfProfile)} - {"name"}
     unknown = set(raw) - allowed
     if unknown:
         raise ValueError(f"unknown PDF profile keys: {sorted(unknown)}")
-    profile = PdfProfile(name=name, limits=limits, **{key: raw[key] for key in raw if key != "limits"})
+    profile = PdfProfile(name=name, limits=limits, mode_budgets=mode_budgets, **{key: raw[key] for key in raw if key not in {"limits", "mode_budgets"}})
     if profile.rollout_state not in {"shadow", "canary", "active", "disabled"}:
         raise ValueError("rollout_state must be shadow, canary, active, or disabled")
     return profile

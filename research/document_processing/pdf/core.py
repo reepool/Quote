@@ -15,10 +15,10 @@ import re
 import time
 import unicodedata
 import warnings
-from dataclasses import asdict, dataclass, field
-from typing import Any, Callable, Iterable, Mapping, Optional, Protocol, Sequence
+from dataclasses import asdict, dataclass, field, replace
+from typing import Any, Callable, Iterable, Literal, Mapping, Optional, Protocol, Sequence
 
-PDF_PARSER_SCHEMA_VERSION = "shared_pdf.v1"
+PDF_PARSER_SCHEMA_VERSION = "shared_pdf.v2"
 PDF_PARSER_VERSION = "shared-pdf-pypdf.v1"
 
 
@@ -62,6 +62,17 @@ class PdfResourceLimits:
             raise ValueError("invalid OCR batch size or render DPI")
 
 
+PdfOcrMode = Literal["none", "toc_probe", "section_extract", "table_extract"]
+PdfRecoveryPolicy = Literal["native_first", "selective_recovery", "force_ocr"]
+
+
+DEFAULT_MODE_BUDGETS: Mapping[str, "PdfResourceLimits"] = {
+    "toc_probe": PdfResourceLimits(max_ocr_pages=5, max_page_seconds=120.0, max_document_seconds=180.0),
+    "section_extract": PdfResourceLimits(max_ocr_pages=20, max_page_seconds=120.0, max_document_seconds=900.0),
+    "table_extract": PdfResourceLimits(max_ocr_pages=8, max_page_seconds=120.0, max_document_seconds=600.0),
+}
+
+
 @dataclass(frozen=True)
 class PdfProfile:
     name: str = "pypdf_native"
@@ -79,6 +90,8 @@ class PdfProfile:
     engine_versions: Mapping[str, str] = field(default_factory=dict)
     fallback_profile: Optional[str] = None
     ocr_model_cache_dir: Optional[str] = None
+    mode_budgets: Mapping[str, PdfResourceLimits] = field(default_factory=dict)
+    ocr_min_confidence: float = 0.60
 
 
 @dataclass(frozen=True)
@@ -87,7 +100,13 @@ class PdfParseRequest:
     expected_content_hash: Optional[str] = None
     target_pages: tuple[int, ...] = ()
     profile: PdfProfile = field(default_factory=lambda: _resolve_default_profile())
+    ocr_mode: PdfOcrMode = "none"
+    recovery_policy: PdfRecoveryPolicy = "native_first"
+    mode_budget: Optional[PdfResourceLimits] = None
+    cache_backend: Optional["PdfPageCacheBackend"] = None
     parameter_overrides: Mapping[str, Any] = field(default_factory=dict)
+
+    requested_pages: tuple[int, ...] = field(init=False, default=())
 
     @property
     def content_hash(self) -> str:
@@ -99,6 +118,9 @@ class PdfParseRequest:
             {
                 "profile": asdict(self.profile),
                 "target_pages": self.target_pages,
+                "ocr_mode": self.ocr_mode,
+                "recovery_policy": self.recovery_policy,
+                "mode_budget": asdict(self.mode_budget) if self.mode_budget else None,
                 "overrides": dict(self.parameter_overrides),
             }
         )
@@ -106,9 +128,17 @@ class PdfParseRequest:
     def __post_init__(self) -> None:
         if self.expected_content_hash and self.expected_content_hash != self.content_hash:
             raise ValueError("expected_content_hash does not match PDF bytes")
-        pages = tuple(sorted({int(page) for page in self.target_pages}))
+        if self.ocr_mode not in {"none", "toc_probe", "section_extract", "table_extract"}:
+            raise ValueError(f"unsupported ocr_mode: {self.ocr_mode}")
+        if self.recovery_policy not in {"native_first", "selective_recovery", "force_ocr"}:
+            raise ValueError(f"unsupported recovery_policy: {self.recovery_policy}")
+        raw_pages = tuple(int(page) for page in self.target_pages)
+        pages = tuple(sorted(set(raw_pages)))
         if any(page < 1 for page in pages):
             raise ValueError("target_pages must be one-based positive integers")
+        if self.recovery_policy == "force_ocr" and not pages:
+            raise ValueError("force_ocr requires explicit target_pages")
+        object.__setattr__(self, "requested_pages", raw_pages)
         object.__setattr__(self, "target_pages", pages)
 
 
@@ -136,6 +166,31 @@ class PdfPageResult:
     ocr_required: bool = False
     width_points: Optional[float] = None
     height_points: Optional[float] = None
+    selected_text: str = ""
+    selected_method: str = "none"
+    selected_text_hash: str = ""
+    selected_usable_for_semantic: bool = False
+    candidates: tuple["PdfCandidate", ...] = ()
+    cache_identity: Mapping[str, Any] = field(default_factory=dict)
+    cache_status: str = "cache_miss"
+    structured_payload: Any = None
+    structured_format: Optional[str] = None
+    pdf_page_label: Optional[str] = None
+    printed_page_label: Optional[str] = None
+    bookmark_title: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class PdfCandidate:
+    method: str
+    text: str
+    text_hash: str
+    quality_status: str
+    usable_for_semantic: bool
+    confidence: Optional[float] = None
+    elapsed_seconds: float = 0.0
+    diagnostics: tuple[PdfDiagnostic, ...] = ()
+    provenance: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -151,6 +206,9 @@ class PdfDocumentResult:
     diagnostics: tuple[PdfDiagnostic, ...] = ()
     elapsed_seconds: float = 0.0
     engine_versions: Mapping[str, str] = field(default_factory=dict)
+    requested_pages: tuple[int, ...] = ()
+    returned_pages: tuple[int, ...] = ()
+    page_diagnostics: Mapping[int, tuple[PdfDiagnostic, ...]] = field(default_factory=dict)
 
 
 class NativeAdapter(Protocol):
@@ -169,6 +227,12 @@ class OcrAdapter(Protocol):
         *,
         request: PdfParseRequest,
     ) -> Mapping[int, "OcrPage"]: ...
+
+
+class PdfPageCacheBackend(Protocol):
+    def get(self, cache_identity: Mapping[str, Any]) -> Optional["PdfPageResult | Mapping[str, Any]"]: ...
+
+    def put(self, cache_identity: Mapping[str, Any], page_result: "PdfPageResult") -> None: ...
 
 
 @dataclass(frozen=True)
@@ -196,6 +260,8 @@ class OcrPage:
     elapsed_seconds: float = 0.0
     diagnostics: tuple[PdfDiagnostic, ...] = ()
     provenance: Mapping[str, Any] = field(default_factory=dict)
+    structured_payload: Any = None
+    structured_format: Optional[str] = None
 
 
 def detect_text_quality(text: str, *, min_characters: int = 20) -> tuple[str, tuple[PdfDiagnostic, ...]]:
@@ -297,74 +363,236 @@ class PdfRouter:
             return self._failed(request, "profile_disabled", "PDF profile is disabled", started)
         native = self.native.extract(request.content, target_pages=request.target_pages)
         if native.page_count == 0:
-            return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, 0, (), "failed", native.diagnostics, time.perf_counter() - started)
+            return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, 0, (), "failed", native.diagnostics, time.perf_counter() - started, requested_pages=request.requested_pages)
         limit = profile.limits.max_pages
         pages = list(native.pages[:limit]) if limit else list(native.pages)
         results: dict[int, PdfPageResult] = {}
         ocr_targets: list[int] = []
         alternate_targets: list[int] = []
+        explicit_targets = set(request.target_pages)
+        allow_ocr = request.ocr_mode != "none" and request.recovery_policy != "native_first"
         for item in pages:
             quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
             all_diags = tuple(item.diagnostics) + tuple(diags)
-            requested = item.page_number in request.target_pages
-            needs_ocr = requested or quality in {"empty", "low_text", "native_text_mapping_error"}
-            if quality == "native_text_mapping_error" and self.alternate_native and profile.alternate_native_engine:
+            needs_recovery = quality in {"empty", "low_text", "native_text_mapping_error"}
+            requested = item.page_number in explicit_targets
+            needs_ocr = allow_ocr and requested and (request.recovery_policy == "force_ocr" or needs_recovery)
+            if quality == "native_text_mapping_error" and self.alternate_native and profile.alternate_native_engine and request.recovery_policy != "force_ocr":
                 alternate_targets.append(item.page_number)
-            elif needs_ocr and profile.ocr_engine:
+            elif needs_ocr:
                 ocr_targets.append(item.page_number)
-            page_hash = _stable_hash({"page": item.page_number, "method": "native_text", "text_hash": compute_content_hash(item.text.encode())})
-            results[item.page_number] = PdfPageResult(item.page_number, item.text, "native_text", quality, compute_content_hash(item.text.encode()), page_hash, all_diags, elapsed_seconds=item.elapsed_seconds, ocr_required=needs_ocr, width_points=item.width_points, height_points=item.height_points)
+            native_candidate = self._candidate("native_text", item.text, quality, item.elapsed_seconds, all_diags)
+            results[item.page_number] = self._page_from_candidates(
+                item.page_number,
+                (native_candidate,),
+                quality if quality == "usable" else quality,
+                all_diags,
+                item.elapsed_seconds,
+                ocr_required=needs_recovery,
+                width_points=item.width_points,
+                height_points=item.height_points,
+                selected=("native_text", item.text) if quality == "usable" else None,
+                cache_identity=self._cache_identity(request, item.page_number, native.engine_version),
+            )
         if alternate_targets and self.alternate_native:
             alternate = self.alternate_native.extract(request.content, target_pages=alternate_targets)
+            alternate_by_page = {item.page_number: item for item in alternate.pages}
             for item in alternate.pages:
                 quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
+                previous = results[item.page_number]
+                alternate_candidate = self._candidate("alternate_native", item.text, quality, item.elapsed_seconds, diags, provenance={"engine": getattr(self.alternate_native, "name", "alternate_native")})
+                candidates = previous.candidates + (alternate_candidate,)
                 if quality == "usable":
-                    previous = results[item.page_number]
-                    results[item.page_number] = self._page(item.page_number, item.text, "alternate_native", quality, previous.diagnostics + tuple(diags), item.elapsed_seconds, previous.provenance + (({"engine": getattr(self.alternate_native, "name", "alternate_native")},)), width_points=previous.width_points, height_points=previous.height_points)
-                elif profile.ocr_engine:
+                    results[item.page_number] = self._page_from_candidates(item.page_number, candidates, quality, previous.diagnostics + tuple(diags), item.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, selected=("alternate_native", item.text), cache_identity=previous.cache_identity)
+                elif allow_ocr and item.page_number in explicit_targets:
                     ocr_targets.append(item.page_number)
+                else:
+                    results[item.page_number] = self._page_from_candidates(item.page_number, candidates, quality, previous.diagnostics + tuple(diags), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
+            for number in set(alternate_targets) - set(alternate_by_page):
+                previous = results[number]
+                diagnostic = PdfDiagnostic("alternate_native_extraction_failed", "alternate-native adapter returned no page", number, "error")
+                candidate = PdfCandidate("alternate_native", "", "", "alternate_native_failure", False, elapsed_seconds=0.0, diagnostics=(diagnostic,))
+                results[number] = self._page_from_candidates(number, previous.candidates + (candidate,), previous.quality_status, previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
         all_ocr_targets = sorted(set(ocr_targets))
-        queue_targets = all_ocr_targets[: profile.limits.max_queue_size]
+        limits = self._effective_limits(request)
+        queue_targets = all_ocr_targets[: limits.max_queue_size]
         queue_deferred = all_ocr_targets[len(queue_targets):]
-        ocr_targets = queue_targets[: profile.limits.max_ocr_pages or None]
+        ocr_targets = queue_targets[: limits.max_ocr_pages or None]
         deferred_targets = queue_deferred + queue_targets[len(ocr_targets):]
         for number in deferred_targets:
             previous = results[number]
             code = "ocr_queue_full" if number in queue_deferred else "ocr_page_budget_exceeded"
             message = "OCR queue bound reached" if code == "ocr_queue_full" else "maximum OCR pages exceeded"
-            results[number] = self._page(number, previous.text, "ocr_deferred", "ocr_budget_exceeded", previous.diagnostics + (PdfDiagnostic(code, message, number, "error"),), previous.elapsed_seconds, previous.provenance, width_points=previous.width_points, height_points=previous.height_points)
+            diagnostic = PdfDiagnostic(code, message, number, "error")
+            results[number] = self._page_from_candidates(number, previous.candidates, "ocr_budget_exceeded", previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
+        cache_hits: set[int] = set()
+        uncached_ocr_targets: list[int] = []
+        for number in ocr_targets:
+            previous = results[number]
+            identity = self._cache_identity(request, number, getattr(self.ocr, "version", profile.engine_versions.get(profile.ocr_engine or "", "unknown")))
+            cached = self._read_cache(request.cache_backend, identity)
+            if cached is None:
+                uncached_ocr_targets.append(number)
+                results[number] = self._with_cache(previous, identity, "cache_miss")
+            else:
+                cache_hits.add(number)
+                results[number] = self._merge_cached(previous, cached, identity)
+        ocr_targets = uncached_ocr_targets
         if ocr_targets and self.ocr and profile.ocr_engine:
             try:
-                ocr_pages = self.ocr.extract_pages(request.content, ocr_targets, request=request)
+                ocr_request = replace(request, profile=replace(profile, limits=limits))
+                ocr_pages = self.ocr.extract_pages(request.content, ocr_targets, request=ocr_request)
             except Exception as exc:
                 ocr_pages = {}
                 for number in ocr_targets:
                     previous = results[number]
-                    results[number] = self._page(number, previous.text, "ocr_failed", "ocr_failure", previous.diagnostics + (PdfDiagnostic("ocr_runtime_failure", f"{type(exc).__name__}: {exc}", number, "error"),), previous.elapsed_seconds, previous.provenance, width_points=previous.width_points, height_points=previous.height_points)
+                    diagnostic = PdfDiagnostic("ocr_failure", f"{type(exc).__name__}: {exc}", number, "error")
+                    results[number] = self._page_from_candidates(number, previous.candidates, "ocr_failure", previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
             for number in ocr_targets:
                 item = ocr_pages.get(number)
                 if item is None:
+                    previous = results[number]
+                    diagnostic = PdfDiagnostic("ocr_failure", "OCR adapter returned no page result", number, "error")
+                    results[number] = self._page_from_candidates(number, previous.candidates, "ocr_failure", previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
                     continue
                 previous = results[number]
                 quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
-                status = "ocr_low_confidence" if item.confidence is not None and item.confidence < 0.6 else ("ocr_success" if quality == "usable" else "ocr_low_quality")
-                results[number] = self._page(number, item.text, "ocr", status, previous.diagnostics + tuple(item.diagnostics) + tuple(diags), item.elapsed_seconds, previous.provenance + (({"engine": getattr(self.ocr, "name", profile.ocr_engine), **dict(item.provenance)},)), item.confidence, width_points=previous.width_points, height_points=previous.height_points)
+                provenance = {"engine": getattr(self.ocr, "name", profile.ocr_engine), "mode": request.ocr_mode, **dict(item.provenance)}
+                diagnostics = previous.diagnostics + tuple(item.diagnostics) + tuple(diags)
+                if item.elapsed_seconds > limits.max_page_seconds:
+                    status = "ocr_timeout"
+                    diagnostics += (PdfDiagnostic("ocr_timeout", "OCR page exceeded its time budget", number, "error", {"elapsed_seconds": item.elapsed_seconds, "max_page_seconds": limits.max_page_seconds}),)
+                elif item.confidence is not None and item.confidence < profile.ocr_min_confidence:
+                    status = "ocr_low_confidence"
+                elif not item.text.strip():
+                    status = "ocr_empty"
+                    diagnostics += (PdfDiagnostic("ocr_empty", "OCR returned empty text", number, "error"),)
+                else:
+                    status = "ocr_success" if quality == "usable" else "ocr_low_quality"
+                candidate = self._candidate("ocr", item.text, status, item.elapsed_seconds, diagnostics, item.confidence, provenance)
+                page = self._page_from_candidates(number, previous.candidates + (candidate,), status, diagnostics, item.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, selected=("ocr", item.text) if status == "ocr_success" else None, confidence=item.confidence, provenance=(provenance,), cache_identity=self._cache_identity(request, number, provenance.get("engine_version", getattr(self.ocr, "version", profile.engine_versions.get(profile.ocr_engine or "", "unknown")))), structured_payload=item.structured_payload, structured_format=item.structured_format)
+                results[number] = page
+                self._write_cache(request.cache_backend, page.cache_identity, page)
         elif ocr_targets:
             for number in ocr_targets:
                 previous = results[number]
-                results[number] = self._page(number, previous.text, "ocr_deferred", "ocr_deferred", previous.diagnostics + (PdfDiagnostic("ocr_unavailable", "configured OCR adapter is unavailable", number, "error"),), previous.elapsed_seconds, previous.provenance, width_points=previous.width_points, height_points=previous.height_points)
+                diagnostic = PdfDiagnostic("ocr_unavailable", "configured OCR adapter is unavailable", number, "error")
+                results[number] = self._page_from_candidates(number, previous.candidates, "ocr_unavailable", previous.diagnostics + (diagnostic,), previous.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, cache_identity=previous.cache_identity)
         elapsed = time.perf_counter() - started
         document_diags = list(native.diagnostics)
-        if elapsed > profile.limits.max_document_seconds:
-            document_diags.append(PdfDiagnostic("document_time_budget_exceeded", "PDF processing exceeded configured document budget", severity="error", details={"elapsed_seconds": elapsed}))
-        status = "partial" if (limit and len(pages) < native.page_count) or deferred_targets or elapsed > profile.limits.max_document_seconds else ("success" if all(page.quality_status not in {"ocr_failure", "ocr_deferred", "ocr_budget_exceeded"} for page in results.values()) else "partial")
-        return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, native.page_count, tuple(results[number] for number in sorted(results)), status, tuple(document_diags), elapsed, {"native": native.engine_version, **dict(profile.engine_versions)})
+        if elapsed > limits.max_document_seconds and request.ocr_mode != "none":
+            document_diags.append(PdfDiagnostic("document_time_budget_exceeded", "PDF processing exceeded configured document budget", severity="error", details={"elapsed_seconds": elapsed, "max_document_seconds": limits.max_document_seconds}))
+        ordered_pages = tuple(results[number] for number in sorted(results))
+        returned_pages = tuple(page.page_number for page in ordered_pages)
+        failed_statuses = {"ocr_failure", "ocr_unavailable", "ocr_timeout", "ocr_empty", "ocr_low_quality", "ocr_low_confidence", "ocr_budget_exceeded"}
+        status = "partial" if (limit and len(pages) < native.page_count) or deferred_targets or elapsed > limits.max_document_seconds or any(page.quality_status in failed_statuses for page in ordered_pages) else "success"
+        page_diagnostics = {page.page_number: page.diagnostics for page in ordered_pages}
+        return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, native.page_count, ordered_pages, status, tuple(document_diags), elapsed, {"native": native.engine_version, **dict(profile.engine_versions)}, request.requested_pages, returned_pages, page_diagnostics)
 
     @staticmethod
-    def _page(number: int, text: str, method: str, status: str, diagnostics: tuple[PdfDiagnostic, ...], elapsed: float, provenance: tuple[Mapping[str, Any], ...], confidence: Optional[float] = None, *, width_points: Optional[float] = None, height_points: Optional[float] = None) -> PdfPageResult:
+    def _candidate(method: str, text: str, quality: str, elapsed: float, diagnostics: tuple[PdfDiagnostic, ...], confidence: Optional[float] = None, provenance: Optional[Mapping[str, Any]] = None) -> PdfCandidate:
         text_hash = compute_content_hash(text.encode("utf-8"))
-        return PdfPageResult(number, text, method, status, text_hash, _stable_hash({"page": number, "method": method, "text_hash": text_hash}), diagnostics, confidence, provenance, elapsed, True, width_points, height_points)
+        return PdfCandidate(method, text, text_hash, quality, quality in {"usable", "ocr_success"}, confidence, elapsed, diagnostics, dict(provenance or {}))
+
+    @classmethod
+    def _page_from_candidates(cls, number: int, candidates: tuple[PdfCandidate, ...], status: str, diagnostics: tuple[PdfDiagnostic, ...], elapsed: float, ocr_required: bool, width_points: Optional[float] = None, height_points: Optional[float] = None, *, selected: Optional[tuple[str, str]] = None, confidence: Optional[float] = None, provenance: tuple[Mapping[str, Any], ...] = (), cache_identity: Optional[Mapping[str, Any]] = None, cache_status: str = "cache_miss", structured_payload: Any = None, structured_format: Optional[str] = None) -> PdfPageResult:
+        method, text = selected if selected else ("none", "")
+        text_hash = compute_content_hash(text.encode("utf-8"))
+        selected_usable = method != "none"
+        return PdfPageResult(number, text, method, status, text_hash, _stable_hash({"page": number, "method": method, "text_hash": text_hash}), diagnostics, confidence, provenance, elapsed, ocr_required, width_points, height_points, text, method, text_hash, selected_usable, candidates, dict(cache_identity or {}), cache_status, structured_payload, structured_format)
+
+    @classmethod
+    def _cache_identity(cls, request: PdfParseRequest, page_number: int, engine_version: str) -> Mapping[str, Any]:
+        profile = request.profile
+        limits = cls._effective_limits(request)
+        model_version = profile.engine_versions.get("paddleocr_model_version", profile.engine_versions.get("paddleocr_model", "unknown"))
+        return {
+            "content_hash": request.content_hash,
+            "physical_page_number": page_number,
+            "profile": profile.name,
+            "ocr_mode": request.ocr_mode,
+            "recovery_policy": request.recovery_policy,
+            "dpi": limits.render_dpi,
+            "batch_size": limits.ocr_batch_size,
+            "engine_version": engine_version,
+            "model_version": model_version,
+            "parser_config_version": profile.parser_config_version,
+        }
+
+    @staticmethod
+    def _effective_limits(request: PdfParseRequest) -> PdfResourceLimits:
+        profile = request.profile
+        mode_limits = profile.mode_budgets.get(request.ocr_mode) if request.ocr_mode in profile.mode_budgets else DEFAULT_MODE_BUDGETS.get(request.ocr_mode)
+        values = [profile.limits, mode_limits, request.mode_budget]
+        values = [item for item in values if item is not None]
+        if not values:
+            return profile.limits
+        def minimum(name: str):
+            entries = [getattr(item, name) for item in values]
+            non_null = [item for item in entries if item is not None]
+            return min(non_null) if non_null else None
+        ocr_caps = []
+        for item in values:
+            cap = item.max_ocr_pages
+            if item is not profile.limits and cap is None:
+                cap = item.max_pages
+            if cap is not None:
+                ocr_caps.append(cap)
+        return PdfResourceLimits(
+            max_pages=profile.limits.max_pages,
+            max_ocr_pages=min(ocr_caps) if ocr_caps else None,
+            max_concurrency=minimum("max_concurrency") or 1,
+            max_queue_size=minimum("max_queue_size") or 1,
+            max_queue_wait_seconds=minimum("max_queue_wait_seconds") or 0.0,
+            max_page_seconds=minimum("max_page_seconds") or profile.limits.max_page_seconds,
+            max_document_seconds=minimum("max_document_seconds") or profile.limits.max_document_seconds,
+            ocr_batch_size=minimum("ocr_batch_size") or 1,
+            render_dpi=minimum("render_dpi") or profile.limits.render_dpi,
+        )
+
+    @staticmethod
+    def _read_cache(backend: Optional[PdfPageCacheBackend], identity: Mapping[str, Any]) -> Optional[PdfPageResult]:
+        if backend is None:
+            return None
+        value = backend.get(identity)
+        if isinstance(value, PdfPageResult):
+            return value
+        if isinstance(value, Mapping):
+            try:
+                diagnostics = tuple(PdfDiagnostic(**item) for item in value.get("diagnostics", ()))
+                candidates = tuple(
+                    PdfCandidate(
+                        method=str(item.get("method", "none")),
+                        text=str(item.get("text", "")),
+                        text_hash=str(item.get("text_hash", "")),
+                        quality_status=str(item.get("quality_status", "unknown")),
+                        usable_for_semantic=bool(item.get("usable_for_semantic", False)),
+                        confidence=item.get("confidence"),
+                        elapsed_seconds=float(item.get("elapsed_seconds", 0.0)),
+                        diagnostics=tuple(PdfDiagnostic(**diag) for diag in item.get("diagnostics", ())),
+                        provenance=dict(item.get("provenance", {})),
+                    )
+                    for item in value.get("candidates", ())
+                )
+                return PdfPageResult(**{**dict(value), "diagnostics": diagnostics, "candidates": candidates})
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    @staticmethod
+    def _write_cache(backend: Optional[PdfPageCacheBackend], identity: Mapping[str, Any], page: PdfPageResult) -> None:
+        if backend is not None and page.selected_method == "ocr":
+            backend.put(identity, page)
+
+    @staticmethod
+    def _with_cache(page: PdfPageResult, identity: Mapping[str, Any], status: str) -> PdfPageResult:
+        return PdfPageResult(**{**asdict(page), "diagnostics": page.diagnostics, "candidates": page.candidates, "cache_identity": dict(identity), "cache_status": status})
+
+    @classmethod
+    def _merge_cached(cls, previous: PdfPageResult, cached: PdfPageResult, identity: Mapping[str, Any]) -> PdfPageResult:
+        candidates = previous.candidates + tuple(item for item in cached.candidates if item.method not in {candidate.method for candidate in previous.candidates})
+        return cls._page_from_candidates(cached.page_number, candidates, cached.quality_status, previous.diagnostics + cached.diagnostics, cached.elapsed_seconds, previous.ocr_required, previous.width_points, previous.height_points, selected=(cached.selected_method, cached.selected_text) if cached.selected_method != "none" else None, confidence=cached.confidence, provenance=cached.provenance, cache_identity=identity, cache_status="cache_hit", structured_payload=cached.structured_payload, structured_format=cached.structured_format)
 
     @staticmethod
     def _failed(request: PdfParseRequest, code: str, message: str, started: float) -> PdfDocumentResult:
-        return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, request.profile.name, request.content_hash, request.parameter_hash, 0, (), "failed", (PdfDiagnostic(code, message, severity="error"),), time.perf_counter() - started)
+        return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, request.profile.name, request.content_hash, request.parameter_hash, 0, (), "failed", (PdfDiagnostic(code, message, severity="error"),), time.perf_counter() - started, requested_pages=request.requested_pages)

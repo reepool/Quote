@@ -7,6 +7,7 @@ import importlib.util
 import statistics
 import time
 import shutil
+import platform
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -270,12 +271,32 @@ def run_bounded_canary(
 
 
 def probe_ocr_components() -> dict[str, dict[str, Any]]:
-    """Return capability evidence without downloading models or touching production."""
+    """Return local capability evidence without downloading models or touching production."""
+    cuda_available = False
+    paddle_version = None
+    paddle_cuda_compiled = None
+    try:
+        import paddle
+
+        paddle_version = getattr(paddle, "__version__", None)
+        paddle_cuda_compiled = bool(getattr(paddle, "is_compiled_with_cuda", lambda: False)())
+        cuda_available = bool(getattr(paddle.device, "is_compiled_with_cuda", lambda: paddle_cuda_compiled)())
+    except Exception:
+        pass
+    runtime = {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "paddle_version": paddle_version,
+        "paddle_cuda_compiled": paddle_cuda_compiled,
+        "cuda_available": cuda_available,
+        "device": "gpu" if cuda_available else "cpu",
+    }
     return {
-        "paddleocr_ppocr": {"available": _module_available("paddleocr"), "component": "pp-ocr"},
-        "paddleocr_pp_structure": {"available": _module_available("paddleocr"), "component": "pp-structure", "selection": "table/layout pages only"},
-        "pdf_inspector_ocr": {"available": _module_available("pdf_inspector"), "component": "pdf-inspector-ocr", "offline": True},
-        "tesseract_ocrmypdf": {"available": bool(shutil.which("tesseract") or shutil.which("ocrmypdf")), "component": "lightweight-baseline"},
+        "runtime": runtime,
+        "paddleocr_ppocr": {"available": _module_available("paddleocr"), "component": "pp-ocr", **runtime},
+        "paddleocr_pp_structure": {"available": _module_available("paddleocr"), "component": "pp-structure", "selection": "table/layout pages only", **runtime},
+        "pdf_inspector_ocr": {"available": _module_available("pdf_inspector"), "component": "pdf-inspector-ocr", "offline": True, **runtime},
+        "tesseract_ocrmypdf": {"available": bool(shutil.which("tesseract") or shutil.which("ocrmypdf")), "component": "lightweight-baseline", **runtime},
     }
 
 

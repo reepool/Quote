@@ -100,7 +100,8 @@ def test_bounded_canary_is_fail_closed_and_component_probe_is_local(tmp_path) ->
     assert result["status"] == "passed"
     assert result["bounded"] is True
     components = probe_ocr_components()
-    assert set(components) == {"paddleocr_ppocr", "paddleocr_pp_structure", "pdf_inspector_ocr", "tesseract_ocrmypdf"}
+    assert {"paddleocr_ppocr", "paddleocr_pp_structure", "pdf_inspector_ocr", "tesseract_ocrmypdf", "runtime"} <= set(components)
+    assert components["runtime"]["device"] in {"cpu", "gpu"}
 
 
 def _manifest_for(pdf, manifest, *, gold=None):

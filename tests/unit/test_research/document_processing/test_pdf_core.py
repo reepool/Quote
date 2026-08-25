@@ -102,6 +102,74 @@ def test_router_prefers_alternate_native_then_selective_ocr() -> None:
     assert not any(page.extraction_method == "ocr" for page in result.pages)
 
 
+def test_native_first_does_not_create_ocr_work_and_preserves_failed_candidate():
+    profile = PdfProfile(name="native-first", alternate_native_engine="pdf-inspector", ocr_engine="paddleocr")
+    ocr = _FakeOcr()
+    result = PdfRouter(native=_FakeNative(), alternate_native=None, ocr=ocr).parse(
+        PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="section_extract", recovery_policy="native_first")
+    )
+    assert result.pages[1].selected_method == "none"
+    assert result.pages[1].selected_text == ""
+    assert result.pages[1].selected_usable_for_semantic is False
+    assert result.pages[1].candidates[0].method == "native_text"
+    assert not any(page.extraction_method == "ocr" for page in result.pages)
+
+
+def test_force_ocr_requires_explicit_pages():
+    with pytest.raises(ValueError, match="force_ocr"):
+        PdfParseRequest(content=_blank_pdf(), recovery_policy="force_ocr", ocr_mode="section_extract")
+
+
+def test_requested_recovery_without_ocr_runtime_is_typed():
+    profile = PdfProfile(name="no-ocr-runtime", ocr_engine=None, min_text_characters=20)
+    result = PdfRouter(native=_FakeNative()).parse(
+        PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="section_extract", recovery_policy="selective_recovery")
+    )
+    assert result.pages[1].selected_method == "none"
+    assert any(item.code == "ocr_unavailable" for item in result.pages[1].diagnostics)
+
+
+def test_page_contract_keeps_requested_order_and_reports_out_of_range():
+    request = PdfParseRequest(content=_blank_pdf(2), target_pages=(3, 2, 2, 1), ocr_mode="none")
+    result = PdfRouter().parse(request)
+    assert result.requested_pages == (3, 2, 2, 1)
+    assert result.returned_pages == (1, 2)
+    assert any(item.code == "target_page_out_of_range" for item in result.diagnostics)
+
+
+def test_cache_backend_reuses_successful_ocr_page():
+    class Cache:
+        def __init__(self):
+            self.values = {}
+
+        def get(self, identity):
+            return self.values.get(tuple(sorted(identity.items())))
+
+        def put(self, identity, page_result):
+            self.values[tuple(sorted(identity.items()))] = page_result
+
+    cache = Cache()
+    profile = PdfProfile(name="cache", ocr_engine="paddleocr", min_text_characters=1)
+    first = PdfRouter(native=_FakeNative(), ocr=_FakeOcr()).parse(PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="section_extract", recovery_policy="force_ocr", cache_backend=cache))
+    second = PdfRouter(native=_FakeNative(), ocr=_FakeOcr()).parse(PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="section_extract", recovery_policy="force_ocr", cache_backend=cache))
+    assert first.pages[1].cache_status == "cache_miss"
+    assert second.pages[1].cache_status == "cache_hit"
+    assert second.pages[1].selected_method == "ocr"
+
+
+def test_mode_budget_caps_ocr_pages_and_page_timeout_is_typed():
+    class SlowOcr(_FakeOcr):
+        def extract_pages(self, content, pages, *, request):
+            return {page: OcrPage("OCR recovered page", 0.95, 2.0) for page in pages}
+
+    profile = PdfProfile(name="budget", ocr_engine="paddleocr", limits=PdfResourceLimits(max_ocr_pages=3, max_page_seconds=5))
+    result = PdfRouter(native=_FakeNative(), ocr=SlowOcr()).parse(
+        PdfParseRequest(content=_blank_pdf(2), profile=profile, target_pages=(2,), ocr_mode="toc_probe", recovery_policy="force_ocr", mode_budget=PdfResourceLimits(max_pages=1, max_page_seconds=1, max_document_seconds=10))
+    )
+    assert result.pages[1].quality_status == "ocr_timeout"
+    assert any(item.code == "ocr_timeout" for item in result.pages[1].diagnostics)
+
+
 def test_missing_ocr_runtime_is_typed_and_profile_switch_is_config_only() -> None:
     profile = profile_from_mapping("test", {"ocr_engine": "paddleocr", "ocr_model_cache_dir": "/tmp/quote-paddlex-test", "limits": {"max_ocr_pages": 1}})
     assert profile.name == "test"
