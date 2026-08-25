@@ -1,48 +1,48 @@
-## 1. Confirm Baseline and Acceptance Evidence
+## 1. Reconcile Existing Contracts and Evidence
 
-- [ ] 1.1 Confirm the in-flight shared page-recovery contract is implemented or reconcile this change against its final request, candidate, budget, cache, and provenance models before changing router behavior.
-- [ ] 1.2 Create a read-only, hash-bound evaluation manifest for 600036.SH, 001322.SZ, 002376.SZ, and 000717.SZ with explicit physical pages and native fidelity/read-order checks; do not modify production PDF assets.
-- [ ] 1.3 Add a reproducible native benchmark that runs identical selected pages through `pypdfium2` and `pypdf` and records engine versions, text hashes, quality status, Chinese/numeric gold results, page order, table/read-order observations, and elapsed time.
+- [ ] 1.1 Confirm the final implemented models from `shared-pdf-processing` and `shared-pdf-page-recovery-contract`; map ordered engines and isolated runtimes onto the existing router, candidate, budget, cache, and provenance owner without adding another PDF entry point, and record how their unarchived capability baselines will be canonicalized/rebased before this change archives without taking ownership of company-profile tasks.
+- [ ] 1.2 Create a separate read-only native-promotion manifest rather than reusing `pdf_page_recovery_acceptance_manifest.json` unchanged; preserve all source PDFs and production data.
+- [ ] 1.3 Add 600036.SH physical pages 1, 2, 19, 41, 51-62, 195, and 350 with verified source-form gold, including `招商銀行`,正文 Chinese headings, key numbers, page continuity, and selected table/read-order checks; do not use simplified cover text as gold.
+- [ ] 1.4 Use bounded read-only probes to add non-empty Chinese/numeric/read-order gold for 000717.SZ, scanned-page Chinese/numeric gold for 001322.SZ, and both native-unusable and PDFium-native-usable negative-OCR pages for 002376.SZ.
+- [ ] 1.5 Version the new corpus/page/gold identity and document current limitations for Hong Kong annual reports, encrypted PDFs, and AcroForm/XFA documents.
 
-## 2. Deliver PDFium Native Extraction
+## 2. Deliver the Independently Releasable PDFium Native Slice
 
-- [ ] 2.1 Implement the `pypdfium2` native-text adapter with one-based physical pages, page count, deterministic text/hash output, engine version, elapsed time, and typed open/page/extraction failures.
-- [ ] 2.2 Add focused adapter tests for normal text, malformed mapping recovery, scanned/empty pages, out-of-range pages, stable ordering, and no OCR side effects.
-- [ ] 2.3 Run the frozen-corpus benchmark and write the versioned selection result; promote PDFium only if every mandatory fidelity and compatibility gate passes before applying the latency comparison.
+- [ ] 2.1 Add direct `pypdfium2==5.13.0` dependency and implement a PDFium native adapter that opens each PDF once per adapter request, extracts assigned physical pages in stable order, and returns deterministic text/hash, page count, version, timing, and typed failures.
+- [ ] 2.2 Replace `native_engine`/`alternate_native_engine` router branching with a validated ordered native engine tuple that sends failed pages to each later adapter in one grouped adapter attempt and short-circuits per page at the first usable candidate.
+- [ ] 2.3 Update the technical quality gate so document-level `mixed` never triggers OCR, and Chinese-expected pages with numeric/ASCII residue but insufficient Chinese/script evidence cannot become usable native candidates.
+- [ ] 2.4 Preserve every native attempt's actual engine/version, text hash, quality, usability, diagnostics, and elapsed time; include chain order/config and engine versions in cache identity and serialization.
+- [ ] 2.5 Add unit/contract tests for malformed mapping, normal Chinese/English expected-script behavior, scanned/empty pages, mixed-page OCR suppression, table/numeric reading order, out-of-range pages, stable ordering, grouped fallback extraction, and one-open-per-adapter-request behavior.
+- [ ] 2.6 Run PDFium versus `pypdf` on the expanded native-promotion manifest and record every fidelity, false-routing, compatibility, table/read-order, and latency gate; promote only if all mandatory accuracy/compatibility gates pass before latency ranking.
+- [ ] 2.7 Canary and activate the PDFium-first native profile with `pypdf` fallback and a configuration-only `pypdf`-first rollback; verify 600036.SH target正文 pages are native-selected and do not invoke OCR.
 
-## 3. Migrate the Native Router and Profiles
+## 3. Retire Inspector from Production Native Routing
 
-- [ ] 3.1 Replace hard-coded primary/alternate native routing with a validated ordered engine tuple that short-circuits per page at the first technically usable candidate.
-- [ ] 3.2 Preserve each attempted engine's name/version, method, hash, quality, usability, diagnostics, and elapsed time, and expose the actual selected native engine in page provenance.
-- [ ] 3.3 Version cache identity and serialization by native chain/order/configuration and relevant engine versions; add tests proving profile-order or engine-version changes cannot hit incompatible cached results.
-- [ ] 3.4 After PDFium passes promotion gates, configure the canary and then production native profile as `pypdfium2 -> pypdf`, retaining a configuration-only rollback to the prior order.
-- [ ] 3.5 Add router tests proving `native_first` never creates OCR work, `selective_recovery` reaches OCR only after every native engine fails for that requested page, and bounded `force_ocr` semantics remain unchanged.
+- [ ] 3.1 Inventory `PdfInspectorNativeAdapter`, `PdfInspectorOcrAdapter`, `detect_pdf_bytes`, evaluator profiles, production configuration, supported operator tools, tests, and direct imports as distinct inspector roles.
+- [ ] 3.2 Migrate production native callers, retire `pdf_inspector_paddleocr` and inspector `alternate_native_engine` wiring, and update focused profile/router tests without changing still-supported evaluation/classification/OCR behavior.
+- [ ] 3.3 Remove `pdf-inspector` from `requirements.txt` only if every supported role is empty; otherwise retain the package with a documented non-native owner and propose later retirement separately rather than silently uninstalling it.
 
-## 4. Retire pdf-inspector Native Paths
+## 4. Align the Authoritative OCR Runtime and Renderer
 
-- [ ] 4.1 Inventory production imports, profiles, configuration, supported operator tools, and tests for `pdf-inspector`, and document any real capability that still blocks removal.
-- [ ] 4.2 Migrate remaining supported callers to the ordered native chain and remove `pdf-inspector` native profiles and adapter wiring after focused integration tests pass.
-- [ ] 4.3 Remove the `pdf-inspector` package dependency only when the verified caller inventory is empty, then run dependency/import smoke tests.
+- [ ] 4.1 Record Paddle/PaddleOCR 3.3.1/3.7.0, model/inference configuration, CUDA 11.8, PDFium 5.13.0, and GRID P4 as the authoritative runtime baseline; mark the 2.6.2/2.7.3 PyMuPDF lab stack as comparative-only evidence.
+- [ ] 4.2 Extend `PaddleOcrAdapter` with one versioned worker protocol and separate isolated GPU (`paddlepaddle-gpu==3.3.1`) and CPU (`paddlepaddle==3.3.1`) environments outside Quote conda; do not add a parallel OCR adapter or business loop.
+- [ ] 4.3 Refactor the Quote-side rendering stage to open PDFium once per OCR batch and render both GPU and CPU inputs at profile-bound 150 DPI (`scale=dpi/72`) by default; workers receive equivalent rendered images and never open PDFs or import PyMuPDF.
+- [ ] 4.4 Implement worker protocol validation and capability/model-health probes for runtime/model/inference versions, device, driver/CUDA, compute capability, memory, persistent writable cache, and process health; Quote must not import CUDA Paddle for probing.
+- [ ] 4.5 Add tests that reproduce/fail closed on worker crash, `SIGILL`/invalid optimization configuration, startup/model failure, malformed response, timeout, empty OCR result, non-writable cache, and isolation from the known Quote conda `libz`/`inflateReset2` conflict.
 
-## 5. Deliver the Isolated GPU OCR Worker
+## 5. Implement GPU-First with Version-Matched CPU Fallback
 
-- [ ] 5.1 Define and test the versioned bounded-page worker protocol, including physical page, input reference, settings/deadline, text/hash/confidence, quality status, diagnostics, elapsed time, and engine/model/device/runtime versions.
-- [ ] 5.2 Provision a version-pinned GPU worker environment outside the Quote conda environment using the P4-compatible Paddle GPU, PaddleOCR, PP-OCRv4, CUDA, writable persistent model cache, and tested IR-fusion setting; record exact versions and reproducible setup in the runbook.
-- [ ] 5.3 Implement worker startup and capability reporting for device visibility, driver/CUDA compatibility, compute capability, memory, model health, required inference settings, and available GRID licence status.
-- [ ] 5.4 Implement the Quote-side GPU worker adapter with protocol validation, startup/inference timeout handling, process-crash isolation, cancellation, and typed diagnostics without adding another PDF business entry point.
-- [ ] 5.5 Add worker and adapter tests for valid output, malformed/mismatched output, startup failure, model failure, timeout, crash, empty OCR result, and partial multi-page completion.
+- [ ] 5.1 Add versioned PDFium-first GPU, CPU-only, and OCR-disabled profiles; treat the old `pypdf_paddleocr_gpu_canary` approval/profile as migration-only runtime evidence, not approval for the new profile.
+- [ ] 5.2 Implement configured GPU-to-CPU fallback classes through the existing adapter while sharing the original page/request budgets, deadlines, target-page whitelist, and completed partial results.
+- [ ] 5.3 Fix `force_ocr` behavior: validate the PDF/page count, retain at most the first native diagnostic candidate, skip later native fallbacks, OCR every valid explicit target page, and reject an empty target set.
+- [ ] 5.4 Extend provenance and cache identity with renderer/version/DPI/image configuration, runtime/device, Paddle/PaddleOCR, model, and inference config; prove GPU, CPU, old profile, and new profile cache entries cannot collide.
+- [ ] 5.5 Add integration tests for healthy GPU selection, permitted pre-inference CPU fallback, default no CPU retry after GPU page timeout, exhausted-budget behavior, partial-page retention, bounded `force_ocr`, and no OCR after usable PDFium text under selective recovery.
 
-## 6. Add GPU-First and CPU-Fallback Routing
+## 6. Expanded Canary, Documentation, and Rollout
 
-- [ ] 6.1 Add validated OCR runtime order and allowed-fallback-failure configuration with GPU-first production, CPU-only rollback, and OCR-disabled profiles.
-- [ ] 6.2 Enforce one shared effective page/request budget across GPU and CPU attempts, retain completed pages, and prevent fallback from expanding target pages or resetting deadlines.
-- [ ] 6.3 Extend OCR provenance and cache identity with runtime/device, Paddle/PaddleOCR, model, and inference-configuration versions; test that GPU and CPU results cannot collide.
-- [ ] 6.4 Add integration tests for healthy GPU selection, permitted pre-inference CPU fallback, default no-retry after GPU page timeout, exhausted-budget behavior, bounded `force_ocr`, and no OCR after usable PDFium text.
-
-## 7. Canary, Rollback, and Closeout
-
-- [ ] 7.1 Run the isolated GPU worker on the hash-bound mapping-corrupt, scanned, mixed, and normal baseline corpus and record fidelity, selected pages, failures, cache behavior, per-page/P95 latency, and GPU-versus-CPU comparison.
-- [ ] 7.2 Verify the production-host canary meets selective-page, output-fidelity, typed-failure, and latency gates before enabling GPU-first OCR; confirm 600036.SH is not sent to full-document OCR.
-- [ ] 7.3 Exercise configuration-only rollback to `pypdf`-first native routing and CPU-only/OCR-disabled recovery, confirming caller APIs and native parsing continue to work.
-- [ ] 7.4 Run focused shared-PDF and integrated caller regression suites, update the current PDF module documentation and GPU operations runbook, and record the worker/model-cache and GRID licence renewal owners.
-- [ ] 7.5 Review the final change for duplicate PDF execution paths, obsolete profiles/dependencies, unbounded OCR, and unrelated scope; resolve only blocking findings and archive the completed OpenSpec change.
+- [ ] 6.1 Run new PDFium-rendered GPU and CPU evaluations on the expanded hash-bound corpus; record identical input identity, Chinese/numeric/table/read-order fidelity, candidate selection, typed failures, cache behavior, per-page/document P50/P95, and resource usage.
+- [ ] 6.2 Issue a new profile/corpus/renderer/runtime/config-bound approval only if GPU-first passes all gates; do not reuse the old narrow `pypdf_paddleocr_gpu_canary` approval and do not use the PyMuPDF 15.18-second lab result as the production SLA.
+- [ ] 6.3 Verify 600036.SH is recovered natively on the expanded正文 set, native-usable mixed pages never enter OCR, scanned pages use bounded GPU OCR, CPU fallback stays within the same budget, and no report receives implicit full-document OCR.
+- [ ] 6.4 Enable GPU-first OCR only after the new approval, and exercise rollback to CPU-only/OCR-disabled plus `pypdf`-first native routing without caller API changes.
+- [ ] 6.5 Update `docs/development/shared_pdf_processing.md`, current profile/config documentation, acceptance/canary references, and runbook so only the isolated-worker CUDA model is current; record worker/cache and GRID licence owners and delete superseded profile/CUDA instructions after migration.
+- [ ] 6.6 Run focused shared-PDF and integrated consumer regressions, review for duplicate execution paths or unrelated scope, resolve blocking findings, and archive the completed change after the native and GPU milestones are both delivered.
