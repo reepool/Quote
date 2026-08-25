@@ -32,6 +32,7 @@
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - `docs/development/business_profile_semantic_production_runbook.md`：公司业务画像语义生产
+- `docs/development/shared_pdf_processing.md`：共享 PDF 解析、选择性 OCR、CPU/GPU canary 与回滚
 - `docs/development/common_llm_gateway_architecture.md`：公共 LLM 网关
 - `docs/development/fx_market_data_requirements.md`：外汇数据域
 - `docs/development/commodity_futures_market_data_requirements.md`：商品期货数据域

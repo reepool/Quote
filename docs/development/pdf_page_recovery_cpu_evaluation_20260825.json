@@ -1,0 +1,287 @@
+{
+  "capabilities": {
+    "paddleocr_pp_structure": {
+      "available": true,
+      "component": "pp-structure",
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "cpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": false,
+        "diagnostic": ""
+      },
+      "paddle_cuda_compiled": false,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15",
+      "selection": "table/layout pages only"
+    },
+    "paddleocr_ppocr": {
+      "available": true,
+      "component": "pp-ocr",
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "cpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": false,
+        "diagnostic": ""
+      },
+      "paddle_cuda_compiled": false,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "pdf_inspector_ocr": {
+      "available": true,
+      "component": "pdf-inspector-ocr",
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "cpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": false,
+        "diagnostic": ""
+      },
+      "offline": true,
+      "paddle_cuda_compiled": false,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "runtime": {
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "cpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": false,
+        "diagnostic": ""
+      },
+      "paddle_cuda_compiled": false,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "tesseract_ocrmypdf": {
+      "available": false,
+      "component": "lightweight-baseline",
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "cpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": false,
+        "diagnostic": ""
+      },
+      "paddle_cuda_compiled": false,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    }
+  },
+  "case_count": 4,
+  "corpus_hash": "55ae9d356e82e40d5dc65065ae7c25b31b7e51b250cfd9672312c8c09883e52a",
+  "profiles": [
+    {
+      "cases": 4,
+      "chinese_exact_match": 1.0,
+      "confidence_coverage": 1.0,
+      "cpu_seconds": 8.825361778,
+      "documents_per_minute": 1.6690020956370217,
+      "heading_match": 1.0,
+      "low_quality_recall": null,
+      "mapping_error_pages": 2,
+      "mapping_error_recall": null,
+      "model_load_seconds": 13.839891892392188,
+      "native_seconds": 0.02430511126294732,
+      "numeric_exact_match": 1.0,
+      "ocr_page_p50_seconds": 35.17666426487267,
+      "ocr_page_p95_seconds": 61.337491397280246,
+      "ocr_pages": 3,
+      "ocr_pages_per_second": 0.026468299158260523,
+      "ocr_seconds": 113.34313482185826,
+      "ocr_time_share": 0.7882080397656287,
+      "p50_seconds": 36.95818024245091,
+      "p95_seconds": 69.59878210583702,
+      "pages_per_minute": 1.6690020956370217,
+      "profile": "pypdf_paddleocr",
+      "queue_wait_seconds": 0.0,
+      "results": [
+        {
+          "case_id": "600036.SH-2025-annual-report",
+          "chinese_exact_match": 1.0,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 7.2981772860000005,
+          "diagnostics": [],
+          "elapsed_seconds": 49.530462400987744,
+          "expected_mapping_error_pages": null,
+          "heading_match": 1.0,
+          "low_quality_recall": null,
+          "mapping_error_pages": 1,
+          "mapping_error_recall": null,
+          "model_load_seconds": 4.8545887167565525,
+          "native_seconds": 0,
+          "numeric_exact_match": 1.0,
+          "ocr_page_seconds": [
+            35.17666426487267
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 35.17666426487267,
+          "page_count": 350,
+          "page_text_hashes": [
+            "05b2a40b1a36eb0eadfcfe90309169e6aa4eb4a6d4fab2dbe7165286b3cc747a"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 135163904,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 2
+        },
+        {
+          "case_id": "001322.SZ-2025-annual-report",
+          "chinese_exact_match": null,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 0.47000425799999945,
+          "diagnostics": [],
+          "elapsed_seconds": 69.59878210583702,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 1,
+          "mapping_error_recall": null,
+          "model_load_seconds": 4.749961673747748,
+          "native_seconds": 0,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [
+            61.337491397280246
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 61.337491397280246,
+          "page_count": 209,
+          "page_text_hashes": [
+            "1bdf7d03ab325bdf9bb900e7f58862e18440978f080ed6011f4fbcff7839b704"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": -499712,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 2
+        },
+        {
+          "case_id": "002376.SZ-2025-annual-report",
+          "chinese_exact_match": null,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 0.773867258000001,
+          "diagnostics": [],
+          "elapsed_seconds": 24.38589808391407,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 0,
+          "mapping_error_recall": null,
+          "model_load_seconds": 4.235341501887888,
+          "native_seconds": 0,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [
+            16.82897915970534
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 16.82897915970534,
+          "page_count": 216,
+          "page_text_hashes": [
+            "293aa54a8984d5c0bba5c64990597ba8be30e49e8ea7def3faa88df75dc4fe99"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 10084352,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 1
+        },
+        {
+          "case_id": "000717.SZ-2025-annual-report-baseline",
+          "chinese_exact_match": null,
+          "confidence_coverage": null,
+          "cpu_seconds": 0.2833129759999995,
+          "diagnostics": [],
+          "elapsed_seconds": 0.28335869777947664,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 0,
+          "mapping_error_recall": null,
+          "model_load_seconds": 0.0,
+          "native_seconds": 0.02430511126294732,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [],
+          "ocr_pages": 0,
+          "ocr_seconds": 0,
+          "page_count": 217,
+          "page_text_hashes": [
+            "7d40ffb07c6ee5c05500b44b09541592007cf7d6f95da461926c81b42ca6fa34"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": -8101888,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 0
+        }
+      ],
+      "rss_delta_bytes": 135163904,
+      "success_rate": 1.0,
+      "table_structure_match": null
+    }
+  ],
+  "read_only": true,
+  "schema_version": "pdf-evaluation.v4",
+  "strata": {
+    "bounded": true,
+    "case_count": 4,
+    "counts": {
+      "mixed": 1,
+      "native": 1,
+      "scanned": 1,
+      "viewer_readable_native_mapping_corrupt": 1
+    },
+    "missing_classes": [
+      "low_quality",
+      "glyph_encoding",
+      "table",
+      "chinese_announcement"
+    ],
+    "required_classes": [
+      "native",
+      "scanned",
+      "mixed",
+      "low_quality",
+      "glyph_encoding",
+      "viewer_readable_native_mapping_corrupt",
+      "table",
+      "chinese_announcement"
+    ]
+  }
+}

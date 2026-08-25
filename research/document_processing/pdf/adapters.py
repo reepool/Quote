@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import importlib.util
 import logging
+import multiprocessing
 import os
-from pathlib import Path
+import pickle
+import queue
 import tempfile
-import time
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .core import OcrPage, PdfDiagnostic, PdfParseRequest
@@ -42,10 +45,12 @@ class PaddleOcrAdapter:
     name = "paddleocr"
     version = "paddleocr-adapter.v1"
 
-    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None) -> None:
+    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None, device: str = "cpu", process_worker: Any = None) -> None:
         self.page_renderer = page_renderer or _render_pdfium_page
         self._ocr = ocr_instance
+        self._process_worker = process_worker
         self.model_cache_dir = model_cache_dir
+        self.device = str(device or "cpu")
         self.structure = structure
         self._warmup_seconds = 0.0
         self._session_lock = threading.Lock()
@@ -79,7 +84,7 @@ class PaddleOcrAdapter:
                 raise RuntimeError("PaddleOCR runtime is not installed") from exc
             # Avoid constructing a model at import time; the session is warm
             # and reused for every page handled by this adapter instance.
-            cached = PaddleOCR(use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False, enable_mkldnn=False)
+            cached = PaddleOCR(device=self.device, use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False, enable_mkldnn=False)
             self._session_local.session = cached
             self._warmup_seconds = max(self._warmup_seconds, time.perf_counter() - started)
             return cached
@@ -87,6 +92,15 @@ class PaddleOcrAdapter:
     def extract_pages(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         if not pages:
             return {}
+        if self._ocr is None and request.profile.limits.enforce_hard_timeout:
+            if self._process_worker is None:
+                try:
+                    pickle.dumps(self.page_renderer)
+                except (pickle.PickleError, TypeError, AttributeError) as exc:
+                    raise TypeError(
+                        "custom page_renderer must be picklable when hard OCR timeouts are enabled"
+                    ) from exc
+            return self._extract_pages_with_process_timeouts(content, pages, request=request)
         batch_size = max(1, int(request.profile.limits.ocr_batch_size))
         batches = [list(pages[offset: offset + batch_size]) for offset in range(0, len(pages), batch_size)]
         workers = min(max(1, int(request.profile.limits.max_concurrency)), len(batches))
@@ -101,6 +115,134 @@ class PaddleOcrAdapter:
         for output in outputs:
             merged.update(output)
         return merged
+
+    def _extract_pages_with_process_timeouts(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
+        """Run bounded persistent workers that can be terminated on page timeout."""
+        context = multiprocessing.get_context("spawn")
+        output_queue = context.Queue()
+        pending = list(dict.fromkeys(int(page) for page in pages))
+        workers = min(max(1, int(request.profile.limits.max_concurrency)), len(pending))
+        worker_state: dict[int, dict[str, Any]] = {}
+        output: dict[int, OcrPage] = {}
+        request_without_cache = PdfParseRequest(
+            content=request.content,
+            expected_content_hash=request.expected_content_hash,
+            target_pages=request.target_pages,
+            profile=request.profile,
+            ocr_mode=request.ocr_mode,
+            recovery_policy=request.recovery_policy,
+            mode_budget=request.mode_budget,
+            parameter_overrides=request.parameter_overrides,
+        )
+        document_deadline = time.monotonic() + request.profile.limits.max_document_seconds
+
+        def start_worker(worker_id: int) -> None:
+            input_queue = context.Queue(maxsize=1)
+            worker_args = (
+                worker_id,
+                input_queue,
+                output_queue,
+                self.structure,
+                self.model_cache_dir,
+                self.device,
+            )
+            if self._process_worker is None:
+                worker_args += (self.page_renderer,)
+            process = context.Process(
+                target=self._process_worker or _paddle_process_worker,
+                args=worker_args,
+                name=f"pdf-ocr-{worker_id}",
+                daemon=True,
+            )
+            process.start()
+            worker_state[worker_id] = {"process": process, "queue": input_queue, "page": None, "deadline": None}
+
+        def assign(worker_id: int) -> None:
+            if not pending:
+                return
+            page = pending.pop(0)
+            state = worker_state[worker_id]
+            state["page"] = page
+            state["deadline"] = min(
+                time.monotonic() + request.profile.limits.max_page_seconds,
+                document_deadline,
+            )
+            state["queue"].put((bytes(content), page, request_without_cache))
+
+        def stop_worker(worker_id: int, *, terminate: bool = False) -> None:
+            state = worker_state[worker_id]
+            process = state["process"]
+            if terminate and process.is_alive():
+                process.terminate()
+            elif process.is_alive():
+                try:
+                    state["queue"].put_nowait(None)
+                except queue.Full:
+                    pass
+            process.join(timeout=0.5 if terminate else 5.0)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=2.0)
+            state["queue"].close()
+
+        for worker_id in range(workers):
+            start_worker(worker_id)
+            assign(worker_id)
+        try:
+            while any(state["page"] is not None for state in worker_state.values()):
+                now = time.monotonic()
+                active_deadlines = [state["deadline"] for state in worker_state.values() if state["page"] is not None]
+                wait_seconds = max(0.0, min(active_deadlines) - now) if active_deadlines else 0.0
+                try:
+                    worker_id, page, result, error = output_queue.get(timeout=wait_seconds)
+                except queue.Empty:
+                    worker_id = page = result = error = None
+                if worker_id is not None:
+                    state = worker_state.get(worker_id)
+                    if state and state["page"] == page:
+                        if error:
+                            diagnostic = PdfDiagnostic("ocr_failure", error, page, "error")
+                            output[page] = OcrPage("", None, 0.0, (diagnostic,), {"device": self.device})
+                        else:
+                            output[page] = result
+                        state["page"] = None
+                        state["deadline"] = None
+                        assign(worker_id)
+                now = time.monotonic()
+                for current_id, state in list(worker_state.items()):
+                    if state["page"] is None or now < state["deadline"]:
+                        continue
+                    timed_out_page = int(state["page"])
+                    document_timeout = now >= document_deadline
+                    code = "ocr_document_timeout" if document_timeout else "ocr_timeout"
+                    diagnostic = PdfDiagnostic(code, "OCR worker exceeded its hard time budget", timed_out_page, "error")
+                    output[timed_out_page] = OcrPage("", None, request.profile.limits.max_page_seconds, (diagnostic,), {"device": self.device, "worker_terminated": True})
+                    stop_worker(current_id, terminate=True)
+                    if document_timeout:
+                        state["page"] = None
+                        state["deadline"] = None
+                    elif pending:
+                        start_worker(current_id)
+                        assign(current_id)
+                    else:
+                        state["page"] = None
+                        state["deadline"] = None
+                if time.monotonic() >= document_deadline:
+                    for remaining_page in pending:
+                        diagnostic = PdfDiagnostic("ocr_document_timeout", "OCR document budget exhausted before page dispatch", remaining_page, "error")
+                        output[remaining_page] = OcrPage("", None, 0.0, (diagnostic,), {"device": self.device})
+                    pending.clear()
+                    break
+        finally:
+            for worker_id in list(worker_state):
+                state = worker_state[worker_id]
+                deadline_expired = time.monotonic() >= document_deadline
+                stop_worker(
+                    worker_id,
+                    terminate=deadline_expired and state["page"] is not None,
+                )
+            output_queue.close()
+        return output
 
     def _extract_batch(self, content: bytes, batch_pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         session = self._session()
@@ -145,6 +287,22 @@ class PaddleOcrAdapter:
                 },
             )
         return output
+
+
+def _paddle_process_worker(worker_id: int, input_queue: Any, output_queue: Any, structure: bool, model_cache_dir: str | None, device: str, page_renderer: Any) -> None:
+    adapter = PaddleOcrAdapter(page_renderer=page_renderer, structure=structure, model_cache_dir=model_cache_dir, device=device)
+    while True:
+        task = input_queue.get()
+        if task is None:
+            return
+        content, page, request = task
+        try:
+            result = adapter._extract_batch(content, [page], request=request).get(page)
+            if result is None:
+                raise RuntimeError("PaddleOCR worker returned no page result")
+            output_queue.put((worker_id, page, result, None))
+        except Exception as exc:
+            output_queue.put((worker_id, page, None, f"{type(exc).__name__}: {exc}"))
 
 
 class PdfInspectorNativeAdapter:

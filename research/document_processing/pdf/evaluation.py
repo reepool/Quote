@@ -2,17 +2,27 @@
 
 from __future__ import annotations
 
-import json
+import importlib.metadata
 import importlib.util
-import statistics
-import time
-import shutil
+import json
+import math
+import os
 import platform
+import shutil
+import statistics
+import subprocess
+import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .core import PdfDocumentResult, PdfParseRequest, PdfProfile, PdfRouter, compute_content_hash
+from .core import (
+    PdfDocumentResult,
+    PdfParseRequest,
+    PdfProfile,
+    PdfResourceLimits,
+    compute_content_hash,
+)
 
 
 @dataclass(frozen=True)
@@ -26,6 +36,9 @@ class PdfEvaluationCase:
     page_count: int | None = None
     gold: Mapping[str, Any] = field(default_factory=dict)
     target_pages: tuple[int, ...] = ()
+    ocr_mode: str = "none"
+    recovery_policy: str = "native_first"
+    mode_budget: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -55,6 +68,7 @@ class PdfEvaluationResult:
     heading_match: float | None = None
     table_structure_match: float | None = None
     low_quality_recall: float | None = None
+    ocr_page_seconds: tuple[float, ...] = ()
 
 
 def load_manifest(path: str | Path) -> tuple[PdfEvaluationCase, ...]:
@@ -176,13 +190,14 @@ def evaluate_cases(
                 pass
             if router_factory is None:
                 from .profiles import build_router
-                router = build_router(profile)
+                router = build_router(profile, allow_unapproved_gpu_canary=profile.ocr_device.startswith("gpu"))
             else:
                 router = router_factory(profile)
             target_pages = case.target_pages
             if max_pages is not None:
                 target_pages = target_pages[:max_pages] if target_pages else tuple(range(1, max_pages + 1))
-            result: PdfDocumentResult = router.parse(PdfParseRequest(content=content, expected_content_hash=case.content_hash, profile=profile, target_pages=target_pages))
+            mode_budget = PdfResourceLimits(**dict(case.mode_budget)) if case.mode_budget else None
+            result: PdfDocumentResult = router.parse(PdfParseRequest(content=content, expected_content_hash=case.content_hash, profile=profile, target_pages=target_pages, ocr_mode=case.ocr_mode, recovery_policy=case.recovery_policy, mode_budget=mode_budget))
             elapsed = time.perf_counter() - started
             cpu_elapsed = time.process_time() - cpu_started
             rss_delta = None
@@ -205,17 +220,25 @@ def evaluate_cases(
             confidence_values = [page.confidence for page in result.pages if page.extraction_method == "ocr"]
             confidence_coverage = sum(value is not None for value in confidence_values) / len(confidence_values) if confidence_values else None
             model_load_seconds = max((float(item.get("warmup_seconds", 0.0)) for page in result.pages for item in page.provenance if isinstance(item, Mapping)), default=0.0)
-            results.append(PdfEvaluationResult(case.case_id, profile.name, result.status, elapsed, result.page_count, len(result.pages), sum(page.extraction_method == "ocr" for page in result.pages), tuple(item.code for item in result.diagnostics), tuple(page.text_hash for page in result.pages), sum(page.elapsed_seconds for page in result.pages if page.extraction_method != "ocr"), sum(page.elapsed_seconds for page in result.pages if page.extraction_method == "ocr"), sum(len(page.diagnostics) for page in result.pages), mapping_pages, expected_mapping, mapping_pages / expected_mapping if expected_mapping else None, chinese_exact, numeric_exact, cpu_elapsed, rss_delta, 0.0, model_load_seconds, confidence_coverage, heading_match, table_match, low_quality_recall))
+            ocr_page_seconds = tuple(page.elapsed_seconds for page in result.pages if page.extraction_method == "ocr")
+            results.append(PdfEvaluationResult(case.case_id, profile.name, result.status, elapsed, result.page_count, len(result.pages), sum(page.extraction_method == "ocr" for page in result.pages), tuple(item.code for item in result.diagnostics), tuple(page.text_hash for page in result.pages), sum(page.elapsed_seconds for page in result.pages if page.extraction_method != "ocr"), sum(ocr_page_seconds), sum(len(page.diagnostics) for page in result.pages), mapping_pages, expected_mapping, mapping_pages / expected_mapping if expected_mapping else None, chinese_exact, numeric_exact, cpu_elapsed, rss_delta, 0.0, model_load_seconds, confidence_coverage, heading_match, table_match, low_quality_recall, ocr_page_seconds))
     grouped: dict[str, list[PdfEvaluationResult]] = {}
     for item in results:
         grouped.setdefault(item.profile, []).append(item)
     profiles_report = []
     for name, items in grouped.items():
         latencies = [item.elapsed_seconds for item in items]
+        ocr_page_latencies = [value for item in items for value in item.ocr_page_seconds]
         ocr_seconds = sum(item.ocr_seconds for item in items)
-        profiles_report.append({"profile": name, "cases": len(items), "success_rate": sum(item.status == "success" for item in items) / len(items), "p50_seconds": statistics.median(latencies), "p95_seconds": sorted(latencies)[max(0, int(len(latencies) * 0.95) - 1)], "ocr_pages": sum(item.ocr_pages for item in items), "native_seconds": sum(item.native_seconds for item in items), "ocr_seconds": ocr_seconds, "ocr_time_share": ocr_seconds / max(sum(latencies), 0.001), "ocr_pages_per_second": sum(item.ocr_pages for item in items) / max(ocr_seconds, 0.001), "documents_per_minute": len(items) / max(sum(latencies), 0.001) * 60.0, "pages_per_minute": sum(item.processed_pages for item in items) / max(sum(latencies), 0.001) * 60.0, "cpu_seconds": sum(item.cpu_seconds or 0.0 for item in items), "rss_delta_bytes": max((item.rss_delta_bytes or 0 for item in items), default=0), "queue_wait_seconds": sum(item.queue_wait_seconds for item in items), "model_load_seconds": sum(item.model_load_seconds for item in items), "confidence_coverage": statistics.mean(item.confidence_coverage for item in items if item.confidence_coverage is not None) if any(item.confidence_coverage is not None for item in items) else None, "heading_match": statistics.mean(item.heading_match for item in items if item.heading_match is not None) if any(item.heading_match is not None for item in items) else None, "table_structure_match": statistics.mean(item.table_structure_match for item in items if item.table_structure_match is not None) if any(item.table_structure_match is not None for item in items) else None, "low_quality_recall": statistics.mean(item.low_quality_recall for item in items if item.low_quality_recall is not None) if any(item.low_quality_recall is not None for item in items) else None, "mapping_error_pages": sum(item.mapping_error_pages for item in items), "mapping_error_recall": statistics.mean(item.mapping_error_recall for item in items if item.mapping_error_recall is not None) if any(item.mapping_error_recall is not None for item in items) else None, "chinese_exact_match": statistics.mean(item.chinese_exact_match for item in items if item.chinese_exact_match is not None) if any(item.chinese_exact_match is not None for item in items) else None, "numeric_exact_match": statistics.mean(item.numeric_exact_match for item in items if item.numeric_exact_match is not None) if any(item.numeric_exact_match is not None for item in items) else None, "results": [asdict(item) for item in items]})
-    corpus_hash = compute_content_hash("\n".join(f"{case.case_id}:{case.content_hash}" for case in bounded_cases).encode())
-    return {"schema_version": "pdf-evaluation.v3", "read_only": True, "corpus_hash": corpus_hash, "case_count": len(bounded_cases), "strata": stratify_cases(bounded_cases), "profiles": profiles_report}
+        profiles_report.append({"profile": name, "cases": len(items), "success_rate": sum(item.status == "success" for item in items) / len(items), "p50_seconds": statistics.median(latencies), "p95_seconds": _p95(latencies), "ocr_page_p50_seconds": statistics.median(ocr_page_latencies) if ocr_page_latencies else None, "ocr_page_p95_seconds": _p95(ocr_page_latencies) if ocr_page_latencies else None, "ocr_pages": sum(item.ocr_pages for item in items), "native_seconds": sum(item.native_seconds for item in items), "ocr_seconds": ocr_seconds, "ocr_time_share": ocr_seconds / max(sum(latencies), 0.001), "ocr_pages_per_second": sum(item.ocr_pages for item in items) / max(ocr_seconds, 0.001), "documents_per_minute": len(items) / max(sum(latencies), 0.001) * 60.0, "pages_per_minute": sum(item.processed_pages for item in items) / max(sum(latencies), 0.001) * 60.0, "cpu_seconds": sum(item.cpu_seconds or 0.0 for item in items), "rss_delta_bytes": max((item.rss_delta_bytes or 0 for item in items), default=0), "queue_wait_seconds": sum(item.queue_wait_seconds for item in items), "model_load_seconds": sum(item.model_load_seconds for item in items), "confidence_coverage": statistics.mean(item.confidence_coverage for item in items if item.confidence_coverage is not None) if any(item.confidence_coverage is not None for item in items) else None, "heading_match": statistics.mean(item.heading_match for item in items if item.heading_match is not None) if any(item.heading_match is not None for item in items) else None, "table_structure_match": statistics.mean(item.table_structure_match for item in items if item.table_structure_match is not None) if any(item.table_structure_match is not None for item in items) else None, "low_quality_recall": statistics.mean(item.low_quality_recall for item in items if item.low_quality_recall is not None) if any(item.low_quality_recall is not None for item in items) else None, "mapping_error_pages": sum(item.mapping_error_pages for item in items), "mapping_error_recall": statistics.mean(item.mapping_error_recall for item in items if item.mapping_error_recall is not None) if any(item.mapping_error_recall is not None for item in items) else None, "chinese_exact_match": statistics.mean(item.chinese_exact_match for item in items if item.chinese_exact_match is not None) if any(item.chinese_exact_match is not None for item in items) else None, "numeric_exact_match": statistics.mean(item.numeric_exact_match for item in items if item.numeric_exact_match is not None) if any(item.numeric_exact_match is not None for item in items) else None, "results": [asdict(item) for item in items]})
+    corpus_contract = json.dumps(
+        [asdict(case) for case in bounded_cases],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    corpus_hash = compute_content_hash(corpus_contract)
+    return {"schema_version": "pdf-evaluation.v4", "read_only": True, "corpus_hash": corpus_hash, "case_count": len(bounded_cases), "strata": stratify_cases(bounded_cases), "capabilities": probe_ocr_components(), "profiles": profiles_report}
 
 
 @dataclass(frozen=True)
@@ -275,12 +298,14 @@ def probe_ocr_components() -> dict[str, dict[str, Any]]:
     cuda_available = False
     paddle_version = None
     paddle_cuda_compiled = None
+    cuda_device_count = 0
     try:
         import paddle
 
         paddle_version = getattr(paddle, "__version__", None)
         paddle_cuda_compiled = bool(getattr(paddle, "is_compiled_with_cuda", lambda: False)())
-        cuda_available = bool(getattr(paddle.device, "is_compiled_with_cuda", lambda: paddle_cuda_compiled)())
+        cuda_device_count = int(paddle.device.cuda.device_count()) if paddle_cuda_compiled else 0
+        cuda_available = paddle_cuda_compiled and cuda_device_count > 0
     except Exception:
         pass
     runtime = {
@@ -289,7 +314,13 @@ def probe_ocr_components() -> dict[str, dict[str, Any]]:
         "paddle_version": paddle_version,
         "paddle_cuda_compiled": paddle_cuda_compiled,
         "cuda_available": cuda_available,
+        "cuda_device_count": cuda_device_count,
         "device": "gpu" if cuda_available else "cpu",
+        "paddleocr_version": _distribution_version("paddleocr"),
+        "pypdfium2_version": _distribution_version("pypdfium2"),
+        "pdf_inspector_version": _distribution_version("pdf-inspector"),
+        "model_cache_dir": os.environ.get("PADDLE_PDX_CACHE_HOME") or os.environ.get("QUOTE_PDF_OCR_CACHE_DIR"),
+        "nvidia_smi": _nvidia_smi_summary(),
     }
     return {
         "runtime": runtime,
@@ -308,7 +339,8 @@ def _character_recall(actual: str, expected: str) -> float:
 
 
 def _fraction_present(actual: str, expected: Sequence[str]) -> float:
-    return sum(item in actual for item in expected) / max(len(expected), 1)
+    compact_actual = "".join(actual.split())
+    return sum(item in actual or "".join(item.split()) in compact_actual for item in expected) / max(len(expected), 1)
 
 
 def _metric_at_least(profile: Mapping[str, Any], key: str, minimum: float) -> bool:
@@ -316,8 +348,89 @@ def _metric_at_least(profile: Mapping[str, Any], key: str, minimum: float) -> bo
     return minimum <= 0.0 or (value is not None and float(value) >= minimum)
 
 
+def assess_gpu_canary(
+    report: Mapping[str, Any],
+    *,
+    max_document_p95_seconds: float = 120.0,
+    max_page_p95_seconds: float = 60.0,
+    min_chinese_exact_match: float = 1.0,
+    min_numeric_exact_match: float = 1.0,
+    min_heading_match: float = 1.0,
+    min_confidence_coverage: float = 1.0,
+    min_gpu_memory_mib: float = 4096.0,
+) -> dict[str, Any]:
+    """Produce the explicit approval artifact required by the GPU profile."""
+    capabilities = report.get("capabilities", {}).get("runtime", {})
+    profiles = [item for item in report.get("profiles", ()) if "gpu" in str(item.get("profile", ""))]
+    profile = profiles[0] if profiles else {}
+    nvidia_smi = capabilities.get("nvidia_smi") or {}
+    visible_gpus = nvidia_smi.get("gpus") or ()
+    gpu_memory = [float(item.get("memory_total_mib", 0.0)) for item in visible_gpus if isinstance(item, Mapping)]
+    expected_case_count = int(report.get("case_count", 0) or 0)
+    evaluated_case_count = int(profile.get("cases", 0) or 0) if profile else 0
+    checks = {
+        "cuda_runtime": capabilities.get("cuda_available") is True,
+        "gpu_resource": nvidia_smi.get("available") is True and int(capabilities.get("cuda_device_count", 0)) > 0 and any(value >= min_gpu_memory_mib for value in gpu_memory),
+        "gpu_profile_evaluated": bool(profile),
+        "complete_corpus": expected_case_count > 0 and evaluated_case_count == expected_case_count,
+        "all_cases_success": bool(profile) and all(item.get("status") == "success" for item in profile.get("results", ())),
+        "document_p95": bool(profile) and float(profile.get("p95_seconds", float("inf"))) <= max_document_p95_seconds,
+        "page_p95": bool(profile) and profile.get("ocr_page_p95_seconds") is not None and float(profile["ocr_page_p95_seconds"]) <= max_page_p95_seconds,
+        "chinese_quality": bool(profile) and profile.get("chinese_exact_match") is not None and float(profile["chinese_exact_match"]) >= min_chinese_exact_match,
+        "numeric_quality": bool(profile) and profile.get("numeric_exact_match") is not None and float(profile["numeric_exact_match"]) >= min_numeric_exact_match,
+        "heading_quality": bool(profile) and profile.get("heading_match") is not None and float(profile["heading_match"]) >= min_heading_match,
+        "confidence_coverage": bool(profile) and profile.get("confidence_coverage") is not None and float(profile["confidence_coverage"]) >= min_confidence_coverage,
+        "no_undiagnosed_failures": bool(profile) and all(item.get("status") == "success" or item.get("diagnostics") for item in profile.get("results", ())),
+    }
+    return {"schema_version": "pdf-gpu-canary-approval.v1", "read_only": True, "corpus_hash": report.get("corpus_hash"), "profile": profile.get("profile"), "checks": checks, "gpu_canary_approved": all(checks.values())}
+
+
 def _module_available(name: str) -> bool:
     return importlib.util.find_spec(name) is not None
+
+
+def _distribution_version(name: str) -> str | None:
+    try:
+        return importlib.metadata.version(name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
+def _nvidia_smi_summary() -> Mapping[str, Any]:
+    try:
+        completed = subprocess.run(
+            ["nvidia-smi", "--query-gpu=name,driver_version,memory.total,compute_cap", "--format=csv,noheader,nounits"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=5.0,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {"available": False}
+    if completed.returncode != 0:
+        return {"available": False, "diagnostic": completed.stderr.strip()[:300]}
+    gpus = []
+    for line in completed.stdout.splitlines():
+        fields = [item.strip() for item in line.split(",")]
+        if len(fields) != 4:
+            continue
+        name, driver_version, memory_total_mib, compute_capability = fields
+        try:
+            memory = float(memory_total_mib)
+        except ValueError:
+            memory = 0.0
+        gpus.append({
+            "name": name,
+            "driver_version": driver_version,
+            "memory_total_mib": memory,
+            "compute_capability": compute_capability,
+        })
+    return {"available": bool(gpus), "gpus": gpus}
+
+
+def _p95(values: Sequence[float]) -> float:
+    ordered = sorted(values)
+    return ordered[max(0, math.ceil(len(ordered) * 0.95) - 1)]
 
 
 def write_report(report: Mapping[str, Any], path: str | Path) -> None:

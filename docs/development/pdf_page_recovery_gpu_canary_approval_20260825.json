@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "all_cases_success": true,
+    "chinese_quality": true,
+    "complete_corpus": true,
+    "confidence_coverage": true,
+    "cuda_runtime": true,
+    "document_p95": true,
+    "gpu_profile_evaluated": true,
+    "gpu_resource": true,
+    "heading_quality": true,
+    "no_undiagnosed_failures": true,
+    "numeric_quality": true,
+    "page_p95": true
+  },
+  "corpus_hash": "55ae9d356e82e40d5dc65065ae7c25b31b7e51b250cfd9672312c8c09883e52a",
+  "gpu_canary_approved": true,
+  "profile": "pypdf_paddleocr_gpu_canary",
+  "read_only": true,
+  "schema_version": "pdf-gpu-canary-approval.v1"
+}

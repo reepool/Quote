@@ -16,7 +16,15 @@ import time
 import unicodedata
 import warnings
 from dataclasses import asdict, dataclass, field, replace
-from typing import Any, Callable, Iterable, Literal, Mapping, Optional, Protocol, Sequence
+from typing import (
+    Any,
+    Callable,
+    Literal,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+)
 
 PDF_PARSER_SCHEMA_VERSION = "shared_pdf.v2"
 PDF_PARSER_VERSION = "shared-pdf-pypdf.v1"
@@ -54,6 +62,7 @@ class PdfResourceLimits:
     max_document_seconds: float = 900.0
     ocr_batch_size: int = 1
     render_dpi: int = 150
+    enforce_hard_timeout: bool = True
 
     def __post_init__(self) -> None:
         if self.max_concurrency < 1 or self.max_queue_size < 1:
@@ -92,6 +101,7 @@ class PdfProfile:
     ocr_model_cache_dir: Optional[str] = None
     mode_budgets: Mapping[str, PdfResourceLimits] = field(default_factory=dict)
     ocr_min_confidence: float = 0.60
+    ocr_device: str = "cpu"
 
 
 @dataclass(frozen=True)
@@ -459,9 +469,15 @@ class PdfRouter:
                 quality, diags = self.quality_detector(item.text, min_characters=profile.min_text_characters)
                 provenance = {"engine": getattr(self.ocr, "name", profile.ocr_engine), "mode": request.ocr_mode, **dict(item.provenance)}
                 diagnostics = previous.diagnostics + tuple(item.diagnostics) + tuple(diags)
-                if item.elapsed_seconds > limits.max_page_seconds:
+                diagnostic_codes = {item.code for item in item.diagnostics}
+                if "ocr_document_timeout" in diagnostic_codes:
                     status = "ocr_timeout"
-                    diagnostics += (PdfDiagnostic("ocr_timeout", "OCR page exceeded its time budget", number, "error", {"elapsed_seconds": item.elapsed_seconds, "max_page_seconds": limits.max_page_seconds}),)
+                elif "ocr_timeout" in diagnostic_codes or item.elapsed_seconds > limits.max_page_seconds:
+                    status = "ocr_timeout"
+                    if "ocr_timeout" not in diagnostic_codes:
+                        diagnostics += (PdfDiagnostic("ocr_timeout", "OCR page exceeded its time budget", number, "error", {"elapsed_seconds": item.elapsed_seconds, "max_page_seconds": limits.max_page_seconds}),)
+                elif "ocr_failure" in diagnostic_codes:
+                    status = "ocr_failure"
                 elif item.confidence is not None and item.confidence < profile.ocr_min_confidence:
                     status = "ocr_low_confidence"
                 elif not item.text.strip():
@@ -548,6 +564,7 @@ class PdfRouter:
             max_document_seconds=minimum("max_document_seconds") or profile.limits.max_document_seconds,
             ocr_batch_size=minimum("ocr_batch_size") or 1,
             render_dpi=minimum("render_dpi") or profile.limits.render_dpi,
+            enforce_hard_timeout=all(item.enforce_hard_timeout for item in values),
         )
 
     @staticmethod

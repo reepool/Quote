@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import io
+import json
+import time
 from pathlib import Path
 
 import pytest
@@ -8,18 +10,29 @@ from pypdf import PdfWriter
 
 from research.document_processing.pdf import (
     DEFAULT_PROFILES,
-    PdfDiagnostic,
     PdfParseRequest,
     PdfProfile,
     PdfResourceLimits,
     PdfRouter,
-    PypdfNativeAdapter,
     detect_text_quality,
     profile_from_mapping,
     resolve_profile,
 )
 from research.document_processing.pdf.adapters import PaddleOcrAdapter
 from research.document_processing.pdf.core import NativePage, NativeResult, OcrPage
+from research.document_processing.pdf.profiles import GPU_CANARY_REQUIRED_CHECKS
+
+
+def _sleeping_process_worker(worker_id, input_queue, output_queue, structure, model_cache_dir, device):
+    while True:
+        task = input_queue.get()
+        if task is None:
+            return
+        time.sleep(10)
+
+
+def _picklable_page_renderer(*_):
+    return "image"
 
 
 def _blank_pdf(page_count: int = 1) -> bytes:
@@ -185,6 +198,41 @@ def test_profile_rollout_can_be_changed_without_consumer_code(monkeypatch) -> No
         resolve_profile()
 
 
+def test_gpu_canary_profile_fails_closed_without_approval(monkeypatch) -> None:
+    monkeypatch.delenv("QUOTE_PDF_GPU_CANARY_APPROVED", raising=False)
+    with pytest.raises(ValueError, match="GPU PDF profile requires"):
+        resolve_profile("pypdf_paddleocr_gpu_canary")
+
+
+def test_gpu_canary_profile_rejects_incomplete_approval_report(monkeypatch, tmp_path) -> None:
+    report = tmp_path / "approval.json"
+    report.write_text('{"schema_version":"pdf-gpu-canary-approval.v1","profile":"pypdf_paddleocr_gpu_canary","corpus_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","gpu_canary_approved":true,"checks":{"cuda_runtime":true}}', encoding="utf-8")
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_APPROVED", "1")
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_REPORT", str(report))
+    with pytest.raises(ValueError, match="has not passed every gate"):
+        resolve_profile("pypdf_paddleocr_gpu_canary")
+
+
+def test_gpu_canary_profile_rejects_approval_for_other_corpus(monkeypatch, tmp_path) -> None:
+    report = tmp_path / "approval.json"
+    report.write_text(json.dumps({
+        "schema_version": "pdf-gpu-canary-approval.v1",
+        "profile": "pypdf_paddleocr_gpu_canary",
+        "corpus_hash": "a" * 64,
+        "gpu_canary_approved": True,
+        "checks": {name: True for name in GPU_CANARY_REQUIRED_CHECKS},
+    }), encoding="utf-8")
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_APPROVED", "1")
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_REPORT", str(report))
+    with pytest.raises(ValueError, match="has not passed every gate"):
+        resolve_profile("pypdf_paddleocr_gpu_canary")
+
+
+def test_ocr_cache_directory_can_be_supplied_by_runtime_config(monkeypatch) -> None:
+    monkeypatch.setenv("QUOTE_PDF_OCR_CACHE_DIR", "/tmp/quote-pdf-cache")
+    assert resolve_profile("pypdf_paddleocr").ocr_model_cache_dir == "/tmp/quote-pdf-cache"
+
+
 def test_default_parse_request_uses_configured_rollout_profile(monkeypatch) -> None:
     monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdf_inspector_paddleocr")
     assert PdfParseRequest(content=b"%PDF-1.4").profile.name == "pdf_inspector_paddleocr"
@@ -235,9 +283,65 @@ def test_paddle_adapter_uses_configured_concurrency_for_real_sessions() -> None:
             return session
 
     adapter = TestAdapter(page_renderer=lambda *_: "image")
-    profile = PdfProfile(name="parallel", limits=PdfResourceLimits(ocr_batch_size=1, max_concurrency=2))
+    profile = PdfProfile(
+        name="parallel",
+        limits=PdfResourceLimits(ocr_batch_size=1, max_concurrency=2, enforce_hard_timeout=False),
+    )
     result = adapter.extract_pages(b"%PDF-1.4", [1, 2], request=PdfParseRequest(content=b"%PDF-1.4", profile=profile))
 
     assert set(result) == {1, 2}
     assert len(sessions) == 2
     assert len({thread_id for session in sessions for thread_id in session.thread_ids}) == 2
+
+
+def test_paddle_adapter_terminates_worker_at_hard_page_timeout() -> None:
+    adapter = PaddleOcrAdapter(process_worker=_sleeping_process_worker)
+    profile = PdfProfile(name="hard-timeout", limits=PdfResourceLimits(max_page_seconds=0.1, max_document_seconds=1.0))
+    started = time.monotonic()
+    result = adapter.extract_pages(b"%PDF-1.4", [1], request=PdfParseRequest(content=b"%PDF-1.4", profile=profile))
+    assert time.monotonic() - started < 3.0
+    assert result[1].diagnostics[0].code == "ocr_timeout"
+    assert result[1].provenance["worker_terminated"] is True
+
+
+def test_document_deadline_terminates_every_active_worker_without_cleanup_delay() -> None:
+    adapter = PaddleOcrAdapter(process_worker=_sleeping_process_worker)
+    profile = PdfProfile(
+        name="document-timeout",
+        limits=PdfResourceLimits(
+            max_concurrency=2,
+            max_page_seconds=0.05,
+            max_document_seconds=0.1,
+        ),
+    )
+    started = time.monotonic()
+    result = adapter.extract_pages(
+        b"%PDF-1.4",
+        [1, 2],
+        request=PdfParseRequest(content=b"%PDF-1.4", profile=profile),
+    )
+    assert time.monotonic() - started < 3.0
+    assert set(result) == {1, 2}
+    assert all(page.diagnostics[0].code in {"ocr_timeout", "ocr_document_timeout"} for page in result.values())
+
+
+def test_real_paddle_with_picklable_custom_renderer_uses_hard_timeout_path(monkeypatch) -> None:
+    adapter = PaddleOcrAdapter(page_renderer=_picklable_page_renderer)
+    sentinel = {1: OcrPage("bounded")}
+    monkeypatch.setattr(adapter, "_extract_pages_with_process_timeouts", lambda *args, **kwargs: sentinel)
+    result = adapter.extract_pages(
+        b"%PDF-1.4",
+        [1],
+        request=PdfParseRequest(content=b"%PDF-1.4", profile=PdfProfile(name="custom-renderer")),
+    )
+    assert result is sentinel
+
+
+def test_hard_timeout_rejects_unpicklable_custom_renderer() -> None:
+    adapter = PaddleOcrAdapter(page_renderer=lambda *_: "image")
+    with pytest.raises(TypeError, match="page_renderer must be picklable"):
+        adapter.extract_pages(
+            b"%PDF-1.4",
+            [1],
+            request=PdfParseRequest(content=b"%PDF-1.4", profile=PdfProfile(name="custom-renderer")),
+        )

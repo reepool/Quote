@@ -10,7 +10,16 @@
       "instrument": "600036.SH",
       "page_count": 350,
       "target_pages": [2],
+      "ocr_mode": "toc_probe",
+      "recovery_policy": "selective_recovery",
+      "mode_budget": {
+        "max_pages": 1,
+        "max_page_seconds": 120,
+        "max_document_seconds": 180
+      },
       "gold": {
+        "expected_text": "第三章 管理层讨论与分析 3.6 分部经营业绩",
+        "expected_numeric": "3.6",
         "expected_headings": ["第三章 管理层讨论与分析", "3.6 分部经营业绩"],
         "toc_physical_page": 2,
         "max_full_document_ocr_pages": 20
@@ -23,8 +32,17 @@
       "document_class": "scanned",
       "instrument": "001322.SZ",
       "page_count": 209,
-      "target_pages": [],
-      "gold": {}
+      "target_pages": [8],
+      "ocr_mode": "toc_probe",
+      "recovery_policy": "force_ocr",
+      "mode_budget": {
+        "max_pages": 1,
+        "max_page_seconds": 120,
+        "max_document_seconds": 180
+      },
+      "gold": {
+        "probe_basis": "physical page 8 is the first native mapping-error page in the bounded 1-10 probe"
+      }
     },
     {
       "case_id": "002376.SZ-2025-annual-report",
@@ -33,8 +51,17 @@
       "document_class": "mixed",
       "instrument": "002376.SZ",
       "page_count": 216,
-      "target_pages": [],
-      "gold": {}
+      "target_pages": [1],
+      "ocr_mode": "toc_probe",
+      "recovery_policy": "force_ocr",
+      "mode_budget": {
+        "max_pages": 1,
+        "max_page_seconds": 120,
+        "max_document_seconds": 180
+      },
+      "gold": {
+        "probe_basis": "physical page 1 is empty under native extraction in the bounded 1-10 probe"
+      }
     },
     {
       "case_id": "000717.SZ-2025-annual-report-baseline",
@@ -43,7 +70,9 @@
       "document_class": "text_based",
       "instrument": "000717.SZ",
       "page_count": 217,
-      "target_pages": [],
+      "target_pages": [2],
+      "ocr_mode": "none",
+      "recovery_policy": "native_first",
       "gold": {}
     }
   ]

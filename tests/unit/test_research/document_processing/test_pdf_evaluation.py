@@ -3,9 +3,16 @@ from __future__ import annotations
 import hashlib
 import json
 
-from research.document_processing.pdf import PdfDiagnostic, PdfDocumentResult, PdfPageResult, PdfProfile, PdfParseRequest
+from research.document_processing.pdf import (
+    PdfDocumentResult,
+    PdfPageResult,
+    PdfParseRequest,
+    PdfProfile,
+)
 from research.document_processing.pdf.evaluation import (
     PdfAcceptanceGates,
+    _p95,
+    assess_gpu_canary,
     assess_report,
     build_archive_manifest,
     evaluate_cases,
@@ -15,6 +22,7 @@ from research.document_processing.pdf.evaluation import (
     stratify_cases,
     write_report,
 )
+from scripts.dev_validation.evaluate_pdf_page_recovery import _exit_code
 
 
 def test_manifest_requires_explicit_hash_and_write_report(tmp_path) -> None:
@@ -62,7 +70,7 @@ def test_evaluation_reports_accuracy_efficiency_and_resource_metrics(tmp_path) -
 
     report = evaluate_cases([case], [PdfProfile(name="test")], router_factory=router_factory)
     profile = report["profiles"][0]
-    assert report["schema_version"] == "pdf-evaluation.v3"
+    assert report["schema_version"] == "pdf-evaluation.v4"
     assert profile["documents_per_minute"] > 0
     assert profile["chinese_exact_match"] == 1.0
     assert profile["numeric_exact_match"] == 1.0
@@ -102,6 +110,84 @@ def test_bounded_canary_is_fail_closed_and_component_probe_is_local(tmp_path) ->
     components = probe_ocr_components()
     assert {"paddleocr_ppocr", "paddleocr_pp_structure", "pdf_inspector_ocr", "tesseract_ocrmypdf", "runtime"} <= set(components)
     assert components["runtime"]["device"] in {"cpu", "gpu"}
+
+
+def test_gpu_canary_approval_requires_runtime_quality_and_latency_gates() -> None:
+    report = {
+        "corpus_hash": "corpus",
+        "case_count": 1,
+        "capabilities": {"runtime": {
+            "cuda_available": True,
+            "cuda_device_count": 1,
+            "nvidia_smi": {"available": True, "gpus": [{"memory_total_mib": 8192.0}]},
+        }},
+        "profiles": [{
+            "profile": "pypdf_paddleocr_gpu_canary",
+            "cases": 1,
+            "p95_seconds": 10.0,
+            "ocr_page_p95_seconds": 2.0,
+            "chinese_exact_match": 1.0,
+            "numeric_exact_match": 1.0,
+            "heading_match": 1.0,
+            "confidence_coverage": 1.0,
+            "results": [{"status": "success", "diagnostics": []}],
+        }],
+    }
+    approval = assess_gpu_canary(report)
+    assert approval["gpu_canary_approved"] is True
+    report["profiles"][0]["ocr_page_p95_seconds"] = 61.0
+    assert assess_gpu_canary(report)["gpu_canary_approved"] is False
+
+
+def test_gpu_canary_approval_rejects_incomplete_corpus() -> None:
+    report = {
+        "case_count": 2,
+        "capabilities": {"runtime": {
+            "cuda_available": True,
+            "cuda_device_count": 1,
+            "nvidia_smi": {"available": True, "gpus": [{"memory_total_mib": 8192.0}]},
+        }},
+        "profiles": [{
+            "profile": "pypdf_paddleocr_gpu_canary",
+            "cases": 1,
+            "p95_seconds": 10.0,
+            "ocr_page_p95_seconds": 2.0,
+            "chinese_exact_match": 1.0,
+            "numeric_exact_match": 1.0,
+            "heading_match": 1.0,
+            "confidence_coverage": 1.0,
+            "results": [{"status": "success", "diagnostics": []}],
+        }],
+    }
+    approval = assess_gpu_canary(report)
+    assert approval["checks"]["complete_corpus"] is False
+    assert approval["gpu_canary_approved"] is False
+
+
+def test_p95_uses_nearest_rank_for_small_canary_samples() -> None:
+    assert _p95([17.0, 39.0, 60.37]) == 60.37
+
+
+def test_corpus_hash_covers_behavior_affecting_evaluation_contract(tmp_path) -> None:
+    pdf = tmp_path / "sample.pdf"
+    pdf.write_bytes(b"%PDF-1.4\nfixture")
+    first_manifest = _manifest_for(pdf, tmp_path / "first.json", gold={"expected_text": "first"})
+    second_manifest = _manifest_for(pdf, tmp_path / "second.json", gold={"expected_text": "second"})
+
+    class FakeRouter:
+        def parse(self, request):
+            page = PdfPageResult(1, "first second", "native", "usable", "hash", "page-hash")
+            return PdfDocumentResult("shared_pdf.v1", "test", request.profile.name, request.content_hash, request.parameter_hash, 1, (page,), "success")
+
+    first = evaluate_cases(load_manifest(first_manifest), [PdfProfile(name="test")], router_factory=lambda _: FakeRouter())
+    second = evaluate_cases(load_manifest(second_manifest), [PdfProfile(name="test")], router_factory=lambda _: FakeRouter())
+    assert first["corpus_hash"] != second["corpus_hash"]
+
+
+def test_gpu_evaluation_exit_code_fails_when_approval_is_rejected() -> None:
+    assert _exit_code({"gpu_canary_approved": False}) == 2
+    assert _exit_code({"gpu_canary_approved": True}) == 0
+    assert _exit_code(None) == 0
 
 
 def _manifest_for(pdf, manifest, *, gold=None):

@@ -1,26 +1,48 @@
 """Versioned, profile-driven PDF extraction shared by research consumers."""
 
+from .adapters import (
+    PaddleOcrAdapter,
+    PdfInspectorNativeAdapter,
+    PdfInspectorOcrAdapter,
+)
 from .core import (
-    PDF_PARSER_SCHEMA_VERSION,
     DEFAULT_MODE_BUDGETS,
+    PDF_PARSER_SCHEMA_VERSION,
     PdfCandidate,
     PdfDiagnostic,
     PdfDocumentResult,
+    PdfOcrMode,
+    PdfPageCacheBackend,
     PdfPageResult,
     PdfParseRequest,
     PdfProfile,
-    PdfResourceLimits,
-    PdfPageCacheBackend,
-    PdfOcrMode,
     PdfRecoveryPolicy,
+    PdfResourceLimits,
     PdfRouter,
     PypdfNativeAdapter,
     compute_content_hash,
     detect_text_quality,
 )
-from .adapters import PaddleOcrAdapter, PdfInspectorNativeAdapter, PdfInspectorOcrAdapter
-from .profiles import DEFAULT_PROFILES, build_router, profile_from_mapping, resolve_profile
-from .evaluation import MANDATORY_600036_CASE, PdfAcceptanceGates, PdfEvaluationCase, assess_report, build_archive_manifest, evaluate_cases, load_manifest, probe_ocr_components, run_bounded_canary, stratify_cases, write_report
+from .evaluation import (
+    MANDATORY_600036_CASE,
+    PdfAcceptanceGates,
+    PdfEvaluationCase,
+    assess_gpu_canary,
+    assess_report,
+    build_archive_manifest,
+    evaluate_cases,
+    load_manifest,
+    probe_ocr_components,
+    run_bounded_canary,
+    stratify_cases,
+    write_report,
+)
+from .profiles import (
+    DEFAULT_PROFILES,
+    build_router,
+    profile_from_mapping,
+    resolve_profile,
+)
 
 __all__ = [
     "PDF_PARSER_SCHEMA_VERSION",
@@ -55,6 +77,7 @@ __all__ = [
     "run_bounded_canary",
     "probe_ocr_components",
     "assess_report",
+    "assess_gpu_canary",
     "write_report",
     "MANDATORY_600036_CASE",
 ]

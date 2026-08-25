@@ -1,0 +1,322 @@
+{
+  "capabilities": {
+    "paddleocr_pp_structure": {
+      "available": true,
+      "component": "pp-structure",
+      "cuda_available": true,
+      "cuda_device_count": 1,
+      "device": "gpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "compute_capability": "6.1",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192.0,
+            "name": "GRID P4-8Q"
+          }
+        ]
+      },
+      "paddle_cuda_compiled": true,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15",
+      "selection": "table/layout pages only"
+    },
+    "paddleocr_ppocr": {
+      "available": true,
+      "component": "pp-ocr",
+      "cuda_available": true,
+      "cuda_device_count": 1,
+      "device": "gpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "compute_capability": "6.1",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192.0,
+            "name": "GRID P4-8Q"
+          }
+        ]
+      },
+      "paddle_cuda_compiled": true,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "pdf_inspector_ocr": {
+      "available": true,
+      "component": "pdf-inspector-ocr",
+      "cuda_available": true,
+      "cuda_device_count": 1,
+      "device": "gpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "compute_capability": "6.1",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192.0,
+            "name": "GRID P4-8Q"
+          }
+        ]
+      },
+      "offline": true,
+      "paddle_cuda_compiled": true,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "runtime": {
+      "cuda_available": true,
+      "cuda_device_count": 1,
+      "device": "gpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "compute_capability": "6.1",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192.0,
+            "name": "GRID P4-8Q"
+          }
+        ]
+      },
+      "paddle_cuda_compiled": true,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    },
+    "tesseract_ocrmypdf": {
+      "available": false,
+      "component": "lightweight-baseline",
+      "cuda_available": true,
+      "cuda_device_count": 1,
+      "device": "gpu",
+      "model_cache_dir": "/tmp/quote_paddlex",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "compute_capability": "6.1",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192.0,
+            "name": "GRID P4-8Q"
+          }
+        ]
+      },
+      "paddle_cuda_compiled": true,
+      "paddle_version": "3.3.1",
+      "paddleocr_version": "3.7.0",
+      "pdf_inspector_version": "1.17.0",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "pypdfium2_version": "5.13.0",
+      "python": "3.11.15"
+    }
+  },
+  "case_count": 4,
+  "corpus_hash": "55ae9d356e82e40d5dc65065ae7c25b31b7e51b250cfd9672312c8c09883e52a",
+  "profiles": [
+    {
+      "cases": 4,
+      "chinese_exact_match": 1.0,
+      "confidence_coverage": 1.0,
+      "cpu_seconds": 10.037787834000003,
+      "documents_per_minute": 5.462899776306242,
+      "heading_match": 1.0,
+      "low_quality_recall": null,
+      "mapping_error_pages": 2,
+      "mapping_error_recall": null,
+      "model_load_seconds": 19.005493432749063,
+      "native_seconds": 0.02330653788521886,
+      "numeric_exact_match": 1.0,
+      "ocr_page_p50_seconds": 2.041898147203028,
+      "ocr_page_p95_seconds": 4.3685037340037525,
+      "ocr_pages": 3,
+      "ocr_pages_per_second": 0.3953855679465504,
+      "ocr_seconds": 7.5875303582288325,
+      "ocr_time_share": 0.17270799123618796,
+      "p50_seconds": 11.82825187779963,
+      "p95_seconds": 20.155196695122868,
+      "pages_per_minute": 5.462899776306242,
+      "profile": "pypdf_paddleocr_gpu_canary",
+      "queue_wait_seconds": 0.0,
+      "results": [
+        {
+          "case_id": "600036.SH-2025-annual-report",
+          "chinese_exact_match": 1.0,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 8.612388486,
+          "diagnostics": [],
+          "elapsed_seconds": 20.155196695122868,
+          "expected_mapping_error_pages": null,
+          "heading_match": 1.0,
+          "low_quality_recall": null,
+          "mapping_error_pages": 1,
+          "mapping_error_recall": null,
+          "model_load_seconds": 7.2918810127303,
+          "native_seconds": 0,
+          "numeric_exact_match": 1.0,
+          "ocr_page_seconds": [
+            2.041898147203028
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 2.041898147203028,
+          "page_count": 350,
+          "page_text_hashes": [
+            "05b2a40b1a36eb0eadfcfe90309169e6aa4eb4a6d4fab2dbe7165286b3cc747a"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr_gpu_canary",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 891666432,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 2
+        },
+        {
+          "case_id": "001322.SZ-2025-annual-report",
+          "chinese_exact_match": null,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 0.5561886650000005,
+          "diagnostics": [],
+          "elapsed_seconds": 12.8046305635944,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 1,
+          "mapping_error_recall": null,
+          "model_load_seconds": 5.367764929309487,
+          "native_seconds": 0,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [
+            4.3685037340037525
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 4.3685037340037525,
+          "page_count": 209,
+          "page_text_hashes": [
+            "1bdf7d03ab325bdf9bb900e7f58862e18440978f080ed6011f4fbcff7839b704"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr_gpu_canary",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 12288,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 2
+        },
+        {
+          "case_id": "002376.SZ-2025-annual-report",
+          "chinese_exact_match": null,
+          "confidence_coverage": 1.0,
+          "cpu_seconds": 0.7482004970000009,
+          "diagnostics": [],
+          "elapsed_seconds": 10.85187319200486,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 0,
+          "mapping_error_recall": null,
+          "model_load_seconds": 6.345847490709275,
+          "native_seconds": 0,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [
+            1.1771284770220518
+          ],
+          "ocr_pages": 1,
+          "ocr_seconds": 1.1771284770220518,
+          "page_count": 216,
+          "page_text_hashes": [
+            "293aa54a8984d5c0bba5c64990597ba8be30e49e8ea7def3faa88df75dc4fe99"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr_gpu_canary",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 9326592,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 1
+        },
+        {
+          "case_id": "000717.SZ-2025-annual-report-baseline",
+          "chinese_exact_match": null,
+          "confidence_coverage": null,
+          "cpu_seconds": 0.12101018600000124,
+          "diagnostics": [],
+          "elapsed_seconds": 0.12101108115166426,
+          "expected_mapping_error_pages": null,
+          "heading_match": null,
+          "low_quality_recall": null,
+          "mapping_error_pages": 0,
+          "mapping_error_recall": null,
+          "model_load_seconds": 0.0,
+          "native_seconds": 0.02330653788521886,
+          "numeric_exact_match": null,
+          "ocr_page_seconds": [],
+          "ocr_pages": 0,
+          "ocr_seconds": 0,
+          "page_count": 217,
+          "page_text_hashes": [
+            "7d40ffb07c6ee5c05500b44b09541592007cf7d6f95da461926c81b42ca6fa34"
+          ],
+          "processed_pages": 1,
+          "profile": "pypdf_paddleocr_gpu_canary",
+          "queue_wait_seconds": 0.0,
+          "rss_delta_bytes": 1347584,
+          "status": "success",
+          "table_structure_match": null,
+          "warnings": 0
+        }
+      ],
+      "rss_delta_bytes": 891666432,
+      "success_rate": 1.0,
+      "table_structure_match": null
+    }
+  ],
+  "read_only": true,
+  "schema_version": "pdf-evaluation.v4",
+  "strata": {
+    "bounded": true,
+    "case_count": 4,
+    "counts": {
+      "mixed": 1,
+      "native": 1,
+      "scanned": 1,
+      "viewer_readable_native_mapping_corrupt": 1
+    },
+    "missing_classes": [
+      "low_quality",
+      "glyph_encoding",
+      "table",
+      "chinese_announcement"
+    ],
+    "required_classes": [
+      "native",
+      "scanned",
+      "mixed",
+      "low_quality",
+      "glyph_encoding",
+      "viewer_readable_native_mapping_corrupt",
+      "table",
+      "chinese_announcement"
+    ]
+  }
+}
