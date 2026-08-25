@@ -1,0 +1,354 @@
+{
+  "schema_version": "pdf-evaluation.v5",
+  "read_only": true,
+  "corpus_hash": "0b8b2798f8a80a2cb2931ec6af007d7116e7e8863cc6d917db128c9a8a34baf2",
+  "case_count": 4,
+  "strata": {
+    "case_count": 4,
+    "counts": {
+      "viewer_readable_native_mapping_corrupt": 1,
+      "native": 1,
+      "mixed": 1,
+      "scanned": 1
+    },
+    "required_classes": [
+      "native",
+      "scanned",
+      "mixed",
+      "low_quality",
+      "glyph_encoding",
+      "viewer_readable_native_mapping_corrupt",
+      "table",
+      "chinese_announcement"
+    ],
+    "missing_classes": [
+      "low_quality",
+      "glyph_encoding",
+      "table",
+      "chinese_announcement"
+    ],
+    "bounded": true
+  },
+  "capabilities": {
+    "runtime": {
+      "python": "3.11.15",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "paddle_version": "3.3.1",
+      "paddle_cuda_compiled": null,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "unprobed",
+      "paddleocr_version": "3.7.0",
+      "pypdfium2_version": "5.13.0",
+      "pdf_inspector_version": "1.17.0",
+      "model_cache_dir": "/tmp/quote-paddlex-cpu-331",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "name": "GRID P4-8Q",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192,
+            "compute_capability": "6.1"
+          }
+        ]
+      },
+      "worker_probes": {}
+    },
+    "paddleocr_ppocr": {
+      "available": true,
+      "component": "pp-ocr",
+      "python": "3.11.15",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "paddle_version": "3.3.1",
+      "paddle_cuda_compiled": null,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "unprobed",
+      "paddleocr_version": "3.7.0",
+      "pypdfium2_version": "5.13.0",
+      "pdf_inspector_version": "1.17.0",
+      "model_cache_dir": "/tmp/quote-paddlex-cpu-331",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "name": "GRID P4-8Q",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192,
+            "compute_capability": "6.1"
+          }
+        ]
+      },
+      "worker_probes": {}
+    },
+    "paddleocr_pp_structure": {
+      "available": true,
+      "component": "pp-structure",
+      "selection": "table/layout pages only",
+      "python": "3.11.15",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "paddle_version": "3.3.1",
+      "paddle_cuda_compiled": null,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "unprobed",
+      "paddleocr_version": "3.7.0",
+      "pypdfium2_version": "5.13.0",
+      "pdf_inspector_version": "1.17.0",
+      "model_cache_dir": "/tmp/quote-paddlex-cpu-331",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "name": "GRID P4-8Q",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192,
+            "compute_capability": "6.1"
+          }
+        ]
+      },
+      "worker_probes": {}
+    },
+    "pdf_inspector_ocr": {
+      "available": true,
+      "component": "pdf-inspector-ocr",
+      "offline": true,
+      "python": "3.11.15",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "paddle_version": "3.3.1",
+      "paddle_cuda_compiled": null,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "unprobed",
+      "paddleocr_version": "3.7.0",
+      "pypdfium2_version": "5.13.0",
+      "pdf_inspector_version": "1.17.0",
+      "model_cache_dir": "/tmp/quote-paddlex-cpu-331",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "name": "GRID P4-8Q",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192,
+            "compute_capability": "6.1"
+          }
+        ]
+      },
+      "worker_probes": {}
+    },
+    "tesseract_ocrmypdf": {
+      "available": false,
+      "component": "lightweight-baseline",
+      "python": "3.11.15",
+      "platform": "Linux-6.1.0-38-amd64-x86_64-with-glibc2.36",
+      "paddle_version": "3.3.1",
+      "paddle_cuda_compiled": null,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "device": "unprobed",
+      "paddleocr_version": "3.7.0",
+      "pypdfium2_version": "5.13.0",
+      "pdf_inspector_version": "1.17.0",
+      "model_cache_dir": "/tmp/quote-paddlex-cpu-331",
+      "nvidia_smi": {
+        "available": true,
+        "gpus": [
+          {
+            "name": "GRID P4-8Q",
+            "driver_version": "535.183.06",
+            "memory_total_mib": 8192,
+            "compute_capability": "6.1"
+          }
+        ]
+      },
+      "worker_probes": {}
+    }
+  },
+  "profiles": [
+    {
+      "profile": "pdfium_paddleocr_cpu",
+      "cases": 4,
+      "success_rate": 1,
+      "p50_seconds": 1.5579850627109408,
+      "p95_seconds": 65.90170399378985,
+      "ocr_page_p50_seconds": 41.656602350994945,
+      "ocr_page_p95_seconds": 41.656602350994945,
+      "ocr_pages": 1,
+      "native_seconds": 0.38110108813270926,
+      "ocr_seconds": 41.656602350994945,
+      "ocr_time_share": 0.6030162482966779,
+      "ocr_pages_per_second": 0.02400579844640439,
+      "documents_per_minute": 3.4742127639640787,
+      "pages_per_minute": 21.71382977477549,
+      "cpu_seconds": 3.411397907,
+      "rss_delta_bytes": 30658560,
+      "queue_wait_seconds": 0,
+      "model_load_seconds": 0,
+      "confidence_coverage": 1,
+      "heading_match": 1,
+      "table_structure_match": 1,
+      "low_quality_recall": 1,
+      "native_selection_match": 1,
+      "negative_ocr_match": true,
+      "mapping_error_pages": 0,
+      "mapping_error_recall": null,
+      "chinese_exact_match": 1,
+      "numeric_exact_match": 1,
+      "results": [
+        {
+          "case_id": "600036.SH-2025-native-mapping-recovery",
+          "profile": "pdfium_paddleocr_cpu",
+          "status": "success",
+          "elapsed_seconds": 2.2987568234093487,
+          "page_count": 350,
+          "processed_pages": 18,
+          "ocr_pages": 0,
+          "diagnostics": [],
+          "page_text_hashes": [
+            "f0b01173af1a097f60d4e59b245ff3f3a90f5738321beadda4008c473e5e4f28",
+            "185ca5830e0310b56aae03b07f784f435f4b80cf72fe8b6a7844b0183895cd8c",
+            "9429879a8da587d9ea37d54ff8f51856a76bc9ef1ca603a3dc93691efc46991d",
+            "69a4b1ea62c87b9c4bf441d61fe23410cf6d59b9e90f4c87c883f183a7b525e7",
+            "098d9f49a24fbaf42435e5c54f42c44c7ac8300ef0734a1af1d5a0565e633f81",
+            "c7a2bb045b4577749b995d0ae27049952d14e2fae842b936b1560c433dcd79b8",
+            "b412f6d5c9904faeafec5ead22faf48bf8c692c9f45495535564d9191cb41e62",
+            "679fd7f41ad33e3b13f9b5c4ff3c7802233745bd619f166048799a8d67a9db62",
+            "bae0e3f12ffed69c207556668d51aa6fcf599a52b81c5514197f316ca993e6f7",
+            "43aba5275dc4037b85be8047e897cf5b67bce12673f8553a36e3147bf4dc949f",
+            "9c2a73f61af28c50e9fa8d5fcd975a166b7b191b48e93c3bb7573c5c85b1966a",
+            "a42b899a25cf713d5e5df7395efcbd50ca41235cc6fda3b9886fb9c3a1580bdf",
+            "a2ebac2200fe8713344c4907a6f7011e35277c40f38eeb1d16f132a9c5d33c49",
+            "fef16223b71f8a620dea5b06fdf12753f3528c57c1346ad11ba252d509259e74",
+            "9478b7de514c08be781161a13f531b9bba662c2eb4550efe95a2ba5ea3f2d2ba",
+            "6b0d637a278a3b5a4c385cdedac5dd8033deb7fd4d88b6ef8bc27a3a1141e8ff",
+            "4de4c7e7f4b93cff3c9ffa374f3fa73bb897f142c0cfa5e786196a81dd317f82",
+            "c32f64e5f5859b9bd12a0b710433559cb53908ac3e298d020987aed6eafd0062"
+          ],
+          "native_seconds": 0.3448783620260656,
+          "ocr_seconds": 0,
+          "warnings": 0,
+          "mapping_error_pages": 0,
+          "expected_mapping_error_pages": null,
+          "mapping_error_recall": null,
+          "chinese_exact_match": 1,
+          "numeric_exact_match": 1,
+          "cpu_seconds": 2.298659739,
+          "rss_delta_bytes": 30658560,
+          "queue_wait_seconds": 0,
+          "model_load_seconds": 0,
+          "confidence_coverage": null,
+          "heading_match": 1,
+          "table_structure_match": 1,
+          "low_quality_recall": null,
+          "ocr_page_seconds": [],
+          "native_selection_match": 1,
+          "negative_ocr_match": true
+        },
+        {
+          "case_id": "000717.SZ-2025-native-baseline",
+          "profile": "pdfium_paddleocr_cpu",
+          "status": "success",
+          "elapsed_seconds": 0.06272374512627721,
+          "page_count": 217,
+          "processed_pages": 4,
+          "ocr_pages": 0,
+          "diagnostics": [],
+          "page_text_hashes": [
+            "3b99d425f90d45f6bf72ca85158e3e4738d49268a13807ec99b8a104ae314877",
+            "564b7df07a4738e9b60b589f3e6059931115573e4f009f9d4d0865d364859bb4",
+            "3105cfb1b2ebef678a4ebaa3be9a7cedf6d2b5617fa0e1cdbadc559660a09a2b",
+            "a1ffde712c268434b008609a98641434910ca1d3c3511d1b50ff264d29ff5d99"
+          ],
+          "native_seconds": 0.025313904974609613,
+          "ocr_seconds": 0,
+          "warnings": 0,
+          "mapping_error_pages": 0,
+          "expected_mapping_error_pages": null,
+          "mapping_error_recall": null,
+          "chinese_exact_match": 1,
+          "numeric_exact_match": 1,
+          "cpu_seconds": 0.06272468399999998,
+          "rss_delta_bytes": 0,
+          "queue_wait_seconds": 0,
+          "model_load_seconds": 0,
+          "confidence_coverage": null,
+          "heading_match": 1,
+          "table_structure_match": 1,
+          "low_quality_recall": null,
+          "ocr_page_seconds": [],
+          "native_selection_match": 1,
+          "negative_ocr_match": null
+        },
+        {
+          "case_id": "002376.SZ-2025-mixed-native-negative-ocr",
+          "profile": "pdfium_paddleocr_cpu",
+          "status": "success",
+          "elapsed_seconds": 0.817213302012533,
+          "page_count": 216,
+          "processed_pages": 2,
+          "ocr_pages": 0,
+          "diagnostics": [],
+          "page_text_hashes": [
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "32ed0120faabdfe374ca1f3cce62a79e03903a9e52c6e31c59846ec373344395"
+          ],
+          "native_seconds": 0.010908821132034063,
+          "ocr_seconds": 0,
+          "warnings": 2,
+          "mapping_error_pages": 0,
+          "expected_mapping_error_pages": null,
+          "mapping_error_recall": null,
+          "chinese_exact_match": 1,
+          "numeric_exact_match": null,
+          "cpu_seconds": 0.8171949359999999,
+          "rss_delta_bytes": 26841088,
+          "queue_wait_seconds": 0,
+          "model_load_seconds": 0,
+          "confidence_coverage": null,
+          "heading_match": 1,
+          "table_structure_match": null,
+          "low_quality_recall": 1,
+          "ocr_page_seconds": [],
+          "native_selection_match": 1,
+          "negative_ocr_match": true
+        },
+        {
+          "case_id": "001322.SZ-2025-forced-ocr-gold",
+          "profile": "pdfium_paddleocr_cpu",
+          "status": "success",
+          "elapsed_seconds": 65.90170399378985,
+          "page_count": 209,
+          "processed_pages": 1,
+          "ocr_pages": 1,
+          "diagnostics": [],
+          "page_text_hashes": [
+            "f73ad05e8270a307f12eda7071b74b6e7228bd4511b8dc6ce704ef028fe0bd49"
+          ],
+          "native_seconds": 0,
+          "ocr_seconds": 41.656602350994945,
+          "warnings": 0,
+          "mapping_error_pages": 0,
+          "expected_mapping_error_pages": null,
+          "mapping_error_recall": null,
+          "chinese_exact_match": 1,
+          "numeric_exact_match": 1,
+          "cpu_seconds": 0.23281854800000001,
+          "rss_delta_bytes": 999424,
+          "queue_wait_seconds": 0,
+          "model_load_seconds": 0,
+          "confidence_coverage": 1,
+          "heading_match": 1,
+          "table_structure_match": null,
+          "low_quality_recall": null,
+          "ocr_page_seconds": [
+            41.656602350994945
+          ],
+          "native_selection_match": null,
+          "negative_ocr_match": null
+        }
+      ]
+    }
+  ]
+}

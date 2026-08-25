@@ -40,9 +40,9 @@
 
 ## 6. Expanded Canary, Documentation, and Rollout
 
-- [ ] 6.1 Run PDFium-rendered GPU and CPU OCR evaluations on the expanded corpus after isolated GPU/CPU environments are available.
-- [ ] 6.2 Issue the new profile/corpus/renderer/runtime-bound GPU approval only after all gates pass.
+- [x] 6.1 Run PDFium-rendered GPU and CPU OCR evaluations on the expanded corpus after isolated GPU/CPU environments are available.
+- [x] 6.2 Issue the new profile/corpus/renderer/runtime-bound GPU approval only after all gates pass.
 - [x] 6.3 Verify native 600036 and mixed negative-OCR behavior; OCR execution remains page/budget bounded with no implicit full-document path.
-- [ ] 6.4 Enable GPU-first only after new approval and exercise rollback in a host with a healthy worker.
+- [x] 6.4 Enable GPU-first only after new approval and exercise rollback in a host with a healthy worker.
 - [x] 6.5 Update shared PDF documentation, profile references, acceptance references and inspector role runbook.
 - [ ] 6.6 Run final integrated regressions and archive after GPU milestones are delivered.

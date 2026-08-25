@@ -1,0 +1,21 @@
+{
+  "schema_version": "pdf-gpu-canary-approval.v1",
+  "read_only": true,
+  "corpus_hash": "0b8b2798f8a80a2cb2931ec6af007d7116e7e8863cc6d917db128c9a8a34baf2",
+  "profile": "pdfium_paddleocr_gpu",
+  "checks": {
+    "cuda_runtime": true,
+    "gpu_resource": true,
+    "gpu_profile_evaluated": true,
+    "complete_corpus": true,
+    "all_cases_success": true,
+    "document_p95": true,
+    "page_p95": true,
+    "chinese_quality": true,
+    "numeric_quality": true,
+    "heading_quality": true,
+    "confidence_coverage": true,
+    "no_undiagnosed_failures": true
+  },
+  "gpu_canary_approved": true
+}

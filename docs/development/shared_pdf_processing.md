@@ -65,6 +65,15 @@ numeric, and TOC gold. The reports are:
 - `pdf_page_recovery_gpu_evaluation_20260825.json`
 - `pdf_page_recovery_gpu_canary_approval_20260825.json`
 
+The expanded PDFium-first canary completed on 2026-08-26 with the same four
+hash-bound cases. Its GPU report is
+`pdfium_paddleocr_gpu_evaluation_20260826.json` and its approval is
+`pdfium_paddleocr_gpu_canary_approval_20260826.json`. All four cases passed;
+GPU document P95 was 11.59 seconds and OCR-page P95 was 1.93 seconds. The
+matching CPU worker report is `pdfium_paddleocr_cpu_evaluation_20260826.json`;
+it passed the same gold with OCR-page P95 41.66 seconds. 600036.SH, 000717.SZ,
+and mixed 002376.SZ pages selected native text and did not enter OCR.
+
 This artifact proves runtime viability only; it does not approve
 `pdfium_paddleocr_gpu`. A new approval must bind the expanded corpus,
 PDFium-rendered image hashes, profile, model, and inference configuration.
@@ -95,7 +104,7 @@ available, enable only the explicit canary:
 ```bash
 export QUOTE_PDF_ENGINE_PROFILE=pdfium_paddleocr_gpu
 export QUOTE_PDF_GPU_CANARY_APPROVED=1
-export QUOTE_PDF_GPU_CANARY_REPORT=/path/to/pdf_page_recovery_gpu_canary_approval_20260825.json
+export QUOTE_PDF_GPU_CANARY_REPORT=/path/to/pdfium_paddleocr_gpu_canary_approval_20260826.json
 export QUOTE_PDF_OCR_CACHE_DIR=/var/cache/quote/paddlex
 ```
 
