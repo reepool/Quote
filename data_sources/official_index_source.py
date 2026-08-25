@@ -14,11 +14,9 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, date
-from io import BytesIO
 from typing import Any, Dict, Iterable, List, Optional
 
 import pandas as pd
-from pypdf import PdfReader
 
 from utils import ds_logger
 from utils.http_transport import HttpTlsConfig, urlopen_bytes
@@ -116,13 +114,9 @@ class OfficialIndexLifecycleParser:
 
     @classmethod
     def extract_pdf_text(cls, pdf_bytes: bytes) -> str:
-        reader = PdfReader(BytesIO(pdf_bytes))
-        parts = []
-        for page in reader.pages:
-            text = page.extract_text() or ""
-            if text:
-                parts.append(text)
-        return "\n".join(parts)
+        from research.document_processing.pdf import PdfParseRequest, PdfRouter
+        result = PdfRouter().parse(PdfParseRequest(content=pdf_bytes))
+        return "\n".join(page.text for page in result.pages if page.text)
 
     @classmethod
     def parse_termination_announcement(

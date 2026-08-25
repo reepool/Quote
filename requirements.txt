@@ -13,6 +13,11 @@ pandas==2.2.3
 numpy==1.26.4
 openpyxl==3.1.5
 pypdf>=4.0.0
+# Shared PDF OCR/native fallback runtime. PaddleOCR models are downloaded and
+# cached at runtime; production workers may omit it when using native-only.
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+pdf-inspector==1.17.0
 
 # API and Serialization
 pydantic==2.11.0

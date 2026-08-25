@@ -1128,32 +1128,23 @@ class BrokerRiskControlPdfFactParser:
                 "unparseable_pages": [],
             }
         try:
-            from pypdf import PdfReader
-        except (
-            Exception
-        ) as exc:  # pragma: no cover - exercised only when dependency is absent
-            return "", {
-                "text_extraction": "failed",
-                "unparseable_pages": ["pypdf_unavailable"],
-                "error_message": str(exc),
-            }
-        unparseable: List[int] = []
-        pages: List[str] = []
-        try:
-            reader = PdfReader(io.BytesIO(payload))
-            for page_index, page in enumerate(reader.pages):
-                try:
-                    pages.append(page.extract_text() or "")
-                except Exception:
-                    unparseable.append(page_index)
+            from research.document_processing.pdf import PdfParseRequest, PdfRouter
+            result = PdfRouter().parse(PdfParseRequest(content=payload))
         except Exception as exc:
             return "", {
                 "text_extraction": "failed",
                 "unparseable_pages": ["document"],
                 "error_message": str(exc),
             }
+        if result.status == "failed":
+            return "", {
+                "text_extraction": "failed",
+                "unparseable_pages": [item.code for item in result.diagnostics],
+            }
+        pages = [page.text for page in result.pages]
+        unparseable = [page.page_number - 1 for page in result.pages if page.quality_status in {"native_text_mapping_error", "empty"}]
         return "\n".join(pages), {
-            "text_extraction": "pypdf",
+            "text_extraction": "shared_pdf",
             "page_count": len(pages),
             "unparseable_pages": unparseable,
             "text_length": sum(len(page) for page in pages),

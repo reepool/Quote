@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "case_id": "600036.SH-2025-annual-report",
+      "announcement_id": "ann_e9a7df3862148a4699fd3a36284fe1c7",
+      "instrument": "600036.SH",
+      "pdf_path": "data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf",
+      "content_hash": "abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79",
+      "page_count": 350,
+      "document_class": "viewer_readable_native_mapping_corrupt",
+      "gold": {"expected_native_mapping_error_pages": 341}
+    }
+  ]
+}

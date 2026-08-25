@@ -1,0 +1,1 @@
+"""Shared document-processing capabilities."""

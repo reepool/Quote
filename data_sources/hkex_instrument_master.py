@@ -12,7 +12,7 @@ import json
 import re
 import time
 from dataclasses import dataclass, field
-from io import BytesIO, StringIO
+from io import StringIO
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 import pandas as pd
@@ -579,17 +579,15 @@ class HKEXSuspensionReportProvider:
         return self.parse_pdf(raw_pdf)
 
     def parse_pdf(self, raw_pdf: bytes) -> HKEXProviderSnapshot:
-        try:
-            from pypdf import PdfReader
-        except ImportError as exc:
-            raise RuntimeError("pypdf is required to parse HKEX suspension PDF reports") from exc
-
-        reader = PdfReader(BytesIO(raw_pdf))
-        text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        from research.document_processing.pdf import PdfParseRequest, PdfRouter
+        result = PdfRouter().parse(PdfParseRequest(content=raw_pdf))
+        if result.status == "failed":
+            raise RuntimeError("shared PDF parser failed")
+        text = "\n".join(page.text for page in result.pages if page.text)
         snapshot = self.parse_text(text)
         snapshot.raw_snapshot_hash = _snapshot_hash_bytes(raw_pdf)
         snapshot.diagnostics["format"] = "pdf"
-        snapshot.diagnostics["page_count"] = len(reader.pages)
+        snapshot.diagnostics["page_count"] = result.page_count
         return snapshot
 
     @staticmethod

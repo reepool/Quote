@@ -167,38 +167,50 @@ def extract_pdf_pages(
     *,
     ocr_adapter: Optional[CorporateActionOcrAdapter] = None,
 ) -> tuple[CorporateActionPageText, ...]:
-    """Extract native page text and fail explicitly if OCR would be required."""
+    """Extract pages through the shared native-first PDF router."""
+    from research.document_processing.pdf import PdfParseRequest, PdfProfile, PdfResourceLimits, PdfRouter
+    from research.document_processing.pdf.core import OcrPage
+
     if not pdf_bytes or not pdf_bytes.startswith(b"%PDF-"):
         raise ValueError("invalid_pdf_signature")
-    try:
-        from pypdf import PdfReader
-        import io
 
-        reader = PdfReader(io.BytesIO(pdf_bytes), strict=False)
-    except Exception as exc:
-        raise ValueError(f"pdf_parse_failed:{type(exc).__name__}") from exc
+    class _CorporateActionOcr:
+        name = "corporate_action_ocr"
+
+        def extract_pages(self, content: bytes, page_numbers: Iterable[int], *, request: PdfParseRequest):
+            del request
+            output: dict[int, OcrPage] = {}
+            for page_number in page_numbers:
+                try:
+                    text = normalize_page_text(ocr_adapter.extract_page_text(content, page_number)) if ocr_adapter else ""
+                except Exception as exc:
+                    from research.document_processing.pdf import PdfDiagnostic
+                    output[page_number] = OcrPage("", diagnostics=(PdfDiagnostic("ocr_adapter_failure", str(exc), page_number, "error"),))
+                    continue
+                output[page_number] = OcrPage(text, provenance={"adapter": type(ocr_adapter).__name__ if ocr_adapter else None})
+            return output
+
+    profile = PdfProfile(
+        name="pypdf_corporate_action",
+        ocr_engine="corporate_action_ocr" if ocr_adapter is not None else None,
+        limits=PdfResourceLimits(max_ocr_pages=None),
+    )
+    result = PdfRouter(ocr=_CorporateActionOcr() if ocr_adapter is not None else None).parse(
+        PdfParseRequest(content=pdf_bytes, profile=profile)
+    )
+    if result.status == "failed":
+        code = result.diagnostics[0].code if result.diagnostics else "pdf_parse_failed"
+        raise ValueError(code)
     pages: list[CorporateActionPageText] = []
-    for index, page in enumerate(reader.pages, start=1):
-        try:
-            text = normalize_page_text(page.extract_text() or "")
-        except Exception:
-            text = ""
-        extraction_method = "native_text"
-        quality_status = "usable"
-        if not text and ocr_adapter is not None:
-            try:
-                text = normalize_page_text(ocr_adapter.extract_page_text(pdf_bytes, index))
-            except Exception:
-                text = ""
-            extraction_method = "ocr"
-            quality_status = "ocr_usable" if len(text) >= 20 else "ocr_low_quality"
-        if text and quality_status != "ocr_low_quality":
+    for page in result.pages:
+        text = normalize_page_text(page.text)
+        if text and page.quality_status not in {"native_text_mapping_error", "ocr_low_quality", "ocr_failure", "ocr_deferred"}:
             pages.append(CorporateActionPageText(
-                page_number=index,
+                page_number=page.page_number,
                 text=text,
-                text_hash=hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                extraction_method=extraction_method,
-                quality_status=quality_status,
+                text_hash=page.text_hash,
+                extraction_method=page.extraction_method,
+                quality_status="usable" if page.extraction_method != "ocr" else "ocr_usable",
             ))
     if not pages:
         raise ValueError("ocr_unavailable")
