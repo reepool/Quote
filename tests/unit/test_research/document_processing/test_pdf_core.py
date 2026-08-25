@@ -103,8 +103,9 @@ def test_router_prefers_alternate_native_then_selective_ocr() -> None:
 
 
 def test_missing_ocr_runtime_is_typed_and_profile_switch_is_config_only() -> None:
-    profile = profile_from_mapping("test", {"ocr_engine": "paddleocr", "limits": {"max_ocr_pages": 1}})
+    profile = profile_from_mapping("test", {"ocr_engine": "paddleocr", "ocr_model_cache_dir": "/tmp/quote-paddlex-test", "limits": {"max_ocr_pages": 1}})
     assert profile.name == "test"
+    assert profile.ocr_model_cache_dir == "/tmp/quote-paddlex-test"
     assert DEFAULT_PROFILES["pypdf_paddleocr"].fallback_profile == "pypdf_native"
 
 
@@ -137,3 +138,38 @@ def test_paddle_adapter_reuses_session_and_batches_pages() -> None:
     result = adapter.extract_pages(b"%PDF-1.4", [1, 2], request=PdfParseRequest(content=b"%PDF-1.4", profile=profile))
     assert [result[index].text for index in (1, 2)] == ["page-1", "page-2"]
     assert len(session.calls) == 1
+    assert result[1].provenance["model"] == "PP-OCRv6"
+
+
+def test_paddle_adapter_uses_configured_concurrency_for_real_sessions() -> None:
+    import threading
+    import time
+
+    class FakeSession:
+        def __init__(self):
+            self.thread_ids = []
+
+        def predict(self, images):
+            self.thread_ids.append(threading.get_ident())
+            time.sleep(0.01)
+            values = images if isinstance(images, list) else [images]
+            return [{"rec_texts": ["page"], "rec_scores": [0.9]} for _ in values]
+
+    sessions = []
+
+    class TestAdapter(PaddleOcrAdapter):
+        def _session(self):
+            session = getattr(self._session_local, "session", None)
+            if session is None:
+                session = FakeSession()
+                self._session_local.session = session
+                sessions.append(session)
+            return session
+
+    adapter = TestAdapter(page_renderer=lambda *_: "image")
+    profile = PdfProfile(name="parallel", limits=PdfResourceLimits(ocr_batch_size=1, max_concurrency=2))
+    result = adapter.extract_pages(b"%PDF-1.4", [1, 2], request=PdfParseRequest(content=b"%PDF-1.4", profile=profile))
+
+    assert set(result) == {1, 2}
+    assert len(sessions) == 2
+    assert len({thread_id for session in sessions for thread_id in session.thread_ids}) == 2

@@ -60,7 +60,14 @@ def build_router(profile: PdfProfile):
 
     native = native_adapter(profile.native_engine)
     alternate = native_adapter(profile.alternate_native_engine) if profile.alternate_native_engine else None
-    ocr = PaddleOcrAdapter(structure=profile.structure_pages) if profile.ocr_engine == "paddleocr" else None
+    ocr = (
+        PaddleOcrAdapter(
+            structure=profile.structure_pages,
+            model_cache_dir=profile.ocr_model_cache_dir,
+        )
+        if profile.ocr_engine == "paddleocr"
+        else None
+    )
     if profile.ocr_engine not in (None, "paddleocr"):
         raise ValueError(f"unsupported PDF OCR engine: {profile.ocr_engine}")
     return PdfRouter(native=native, alternate_native=alternate, ocr=ocr)

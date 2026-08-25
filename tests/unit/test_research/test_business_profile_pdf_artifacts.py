@@ -81,13 +81,55 @@ def test_low_text_only_enters_ocr_queue_when_page_is_targeted():
 
     artifact = extractor.extract_bytes(content, target_page_numbers=[2])
 
-    assert artifact.low_text_pages == [1, 2]
+    assert artifact.low_text_pages == [2]
     assert artifact.ocr_required_pages == [2]
-    assert artifact.pages[0].field_relevant is False
-    assert artifact.pages[0].ocr_required is False
-    assert artifact.pages[1].field_relevant is True
-    assert artifact.pages[1].ocr_required is True
+    assert artifact.pages[0].page_number == 2
+    assert artifact.pages[0].field_relevant is True
+    assert artifact.pages[0].ocr_required is True
     assert artifact.status == "ocr_required"
+
+
+def test_target_pages_are_forwarded_to_shared_router_and_profile_is_cache_identity():
+    content = _pdf_bytes(["first page native text", "second page native text"])
+    native = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_native")
+    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_paddleocr")
+
+    targeted = native.extract_bytes(content, target_page_numbers=[2])
+
+    assert [page.page_number for page in targeted.pages] == [2]
+    assert native._parameter_hash({2}) != ocr._parameter_hash({2})
+
+
+def test_artifact_page_preserves_ocr_method_confidence_and_provenance(monkeypatch):
+    from research.document_processing.pdf import PdfDocumentResult, PdfPageResult
+
+    class FakeRouter:
+        def parse(self, request):
+            page = PdfPageResult(
+                page_number=2,
+                text="OCR extracted disclosure",
+                extraction_method="ocr",
+                quality_status="ocr_success",
+                text_hash="text-hash",
+                page_result_hash="page-hash",
+                confidence=0.97,
+                provenance=({"engine": "paddleocr"},),
+            )
+            return PdfDocumentResult(
+                "shared_pdf.v1", "test", request.profile.name,
+                request.content_hash, request.parameter_hash, 2, (page,), "success",
+            )
+
+    monkeypatch.setattr("research.document_processing.pdf.build_router", lambda profile: FakeRouter())
+    artifact = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_native").extract_bytes(
+        _pdf_bytes(["unused", "native fallback"]), target_page_numbers=[2]
+    )
+
+    page = artifact.pages[0]
+    assert page.extraction_method == "ocr"
+    assert page.ocr_confidence == 0.97
+    assert page.extraction_provenance == [{"engine": "paddleocr"}]
+    assert artifact.diagnostics["extraction_methods"] == ["ocr"]
 
 
 def test_failure_classes_cover_invalid_malformed_and_encrypted_pdf():
@@ -324,6 +366,28 @@ def test_archived_manifest_page_artifact_is_hash_bound_and_reused(tmp_path):
     source_path.write_bytes(content + b"changed")
     with pytest.raises(RuntimeError, match="hash mismatch"):
         ensure_archived_pdf_page_artifact(manifest)
+
+
+def test_archived_artifact_cache_is_separate_for_engine_profiles(tmp_path):
+    source_path = tmp_path / "original" / "report.pdf"
+    source_path.parent.mkdir(parents=True)
+    content = _pdf_bytes(["Principal Business native text"])
+    source_path.write_bytes(content)
+    manifest = {
+        "source_file_id": "source-1",
+        "archive_path": str(source_path),
+        "content_hash": __import__("hashlib").sha256(content).hexdigest(),
+    }
+    store = BusinessProfilePdfArtifactStore()
+    native = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_native", low_text_character_threshold=5)
+    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_paddleocr", low_text_character_threshold=5)
+
+    first = ensure_archived_pdf_page_artifact(manifest, extractor=native, store=store)
+    second = ensure_archived_pdf_page_artifact(manifest, extractor=ocr, store=store)
+
+    assert first["cache_status"] == "miss"
+    assert second["cache_status"] == "miss"
+    assert first["artifact_path"] != second["artifact_path"]
 
 
 def test_600036_mapping_corruption_is_ocr_required_not_not_disclosed():

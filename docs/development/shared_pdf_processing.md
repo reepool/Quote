@@ -17,14 +17,25 @@ unset value resolves to `pypdf_native`; unknown or disabled values fail closed.
 
 OCR is page-addressable and lazy. Native pages do not render or load an OCR
 model. Configure `max_ocr_pages`, `max_document_seconds`, `render_dpi`, batch
-size, queue size, and concurrency through `PdfResourceLimits`. Missing OCR
-runtimes produce typed `ocr_unavailable`/`ocr_deferred` results.
+size, queue size, and concurrency through `PdfResourceLimits`. When
+`max_concurrency` is greater than one, the PaddleOCR adapter uses bounded
+worker sessions; each worker reuses its model session instead of reloading it
+for every page. Missing OCR runtimes produce typed `ocr_unavailable`/`ocr_deferred`
+results.
 
 Quote's CPU environment has `paddlepaddle==3.3.1`, `paddleocr==3.7.0`,
-`pdf-inspector==1.17.0`, and `pypdfium2` installed. Set
-`PADDLE_PDX_CACHE_HOME` to a writable model-cache directory on workers (for
-example `/var/cache/quote/paddlex`); the adapter also defaults to a temporary
-cache when unset.
+`pdf-inspector==1.17.0`, and `pypdfium2` installed. Production workers should
+set `PADDLE_PDX_CACHE_HOME` or `ocr_model_cache_dir` in the selected profile to
+a persistent writable model-cache directory (for example
+`/var/cache/quote/paddlex`). The adapter rejects a configured non-writable
+directory and records a warning/provenance marker when it has to use a
+temporary development fallback.
+
+Business-profile extraction forwards `target_page_numbers` to the shared
+router. The selected engine profile is part of the artifact parameter hash,
+so switching from `pypdf_native` to `pypdf_paddleocr` cannot reuse an artifact
+created by the other profile. Each page artifact records the selected
+`extraction_method`, OCR confidence, and engine/model provenance.
 
 ## Evaluation
 

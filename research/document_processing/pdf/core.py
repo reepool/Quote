@@ -78,6 +78,7 @@ class PdfProfile:
     parser_config_version: str = "pdf-profile.v1"
     engine_versions: Mapping[str, str] = field(default_factory=dict)
     fallback_profile: Optional[str] = None
+    ocr_model_cache_dir: Optional[str] = None
 
 
 @dataclass(frozen=True)

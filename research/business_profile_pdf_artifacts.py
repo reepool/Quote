@@ -206,6 +206,9 @@ class BusinessProfilePdfPageArtifact:
     heading_matches: List[BusinessProfileHeadingMatch] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
     page_artifact_hash: str = ""
+    extraction_method: str = "native_text"
+    ocr_confidence: Optional[float] = None
+    extraction_provenance: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -371,7 +374,13 @@ class BusinessProfilePdfArtifactExtractor:
                 parameter_hash=parameter_hash,
                 failure_class="unsupported_engine_profile",
             )
-        result = build_router(profile).parse(PdfParseRequest(content=content_bytes, profile=profile))
+        result = build_router(profile).parse(
+            PdfParseRequest(
+                content=content_bytes,
+                profile=profile,
+                target_pages=tuple(sorted(target_pages)),
+            )
+        )
         if result.status == "failed":
             code = result.diagnostics[0].code if result.diagnostics else "malformed_pdf"
             failure_class = {
@@ -468,6 +477,9 @@ class BusinessProfilePdfArtifactExtractor:
                 "ocr_required": ocr_required,
                 "heading_matches": [asdict(item) for item in matches],
                 "errors": page_errors,
+                "extraction_method": shared_page.extraction_method,
+                "ocr_confidence": shared_page.confidence,
+                "extraction_provenance": [dict(item) for item in shared_page.provenance],
             }
             pages.append(
                 BusinessProfilePdfPageArtifact(
@@ -535,6 +547,9 @@ class BusinessProfilePdfArtifactExtractor:
             "extraction_error_pages": extraction_error_pages,
             "glyph_decoding_pages": glyph_decoding_pages,
             "heading_match_count": len(heading_index),
+            "engine_profile": self.engine_profile,
+            "extraction_methods": sorted({item.extraction_method for item in pages}),
+            "ocr_page_count": sum(item.extraction_method == "ocr" for item in pages),
         }
         payload = self._artifact_payload(
             source_file_id=source_file_id,
@@ -634,6 +649,7 @@ class BusinessProfilePdfArtifactExtractor:
                     key: list(self.heading_aliases[key])
                     for key in sorted(self.heading_aliases)
                 },
+                "engine_profile": self.engine_profile,
                 "target_page_numbers": sorted(target_pages),
             }
         )

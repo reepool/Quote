@@ -7,80 +7,130 @@ usable on workers that do not install PaddleOCR or pdf-inspector.
 from __future__ import annotations
 
 import importlib.util
+import logging
 import os
+from pathlib import Path
 import tempfile
 import time
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Mapping, Sequence
 
 from .core import OcrPage, PdfDiagnostic, PdfParseRequest
 
+logger = logging.getLogger(__name__)
+
 
 class PaddleOcrAdapter:
-    """Page-addressable PaddleOCR adapter with one lazily-created session.
+    """Page-addressable PaddleOCR adapter with bounded worker sessions.
 
     The adapter accepts an injected ``page_renderer`` so deployments can use
     PDFium, PyMuPDF, or another renderer without coupling the shared contract.
+    Each worker lazily creates and then reuses one model session.
     """
 
     name = "paddleocr"
 
-    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False) -> None:
+    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None) -> None:
         self.page_renderer = page_renderer or _render_pdfium_page
         self._ocr = ocr_instance
+        self.model_cache_dir = model_cache_dir
         self.structure = structure
         self._warmup_seconds = 0.0
         self._session_lock = threading.Lock()
+        self._session_local = threading.local()
 
     @property
     def available(self) -> bool:
         return self._ocr is not None or importlib.util.find_spec("paddleocr") is not None
 
     def _session(self) -> Any:
-        if self._ocr is None:
+        if self._ocr is not None:
+            return self._ocr
+        cached = getattr(self._session_local, "session", None)
+        if cached is not None:
+            return cached
+        with self._session_lock:
             started = time.perf_counter()
-            os.environ.setdefault("PADDLE_PDX_CACHE_HOME", os.path.join(tempfile.gettempdir(), "quote_paddlex"))
+            cache_dir = self.model_cache_dir or os.environ.get("PADDLE_PDX_CACHE_HOME")
+            if not cache_dir:
+                cache_dir = os.path.join(tempfile.gettempdir(), "quote_paddlex")
+                # Keep local development usable, but make an unconfigured
+                # production cache explicit in provenance and logs.
+                logger.warning("PADDLE_PDX_CACHE_HOME is not configured; using temporary OCR cache %s", cache_dir)
+            Path(cache_dir).mkdir(parents=True, exist_ok=True)
+            if not os.access(cache_dir, os.W_OK):
+                raise RuntimeError(f"PaddleOCR model cache is not writable: {cache_dir}")
+            os.environ["PADDLE_PDX_CACHE_HOME"] = cache_dir
             try:
                 from paddleocr import PaddleOCR
             except ImportError as exc:
                 raise RuntimeError("PaddleOCR runtime is not installed") from exc
             # Avoid constructing a model at import time; the session is warm
             # and reused for every page handled by this adapter instance.
-            self._ocr = PaddleOCR(use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False, enable_mkldnn=False)
-            self._warmup_seconds = time.perf_counter() - started
-        return self._ocr
+            cached = PaddleOCR(use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False, enable_mkldnn=False)
+            self._session_local.session = cached
+            self._warmup_seconds = max(self._warmup_seconds, time.perf_counter() - started)
+            return cached
 
     def extract_pages(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         if not pages:
             return {}
-        with self._session_lock:
-            session = self._session()
-            output: dict[int, OcrPage] = {}
-            batch_size = max(1, int(request.profile.limits.ocr_batch_size))
-            for offset in range(0, len(pages), batch_size):
-                batch_pages = list(pages[offset: offset + batch_size])
-                started = time.perf_counter()
-                images = []
-                for page_number in batch_pages:
-                    image = self.page_renderer(content, page_number, request.profile.limits.render_dpi)
-                    if not isinstance(image, str):
-                        try:
-                            import numpy as np
-                            image = np.asarray(image)
-                        except ImportError as exc:
-                            raise RuntimeError("numpy is required for PaddleOCR input") from exc
-                    images.append(image)
-                if hasattr(session, "predict"):
-                    raw_results = list(session.predict(images if len(images) > 1 else images[0]))
-                else:
-                    raw_results = [session.ocr(image, cls=True) for image in images]
-                if len(raw_results) != len(batch_pages):
-                    raise RuntimeError(f"PaddleOCR returned {len(raw_results)} results for {len(batch_pages)} pages")
-                elapsed = time.perf_counter() - started
-                for page_number, result in zip(batch_pages, raw_results):
-                    text, confidence, blocks = _normalise_paddle_result(result)
-                    diagnostics = () if text else (PdfDiagnostic("ocr_empty", "PaddleOCR returned no text", page_number, "error"),)
-                    output[page_number] = OcrPage(text, confidence, elapsed / len(batch_pages), diagnostics, {"component": "pp-structure" if self.structure else "pp-ocr", "blocks": blocks, "batch_size": len(batch_pages), "warmup_seconds": self._warmup_seconds})
+        batch_size = max(1, int(request.profile.limits.ocr_batch_size))
+        batches = [list(pages[offset: offset + batch_size]) for offset in range(0, len(pages), batch_size)]
+        workers = min(max(1, int(request.profile.limits.max_concurrency)), len(batches))
+        if self._ocr is not None:
+            workers = 1
+        if workers == 1:
+            outputs = [self._extract_batch(content, batch, request=request) for batch in batches]
+        else:
+            with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="pdf-ocr") as pool:
+                outputs = list(pool.map(lambda batch: self._extract_batch(content, batch, request=request), batches))
+        merged: dict[int, OcrPage] = {}
+        for output in outputs:
+            merged.update(output)
+        return merged
+
+    def _extract_batch(self, content: bytes, batch_pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
+        session = self._session()
+        started = time.perf_counter()
+        images = []
+        for page_number in batch_pages:
+            image = self.page_renderer(content, page_number, request.profile.limits.render_dpi)
+            if not isinstance(image, str):
+                try:
+                    import numpy as np
+                    image = np.asarray(image)
+                except ImportError as exc:
+                    raise RuntimeError("numpy is required for PaddleOCR input") from exc
+            images.append(image)
+        if hasattr(session, "predict"):
+            raw_results = list(session.predict(images if len(images) > 1 else images[0]))
+        else:
+            raw_results = [session.ocr(image, cls=True) for image in images]
+        if len(raw_results) != len(batch_pages):
+            raise RuntimeError(f"PaddleOCR returned {len(raw_results)} results for {len(batch_pages)} pages")
+        elapsed = time.perf_counter() - started
+        output: dict[int, OcrPage] = {}
+        for page_number, result in zip(batch_pages, raw_results):
+            text, confidence, blocks = _normalise_paddle_result(result)
+            diagnostics = () if text else (PdfDiagnostic("ocr_empty", "PaddleOCR returned no text", page_number, "error"),)
+            output[page_number] = OcrPage(
+                text,
+                confidence,
+                elapsed / len(batch_pages),
+                diagnostics,
+                {
+                    "component": "pp-structure" if self.structure else "pp-ocr",
+                    "engine": "paddleocr",
+                    "model": request.profile.engine_versions.get("paddleocr_model", "PP-OCRv6"),
+                    "model_version": request.profile.engine_versions.get("paddleocr_model_version"),
+                    "blocks": blocks,
+                    "batch_size": len(batch_pages),
+                    "warmup_seconds": self._warmup_seconds,
+                    "model_cache_dir": self.model_cache_dir or os.environ.get("PADDLE_PDX_CACHE_HOME"),
+                },
+            )
         return output
 
 
