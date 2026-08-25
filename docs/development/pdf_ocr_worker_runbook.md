@@ -1,5 +1,10 @@
 # Isolated OCR Worker Runbook
 
+For persistent local installation, use
+[pdf_ocr_worker_deployment.md](pdf_ocr_worker_deployment.md) and
+`scripts/deploy_pdf_ocr_workers.sh`. The commands below describe the runtime
+contract and manual environment variables.
+
 The Quote process sends rendered PNG images to `research.document_processing.pdf.ocr_worker`.
 Workers never receive PDF bytes or paths. Configure:
 
