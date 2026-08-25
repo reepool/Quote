@@ -153,7 +153,10 @@
               {
                 "principal": "Reepool",
                 "token_env": "ANNOUNCEMENT_ASSET_REEPOOL_TOKEN",
-                "scopes": ["annual_report_assets:operator"]
+                "scopes": [
+                  "annual_report_assets:operator",
+                  "annual_report_assets:read_content"
+                ]
               },
               {
                 "principal": "telegram:471105519",
