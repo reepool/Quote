@@ -24,7 +24,7 @@ _REASON_PRIORITY = {
 }
 
 DAILY_TITLE_TRIGGER_POLICY_VERSION = (
-    "cninfo_corporate_action_daily_title_trigger_v7"
+    "cninfo_corporate_action_daily_title_trigger_v8"
 )
 _SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 _DAILY_ACTION_SUBJECT_MARKERS = (
@@ -173,6 +173,12 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
         )
     ):
         return "cash_performance_compensation_payment"
+    if (
+        "核查意见" in normalized_title
+        and "上市流通" in normalized_title
+        and any(marker in normalized_title for marker in ("股权分置", "股改"))
+    ):
+        return "share_reform_listing_review_opinion"
     if (
         "限售股份" in normalized_title
         and "上市流通" in normalized_title

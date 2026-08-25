@@ -151,6 +151,13 @@ def test_daily_title_trigger_rejects_unrelated_disclosures(title):
         ),
         (
             (
+                "中德证券有限责任公司关于济南高新发展股份有限公司"
+                "股权分置改革有限售条件的流通股上市流通的核查意见"
+            ),
+            "deterministic_exclusion:share_reform_listing_review_opinion",
+        ),
+        (
+            (
                 "华泰联合证券有限责任公司关于江西正邦科技股份有限公司"
                 "重整投资人受让资本公积转增的部分限售股份上市流通的核查意见"
             ),
