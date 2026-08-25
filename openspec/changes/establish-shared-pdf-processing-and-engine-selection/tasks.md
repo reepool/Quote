@@ -38,8 +38,8 @@
 
 - [ ] 4.1 Define configurable acceptance gates for fidelity, Chinese OCR accuracy, numeric/date accuracy, table/heading evidence, P95 latency, throughput, resource limits, failure rate, and operational maintainability.
 - [ ] 4.2 Define separate efficiency gates for OCR page throughput, queue wait, cold/warm tail latency, model-load amortization, and CPU/RSS/GPU budgets relative to the native baseline.
-- [ ] 4.3 Compare evaluation results against the gates and record a versioned primary/fallback/component-specialized recommendation or an explicit no-change decision.
-- [ ] 4.4 Add configuration-only activation and rollback for the selected profile; verify that consumers do not require code changes to switch profiles.
+- [x] 4.3 Compare evaluation results against the gates and record a versioned primary/fallback/component-specialized recommendation or an explicit no-change decision.
+- [x] 4.4 Add configuration-only activation and rollback for the selected profile; verify that consumers do not require code changes to switch profiles.
 - [ ] 4.5 Run a bounded canary on representative official announcement assets and verify source hash, page evidence, OCR provenance, queue behavior, resource budgets, and downstream fail-closed behavior before broader activation.
 
 ## 5. Consumer Migration
