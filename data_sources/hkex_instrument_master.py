@@ -20,7 +20,7 @@ import pandas as pd
 from utils.http_transport import HttpTlsConfig, urlopen_bytes
 
 
-HKEX_MASTER_PARSER_VERSION = "hkex-instrument-master-v1"
+HKEX_MASTER_PARSER_VERSION = "hkex-instrument-master-v2"
 OFFICIAL_SOURCES = {"hkex_securities_list", "hkexnews_active_list", "hkexnews_delisted_list"}
 
 
@@ -558,15 +558,22 @@ class HKEXSupplementalAdapter:
 class HKEXSuspensionReportProvider:
     """Parser for official HKEX prolonged-suspension reports.
 
-    The live source is PDF. Text extraction is delegated to pypdf when
-    available; tests and operator fixtures can feed extracted text directly.
+    The live source is PDF. Text extraction goes through the shared PDF
+    profile router; tests and operator fixtures can feed extracted text
+    directly. Row parsing is engine-agnostic and keys off ticker/date blocks.
     """
 
     source = "hkexnews_suspension_report"
 
-    def __init__(self, source_url: str = "", market: str = ""):
+    def __init__(
+        self,
+        source_url: str = "",
+        market: str = "",
+        profile_name: Optional[str] = None,
+    ):
         self.source_url = source_url
         self.market = market
+        self.profile_name = profile_name
 
     def fetch_pdf(self, *, timeout_sec: float = 20.0) -> HKEXProviderSnapshot:
         if not self.source_url:
@@ -579,8 +586,10 @@ class HKEXSuspensionReportProvider:
         return self.parse_pdf(raw_pdf)
 
     def parse_pdf(self, raw_pdf: bytes) -> HKEXProviderSnapshot:
-        from research.document_processing.pdf import PdfParseRequest, PdfRouter
-        result = PdfRouter().parse(PdfParseRequest(content=raw_pdf))
+        from research.document_processing.pdf import PdfParseRequest, build_router, resolve_profile
+
+        profile = resolve_profile(self.profile_name)
+        result = build_router(profile).parse(PdfParseRequest(content=raw_pdf, profile=profile))
         if result.status == "failed":
             raise RuntimeError("shared PDF parser failed")
         text = "\n".join(page.text for page in result.pages if page.text)
@@ -588,40 +597,45 @@ class HKEXSuspensionReportProvider:
         snapshot.raw_snapshot_hash = _snapshot_hash_bytes(raw_pdf)
         snapshot.diagnostics["format"] = "pdf"
         snapshot.diagnostics["page_count"] = result.page_count
+        snapshot.diagnostics["pdf_profile"] = profile.name
         return snapshot
 
-    @staticmethod
-    def _is_report_row_start(line: str) -> bool:
-        return re.match(r"^\s*\d{1,3}\.?\s{2,}\S", line or "") is not None
+    _DATE_RE = re.compile(r"\b\d{1,2}-[A-Za-z]{3}-\d{4}\b")
+    _CODE_RE = re.compile(r"\((\d{1,5})\)")
+    _HEADER_RE = re.compile(r"^\s*\d{1,3}\.?\s+\S")
 
-    @staticmethod
-    def _extract_report_block(block: List[str]) -> Optional[Dict[str, str]]:
+    @classmethod
+    def _is_report_row_start(cls, line: str) -> bool:
+        return cls._HEADER_RE.match(line or "") is not None
+
+    @classmethod
+    def _extract_report_block(cls, block: List[str]) -> Optional[Dict[str, str]]:
         if not block:
             return None
-        first = block[0]
-        match = re.match(r"^\s*\d{1,3}\.?\s{2,}(.+?)\s*$", first)
-        if not match:
-            return None
-
         date_index = None
         for index, line in enumerate(block):
-            if re.search(r"\b\d{1,2}-[A-Za-z]{3}-\d{4}\b", line or ""):
+            if cls._DATE_RE.search(line or ""):
                 date_index = index
                 break
         if date_index is None or date_index == 0:
             return None
 
-        name_lines = [match.group(1).strip()]
-        name_lines.extend(line.strip() for line in block[1:date_index] if line.strip())
-        name_text = " ".join(name_lines)
-        code_matches = re.findall(r"\((\d{1,5})\)", name_text)
+        start = 0
+        for index in range(date_index - 1, -1, -1):
+            if cls._is_report_row_start(block[index]):
+                start = index
+                break
+
+        name_text = " ".join(line.strip() for line in block[start:date_index] if line.strip())
+        code_matches = cls._CODE_RE.findall(name_text)
         if not code_matches:
             return None
         raw_code = code_matches[-1]
         code = normalize_hkex_code(raw_code)
         if not code:
             return None
-        name = re.sub(rf"\(\s*{re.escape(raw_code)}\s*\)", "", name_text).strip()
+        name = re.sub(rf"\(\s*{re.escape(raw_code)}\s*\)", "", name_text)
+        name = re.sub(r"^\s*\d{1,3}\.?\s+", "", name).strip(" \t^*#")
         return {"code": code, "name": name}
 
     def parse_text(self, raw_text: str) -> HKEXProviderSnapshot:
@@ -668,16 +682,11 @@ class HKEXSuspensionReportProvider:
             stripped = (line or "").strip()
             if not stripped:
                 continue
-            if self._is_report_row_start(stripped):
+            if stripped.startswith("Link to HKEXnews") or stripped.startswith("Posted on "):
                 if current_block:
                     flush_block()
-                current_block.append(stripped)
                 continue
-            if current_block:
-                if stripped.startswith("Link to HKEXnews") or stripped.startswith("Posted on "):
-                    flush_block()
-                    continue
-                current_block.append(stripped)
+            current_block.append(stripped)
         if current_block:
             flush_block()
         return HKEXProviderSnapshot(
@@ -796,12 +805,23 @@ class HKEXSourceEvidencePolicy:
         official_active_rows: Iterable[Dict[str, Any]],
         official_delisted_rows: Iterable[Dict[str, Any]],
     ) -> Dict[str, Any]:
-        sources = {snapshot.source for snapshot in snapshots or []}
+        snapshot_list = list(snapshots or [])
+        sources = {snapshot.source for snapshot in snapshot_list}
         error_list = list(errors or [])
         primary_active_available = "hkex_securities_list" in sources
         fallback_active_available = "hkexnews_active_list" in sources
         delisted_available = "hkexnews_delisted_list" in sources or "hkex_manual_review" in sources
-        suspension_available = "hkexnews_suspension_report" in sources or "hkex_manual_review" in sources
+        suspension_available = False
+        for snapshot in snapshot_list:
+            if snapshot.source == "hkexnews_suspension_report" and snapshot.rows:
+                suspension_available = True
+                break
+            if snapshot.source == "hkex_manual_review" and any(
+                str(row.get("status") or "").lower() == "suspended"
+                for row in snapshot.rows
+            ):
+                suspension_available = True
+                break
         has_active_rows = any(row.get("instrument_id") for row in official_active_rows or [])
         has_delisted_rows = any(row.get("instrument_id") for row in official_delisted_rows or [])
         active_fallback_used = not primary_active_available and fallback_active_available and has_active_rows

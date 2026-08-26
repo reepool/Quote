@@ -228,7 +228,8 @@
         "ordinary_equity",
         "reit",
         "etf"
-      ]
+      ],
+      "pdf_profile": ""
     },
     "default_start_years": {
       "SSE": 1990,

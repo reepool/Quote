@@ -261,8 +261,8 @@ asyncio.run(main())
 - 主 active 源：HKEX `ListOfSecurities.xlsx`，来自 HKEX Securities Lists 的 Full List of Securities。
 - 辅 active 源：HKEXnews `activestock_sehk_e.json`。
 - delisted 源：HKEXnews `inactivestock_sehk_e.json`。
-- suspension 源：HKEXnews prolonged suspension monthly PDF（Main Board / GEM）；系统通过 `pypdf` 提取文本并解析代码。若运行环境未安装 `pypdf` 或 PDF 格式变化导致解析失败，结果会降级为 warning，不会静默作为停牌证据。
-- PDF 文本解析只接受报告表格行块：行首序号（兼容 `4  Name` 与 `4.  Name` 两种格式）、公司名称中的括号代码、以及同一块内的日期行必须同时存在；说明文字里的普通数字不会被当成港股代码，避免把 `00001.HK`、`00005.HK` 等误标停牌。
+- suspension 源：HKEXnews prolonged suspension monthly PDF（Main Board / GEM）。抽字走共享 PDF profile（默认 `pdfium_native`，可用 `pdf_profile` 或 `QUOTE_PDF_ENGINE_PROFILE` 回滚到 `pypdf_native`）。行解析按 `Link to HKEXnews` 切块，再用括号代码和日期确认公司，兼容 pypdf / pdfium 的空白差异。解析 0 行或抓取失败时视为停牌源不可用：报告 warning，且不会据此把本地 `suspended` 标的改回 active。
+- PDF 文本解析只接受同时带括号代码和日期的公司块；复牌条件行（如 `1. Approval...`）和前言说明不会被当成停牌代码。
 - HKEXnews delisted JSON 若不提供真实退市日期，系统只写 `status=delisted,is_active=0,trading_status=0`，不再用同步日伪造 `delisted_date`；精确退市日后续应从 HKEX 交易安排公告或公司公告补录。
 
 研究模块应通过 `DataManager.resolve_hkex_current_universe()` 获取港股当前研究 universe。该 resolver 会复用共享 governance，优先按 metadata 过滤普通股/REIT/ETF 和 canonical counter；metadata 不可用时允许降级回退到本地 active instruments，并在 `readiness='degraded'` 和 warnings 中暴露原因。

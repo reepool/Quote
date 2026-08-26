@@ -160,6 +160,136 @@ def test_suspension_report_text_parser_emits_official_suspended_rows():
     assert by_id["00195.HK"]["status"] == "suspended"
 
 
+def test_suspension_report_text_parser_accepts_pdfium_single_space_company_rows():
+    snapshot = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdfium.txt",
+        market="Main Board",
+    ).parse_text(
+        """
+        1. This report summarises the status of companies which have been suspended for
+        three months or more.
+        1. China Longevity
+        Group Company
+        Limited (formerly
+        known as Sijia
+        Group Company
+        Limited) (1863) ^
+        14-Feb-2013 31-Jul-2019 1. Approval of resumption by Securities and
+        Futures Commission (SFC)
+        2. Inform market of material information
+        Link to HKEXnews
+        2. Wisdom Wealth
+        Resources
+        Investment
+        Holding Group Limited (7) *
+        2-Apr-2024 1-Oct-2025 1. Publish all outstanding financial results
+        Link to HKEXnews
+        """
+    )
+
+    by_id = {row["instrument_id"]: row for row in snapshot.rows}
+    assert set(by_id) == {"01863.HK", "00007.HK"}
+    assert by_id["01863.HK"]["status"] == "suspended"
+    assert by_id["00007.HK"]["trading_status"] == 0
+    assert "00001.HK" not in by_id
+
+
+def test_suspension_parse_pdf_uses_shared_profile_router(monkeypatch):
+    from research.document_processing.pdf.profiles import DEFAULT_PROFILES
+
+    captured = {}
+
+    class _Page:
+        text = (
+            "11  Renco Holdings\n"
+            "(2323)\n"
+            "20-Jan-2025 19-Jul-2026 1. Conduct an investigation\n"
+            "Link to HKEXnews\n"
+        )
+
+    class _Result:
+        status = "success"
+        page_count = 1
+        pages = (_Page(),)
+
+    class _Router:
+        def parse(self, request):
+            captured["request_profile"] = request.profile.name
+            return _Result()
+
+    def fake_resolve(name=None):
+        captured["requested_profile"] = name
+        return DEFAULT_PROFILES["pypdf_native"]
+
+    def fake_build(profile, **kwargs):
+        captured["built_profile"] = profile.name
+        return _Router()
+
+    monkeypatch.setattr("research.document_processing.pdf.resolve_profile", fake_resolve)
+    monkeypatch.setattr("research.document_processing.pdf.build_router", fake_build)
+
+    snapshot = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+        profile_name="pypdf_native",
+    ).parse_pdf(b"%PDF-1.4 test")
+
+    assert captured["requested_profile"] == "pypdf_native"
+    assert captured["built_profile"] == "pypdf_native"
+    assert captured["request_profile"] == "pypdf_native"
+    assert snapshot.diagnostics["pdf_profile"] == "pypdf_native"
+    assert snapshot.rows[0]["instrument_id"] == "02323.HK"
+
+
+def test_source_evidence_policy_treats_empty_suspension_snapshot_as_unavailable():
+    official = HKEXSecuritiesListProvider(
+        source_url="fixture://hkex_securities_list.csv"
+    ).parse_csv(_fixture("hkex_securities_list.csv"))
+    empty = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+    ).parse_text("1. This report summarises the status of companies.")
+
+    assert empty.rows == []
+    policy = HKEXSourceEvidencePolicy.assess(
+        snapshots=[official, empty],
+        errors=[],
+        official_active_rows=official.rows,
+        official_delisted_rows=[],
+    )
+
+    assert policy["suspension_source_available"] is False
+    assert policy["suspension_write_allowed"] is False
+    assert policy["reactivation_write_allowed"] is True
+
+
+def test_source_evidence_policy_accepts_nonempty_suspension_snapshot():
+    official = HKEXSecuritiesListProvider(
+        source_url="fixture://hkex_securities_list.csv"
+    ).parse_csv(_fixture("hkex_securities_list.csv"))
+    suspension = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+    ).parse_text(
+        """
+        11  Renco Holdings
+        Group Limited (2323)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+    )
+
+    policy = HKEXSourceEvidencePolicy.assess(
+        snapshots=[official, suspension],
+        errors=[],
+        official_active_rows=official.rows,
+        official_delisted_rows=[],
+    )
+
+    assert policy["suspension_source_available"] is True
+    assert policy["suspension_write_allowed"] is True
+
+
 def test_manual_review_provider_turns_operator_conclusions_into_lifecycle_evidence():
     snapshot = HKEXManualReviewProvider(source_url="fixture://manual_review.json").parse_json(
         """

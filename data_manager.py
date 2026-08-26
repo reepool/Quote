@@ -16120,6 +16120,7 @@ class DataManager:
             'fetch_supplemental_live': False,
             'write_review_discrepancies': True,
             'allowed_product_types': ['ordinary_equity', 'reit', 'etf'],
+            'pdf_profile': '',
         }
         raw_config = self.data_config.get('hkex_instrument_master_sync')
         if not isinstance(raw_config, dict):
@@ -17101,6 +17102,7 @@ class DataManager:
                 provider = HKEXSuspensionReportProvider(
                     source_url=config.get(config_url_key) or config.get(config_file_key) or '',
                     market=market,
+                    profile_name=str(config.get('pdf_profile') or '').strip() or None,
                 )
                 raw_pdf = self._read_hkex_master_binary_file(config.get(config_file_key))
                 if raw_pdf is not None:
@@ -17116,6 +17118,11 @@ class DataManager:
                     result['snapshots'].append(snapshot)
                     result['suspension_rows'].extend(snapshot.rows)
                     result['official_active_rows'].extend(snapshot.rows)
+                    if not snapshot.rows:
+                        result['warnings'].append(
+                            f"HKEX suspension report parsed 0 rows ({market}); "
+                            "treating source as unavailable"
+                        )
             except Exception as exc:
                 result['warnings'].append(f"HKEX suspension report fetch/parse failed ({market}): {exc}")
 
@@ -17453,6 +17460,12 @@ class DataManager:
                     delisted_count += 1
             for item in decisions.get('reactivation_candidates', []):
                 if not source_evidence_policy.get('reactivation_write_allowed'):
+                    continue
+                local_status = str((item.get('local') or {}).get('status') or '')
+                if (
+                    local_status == 'suspended'
+                    and not source_evidence_policy.get('suspension_source_available')
+                ):
                     continue
                 if item.get('instrument_id') not in allowed_lifecycle_ids:
                     continue
