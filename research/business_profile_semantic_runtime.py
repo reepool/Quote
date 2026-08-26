@@ -1497,6 +1497,24 @@ class BusinessProfileSemanticRuntime:
                     item["field_family"],
                     semantic_field_families_reused=1,
                 )
+                if item["field_family"] in {
+                    "atomic_activities",
+                    "named_relationships",
+                }:
+                    # A completed joint run is the durable source of truth.
+                    # Keep the existing joint metrics so reports distinguish a
+                    # persisted replay from a new model request.
+                    metrics["joint_semantic_saved_llm_calls"] = int(
+                        metrics.get("joint_semantic_saved_llm_calls") or 0
+                    ) + 1
+                    if item["field_family"] == "atomic_activities":
+                        metrics["joint_semantic_durable_replays"] = int(
+                            metrics.get("joint_semantic_durable_replays") or 0
+                        ) + 1
+                    else:
+                        metrics["joint_semantic_sibling_reuses"] = int(
+                            metrics.get("joint_semantic_sibling_reuses") or 0
+                        ) + 1
                 outputs.append({**item, **reusable, "reused": True})
                 logger.info(
                     "business-profile semantic family reused instrument_id=%s "
@@ -4310,14 +4328,10 @@ class BusinessProfileSemanticRuntime:
     ) -> dict[str, Any] | None:
         if self.result_policy != "reuse":
             return None
-        # Activities and named relationships are produced by the shared joint
-        # semantic bundle. Let that path replay its durable artifact so its
-        # sibling/durable-replay metrics and lineage remain intact.
-        if str(item.get("field_family") or "") in {
-            "atomic_activities",
-            "named_relationships",
-        }:
-            return None
+        # Joint activities/relationships are persisted as ordinary completed
+        # semantic runs as well.  Reuse the governed record identities first;
+        # replaying the raw joint artifact would regenerate evidence/record
+        # ids and can incorrectly collide with an already approved version.
         document_id = str((item.get("document") or {}).get("identity") or "")
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
