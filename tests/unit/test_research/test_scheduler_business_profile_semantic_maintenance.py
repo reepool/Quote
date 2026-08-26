@@ -466,6 +466,7 @@ def test_scheduler_forwards_manual_backfill_scope(tmp_path, monkeypatch):
         field_families=["commodity_exposure_facts"],
         runtime_identities={"rules": "v1"},
         force=True,
+        result_policy="reuse",
         max_attempts=4,
         stage_budgets={"acquire": {"max_items": 2}},
         should_stop=ANY,
@@ -490,6 +491,9 @@ def test_scheduler_marks_degraded_terminal_backfill_as_failed(tmp_path, monkeypa
             "status": "degraded",
             "reason": "terminal_work_items_present",
             "queue_health": {"claimable": 0, "running": 0, "terminal": 1},
+            "workers": {
+                "semantic": {"terminal_failures": 1},
+            },
             "throughput": {"worker_completed": 0},
         }
     )
@@ -519,6 +523,52 @@ def test_scheduler_marks_degraded_terminal_backfill_as_failed(tmp_path, monkeypa
     assert report["maintenance_tasks"][0]["status"] == (
         "terminal_work_items_present"
     )
+
+
+def test_scheduler_ignores_historical_terminal_queue_items_for_current_run(
+    tmp_path, monkeypatch
+):
+    task = _task()
+    store = BusinessProfileBackfillControlStore(tmp_path / "checkpoints")
+    manager = Mock()
+    manager.run_business_profile_backfill = AsyncMock(
+        return_value={
+            "status": "success",
+            "queue_health": {"claimable": 0, "running": 0, "terminal": 5},
+            "workers": {
+                "acquire": {"terminal_failures": 0},
+                "parse": {"terminal_failures": 0},
+                "semantic": {"terminal_failures": 0},
+                "verify": {"terminal_failures": 0},
+                "publish": {"terminal_failures": 0},
+            },
+            "throughput": {"worker_completed": 0},
+        }
+    )
+    monkeypatch.setattr(task_module, "data_manager", manager)
+    monkeypatch.setattr(
+        task_module,
+        "_business_profile_backfill_control_store",
+        lambda: store,
+    )
+
+    success = asyncio.run(
+        task.business_profile_backfill(
+            selection_policy="expanded",
+            instrument_ids=["600519.SH"],
+            start_date="2026-01-01",
+            document_types=["annual_report"],
+            field_families=["atomic_activities"],
+        )
+    )
+
+    assert success is True
+    progress = store.status()
+    assert progress["state"] == "completed"
+    assert progress["latest_result"]["run_terminal_failures"] == 0
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "success"
+    assert report["business_profile_async_production"]["queue_health"]["terminal"] == 5
 
 
 def test_scheduler_reports_nonterminal_degraded_backfill_as_warning(

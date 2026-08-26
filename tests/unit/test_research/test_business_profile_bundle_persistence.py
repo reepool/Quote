@@ -1,3 +1,4 @@
+import json
 import sqlite3
 
 import pytest
@@ -217,6 +218,37 @@ def test_replace_bundle_attaches_successor_and_preserves_prior_version(tmp_path)
     assert prior["review_status"] == "approved"
     assert successor["supersedes_record_id"] == "fact-1"
     assert successor["version"] == 2
+
+
+def test_reuse_bundle_keeps_nonzero_report_flow_candidate(tmp_path):
+    repository, _storage = _repository(tmp_path)
+    positive = _operating_fact(record_id="fact-positive")
+    zero = _operating_fact(record_id="fact-zero")
+    zero["value_raw"] = 0.0
+    zero["value_normalized"] = 0.0
+    run = _run("run-reuse-conflict")
+    run["metadata"] = {"result_policy": "reuse"}
+
+    repository.persist_document_field_family_bundle(
+        run=run,
+        records_by_type={
+            "evidence": [_evidence()],
+            "operating_facts": [positive, zero],
+        },
+    )
+
+    facts = repository.list_records("operating_facts")
+    assert [item["record_id"] for item in facts] == ["fact-positive"]
+    assert facts[0]["value_raw"] == 100.0
+    with repository.storage.get_connection() as conn:
+        metadata = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs "
+                "WHERE run_id = ?",
+                ("run-reuse-conflict",),
+            ).fetchone()[0]
+        )
+    assert metadata["record_ids"]["operating_facts"] == ["fact-positive"]
 
 
 def test_bundle_collapses_identical_primary_keys(tmp_path):

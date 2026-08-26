@@ -706,6 +706,13 @@ class BusinessProfileRepository:
         ):
             raise ValueError("business profile bundle product catalog version mismatch")
         prepared_at = get_shanghai_time().isoformat()
+        run_metadata = run_payload.get("metadata") or {}
+        result_policy_value = run_metadata.get("result_policy")
+        # Older direct repository callers omit the policy and retain the
+        # original strict replay contract. The async production runtime always
+        # supplies it explicitly, so only that path gets conservative reuse.
+        result_policy = str(result_policy_value or "reuse").strip().lower()
+        reuse_requested = result_policy_value is not None and result_policy == "reuse"
         prepared_by_type: Dict[str, List[Dict[str, Any]]] = {}
         total_records = 0
         for record_type, raw_records in records_by_type.items():
@@ -718,18 +725,17 @@ class BusinessProfileRepository:
                 for row in rows
             ]
             prepared = _collapse_identical_bundle_records(record_type, prepared)
-            self._validate_prepared_batch_temporal(record_type, prepared)
+            self._validate_prepared_batch_temporal(
+                record_type,
+                prepared,
+                allow_reuse_conflicts=reuse_requested,
+            )
             prepared_by_type[record_type] = prepared
         # A replace run is an explicit request to publish a new observation for
         # the same report flow. Link it to the current candidate/approved
         # version so temporal governance can retain history without treating
         # the rerun as an accidental duplicate.
-        replace_requested = (
-            str((run_payload.get("metadata") or {}).get("result_policy") or "reuse")
-            .strip()
-            .lower()
-            == "replace"
-        )
+        replace_requested = result_policy == "replace"
         run_id = str(run_payload["run_id"])
         for record_type, prepared in prepared_by_type.items():
             if record_type == "evidence":
@@ -747,14 +753,49 @@ class BusinessProfileRepository:
                         f"bundle record evidence_id is required: {record_type}:{item['pk_value']}"
                     )
         counts = {
-            "evidence_count": len(prepared_by_type.get("evidence", [])),
+            "evidence_count": sum(
+                1
+                for item in prepared_by_type.get("evidence", [])
+                if not item.get("skip_write")
+            ),
             "fact_count": sum(
-                len(prepared_by_type.get(key, []))
+                sum(
+                    1
+                    for item in prepared_by_type.get(key, [])
+                    if not item.get("skip_write")
+                )
                 for key in ("segments", "operating_facts", "exposure_facts")
             ),
-            "activity_count": len(prepared_by_type.get("activities", [])),
-            "relationship_count": len(prepared_by_type.get("relationships", [])),
+            "activity_count": sum(
+                1
+                for item in prepared_by_type.get("activities", [])
+                if not item.get("skip_write")
+            ),
+            "relationship_count": sum(
+                1
+                for item in prepared_by_type.get("relationships", [])
+                if not item.get("skip_write")
+            ),
         }
+        # Keep the durable run manifest aligned with rows that will actually
+        # be written. Skipped reuse conflicts remain available in the raw
+        # semantic artifact, but must not make a later family replay reject
+        # an otherwise complete run for missing record ids.
+        run_metadata = dict(run_payload.get("metadata") or {})
+        record_ids = dict(run_metadata.get("record_ids") or {})
+        for record_type, prepared in prepared_by_type.items():
+            if record_type == "evidence":
+                continue
+            record_ids[record_type] = [
+                item["pk_value"] for item in prepared if not item.get("skip_write")
+            ]
+        run_metadata["record_ids"] = record_ids
+        run_metadata["evidence_ids"] = [
+            item["pk_value"]
+            for item in prepared_by_type.get("evidence", [])
+            if not item.get("skip_write")
+        ]
+        run_payload["metadata"] = run_metadata
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -830,16 +871,27 @@ class BusinessProfileRepository:
                                 dict(zip(spec["columns"], item["values"])),
                             )
                             if existing_content_hash != incoming_content_hash:
-                                raise ValueError(
-                                    "business profile terminal-state race changed content: "
-                                    f"{record_type}:{item['pk_value']}"
-                                )
+                                if reuse_requested:
+                                    # Reuse must never replace an approved or
+                                    # held fact because a replay produced a
+                                    # different candidate identity. Keep the
+                                    # governed row and complete the replay;
+                                    # the differing candidate is retained in
+                                    # the semantic artifact for diagnosis.
+                                    item["skip_write"] = True
+                                    item["reuse_conflict"] = True
+                                else:
+                                    raise ValueError(
+                                        "business profile terminal-state race changed content: "
+                                        f"{record_type}:{item['pk_value']}"
+                                    )
                             item["skip_write"] = True
                         self._validate_temporal_state(
                             conn,
                             record_type,
                             item,
                             prepared_by_pk=prepared_by_pk,
+                            allow_reuse_conflict=reuse_requested,
                         )
                         if record_type != "evidence":
                             evidence_id = str(
@@ -983,11 +1035,17 @@ class BusinessProfileRepository:
         self,
         record_type: str,
         prepared: Sequence[Dict[str, Any]],
+        *,
+        allow_reuse_conflicts: bool = False,
     ) -> None:
         policy = get_business_profile_temporal_policy(record_type)
         for index, left in enumerate(prepared):
             for right in prepared[index + 1 :]:
-                if left["status"] == "candidate" and right["status"] == "candidate":
+                if (
+                    left["status"] == "candidate"
+                    and right["status"] == "candidate"
+                    and not allow_reuse_conflicts
+                ):
                     continue
                 if not self._same_stable_identity(
                     policy.stable_identity_fields,
@@ -1000,6 +1058,13 @@ class BusinessProfileRepository:
                     left["payload"],
                     right["payload"],
                 ):
+                    if allow_reuse_conflicts and record_type in {
+                        "operating_facts", "segments"
+                    }:
+                        winner = self._prefer_report_flow_candidate(left, right)
+                        loser = right if winner is left else left
+                        loser["skip_write"] = True
+                        continue
                     raise ValueError(
                         "business profile temporal conflict within bulk batch: "
                         f"{record_type}:{left['pk_value']}:{right['pk_value']}"
@@ -1012,7 +1077,10 @@ class BusinessProfileRepository:
         prepared: Dict[str, Any],
         *,
         prepared_by_pk: Optional[Dict[str, Dict[str, Any]]] = None,
+        allow_reuse_conflict: bool = False,
     ) -> None:
+        if prepared.get("skip_write"):
+            return
         policy = get_business_profile_temporal_policy(record_type)
         spec = prepared["spec"]
         payload = prepared["payload"]
@@ -1057,10 +1125,91 @@ class BusinessProfileRepository:
             if pointer and str(existing.get(spec["pk"])) == pointer:
                 continue
             if self._temporal_versions_conflict(record_type, payload, existing):
+                if self._equivalent_report_flow_content(record_type, payload, existing):
+                    # A replay can produce a new record id when evidence spans
+                    # are regenerated, while the reported fact is unchanged.
+                    # Link it to the governed version instead of treating the
+                    # same fact as a temporal contradiction.
+                    if pointer:
+                        continue
+                    payload[pointer_column] = str(existing[spec["pk"]])
+                    payload["version"] = max(
+                        int(payload.get("version") or 1),
+                        int(existing.get("version") or 0) + 1,
+                    )
+                    prepared["values"] = [
+                        _json_dumps(
+                            payload.get(column[:-5])
+                            if column.endswith("_json")
+                            else payload.get(column)
+                        )
+                        if column in spec["json"]
+                        else payload.get(column)
+                        for column in spec["columns"]
+                    ]
+                    continue
+                if allow_reuse_conflict and record_type in {
+                    "operating_facts", "segments"
+                }:
+                    # Reuse is intentionally conservative: an already held or
+                    # approved report-flow fact remains authoritative. The
+                    # conflicting replay candidate stays in its semantic
+                    # artifact and is retriable through an explicit replace
+                    # run, instead of aborting the whole document bundle.
+                    prepared["skip_write"] = True
+                    return
                 raise ValueError(
                     "business profile temporal conflict: "
                     f"{record_type}:{prepared['pk_value']}:{existing.get(spec['pk'])}"
                 )
+
+    @staticmethod
+    def _equivalent_report_flow_content(
+        record_type: str,
+        left: Mapping[str, Any],
+        right: Mapping[str, Any],
+    ) -> bool:
+        """Return whether two report-flow rows carry the same reported fact."""
+
+        if record_type not in {"operating_facts", "segments"}:
+            return False
+        fields = (
+            (
+                "report_period", "segment_id", "project_id", "fact_type",
+                "value_raw", "unit_raw", "value_normalized", "unit_normalized",
+                "fact_scope", "currency", "equity_basis", "valid_from", "valid_to",
+            )
+            if record_type == "operating_facts"
+            else (
+                "report_period", "segment_id", "segment_type",
+                "consolidation_scope", "revenue", "revenue_share", "segment_cost",
+                "cost_share", "segment_profit", "profit_share", "gross_margin",
+                "segment_assets", "currency", "geography", "valid_from", "valid_to",
+            )
+        )
+        return all(left.get(field) == right.get(field) for field in fields)
+
+    @staticmethod
+    def _prefer_report_flow_candidate(
+        left: Dict[str, Any], right: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Choose a deterministic winner for duplicate reuse candidates.
+
+        A zero measurement is commonly emitted for an unfulfilled contract
+        row alongside the fulfilled amount in the same annual-report table.
+        Reuse keeps the non-zero reported fact and leaves the discarded row in
+        the semantic artifact for audit. Other conflicts retain source order;
+        explicit ``result_policy=replace`` is required to change history.
+        """
+
+        left_value = left["payload"].get("value_raw")
+        right_value = right["payload"].get("value_raw")
+        try:
+            left_zero = float(left_value) == 0.0
+            right_zero = float(right_value) == 0.0
+        except (TypeError, ValueError):
+            left_zero = right_zero = False
+        return left if (not left_zero or right_zero) else right
 
     @staticmethod
     def _same_stable_identity(

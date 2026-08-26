@@ -584,6 +584,8 @@ def _format_business_profile_backfill_progress(progress: Dict[str, Any]) -> str:
         f"phase_ready: {bool(readiness.get('phase_ready'))}\n"
         f"本批: 入队{int(throughput.get('enqueued') or enqueue.get('inserted') or 0)}，"
         f"完整完成{int(throughput.get('worker_completed') or 0)}\n"
+        f"本批终态失败: {int(latest.get('run_terminal_failures') or 0)}，"
+        f"队列历史终态: {int(queue.get('terminal') or 0)}\n"
         f"累计: {worker_text}\n"
         f"语义结果: 候选{int(publication.get('candidate_records') or 0)}，"
         f"已核验{int(publication.get('verified_records') or 0)}，"
@@ -8537,15 +8539,24 @@ class ScheduledTasks:
                     lambda: store.should_stop(run_id) is not None
                 )
                 result_status = str(result.get("status") or "failed").lower()
-                terminal_items = int(
-                    (result.get("queue_health") or {}).get("terminal") or 0
+                # queue_health is a scoped snapshot of the durable queue and
+                # includes terminal work left by earlier runs.  It must not be
+                # used as the outcome of this invocation: a reuse run can
+                # legitimately claim nothing while historical terminal items
+                # remain.  Worker terminal_failures are the failures produced
+                # by this pass and are the only terminal gate for the pass.
+                run_terminal_failures = sum(
+                    int((worker or {}).get("terminal_failures") or 0)
+                    for worker in (result.get("workers") or {}).values()
+                    if isinstance(worker, dict)
                 )
+                result["run_terminal_failures"] = run_terminal_failures
                 warning_completed = (
-                    result_status == "degraded" and terminal_items == 0
+                    result_status == "degraded" and run_terminal_failures == 0
                 )
                 success = (
                     result_status in {"success", "disabled", "stopped"}
-                    and terminal_items == 0
+                    and run_terminal_failures == 0
                 )
                 completed = success or warning_completed
                 result_reason = str(
