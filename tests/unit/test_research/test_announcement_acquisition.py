@@ -90,6 +90,16 @@ def test_scope_key_excludes_run_window_and_bounds_but_includes_stream_identity()
     )
 
     assert left.scope_key == right.scope_key
+    assert left.scope_key == AnnouncementScope(
+        exchange="SSE",
+        symbol="600000",
+        start_date="2026-03-01",
+        end_date="2026-04-01",
+        page_size=30,
+        max_pages=10,
+        keyword="年度报告",
+        source_options={"adaptive_pagination": True},
+    ).scope_key
     assert left.scope_key != different.scope_key
 
 
@@ -661,6 +671,47 @@ def test_cninfo_provider_preflights_reported_total_before_page_bound():
     assert result.diagnostics["last_page_scanned"] == 1
     assert result.diagnostics["next_page"] == 2
     assert len(session.calls) == 1
+
+
+def test_cninfo_provider_adapts_page_budget_to_reported_market_total():
+    full_page = [
+        {
+            "announcementId": f"adaptive-{index}",
+            "announcementTitle": f"公告{index}",
+            "announcementTime": 1777392000000 - index,
+        }
+        for index in range(30)
+    ]
+    tail_page = [
+        {
+            "announcementId": "adaptive-tail",
+            "announcementTitle": "公告尾页",
+            "announcementTime": 1777391999000,
+        }
+    ]
+    session = _Session(
+        payloads=[
+            {"announcements": full_page, "totalpages": 3},
+            {"announcements": full_page, "totalpages": 3},
+            {"announcements": tail_page, "totalpages": 3},
+        ]
+    )
+
+    result = _cninfo_provider(session).discover(
+        _query(
+            page_size=30,
+            max_pages=1,
+            source_options={"adaptive_pagination": True},
+        )
+    )
+
+    assert result.status == "success"
+    assert result.is_complete is True
+    assert result.stop_reason == "last_page"
+    assert result.pages_scanned == 3
+    assert result.announcements_seen == 61
+    assert result.diagnostics["adaptive_pagination"] is True
+    assert [call["data"]["pageNum"] for call in session.calls] == ["1", "2", "3"]
 
 
 @pytest.mark.parametrize(

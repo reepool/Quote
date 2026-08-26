@@ -182,6 +182,14 @@ class AnnouncementScope:
 
     def stable_scope_payload(self) -> Dict[str, Any]:
         """Return fields that identify the stream, excluding run windows/bounds."""
+        # Pagination strategy changes how a stream is read, not which
+        # announcement stream it represents. Keep operational source options
+        # such as adaptive pagination from invalidating an existing cursor.
+        stable_source_options = {
+            key: value
+            for key, value in self.source_options.items()
+            if key != "adaptive_pagination"
+        }
         return {
             "exchange": self.exchange,
             "market": self.market,
@@ -189,7 +197,7 @@ class AnnouncementScope:
             "symbol": self.symbol,
             "keyword": self.keyword,
             "category": self.category,
-            "source_options": self.source_options,
+            "source_options": stable_source_options,
         }
 
     @property

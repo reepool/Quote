@@ -84,6 +84,7 @@ class _CninfoRequest:
     max_pages: int = 20
     start_page: int = 1
     preflight_page_bound: bool = False
+    adaptive_pagination: bool = False
     stop_at_watermark: Optional[str] = None
 
 
@@ -226,10 +227,9 @@ class _CninfoTransport:
         is_complete = False
         stop_reason = "max_pages_exhausted"
 
-        for page_num in range(
-            start_page,
-            start_page + max(1, int(config.max_pages)),
-        ):
+        page_budget = max(1, int(config.max_pages))
+        page_num = start_page
+        while page_num < start_page + page_budget:
             payload: Optional[Dict[str, Any]] = None
             page_started = time.monotonic()
             LOGGER.info(
@@ -237,7 +237,7 @@ class _CninfoTransport:
                 config.purpose_key,
                 config.market,
                 page_num,
-                max(1, config.max_pages),
+                page_budget,
                 effective_page_size,
             )
             try:
@@ -260,6 +260,14 @@ class _CninfoTransport:
             )
             if observed_total_pages is not None:
                 total_pages = observed_total_pages
+                if config.adaptive_pagination:
+                    # CNInfo totals are scoped to the current date-filtered query.
+                    # Use max_pages as an initial budget, then expand to the
+                    # market's reported result set once the first page arrives.
+                    page_budget = max(
+                        page_budget,
+                        max(1, total_pages - start_page + 1),
+                    )
 
             try:
                 raw_records = self._extract_records(payload)
@@ -355,6 +363,7 @@ class _CninfoTransport:
                 break
             if (
                 config.preflight_page_bound
+                and not config.adaptive_pagination
                 and page_num == start_page == 1
                 and total_pages is not None
                 and total_pages > max(1, int(config.max_pages))
@@ -370,6 +379,7 @@ class _CninfoTransport:
                 break
             if self.request_interval_seconds > 0:
                 time.sleep(self.request_interval_seconds)
+            page_num += 1
 
         resumable_stop = stop_reason in {
             "estimated_pages_exceed_bound",
@@ -764,6 +774,9 @@ class CninfoAnnouncementProvider:
                 max_pages=scope.max_pages,
                 start_page=scope.start_page,
                 preflight_page_bound=scope.preflight_page_bound,
+                adaptive_pagination=bool(
+                    (scope.source_options or {}).get("adaptive_pagination", False)
+                ),
                 stop_at_watermark=(
                     None if scope.cursor is None else scope.cursor.value
                 ),
@@ -815,6 +828,11 @@ class CninfoAnnouncementProvider:
                 "last_page_scanned": raw_result.last_page_scanned,
                 "next_page": raw_result.next_page,
                 "preflight_page_bound": scope.preflight_page_bound,
+                "adaptive_pagination": bool(
+                    (scope.source_options or {}).get("adaptive_pagination", False)
+                ),
+                "page_budget": max(1, int(scope.max_pages)),
+                "reported_total_pages": raw_result.total_pages,
                 "market_config": dict(market_config),
                 "identity": identity or {},
             },

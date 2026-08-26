@@ -24334,6 +24334,7 @@ class DataManager:
                 page_size=max(1, int(page_size)),
                 max_pages=max(1, int(max_pages)),
                 overlap_days=max(0, int(overlap_days)),
+                source_options={"adaptive_pagination": True},
             )
             state = storage.get_announcement_scan_state(
                 purpose_key="a_share_cninfo_corporate_action_daily_sync",
