@@ -1594,6 +1594,47 @@ def test_force_rotates_retry_due_checkpoint_requeued_by_contract_recovery(tmp_pa
     assert checkpoint_path.exists()
 
 
+def test_replace_policy_rotates_completed_work_without_force(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    identity = {"rules": "v1", "result_policy": "replace"}
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    assert first["inserted"] == 1
+    with storage.get_connection() as conn:
+        work_id = conn.execute(
+            "SELECT work_id FROM business_profile_work_items"
+        ).fetchone()[0]
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'completed', "
+            "stage = 'publish', completed_at = updated_at WHERE work_id = ?",
+            (work_id,),
+        )
+        conn.commit()
+
+    second = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+
+    assert second["reset"] == 1
+    assert second["checkpoint_rotated"] == 1
+    recovered = queue.get(work_id)
+    assert recovered["status"] == "pending"
+    assert recovered["stage"] == "acquire"
+    assert recovered["metadata"]["replacement_generation"] == 2
+    assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
+        "replace_replay_checkpoint_rotated"
+    )
+
+
 def test_force_replay_refreshes_work_cutoff(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -2063,6 +2104,19 @@ def test_operation_status_allows_healthy_bounded_backlog():
 
     assert status == "success"
     assert reason_codes == []
+
+
+def test_operation_status_does_not_hide_deferred_or_backpressured_workers():
+    status, reason_codes = _business_profile_operation_status(
+        discovery={"status": "success"},
+        workers={
+            "parse": {"status": "deferred", "reason": "no_stage_budget"},
+            "acquire": {"status": "backpressured"},
+        },
+    )
+
+    assert status == "degraded"
+    assert reason_codes == ["worker_backpressured"]
 
 
 def test_operation_status_degrades_for_actionable_publication_gaps():

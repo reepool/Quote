@@ -1719,6 +1719,89 @@ def test_action_only_verification_failure_expands_bounded_annual_report_context(
     assert failed["retry_calls"] == 0
 
 
+def test_verification_wave_splits_large_family_without_overflow_rework(tmp_path):
+    class ChunkGateway(_FakeGateway):
+        async def complete(self, request):
+            self.requests.append(request)
+            payload = json.loads(request.messages[-1].content)
+            return _response(
+                {
+                    "schema_version": "business_profile_semantic_batch_verifier.v1",
+                    "decisions": [
+                        _batch_verification_decision(item["target_id"])
+                        for item in payload.get("records", [])
+                    ],
+                },
+                request,
+            )
+
+    gateway = ChunkGateway()
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
+    )
+    selected = SelectedSectionArtifact(
+        artifact_version="business_profile_selected_sections.v1",
+        bundle={},
+        sections=(
+            SelectedSection(
+                section_id="section-1",
+                page_number=1,
+                section_key="operations",
+                text="公司生产动力煤。",
+                normalized_text="公司生产动力煤。",
+                normalized_start=0,
+                normalized_end=8,
+                page_hash="page-hash",
+                section_hash="section-hash",
+                selector_reasons=("test",),
+                quality="native",
+            ),
+        ),
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash="selected-hash",
+    )
+    targets = [
+        {
+            "target_id": f"activity-{index}",
+            "target_type": "activity",
+            "selected": selected,
+            "verification_target": {
+                "activity_id": f"activity-{index}",
+                "action": "produces",
+                "object_raw": "动力煤",
+                "evidence": {
+                    "evidence_spans": [
+                        {
+                            "section_id": "section-1",
+                            "page_number": 1,
+                            "section_hash": "section-hash",
+                            "quote": "公司生产动力煤。",
+                            "quote_hash": hashlib.sha256(
+                                "公司生产动力煤。".encode()
+                            ).hexdigest(),
+                        }
+                    ]
+                },
+            },
+        }
+        for index in range(51)
+    ]
+
+    outcomes = asyncio.run(runtime._verify_wave_async(targets))
+
+    assert len(outcomes) == 51
+    assert all("exception" not in outcome for outcome in outcomes)
+    assert len(gateway.requests) == 2
+    request_sizes = [
+        len(json.loads(request.messages[-1].content)["records"])
+        for request in gateway.requests
+    ]
+    assert request_sizes == [50, 1]
+
+
 def _relationship_runtime(
     tmp_path,
     monkeypatch,

@@ -1700,6 +1700,10 @@ class BusinessProfileWorkRepository:
         bound_shared_asset: Mapping[str, Any] | None = None,
     ) -> dict[str, int]:
         identity_hash = _stable_hash(processing_identity)
+        replacement_requested = (
+            str(processing_identity.get("result_policy") or "reuse").strip().lower()
+            == "replace"
+        )
         normalized_binding = (
             _normalize_bound_shared_asset(bound_shared_asset)
             if bound_shared_asset
@@ -1759,7 +1763,14 @@ class BusinessProfileWorkRepository:
                             "updated_at = ? WHERE work_id = ?",
                             (_canonical_json(existing_metadata), now, work_id),
                         )
-                    if force and existing_status in FORCE_REPLAYABLE_STATUSES:
+                    # Explicit replacement is a bounded, idempotent replay of the
+                    # same work item.  It must rotate the checkpoint even when
+                    # force=false, while retries of the rotated item continue to
+                    # use the same replacement generation.
+                    replay_requested = (
+                        force or replacement_requested
+                    ) and existing_status in FORCE_REPLAYABLE_STATUSES
+                    if replay_requested:
                         invalidated_stage_results = existing_metadata.pop(
                             "stage_results", {}
                         )
@@ -1767,7 +1778,7 @@ class BusinessProfileWorkRepository:
                             str(existing["checkpoint_path"] or checkpoint)
                         )
                         replay_token = hashlib.sha256(
-                            f"force:{work_id}:{now}".encode("utf-8")
+                            f"replay:{work_id}:{now}".encode("utf-8")
                         ).hexdigest()[:12]
                         checkpoint = _rotated_checkpoint_path(
                             previous_checkpoint,
@@ -1778,7 +1789,11 @@ class BusinessProfileWorkRepository:
                         history = list(existing_metadata.get("recovery_history") or [])
                         history.append(
                             {
-                                "reason": "force_replay_checkpoint_rotated",
+                                "reason": (
+                                    "replace_replay_checkpoint_rotated"
+                                    if replacement_requested
+                                    else "force_replay_checkpoint_rotated"
+                                ),
                                 "recovered_at": now,
                                 "from_stage": str(existing["stage"]),
                                 "from_status": existing_status,
@@ -1802,6 +1817,19 @@ class BusinessProfileWorkRepository:
                             processing_identity
                         )
                         existing_metadata["reprocess_complete_coverage"] = True
+                        if replacement_requested:
+                            existing_metadata["replacement_generation"] = (
+                                max(
+                                    0,
+                                    int(
+                                        existing_metadata.get(
+                                            "replacement_generation", 0
+                                        )
+                                        or 0
+                                    ),
+                                )
+                                + 1
+                            )
                         if normalized_binding is not None:
                             existing_metadata["bound_shared_asset"] = normalized_binding
                         conn.execute(
@@ -1837,6 +1865,7 @@ class BusinessProfileWorkRepository:
                         "published_at": row.get("published_at"),
                         "knowledge_cutoff": knowledge_cutoff,
                         "processing_identity": dict(processing_identity),
+                        "replacement_generation": 1 if replacement_requested else 0,
                         "reprocess_complete_coverage": bool(
                             force or prior_completed_identity is not None
                         ),
@@ -2776,6 +2805,13 @@ class BusinessProfileAsyncProductionService:
                     "blocked_configuration_reasons",
                     "machine_rework_reasons",
                 ):
+                    if counter_name == "recovery_states" and not quality.get(
+                        counter_name
+                    ):
+                        # Recovery provenance is optional. Do not manufacture an
+                        # empty map in reports that never entered recovery; this
+                        # keeps the quality payload stable and meaningful.
+                        continue
                     target = quality_totals.setdefault(counter_name, {})
                     for label, count in dict(quality.get(counter_name) or {}).items():
                         target[str(label)] = target.get(str(label), 0) + int(count or 0)
@@ -3149,6 +3185,20 @@ def _business_profile_operation_status(
     )
     for counter, reason in counter_reasons:
         if any(int(result.get(counter) or 0) > 0 for result in workers.values()):
+            reason_codes.append(reason)
+    # A worker held by backpressure or returning an unexpected state is not a
+    # successful business completion. Previously only counters were inspected,
+    # so a run could report success while a worker had not processed its queue.
+    for stage, result in workers.items():
+        worker_status = str(result.get("status") or "").strip().lower()
+        # A missing stage budget is an intentional bounded invocation (for
+        # example a caller may run only acquire); it is not itself a failure.
+        if worker_status in {"", "success", "deferred"}:
+            continue
+        if worker_status == "stopped":
+            continue
+        reason = f"worker_{worker_status or 'invalid_status'}"
+        if reason not in reason_codes:
             reason_codes.append(reason)
     if any(
         int(dict(result.get("quality") or {}).get("publication_gaps") or 0) > 0

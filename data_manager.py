@@ -3310,6 +3310,12 @@ class DataManager:
                         "reprocess_complete_coverage"
                     )
                 ),
+                "replacement_generation": int(
+                    dict(item.get("metadata") or {}).get(
+                        "replacement_generation", 0
+                    )
+                    or 0
+                ),
                 "result_policy": result_policy,
             }
             bound_shared_asset = dict(
@@ -3489,6 +3495,7 @@ class DataManager:
         source_file_ids: Optional[List[str]] = None,
         bound_annual_report_asset: Optional[Mapping[str, Any]] = None,
         reprocess_complete_coverage: bool = False,
+        replacement_generation: int = 0,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -3714,6 +3721,7 @@ class DataManager:
             reprocess_complete_coverage=reprocess_complete_coverage,
             manifest_loader=manifest_loader,
             result_policy=result_policy,
+            replacement_generation=replacement_generation,
         )
 
         scope = SemanticProductionScope(

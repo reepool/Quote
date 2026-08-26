@@ -766,6 +766,7 @@ class BusinessProfileSemanticRuntime:
         selection_policy: str = "latest_annual_only",
         reprocess_complete_coverage: bool = False,
         result_policy: str = "reuse",
+        replacement_generation: int = 0,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository = repository
@@ -793,6 +794,7 @@ class BusinessProfileSemanticRuntime:
         self.result_policy = str(result_policy or "reuse").strip().lower()
         if self.result_policy not in {"reuse", "replace"}:
             raise ValueError("business-profile result_policy must be reuse or replace")
+        self.replacement_generation = max(0, int(replacement_generation or 0))
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
         self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(
@@ -2271,6 +2273,11 @@ class BusinessProfileSemanticRuntime:
                             if semantic_audit is not None
                             else None
                         ),
+                        "replacement_generation": (
+                            self.replacement_generation
+                            if self.result_policy == "replace"
+                            else None
+                        ),
                     }
                 )[:24]
             )
@@ -2585,76 +2592,87 @@ class BusinessProfileSemanticRuntime:
         targets: Sequence[Mapping[str, Any]],
     ) -> list[dict[str, Any]]:
         semantic_audits: list[Mapping[str, Any]] = []
-        try:
-            extractor = BusinessProfileSemanticExtractor(
-                self.llm_client,
-                audit_sink=semantic_audits.append,
-            )
-            verifications, audit = await extractor.verify_batch_async(targets=targets)
-            by_target_id = {
-                str(item.get("target_id") or ""): item for item in verifications
-            }
-            audit_payload = audit.to_dict()
-            usage_tokens = int(
-                (audit_payload.get("usage") or {}).get("total_tokens") or 0
-            )
-            outcomes: list[dict[str, Any]] = []
-            for target in targets:
-                verification_target = dict(target.get("verification_target") or {})
-                target_id = str(
-                    target.get("target_id")
-                    or verification_target.get("activity_id")
-                    or verification_target.get("relationship_id")
-                    or verification_target.get("record_id")
-                    or ""
+        extractor = BusinessProfileSemanticExtractor(
+            self.llm_client,
+            audit_sink=semantic_audits.append,
+        )
+        outcomes: list[dict[str, Any]] = []
+        # The verifier contract accepts a bounded request.  A report can contain
+        # more targets than that, so split one logical family wave into bounded
+        # requests and retain per-wave audit/usage information.
+        for offset in range(0, len(targets), 50):
+            batch = list(targets[offset : offset + 50])
+            batch_audit: Mapping[str, Any] | None = None
+            try:
+                verifications, audit = await extractor.verify_batch_async(
+                    targets=batch
                 )
-                verification = by_target_id.get(target_id)
-                if verification is None:
+                batch_audit = audit.to_dict()
+                by_target_id = {
+                    str(item.get("target_id") or ""): item for item in verifications
+                }
+                usage_tokens = int(
+                    (batch_audit.get("usage") or {}).get("total_tokens") or 0
+                )
+                for index, target in enumerate(batch):
+                    verification_target = dict(
+                        target.get("verification_target") or {}
+                    )
+                    target_id = str(
+                        target.get("target_id")
+                        or verification_target.get("activity_id")
+                        or verification_target.get("relationship_id")
+                        or verification_target.get("record_id")
+                        or ""
+                    )
+                    verification = by_target_id.get(target_id)
+                    if verification is None:
+                        outcomes.append(
+                            {
+                                "target": target,
+                                "exception": ValueError(
+                                    "semantic verification batch omitted "
+                                    f"target_id={target_id}"
+                                ),
+                                "audit": batch_audit,
+                                "retry_calls": 0,
+                                "usage_tokens": 0,
+                                "batch_llm_calls": 1 if index == 0 else 0,
+                            }
+                        )
+                        continue
                     outcomes.append(
                         {
                             "target": target,
-                            "exception": ValueError(
-                                f"semantic verification batch omitted target_id={target_id}"
-                            ),
-                            "audit": audit_payload,
+                            "verification": {
+                                **dict(verification),
+                                "audit": batch_audit,
+                                "attempts": [{"kind": "batched", "audit": batch_audit}],
+                            },
+                            "audit": batch_audit,
                             "retry_calls": 0,
-                            "usage_tokens": 0,
-                            "batch_llm_calls": 1 if target is targets[0] else 0,
+                            "usage_tokens": usage_tokens if index == 0 else 0,
+                            "batch_llm_calls": 1 if index == 0 else 0,
                         }
                     )
-                    continue
-                outcomes.append(
+            except Exception as exc:
+                failure_audit = dict(batch_audit or (semantic_audits[-1] if semantic_audits else {}))
+                usage_tokens = int(
+                    (failure_audit.get("usage") or {}).get("total_tokens") or 0
+                )
+                attempted_calls = 1 if failure_audit else 0
+                outcomes.extend(
                     {
                         "target": target,
-                        "verification": {
-                            **dict(verification),
-                            "audit": audit_payload,
-                            "attempts": [{"kind": "batched", "audit": audit_payload}],
-                        },
-                        "audit": audit_payload,
+                        "exception": exc,
+                        "audit": failure_audit or None,
                         "retry_calls": 0,
-                        "usage_tokens": usage_tokens if target is targets[0] else 0,
-                        "batch_llm_calls": 1 if target is targets[0] else 0,
+                        "usage_tokens": usage_tokens if index == 0 else 0,
+                        "batch_llm_calls": attempted_calls if index == 0 else 0,
                     }
+                    for index, target in enumerate(batch)
                 )
-            return outcomes
-        except Exception as exc:
-            failure_audit = dict(semantic_audits[-1]) if semantic_audits else {}
-            usage_tokens = int(
-                (failure_audit.get("usage") or {}).get("total_tokens") or 0
-            )
-            attempted_calls = 1 if failure_audit else 0
-            return [
-                {
-                    "target": target,
-                    "exception": exc,
-                    "audit": failure_audit or None,
-                    "retry_calls": 0,
-                    "usage_tokens": usage_tokens if target is targets[0] else 0,
-                    "batch_llm_calls": (attempted_calls if target is targets[0] else 0),
-                }
-                for target in targets
-            ]
+        return outcomes
 
     def verify(self, **kwargs: Any) -> Mapping[str, Any]:
         scope = kwargs["scope"]
@@ -2893,11 +2911,10 @@ class BusinessProfileSemanticRuntime:
                 if family_stop_reason:
                     budget_stop_reason = budget_stop_reason or family_stop_reason
                     break
-                # Extraction caps report records at 50. Keep the complete
-                # family in one request so verification cannot fan out into
-                # one request per activity/relationship.
-                batch = family_targets[:50]
-                overflow_targets = family_targets[50:]
+                # Keep one report/field-family as the logical wave.  The
+                # verifier splits it into bounded requests internally, so a
+                # large report is not converted into artificial machine rework.
+                batch = family_targets
                 outcomes = self._async_bridge.run(self._verify_wave_async(batch))
                 batch_calls = sum(
                     int(outcome.get("batch_llm_calls") or 0) for outcome in outcomes
@@ -2983,29 +3000,6 @@ class BusinessProfileSemanticRuntime:
                         family,
                         machine_rework=1,
                         errors=1,
-                    )
-                for overflow_target in overflow_targets:
-                    overflow_id = str(overflow_target.get("target_id") or "")
-                    overflow_exception = _rework_item(
-                        overflow_target["output"],
-                        overflow_target["output"]["document"],
-                        "verification_batch_overflow",
-                        overflow_id,
-                        diagnostics={
-                            "batch_limit": 50,
-                            "target_id": overflow_id,
-                            "message": (
-                                "report/family ambiguity batch exceeded the bounded "
-                                "verification request size"
-                            ),
-                        },
-                    )
-                    machine_rework.append(overflow_exception)
-                    new_machine_rework.append(overflow_exception)
-                    _increment_family_metrics(
-                        by_field_family,
-                        family,
-                        machine_rework=1,
                     )
                 write_progress()
                 if configuration_stop_requested or family_stop_reason == (
