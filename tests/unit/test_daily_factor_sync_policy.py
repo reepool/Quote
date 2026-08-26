@@ -126,6 +126,29 @@ class TestDailyFactorSyncPolicy:
         assert empty == {}
 
     @pytest.mark.asyncio
+    async def test_market_discovery_queries_quarterly_report_periods(self, monkeypatch):
+        requested = []
+
+        def stock_fhps_em(*, date):
+            requested.append(date)
+            return pd.DataFrame(columns=["代码", "除权除息日"])
+
+        monkeypatch.setitem(
+            sys.modules,
+            "akshare",
+            SimpleNamespace(stock_fhps_em=stock_fhps_em),
+        )
+
+        async def run_inline(function, *args, **kwargs):
+            return function(*args, **kwargs)
+
+        monkeypatch.setattr(data_manager_module.asyncio, "to_thread", run_inline)
+        result = await DataManager()._query_ex_dividend_symbols({date(2026, 4, 1)})
+
+        assert result == {}
+        assert requested == ["20251231", "20260331", "20260630", "20260930", "20261231"]
+
+    @pytest.mark.asyncio
     async def test_market_discovery_fails_closed_on_partial_periods(
         self,
         monkeypatch,

@@ -56,6 +56,7 @@ class DataSourceFactory:
         self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
         self.daily_stale_source_counts: Dict[tuple[str, str, str, date], int] = {}
         self.daily_stale_source_breakers: set[tuple[str, str, str, date]] = set()
+        self.last_daily_data_diagnostic: Dict[str, Any] = {}
         self.last_instrument_list_diagnostics: Dict[tuple[str, tuple[str, ...]], Dict[str, Any]] = {}
 
     async def initialize(self):
@@ -1241,6 +1242,7 @@ class DataSourceFactory:
                 latest_date,
                 expected_date,
             )
+            self.last_daily_data_diagnostic["stale_source"] = True
             self._record_daily_source_stale_result(
                 exchange=exchange,
                 instrument_type=instrument_type,
@@ -1274,6 +1276,13 @@ class DataSourceFactory:
             source_symbol: 数据源原始代码（如东财 105.AAPL），可选
         """
         exchange = exchange.upper()
+        self.last_daily_data_diagnostic = {
+            "exchange": exchange,
+            "instrument_id": instrument_id,
+            "symbol": symbol,
+            "stale_source": False,
+            "empty": False,
+        }
 
         source_chain = self._get_daily_source_chain(exchange, instrument_type)
         if not source_chain:
@@ -1320,6 +1329,7 @@ class DataSourceFactory:
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
                 elif not data:
+                    self.last_daily_data_diagnostic["empty"] = True
                     ds_logger.warning(f"[DataSourceFactory] Empty data from {primary_source.name} for {symbol}")
                 else:
                     ds_logger.warning(f"[DataSourceFactory] Validation failed from {primary_source.name} for {symbol}")
@@ -1365,6 +1375,7 @@ class DataSourceFactory:
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
                         return data
                     elif not data:
+                        self.last_daily_data_diagnostic["empty"] = True
                         ds_logger.warning(f"[DataSourceFactory] Empty data from backup {backup_source.name} for {symbol}")
                     else:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")

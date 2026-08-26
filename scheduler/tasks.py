@@ -4917,12 +4917,32 @@ class ScheduledTasks:
 
             # 步骤2: 交易日检查
             trading_exchanges = []
+            calendar_unknown_exchanges = []
             if enable_trading_day_check:
                 scheduler_logger.info("[Scheduler] Step 2: Checking trading days...")
 
                 for exchange in exchanges:
                     try:
-                        is_trading = await data_manager.db_ops.is_trading_day(exchange, today)
+                        calendar_rows = await data_manager.db_ops.get_trading_calendar_records(
+                            exchange, today, today
+                        )
+                        if calendar_rows:
+                            is_trading = bool(calendar_rows[0].get('is_trading_day'))
+                        else:
+                            # An absent row is unknown, not an explicit holiday.
+                            # DateUtils is the existing deterministic fallback.
+                            try:
+                                is_trading = bool(DateUtils.is_trading_day(exchange, today))
+                                scheduler_logger.info(
+                                    f"[Scheduler] {exchange} calendar row missing; "
+                                    f"using DateUtils fallback={is_trading}"
+                                )
+                            except Exception as fallback_error:
+                                calendar_unknown_exchanges.append(exchange)
+                                scheduler_logger.error(
+                                    f"[Scheduler] Calendar unknown for {exchange}: {fallback_error}"
+                                )
+                                continue
                         if is_trading:
                             trading_exchanges.append(exchange)
                             scheduler_logger.info(f"[Scheduler] {exchange} is trading today")
@@ -4931,10 +4951,26 @@ class ScheduledTasks:
                     except Exception as e:
                         scheduler_logger.warning(f"[Scheduler] Failed to check trading day for {exchange}: {e}")
                         # fallback to DateUtils
-                        if DateUtils.is_trading_day(exchange, today):
-                            trading_exchanges.append(exchange)
-                            scheduler_logger.info(f"[Scheduler] {exchange} is trading today (fallback check)")
+                        try:
+                            if DateUtils.is_trading_day(exchange, today):
+                                trading_exchanges.append(exchange)
+                                scheduler_logger.info(f"[Scheduler] {exchange} is trading today (fallback check)")
+                        except Exception as fallback_error:
+                            calendar_unknown_exchanges.append(exchange)
+                            scheduler_logger.error(
+                                f"[Scheduler] Calendar unknown for {exchange}: {fallback_error}"
+                            )
 
+                if not trading_exchanges and calendar_unknown_exchanges:
+                    report_data = {
+                        'name': '每日数据更新报告',
+                        'status': 'warning',
+                        'calendar_unknown': calendar_unknown_exchanges,
+                        'date': today.strftime('%Y-%m-%d'),
+                        'trading_calendar_updates': trading_calendar_updates,
+                    }
+                    await self._send_task_report(report_data, 'daily_update_report', '每日数据更新', job_config)
+                    return False
                 if not trading_exchanges:
                     # 非交易日，使用报告系统发送通知
                     report_data = {
@@ -5004,7 +5040,11 @@ class ScheduledTasks:
                 update_results['no_op_reason'] = 'target_date_already_covered'
                 update_results['summary_note'] = '目标日期已覆盖，无新增行情'
                 update_results['success_rate'] = 100.0
-            is_successful = failure_count == 0 and (success_count > 0 or no_op)
+            is_successful = (
+                failure_count == 0
+                and not calendar_unknown_exchanges
+                and (success_count > 0 or no_op)
+            )
 
             report_data = {
                 'name': '每日数据更新报告',
@@ -5013,6 +5053,7 @@ class ScheduledTasks:
                 'trading_exchanges': trading_exchanges,
                 'update_results': update_results,
                 'trading_calendar_updates': trading_calendar_updates,
+                'calendar_unknown': calendar_unknown_exchanges,
                 'start_time': datetime.now().strftime('%H:%M:%S')
             }
 
@@ -5023,8 +5064,11 @@ class ScheduledTasks:
                 job_config=job_config
             )
 
-            scheduler_logger.info("[Scheduler] Daily data update completed successfully")
-            return True
+            scheduler_logger.info(
+                "[Scheduler] Daily data update completed with status=%s",
+                "success" if is_successful else "warning",
+            )
+            return is_successful
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Daily data update failed: {e}")

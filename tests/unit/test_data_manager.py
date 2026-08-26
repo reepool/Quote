@@ -163,6 +163,32 @@ class TestDataManager:
 
         assert result is True
 
+    def test_prepare_daily_quote_rows_rejects_invalid_ohlc(self):
+        data_manager = DataManager()
+        instrument = {'instrument_id': '000001.SZ', 'symbol': '000001'}
+        rows, rejected = data_manager._prepare_daily_quote_rows([
+            {
+                'time': datetime(2026, 8, 26),
+                'open': 10.0,
+                'high': 9.0,
+                'low': 8.0,
+                'close': 8.5,
+                'volume': 100,
+            },
+            {
+                'time': datetime(2026, 8, 26),
+                'open': 10.0,
+                'high': 11.0,
+                'low': 9.0,
+                'close': 10.5,
+                'volume': 100,
+            },
+        ], instrument)
+
+        assert rejected == 1
+        assert len(rows) == 1
+        assert rows[0]['is_complete'] is True
+
     @pytest.mark.asyncio
     async def test_get_data_gaps(self, data_manager):
         """Test data gap detection"""

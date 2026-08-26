@@ -2608,6 +2608,52 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get latest quote date for {instrument_id}: {e}")
             return None
 
+    async def get_daily_quote(
+        self, instrument_id: str, quote_date: Union[date, datetime]
+    ) -> Optional[Dict[str, Any]]:
+        """Return one quote row for an instrument and trade date."""
+        try:
+            start = self._coerce_datetime(quote_date)
+            if start is None:
+                return None
+            end = start + timedelta(days=1)
+            async with self.get_async_session() as session:
+                stmt = (
+                    select(DailyQuoteDB)
+                    .where(
+                        DailyQuoteDB.instrument_id == instrument_id,
+                        DailyQuoteDB.time >= start,
+                        DailyQuoteDB.time < end,
+                    )
+                    .order_by(DailyQuoteDB.time.desc())
+                    .limit(1)
+                )
+                row = (await session.execute(stmt)).scalar_one_or_none()
+                if row is None:
+                    return None
+                return {
+                    "time": row.time,
+                    "instrument_id": row.instrument_id,
+                    "open": row.open,
+                    "high": row.high,
+                    "low": row.low,
+                    "close": row.close,
+                    "volume": row.volume,
+                    "amount": row.amount,
+                    "tradestatus": row.tradestatus,
+                    "is_complete": row.is_complete,
+                    "quality_score": row.quality_score,
+                    "source": row.source,
+                }
+        except Exception as e:
+            self.db_logger.error(
+                "Failed to get daily quote for %s on %s: %s",
+                instrument_id,
+                quote_date,
+                e,
+            )
+            return None
+
     async def get_latest_stock_quote_dates_by_exchange(
         self,
         exchanges: List[str],

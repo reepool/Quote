@@ -1050,6 +1050,84 @@ async def test_update_daily_data_marks_partial_quote_persistence_as_failure():
 
 
 @pytest.mark.asyncio
+async def test_update_daily_data_does_not_count_empty_quote_as_success():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'exchange': 'SZSE',
+        'type': 'stock',
+        'listed_date': datetime(2020, 1, 1),
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SZSE'],
+            target_date=date(2026, 8, 26),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    assert result['success_count'] == 0
+    assert result['failure_count'] == 1
+    assert result['integrity_stats']['empty_unresolved'] == 1
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_keeps_valid_target_quote_idempotent():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'exchange': 'SZSE',
+        'type': 'stock',
+        'listed_date': datetime(2020, 1, 1),
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(
+        return_value=datetime(2026, 8, 26)
+    )
+    manager.db_ops.get_daily_quote = AsyncMock(return_value={
+        'time': datetime(2026, 8, 26),
+        'instrument_id': '000001.SZ',
+        'open': 10.0,
+        'high': 11.0,
+        'low': 9.0,
+        'close': 10.5,
+        'volume': 100,
+        'is_complete': True,
+    })
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SZSE'],
+            target_date=date(2026, 8, 26),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    manager.source_factory.get_daily_data.assert_not_awaited()
+    assert result['failure_count'] == 0
+    assert result['success_count'] == 0
+
+
+@pytest.mark.asyncio
 async def test_update_daily_data_preserves_results_when_watermark_write_fails():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()

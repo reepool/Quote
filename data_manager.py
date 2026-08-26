@@ -13223,6 +13223,44 @@ class DataManager:
         except (ValueError, TypeError):
             return False
 
+    def _prepare_daily_quote_rows(
+        self, data: List[Dict[str, Any]], instrument: Dict[str, Any]
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Validate and enrich current daily rows without historical state."""
+        valid_rows: List[Dict[str, Any]] = []
+        rejected = 0
+        for raw in data or []:
+            if not isinstance(raw, dict) or not self._validate_quote_data(raw):
+                rejected += 1
+                continue
+            try:
+                prices = [
+                    float(raw[field])
+                    for field in ("open", "high", "low", "close")
+                ]
+                if (
+                    not all(math.isfinite(value) and value > 0 for value in prices)
+                    or not (prices[2] <= prices[0] <= prices[1])
+                    or not (prices[2] <= prices[3] <= prices[1])
+                ):
+                    rejected += 1
+                    continue
+            except (TypeError, ValueError, OverflowError):
+                rejected += 1
+                continue
+            quote = dict(raw)
+            quote["instrument_id"] = instrument["instrument_id"]
+            quote.setdefault("batch_id", self.progress.batch_id)
+            quote["is_complete"] = bool(
+                quote.get("is_complete")
+                if "is_complete" in quote
+                else self._check_data_completeness(quote)
+            )
+            quote.setdefault("quality_score", self._calculate_quality_score(quote, instrument))
+            quote.setdefault("adjustment_type", "none")
+            valid_rows.append(quote)
+        return valid_rows, rejected
+
     def _calculate_quality_score(self, quote: Dict, instrument: Dict) -> float:
         """计算数据质量评分"""
         score = 1.0
@@ -15175,6 +15213,9 @@ class DataManager:
             quote_composite_watermark = update_results.get(
                 'quote_composite_watermark'
             )
+            integrity_stats = update_results.get('integrity_stats')
+            if not isinstance(integrity_stats, dict):
+                integrity_stats = {}
 
             report = {
                 'summary': {
@@ -15195,6 +15236,7 @@ class DataManager:
                 'changelog_stats': changelog_stats,
                 'factor_stats': factor_stats,
                 'quote_composite_watermark': quote_composite_watermark,
+                'integrity_stats': integrity_stats,
                 'errors': []
             }
 
@@ -15234,6 +15276,7 @@ class DataManager:
                                 'factor_stats': dict(
                                     factor_stats.get(exchange) or {}
                                 ),
+                                'integrity_stats': dict(stats.get('integrity_stats') or {}),
                             }
                             report['summary']['total_instruments_checked'] += total_count
                             report['summary']['updated_instruments'] += success_count
@@ -19905,7 +19948,7 @@ class DataManager:
             import akshare as ak
             import pandas as pd
 
-            # 查询最近两个报告期的分红方案（覆盖年报和中报）
+            # 查询目标年份涉及的季度报告期，覆盖年报、季报和中报。
             target_date_strs = {
                 d.strftime('%Y-%m-%d') if hasattr(d, 'strftime') else str(d)
                 for d in target_dates if d is not None
@@ -19922,7 +19965,13 @@ class DataManager:
             report_periods = sorted({
                 period
                 for year in years
-                for period in (f"{year - 1}1231", f"{year}0630")
+                for period in (
+                    f"{year - 1}1231",
+                    f"{year}0331",
+                    f"{year}0630",
+                    f"{year}0930",
+                    f"{year}1231",
+                )
             })
 
             all_records = []
@@ -37283,6 +37332,15 @@ class DataManager:
                 'success_count': 0,
                 'failure_count': 0,
                 'total_quotes_added': 0,
+                'integrity_stats': {
+                    'empty_unresolved': 0,
+                    'quality_rejected': 0,
+                    'stale_source': 0,
+                    'refetched_incomplete': 0,
+                    'legitimate_no_quote': 0,
+                    'calendar_unknown': 0,
+                    'samples': [],
+                },
                 'exchange_stats': {},
                 'catchup_stats': {
                     'new_instrument_count': 0,
@@ -37338,6 +37396,15 @@ class DataManager:
                         'success_count': 0,
                         'failure_count': 0,
                         'quotes_added': 0,
+                        'integrity_stats': {
+                            'empty_unresolved': 0,
+                            'quality_rejected': 0,
+                            'stale_source': 0,
+                            'refetched_incomplete': 0,
+                            'legitimate_no_quote': 0,
+                            'calendar_unknown': 0,
+                            'samples': [],
+                        },
                         'total_instruments': total_instruments,
                         'catchup_stats': {
                             'new_instrument_count': 0,
@@ -37368,10 +37435,23 @@ class DataManager:
                             )
 
                             # 如果没有数据或数据不是最新的，则更新
-                            should_update = (
-                                latest_date is None or
-                                latest_date < datetime.combine(target_date, datetime.min.time())
-                            )
+                            target_datetime = datetime.combine(target_date, datetime.min.time())
+                            should_update = latest_date is None or latest_date < target_datetime
+                            existing_target = None
+                            if latest_date is not None and latest_date >= target_datetime:
+                                getter = getattr(self.db_ops, 'get_daily_quote', None)
+                                if getter and inspect.iscoroutinefunction(getter):
+                                    existing_target = await getter(
+                                        instrument['instrument_id'], target_date
+                                    )
+                                if existing_target is not None:
+                                    should_update = not (
+                                        bool(existing_target.get('is_complete'))
+                                        and self._validate_quote_data(existing_target)
+                                    )
+                                    if should_update:
+                                        exchange_result['integrity_stats']['refetched_incomplete'] += 1
+                                        update_results['integrity_stats']['refetched_incomplete'] += 1
 
                             # 从数据源获取数据
                             # A 股沿用 calendar-day 锚点；
@@ -37425,9 +37505,33 @@ class DataManager:
                                         source_symbol=instrument.get('source_symbol', '')
                                     )
 
-                                if data:
+                                prepared_data, rejected_count = self._prepare_daily_quote_rows(
+                                    data or [], instrument
+                                )
+                                source_diagnostic = getattr(
+                                    self.source_factory,
+                                    'last_daily_data_diagnostic',
+                                    {},
+                                )
+                                if isinstance(source_diagnostic, dict) and source_diagnostic.get('stale_source'):
+                                    exchange_result['integrity_stats']['stale_source'] += 1
+                                    update_results['integrity_stats']['stale_source'] += 1
+                                if rejected_count:
+                                    exchange_result['integrity_stats']['quality_rejected'] += rejected_count
+                                    update_results['integrity_stats']['quality_rejected'] += rejected_count
+                                if not prepared_data:
+                                    if instrument.get('trading_status') not in (None, 1):
+                                        exchange_result['integrity_stats']['legitimate_no_quote'] += 1
+                                        update_results['integrity_stats']['legitimate_no_quote'] += 1
+                                    else:
+                                        exchange_result['integrity_stats']['empty_unresolved'] += 1
+                                        update_results['integrity_stats']['empty_unresolved'] += 1
+                                        exchange_result['failure_count'] += 1
+                                        update_results['failure_count'] += 1
+                                    continue
+                                if prepared_data:
                                     write_stats = await self.db_ops.save_daily_quotes(
-                                        data,
+                                        prepared_data,
                                         return_stats=True,
                                     )
                                     if not isinstance(write_stats, dict):
@@ -37444,12 +37548,12 @@ class DataManager:
                                             "daily quote persistence was incomplete: "
                                             f"failed={int(write_stats.get('failed') or 0)}"
                                         )
-                                    exchange_result['quotes_added'] += len(data)
-                                    update_results['total_quotes_added'] += len(data)
+                                    exchange_result['quotes_added'] += len(prepared_data)
+                                    update_results['total_quotes_added'] += len(prepared_data)
                                     if is_catchup:
-                                        exchange_result['catchup_stats']['catchup_quotes_added'] += len(data)
-                                        update_results['catchup_stats']['catchup_quotes_added'] += len(data)
-                                    dm_logger.debug(f"[DataManager] Updated {len(data)} records for {instrument['symbol']}")
+                                        exchange_result['catchup_stats']['catchup_quotes_added'] += len(prepared_data)
+                                        update_results['catchup_stats']['catchup_quotes_added'] += len(prepared_data)
+                                    dm_logger.debug(f"[DataManager] Updated {len(prepared_data)} records for {instrument['symbol']}")
 
                                 if is_catchup:
                                     counter_name = (
@@ -37476,7 +37580,7 @@ class DataManager:
                                             'fetch_start_date': fetch_start_date.isoformat(),
                                             'end_date': end_date.isoformat(),
                                             'capped': bool(window.get('capped')),
-                                            'quotes_added': len(data or []),
+                                            'quotes_added': len(prepared_data),
                                         },
                                     )
 
