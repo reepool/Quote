@@ -58,7 +58,7 @@ async def get_instruments(
     where_clause = " AND ".join(conditions)
     limit_clause = f" LIMIT {limit}" if limit else ""
 
-    sql = f"SELECT instrument_id, symbol, name, exchange, type FROM instruments WHERE {where_clause} ORDER BY instrument_id{limit_clause}"
+    sql = f"SELECT instrument_id, symbol, source_symbol, name, exchange, type FROM instruments WHERE {where_clause} ORDER BY instrument_id{limit_clause}"
     return await db_ops.execute_read_query(sql, params)
 
 
@@ -229,7 +229,8 @@ async def repair_gaps(
                 symbol,
                 datetime.combine(seg_start, datetime.min.time()),
                 datetime.combine(seg_end, datetime.max.time()),
-                instrument_type=instrument_type
+                instrument_type=instrument_type,
+                source_symbol=instrument.get('source_symbol') or '',
             )
 
             if data:

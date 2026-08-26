@@ -136,6 +136,19 @@ class FakeRepairDbOps:
                 'delisted_date': None,
                 'source_symbol': '399001',
             },
+            '399691.SZ': {
+                'instrument_id': '399691.SZ',
+                'symbol': '399691',
+                'name': 'CNIndex dual-code index',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'listed_date': datetime(2016, 8, 8),
+                'delisted_date': None,
+                'source_symbol': '970068',
+            },
             '005125.SZ': {
                 'instrument_id': '005125.SZ',
                 'symbol': '005125',
@@ -257,6 +270,7 @@ class FakeRepairDbOps:
         self.latest_quotes = {
             '005061.SZ': datetime(2025, 5, 1),
             '399001.SZ': datetime(2026, 6, 13),
+            '399691.SZ': datetime(2026, 8, 26),
             '399238.SZ': datetime(2025, 12, 5),
             '00007.HK': datetime(2024, 3, 28),
             '01688.HK': datetime(2026, 6, 26),
@@ -810,6 +824,45 @@ async def test_lifecycle_eligible_gap_still_uses_quote_source():
     assert await manager._fill_single_gap(gap) is True
     manager.source_factory.get_daily_data.assert_awaited_once()
     assert manager.db_ops.saved_quotes[0]['instrument_id'] == '399001.SZ'
+
+
+@pytest.mark.asyncio
+async def test_gap_fill_passes_instrument_source_symbol_to_quote_source():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[
+        {
+            'instrument_id': '399691.SZ',
+            'time': datetime(2026, 8, 24),
+            'open': 1,
+            'high': 1,
+            'low': 1,
+            'close': 1,
+            'volume': 1,
+        }
+    ])
+
+    gap = DataGapInfo(
+        instrument_id='399691.SZ',
+        symbol='399691',
+        exchange='SZSE',
+        gap_start=date(2026, 8, 24),
+        gap_end=date(2026, 8, 24),
+        gap_days=1,
+        gap_type='missing_data',
+        severity='low',
+        recommendation='test',
+        missing_dates=[date(2026, 8, 24)],
+    )
+
+    assert await manager._fill_single_gap(gap) is True
+    manager.source_factory.get_daily_data.assert_awaited_once()
+    _args, kwargs = manager.source_factory.get_daily_data.await_args
+    assert _args[1] == '399691.SZ'
+    assert _args[2] == '399691'
+    assert kwargs['source_symbol'] == '970068'
+    assert manager.db_ops.saved_quotes[0]['instrument_id'] == '399691.SZ'
 
 
 @pytest.mark.asyncio

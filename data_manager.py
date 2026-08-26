@@ -14822,15 +14822,16 @@ class DataManager:
             source_instrument_id = gap.instrument_id
             if converted_id and converted_id != gap.instrument_id:
                 source_instrument_id = converted_id
-            source_symbol = gap.symbol or instrument.get('symbol')
+            quote_symbol = gap.symbol or instrument.get('symbol')
 
             data = await self.source_factory.get_daily_data(
                 gap.exchange,
                 source_instrument_id,
-                source_symbol,
+                quote_symbol,
                 start_date,
                 end_date,
-                instrument_type=instrument.get('type', 'stock')
+                instrument_type=instrument.get('type', 'stock'),
+                source_symbol=instrument.get('source_symbol') or '',
             )
 
             if data:

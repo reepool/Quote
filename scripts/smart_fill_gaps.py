@@ -54,6 +54,7 @@ async def scan_gaps(min_gap_days: int = 15, exchange: str = None) -> List[Dict[s
     SELECT
         ga.instrument_id,
         i.symbol,
+        i.source_symbol,
         i.name,
         i.exchange,
         i.type,
@@ -157,7 +158,8 @@ async def fill_gaps(
                 symbol,
                 start_date if isinstance(start_date, datetime) else datetime.combine(start_date, datetime.min.time()),
                 end_date if isinstance(end_date, datetime) else datetime.combine(end_date, datetime.max.time()),
-                instrument_type=instrument_type
+                instrument_type=instrument_type,
+                source_symbol=gap.get('source_symbol') or '',
             )
 
             if data:
