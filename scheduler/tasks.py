@@ -8358,6 +8358,7 @@ class ScheduledTasks:
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
         force: bool = False,
+        result_policy: str = "reuse",
         max_attempts: int = 3,
         stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
         continuous: bool = False,
@@ -8370,10 +8371,23 @@ class ScheduledTasks:
     ) -> bool:
         """Run one bounded pass or continuously drain durable profile queues."""
         task_id = "business_profile_backfill"
+        result_policy = str(result_policy or "reuse").strip().lower()
+        if result_policy not in {"reuse", "replace"}:
+            scheduler_logger.error(
+                "[Scheduler] Unsupported business-profile result_policy=%s",
+                result_policy,
+            )
+            return False
         if continuous and force:
             scheduler_logger.error(
                 "[Scheduler] Continuous business-profile backfill rejects force=true "
                 "because every cycle would reset finalized work"
+            )
+            return False
+        if continuous and result_policy == "replace":
+            scheduler_logger.error(
+                "[Scheduler] Continuous business-profile backfill rejects "
+                "result_policy=replace; use a bounded run for explicit replacement"
             )
             return False
         if continuous and str(selection_policy or "").strip() == "expanded":
@@ -8411,6 +8425,7 @@ class ScheduledTasks:
             "document_types": list(document_types or []),
             "field_families": list(field_families or []),
             "force": bool(force),
+            "result_policy": result_policy,
             "max_attempts": int(max_attempts),
             "continuous": bool(continuous),
         }
@@ -8427,6 +8442,7 @@ class ScheduledTasks:
                 field_families=field_families,
                 runtime_identities=runtime_identities,
                 force=force,
+                result_policy=result_policy,
                 max_attempts=max_attempts,
                 stage_budgets=stage_budgets,
                 should_stop=should_stop,

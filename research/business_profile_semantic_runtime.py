@@ -765,6 +765,7 @@ class BusinessProfileSemanticRuntime:
         planned_disclosure_acquirer: Any | None = None,
         selection_policy: str = "latest_annual_only",
         reprocess_complete_coverage: bool = False,
+        result_policy: str = "reuse",
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository = repository
@@ -789,6 +790,9 @@ class BusinessProfileSemanticRuntime:
         self.planned_disclosure_acquirer = planned_disclosure_acquirer
         self.selection_policy = str(selection_policy or "latest_annual_only")
         self.reprocess_complete_coverage = bool(reprocess_complete_coverage)
+        self.result_policy = str(result_policy or "reuse").strip().lower()
+        if self.result_policy not in {"reuse", "replace"}:
+            raise ValueError("business-profile result_policy must be reuse or replace")
         self.clock = clock
         self.activity_producer = BusinessProfileActivityProducer(repository)
         self.semantic_artifacts = BusinessProfileSemanticArtifactRepository(
@@ -2341,6 +2345,7 @@ class BusinessProfileSemanticRuntime:
                         "metadata": {
                             "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
                             "runtime_identities": dict(scope.identities),
+                            "result_policy": self.result_policy,
                             "document_hash": item["document"].get("content_hash"),
                             "page_artifact_hash": item["page_artifact_hash"],
                             "selected_artifact_path": item["selected_artifact_path"],
@@ -4303,29 +4308,34 @@ class BusinessProfileSemanticRuntime:
         item: Mapping[str, Any],
         runtime_identities: Mapping[str, str],
     ) -> dict[str, Any] | None:
+        if self.result_policy != "reuse":
+            return None
+        # Activities and named relationships are produced by the shared joint
+        # semantic bundle. Let that path replay its durable artifact so its
+        # sibling/durable-replay metrics and lineage remain intact.
+        if str(item.get("field_family") or "") in {
+            "atomic_activities",
+            "named_relationships",
+        }:
+            return None
         document_id = str((item.get("document") or {}).get("identity") or "")
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             rows = conn.execute(
-                "SELECT run_id, metadata_json FROM business_profile_semantic_runs "
+                "SELECT run_id, bundle_hash, metadata_json FROM business_profile_semantic_runs "
                 "WHERE instrument_id = ? AND field_family = ? "
-                "AND source_document_id = ? AND bundle_hash = ? "
+                "AND source_document_id = ? "
                 "AND status = 'completed' ORDER BY updated_at DESC, run_id DESC",
                 (
                     str(item.get("instrument_id") or ""),
                     str(item.get("field_family") or ""),
                     document_id,
-                    str(item.get("selected_artifact_hash") or ""),
                 ),
             ).fetchall()
         for row in rows:
             try:
                 metadata = json.loads(row["metadata_json"] or "{}")
             except (TypeError, json.JSONDecodeError):
-                continue
-            if dict(metadata.get("runtime_identities") or {}) != dict(
-                runtime_identities
-            ):
                 continue
             if metadata.get("semantic_family_complete") is not True:
                 continue
@@ -4362,6 +4372,12 @@ class BusinessProfileSemanticRuntime:
                 "expected_non_disclosure": bool(
                     metadata.get("expected_non_disclosure")
                 ),
+                "reuse_source": {
+                    "runtime_identities": dict(
+                        metadata.get("runtime_identities") or {}
+                    ),
+                    "bundle_hash": str(row["bundle_hash"] or ""),
+                },
             }
         return None
 

@@ -1093,6 +1093,7 @@
           "field_families": [],
           "runtime_identities": {},
           "force": false,
+          "result_policy": "reuse",
           "max_attempts": 3,
           "stage_budgets": null,
           "continuous": false,

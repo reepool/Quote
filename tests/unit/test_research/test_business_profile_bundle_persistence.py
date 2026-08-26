@@ -124,6 +124,31 @@ def _relationship(
     }
 
 
+def _operating_fact(record_id="fact-1", evidence_id="evidence-1"):
+    return {
+        "record_id": record_id,
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "segment_id": "coal",
+        "fact_type": "production_volume",
+        "project_id": None,
+        "value_raw": 100.0,
+        "unit_raw": "吨",
+        "value_normalized": 100.0,
+        "unit_normalized": "吨",
+        "fact_scope": "issuer",
+        "evidence_id": evidence_id,
+        "data_available_date": "2026-03-28",
+        "confidence": 0.95,
+        "review_status": "candidate",
+        "valid_from": "2025-01-01",
+        "valid_to": "2025-12-31",
+        "knowledge_from": "2026-03-28",
+        "version": 1,
+        "metadata": {},
+    }
+
+
 def _assert_empty(repository, storage):
     assert repository.list_records("evidence") == []
     assert repository.list_records("activities") == []
@@ -167,6 +192,31 @@ def test_valid_document_field_family_bundle_commits_once(tmp_path):
         )
     assert run["status"] == "completed"
     assert run["activity_count"] == 1
+
+
+def test_replace_bundle_attaches_successor_and_preserves_prior_version(tmp_path):
+    repository, _storage = _repository(tmp_path)
+    repository.persist_document_field_family_bundle(
+        run=_run(),
+        records_by_type={"evidence": [_evidence()], "operating_facts": [_operating_fact()]},
+    )
+    _system_promote(repository, "evidence", "evidence-1")
+    _system_promote(repository, "operating_facts", "fact-1")
+
+    replacement = _operating_fact(record_id="fact-2")
+    replacement["confidence"] = 0.97
+    run = _run("run-replace")
+    run["metadata"] = {"result_policy": "replace"}
+    repository.persist_document_field_family_bundle(
+        run=run,
+        records_by_type={"operating_facts": [replacement]},
+    )
+
+    prior = repository.get_record("operating_facts", "fact-1")
+    successor = repository.get_record("operating_facts", "fact-2")
+    assert prior["review_status"] == "approved"
+    assert successor["supersedes_record_id"] == "fact-1"
+    assert successor["version"] == 2
 
 
 def test_bundle_collapses_identical_primary_keys(tmp_path):

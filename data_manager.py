@@ -2808,6 +2808,7 @@ class DataManager:
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
         force: bool = False,
+        result_policy: str = "reuse",
         max_attempts: int = 3,
         stage_budgets: Optional[Dict[str, Dict[str, Any]]] = None,
         should_stop: Optional[Callable[[], bool]] = None,
@@ -2820,6 +2821,11 @@ class DataManager:
                 "status": "disabled",
                 "reason": "research business-profile storage is disabled",
             }
+        result_policy = str(result_policy or "reuse").strip().lower()
+        if result_policy not in {"reuse", "replace"}:
+            raise ValueError(
+                "business-profile result_policy must be reuse or replace"
+            )
         module = self.research_config.modules.get("business_profile_evidence", {})
         operations = dict(module.get("production_operations") or {})
         if (
@@ -2995,6 +3001,7 @@ class DataManager:
             operations=operations,
             semantic=semantic,
             default_exchanges=backfill_exchanges,
+            result_policy=result_policy,
         )
         budgets = parse_stage_budgets(
             stage_budgets
@@ -3056,6 +3063,7 @@ class DataManager:
             stage_budgets=budgets,
             max_attempts=max_attempts,
             force=force,
+            result_policy=result_policy,
             selection_policy=policy,
             should_stop=should_stop,
             bound_annual_report_asset=bound_annual_report_asset,
@@ -3202,6 +3210,7 @@ class DataManager:
         operations: Mapping[str, Any],
         semantic: Mapping[str, Any],
         default_exchanges: Sequence[str],
+        result_policy: str = "reuse",
     ) -> tuple[Any, Dict[str, Any]]:
         """Build the shared discovery and stage runtime for daily and backfill."""
         from research.business_profile_async_production import (
@@ -3301,6 +3310,7 @@ class DataManager:
                         "reprocess_complete_coverage"
                     )
                 ),
+                "result_policy": result_policy,
             }
             bound_shared_asset = dict(
                 (item.get("metadata") or {}).get("bound_shared_asset") or {}
@@ -3420,6 +3430,7 @@ class DataManager:
             "rollout_phase": semantic.get("rollout_phase"),
             "promotion_enabled": semantic.get("promotion_enabled") is True,
             "promotion_manifest_hashes": promotion_manifest_hashes,
+            "result_policy": result_policy,
         }
 
     async def run_business_profile_reconciliation(
@@ -3467,6 +3478,7 @@ class DataManager:
         instrument_ids: Optional[List[str]] = None,
         field_families: Optional[List[str]] = None,
         runtime_identities: Optional[Dict[str, str]] = None,
+        result_policy: str = "reuse",
         promotion_manifest_hashes: Optional[Dict[str, str]] = None,
         promotion_manifests: Optional[Dict[str, Dict[str, Any]]] = None,
         promotion_enabled: Optional[bool] = None,
@@ -3528,6 +3540,11 @@ class DataManager:
         from utils.llm import LlmClient
 
         config = parse_semantic_production_config(production_payload)
+        result_policy = str(result_policy or "reuse").strip().lower()
+        if result_policy not in {"reuse", "replace"}:
+            raise ValueError(
+                "business-profile result_policy must be reuse or replace"
+            )
         cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
         checkpoint_root = Path(
             production_payload.get("checkpoint_root")
@@ -3696,6 +3713,7 @@ class DataManager:
             selection_policy=selection_policy,
             reprocess_complete_coverage=reprocess_complete_coverage,
             manifest_loader=manifest_loader,
+            result_policy=result_policy,
         )
 
         scope = SemanticProductionScope(

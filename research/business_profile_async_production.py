@@ -2235,6 +2235,7 @@ class BusinessProfileAsyncProductionService:
         stage_budgets: Mapping[str, StageBudget] | None = None,
         max_attempts: int = 3,
         force: bool = False,
+        result_policy: str = "reuse",
         selection_policy: str = "expanded",
         should_stop: Callable[[], bool] | None = None,
         bound_annual_report_asset: Mapping[str, Any] | None = None,
@@ -2247,6 +2248,11 @@ class BusinessProfileAsyncProductionService:
         policy = str(selection_policy or "expanded").strip()
         if policy not in {"latest_annual_only", "expanded"}:
             raise ValueError(f"unsupported business-profile backfill policy: {policy}")
+        result_policy = str(result_policy or "reuse").strip().lower()
+        if result_policy not in {"reuse", "replace"}:
+            raise ValueError(
+                "business-profile result_policy must be reuse or replace"
+            )
         if policy == "latest_annual_only":
             unsupported_types = sorted(
                 set(str(item) for item in document_types)
@@ -2272,13 +2278,14 @@ class BusinessProfileAsyncProductionService:
             )
         logger.info(
             "business-profile backfill start cutoff=%s policy=%s instruments=%s "
-            "start_date=%s end_date=%s document_types=%s stages=%s",
+            "start_date=%s end_date=%s document_types=%s result_policy=%s stages=%s",
             knowledge_cutoff,
             policy,
             len(instrument_ids),
             start_date,
             end_date,
             tuple(document_types),
+            result_policy,
             _stage_budget_log_value(stage_budgets or {}),
         )
         contract_recovery = await self._run_storage_operation(
@@ -2415,6 +2422,7 @@ class BusinessProfileAsyncProductionService:
             "reason_codes": reason_codes,
             "operation": "business_profile_backfill",
             "selection_policy": policy,
+            "result_policy": result_policy,
             "knowledge_cutoff": knowledge_cutoff,
             "discovery": discovery,
             "recovery": recovery,

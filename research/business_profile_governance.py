@@ -720,6 +720,16 @@ class BusinessProfileRepository:
             prepared = _collapse_identical_bundle_records(record_type, prepared)
             self._validate_prepared_batch_temporal(record_type, prepared)
             prepared_by_type[record_type] = prepared
+        # A replace run is an explicit request to publish a new observation for
+        # the same report flow. Link it to the current candidate/approved
+        # version so temporal governance can retain history without treating
+        # the rerun as an accidental duplicate.
+        replace_requested = (
+            str((run_payload.get("metadata") or {}).get("result_policy") or "reuse")
+            .strip()
+            .lower()
+            == "replace"
+        )
         run_id = str(run_payload["run_id"])
         for record_type, prepared in prepared_by_type.items():
             if record_type == "evidence":
@@ -749,6 +759,10 @@ class BusinessProfileRepository:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
             try:
+                if replace_requested:
+                    self._attach_replace_successors(
+                        conn, prepared_by_type=prepared_by_type
+                    )
                 if conn.execute(
                     "SELECT 1 FROM business_profile_semantic_runs WHERE run_id = ?",
                     (run_id,),
@@ -893,6 +907,67 @@ class BusinessProfileRepository:
                 conn.rollback()
                 raise
         return {"run_id": run_id, "status": "completed", **counts}
+
+    def _attach_replace_successors(
+        self,
+        conn: Any,
+        *,
+        prepared_by_type: Mapping[str, Sequence[Dict[str, Any]]],
+    ) -> None:
+        """Attach replacement candidates to the current governed version.
+
+        Only rows that would otherwise duplicate the temporal identity are
+        linked. The incoming record remains a candidate; approved/held history
+        is never modified or deleted, while an older candidate is superseded.
+        """
+        for record_type, prepared_rows in prepared_by_type.items():
+            policy = get_business_profile_temporal_policy(record_type)
+            pointer_column = get_business_profile_supersession_column(record_type)
+            if pointer_column not in self._TABLES[record_type]["columns"]:
+                continue
+            for prepared in prepared_rows:
+                payload = prepared["payload"]
+                if payload.get(pointer_column):
+                    continue
+                clauses = [f"{field} IS ?" for field in policy.stable_identity_fields]
+                values = [payload.get(field) for field in policy.stable_identity_fields]
+                spec = prepared["spec"]
+                rows = conn.execute(
+                    f"SELECT * FROM {spec['table']} WHERE {' AND '.join(clauses)} "
+                    "AND review_status IN ('candidate', 'held', 'approved') "
+                    f"AND {spec['pk']} <> ? ORDER BY version DESC, updated_at DESC",
+                    (*values, prepared["pk_value"]),
+                ).fetchall()
+                predecessor = None
+                for row in rows:
+                    existing = dict(row)
+                    if self._temporal_versions_conflict(record_type, payload, existing):
+                        predecessor = existing
+                        break
+                if predecessor is None:
+                    continue
+                payload[pointer_column] = str(predecessor[spec["pk"]])
+                payload["version"] = max(
+                    int(payload.get("version") or 1),
+                    int(predecessor.get("version") or 0) + 1,
+                )
+                if str(predecessor.get("review_status") or "") == "candidate":
+                    conn.execute(
+                        f"UPDATE {spec['table']} SET review_status = 'superseded', "
+                        "updated_at = ? WHERE "
+                        f"{spec['pk']} = ? AND review_status = 'candidate'",
+                        (get_shanghai_time().isoformat(), predecessor[spec["pk"]]),
+                    )
+                prepared["values"] = [
+                    _json_dumps(
+                        payload.get(column[:-5])
+                        if column.endswith("_json")
+                        else payload.get(column)
+                    )
+                    if column in spec["json"]
+                    else payload.get(column)
+                    for column in spec["columns"]
+                ]
 
     @staticmethod
     def _terminal_content_hash(spec: Dict[str, Any], row: Dict[str, Any]) -> str:
