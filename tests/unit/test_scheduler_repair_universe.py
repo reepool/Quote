@@ -113,3 +113,35 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
     assert report_data['summary']['severity_distribution'] == {'low': 1}
     assert report_data['summary']['failed_repairs'] == 1
     assert report_data['summary']['skipped_after_no_data_failures'] == 4
+
+
+@pytest.mark.asyncio
+async def test_find_gap_and_repair_forwards_instrument_ids(monkeypatch):
+    task = ScheduledTasks()
+    task.config = Mock()
+    task.config.get_nested.return_value = 1
+    task._send_task_report = AsyncMock()
+
+    fake_manager = Mock()
+    fake_manager.detect_data_gaps = AsyncMock(return_value={
+        'gaps': [],
+        'repair_universe': {},
+        'instrument_master_governance': None,
+    })
+    fake_manager.load_gap_skip_set = AsyncMock(return_value=set())
+    fake_manager.get_top_affected_stocks.return_value = []
+
+    monkeypatch.setattr(scheduler_tasks, 'data_manager', fake_manager)
+
+    assert await task.find_gap_and_repair(
+        exchanges=['SZSE'],
+        start_date=date(2026, 8, 18),
+        end_date=date(2026, 8, 24),
+        instrument_ids=['399691.SZ'],
+        skip_failed_segments=False,
+    ) is True
+
+    _, kwargs = fake_manager.detect_data_gaps.await_args
+    assert kwargs['instrument_ids'] == ['399691.SZ']
+    report_data = task._send_task_report.await_args.kwargs['report_data']
+    assert report_data['filters']['instrument_ids'] == ['399691.SZ']
