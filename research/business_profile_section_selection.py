@@ -275,8 +275,11 @@ class BusinessProfileSectionSelector:
                     "normalized_text": normalized,
                 }
             )
+            extraction_method = str(page.get("extraction_method") or "native_text")
             quality = (
-                "low_text"
+                "ocr"
+                if extraction_method == "ocr" and str(page.get("text") or "").strip()
+                else "low_text"
                 if bool(page.get("ocr_required"))
                 else "native"
                 if str(page.get("native_text_status") or "") == "extracted"
@@ -301,7 +304,9 @@ class BusinessProfileSectionSelector:
                 )
             )
         bundle_quality = (
-            "low_text"
+            "ocr"
+            if any(item.quality == "ocr" for item in sections)
+            else "low_text"
             if any(item.quality == "low_text" for item in sections)
             else "unsupported"
             if any(item.quality == "unsupported" for item in sections)

@@ -2753,6 +2753,8 @@ class BusinessProfileAsyncProductionService:
                     "outline_seconds",
                     "selection_seconds",
                     "selected_artifact_write_seconds",
+                    "toc_recovery_seconds",
+                    "section_recovery_seconds",
                 ):
                     if key in quality:
                         quality_totals[key] = float(
@@ -2761,6 +2763,7 @@ class BusinessProfileAsyncProductionService:
                 for counter_name in (
                     "outline_sources",
                     "outline_confidences",
+                    "recovery_states",
                     "empty_output_reasons",
                     "blocked_configuration_reasons",
                     "machine_rework_reasons",

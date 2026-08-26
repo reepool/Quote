@@ -16,11 +16,15 @@ MANAGEMENT_DISCUSSION_TITLES = (
     "经营分析",
 )
 _MAJOR_HEADING_RE = re.compile(
-    r"^\s*第(?P<number>[一二三四五六七八九十百]+)节\s*(?P<title>[^\n]{1,80})\s*$"
+    r"^\s*第(?P<number>[一二三四五六七八九十百]+)(?P<kind>章|节)\s*(?P<title>[^\n]{1,80})\s*$"
 )
 _TOC_ENTRY_RE = re.compile(
-    r"第(?P<number>[一二三四五六七八九十百]+)节\s*"
+    r"第(?P<number>[一二三四五六七八九十百]+)(?:章|节)\s*"
     r"(?P<title>.*?)(?P<page>\d{1,4})\s*$"
+)
+_TOC_ENTRY_LEADING_PAGE_RE = re.compile(
+    r"^(?P<page>\d{1,4})\s+第(?P<number>[一二三四五六七八九十百]+)(?:章|节)\s*"
+    r"(?P<title>[^\n]{1,100})\s*$"
 )
 _DOT_NOISE_RE = re.compile(r"[.。·…_\-—]+")
 
@@ -52,7 +56,31 @@ class BusinessProfileReportOutline:
         }
 
 
-def locate_business_profile_outline(artifact: Mapping[str, Any]) -> BusinessProfileReportOutline:
+@dataclass(frozen=True)
+class BusinessProfileRecoveryDecision:
+    """Bounded business-layer decision before semantic processing."""
+
+    state: str
+    outline: BusinessProfileReportOutline
+    toc_probe_pages: tuple[int, ...] = ()
+    section_pages: tuple[int, ...] = ()
+    diagnostics: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "state": self.state,
+            "outline": self.outline.to_dict(),
+            "toc_probe_pages": list(self.toc_probe_pages),
+            "section_pages": list(self.section_pages),
+            "diagnostics": list(self.diagnostics),
+        }
+
+
+def locate_business_profile_outline(
+    artifact: Mapping[str, Any],
+    *,
+    allow_full_document_fallback: bool = True,
+) -> BusinessProfileReportOutline:
     """Resolve the management-discussion page range from TOC or headings."""
 
     pages = _pages(artifact)
@@ -61,6 +89,31 @@ def locate_business_profile_outline(artifact: Mapping[str, Any]) -> BusinessProf
         return _unavailable_outline()
     page_set = set(page_numbers)
     page_count = max(page_numbers)
+    bookmark = _bookmark_management_entry(pages)
+    if bookmark is not None:
+        start_page, title = bookmark
+        following = next(
+            (
+                int(page.get("page_number") or 0)
+                for page in pages
+                if int(page.get("page_number") or 0) > start_page
+                and str(page.get("bookmark_title") or "").strip()
+                and not any(
+                    candidate
+                    in re.sub(r"\s+", "", str(page.get("bookmark_title") or ""))
+                    for candidate in MANAGEMENT_DISCUSSION_TITLES
+                )
+            ),
+            page_count + 1,
+        )
+        return BusinessProfileReportOutline(
+            start_page=start_page,
+            end_page=min(page_count, following - 1),
+            source="bookmark",
+            confidence="high",
+            chapter_title=title,
+            diagnostics=("bookmark_management_heading",),
+        )
     toc_entries = _toc_entries(pages)
     management = _find_management_full_entry(toc_entries)
     if management is not None:
@@ -121,6 +174,8 @@ def locate_business_profile_outline(artifact: Mapping[str, Any]) -> BusinessProf
                 diagnostics=("toc_unavailable_or_unmapped",),
             )
 
+    if not allow_full_document_fallback:
+        return _unresolved_outline(page_count)
     return BusinessProfileReportOutline(
         start_page=min(page_numbers),
         end_page=page_count,
@@ -128,6 +183,54 @@ def locate_business_profile_outline(artifact: Mapping[str, Any]) -> BusinessProf
         confidence="low",
         chapter_title="",
         diagnostics=("management_discussion_boundary_unavailable",),
+    )
+
+
+def assess_business_profile_recovery(
+    artifact: Mapping[str, Any],
+    *,
+    toc_probe_max_pages: int = 5,
+    section_max_pages: int = 20,
+) -> BusinessProfileRecoveryDecision:
+    """Classify a report and return only bounded pages eligible for recovery."""
+    pages = _pages(artifact)
+    page_numbers = tuple(int(item["page_number"]) for item in pages)
+    if not page_numbers:
+        return BusinessProfileRecoveryDecision(
+            "source_unrecoverable", _unavailable_outline(), diagnostics=("empty_pdf_artifact",)
+        )
+    outline = locate_business_profile_outline(
+        artifact, allow_full_document_fallback=False
+    )
+    probe_pages = tuple(page_numbers[: max(1, int(toc_probe_max_pages))])
+    if outline.source == "unavailable":
+        return BusinessProfileRecoveryDecision(
+            "source_unrecoverable", outline, toc_probe_pages=probe_pages,
+            diagnostics=outline.diagnostics,
+        )
+    if outline.source == "toc_unresolved":
+        return BusinessProfileRecoveryDecision(
+            "toc_probe_required", outline, toc_probe_pages=probe_pages,
+            diagnostics=("bounded_toc_probe_required",),
+        )
+    by_number = {int(page["page_number"]): page for page in pages}
+    scope = tuple(
+        number for number in range(outline.start_page, outline.end_page + 1)
+        if number in by_number
+    )
+    unusable = tuple(
+        number for number in scope
+        if not _usable_page(by_number[number])
+    )
+    if unusable:
+        target = unusable[: max(1, int(section_max_pages))]
+        return BusinessProfileRecoveryDecision(
+            "section_ocr_required", outline, section_pages=target,
+            diagnostics=("business_section_has_unusable_pages",),
+        )
+    return BusinessProfileRecoveryDecision(
+        "native_ready", outline, section_pages=scope,
+        diagnostics=("business_sections_native_ready",),
     )
 
 
@@ -154,6 +257,9 @@ def _toc_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str, int
             continue
         for line in text.splitlines():
             match = _TOC_ENTRY_RE.search(line.strip())
+            leading_page = _TOC_ENTRY_LEADING_PAGE_RE.search(line.strip())
+            if match is None and leading_page is not None:
+                match = leading_page
             if not match:
                 continue
             title = _clean_title(match.group("title"))
@@ -162,10 +268,21 @@ def _toc_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str, int
                     (
                         _chinese_section_number(match.group("number")),
                         title,
-                        int(match.group("page")),
+                        int(match.groupdict().get("page") or match.groupdict().get("page")),
                     )
                 )
     return _dedupe_entries(entries)
+
+
+def _bookmark_management_entry(
+    pages: Sequence[Mapping[str, Any]],
+) -> tuple[int, str] | None:
+    for page in pages:
+        title = str(page.get("bookmark_title") or "").strip()
+        normalized = re.sub(r"\s+", "", title)
+        if title and any(candidate in normalized for candidate in MANAGEMENT_DISCUSSION_TITLES):
+            return int(page.get("page_number") or 0), title
+    return None
 
 
 def _heading_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str, int]]:
@@ -180,6 +297,7 @@ def _heading_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str,
             if match is None:
                 continue
             title = _clean_title(match.group("title"))
+            title = re.sub(r"\s+\d{1,4}$", "", title).strip()
             if title:
                 entries.append(
                     (
@@ -188,7 +306,13 @@ def _heading_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str,
                         page_number,
                     )
                 )
-    return _dedupe_entries(entries)
+    # Page headers repeat the major chapter title on every page.  Keep the
+    # first physical page for each chapter number so the next chapter forms a
+    # real boundary rather than ending the current chapter on its first page.
+    first_by_number: dict[int, tuple[int, str, int]] = {}
+    for entry in sorted(entries, key=lambda item: (item[2], item[0])):
+        first_by_number.setdefault(entry[0], entry)
+    return list(first_by_number.values())
 
 
 def _find_management_entry(
@@ -250,3 +374,23 @@ def _unavailable_outline() -> BusinessProfileReportOutline:
         chapter_title="",
         diagnostics=("empty_pdf_artifact",),
     )
+
+
+def _unresolved_outline(page_count: int) -> BusinessProfileReportOutline:
+    return BusinessProfileReportOutline(
+        start_page=1,
+        end_page=max(1, page_count),
+        source="toc_unresolved",
+        confidence="low",
+        chapter_title="",
+        diagnostics=("management_discussion_boundary_unavailable",),
+    )
+
+
+def _usable_page(page: Mapping[str, Any]) -> bool:
+    text = str(page.get("text") or "").strip()
+    method = str(page.get("extraction_method") or "native_text")
+    status = str(page.get("native_text_status") or "")
+    return bool(text) and method in {"native_text", "alternate_native", "ocr"} and status not in {
+        "empty", "glyph_decoding_error", "extraction_error"
+    }

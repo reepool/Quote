@@ -49,7 +49,12 @@ from research.business_profile_numeric_reconciliation import (
     normalize_ratio,
     reconcile_gross_margin,
 )
-from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+from research.business_profile_pdf_artifacts import (
+    BusinessProfilePdfArtifactStore,
+    BusinessProfilePdfPageCache,
+    ensure_archived_pdf_page_artifact,
+    merge_business_profile_pdf_artifacts,
+)
 from research.business_profile_product_catalog import (
     load_business_product_catalog,
     normalize_product_alias,
@@ -59,7 +64,10 @@ from research.business_profile_promotion import (
     FieldFamilyPromotionManifest,
     PromotionContext,
 )
-from research.business_profile_report_outline import locate_business_profile_outline
+from research.business_profile_report_outline import (
+    assess_business_profile_recovery,
+    locate_business_profile_outline,
+)
 from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_section_selection import (
     ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
@@ -111,6 +119,145 @@ LOCAL_DERIVED_FAMILIES = {
     "commodity_exposure_facts",
     "commodity_exposure_publication",
 }
+
+
+def _recover_business_profile_document(
+    document: Mapping[str, Any],
+    page_result: Mapping[str, Any],
+    *,
+    toc_probe_max_pages: int = 5,
+    section_max_pages: int = 20,
+) -> tuple[dict[str, Any], Any, dict[str, Any]]:
+    """Run bounded TOC/section recovery and return the updated artifact."""
+    artifact = page_result["artifact"]
+    decision = assess_business_profile_recovery(
+        artifact,
+        toc_probe_max_pages=toc_probe_max_pages,
+        section_max_pages=section_max_pages,
+    )
+    timings: dict[str, float] = {"toc_recovery_seconds": 0.0, "section_recovery_seconds": 0.0}
+    # Existing injected/fixture artifacts may intentionally contain only a
+    # small native page set.  Do not turn a clean native artifact with no
+    # recovery diagnostics into an OCR request merely because no TOC heading
+    # was present in that fixture.
+    def artifact_value(name: str, default: Any = None) -> Any:
+        return artifact.get(name, default) if isinstance(artifact, Mapping) else getattr(artifact, name, default)
+
+    artifact_diagnostics = artifact_value("diagnostics", {}) or {}
+    artifact_pages = artifact_value("pages", []) or []
+    has_native_text = any(
+        bool(str((page.get("text") if isinstance(page, Mapping) else getattr(page, "text", "")) or "").strip())
+        for page in artifact_pages
+    )
+    if (
+        isinstance(artifact, Mapping)
+        and "diagnostics" not in artifact
+        and has_native_text
+        and not artifact_value("ocr_required_pages", [])
+        and str(artifact_value("status", "parsed") or "parsed") == "parsed"
+        and not artifact_value("parser_diagnostics", [])
+        and not artifact_diagnostics.get("glyph_decoding_pages")
+    ):
+        return page_result, locate_business_profile_outline(artifact), {
+            "recovery_state": "native_ready",
+            "recovery_diagnostics": ["clean_native_artifact_no_recovery_needed"],
+            "toc_probe_pages": [],
+            "section_ocr_pages": [],
+            **timings,
+        }
+    if (
+        len(artifact_pages) <= 5
+        and has_native_text
+        and not artifact_value("ocr_required_pages", [])
+        and not artifact_diagnostics.get("glyph_decoding_pages")
+    ):
+        return page_result, locate_business_profile_outline(artifact), {
+            "recovery_state": "native_ready",
+            "recovery_diagnostics": ["small_native_fixture_or_document"],
+            "toc_probe_pages": [],
+            "section_ocr_pages": [],
+            **timings,
+        }
+    archive_path = Path(str(document.get("archive_path") or ""))
+    if decision.state == "toc_probe_required" and decision.toc_probe_pages:
+        started = time.monotonic()
+        try:
+            recovered = ensure_archived_pdf_page_artifact(
+                document,
+                target_page_numbers=decision.toc_probe_pages,
+                ocr_mode="toc_probe",
+                recovery_policy="selective_recovery",
+                cache_backend=BusinessProfilePdfPageCache(archive_path.parent / "page_cache"),
+            )["artifact"]
+        except TypeError as exc:
+            if "target_page_numbers" not in str(exc):
+                raise
+            return page_result, locate_business_profile_outline(artifact), {
+                "recovery_state": "toc_unresolved",
+                "recovery_diagnostics": ["recovery_adapter_does_not_support_target_pages"],
+                "toc_probe_pages": list(decision.toc_probe_pages),
+                "section_ocr_pages": [],
+                **timings,
+            }
+        artifact = merge_business_profile_pdf_artifacts(artifact, recovered)
+        timings["toc_recovery_seconds"] = time.monotonic() - started
+        decision = assess_business_profile_recovery(
+            artifact,
+            toc_probe_max_pages=toc_probe_max_pages,
+            section_max_pages=section_max_pages,
+        )
+    if decision.state == "section_ocr_required" and decision.section_pages:
+        started = time.monotonic()
+        try:
+            recovered = ensure_archived_pdf_page_artifact(
+                document,
+                target_page_numbers=decision.section_pages,
+                ocr_mode="section_extract",
+                recovery_policy="selective_recovery",
+                cache_backend=BusinessProfilePdfPageCache(archive_path.parent / "page_cache"),
+            )["artifact"]
+        except TypeError as exc:
+            if "target_page_numbers" not in str(exc):
+                raise
+            return page_result, locate_business_profile_outline(artifact), {
+                "recovery_state": "partial_ocr",
+                "recovery_diagnostics": ["recovery_adapter_does_not_support_target_pages"],
+                "toc_probe_pages": list(decision.toc_probe_pages),
+                "section_ocr_pages": list(decision.section_pages),
+                **timings,
+            }
+        artifact = merge_business_profile_pdf_artifacts(artifact, recovered)
+        timings["section_recovery_seconds"] = time.monotonic() - started
+        decision = assess_business_profile_recovery(
+            artifact,
+            toc_probe_max_pages=toc_probe_max_pages,
+            section_max_pages=section_max_pages,
+        )
+    if artifact.artifact_hash != page_result.get("artifact_hash"):
+        store = BusinessProfilePdfArtifactStore()
+        write = store.write(artifact, source_pdf_path=archive_path)
+        page_result = {
+            **dict(page_result),
+            "artifact": artifact,
+            "artifact_path": write.artifact_path,
+            "artifact_hash": write.artifact_hash,
+            "status": write.status,
+        }
+    final_state = decision.state
+    if timings["toc_recovery_seconds"] > 0 and final_state == "toc_probe_required":
+        final_state = "toc_unresolved"
+    if (
+        timings["section_recovery_seconds"] > 0
+        and final_state == "section_ocr_required"
+    ):
+        final_state = "partial_ocr"
+    return page_result, decision.outline, {
+        "recovery_state": final_state,
+        "recovery_diagnostics": list(decision.diagnostics),
+        "toc_probe_pages": list(decision.toc_probe_pages),
+        "section_ocr_pages": list(decision.section_pages),
+        **timings,
+    }
 
 
 @dataclass(frozen=True)
@@ -941,12 +1088,14 @@ class BusinessProfileSemanticRuntime:
         by_field_family: dict[str, dict[str, float]] = {}
         outline_sources: dict[str, int] = {}
         outline_confidences: dict[str, int] = {}
+        recovery_states: dict[str, int] = {}
         outline_pages_scoped = 0
         planned_documents = 0
         page_artifact_cache: dict[tuple[str, str], dict[str, Any]] = {}
         page_artifact_cache_hits = 0
         page_artifact_cache_misses = 0
         pdf_parser_warning_count = 0
+        budget_stop_reason: str | None = None
         timing_totals = {
             "pdf_hash_read_seconds": 0.0,
             "pdf_cache_read_seconds": 0.0,
@@ -955,6 +1104,8 @@ class BusinessProfileSemanticRuntime:
             "outline_seconds": 0.0,
             "selection_seconds": 0.0,
             "selected_artifact_write_seconds": 0.0,
+            "toc_recovery_seconds": 0.0,
+            "section_recovery_seconds": 0.0,
         }
         selector = BusinessProfileSectionSelector(
             max_pages=min(12, config.budgets.max_pages)
@@ -1002,11 +1153,15 @@ class BusinessProfileSemanticRuntime:
                         page_result = ensure_archived_pdf_page_artifact(document)
                         pdf_artifact = page_result["artifact"]
                         outline_started = time.monotonic()
-                        outline = locate_business_profile_outline(pdf_artifact)
+                        page_result, outline, recovery_metrics = _recover_business_profile_document(
+                            document, page_result
+                        )
+                        pdf_artifact = page_result["artifact"]
                         outline_seconds = time.monotonic() - outline_started
                         page_artifact_cache[document_cache_key] = {
                             "page_result": page_result,
                             "outline": outline,
+                            "recovery_metrics": recovery_metrics,
                         }
                         page_artifact_cache_misses += 1
                         pdf_parser_warning_count += int(
@@ -1017,6 +1172,7 @@ class BusinessProfileSemanticRuntime:
                         page_result = dict(cached_document["page_result"])
                         pdf_artifact = page_result["artifact"]
                         outline = cached_document["outline"]
+                        recovery_metrics = dict(cached_document.get("recovery_metrics") or {})
                         page_artifact_cache_hits += 1
                         outline_seconds = 0.0
                         page_timings = {}
@@ -1027,6 +1183,22 @@ class BusinessProfileSemanticRuntime:
                         outline_confidences.get(outline.confidence, 0) + 1
                     )
                     outline_pages_scoped += outline.end_page - outline.start_page + 1
+                    recovery_state = str(recovery_metrics.get("recovery_state") or "native_ready")
+                    recovery_states[recovery_state] = recovery_states.get(recovery_state, 0) + 1
+                    if recovery_state in {"toc_probe_required", "toc_unresolved", "source_unrecoverable", "section_ocr_required", "partial_ocr"}:
+                        machine_rework.append(
+                            _rework_item(plan, document, f"pdf_recovery_{recovery_state}")
+                        )
+                        _increment_family_metrics(
+                            by_field_family, plan["field_family"], machine_rework=1
+                        )
+                        logger.warning(
+                            "business-profile recovery blocked semantic input instrument_id=%s "
+                            "document_id=%s state=%s diagnostics=%s",
+                            plan["instrument_id"], document.get("identity"), recovery_state,
+                            recovery_metrics.get("recovery_diagnostics"),
+                        )
+                        continue
                     templates = self._templates_for(document, plan["instrument_id"])
                     due_rework = self._due_rework_reasons(
                         instrument_id=plan["instrument_id"],
@@ -1065,6 +1237,28 @@ class BusinessProfileSemanticRuntime:
                             page_scope=outline.page_numbers,
                         )
                     selection_seconds = time.monotonic() - selection_started
+                    selected_characters = sum(
+                        len(item.normalized_text) for item in selected.sections
+                    )
+                    if characters + selected_characters > config.budgets.max_characters:
+                        budget_stop_reason = "budget_exhausted:characters"
+                        logger.info(
+                            "business-profile selection stopped at character budget "
+                            "instrument_id=%s field_family=%s current=%s next=%s limit=%s",
+                            plan["instrument_id"], plan["field_family"], characters,
+                            selected_characters, config.budgets.max_characters,
+                        )
+                        break
+                    unusable_selected_pages = [
+                        item.page_number
+                        for item in selected.sections
+                        if item.quality in {"low_text", "unsupported"}
+                    ]
+                    if unusable_selected_pages:
+                        raise ValueError(
+                            "selected business-profile pages are unusable for semantic input: "
+                            f"pages={unusable_selected_pages}"
+                        )
                     selected_write_started = time.monotonic()
                     selected_path, write_status = self.section_store.write(selected)
                     selected_write_seconds = time.monotonic() - selected_write_started
@@ -1084,6 +1278,8 @@ class BusinessProfileSemanticRuntime:
                         "outline_seconds": outline_seconds,
                         "selection_seconds": selection_seconds,
                         "selected_artifact_write_seconds": selected_write_seconds,
+                        "toc_recovery_seconds": float(recovery_metrics.get("toc_recovery_seconds") or 0),
+                        "section_recovery_seconds": float(recovery_metrics.get("section_recovery_seconds") or 0),
                     }
                     for metric_name, elapsed in document_timings.items():
                         timing_totals[metric_name] += elapsed
@@ -1153,6 +1349,7 @@ class BusinessProfileSemanticRuntime:
                         "template_scopes": [item.scope.scope_id for item in templates],
                         "expanded_for_missing_context": prior is not None,
                         "outline": outline.to_dict(),
+                        "recovery": recovery_metrics,
                     }
                 )
         for exception in machine_rework:
@@ -1189,6 +1386,8 @@ class BusinessProfileSemanticRuntime:
                 "selected_pages": pages,
                 "outline_sources": outline_sources,
                 "outline_confidences": outline_confidences,
+                "recovery_states": recovery_states,
+                "budget_stop_reason": budget_stop_reason,
                 "outline_pages_scoped": outline_pages_scoped,
                 "page_artifact_cache_hits": page_artifact_cache_hits,
                 "page_artifact_cache_misses": page_artifact_cache_misses,
@@ -1208,6 +1407,7 @@ class BusinessProfileSemanticRuntime:
                 "pdf_parser_warning_count": pdf_parser_warning_count,
                 **timing_totals,
                 "by_field_family": by_field_family,
+                "budget_stop_reason": budget_stop_reason,
             },
         }
 

@@ -294,6 +294,14 @@ class BusinessProfileSemanticPipeline:
                 str(result.get("reason") or stop_reason or result["status"]),
             )
         quality = dict(result.get("quality") or {})
+        stage_budget_stop = str(quality.get("budget_stop_reason") or "").strip()
+        if stage_budget_stop:
+            checkpoint["completed_stages"] = list(
+                dict.fromkeys([*checkpoint["completed_stages"], stage])
+            )
+            checkpoint["artifacts"][stage] = result.get("artifact")
+            stopped = self._stop(checkpoint, stage_budget_stop)
+            return {**stopped, "quality": quality}
         if quality and not bool(quality.get("stage_ready", True)):
             checkpoint["artifacts"][stage] = result.get("artifact")
             if quality.get("blocked_configuration") is True:

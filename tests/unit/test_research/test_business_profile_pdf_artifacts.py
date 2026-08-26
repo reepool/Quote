@@ -10,10 +10,12 @@ from research.business_profile_pdf_artifacts import (
     BUSINESS_PROFILE_PDF_ARTIFACT_SCHEMA_VERSION,
     BusinessProfilePdfArtifactExtractor,
     BusinessProfilePdfArtifactStore,
+    BusinessProfilePdfPageCache,
     build_not_disclosed_diagnostic,
     build_table_parse_failure_diagnostic,
     build_unsupported_template_diagnostic,
     ensure_archived_pdf_page_artifact,
+    merge_business_profile_pdf_artifacts,
 )
 from scripts.research_business_profile_pdf_artifact import build_pdf_artifact
 
@@ -92,12 +94,30 @@ def test_low_text_only_enters_ocr_queue_when_page_is_targeted():
 def test_target_pages_are_forwarded_to_shared_router_and_profile_is_cache_identity():
     content = _pdf_bytes(["first page native text", "second page native text"])
     native = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_native")
-    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_paddleocr")
+    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pdfium_paddleocr_cpu")
 
     targeted = native.extract_bytes(content, target_page_numbers=[2])
 
     assert [page.page_number for page in targeted.pages] == [2]
     assert native._parameter_hash({2}) != ocr._parameter_hash({2})
+
+
+def test_page_cache_round_trip_and_recovery_merge(tmp_path):
+    content = _pdf_bytes(["Principal Business native text", "bad"])
+    base = BusinessProfilePdfArtifactExtractor(low_text_character_threshold=10).extract_bytes(
+        content, target_page_numbers=[1]
+    )
+    recovered = BusinessProfilePdfArtifactExtractor(low_text_character_threshold=10).extract_bytes(
+        content, target_page_numbers=[2], ocr_mode="section_extract", recovery_policy="force_ocr"
+    )
+    merged = merge_business_profile_pdf_artifacts(base, recovered)
+    assert merged.page_count == 2
+    assert [page.page_number for page in merged.pages] == [1, 2]
+
+    cache = BusinessProfilePdfPageCache(tmp_path / "cache")
+    identity = {"content_hash": "a" * 64, "physical_page_number": 2, "profile": "test"}
+    cache.put(identity, {"selected_method": "ocr", "selected_text": "cached"})
+    assert cache.get(identity)["selected_text"] == "cached"
 
 
 def test_artifact_page_preserves_ocr_method_confidence_and_provenance(monkeypatch):
@@ -380,7 +400,7 @@ def test_archived_artifact_cache_is_separate_for_engine_profiles(tmp_path):
     }
     store = BusinessProfilePdfArtifactStore()
     native = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_native", low_text_character_threshold=5)
-    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pypdf_paddleocr", low_text_character_threshold=5)
+    ocr = BusinessProfilePdfArtifactExtractor(engine_profile="pdfium_paddleocr_cpu", low_text_character_threshold=5)
 
     first = ensure_archived_pdf_page_artifact(manifest, extractor=native, store=store)
     second = ensure_archived_pdf_page_artifact(manifest, extractor=ocr, store=store)
@@ -390,13 +410,13 @@ def test_archived_artifact_cache_is_separate_for_engine_profiles(tmp_path):
     assert first["artifact_path"] != second["artifact_path"]
 
 
-def test_600036_mapping_corruption_is_ocr_required_not_not_disclosed():
+def test_600036_mapping_corruption_is_recovered_natively_not_ocr():
     path = Path("data/filings/announcements/blobs/ab/abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79.pdf")
     if not path.exists():
         pytest.skip("optional archived 600036.SH fixture is not present")
     artifact = BusinessProfilePdfArtifactExtractor().extract_file(path, source_file_id="600036.SH")
-    assert artifact.status == "ocr_required"
+    assert artifact.status == "parsed"
     assert artifact.page_count == 350
-    assert sum(page.native_text_status == "glyph_decoding_error" for page in artifact.pages) >= 300
-    assert len(artifact.heading_index) == 0
+    assert sum(page.native_text_status == "glyph_decoding_error" for page in artifact.pages) == 0
+    assert len(artifact.heading_index) > 0
     assert not any(d.outcome == "not_disclosed" for d in artifact.parser_diagnostics)

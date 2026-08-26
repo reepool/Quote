@@ -205,5 +205,9 @@ def _require_isolated_gpu_runtime(profile: PdfProfile) -> None:
     from .adapters import PaddleOcrAdapter
 
     probe = PaddleOcrAdapter.probe_runtime(profile)
-    if not probe.get("healthy") or not probe.get("cuda_available"):
+    if (
+        not probe.get("healthy")
+        or not probe.get("cuda_available")
+        or probe.get("model_cache_writable") is False
+    ):
         raise ValueError("GPU PDF profile requires a healthy isolated CUDA OCR worker")

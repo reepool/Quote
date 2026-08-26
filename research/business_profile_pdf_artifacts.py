@@ -21,7 +21,7 @@ BUSINESS_PROFILE_PDF_ARTIFACT_SCHEMA_VERSION = "business_profile_pdf_artifact.v2
 # v3 detects valid-Unicode mojibake (for example a broken ToUnicode map), not
 # only replacement/control characters.  The version invalidates old manifests
 # whose page-level diagnostics under-reported these pages.
-BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION = "business_profile_pypdf.v3"
+BUSINESS_PROFILE_PDF_EXTRACTOR_VERSION = "business_profile_pdfium_recovery.v4"
 DEFAULT_LOW_TEXT_CHARACTER_THRESHOLD = 40
 DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD = 0.05
 DEFAULT_GLYPH_DECODING_MIN_CHARACTERS = 3
@@ -209,6 +209,9 @@ class BusinessProfilePdfPageArtifact:
     extraction_method: str = "native_text"
     ocr_confidence: Optional[float] = None
     extraction_provenance: List[Dict[str, Any]] = field(default_factory=list)
+    pdf_page_label: Optional[str] = None
+    printed_page_label: Optional[str] = None
+    bookmark_title: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -236,6 +239,7 @@ class BusinessProfilePdfArtifact:
     parser_diagnostics: List[BusinessProfileParserDiagnostic]
     diagnostics: Dict[str, Any]
     artifact_hash: str
+    recovery_state: str = "native_ready"
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -349,12 +353,18 @@ class BusinessProfilePdfArtifactExtractor:
         source_file_id: Optional[str] = None,
         source_pdf_path: Optional[str] = None,
         target_page_numbers: Iterable[int] = (),
+        ocr_mode: str = "none",
+        recovery_policy: str = "native_first",
+        cache_backend: Any | None = None,
+        mode_budget: Any | None = None,
     ) -> BusinessProfilePdfArtifact:
         """Extract an artifact without writing it to disk."""
         content_bytes = bytes(content or b"")
         content_hash = hashlib.sha256(content_bytes).hexdigest()
         target_pages = self._normalize_target_pages(target_page_numbers)
-        parameter_hash = self._parameter_hash(target_pages)
+        parameter_hash = self._parameter_hash(
+            target_pages, ocr_mode=ocr_mode, recovery_policy=recovery_policy
+        )
         if not content_bytes.lstrip().startswith(b"%PDF-"):
             return self._failure_artifact(
                 source_file_id=source_file_id,
@@ -379,6 +389,10 @@ class BusinessProfilePdfArtifactExtractor:
                 content=content_bytes,
                 profile=profile,
                 target_pages=tuple(sorted(target_pages)),
+                ocr_mode=ocr_mode,
+                recovery_policy=recovery_policy,
+                cache_backend=cache_backend,
+                mode_budget=mode_budget,
             )
         )
         if result.status == "failed":
@@ -430,7 +444,10 @@ class BusinessProfilePdfArtifactExtractor:
                 "",
             )
             diagnostic_text = native_candidate_text or text
-            native_text_status = "extracted" if diagnostic_text.strip() else "empty"
+            native_text_status = (
+                "ocr" if shared_page.extraction_method == "ocr"
+                else "extracted" if diagnostic_text.strip() else "empty"
+            )
             if shared_page.quality_status == "native_text_mapping_error":
                 native_text_status = "glyph_decoding_error"
                 glyph_decoding_pages.append(page_number)
@@ -442,6 +459,15 @@ class BusinessProfilePdfArtifactExtractor:
             width, height = shared_page.width_points, shared_page.height_points
             non_whitespace = len(re.sub(r"\s+", "", diagnostic_text))
             suspicious_glyphs = self._suspicious_glyph_count(diagnostic_text)
+            diagnostic_control_count = max(
+                (
+                    int(item.details.get("controls", 0)) + int(item.details.get("replacement", 0))
+                    for item in shared_page.diagnostics
+                    if isinstance(item.details, Mapping)
+                ),
+                default=0,
+            )
+            suspicious_glyphs = max(suspicious_glyphs, diagnostic_control_count)
             suspicious_glyph_ratio = (
                 suspicious_glyphs / non_whitespace if non_whitespace else 0.0
             )
@@ -489,6 +515,9 @@ class BusinessProfilePdfArtifactExtractor:
                 "extraction_method": shared_page.extraction_method,
                 "ocr_confidence": shared_page.confidence,
                 "extraction_provenance": [dict(item) for item in shared_page.provenance],
+                "pdf_page_label": shared_page.pdf_page_label,
+                "printed_page_label": shared_page.printed_page_label,
+                "bookmark_title": shared_page.bookmark_title,
             }
             pages.append(
                 BusinessProfilePdfPageArtifact(
@@ -559,7 +588,17 @@ class BusinessProfilePdfArtifactExtractor:
             "engine_profile": self.engine_profile,
             "extraction_methods": sorted({item.extraction_method for item in pages}),
             "ocr_page_count": sum(item.extraction_method == "ocr" for item in pages),
+            "ocr_mode": ocr_mode,
+            "recovery_policy": recovery_policy,
         }
+        recovery_state = (
+            "partial_ocr"
+            if any(item.extraction_method == "ocr" for item in pages)
+            and any(item.ocr_required for item in pages)
+            else "native_ready"
+            if not ocr_required_pages
+            else "section_ocr_required"
+        )
         payload = self._artifact_payload(
             source_file_id=source_file_id,
             source_pdf_path=source_pdf_path,
@@ -574,6 +613,7 @@ class BusinessProfilePdfArtifactExtractor:
             ocr_required_pages=ocr_required_pages,
             parser_diagnostics=parser_diagnostics,
             diagnostics=diagnostics,
+            recovery_state=recovery_state,
         )
         return BusinessProfilePdfArtifact(
             **payload,
@@ -616,6 +656,7 @@ class BusinessProfilePdfArtifactExtractor:
             ocr_required_pages=[],
             parser_diagnostics=[parser_diagnostic],
             diagnostics=diagnostics,
+            recovery_state="source_unrecoverable",
         )
         return BusinessProfilePdfArtifact(
             **payload,
@@ -642,12 +683,15 @@ class BusinessProfilePdfArtifactExtractor:
         return output
 
     def _artifact_hash(self, payload: Mapping[str, Any]) -> str:
-        hashable = self._serializable_payload(payload)
-        hashable.pop("source_pdf_path", None)
-        hashable.pop("source_file_id", None)
-        return self._stable_hash(hashable)
+        return _artifact_hash(payload)
 
-    def _parameter_hash(self, target_pages: set[int]) -> str:
+    def _parameter_hash(
+        self,
+        target_pages: set[int],
+        *,
+        ocr_mode: str = "none",
+        recovery_policy: str = "native_first",
+    ) -> str:
         return self._stable_hash(
             {
                 "extractor_version": self.extractor_version,
@@ -660,6 +704,8 @@ class BusinessProfilePdfArtifactExtractor:
                 },
                 "engine_profile": self.engine_profile,
                 "target_page_numbers": sorted(target_pages),
+                "ocr_mode": ocr_mode,
+                "recovery_policy": recovery_policy,
             }
         )
 
@@ -790,6 +836,10 @@ class BusinessProfilePdfArtifactExtractor:
 
 class BusinessProfilePdfArtifactStore:
     """Write compressed, immutable page artifacts beside the archived original."""
+
+    def page_cache(self) -> "BusinessProfilePdfPageCache":
+        """Return the content-addressed page cache used by the shared router."""
+        return BusinessProfilePdfPageCache(Path("data/derived/business_profile/page_cache"))
 
     def artifact_path(
         self,
@@ -959,6 +1009,133 @@ _PYPDF_WARNING_FILTER = _PypdfWarningFilter()
 _PYPDF_FILTER_LOCK = threading.Lock()
 
 
+def _artifact_hash(payload: Mapping[str, Any]) -> str:
+    """Calculate the immutable artifact hash without source-path identity."""
+    hashable = dict(payload)
+    hashable["pages"] = [
+        item.to_dict() if hasattr(item, "to_dict") else dict(item)
+        for item in hashable.get("pages") or []
+    ]
+    hashable["heading_index"] = [
+        asdict(item) if hasattr(item, "__dataclass_fields__") else dict(item)
+        for item in hashable.get("heading_index") or []
+    ]
+    hashable["parser_diagnostics"] = [
+        item.to_dict() if hasattr(item, "to_dict") else dict(item)
+        for item in hashable.get("parser_diagnostics") or []
+    ]
+    hashable.pop("artifact_hash", None)
+    hashable.pop("source_pdf_path", None)
+    hashable.pop("source_file_id", None)
+    return hashlib.sha256(
+        json.dumps(
+            hashable,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+class BusinessProfilePdfPageCache:
+    """Small file-backed adapter for the shared PDF page-cache protocol."""
+
+    def __init__(self, root: str | Path):
+        self.root = Path(root)
+
+    @staticmethod
+    def _key(identity: Mapping[str, Any]) -> str:
+        return hashlib.sha256(
+            json.dumps(dict(identity), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            .encode("utf-8")
+        ).hexdigest()
+
+    def get(self, identity: Mapping[str, Any]) -> Optional[Mapping[str, Any]]:
+        path = self.root / f"{self._key(identity)}.json.gz"
+        if not path.is_file():
+            return None
+        try:
+            return json.loads(gzip.decompress(path.read_bytes()).decode("utf-8"))
+        except (OSError, ValueError, gzip.BadGzipFile, json.JSONDecodeError):
+            logger.warning("business-profile page cache entry unreadable path=%s", path)
+            return None
+
+    def put(self, identity: Mapping[str, Any], page: Any) -> None:
+        payload = asdict(page) if hasattr(page, "__dataclass_fields__") else dict(page)
+        path = self.root / f"{self._key(identity)}.json.gz"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        temporary = path.with_name(f".{path.name}.{os.getpid()}.{time.monotonic_ns()}.part")
+        temporary.write_bytes(gzip.compress(raw, compresslevel=6, mtime=0))
+        try:
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+
+def merge_business_profile_pdf_artifacts(
+    base: BusinessProfilePdfArtifact,
+    recovered: BusinessProfilePdfArtifact,
+) -> BusinessProfilePdfArtifact:
+    """Merge targeted recovery pages into a full native artifact."""
+    pages_by_number = {page.page_number: page for page in base.pages}
+    replaced: list[int] = []
+    for page in recovered.pages:
+        current = pages_by_number.get(page.page_number)
+        recovered_usable = bool(page.text.strip()) and page.extraction_method in {
+            "native_text", "alternate_native", "ocr"
+        } and page.native_text_status not in {"glyph_decoding_error", "extraction_error", "empty"}
+        current_usable = bool(current and current.text.strip()) and current.native_text_status in {
+            "extracted", "ocr"
+        }
+        if current is None or (recovered_usable and not current_usable):
+            pages_by_number[page.page_number] = page
+            replaced.append(page.page_number)
+    pages = [pages_by_number[number] for number in sorted(pages_by_number)]
+    headings = [match for page in pages for match in page.heading_matches]
+    ocr_required = [page.page_number for page in pages if page.ocr_required]
+    low_text = [page.page_number for page in pages if page.non_whitespace_character_count < DEFAULT_LOW_TEXT_CHARACTER_THRESHOLD]
+    diagnostics = dict(base.diagnostics)
+    diagnostics.update(
+        {
+            "recovered_page_numbers": sorted(set(replaced)),
+            "extraction_methods": sorted({page.extraction_method for page in pages}),
+            "ocr_page_count": sum(page.extraction_method == "ocr" for page in pages),
+        }
+    )
+    parser_diagnostics = list(base.parser_diagnostics)
+    for item in recovered.parser_diagnostics:
+        if item.to_dict() not in [existing.to_dict() for existing in parser_diagnostics]:
+            parser_diagnostics.append(item)
+    payload = {
+        "schema_version": base.schema_version,
+        "extractor_version": recovered.extractor_version,
+        "source_file_id": base.source_file_id,
+        "source_pdf_path": base.source_pdf_path,
+        "source_content_hash": base.source_content_hash,
+        "parameter_hash": recovered.parameter_hash,
+        "status": "partial" if any(page.ocr_required for page in pages) else "parsed",
+        "encrypted": base.encrypted or recovered.encrypted,
+        "page_count": base.page_count,
+        "pages": pages,
+        "heading_index": headings,
+        "low_text_pages": low_text,
+        "ocr_required_pages": ocr_required,
+        "parser_diagnostics": parser_diagnostics,
+        "diagnostics": diagnostics,
+        "recovery_state": recovered.recovery_state,
+    }
+    payload["artifact_hash"] = _artifact_hash(
+        {
+            **payload,
+            "pages": [page.to_dict() for page in pages],
+            "heading_index": [asdict(item) for item in headings],
+            "parser_diagnostics": [item.to_dict() for item in parser_diagnostics],
+        }
+    )
+    return BusinessProfilePdfArtifact(**payload)
+
+
 @contextmanager
 def _aggregate_pypdf_warnings():
     collector: Dict[str, Any] = {"count": 0, "samples": []}
@@ -980,6 +1157,10 @@ def ensure_archived_pdf_page_artifact(
     extractor: Optional[BusinessProfilePdfArtifactExtractor] = None,
     store: Optional[BusinessProfilePdfArtifactStore] = None,
     target_page_numbers: Iterable[int] = (),
+    ocr_mode: str = "none",
+    recovery_policy: str = "native_first",
+    mode_budget: Any | None = None,
+    cache_backend: Any | None = None,
 ) -> Dict[str, Any]:
     """Create or reuse native page artifacts for one verified archived PDF."""
 
@@ -999,7 +1180,9 @@ def ensure_archived_pdf_page_artifact(
     active_store = store or BusinessProfilePdfArtifactStore()
     source_file_id = str(manifest.get("source_file_id") or "") or None
     target_pages = active_extractor._normalize_target_pages(target_page_numbers)
-    parameter_hash = active_extractor._parameter_hash(target_pages)
+    parameter_hash = active_extractor._parameter_hash(
+        target_pages, ocr_mode=ocr_mode, recovery_policy=recovery_policy
+    )
     artifact_path = active_store.artifact_path(
         archive_path,
         source_content_hash=expected_hash,
@@ -1048,6 +1231,10 @@ def ensure_archived_pdf_page_artifact(
             source_file_id=source_file_id,
             source_pdf_path=str(archive_path),
             target_page_numbers=target_pages,
+            ocr_mode=ocr_mode,
+            recovery_policy=recovery_policy,
+            mode_budget=mode_budget,
+            cache_backend=cache_backend,
         )
     extract_completed = time.monotonic()
     write_result = active_store.write(artifact)
