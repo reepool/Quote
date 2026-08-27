@@ -52,6 +52,7 @@ from research.business_profile_numeric_reconciliation import (
 from research.business_profile_pdf_artifacts import (
     BusinessProfilePdfArtifactStore,
     BusinessProfilePdfPageCache,
+    _artifact_hash,
     ensure_archived_pdf_page_artifact,
     merge_business_profile_pdf_artifacts,
 )
@@ -234,6 +235,24 @@ def _recover_business_profile_document(
             section_max_pages=section_max_pages,
         )
     if artifact.artifact_hash != page_result.get("artifact_hash"):
+        # A targeted OCR artifact and the merged full-document artifact have
+        # different contents but can otherwise share the same extractor and
+        # request parameters. Give the merged artifact its own cache identity;
+        # writing it back to the targeted-page path causes an immutable-cache
+        # hash collision on the next recovery pass.
+        merged_parameter_hash = hashlib.sha256(
+            (
+                "business-profile-merged-recovery:"
+                f"{artifact.parameter_hash}:"
+                f"{page_result.get('artifact_hash') or ''}:"
+                f"{artifact.artifact_hash}"
+            ).encode("utf-8")
+        ).hexdigest()
+        artifact = replace(artifact, parameter_hash=merged_parameter_hash)
+        artifact = replace(
+            artifact,
+            artifact_hash=_artifact_hash(artifact.to_dict()),
+        )
         store = BusinessProfilePdfArtifactStore()
         write = store.write(artifact, source_pdf_path=archive_path)
         page_result = {
@@ -1233,15 +1252,40 @@ class BusinessProfileSemanticRuntime:
                         )
                     else:
                         selection_started = time.monotonic()
-                        selected = selector.expand_for_missing_context(
-                            prior=prior,
-                            artifact=pdf_artifact,
-                            instrument_id=plan["instrument_id"],
-                            source_document_id=document["identity"],
-                            field_family=selection_family,
-                            templates=templates,
-                            page_scope=outline.page_numbers,
-                        )
+                        try:
+                            selected = selector.expand_for_missing_context(
+                                prior=prior,
+                                artifact=pdf_artifact,
+                                instrument_id=plan["instrument_id"],
+                                source_document_id=document["identity"],
+                                field_family=selection_family,
+                                templates=templates,
+                                page_scope=outline.page_numbers,
+                            )
+                        except (FileNotFoundError, RuntimeError, ValueError) as exc:
+                            # A prior artifact can outlive a changed outline
+                            # or parser identity. Re-select from the current
+                            # bounded outline before classifying the document
+                            # as machine rework.
+                            logger.warning(
+                                "business-profile stale context expansion fallback "
+                                "instrument_id=%s field_family=%s source_document_id=%s "
+                                "error_type=%s error=%s",
+                                plan["instrument_id"],
+                                plan["field_family"],
+                                document["identity"],
+                                type(exc).__name__,
+                                str(exc)[:500],
+                            )
+                            selected = selector.select(
+                                artifact=pdf_artifact,
+                                instrument_id=plan["instrument_id"],
+                                source_document_id=document["identity"],
+                                field_family=selection_family,
+                                templates=templates,
+                                page_scope=outline.page_numbers,
+                            )
+                            prior = None
                     selection_seconds = time.monotonic() - selection_started
                     selected_characters = sum(
                         len(item.normalized_text) for item in selected.sections
@@ -1310,7 +1354,15 @@ class BusinessProfileSemanticRuntime:
                     )
                 except (FileNotFoundError, RuntimeError, ValueError) as exc:
                     machine_rework.append(
-                        _rework_item(plan, document, _selection_failure_reason(exc))
+                        _rework_item(
+                            plan,
+                            document,
+                            _selection_failure_reason(exc),
+                            diagnostics={
+                                "error_type": type(exc).__name__,
+                                "error": str(exc)[:500],
+                            },
+                        )
                     )
                     _increment_family_metrics(
                         by_field_family, plan["field_family"], machine_rework=1
@@ -1356,6 +1408,10 @@ class BusinessProfileSemanticRuntime:
                         "expanded_for_missing_context": prior is not None,
                         "outline": outline.to_dict(),
                         "recovery": recovery_metrics,
+                        "evidence_context_hash": _evidence_context_hash(
+                            str(document.get("identity") or ""),
+                            str(selected.artifact_hash),
+                        ),
                     }
                 )
         for exception in machine_rework:
@@ -2372,6 +2428,10 @@ class BusinessProfileSemanticRuntime:
                             "runtime_identities": dict(scope.identities),
                             "result_policy": self.result_policy,
                             "document_hash": item["document"].get("content_hash"),
+                            "evidence_context_hash": _evidence_context_hash(
+                                str(item["document"].get("identity") or ""),
+                                str(item["selected_artifact_hash"] or ""),
+                            ),
                             "page_artifact_hash": item["page_artifact_hash"],
                             "selected_artifact_path": item["selected_artifact_path"],
                             "parser_diagnostics": [
@@ -2460,6 +2520,10 @@ class BusinessProfileSemanticRuntime:
                     "expected_non_disclosure": expected_non_disclosure,
                     "semantic_family_complete": semantic_family_complete,
                     "unit_conversion_pending": unit_conversion_pending,
+                    "evidence_context_hash": _evidence_context_hash(
+                        str(item["document"].get("identity") or ""),
+                        str(item["selected_artifact_hash"] or ""),
+                    ),
                 }
             )
             _increment_family_metrics(
@@ -2689,6 +2753,23 @@ class BusinessProfileSemanticRuntime:
         )
         verifications: list[dict[str, Any]] = []
         verified_target_ids: set[str] = set()
+        current_context_by_target: dict[str, str] = {}
+        for output in extracted.get("outputs") or []:
+            context_hash = str(
+                output.get("evidence_context_hash")
+                or _evidence_context_hash(
+                    str((output.get("document") or {}).get("identity") or ""),
+                    str(output.get("selected_artifact_hash") or ""),
+                )
+            )
+            for record_type in (
+                "activities",
+                "relationships",
+                "segments",
+                "operating_facts",
+            ):
+                for target_id in output.get("record_ids", {}).get(record_type, []):
+                    current_context_by_target[str(target_id)] = context_hash
         for item in (prior_verify or {}).get("verifications") or []:
             if not isinstance(item, Mapping):
                 continue
@@ -2696,6 +2777,10 @@ class BusinessProfileSemanticRuntime:
                 continue
             target_id = str(item.get("target_id") or "")
             if not target_id or target_id in verified_target_ids:
+                continue
+            if str(item.get("evidence_context_hash") or "") != current_context_by_target.get(
+                target_id, ""
+            ):
                 continue
             verifications.append(dict(item))
             verified_target_ids.add(target_id)
@@ -2717,6 +2802,11 @@ class BusinessProfileSemanticRuntime:
             if not isinstance(item, Mapping):
                 continue
             key = (item.get("target_id"), item.get("reason_code"))
+            target_id = str(item.get("target_id") or "")
+            if str(item.get("evidence_context_hash") or "") != current_context_by_target.get(
+                target_id, ""
+            ):
+                continue
             if key not in inherited_rework_keys:
                 machine_rework.append(dict(item))
                 inherited_rework_keys.add(key)
@@ -2753,11 +2843,74 @@ class BusinessProfileSemanticRuntime:
                 field_family=field_family,
             )
 
-        for output in extracted["outputs"]:
-            selected = _load_selected(
-                self.section_store, output["selected_artifact_path"]
+        def record_selected_artifact_failure(
+            output: Mapping[str, Any], exc: Exception
+        ) -> None:
+            """Convert a missing/corrupt selected artifact into recoverable work."""
+
+            nonlocal errors
+            family = str(output.get("field_family") or "unknown")
+            diagnostics = _runtime_failure_diagnostics(
+                exc,
+                transformation_stage="semantic_verification_context",
+                semantic_audit=None,
             )
+            for record_type in (
+                "activities",
+                "relationships",
+                "segments",
+                "operating_facts",
+            ):
+                for target_id in output.get("record_ids", {}).get(record_type, []):
+                    target_id = str(target_id or "")
+                    if not target_id or target_id in verified_target_ids:
+                        continue
+                    target_order.setdefault(target_id, len(target_order))
+                    failure = _rework_item(
+                        output,
+                        output.get("document") or {},
+                        "evidence_provenance_failed",
+                        target_id,
+                        diagnostics=diagnostics,
+                    )
+                    machine_rework[:] = [
+                        item
+                        for item in machine_rework
+                        if str(item.get("target_id") or "") != target_id
+                    ]
+                    machine_rework.append(failure)
+                    new_machine_rework.append(failure)
+                    errors += 1
+                    _increment_family_metrics(
+                        by_field_family,
+                        family,
+                        machine_rework=1,
+                        errors=1,
+                    )
+                    _log_runtime_semantic_failure(
+                        output,
+                        reason="evidence_provenance_failed",
+                        exc=exc,
+                        diagnostics=diagnostics,
+                    )
+
+        for output in extracted["outputs"]:
             family = str(output["field_family"])
+            try:
+                selected = _load_selected(
+                    self.section_store, output["selected_artifact_path"]
+                )
+            except (
+                FileNotFoundError,
+                OSError,
+                TypeError,
+                ValueError,
+                KeyError,
+                AttributeError,
+                json.JSONDecodeError,
+            ) as exc:
+                record_selected_artifact_failure(output, exc)
+                continue
             for record_type in (
                 "activities",
                 "relationships",
@@ -2796,6 +2949,9 @@ class BusinessProfileSemanticRuntime:
                                     else "held"
                                 ),
                                 "proof": deterministic_proof,
+                                "evidence_context_hash": str(
+                                    output.get("evidence_context_hash") or ""
+                                ),
                             }
                         )
                         verified_target_ids.add(target_id)
@@ -2813,6 +2969,9 @@ class BusinessProfileSemanticRuntime:
                                 "target_id": target_id,
                                 "decision": "validated",
                                 "proof": program_proof,
+                                "evidence_context_hash": str(
+                                    output.get("evidence_context_hash") or ""
+                                ),
                             }
                         )
                         verified_target_ids.add(target_id)
@@ -2840,6 +2999,9 @@ class BusinessProfileSemanticRuntime:
                             "target_id": target_id,
                             "verification_target": verification_target,
                             "selected": selected,
+                            "evidence_context_hash": str(
+                                output.get("evidence_context_hash") or ""
+                            ),
                         }
                     )
 
@@ -2950,7 +3112,11 @@ class BusinessProfileSemanticRuntime:
                         tokens=usage_tokens,
                     )
                     if "exception" not in outcome:
-                        verifications.append(dict(outcome["verification"]))
+                        verification = dict(outcome["verification"])
+                        verification["evidence_context_hash"] = str(
+                            target.get("evidence_context_hash") or ""
+                        )
+                        verifications.append(verification)
                         verified_target_ids.add(target_id)
                         new_verified_records += 1
                         clear_resolved_rework(target_id, family)
@@ -4371,10 +4537,35 @@ class BusinessProfileSemanticRuntime:
                     row["run_id"],
                 )
                 continue
+            source_path = str(metadata.get("selected_artifact_path") or "")
+            source_hash = str(row["bundle_hash"] or "")
+            source_artifact, rejection_reason = self._validate_semantic_reuse_context(
+                item=item,
+                metadata=metadata,
+                source_path=source_path,
+                source_hash=source_hash,
+            )
+            if source_artifact is None:
+                logger.warning(
+                    "business-profile semantic reuse rejected stale source context "
+                    "instrument_id=%s field_family=%s run_id=%s reason=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    row["run_id"],
+                    rejection_reason,
+                )
+                continue
+            source_context_hash = _evidence_context_hash(
+                document_id, source_artifact.artifact_hash
+            )
             return {
                 "run_id": str(row["run_id"]),
                 "record_ids": record_ids,
                 "evidence_ids": evidence_ids,
+                "selected_artifact_hash": source_artifact.artifact_hash,
+                "selected_artifact_path": source_path,
+                "page_artifact_hash": str(metadata.get("page_artifact_hash") or ""),
+                "evidence_context_hash": source_context_hash,
                 "semantic": metadata.get("semantic_audit") is not None,
                 "semantic_audit": metadata.get("semantic_audit"),
                 "expected_non_disclosure": bool(
@@ -4385,9 +4576,123 @@ class BusinessProfileSemanticRuntime:
                         metadata.get("runtime_identities") or {}
                     ),
                     "bundle_hash": str(row["bundle_hash"] or ""),
+                    "selected_artifact_path": source_path,
+                    "evidence_context_hash": source_context_hash,
                 },
             }
         return None
+
+    def _validate_semantic_reuse_context(
+        self,
+        *,
+        item: Mapping[str, Any],
+        metadata: Mapping[str, Any],
+        source_path: str,
+        source_hash: str,
+    ) -> tuple[SelectedSectionArtifact | None, str]:
+        """Validate a persisted semantic run and its evidence as one context."""
+
+        if not source_path:
+            return None, "missing_selected_artifact_path"
+        try:
+            selected = _load_selected(self.section_store, source_path)
+        except (
+            FileNotFoundError,
+            OSError,
+            TypeError,
+            ValueError,
+            KeyError,
+            AttributeError,
+            json.JSONDecodeError,
+        ):
+            return None, "selected_artifact_unavailable"
+        try:
+            artifact_payload = selected.to_dict()
+            recorded_hash = str(artifact_payload.pop("artifact_hash") or "")
+        except (AttributeError, KeyError, TypeError, ValueError):
+            return None, "selected_artifact_invalid"
+        if recorded_hash != selected.artifact_hash or _stable_hash(artifact_payload) != selected.artifact_hash:
+            return None, "selected_artifact_hash_invalid"
+        if source_hash and selected.artifact_hash != source_hash:
+            return None, "selected_artifact_hash_mismatch"
+        document = dict(item.get("document") or {})
+        document_id = str(document.get("identity") or "")
+        document_hash = str(document.get("content_hash") or "")
+        if not isinstance(selected.bundle, Mapping):
+            return None, "selected_artifact_bundle_invalid"
+        bundle = dict(selected.bundle)
+        if str(bundle.get("source_document_id") or "") != document_id:
+            return None, "source_document_mismatch"
+        if document_hash and str(bundle.get("document_hash") or "") != document_hash:
+            return None, "document_hash_mismatch"
+        raw_evidence_ids = metadata.get("evidence_ids") or []
+        if not isinstance(raw_evidence_ids, (list, tuple, set)):
+            return None, "evidence_ids_invalid"
+        evidence_ids = [str(value) for value in raw_evidence_ids if str(value)]
+        sections_by_id = {section.section_id: section for section in selected.sections}
+        for evidence_id in evidence_ids:
+            evidence = self.repository.get_record("evidence", evidence_id)
+            if evidence is None:
+                return None, f"missing_evidence:{evidence_id}"
+            if not isinstance(evidence, Mapping):
+                return None, f"malformed_evidence:{evidence_id}"
+            if str(evidence.get("source_document_id") or "") != document_id:
+                return None, f"evidence_document_mismatch:{evidence_id}"
+            raw_evidence_metadata = evidence.get("metadata") or {}
+            if not isinstance(raw_evidence_metadata, Mapping):
+                return None, f"malformed_evidence_metadata:{evidence_id}"
+            evidence_metadata = dict(raw_evidence_metadata)
+            if str(evidence_metadata.get("selected_artifact_hash") or "") != selected.artifact_hash:
+                return None, f"evidence_artifact_mismatch:{evidence_id}"
+            raw_spans = evidence_metadata.get("evidence_spans") or []
+            if not isinstance(raw_spans, (list, tuple)):
+                return None, f"malformed_spans:{evidence_id}"
+            spans = list(raw_spans)
+            if not spans:
+                # Deterministic table evidence predates span manifests.  It
+                # still carries the immutable section identity and quality
+                # metadata, which is sufficient to prove that its source
+                # section belongs to this selected artifact.  Semantic
+                # evidence must always carry exact spans and is rejected
+                # when those spans are absent.
+                if str(evidence.get("extraction_method") or "") != "deterministic_table":
+                    return None, f"evidence_spans_missing:{evidence_id}"
+                section_id = str(evidence.get("section_path") or "")
+                section = sections_by_id.get(section_id)
+                if section is None:
+                    return None, f"unknown_section:{evidence_id}"
+                if str(evidence_metadata.get("section_hash") or "") != section.section_hash:
+                    return None, f"section_hash_mismatch:{evidence_id}"
+                if evidence.get("page_number") not in {None, section.page_number}:
+                    return None, f"page_mismatch:{evidence_id}"
+                continue
+            for span in spans:
+                if not isinstance(span, Mapping):
+                    return None, f"malformed_span:{evidence_id}"
+                section = sections_by_id.get(str(span.get("section_id") or ""))
+                if section is None:
+                    return None, f"unknown_section:{evidence_id}"
+                quote = str(span.get("quote") or "")
+                if not quote or str(span.get("section_hash") or "") != section.section_hash:
+                    return None, f"section_hash_mismatch:{evidence_id}"
+                if span.get("page_number") not in {None, section.page_number}:
+                    return None, f"page_mismatch:{evidence_id}"
+                if str(span.get("quote_hash") or "") != hashlib.sha256(quote.encode("utf-8")).hexdigest():
+                    return None, f"quote_hash_invalid:{evidence_id}"
+                start = span.get("normalized_start")
+                end = span.get("normalized_end")
+                if start is None or end is None:
+                    if quote not in section.normalized_text:
+                        return None, f"quote_not_found:{evidence_id}"
+                else:
+                    try:
+                        local_start = int(start) - section.normalized_start
+                        local_end = int(end) - section.normalized_start
+                    except (TypeError, ValueError, OverflowError):
+                        return None, f"malformed_range:{evidence_id}"
+                    if not (0 <= local_start < local_end <= len(section.normalized_text)) or section.normalized_text[local_start:local_end] != quote:
+                        return None, f"quote_range_mismatch:{evidence_id}"
+        return selected, ""
 
     def _find_record(self, record_type: str, record_id: str) -> dict[str, Any]:
         record = self.repository.get_record(record_type, record_id)
@@ -4428,6 +4733,17 @@ def _structured_artifact_identity(
         input_hash=_stable_hash(input_scope),
         prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
         schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
+    )
+
+
+def _evidence_context_hash(source_document_id: str, selected_artifact_hash: str) -> str:
+    """Identify the immutable document/selected-section context of a result."""
+
+    return _stable_hash(
+        {
+            "source_document_id": str(source_document_id or ""),
+            "selected_artifact_hash": str(selected_artifact_hash or ""),
+        }
     )
 
 
@@ -5821,6 +6137,13 @@ def _rework_item(
         "tier": "machine_rework",
         "reason_code": reason,
         "selected_artifact_path": plan.get("selected_artifact_path"),
+        "evidence_context_hash": str(
+            plan.get("evidence_context_hash")
+            or _evidence_context_hash(
+                str(document.get("identity") or ""),
+                str(plan.get("selected_artifact_hash") or ""),
+            )
+        ),
         "diagnostics": dict(diagnostics or {}),
     }
 
@@ -5868,6 +6191,12 @@ def _instrument_identity(instrument_id: str) -> dict[str, str]:
 
 def _selection_failure_reason(exc: Exception) -> str:
     text = str(exc).lower()
+    if "immutable derived artifact" in text or "artifact hash mismatch" in text:
+        return "pdf_artifact_cache_conflict"
+    if "recovery" in text or "ocr" in text and "unavailable" in text:
+        return "pdf_recovery_failed"
+    if "outside selected chapter scope" in text:
+        return "selector_context_stale"
     if "ocr" in text or "low_text" in text:
         return "ocr_required"
     if "template" in text:

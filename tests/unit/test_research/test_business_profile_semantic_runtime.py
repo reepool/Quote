@@ -817,6 +817,208 @@ def test_latest_selected_artifact_query_returns_completed_document_match(tmp_pat
     assert recovered.artifact_hash == "selected-artifact-hash"
 
 
+def _reusable_context_fixture(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository,
+        artifact_root=tmp_path / "artifacts",
+    )
+    text = "报告期内公司生产与销售测试产品。"
+    text_hash = hashlib.sha256(text.encode()).hexdigest()
+    section = SelectedSection(
+        section_id="section-reuse-source",
+        page_number=7,
+        section_key="principal_business",
+        text=text,
+        normalized_text=text,
+        normalized_start=0,
+        normalized_end=len(text),
+        page_hash=text_hash,
+        section_hash=text_hash,
+        selector_reasons=("test",),
+        quality="native",
+    )
+    bundle = {
+        "schema_version": "business_profile_selected_section_bundle.v1",
+        "source_document_id": "shared-asset:reuse-document",
+        "document_hash": "d" * 64,
+        "field_family": "atomic_activities",
+        "section_ids": [section.section_id],
+        "section_hash": runtime_module._stable_hash([section.section_hash]),
+    }
+    artifact_core = {
+        "artifact_version": "business_profile_selected_sections.v1",
+        "bundle": bundle,
+        "sections": [section.to_dict()],
+        "previous_bundle_id": None,
+        "expansion_reason": None,
+    }
+    selected = SelectedSectionArtifact(
+        artifact_version=artifact_core["artifact_version"],
+        bundle=bundle,
+        sections=(section,),
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash=runtime_module._stable_hash(artifact_core),
+    )
+    selected_path, _ = runtime.section_store.write(selected)
+    evidence = {
+        "source_document_id": "shared-asset:reuse-document",
+        "metadata": {
+            "selected_artifact_hash": selected.artifact_hash,
+            "evidence_spans": [
+                {
+                    "evidence_span_id": "span-reuse-source",
+                    "section_id": section.section_id,
+                    "page_number": section.page_number,
+                    "section_hash": section.section_hash,
+                    "normalized_start": 0,
+                    "normalized_end": len(text),
+                    "quote": text,
+                    "quote_hash": text_hash,
+                }
+            ],
+        },
+    }
+    return runtime, selected, selected_path, evidence
+
+
+def test_semantic_reuse_uses_source_artifact_when_current_selection_differs(tmp_path):
+    runtime, selected, selected_path, evidence = _reusable_context_fixture(tmp_path)
+    runtime.repository.get_record = Mock(return_value=evidence)
+    item = {
+        "instrument_id": "601088.SH",
+        "field_family": "atomic_activities",
+        "document": {
+            "identity": "shared-asset:reuse-document",
+            "content_hash": "d" * 64,
+            "report_period": "2025-12-31",
+        },
+    }
+    validated, reason = runtime._validate_semantic_reuse_context(
+        item=item,
+        metadata={"evidence_ids": ["evidence-reuse"]},
+        source_path=str(selected_path),
+        source_hash=selected.artifact_hash,
+    )
+    assert validated is not None, reason
+    assert validated.artifact_hash == selected.artifact_hash
+    assert reason == ""
+
+
+def test_semantic_reuse_rejects_evidence_from_different_section_context(tmp_path):
+    runtime, selected, selected_path, evidence = _reusable_context_fixture(tmp_path)
+    evidence["metadata"]["evidence_spans"][0]["section_id"] = "section-from-other-artifact"
+    runtime.repository.get_record = Mock(return_value=evidence)
+    item = {
+        "instrument_id": "601088.SH",
+        "field_family": "atomic_activities",
+        "document": {
+            "identity": "shared-asset:reuse-document",
+            "content_hash": "d" * 64,
+            "report_period": "2025-12-31",
+        },
+    }
+    validated, reason = runtime._validate_semantic_reuse_context(
+        item=item,
+        metadata={"evidence_ids": ["evidence-reuse"]},
+        source_path=str(selected_path),
+        source_hash=selected.artifact_hash,
+    )
+    assert validated is None
+    assert reason == "unknown_section:evidence-reuse"
+
+
+def test_semantic_reuse_rejects_malformed_evidence_range_without_raising(tmp_path):
+    runtime, selected, selected_path, evidence = _reusable_context_fixture(tmp_path)
+    evidence["metadata"]["evidence_spans"][0]["normalized_start"] = "invalid"
+    runtime.repository.get_record = Mock(return_value=evidence)
+    item = {
+        "instrument_id": "601088.SH",
+        "field_family": "atomic_activities",
+        "document": {
+            "identity": "shared-asset:reuse-document",
+            "content_hash": "d" * 64,
+            "report_period": "2025-12-31",
+        },
+    }
+    validated, reason = runtime._validate_semantic_reuse_context(
+        item=item,
+        metadata={"evidence_ids": ["evidence-reuse"]},
+        source_path=str(selected_path),
+        source_hash=selected.artifact_hash,
+    )
+    assert validated is None
+    assert reason == "malformed_range:evidence-reuse"
+
+
+def test_semantic_reuse_accepts_deterministic_evidence_without_span_manifest(tmp_path):
+    runtime, selected, selected_path, evidence = _reusable_context_fixture(tmp_path)
+    evidence.pop("section_path", None)
+    evidence["section_path"] = selected.sections[0].section_id
+    evidence["page_number"] = selected.sections[0].page_number
+    evidence["extraction_method"] = "deterministic_table"
+    evidence["metadata"].pop("evidence_spans", None)
+    evidence["metadata"]["section_hash"] = selected.sections[0].section_hash
+    runtime.repository.get_record = Mock(return_value=evidence)
+    item = {
+        "instrument_id": "601088.SH",
+        "field_family": "structured_segments",
+        "document": {
+            "identity": "shared-asset:reuse-document",
+            "content_hash": "d" * 64,
+            "report_period": "2025-12-31",
+        },
+    }
+    validated, reason = runtime._validate_semantic_reuse_context(
+        item=item,
+        metadata={"evidence_ids": ["evidence-reuse"]},
+        source_path=str(selected_path),
+        source_hash=selected.artifact_hash,
+    )
+    assert validated is not None, reason
+    assert reason == ""
+
+
+def test_verify_missing_selected_artifact_becomes_rework_instead_of_crashing(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="structured_segments",
+        text=(
+            "分部信息\n"
+            "|分产品|营业收入（万元）|营业成本（万元）|毛利率|\n"
+            "|煤炭|100|60|40%|"
+        ),
+    )
+    for stage in ("plan", "select", "extract"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+    checkpoint = pipeline.checkpoint_store.load()
+    selected_payload = pipeline.handlers["select"].__self__.stage_store.read(
+        checkpoint["artifacts"]["select"], expected_stage="select"
+    )
+    selected_path = selected_payload["selected"][0]["selected_artifact_path"]
+    selected_file = runtime_module.Path(selected_path)
+    selected_file.unlink()
+
+    result = pipeline.run("verify", scope=scope)
+
+    assert result["status"] == "stopped"
+    assert result["reason"].startswith("quality_gate:verify:")
+    verify_payload = pipeline.handlers["verify"].__self__.stage_store.read(
+        pipeline.checkpoint_store.load()["artifacts"]["verify"],
+        expected_stage="verify",
+    )
+    assert verify_payload["verifications"] == []
+    assert verify_payload["machine_rework"]
+    assert {
+        item["reason_code"] for item in verify_payload["machine_rework"]
+    } == {"evidence_provenance_failed"}
+
+
 def test_structured_record_ids_rotate_without_changing_stable_segment_identity(
     monkeypatch,
 ):
