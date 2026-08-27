@@ -56,6 +56,7 @@ DEFAULT_PROFILES = {
     "pdfium_native": PdfProfile(
         name="pdfium_native",
         native_engines=("pypdfium2", "pypdf"),
+        native_max_concurrency=4,
         expected_script="auto",
         min_text_characters=4,
         engine_versions=PDFIUM_ENGINE_VERSIONS,
@@ -64,6 +65,7 @@ DEFAULT_PROFILES = {
     "pypdf_native": PdfProfile(
         name="pypdf_native",
         native_engines=("pypdf",),
+        native_max_concurrency=4,
         expected_script="auto",
         min_text_characters=4,
         engine_versions=PDFIUM_ENGINE_VERSIONS,
@@ -71,6 +73,7 @@ DEFAULT_PROFILES = {
     "pdfium_paddleocr_cpu": PdfProfile(
         name="pdfium_paddleocr_cpu",
         native_engines=("pypdfium2", "pypdf"),
+        native_max_concurrency=4,
         ocr_engine="paddleocr",
         expected_script="auto",
         min_text_characters=4,
@@ -82,6 +85,7 @@ DEFAULT_PROFILES = {
     "pdfium_paddleocr_gpu": PdfProfile(
         name="pdfium_paddleocr_gpu",
         native_engines=("pypdfium2", "pypdf"),
+        native_max_concurrency=4,
         ocr_engine="paddleocr",
         expected_script="auto",
         min_text_characters=4,

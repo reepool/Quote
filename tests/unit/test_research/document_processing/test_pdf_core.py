@@ -208,6 +208,18 @@ def test_missing_ocr_runtime_is_typed_and_profile_switch_is_config_only() -> Non
     assert DEFAULT_PROFILES["pdfium_paddleocr_cpu"].fallback_profile == "pdfium_native"
 
 
+def test_production_profiles_use_four_native_workers() -> None:
+    assert {
+        name: profile.native_max_concurrency
+        for name, profile in DEFAULT_PROFILES.items()
+    } == {
+        "pdfium_native": 4,
+        "pypdf_native": 4,
+        "pdfium_paddleocr_cpu": 4,
+        "pdfium_paddleocr_gpu": 4,
+    }
+
+
 def test_profile_rollout_can_be_changed_without_consumer_code(monkeypatch) -> None:
     monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdfium_native")
     assert resolve_profile().name == "pdfium_native"
