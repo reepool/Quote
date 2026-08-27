@@ -649,6 +649,41 @@ def test_trading_status_snapshot_rejects_continued_suspension_stamped_as_resumpt
     assert row["source"] == HKEX_TRADING_HALT_SOURCE
 
 
+def test_trading_status_snapshot_keeps_future_resumption_untradable_until_resume_date():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        HKEX_TRADING_RESUMPTION_SOURCE,
+        build_hkex_trading_status_snapshot,
+    )
+
+    records = [
+        _hkexnews_record(
+            announcement_id="1831-future-resume",
+            title="TRADING WILL RESUME ON 2 SEPTEMBER 2026",
+            published_at="2026-08-27T04:00:00+00:00",
+            symbols=("01831",),
+            headline_category="trading_resumption",
+            short_text="[Resumption]",
+        )
+    ]
+
+    before = build_hkex_trading_status_snapshot(records, as_of=date(2026, 8, 27))
+    after = build_hkex_trading_status_snapshot(records, as_of=date(2026, 9, 2))
+
+    pending = before.rows[0]
+    assert pending["instrument_id"] == "01831.HK"
+    assert pending["status"] == "suspended"
+    assert pending["trading_status"] == 0
+    assert pending["source"] == HKEX_TRADING_RESUMPTION_SOURCE
+    assert pending["lifecycle_evidence"]["expected_resume_date"] == "2026-09-02"
+
+    resumed = after.rows[0]
+    assert resumed["status"] == "active"
+    assert resumed["trading_status"] == 1
+    assert resumed["source"] == HKEX_TRADING_RESUMPTION_SOURCE
+
+
 def test_trading_status_snapshot_later_halt_overrides_earlier_resumption():
     from data_sources.hkex_instrument_master import (
         HKEX_TRADING_HALT_SOURCE,

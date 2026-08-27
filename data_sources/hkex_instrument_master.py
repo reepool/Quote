@@ -468,6 +468,7 @@ def build_hkex_trading_status_snapshot(
     records: Iterable[Any],
     *,
     source_url: str = "https://www1.hkexnews.hk/search/titlesearch.xhtml",
+    as_of: Optional[date] = None,
 ) -> HKEXProviderSnapshot:
     """Keep the latest halt/suspension/resumption headline per instrument."""
     latest_by_id: Dict[str, Dict[str, Any]] = {}
@@ -506,9 +507,18 @@ def build_hkex_trading_status_snapshot(
                     ),
                 }
 
+    effective_as_of = as_of or date.today()
     rows: List[Dict[str, Any]] = []
     for item in latest_by_id.values():
         is_resumption = item["event"] == TRADING_RESUMPTION_CATEGORY
+        dates = extract_hkex_timetable_dates(item["title"])
+        resume_date = dates["expected_resume_date"]
+        pending_resume = (
+            is_resumption
+            and resume_date is not None
+            and effective_as_of < resume_date
+        )
+        tradable = is_resumption and not pending_resume
         source = (
             HKEX_TRADING_RESUMPTION_SOURCE
             if is_resumption
@@ -521,9 +531,9 @@ def build_hkex_trading_status_snapshot(
                 "name": item["name"],
                 "exchange": "HKEX",
                 "type": "stock",
-                "status": "active" if is_resumption else "suspended",
+                "status": "active" if tradable else "suspended",
                 "is_active": True,
-                "trading_status": 1 if is_resumption else 0,
+                "trading_status": 1 if tradable else 0,
                 "source": source,
                 "source_symbol": item["symbol"],
                 "official_lifecycle_source": source,
@@ -534,6 +544,9 @@ def build_hkex_trading_status_snapshot(
                     "published_at": item["published_at"],
                     "title": item["title"],
                     "announcement_id": item["announcement_id"],
+                    "expected_resume_date": (
+                        resume_date.isoformat() if resume_date else None
+                    ),
                     "source_url": source_url,
                 },
             }
@@ -562,6 +575,7 @@ def build_hkex_trading_status_snapshot(
             "row_count": len(rows),
             "classified_count": seen,
             "latest_event_count": len(latest_by_id),
+            "as_of": effective_as_of.isoformat(),
         },
     )
 
@@ -1526,6 +1540,7 @@ class HKEXSourceEvidencePolicy:
         errors: Iterable[str],
         official_active_rows: Iterable[Dict[str, Any]],
         official_delisted_rows: Iterable[Dict[str, Any]],
+        trading_status_scan: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         snapshot_list = list(snapshots or [])
         sources = {snapshot.source for snapshot in snapshot_list}
@@ -1554,6 +1569,14 @@ class HKEXSourceEvidencePolicy:
         has_active_rows = any(row.get("instrument_id") for row in official_active_rows or [])
         has_delisted_rows = any(row.get("instrument_id") for row in official_delisted_rows or [])
         active_fallback_used = not primary_active_available and fallback_active_available and has_active_rows
+        if trading_status_scan is None:
+            scan_complete = True
+        else:
+            scan_status = str((trading_status_scan or {}).get("status") or "").strip()
+            scan_complete = bool((trading_status_scan or {}).get("is_complete")) and scan_status in {
+                "success",
+                "success_empty",
+            }
 
         return {
             "sources": sorted(sources),
@@ -1564,9 +1587,11 @@ class HKEXSourceEvidencePolicy:
             "delisted_source_available": delisted_available,
             "suspension_source_available": suspension_available,
             "prolonged_suspension_source_available": prolonged_suspension_available,
+            "trading_status_scan_complete": scan_complete,
+            "untradable_restore_allowed": scan_complete,
             "safe_write_allowed": primary_active_available and has_active_rows and not error_list,
             "reactivation_write_allowed": primary_active_available and has_active_rows and not error_list,
-            "delisting_write_allowed": has_delisted_rows and delisted_available and not error_list,
+            "delisting_write_allowed": has_delisted_rows and delisted_available,
             "suspension_write_allowed": suspension_available and not error_list,
         }
 

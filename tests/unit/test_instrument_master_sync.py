@@ -1211,6 +1211,109 @@ async def test_hkex_trading_arrangement_keeps_listed_status_and_clears_trading_s
 
 
 @pytest.mark.asyncio
+async def test_hkex_incomplete_announcement_scan_does_not_restore_untradable():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_trading_arrangement',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [],
+            'scan': {
+                'status': 'failed',
+                'is_complete': False,
+                'errors': ['hkexnews trading_arrangement request failed'],
+                'stop_reason': 'request_failed',
+            },
+        }
+    )
+
+    result = await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['status'] == 'active'
+    assert by_id['00005.HK']['trading_status'] == 0
+    manager.db_ops.mark_instrument_untradable.assert_not_awaited()
+    assert result['exchanges']['HKEX']['source_evidence_policy'][
+        'trading_status_scan_complete'
+    ] is False
+
+
+@pytest.mark.asyncio
+async def test_hkex_delisting_writes_without_official_active_rows():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00907.HK',
+            'symbol': '00907',
+            'name': 'KAISER OPTICAL',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'akshare',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    manager._get_hkex_instrument_master_sync_config = Mock(
+        return_value=_hkex_sync_config("lifecycle_write")
+    )
+    delisted_row = {
+        'instrument_id': '00907.HK',
+        'symbol': '00907',
+        'name': 'KAISER OPTICAL',
+        'exchange': 'HKEX',
+        'type': 'stock',
+        'status': 'delisted',
+        'is_active': False,
+        'trading_status': 0,
+        'source': 'hkexnews_delisted_list',
+        'delisted_date': '2026-05-24',
+    }
+    manager._fetch_hkex_instrument_master_sources = AsyncMock(return_value={
+        'snapshots': [
+            HKEXProviderSnapshot(
+                source='hkexnews_delisted_list',
+                source_url='fixture://delisted',
+                parser_version='test',
+                raw_snapshot_hash='delisted_hash',
+                rows=[delisted_row],
+            ),
+        ],
+        'official_active_rows': [],
+        'official_delisted_rows': [delisted_row],
+        'supplemental_rows': [],
+        'suspension_rows': [],
+        'untradable_rows': [],
+        'warnings': ['HKEX official active source returned no rows'],
+        'errors': [],
+    })
+
+    result = await manager.sync_hkex_instrument_master()
+
+    manager.db_ops.mark_instrument_delisted.assert_awaited_once()
+    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '00907.HK'
+    manager.db_ops.mark_instrument_active.assert_not_awaited()
+    manager.db_ops.save_instruments_batch.assert_not_awaited()
+    assert result['summary']['deactivated_instruments'] == 1
+
+
+@pytest.mark.asyncio
 async def test_governance_dispatches_hkex_to_hkex_policy_when_enabled():
     manager = _manager()
     manager.db_ops = Mock()

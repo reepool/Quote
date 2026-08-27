@@ -17019,33 +17019,102 @@ class DataManager:
         )
         records_by_id: Dict[str, Any] = {}
         scan_categories = HKEX_TRADING_STATUS_CATEGORIES + HKEX_TRADING_ELIGIBILITY_CATEGORIES
+        scan_errors: List[str] = []
+        stop_reasons: List[str] = []
+        scan_complete = True
+        scan_status = 'success'
         for category in scan_categories:
-            route_result = await asyncio.to_thread(
-                service.acquire,
-                AnnouncementQuery(
-                    purpose_key="instrument_master_hkex_trading_status",
-                    scope=AnnouncementScope(
-                        exchange="HKEX",
-                        market="HKEX",
-                        category=category,
-                        start_date=start_dt.isoformat(),
-                        end_date=end_dt.isoformat(),
-                        page_size=100,
-                        max_pages=int(config.get('trading_status_scan_max_pages', 20)),
+            try:
+                route_result = await asyncio.to_thread(
+                    service.acquire,
+                    AnnouncementQuery(
+                        purpose_key="instrument_master_hkex_trading_status",
+                        scope=AnnouncementScope(
+                            exchange="HKEX",
+                            market="HKEX",
+                            category=category,
+                            start_date=start_dt.isoformat(),
+                            end_date=end_dt.isoformat(),
+                            page_size=100,
+                            max_pages=int(config.get('trading_status_scan_max_pages', 20)),
+                        ),
                     ),
-                ),
-            )
+                )
+            except Exception as exc:
+                scan_complete = False
+                scan_status = 'failed' if scan_status == 'success' and not records_by_id else 'degraded'
+                scan_errors.append(f'{category}: {exc}')
+                continue
             scan_result = getattr(route_result, "scan_result", None)
             if scan_result is None:
+                scan_complete = False
+                scan_status = 'degraded'
+                scan_errors.append(f'{category}: missing scan_result')
                 continue
+            result_status = str(getattr(scan_result, 'status', '') or '')
+            if result_status not in {'success', 'success_empty'}:
+                scan_complete = False
+                if result_status == 'failed' and scan_status == 'success' and not records_by_id:
+                    scan_status = 'failed'
+                else:
+                    scan_status = 'degraded'
+            if not bool(getattr(scan_result, 'is_complete', True)):
+                scan_complete = False
+                if scan_status == 'success':
+                    scan_status = 'degraded'
+            stop_reason = str(getattr(scan_result, 'stop_reason', '') or '')
+            if stop_reason and stop_reason != 'complete':
+                stop_reasons.append(f'{category}:{stop_reason}')
+            scan_errors.extend(getattr(scan_result, 'errors', ()) or ())
             for record in getattr(scan_result, "records", ()) or ():
                 if getattr(record, "source_announcement_id", None):
                     records_by_id[record.source_announcement_id] = record
+        if scan_errors and not records_by_id:
+            scan_status = 'failed'
+        elif scan_errors and scan_status == 'success':
+            scan_status = 'degraded'
         records = records_by_id.values()
-        return [
-            build_hkex_trading_eligibility_snapshot(records, as_of=end_dt),
-            build_hkex_trading_status_snapshot(records),
-        ]
+        return {
+            'snapshots': [
+                build_hkex_trading_eligibility_snapshot(records, as_of=end_dt),
+                build_hkex_trading_status_snapshot(records, as_of=end_dt),
+            ],
+            'scan': {
+                'status': scan_status,
+                'is_complete': bool(scan_complete and scan_status in {'success', 'success_empty'}),
+                'errors': scan_errors,
+                'stop_reason': (
+                    '; '.join(stop_reasons)
+                    if stop_reasons
+                    else ('complete' if scan_complete else 'incomplete')
+                ),
+            },
+        }
+
+    @staticmethod
+    def _unwrap_hkex_trading_status_scan(raw: Any) -> Tuple[List[Any], Dict[str, Any]]:
+        """Accept the current scan report or legacy snapshot-list mocks."""
+        if isinstance(raw, dict) and 'snapshots' in raw:
+            snapshots = raw.get('snapshots') or []
+            if not isinstance(snapshots, (list, tuple)):
+                snapshots = [snapshots]
+            scan = dict(raw.get('scan') or {})
+            if 'is_complete' not in scan:
+                scan['is_complete'] = str(scan.get('status') or '') in {
+                    'success',
+                    'success_empty',
+                }
+            if 'status' not in scan:
+                scan['status'] = 'success' if scan.get('is_complete') else 'degraded'
+            return [item for item in snapshots if item is not None], scan
+        if raw is None:
+            return [], {'status': 'success', 'is_complete': True}
+        if not isinstance(raw, (list, tuple)):
+            raw = [raw]
+        return [item for item in raw if item is not None], {
+            'status': 'success',
+            'is_complete': True,
+        }
 
     async def _fetch_hkex_instrument_master_sources(
         self,
@@ -17068,6 +17137,7 @@ class DataManager:
             'supplemental_rows': [],
             'suspension_rows': [],
             'untradable_rows': [],
+            'trading_status_scan': None,
             'warnings': [],
             'errors': [],
         }
@@ -17192,11 +17262,17 @@ class DataManager:
             try:
                 from data_sources.hkex_instrument_master import HKEX_TRADING_HALT_SOURCE
 
-                snapshots = await self._scan_hkex_trading_status_announcements(config)
-                if snapshots is None:
-                    snapshots = []
-                elif not isinstance(snapshots, (list, tuple)):
-                    snapshots = [snapshots]
+                raw_scan = await self._scan_hkex_trading_status_announcements(config)
+                snapshots, scan_report = self._unwrap_hkex_trading_status_scan(raw_scan)
+                result['trading_status_scan'] = scan_report
+                if not scan_report.get('is_complete') or scan_report.get('status') not in {
+                    'success',
+                    'success_empty',
+                }:
+                    result['warnings'].append(
+                        "HKEXnews trading-status announcement scan is incomplete; "
+                        "keeping existing untradable trading_status"
+                    )
                 for snapshot in snapshots:
                     if snapshot is None:
                         continue
@@ -17214,6 +17290,12 @@ class DataManager:
                 result['warnings'].append(
                     f"HKEXnews trading-status announcement scan failed: {exc}"
                 )
+                result['trading_status_scan'] = {
+                    'status': 'failed',
+                    'is_complete': False,
+                    'errors': [str(exc)],
+                    'stop_reason': 'request_failed',
+                }
 
         try:
             raw = self._read_hkex_master_file(config.get('akshare_spot_file'))
@@ -17326,8 +17408,15 @@ class DataManager:
         *,
         config: Dict[str, Any],
         metadata_rows: List[Dict[str, Any]],
+        local_rows: Optional[List[Dict[str, Any]]] = None,
+        preserve_untradable: bool = False,
     ) -> List[Dict[str, Any]]:
         metadata_by_id = {row.get('instrument_id'): row for row in metadata_rows if row.get('instrument_id')}
+        local_by_id = {
+            row.get('instrument_id'): row
+            for row in (local_rows or [])
+            if row.get('instrument_id')
+        }
         allowed_product_types = set(config.get('allowed_product_types') or ['ordinary_equity', 'reit', 'etf'])
         valid_fields = {
             'instrument_id', 'symbol', 'name', 'exchange', 'type', 'currency',
@@ -17354,6 +17443,13 @@ class DataManager:
                 'status': 'active',
                 'is_active': True,
                 'trading_status': 0 if row.get('trading_status') in (0, '0', False) else 1,
+            }
+            if preserve_untradable:
+                local = local_by_id.get(instrument_id) or {}
+                if local.get('trading_status') in (0, '0', False):
+                    item['trading_status'] = 0
+            item = {
+                **item,
                 'source': row.get('source') or 'hkex_securities_list',
                 'source_symbol': row.get('source_symbol') or row.get('symbol'),
             }
@@ -17449,15 +17545,22 @@ class DataManager:
             errors=source_bundle.get('errors') or [],
             official_active_rows=official_active_rows,
             official_delisted_rows=official_delisted_rows,
+            trading_status_scan=source_bundle.get('trading_status_scan'),
         )
         quote_diagnostics = build_quote_availability_diagnostics(
             local_rows=quote_rows,
             yfinance_rows=[],
         )
+        preserve_untradable = not source_evidence_policy.get(
+            'untradable_restore_allowed',
+            True,
+        )
         safe_write_preview_rows = self._filter_hkex_safe_write_rows(
             decisions.get('insert_candidates', []) + decisions.get('metadata_update_candidates', []),
             config=config,
             metadata_rows=metadata_rows,
+            local_rows=local_rows,
+            preserve_untradable=preserve_untradable,
         )
         allowed_lifecycle_ids = {
             row.get('instrument_id')
@@ -17482,7 +17585,10 @@ class DataManager:
         result['warnings'].extend(source_bundle.get('warnings') or [])
         result['errors'].extend(source_bundle.get('errors') or [])
         if not official_active_rows:
-            result['warnings'].append('HKEX official active source returned no rows; lifecycle writes disabled')
+            result['warnings'].append(
+                'HKEX official active source returned no rows; '
+                'active/safe-write/reactivation disabled'
+            )
         if source_evidence_policy.get('active_fallback_used'):
             result['warnings'].append(
                 'HKEX primary securities-list source unavailable; using HKEXnews active fallback for audit only'
@@ -17533,76 +17639,79 @@ class DataManager:
                 run_id=started_at.strftime('hkex_master_%Y%m%d_%H%M%S'),
             )
 
-        if selected_mode == 'lifecycle_write' and official_active_rows:
-            for item in decisions.get('delisting_candidates', []):
-                if not source_evidence_policy.get('delisting_write_allowed'):
-                    continue
-                official = item.get('official') or {}
-                updated = await self.db_ops.mark_instrument_delisted(
-                    item.get('instrument_id'),
-                    delisted_date=official.get('delisted_date'),
-                    source=official.get('source') or 'hkexnews_delisted_list',
-                )
-                if updated:
-                    delisted_count += 1
-            for item in decisions.get('reactivation_candidates', []):
-                if not source_evidence_policy.get('reactivation_write_allowed'):
-                    continue
-                local = item.get('local') or {}
-                local_status = str(local.get('status') or '')
-                local_source = str(local.get('source') or '')
-                if (
-                    local_status == 'suspended'
-                    and not source_evidence_policy.get('suspension_source_available')
-                ):
-                    continue
-                if (
-                    local_status == 'suspended'
-                    and local_source == 'hkexnews_suspension_report'
-                    and not source_evidence_policy.get(
-                        'prolonged_suspension_source_available'
+        if selected_mode == 'lifecycle_write':
+            if source_evidence_policy.get('delisting_write_allowed'):
+                for item in decisions.get('delisting_candidates', []):
+                    official = item.get('official') or {}
+                    updated = await self.db_ops.mark_instrument_delisted(
+                        item.get('instrument_id'),
+                        delisted_date=official.get('delisted_date'),
+                        source=official.get('source') or 'hkexnews_delisted_list',
                     )
-                ):
-                    continue
-                if item.get('instrument_id') not in allowed_lifecycle_ids:
-                    continue
-                official = item.get('official') or {}
-                if not hasattr(self.db_ops, 'mark_instrument_active'):
-                    continue
-                updated = await self.db_ops.mark_instrument_active(
-                    item.get('instrument_id'),
-                    source=official.get('source') or 'hkex_securities_list',
-                    listed_date=official.get('listed_date'),
-                )
-                if updated:
-                    reactivated_count += 1
-            for item in decisions.get('suspension_candidates', []):
-                if not source_evidence_policy.get('suspension_write_allowed'):
-                    continue
-                if item.get('instrument_id') not in allowed_lifecycle_ids:
-                    continue
-                official = item.get('official') or {}
-                if not hasattr(self.db_ops, 'mark_instrument_suspended'):
-                    continue
-                updated = await self.db_ops.mark_instrument_suspended(
-                    item.get('instrument_id'),
-                    source=official.get('source') or 'hkex_official_suspension',
-                )
-                if updated:
-                    suspended_count += 1
-            if hasattr(self.db_ops, 'mark_instrument_untradable'):
-                for row in source_bundle.get('untradable_rows') or []:
-                    instrument_id = row.get('instrument_id')
-                    if instrument_id not in allowed_lifecycle_ids:
+                    if updated:
+                        delisted_count += 1
+            if official_active_rows:
+                for item in decisions.get('reactivation_candidates', []):
+                    if not source_evidence_policy.get('reactivation_write_allowed'):
                         continue
-                    if str(row.get('status') or '').lower() != 'active':
+                    local = item.get('local') or {}
+                    local_status = str(local.get('status') or '')
+                    local_source = str(local.get('source') or '')
+                    if (
+                        local_status == 'suspended'
+                        and not source_evidence_policy.get('suspension_source_available')
+                    ):
                         continue
-                    if row.get('trading_status') not in (0, '0', False):
+                    if (
+                        local_status == 'suspended'
+                        and local_source == 'hkexnews_suspension_report'
+                        and not source_evidence_policy.get(
+                            'prolonged_suspension_source_available'
+                        )
+                    ):
                         continue
-                    await self.db_ops.mark_instrument_untradable(
-                        instrument_id,
-                        source=row.get('source') or 'hkexnews_trading_arrangement',
+                    if item.get('instrument_id') not in allowed_lifecycle_ids:
+                        continue
+                    official = item.get('official') or {}
+                    if not hasattr(self.db_ops, 'mark_instrument_active'):
+                        continue
+                    updated = await self.db_ops.mark_instrument_active(
+                        item.get('instrument_id'),
+                        source=official.get('source') or 'hkex_securities_list',
+                        listed_date=official.get('listed_date'),
                     )
+                    if updated:
+                        reactivated_count += 1
+                for item in decisions.get('suspension_candidates', []):
+                    if not source_evidence_policy.get('suspension_write_allowed'):
+                        continue
+                    if item.get('instrument_id') not in allowed_lifecycle_ids:
+                        continue
+                    official = item.get('official') or {}
+                    if not hasattr(self.db_ops, 'mark_instrument_suspended'):
+                        continue
+                    updated = await self.db_ops.mark_instrument_suspended(
+                        item.get('instrument_id'),
+                        source=official.get('source') or 'hkex_official_suspension',
+                    )
+                    if updated:
+                        suspended_count += 1
+                if (
+                    hasattr(self.db_ops, 'mark_instrument_untradable')
+                    and source_evidence_policy.get('trading_status_scan_complete', True)
+                ):
+                    for row in source_bundle.get('untradable_rows') or []:
+                        instrument_id = row.get('instrument_id')
+                        if instrument_id not in allowed_lifecycle_ids:
+                            continue
+                        if str(row.get('status') or '').lower() != 'active':
+                            continue
+                        if row.get('trading_status') not in (0, '0', False):
+                            continue
+                        await self.db_ops.mark_instrument_untradable(
+                            instrument_id,
+                            source=row.get('source') or 'hkexnews_trading_arrangement',
+                        )
 
         after = await self._get_instrument_master_snapshot('HKEX')
         exchange_result = {
@@ -17629,6 +17738,7 @@ class DataManager:
             'source_evidence_policy': source_evidence_policy,
             'official_active_count': len(official_active_rows),
             'official_delisted_count': len(official_delisted_rows),
+            'trading_status_scan': source_bundle.get('trading_status_scan') or {},
             'official_suspension_count': len(source_bundle.get('suspension_rows') or []),
             'supplemental_count': len(source_bundle.get('supplemental_rows') or []),
             'decision_counts': decisions.get('counts', {}),

@@ -154,3 +154,102 @@ def test_hkexnews_provider_chunks_market_wide_search_by_month():
         ("20260701", "20260731"),
         ("20260801", "20260826"),
     ]
+
+
+def _title_search_payload(rows, *, record_cnt=None, has_next=False):
+    return {
+        "recordCnt": len(rows) if record_cnt is None else record_cnt,
+        "hasNextPage": has_next,
+        "hasNextRow": has_next,
+        "result": json.dumps(rows),
+    }
+
+
+def _title_search_row(news_id, title, stock_code):
+    return {
+        "NEWS_ID": news_id,
+        "TITLE": title,
+        "DATE_TIME": "24/08/2026 12:21",
+        "STOCK_CODE": stock_code,
+        "STOCK_NAME": "EXAMPLE",
+        "LONG_TEXT": "[Trading Halt]",
+        "SHORT_TEXT": "[Trading Halt]",
+        "FILE_LINK": f"/listedco/listconews/sehk/2026/0824/{news_id}.pdf",
+    }
+
+
+def test_hkexnews_provider_loads_more_rows_when_has_next_page():
+    first = _title_search_row("20260824122101831", "TRADING HALT", "01831")
+    second = _title_search_row("20260824130009999", "TRADING HALT", "09999")
+    session = _Session(
+        payloads=[
+            {},
+            _title_search_payload([first], record_cnt=101, has_next=True),
+            _title_search_payload([first, second], record_cnt=101, has_next=False),
+        ]
+    )
+    provider = _provider(session)
+
+    result = provider.discover(
+        AnnouncementQuery(
+            purpose_key="instrument_master_hkex_trading_status",
+            scope=AnnouncementScope(
+                exchange="HKEX",
+                market="SEHK",
+                category="trading_halt",
+                start_date="2026-08-01",
+                end_date="2026-08-26",
+                page_size=100,
+                max_pages=3,
+            ),
+        )
+    )
+
+    search_calls = [
+        call for call in session.calls if call["url"].endswith("titleSearchServlet.do")
+    ]
+    assert len(search_calls) == 2
+    assert search_calls[0]["params"]["rowRange"] == "100"
+    assert int(search_calls[1]["params"]["rowRange"]) >= 101
+    assert {record.source_announcement_id for record in result.records} == {
+        "20260824122101831",
+        "20260824130009999",
+    }
+    assert result.is_complete is True
+    assert result.status == "success"
+    assert result.pages_scanned == 2
+
+
+def test_hkexnews_provider_marks_incomplete_when_max_pages_exhausted():
+    first = _title_search_row("20260824122101831", "TRADING HALT", "01831")
+    session = _Session(
+        payloads=[
+            {},
+            _title_search_payload([first], record_cnt=101, has_next=True),
+        ]
+    )
+    provider = _provider(session)
+
+    result = provider.discover(
+        AnnouncementQuery(
+            purpose_key="instrument_master_hkex_trading_status",
+            scope=AnnouncementScope(
+                exchange="HKEX",
+                market="SEHK",
+                category="trading_halt",
+                start_date="2026-08-01",
+                end_date="2026-08-26",
+                page_size=100,
+                max_pages=1,
+            ),
+        )
+    )
+
+    search_calls = [
+        call for call in session.calls if call["url"].endswith("titleSearchServlet.do")
+    ]
+    assert len(search_calls) == 1
+    assert result.pages_scanned == 1
+    assert result.is_complete is False
+    assert result.stop_reason == "max_pages_exhausted"
+    assert result.status == "success"

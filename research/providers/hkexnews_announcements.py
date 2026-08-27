@@ -121,48 +121,77 @@ class HkexnewsAnnouncementProvider:
         self._ensure_warmup()
         requests_made += 1
         stop_reason = "complete"
+        page_size = min(scope.page_size, self.capabilities.max_page_size)
+        max_pages = max(1, int(scope.max_pages))
         for market in markets:
             for window_start, window_end in windows:
-                try:
-                    payload = self._request_search(
-                        market=market,
-                        start_date=window_start,
-                        end_date=window_end,
-                        page_size=min(scope.page_size, self.capabilities.max_page_size),
-                        keyword=scope.keyword,
-                        category_options=category_options,
-                        stock_id=str(scope.source_options.get("stock_id") or "-1"),
+                row_range = page_size
+                window_pages = 0
+                while True:
+                    try:
+                        payload = self._request_search(
+                            market=market,
+                            start_date=window_start,
+                            end_date=window_end,
+                            page_size=row_range,
+                            keyword=scope.keyword,
+                            category_options=category_options,
+                            stock_id=str(scope.source_options.get("stock_id") or "-1"),
+                        )
+                    except Exception as exc:
+                        errors.append(
+                            f"hkexnews {market} {window_start}/{window_end} request failed: {exc}"
+                        )
+                        stop_reason = "request_failed"
+                        break
+                    requests_made += 1
+                    pages_scanned += 1
+                    window_pages += 1
+                    try:
+                        rows = self._extract_rows(payload)
+                    except ValueError as exc:
+                        errors.append(
+                            f"hkexnews {market} {window_start}/{window_end} malformed payload: {exc}"
+                        )
+                        stop_reason = "malformed_payload"
+                        break
+                    for row in rows:
+                        record = self._normalize_record(
+                            row,
+                            market=market,
+                            headline_category=scope.category,
+                        )
+                        if record is None:
+                            continue
+                        if scope.symbol and scope.symbol not in record.symbols:
+                            continue
+                        records.append(record)
+                    if not self._payload_has_more(
+                        payload,
+                        row_range=row_range,
+                        row_count=len(rows),
+                    ):
+                        break
+                    if window_pages >= max_pages:
+                        stop_reason = "max_pages_exhausted"
+                        break
+                    next_range = self._next_row_range(
+                        payload,
+                        row_range=row_range,
+                        page_size=page_size,
+                        max_pages=max_pages,
                     )
-                except Exception as exc:
-                    errors.append(
-                        f"hkexnews {market} {window_start}/{window_end} request failed: {exc}"
-                    )
-                    stop_reason = "request_failed"
+                    if next_range <= row_range:
+                        stop_reason = "max_pages_exhausted"
+                        break
+                    row_range = next_range
+                    if self.request_interval_seconds:
+                        time.sleep(self.request_interval_seconds)
+                if stop_reason == "request_failed" or stop_reason == "malformed_payload":
                     break
-                requests_made += 1
-                pages_scanned += 1
-                try:
-                    rows = self._extract_rows(payload)
-                except ValueError as exc:
-                    errors.append(
-                        f"hkexnews {market} {window_start}/{window_end} malformed payload: {exc}"
-                    )
-                    stop_reason = "malformed_payload"
-                    break
-                for row in rows:
-                    record = self._normalize_record(
-                        row,
-                        market=market,
-                        headline_category=scope.category,
-                    )
-                    if record is None:
-                        continue
-                    if scope.symbol and scope.symbol not in record.symbols:
-                        continue
-                    records.append(record)
-                if self.request_interval_seconds:
+                if self.request_interval_seconds and stop_reason != "max_pages_exhausted":
                     time.sleep(self.request_interval_seconds)
-            if stop_reason != "complete":
+            if stop_reason in {"request_failed", "malformed_payload"}:
                 break
 
         seen: Dict[str, AnnouncementRecord] = {}
@@ -177,6 +206,7 @@ class HkexnewsAnnouncementProvider:
             status = "success"
         else:
             status = "success_empty"
+        incomplete = stop_reason == "max_pages_exhausted"
         return AnnouncementScanResult(
             source=self.source_name,
             query=query.for_source(self.source_name),
@@ -190,8 +220,8 @@ class HkexnewsAnnouncementProvider:
                 (record.published_at for record in unique_records if record.published_at),
                 default=None,
             ),
-            is_complete=not errors,
-            stop_reason=stop_reason if errors else "complete",
+            is_complete=not errors and not incomplete,
+            stop_reason=stop_reason if (errors or incomplete) else "complete",
             errors=tuple(errors),
             diagnostics={
                 "markets": list(markets),
@@ -241,6 +271,52 @@ class HkexnewsAnnouncementProvider:
         self._warmed_up = True
         if self.request_interval_seconds:
             time.sleep(self.request_interval_seconds)
+
+    @staticmethod
+    def _truthy(value: Any) -> bool:
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes"}
+        return bool(value)
+
+    @classmethod
+    def _payload_record_cnt(cls, payload: Mapping[str, Any]) -> Optional[int]:
+        raw = payload.get("recordCnt")
+        if raw in (None, ""):
+            return None
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def _payload_has_more(
+        cls,
+        payload: Mapping[str, Any],
+        *,
+        row_range: int,
+        row_count: int,
+    ) -> bool:
+        if cls._truthy(payload.get("hasNextPage")) or cls._truthy(payload.get("hasNextRow")):
+            return True
+        record_cnt = cls._payload_record_cnt(payload)
+        if record_cnt is None:
+            return False
+        return record_cnt > max(row_range, row_count)
+
+    @classmethod
+    def _next_row_range(
+        cls,
+        payload: Mapping[str, Any],
+        *,
+        row_range: int,
+        page_size: int,
+        max_pages: int,
+    ) -> int:
+        ceiling = page_size * max(1, max_pages)
+        record_cnt = cls._payload_record_cnt(payload)
+        if record_cnt is not None and record_cnt > row_range:
+            return min(record_cnt, ceiling)
+        return min(row_range + page_size, ceiling)
 
     def _request_search(
         self,
