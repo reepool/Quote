@@ -458,3 +458,218 @@ class TestSourceFactoryRouting:
 
         assert result == []
         self.yfinance.get_daily_data.assert_awaited_once()
+
+    def _set_index_breaker_behavior(
+        self,
+        *,
+        stale_threshold: int = 3,
+        stale_probe_every: int = 0,
+        transport_threshold: int = 3,
+        transport_probe_every: int = 0,
+    ) -> None:
+        self.factory.routing['daily_behavior']['default']['index'] = {
+            'skip_backup_on_empty_short_range': False,
+            'require_end_date_coverage': True,
+            'stale_source_circuit_breaker_threshold': stale_threshold,
+            'stale_source_circuit_breaker_probe_every': stale_probe_every,
+            'transport_error_circuit_breaker_threshold': transport_threshold,
+            'transport_error_circuit_breaker_probe_every': transport_probe_every,
+        }
+
+    @staticmethod
+    def _index_quote(instrument_id: str, quote_date: datetime, close: float) -> dict:
+        return {
+            'instrument_id': instrument_id,
+            'time': quote_date,
+            'open': close,
+            'high': close,
+            'low': close,
+            'close': close,
+        }
+
+    def test_http_throttle_error_classifier(self):
+        assert self.factory._is_daily_http_throttle_error(
+            Exception('HTTP Error 403: Forbidden')
+        )
+        err = Exception('boom')
+        err.code = 429
+        assert self.factory._is_daily_http_throttle_error(err)
+        assert not self.factory._is_daily_http_throttle_error(Exception('timeout'))
+
+    @pytest.mark.asyncio
+    async def test_index_daily_source_skips_after_http_403_threshold(self):
+        self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 27).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(
+            side_effect=Exception('HTTP Error 403: Forbidden')
+        )
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 27), 2.0)
+            ]
+        )
+
+        for symbol in ['000842', '000939', '000940', '000941']:
+            rows = await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 27),
+                datetime(2026, 8, 27),
+                instrument_type='index',
+            )
+            assert rows[0]['close'] == 2.0
+
+        assert self.csindex.get_daily_data.await_count == 3
+        assert self.baostock.get_daily_data.await_count == 4
+        breaker_key = ('SSE', 'index', 'csindex_a_stock', datetime(2026, 8, 27).date())
+        assert breaker_key in self.factory.daily_transport_error_breakers
+        assert self.factory.last_daily_data_diagnostic['skipped_sources'] == [
+            'csindex_a_stock'
+        ]
+
+    @pytest.mark.asyncio
+    async def test_empty_index_result_does_not_open_http_403_breaker(self):
+        self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 27).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(return_value=[])
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 27), 2.0)
+            ]
+        )
+
+        for symbol in ['000842', '000939', '000940']:
+            await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 27),
+                datetime(2026, 8, 27),
+                instrument_type='index',
+            )
+
+        assert self.csindex.get_daily_data.await_count == 3
+        assert not self.factory.daily_transport_error_breakers
+
+    @pytest.mark.asyncio
+    async def test_stale_index_breaker_recovers_on_half_open_probe(self):
+        self._set_index_breaker_behavior(stale_threshold=2, stale_probe_every=2)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 26).date(), datetime(2026, 8, 27).date()]
+        )
+        stale_calls = {'n': 0}
+
+        async def cnindex_impl(instrument_id, *_args, **_kwargs):
+            stale_calls['n'] += 1
+            quote_date = (
+                datetime(2026, 8, 26)
+                if stale_calls['n'] <= 2
+                else datetime(2026, 8, 27)
+            )
+            return [self._index_quote(instrument_id, quote_date, 3.0 if stale_calls['n'] > 2 else 1.0)]
+
+        self.cnindex.get_daily_data = AsyncMock(side_effect=cnindex_impl)
+        self.baostock.get_daily_data = AsyncMock(return_value=[])
+        self.akshare.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 27), 2.0)
+            ]
+        )
+
+        closes = []
+        for symbol in ['399001', '399002', '399003', '399004', '399005']:
+            rows = await self.factory.get_daily_data(
+                'SZSE',
+                f'{symbol}.SZ',
+                symbol,
+                datetime(2026, 8, 26),
+                datetime(2026, 8, 27),
+                instrument_type='index',
+            )
+            closes.append(rows[0]['close'])
+
+        assert closes == [2.0, 2.0, 2.0, 3.0, 3.0]
+        assert self.cnindex.get_daily_data.await_count == 4
+        breaker_key = ('SZSE', 'index', 'cnindex_a_stock', datetime(2026, 8, 27).date())
+        assert breaker_key not in self.factory.daily_stale_source_breakers
+
+    @pytest.mark.asyncio
+    async def test_http_403_half_open_probe_keeps_breaker_when_still_forbidden(self):
+        self._set_index_breaker_behavior(
+            transport_threshold=2,
+            transport_probe_every=2,
+        )
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 27).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(
+            side_effect=Exception('HTTP Error 403: Forbidden')
+        )
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 27), 2.0)
+            ]
+        )
+
+        for symbol in ['000842', '000939', '000940', '000941']:
+            await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 27),
+                datetime(2026, 8, 27),
+                instrument_type='index',
+            )
+
+        assert self.csindex.get_daily_data.await_count == 3
+        breaker_key = ('SSE', 'index', 'csindex_a_stock', datetime(2026, 8, 27).date())
+        assert breaker_key in self.factory.daily_transport_error_breakers
+        assert self.factory.last_daily_data_diagnostic.get('probed_sources') == [
+            'csindex_a_stock'
+        ]
+
+    @pytest.mark.asyncio
+    async def test_http_403_half_open_probe_recovers_when_source_covers_t_day(self):
+        self._set_index_breaker_behavior(
+            transport_threshold=2,
+            transport_probe_every=2,
+        )
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 27).date()]
+        )
+        calls = {'n': 0}
+
+        async def csindex_impl(instrument_id, *_args, **_kwargs):
+            calls['n'] += 1
+            if calls['n'] <= 2:
+                raise Exception('HTTP Error 403: Forbidden')
+            return [self._index_quote(instrument_id, datetime(2026, 8, 27), 3.0)]
+
+        self.csindex.get_daily_data = AsyncMock(side_effect=csindex_impl)
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 27), 2.0)
+            ]
+        )
+
+        closes = []
+        for symbol in ['000842', '000939', '000940', '000941', '000942']:
+            rows = await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 27),
+                datetime(2026, 8, 27),
+                instrument_type='index',
+            )
+            closes.append(rows[0]['close'])
+
+        assert closes == [2.0, 2.0, 2.0, 3.0, 3.0]
+        assert self.csindex.get_daily_data.await_count == 4
+        breaker_key = ('SSE', 'index', 'csindex_a_stock', datetime(2026, 8, 27).date())
+        assert breaker_key not in self.factory.daily_transport_error_breakers

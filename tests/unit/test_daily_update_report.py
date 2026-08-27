@@ -797,6 +797,71 @@ def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_ta
     assert '*行情追补*' in message
 
 
+def test_daily_update_report_renders_integrity_samples_without_nested_table_noise():
+    engine = ReportEngine()
+    integrity_stats = {
+        'empty_unresolved': 4,
+        'quality_rejected': 0,
+        'stale_source': 16,
+        'refetched_incomplete': 0,
+        'legitimate_no_quote': 0,
+        'calendar_unknown': 0,
+        'samples': [
+            {
+                'instrument_id': '000842.SH',
+                'symbol': '000842',
+                'exchange': 'SSE',
+                'category': 'empty_unresolved',
+                'skipped_sources': [],
+                'transport_error': True,
+            },
+            {
+                'instrument_id': '399691.SZ',
+                'symbol': '399691',
+                'exchange': 'SZSE',
+                'category': 'empty_unresolved',
+                'skipped_sources': ['cnindex_a_stock'],
+            },
+        ],
+    }
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-08-27',
+            'status': 'warning',
+            'update_results': {
+                'success_count': 6213,
+                'failure_count': 4,
+                'total_quotes_added': 12423,
+                'integrity_stats': integrity_stats,
+                'exchange_stats': {
+                    'SSE': {
+                        'success_count': 2592,
+                        'failure_count': 3,
+                        'quotes_added': 5184,
+                        'total_instruments': 2595,
+                        'integrity_stats': integrity_stats,
+                    },
+                    'SZSE': {
+                        'success_count': 3283,
+                        'failure_count': 1,
+                        'quotes_added': 6563,
+                        'total_instruments': 3284,
+                    },
+                },
+            },
+        },
+        'telegram',
+    )
+
+    assert '*完整性*' in message
+    assert '未覆盖: 4' in message
+    assert '000842.SH' in message
+    assert '399691.SZ skipped=cnindex_a_stock' in message
+    assert "'samples':" not in message
+    assert 'Integrity Stats' not in message
+
+
 def test_daily_update_report_renders_changelog_summary_without_nested_table_noise():
     engine = ReportEngine()
     changelog_stats = {
@@ -1080,6 +1145,16 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
     assert result['success_count'] == 0
     assert result['failure_count'] == 1
     assert result['integrity_stats']['empty_unresolved'] == 1
+    assert result['integrity_stats']['samples'] == [{
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'exchange': 'SZSE',
+        'category': 'empty_unresolved',
+        'skipped_sources': [],
+        'probed_sources': [],
+        'stale_source': False,
+        'transport_error': False,
+    }]
 
 
 @pytest.mark.asyncio

@@ -37514,6 +37514,16 @@ class DataManager:
                 if len(exchange_samples) < catchup_sample_limit:
                     exchange_samples.append(sample)
 
+            def _record_integrity_sample(exchange_result: Dict[str, Any], sample: Dict[str, Any]) -> None:
+                if catchup_sample_limit <= 0:
+                    return
+                global_samples = update_results['integrity_stats']['samples']
+                if len(global_samples) < catchup_sample_limit:
+                    global_samples.append(sample)
+                exchange_samples = exchange_result['integrity_stats']['samples']
+                if len(exchange_samples) < catchup_sample_limit:
+                    exchange_samples.append(sample)
+
             for exchange in exchanges:
                 try:
                     dm_logger.info(f"[DataManager] Updating data for {exchange}, types: {instrument_types}")
@@ -37661,6 +37671,34 @@ class DataManager:
                                         update_results['integrity_stats']['empty_unresolved'] += 1
                                         exchange_result['failure_count'] += 1
                                         update_results['failure_count'] += 1
+                                        skipped_sources = []
+                                        probed_sources = []
+                                        if isinstance(source_diagnostic, dict):
+                                            skipped_sources = list(
+                                                source_diagnostic.get('skipped_sources') or []
+                                            )
+                                            probed_sources = list(
+                                                source_diagnostic.get('probed_sources') or []
+                                            )
+                                        _record_integrity_sample(
+                                            exchange_result,
+                                            {
+                                                'instrument_id': instrument.get('instrument_id'),
+                                                'symbol': instrument.get('symbol'),
+                                                'exchange': exchange,
+                                                'category': 'empty_unresolved',
+                                                'skipped_sources': skipped_sources,
+                                                'probed_sources': probed_sources,
+                                                'stale_source': bool(
+                                                    isinstance(source_diagnostic, dict)
+                                                    and source_diagnostic.get('stale_source')
+                                                ),
+                                                'transport_error': bool(
+                                                    isinstance(source_diagnostic, dict)
+                                                    and source_diagnostic.get('transport_error')
+                                                ),
+                                            },
+                                        )
                                     continue
                                 if prepared_data:
                                     write_stats = await self.db_ops.save_daily_quotes(

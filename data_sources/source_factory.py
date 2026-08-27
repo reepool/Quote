@@ -56,6 +56,9 @@ class DataSourceFactory:
         self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
         self.daily_stale_source_counts: Dict[tuple[str, str, str, date], int] = {}
         self.daily_stale_source_breakers: set[tuple[str, str, str, date]] = set()
+        self.daily_transport_error_counts: Dict[tuple[str, str, str, date], int] = {}
+        self.daily_transport_error_breakers: set[tuple[str, str, str, date]] = set()
+        self.daily_breaker_skip_counts: Dict[tuple[str, str, str, date], int] = {}
         self.last_daily_data_diagnostic: Dict[str, Any] = {}
         self.last_instrument_list_diagnostics: Dict[tuple[str, tuple[str, ...]], Dict[str, Any]] = {}
 
@@ -518,17 +521,80 @@ class DataSourceFactory:
         route_cfg = self._get_daily_route_config(exchange, instrument_type)
         return bool(route_cfg.get('skip_backup_on_empty_short_range', False))
 
+    def _daily_route_int(
+        self,
+        exchange: str,
+        instrument_type: str,
+        key: str,
+        default: int,
+    ) -> int:
+        """Return a non-negative integer daily-behavior setting."""
+        route_cfg = self._get_daily_route_config(exchange, instrument_type)
+        raw_value = route_cfg.get(key, default)
+        try:
+            return max(0, int(raw_value))
+        except (TypeError, ValueError):
+            return max(0, int(default))
+
     def _daily_stale_breaker_threshold(self, exchange: str, instrument_type: str) -> int:
         """Return per-run stale-source breaker threshold; 0 disables the breaker."""
-        route_cfg = self._get_daily_route_config(exchange, instrument_type)
-        raw_threshold = route_cfg.get(
+        default = 3 if (instrument_type or 'stock').lower() == 'index' else 0
+        return self._daily_route_int(
+            exchange,
+            instrument_type,
             'stale_source_circuit_breaker_threshold',
-            3 if (instrument_type or 'stock').lower() == 'index' else 0,
+            default,
         )
+
+    def _daily_transport_error_breaker_threshold(
+        self,
+        exchange: str,
+        instrument_type: str,
+    ) -> int:
+        """Return per-run HTTP 403/429 breaker threshold; 0 disables the breaker."""
+        default = 3 if (instrument_type or 'stock').lower() == 'index' else 0
+        return self._daily_route_int(
+            exchange,
+            instrument_type,
+            'transport_error_circuit_breaker_threshold',
+            default,
+        )
+
+    def _daily_breaker_probe_every(
+        self,
+        exchange: str,
+        instrument_type: str,
+        kind: str,
+    ) -> int:
+        """Return skip-count interval for a half-open probe; 0 disables probing."""
+        key = (
+            'stale_source_circuit_breaker_probe_every'
+            if kind == 'stale'
+            else 'transport_error_circuit_breaker_probe_every'
+        )
+        return self._daily_route_int(exchange, instrument_type, key, 0)
+
+    @staticmethod
+    def _is_daily_http_throttle_error(exc: BaseException) -> bool:
+        """Return True for HTTP 403/429 anti-crawl failures."""
+        status = getattr(exc, 'code', None)
+        if status is None:
+            status = getattr(exc, 'status', None)
         try:
-            return max(0, int(raw_threshold))
+            status_int = int(status)
         except (TypeError, ValueError):
-            return 0
+            status_int = None
+        if status_int in (403, 429):
+            return True
+        text = str(exc).lower()
+        return (
+            'http error 403' in text
+            or 'http error 429' in text
+            or ('403' in text and 'forbidden' in text)
+            or 'too many requests' in text
+            or 'status code: 403' in text
+            or 'status_code=403' in text
+        )
 
     def _daily_stale_breaker_key(
         self,
@@ -557,6 +623,9 @@ class DataSourceFactory:
         key = self._daily_stale_breaker_key(exchange, instrument_type, source_name, expected_date)
         self.daily_stale_source_counts.pop(key, None)
         self.daily_stale_source_breakers.discard(key)
+        self.daily_transport_error_counts.pop(key, None)
+        self.daily_transport_error_breakers.discard(key)
+        self.daily_breaker_skip_counts.pop(key, None)
 
     def _record_daily_source_stale_result(
         self,
@@ -591,6 +660,71 @@ class DataSourceFactory:
                 symbol,
             )
 
+    def _record_daily_source_transport_error(
+        self,
+        *,
+        exchange: str,
+        instrument_type: str,
+        source_name: str,
+        expected_date: date,
+        symbol: str,
+        error: BaseException,
+    ) -> None:
+        threshold = self._daily_transport_error_breaker_threshold(exchange, instrument_type)
+        if threshold <= 0:
+            return
+
+        key = self._daily_stale_breaker_key(exchange, instrument_type, source_name, expected_date)
+        count = self.daily_transport_error_counts.get(key, 0) + 1
+        self.daily_transport_error_counts[key] = count
+        if count >= threshold and key not in self.daily_transport_error_breakers:
+            self.daily_transport_error_breakers.add(key)
+            ds_logger.warning(
+                "[DataSourceFactory] Circuit breaker opened for HTTP throttle %s daily source %s "
+                "on %s/%s expected_trading_day=%s after %s throttle errors; "
+                "last_error=%s last_symbol=%s",
+                instrument_type,
+                source_name,
+                exchange,
+                instrument_type,
+                expected_date,
+                count,
+                error,
+                symbol,
+            )
+
+    async def _maybe_record_daily_transport_error(
+        self,
+        *,
+        exchange: str,
+        instrument_type: str,
+        source_name: str,
+        start_date: datetime,
+        end_date: datetime,
+        symbol: str,
+        error: BaseException,
+    ) -> None:
+        if not self._is_daily_http_throttle_error(error):
+            return
+        expected_date = await self._get_expected_daily_coverage_date(
+            exchange, start_date, end_date
+        )
+        if expected_date is None:
+            return
+        if isinstance(self.last_daily_data_diagnostic, dict):
+            self.last_daily_data_diagnostic["transport_error"] = True
+        self._record_daily_source_transport_error(
+            exchange=exchange,
+            instrument_type=instrument_type,
+            source_name=source_name,
+            expected_date=expected_date,
+            symbol=symbol,
+            error=error,
+        )
+
+    def _breaker_probe_is_due(self, skip_count: int, probe_every: int) -> bool:
+        return probe_every > 0 and skip_count % probe_every == 0
+
     async def _filter_daily_source_chain_for_stale_breaker(
         self,
         source_chain: List[BaseDataSource],
@@ -601,36 +735,78 @@ class DataSourceFactory:
         end_date: datetime,
         symbol: str,
     ) -> List[BaseDataSource]:
-        threshold = self._daily_stale_breaker_threshold(exchange, instrument_type)
-        if threshold <= 0 or not source_chain:
+        stale_threshold = self._daily_stale_breaker_threshold(exchange, instrument_type)
+        transport_threshold = self._daily_transport_error_breaker_threshold(
+            exchange, instrument_type
+        )
+        if (stale_threshold <= 0 and transport_threshold <= 0) or not source_chain:
             return source_chain
 
         expected_date = await self._get_expected_daily_coverage_date(exchange, start_date, end_date)
         if expected_date is None:
             return source_chain
 
+        stale_probe_every = self._daily_breaker_probe_every(
+            exchange, instrument_type, 'stale'
+        )
+        transport_probe_every = self._daily_breaker_probe_every(
+            exchange, instrument_type, 'transport'
+        )
         filtered: List[BaseDataSource] = []
         skipped: List[str] = []
+        probed: List[str] = []
         for source in source_chain:
+            source_name = getattr(source, 'name', type(source).__name__)
             key = self._daily_stale_breaker_key(
                 exchange,
                 instrument_type,
-                getattr(source, 'name', type(source).__name__),
+                source_name,
                 expected_date,
             )
-            if key in self.daily_stale_source_breakers:
-                skipped.append(getattr(source, 'name', type(source).__name__))
+            stale_open = stale_threshold > 0 and key in self.daily_stale_source_breakers
+            transport_open = (
+                transport_threshold > 0 and key in self.daily_transport_error_breakers
+            )
+            if not stale_open and not transport_open:
+                filtered.append(source)
                 continue
-            filtered.append(source)
+
+            skip_count = self.daily_breaker_skip_counts.get(key, 0) + 1
+            self.daily_breaker_skip_counts[key] = skip_count
+            due = False
+            if stale_open and self._breaker_probe_is_due(skip_count, stale_probe_every):
+                due = True
+            if transport_open and self._breaker_probe_is_due(
+                skip_count, transport_probe_every
+            ):
+                due = True
+            if due:
+                filtered.append(source)
+                probed.append(source_name)
+                continue
+            skipped.append(source_name)
+
+        if isinstance(self.last_daily_data_diagnostic, dict):
+            self.last_daily_data_diagnostic["skipped_sources"] = skipped
+            self.last_daily_data_diagnostic["probed_sources"] = probed
 
         if skipped:
             ds_logger.info(
-                "[DataSourceFactory] Skipping stale daily source(s) for %s/%s %s expected_trading_day=%s: %s",
+                "[DataSourceFactory] Skipping daily source(s) for %s/%s %s expected_trading_day=%s: %s",
                 exchange,
                 instrument_type,
                 symbol,
                 expected_date,
                 ", ".join(skipped),
+            )
+        if probed:
+            ds_logger.info(
+                "[DataSourceFactory] Half-open probe of daily source(s) for %s/%s %s expected_trading_day=%s: %s",
+                exchange,
+                instrument_type,
+                symbol,
+                expected_date,
+                ", ".join(probed),
             )
         return filtered
 
@@ -1330,6 +1506,9 @@ class DataSourceFactory:
             "symbol": symbol,
             "stale_source": False,
             "empty": False,
+            "transport_error": False,
+            "skipped_sources": [],
+            "probed_sources": [],
         }
 
         source_chain = self._get_daily_source_chain(exchange, instrument_type)
@@ -1346,7 +1525,7 @@ class DataSourceFactory:
         )
         if not source_chain:
             ds_logger.warning(
-                "[DataSourceFactory] All daily sources are currently blocked by stale coverage circuit breaker for %s %s",
+                "[DataSourceFactory] All daily sources are currently blocked by coverage circuit breaker for %s %s",
                 exchange,
                 symbol,
             )
@@ -1392,6 +1571,15 @@ class DataSourceFactory:
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get daily data from {primary_source.name}: {e}")
             primary_exception = True
+            await self._maybe_record_daily_transport_error(
+                exchange=exchange,
+                instrument_type=instrument_type,
+                source_name=primary_source.name,
+                start_date=start_date,
+                end_date=end_date,
+                symbol=symbol,
+                error=e,
+            )
         else:
             primary_exception = False
 
@@ -1445,6 +1633,15 @@ class DataSourceFactory:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")
             except Exception as backup_e:
                 ds_logger.error(f"[DataSourceFactory] Backup source {backup_source.name} failed: {backup_e}")
+                await self._maybe_record_daily_transport_error(
+                    exchange=exchange,
+                    instrument_type=instrument_type,
+                    source_name=backup_source.name,
+                    start_date=start_date,
+                    end_date=end_date,
+                    symbol=symbol,
+                    error=backup_e,
+                )
 
         ds_logger.warning(f"[DataSourceFactory] No data available for {exchange} {symbol}")
         return []

@@ -220,6 +220,7 @@ class ReportEngine:
                 ),
                 'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
                 'changelog_stats': summary.get('changelog_stats', data.get('changelog_stats')),
+                'integrity_stats': summary.get('integrity_stats', data.get('integrity_stats')),
             })
 
         data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
@@ -233,6 +234,9 @@ class ReportEngine:
         )
         data['daily_changelog_summary'] = self._format_daily_changelog_summary(
             data.get('changelog_stats')
+        )
+        data['daily_integrity_summary'] = self._format_daily_integrity_summary(
+            data.get('integrity_stats')
         )
 
         # 确保所有报告都有一个明确的名称
@@ -261,6 +265,40 @@ class ReportEngine:
             if value or label == '水位写入':
                 visible_parts.append(f"{label}: {value}")
         return '，'.join(visible_parts)
+
+    def _format_daily_integrity_summary(self, integrity_stats: Dict[str, Any]) -> str:
+        """Format bounded unresolved coverage samples for operator reports."""
+        if not isinstance(integrity_stats, dict) or not integrity_stats:
+            return ''
+
+        empty_unresolved = int(integrity_stats.get('empty_unresolved', 0) or 0)
+        stale_source = int(integrity_stats.get('stale_source', 0) or 0)
+        quality_rejected = int(integrity_stats.get('quality_rejected', 0) or 0)
+        samples = integrity_stats.get('samples') or []
+        if empty_unresolved <= 0 and not samples:
+            return ''
+
+        lines = [
+            f"未覆盖: {empty_unresolved}，陈旧源: {stale_source}，质量拒绝: {quality_rejected}",
+        ]
+        sample_parts = []
+        for sample in samples[:5]:
+            if not isinstance(sample, dict):
+                continue
+            instrument_id = sample.get('instrument_id') or sample.get('symbol')
+            if not instrument_id:
+                continue
+            extras = []
+            skipped = sample.get('skipped_sources') or []
+            if skipped:
+                extras.append('skipped=' + ','.join(str(item) for item in skipped[:3]))
+            if sample.get('transport_error'):
+                extras.append('http_throttle')
+            suffix = f" {' '.join(extras)}" if extras else ''
+            sample_parts.append(f"{instrument_id}{suffix}")
+        if sample_parts:
+            lines.append('样例: ' + '；'.join(sample_parts))
+        return '\n'.join(lines)
 
     def _format_daily_exchange_stats_for_table(
         self,

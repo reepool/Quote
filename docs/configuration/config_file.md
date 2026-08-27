@@ -1137,6 +1137,12 @@
   控制非空行情是否必须覆盖请求区间内最后一个交易日。当前指数为 `true`，避免官方源返回前一日 stale 数据却阻断 fallback。
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.stale_source_circuit_breaker_threshold`**: `int`
   控制同一进程、同一交易所、同一品种类型、同一行情源、同一目标交易日连续 stale 后的临时熔断阈值。指数默认 `3`；达到阈值后，本轮后续同 key 请求会跳过该 stale 源并直接走后续 fallback。该熔断只影响当轮行情下载链路，不改写主数据生命周期，也不跨目标交易日复用。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.stale_source_circuit_breaker_probe_every`**: `int`
+  控制 stale 熔断打开后每隔多少个被跳过的品种做一次半开探测。`0` 表示本轮不再探测。探测成功覆盖目标交易日后关闭熔断。日更循环不会因此 sleep。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.transport_error_circuit_breaker_threshold`**: `int`
+  控制同一进程、同一交易所、同一品种类型、同一行情源、同一目标交易日累计 HTTP 403/429 后的临时熔断阈值。指数默认 `3`；达到阈值后后续请求跳过该源并走 fallback，不在日更主循环插入 cooldown sleep。空结果和 stale 不计入该阈值。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.transport_error_circuit_breaker_probe_every`**: `int`
+  控制 403/429 熔断打开后每隔多少个被跳过的品种做一次半开探测。`0` 表示本轮不再探测。
 - **`routing.instrument_list.<region>`**: `List[str]`
   指定品种列表抓取链，按 region 配置。A 股股票当前为 `exchange_official -> baostock -> akshare`；官方源成功时备源不得并集补入官方 current list 缺失代码，只能补非生命周期字段和写差异诊断。
 - **`routing.calendar.<region>`**: `List[str]`
