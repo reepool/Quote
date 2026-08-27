@@ -16963,7 +16963,7 @@ class DataManager:
         }
 
     async def _get_hkex_local_master_rows(self) -> List[Dict[str, Any]]:
-        return await self.db_ops.execute_read_query(
+        rows = await self.db_ops.execute_read_query(
             """
             SELECT instrument_id, symbol, name, exchange, type, status, is_active,
                    listed_date, delisted_date, source, source_symbol, currency,
@@ -16972,6 +16972,61 @@ class DataManager:
             WHERE exchange = 'HKEX' AND type = 'stock'
             """
         )
+        return await self._attach_hkex_local_expected_resume_dates(rows)
+
+    async def _attach_hkex_local_expected_resume_dates(
+        self,
+        rows: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        """Restore dated product-cessation windows from last official metadata."""
+        from data_sources.hkex_instrument_master import (
+            HKEX_PRODUCT_CESSATION_SOURCE,
+            hkex_row_expected_resume_date,
+        )
+
+        missing_ids = [
+            str(row.get('instrument_id'))
+            for row in rows or []
+            if str(row.get('source') or '') == HKEX_PRODUCT_CESSATION_SOURCE
+            and row.get('trading_status') in (0, '0', False)
+            and hkex_row_expected_resume_date(row) is None
+            and row.get('instrument_id')
+        ]
+        if not missing_ids:
+            return rows
+        try:
+            placeholders = ', '.join(f':resume_id_{index}' for index in range(len(missing_ids)))
+            params = {
+                f'resume_id_{index}': instrument_id
+                for index, instrument_id in enumerate(missing_ids)
+            }
+            metadata_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, metadata_json
+                FROM instrument_master_metadata
+                WHERE instrument_id IN ({placeholders})
+                """,
+                params,
+            )
+        except Exception:
+            return rows
+        dates_by_id: Dict[str, str] = {}
+        for meta in metadata_rows or []:
+            try:
+                payload = json.loads(meta.get('metadata_json') or '{}')
+            except (TypeError, json.JSONDecodeError):
+                continue
+            if not isinstance(payload, dict):
+                continue
+            resume_date = hkex_row_expected_resume_date(payload)
+            instrument_id = str(meta.get('instrument_id') or '')
+            if instrument_id and resume_date is not None:
+                dates_by_id[instrument_id] = resume_date.isoformat()
+        for row in rows or []:
+            instrument_id = str(row.get('instrument_id') or '')
+            if instrument_id in dates_by_id and hkex_row_expected_resume_date(row) is None:
+                row['expected_resume_date'] = dates_by_id[instrument_id]
+        return rows
 
     async def _get_hkex_quote_availability_rows(self, *, stale_days: int = 14) -> List[Dict[str, Any]]:
         rows = await self.db_ops.execute_read_query(
@@ -17368,7 +17423,11 @@ class DataManager:
             existing = merged.get(instrument_id, {})
             existing_source = existing.get('source')
             incoming_source = row.get('source')
-            combined = overlay_hkex_lifecycle_fields(existing, row)
+            combined = overlay_hkex_lifecycle_fields(
+                existing,
+                row,
+                as_of=get_shanghai_time().date(),
+            )
             combined['listing_source_present'] = bool(
                 existing.get('listing_source_present')
                 or existing_source in HKEX_LISTING_ACTIVE_SOURCES
@@ -17389,13 +17448,22 @@ class DataManager:
         *,
         rows: List[Dict[str, Any]],
         snapshots: List[Any],
+        local_rows: Optional[List[Dict[str, Any]]] = None,
     ) -> List[Dict[str, Any]]:
-        from data_sources.hkex_instrument_master import build_dual_counter_map
+        from data_sources.hkex_instrument_master import (
+            build_dual_counter_map,
+            hkex_row_expected_resume_date,
+        )
 
         snapshot_by_source = {
             snapshot.source: snapshot
             for snapshot in snapshots or []
             if getattr(snapshot, 'source', None)
+        }
+        local_by_id = {
+            row.get('instrument_id'): row
+            for row in (local_rows or [])
+            if row.get('instrument_id')
         }
         dual_map = build_dual_counter_map(rows)
         metadata_rows: List[Dict[str, Any]] = []
@@ -17409,6 +17477,10 @@ class DataManager:
                 'is_canonical': True,
                 'counter_currency': row.get('currency'),
             })
+            if hkex_row_expected_resume_date(item) is None:
+                local_resume = hkex_row_expected_resume_date(local_by_id.get(instrument_id))
+                if local_resume is not None:
+                    item['expected_resume_date'] = local_resume.isoformat()
             snapshot = snapshot_by_source.get(row.get('source'))
             if snapshot is not None:
                 item['raw_snapshot_hash'] = snapshot.raw_snapshot_hash
@@ -17471,7 +17543,11 @@ class DataManager:
                 'source': row.get('source') or 'hkex_securities_list',
                 'source_symbol': row.get('source_symbol') or row.get('symbol'),
             }
-            if is_hkex_sticky_untradable_local(local):
+            if is_hkex_sticky_untradable_local(
+                local,
+                official=row,
+                as_of=get_shanghai_time().date(),
+            ):
                 item['trading_status'] = 0
                 item['source'] = HKEX_PRODUCT_CESSATION_SOURCE
             if row.get('listed_date'):
@@ -17554,6 +17630,7 @@ class DataManager:
         metadata_rows = self._build_hkex_metadata_rows(
             rows=official_active_rows,
             snapshots=source_bundle.get('snapshots') or [],
+            local_rows=local_rows,
         )
         decisions = HKEXLifecyclePolicy.build_decisions(
             local_rows=local_rows,

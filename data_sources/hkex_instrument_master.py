@@ -70,11 +70,18 @@ HKEX_UNTRADABLE_SOURCES = frozenset(
         HKEX_PRODUCT_CESSATION_SOURCE,
     }
 )
+HKEX_MANUAL_REVIEW_SOURCE = "hkex_manual_review"
 HKEX_LISTING_ACTIVE_SOURCES = frozenset(
     {
         "hkex_securities_list",
         "hkexnews_active_list",
-        "hkex_manual_review",
+        HKEX_MANUAL_REVIEW_SOURCE,
+    }
+)
+HKEX_STICKY_CESSATION_OVERRIDE_SOURCES = frozenset(
+    {
+        HKEX_MANUAL_REVIEW_SOURCE,
+        HKEX_TRADING_RESUMPTION_SOURCE,
     }
 )
 HKEX_TRADING_STATUS_EVENT_CATEGORIES = frozenset(
@@ -722,13 +729,56 @@ def extract_hkex_timetable_dates(title: Any) -> Dict[str, Optional[date]]:
     }
 
 
-def is_hkex_sticky_untradable_local(row: Optional[Dict[str, Any]]) -> bool:
-    """Product cessation without a resume date stays untradable after the scan window."""
+def hkex_row_expected_resume_date(row: Optional[Dict[str, Any]]) -> Optional[date]:
+    """Read an explicit resume/commence date from a local or official lifecycle row."""
+    item = row or {}
+    candidates = [item.get("expected_resume_date")]
+    evidence = item.get("lifecycle_evidence")
+    if isinstance(evidence, dict):
+        candidates.append(evidence.get("expected_resume_date"))
+    for value in candidates:
+        parsed = parse_hkex_lifecycle_evidence_at(value)
+        if parsed is not None:
+            return parsed.date()
+    return None
+
+
+def hkex_expected_resume_date_reached(
+    row: Optional[Dict[str, Any]],
+    as_of: Optional[date] = None,
+) -> bool:
+    """Return whether a dated untradable window has already reached its resume date."""
+    resume_date = hkex_row_expected_resume_date(row)
+    if resume_date is None:
+        return False
+    return (as_of or date.today()) >= resume_date
+
+
+def is_hkex_sticky_untradable_local(
+    row: Optional[Dict[str, Any]],
+    *,
+    official: Optional[Dict[str, Any]] = None,
+    as_of: Optional[date] = None,
+) -> bool:
+    """Undated product cessation stays untradable after the scan window.
+
+    Manual review ``active`` and later official resumption can end the state.
+    A stored ``expected_resume_date`` that has already been reached also ends it.
+    """
     item = row or {}
     source = str(item.get("source") or item.get("official_lifecycle_source") or "")
     if source != HKEX_PRODUCT_CESSATION_SOURCE:
         return False
-    return item.get("trading_status") in (0, "0", False)
+    if item.get("trading_status") not in (0, "0", False):
+        return False
+    if _hkex_official_clears_sticky_cessation(official):
+        return False
+    if hkex_expected_resume_date_reached(item, as_of) or hkex_expected_resume_date_reached(
+        official,
+        as_of,
+    ):
+        return False
+    return True
 
 
 def is_hkex_untradable_window(
@@ -815,6 +865,11 @@ def build_hkex_trading_eligibility_snapshot(
                 "source_symbol": item["symbol"],
                 "official_lifecycle_source": source,
                 "lifecycle_evidence_at": item["published_at"],
+                "expected_resume_date": (
+                    dates["expected_resume_date"].isoformat()
+                    if dates["expected_resume_date"]
+                    else None
+                ),
                 "lifecycle_evidence": {
                     "source": source,
                     "headline_category": item["event"],
@@ -996,9 +1051,46 @@ def _hkex_row_makes_tradable(row: Optional[Dict[str, Any]]) -> bool:
     return item.get("trading_status") not in (0, "0", False)
 
 
+def _hkex_row_source(row: Optional[Dict[str, Any]]) -> str:
+    item = row or {}
+    return str(item.get("source") or item.get("official_lifecycle_source") or "")
+
+
+def _hkex_official_clears_sticky_cessation(official: Optional[Dict[str, Any]]) -> bool:
+    if official is None:
+        return False
+    if _hkex_row_source(official) not in HKEX_STICKY_CESSATION_OVERRIDE_SOURCES:
+        return False
+    return _hkex_row_makes_tradable(official)
+
+
+def _hkex_incoming_overrides_untradable(
+    existing: Dict[str, Any],
+    incoming: Dict[str, Any],
+    *,
+    as_of: Optional[date] = None,
+) -> bool:
+    if not _hkex_row_makes_tradable(incoming):
+        return False
+    incoming_source = _hkex_row_source(incoming)
+    if incoming_source == HKEX_MANUAL_REVIEW_SOURCE:
+        return True
+    if incoming_source == HKEX_TRADING_RESUMPTION_SOURCE:
+        return _hkex_incoming_lifecycle_wins(
+            parse_hkex_lifecycle_evidence_at((existing or {}).get("lifecycle_evidence_at")),
+            parse_hkex_lifecycle_evidence_at((incoming or {}).get("lifecycle_evidence_at")),
+        )
+    return hkex_expected_resume_date_reached(existing, as_of) or hkex_expected_resume_date_reached(
+        incoming,
+        as_of,
+    )
+
+
 def overlay_hkex_lifecycle_fields(
     existing: Dict[str, Any],
     incoming: Dict[str, Any],
+    *,
+    as_of: Optional[date] = None,
 ) -> Dict[str, Any]:
     """Merge two official rows, letting later dated halt/resume/PDF evidence win."""
     combined = dict(existing or {})
@@ -1006,8 +1098,18 @@ def overlay_hkex_lifecycle_fields(
         parse_hkex_lifecycle_evidence_at((existing or {}).get("lifecycle_evidence_at")),
         parse_hkex_lifecycle_evidence_at((incoming or {}).get("lifecycle_evidence_at")),
     )
-    if _hkex_row_is_untradable(existing) and _hkex_row_makes_tradable(incoming):
+    if (
+        _hkex_row_source(existing) == HKEX_MANUAL_REVIEW_SOURCE
+        and _hkex_row_makes_tradable(existing)
+        and _hkex_row_is_untradable(incoming)
+    ):
         incoming_wins = False
+    elif _hkex_row_is_untradable(existing) and _hkex_row_makes_tradable(incoming):
+        incoming_wins = _hkex_incoming_overrides_untradable(
+            existing,
+            incoming,
+            as_of=as_of,
+        )
     for key, value in (incoming or {}).items():
         if value in (None, ""):
             continue
@@ -1529,7 +1631,12 @@ class HKEXManualReviewProvider:
                 str(item.get("effective_date") or item.get("delisted_date") or "").strip()
                 or None
             )
-            rows.append({
+            evidence_at = parse_hkex_lifecycle_evidence_at(
+                item.get("lifecycle_evidence_at")
+                or item.get("reviewed_at")
+                or effective_date
+            )
+            row = {
                 "instrument_id": hkex_instrument_id(code),
                 "symbol": code,
                 "name": str(item.get("name") or item.get("stock_name") or "").strip(),
@@ -1550,10 +1657,14 @@ class HKEXManualReviewProvider:
                     "source": self.source,
                     "source_url": self.source_url,
                     "status": status,
+                    "effective_date": effective_date,
                     "evidence_url": str(item.get("evidence_url") or item.get("source_url") or "").strip(),
                     "format": source_format,
                 },
-            })
+            }
+            if evidence_at is not None:
+                row["lifecycle_evidence_at"] = evidence_at.isoformat()
+            rows.append(row)
         return HKEXProviderSnapshot(
             source=self.source,
             source_url=self.source_url,

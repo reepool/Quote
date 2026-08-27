@@ -1327,6 +1327,160 @@ async def test_hkex_product_cessation_survives_successful_empty_scan():
 
 
 @pytest.mark.asyncio
+async def test_hkex_product_cessation_restored_by_manual_review_active(tmp_path):
+    manual_file = tmp_path / "hkex_manual_review.json"
+    manual_file.write_text(
+        """
+        [
+          {
+            "instrument_id": "00005.HK",
+            "action": "active",
+            "effective_date": "2026-08-20",
+            "reason": "operator restored misclassified product cessation"
+          }
+        ]
+        """,
+        encoding="utf-8",
+    )
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_product_cessation',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['manual_review_file'] = str(manual_file)
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [],
+            'scan': {
+                'status': 'success_empty',
+                'is_complete': True,
+                'errors': [],
+                'stop_reason': 'complete',
+            },
+        }
+    )
+
+    await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 1
+    assert by_id['00005.HK']['source'] == 'hkex_manual_review'
+
+
+@pytest.mark.asyncio
+async def test_hkex_product_cessation_restored_by_later_official_resumption():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_product_cessation',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [
+                HKEXProviderSnapshot(
+                    source='hkexnews_trading_resumption',
+                    source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+                    parser_version='test',
+                    raw_snapshot_hash='resume',
+                    rows=[
+                        {
+                            'instrument_id': '00005.HK',
+                            'symbol': '00005',
+                            'name': 'HSBC HOLDINGS',
+                            'status': 'active',
+                            'trading_status': 1,
+                            'source': 'hkexnews_trading_resumption',
+                            'lifecycle_evidence_at': '2026-08-17T00:46:00+00:00',
+                        }
+                    ],
+                )
+            ],
+            'scan': {
+                'status': 'success',
+                'is_complete': True,
+                'errors': [],
+                'stop_reason': 'complete',
+            },
+        }
+    )
+
+    await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 1
+    assert by_id['00005.HK']['source'] == 'hkexnews_trading_resumption'
+
+
+@pytest.mark.asyncio
+async def test_hkex_product_cessation_with_reached_resume_date_can_restore():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_product_cessation',
+            'expected_resume_date': '2026-01-02',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [],
+            'scan': {
+                'status': 'success_empty',
+                'is_complete': True,
+                'errors': [],
+                'stop_reason': 'complete',
+            },
+        }
+    )
+
+    await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 1
+    assert by_id['00005.HK']['source'] != 'hkexnews_product_cessation'
+
+
+@pytest.mark.asyncio
 async def test_hkex_expired_trading_arrangement_can_restore_after_complete_empty_scan():
     manager = _manager()
     _attach_hkex_mock_db(manager, local_rows=[
