@@ -68,6 +68,7 @@ _BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT = (
     "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do"
 )
 DEFAULT_STALE_RUNNING_TIMEOUT_SECONDS = 6 * 60 * 60
+DEFAULT_MAX_CANDIDATES = 0  # 0 = unlimited; finish every selected candidate in the same run
 STALE_FINANCIAL_JOB_NAMES = (
     "financial_disclosure_incremental_sync",
     "financial_disclosure_reconciliation_sync",
@@ -176,7 +177,7 @@ class FinancialDisclosureIncrementalSyncService:
             else max_pages_per_market
         )
         candidate_limit = int(
-            maintenance_cfg.get("max_candidates", 500)
+            maintenance_cfg.get("max_candidates", DEFAULT_MAX_CANDIDATES)
             if max_candidates is None
             else max_candidates
         )

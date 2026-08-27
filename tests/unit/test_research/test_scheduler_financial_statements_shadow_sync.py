@@ -1,4 +1,6 @@
 import asyncio
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
 import scheduler.tasks as task_module
@@ -475,3 +477,17 @@ def test_financial_disclosure_incremental_task_no_longer_runs_broker_post_task(m
     report_data = task._send_task_report.await_args.kwargs["report_data"]
     assert "券商风控后置任务" not in report_data["content"]
     assert "broker_risk_control_incremental_sync" not in task._active_tasks
+
+
+def test_financial_disclosure_jobs_process_all_candidates_same_day():
+    jobs = json.loads(
+        Path("config/05_scheduler.json").read_text(encoding="utf-8")
+    )["scheduler_config"]["jobs"]
+
+    incremental = jobs["financial_disclosure_incremental_sync"]["parameters"]
+    reconciliation = jobs["financial_disclosure_reconciliation_sync"]["parameters"]
+
+    assert incremental["max_candidates"] == 0
+    assert reconciliation["max_candidates"] == 0
+    assert incremental["max_runtime_seconds"] >= 14400
+    assert reconciliation["max_runtime_seconds"] >= 18000

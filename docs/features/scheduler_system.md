@@ -571,10 +571,10 @@ async def weekly_data_maintenance(self,
       "page_size": 30,
       "max_pages_per_market": 40,
       "pending_recheck_days": 7,
-      "max_candidates": 500,
+      "max_candidates": 0,
       "db_path": "data/financials.db",
       "dry_run": false,
-      "max_runtime_seconds": 7200
+      "max_runtime_seconds": 14400
     },
     "dependencies": {
       "post_success": [
@@ -614,10 +614,10 @@ async def weekly_data_maintenance(self,
       "exchanges": ["SSE", "SZSE", "BSE"],
       "period_window": "latest",
       "rolling_quarters": 10,
-      "max_candidates": 500,
+      "max_candidates": 0,
       "pending_recheck_days": 7,
       "db_path": "data/financials.db",
-      "max_runtime_seconds": 10800
+      "max_runtime_seconds": 18000
     }
   },
   "financial_statements_catchup_sync": {

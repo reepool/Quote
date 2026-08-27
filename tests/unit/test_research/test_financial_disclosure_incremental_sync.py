@@ -931,6 +931,56 @@ def test_incremental_candidate_limit_is_not_consumed_by_accepted_states(tmp_path
     assert result["report_periods"][-1] == "2026-03-31"
 
 
+def test_incremental_sync_default_candidate_limit_keeps_all_announcements(tmp_path):
+    records = [
+        _record(
+            announcement_id=f"h1-{symbol}",
+            title="2026年半年度报告",
+            announcement_time="2026-08-27",
+            market="SZSE",
+            symbols=[symbol],
+        )
+        for symbol in ("002731", "000006", "000007")
+    ]
+
+    class _MultiInstrumentDbOps:
+        async def get_instruments_by_exchange(self, exchange):
+            return [
+                {
+                    "instrument_id": f"{symbol}.SZ",
+                    "symbol": symbol,
+                    "exchange": "SZSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+                for symbol in ("002731", "000006", "000007")
+            ]
+
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_MultiInstrumentDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService(records),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["candidate_limit"] == 0
+    assert result["candidate_count"] == 3
+    assert result["candidate_unlimited_count"] == 3
+    assert {item["instrument_id"] for item in result["outcomes"]} == {
+        "002731.SZ",
+        "000006.SZ",
+        "000007.SZ",
+    }
+
+
 def test_incremental_sync_succeeds_when_cninfo_fails_but_fallback_writes(tmp_path):
     record = _record(
         announcement_id="fallback-q2-report",

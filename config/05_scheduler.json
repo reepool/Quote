@@ -2195,7 +2195,7 @@
           "overlap_days": 3,
           "page_size": 30,
           "max_pages_per_market": 40,
-          "max_candidates": 500,
+          "max_candidates": 0,
           "pending_recheck_days": 7,
           "target_instrument_ids": null,
           "target_symbols": null,
@@ -2208,7 +2208,7 @@
           "request_interval_seconds": 0.2,
           "request_timeout_seconds": 20.0,
           "dry_run": false,
-          "max_runtime_seconds": 7200
+          "max_runtime_seconds": 14400
         },
         "dependencies": {
           "post_success": [
@@ -2290,7 +2290,7 @@
           "rolling_quarters": 10,
           "baseline_report_period": "2024Q1",
           "latest_report_period": null,
-          "max_candidates": 500,
+          "max_candidates": 0,
           "pending_recheck_days": 7,
           "target_instrument_ids": null,
           "target_symbols": null,
@@ -2298,7 +2298,7 @@
           "request_interval_seconds": 0.2,
           "request_timeout_seconds": 20.0,
           "dry_run": false,
-          "max_runtime_seconds": 10800
+          "max_runtime_seconds": 18000
         }
       },
       "financial_statements_shadow_sync": {
