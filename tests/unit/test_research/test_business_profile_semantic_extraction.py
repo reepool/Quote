@@ -1267,3 +1267,48 @@ async def test_no_keyword_spans_use_ranked_bounded_selected_sections():
     payload = json.loads(gateway.requests[0].messages[-1].content)
     assert payload["evidence_spans"]
     assert sum(len(item["text"]) for item in payload["evidence_spans"]) <= 120
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_row_review_uses_stronger_model_without_mutating_source_fields():
+    rows = [
+        {
+            "segment_name_raw": "多晶硅料",
+            "fact_type": "purchase_amount",
+            "value_raw": 4.18,
+            "unit_raw": "亿元",
+            "fact_scope": "多晶硅料:采购金额#row-1",
+            "metadata": {
+                "source_row_key": "row-1",
+                "exact_evidence": {"quote": "合同一 67.46 4.18 亿元"},
+            },
+        },
+        {
+            "segment_name_raw": "多晶硅料",
+            "fact_type": "purchase_amount",
+            "value_raw": 0,
+            "unit_raw": "亿元",
+            "fact_scope": "多晶硅料:采购金额#row-2",
+            "metadata": {
+                "source_row_key": "row-2",
+                "exact_evidence": {"quote": "合同二 1.25 0 亿元"},
+            },
+        },
+    ]
+    response = {
+        "schema_version": "business_profile_semantic_row_review.v1",
+        "decisions": [
+            {"source_row_key": "row-1", "classification": "separate", "reason_zh": "合同一"},
+            {"source_row_key": "row-2", "classification": "separate", "reason_zh": "合同二"},
+        ],
+    }
+    gateway = _FakeGateway([response])
+    extractor = BusinessProfileSemanticExtractor(gateway)
+
+    decisions, audit = await extractor.review_ambiguous_rows_async(rows=rows)
+
+    assert [item["classification"] for item in decisions] == ["separate", "separate"]
+    assert gateway.requests[0].model == "gpt-5.6-terra"
+    assert rows[0]["value_raw"] == 4.18
+    assert rows[1]["value_raw"] == 0
+    assert audit.stage == "semantic_row_review"

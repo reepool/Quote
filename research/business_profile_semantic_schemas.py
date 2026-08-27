@@ -36,6 +36,18 @@ SELECTED_SECTION_BUNDLE_SCHEMA = _closed_object(
         "document_hash": _HASH,
         "field_family": {"type": "string", "minLength": 1},
         "selector_version": {"type": "string", "minLength": 1},
+        "page_budget": {
+            "type": "object",
+            "properties": {
+                "effective_max_pages": {"type": "integer", "minimum": 1},
+                "chapter_page_count": {"type": "integer", "minimum": 1},
+                "budget_reason": {"type": "string", "minLength": 1},
+            },
+            "required": ("effective_max_pages", "chapter_page_count", "budget_reason"),
+            "additionalProperties": False,
+        },
+        "window_index": {"type": "integer", "minimum": 0},
+        "window_count": {"type": "integer", "minimum": 1},
         "section_ids": {
             "type": "array",
             "items": {"type": "string", "minLength": 1},

@@ -39,6 +39,7 @@ from research.business_profile_semantic_runtime import (
     BusinessProfileSemanticRuntime,
     _atomic_activity_fact_type,
     _atomic_activity_operating_fact,
+    _ambiguous_operating_row_groups,
     _bind_promotion_validation,
     _catalog_version_scope,
     _catalogs_current,
@@ -46,6 +47,7 @@ from research.business_profile_semantic_runtime import (
     _normalized_value,
     _select_current_semantic_activities,
     _semantic_failure_reason,
+    _semantic_operating_record,
     _semantic_relationship_assertion_ids,
     _verification_allows_promotion,
     _verification_result_is_current,
@@ -100,6 +102,50 @@ def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
         )
         == "numeric_reconciliation_failed"
     )
+
+
+def test_operating_fact_row_identity_keeps_same_product_contracts_separate():
+    item = {
+        "instrument_id": "601012.SH",
+        "document": {
+            "identity": "annual-report-2025",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-30T00:00:00+08:00",
+        },
+    }
+    evidence = {"source_document_id": "annual-report-2025"}
+    first = _semantic_operating_record(
+        item,
+        {
+            "segment_name_raw": "多晶硅料",
+            "fact_type": "purchase_amount",
+            "value": 4.18,
+            "unit_raw": "亿元",
+            "fact_scope": "多晶硅料:采购金额",
+            "source_row_key": "row-contract-1",
+            "evidence": evidence,
+        },
+        "span-contract-1",
+    )
+    second = _semantic_operating_record(
+        item,
+        {
+            "segment_name_raw": "多晶硅料",
+            "fact_type": "purchase_amount",
+            "value": 0,
+            "unit_raw": "亿元",
+            "fact_scope": "多晶硅料:采购金额",
+            "source_row_key": "row-contract-2",
+            "evidence": evidence,
+        },
+        "span-contract-2",
+    )
+
+    assert first["record_id"] != second["record_id"]
+    assert first["fact_scope"] != second["fact_scope"]
+    assert first["metadata"]["source_row_key"] == "row-contract-1"
+    assert second["metadata"]["source_row_key"] == "row-contract-2"
+    assert _ambiguous_operating_row_groups([first, second]) == [[first, second]]
     assert (
         _semantic_failure_reason(ValueError("unsupported ratio unit: （%）"))
         == "unit_normalization_failed"

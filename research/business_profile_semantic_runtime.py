@@ -1133,7 +1133,7 @@ class BusinessProfileSemanticRuntime:
             "section_recovery_seconds": 0.0,
         }
         selector = BusinessProfileSectionSelector(
-            max_pages=min(12, config.budgets.max_pages)
+            max_pages=max(1, int(config.budgets.max_pages))
         )
         for plan in plan_payload["plans"]:
             if plan.get("kind") == "local_derivation":
@@ -1240,6 +1240,20 @@ class BusinessProfileSemanticRuntime:
                         else None
                     )
                     selection_family = semantic_selection_family(plan["field_family"])
+                    chapter_page_count = len(outline.page_numbers)
+                    adaptive_page_limit = min(
+                        max(1, int(config.budgets.max_pages)),
+                        max(1, chapter_page_count),
+                    )
+                    adaptive_budget = {
+                        "effective_max_pages": adaptive_page_limit,
+                        "chapter_page_count": chapter_page_count,
+                        "budget_reason": (
+                            "chapter_span_within_global_limit"
+                            if chapter_page_count <= int(config.budgets.max_pages)
+                            else "global_page_safety_limit"
+                        ),
+                    }
                     if prior is None:
                         selection_started = time.monotonic()
                         selected = selector.select(
@@ -1249,6 +1263,8 @@ class BusinessProfileSemanticRuntime:
                             field_family=selection_family,
                             templates=templates,
                             page_scope=outline.page_numbers,
+                            max_pages_override=adaptive_page_limit,
+                            page_budget=adaptive_budget,
                         )
                     else:
                         selection_started = time.monotonic()
@@ -1261,6 +1277,8 @@ class BusinessProfileSemanticRuntime:
                                 field_family=selection_family,
                                 templates=templates,
                                 page_scope=outline.page_numbers,
+                                max_pages_override=adaptive_page_limit,
+                                page_budget=adaptive_budget,
                             )
                         except (FileNotFoundError, RuntimeError, ValueError) as exc:
                             # A prior artifact can outlive a changed outline
@@ -1284,6 +1302,8 @@ class BusinessProfileSemanticRuntime:
                                 field_family=selection_family,
                                 templates=templates,
                                 page_scope=outline.page_numbers,
+                                max_pages_override=adaptive_page_limit,
+                                page_budget=adaptive_budget,
                             )
                             prior = None
                     selection_seconds = time.monotonic() - selection_started
@@ -1406,6 +1426,7 @@ class BusinessProfileSemanticRuntime:
                         "template_ids": [item.template_id for item in templates],
                         "template_scopes": [item.scope.scope_id for item in templates],
                         "expanded_for_missing_context": prior is not None,
+                        "page_budget": dict(selected.bundle.get("page_budget") or adaptive_budget),
                         "outline": outline.to_dict(),
                         "recovery": recovery_metrics,
                         "evidence_context_hash": _evidence_context_hash(
@@ -1889,6 +1910,11 @@ class BusinessProfileSemanticRuntime:
                                 )
                                 + 1
                             )
+                        self._review_ambiguous_operating_rows(
+                            list((conversion.records_by_type.get("operating_facts") or ())),
+                            extractor=extractor,
+                            metrics=metrics,
+                        )
                         records_by_type = dict(conversion.records_by_type)
                         unit_conversion_pending = [
                             dict(pending.diagnostic)
@@ -3620,6 +3646,75 @@ class BusinessProfileSemanticRuntime:
             industry_group=(document.get("metadata") or {}).get("industry_group"),
         )
 
+    def _review_ambiguous_operating_rows(
+        self,
+        records: Sequence[dict[str, Any]],
+        *,
+        extractor: BusinessProfileSemanticExtractor,
+        metrics: dict[str, Any],
+    ) -> None:
+        """Review duplicate-label row groups without changing source facts."""
+
+        groups = _ambiguous_operating_row_groups(records)
+        for group in groups:
+            try:
+                decisions, audit = self._async_bridge.run(
+                    extractor.review_ambiguous_rows_async(rows=group)
+                )
+            except Exception as exc:
+                metrics["semantic_row_review_failures"] = int(
+                    metrics.get("semantic_row_review_failures") or 0
+                ) + 1
+                logger.warning(
+                    "business-profile row ambiguity review deferred rows=%s "
+                    "error_type=%s error=%s",
+                    len(group),
+                    type(exc).__name__,
+                    str(exc)[:300],
+                )
+                continue
+            metrics["semantic_row_review_calls"] = int(
+                metrics.get("semantic_row_review_calls") or 0
+            ) + 1
+            metrics["tokens"] = float(metrics.get("tokens") or 0) + float(
+                (audit.usage or {}).get("total_tokens") or 0
+            )
+            by_key = {
+                str(item.get("source_row_key") or ""): item for item in decisions
+            }
+            for record in group:
+                metadata = record.setdefault("metadata", {})
+                row_key = str(metadata.get("source_row_key") or "")
+                decision = by_key.get(row_key)
+                if decision is None:
+                    continue
+                metadata["ambiguity_review"] = {
+                    "classification": str(decision.get("classification") or "unclear"),
+                    "reason_zh": str(decision.get("reason_zh") or "")[:1000],
+                    "model": audit.actual_model,
+                    "profile": audit.profile,
+                }
+            if all(
+                str(item.get("classification") or "") == "separate"
+                for item in decisions
+            ):
+                for record in group:
+                    metadata = record.setdefault("metadata", {})
+                    if metadata.get("publication_blocker") == "ambiguous_same_subject_rows":
+                        metadata.pop("publication_blocker", None)
+                    metadata.pop("semantic_ambiguity_reasons", None)
+                    validation = metadata.get("promotion_validation")
+                    if isinstance(validation, dict):
+                        validation["no_conflicts"] = True
+                    metadata["semantic_ambiguity_resolved"] = True
+            logger.info(
+                "business-profile row ambiguity review completed rows=%s model=%s "
+                "classifications=%s",
+                len(group),
+                audit.actual_model,
+                [str(item.get("classification") or "") for item in decisions],
+            )
+
     def _deterministic_records(
         self,
         item: Mapping[str, Any],
@@ -3648,6 +3743,7 @@ class BusinessProfileSemanticRuntime:
                     for record in records:
                         _bind_promotion_validation(record, evidence_row)
                     output.setdefault("operating_facts", []).extend(records)
+        _annotate_ambiguous_operating_facts(output.get("operating_facts") or [])
         return output
 
     def _structured_semantic_records(
@@ -3730,6 +3826,7 @@ class BusinessProfileSemanticRuntime:
                 ),
             )
         output["evidence"] = list(evidence_by_id.values())
+        _annotate_ambiguous_operating_facts(output.get("operating_facts") or [])
         return StructuredSemanticConversion(
             records_by_type=output,
             pending_units=tuple(pending_units),
@@ -5315,6 +5412,12 @@ def _operating_records(
 ) -> list[dict[str, Any]]:
     start, end = derive_report_observation_interval(item["document"]["report_period"])
     output: list[dict[str, Any]] = []
+    source_row_key = _source_row_key(
+        table_id=str(table.table_id),
+        row_label=str(row.get("row_label") or ""),
+        cells=row.get("cells") or {},
+        evidence_id=evidence_id,
+    )
     for header, raw in row["cells"].items():
         if header == table.headers[0]:
             continue
@@ -5333,7 +5436,8 @@ def _operating_records(
             + _stable_hash(
                 {
                     "table": table.table_id,
-                    "row": row["row_label"],
+                "row": row["row_label"],
+                "source_row_key": source_row_key,
                     "header": header,
                     "raw": raw,
                     "document": item["document"]["identity"],
@@ -5352,7 +5456,7 @@ def _operating_records(
                 "unit_raw": raw_unit,
                 "value_normalized": normalized_value,
                 "unit_normalized": normalized_unit,
-                "fact_scope": f"{row['row_label']}:{header}",
+                "fact_scope": f"{row['row_label']}:{header}#{source_row_key}",
                 "equity_basis": "source_reported_unknown",
                 "evidence_id": evidence_id,
                 "data_available_date": str(item["document"]["published_at"])[:10],
@@ -5367,6 +5471,8 @@ def _operating_records(
                     "table_id": table.table_id,
                     "signature_id": table.signature_id,
                     "source_header": header,
+                    "source_row_key": source_row_key,
+                    "source_row_label": row["row_label"],
                     "numeric_reconciliation_status": "not_applicable",
                     "numeric_reconciliation_valid": bool(
                         normalized_unit and normalized_value is not None
@@ -5507,13 +5613,28 @@ def _atomic_activity_operating_fact(
     object_raw = str(assertion.get("object_raw") or "").strip()
     source_label = str(assertion.get("source_label_raw") or "").strip()
     semantic_assertion_id = str(assertion.get("activity_id") or "").strip()
-    fact_scope = f"{object_raw}:{source_label or assertion.get('action') or fact_type}"
+    source_row_key = _source_row_key(
+        table_id="semantic_activity",
+        row_label=object_raw,
+        cells={
+            "label": source_label or assertion.get("action") or fact_type,
+            "value": value_raw,
+            "unit": unit_raw,
+        },
+        evidence_id=evidence_id,
+    )
+    fact_scope = (
+        f"{object_raw}:{source_label or assertion.get('action') or fact_type}"
+        f"#{source_row_key}"
+    )
     row = {
         "value": value,
         "unit_raw": unit_raw,
         "segment_name_raw": object_raw,
         "fact_type": fact_type,
         "fact_scope": fact_scope,
+        "source_row_key": source_row_key,
+        "contract_reference_raw": assertion.get("contract_reference_raw"),
         "source_label_raw": source_label or fact_scope,
         "semantic_summary_zh": assertion.get("semantic_summary_zh"),
         "model_derived_hints": dict(assertion.get("model_derived_hints") or {}),
@@ -5556,6 +5677,8 @@ def _atomic_activity_operating_fact(
                 "semantic_synthesis": True,
                 "semantic_summary_zh": assertion.get("semantic_summary_zh"),
                 "source_label_raw": source_label or fact_scope,
+                "source_row_key": source_row_key,
+                "contract_reference_raw": assertion.get("contract_reference_raw"),
                 "canonical_segment_name": canonical_name,
                 "model_derived_hints": dict(assertion.get("model_derived_hints") or {}),
                 "unit_resolution": exc.resolution.to_dict(),
@@ -5580,6 +5703,7 @@ def _atomic_activity_operating_fact(
                 "value_raw": value_raw,
                 "unit_raw": unit_raw,
                 "evidence_id": evidence_id,
+                "source_row_key": source_row_key,
                 "processing_contract": _structured_record_contract_identity(),
             }
         )[:24]
@@ -5590,6 +5714,8 @@ def _atomic_activity_operating_fact(
             "semantic_assertion_id": semantic_assertion_id,
             "object_raw": object_raw,
             "source_label_raw": source_label or fact_scope,
+            "source_row_key": source_row_key,
+            "contract_reference_raw": assertion.get("contract_reference_raw"),
             "source_value_raw": value_raw,
             "source_unit_raw": unit_raw,
             "exact_evidence": assertion["evidence"],
@@ -5616,6 +5742,20 @@ def _semantic_operating_record(
         )
     )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
+    source_row_key = str(row.get("source_row_key") or "").strip() or _source_row_key(
+        table_id="semantic_row",
+        row_label=str(row.get("segment_name_raw") or ""),
+        cells={
+            "fact_type": row.get("fact_type"),
+            "fact_scope": row.get("fact_scope"),
+            "value": value,
+            "unit": raw_unit,
+        },
+        evidence_id=evidence_id,
+    )
+    fact_scope = str(row["fact_scope"])
+    if f"#{source_row_key}" not in fact_scope:
+        fact_scope = f"{fact_scope}#{source_row_key}"
     record_id = (
         "bp-operating-"
         + _stable_hash(
@@ -5623,7 +5763,8 @@ def _semantic_operating_record(
                 "document": item["document"]["identity"],
                 "segment_name_raw": row["segment_name_raw"],
                 "fact_type": row["fact_type"],
-                "fact_scope": row["fact_scope"],
+                "fact_scope": fact_scope,
+                "source_row_key": source_row_key,
                 "evidence": row["evidence"],
                 "semantic_schema": STRUCTURED_EXTRACTION_SCHEMA_VERSION,
                 "processing_contract": _structured_record_contract_identity(),
@@ -5644,7 +5785,7 @@ def _semantic_operating_record(
         "unit_raw": raw_unit,
         "value_normalized": normalized_value,
         "unit_normalized": normalized_unit,
-        "fact_scope": row["fact_scope"],
+        "fact_scope": fact_scope,
         "equity_basis": "source_reported_unknown",
         "evidence_id": evidence_id,
         "data_available_date": str(item["document"]["published_at"])[:10],
@@ -5660,6 +5801,8 @@ def _semantic_operating_record(
             "semantic_synthesis": True,
             "semantic_summary_zh": row.get("semantic_summary_zh"),
             "source_label_raw": row.get("source_label_raw") or row["segment_name_raw"],
+            "source_row_key": source_row_key,
+            "contract_reference_raw": row.get("contract_reference_raw"),
             "canonical_segment_name": canonical_name,
             "model_derived_hints": dict(row.get("model_derived_hints") or {}),
             "unit_resolution": unit_resolution.to_dict(),
@@ -5672,6 +5815,66 @@ def _semantic_operating_record(
             "exact_evidence_valid": True,
         },
     }
+
+
+def _source_row_key(
+    *,
+    table_id: str,
+    row_label: str,
+    cells: Mapping[str, Any],
+    evidence_id: str,
+) -> str:
+    """Derive a stable row identity from immutable source evidence.
+
+    The key is intentionally program-generated. Model-provided ids are treated
+    as hints only and cannot change the identity used for persistence.
+    """
+
+    return "row-" + _stable_hash(
+        {
+            "table_id": table_id,
+            "row_label": str(row_label).strip(),
+            "cells": {str(key): str(value) for key, value in cells.items()},
+            "evidence_id": evidence_id,
+        }
+    )[:24]
+
+
+def _ambiguous_operating_row_groups(
+    records: Sequence[Mapping[str, Any]],
+) -> list[list[Mapping[str, Any]]]:
+    groups: dict[tuple[str, ...], list[Mapping[str, Any]]] = {}
+    for record in records:
+        scope = str(record.get("fact_scope") or "")
+        base_scope = scope.split("#", 1)[0]
+        key = (
+            str(record.get("instrument_id") or ""),
+            str(record.get("report_period") or ""),
+            str(record.get("segment_id") or ""),
+            str(record.get("fact_type") or ""),
+            base_scope,
+        )
+        groups.setdefault(key, []).append(record)
+    return [rows for rows in groups.values() if len(rows) > 1]
+
+
+def _annotate_ambiguous_operating_facts(
+    records: Sequence[dict[str, Any]],
+) -> list[list[dict[str, Any]]]:
+    groups = _ambiguous_operating_row_groups(records)
+    for group in groups:
+        keys = sorted(
+            str((record.get("metadata") or {}).get("source_row_key") or "")
+            for record in group
+        )
+        for record in group:
+            metadata = record.setdefault("metadata", {})
+            metadata["semantic_ambiguity_reasons"] = [
+                "ambiguous_same_subject_rows"
+            ]
+            metadata["ambiguous_row_keys"] = keys
+            metadata["publication_blocker"] = "ambiguous_same_subject_rows"
+    return [list(group) for group in groups]
 
 
 def _pending_structured_unit_diagnostic(

@@ -29,6 +29,8 @@ SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v5"
 SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v6"
 SEMANTIC_BATCH_VERIFIER_SCHEMA_VERSION = "business_profile_semantic_batch_verifier.v1"
 SEMANTIC_BATCH_VERIFIER_PROMPT_VERSION = "business_profile_semantic_batch_verifier.v1"
+SEMANTIC_ROW_REVIEW_SCHEMA_VERSION = "business_profile_semantic_row_review.v1"
+SEMANTIC_ROW_REVIEW_PROMPT_VERSION = "business_profile_semantic_row_review.v1"
 DETERMINISTIC_VERIFICATION_PROOF_VERSION = (
     "business_profile_deterministic_verification.v1"
 )
@@ -98,6 +100,8 @@ _OPERATING_FACT_TYPES = (
 class BusinessProfileSemanticPolicy:
     extraction_profile: str = "semantic_extraction"
     verification_profile: str = "semantic_extraction"
+    ambiguity_review_profile: str = "semantic_extraction"
+    ambiguity_review_model: str = "gpt-5.6-terra"
     max_input_characters: int = 24000
     max_sections_per_request: int = 12
     max_evidence_spans_per_request: int = 96
@@ -110,6 +114,10 @@ class BusinessProfileSemanticPolicy:
     def __post_init__(self) -> None:
         if not self.extraction_profile or not self.verification_profile:
             raise ValueError("semantic LLM profiles are required")
+        if not str(self.ambiguity_review_profile).strip() or not str(
+            self.ambiguity_review_model
+        ).strip():
+            raise ValueError("ambiguity review LLM profile and model are required")
         if self.max_input_characters < 1 or self.max_sections_per_request < 1:
             raise ValueError("semantic request bounds must be positive")
         if (
@@ -1353,6 +1361,129 @@ class BusinessProfileSemanticExtractor:
             )
             raise
 
+    async def review_ambiguous_rows_async(
+        self,
+        *,
+        rows: Sequence[Mapping[str, Any]],
+    ) -> tuple[list[Mapping[str, Any]], SemanticRunAudit]:
+        """Ask a stronger model to classify only an ambiguous row group.
+
+        The model can classify row boundaries, but cannot change source values,
+        units, or evidence. Failure is intentionally propagated to the caller
+        so the caller can retain all rows as candidates.
+        """
+
+        if not rows:
+            raise ValueError("ambiguous row review requires rows")
+        row_keys = [str((row.get("metadata") or {}).get("source_row_key") or "") for row in rows]
+        if any(not key for key in row_keys) or len(row_keys) != len(set(row_keys)):
+            raise ValueError("ambiguous row review requires unique source row keys")
+        request_payload = {
+            "schema_version": SEMANTIC_ROW_REVIEW_SCHEMA_VERSION,
+            "rows": [
+                {
+                    "source_row_key": key,
+                    "segment_name_raw": str(row.get("segment_name_raw") or ""),
+                    "fact_type": str(row.get("fact_type") or ""),
+                    "value_raw": row.get("value_raw"),
+                    "unit_raw": str(row.get("unit_raw") or ""),
+                    "fact_scope": str(row.get("fact_scope") or ""),
+                    "contract_reference_raw": (row.get("metadata") or {}).get(
+                        "contract_reference_raw"
+                    ),
+                    "evidence": (row.get("metadata") or {}).get("exact_evidence")
+                    or {},
+                }
+                for key, row in zip(row_keys, rows)
+            ],
+        }
+        input_hash = _stable_hash(request_payload)
+        response = None
+        logger.info(
+            "business-profile llm start stage=semantic_row_review rows=%s input_hash=%s",
+            len(rows),
+            input_hash,
+        )
+        try:
+            response = await self.llm_client.complete(
+                LlmRequest(
+                    profile=self.policy.ambiguity_review_profile,
+                    model=self.policy.ambiguity_review_model,
+                    messages=(
+                        LlmMessage(
+                            role="system",
+                            is_safety_instruction=True,
+                            content=(
+                                "仅依据给定年报表格行和证据，判断每个 source_row_key 是否属于"
+                                "独立合同或独立披露行。只能返回 separate、duplicate 或 unclear。"
+                                "不得修改原始数值、单位、行键或证据，不得换算或汇总；使用中文说明理由。"
+                            ),
+                        ),
+                        LlmMessage(role="user", content=_canonical_json(request_payload)),
+                    ),
+                    response_schema=_row_review_schema(),
+                    schema_name=SEMANTIC_ROW_REVIEW_SCHEMA_VERSION.replace(".", "_"),
+                    schema_version=SEMANTIC_ROW_REVIEW_SCHEMA_VERSION,
+                    max_output_tokens=min(self.policy.max_output_tokens, 3000),
+                    timeout_seconds=self.policy.timeout_seconds,
+                    queue_timeout_seconds=self.policy.queue_timeout_seconds,
+                    metadata={
+                        "workload": "business_profile_semantic_row_review",
+                        "stage": "semantic_row_review",
+                        "stage_sequence": 3,
+                        "business_item_key": "rows:" + _stable_hash(row_keys)[:32],
+                        "input_hash": input_hash,
+                        "bulk": True,
+                    },
+                    content_is_untrusted=True,
+                )
+            )
+            data = dict(response.data)
+            _validate_closed_schema(data, _row_review_schema(), "semantic row review response")
+            decisions = list(data.get("decisions") or [])
+            returned = [str(item.get("source_row_key") or "") for item in decisions]
+            if returned != row_keys:
+                raise ValueError("semantic row review row keys must match input order")
+            if any(
+                not str(item.get("reason_zh") or "").strip()
+                or not any("\u3400" <= char <= "\u9fff" for char in str(item.get("reason_zh") or ""))
+                for item in decisions
+            ):
+                raise ChineseLanguageContractError("semantic row review reason must be Chinese")
+            audit = _success_audit(
+                response,
+                stage="semantic_row_review",
+                profile=self.policy.ambiguity_review_profile,
+                prompt_version=SEMANTIC_ROW_REVIEW_PROMPT_VERSION,
+                input_hash=input_hash,
+                gates={"closed_schema": True, "row_keys": True, "source_fields_immutable": True},
+                diagnostics={"row_count": len(rows), "semantic_result": _bounded_semantic_result(data)},
+            )
+            self._persist_audit(audit)
+            _log_llm_response_debug("semantic_row_review", data)
+            logger.info(
+                "business-profile llm end status=completed stage=semantic_row_review rows=%s model=%s tokens=%s latency_ms=%s",
+                len(decisions), audit.actual_model, audit.usage.get("total_tokens"), audit.latency_ms,
+            )
+            return decisions, audit
+        except Exception as exc:
+            audit = _failure_audit(
+                response,
+                stage="semantic_row_review",
+                profile=self.policy.ambiguity_review_profile,
+                prompt_version=SEMANTIC_ROW_REVIEW_PROMPT_VERSION,
+                input_hash=input_hash,
+                failure_category=_failure_category(exc),
+                diagnostics={"row_keys": row_keys, **_exception_diagnostics(exc)},
+            )
+            self._persist_audit(audit)
+            logger.warning(
+                "business-profile llm end status=failed stage=semantic_row_review failure_category=%s error=%s",
+                audit.failure_category,
+                _safe_diagnostic_message(exc),
+            )
+            raise
+
     def _persist_audit(self, audit: SemanticRunAudit) -> None:
         if self.audit_sink is not None:
             self.audit_sink(audit.to_dict())
@@ -1893,6 +2024,7 @@ def _structured_extraction_schema(
                 "unit_raw": {"type": "string", "minLength": 1},
                 "source_value": {"type": ["number", "null"]},
                 "source_unit_raw": {"type": ["string", "null"]},
+                "contract_reference_raw": {"type": ["string", "null"]},
                 "fact_scope": {"type": "string", "minLength": 1},
                 "model_derived_hints": {"type": "object"},
                 "evidence_span_ids": evidence_span_ids,
@@ -1917,6 +2049,31 @@ def _structured_extraction_schema(
             "report_period": {"type": "string", "format": "date"},
             "rows": {"type": "array", "items": row, "maxItems": max_items},
             "model_derived_hints": {"type": "object"},
+        },
+        "additionalProperties": False,
+    }
+
+
+def _row_review_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "required": ["schema_version", "decisions"],
+        "properties": {
+            "schema_version": {"const": SEMANTIC_ROW_REVIEW_SCHEMA_VERSION},
+            "decisions": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "required": ["source_row_key", "classification", "reason_zh"],
+                    "properties": {
+                        "source_row_key": {"type": "string", "minLength": 1},
+                        "classification": {"enum": ["separate", "duplicate", "unclear"]},
+                        "reason_zh": {"type": "string", "minLength": 1},
+                    },
+                    "additionalProperties": False,
+                },
+            },
         },
         "additionalProperties": False,
     }

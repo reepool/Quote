@@ -395,3 +395,29 @@ def test_selector_ranks_dense_hits_within_page_budget():
         templates=_templates(),
     )
     assert [item.page_number for item in selected.sections] == [1, 2]
+
+
+def test_selector_uses_chapter_span_as_adaptive_budget():
+    pages = ["无关前文"] * 18
+    pages[4] = "煤炭产销量 项目 原煤产量 商品煤销量"
+    pages[17] = "煤炭产销量续页 项目 原煤产量 商品煤销量"
+    selected = BusinessProfileSectionSelector(context_pages=1, max_pages=40).select(
+        artifact=_artifact(*pages),
+        instrument_id="601012.SH",
+        source_document_id="report-long-section",
+        field_family="tabular_operating_facts",
+        templates=_templates(),
+        page_scope=range(1, 19),
+        max_pages_override=18,
+        page_budget={
+            "effective_max_pages": 18,
+            "chapter_page_count": 18,
+            "budget_reason": "chapter_span_within_global_limit",
+        },
+    )
+
+    assert selected.bundle["page_budget"]["effective_max_pages"] == 18
+    assert selected.bundle["page_budget"]["chapter_page_count"] == 18
+    assert selected.bundle["window_index"] == 0
+    assert selected.bundle["window_count"] == 1
+    assert [item.page_number for item in selected.sections] == [4, 5, 6, 17, 18]

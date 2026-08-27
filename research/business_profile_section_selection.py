@@ -147,7 +147,7 @@ class BusinessProfileSectionSelector:
         *,
         selector_version: str = SELECTOR_VERSION,
         context_pages: int = 1,
-        max_pages: int = 12,
+        max_pages: int = 40,
     ) -> None:
         if context_pages < 0:
             raise ValueError("context_pages must be non-negative")
@@ -172,8 +172,15 @@ class BusinessProfileSectionSelector:
         page_scope: Iterable[int] = (),
         previous_bundle_id: Optional[str] = None,
         expansion_reason: Optional[str] = None,
+        max_pages_override: Optional[int] = None,
+        page_budget: Optional[Mapping[str, Any]] = None,
+        window_index: int = 0,
+        window_count: int = 1,
     ) -> SelectedSectionArtifact:
         family = _selection_family(field_family)
+        effective_max_pages = int(max_pages_override or self.max_pages)
+        if effective_max_pages < 1:
+            raise ValueError("max_pages_override must be positive")
         all_pages = _artifact_pages(artifact)
         scope = {int(value) for value in page_scope if int(value) > 0}
         pages_by_number = {int(page["page_number"]): page for page in all_pages}
@@ -241,13 +248,10 @@ class BusinessProfileSectionSelector:
                 reasons_by_page,
                 pages_by_number=selection_pages_by_number,
                 context_pages=self.context_pages,
-                max_pages=self.max_pages,
+                max_pages=effective_max_pages,
             )
-        if len(selected_pages) > self.max_pages:
-            raise ValueError(
-                "selected page bound exhausted: "
-                f"selected={len(selected_pages)} max_pages={self.max_pages}"
-            )
+        if len(selected_pages) > effective_max_pages:
+            selected_pages = sorted(selected_pages)[:effective_max_pages]
         if not selected_pages:
             raise ValueError(f"no governed pages selected for field family: {family}")
         sections: list[SelectedSection] = []
@@ -333,6 +337,20 @@ class BusinessProfileSectionSelector:
             "section_hash": combined_hash,
             "quality": bundle_quality,
             "selector_reasons": reasons,
+            "page_budget": {
+                "effective_max_pages": effective_max_pages,
+                "chapter_page_count": len(selection_pages_by_number),
+                "budget_reason": str(
+                    (page_budget or {}).get("budget_reason")
+                    or (
+                        "chapter_span_within_global_limit"
+                        if len(selection_pages_by_number) <= effective_max_pages
+                        else "global_page_safety_limit"
+                    )
+                ),
+            },
+            "window_index": max(0, int(window_index)),
+            "window_count": max(1, int(window_count)),
         }
         bundle_id = _stable_hash(bundle_core)
         bundle = {**bundle_core, "bundle_id": bundle_id}
@@ -364,6 +382,8 @@ class BusinessProfileSectionSelector:
         templates: Sequence[ResolvedDisclosureTemplate],
         expansion_pages: int = 1,
         page_scope: Iterable[int] = (),
+        max_pages_override: Optional[int] = None,
+        page_budget: Optional[Mapping[str, Any]] = None,
     ) -> SelectedSectionArtifact:
         if expansion_pages < 1:
             raise ValueError("expansion_pages must be positive")
@@ -399,6 +419,8 @@ class BusinessProfileSectionSelector:
             page_scope=sorted(allowed_pages),
             previous_bundle_id=str(prior.bundle["bundle_id"]),
             expansion_reason="governed_missing_context",
+            max_pages_override=max_pages_override,
+            page_budget=page_budget,
         )
 
 
