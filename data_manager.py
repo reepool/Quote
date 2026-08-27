@@ -17432,6 +17432,10 @@ class DataManager:
             for row in (local_rows or [])
             if row.get('instrument_id')
         }
+        from data_sources.hkex_instrument_master import (
+            HKEX_PRODUCT_CESSATION_SOURCE,
+            is_hkex_sticky_untradable_local,
+        )
         allowed_product_types = set(config.get('allowed_product_types') or ['ordinary_equity', 'reit', 'etf'])
         valid_fields = {
             'instrument_id', 'symbol', 'name', 'exchange', 'type', 'currency',
@@ -17459,15 +17463,17 @@ class DataManager:
                 'is_active': True,
                 'trading_status': 0 if row.get('trading_status') in (0, '0', False) else 1,
             }
-            if preserve_untradable:
-                local = local_by_id.get(instrument_id) or {}
-                if local.get('trading_status') in (0, '0', False):
-                    item['trading_status'] = 0
+            local = local_by_id.get(instrument_id) or {}
+            if preserve_untradable and local.get('trading_status') in (0, '0', False):
+                item['trading_status'] = 0
             item = {
                 **item,
                 'source': row.get('source') or 'hkex_securities_list',
                 'source_symbol': row.get('source_symbol') or row.get('symbol'),
             }
+            if is_hkex_sticky_untradable_local(local):
+                item['trading_status'] = 0
+                item['source'] = HKEX_PRODUCT_CESSATION_SOURCE
             if row.get('listed_date'):
                 item['listed_date'] = row.get('listed_date')
             if row.get('lot_size') is not None:

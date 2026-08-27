@@ -552,6 +552,32 @@ def test_lifecycle_policy_listing_and_delisted_conflict_goes_to_review():
     )
 
 
+def test_product_cessation_without_resume_date_is_sticky_local_state():
+    from data_sources.hkex_instrument_master import is_hkex_sticky_untradable_local
+
+    assert is_hkex_sticky_untradable_local(
+        {
+            "instrument_id": "03038.HK",
+            "trading_status": 0,
+            "source": "hkexnews_product_cessation",
+        }
+    )
+    assert not is_hkex_sticky_untradable_local(
+        {
+            "instrument_id": "01712.HK",
+            "trading_status": 0,
+            "source": "hkexnews_trading_arrangement",
+        }
+    )
+    assert not is_hkex_sticky_untradable_local(
+        {
+            "instrument_id": "03038.HK",
+            "trading_status": 1,
+            "source": "hkexnews_product_cessation",
+        }
+    )
+
+
 def test_source_evidence_policy_does_not_treat_missing_scan_as_complete():
     official = HKEXSecuritiesListProvider(
         source_url="fixture://hkex_securities_list.csv"

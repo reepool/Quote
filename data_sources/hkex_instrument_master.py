@@ -722,6 +722,15 @@ def extract_hkex_timetable_dates(title: Any) -> Dict[str, Optional[date]]:
     }
 
 
+def is_hkex_sticky_untradable_local(row: Optional[Dict[str, Any]]) -> bool:
+    """Product cessation without a resume date stays untradable after the scan window."""
+    item = row or {}
+    source = str(item.get("source") or item.get("official_lifecycle_source") or "")
+    if source != HKEX_PRODUCT_CESSATION_SOURCE:
+        return False
+    return item.get("trading_status") in (0, "0", False)
+
+
 def is_hkex_untradable_window(
     category: str,
     *,

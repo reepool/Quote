@@ -1287,6 +1287,85 @@ async def test_hkex_disabled_announcement_scan_does_not_restore_untradable():
 
 
 @pytest.mark.asyncio
+async def test_hkex_product_cessation_survives_successful_empty_scan():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_product_cessation',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [],
+            'scan': {
+                'status': 'success_empty',
+                'is_complete': True,
+                'errors': [],
+                'stop_reason': 'complete',
+            },
+        }
+    )
+
+    await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 0
+    assert by_id['00005.HK']['source'] == 'hkexnews_product_cessation'
+
+
+@pytest.mark.asyncio
+async def test_hkex_expired_trading_arrangement_can_restore_after_complete_empty_scan():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_trading_arrangement',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value={
+            'snapshots': [],
+            'scan': {
+                'status': 'success_empty',
+                'is_complete': True,
+                'errors': [],
+                'stop_reason': 'complete',
+            },
+        }
+    )
+
+    await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 1
+
+
+@pytest.mark.asyncio
 async def test_hkex_delisting_writes_without_official_active_rows():
     manager = _manager()
     _attach_hkex_mock_db(manager, local_rows=[
