@@ -146,7 +146,7 @@ class TestDailyFactorSyncPolicy:
         result = await DataManager()._query_ex_dividend_symbols({date(2026, 4, 1)})
 
         assert result == {}
-        assert requested == ["20251231", "20260331", "20260630", "20260930", "20261231"]
+        assert requested == ["20251231", "20260331"]
 
     @pytest.mark.asyncio
     async def test_market_discovery_fails_closed_on_partial_periods(

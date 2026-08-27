@@ -20025,13 +20025,24 @@ class DataManager:
             import akshare as ak
             import pandas as pd
 
-            # 查询目标年份涉及的季度报告期，覆盖年报、季报和中报。
+            # 查询目标年份涉及的季度报告期，覆盖年报、季报和中报；
+            # 尚未结束的报告期不可能产生目标窗口内的除权日，不能请求
+            # 未来期间（东方财富对这类期间可能返回空 result）。
             target_date_strs = {
                 d.strftime('%Y-%m-%d') if hasattr(d, 'strftime') else str(d)
                 for d in target_dates if d is not None
             }
             if not target_date_strs:
                 return {}
+
+            normalized_target_dates = {
+                normalized
+                for raw_date in target_dates
+                if (normalized := self._date_from_any(raw_date)) is not None
+            }
+            if not normalized_target_dates:
+                return {}
+            max_target_date = max(normalized_target_dates)
 
             # 根据目标日期推算需查询的报告期。区间补数可能跨年，不能只取
             # 一个 sample date，否则会漏掉另一年的分红方案。
@@ -20049,6 +20060,7 @@ class DataManager:
                     f"{year}0930",
                     f"{year}1231",
                 )
+                if datetime.strptime(period, '%Y%m%d').date() <= max_target_date
             })
 
             all_records = []
