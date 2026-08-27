@@ -70,11 +70,44 @@ _HKEX_CIS_FORM_TOKENS = (
     "CEASE TO BE LISTED",
     "LAST DAY OF DEALING",
 )
-_HKEX_WITHDRAWAL_FORM_TOKENS = (
+_HKEX_WITHDRAWAL_ACTUAL_TOKENS = (
     "LAST DAY OF DEALING",
+    "CESSATION OF DEALING",
+    "CEASE TO BE LISTED",
+)
+_HKEX_WITHDRAWAL_DECISION_TOKENS = (
     "WITHDRAWAL OF LISTING",
     "CANCELLATION OF LISTING",
-    "CESSATION OF DEALING",
+)
+_HKEX_WITHDRAWAL_PROCEDURAL_TOKENS = (
+    "PROPOSED",
+    "PRE-CONDITIONAL",
+    "MONTHLY UPDATE",
+    "DELAY IN DESPATCH",
+    "APPOINTMENT OF INDEPENDENT FINANCIAL ADVISER",
+    "PROFIT WARNING",
+    "LAPSE OF THE PROPOSAL",
+    "LAPSE OF THE SCHEME",
+    "NEEQ",
+)
+_HKEX_NON_EQUITY_SUBJECT_TOKENS = (
+    "IN THE NOTES",
+    "IN THE BONDS",
+    "IN THE WARRANTS",
+    "IN THE CONVERTIBLE",
+    "IN THE DEBENTURE",
+)
+_HKEX_PRODUCT_CESSATION_TOKENS = (
+    "CESSATION OF TRADING",
+    "TERMINATION OF THE SUB-FUND",
+    "TERMINATION OF THE FUND",
+    "TERMINATION OF THE ETF",
+    "TERMINATING SUB-FUND",
+    "VOLUNTARY DEAUTHORISATION",
+)
+_HKEX_COUNTER_CURRENCY_RE = re.compile(
+    r"\b(HKD|USD|RMB|CNY)\s+TRADING COUNTER",
+    re.IGNORECASE,
 )
 _HKEX_EFFECTIVE_DATE_HINTS = (
     "effective",
@@ -490,6 +523,103 @@ def build_hkex_trading_status_snapshot(
     )
 
 
+_HKEX_FUND_LIKE_CODE_RANGES = (
+    (2800, 2849),
+    (3000, 3799),
+    (7200, 7399),
+    (7500, 7599),
+    (7700, 7799),
+    (82800, 82849),
+)
+
+
+def _hkex_symbol_product(symbol: str) -> Dict[str, Any]:
+    """Classify one HKEX code without using a shared announcement name."""
+    instrument_id = hkex_instrument_id(symbol)
+    return classify_hkex_product(
+        {
+            "instrument_id": instrument_id,
+            "symbol": normalize_hkex_code(symbol),
+        }
+    )
+
+
+def _is_hkex_fund_like_symbol(symbol: str) -> bool:
+    product = _hkex_symbol_product(symbol)
+    if product.get("research_scope") == "fund" or product.get("product_type") in {
+        "etf",
+        "reit",
+        "leveraged_inverse_product",
+    }:
+        return True
+    numeric = _hkex_numeric_code(
+        instrument_id=hkex_instrument_id(symbol),
+        symbol=normalize_hkex_code(symbol),
+    )
+    if numeric is None:
+        return False
+    return any(start <= numeric <= end for start, end in _HKEX_FUND_LIKE_CODE_RANGES)
+
+
+def select_hkex_eligibility_symbols(record: Any, event: str) -> Tuple[str, ...]:
+    """Attach an eligibility event only to the securities it actually names.
+
+    HKEXnews puts the issuer ordinary share, notes, warrants and share classes
+    into one STOCK_CODE field. A note last-day or ETF class cessation must not
+    turn the ordinary share untradable.
+    """
+    symbols: List[str] = []
+    for raw in getattr(record, "symbols", ()) or ():
+        code = normalize_hkex_code(raw)
+        if code and code not in symbols:
+            symbols.append(code)
+    if not symbols:
+        return ()
+
+    excluded: List[str] = []
+    fund_like: List[str] = []
+    equity_like: List[str] = []
+    for symbol in symbols:
+        product = _hkex_symbol_product(symbol)
+        if _is_hkex_fund_like_symbol(symbol):
+            fund_like.append(symbol)
+        elif product.get("research_scope") == "exclude":
+            excluded.append(symbol)
+        else:
+            equity_like.append(symbol)
+
+    title = str(getattr(record, "title", "") or "")
+    if event == CIS_MATTERS_CATEGORY:
+        selected = list(fund_like)
+        currencies = _hkex_title_terminated_counter_currencies(title)
+        if currencies and _is_hkex_counter_only_cessation(title):
+            selected = [
+                symbol
+                for symbol in selected
+                if _hkex_symbol_counter_currency(symbol) in currencies
+            ]
+        return tuple(selected)
+    if event == WITHDRAWAL_OF_LISTING_CATEGORY:
+        title_upper = title.upper()
+        note_subject = any(token in title_upper for token in _HKEX_NON_EQUITY_SUBJECT_TOKENS)
+        if excluded and equity_like:
+            return tuple(excluded + fund_like)
+        if note_subject:
+            return tuple(excluded + fund_like)
+    if (
+        event
+        in {
+            TRADING_ARRANGEMENT_CATEGORY,
+            CAPITAL_REORGANISATION_CATEGORY,
+            LISTING_BY_INTRODUCTION_CATEGORY,
+        }
+        and excluded
+        and (equity_like or fund_like)
+    ):
+        return tuple(equity_like + fund_like)
+    return tuple(symbols)
+
+
 def classify_hkex_trading_eligibility_headline(record: Any) -> Optional[str]:
     """Classify arrangement/ETF eligibility by category or tag, never free-text type."""
     payload = getattr(record, "raw_payload", None) or {}
@@ -497,12 +627,12 @@ def classify_hkex_trading_eligibility_headline(record: Any) -> Optional[str]:
         payload = {}
     stamped = normalize_announcement_category(payload.get("headline_category"))
     if stamped in HKEX_TRADING_ELIGIBILITY_EVENT_CATEGORIES:
-        if stamped == CIS_MATTERS_CATEGORY and not _hkex_text_has_tokens(
+        if stamped == CIS_MATTERS_CATEGORY and not _hkex_title_has_tokens(
             record, _HKEX_CIS_FORM_TOKENS
         ):
             return None
-        if stamped == WITHDRAWAL_OF_LISTING_CATEGORY and not _hkex_text_has_tokens(
-            record, _HKEX_WITHDRAWAL_FORM_TOKENS
+        if stamped == WITHDRAWAL_OF_LISTING_CATEGORY and not _is_hkex_withdrawal_headline(
+            record
         ):
             return None
         return stamped
@@ -542,6 +672,8 @@ def is_hkex_untradable_window(
         if as_of >= resume_date:
             return False
         return effective_date is None or as_of >= effective_date
+    if category == CIS_MATTERS_CATEGORY and _is_hkex_counter_only_cessation(title):
+        return effective_date is not None and as_of >= effective_date
     if category in {CIS_MATTERS_CATEGORY, WITHDRAWAL_OF_LISTING_CATEGORY}:
         return effective_date is None or as_of >= effective_date
     return False
@@ -564,7 +696,7 @@ def build_hkex_trading_eligibility_snapshot(
         published_at = str(getattr(record, "published_at", None) or "")
         names = tuple(getattr(record, "security_names", ()) or ())
         title = str(getattr(record, "title", "") or "")
-        for raw_symbol in getattr(record, "symbols", ()) or ():
+        for raw_symbol in select_hkex_eligibility_symbols(record, event):
             instrument_id = hkex_instrument_id(raw_symbol)
             if not instrument_id:
                 continue
@@ -659,18 +791,55 @@ def build_hkex_trading_eligibility_snapshot(
     )
 
 
-def _hkex_text_has_tokens(record: Any, tokens: Tuple[str, ...]) -> bool:
-    payload = getattr(record, "raw_payload", None) or {}
-    if not isinstance(payload, dict):
-        payload = {}
-    blob = " ".join(
-        [
-            str(getattr(record, "title", "") or ""),
-            str(payload.get("SHORT_TEXT") or ""),
-            str(payload.get("LONG_TEXT") or ""),
-        ]
-    ).upper()
-    return any(token in blob for token in tokens)
+def _hkex_record_title(record: Any) -> str:
+    return str(getattr(record, "title", "") or "").upper()
+
+
+def _hkex_title_has_tokens(record: Any, tokens: Tuple[str, ...]) -> bool:
+    title = _hkex_record_title(record)
+    return any(token in title for token in tokens)
+
+
+def _is_hkex_withdrawal_headline(record: Any) -> bool:
+    """Keep proposed privatisation / monthly updates out of the untradable set."""
+    title = _hkex_record_title(record)
+    if any(token in title for token in _HKEX_WITHDRAWAL_ACTUAL_TOKENS):
+        return True
+    if any(token in title for token in _HKEX_WITHDRAWAL_DECISION_TOKENS):
+        return not any(token in title for token in _HKEX_WITHDRAWAL_PROCEDURAL_TOKENS)
+    return False
+
+
+def _hkex_title_terminated_counter_currencies(title: Any) -> Tuple[str, ...]:
+    found: List[str] = []
+    for match in _HKEX_COUNTER_CURRENCY_RE.finditer(str(title or "")):
+        currency = match.group(1).upper()
+        if currency == "CNY":
+            currency = "RMB"
+        if currency not in found:
+            found.append(currency)
+    return tuple(found)
+
+
+def _hkex_symbol_counter_currency(symbol: str) -> str:
+    numeric = _hkex_numeric_code(
+        instrument_id=hkex_instrument_id(symbol),
+        symbol=normalize_hkex_code(symbol),
+    )
+    if numeric is None:
+        return "HKD"
+    if 80000 <= numeric <= 89999:
+        return "RMB"
+    if 9000 <= numeric <= 9999:
+        return "USD"
+    return "HKD"
+
+
+def _is_hkex_counter_only_cessation(title: Any) -> bool:
+    if not _hkex_title_terminated_counter_currencies(title):
+        return False
+    text = str(title or "").upper()
+    return not any(token in text for token in _HKEX_PRODUCT_CESSATION_TOKENS)
 
 
 def _iter_hkex_title_dates(text: str) -> Iterable[Tuple[date, int, int]]:
@@ -1231,6 +1400,10 @@ class HKEXSourceEvidencePolicy:
         primary_active_available = "hkex_securities_list" in sources
         fallback_active_available = "hkexnews_active_list" in sources
         delisted_available = "hkexnews_delisted_list" in sources or "hkex_manual_review" in sources
+        prolonged_suspension_available = any(
+            snapshot.source == "hkexnews_suspension_report" and snapshot.rows
+            for snapshot in snapshot_list
+        )
         suspension_available = False
         for snapshot in snapshot_list:
             if (
@@ -1257,6 +1430,7 @@ class HKEXSourceEvidencePolicy:
             "active_fallback_used": active_fallback_used,
             "delisted_source_available": delisted_available,
             "suspension_source_available": suspension_available,
+            "prolonged_suspension_source_available": prolonged_suspension_available,
             "safe_write_allowed": primary_active_available and has_active_rows and not error_list,
             "reactivation_write_allowed": primary_active_available and has_active_rows and not error_list,
             "delisting_write_allowed": has_delisted_rows and delisted_available and not error_list,

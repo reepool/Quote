@@ -17546,10 +17546,20 @@ class DataManager:
             for item in decisions.get('reactivation_candidates', []):
                 if not source_evidence_policy.get('reactivation_write_allowed'):
                     continue
-                local_status = str((item.get('local') or {}).get('status') or '')
+                local = item.get('local') or {}
+                local_status = str(local.get('status') or '')
+                local_source = str(local.get('source') or '')
                 if (
                     local_status == 'suspended'
                     and not source_evidence_policy.get('suspension_source_available')
+                ):
+                    continue
+                if (
+                    local_status == 'suspended'
+                    and local_source == 'hkexnews_suspension_report'
+                    and not source_evidence_policy.get(
+                        'prolonged_suspension_source_available'
+                    )
                 ):
                     continue
                 if item.get('instrument_id') not in allowed_lifecycle_ids:

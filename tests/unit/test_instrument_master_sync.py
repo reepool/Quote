@@ -917,7 +917,72 @@ async def test_hkex_empty_suspension_snapshot_does_not_reactivate_local_suspende
     assert '09988.HK' in reactivated
     assert result['exchanges']['HKEX']['official_suspension_count'] == 0
     assert result['exchanges']['HKEX']['source_evidence_policy']['suspension_source_available'] is False
+    assert result['exchanges']['HKEX']['source_evidence_policy']['prolonged_suspension_source_available'] is False
     assert any('0 rows' in warning for warning in result['exchanges']['HKEX']['warnings'])
+
+
+@pytest.mark.asyncio
+async def test_hkex_failed_pdf_does_not_reactivate_report_only_when_halt_exists(tmp_path):
+    dummy_pdf = tmp_path / "empty_suspension.pdf"
+    dummy_pdf.write_bytes(b"%PDF-1.4 empty")
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['official_securities_list_file'] = str(FIXTURE_DIR / "hkex_securities_list.csv")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    empty = HKEXProviderSnapshot(
+        source='hkexnews_suspension_report',
+        source_url='fixture://empty.pdf',
+        parser_version='test',
+        raw_snapshot_hash='empty',
+        rows=[],
+        diagnostics={'row_count': 0, 'skipped_count': 0, 'format': 'pdf'},
+    )
+    other_halt = HKEXProviderSnapshot(
+        source='hkexnews_trading_halt',
+        source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+        parser_version='test',
+        raw_snapshot_hash='halt',
+        rows=[
+            {
+                'instrument_id': '08888.HK',
+                'status': 'suspended',
+                'trading_status': 0,
+                'source': 'hkexnews_trading_halt',
+            }
+        ],
+        diagnostics={'row_count': 1},
+    )
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value=[empty, other_halt]
+    )
+    with patch(
+        'data_sources.hkex_instrument_master.HKEXSuspensionReportProvider.parse_pdf',
+        return_value=empty,
+    ):
+        cfg['hkexnews_suspension_main_board_file'] = str(dummy_pdf)
+        result = await manager.sync_hkex_instrument_master()
+
+    reactivated = [
+        call.args[0] for call in manager.db_ops.mark_instrument_active.await_args_list
+    ]
+    assert '00005.HK' not in reactivated
+    assert result['exchanges']['HKEX']['source_evidence_policy']['suspension_source_available'] is True
+    assert result['exchanges']['HKEX']['source_evidence_policy']['prolonged_suspension_source_available'] is False
 
 
 @pytest.mark.asyncio

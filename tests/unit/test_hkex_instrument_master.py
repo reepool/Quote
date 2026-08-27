@@ -705,3 +705,169 @@ def test_eligibility_window_reopens_after_expected_resume_date():
 
     assert [row["instrument_id"] for row in before.rows] == ["01712.HK"]
     assert after.rows == []
+
+
+def test_eligibility_snapshot_does_not_mark_ordinary_share_from_note_or_class_codes():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+        select_hkex_eligibility_symbols,
+    )
+
+    note_withdrawal = _hkexnews_record(
+        announcement_id="2688-note",
+        title="LAST DAY OF DEALINGS IN THE NOTES",
+        published_at="2026-08-20T04:00:00+00:00",
+        symbols=("02688", "05270"),
+        headline_category="withdrawal_of_listing",
+    )
+    cis_mixed = _hkexnews_record(
+        announcement_id="2688-cis",
+        title="CESSATION OF TRADING AND TERMINATION OF THE SUB-FUND",
+        published_at="2026-08-21T04:00:00+00:00",
+        symbols=("02688", "03038"),
+        headline_category="cis_matters",
+    )
+
+    assert select_hkex_eligibility_symbols(note_withdrawal, "withdrawal_of_listing") == (
+        "05270",
+    )
+    assert select_hkex_eligibility_symbols(cis_mixed, "cis_matters") == ("03038",)
+
+    snapshot = build_hkex_trading_eligibility_snapshot(
+        [note_withdrawal, cis_mixed],
+        as_of=date(2026, 8, 27),
+    )
+    by_id = {row["instrument_id"]: row for row in snapshot.rows}
+    assert "02688.HK" not in by_id
+    assert by_id["03038.HK"]["source"] == "hkexnews_product_cessation"
+
+
+def test_eligibility_snapshot_ignores_proposed_privatisation_and_category_labels():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+        classify_hkex_trading_eligibility_headline,
+    )
+
+    category_label = (
+        "Privatisation/Withdrawal or Cancellation of Listing of Securities"
+    )
+    proposed = _hkexnews_record(
+        announcement_id="2688-monthly",
+        title=(
+            "PRE-CONDITIONAL PROPOSAL TO PRIVATIZE ENN ENERGY HOLDINGS "
+            "LIMITED AND WITHDRAW ITS LISTING - MONTHLY UPDATE"
+        ),
+        published_at="2026-05-15T09:56:00+00:00",
+        symbols=("02688",),
+        headline_category="withdrawal_of_listing",
+        short_text=category_label,
+        long_text=category_label,
+    )
+    profit_warning = _hkexnews_record(
+        announcement_id="232-warning",
+        title="PROFIT WARNING",
+        published_at="2026-08-07T11:00:00+00:00",
+        symbols=("00232",),
+        headline_category="withdrawal_of_listing",
+        short_text=category_label,
+    )
+    lapsed = _hkexnews_record(
+        announcement_id="1793-lapse",
+        title="JOINT ANNOUNCEMENT RESULTS OF THE COURT MEETING AND LAPSE OF THE PROPOSAL",
+        published_at="2026-06-24T10:19:00+00:00",
+        symbols=("01793",),
+        headline_category="withdrawal_of_listing",
+        short_text=category_label,
+    )
+    proposed_withdrawal = _hkexnews_record(
+        announcement_id="751-scheme",
+        title=(
+            "MONTHLY UPDATE IN RELATION TO PROPOSED PRE-CONDITIONAL SHARE "
+            "BUY-BACK AND PROPOSED WITHDRAWAL OF LISTING"
+        ),
+        published_at="2026-08-17T08:52:00+00:00",
+        symbols=("00751",),
+        headline_category="withdrawal_of_listing",
+        short_text=category_label,
+    )
+    cancellation = _hkexnews_record(
+        announcement_id="8047-cancel",
+        title=(
+            "DECISION OF THE LISTING COMMITTEE ON THE CANCELLATION OF LISTING "
+            "AND CONTINUED SUSPENSION OF TRADING"
+        ),
+        published_at="2026-08-04T13:42:00+00:00",
+        symbols=("08047",),
+        headline_category="withdrawal_of_listing",
+        short_text=category_label,
+    )
+    last_day = _hkexnews_record(
+        announcement_id="1712-last",
+        title="LAST DAY OF DEALINGS IN THE SHARES ON 13 AUGUST 2026",
+        published_at="2026-08-06T12:09:00+00:00",
+        symbols=("01712",),
+        headline_category="withdrawal_of_listing",
+    )
+
+    assert classify_hkex_trading_eligibility_headline(proposed) is None
+    assert classify_hkex_trading_eligibility_headline(profit_warning) is None
+    assert classify_hkex_trading_eligibility_headline(lapsed) is None
+    assert classify_hkex_trading_eligibility_headline(proposed_withdrawal) is None
+    assert classify_hkex_trading_eligibility_headline(cancellation) == (
+        "withdrawal_of_listing"
+    )
+    assert classify_hkex_trading_eligibility_headline(last_day) == (
+        "withdrawal_of_listing"
+    )
+
+    snapshot = build_hkex_trading_eligibility_snapshot(
+        [proposed, profit_warning, lapsed, proposed_withdrawal, cancellation, last_day],
+        as_of=date(2026, 8, 27),
+    )
+    by_id = {row["instrument_id"]: row for row in snapshot.rows}
+    assert "02688.HK" not in by_id
+    assert "00232.HK" not in by_id
+    assert "01793.HK" not in by_id
+    assert "00751.HK" not in by_id
+    assert by_id["08047.HK"]["source"] == "hkexnews_product_cessation"
+    assert by_id["01712.HK"]["source"] == "hkexnews_product_cessation"
+
+
+def test_eligibility_snapshot_does_not_mark_remaining_hkd_counter():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+        select_hkex_eligibility_symbols,
+    )
+
+    usd_rmb_counters = _hkexnews_record(
+        announcement_id="3483-counter",
+        title=(
+            "Announcement - Termination of USD Trading Counter and RMB "
+            "Trading Counter of each Sub-Fund"
+        ),
+        published_at="2026-08-24T10:50:00+00:00",
+        symbols=("03483", "03489", "09483", "09489", "83483", "83489"),
+        headline_category="cis_matters",
+    )
+    hkd_counter = _hkexnews_record(
+        announcement_id="3011-counter",
+        title="Termination of HKD Trading Counter",
+        published_at="2026-07-14T09:43:00+00:00",
+        symbols=("03011", "09011"),
+        headline_category="cis_matters",
+    )
+
+    assert select_hkex_eligibility_symbols(usd_rmb_counters, "cis_matters") == ()
+    assert select_hkex_eligibility_symbols(hkd_counter, "cis_matters") == ("03011",)
+
+    snapshot = build_hkex_trading_eligibility_snapshot(
+        [usd_rmb_counters, hkd_counter],
+        as_of=date(2026, 8, 27),
+    )
+    assert snapshot.rows == []
