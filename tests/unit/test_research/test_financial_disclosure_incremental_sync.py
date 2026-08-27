@@ -55,6 +55,20 @@ class _FakeLifecycleDbOps:
         ]
 
 
+class _FakeIpoDbOps:
+    async def get_instruments_by_exchange(self, exchange):
+        return [
+            {
+                "instrument_id": "301583.SZ",
+                "symbol": "301583",
+                "exchange": "SZSE",
+                "type": "stock",
+                "is_active": True,
+                "listed_date": "2026-07-10 00:00:00.000000",
+            }
+        ]
+
+
 class _FakeFinancialStatements:
     def __init__(self, *, ready=False, numeric_rows=None, missing_fields=None):
         self.ready = ready
@@ -1556,6 +1570,137 @@ def test_reconciliation_accepts_pre_listing_period_without_source_retry(tmp_path
     assert result["report_period_lifecycle_summary"]["pre_listing"] == 1
     assert storage.states[0]["status"] == "accepted_disclosure_gap"
     assert storage.states[0]["classification"] == "pre_listing_period"
+
+
+def test_incremental_fetches_pre_listing_period_when_post_listing_report_exists(tmp_path):
+    record = _record(
+        announcement_id="ipo-h1-report",
+        title="2026年半年度报告",
+        announcement_time="2026-08-26",
+        market="SZSE",
+        symbols=["301583"],
+    )
+    storage = _FakeStorage(ready=False)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeIpoDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([record]),
+    )
+    import_calls = []
+
+    async def _import(**kwargs):
+        import_calls.append(kwargs)
+        storage.financial_statements.ready = True
+        return {
+            **service.repair_router.default_summary(),
+            "cninfo_attempts": 1,
+            "fallback_attempts": 1,
+            "fallback_successes": 1,
+            "final_source": "fallback",
+            "source_collection_complete": True,
+        }
+
+    service._run_targeted_import = _import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert import_calls
+    assert result["changed_count"] == 1
+    assert result["accepted_gap_count"] == 0
+    assert storage.states[-1]["status"] == "changed"
+    assert storage.states[-1]["classification"] != "pre_listing_period"
+
+
+def test_incremental_skips_pre_listing_period_without_post_listing_report(tmp_path):
+    record = _record(
+        announcement_id="pre-ipo-h1",
+        title="2026年半年度报告",
+        announcement_time="2026-06-20",
+        market="SZSE",
+        symbols=["301583"],
+    )
+    storage = _FakeStorage(ready=False)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeIpoDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([record]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("pre-listing reports before IPO must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["accepted_gap_count"] == 1
+    assert result["changed_count"] == 0
+    assert storage.states[-1]["classification"] == "pre_listing_period"
+
+
+def test_reconciliation_fetches_pre_listing_period_from_post_listing_audit(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        audit_rows=[
+            {
+                "instrument_id": "301583.SZ",
+                "title": "2026年半年度报告",
+                "published_at": "2026-08-26",
+                "source_announcement_id": "audit-h1",
+                "announcement_id": "audit-h1",
+                "selection_reasons": ["periodic_report"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeIpoDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+    import_calls = []
+
+    async def _import(**kwargs):
+        import_calls.append(kwargs)
+        storage.financial_statements.ready = True
+        return {
+            **service.repair_router.default_summary(),
+            "cninfo_attempts": 1,
+            "fallback_attempts": 1,
+            "fallback_successes": 1,
+            "final_source": "fallback",
+            "source_collection_complete": True,
+        }
+
+    service._run_targeted_import = _import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-06-30"],
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert import_calls
+    assert result["changed_count"] == 1
+    assert result["accepted_gap_count"] == 0
+    assert storage.states[-1]["status"] == "changed"
 
 
 def test_reconciliation_converts_pre_listing_pending_state_without_source_retry(tmp_path):

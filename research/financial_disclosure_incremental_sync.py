@@ -32,6 +32,7 @@ from research.financial_disclosure_events import (
     financial_disclosure_event_filter,
     infer_report_periods_from_title,
     is_financial_disclosure_like_title,
+    is_non_primary_financial_announcement_title,
 )
 from research.financial_source_field_mapping import MAPPING_VERSION
 from research.financial_statement_maintenance_repair import (
@@ -86,14 +87,40 @@ class FinancialDisclosureMaintenanceCandidate:
     reasons: List[str] = field(default_factory=list)
     events: List[FinancialDisclosureEvent] = field(default_factory=list)
     lifecycle_classification: Optional[str] = None
+    listed_date: Optional[str] = None
 
     @property
     def key(self) -> Tuple[str, str]:
         return (self.instrument_id, self.report_period)
 
+    def has_post_listing_formal_periodic_announcement(self) -> bool:
+        listed_at = FinancialDisclosureIncrementalSyncService._parse_date_text(
+            self.listed_date
+        )
+        if listed_at is None:
+            return False
+        for event in self.events:
+            if event.report_period != self.report_period:
+                continue
+            if not _event_is_formal_periodic_report(event):
+                continue
+            announced_at = FinancialDisclosureIncrementalSyncService._parse_date_text(
+                event.announcement_time
+            )
+            if announced_at is None:
+                continue
+            if announced_at.date() >= listed_at.date():
+                return True
+        return False
+
     @property
     def classification(self) -> str:
-        if self.lifecycle_classification:
+        if (
+            self.lifecycle_classification == "pre_listing_period"
+            and self.has_post_listing_formal_periodic_announcement()
+        ):
+            pass
+        elif self.lifecycle_classification:
             return self.lifecycle_classification
         if any(
             event.classification == PENDING_DELISTING_RISK_CLASSIFICATION
@@ -108,6 +135,29 @@ class FinancialDisclosureMaintenanceCandidate:
         ):
             return FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
         return FINANCIAL_PERIODIC_REPORT_CLASSIFICATION
+
+
+FORMAL_PERIODIC_EVENT_REASONS = frozenset(
+    {"periodic_report", "periodic_report_correction"}
+)
+
+
+def _event_is_formal_periodic_report(event: FinancialDisclosureEvent) -> bool:
+    title = str(event.title or "")
+    if title and is_non_primary_financial_announcement_title(title):
+        return False
+    reasons = {str(item) for item in event.reasons or []}
+    if reasons & FORMAL_PERIODIC_EVENT_REASONS:
+        return True
+    if "periodic_report_delayed" in reasons or "pending_delisting_risk" in reasons:
+        return False
+    return bool(title) and bool(infer_report_periods_from_title(title)) and (
+        "半年度报告" in title
+        or "半年报" in title
+        or "年度报告" in title
+        or "年报" in title
+        or "季度报告" in title
+    )
 
 
 class FinancialDisclosureIncrementalSyncService:
@@ -671,6 +721,9 @@ class FinancialDisclosureIncrementalSyncService:
         risk_audits_by_instrument = self._load_disclosure_risk_audits_by_instrument(
             instruments_by_id.keys()
         )
+        periodic_audits_by_instrument = self._load_periodic_report_audits_by_instrument(
+            instruments_by_id.keys()
+        )
         for event in events:
             instrument = instruments_by_id.get(event.instrument_id)
             if instrument is None:
@@ -771,6 +824,18 @@ class FinancialDisclosureIncrementalSyncService:
                         candidates[candidate.key] = candidate
                 if max_candidates > 0 and len(candidates) >= max_candidates:
                     break
+        for candidate in candidates.values():
+            if candidate.lifecycle_classification != "pre_listing_period":
+                continue
+            if candidate.has_post_listing_formal_periodic_announcement():
+                continue
+            audit_event = self._post_listing_periodic_event_for_candidate(
+                candidate,
+                periodic_audits_by_instrument.get(candidate.instrument_id, []),
+            )
+            if audit_event is None:
+                continue
+            self._merge_candidate_event(candidate, audit_event)
         self._last_candidate_unlimited_count = len(candidates)
         self._last_candidate_limit = int(max_candidates)
         self._last_expired_pending_count = expired_pending
@@ -1064,6 +1129,11 @@ class FinancialDisclosureIncrementalSyncService:
                 instrument,
                 report_period,
             ),
+            listed_date=(
+                None
+                if instrument.get("listed_date") is None
+                else str(instrument.get("listed_date"))
+            ),
         )
 
     def _load_profile_industry_membership(
@@ -1154,6 +1224,84 @@ class FinancialDisclosureIncrementalSyncService:
                 ),
                 title=audit.get("title"),
             )
+        return None
+
+    def _load_periodic_report_audits_by_instrument(
+        self,
+        instrument_ids: Sequence[str],
+    ) -> Dict[str, List[Mapping[str, Any]]]:
+        loader = getattr(self.storage, "list_announcement_audit", None)
+        if loader is None:
+            return {}
+        with self.storage.financial_database_scope():
+            try:
+                rows = loader(
+                    purpose_key=self.purpose_key,
+                    instrument_ids=[str(item) for item in instrument_ids if str(item)],
+                    limit=1000,
+                )
+            except TypeError:
+                rows = loader(
+                    purpose_key=self.purpose_key,
+                    instrument_ids=[str(item) for item in instrument_ids if str(item)],
+                )
+        result: Dict[str, List[Mapping[str, Any]]] = {}
+        for row in rows:
+            title = str(row.get("title") or "")
+            reasons = {str(item) for item in row.get("selection_reasons") or []}
+            if is_non_primary_financial_announcement_title(title):
+                continue
+            if not infer_report_periods_from_title(title):
+                continue
+            if not (
+                reasons & FORMAL_PERIODIC_EVENT_REASONS
+                or "半年度报告" in title
+                or "半年报" in title
+                or "年度报告" in title
+                or "年报" in title
+                or "季度报告" in title
+            ):
+                continue
+            instrument_id = str(row.get("instrument_id") or "")
+            if not instrument_id:
+                continue
+            result.setdefault(instrument_id, []).append(row)
+        return result
+
+    def _post_listing_periodic_event_for_candidate(
+        self,
+        candidate: FinancialDisclosureMaintenanceCandidate,
+        audits: Sequence[Mapping[str, Any]],
+    ) -> Optional[FinancialDisclosureEvent]:
+        listed_at = self._parse_date_text(candidate.listed_date)
+        if listed_at is None:
+            return None
+        for audit in audits:
+            title = str(audit.get("title") or "")
+            if candidate.report_period not in infer_report_periods_from_title(title):
+                continue
+            reasons = [str(item) for item in audit.get("selection_reasons") or []]
+            event = FinancialDisclosureEvent(
+                instrument_id=candidate.instrument_id,
+                report_period=candidate.report_period,
+                classification=FINANCIAL_PERIODIC_REPORT_CLASSIFICATION,
+                reasons=reasons or ["periodic_report"],
+                announcement_id=str(
+                    audit.get("source_announcement_id")
+                    or audit.get("announcement_id")
+                    or "audit-periodic"
+                ),
+                announcement_time=(
+                    audit.get("published_at") or audit.get("announcement_time")
+                ),
+                title=title,
+            )
+            if not _event_is_formal_periodic_report(event):
+                continue
+            announced_at = self._parse_date_text(event.announcement_time)
+            if announced_at is None or announced_at.date() < listed_at.date():
+                continue
+            return event
         return None
 
     @staticmethod
