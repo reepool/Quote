@@ -103,10 +103,17 @@ def normalize_published_at(
         try:
             parsed = datetime.fromisoformat(candidate)
         except ValueError:
-            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y/%m/%d %H:%M:%S"):
+            for fmt in (
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%d",
+                "%Y/%m/%d %H:%M:%S",
+                "%d/%m/%Y %H:%M:%S",
+                "%d/%m/%Y %H:%M",
+                "%d/%m/%Y",
+            ):
                 try:
                     parsed = datetime.strptime(text, fmt)
-                    if fmt == "%Y-%m-%d":
+                    if fmt in {"%Y-%m-%d", "%d/%m/%Y"}:
                         diagnostics.append("published_at_date_only")
                     break
                 except ValueError:

@@ -1,0 +1,5 @@
+{
+  "recordCnt": 2,
+  "hasNextPage": false,
+  "result": "[{\"NEWS_ID\":\"20260824122101831\",\"TITLE\":\"TRADING HALT\",\"DATE_TIME\":\"24/08/2026 12:21\",\"STOCK_CODE\":\"01831\",\"STOCK_NAME\":\"SHIFANG HLDG\",\"LONG_TEXT\":\"[Trading Halt]\",\"SHORT_TEXT\":\"[Trading Halt]\",\"FILE_LINK\":\"/listedco/listconews/sehk/2026/0824/20260824001831.pdf\"},{\"NEWS_ID\":\"20260512090001803\",\"TITLE\":\"TRADING HALT AND RESUMPTION OF TRADING\",\"DATE_TIME\":\"12/05/2026 09:00\",\"STOCK_CODE\":\"01803\",\"STOCK_NAME\":\"EXAMPLE\",\"LONG_TEXT\":\"[Resumption]\",\"SHORT_TEXT\":\"[Resumption]\",\"FILE_LINK\":\"/listedco/listconews/sehk/2026/0512/20260512001803.pdf\"}]"
+}

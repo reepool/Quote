@@ -238,7 +238,7 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 - `config/05_scheduler.json` 中的 `a_share_stock_master_sync` 是 `manual_only=true`，没有自动运行时间。
 - Telegram 可用 `/run a_share_stock_master_sync` 手工触发，默认参数为 `exchanges=["SSE","SZSE","BSE"], timeout_sec=180`；该任务按 `exchange_official -> BaoStock -> AkShare` 路由强制刷新 A 股股票主数据，生成 source authority 与市场明细报告，不请求股票或指数行情。
 - `config/05_scheduler.json` 中的 `hkex_instrument_master_sync` 是 `manual_only=true`，没有自动运行时间。
-- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=lifecycle_write, timeout_sec=60`；会写入安全新增/metadata 候选，并按官方/人工证据写退市、复牌、停牌生命周期字段。
+- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=lifecycle_write, timeout_sec=120`；会写入安全新增/metadata 候选，并按官方/人工证据写退市、复牌、停牌生命周期字段。标题扫描会额外请求 HKEXnews，所以超时从 60 提到 120。
 - `lifecycle_write` 是更高权限模式，会先执行 `safe_write` 能做的安全写入，再按官方/人工证据改写退市、复牌和停牌状态；它不是和 `safe_write` 并列同时打开的第二个开关。
 - `config/03_data.json` 的 `hk_daily_data_update` 前置 HKEX governance 已切到 `lifecycle_write`；港股日更读取 universe 前会先用 HKEX 官方证据修正 active/suspended/delisted 状态。
 - 本地直接调用可用：
@@ -247,7 +247,7 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 /home/python/miniconda3/envs/Quote/bin/python -c 'exec("""import asyncio
 from scheduler.tasks import scheduled_tasks
 async def main():
-    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="lifecycle_write", timeout_sec=60)
+    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="lifecycle_write", timeout_sec=120)
     print({"success": ok})
 asyncio.run(main())
 """)'
@@ -262,6 +262,7 @@ asyncio.run(main())
 - 辅 active 源：HKEXnews `activestock_sehk_e.json`。
 - delisted 源：HKEXnews `inactivestock_sehk_e.json`。
 - suspension 源：HKEXnews prolonged suspension monthly PDF（Main Board / GEM）。抽字走共享 PDF profile（默认 `pdfium_native`，可用 `pdf_profile` 或 `QUOTE_PDF_ENGINE_PROFILE` 回滚到 `pypdf_native`）。行解析按 `Link to HKEXnews` 切块，再用括号代码和日期确认公司，兼容 pypdf / pdfium 的空白差异。解析 0 行或抓取失败时视为停牌源不可用：报告 warning，且不会据此把本地 `suspended` 标的改回 active。
+- 短暂停牌源：同一套 `AnnouncementAcquisitionService` + `hkexnews` provider 扫描 HKEXnews 标题分类 `Trading Halt` / `Suspension` / `Resumption`。分类看 headline category / `[Trading Halt]` 标签，不看自由文本标题。按 `published_at` 取每只股票最新事件：停牌/停牌中写入 `hkexnews_trading_halt`，复牌不写停牌行。AkShare / 东财只做补充诊断，不是生命周期权威。
 - PDF 文本解析只接受同时带括号代码和日期的公司块；复牌条件行（如 `1. Approval...`）和前言说明不会被当成停牌代码。
 - HKEXnews delisted JSON 若不提供真实退市日期，系统只写 `status=delisted,is_active=0,trading_status=0`，不再用同步日伪造 `delisted_date`；精确退市日后续应从 HKEX 交易安排公告或公司公告补录。
 

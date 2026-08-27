@@ -207,7 +207,7 @@
     "hkex_instrument_master_sync": {
       "enabled": true,
       "mode": "lifecycle_write",
-      "timeout_sec": 60,
+      "timeout_sec": 120,
       "quote_stale_days": 14,
       "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",
       "official_securities_list_file": "",
@@ -229,7 +229,10 @@
         "reit",
         "etf"
       ],
-      "pdf_profile": ""
+      "pdf_profile": "",
+      "trading_status_announcement_scan_enabled": true,
+      "trading_status_lookback_months": 8,
+      "trading_status_scan_max_pages": 20
     },
     "default_start_years": {
       "SSE": 1990,

@@ -105,6 +105,7 @@ def _hkex_sync_config(mode: str = "audit_only") -> dict:
         'eastmoney_profile_file': str(FIXTURE_DIR / "eastmoney_hk_profile_rows.csv"),
         'write_review_discrepancies': True,
         'allowed_product_types': ['ordinary_equity', 'reit', 'etf'],
+        'trading_status_announcement_scan_enabled': False,
     }
 
 
@@ -806,6 +807,58 @@ async def test_hkex_sync_suspension_evidence_marks_trading_status_zero(tmp_path)
     assert result['exchanges']['HKEX']['official_suspension_count'] == 1
     manager.db_ops.mark_instrument_suspended.assert_awaited_once()
     assert manager.db_ops.mark_instrument_suspended.await_args.args[0] == '00005.HK'
+
+
+@pytest.mark.asyncio
+async def test_hkex_trading_halt_announcement_marks_short_halt_and_does_not_reactivate():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 1,
+            'source': 'hkex_securities_list',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    halt_snapshot = HKEXProviderSnapshot(
+        source='hkexnews_trading_halt',
+        source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+        parser_version='test',
+        raw_snapshot_hash='halt',
+        rows=[
+            {
+                'instrument_id': '00005.HK',
+                'symbol': '00005',
+                'name': 'HSBC HOLDINGS',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'suspended',
+                'is_active': True,
+                'trading_status': 0,
+                'source': 'hkexnews_trading_halt',
+            }
+        ],
+        diagnostics={'row_count': 1},
+    )
+    manager._scan_hkex_trading_status_announcements = AsyncMock(return_value=halt_snapshot)
+
+    result = await manager.sync_hkex_instrument_master()
+
+    manager.db_ops.mark_instrument_suspended.assert_awaited_once()
+    assert manager.db_ops.mark_instrument_suspended.await_args.args[0] == '00005.HK'
+    assert manager.db_ops.mark_instrument_suspended.await_args.kwargs['source'] == 'hkexnews_trading_halt'
+    manager.db_ops.mark_instrument_active.assert_not_awaited()
+    assert result['exchanges']['HKEX']['source_evidence_policy']['suspension_source_available'] is True
+    assert result['exchanges']['HKEX']['official_suspension_count'] == 1
 
 
 @pytest.mark.asyncio

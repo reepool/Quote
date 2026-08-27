@@ -216,7 +216,7 @@
         "coalesce": true,
         "parameters": {
           "mode": "lifecycle_write",
-          "timeout_sec": 60,
+          "timeout_sec": 120,
           "max_runtime_seconds": 600
         }
       },

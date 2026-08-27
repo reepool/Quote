@@ -2264,7 +2264,21 @@
         "cost_tier": "free",
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
-        "role": "official_hk_disclosure_fallback"
+        "role": "official_hk_disclosure_fallback",
+        "announcements": {
+          "enabled": true,
+          "endpoint_url": "https://www1.hkexnews.hk/search/titleSearchServlet.do",
+          "warmup_url": "https://www1.hkexnews.hk/search/titlesearch.xhtml",
+          "referer": "https://www1.hkexnews.hk/search/titlesearch.xhtml?lang=EN",
+          "artifact_base_url": "https://www1.hkexnews.hk",
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.15,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "max_page_size": 100,
+          "markets": ["SEHK", "GEM"],
+          "note": "Official HKEXnews title-search metadata. Market-wide searches are split into calendar-month windows because the upstream endpoint rejects ranges longer than about one month."
+        }
       }
     },
     "routing": {
@@ -2323,6 +2337,17 @@
               "sources": [
                 "cninfo"
               ],
+              "fallback_on": [
+                "failed",
+                "degraded",
+                "identity_not_found",
+                "indeterminate"
+              ]
+            }
+          },
+          "instrument_master_hkex_trading_status": {
+            "HKEX": {
+              "sources": ["hkexnews"],
               "fallback_on": [
                 "failed",
                 "degraded",

@@ -7,6 +7,7 @@ from data_sources.hkex_instrument_master import (
     HKEXLifecyclePolicy,
     HKEXManualReviewProvider,
     HKEXNewsStockListProvider,
+    HKEXProviderSnapshot,
     HKEXSecuritiesListProvider,
     HKEXSourceEvidencePolicy,
     HKEXSuspensionReportProvider,
@@ -17,6 +18,7 @@ from data_sources.hkex_instrument_master import (
     hkex_instrument_id,
     normalize_hkex_code,
 )
+from research.announcements import AnnouncementRecord, build_announcement_key
 
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "hkex_instrument_master"
@@ -511,3 +513,119 @@ def test_lifecycle_policy_requires_official_evidence_for_suspension():
 
     assert decisions["suspension_candidates"][0]["instrument_id"] == "00005.HK"
     assert decisions["counts"]["suspension_candidates"] == 1
+
+
+def _hkexnews_record(
+    *,
+    announcement_id: str,
+    title: str,
+    published_at: str,
+    symbols: tuple[str, ...],
+    headline_category: str | None = None,
+    short_text: str = "",
+    long_text: str = "",
+) -> AnnouncementRecord:
+    payload = {
+        "TITLE": title,
+        "SHORT_TEXT": short_text,
+        "LONG_TEXT": long_text,
+    }
+    if headline_category is not None:
+        payload["headline_category"] = headline_category
+    return AnnouncementRecord(
+        source="hkexnews",
+        source_announcement_id=announcement_id,
+        announcement_key=build_announcement_key("hkexnews", announcement_id),
+        title=title,
+        published_at=published_at,
+        exchange="HKEX",
+        market="SEHK",
+        symbols=symbols,
+        raw_payload=payload,
+    )
+
+
+def test_trading_status_classifier_uses_headline_category_not_title():
+    from data_sources.hkex_instrument_master import classify_hkex_trading_status_headline
+
+    record = _hkexnews_record(
+        announcement_id="1803-resume",
+        title="TRADING HALT AND RESUMPTION OF TRADING",
+        published_at="2026-05-12T04:00:00+00:00",
+        symbols=("01803",),
+        headline_category="trading_resumption",
+        short_text="[Resumption]",
+    )
+
+    assert classify_hkex_trading_status_headline(record) == "trading_resumption"
+
+
+def test_trading_status_snapshot_uses_datetime_not_string_order():
+    from data_sources.hkex_instrument_master import build_hkex_trading_status_snapshot
+
+    snapshot = build_hkex_trading_status_snapshot(
+        [
+            _hkexnews_record(
+                announcement_id="1632-resume",
+                title="RESUMPTION OF TRADING",
+                published_at="2026-06-29T01:00:00+00:00",
+                symbols=("01632",),
+                headline_category="trading_resumption",
+                short_text="[Resumption]",
+            ),
+            _hkexnews_record(
+                announcement_id="1831-halt",
+                title="TRADING HALT",
+                published_at="2026-08-24T04:21:00+00:00",
+                symbols=("01831",),
+                headline_category="trading_halt",
+                short_text="[Trading Halt]",
+            ),
+            _hkexnews_record(
+                announcement_id="1632-halt-older",
+                title="TRADING HALT",
+                published_at="2026-03-01T01:00:00+00:00",
+                symbols=("01632",),
+                headline_category="trading_halt",
+                short_text="[Trading Halt]",
+            ),
+        ]
+    )
+
+    by_id = {row["instrument_id"]: row for row in snapshot.rows}
+    assert snapshot.source == "hkexnews_trading_halt"
+    assert "01831.HK" in by_id
+    assert by_id["01831.HK"]["status"] == "suspended"
+    assert by_id["01831.HK"]["trading_status"] == 0
+    assert "01632.HK" not in by_id
+
+
+def test_source_evidence_policy_accepts_trading_halt_snapshot():
+    official = HKEXSecuritiesListProvider(
+        source_url="fixture://hkex_securities_list.csv"
+    ).parse_csv(_fixture("hkex_securities_list.csv"))
+    halt = HKEXProviderSnapshot(
+        source="hkexnews_trading_halt",
+        source_url="https://www1.hkexnews.hk/search/titlesearch.xhtml",
+        parser_version="test",
+        raw_snapshot_hash="halt",
+        rows=[
+            {
+                "instrument_id": "01831.HK",
+                "status": "suspended",
+                "trading_status": 0,
+                "source": "hkexnews_trading_halt",
+            }
+        ],
+        diagnostics={"row_count": 1},
+    )
+
+    policy = HKEXSourceEvidencePolicy.assess(
+        snapshots=[official, halt],
+        errors=[],
+        official_active_rows=official.rows,
+        official_delisted_rows=[],
+    )
+
+    assert policy["suspension_source_available"] is True
+    assert policy["suspension_write_allowed"] is True

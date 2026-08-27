@@ -8,11 +8,38 @@ ANNUAL_REPORT_CATEGORY = "annual_report"
 SEMIANNUAL_REPORT_CATEGORY = "semiannual_report"
 PERIODIC_REPORT_CATEGORY = "periodic_report"
 PERIODIC_REPORT_ANOMALY_CATEGORY = "periodic_report_anomaly"
+TRADING_HALT_CATEGORY = "trading_halt"
+TRADING_SUSPENSION_CATEGORY = "trading_suspension"
+TRADING_RESUMPTION_CATEGORY = "trading_resumption"
+
+HKEX_TRADING_STATUS_CATEGORIES = (
+    TRADING_HALT_CATEGORY,
+    TRADING_SUSPENSION_CATEGORY,
+    TRADING_RESUMPTION_CATEGORY,
+)
 
 _CNINFO_PERIODIC_REPORT_VALUE = (
     "category_yjdbg_szsh;category_bndbg_szsh;"
     "category_sjdbg_szsh;category_ndbg_szsh"
 )
+
+_HKEXNEWS_VALUES = {
+    TRADING_HALT_CATEGORY: {
+        "t1code": "10000",
+        "t2code": "17960",
+        "t2Gcode": "7",
+    },
+    TRADING_SUSPENSION_CATEGORY: {
+        "t1code": "10000",
+        "t2code": "17850",
+        "t2Gcode": "7",
+    },
+    TRADING_RESUMPTION_CATEGORY: {
+        "t1code": "10000",
+        "t2code": "17650",
+        "t2Gcode": "7",
+    },
+}
 
 _ALIASES = {
     ANNUAL_REPORT_CATEGORY: ANNUAL_REPORT_CATEGORY,
@@ -29,6 +56,16 @@ _ALIASES = {
     "periodic": PERIODIC_REPORT_CATEGORY,
     _CNINFO_PERIODIC_REPORT_VALUE: PERIODIC_REPORT_CATEGORY,
     PERIODIC_REPORT_ANOMALY_CATEGORY: PERIODIC_REPORT_ANOMALY_CATEGORY,
+    TRADING_HALT_CATEGORY: TRADING_HALT_CATEGORY,
+    "halt": TRADING_HALT_CATEGORY,
+    "trading halt": TRADING_HALT_CATEGORY,
+    "17960": TRADING_HALT_CATEGORY,
+    TRADING_SUSPENSION_CATEGORY: TRADING_SUSPENSION_CATEGORY,
+    "suspension": TRADING_SUSPENSION_CATEGORY,
+    "17850": TRADING_SUSPENSION_CATEGORY,
+    TRADING_RESUMPTION_CATEGORY: TRADING_RESUMPTION_CATEGORY,
+    "resumption": TRADING_RESUMPTION_CATEGORY,
+    "17650": TRADING_RESUMPTION_CATEGORY,
 }
 
 _CNINFO_VALUES = {
@@ -85,6 +122,16 @@ def cninfo_category_value(value: Any) -> str | None:
     if normalized is None:
         return None
     return _CNINFO_VALUES.get(normalized, normalized)
+
+
+def hkexnews_category_options(value: Any) -> dict[str, Any] | None:
+    """Return HKEXnews title-search codes for a normalized headline category."""
+
+    normalized = normalize_announcement_category(value)
+    if normalized is None:
+        return {}
+    options = _HKEXNEWS_VALUES.get(normalized)
+    return None if options is None else dict(options)
 
 
 def exchange_category_options(exchange: str, value: Any) -> dict[str, Any] | None:

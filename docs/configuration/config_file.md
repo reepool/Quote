@@ -703,7 +703,7 @@
   "hkex_instrument_master_sync": {
     "enabled": true,
     "mode": "lifecycle_write",
-    "timeout_sec": 60,
+    "timeout_sec": 120,
     "quote_stale_days": 14,
     "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",
     "official_securities_list_file": "",
@@ -721,7 +721,10 @@
     "fetch_supplemental_live": false,
     "write_review_discrepancies": true,
     "allowed_product_types": ["ordinary_equity", "reit", "etf"],
-    "pdf_profile": ""
+    "pdf_profile": "",
+    "trading_status_announcement_scan_enabled": true,
+    "trading_status_lookback_months": 8,
+    "trading_status_scan_max_pages": 20
   }
 }
 ```
@@ -729,6 +732,8 @@
 - **`mode`**: `audit_only` 只出差异，`safe_write` 写官方 in-scope 新标的、安全范围内存量标的的非破坏性字段和辅助 metadata，`lifecycle_write` 才允许官方证据驱动 active/suspended/delisted 状态变更。
 - **`official_*_url/file`**: 官方 HKEX / HKEXnews 快照来源；`file` 用于本地审计或离线 fixture，`url` 用于带超时的线上获取。当前主 active 源为 HKEX `ListOfSecurities.xlsx`，辅 active 源为 HKEXnews `activestock_sehk_e.json`，delisted 源为 HKEXnews `inactivestock_sehk_e.json`。
 - **`hkexnews_suspension_*_url/file`**: HKEXnews 月度 prolonged suspension PDF，作为停牌复核来源。抽字走共享 PDF profile；行解析按代码和日期切块，兼容 pypdf / pdfium 空白差异。解析出 0 行时视为停牌源不可用，不会据此把本地停牌股改回 active。
+- **`trading_status_announcement_scan_enabled`**: 是否通过统一公告接口扫描 HKEXnews 标题分类 `Trading Halt` / `Suspension` / `Resumption`，补月度 PDF 覆盖不到的短暂停牌。命中最新停牌/停牌标题的标的写入 `status=suspended,trading_status=0,source=hkexnews_trading_halt`，日更 `tradable_only=True` 会跳过。最新事件是复牌时不写停牌行，官方 active 列表可按原规则复活。空行情本身不会改生命周期。
+- **`trading_status_lookback_months`**: 标题扫描回看月数。HKEXnews 全市场查询大约只能覆盖一个月，provider 会按自然月切窗，不要在业务层再写一套抓取。
 - **`pdf_profile`**: 可选。空则使用全局 `QUOTE_PDF_ENGINE_PROFILE`（默认 `pdfium_native`）。需要回滚停牌 PDF 抽字时填 `pypdf_native`。
 - **`manual_review_file`**: 人工复核结论回灌文件，默认 `data/hkex_manual_review.json`，支持 JSON/CSV，文件不存在时按空 review 处理。字段建议包含 `instrument_id`/`code`、`action`、`effective_date`、`reason`、`evidence_url`、`reviewed_by`；`action=delisted/suspended/active` 会在 `lifecycle_write` 下作为 reviewed lifecycle evidence 生效。API 与 Telegram `/hkex_review` 命令都会写入该文件。
 - **`akshare_spot_file` / `eastmoney_profile_file` / `fetch_supplemental_live`**: 补充源配置，仅用于候选发现、字段补充和差异诊断，不作为生命周期权威。

@@ -25,6 +25,7 @@ from .baostock_financial_summary import BaostockFinancialSummaryProvider
 from .baostock_industry import BaostockIndustryProvider
 from .cninfo_shareholders import CninfoShareholdersProvider
 from .cninfo_announcements import CninfoAnnouncementProvider
+from .hkexnews_announcements import HkexnewsAnnouncementProvider
 from .efinance_shareholders import EfinanceShareholdersProvider
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
@@ -102,6 +103,9 @@ class OfficialAnnouncementProviderRegistry(AnnouncementProviderRegistry):
                     )
                 )
             )
+        hkexnews_config = configured.get("hkexnews")
+        if hkexnews_config and bool(hkexnews_config.get("enabled", True)):
+            built.append(HkexnewsAnnouncementProvider(source_config=hkexnews_config))
         super().__init__(built)
 
 

@@ -16104,7 +16104,7 @@ class DataManager:
         defaults: Dict[str, Any] = {
             'enabled': False,
             'mode': 'audit_only',
-            'timeout_sec': 60,
+            'timeout_sec': 120,
             'official_securities_list_url': 'https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx',
             'official_securities_list_file': '',
             'hkexnews_active_list_url': 'https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json',
@@ -16122,6 +16122,9 @@ class DataManager:
             'write_review_discrepancies': True,
             'allowed_product_types': ['ordinary_equity', 'reit', 'etf'],
             'pdf_profile': '',
+            'trading_status_announcement_scan_enabled': True,
+            'trading_status_lookback_months': 8,
+            'trading_status_scan_max_pages': 20,
         }
         raw_config = self.data_config.get('hkex_instrument_master_sync')
         if not isinstance(raw_config, dict):
@@ -16987,6 +16990,54 @@ class DataManager:
             row['quote_stale'] = parsed_date is None or parsed_date.date() < cutoff
         return rows
 
+    async def _scan_hkex_trading_status_announcements(
+        self,
+        config: Dict[str, Any],
+    ):
+        """Scan HKEXnews halt/suspension/resumption headlines through the shared announcement service."""
+        from research.announcements import AnnouncementQuery, AnnouncementScope
+        from research.announcements.categories import HKEX_TRADING_STATUS_CATEGORIES
+        from data_sources.hkex_instrument_master import (
+            build_hkex_trading_status_snapshot,
+        )
+
+        lookback_months = max(1, int(config.get('trading_status_lookback_months', 8)))
+        end_dt = get_shanghai_time().date()
+        start_year = end_dt.year
+        start_month = end_dt.month - lookback_months
+        while start_month <= 0:
+            start_month += 12
+            start_year -= 1
+        start_dt = date(start_year, start_month, 1)
+        service = self._build_official_announcement_acquisition_service(
+            request_timeout_seconds=20.0,
+            request_interval_seconds=0.15,
+        )
+        records_by_id: Dict[str, Any] = {}
+        for category in HKEX_TRADING_STATUS_CATEGORIES:
+            route_result = await asyncio.to_thread(
+                service.acquire,
+                AnnouncementQuery(
+                    purpose_key="instrument_master_hkex_trading_status",
+                    scope=AnnouncementScope(
+                        exchange="HKEX",
+                        market="HKEX",
+                        category=category,
+                        start_date=start_dt.isoformat(),
+                        end_date=end_dt.isoformat(),
+                        page_size=100,
+                        max_pages=int(config.get('trading_status_scan_max_pages', 20)),
+                    ),
+                ),
+            )
+            scan_result = getattr(route_result, "scan_result", None)
+            if scan_result is None:
+                continue
+            for record in getattr(scan_result, "records", ()) or ():
+                if getattr(record, "source_announcement_id", None):
+                    records_by_id[record.source_announcement_id] = record
+        return build_hkex_trading_status_snapshot(records_by_id.values())
+
     async def _fetch_hkex_instrument_master_sources(
         self,
         config: Dict[str, Any],
@@ -17126,6 +17177,18 @@ class DataManager:
                         )
             except Exception as exc:
                 result['warnings'].append(f"HKEX suspension report fetch/parse failed ({market}): {exc}")
+
+        if config.get('trading_status_announcement_scan_enabled', True):
+            try:
+                snapshot = await self._scan_hkex_trading_status_announcements(config)
+                if snapshot is not None:
+                    result['snapshots'].append(snapshot)
+                    result['suspension_rows'].extend(snapshot.rows)
+                    result['official_active_rows'].extend(snapshot.rows)
+            except Exception as exc:
+                result['warnings'].append(
+                    f"HKEXnews trading-status announcement scan failed: {exc}"
+                )
 
         try:
             raw = self._read_hkex_master_file(config.get('akshare_spot_file'))

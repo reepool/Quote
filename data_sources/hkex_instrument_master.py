@@ -17,7 +17,28 @@ from typing import Any, Dict, Iterable, List, Optional, Set
 
 import pandas as pd
 
+from research.announcements.categories import (
+    TRADING_HALT_CATEGORY,
+    TRADING_RESUMPTION_CATEGORY,
+    TRADING_SUSPENSION_CATEGORY,
+    normalize_announcement_category,
+)
 from utils.http_transport import HttpTlsConfig, urlopen_bytes
+
+HKEX_TRADING_HALT_SOURCE = "hkexnews_trading_halt"
+HKEX_TRADING_STATUS_EVENT_CATEGORIES = frozenset(
+    {
+        TRADING_HALT_CATEGORY,
+        TRADING_SUSPENSION_CATEGORY,
+        TRADING_RESUMPTION_CATEGORY,
+    }
+)
+_HKEX_HEADLINE_TAG_MAP = {
+    "trading halt": TRADING_HALT_CATEGORY,
+    "suspension": TRADING_SUSPENSION_CATEGORY,
+    "resumption": TRADING_RESUMPTION_CATEGORY,
+}
+_HKEX_HEADLINE_TAG_RE = re.compile(r"\[([^\]]+)\]")
 
 
 HKEX_MASTER_PARSER_VERSION = "hkex-instrument-master-v2"
@@ -277,6 +298,110 @@ class HKEXProviderSnapshot:
     raw_snapshot_hash: str
     rows: List[Dict[str, Any]]
     diagnostics: Dict[str, Any] = field(default_factory=dict)
+
+
+def classify_hkex_trading_status_headline(record: Any) -> Optional[str]:
+    """Classify a HKEXnews headline by category/tag, never by free-text title."""
+    payload = getattr(record, "raw_payload", None) or {}
+    if not isinstance(payload, dict):
+        payload = {}
+    stamped = normalize_announcement_category(payload.get("headline_category"))
+    if stamped in HKEX_TRADING_STATUS_EVENT_CATEGORIES:
+        return stamped
+    for field in (payload.get("SHORT_TEXT"), payload.get("LONG_TEXT")):
+        for tag in _HKEX_HEADLINE_TAG_RE.findall(str(field or "")):
+            mapped = _HKEX_HEADLINE_TAG_MAP.get(tag.strip().lower())
+            if mapped:
+                return mapped
+    return None
+
+
+def build_hkex_trading_status_snapshot(
+    records: Iterable[Any],
+    *,
+    source_url: str = "https://www1.hkexnews.hk/search/titlesearch.xhtml",
+) -> HKEXProviderSnapshot:
+    """Keep the latest halt/suspension headline per instrument as official rows."""
+    latest_by_id: Dict[str, Dict[str, Any]] = {}
+    seen = 0
+    for record in records or []:
+        event = classify_hkex_trading_status_headline(record)
+        if event is None:
+            continue
+        seen += 1
+        published_at = str(getattr(record, "published_at", None) or "")
+        names = tuple(getattr(record, "security_names", ()) or ())
+        for raw_symbol in getattr(record, "symbols", ()) or ():
+            instrument_id = hkex_instrument_id(raw_symbol)
+            if not instrument_id:
+                continue
+            current = latest_by_id.get(instrument_id)
+            if current is None or published_at > str(current.get("published_at") or ""):
+                latest_by_id[instrument_id] = {
+                    "instrument_id": instrument_id,
+                    "symbol": normalize_hkex_code(raw_symbol),
+                    "name": names[0] if names else str(getattr(record, "title", "") or ""),
+                    "event": event,
+                    "published_at": published_at,
+                    "title": str(getattr(record, "title", "") or ""),
+                    "announcement_id": str(
+                        getattr(record, "source_announcement_id", "") or ""
+                    ),
+                }
+
+    rows: List[Dict[str, Any]] = []
+    for item in latest_by_id.values():
+        if item["event"] == TRADING_RESUMPTION_CATEGORY:
+            continue
+        rows.append(
+            {
+                "instrument_id": item["instrument_id"],
+                "symbol": item["symbol"],
+                "name": item["name"],
+                "exchange": "HKEX",
+                "type": "stock",
+                "status": "suspended",
+                "is_active": True,
+                "trading_status": 0,
+                "source": HKEX_TRADING_HALT_SOURCE,
+                "source_symbol": item["symbol"],
+                "official_lifecycle_source": HKEX_TRADING_HALT_SOURCE,
+                "lifecycle_evidence": {
+                    "source": HKEX_TRADING_HALT_SOURCE,
+                    "headline_category": item["event"],
+                    "published_at": item["published_at"],
+                    "title": item["title"],
+                    "announcement_id": item["announcement_id"],
+                    "source_url": source_url,
+                },
+            }
+        )
+    rows.sort(key=lambda row: str(row.get("instrument_id") or ""))
+    raw_snapshot = json.dumps(
+        [
+            {
+                "instrument_id": row["instrument_id"],
+                "announcement_id": (row.get("lifecycle_evidence") or {}).get(
+                    "announcement_id"
+                ),
+            }
+            for row in rows
+        ],
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    return HKEXProviderSnapshot(
+        source=HKEX_TRADING_HALT_SOURCE,
+        source_url=source_url,
+        parser_version=HKEX_MASTER_PARSER_VERSION,
+        raw_snapshot_hash=_snapshot_hash(raw_snapshot),
+        rows=rows,
+        diagnostics={
+            "row_count": len(rows),
+            "classified_count": seen,
+            "latest_event_count": len(latest_by_id),
+        },
+    )
 
 
 class HKEXSecuritiesListProvider:
@@ -813,7 +938,10 @@ class HKEXSourceEvidencePolicy:
         delisted_available = "hkexnews_delisted_list" in sources or "hkex_manual_review" in sources
         suspension_available = False
         for snapshot in snapshot_list:
-            if snapshot.source == "hkexnews_suspension_report" and snapshot.rows:
+            if (
+                snapshot.source in {"hkexnews_suspension_report", HKEX_TRADING_HALT_SOURCE}
+                and snapshot.rows
+            ):
                 suspension_available = True
                 break
             if snapshot.source == "hkex_manual_review" and any(

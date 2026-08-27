@@ -128,6 +128,13 @@ def test_timestamp_normalization_reports_assumed_timezone_and_invalid_values():
     assert normalized == "2026-07-20T01:30:00+00:00"
     assert diagnostics == ["published_at_assumed_timezone:Asia/Shanghai"]
 
+    hkex, hkex_diagnostics = normalize_published_at(
+        "24/08/2026 12:21",
+        source_timezone=__import__("zoneinfo").ZoneInfo("Asia/Hong_Kong"),
+    )
+    assert hkex == "2026-08-24T04:21:00+00:00"
+    assert "published_at_assumed_timezone:Asia/Hong_Kong" in hkex_diagnostics
+
     invalid, invalid_diagnostics = normalize_published_at("not-a-time")
     assert invalid is None
     assert invalid_diagnostics == ["published_at_unparseable"]
@@ -1593,10 +1600,15 @@ def test_repository_config_registers_enabled_announcement_sources_and_routes():
     assert registry.get("sse") is not None
     assert registry.get("szse") is not None
     assert registry.get("bse") is not None
+    assert registry.get("hkexnews") is not None
     assert acquisition_config.route_for(
         "business_profile_evidence:600028.SH",
         "SSE",
     ).sources == ("cninfo", "sse")
+    assert acquisition_config.route_for(
+        "instrument_master_hkex_trading_status",
+        "HKEX",
+    ).sources == ("hkexnews",)
 
 
 def test_registry_provider_override_preserves_other_configured_sources():
