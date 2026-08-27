@@ -12,25 +12,49 @@ import json
 import re
 import time
 from dataclasses import dataclass, field
+from datetime import date
 from io import BytesIO, StringIO
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 import pandas as pd
 
 from research.announcements.categories import (
+    CAPITAL_REORGANISATION_CATEGORY,
+    CIS_MATTERS_CATEGORY,
+    LISTING_BY_INTRODUCTION_CATEGORY,
+    TRADING_ARRANGEMENT_CATEGORY,
     TRADING_HALT_CATEGORY,
     TRADING_RESUMPTION_CATEGORY,
     TRADING_SUSPENSION_CATEGORY,
+    WITHDRAWAL_OF_LISTING_CATEGORY,
     normalize_announcement_category,
 )
 from utils.http_transport import HttpTlsConfig, urlopen_bytes
 
 HKEX_TRADING_HALT_SOURCE = "hkexnews_trading_halt"
+HKEX_TRADING_ARRANGEMENT_SOURCE = "hkexnews_trading_arrangement"
+HKEX_PRODUCT_CESSATION_SOURCE = "hkexnews_product_cessation"
+HKEX_TRADING_ELIGIBILITY_SOURCE = "hkexnews_trading_eligibility"
+HKEX_UNTRADABLE_SOURCES = frozenset(
+    {
+        HKEX_TRADING_ARRANGEMENT_SOURCE,
+        HKEX_PRODUCT_CESSATION_SOURCE,
+    }
+)
 HKEX_TRADING_STATUS_EVENT_CATEGORIES = frozenset(
     {
         TRADING_HALT_CATEGORY,
         TRADING_SUSPENSION_CATEGORY,
         TRADING_RESUMPTION_CATEGORY,
+    }
+)
+HKEX_TRADING_ELIGIBILITY_EVENT_CATEGORIES = frozenset(
+    {
+        TRADING_ARRANGEMENT_CATEGORY,
+        CAPITAL_REORGANISATION_CATEGORY,
+        LISTING_BY_INTRODUCTION_CATEGORY,
+        WITHDRAWAL_OF_LISTING_CATEGORY,
+        CIS_MATTERS_CATEGORY,
     }
 )
 _HKEX_HEADLINE_TAG_MAP = {
@@ -39,6 +63,68 @@ _HKEX_HEADLINE_TAG_MAP = {
     "resumption": TRADING_RESUMPTION_CATEGORY,
 }
 _HKEX_HEADLINE_TAG_RE = re.compile(r"\[([^\]]+)\]")
+_HKEX_CIS_FORM_TOKENS = (
+    "CESSATION",
+    "TERMINATION",
+    "TERMINATING",
+    "CEASE TO BE LISTED",
+    "LAST DAY OF DEALING",
+)
+_HKEX_WITHDRAWAL_FORM_TOKENS = (
+    "LAST DAY OF DEALING",
+    "WITHDRAWAL OF LISTING",
+    "CANCELLATION OF LISTING",
+    "CESSATION OF DEALING",
+)
+_HKEX_EFFECTIVE_DATE_HINTS = (
+    "effective",
+    "last day of dealing",
+    "cease",
+    "cessation",
+    "with effect",
+)
+_HKEX_RESUME_DATE_HINTS = (
+    "commence",
+    "commencement",
+    "expected",
+    "resume",
+    "resumption",
+    "dealings expected",
+)
+_HKEX_MONTH_MAP = {
+    "jan": 1,
+    "january": 1,
+    "feb": 2,
+    "february": 2,
+    "mar": 3,
+    "march": 3,
+    "apr": 4,
+    "april": 4,
+    "may": 5,
+    "jun": 6,
+    "june": 6,
+    "jul": 7,
+    "july": 7,
+    "aug": 8,
+    "august": 8,
+    "sep": 9,
+    "sept": 9,
+    "september": 9,
+    "oct": 10,
+    "october": 10,
+    "nov": 11,
+    "november": 11,
+    "dec": 12,
+    "december": 12,
+}
+_HKEX_NAMED_DATE_RE = re.compile(
+    r"\b(\d{1,2})\s+"
+    r"(January|February|March|April|May|June|July|August|September|"
+    r"October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|"
+    r"Oct|Nov|Dec)\.?\s+(\d{4})\b",
+    re.IGNORECASE,
+)
+_HKEX_NUMERIC_DATE_RE = re.compile(r"\b(\d{1,2})[./](\d{1,2})[./](\d{4})\b")
 
 
 HKEX_MASTER_PARSER_VERSION = "hkex-instrument-master-v2"
@@ -402,6 +488,215 @@ def build_hkex_trading_status_snapshot(
             "latest_event_count": len(latest_by_id),
         },
     )
+
+
+def classify_hkex_trading_eligibility_headline(record: Any) -> Optional[str]:
+    """Classify arrangement/ETF eligibility by category or tag, never free-text type."""
+    payload = getattr(record, "raw_payload", None) or {}
+    if not isinstance(payload, dict):
+        payload = {}
+    stamped = normalize_announcement_category(payload.get("headline_category"))
+    if stamped in HKEX_TRADING_ELIGIBILITY_EVENT_CATEGORIES:
+        if stamped == CIS_MATTERS_CATEGORY and not _hkex_text_has_tokens(
+            record, _HKEX_CIS_FORM_TOKENS
+        ):
+            return None
+        if stamped == WITHDRAWAL_OF_LISTING_CATEGORY and not _hkex_text_has_tokens(
+            record, _HKEX_WITHDRAWAL_FORM_TOKENS
+        ):
+            return None
+        return stamped
+    return None
+
+
+def extract_hkex_timetable_dates(title: Any) -> Dict[str, Optional[date]]:
+    """Extract effective/resume dates from an already-classified headline."""
+    text = str(title or "")
+    effective_date: Optional[date] = None
+    resume_date: Optional[date] = None
+    for parsed, start, end in _iter_hkex_title_dates(text):
+        window = text[max(0, start - 48) : min(len(text), end + 16)].lower()
+        is_resume = any(hint in window for hint in _HKEX_RESUME_DATE_HINTS)
+        is_effective = any(hint in window for hint in _HKEX_EFFECTIVE_DATE_HINTS)
+        if is_resume:
+            resume_date = parsed
+        elif is_effective and effective_date is None:
+            effective_date = parsed
+    return {
+        "effective_date": effective_date,
+        "expected_resume_date": resume_date,
+    }
+
+
+def is_hkex_untradable_window(
+    category: str,
+    *,
+    title: Any,
+    as_of: date,
+) -> bool:
+    """Return whether an eligibility headline currently blocks daily trading."""
+    dates = extract_hkex_timetable_dates(title)
+    effective_date = dates["effective_date"]
+    resume_date = dates["expected_resume_date"]
+    if resume_date is not None:
+        if as_of >= resume_date:
+            return False
+        return effective_date is None or as_of >= effective_date
+    if category in {CIS_MATTERS_CATEGORY, WITHDRAWAL_OF_LISTING_CATEGORY}:
+        return effective_date is None or as_of >= effective_date
+    return False
+
+
+def build_hkex_trading_eligibility_snapshot(
+    records: Iterable[Any],
+    *,
+    as_of: date,
+    source_url: str = "https://www1.hkexnews.hk/search/titlesearch.xhtml",
+) -> HKEXProviderSnapshot:
+    """Keep current untradable arrangement/ETF windows without marking a halt."""
+    latest_by_id: Dict[str, Dict[str, Any]] = {}
+    seen = 0
+    for record in records or []:
+        event = classify_hkex_trading_eligibility_headline(record)
+        if event is None:
+            continue
+        seen += 1
+        published_at = str(getattr(record, "published_at", None) or "")
+        names = tuple(getattr(record, "security_names", ()) or ())
+        title = str(getattr(record, "title", "") or "")
+        for raw_symbol in getattr(record, "symbols", ()) or ():
+            instrument_id = hkex_instrument_id(raw_symbol)
+            if not instrument_id:
+                continue
+            current = latest_by_id.get(instrument_id)
+            if current is None or published_at > str(current.get("published_at") or ""):
+                latest_by_id[instrument_id] = {
+                    "instrument_id": instrument_id,
+                    "symbol": normalize_hkex_code(raw_symbol),
+                    "name": names[0] if names else title,
+                    "event": event,
+                    "published_at": published_at,
+                    "title": title,
+                    "announcement_id": str(
+                        getattr(record, "source_announcement_id", "") or ""
+                    ),
+                }
+
+    rows: List[Dict[str, Any]] = []
+    for item in latest_by_id.values():
+        if not is_hkex_untradable_window(
+            item["event"],
+            title=item["title"],
+            as_of=as_of,
+        ):
+            continue
+        dates = extract_hkex_timetable_dates(item["title"])
+        source = (
+            HKEX_PRODUCT_CESSATION_SOURCE
+            if item["event"] in {CIS_MATTERS_CATEGORY, WITHDRAWAL_OF_LISTING_CATEGORY}
+            else HKEX_TRADING_ARRANGEMENT_SOURCE
+        )
+        rows.append(
+            {
+                "instrument_id": item["instrument_id"],
+                "symbol": item["symbol"],
+                "name": item["name"],
+                "exchange": "HKEX",
+                "type": "stock",
+                "status": "active",
+                "is_active": True,
+                "trading_status": 0,
+                "source": source,
+                "source_symbol": item["symbol"],
+                "official_lifecycle_source": source,
+                "lifecycle_evidence": {
+                    "source": source,
+                    "headline_category": item["event"],
+                    "published_at": item["published_at"],
+                    "title": item["title"],
+                    "announcement_id": item["announcement_id"],
+                    "effective_date": (
+                        dates["effective_date"].isoformat()
+                        if dates["effective_date"]
+                        else None
+                    ),
+                    "expected_resume_date": (
+                        dates["expected_resume_date"].isoformat()
+                        if dates["expected_resume_date"]
+                        else None
+                    ),
+                    "source_url": source_url,
+                },
+            }
+        )
+    rows.sort(key=lambda row: str(row.get("instrument_id") or ""))
+    raw_snapshot = json.dumps(
+        [
+            {
+                "instrument_id": row["instrument_id"],
+                "source": row.get("source"),
+                "announcement_id": (row.get("lifecycle_evidence") or {}).get(
+                    "announcement_id"
+                ),
+            }
+            for row in rows
+        ],
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    return HKEXProviderSnapshot(
+        source=HKEX_TRADING_ELIGIBILITY_SOURCE,
+        source_url=source_url,
+        parser_version=HKEX_MASTER_PARSER_VERSION,
+        raw_snapshot_hash=_snapshot_hash(raw_snapshot),
+        rows=rows,
+        diagnostics={
+            "row_count": len(rows),
+            "classified_count": seen,
+            "latest_event_count": len(latest_by_id),
+            "as_of": as_of.isoformat(),
+        },
+    )
+
+
+def _hkex_text_has_tokens(record: Any, tokens: Tuple[str, ...]) -> bool:
+    payload = getattr(record, "raw_payload", None) or {}
+    if not isinstance(payload, dict):
+        payload = {}
+    blob = " ".join(
+        [
+            str(getattr(record, "title", "") or ""),
+            str(payload.get("SHORT_TEXT") or ""),
+            str(payload.get("LONG_TEXT") or ""),
+        ]
+    ).upper()
+    return any(token in blob for token in tokens)
+
+
+def _iter_hkex_title_dates(text: str) -> Iterable[Tuple[date, int, int]]:
+    for match in _HKEX_NAMED_DATE_RE.finditer(text or ""):
+        day = int(match.group(1))
+        month = _HKEX_MONTH_MAP.get(match.group(2).rstrip(".").lower())
+        year = int(match.group(3))
+        parsed = _safe_hkex_date(year, month, day)
+        if parsed is not None:
+            yield parsed, match.start(), match.end()
+    for match in _HKEX_NUMERIC_DATE_RE.finditer(text or ""):
+        day = int(match.group(1))
+        month = int(match.group(2))
+        year = int(match.group(3))
+        parsed = _safe_hkex_date(year, month, day)
+        if parsed is not None:
+            yield parsed, match.start(), match.end()
+
+
+def _safe_hkex_date(year: int, month: Optional[int], day: int) -> Optional[date]:
+    if month is None:
+        return None
+    try:
+        return date(year, month, day)
+    except ValueError:
+        return None
 
 
 class HKEXSecuritiesListProvider:

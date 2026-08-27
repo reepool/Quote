@@ -629,3 +629,79 @@ def test_source_evidence_policy_accepts_trading_halt_snapshot():
 
     assert policy["suspension_source_available"] is True
     assert policy["suspension_write_allowed"] is True
+
+
+def test_eligibility_snapshot_marks_scheme_gap_but_not_completed_consolidation():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+    )
+
+    snapshot = build_hkex_trading_eligibility_snapshot(
+        [
+            _hkexnews_record(
+                announcement_id="1712-intro",
+                title="DEALINGS IN THE NEW SHARES ARE EXPECTED TO COMMENCE ON 2 SEPTEMBER 2026",
+                published_at="2026-08-13T04:00:00+00:00",
+                symbols=("01712",),
+                headline_category="listing_by_introduction",
+            ),
+            _hkexnews_record(
+                announcement_id="1777-reorg",
+                title="SHARE CONSOLIDATION BECAME EFFECTIVE ON 12 AUGUST 2026",
+                published_at="2026-08-12T04:00:00+00:00",
+                symbols=("01777",),
+                headline_category="capital_reorganisation",
+            ),
+            _hkexnews_record(
+                announcement_id="3038-cessation",
+                title="VOLUNTARY CESSATION OF TRADING AND TERMINATION OF THE SUB-FUND",
+                published_at="2026-07-28T04:00:00+00:00",
+                symbols=("03038",),
+                headline_category="cis_matters",
+            ),
+            _hkexnews_record(
+                announcement_id="3038-monthly",
+                title="MONTHLY RETURN OF THE ETF",
+                published_at="2026-08-10T04:00:00+00:00",
+                symbols=("03038",),
+                headline_category="cis_matters",
+            ),
+        ],
+        as_of=date(2026, 8, 27),
+    )
+
+    by_id = {row["instrument_id"]: row for row in snapshot.rows}
+    assert snapshot.source == "hkexnews_trading_eligibility"
+    assert by_id["01712.HK"]["status"] == "active"
+    assert by_id["01712.HK"]["trading_status"] == 0
+    assert by_id["01712.HK"]["source"] == "hkexnews_trading_arrangement"
+    assert by_id["01712.HK"]["lifecycle_evidence"]["expected_resume_date"] == "2026-09-02"
+    assert "01777.HK" not in by_id
+    assert by_id["03038.HK"]["source"] == "hkexnews_product_cessation"
+    assert by_id["03038.HK"]["trading_status"] == 0
+
+
+def test_eligibility_window_reopens_after_expected_resume_date():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+    )
+
+    records = [
+        _hkexnews_record(
+            announcement_id="1712-intro",
+            title="DEALINGS IN THE NEW SHARES ARE EXPECTED TO COMMENCE ON 2 SEPTEMBER 2026",
+            published_at="2026-08-13T04:00:00+00:00",
+            symbols=("01712",),
+            headline_category="listing_by_introduction",
+        )
+    ]
+
+    before = build_hkex_trading_eligibility_snapshot(records, as_of=date(2026, 9, 1))
+    after = build_hkex_trading_eligibility_snapshot(records, as_of=date(2026, 9, 2))
+
+    assert [row["instrument_id"] for row in before.rows] == ["01712.HK"]
+    assert after.rows == []

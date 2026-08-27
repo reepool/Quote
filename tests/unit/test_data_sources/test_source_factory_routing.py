@@ -418,3 +418,43 @@ class TestSourceFactoryRouting:
         cfg = self.factory._get_daily_route_config('SSE', 'stock')
 
         assert cfg['skip_backup_on_empty_short_range'] is False
+
+    @pytest.mark.asyncio
+    async def test_hkex_yfinance_zero_volume_is_not_coverage(self):
+        expected_date = datetime(2026, 8, 26).date()
+        self.factory.db_ops.get_trading_days = AsyncMock(return_value=[expected_date])
+        self.factory.routing['daily']['HKEX'] = {
+            'stock': ['akshare', 'yfinance'],
+        }
+        self.factory.routing['daily_behavior']['default']['stock'] = {
+            'skip_backup_on_empty_short_range': False,
+            'require_end_date_coverage': True,
+        }
+        akshare_hk = _build_source('akshare_hk_stock', ['HKEX'])
+        self.factory.sources['akshare_hk_stock'] = akshare_hk
+        self.factory.source_instances_by_region['hk_stock']['akshare'] = akshare_hk
+        self.factory._validate_daily_data = Mock(return_value=True)
+        akshare_hk.get_daily_data.return_value = []
+        self.yfinance.get_daily_data.return_value = [
+            {
+                'instrument_id': '01712.HK',
+                'time': datetime(2026, 8, 26),
+                'open': 1.0,
+                'high': 1.0,
+                'low': 1.0,
+                'close': 1.0,
+                'volume': None,
+            }
+        ]
+
+        result = await self.factory.get_daily_data(
+            'HKEX',
+            '01712.HK',
+            '01712',
+            datetime(2026, 8, 25),
+            datetime(2026, 8, 26),
+            instrument_type='stock',
+        )
+
+        assert result == []
+        self.yfinance.get_daily_data.assert_awaited_once()

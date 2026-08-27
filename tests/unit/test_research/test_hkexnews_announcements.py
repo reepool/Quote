@@ -76,6 +76,11 @@ def test_hkexnews_category_codes_map_headline_taxonomy():
     }
     assert hkexnews_category_options("trading_suspension")["t2code"] == "17850"
     assert hkexnews_category_options("trading_resumption")["t2code"] == "17650"
+    assert hkexnews_category_options("trading_arrangement")["t2code"] == "18540"
+    assert hkexnews_category_options("capital_reorganisation")["t2code"] == "18120"
+    assert hkexnews_category_options("listing_by_introduction")["t2code"] == "15300"
+    assert hkexnews_category_options("withdrawal_of_listing")["t2code"] == "17600"
+    assert hkexnews_category_options("cis_matters")["t2code"] == "19400"
 
 
 def test_hkexnews_provider_parses_servlet_result_string_and_stamps_category():

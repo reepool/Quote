@@ -1260,6 +1260,54 @@ class DataSourceFactory:
         )
         return True
 
+    @staticmethod
+    def _is_yfinance_source(source_name: str) -> bool:
+        return "yfinance" in str(source_name or "").lower()
+
+    def _expected_quote_has_tradable_volume(
+        self,
+        data: List[Dict[str, Any]],
+        expected_date: date,
+    ) -> bool:
+        for quote in data or []:
+            if self._quote_date(quote.get("time")) != expected_date:
+                continue
+            volume = quote.get("volume")
+            try:
+                return volume is not None and float(volume) > 0
+            except (TypeError, ValueError):
+                return False
+        return False
+
+    async def _validate_yfinance_tradable_volume(
+        self,
+        data: List[Dict[str, Any]],
+        *,
+        exchange: str,
+        start_date: datetime,
+        end_date: datetime,
+        source_name: str,
+        symbol: str,
+    ) -> bool:
+        """Reject Yahoo carry-forward bars so they do not satisfy HKEX coverage."""
+        if not self._is_yfinance_source(source_name):
+            return True
+        if str(exchange or "").upper() != "HKEX":
+            return True
+        expected_date = await self._get_expected_daily_coverage_date(
+            exchange, start_date, end_date
+        )
+        if expected_date is None:
+            return True
+        if self._expected_quote_has_tradable_volume(data, expected_date):
+            return True
+        ds_logger.warning(
+            "[DataSourceFactory] Ignoring yfinance zero-volume carry-forward for %s on %s",
+            symbol,
+            expected_date,
+        )
+        return False
+
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
                            instrument_type: str = 'stock',
@@ -1325,6 +1373,14 @@ class DataSourceFactory:
                         source_name=primary_source.name,
                         symbol=symbol,
                     )
+                    and await self._validate_yfinance_tradable_volume(
+                        data,
+                        exchange=exchange,
+                        start_date=start_date,
+                        end_date=end_date,
+                        source_name=primary_source.name,
+                        symbol=symbol,
+                    )
                 ):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
@@ -1366,6 +1422,14 @@ class DataSourceFactory:
                             data,
                             exchange=exchange,
                             instrument_type=instrument_type,
+                            start_date=start_date,
+                            end_date=end_date,
+                            source_name=backup_source.name,
+                            symbol=symbol,
+                        )
+                        and await self._validate_yfinance_tradable_volume(
+                            data,
+                            exchange=exchange,
                             start_date=start_date,
                             end_date=end_date,
                             source_name=backup_source.name,

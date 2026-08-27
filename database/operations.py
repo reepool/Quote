@@ -1420,6 +1420,33 @@ class DatabaseOperations:
             self.db_logger.error("Failed to mark %s suspended: %s", instrument_id, exc)
             return False
 
+    async def mark_instrument_untradable(
+        self,
+        instrument_id: str,
+        *,
+        source: str,
+    ) -> bool:
+        """Keep a listed HKEX name active but skip daily capture until the window ends."""
+        if not instrument_id or not source:
+            return False
+        try:
+            async with self.get_async_session() as session:
+                result = await session.execute(
+                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
+                )
+                record = result.scalar_one_or_none()
+                if record is None:
+                    return False
+
+                record.trading_status = 0
+                record.source = source
+                record.updated_at = get_shanghai_time()
+                await session.commit()
+                return True
+        except Exception as exc:
+            self.db_logger.error("Failed to mark %s untradable: %s", instrument_id, exc)
+            return False
+
     async def mark_index_lifecycle_state(
         self,
         instrument_id: str,

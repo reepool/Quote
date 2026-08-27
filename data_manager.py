@@ -16994,10 +16994,14 @@ class DataManager:
         self,
         config: Dict[str, Any],
     ):
-        """Scan HKEXnews halt/suspension/resumption headlines through the shared announcement service."""
+        """Scan HKEXnews halt and eligibility headlines through the shared announcement service."""
         from research.announcements import AnnouncementQuery, AnnouncementScope
-        from research.announcements.categories import HKEX_TRADING_STATUS_CATEGORIES
+        from research.announcements.categories import (
+            HKEX_TRADING_ELIGIBILITY_CATEGORIES,
+            HKEX_TRADING_STATUS_CATEGORIES,
+        )
         from data_sources.hkex_instrument_master import (
+            build_hkex_trading_eligibility_snapshot,
             build_hkex_trading_status_snapshot,
         )
 
@@ -17014,7 +17018,8 @@ class DataManager:
             request_interval_seconds=0.15,
         )
         records_by_id: Dict[str, Any] = {}
-        for category in HKEX_TRADING_STATUS_CATEGORIES:
+        scan_categories = HKEX_TRADING_STATUS_CATEGORIES + HKEX_TRADING_ELIGIBILITY_CATEGORIES
+        for category in scan_categories:
             route_result = await asyncio.to_thread(
                 service.acquire,
                 AnnouncementQuery(
@@ -17036,7 +17041,11 @@ class DataManager:
             for record in getattr(scan_result, "records", ()) or ():
                 if getattr(record, "source_announcement_id", None):
                     records_by_id[record.source_announcement_id] = record
-        return build_hkex_trading_status_snapshot(records_by_id.values())
+        records = records_by_id.values()
+        return [
+            build_hkex_trading_eligibility_snapshot(records, as_of=end_dt),
+            build_hkex_trading_status_snapshot(records),
+        ]
 
     async def _fetch_hkex_instrument_master_sources(
         self,
@@ -17058,6 +17067,7 @@ class DataManager:
             'official_delisted_rows': [],
             'supplemental_rows': [],
             'suspension_rows': [],
+            'untradable_rows': [],
             'warnings': [],
             'errors': [],
         }
@@ -17180,11 +17190,22 @@ class DataManager:
 
         if config.get('trading_status_announcement_scan_enabled', True):
             try:
-                snapshot = await self._scan_hkex_trading_status_announcements(config)
-                if snapshot is not None:
+                from data_sources.hkex_instrument_master import HKEX_TRADING_HALT_SOURCE
+
+                snapshots = await self._scan_hkex_trading_status_announcements(config)
+                if snapshots is None:
+                    snapshots = []
+                elif not isinstance(snapshots, (list, tuple)):
+                    snapshots = [snapshots]
+                for snapshot in snapshots:
+                    if snapshot is None:
+                        continue
                     result['snapshots'].append(snapshot)
-                    result['suspension_rows'].extend(snapshot.rows)
                     result['official_active_rows'].extend(snapshot.rows)
+                    if getattr(snapshot, 'source', None) == HKEX_TRADING_HALT_SOURCE:
+                        result['suspension_rows'].extend(snapshot.rows)
+                    else:
+                        result['untradable_rows'].extend(snapshot.rows)
             except Exception as exc:
                 result['warnings'].append(
                     f"HKEXnews trading-status announcement scan failed: {exc}"
@@ -17330,7 +17351,7 @@ class DataManager:
                 'currency': row.get('currency') or meta.get('counter_currency') or 'HKD',
                 'status': 'active',
                 'is_active': True,
-                'trading_status': 1,
+                'trading_status': 0 if row.get('trading_status') in (0, '0', False) else 1,
                 'source': row.get('source') or 'hkex_securities_list',
                 'source_symbol': row.get('source_symbol') or row.get('symbol'),
             }
@@ -17557,6 +17578,19 @@ class DataManager:
                 )
                 if updated:
                     suspended_count += 1
+            if hasattr(self.db_ops, 'mark_instrument_untradable'):
+                for row in source_bundle.get('untradable_rows') or []:
+                    instrument_id = row.get('instrument_id')
+                    if instrument_id not in allowed_lifecycle_ids:
+                        continue
+                    if str(row.get('status') or '').lower() != 'active':
+                        continue
+                    if row.get('trading_status') not in (0, '0', False):
+                        continue
+                    await self.db_ops.mark_instrument_untradable(
+                        instrument_id,
+                        source=row.get('source') or 'hkexnews_trading_arrangement',
+                    )
 
         after = await self._get_instrument_master_snapshot('HKEX')
         exchange_result = {
