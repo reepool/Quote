@@ -8,11 +8,12 @@ metadata fill, but they must not activate or delist instruments on their own.
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import re
 import time
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime, timezone
 from io import BytesIO, StringIO
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
@@ -32,9 +33,37 @@ from research.announcements.categories import (
 from utils.http_transport import HttpTlsConfig, urlopen_bytes
 
 HKEX_TRADING_HALT_SOURCE = "hkexnews_trading_halt"
+HKEX_TRADING_RESUMPTION_SOURCE = "hkexnews_trading_resumption"
 HKEX_TRADING_ARRANGEMENT_SOURCE = "hkexnews_trading_arrangement"
 HKEX_PRODUCT_CESSATION_SOURCE = "hkexnews_product_cessation"
 HKEX_TRADING_ELIGIBILITY_SOURCE = "hkexnews_trading_eligibility"
+HKEX_LIFECYCLE_OVERLAY_FIELDS = (
+    "status",
+    "trading_status",
+    "source",
+    "official_lifecycle_source",
+    "lifecycle_evidence",
+    "lifecycle_evidence_at",
+)
+_HKEX_RESUMPTION_NEGATION_TOKENS = (
+    "CONTINUED SUSPENSION",
+    "CONTINUATION OF SUSPENSION",
+    "REMAIN SUSPENDED",
+    "REMAINS SUSPENDED",
+    "STILL SUSPENDED",
+)
+_HKEX_RESUMPTION_ACTION_TOKENS = (
+    "RESUMPTION OF TRADING",
+    "RESUME TRADING",
+    "TRADING WILL RESUME",
+    "TRADING RESUMED",
+    "FULFILMENT OF RESUMPTION GUIDANCE",
+    "FULFILLMENT OF RESUMPTION GUIDANCE",
+)
+_HKEX_REPORT_AS_OF_RE = re.compile(
+    r"(?:as at|Posted on)\s+(\d{1,2}\s+[A-Za-z]+\.?\s+\d{4})",
+    re.IGNORECASE,
+)
 HKEX_UNTRADABLE_SOURCES = frozenset(
     {
         HKEX_TRADING_ARRANGEMENT_SOURCE,
@@ -440,29 +469,38 @@ def build_hkex_trading_status_snapshot(
     *,
     source_url: str = "https://www1.hkexnews.hk/search/titlesearch.xhtml",
 ) -> HKEXProviderSnapshot:
-    """Keep the latest halt/suspension headline per instrument as official rows."""
+    """Keep the latest halt/suspension/resumption headline per instrument."""
     latest_by_id: Dict[str, Dict[str, Any]] = {}
     seen = 0
     for record in records or []:
         event = classify_hkex_trading_status_headline(record)
         if event is None:
             continue
+        title = str(getattr(record, "title", "") or "")
+        event = _hkex_effective_trading_status_event(event, title)
         seen += 1
         published_at = str(getattr(record, "published_at", None) or "")
+        published_dt = parse_hkex_lifecycle_evidence_at(published_at)
         names = tuple(getattr(record, "security_names", ()) or ())
         for raw_symbol in getattr(record, "symbols", ()) or ():
             instrument_id = hkex_instrument_id(raw_symbol)
             if not instrument_id:
                 continue
             current = latest_by_id.get(instrument_id)
-            if current is None or published_at > str(current.get("published_at") or ""):
+            current_dt = parse_hkex_lifecycle_evidence_at(
+                (current or {}).get("published_at")
+            )
+            if current is None or (
+                published_dt is not None
+                and (current_dt is None or published_dt > current_dt)
+            ):
                 latest_by_id[instrument_id] = {
                     "instrument_id": instrument_id,
                     "symbol": normalize_hkex_code(raw_symbol),
-                    "name": names[0] if names else str(getattr(record, "title", "") or ""),
+                    "name": names[0] if names else title,
                     "event": event,
                     "published_at": published_at,
-                    "title": str(getattr(record, "title", "") or ""),
+                    "title": title,
                     "announcement_id": str(
                         getattr(record, "source_announcement_id", "") or ""
                     ),
@@ -470,8 +508,12 @@ def build_hkex_trading_status_snapshot(
 
     rows: List[Dict[str, Any]] = []
     for item in latest_by_id.values():
-        if item["event"] == TRADING_RESUMPTION_CATEGORY:
-            continue
+        is_resumption = item["event"] == TRADING_RESUMPTION_CATEGORY
+        source = (
+            HKEX_TRADING_RESUMPTION_SOURCE
+            if is_resumption
+            else HKEX_TRADING_HALT_SOURCE
+        )
         rows.append(
             {
                 "instrument_id": item["instrument_id"],
@@ -479,14 +521,15 @@ def build_hkex_trading_status_snapshot(
                 "name": item["name"],
                 "exchange": "HKEX",
                 "type": "stock",
-                "status": "suspended",
+                "status": "active" if is_resumption else "suspended",
                 "is_active": True,
-                "trading_status": 0,
-                "source": HKEX_TRADING_HALT_SOURCE,
+                "trading_status": 1 if is_resumption else 0,
+                "source": source,
                 "source_symbol": item["symbol"],
-                "official_lifecycle_source": HKEX_TRADING_HALT_SOURCE,
+                "official_lifecycle_source": source,
+                "lifecycle_evidence_at": item["published_at"],
                 "lifecycle_evidence": {
-                    "source": HKEX_TRADING_HALT_SOURCE,
+                    "source": source,
                     "headline_category": item["event"],
                     "published_at": item["published_at"],
                     "title": item["title"],
@@ -868,6 +911,90 @@ def _safe_hkex_date(year: int, month: Optional[int], day: int) -> Optional[date]
         return None
 
 
+def parse_hkex_lifecycle_evidence_at(value: Any) -> Optional[datetime]:
+    """Parse announcement or monthly-report timestamps for lifecycle overlays."""
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, date):
+        return datetime(value.year, value.month, value.day, tzinfo=timezone.utc)
+    text = html.unescape(str(value).strip())
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+    except ValueError:
+        pass
+    for parsed_date, _start, _end in _iter_hkex_title_dates(text):
+        return datetime(
+            parsed_date.year,
+            parsed_date.month,
+            parsed_date.day,
+            tzinfo=timezone.utc,
+        )
+    return None
+
+
+def _hkex_incoming_lifecycle_wins(
+    existing_at: Optional[datetime],
+    incoming_at: Optional[datetime],
+) -> bool:
+    if incoming_at is None and existing_at is None:
+        return True
+    if incoming_at is None:
+        return False
+    if existing_at is None:
+        return True
+    return incoming_at >= existing_at
+
+
+def overlay_hkex_lifecycle_fields(
+    existing: Dict[str, Any],
+    incoming: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Merge two official rows, letting later dated halt/resume/PDF evidence win."""
+    combined = dict(existing or {})
+    incoming_wins = _hkex_incoming_lifecycle_wins(
+        parse_hkex_lifecycle_evidence_at((existing or {}).get("lifecycle_evidence_at")),
+        parse_hkex_lifecycle_evidence_at((incoming or {}).get("lifecycle_evidence_at")),
+    )
+    for key, value in (incoming or {}).items():
+        if value in (None, ""):
+            continue
+        if key in HKEX_LIFECYCLE_OVERLAY_FIELDS and not incoming_wins:
+            continue
+        combined[key] = value
+    return combined
+
+
+def _parse_hkex_suspension_report_as_of(raw_text: str) -> Optional[date]:
+    as_at = None
+    posted = None
+    for match in _HKEX_REPORT_AS_OF_RE.finditer(raw_text or ""):
+        parsed = next(_iter_hkex_title_dates(match.group(0)), None)
+        if parsed is None:
+            continue
+        token = match.group(0).lower()
+        if token.startswith("as at"):
+            as_at = parsed[0]
+        elif posted is None:
+            posted = parsed[0]
+    return as_at or posted
+
+
+def _hkex_effective_trading_status_event(event: str, title: Any) -> str:
+    if event != TRADING_RESUMPTION_CATEGORY:
+        return event
+    text = html.unescape(str(title or "")).upper()
+    has_negation = any(token in text for token in _HKEX_RESUMPTION_NEGATION_TOKENS)
+    has_action = any(token in text for token in _HKEX_RESUMPTION_ACTION_TOKENS)
+    if has_negation and not has_action:
+        return TRADING_SUSPENSION_CATEGORY
+    return event
+
+
 class HKEXSecuritiesListProvider:
     """Parser for official HKEX securities list snapshots."""
 
@@ -1232,6 +1359,8 @@ class HKEXSuspensionReportProvider:
         seen: Set[str] = set()
         skipped = 0
         current_block: List[str] = []
+        report_as_of = _parse_hkex_suspension_report_as_of(raw_text)
+        report_as_of_text = report_as_of.isoformat() if report_as_of else None
 
         def flush_block() -> None:
             nonlocal skipped
@@ -1245,6 +1374,14 @@ class HKEXSuspensionReportProvider:
                 skipped += 1
                 return
             seen.add(code)
+            evidence = {
+                "source": self.source,
+                "source_url": self.source_url,
+                "status": "suspended",
+                "market": self.market,
+            }
+            if report_as_of_text:
+                evidence["as_of"] = report_as_of_text
             rows.append({
                 "instrument_id": hkex_instrument_id(code),
                 "symbol": code,
@@ -1259,12 +1396,8 @@ class HKEXSuspensionReportProvider:
                 "market": self.market,
                 "official_lifecycle_source": self.source,
                 "source_url": self.source_url,
-                "lifecycle_evidence": {
-                    "source": self.source,
-                    "source_url": self.source_url,
-                    "status": "suspended",
-                    "market": self.market,
-                },
+                "lifecycle_evidence_at": report_as_of_text,
+                "lifecycle_evidence": evidence,
             })
 
         for line in (raw_text or "").splitlines():

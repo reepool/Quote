@@ -200,6 +200,43 @@ def test_hkex_active_merge_preserves_primary_product_classification():
     assert merged[0]['status'] == 'active'
 
 
+def test_hkex_active_merge_later_resumption_overrides_stale_suspension_report():
+    manager = _manager()
+
+    merged = manager._merge_hkex_official_active_rows([
+        {
+            'instrument_id': '01566.HK',
+            'symbol': '01566',
+            'name': 'CA CULTURAL',
+            'source': 'hkexnews_active_list',
+            'status': 'active',
+            'trading_status': 1,
+        },
+        {
+            'instrument_id': '01566.HK',
+            'symbol': '01566',
+            'name': 'CA Cultural Technology Group Limited',
+            'source': 'hkexnews_suspension_report',
+            'status': 'suspended',
+            'trading_status': 0,
+            'lifecycle_evidence_at': '2026-07-31',
+        },
+        {
+            'instrument_id': '01566.HK',
+            'symbol': '01566',
+            'name': 'CA CULTURAL',
+            'source': 'hkexnews_trading_resumption',
+            'status': 'active',
+            'trading_status': 1,
+            'lifecycle_evidence_at': '2026-08-17T00:46:00+00:00',
+        },
+    ])
+
+    assert merged[0]['status'] == 'active'
+    assert merged[0]['trading_status'] == 1
+    assert merged[0]['source'] == 'hkexnews_trading_resumption'
+
+
 @pytest.mark.asyncio
 async def test_hkex_manual_review_evidence_append_uses_configured_json_file(tmp_path):
     manager = _manager()
@@ -1033,6 +1070,87 @@ async def test_hkex_resumption_reactivates_local_suspended_when_halt_source_avai
     assert manager.db_ops.mark_instrument_active.await_args.args[0] == '00005.HK'
     manager.db_ops.mark_instrument_suspended.assert_not_awaited()
     assert result['exchanges']['HKEX']['source_evidence_policy']['suspension_source_available'] is True
+
+
+@pytest.mark.asyncio
+async def test_hkex_later_resumption_reactivates_pdf_suspended_name(tmp_path):
+    suspension_file = tmp_path / "hkex_suspension.txt"
+    suspension_file.write_text(
+        """
+        (Posted on 31 July 2026)
+        MONTHLY PROLONGED SUSPENSION STATUS REPORT (MAIN BOARD)
+        (as at 31 July 2026)
+        1  HSBC HOLDINGS
+        (5)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """,
+        encoding="utf-8",
+    )
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['hkexnews_suspension_main_board_file'] = str(suspension_file)
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    resume_snapshot = HKEXProviderSnapshot(
+        source='hkexnews_trading_halt',
+        source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+        parser_version='test',
+        raw_snapshot_hash='resume',
+        rows=[
+            {
+                'instrument_id': '00005.HK',
+                'symbol': '00005',
+                'name': 'HSBC HOLDINGS',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'hkexnews_trading_resumption',
+                'lifecycle_evidence_at': '2026-08-17T00:46:00+00:00',
+            }
+        ],
+        diagnostics={'row_count': 1},
+    )
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value=resume_snapshot
+    )
+    with patch(
+        'data_sources.hkex_instrument_master.HKEXSuspensionReportProvider.parse_pdf'
+    ) as parse_pdf:
+        from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+
+        parse_pdf.return_value = HKEXSuspensionReportProvider(
+            source_url=str(suspension_file),
+            market='Main Board',
+        ).parse_text(suspension_file.read_text(encoding='utf-8'))
+        result = await manager.sync_hkex_instrument_master()
+
+    manager.db_ops.mark_instrument_active.assert_awaited()
+    assert manager.db_ops.mark_instrument_active.await_args.args[0] == '00005.HK'
+    assert (
+        manager.db_ops.mark_instrument_active.await_args.kwargs['source']
+        == 'hkexnews_trading_resumption'
+    )
+    manager.db_ops.mark_instrument_suspended.assert_not_awaited()
+    assert result['exchanges']['HKEX']['source_evidence_policy'][
+        'prolonged_suspension_source_available'
+    ] is True
 
 
 @pytest.mark.asyncio

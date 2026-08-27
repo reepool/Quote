@@ -17203,7 +17203,11 @@ class DataManager:
                     result['snapshots'].append(snapshot)
                     result['official_active_rows'].extend(snapshot.rows)
                     if getattr(snapshot, 'source', None) == HKEX_TRADING_HALT_SOURCE:
-                        result['suspension_rows'].extend(snapshot.rows)
+                        result['suspension_rows'].extend(
+                            row
+                            for row in snapshot.rows
+                            if str(row.get('status') or '').lower() == 'suspended'
+                        )
                     else:
                         result['untradable_rows'].extend(snapshot.rows)
             except Exception as exc:
@@ -17250,6 +17254,8 @@ class DataManager:
         return result
 
     def _merge_hkex_official_active_rows(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        from data_sources.hkex_instrument_master import overlay_hkex_lifecycle_fields
+
         preserve_from_primary = {
             'product_type',
             'research_scope',
@@ -17268,20 +17274,16 @@ class DataManager:
             if not instrument_id:
                 continue
             existing = merged.get(instrument_id, {})
-            combined = dict(existing)
             existing_source = existing.get('source')
             incoming_source = row.get('source')
-            for key, value in row.items():
-                if value in (None, ''):
-                    continue
+            combined = overlay_hkex_lifecycle_fields(existing, row)
+            for key in preserve_from_primary:
                 if (
-                    key in preserve_from_primary
-                    and existing_source == 'hkex_securities_list'
+                    existing_source == 'hkex_securities_list'
                     and incoming_source == 'hkexnews_active_list'
                     and existing.get(key) not in (None, '')
                 ):
-                    continue
-                combined[key] = value
+                    combined[key] = existing[key]
             merged[instrument_id] = combined
         return list(merged.values())
 

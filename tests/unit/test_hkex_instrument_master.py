@@ -560,8 +560,12 @@ def test_trading_status_classifier_uses_headline_category_not_title():
     assert classify_hkex_trading_status_headline(record) == "trading_resumption"
 
 
-def test_trading_status_snapshot_uses_datetime_not_string_order():
-    from data_sources.hkex_instrument_master import build_hkex_trading_status_snapshot
+def test_trading_status_snapshot_later_event_overrides_earlier_halt_or_resumption():
+    from data_sources.hkex_instrument_master import (
+        HKEX_TRADING_HALT_SOURCE,
+        HKEX_TRADING_RESUMPTION_SOURCE,
+        build_hkex_trading_status_snapshot,
+    )
 
     snapshot = build_hkex_trading_status_snapshot(
         [
@@ -589,15 +593,162 @@ def test_trading_status_snapshot_uses_datetime_not_string_order():
                 headline_category="trading_halt",
                 short_text="[Trading Halt]",
             ),
+            _hkexnews_record(
+                announcement_id="1566-continued",
+                title="CONTINUED SUSPENSION OF TRADING",
+                published_at="2026-08-11T14:53:00+00:00",
+                symbols=("01566",),
+                headline_category="trading_suspension",
+            ),
+            _hkexnews_record(
+                announcement_id="1566-resume",
+                title="EXCHANGE NOTICE - RESUMPTION OF TRADING",
+                published_at="2026-08-17T00:46:00+00:00",
+                symbols=("01566",),
+                headline_category="trading_resumption",
+                short_text="[Resumption]",
+            ),
         ]
     )
 
     by_id = {row["instrument_id"]: row for row in snapshot.rows}
-    assert snapshot.source == "hkexnews_trading_halt"
-    assert "01831.HK" in by_id
+    assert snapshot.source == HKEX_TRADING_HALT_SOURCE
     assert by_id["01831.HK"]["status"] == "suspended"
     assert by_id["01831.HK"]["trading_status"] == 0
-    assert "01632.HK" not in by_id
+    assert by_id["01831.HK"]["source"] == HKEX_TRADING_HALT_SOURCE
+    assert by_id["01632.HK"]["status"] == "active"
+    assert by_id["01632.HK"]["trading_status"] == 1
+    assert by_id["01632.HK"]["source"] == HKEX_TRADING_RESUMPTION_SOURCE
+    assert by_id["01566.HK"]["status"] == "active"
+    assert by_id["01566.HK"]["trading_status"] == 1
+    assert by_id["01566.HK"]["source"] == HKEX_TRADING_RESUMPTION_SOURCE
+    assert str(by_id["01566.HK"]["lifecycle_evidence_at"]).startswith("2026-08-17")
+
+
+def test_trading_status_snapshot_rejects_continued_suspension_stamped_as_resumption():
+    from data_sources.hkex_instrument_master import (
+        HKEX_TRADING_HALT_SOURCE,
+        build_hkex_trading_status_snapshot,
+    )
+
+    snapshot = build_hkex_trading_status_snapshot(
+        [
+            _hkexnews_record(
+                announcement_id="1566-continued",
+                title="JOINT ANNOUNCEMENT - CONTINUED SUSPENSION OF TRADING",
+                published_at="2026-06-30T12:32:00+00:00",
+                symbols=("01566",),
+                headline_category="trading_resumption",
+            )
+        ]
+    )
+
+    row = snapshot.rows[0]
+    assert row["instrument_id"] == "01566.HK"
+    assert row["status"] == "suspended"
+    assert row["source"] == HKEX_TRADING_HALT_SOURCE
+
+
+def test_trading_status_snapshot_later_halt_overrides_earlier_resumption():
+    from data_sources.hkex_instrument_master import (
+        HKEX_TRADING_HALT_SOURCE,
+        build_hkex_trading_status_snapshot,
+    )
+
+    snapshot = build_hkex_trading_status_snapshot(
+        [
+            _hkexnews_record(
+                announcement_id="5-resume",
+                title="RESUMPTION OF TRADING",
+                published_at="2026-08-10T01:00:00+00:00",
+                symbols=("00005",),
+                headline_category="trading_resumption",
+                short_text="[Resumption]",
+            ),
+            _hkexnews_record(
+                announcement_id="5-halt",
+                title="TRADING HALT",
+                published_at="2026-08-12T04:00:00+00:00",
+                symbols=("00005",),
+                headline_category="trading_halt",
+                short_text="[Trading Halt]",
+            ),
+        ]
+    )
+
+    row = snapshot.rows[0]
+    assert row["instrument_id"] == "00005.HK"
+    assert row["status"] == "suspended"
+    assert row["source"] == HKEX_TRADING_HALT_SOURCE
+
+
+def test_suspension_report_stamps_report_as_of_as_lifecycle_evidence():
+    snapshot = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+    ).parse_text(
+        """
+        (Posted on 31 July 2026)
+        MONTHLY PROLONGED SUSPENSION STATUS REPORT (MAIN BOARD)
+        (as at 31 July 2026)
+        6. CA Cultural Technology Group Limited (1566)
+        21-Nov-2024 20-May-2026 1. Publish all outstanding financial results
+        Link to HKEXnews
+        """
+    )
+
+    row = snapshot.rows[0]
+    assert row["instrument_id"] == "01566.HK"
+    assert str(row["lifecycle_evidence_at"]).startswith("2026-07-31")
+
+
+def test_later_resumption_overrides_earlier_prolonged_suspension_evidence():
+    from data_sources.hkex_instrument_master import overlay_hkex_lifecycle_fields
+
+    merged = overlay_hkex_lifecycle_fields(
+        {
+            "instrument_id": "01566.HK",
+            "status": "suspended",
+            "trading_status": 0,
+            "source": "hkexnews_suspension_report",
+            "lifecycle_evidence_at": "2026-07-31",
+        },
+        {
+            "instrument_id": "01566.HK",
+            "status": "active",
+            "trading_status": 1,
+            "source": "hkexnews_trading_resumption",
+            "lifecycle_evidence_at": "2026-08-17T00:46:00+00:00",
+        },
+    )
+
+    assert merged["status"] == "active"
+    assert merged["trading_status"] == 1
+    assert merged["source"] == "hkexnews_trading_resumption"
+
+
+def test_earlier_prolonged_suspension_does_not_override_later_resumption():
+    from data_sources.hkex_instrument_master import overlay_hkex_lifecycle_fields
+
+    merged = overlay_hkex_lifecycle_fields(
+        {
+            "instrument_id": "01566.HK",
+            "status": "active",
+            "trading_status": 1,
+            "source": "hkexnews_trading_resumption",
+            "lifecycle_evidence_at": "2026-08-17T00:46:00+00:00",
+        },
+        {
+            "instrument_id": "01566.HK",
+            "status": "suspended",
+            "trading_status": 0,
+            "source": "hkexnews_suspension_report",
+            "lifecycle_evidence_at": "2026-07-31",
+        },
+    )
+
+    assert merged["status"] == "active"
+    assert merged["source"] == "hkexnews_trading_resumption"
 
 
 def test_source_evidence_policy_accepts_trading_halt_snapshot():
