@@ -25,8 +25,7 @@ None.
 
 ### Modified Capabilities
 
-- `shared-pdf-processing`: Replace primary/alternate and inspector-profile semantics with an ordered PDFium-first native chain, page-level quality precedence, direct PDFium dependency, and the existing adapter's isolated OCR worker model.
-- `shared-pdf-processing`: Also require supervised isolation for PDFium extraction/rasterization and a bounded, configurable multi-process native worker pool with serial work inside each worker.
+- `shared-pdf-processing`: Replace primary/alternate and inspector-profile semantics with an ordered PDFium-first native chain, page-level quality precedence, direct PDFium dependency, supervised isolation for PDFium extraction/rasterization, and a bounded configurable multi-process native worker pool with serial work inside each worker.
 - `shared-pdf-page-recovery-contract`: Clarify `force_ocr`, renderer, GPU/CPU fallback, shared budgets, cache/provenance, and worker-safe capability probing.
 - `pdf-engine-evaluation`: Strengthen native promotion gold, identical-render comparisons, mixed-page negative OCR checks, and invalidate the old narrow canary as approval for the new profile.
 
