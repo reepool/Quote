@@ -32,7 +32,7 @@
 | `trading_calendar_update` | 交易日历 | 每月 1 日 `01:00` | 月初轻量更新，早于月度修复 |
 | `weekly_data_maintenance` | 周维护 | 周日 `02:00` | 预留 5 小时，避开周日白天修复 |
 | `database_backup` | 备份 | 周一 `01:15` | 独立于周末批处理窗口，按近期实际耗时预留至 `06:30` |
-| `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
+| `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，定期报告分类流 + 权益变动窄扫描，预留 2 小时，早于申万任务 |
 | `special_commodity_overseas_daily_price_sync` | 海外特殊商品日频价格 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
 | `special_commodity_industrial_indicator_sync` | 大宗商品非价格产业指标聚合 | 周一至周五 `16:30` | 单任务按 scope 独立调度 CBCFI 运价、CCTDA 环渤海港口库存和 NBS 原煤累计产量；三个 scope 均已完成生产与调度幂等验收 |
 | `special_commodity_domestic_spot_price_sync` | 国内特殊商品现货价格与基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯、苯乙烯、尿素、烧碱、纯碱、玻璃、沥青、液化石油气、天然橡胶、软木浆现货、NBS 动力煤旬价及 CCTDA 周频 BSPI，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
@@ -453,25 +453,26 @@ async def weekly_data_maintenance(self,
       "lookback_days": 7,
       "overlap_days": 2,
       "page_size": 30,
-      "max_pages_per_market": 20,
-      "max_candidates": 300,
+      "max_pages_per_market": 40,
+      "max_candidates": 0,
       "pending_recheck_days": 5,
       "budget_mode": "availability_first",
       "allow_paid_proxy": true,
       "dry_run": false,
-      "max_runtime_seconds": 3600
+      "max_runtime_seconds": 7200
     }
   }
 }
 ```
 
 #### 业务逻辑
-1. **公告扫描**：通用 CNInfo scanner 按市场/栏目和时间窗口分页扫描，不逐股票查询公告。
+1. **公告扫描**：与财务日更一样走 CNInfo 定期报告分类流，另加权益变动/收购/持股变动等窄关键字流；开启自适应翻页，扫完当前窗口而不是在全量公告流上卡 20 页。`max_candidates=0` 表示当日选中的标的全部处理完。
 2. **候选筛选**：股东域过滤季度/年度/半年度报告、权益变动、控股股东/实控人变更等公告，并合并本地缺失 required scope 与 pending recheck 标的。
 3. **变更判断**：对候选标的读取股东结构化数据，计算 `holder_count / top10_holders / ownership_clues` 规范化 hash。
 4. **有变才写**：hash 未变化时不重写快照；公告早于结构化数据更新时进入 5 个自然日 pending recheck，用于吸收 CNInfo 公告元数据与 data20 结构化股东数据之间的更新滞后。
 5. **pending 硬上限**：同一批公告第一次进入 pending 时记录 `first_pending_at`，截止时间固定为 `first_pending_at + pending_recheck_days`；同一公告不会因每日扫描而滚动延长。完成更新会转为 `changed` 并清空 pending，超过截止时间会转为普通 unchanged，不再从 pending 队列重试；新的公告 ID 会开启新的 pending 周期。
 6. **健康复核**：运行后可通过 `/api/v1/research/shareholders/readiness` 或 `scripts/research_shareholder_rollout_validation.py --skip-sync` 复核 required scope 覆盖。
+7. **漏扫补数**：分类流改动后 scope_key 是新的，下一次增量会按 `lookback_days` 完整重扫。若要补本轮半年报季被 20 页全量流丢掉的标的，手工 `/run shareholder_incremental_sync` 并传入 `lookback_days=14`、`max_candidates=0`；周六 `shareholder_reconciliation_sync` 仍是全市场 changed-only 兜底。
 
 ### 6.6 研究域财务报表日更与对账
 

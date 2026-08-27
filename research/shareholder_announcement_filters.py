@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional
 
 from research.announcements import AnnouncementRecord
+from research.announcements.categories import PERIODIC_REPORT_CATEGORY
 
 
 PERIODIC_REPORT_KEYWORDS = (
@@ -16,6 +17,13 @@ PERIODIC_REPORT_KEYWORDS = (
     "季度报告",
     "第一季度报告",
     "第三季度报告",
+)
+
+OWNERSHIP_EVENT_SEARCH_KEYS = (
+    "权益变动",
+    "收购报告书",
+    "要约收购",
+    "股东持股变动",
 )
 
 OWNERSHIP_EVENT_KEYWORDS = (
@@ -58,6 +66,26 @@ def shareholder_announcement_filter(
     if any(keyword in title for keyword in OWNERSHIP_EVENT_KEYWORDS):
         reasons.append("ownership_event")
     return reasons
+
+
+def shareholder_announcement_stream_specs() -> List[Dict[str, Any]]:
+    """Return independent CNInfo streams for shareholder incremental discovery."""
+    streams = [
+        {
+            "kind": "periodic_report",
+            "category": PERIODIC_REPORT_CATEGORY,
+            "keyword": None,
+        }
+    ]
+    for keyword in OWNERSHIP_EVENT_SEARCH_KEYS:
+        streams.append(
+            {
+                "kind": "ownership_event",
+                "category": None,
+                "keyword": keyword,
+            }
+        )
+    return streams
 
 
 def build_shareholder_symbol_index(

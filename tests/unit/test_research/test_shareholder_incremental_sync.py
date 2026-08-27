@@ -239,11 +239,106 @@ async def test_shareholder_incremental_sync_uses_common_announcement_service(tmp
     assert result["snapshots_written"] == 1
     assert announcement_service.queries[0].purpose_key == service.purpose_key
     with sqlite3.connect(config.storage.db_path) as conn:
-        assert conn.execute("SELECT COUNT(*) FROM announcement_scan_state").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM announcement_scan_state").fetchone()[0] == 5
         audit = conn.execute(
             "SELECT source_announcement_id FROM announcement_audit"
         ).fetchone()
     assert audit == ("ann-common-1",)
+
+
+def test_shareholder_scan_uses_periodic_report_and_ownership_streams(tmp_path):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    announcement_service = _FakeAnnouncementService([])
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": _ShareholderProvider()}),
+        announcement_service=announcement_service,
+    )
+
+    result = service._scan_announcements(
+        exchanges=["SSE"],
+        lookback_days=7,
+        overlap_days=2,
+        page_size=30,
+        max_pages_per_market=40,
+        all_instruments=[],
+        run_id=None,
+        dry_run=True,
+    )
+
+    assert [
+        (query.scope.category, query.scope.keyword)
+        for query in announcement_service.queries
+    ] == [
+        ("periodic_report", None),
+        (None, "权益变动"),
+        (None, "收购报告书"),
+        (None, "要约收购"),
+        (None, "股东持股变动"),
+    ]
+    assert all(
+        query.scope.source_options.get("adaptive_pagination") is True
+        for query in announcement_service.queries
+    )
+    assert result["errors"] == []
+    assert result["selected_announcements"] == 0
+
+
+@pytest.mark.asyncio
+async def test_shareholder_incremental_default_keeps_all_announcement_candidates(tmp_path):
+    config = _build_config(tmp_path)
+    config.modules["shareholders"]["incremental_sync"].pop("max_candidates", None)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instruments = [
+        {
+            "instrument_id": f"60000{index}.SH",
+            "symbol": f"60000{index}",
+            "name": f"测试{index}",
+            "exchange": "SSE",
+            "type": "stock",
+            "is_active": True,
+        }
+        for index in range(3)
+    ]
+    announcement_service = _FakeAnnouncementService(
+        [
+            AnnouncementRecord(
+                source="cninfo",
+                source_announcement_id=f"ann-{instrument['symbol']}",
+                announcement_key=build_announcement_key(
+                    "cninfo", f"ann-{instrument['symbol']}"
+                ),
+                title=f"{instrument['name']}2026年半年度报告",
+                published_at="2026-08-26T16:00:00+08:00",
+                published_at_raw="2026-08-26",
+                exchange="SSE",
+                market="SSE",
+                symbols=(instrument["symbol"],),
+                raw_payload={"announcementId": f"ann-{instrument['symbol']}"},
+            )
+            for instrument in instruments
+        ]
+    )
+    provider = _ShareholderProvider(holder_count=100)
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps(instruments),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": provider}),
+        announcement_service=announcement_service,
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0, dry_run=True)
+
+    assert result["candidate_instruments"] == 3
+    assert result["selected_announcements"] == 3
 
 
 def test_shareholder_hash_is_stable_for_reordered_top_holders():

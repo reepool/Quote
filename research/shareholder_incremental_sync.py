@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Set
 from research.announcements import (
     AnnouncementAcquisitionService,
     AnnouncementQuery,
+    AnnouncementRecord,
     AnnouncementScope,
     ProviderCursor,
     load_announcement_acquisition_config,
@@ -26,6 +27,7 @@ from research.shareholder_announcement_filters import (
     build_shareholder_announcement_candidates,
     build_shareholder_symbol_index,
     shareholder_announcement_filter,
+    shareholder_announcement_stream_specs,
 )
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
 from research.source_policy import ResearchSourcePolicyResolver
@@ -106,12 +108,12 @@ class ShareholderIncrementalSyncService:
             incremental_cfg.get("page_size", 30) if page_size is None else page_size
         )
         max_pages = int(
-            incremental_cfg.get("max_pages_per_market", 20)
+            incremental_cfg.get("max_pages_per_market", 40)
             if max_pages_per_market is None
             else max_pages_per_market
         )
         candidate_limit = int(
-            incremental_cfg.get("max_candidates", 300)
+            incremental_cfg.get("max_candidates", 0)
             if max_candidates is None
             else max_candidates
         )
@@ -318,80 +320,99 @@ class ShareholderIncrementalSyncService:
         end_date = now.date().isoformat()
         start_date = (now - timedelta(days=lookback_days)).date().isoformat()
         symbol_index = build_shareholder_symbol_index(all_instruments)
-        all_selected = []
+        selected_by_key: Dict[str, AnnouncementRecord] = {}
         pages_scanned = 0
         announcements_scanned = 0
-        selected_announcements = 0
         errors: List[str] = []
         if self.announcement_service is None:
             raise RuntimeError("announcement acquisition service is not configured")
 
         for exchange in exchanges:
-            scope = AnnouncementScope(
-                exchange=exchange,
-                market=exchange,
-                start_date=(
-                    now - timedelta(days=max(lookback_days, overlap_days))
-                ).date().isoformat(),
-                end_date=end_date,
-                page_size=page_size,
-                max_pages=max_pages_per_market,
-                overlap_days=overlap_days,
-            )
-            state = self.storage.get_announcement_scan_state(
-                purpose_key=self.purpose_key,
-                source="cninfo",
-                scope_key=scope.scope_key,
-            )
-            if state and state.get("committed_cursor"):
-                cursor = state["committed_cursor"]
+            normalized_exchange = str(exchange).strip().upper()
+            for stream in shareholder_announcement_stream_specs():
                 scope = AnnouncementScope(
-                    **{
-                        **scope.__dict__,
-                        "cursor": ProviderCursor(
-                            kind=str(cursor["kind"]),
-                            value=str(cursor["value"]),
-                        ),
-                    }
+                    exchange=normalized_exchange,
+                    market=normalized_exchange,
+                    keyword=stream["keyword"],
+                    category=stream["category"],
+                    start_date=(
+                        now - timedelta(days=max(lookback_days, overlap_days))
+                    ).date().isoformat(),
+                    end_date=end_date,
+                    page_size=page_size,
+                    max_pages=max_pages_per_market,
+                    overlap_days=overlap_days,
+                    source_options={"adaptive_pagination": True},
                 )
-            route_result = self.announcement_service.acquire(
-                AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
-                selectors=[shareholder_announcement_filter],
-            )
-            result = route_result.scan_result
-            if result is None:
-                errors.append(f"{exchange}:announcement_route_returned_no_result")
-                continue
-            pages_scanned += result.pages_scanned
-            announcements_scanned += result.announcements_seen
-            selected_announcements += len(result.selected_records)
-            all_selected.extend(result.selected_records)
-            errors.extend(result.errors)
-            if not dry_run:
-                self.storage.upsert_announcement_scan_state(
-                    scan_result=result,
-                    selected_announcements=len(result.selected_records),
-                    attempts=[asdict(item) for item in route_result.attempts],
-                    metadata={
-                        "start_date": start_date,
-                        "end_date": end_date,
-                        "overlap_days": overlap_days,
-                    },
+                state = self.storage.get_announcement_scan_state(
+                    purpose_key=self.purpose_key,
+                    source="cninfo",
+                    scope_key=scope.scope_key,
                 )
-                for record in result.selected_records:
-                    for symbol in record.symbols or ("",):
-                        instrument = symbol_index.get(symbol)
-                        self.storage.store_announcement_audit(
-                            purpose_key=self.purpose_key,
-                            record=record,
-                            instrument_id=(
-                                None
-                                if instrument is None
-                                else str(instrument.get("instrument_id") or "")
+                if state and state.get("committed_cursor"):
+                    cursor = state["committed_cursor"]
+                    scope = AnnouncementScope(
+                        **{
+                            **scope.__dict__,
+                            "cursor": ProviderCursor(
+                                kind=str(cursor["kind"]),
+                                value=str(cursor["value"]),
                             ),
-                            symbol=symbol or None,
-                            ingestion_run_id=run_id,
-                        )
+                        }
+                    )
+                route_result = self.announcement_service.acquire(
+                    AnnouncementQuery(purpose_key=self.purpose_key, scope=scope),
+                    selectors=[shareholder_announcement_filter],
+                )
+                result = route_result.scan_result
+                stream_label = (
+                    f"category={scope.category}"
+                    if scope.category
+                    else f"keyword={scope.keyword or 'none'}"
+                )
+                if result is None:
+                    errors.append(
+                        f"{normalized_exchange}:{stream_label}:"
+                        "announcement_route_returned_no_result"
+                    )
+                    continue
+                pages_scanned += result.pages_scanned
+                announcements_scanned += result.announcements_seen
+                for record in result.selected_records:
+                    selected_by_key.setdefault(record.announcement_key, record)
+                errors.extend(result.errors)
+                if not result.is_complete:
+                    errors.append(
+                        f"{normalized_exchange}:{stream_label}:{result.source}:"
+                        f"{result.status}:{result.stop_reason or 'incomplete'}"
+                    )
+                if not dry_run:
+                    self.storage.upsert_announcement_scan_state(
+                        scan_result=result,
+                        selected_announcements=len(result.selected_records),
+                        attempts=[asdict(item) for item in route_result.attempts],
+                        metadata={
+                            "stream_kind": stream["kind"],
+                            "start_date": start_date,
+                            "end_date": end_date,
+                            "overlap_days": overlap_days,
+                        },
+                    )
+                    for record in result.selected_records:
+                        for symbol in record.symbols or ("",):
+                            instrument = symbol_index.get(symbol)
+                            self.storage.store_announcement_audit(
+                                purpose_key=self.purpose_key,
+                                record=record,
+                                instrument_id=(
+                                    None
+                                    if instrument is None
+                                    else str(instrument.get("instrument_id") or "")
+                                ),
+                                symbol=symbol or None,
+                                ingestion_run_id=run_id,
+                            )
+        all_selected = list(selected_by_key.values())
         candidates = build_shareholder_announcement_candidates(
             all_selected,
             symbol_index,
@@ -400,7 +421,7 @@ class ShareholderIncrementalSyncService:
             "candidates": candidates,
             "pages_scanned": pages_scanned,
             "announcements_scanned": announcements_scanned,
-            "selected_announcements": selected_announcements,
+            "selected_announcements": len(all_selected),
             "errors": errors,
         }
 

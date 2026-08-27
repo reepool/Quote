@@ -246,3 +246,16 @@ def test_shareholder_reconciliation_sync_uses_changed_only_policy(monkeypatch):
     assert "写入策略: `changed_only`" in report_data["content"]
     assert "本次无需改写快照: 1" in report_data["content"]
     assert "shareholder_reconciliation_sync" not in task._active_tasks
+
+
+def test_shareholder_incremental_scheduler_scan_is_unlimited():
+    from pathlib import Path
+    import json
+
+    jobs = json.loads(Path("config/05_scheduler.json").read_text(encoding="utf-8"))[
+        "scheduler_config"
+    ]["jobs"]
+    incremental = jobs["shareholder_incremental_sync"]["parameters"]
+    assert incremental["max_candidates"] == 0
+    assert incremental["max_pages_per_market"] >= 40
+    assert incremental["max_runtime_seconds"] >= 7200

@@ -2124,13 +2124,13 @@
           "lookback_days": 7,
           "overlap_days": 2,
           "page_size": 30,
-          "max_pages_per_market": 20,
-          "max_candidates": 300,
+          "max_pages_per_market": 40,
+          "max_candidates": 0,
           "pending_recheck_days": 5,
           "budget_mode": "availability_first",
           "allow_paid_proxy": true,
           "dry_run": false,
-          "max_runtime_seconds": 3600
+          "max_runtime_seconds": 7200
         }
       },
       "financial_l1_full_import": {
