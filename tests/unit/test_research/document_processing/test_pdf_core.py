@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import json
+import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -20,9 +22,12 @@ from research.document_processing.pdf import (
     detect_text_quality,
     profile_from_mapping,
     resolve_profile,
+    benchmark_native_parallelism,
 )
-from research.document_processing.pdf.adapters import PaddleOcrAdapter
+from research.document_processing.pdf.adapters import IsolatedNativeAdapter, PaddleOcrAdapter
 from research.document_processing.pdf.core import NativePage, NativeResult, OcrPage
+from research.document_processing.pdf.native_worker import NativeWorkerPool
+from research.document_processing.pdf.evaluation import NATIVE_WORKER_WIDTHS
 from research.document_processing.pdf.profiles import GPU_CANARY_REQUIRED_CHECKS
 
 
@@ -36,6 +41,15 @@ def _sleeping_process_worker(worker_id, input_queue, output_queue, structure, mo
 
 def _picklable_page_renderer(*_):
     return "image"
+
+
+def _trap_native_worker(worker_id, input_queue, output_queue):
+    os.kill(os.getpid(), signal.SIGTRAP)
+
+
+def _hang_native_worker(worker_id, input_queue, output_queue):
+    input_queue.get()
+    time.sleep(10)
 
 
 def _blank_pdf(page_count: int = 1) -> bytes:
@@ -437,6 +451,49 @@ def test_external_worker_malformed_response_fails_closed(tmp_path) -> None:
         _blank_pdf(), [1], request=PdfParseRequest(content=_blank_pdf(), profile=profile)
     )
     assert result[1].diagnostics[0].code == "ocr_worker_malformed_response"
+
+
+def test_native_worker_pool_extracts_and_renders_in_isolated_process() -> None:
+    pool = NativeWorkerPool(max_workers=2, task_timeout_seconds=20.0)
+    try:
+        content = _blank_pdf(2)
+        adapter = IsolatedNativeAdapter("pypdfium2", pool=pool, timeout_seconds=20.0)
+        result = adapter.extract(content, target_pages=(2, 1))
+        assert result.page_count == 2
+        assert [page.page_number for page in result.pages] == [1, 2]
+        images = pool.render(content, (1,), dpi=100, timeout_seconds=20.0)
+        assert set(images) == {1}
+        assert images[1].startswith(b"\x89PNG")
+    finally:
+        pool.close()
+
+
+def test_native_worker_signal_is_typed_and_parent_survives() -> None:
+    pool = NativeWorkerPool(max_workers=1, task_timeout_seconds=5.0, max_restarts=1, worker_target=_trap_native_worker)
+    try:
+        result = pool.extract(_blank_pdf(), "pypdfium2", target_pages=(1,))
+        assert result.diagnostics[0].code == "native_worker_crashed"
+        assert result.diagnostics[0].details["worker_exitcode"] < 0
+    finally:
+        pool.close()
+
+
+def test_native_worker_timeout_is_typed_and_worker_is_reaped() -> None:
+    pool = NativeWorkerPool(max_workers=1, task_timeout_seconds=0.1, max_restarts=0, worker_target=_hang_native_worker)
+    try:
+        result = pool.extract(_blank_pdf(), "pypdfium2", target_pages=(1,), timeout_seconds=0.1)
+        assert result.diagnostics[0].code == "native_worker_timeout"
+    finally:
+        pool.close()
+
+
+def test_native_parallel_benchmark_width_matrix_includes_six_eight_ten(tmp_path) -> None:
+    pdf = tmp_path / "sample.pdf"
+    pdf.write_bytes(_blank_pdf())
+    case = type("Case", (), {"pdf_path": str(pdf), "target_pages": (1,), "page_count": 1})()
+    report = benchmark_native_parallelism([case], widths=(1, 2, 4, 6, 8, 10), rounds=1, timeout_seconds=20.0)
+    assert report["widths"] == [1, 2, 4, 6, 8, 10]
+    assert {item["width"] for item in report["reports"]} == set(NATIVE_WORKER_WIDTHS)
 
 
 class _StaticNative:

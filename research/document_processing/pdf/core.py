@@ -114,6 +114,11 @@ class PdfProfile:
         "ocr_model_unhealthy",
     )
     ocr_inference_config: Mapping[str, Any] = field(default_factory=dict)
+    native_max_concurrency: int = 1
+    native_queue_size: int = 32
+    native_queue_wait_seconds: float = 30.0
+    native_worker_restart_limit: int = 3
+    native_start_method: str = "spawn"
 
     def __post_init__(self) -> None:
         engines = tuple(str(engine).strip() for engine in self.native_engines if str(engine).strip())
@@ -123,6 +128,8 @@ class PdfProfile:
             raise ValueError("native_engines must not contain duplicates")
         if self.min_expected_script_characters < 1:
             raise ValueError("min_expected_script_characters must be positive")
+        if self.native_max_concurrency < 1 or self.native_queue_size < 1 or self.native_worker_restart_limit < 0:
+            raise ValueError("native worker limits must be positive")
         object.__setattr__(self, "native_engines", engines)
         object.__setattr__(self, "ocr_worker_command", tuple(self.ocr_worker_command))
         object.__setattr__(self, "ocr_fallback_worker_command", tuple(self.ocr_fallback_worker_command))
@@ -248,7 +255,7 @@ class PdfDocumentResult:
 class NativeAdapter(Protocol):
     name: str
 
-    def extract(self, content: bytes, *, target_pages: Sequence[int] = ()) -> "NativeResult": ...
+    def extract(self, content: bytes, *, target_pages: Sequence[int] = (), progress_callback: Optional[Callable[["NativePage"], None]] = None, page_count_callback: Optional[Callable[[int], None]] = None) -> "NativeResult": ...
 
 
 class OcrAdapter(Protocol):
@@ -359,7 +366,7 @@ class PypdfNativeAdapter:
     name = "pypdf"
     version = PDF_PARSER_VERSION
 
-    def extract(self, content: bytes, *, target_pages: Sequence[int] = ()) -> NativeResult:
+    def extract(self, content: bytes, *, target_pages: Sequence[int] = (), progress_callback: Optional[Callable[[NativePage], None]] = None, page_count_callback: Optional[Callable[[int], None]] = None) -> NativeResult:
         started = time.perf_counter()
         raw = bytes(content)
         if not raw.lstrip().startswith(b"%PDF-"):
@@ -375,6 +382,8 @@ class PypdfNativeAdapter:
                 if reader.is_encrypted and not reader.decrypt(""):
                     return NativeResult(0, (), (PdfDiagnostic("encrypted_password_required", "PDF requires a password", severity="error"),), self.version)
                 count = len(reader.pages)
+                if page_count_callback is not None:
+                    page_count_callback(count)
                 if count < 1:
                     return NativeResult(0, (), (PdfDiagnostic("empty_pdf", "PDF contains no pages", severity="error"),), self.version)
                 requested = set(int(p) for p in target_pages) if target_pages else set(range(1, count + 1))
@@ -394,9 +403,15 @@ class PypdfNativeAdapter:
                             height = float(reader.pages[number - 1].mediabox.height)
                         except (AttributeError, TypeError, ValueError):
                             width = height = None
-                        pages.append(NativePage(number, text, time.perf_counter() - page_started, width_points=width, height_points=height))
+                        item = NativePage(number, text, time.perf_counter() - page_started, width_points=width, height_points=height)
+                        pages.append(item)
+                        if progress_callback is not None:
+                            progress_callback(item)
                     except Exception as exc:
-                        pages.append(NativePage(number, "", time.perf_counter() - page_started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),)))
+                        item = NativePage(number, "", time.perf_counter() - page_started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),))
+                        pages.append(item)
+                        if progress_callback is not None:
+                            progress_callback(item)
                 return NativeResult(count, tuple(pages), tuple(document_diags), self.version)
         except Exception as exc:
             message = f"{type(exc).__name__}: {exc}"
@@ -418,7 +433,7 @@ class PdfiumNativeAdapter:
         except Exception:
             return "pypdfium2-unknown"
 
-    def extract(self, content: bytes, *, target_pages: Sequence[int] = ()) -> NativeResult:
+    def extract(self, content: bytes, *, target_pages: Sequence[int] = (), progress_callback: Optional[Callable[[NativePage], None]] = None, page_count_callback: Optional[Callable[[int], None]] = None) -> NativeResult:
         raw = bytes(content)
         if not raw.lstrip().startswith(b"%PDF-"):
             return NativeResult(0, (), (PdfDiagnostic("invalid_pdf_signature", "input does not start with %PDF-", severity="error"),), self.version)
@@ -430,6 +445,8 @@ class PdfiumNativeAdapter:
         try:
             document = pdfium.PdfDocument(raw)
             count = len(document)
+            if page_count_callback is not None:
+                page_count_callback(count)
             if count < 1:
                 return NativeResult(0, (), (PdfDiagnostic("empty_pdf", "PDF contains no pages", severity="error"),), self.version)
             requested = tuple(sorted(set(int(page) for page in target_pages))) if target_pages else tuple(range(1, count + 1))
@@ -446,9 +463,15 @@ class PdfiumNativeAdapter:
                     text_page = page.get_textpage()
                     text = text_page.get_text_range() or ""
                     width, height = page.get_size()
-                    pages.append(NativePage(number, text, time.perf_counter() - started, width_points=float(width), height_points=float(height)))
+                    item = NativePage(number, text, time.perf_counter() - started, width_points=float(width), height_points=float(height))
+                    pages.append(item)
+                    if progress_callback is not None:
+                        progress_callback(item)
                 except Exception as exc:
-                    pages.append(NativePage(number, "", time.perf_counter() - started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),)))
+                    item = NativePage(number, "", time.perf_counter() - started, (PdfDiagnostic("native_extraction_error", f"{type(exc).__name__}: {exc}", number, "error"),))
+                    pages.append(item)
+                    if progress_callback is not None:
+                        progress_callback(item)
                 finally:
                     if text_page is not None:
                         text_page.close()
@@ -621,8 +644,14 @@ class PdfRouter:
             document_diags.append(PdfDiagnostic("document_time_budget_exceeded", "PDF processing exceeded configured document budget", severity="error", details={"elapsed_seconds": elapsed, "max_document_seconds": limits.max_document_seconds}))
         ordered_pages = tuple(results[number] for number in sorted(results))
         returned_pages = tuple(page.page_number for page in ordered_pages)
-        failed_statuses = {"ocr_failure", "ocr_unavailable", "ocr_timeout", "ocr_empty", "ocr_low_quality", "ocr_low_confidence", "ocr_budget_exceeded"}
-        status = "partial" if (limit and len(pages) < native.page_count) or deferred_targets or elapsed > limits.max_document_seconds or any(page.quality_status in failed_statuses for page in ordered_pages) else "success"
+        failed_statuses = {
+            "ocr_failure", "ocr_unavailable", "ocr_timeout", "ocr_empty", "ocr_low_quality", "ocr_low_confidence", "ocr_budget_exceeded",
+            "native_worker_crashed", "native_worker_timeout", "native_worker_protocol_error", "native_extraction_failure",
+        }
+        native_failed = any(item.code in failed_statuses for item in native.diagnostics)
+        status = "partial" if (limit and len(pages) < native.page_count) or deferred_targets or elapsed > limits.max_document_seconds or native_failed or any(page.quality_status in failed_statuses for page in ordered_pages) else "success"
+        if not ordered_pages and native.page_count:
+            status = "failed"
         page_diagnostics = {page.page_number: page.diagnostics for page in ordered_pages}
         return PdfDocumentResult(PDF_PARSER_SCHEMA_VERSION, PDF_PARSER_VERSION, profile.name, request.content_hash, request.parameter_hash, native.page_count, ordered_pages, status, tuple(document_diags), elapsed, {"native": native.engine_version, **dict(profile.engine_versions)}, request.requested_pages, returned_pages, page_diagnostics)
 

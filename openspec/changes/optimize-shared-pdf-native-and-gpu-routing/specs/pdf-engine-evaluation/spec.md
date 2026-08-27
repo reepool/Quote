@@ -95,7 +95,7 @@ The evaluator SHALL select or recommend primary and fallback profiles only when 
 
 ### Requirement: Native worker crash and parallelism evaluation
 
-The evaluator MUST provide a read-only canary for the supervised native worker pool. It MUST vary the configured multi-process width (at least 1, 2, and 4 when host capacity allows) while keeping corpus bytes, requested pages, parser versions, deadlines, and quality gates fixed. It MUST include the known 603268.SH and 002496.SZ crash reports, run at least 20 rounds for the crash-isolation gate, and record parent-service liveness, worker exit signal/status, restart count, throughput, P50/P95/tail latency, memory, queue wait, and completed-page preservation.
+The evaluator MUST provide a read-only canary for the supervised native worker pool. It MUST compare configured multi-process widths `1`, `2`, `4`, `6`, `8`, and `10` when host capacity allows, while keeping corpus bytes, requested pages, parser versions, deadlines, and quality gates fixed. It MUST include the known 603268.SH and 002496.SZ crash reports, run at least 20 rounds for the crash-isolation gate, and record parent-service liveness, worker exit signal/status, restart count, throughput, P50/P95/tail latency, memory, queue wait, and completed-page preservation.
 
 #### Scenario: Known concurrent crash is isolated
 

@@ -1,10 +1,12 @@
 """Versioned, profile-driven PDF extraction shared by research consumers."""
 
 from .adapters import (
+    IsolatedNativeAdapter,
     PaddleOcrAdapter,
     PdfInspectorNativeAdapter,
     PdfInspectorOcrAdapter,
 )
+from .native_worker import NATIVE_WORKER_PROTOCOL, NativeWorkerPool, get_shared_native_worker_pool
 from .core import (
     DEFAULT_MODE_BUDGETS,
     PDF_PARSER_SCHEMA_VERSION,
@@ -30,6 +32,7 @@ from .evaluation import (
     PdfEvaluationCase,
     assess_gpu_canary,
     assess_report,
+    benchmark_native_parallelism,
     build_archive_manifest,
     evaluate_cases,
     load_manifest,
@@ -64,6 +67,10 @@ __all__ = [
     "compute_content_hash",
     "detect_text_quality",
     "PaddleOcrAdapter",
+    "IsolatedNativeAdapter",
+    "NativeWorkerPool",
+    "get_shared_native_worker_pool",
+    "NATIVE_WORKER_PROTOCOL",
     "PdfInspectorNativeAdapter",
     "PdfInspectorOcrAdapter",
     "DEFAULT_PROFILES",
@@ -80,6 +87,7 @@ __all__ = [
     "probe_ocr_components",
     "assess_report",
     "assess_gpu_canary",
+    "benchmark_native_parallelism",
     "write_report",
     "MANDATORY_600036_CASE",
 ]

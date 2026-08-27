@@ -45,15 +45,15 @@
 - [x] 6.3 Verify native 600036 and mixed negative-OCR behavior; OCR execution remains page/budget bounded with no implicit full-document path.
 - [x] 6.4 Enable GPU-first only after new approval and exercise rollback in a host with a healthy worker.
 - [x] 6.5 Update shared PDF documentation, profile references, acceptance references and inspector role runbook.
-- [ ] 6.6 Run final integrated regressions and archive after GPU milestones are delivered.
+- [x] 6.6 Run final integrated regressions and archive after GPU milestones are delivered.
 
 ## 7. Isolate Native PDFium and Preserve Safe Parallelism
 
-- [ ] 7.1 Add a versioned native-worker protocol for PDFium text extraction, PDFium rasterization, and pypdf fallback; accept only hash-bound read-only PDF input and serializable page results.
-- [ ] 7.2 Implement one supervised `spawn`-based native worker pool owned by the shared PDF module, with configurable pool width, queue bound, worker task/restart limit, per-page/document deadlines, signal/exit capture, and no nested PDFium threads.
-- [ ] 7.3 Route `PdfiumNativeAdapter`, `PypdfNativeAdapter`, and OCR batch rendering through the native worker boundary while preserving existing `PdfParseRequest`, page ordering, cache identity, provenance, and fallback semantics.
-- [ ] 7.4 Convert native worker crashes (`SIGTRAP`/`SIGSEGV`/`SIGABRT`), non-zero exits, timeouts, malformed responses, and missing pages into typed diagnostics; preserve completed pages and bound retries.
-- [ ] 7.5 Add focused unit/integration tests for worker protocol validation, signal/timeout containment, worker replacement, completed-page preservation, no nested pool creation, and OCR image handoff.
-- [ ] 7.6 Add a read-only multi-process benchmark varying native pool width (at least 1, 2, and 4 where capacity permits) over the frozen corpus and 603268.SH/002496.SZ; run at least 20 crash-isolation rounds and record throughput, P95/tail latency, memory, queue wait, crash/restart counts, parent liveness, and page preservation.
-- [ ] 7.7 Select and document the highest safe tested width; use a conservative fallback width when no parallel setting passes, and update deployment/runbook configuration without changing business callers.
-- [ ] 7.8 Re-run expanded native/OCR regressions and confirm the Quote service does not restart when a native worker crashes; then complete task 6.6 and archive only after all capability deltas are reconciled.
+- [x] 7.1 Add a versioned native-worker protocol for PDFium text extraction, PDFium rasterization, and pypdf fallback; accept only hash-bound read-only PDF input and serializable page results.
+- [x] 7.2 Implement one supervised `spawn`-based native worker pool owned by the shared PDF module, with configurable pool width, queue bound, worker task/restart limit, per-page/document deadlines, signal/exit capture, and no nested PDFium threads.
+- [x] 7.3 Route `PdfiumNativeAdapter`, `PypdfNativeAdapter`, and OCR batch rendering through the native worker boundary while preserving existing `PdfParseRequest`, page ordering, cache identity, provenance, and fallback semantics.
+- [x] 7.4 Convert native worker crashes (`SIGTRAP`/`SIGSEGV`/`SIGABRT`), non-zero exits, timeouts, malformed responses, and missing pages into typed diagnostics; preserve completed pages and bound retries.
+- [x] 7.5 Add focused unit/integration tests for worker protocol validation, signal/timeout containment, worker replacement, completed-page preservation, no nested pool creation, and OCR image handoff.
+- [x] 7.6 Add a read-only multi-process benchmark comparing native pool widths 1, 2, 4, 6, 8, and 10 where host capacity permits over the frozen corpus and 603268.SH/002496.SZ; run at least 20 crash-isolation rounds and record throughput, P95/tail latency, memory, queue wait, crash/restart counts, parent liveness, and page preservation.
+- [x] 7.7 Select and document the highest safe tested width; use a conservative fallback width when no parallel setting passes, and update deployment/runbook configuration without changing business callers.
+- [x] 7.8 Re-run expanded native/OCR regressions and confirm the Quote service does not restart when a native worker crashes; then complete task 6.6 and archive only after all capability deltas are reconciled.

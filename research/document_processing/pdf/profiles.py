@@ -138,22 +138,27 @@ def resolve_profile(name: str | None = None) -> PdfProfile:
 
 def build_router(profile: PdfProfile, *, allow_unapproved_gpu_canary: bool = False):
     """Resolve adapters from a profile without vendor branches in consumers."""
-    from .adapters import PaddleOcrAdapter
-    from .core import PdfRouter, PdfiumNativeAdapter, PypdfNativeAdapter
-
-    def native_adapter(name: str):
-        if name == "pypdf":
-            return PypdfNativeAdapter()
-        if name == "pypdfium2":
-            return PdfiumNativeAdapter()
-        raise ValueError(f"unsupported PDF native engine: {name}")
+    from .adapters import IsolatedNativeAdapter, PaddleOcrAdapter
+    from .core import PdfRouter
+    from .native_worker import get_shared_native_worker_pool
 
     if profile.ocr_device.startswith("gpu"):
         if allow_unapproved_gpu_canary:
             _require_isolated_gpu_runtime(profile)
         else:
             _require_gpu_canary_approval(profile)
-    native_chain = tuple(native_adapter(name) for name in profile.native_engines)
+    native_pool = get_shared_native_worker_pool(
+        max_workers=profile.native_max_concurrency,
+        queue_size=profile.native_queue_size,
+        queue_wait_seconds=profile.native_queue_wait_seconds,
+        task_timeout_seconds=profile.limits.max_document_seconds,
+        start_method=profile.native_start_method,
+        max_restarts=profile.native_worker_restart_limit,
+    )
+    native_chain = tuple(
+        IsolatedNativeAdapter(name, pool=native_pool, timeout_seconds=profile.limits.max_document_seconds)
+        for name in profile.native_engines
+    )
     ocr = (
         PaddleOcrAdapter(
             structure=profile.structure_pages,
@@ -161,6 +166,7 @@ def build_router(profile: PdfProfile, *, allow_unapproved_gpu_canary: bool = Fal
             device=profile.ocr_device,
             worker_command=profile.ocr_worker_command,
             fallback_worker_command=profile.ocr_fallback_worker_command,
+            native_pool=native_pool,
         )
         if profile.ocr_engine == "paddleocr"
         else None

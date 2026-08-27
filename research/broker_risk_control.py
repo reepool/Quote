@@ -1128,8 +1128,9 @@ class BrokerRiskControlPdfFactParser:
                 "unparseable_pages": [],
             }
         try:
-            from research.document_processing.pdf import PdfParseRequest, PdfRouter
-            result = PdfRouter().parse(PdfParseRequest(content=payload))
+            from research.document_processing.pdf import PdfParseRequest, build_router
+            request = PdfParseRequest(content=payload)
+            result = build_router(request.profile).parse(request)
         except Exception as exc:
             return "", {
                 "text_extraction": "failed",

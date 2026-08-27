@@ -148,6 +148,17 @@ The native promotion manifest is
 expanded native Chinese, numeric, heading, table/read-order, and mixed-page
 negative-OCR checks; pypdf remains the rollback baseline.
 
+The supervised native parallelism canary on 2026-08-27 compared 1, 2, 4, 6,
+8, and 10 workers over six hash-bound local reports (the four frozen cases plus
+603268.SH and 002496.SZ), pages 1, 2, 19, and 41, for 20 rounds per width
+(480 page requests total). Every width completed all requested pages with zero
+worker restarts, zero typed crash/timeout/protocol diagnostics, and a live
+parent process. Width 4 had the best measured document throughput; width 10
+was the highest crash-safe tested ceiling. Use 4 as the production starting
+width (`native_max_concurrency=4`) and treat 10 as an upper canary limit until
+larger page mixes are measured. The raw report is
+`pdf_native_parallel_benchmark_20260827.json`.
+
 The mandatory 600036.SH fixture is classified as
 `viewer_readable_native_mapping_corrupt`. Its non-empty but unrelated-script
 text must not be promoted as usable native evidence. The local corpus covers

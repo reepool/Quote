@@ -99,7 +99,7 @@ The shared module owns one bounded native worker pool per process/service, using
 
 OCR workers continue to receive rendered PNGs only. The native worker performs the authoritative PDFium rendering once per OCR batch; GPU and CPU OCR workers never open PDFs and never load PDFium. Thus both native extraction and OCR preparation are protected from a PDFium crash in the Quote parent, while OCR runtime isolation remains a separate boundary.
 
-The safe default pool width is conservative and must be promoted by canary. A read-only benchmark varies native worker width (at least 1, 2, and 4, subject to host capacity), measures throughput, P95/tail latency, memory, crash rate, queue wait, and completed-page preservation, and selects the highest width that has zero parent-process exits and no unexplained page loss over the required corpus. The benchmark must include the known 603268.SH and 002496.SZ reports and run at least 20 rounds for the crash-isolation gate.
+The safe default pool width is conservative and must be promoted by canary. A read-only benchmark compares native worker widths 1, 2, 4, 6, 8, and 10 (subject to host capacity), measures throughput, P95/tail latency, memory, crash rate, queue wait, and completed-page preservation, and selects the highest width that has zero parent-process exits and no unexplained page loss over the required corpus. The benchmark must include the known 603268.SH and 002496.SZ reports and run at least 20 rounds for the crash-isolation gate. Throughput-optimal width and highest crash-safe width are recorded separately.
 
 ## Risks / Trade-offs
 

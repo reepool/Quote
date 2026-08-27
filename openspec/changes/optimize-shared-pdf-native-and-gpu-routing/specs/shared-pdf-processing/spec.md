@@ -131,7 +131,7 @@ The shared module MUST execute production `pypdfium2` extraction, PDFium rasteri
 
 #### Scenario: Native parallelism is selected by canary
 
-- **WHEN** the evaluator tests native worker widths on the frozen corpus and known crash reports
+- **WHEN** the evaluator tests native worker widths `1`, `2`, `4`, `6`, `8`, and `10` on the frozen corpus and known crash reports (subject to host capacity)
 - **THEN** it MUST report throughput, P95/tail latency, memory, queue wait, worker crash rate, parent-process exits, and completed-page preservation for each width
 - **AND** production configuration MUST select only the highest tested width with zero parent-process exits and no unexplained page loss
 

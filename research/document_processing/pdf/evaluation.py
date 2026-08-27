@@ -8,6 +8,7 @@ import json
 import math
 import os
 import platform
+import resource
 import shutil
 import statistics
 import subprocess
@@ -23,6 +24,87 @@ from .core import (
     PdfResourceLimits,
     compute_content_hash,
 )
+
+NATIVE_WORKER_WIDTHS = (1, 2, 4, 6, 8, 10)
+
+
+def benchmark_native_parallelism(
+    cases: Sequence[PdfEvaluationCase],
+    *,
+    widths: Sequence[int] = NATIVE_WORKER_WIDTHS,
+    rounds: int = 20,
+    target_pages: Sequence[int] = (),
+    timeout_seconds: float = 900.0,
+) -> dict[str, Any]:
+    """Run a read-only native-worker width comparison over explicit cases."""
+    if not cases or not widths or rounds < 1:
+        raise ValueError("cases, widths, and rounds must be non-empty/positive")
+    from concurrent.futures import ThreadPoolExecutor
+    from .adapters import IsolatedNativeAdapter
+    from .native_worker import NativeWorkerPool
+
+    reports: list[dict[str, Any]] = []
+    for raw_width in widths:
+        width = int(raw_width)
+        if width < 1:
+            raise ValueError("native worker widths must be positive")
+        pool = NativeWorkerPool(max_workers=width, queue_size=max(32, width * 2), task_timeout_seconds=timeout_seconds)
+        adapter = IsolatedNativeAdapter("pypdfium2", pool=pool, timeout_seconds=timeout_seconds)
+        latencies: list[float] = []
+        page_counts: list[int] = []
+        diagnostics: list[str] = []
+        completed_pages = 0
+        expected_pages_total = 0
+        expected_pages_known = True
+        started = time.perf_counter()
+        try:
+            for _ in range(rounds):
+                def run_case(case: PdfEvaluationCase):
+                    content = Path(case.pdf_path).read_bytes()
+                    case_pages = tuple(target_pages) or case.target_pages
+                    call_started = time.perf_counter()
+                    result = adapter.extract(content, target_pages=case_pages)
+                    return result, time.perf_counter() - call_started
+
+                with ThreadPoolExecutor(max_workers=min(width, len(cases)), thread_name_prefix="pdf-native-benchmark") as executor:
+                    outputs = list(executor.map(run_case, cases))
+                for case, (result, elapsed) in zip(cases, outputs):
+                    latencies.append(elapsed)
+                    page_counts.append(len(result.pages))
+                    completed_pages += len(result.pages)
+                    requested = tuple(target_pages) or case.target_pages
+                    if requested:
+                        expected_pages_total += len(requested)
+                    elif case.page_count is not None:
+                        expected_pages_total += int(case.page_count)
+                    elif result.page_count:
+                        expected_pages_total += int(result.page_count)
+                    else:
+                        expected_pages_known = False
+                    diagnostics.extend(item.code for item in result.diagnostics)
+        finally:
+            pool.close()
+        reports.append({
+            "width": width,
+            "rounds": rounds,
+            "cases": len(cases),
+            "elapsed_seconds": time.perf_counter() - started,
+            "p50_seconds": statistics.median(latencies) if latencies else None,
+            "p95_seconds": _p95(latencies) if latencies else None,
+            "throughput_documents_per_second": len(latencies) / max(time.perf_counter() - started, 0.001),
+            "completed_pages": completed_pages,
+            "expected_pages": expected_pages_total,
+            "expected_pages_known": expected_pages_known,
+            "diagnostics": sorted(set(diagnostics)),
+            "worker_restarts": pool.restart_count,
+            "queue_wait_seconds": pool.queue_wait_total_seconds,
+            "rss_max_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024),
+            "parent_process_alive": True,
+        })
+    eligible = [item for item in reports if item["parent_process_alive"] and item["expected_pages_known"] and item["completed_pages"] >= item["expected_pages"] and not any(code in {"native_worker_crashed", "native_worker_timeout", "native_worker_protocol_error"} for code in item["diagnostics"])]
+    throughput_optimal = min(eligible, key=lambda item: item["elapsed_seconds"])["width"] if eligible else 1
+    highest_safe = max((item["width"] for item in eligible), default=1)
+    return {"schema_version": "pdf-native-parallel-benchmark.v1", "read_only": True, "widths": list(widths), "rounds": rounds, "reports": reports, "throughput_optimal_width": throughput_optimal, "highest_safe_width": highest_safe, "recommended_width": throughput_optimal}
 
 
 @dataclass(frozen=True)

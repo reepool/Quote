@@ -311,9 +311,10 @@ def refine_classification_from_pdf(
 
 def _pdf_first_page_is_annual_summary(pdf: bytes | Path) -> bool:
     try:
-        from research.document_processing.pdf import PdfParseRequest, PdfRouter
+        from research.document_processing.pdf import PdfParseRequest, build_router
         payload = pdf if isinstance(pdf, bytes) else Path(pdf).read_bytes()
-        result = PdfRouter().parse(PdfParseRequest(content=payload, target_pages=(1,)))
+        request = PdfParseRequest(content=payload, target_pages=(1,))
+        result = build_router(request.profile).parse(request)
         if not result.pages:
             return False
         text = re.sub(r"\s+", "", str(result.pages[0].text or ""))

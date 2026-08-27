@@ -24,8 +24,35 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .core import OcrPage, PdfDiagnostic, PdfParseRequest
+from .native_worker import NativeWorkerFailure, NativeWorkerPool
 
 logger = logging.getLogger(__name__)
+
+
+class IsolatedNativeAdapter:
+    """Route one native engine through the shared supervised worker pool."""
+
+    def __init__(
+        self,
+        engine: str,
+        *,
+        pool: NativeWorkerPool,
+        timeout_seconds: float = 900.0,
+    ) -> None:
+        if engine not in {"pypdfium2", "pypdf"}:
+            raise ValueError(f"unsupported isolated native engine: {engine}")
+        self.name = engine
+        self.pool = pool
+        self.timeout_seconds = float(timeout_seconds)
+        self.version = f"isolated-{engine}"
+
+    def extract(self, content: bytes, *, target_pages: Sequence[int] = (), **_: Any):
+        return self.pool.extract(
+            content,
+            self.name,
+            target_pages=target_pages,
+            timeout_seconds=self.timeout_seconds,
+        )
 
 
 class _OcrWorkerError(RuntimeError):
@@ -48,7 +75,7 @@ def _paddle_device() -> str:
 class PaddleOcrAdapter:
     """Page-addressable PaddleOCR adapter with bounded worker sessions.
 
-    Quote-side rendering uses PDFium. Production Paddle imports stay in an
+    Native worker rendering uses PDFium. Production Paddle imports stay in an
     explicitly configured external worker command; the in-process path is
     retained only for injected test sessions and local compatibility.
     """
@@ -57,7 +84,7 @@ class PaddleOcrAdapter:
     version = "paddleocr-adapter.v2"
     worker_protocol_version = "quote-pdf-ocr-worker.v1"
 
-    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None, device: str = "cpu", process_worker: Any = None, worker_command: Sequence[str] = (), fallback_worker_command: Sequence[str] = ()) -> None:
+    def __init__(self, *, page_renderer: Any = None, ocr_instance: Any = None, structure: bool = False, model_cache_dir: str | None = None, device: str = "cpu", process_worker: Any = None, worker_command: Sequence[str] = (), fallback_worker_command: Sequence[str] = (), native_pool: NativeWorkerPool | None = None) -> None:
         self.page_renderer = page_renderer or _render_pdfium_page
         self._default_renderer = page_renderer is None
         self._ocr = ocr_instance
@@ -67,6 +94,7 @@ class PaddleOcrAdapter:
         self.structure = structure
         self.worker_command = tuple(str(item) for item in worker_command)
         self.fallback_worker_command = tuple(str(item) for item in fallback_worker_command)
+        self.native_pool = native_pool
         self._warmup_seconds = 0.0
         self._session_lock = threading.Lock()
         self._session_local = threading.local()
@@ -170,7 +198,18 @@ class PaddleOcrAdapter:
         """Render once in Quote and send image-only work to an isolated runtime."""
         started = time.monotonic()
         try:
-            images = _render_pdfium_batch(content, pages, request.profile.limits.render_dpi)
+            if self.native_pool is not None:
+                images = self.native_pool.render(
+                    content,
+                    pages,
+                    dpi=request.profile.limits.render_dpi,
+                    timeout_seconds=request.profile.limits.max_document_seconds,
+                )
+            else:
+                images = _render_pdfium_batch(content, pages, request.profile.limits.render_dpi)
+        except NativeWorkerFailure as exc:
+            diagnostic = PdfDiagnostic(exc.code, str(exc), severity="error", details=exc.details)
+            return {int(page): OcrPage("", None, 0.0, (diagnostic,), {"runtime": request.profile.ocr_runtime, "renderer": "pypdfium2"}) for page in pages}
         except Exception as exc:
             diagnostic = PdfDiagnostic("ocr_render_failure", f"{type(exc).__name__}: {exc}", severity="error")
             return {int(page): OcrPage("", None, 0.0, (diagnostic,), {"runtime": request.profile.ocr_runtime}) for page in pages}
