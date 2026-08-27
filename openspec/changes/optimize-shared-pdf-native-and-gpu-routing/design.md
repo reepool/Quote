@@ -8,6 +8,8 @@ The 600036.SH 2025 annual report provides the concrete native failure. On 17 sam
 
 There are also two GPU evidence sets. The committed Quote canary reports PaddlePaddle GPU 3.3.1, PaddleOCR 3.7.0, Python 3.11.15, PDFium 5.13.0, CUDA 11.8, and GRID P4 passing four hash-bound one-page cases. The external lab used Paddle GPU 2.6.2, PaddleOCR 2.7.3, PP-OCRv4, and PyMuPDF rendering; it measured 15.18 seconds for 14 pages but required disabling an IR fusion path and reproduced a `libz`/`inflateReset2` crash when mixed into Quote conda. The committed canary proves the 3.3.1/3.7.0 runtime can execute on this P4, but its narrow gold does not approve the new PDFium-first routing architecture or establish the lab timing as a production SLA.
 
+On 2026-08-27, the production service was terminated by `SIGTRAP` from `libpdfium.so` while the business-profile parse stage ran four concurrent in-process PDFium calls. The same two reports completed in single-threaded trials and reproduced the trap with four threads, without OOM evidence. This is a native-runtime safety failure: lowering a thread count is only a mitigation, not process isolation, and systemd restart cannot preserve the interrupted batch.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -17,6 +19,8 @@ There are also two GPU evidence sets. The committed Quote canary reports PaddleP
 - Keep `pypdf` as a bounded native fallback while retiring inspector from the production native chain.
 - Use one authoritative 3.3.1/3.7.0 OCR runtime family in isolated, version-matched GPU and CPU workers.
 - Fix renderer, recovery-policy, cache, provenance, and fallback semantics before implementation.
+- Isolate every production PDFium operation (text extraction and rasterization) from the Quote parent process while retaining bounded multi-process parallelism.
+- Measure safe native worker parallelism on representative crash corpus and record the selected pool setting; do not infer it from the business-profile or LLM executor width.
 - Allow the native slice to merge and run independently before GPU production enablement.
 
 **Non-Goals:**
@@ -26,6 +30,7 @@ There are also two GPU evidence sets. The committed Quote canary reports PaddleP
 - Implementing company-profile TOC/section state machines or table reconstruction.
 - Supporting encrypted PDFs, AcroForm/XFA extraction, or establishing Hong Kong annual-report gold in this change; these remain declared corpus limitations, not inferred successes.
 - Building a remote OCR platform, a new PDF entry point, or a new cache/database service.
+- Treating a lower thread count, systemd restart, or an OCR-only child process as sufficient native crash isolation.
 
 ## Decisions
 
@@ -68,7 +73,7 @@ The existing `PaddleOcrAdapter` is extended to manage the worker protocol; no pa
 
 ### 6. Fix rendering to PDFium input parity
 
-The Quote-side adapter renders selected physical pages with `pypdfium2==5.13.0` at the profile's configured DPI, initially 150 DPI (`scale=dpi/72`). It opens the PDFium document once for the requested OCR batch and passes rendered image payloads/references to both GPU and CPU workers. Workers do not open PDF files and do not import or depend on PyMuPDF, even if PaddleOCR packaging declares it transitively.
+The isolated native worker renders selected physical pages with `pypdfium2==5.13.0` at the profile's configured DPI, initially 150 DPI (`scale=dpi/72`). It opens the PDFium document once for the requested OCR batch and passes rendered image payloads/references to both GPU and CPU workers. The Quote parent and OCR workers do not open PDF files or call PDFium for this operation, and workers do not import or depend on PyMuPDF, even if PaddleOCR packaging declares it transitively.
 
 DPI, renderer name/version, color/image configuration, and model configuration enter cache and canary identities. Because the lab used PyMuPDF at 2.0x, its 15.18-second result is comparative evidence only; production latency gates are established from PDFium-rendered expanded canaries.
 
@@ -83,6 +88,16 @@ The production OCR order is GPU then CPU. CPU fallback is allowed by configured 
 The existing `pypdf_paddleocr_gpu_canary` approval remains historical proof that 3.3.1/3.7.0 can execute on the P4. It cannot approve the PDFium-first profile because its corpus hash, profile, pages, native routing, renderer/config identity, and gold scope differ. The new GPU profile requires a new approval artifact over the expanded manifest, PDFium-rendered inputs, worker isolation, CPU fallback, cache separation, selective routing, and no-full-document-OCR checks.
 
 Native PDFium promotion has its own gate and can merge before GPU worker/canary completion. For 600036.SH, successful PDFium native extraction is expected to eliminate OCR on those pages; OCR recovery from the old page-2 canary cannot be counted as proof of the new native architecture.
+
+### 9. Isolate native PDF processing while preserving safe parallelism
+
+PDFium text extraction and PDFium rasterization are native operations and MUST execute in a supervised worker process outside the Quote parent. The worker protocol accepts content-hash-bound PDF bytes or a read-only asset reference, requested physical pages, profile/configuration identity, and explicit deadlines; it returns only validated serializable page results and diagnostics. A worker is never allowed to write business data.
+
+The shared module owns one bounded native worker pool per process/service, using `spawn` (or an equivalent clean-process start method). The pool may process multiple documents concurrently. Each worker handles one assigned document attempt at a time and uses PDFium and `pypdf` serially, with one PDF open per adapter attempt and no nested PDFium thread pool. Pool width, queue bound, worker task limit, per-page/document deadlines, and restart budget are configuration values. The parent detects non-zero exit, signal (including `SIGTRAP`), timeout, malformed output, and missing pages, converts them to typed diagnostics, reaps the worker, and retries only within a bounded policy.
+
+OCR workers continue to receive rendered PNGs only. The native worker performs the authoritative PDFium rendering once per OCR batch; GPU and CPU OCR workers never open PDFs and never load PDFium. Thus both native extraction and OCR preparation are protected from a PDFium crash in the Quote parent, while OCR runtime isolation remains a separate boundary.
+
+The safe default pool width is conservative and must be promoted by canary. A read-only benchmark varies native worker width (at least 1, 2, and 4, subject to host capacity), measures throughput, P95/tail latency, memory, crash rate, queue wait, and completed-page preservation, and selects the highest width that has zero parent-process exits and no unexplained page loss over the required corpus. The benchmark must include the known 603268.SH and 002496.SZ reports and run at least 20 rounds for the crash-isolation gate.
 
 ## Risks / Trade-offs
 
@@ -100,9 +115,11 @@ Native PDFium promotion has its own gate and can merge before GPU worker/canary 
 2. Add direct PDFium dependency/adapter, page-quality rules, ordered chain, cache/provenance changes, and focused tests. Run the native corpus and promote PDFium only if all gates pass.
 3. Canary and activate the PDFium-first native profile. Retain a `pypdf`-first rollback profile. This milestone is independently releasable.
 4. Inventory and remove inspector from production native profiles; retain documented non-native uses or schedule their separate retirement before uninstalling the package.
-5. Extend `PaddleOcrAdapter` for versioned isolated GPU/CPU workers and PDFium-rendered inputs using the authoritative 3.3.1/3.7.0 runtime family.
-6. Run the expanded GPU/CPU canary, issue a new approval for the new profile, then activate GPU-first OCR. Roll back to CPU-only or OCR-disabled configuration without changing callers.
-7. Remove superseded profile names and contradictory CUDA instructions after callers/configuration migrate; archive the change.
+5. Extend the shared PDF module with a supervised native worker protocol/pool. Route PDFium extraction and OCR rasterization through it; keep worker-internal parsing serial and parent-level concurrency bounded.
+6. Run the native crash-isolation canary and multi-process parameter benchmark, select a safe pool width, and verify that worker signals/timeouts become typed page/document diagnostics without Quote restarts.
+7. Extend `PaddleOcrAdapter` for versioned isolated GPU/CPU workers and native-worker-rendered inputs using the authoritative 3.3.1/3.7.0 runtime family.
+8. Run the expanded GPU/CPU canary, issue a new approval for the new profile, then activate GPU-first OCR. Roll back to CPU-only or OCR-disabled configuration without changing callers.
+9. Remove superseded profile names and contradictory CUDA/native-isolation instructions after callers/configuration migrate; archive the change.
 
 ## Open Questions
 

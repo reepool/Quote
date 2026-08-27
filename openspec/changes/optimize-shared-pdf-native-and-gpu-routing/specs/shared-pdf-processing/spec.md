@@ -47,7 +47,7 @@ Except for explicit `force_ocr`, the module SHALL prefer the first usable page c
 - **AND** the result SHALL retain every native attempt and diagnostic in provenance
 
 ### Requirement: Shared PDF processing is bounded and side-effect controlled
-The shared module SHALL enforce configured page, OCR concurrency, elapsed-time, queue wait, per-page/per-document OCR budget, memory/model-cache, and output-size limits; parsing SHALL not mutate announcement records, source PDFs, business facts, or queues. Each native adapter SHALL open a submitted PDF at most once per request/adapter attempt and extract all pages assigned to that adapter without reopening the document for each page.
+The shared module SHALL enforce configured page, OCR concurrency, elapsed-time, queue wait, per-page/per-document OCR budget, memory/model-cache, and output-size limits; parsing SHALL not mutate announcement records, source PDFs, business facts, or queues. Each native adapter SHALL open a submitted PDF at most once per request/adapter attempt and extract all pages assigned to that adapter without reopening the document for each page. PDFium text extraction and PDFium rasterization SHALL execute in a supervised native worker outside the Quote parent process.
 
 #### Scenario: Request exceeds a configured limit
 - **WHEN** a request exceeds page, concurrency, elapsed-time, or resource bounds
@@ -96,6 +96,44 @@ The module SHALL extend the existing `PaddleOcrAdapter` boundary to reuse bounde
 - **WHEN** the shared module checks GPU availability or model health
 - **THEN** it SHALL invoke the isolated worker's versioned capability probe
 - **AND** the Quote process SHALL NOT import a CUDA Paddle package for liveness detection
+
+### Requirement: Supervised native worker isolation and bounded parallelism
+
+The shared module MUST execute production `pypdfium2` extraction, PDFium rasterization, and native `pypdf` fallback inside a supervised worker pool outside the Quote parent process. The pool MUST support bounded multi-process parallelism across documents while each worker processes one document attempt serially and MUST NOT create nested PDFium threads. Pool width, queue size, worker task/restart limit, per-page deadline, per-document deadline, and start method MUST be explicit configuration. The parent MUST convert worker signal exits (including `SIGTRAP`), non-zero exits, timeouts, protocol errors, and missing page results into typed diagnostics and MUST preserve completed pages.
+
+#### Scenario: Native worker crashes without terminating Quote
+
+- **WHEN** a native worker is terminated by `SIGTRAP`, `SIGSEGV`, `SIGABRT`, another signal, or a non-zero exit while parsing a PDF
+- **THEN** the parent MUST reap and replace only that worker, return a `native_worker_crashed` (or equivalent) diagnostic containing the signal/exit status, and keep the Quote process alive
+- **AND** affected pages MUST follow the configured bounded native/OCR fallback policy without retrying indefinitely
+
+#### Scenario: Native worker timeout is hard-bounded
+
+- **WHEN** a native worker exceeds its per-page or per-document deadline
+- **THEN** the parent MUST terminate and reap the worker, return `native_worker_timeout` (or equivalent) for unfinished pages, and preserve pages completed before the timeout
+
+#### Scenario: Native pool processes documents in parallel
+
+- **WHEN** multiple independent PDF requests are submitted and the configured native pool width is greater than one
+- **THEN** separate workers MAY process those documents concurrently up to the configured width
+- **AND** no request may create a second native pool or exceed the shared queue/concurrency bound
+
+#### Scenario: Worker-internal PDFium access is serial
+
+- **WHEN** one native worker handles a document attempt
+- **THEN** it MUST use one PDFium document/adapter attempt and process its assigned pages serially, with no nested PDFium thread pool
+
+#### Scenario: OCR rendering is isolated with native parsing
+
+- **WHEN** a page is routed to OCR
+- **THEN** the native worker MUST perform the authoritative PDFium rasterization and send validated image bytes/references to the existing OCR worker
+- **AND** the Quote parent and OCR worker MUST NOT open the PDF for that operation
+
+#### Scenario: Native parallelism is selected by canary
+
+- **WHEN** the evaluator tests native worker widths on the frozen corpus and known crash reports
+- **THEN** it MUST report throughput, P95/tail latency, memory, queue wait, worker crash rate, parent-process exits, and completed-page preservation for each width
+- **AND** production configuration MUST select only the highest tested width with zero parent-process exits and no unexplained page loss
 
 ## ADDED Requirements
 

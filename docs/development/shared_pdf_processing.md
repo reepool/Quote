@@ -22,13 +22,18 @@ unset value resolves to `pdfium_native`; unknown or disabled values fail closed.
 
 OCR is page-addressable and lazy. Native pages do not render or load an OCR
 model. Configure `max_ocr_pages`, `max_document_seconds`, `render_dpi`, batch
-size, queue size, and concurrency through `PdfResourceLimits`. When
-`max_concurrency` is greater than one, the PaddleOCR adapter uses bounded
-worker sessions; each worker reuses its model session instead of reloading it
-for every page in the request. Real Paddle workers run in terminable child
-processes so `max_page_seconds` and the document deadline are hard limits;
-completed pages survive another page's timeout. Missing OCR runtimes and
-timeouts produce typed `ocr_unavailable`/`ocr_deferred`/`ocr_timeout` results.
+size, queue size, and concurrency through `PdfResourceLimits`. Production
+PDFium text extraction, pypdf fallback, and PDFium rasterization run in a
+supervised native worker pool outside the Quote parent. The pool may process
+multiple documents in parallel, but each worker uses PDFium serially and does
+not create a nested PDFium thread pool. Worker signal exits, including
+`SIGTRAP`, hard timeouts, malformed responses, and missing pages become typed
+diagnostics; completed pages are retained. The pool width is selected by a
+read-only corpus canary, not copied from the business or LLM executor width.
+Real Paddle workers remain terminable child processes and reuse their model
+session instead of reloading it for every page in the request. Missing OCR
+runtimes and timeouts produce typed `ocr_unavailable`/`ocr_deferred`/
+`ocr_timeout` results.
 Custom page renderers used with hard timeouts must be picklable by Python's
 `spawn` multiprocessing context; injected in-process OCR test sessions may opt
 out of hard timeouts explicitly.
@@ -40,7 +45,8 @@ are combined using the smaller limit. The default mode budgets are 5 pages / 180
 seconds for `toc_probe`, 20 pages / 900 seconds for `section_extract`, and 8
 pages / 600 seconds for `table_extract`.
 
-Quote's native environment has direct `pypdfium2==5.13.0` and `pypdf`. OCR
+Quote's native environment has direct `pypdfium2==5.13.0` and `pypdf`, but
+production PDFium calls are dispatched through the native worker boundary. OCR
 workers outside Quote use matched `paddlepaddle==3.3.1` /
 `paddleocr==3.7.0` versions for both GPU and CPU. `pdf-inspector==1.17.0`
 remains only for non-native consumers. Production workers should

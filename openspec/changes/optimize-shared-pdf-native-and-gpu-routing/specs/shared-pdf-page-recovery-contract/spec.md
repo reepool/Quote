@@ -64,6 +64,25 @@
 - **WHEN** 隔离 GPU worker 报告 CUDA 不可用、启动失败、模型不健康或进程崩溃
 - **THEN** 探测报告返回 typed GPU unavailable/failed 结果，且仍可运行 native profile 和已配置的 CPU worker 评估
 
+### Requirement: Native parser process isolation and parallel execution
+
+共享 PDF 模块 MUST 将生产 `pypdfium2` 文本抽取、PDFium OCR 光栅化和 `pypdf` native fallback 放入共享模块管理的受监管 native worker 池；Quote 主进程不得直接执行这些 native 操作。worker 池 MUST 支持跨文档的有界多进程并行，但单个 worker 内部 PDFium/pypdf MUST 串行执行，不得再创建嵌套 PDFium 线程池。池宽度、队列上限、启动方式、worker 重启上限和页/文档超时 MUST 可配置；worker signal/退出、超时、协议错误和缺页 MUST 转换为 typed diagnostic，并保留已完成页。
+
+#### Scenario: Native worker crash is contained
+
+- **WHEN** native worker 因 `SIGTRAP`、`SIGSEGV`、`SIGABRT` 或其他非零退出终止
+- **THEN** 父进程 MUST 保持运行、回收并有界替换该 worker，返回包含 signal/exit status 的 `native_worker_crashed`（或等价）诊断，并按既有 fallback policy 继续处理
+
+#### Scenario: Native workers process documents in parallel
+
+- **WHEN** 同时提交多个独立 PDF 且配置池宽度大于 1
+- **THEN** worker 池 MUST 允许不超过配置宽度的跨文档并行，单个业务调用方不得创建额外 native 池
+
+#### Scenario: OCR rasterization uses the native worker
+
+- **WHEN** 页面进入 OCR
+- **THEN** native worker MUST 完成 PDFium 渲染并把图片交给现有 OCR worker；Quote 主进程和 OCR worker 均不得重新打开 PDF
+
 #### Scenario: GPU runtime version differs from approved baseline
 - **WHEN** worker 报告的 Paddle、PaddleOCR、model 或 inference config 与 profile-bound approval 不一致
 - **THEN** GPU profile fail closed，不能复用旧 approval artifact
@@ -92,7 +111,7 @@
 
 ### Requirement: PDFium rasterization is authoritative OCR input
 
-共享模块 MUST 使用直接依赖的 `pypdfium2==5.13.0` 在 Quote-side adapter 边界按物理页渲染 OCR 输入，默认 150 DPI (`scale=dpi/72`) 且 DPI 可由 profile 配置。一次 OCR batch MUST 复用同一 PDFium document；GPU 与 CPU worker MUST 接收等价的已渲染输入，不得自行打开 PDF 或依赖 PyMuPDF。
+共享模块 MUST 使用直接依赖的 `pypdfium2==5.13.0` 在受监管 native worker 边界按物理页渲染 OCR 输入，默认 150 DPI (`scale=dpi/72`) 且 DPI 可由 profile 配置。一次 OCR batch MUST 复用同一 PDFium document；GPU 与 CPU worker MUST 接收等价的已渲染输入，不得自行打开 PDF 或依赖 PyMuPDF；Quote 主进程不得直接执行 PDFium 渲染。
 
 #### Scenario: Same page is compared on GPU and CPU
 - **WHEN** GPU/CPU canary 处理同一 PDF 物理页

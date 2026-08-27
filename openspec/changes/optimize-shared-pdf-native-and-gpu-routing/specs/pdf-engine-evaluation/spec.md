@@ -92,3 +92,25 @@ The evaluator SHALL select or recommend primary and fallback profiles only when 
 - **WHEN** all candidates fail one or more required gates
 - **THEN** the evaluator SHALL leave the current production profile unchanged
 - **AND** it SHALL report blocking gates and preserve the current engine as the fallback baseline
+
+### Requirement: Native worker crash and parallelism evaluation
+
+The evaluator MUST provide a read-only canary for the supervised native worker pool. It MUST vary the configured multi-process width (at least 1, 2, and 4 when host capacity allows) while keeping corpus bytes, requested pages, parser versions, deadlines, and quality gates fixed. It MUST include the known 603268.SH and 002496.SZ crash reports, run at least 20 rounds for the crash-isolation gate, and record parent-service liveness, worker exit signal/status, restart count, throughput, P50/P95/tail latency, memory, queue wait, and completed-page preservation.
+
+#### Scenario: Known concurrent crash is isolated
+
+- **WHEN** the evaluator runs the known 603268.SH/002496.SZ combination at the configured concurrent width
+- **THEN** a PDFium worker `SIGTRAP`/native crash MUST be reported as a typed diagnostic and the Quote parent process MUST remain alive
+- **AND** the service restart count MUST not increase because of the canary
+
+#### Scenario: Width is promoted only after safe parallel evidence
+
+- **WHEN** one tested width has higher throughput but a parent exit, unexplained page loss, or untyped worker failure
+- **THEN** that width MUST be ineligible for production selection
+- **AND** the report MUST select the highest width that passes liveness, fidelity, bounded-resource, and diagnostic gates, or retain serial width when no parallel width passes
+
+#### Scenario: Native worker and OCR worker boundaries remain distinct
+
+- **WHEN** an OCR trial is evaluated after native PDFium rendering
+- **THEN** the report MUST prove that PDFium extraction/rasterization occurred in the native worker and PaddleOCR inference occurred only in the isolated GPU/CPU worker
+- **AND** a GPU/CPU OCR success MUST NOT be accepted if the Quote parent directly opened PDFium during the trial
