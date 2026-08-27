@@ -6,7 +6,7 @@ Business-profile extraction currently collapses distinct rows from contract-perf
 
 - Preserve contract/table-row identity in operating facts and prevent rows with the same product name from being merged without corroborating identity.
 - Require the extraction response to carry row-level context and raw values; derive a stable programmatic row identity from immutable table evidence.
-- Route only ambiguous duplicate/conflicting rows to a stronger reasoning model for targeted review, while retaining both rows when the ambiguity cannot be resolved.
+- Route only ambiguous duplicate/conflicting rows to the configured review model for targeted review, while retaining both rows when the ambiguity cannot be resolved. The default reuses the existing semantic model; stronger-model routing is an optional future override.
 - Replace the fixed 12-page selector limit with a chapter-aware adaptive page budget derived from section boundaries, table continuation pages, and field-family context.
 - Enforce token, character, and document-level safety budgets while allowing a genuinely long section to be split into bounded windows.
 - Add diagnostics and regression coverage for row identity, targeted ambiguity review, adaptive selection, and budget exhaustion.

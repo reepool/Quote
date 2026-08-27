@@ -23,7 +23,7 @@ The system MUST include `source_row_key` in the durable operating-fact identity 
 - **THEN** the system MUST preserve the approved row and MUST NOT overwrite it with a conflicting candidate solely due to the new row-key field
 
 ### Requirement: Ambiguous row groups receive targeted stronger-model review
-The system MUST detect same-subject row groups that would otherwise conflict and MAY submit only those groups to the configured stronger reasoning profile, defaulting to `gpt-5.6-terra`; the review MUST return a closed JSON decision referencing supplied row keys.
+The system MUST detect same-subject row groups that would otherwise conflict and MAY submit only those groups to the configured ambiguity-review profile. When no override is configured, it MUST reuse the normal semantic verification profile and its configured model; it MUST NOT assume that a Terra model or route exists. The review MUST return a closed JSON decision referencing supplied row keys.
 
 #### Scenario: Stronger review confirms separate contracts
 - **WHEN** the review identifies two or more distinct contract rows

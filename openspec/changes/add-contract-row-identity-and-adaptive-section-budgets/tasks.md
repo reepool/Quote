@@ -6,7 +6,7 @@
 
 ## 2. Targeted reasoning review
 
-- [x] 2.1 Add a closed JSON stronger-model review request for ambiguous row groups using the existing LLM gateway and configurable `gpt-5.6-terra` default.
+- [x] 2.1 Add a closed JSON ambiguity-review request for ambiguous row groups using the existing LLM gateway; default to the existing semantic route/model and keep stronger-model overrides optional.
 - [x] 2.2 Validate review row-key coverage, prohibit numeric/evidence mutations, and define timeout/schema/inconclusive fallback that preserves all rows as candidates.
 - [x] 2.3 Integrate targeted review into the structured semantic flow with bounded retries, audit diagnostics, and no review call for non-ambiguous groups.
 

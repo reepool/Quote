@@ -1308,7 +1308,11 @@ async def test_ambiguous_row_review_uses_stronger_model_without_mutating_source_
     decisions, audit = await extractor.review_ambiguous_rows_async(rows=rows)
 
     assert [item["classification"] for item in decisions] == ["separate", "separate"]
-    assert gateway.requests[0].model == "gpt-5.6-terra"
+    # Default review stays on the configured semantic route/model. A future
+    # tiered deployment can opt in through the policy override fields.
+    assert gateway.requests[0].profile == "semantic_extraction"
+    assert gateway.requests[0].model is None
     assert rows[0]["value_raw"] == 4.18
     assert rows[1]["value_raw"] == 0
     assert audit.stage == "semantic_row_review"
+    assert audit.actual_model == "provider-model-v2"

@@ -100,8 +100,10 @@ _OPERATING_FACT_TYPES = (
 class BusinessProfileSemanticPolicy:
     extraction_profile: str = "semantic_extraction"
     verification_profile: str = "semantic_extraction"
-    ambiguity_review_profile: str = "semantic_extraction"
-    ambiguity_review_model: str = "gpt-5.6-terra"
+    # Optional overrides reserved for a future tiered LLM deployment. By
+    # default ambiguity review uses the same route and model as verification.
+    ambiguity_review_profile: Optional[str] = None
+    ambiguity_review_model: Optional[str] = None
     max_input_characters: int = 24000
     max_sections_per_request: int = 12
     max_evidence_spans_per_request: int = 96
@@ -114,10 +116,14 @@ class BusinessProfileSemanticPolicy:
     def __post_init__(self) -> None:
         if not self.extraction_profile or not self.verification_profile:
             raise ValueError("semantic LLM profiles are required")
-        if not str(self.ambiguity_review_profile).strip() or not str(
+        if self.ambiguity_review_profile is not None and not str(
+            self.ambiguity_review_profile
+        ).strip():
+            raise ValueError("ambiguity review profile override cannot be blank")
+        if self.ambiguity_review_model is not None and not str(
             self.ambiguity_review_model
         ).strip():
-            raise ValueError("ambiguity review LLM profile and model are required")
+            raise ValueError("ambiguity review model override cannot be blank")
         if self.max_input_characters < 1 or self.max_sections_per_request < 1:
             raise ValueError("semantic request bounds must be positive")
         if (
@@ -136,6 +142,21 @@ class BusinessProfileSemanticPolicy:
             raise ValueError(
                 "semantic queue_timeout_seconds must be finite and positive"
             )
+
+    def resolved_ambiguity_review_profile(self) -> str:
+        """Use the normal verifier route unless a future tier overrides it."""
+
+        return (
+            str(self.ambiguity_review_profile or "").strip()
+            or str(self.verification_profile or "").strip()
+            or str(self.extraction_profile or "").strip()
+        )
+
+    def resolved_ambiguity_review_model(self) -> Optional[str]:
+        """Return a model override only when one is explicitly configured."""
+
+        value = str(self.ambiguity_review_model or "").strip()
+        return value or None
 
 
 @dataclass(frozen=True)
@@ -1366,7 +1387,7 @@ class BusinessProfileSemanticExtractor:
         *,
         rows: Sequence[Mapping[str, Any]],
     ) -> tuple[list[Mapping[str, Any]], SemanticRunAudit]:
-        """Ask a stronger model to classify only an ambiguous row group.
+        """Ask the configured review model to classify an ambiguous row group.
 
         The model can classify row boundaries, but cannot change source values,
         units, or evidence. Failure is intentionally propagated to the caller
@@ -1399,16 +1420,20 @@ class BusinessProfileSemanticExtractor:
         }
         input_hash = _stable_hash(request_payload)
         response = None
+        review_profile = self.policy.resolved_ambiguity_review_profile()
+        review_model = self.policy.resolved_ambiguity_review_model()
         logger.info(
-            "business-profile llm start stage=semantic_row_review rows=%s input_hash=%s",
+            "business-profile llm start stage=semantic_row_review rows=%s profile=%s requested_model=%s input_hash=%s",
             len(rows),
+            review_profile,
+            review_model or "profile_default",
             input_hash,
         )
         try:
             response = await self.llm_client.complete(
                 LlmRequest(
-                    profile=self.policy.ambiguity_review_profile,
-                    model=self.policy.ambiguity_review_model,
+                    profile=review_profile,
+                    model=review_model,
                     messages=(
                         LlmMessage(
                             role="system",
@@ -1453,11 +1478,16 @@ class BusinessProfileSemanticExtractor:
             audit = _success_audit(
                 response,
                 stage="semantic_row_review",
-                profile=self.policy.ambiguity_review_profile,
+                profile=review_profile,
                 prompt_version=SEMANTIC_ROW_REVIEW_PROMPT_VERSION,
                 input_hash=input_hash,
                 gates={"closed_schema": True, "row_keys": True, "source_fields_immutable": True},
-                diagnostics={"row_count": len(rows), "semantic_result": _bounded_semantic_result(data)},
+                diagnostics={
+                    "row_count": len(rows),
+                    "requested_model": review_model,
+                    "actual_model": response.model,
+                    "semantic_result": _bounded_semantic_result(data),
+                },
             )
             self._persist_audit(audit)
             _log_llm_response_debug("semantic_row_review", data)
@@ -1470,7 +1500,7 @@ class BusinessProfileSemanticExtractor:
             audit = _failure_audit(
                 response,
                 stage="semantic_row_review",
-                profile=self.policy.ambiguity_review_profile,
+                profile=review_profile,
                 prompt_version=SEMANTIC_ROW_REVIEW_PROMPT_VERSION,
                 input_hash=input_hash,
                 failure_category=_failure_category(exc),

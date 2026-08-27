@@ -33,7 +33,7 @@ The deterministic table parser remains authoritative for rows it can read. Seman
 
 ### Ambiguity uses targeted stronger-model review
 
-Rows are grouped only when their document, period, normalized subject, and fact type match. Multiple distinct row keys in one group are marked as `ambiguous_same_subject_rows` when a broad identity would otherwise conflict. A targeted review request contains the table rows and evidence spans and asks the configured stronger reasoning profile (default `gpt-5.6-terra`) to classify contract boundaries. It cannot alter numeric values or evidence ids.
+Rows are grouped only when their document, period, normalized subject, and fact type match. Multiple distinct row keys in one group are marked as `ambiguous_same_subject_rows` when a broad identity would otherwise conflict. A targeted review request contains the table rows and evidence spans and asks the configured ambiguity-review route to classify contract boundaries. By default this reuses the normal verification profile and its configured model; no Terra model is assumed or claimed to exist. A future stronger model may be enabled by an explicit policy override once its route is provided by the LLM team. The review cannot alter numeric values or evidence ids.
 
 If the review confirms separate contracts, rows remain separate. If it confirms a single row was duplicated, the program may deduplicate only when the evidence row keys and raw cells support that conclusion. If the review is unavailable, invalid, or inconclusive, all rows remain candidates and publication is blocked only for the ambiguous group, not unrelated facts.
 
@@ -66,5 +66,5 @@ Rollback is code-only: disable targeted review and adaptive windows through the 
 
 ## Open Questions
 
-- The stronger review profile should be configurable through the existing semantic policy rather than hard-coded; the initial default is `gpt-5.6-terra`.
+- The ambiguity-review profile and model remain configurable through the existing semantic policy, but both overrides are optional. The production default is the existing single semantic model route; a stronger model is only used after an explicit, verifiable route is supplied by the LLM team.
 - Exact per-family page and token ceilings should be tuned from the first canary metrics; the implementation will expose defaults and request overrides.
