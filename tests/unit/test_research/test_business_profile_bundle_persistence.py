@@ -251,6 +251,30 @@ def test_reuse_bundle_keeps_nonzero_report_flow_candidate(tmp_path):
     assert metadata["record_ids"]["operating_facts"] == ["fact-positive"]
 
 
+def test_reuse_bundle_skips_conflicting_candidate_against_approved_fact(tmp_path):
+    repository, _storage = _repository(tmp_path)
+    repository.persist_document_field_family_bundle(
+        run=_run("run-approved"),
+        records_by_type={"evidence": [_evidence()], "operating_facts": [_operating_fact()]},
+    )
+    _system_promote(repository, "evidence", "evidence-1")
+    _system_promote(repository, "operating_facts", "fact-1")
+
+    zero = _operating_fact(record_id="fact-zero")
+    zero["value_raw"] = 0.0
+    zero["value_normalized"] = 0.0
+    run = _run("run-reuse-approved")
+    run["metadata"] = {"result_policy": "reuse"}
+    result = repository.persist_document_field_family_bundle(
+        run=run,
+        records_by_type={"operating_facts": [zero]},
+    )
+
+    assert result["fact_count"] == 0
+    assert repository.get_record("operating_facts", "fact-zero") is None
+    assert repository.get_record("operating_facts", "fact-1")["review_status"] == "approved"
+
+
 def test_bundle_collapses_identical_primary_keys(tmp_path):
     repository, _storage_manager = _repository(tmp_path)
 

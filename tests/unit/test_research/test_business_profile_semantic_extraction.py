@@ -1019,6 +1019,87 @@ async def test_ten_report_replay_uses_one_batch_verification_call_per_report():
 
 
 @pytest.mark.asyncio
+async def test_batch_verification_salvages_valid_decision_from_bad_target_ids():
+    selected = _selected()
+    section = selected.sections[0]
+    checks = {
+        "subject": True,
+        "action": True,
+        "object": True,
+        "scope": True,
+        "period": True,
+        "evidence": True,
+    }
+    targets = []
+    for target_id in ("activity-valid", "activity-missing"):
+        target = {
+            "activity_id": target_id,
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "subject_scope": "issuer",
+            "action": "produces",
+            "object_raw": "动力煤",
+            "evidence": {
+                "section_id": section.section_id,
+                "page_number": section.page_number,
+                "section_hash": section.section_hash,
+                "quote": section.normalized_text,
+                "quote_hash": hashlib.sha256(
+                    section.normalized_text.encode()
+                ).hexdigest(),
+            },
+        }
+        targets.append(
+            {
+                "target_type": "activity",
+                "target_id": target_id,
+                "verification_target": target,
+                "selected": selected,
+            }
+        )
+
+    def malformed_response(_request):
+        return {
+            "schema_version": "business_profile_semantic_batch_verifier.v1",
+            "decisions": [
+                {
+                    "target_id": "activity-valid",
+                    "decision": "supported",
+                    "checks": checks,
+                    "failed_aspects": [],
+                    "reason_zh": "公告证据完整支持该业务断言",
+                },
+                {
+                    "target_id": "activity-valid",
+                    "decision": "unclear",
+                    "checks": {**checks, "evidence": False},
+                    "failed_aspects": ["evidence"],
+                    "reason_zh": "重复目标不应覆盖首条有效决策",
+                },
+                {
+                    "target_id": "provider-hallucinated",
+                    "decision": "supported",
+                    "checks": checks,
+                    "failed_aspects": [],
+                    "reason_zh": "未知目标应被隔离",
+                },
+            ],
+        }
+
+    audit_sink = []
+    extractor = BusinessProfileSemanticExtractor(
+        _RequestAwareGateway(malformed_response), audit_sink=audit_sink.append
+    )
+    decisions, audit = await extractor.verify_batch_async(targets=targets)
+
+    assert [item["target_id"] for item in decisions] == ["activity-valid"]
+    assert audit.validation_gates["target_ids"] is False
+    assert "invalid_batch_target_ids" in audit.warning_codes
+    assert audit.diagnostics["response_issues"]
+    assert audit_sink[-1]["diagnostics"]["accepted_target_ids"] == ["activity-valid"]
+
+
+@pytest.mark.asyncio
 async def test_independent_verifier_rejects_decision_check_contradiction():
     selected = _selected()
     extraction = await BusinessProfileSemanticExtractor(

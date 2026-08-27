@@ -1229,9 +1229,24 @@ class BusinessProfileSemanticExtractor:
                 _batch_verification_response_schema(),
                 "semantic verification batch response",
             )
-            _validate_batch_verification_response(data, expected_ids=target_ids)
+            # A provider can occasionally repeat a target or hallucinate an
+            # id even when the rest of the batch is valid.  Keep the first
+            # valid decision and let the runtime rework only omitted targets;
+            # rejecting the whole report loses otherwise usable decisions.
+            sanitized_decisions, response_issues = _sanitize_batch_decisions(
+                data.get("decisions") or (), expected_ids=target_ids
+            )
+            if not sanitized_decisions:
+                raise ValueError(
+                    "semantic verification batch response has no valid target decisions"
+                )
+            sanitized_data = {"decisions": sanitized_decisions}
+            _validate_batch_verification_response(
+                sanitized_data, expected_ids=target_ids
+            )
             decisions = {
-                str(item["target_id"]): dict(item) for item in data["decisions"]
+                str(item["target_id"]): dict(item)
+                for item in sanitized_decisions
             }
             target_types = {
                 str(item["target_id"]): str(item["target_type"]) for item in records
@@ -1287,11 +1302,14 @@ class BusinessProfileSemanticExtractor:
                 input_hash=input_hash,
                 gates={
                     "batch_schema": True,
-                    "target_ids": True,
+                    "target_ids": not response_issues,
                     "exact_evidence": True,
                 },
+                extra_warnings=("invalid_batch_target_ids",) if response_issues else (),
                 diagnostics={
                     "batch_size": len(targets),
+                    "response_issues": response_issues,
+                    "accepted_target_ids": list(decisions),
                     "semantic_result": _bounded_semantic_result(response.data),
                 },
             )
@@ -2056,6 +2074,49 @@ def _validate_batch_verification_response(
             raise ChineseLanguageContractError(
                 "semantic verification batch reason_zh must contain Simplified Chinese"
             )
+
+
+def _sanitize_batch_decisions(
+    decisions: Sequence[Any], *, expected_ids: Sequence[str]
+) -> tuple[list[Mapping[str, Any]], list[dict[str, Any]]]:
+    """Keep the first decision for each expected id and diagnose the rest.
+
+    This is deliberately limited to target identity defects.  Item-level
+    contract errors (invalid checks, decision contradictions, language
+    violations) still fail validation so a semantically malformed decision is
+    never silently accepted.
+    """
+
+    expected = {str(item) for item in expected_ids}
+    seen: set[str] = set()
+    accepted: list[Mapping[str, Any]] = []
+    issues: list[dict[str, Any]] = []
+    for index, raw in enumerate(decisions):
+        if not isinstance(raw, Mapping):
+            issues.append({"index": index, "reason": "decision_not_object"})
+            continue
+        target_id = str(raw.get("target_id") or "").strip()
+        if not target_id:
+            issues.append({"index": index, "reason": "target_id_missing"})
+            continue
+        if target_id not in expected:
+            issues.append(
+                {"index": index, "target_id": target_id, "reason": "target_id_unknown"}
+            )
+            continue
+        if target_id in seen:
+            issues.append(
+                {"index": index, "target_id": target_id, "reason": "target_id_duplicate"}
+            )
+            continue
+        seen.add(target_id)
+        accepted.append(raw)
+    for target_id in expected:
+        if target_id not in seen:
+            issues.append(
+                {"target_id": target_id, "reason": "target_id_omitted"}
+            )
+    return accepted, issues
 
 
 def _resolve_verification_evidence(
@@ -2962,7 +3023,14 @@ def _failure_category(exc: Exception) -> str:
     code = str(getattr(exc, "code", "") or "").lower()
     if "timeout" in name or "deadline" in name or "timeout" in message:
         return "gateway_timeout"
-    if "schema" in name or "schema" in message:
+    if (
+        "schema" in name
+        or "schema" in message
+        or "target ids" in message
+        or "target_id" in message
+        or "target decisions" in message
+        or "identity collision" in message
+    ):
         return "schema_validation_failed"
     if code in {
         "malformed_evidence_span_ids",

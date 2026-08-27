@@ -2661,11 +2661,75 @@ class BusinessProfileSemanticRuntime:
             audit_sink=semantic_audits.append,
         )
         outcomes: list[dict[str, Any]] = []
+
+        def target_id_for(item: Mapping[str, Any]) -> str:
+            verification_target = dict(item.get("verification_target") or {})
+            return str(
+                item.get("target_id")
+                or verification_target.get("activity_id")
+                or verification_target.get("relationship_id")
+                or verification_target.get("record_id")
+                or ""
+            )
+
+        # Extraction can reuse an assertion from more than one output entry.
+        # Identical duplicates are safe to verify once; different payloads
+        # sharing an id are an identity collision and must be reworked rather
+        # than merged or sent as an invalid LLM batch.
+        unique_targets: list[Mapping[str, Any]] = []
+        by_id: dict[str, tuple[str, Mapping[str, Any]]] = {}
+        collisions: dict[str, list[Mapping[str, Any]]] = {}
+        for item in targets:
+            target_id = target_id_for(item)
+            if not target_id:
+                # Keep malformed entries independent so one missing id cannot
+                # collapse unrelated targets into a single collision.
+                unique_targets.append(item)
+                continue
+            fingerprint = _stable_hash(
+                {
+                    "target": item.get("verification_target") or item.get("target") or {},
+                    "evidence_context_hash": item.get("evidence_context_hash"),
+                }
+            )
+            prior = by_id.get(target_id)
+            if prior is None:
+                by_id[target_id] = (fingerprint, item)
+                unique_targets.append(item)
+            elif prior[0] == fingerprint:
+                logger.info(
+                    "business-profile verification duplicate target reused target_id=%s",
+                    target_id,
+                )
+            else:
+                entries = collisions.setdefault(target_id, [prior[1]])
+                entries.append(item)
+        if collisions:
+            unique_targets = [
+                item
+                for item in unique_targets
+                if target_id_for(item) not in collisions
+            ]
+        for target_id, items in collisions.items():
+            for item in items:
+                outcomes.append(
+                    {
+                        "target": item,
+                        "exception": ValueError(
+                            "semantic verification target identity collision "
+                            f"target_id={target_id}"
+                        ),
+                        "audit": None,
+                        "retry_calls": 0,
+                        "usage_tokens": 0,
+                        "batch_llm_calls": 0,
+                    }
+                )
         # The verifier contract accepts a bounded request.  A report can contain
         # more targets than that, so split one logical family wave into bounded
         # requests and retain per-wave audit/usage information.
-        for offset in range(0, len(targets), 50):
-            batch = list(targets[offset : offset + 50])
+        for offset in range(0, len(unique_targets), 50):
+            batch = list(unique_targets[offset : offset + 50])
             batch_audit: Mapping[str, Any] | None = None
             try:
                 verifications, audit = await extractor.verify_batch_async(
@@ -6224,6 +6288,13 @@ def _semantic_failure_reason(exc: Exception) -> str:
     }:
         return "evidence_provenance_failed"
     if "schema" in text or "schema_validation_failed" in row_categories:
+        return "schema_failure"
+    if (
+        "target ids" in text
+        or "target_id" in text
+        or "target decisions" in text
+        or "identity collision" in text
+    ):
         return "schema_failure"
     if "numeric_reconciliation_failed" in text:
         return "numeric_reconciliation_failed"

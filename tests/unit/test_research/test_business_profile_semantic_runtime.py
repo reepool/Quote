@@ -2004,6 +2004,107 @@ def test_verification_wave_splits_large_family_without_overflow_rework(tmp_path)
     assert request_sizes == [50, 1]
 
 
+def test_verification_wave_reuses_identical_duplicate_target_once(tmp_path):
+    class CountingGateway(_FakeGateway):
+        async def complete(self, request):
+            self.requests.append(request)
+            payload = json.loads(request.messages[-1].content)
+            return _response(
+                {
+                    "schema_version": "business_profile_semantic_batch_verifier.v1",
+                    "decisions": [
+                        _batch_verification_decision(item["target_id"])
+                        for item in payload["records"]
+                    ],
+                },
+                request,
+            )
+
+    gateway = CountingGateway()
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
+    )
+    selected = SelectedSectionArtifact(
+        artifact_version="business_profile_selected_sections.v1",
+        bundle={},
+        sections=(
+            SelectedSection(
+                section_id="section-1",
+                page_number=1,
+                section_key="operations",
+                text="公司生产动力煤。",
+                normalized_text="公司生产动力煤。",
+                normalized_start=0,
+                normalized_end=8,
+                page_hash="page-hash",
+                section_hash="section-hash",
+                selector_reasons=("test",),
+                quality="native",
+            ),
+        ),
+        previous_bundle_id=None,
+        expansion_reason=None,
+        artifact_hash="selected-hash",
+    )
+    target = {
+        "target_id": "activity-duplicate",
+        "target_type": "activity",
+        "selected": selected,
+        "evidence_context_hash": "context-hash",
+        "verification_target": {
+            "activity_id": "activity-duplicate",
+            "action": "produces",
+            "object_raw": "动力煤",
+            "evidence": {
+                "section_id": "section-1",
+                "page_number": 1,
+                "section_hash": "section-hash",
+                "quote": "公司生产动力煤。",
+                "quote_hash": hashlib.sha256("公司生产动力煤。".encode()).hexdigest(),
+            },
+        },
+    }
+
+    outcomes = asyncio.run(runtime._verify_wave_async([target, dict(target)]))
+
+    assert len(outcomes) == 1
+    assert outcomes[0]["verification"]["target_id"] == "activity-duplicate"
+    assert len(gateway.requests) == 1
+
+
+def test_verification_wave_isolates_same_id_with_different_content(tmp_path):
+    gateway = _FakeGateway()
+    runtime = BusinessProfileSemanticRuntime(
+        repository=BusinessProfileRepository(_storage(tmp_path)),
+        artifact_root=tmp_path / "artifacts",
+        llm_client=gateway,
+    )
+    first = {
+        "target_id": "activity-collision",
+        "target_type": "activity",
+        "verification_target": {
+            "activity_id": "activity-collision",
+            "action": "produces",
+            "object_raw": "动力煤",
+        },
+    }
+    second = {
+        **first,
+        "verification_target": {
+            **first["verification_target"],
+            "action": "sells",
+        },
+    }
+
+    outcomes = asyncio.run(runtime._verify_wave_async([first, second]))
+
+    assert len(outcomes) == 2
+    assert all("identity collision" in str(item["exception"]) for item in outcomes)
+    assert gateway.requests == []
+
+
 def _relationship_runtime(
     tmp_path,
     monkeypatch,

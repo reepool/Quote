@@ -707,7 +707,12 @@ class BusinessProfileRepository:
             raise ValueError("business profile bundle product catalog version mismatch")
         prepared_at = get_shanghai_time().isoformat()
         run_metadata = run_payload.get("metadata") or {}
-        result_policy_value = run_metadata.get("result_policy")
+        # The async runtime stores the policy in metadata.  Accept the
+        # top-level form as well so replay callers cannot accidentally lose
+        # the explicit reuse/replace contract while reconstructing a bundle.
+        result_policy_value = run_metadata.get(
+            "result_policy", run_payload.get("result_policy")
+        )
         # Older direct repository callers omit the policy and retain the
         # original strict replay contract. The async production runtime always
         # supplies it explicitly, so only that path gets conservative reuse.
@@ -907,6 +912,36 @@ class BusinessProfileRepository:
                                     "bundle evidence instrument mismatch: "
                                     f"{record_type}:{evidence_id}"
                                 )
+                # Temporal reuse validation may mark a replay candidate as
+                # skip_write (for example a zero-valued row shadowed by an
+                # already approved non-zero fact).  Recompute counts after
+                # validation so the run manifest reports rows actually
+                # persisted, not rows merely prepared.
+                counts = {
+                    "evidence_count": sum(
+                        1
+                        for item in prepared_by_type.get("evidence", [])
+                        if not item.get("skip_write")
+                    ),
+                    "fact_count": sum(
+                        sum(
+                            1
+                            for item in prepared_by_type.get(key, [])
+                            if not item.get("skip_write")
+                        )
+                        for key in ("segments", "operating_facts", "exposure_facts")
+                    ),
+                    "activity_count": sum(
+                        1
+                        for item in prepared_by_type.get("activities", [])
+                        if not item.get("skip_write")
+                    ),
+                    "relationship_count": sum(
+                        1
+                        for item in prepared_by_type.get("relationships", [])
+                        if not item.get("skip_write")
+                    ),
+                }
                 for record_type in (
                     "evidence",
                     "segments",
