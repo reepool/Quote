@@ -1255,6 +1255,38 @@ async def test_hkex_incomplete_announcement_scan_does_not_restore_untradable():
 
 
 @pytest.mark.asyncio
+async def test_hkex_disabled_announcement_scan_does_not_restore_untradable():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_trading_arrangement',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['trading_status_announcement_scan_enabled'] = False
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+
+    result = await manager.sync_hkex_instrument_master()
+
+    safe_rows = manager.db_ops.save_instruments_batch.await_args.args[0]
+    by_id = {row['instrument_id']: row for row in safe_rows}
+    assert by_id['00005.HK']['trading_status'] == 0
+    assert result['exchanges']['HKEX']['source_evidence_policy'][
+        'untradable_restore_allowed'
+    ] is False
+    assert result['exchanges']['HKEX']['trading_status_scan']['status'] == 'disabled'
+
+
+@pytest.mark.asyncio
 async def test_hkex_delisting_writes_without_official_active_rows():
     manager = _manager()
     _attach_hkex_mock_db(manager, local_rows=[

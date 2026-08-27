@@ -17296,6 +17296,13 @@ class DataManager:
                     'errors': [str(exc)],
                     'stop_reason': 'request_failed',
                 }
+        else:
+            result['trading_status_scan'] = {
+                'status': 'disabled',
+                'is_complete': False,
+                'errors': [],
+                'stop_reason': 'scan_disabled',
+            }
 
         try:
             raw = self._read_hkex_master_file(config.get('akshare_spot_file'))
@@ -17336,7 +17343,10 @@ class DataManager:
         return result
 
     def _merge_hkex_official_active_rows(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        from data_sources.hkex_instrument_master import overlay_hkex_lifecycle_fields
+        from data_sources.hkex_instrument_master import (
+            HKEX_LISTING_ACTIVE_SOURCES,
+            overlay_hkex_lifecycle_fields,
+        )
 
         preserve_from_primary = {
             'product_type',
@@ -17359,6 +17369,11 @@ class DataManager:
             existing_source = existing.get('source')
             incoming_source = row.get('source')
             combined = overlay_hkex_lifecycle_fields(existing, row)
+            combined['listing_source_present'] = bool(
+                existing.get('listing_source_present')
+                or existing_source in HKEX_LISTING_ACTIVE_SOURCES
+                or incoming_source in HKEX_LISTING_ACTIVE_SOURCES
+            )
             for key in preserve_from_primary:
                 if (
                     existing_source == 'hkex_securities_list'
@@ -17553,7 +17568,7 @@ class DataManager:
         )
         preserve_untradable = not source_evidence_policy.get(
             'untradable_restore_allowed',
-            True,
+            False,
         )
         safe_write_preview_rows = self._filter_hkex_safe_write_rows(
             decisions.get('insert_candidates', []) + decisions.get('metadata_update_candidates', []),

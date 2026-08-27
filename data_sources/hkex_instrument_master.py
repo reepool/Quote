@@ -70,6 +70,13 @@ HKEX_UNTRADABLE_SOURCES = frozenset(
         HKEX_PRODUCT_CESSATION_SOURCE,
     }
 )
+HKEX_LISTING_ACTIVE_SOURCES = frozenset(
+    {
+        "hkex_securities_list",
+        "hkexnews_active_list",
+        "hkex_manual_review",
+    }
+)
 HKEX_TRADING_STATUS_EVENT_CATEGORIES = frozenset(
     {
         TRADING_HALT_CATEGORY,
@@ -798,6 +805,7 @@ def build_hkex_trading_eligibility_snapshot(
                 "source": source,
                 "source_symbol": item["symbol"],
                 "official_lifecycle_source": source,
+                "lifecycle_evidence_at": item["published_at"],
                 "lifecycle_evidence": {
                     "source": source,
                     "headline_category": item["event"],
@@ -964,6 +972,21 @@ def _hkex_incoming_lifecycle_wins(
     return incoming_at >= existing_at
 
 
+def _hkex_row_is_untradable(row: Optional[Dict[str, Any]]) -> bool:
+    item = row or {}
+    source = str(item.get("source") or item.get("official_lifecycle_source") or "")
+    if source not in HKEX_UNTRADABLE_SOURCES:
+        return False
+    return item.get("trading_status") in (0, "0", False)
+
+
+def _hkex_row_makes_tradable(row: Optional[Dict[str, Any]]) -> bool:
+    item = row or {}
+    if str(item.get("status") or "").lower() == "suspended":
+        return False
+    return item.get("trading_status") not in (0, "0", False)
+
+
 def overlay_hkex_lifecycle_fields(
     existing: Dict[str, Any],
     incoming: Dict[str, Any],
@@ -974,6 +997,8 @@ def overlay_hkex_lifecycle_fields(
         parse_hkex_lifecycle_evidence_at((existing or {}).get("lifecycle_evidence_at")),
         parse_hkex_lifecycle_evidence_at((incoming or {}).get("lifecycle_evidence_at")),
     )
+    if _hkex_row_is_untradable(existing) and _hkex_row_makes_tradable(incoming):
+        incoming_wins = False
     for key, value in (incoming or {}).items():
         if value in (None, ""):
             continue
@@ -1569,14 +1594,11 @@ class HKEXSourceEvidencePolicy:
         has_active_rows = any(row.get("instrument_id") for row in official_active_rows or [])
         has_delisted_rows = any(row.get("instrument_id") for row in official_delisted_rows or [])
         active_fallback_used = not primary_active_available and fallback_active_available and has_active_rows
-        if trading_status_scan is None:
-            scan_complete = True
-        else:
-            scan_status = str((trading_status_scan or {}).get("status") or "").strip()
-            scan_complete = bool((trading_status_scan or {}).get("is_complete")) and scan_status in {
-                "success",
-                "success_empty",
-            }
+        scan_status = str((trading_status_scan or {}).get("status") or "").strip()
+        scan_complete = bool((trading_status_scan or {}).get("is_complete")) and scan_status in {
+            "success",
+            "success_empty",
+        }
 
         return {
             "sources": sorted(sources),
@@ -1658,6 +1680,15 @@ class HKEXLifecyclePolicy:
             for row in supplemental_rows
             if row.get("instrument_id")
         }
+        listing_active_ids = {
+            row.get("instrument_id")
+            for row in official_active_rows
+            if row.get("instrument_id")
+            and (
+                row.get("source") in HKEX_LISTING_ACTIVE_SOURCES
+                or row.get("listing_source_present")
+            )
+        }
 
         inserts: List[Dict[str, Any]] = []
         metadata_updates: List[Dict[str, Any]] = []
@@ -1667,6 +1698,8 @@ class HKEXLifecyclePolicy:
         review_required: List[Dict[str, Any]] = []
 
         for instrument_id, active_row in active_by_id.items():
+            if instrument_id in delisted_by_id:
+                continue
             local = local_by_id.get(instrument_id)
             official_status = str(active_row.get("status") or "active").lower()
             if local is None:
@@ -1694,15 +1727,23 @@ class HKEXLifecyclePolicy:
             local_classification = classify_hkex_product(local)
             if local_classification.get("research_scope") == "exclude":
                 continue
-            if instrument_id in active_by_id:
-                continue
             if instrument_id in delisted_by_id:
+                if instrument_id in listing_active_ids:
+                    review_required.append({
+                        "instrument_id": instrument_id,
+                        "reason": "official_active_and_delisted_evidence_conflict",
+                        "official": active_by_id.get(instrument_id),
+                        "local": local,
+                    })
+                    continue
                 delistings.append({
                     "instrument_id": instrument_id,
                     "reason": "official_delisted_evidence",
                     "official": delisted_by_id[instrument_id],
                     "local": local,
                 })
+                continue
+            if instrument_id in active_by_id:
                 continue
             if (
                 local.get("is_active") in (True, 1, "1")

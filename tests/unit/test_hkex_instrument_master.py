@@ -483,6 +483,92 @@ def test_lifecycle_policy_requires_official_evidence_for_reactivation_and_delist
     assert "00907.HK" not in review_ids
 
 
+def test_lifecycle_policy_delisted_overrides_stale_scan_active_row():
+    decisions = HKEXLifecyclePolicy.build_decisions(
+        local_rows=[
+            {
+                "instrument_id": "00907.HK",
+                "status": "active",
+                "is_active": True,
+            }
+        ],
+        official_active_rows=[
+            {
+                "instrument_id": "00907.HK",
+                "status": "active",
+                "trading_status": 1,
+                "source": "hkexnews_trading_resumption",
+            }
+        ],
+        official_delisted_rows=[
+            {
+                "instrument_id": "00907.HK",
+                "status": "delisted",
+                "source": "hkexnews_delisted_list",
+                "delisted_date": "2026-05-24",
+            }
+        ],
+    )
+
+    assert [row["instrument_id"] for row in decisions["delisting_candidates"]] == [
+        "00907.HK"
+    ]
+    assert decisions["reactivation_candidates"] == []
+    assert decisions["metadata_update_candidates"] == []
+    assert decisions["review_required"] == []
+
+
+def test_lifecycle_policy_listing_and_delisted_conflict_goes_to_review():
+    decisions = HKEXLifecyclePolicy.build_decisions(
+        local_rows=[
+            {
+                "instrument_id": "00005.HK",
+                "status": "active",
+                "is_active": True,
+            }
+        ],
+        official_active_rows=[
+            {
+                "instrument_id": "00005.HK",
+                "status": "active",
+                "source": "hkex_securities_list",
+                "listing_source_present": True,
+            }
+        ],
+        official_delisted_rows=[
+            {
+                "instrument_id": "00005.HK",
+                "status": "delisted",
+                "source": "hkexnews_delisted_list",
+            }
+        ],
+    )
+
+    assert decisions["delisting_candidates"] == []
+    assert decisions["metadata_update_candidates"] == []
+    assert decisions["review_required"][0]["instrument_id"] == "00005.HK"
+    assert decisions["review_required"][0]["reason"] == (
+        "official_active_and_delisted_evidence_conflict"
+    )
+
+
+def test_source_evidence_policy_does_not_treat_missing_scan_as_complete():
+    official = HKEXSecuritiesListProvider(
+        source_url="fixture://hkex_securities_list.csv"
+    ).parse_csv(_fixture("hkex_securities_list.csv"))
+
+    policy = HKEXSourceEvidencePolicy.assess(
+        snapshots=[official],
+        errors=[],
+        official_active_rows=official.rows,
+        official_delisted_rows=[],
+        trading_status_scan=None,
+    )
+
+    assert policy["trading_status_scan_complete"] is False
+    assert policy["untradable_restore_allowed"] is False
+
+
 def test_lifecycle_policy_keeps_supplemental_only_rows_in_review():
     supplemental = [{"instrument_id": "08888.HK", "source": "akshare_hk_spot_em"}]
 
@@ -786,6 +872,43 @@ def test_earlier_prolonged_suspension_does_not_override_later_resumption():
     assert merged["source"] == "hkexnews_trading_resumption"
 
 
+def test_current_product_cessation_is_not_cleared_by_earlier_or_later_resumption():
+    from data_sources.hkex_instrument_master import overlay_hkex_lifecycle_fields
+
+    cessation = {
+        "instrument_id": "03038.HK",
+        "status": "active",
+        "trading_status": 0,
+        "source": "hkexnews_product_cessation",
+        "lifecycle_evidence_at": "2026-07-28T04:00:00+00:00",
+    }
+    earlier_resume = overlay_hkex_lifecycle_fields(
+        cessation,
+        {
+            "instrument_id": "03038.HK",
+            "status": "active",
+            "trading_status": 1,
+            "source": "hkexnews_trading_resumption",
+            "lifecycle_evidence_at": "2026-06-29T01:00:00+00:00",
+        },
+    )
+    later_resume = overlay_hkex_lifecycle_fields(
+        cessation,
+        {
+            "instrument_id": "03038.HK",
+            "status": "active",
+            "trading_status": 1,
+            "source": "hkexnews_trading_resumption",
+            "lifecycle_evidence_at": "2026-08-17T00:46:00+00:00",
+        },
+    )
+
+    assert earlier_resume["trading_status"] == 0
+    assert earlier_resume["source"] == "hkexnews_product_cessation"
+    assert later_resume["trading_status"] == 0
+    assert later_resume["source"] == "hkexnews_product_cessation"
+
+
 def test_source_evidence_policy_accepts_trading_halt_snapshot():
     official = HKEXSecuritiesListProvider(
         source_url="fixture://hkex_securities_list.csv"
@@ -863,6 +986,7 @@ def test_eligibility_snapshot_marks_scheme_gap_but_not_completed_consolidation()
     assert by_id["01712.HK"]["status"] == "active"
     assert by_id["01712.HK"]["trading_status"] == 0
     assert by_id["01712.HK"]["source"] == "hkexnews_trading_arrangement"
+    assert str(by_id["01712.HK"]["lifecycle_evidence_at"]).startswith("2026-08-13")
     assert by_id["01712.HK"]["lifecycle_evidence"]["expected_resume_date"] == "2026-09-02"
     assert "01777.HK" not in by_id
     assert by_id["03038.HK"]["source"] == "hkexnews_product_cessation"
