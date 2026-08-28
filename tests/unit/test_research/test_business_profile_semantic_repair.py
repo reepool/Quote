@@ -1,5 +1,7 @@
 from research.business_profile_semantic_repair import BusinessProfileSemanticRepairService
-from research.providers.base import ShareholderSnapshot
+from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_review import BusinessProfileReviewService
+from research.providers.base import CompanyProfileSnapshot, ShareholderSnapshot
 from research.storage import ResearchStorageManager
 from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
 
@@ -26,6 +28,7 @@ def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):
         source="efinance", snapshot_json={
             "coverage_scope": ["holder_count", "reference_only_ownership_clues"],
             "holder_count": {"value": 10, "report_date": "20260331"},
+            "top_holders": [{"rank": 1, "holder_name": "第一大股东", "report_date": "20260331"}],
             "ownership_clues": {"control_owner_name": "第一大股东"},
         },
     ))
@@ -50,6 +53,50 @@ def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):
         raise AssertionError("apply without an explicit scope must fail")
 
 
+def test_repair_keeps_official_controller_without_control_history(tmp_path):
+    storage = _storage(tmp_path)
+    storage.upsert_shareholder_snapshot(ShareholderSnapshot(
+        instrument_id="600001.SH", symbol="600001", exchange="SSE",
+        control_owner_name="控制人甲", source="cninfo", snapshot_json={
+            "coverage_scope": ["reference_only_ownership_clues"],
+            "ownership_clues": {"control_owner_name": "控制人甲"},
+            "scope_raw_provenance": {
+                "reference_only_ownership_clues": {
+                    "source": "cninfo", "source_mode": "direct", "payload": {},
+                }
+            },
+        },
+    ))
+
+    audit = BusinessProfileSemanticRepairService(storage).run(
+        instrument_ids=["600001.SH"]
+    )
+
+    assert "shareholder_inferred_controller" not in {
+        item["code"] for item in audit["instruments"][0]["issues"]
+    }
+
+
+def test_repair_holds_ambiguous_controller_provenance_without_writing(tmp_path):
+    storage = _storage(tmp_path)
+    storage.upsert_shareholder_snapshot(ShareholderSnapshot(
+        instrument_id="600002.SH", symbol="600002", exchange="SSE",
+        control_owner_name="控制人甲", source="unknown", snapshot_json={
+            "coverage_scope": ["reference_only_ownership_clues"],
+            "ownership_clues": {"control_owner_name": "控制人甲"},
+        },
+    ))
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(instrument_ids=["600002.SH"])
+    applied = service.run(instrument_ids=["600002.SH"], apply=True)
+
+    assert {item["code"] for item in audit["instruments"][0]["issues"]} == {
+        "shareholder_controller_provenance_ambiguous"
+    }
+    assert applied["change_counts"]["held"] == 1
+
+
 def test_repair_apply_normalizes_dates_preserves_scope_provenance_and_is_idempotent(tmp_path):
     storage = _storage(tmp_path)
     storage.upsert_shareholder_snapshot(ShareholderSnapshot(
@@ -72,13 +119,13 @@ def test_repair_apply_normalizes_dates_preserves_scope_provenance_and_is_idempot
     repaired = storage.get_shareholder_snapshot("600000.SH", include_snapshot=True)
     repeated = service.run(instrument_ids=["600000.SH"], apply=True)
 
-    assert applied["change_counts"] == {"changed": 1}
+    assert applied["change_counts"]["changed"] == 1
     assert repaired["holder_count_report_date"] == "2026-03-31"
     assert repaired["snapshot"]["holder_count"]["report_date"] == "2026-03-31"
     provenance = repaired["snapshot"]["scope_raw_provenance"]["holder_count"]
     assert provenance["source"] == "cninfo"
     assert provenance["payload"] == {"raw_report_date": "20260331", "value": 10}
-    assert repeated["change_counts"] == {"unchanged": 1}
+    assert repeated["change_counts"]["unchanged"] == 1
 
 
 def test_local_shareholder_projection_uses_snapshot_and_control_history_only(tmp_path):
@@ -103,3 +150,134 @@ def test_local_shareholder_projection_uses_snapshot_and_control_history_only(tmp
     assert projection["status"] == "success"
     assert projection["top_holders"][0]["holder_name"] == "股东甲"
     assert projection["actual_controller"]["actual_controller_name"] == "控制人甲"
+
+
+def _approved_relationship_with_short_name(storage, *, human_approval=False):
+    repository = BusinessProfileRepository(storage)
+    evidence = {
+        "evidence_id": "repair-evidence",
+        "instrument_id": "600010.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "document-hash",
+        "data_available_date": "2026-03-28",
+        "availability_quality": "actual",
+        "evidence_text_hash": "text-hash",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    }
+    repository.upsert("evidence", evidence)
+    current_evidence = repository.get_record("evidence", evidence["evidence_id"])
+    review = BusinessProfileReviewService(repository)
+    review.system_promote_record(
+        "evidence",
+        evidence["evidence_id"],
+        field_family="test:evidence",
+        policy_version="test.v1",
+        gate_manifest_hash="test-evidence",
+        reviewer_version="v1",
+        expected_updated_at=current_evidence["updated_at"],
+    )
+    relationship = {
+        "relationship_id": "repair-relationship",
+        "instrument_id": "600010.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "buys_from",
+        "direction": "inbound",
+        "counterparty_name_raw": "供应商甲",
+        "counterparty_entity_id": "600011.SH",
+        "resolution_basis": "exact_legal_name",
+        "anonymous": 0,
+        "scope_type": "company",
+        "scope_id": "600010.SH",
+        "object_raw": "原材料",
+        "evidence_id": evidence["evidence_id"],
+        "data_available_date": "2026-03-28",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": "2025-01-01",
+        "metadata": {
+            "identity_status": "resolved_entity",
+            "resolution_status": "resolved_entity",
+            "entity_resolution": {"basis": "exact_legal_name"},
+        },
+    }
+    repository.upsert("relationships", relationship)
+    current_relationship = repository.get_record(
+        "relationships", relationship["relationship_id"]
+    )
+    if human_approval:
+        review.review_record(
+            "relationships",
+            relationship["relationship_id"],
+            decision="approved",
+            reviewer="analyst@example",
+            reason="fixture relationship approval",
+            expected_review_status="candidate",
+            expected_updated_at=current_relationship["updated_at"],
+            evidence_references=[evidence["evidence_id"]],
+        )
+    else:
+        review.system_promote_record(
+            "relationships",
+            relationship["relationship_id"],
+            field_family="test:relationships",
+            policy_version="test.v1",
+            gate_manifest_hash="test-relationship",
+            reviewer_version="v1",
+            expected_updated_at=current_relationship["updated_at"],
+            evidence_references=[evidence["evidence_id"]],
+        )
+    storage.upsert_company_profile(
+        CompanyProfileSnapshot(
+            instrument_id="600011.SH",
+            symbol="600011",
+            company_name="供应商甲",
+            short_name="供应商甲",
+            exchange="SSE",
+            source="baostock",
+            source_mode="direct",
+        )
+    )
+    return repository, review
+
+
+def test_repair_holds_machine_approved_short_name_resolution_and_preserves_history(tmp_path):
+    storage = _storage(tmp_path)
+    repository, review = _approved_relationship_with_short_name(storage)
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(instrument_ids=["600010.SH"])
+    assert audit["change_counts"]["would_change"] == 1
+    assert audit["write_count"] == 0
+    assert audit["before_current_projections"]["600010.SH"]["relationships"] == [
+        "repair-relationship"
+    ]
+
+    applied = service.run(instrument_ids=["600010.SH"], apply=True)
+    repaired = repository.get_record("relationships", "repair-relationship")
+    assert repaired["review_status"] == "held"
+    assert applied["change_counts"]["changed"] == 1
+    assert applied["after_current_projections"]["600010.SH"]["relationships"] == []
+    history = review.list_review_audit(
+        record_type="relationships", record_id="repair-relationship"
+    )
+    assert len(history) == 2
+    assert history[0]["new_status"] == "held"
+
+    repeated = service.run(instrument_ids=["600010.SH"], apply=True)
+    assert repeated["change_counts"]["unchanged"] == 1
+
+
+def test_repair_does_not_override_human_reviewed_short_name_resolution(tmp_path):
+    storage = _storage(tmp_path)
+    repository, _ = _approved_relationship_with_short_name(storage, human_approval=True)
+
+    applied = BusinessProfileSemanticRepairService(storage).run(
+        instrument_ids=["600010.SH"], apply=True
+    )
+
+    assert repository.get_record("relationships", "repair-relationship")["review_status"] == "approved"
+    assert applied["change_counts"]["held"] == 1
+    assert applied["change_counts"]["changed"] == 0

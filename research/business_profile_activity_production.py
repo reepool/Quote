@@ -28,6 +28,15 @@ RELATIONSHIP_DIRECTIONS = {
     "receives_service_from": "inbound",
 }
 
+RELATIONSHIP_IDENTITY_RESOLVED = "resolved_entity"
+RELATIONSHIP_IDENTITY_DISCLOSED = "disclosed_name_only"
+_LEGACY_RELATIONSHIP_IDENTITY_STATUSES = {
+    "resolved": RELATIONSHIP_IDENTITY_RESOLVED,
+    RELATIONSHIP_IDENTITY_RESOLVED: RELATIONSHIP_IDENTITY_RESOLVED,
+    "unresolved": RELATIONSHIP_IDENTITY_DISCLOSED,
+    RELATIONSHIP_IDENTITY_DISCLOSED: RELATIONSHIP_IDENTITY_DISCLOSED,
+}
+
 _ANONYMOUS_CONCENTRATION_LABEL_ALIASES = {
     "前五大客户": "top_five_customers",
     "前五名客户": "top_five_customers",
@@ -64,6 +73,30 @@ class EntityResolution:
             "candidate_entity_ids": list(self.candidate_entity_ids),
             "policy_version": ENTITY_RESOLUTION_POLICY_VERSION,
         }
+
+
+def canonical_relationship_identity_status(
+    metadata: Mapping[str, Any] | None,
+) -> str | None:
+    """Normalize legacy relationship statuses at one read boundary.
+
+    ``None`` denotes an unknown or internally conflicting legacy row.  New
+    writers always emit the two canonical values and therefore never need a
+    best-effort choice here.
+    """
+
+    values: set[str] = set()
+    for key in ("identity_status", "resolution_status"):
+        raw = str((metadata or {}).get(key) or "").strip().lower()
+        if not raw:
+            continue
+        normalized = _LEGACY_RELATIONSHIP_IDENTITY_STATUSES.get(raw)
+        if normalized is None:
+            return None
+        values.add(normalized)
+    if len(values) > 1:
+        return None
+    return next(iter(values), RELATIONSHIP_IDENTITY_DISCLOSED)
 
 
 class GovernedCounterpartyResolver:
@@ -374,15 +407,15 @@ class BusinessProfileActivityProducer:
             "metadata": {
                 "entity_resolution": resolution.to_dict(),
                 "resolution_status": (
-                    "resolved_entity"
+                    RELATIONSHIP_IDENTITY_RESOLVED
                     if resolution.status == "resolved" and resolution.entity_id
-                    else "disclosed_name_only"
+                    else RELATIONSHIP_IDENTITY_DISCLOSED
                 ),
                 "counterparty_catalog_pending": False,
                 "identity_status": (
-                    "resolved_entity"
+                    RELATIONSHIP_IDENTITY_RESOLVED
                     if resolution.status == "resolved" and resolution.entity_id
-                    else "disclosed_name_only"
+                    else RELATIONSHIP_IDENTITY_DISCLOSED
                 ),
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
                 "source_row_key": assertion.get("source_row_key"),

@@ -315,7 +315,7 @@ def test_sql_as_of_is_correct_beyond_prior_5000_row_history_cap(tmp_path):
             "confidence": 1.0,
             "review_status": "candidate",
             "valid_from": "2025-01-01",
-            "valid_to": "2025-06-30",
+            "valid_to": None,
         }
         for index in reversed(range(5001))
     ]
@@ -326,7 +326,7 @@ def test_sql_as_of_is_correct_beyond_prior_5000_row_history_cap(tmp_path):
                 "record_id": "segment-00000-annual-correction",
                 "report_period": "2025-12-31",
                 "data_available_date": "2026-03-31",
-                "valid_to": "2025-12-31",
+                "valid_to": None,
                 "supersedes_record_id": "segment-00000",
                 "version": 2,
             },

@@ -130,6 +130,48 @@ async def test_company_profile_sync_falls_back_to_next_provider_and_writes_rows(
     assert audit_count == 1
 
 
+def test_company_profile_storage_accepts_only_governed_legal_name_authority(tmp_path):
+    storage = ResearchStorageManager(_build_research_config(tmp_path))
+    storage.initialize()
+
+    storage.upsert_company_profile(
+        CompanyProfileSnapshot(
+            instrument_id="600000.SH",
+            symbol="600000",
+            company_name="浦发银行",
+            short_name="浦发银行",
+            exchange="SSE",
+            legal_name="浦发银行股份有限公司",
+            legal_name_authority="provider_display_label",
+            source="baostock",
+            source_mode="direct",
+        )
+    )
+    ungoverned = storage.get_company_profile("600000.SH")
+    assert ungoverned["profile"]["legal_name"] is None
+    assert ungoverned["profile"]["legal_name_authority"] is None
+
+    storage.upsert_company_profile(
+        CompanyProfileSnapshot(
+            instrument_id="600000.SH",
+            symbol="600000",
+            company_name="浦发银行",
+            short_name="浦发银行",
+            exchange="SSE",
+            legal_name="上海浦东发展银行股份有限公司",
+            legal_name_authority="exchange_registered_issuer",
+            source="official_exchange",
+            source_mode="direct",
+        )
+    )
+    governed = storage.get_company_profile("600000.SH")
+    assert governed["profile"]["legal_name"] == "上海浦东发展银行股份有限公司"
+    assert (
+        governed["profile"]["legal_name_authority"]
+        == "exchange_registered_issuer"
+    )
+
+
 @pytest.mark.asyncio
 async def test_company_profile_sync_degrades_when_no_provider_returns_profiles(tmp_path):
     research_config = _build_research_config(tmp_path)

@@ -12,6 +12,10 @@ from research.business_profile_governance import (
     _json_loads,
     _stable_hash,
 )
+from research.business_profile_activity_production import (
+    RELATIONSHIP_IDENTITY_DISCLOSED,
+    canonical_relationship_identity_status,
+)
 from research.business_profile_temporal import (
     get_business_profile_supersession_column,
 )
@@ -121,13 +125,20 @@ class BusinessProfileReviewService:
                         relationship_metadata = _json_loads(
                             row.get("metadata_json"), {}
                         )
-                        identity_status = str(
-                            relationship_metadata.get("identity_status")
-                            or relationship_metadata.get("resolution_status")
-                            or ""
+                        has_identity_status = any(
+                            str(relationship_metadata.get(key) or "").strip()
+                            for key in ("identity_status", "resolution_status")
+                        )
+                        identity_status = canonical_relationship_identity_status(
+                            relationship_metadata
+                        )
+                        if has_identity_status and identity_status is None:
+                            raise ValueError(
+                                "relationship identity statuses are conflicting or unknown"
                         )
                         if (
-                            identity_status == "disclosed_name_only"
+                            has_identity_status
+                            and identity_status == RELATIONSHIP_IDENTITY_DISCLOSED
                             and not bool((metadata or {}).get("confirm_disclosed_name_only"))
                         ):
                             raise ValueError(
@@ -277,6 +288,68 @@ class BusinessProfileReviewService:
                         "system_reopen": {
                             "schema_version": SYSTEM_REOPEN_SCHEMA_VERSION,
                             "prior_status": "rejected",
+                        },
+                    },
+                    now=now,
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return audit
+
+    def system_hold_approved_record(
+        self,
+        record_type: str,
+        record_id: str,
+        *,
+        expected_updated_at: str,
+        reason: str,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Remove an unsafe machine-approved record from current reads.
+
+        This narrowly scoped transition is for deterministic integrity repairs.
+        It never overrides a human decision and retains the original row and
+        its evidence as immutable review history.
+        """
+
+        spec = self._record_spec(record_type)
+        now = get_shanghai_time().isoformat()
+        operation_id = f"bp-review-op-{uuid.uuid4().hex}"
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = self._load_review_row(conn, spec, record_id)
+                if row is None:
+                    raise ValueError(
+                        f"business profile record not found: {record_type}:{record_id}"
+                    )
+                self._validate_no_prior_human_decision(
+                    conn, record_type=record_type, record_id=record_id
+                )
+                self._validate_expected_review_state(
+                    row,
+                    expected_status="approved",
+                    expected_updated_at=str(expected_updated_at or "").strip(),
+                )
+                audit = self._update_review_status(
+                    conn,
+                    spec=spec,
+                    record_type=record_type,
+                    row=row,
+                    new_status="held",
+                    operation_id=operation_id,
+                    reviewer=SYSTEM_PROMOTION_REVIEWER_PREFIX + "integrity_hold.v1",
+                    reason=str(reason or "deterministic integrity repair requires review"),
+                    evidence_references=(),
+                    replacement_record_id=None,
+                    metadata={
+                        **dict(metadata or {}),
+                        "system_integrity_hold": {
+                            "schema_version": "business_profile_system_integrity_hold.v1",
+                            "prior_status": "approved",
                         },
                     },
                     now=now,

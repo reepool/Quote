@@ -11,13 +11,20 @@ from typing import Any, Dict, List, Optional
 
 @dataclass(frozen=True)
 class CompanyProfileSnapshot:
-    """Normalized company profile snapshot from one provider."""
+    """Normalized company profile snapshot from one provider.
+
+    ``company_name`` is the provider's display label.  It is deliberately
+    separate from ``legal_name``: only a provider that explicitly supplies a
+    governed legal-name authority may populate the latter.
+    """
 
     instrument_id: str
     symbol: str
     company_name: str
     short_name: str
     exchange: str
+    legal_name: Optional[str] = None
+    legal_name_authority: Optional[str] = None
     market: Optional[str] = None
     listed_date: Optional[str] = None
     industry_raw: Optional[str] = None

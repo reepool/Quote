@@ -1117,7 +1117,25 @@ class ResearchStorageManager:
     ) -> None:
         """Upsert one normalized company profile snapshot."""
         now = get_shanghai_time().isoformat()
-        profile_json = json.dumps(asdict(snapshot), ensure_ascii=False, sort_keys=True)
+        profile_payload = asdict(snapshot)
+        # Provider display labels are useful profile metadata but are not a
+        # counterparty identity source.  Keep a legal name only when the
+        # payload states one of the governed authorities understood by the
+        # semantic resolver.
+        legal_name_authorities = {
+            "official_company_registration",
+            "official_legal_name",
+            "exchange_registered_issuer",
+        }
+        authority = str(profile_payload.get("legal_name_authority") or "").strip()
+        legal_name = str(profile_payload.get("legal_name") or "").strip()
+        if not legal_name or authority not in legal_name_authorities:
+            profile_payload["legal_name"] = None
+            profile_payload["legal_name_authority"] = None
+        else:
+            profile_payload["legal_name"] = legal_name
+            profile_payload["legal_name_authority"] = authority
+        profile_json = json.dumps(profile_payload, ensure_ascii=False, sort_keys=True)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)

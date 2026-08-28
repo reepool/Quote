@@ -4503,10 +4503,14 @@ def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path
             "INSERT INTO company_profiles ("
             "instrument_id, symbol, company_name, short_name, exchange, market, "
             "status, source, source_mode, data_as_of, profile_json, created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, ?)",
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 "600000.SH", "600000", "浦发银行股份有限公司", "浦发银行",
                 "SSE", "A股", "active", "official", "direct", "2026-08-04",
+                json.dumps({
+                    "legal_name": "浦发银行股份有限公司",
+                    "legal_name_authority": "official_company_registration",
+                }),
                 "2026-08-04T00:00:00+08:00", "2026-08-04T00:00:00+08:00",
             ),
         )
@@ -4536,7 +4540,7 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
             [
                 (
                     "600000.SH",
-                    "上海浦东发展银行股份有限公司",
+                    "浦发银行",
                     "stock",
                     "SSE",
                     "1999-11-10",
@@ -4567,7 +4571,7 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
             "INSERT INTO company_profiles ("
             "instrument_id, symbol, company_name, short_name, exchange, market, "
             "status, source, source_mode, data_as_of, profile_json, created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, ?)",
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 (
                     "600000.SH",
@@ -4580,6 +4584,10 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
                     "official",
                     "direct",
                     "2026-08-04",
+                    json.dumps({
+                        "legal_name": "上海浦东发展银行股份有限公司",
+                        "legal_name_authority": "official_company_registration",
+                    }),
                     now,
                     now,
                 ),
@@ -4594,6 +4602,7 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
                     "official",
                     "direct",
                     "2026-08-04",
+                    "{}",
                     now,
                     now,
                 ),
@@ -4608,6 +4617,7 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
                     "official",
                     "direct",
                     "2026-08-04",
+                    "{}",
                     now,
                     now,
                 ),
@@ -4626,6 +4636,25 @@ def test_production_counterparty_resolver_resolves_full_name_not_security_short_
     assert resolver.resolve("上海浦东发展银行股份有限公司").entity_id == "600000.SH"
 
 
+def test_production_counterparty_resolver_allows_empty_governed_entity_set(tmp_path):
+    storage = _storage(tmp_path)
+    with sqlite3.connect(storage.quotes_db_path) as conn:
+        conn.execute(
+            "CREATE TABLE instruments ("
+            "instrument_id TEXT PRIMARY KEY, name TEXT, type TEXT, exchange TEXT, "
+            "listed_date TEXT, delisted_date TEXT)"
+        )
+        conn.execute(
+            "INSERT INTO instruments VALUES (?, ?, ?, ?, ?, ?)",
+            ("600000.SH", "浦发银行", "stock", "SSE", "1999-11-10", None),
+        )
+
+    resolver = runtime_module.build_business_profile_counterparty_resolver(storage)
+
+    assert resolver.resolve("供应商甲股份有限公司").status == "unresolved"
+    assert resolver.resolve("供应商甲股份有限公司").entity_id is None
+
+
 def test_disclosed_complete_counterparty_is_published_without_master_registration(
     tmp_path, monkeypatch
 ):
@@ -4639,8 +4668,8 @@ def test_disclosed_complete_counterparty_is_published_without_master_registratio
     assert len(gateway.requests) == 2
     assert len(relationships) == 1
     assert relationships[0]["counterparty_entity_id"] is None
-    assert relationships[0]["metadata"]["resolution_status"] == "unresolved"
-    assert relationships[0]["metadata"]["counterparty_catalog_pending"] is True
+    assert relationships[0]["metadata"]["resolution_status"] == "disclosed_name_only"
+    assert relationships[0]["metadata"]["counterparty_catalog_pending"] is False
     assert relationships[0]["review_status"] == "candidate"
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert any("catalog_proposal" in item["reason_codes"] for item in exceptions)
@@ -4671,7 +4700,8 @@ def test_resolved_relationship_closes_prior_catalog_proposal_exceptions(
         "review_status": "candidate",
         "metadata": {
             **unresolved["metadata"],
-            "resolution_status": "resolved",
+            "resolution_status": "resolved_entity",
+            "identity_status": "resolved_entity",
             "counterparty_catalog_pending": False,
             "semantic_assertion_id": assertion_id,
         },

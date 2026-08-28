@@ -267,7 +267,7 @@ def test_exposure_facts_and_calibrated_assumptions_are_bitemporal(tmp_path):
         "confidence": 1.0,
         "review_status": "candidate",
         "valid_from": "2025-01-01",
-        "valid_to": "2026-01-01",
+        "valid_to": None,
         "knowledge_from": "2026-03-28",
         "version": 1,
         "metadata": {},

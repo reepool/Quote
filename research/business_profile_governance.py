@@ -1275,11 +1275,21 @@ class BusinessProfileRepository:
                 ):
                     return False
         elif record_type == "relationships":
-            left_value = cls._lineage_value(left, "relationship_occurrence_key")
-            right_value = cls._lineage_value(right, "relationship_occurrence_key")
+            left_value = cls._relationship_occurrence_value(left)
+            right_value = cls._relationship_occurrence_value(right)
             if left_value is not None and right_value is not None and left_value != right_value:
                 return False
         return True
+
+    @classmethod
+    def _relationship_occurrence_value(cls, record: Mapping[str, Any]) -> Any:
+        """Read the canonical occurrence key with legacy source-row fallback."""
+
+        return (
+            cls._lineage_value(record, "relationship_occurrence_key")
+            or cls._lineage_value(record, "source_row_key")
+            or cls._lineage_value(record, "contract_reference_raw")
+        )
 
     @staticmethod
     def _lineage_value(record: Mapping[str, Any], field: str) -> Any:
@@ -1567,10 +1577,16 @@ class BusinessProfileRepository:
                     "<= ?"
                 )
                 params.extend([cutoff, policy.freshness_days])
-        elif policy.validity_start_field:
+        if policy.validity_start_field:
             clauses.append(
                 f"({alias}.{policy.validity_start_field} IS NULL "
                 f"OR {alias}.{policy.validity_start_field} <= ?)"
+            )
+            params.append(cutoff)
+        if policy.validity_end_field:
+            clauses.append(
+                f"({alias}.{policy.validity_end_field} IS NULL "
+                f"OR {alias}.{policy.validity_end_field} > ?)"
             )
             params.append(cutoff)
         if policy.temporal_class == BusinessProfileTemporalClass.PERSISTENT_RELATIONSHIP:
@@ -1581,11 +1597,6 @@ class BusinessProfileRepository:
                     f"julianday(?) - julianday({alias}.{policy.observation_period_field}) <= ?"
                 )
                 params.extend([cutoff, policy.freshness_days])
-            clauses.append(
-                f"({alias}.{policy.validity_end_field} IS NULL "
-                f"OR {alias}.{policy.validity_end_field} > ?)"
-            )
-            params.append(cutoff)
         if business_regime_id is not None and "business_regime_id" in spec["columns"]:
             clauses.append(f"{alias}.business_regime_id = ?")
             params.append(business_regime_id)
@@ -2128,10 +2139,8 @@ class BusinessProfileResolver:
                 )
             if not fresh:
                 return False
-        start_field = "effective_from" if record_type == "exposures" else "valid_from"
-        end_field = "effective_to" if record_type == "exposures" else "valid_to"
-        start = _date_key(record.get(start_field))
-        end = _date_key(record.get(end_field))
+        start = _date_key(record.get(policy.validity_start_field or ""))
+        end = _date_key(record.get(policy.validity_end_field or ""))
         # Validity intervals are half-open: [valid_from, valid_to).
         return (not start or start <= cutoff) and (not end or cutoff < end)
 

@@ -22,6 +22,8 @@ from research.business_profile_activity_production import (
     BusinessProfileActivityProducer,
     EntityResolution,
     GovernedCounterpartyResolver,
+    RELATIONSHIP_IDENTITY_RESOLVED,
+    canonical_relationship_identity_status,
     classify_entity_resolution_exception,
 )
 from research.business_profile_deterministic_extraction import (
@@ -616,17 +618,32 @@ def build_business_profile_counterparty_resolver(
     with storage.get_connection() as conn:
         storage._apply_pragmas(conn)
         profiles = conn.execute(
-            "SELECT instrument_id, company_name FROM company_profiles "
-            "WHERE company_name IS NOT NULL AND TRIM(company_name) <> ''"
+            "SELECT instrument_id, data_as_of, profile_json FROM company_profiles"
         ).fetchall()
-    legal_names = {
-        str(row["instrument_id"]): str(row["company_name"]).strip()
-        for row in profiles
+    legal_names: dict[str, str] = {}
+    governed_authorities = {
+        "official_company_registration",
+        "official_legal_name",
+        "exchange_registered_issuer",
     }
+    for row in profiles:
+        try:
+            profile = json.loads(str(row["profile_json"] or "{}"))
+        except (TypeError, ValueError):
+            continue
+        legal_name = str(profile.get("legal_name") or "").strip()
+        authority = str(profile.get("legal_name_authority") or "").strip()
+        data_as_of = str(row["data_as_of"] or "")[:10]
+        if (
+            legal_name
+            and authority in governed_authorities
+            and data_as_of
+            and (not knowledge_cutoff or data_as_of <= knowledge_cutoff)
+        ):
+            legal_names[str(row["instrument_id"])] = legal_name
     entities_by_id = {
         str(row["instrument_id"]): {
             "entity_id": str(row["instrument_id"]),
-            "official_identifier": str(row["instrument_id"]),
             "legal_name": legal_names[str(row["instrument_id"])],
             "valid_from": str(row["listed_date"] or "")[:10] or None,
             "valid_to": str(row["delisted_date"] or "")[:10] or None,
@@ -639,10 +656,6 @@ def build_business_profile_counterparty_resolver(
     # explicitly reviewed aliases enter through the resolver's own owner.
     aliases: list[dict[str, Any]] = []
     entities = list(entities_by_id.values())
-    if not entities:
-        raise ValueError(
-            "named relationship production requires governed A-share identities"
-        )
     return GovernedCounterpartyResolver(entities=entities, aliases=aliases)
 
 
@@ -3426,8 +3439,10 @@ class BusinessProfileSemanticRuntime:
                         exception_reasons.append("context_incomplete")
                     if (
                         record_type == "relationships"
-                        and (record.get("metadata") or {}).get("resolution_status")
-                        != "resolved"
+                        and canonical_relationship_identity_status(
+                            record.get("metadata") if isinstance(record.get("metadata"), Mapping) else None
+                        )
+                        != RELATIONSHIP_IDENTITY_RESOLVED
                     ):
                         exception_reasons.append("catalog_proposal")
                     promotion = self._promote_record(
@@ -3573,6 +3588,11 @@ class BusinessProfileSemanticRuntime:
         field_family: str,
     ) -> None:
         """Close catalog-pending exceptions represented by an approved relation."""
+
+        if canonical_relationship_identity_status(
+            record.get("metadata") if isinstance(record.get("metadata"), Mapping) else None
+        ) != RELATIONSHIP_IDENTITY_RESOLVED:
+            return
 
         assertion_ids = set(_semantic_relationship_assertion_ids(record))
         if not assertion_ids:

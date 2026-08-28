@@ -12,12 +12,14 @@ import hashlib
 from typing import Any, Iterable
 
 from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_review import BusinessProfileReviewService
 from research.providers.base import ShareholderSnapshot
 from research.shareholder_snapshot_policy import (
     actual_shareholder_coverage_scope,
     normalize_shareholder_report_date,
 )
 from research.shareholder_sync import ShareholderShadowSyncService
+from utils.date_utils import get_shanghai_time
 
 
 REPAIR_SCHEMA_VERSION = "business_profile_semantic_repair.v1"
@@ -29,6 +31,7 @@ class BusinessProfileSemanticRepairService:
     def __init__(self, storage: Any) -> None:
         self.storage = storage
         self.repository = BusinessProfileRepository(storage)
+        self.review_service = BusinessProfileReviewService(self.repository)
 
     def run(
         self,
@@ -48,7 +51,12 @@ class BusinessProfileSemanticRepairService:
             return self._report([], apply=apply)
 
         findings = [self._audit_instrument(instrument_id) for instrument_id in ids]
-        result = self._report(findings, apply=apply)
+        before_projections = self._current_projections(ids)
+        result = self._report(
+            findings,
+            apply=apply,
+            before_projections=before_projections,
+        )
         if not apply:
             return result
 
@@ -74,7 +82,8 @@ class BusinessProfileSemanticRepairService:
                     }
                 )
         result["changes"] = changes
-        result["change_counts"] = dict(Counter(item["status"] for item in changes))
+        result["after_current_projections"] = self._current_projections(ids)
+        result["change_counts"] = self._change_counts(changes)
         result["write_count"] = sum(item["status"] == "changed" for item in changes)
         return result
 
@@ -122,30 +131,36 @@ class BusinessProfileSemanticRepairService:
                     issues.append(self._issue("shareholder_noncanonical_report_date", instrument_id, {
                         "value": str(scope_date), "normalized": normalized,
                     }))
-            name = str(snapshot.get("control_owner_name") or "").strip()
-            if name:
-                controller_names = {
-                    str(item.get("actual_controller_name") or "").strip()
-                    for item in self.storage.list_shareholder_control_changes(instrument_id)
-                }
-                if name not in controller_names:
-                    issues.append(self._issue("shareholder_inferred_controller", instrument_id, {
-                        "control_owner_name": name,
-                    }))
+            controller_finding = self._controller_provenance_finding(
+                snapshot, payload
+            )
+            if controller_finding is not None:
+                issues.append(
+                    self._issue(
+                        controller_finding["code"],
+                        instrument_id,
+                        controller_finding["details"],
+                    )
+                )
 
         relationships = self.repository.list_records("relationships", instrument_id=instrument_id, limit=10000)
         for record in relationships:
             metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
             if (
                 record.get("review_status") == "approved"
-                and str(metadata.get("resolution_basis") or "") == "exact_legal_name"
+                and self._relationship_resolution_basis(record, metadata)
+                in {
+                    "exact_legal_name",
+                    "approved_exact_alias",
+                    "approved_exact_legal_name",
+                }
                 and self._is_short_name_resolution(record)
             ):
                 issues.append(self._issue("relationship_short_name_auto_resolution", instrument_id, {
                     "relationship_id": record.get("relationship_id"),
                     "counterparty_name_raw": record.get("counterparty_name_raw"),
+                    "resolution_basis": self._relationship_resolution_basis(record, metadata),
                 }))
-        issues.extend(self._relationship_lineage_findings(instrument_id, relationships))
         issues.extend(self._exposure_collision_findings(instrument_id))
         return {"instrument_id": instrument_id, "issues": issues}
 
@@ -164,7 +179,14 @@ class BusinessProfileSemanticRepairService:
                 "reason": "shareholder_snapshot_reconstructed_locally",
             })
         for issue in finding["issues"]:
-            if issue["code"] in {"relationship_short_name_auto_resolution", "relationship_multiple_report_cohorts", "exposure_action_collision"}:
+            if issue["code"] == "relationship_short_name_auto_resolution":
+                changes.append(
+                    self._hold_unsafe_relationship(instrument_id, issue)
+                )
+            elif issue["code"] in {
+                "shareholder_controller_provenance_ambiguous",
+                "exposure_action_collision",
+            }:
                 changes.append({
                     "instrument_id": instrument_id,
                     "status": "held",
@@ -172,6 +194,128 @@ class BusinessProfileSemanticRepairService:
                     "stable_id": issue["stable_id"],
                 })
         return changes
+
+    def _hold_unsafe_relationship(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        relationship_id = str(issue.get("details", {}).get("relationship_id") or "")
+        record = self.repository.get_record("relationships", relationship_id)
+        if record is None:
+            return {
+                "instrument_id": instrument_id,
+                "status": "unchanged",
+                "reason": "relationship_already_absent",
+                "stable_id": issue["stable_id"],
+            }
+        if record.get("review_status") != "approved":
+            return {
+                "instrument_id": instrument_id,
+                "status": "unchanged",
+                "reason": "relationship_no_longer_approved",
+                "stable_id": issue["stable_id"],
+                "affected_ids": [relationship_id],
+            }
+        try:
+            audit = self.review_service.system_hold_approved_record(
+                "relationships",
+                relationship_id,
+                expected_updated_at=str(record.get("updated_at") or ""),
+                reason=(
+                    "automatic short-name entity resolution is not supported by "
+                    "governed legal-name evidence"
+                ),
+                metadata={
+                    "repair_issue_id": issue["stable_id"],
+                    "resolution_basis": issue.get("details", {}).get(
+                        "resolution_basis"
+                    ),
+                    "preserved_evidence_id": record.get("evidence_id"),
+                    "required_next_state": "disclosed_name_only_or_governed_successor",
+                },
+            )
+        except ValueError as exc:
+            return {
+                "instrument_id": instrument_id,
+                "status": "held",
+                "reason": "relationship_repair_requires_human_review",
+                "stable_id": issue["stable_id"],
+                "affected_ids": [relationship_id],
+                "details": str(exc),
+            }
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "relationship_short_name_resolution_held_by_review_owner",
+            "stable_id": issue["stable_id"],
+            "affected_ids": [relationship_id],
+            "review_audit_id": audit.get("audit_id"),
+        }
+
+    def _controller_provenance_finding(
+        self,
+        snapshot: dict[str, Any],
+        payload: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        """Classify only controller values that local evidence can prove unsafe."""
+
+        name = str(snapshot.get("control_owner_name") or "").strip()
+        if not name:
+            return None
+        control_changes = self.storage.list_shareholder_control_changes(
+            str(snapshot.get("instrument_id") or "")
+        )
+        controller_names = {
+            str(item.get("actual_controller_name") or "").strip()
+            for item in control_changes
+        }
+        if name in controller_names:
+            return None
+        ownership_provenance = self._scope_provenance(
+            snapshot, payload, "reference_only_ownership_clues"
+        )
+        source = str(ownership_provenance.get("source") or snapshot.get("source") or "").strip().lower()
+        top_holder_names = {
+            str(item.get("holder_name") or item.get("name") or "").strip()
+            for item in payload.get("top_holders") or ()
+            if isinstance(item, dict)
+        }
+        details = {
+            "control_owner_name": name,
+            "ownership_source": source or None,
+            "top_holder_match": name in top_holder_names,
+            "control_history_match": False,
+            "scope_provenance": ownership_provenance,
+        }
+        official_sources = {"cninfo", "official", "sse", "szse", "bse"}
+        aggregate_sources = {"efinance", "akshare", "baostock", "pytdx"}
+        if source in official_sources:
+            return None
+        if source in aggregate_sources and name in top_holder_names:
+            return {"code": "shareholder_inferred_controller", "details": details}
+        return {
+            "code": "shareholder_controller_provenance_ambiguous",
+            "details": details,
+        }
+
+    @staticmethod
+    def _scope_provenance(
+        snapshot: dict[str, Any],
+        payload: dict[str, Any],
+        scope: str,
+    ) -> dict[str, Any]:
+        provenance = payload.get("scope_raw_provenance")
+        selected = provenance.get(scope) if isinstance(provenance, dict) else None
+        if isinstance(selected, dict):
+            return dict(selected)
+        scope_sources = payload.get("scope_sources")
+        source = scope_sources.get(scope) if isinstance(scope_sources, dict) else None
+        if source:
+            source_name, _, source_mode = str(source).partition(":")
+            return {"source": source_name, "source_mode": source_mode or None}
+        return {
+            "source": snapshot.get("source"),
+            "source_mode": snapshot.get("source_mode"),
+        }
 
     def _rebuild_snapshot(self, snapshot: dict[str, Any], *, clear_inferred_controller: bool) -> ShareholderSnapshot:
         payload = dict(snapshot.get("snapshot") or {})
@@ -252,11 +396,11 @@ class BusinessProfileSemanticRepairService:
                 snapshot.get("top_holders_total_ratio") if scope == "top10_holders" else None
             ),
             control_owner_name=(
-                snapshot.get("control_owner_name")
+                str((payload.get("ownership_clues") or {}).get("control_owner_name") or "").strip() or None
                 if scope == "reference_only_ownership_clues" else None
             ),
             control_owner_ratio=(
-                snapshot.get("control_owner_ratio")
+                (payload.get("ownership_clues") or {}).get("control_owner_ratio")
                 if scope == "reference_only_ownership_clues" else None
             ),
             schema_version=str(snapshot.get("schema_version") or "shareholders.v1"),
@@ -294,8 +438,28 @@ class BusinessProfileSemanticRepairService:
         if not entity_id or not raw_name:
             return False
         profile = self.storage.get_company_profile(entity_id, include_snapshot=False)
-        return bool(profile and raw_name == str(profile.get("short_name") or "").strip()
-                         and raw_name != str(profile.get("company_name") or "").strip())
+        return bool(
+            profile
+            and raw_name == str(profile.get("short_name") or "").strip()
+        )
+
+    @staticmethod
+    def _relationship_resolution_basis(
+        record: dict[str, Any],
+        metadata: dict[str, Any],
+    ) -> str:
+        entity_resolution = metadata.get("entity_resolution")
+        nested_basis = (
+            entity_resolution.get("basis")
+            if isinstance(entity_resolution, dict)
+            else None
+        )
+        return str(
+            record.get("resolution_basis")
+            or nested_basis
+            or metadata.get("resolution_basis")
+            or ""
+        ).strip()
 
     def _relationship_lineage_findings(self, instrument_id: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         approved = [item for item in rows if item.get("review_status") == "approved"]
@@ -311,15 +475,36 @@ class BusinessProfileSemanticRepairService:
         ]
 
     def _exposure_collision_findings(self, instrument_id: str) -> list[dict[str, Any]]:
-        rows = self.repository.list_records("exposures", instrument_id=instrument_id, review_status="approved", limit=10000)
-        groups: dict[tuple[Any, ...], set[str]] = {}
+        rows = self.repository.list_records(
+            "exposures", instrument_id=instrument_id, limit=10000
+        )
+        by_id = {str(item.get("exposure_id") or ""): item for item in rows}
+        issues: list[dict[str, Any]] = []
         for item in rows:
-            key = (item.get("scope_type"), item.get("scope_id"), item.get("commodity_id"), item.get("exposure_role"))
-            groups.setdefault(key, set()).add(str((item.get("metadata") or {}).get("source_activity_action") or ""))
-        return [
-            self._issue("exposure_action_collision", instrument_id, {"actions": sorted(actions)})
-            for actions in groups.values() if len(actions - {""}) > 1
-        ]
+            if item.get("review_status") != "approved":
+                continue
+            predecessor_id = str(item.get("supersedes_exposure_id") or "").strip()
+            predecessor = by_id.get(predecessor_id)
+            if predecessor is None:
+                continue
+            action = str((item.get("metadata") or {}).get("source_activity_action") or "").strip()
+            prior_action = str(
+                (predecessor.get("metadata") or {}).get("source_activity_action") or ""
+            ).strip()
+            if not action or not prior_action or action == prior_action:
+                continue
+            issues.append(
+                self._issue(
+                    "exposure_action_collision",
+                    instrument_id,
+                    {
+                        "exposure_id": item.get("exposure_id"),
+                        "predecessor_exposure_id": predecessor_id,
+                        "actions": sorted({action, prior_action}),
+                    },
+                )
+            )
+        return issues
 
     @staticmethod
     def _snapshot_dates(payload: dict[str, Any]) -> list[Any]:
@@ -342,8 +527,52 @@ class BusinessProfileSemanticRepairService:
         return {"code": code, "instrument_id": instrument_id, "stable_id": stable_id, "details": details}
 
     @staticmethod
-    def _report(findings: list[dict[str, Any]], *, apply: bool) -> dict[str, Any]:
+    def _change_counts(changes: list[dict[str, Any]]) -> dict[str, int]:
+        counts = Counter(item.get("status") for item in changes)
+        return {
+            name: int(counts.get(name, 0))
+            for name in ("would_change", "changed", "unchanged", "held", "failed")
+        }
+
+    def _current_projections(self, instrument_ids: Iterable[str]) -> dict[str, Any]:
+        cutoff = str(get_shanghai_time().date())
+        output: dict[str, Any] = {}
+        for instrument_id in instrument_ids:
+            output[str(instrument_id)] = {
+                "cutoff": cutoff,
+                "relationships": [
+                    str(item.get("relationship_id") or "")
+                    for item in self.repository.get_approved_as_of(
+                        "relationships", instrument_id=str(instrument_id), cutoff=cutoff
+                    )
+                ],
+                "exposures": [
+                    str(item.get("exposure_id") or "")
+                    for item in self.repository.get_approved_as_of(
+                        "exposures", instrument_id=str(instrument_id), cutoff=cutoff
+                    )
+                ],
+            }
+        return output
+
+    @staticmethod
+    def _report(
+        findings: list[dict[str, Any]],
+        *,
+        apply: bool,
+        before_projections: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         issues = [item for finding in findings for item in finding["issues"]]
+        would_change = sum(
+            item["code"]
+            in {
+                "shareholder_scope_mismatch",
+                "shareholder_noncanonical_report_date",
+                "shareholder_inferred_controller",
+                "relationship_short_name_auto_resolution",
+            }
+            for item in issues
+        )
         return {
             "schema_version": REPAIR_SCHEMA_VERSION,
             "mode": "apply" if apply else "audit",
@@ -352,4 +581,13 @@ class BusinessProfileSemanticRepairService:
             "write_count": 0,
             "instruments": findings,
             "issue_counts": dict(Counter(item["code"] for item in issues)),
+            "before_current_projections": before_projections or {},
+            "after_current_projections": before_projections or {},
+            "change_counts": {
+                "would_change": 0 if apply else would_change,
+                "changed": 0,
+                "unchanged": 0,
+                "held": 0,
+                "failed": 0,
+            },
         }

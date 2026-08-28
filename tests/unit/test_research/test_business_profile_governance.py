@@ -265,6 +265,100 @@ def test_relationship_as_of_excludes_stale_persistent_evidence(tmp_path):
     ) == []
 
 
+@pytest.mark.parametrize(
+    ("record_type", "record", "record_id"),
+    [
+        (
+            "activities",
+            {
+                "activity_id": "ended-activity",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": "produces",
+                "object_type": "product",
+                "object_raw": "煤炭",
+                "evidence_id": "evidence-2025-ar",
+                "extraction_method": "semantic_verified",
+                "valid_from": "2025-01-01",
+                "valid_to": "2026-04-30",
+            },
+            "activity_id",
+        ),
+        (
+            "value_chain_roles",
+            {
+                "record_id": "ended-role",
+                "report_period": "2025-12-31",
+                "role": "upstream_producer",
+                "materiality": "high",
+                "mapping_basis": "company_disclosure",
+                "evidence_id": "evidence-2025-ar",
+                "valid_from": "2025-01-01",
+                "valid_to": "2026-04-30",
+            },
+            "record_id",
+        ),
+        (
+            "exposure_assumptions",
+            {
+                "assumption_id": "ended-assumption",
+                "scope_type": "instrument",
+                "scope_id": "601088.SH",
+                "assumption_type": "pass_through",
+                "assumption_value": 0.5,
+                "unit": "fraction",
+                "method": "approved_model",
+                "effective_from": "2025-01-01",
+                "effective_to": "2026-04-30",
+            },
+            "assumption_id",
+        ),
+        (
+            "exposures",
+            {
+                "exposure_id": "ended-exposure",
+                "report_period": "2025-12-31",
+                "scope_type": "company",
+                "scope_id": "601088.SH",
+                "commodity_id": "coal",
+                "exposure_role": "revenue",
+                "direction": "positive",
+                "mapping_basis": "test",
+                "price_series_id": "coal-price",
+                "evidence_id": "evidence-2025-ar",
+                "effective_from": "2025-01-01",
+                "effective_to": "2026-04-30",
+            },
+            "exposure_id",
+        ),
+    ],
+)
+def test_as_of_excludes_every_expired_validity_interval(
+    tmp_path, record_type, record, record_id
+):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    payload = {
+        **record,
+        "instrument_id": "601088.SH",
+        "data_available_date": "2026-03-28",
+        "confidence": 1.0,
+        "review_status": "approved",
+    }
+    _governed_upsert(repository, record_type, payload)
+
+    before_end = repository.get_approved_as_of(
+        record_type, instrument_id="601088.SH", cutoff="2026-04-29"
+    )
+    at_end = repository.get_approved_as_of(
+        record_type, instrument_id="601088.SH", cutoff="2026-04-30"
+    )
+
+    assert before_end[0][record_id] == record[record_id]
+    assert at_end == []
+
+
 def _governed_upsert(repository, record_type, record):
     """Insert test records through the same candidate-first audited path as production."""
 

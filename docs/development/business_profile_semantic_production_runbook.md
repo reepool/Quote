@@ -380,12 +380,17 @@ signature 和排序后的本地候选。
 审计输出 `issue_counts`、稳定 issue ID 以及每只股票的 before/after 诊断，
 `write_count` 必须为 `0`。常见结果包括：
 
-- `shareholder_inferred_controller`：历史快照把第一大股东误写为实控人；apply 会在
-  本地没有控制权历史支持时清除该派生字段。
+- `shareholder_inferred_controller`：仅当本地 provenance 能证明聚合来源把实际第一
+  大股东误写为实控人、且不存在适用的官方控制权记录时，apply 才清除该派生字段。
+  来自 CNInfo、交易所等官方来源的实控人即使尚无控制权历史行也会保留；来源无法
+  判定时报告 `shareholder_controller_provenance_ambiguous` 并保持 `held`。
 - `shareholder_scope_mismatch` 或 `shareholder_noncanonical_report_date`：按当前
   scope 归并规则重建快照及每个 scope 的 source/raw provenance。
 - 关系简称解析、跨年 cohort 和历史暴露碰撞：当前时点读取已按新规则避免错误消费；
-  如果本地证据不足以无损改写，会报告 `held`，而不会删除证据、重调 LLM 或伪造批准。
+  对没有人工决定、且可证明仅由证券简称自动绑定实体的已批准关系，apply 通过既有
+  review owner 将该记录隔离为 `held`，保留原始证据和不可变审核记录，等待明确的
+  `disclosed_name_only` 确认或由受治理全称产生的 successor。其余证据不足的记录
+  报告 `held`，而不会删除证据、重调 LLM 或伪造批准。
 
 先在复制库完成审计后，才可对限定股票执行 apply：
 
