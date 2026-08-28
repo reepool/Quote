@@ -442,6 +442,22 @@
 - **`short_gap_catchup_days`**: 对已有行情但最新日期落后普通日更窗口的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。
 - **`sample_limit`**: 日更报告中保留的追补样例数量。追补窗口被截断或缺少 `listed_date` 时会在报告中暴露，超过窗口的大缺口仍交给 `/backfill` 或 `find_gap_and_repair`。
 
+### data_config.daily_update_official_retry
+
+> 普通 A 股日更在全市场循环结束后，对仍未覆盖目标交易日的失败代码再请求一次官方行情源。用于官方源被 403/stale 熔断跳过、但任务末尾可能已经恢复的指数。
+
+```json
+{
+  "daily_update_official_retry": {
+    "enabled": true,
+    "max_instruments": 50
+  }
+}
+```
+
+- **`enabled`**: 是否在日更主循环结束后补拉 `empty_unresolved` 代码。
+- **`max_instruments`**: 单轮最多补拉数量，避免全市场主源故障时重复打官方接口。补拉只走路由链第一个官方源，并忽略本轮 coverage 熔断，不重试 BaoStock/AkShare。挽回结果计入成功数，并出现在 Telegram「完整性」段的「官方补拉」。
+
 ### data_config.repair_universe_governance
 
 > 历史缺口修复、月度完整性检查和区间回补的本地生命周期过滤配置。该配置只使用本地主数据和本地生命周期证据约束 repair universe，默认不刷新上游当前主数据。

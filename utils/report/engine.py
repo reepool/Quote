@@ -221,6 +221,10 @@ class ReportEngine:
                 'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
                 'changelog_stats': summary.get('changelog_stats', data.get('changelog_stats')),
                 'integrity_stats': summary.get('integrity_stats', data.get('integrity_stats')),
+                'official_retry_stats': summary.get(
+                    'official_retry_stats',
+                    data.get('official_retry_stats'),
+                ),
             })
 
         data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
@@ -236,7 +240,8 @@ class ReportEngine:
             data.get('changelog_stats')
         )
         data['daily_integrity_summary'] = self._format_daily_integrity_summary(
-            data.get('integrity_stats')
+            data.get('integrity_stats'),
+            official_retry_stats=data.get('official_retry_stats'),
         )
 
         # 确保所有报告都有一个明确的名称
@@ -266,21 +271,42 @@ class ReportEngine:
                 visible_parts.append(f"{label}: {value}")
         return '，'.join(visible_parts)
 
-    def _format_daily_integrity_summary(self, integrity_stats: Dict[str, Any]) -> str:
+    def _format_daily_integrity_summary(
+        self,
+        integrity_stats: Dict[str, Any],
+        official_retry_stats: Optional[Dict[str, Any]] = None,
+    ) -> str:
         """Format bounded unresolved coverage samples for operator reports."""
-        if not isinstance(integrity_stats, dict) or not integrity_stats:
-            return ''
+        if not isinstance(integrity_stats, dict):
+            integrity_stats = {}
+        if not isinstance(official_retry_stats, dict) or not official_retry_stats:
+            official_retry_stats = integrity_stats.get('official_retry') or {}
+            if not isinstance(official_retry_stats, dict):
+                official_retry_stats = {}
 
         empty_unresolved = int(integrity_stats.get('empty_unresolved', 0) or 0)
         stale_source = int(integrity_stats.get('stale_source', 0) or 0)
         quality_rejected = int(integrity_stats.get('quality_rejected', 0) or 0)
         samples = integrity_stats.get('samples') or []
-        if empty_unresolved <= 0 and not samples:
+        retry_attempted = int(official_retry_stats.get('attempted', 0) or 0)
+        retry_recovered = int(official_retry_stats.get('recovered', 0) or 0)
+        if empty_unresolved <= 0 and not samples and retry_attempted <= 0:
             return ''
 
         lines = [
             f"未覆盖: {empty_unresolved}，陈旧源: {stale_source}，质量拒绝: {quality_rejected}",
         ]
+        if retry_attempted > 0:
+            lines.append(f"官方补拉: 尝试{retry_attempted}，挽回{retry_recovered}")
+            recovered_parts = []
+            for sample in (official_retry_stats.get('recovered_samples') or [])[:5]:
+                if not isinstance(sample, dict):
+                    continue
+                instrument_id = sample.get('instrument_id') or sample.get('symbol')
+                if instrument_id:
+                    recovered_parts.append(str(instrument_id))
+            if recovered_parts:
+                lines.append('挽回样例: ' + '；'.join(recovered_parts))
         sample_parts = []
         for sample in samples[:5]:
             if not isinstance(sample, dict):
@@ -294,6 +320,8 @@ class ReportEngine:
                 extras.append('skipped=' + ','.join(str(item) for item in skipped[:3]))
             if sample.get('transport_error'):
                 extras.append('http_throttle')
+            if sample.get('official_retry'):
+                extras.append('retry=' + str(sample.get('official_retry')))
             suffix = f" {' '.join(extras)}" if extras else ''
             sample_parts.append(f"{instrument_id}{suffix}")
         if sample_parts:

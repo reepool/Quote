@@ -15324,6 +15324,9 @@ class DataManager:
             integrity_stats = update_results.get('integrity_stats')
             if not isinstance(integrity_stats, dict):
                 integrity_stats = {}
+            official_retry_stats = update_results.get('official_retry_stats')
+            if not isinstance(official_retry_stats, dict):
+                official_retry_stats = integrity_stats.get('official_retry') or {}
 
             report = {
                 'summary': {
@@ -15345,6 +15348,7 @@ class DataManager:
                 'factor_stats': factor_stats,
                 'quote_composite_watermark': quote_composite_watermark,
                 'integrity_stats': integrity_stats,
+                'official_retry_stats': official_retry_stats,
                 'errors': []
             }
 
@@ -15446,6 +15450,8 @@ class DataManager:
                 'quote_composite_watermark': update_results.get(
                     'quote_composite_watermark'
                 ),
+                'integrity_stats': update_results.get('integrity_stats', {}),
+                'official_retry_stats': update_results.get('official_retry_stats', {}),
                 'errors': [str(e)]
             }
 
@@ -19266,6 +19272,300 @@ class DataManager:
         }
         cfg['enabled'] = bool(cfg.get('enabled', True))
         return cfg
+
+    def _get_daily_update_official_retry_config(self) -> Dict[str, Any]:
+        """Return end-of-run official-source retry settings for unresolved quotes."""
+        defaults = {
+            'enabled': True,
+            'max_instruments': 50,
+        }
+        raw = self.data_config.get('daily_update_official_retry', {})
+        if not isinstance(raw, dict):
+            raw = {}
+        cfg = {**defaults, **raw}
+        try:
+            cfg['max_instruments'] = max(
+                0,
+                int(cfg.get('max_instruments', defaults['max_instruments'])),
+            )
+        except (TypeError, ValueError):
+            cfg['max_instruments'] = defaults['max_instruments']
+        cfg['enabled'] = bool(cfg.get('enabled', True))
+        return cfg
+
+    @staticmethod
+    def _empty_official_retry_stats() -> Dict[str, Any]:
+        return {
+            'attempted': 0,
+            'recovered': 0,
+            'still_unresolved': 0,
+            'quotes_added': 0,
+            'capped': False,
+            'recovered_samples': [],
+        }
+
+    @staticmethod
+    def _remove_integrity_sample(
+        integrity_stats: Dict[str, Any],
+        instrument_id: str,
+    ) -> None:
+        samples = integrity_stats.get('samples')
+        if not isinstance(samples, list):
+            return
+        integrity_stats['samples'] = [
+            sample
+            for sample in samples
+            if not (
+                isinstance(sample, dict)
+                and sample.get('instrument_id') == instrument_id
+            )
+        ]
+
+    @staticmethod
+    def _patch_integrity_sample(
+        integrity_stats: Dict[str, Any],
+        instrument_id: str,
+        patch: Dict[str, Any],
+    ) -> None:
+        samples = integrity_stats.get('samples')
+        if not isinstance(samples, list):
+            return
+        for sample in samples:
+            if isinstance(sample, dict) and sample.get('instrument_id') == instrument_id:
+                sample.update(patch)
+
+    async def _retry_empty_unresolved_official_daily(
+        self,
+        *,
+        candidates: List[Dict[str, Any]],
+        update_results: Dict[str, Any],
+        retry_config: Dict[str, Any],
+        per_instrument_timeout_sec: Optional[int],
+        catchup_sample_limit: int,
+    ) -> Dict[str, Any]:
+        """Retry empty_unresolved A-share codes once from the official daily source."""
+        stats = self._empty_official_retry_stats()
+        if not candidates:
+            return stats
+
+        max_instruments = int(retry_config.get('max_instruments', 50) or 0)
+        if max_instruments <= 0:
+            return stats
+
+        to_retry = candidates[:max_instruments]
+        stats['capped'] = len(candidates) > len(to_retry)
+        if stats['capped']:
+            dm_logger.warning(
+                "[DataManager] Official daily retry capped from %s to %s unresolved instruments",
+                len(candidates),
+                len(to_retry),
+            )
+        dm_logger.info(
+            "[DataManager] Retrying %s empty_unresolved instrument(s) from official daily source",
+            len(to_retry),
+        )
+
+        for item in to_retry:
+            instrument = item.get('instrument') or {}
+            exchange = str(item.get('exchange') or instrument.get('exchange') or '').upper()
+            exchange_result = (update_results.get('exchange_stats') or {}).get(exchange)
+            instrument_id = instrument.get('instrument_id')
+            symbol = instrument.get('symbol') or instrument_id
+            if not isinstance(exchange_result, dict) or 'error' in exchange_result:
+                stats['still_unresolved'] += 1
+                continue
+
+            fetch_start_date = item.get('fetch_start_date')
+            end_date = item.get('end_date')
+            stats['attempted'] += 1
+            try:
+                fetch_coro = self.source_factory.get_daily_data(
+                    exchange,
+                    instrument['instrument_id'],
+                    instrument['symbol'],
+                    datetime.combine(fetch_start_date, datetime.min.time()),
+                    datetime.combine(end_date, datetime.max.time()),
+                    instrument_type=instrument.get('type', 'stock'),
+                    source_symbol=instrument.get('source_symbol', ''),
+                    official_source_only=True,
+                    ignore_coverage_breaker=True,
+                )
+                if per_instrument_timeout_sec:
+                    data = await asyncio.wait_for(
+                        fetch_coro,
+                        timeout=per_instrument_timeout_sec,
+                    )
+                else:
+                    data = await fetch_coro
+            except asyncio.TimeoutError:
+                dm_logger.warning(
+                    "[DataManager] Official daily retry timed out for %s (%s)",
+                    symbol,
+                    instrument_id,
+                )
+                stats['still_unresolved'] += 1
+                self._patch_integrity_sample(
+                    update_results['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'timeout'},
+                )
+                self._patch_integrity_sample(
+                    exchange_result['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'timeout'},
+                )
+                continue
+            except Exception as retry_error:
+                dm_logger.warning(
+                    "[DataManager] Official daily retry failed for %s: %s",
+                    symbol,
+                    retry_error,
+                )
+                stats['still_unresolved'] += 1
+                self._patch_integrity_sample(
+                    update_results['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'error'},
+                )
+                self._patch_integrity_sample(
+                    exchange_result['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'error'},
+                )
+                continue
+
+            prepared_data, rejected_count = self._prepare_daily_quote_rows(
+                data or [], instrument
+            )
+            source_diagnostic = getattr(
+                self.source_factory,
+                'last_daily_data_diagnostic',
+                {},
+            )
+            if rejected_count:
+                exchange_result['integrity_stats']['quality_rejected'] += rejected_count
+                update_results['integrity_stats']['quality_rejected'] += rejected_count
+            if not prepared_data:
+                stats['still_unresolved'] += 1
+                retry_patch = {
+                    'official_retry': 'empty',
+                    'stale_source': bool(
+                        isinstance(source_diagnostic, dict)
+                        and source_diagnostic.get('stale_source')
+                    ),
+                    'transport_error': bool(
+                        isinstance(source_diagnostic, dict)
+                        and source_diagnostic.get('transport_error')
+                    ),
+                }
+                self._patch_integrity_sample(
+                    update_results['integrity_stats'],
+                    instrument_id,
+                    retry_patch,
+                )
+                self._patch_integrity_sample(
+                    exchange_result['integrity_stats'],
+                    instrument_id,
+                    retry_patch,
+                )
+                dm_logger.info(
+                    "[DataManager] Official daily retry still empty for %s",
+                    symbol,
+                )
+                continue
+
+            write_stats = await self.db_ops.save_daily_quotes(
+                prepared_data,
+                return_stats=True,
+            )
+            if not isinstance(write_stats, dict):
+                write_stats = {}
+            if int(write_stats.get('failed', 0) or 0):
+                stats['still_unresolved'] += 1
+                dm_logger.warning(
+                    "[DataManager] Official daily retry persistence incomplete for %s: failed=%s",
+                    symbol,
+                    write_stats.get('failed'),
+                )
+                self._patch_integrity_sample(
+                    update_results['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'persist_failed'},
+                )
+                self._patch_integrity_sample(
+                    exchange_result['integrity_stats'],
+                    instrument_id,
+                    {'official_retry': 'persist_failed'},
+                )
+                continue
+
+            for stat_key in (
+                'inserted', 'changed', 'unchanged',
+                'skipped', 'failed', 'changelog_written',
+            ):
+                stat_value = int(write_stats.get(stat_key, 0) or 0)
+                exchange_result['changelog_stats'][stat_key] += stat_value
+                update_results['changelog_stats'][stat_key] += stat_value
+
+            quotes_added = len(prepared_data)
+            exchange_result['quotes_added'] += quotes_added
+            update_results['total_quotes_added'] += quotes_added
+            exchange_result['success_count'] += 1
+            update_results['success_count'] += 1
+            exchange_result['failure_count'] = max(0, exchange_result['failure_count'] - 1)
+            update_results['failure_count'] = max(0, update_results['failure_count'] - 1)
+            exchange_result['integrity_stats']['empty_unresolved'] = max(
+                0, exchange_result['integrity_stats']['empty_unresolved'] - 1
+            )
+            update_results['integrity_stats']['empty_unresolved'] = max(
+                0, update_results['integrity_stats']['empty_unresolved'] - 1
+            )
+            self._remove_integrity_sample(
+                update_results['integrity_stats'], instrument_id
+            )
+            self._remove_integrity_sample(
+                exchange_result['integrity_stats'], instrument_id
+            )
+
+            window = item.get('window') or {}
+            is_catchup = bool(item.get('is_catchup'))
+            if is_catchup:
+                counter_name = (
+                    'new_instrument_count'
+                    if window.get('reason') == 'new_instrument_catchup'
+                    else 'short_gap_count'
+                )
+                exchange_result['catchup_stats'][counter_name] += 1
+                update_results['catchup_stats'][counter_name] += 1
+                exchange_result['catchup_stats']['catchup_quotes_added'] += quotes_added
+                update_results['catchup_stats']['catchup_quotes_added'] += quotes_added
+                if window.get('capped'):
+                    exchange_result['catchup_stats']['capped_count'] += 1
+                    update_results['catchup_stats']['capped_count'] += 1
+
+            recovered_sample = {
+                'instrument_id': instrument_id,
+                'symbol': symbol,
+                'exchange': exchange,
+                'quotes_added': quotes_added,
+            }
+            stats['recovered'] += 1
+            stats['quotes_added'] += quotes_added
+            if catchup_sample_limit > 0 and len(stats['recovered_samples']) < catchup_sample_limit:
+                stats['recovered_samples'].append(recovered_sample)
+            dm_logger.info(
+                "[DataManager] Official daily retry recovered %s: %s quotes",
+                symbol,
+                quotes_added,
+            )
+
+        dm_logger.info(
+            "[DataManager] Official daily retry finished: attempted=%s recovered=%s still_unresolved=%s",
+            stats['attempted'],
+            stats['recovered'],
+            stats['still_unresolved'],
+        )
+        return stats
 
     @staticmethod
     def _coerce_date(value: Any) -> Optional[date]:
@@ -37809,7 +38109,9 @@ class DataManager:
                     'failed': 0,
                     'changelog_written': 0,
                 },
+                'official_retry_stats': self._empty_official_retry_stats(),
             }
+            empty_unresolved_retries: List[Dict[str, Any]] = []
             instrument_master_sync = await self._maybe_sync_instrument_master_before_daily_update(
                 exchanges,
                 target_date,
@@ -38017,6 +38319,17 @@ class DataManager:
                                                 ),
                                             },
                                         )
+                                        if exchange in ('SSE', 'SZSE', 'BSE'):
+                                            empty_unresolved_retries.append(
+                                                {
+                                                    'exchange': exchange,
+                                                    'instrument': instrument,
+                                                    'fetch_start_date': fetch_start_date,
+                                                    'end_date': end_date,
+                                                    'is_catchup': is_catchup,
+                                                    'window': window,
+                                                }
+                                            )
                                     continue
                                 if prepared_data:
                                     write_stats = await self.db_ops.save_daily_quotes(
@@ -38144,6 +38457,21 @@ class DataManager:
                     update_results['failure_count'] += 1
                     update_results['exchange_stats'][exchange] = {'error': str(e)}
                     continue
+
+            retry_config = self._get_daily_update_official_retry_config()
+            if retry_config.get('enabled') and empty_unresolved_retries:
+                update_results['official_retry_stats'] = (
+                    await self._retry_empty_unresolved_official_daily(
+                        candidates=empty_unresolved_retries,
+                        update_results=update_results,
+                        retry_config=retry_config,
+                        per_instrument_timeout_sec=per_instrument_timeout_sec,
+                        catchup_sample_limit=catchup_sample_limit,
+                    )
+                )
+            update_results['integrity_stats']['official_retry'] = (
+                update_results['official_retry_stats']
+            )
 
             try:
                 update_results['quote_composite_watermark'] = (

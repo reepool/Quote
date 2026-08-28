@@ -39,6 +39,10 @@
       "short_gap_catchup_days": 5,
       "sample_limit": 10
     },
+    "daily_update_official_retry": {
+      "enabled": true,
+      "max_instruments": 50
+    },
     "repair_universe_governance": {
       "enabled": true,
       "default_mode": "historical_backfill",

@@ -862,6 +862,70 @@ def test_daily_update_report_renders_integrity_samples_without_nested_table_nois
     assert 'Integrity Stats' not in message
 
 
+def test_daily_update_report_renders_official_retry_without_nested_table_noise():
+    engine = ReportEngine()
+    integrity_stats = {
+        'empty_unresolved': 1,
+        'quality_rejected': 0,
+        'stale_source': 16,
+        'samples': [
+            {
+                'instrument_id': '399691.SZ',
+                'symbol': '399691',
+                'exchange': 'SZSE',
+                'category': 'empty_unresolved',
+                'skipped_sources': ['cnindex_a_stock'],
+                'official_retry': 'empty',
+            },
+        ],
+        'official_retry': {
+            'attempted': 4,
+            'recovered': 3,
+            'still_unresolved': 1,
+            'quotes_added': 3,
+            'recovered_samples': [
+                {'instrument_id': '000842.SH', 'symbol': '000842', 'exchange': 'SSE'},
+                {'instrument_id': '000939.SH', 'symbol': '000939', 'exchange': 'SSE'},
+            ],
+        },
+    }
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-08-28',
+            'status': 'warning',
+            'update_results': {
+                'success_count': 6216,
+                'failure_count': 1,
+                'total_quotes_added': 12426,
+                'integrity_stats': integrity_stats,
+                'official_retry_stats': integrity_stats['official_retry'],
+                'exchange_stats': {
+                    'SSE': {
+                        'success_count': 2595,
+                        'failure_count': 0,
+                        'quotes_added': 5186,
+                        'total_instruments': 2595,
+                    },
+                    'SZSE': {
+                        'success_count': 3283,
+                        'failure_count': 1,
+                        'quotes_added': 6563,
+                        'total_instruments': 3284,
+                    },
+                },
+            },
+        },
+        'telegram',
+    )
+
+    assert '*完整性*' in message
+    assert '官方补拉: 尝试4，挽回3' in message
+    assert '挽回样例: 000842.SH；000939.SH' in message
+    assert '399691.SZ skipped=cnindex_a_stock retry=empty' in message
+    assert "'recovered_samples':" not in message
+
+
 def test_daily_update_report_renders_changelog_summary_without_nested_table_noise():
     engine = ReportEngine()
     changelog_stats = {
@@ -1133,6 +1197,7 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
     manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
     manager.source_factory = Mock()
     manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+    manager.source_factory.last_daily_data_diagnostic = {}
 
     with patch('builtins.open', mock_open()):
         result = await manager.update_daily_data(
@@ -1142,9 +1207,16 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
             run_factor_audit=False,
         )
 
+    assert manager.source_factory.get_daily_data.await_count == 2
+    retry_call = manager.source_factory.get_daily_data.await_args_list[1]
+    assert retry_call.kwargs['official_source_only'] is True
+    assert retry_call.kwargs['ignore_coverage_breaker'] is True
     assert result['success_count'] == 0
     assert result['failure_count'] == 1
     assert result['integrity_stats']['empty_unresolved'] == 1
+    assert result['official_retry_stats']['attempted'] == 1
+    assert result['official_retry_stats']['recovered'] == 0
+    assert result['official_retry_stats']['still_unresolved'] == 1
     assert result['integrity_stats']['samples'] == [{
         'instrument_id': '000001.SZ',
         'symbol': '000001',
@@ -1154,7 +1226,101 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
         'probed_sources': [],
         'stale_source': False,
         'transport_error': False,
+        'official_retry': 'empty',
     }]
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_retries_empty_unresolved_from_official_source():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._record_a_share_quote_composite_watermark = AsyncMock(
+        return_value={'status': 'ok'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '000842.SH',
+        'symbol': '000842',
+        'exchange': 'SSE',
+        'type': 'index',
+        'listed_date': datetime(2010, 1, 1),
+        'source_symbol': '000842',
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.db_ops.save_daily_quotes = AsyncMock(return_value={
+        'inserted': 1,
+        'changed': 0,
+        'unchanged': 0,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 1,
+    })
+    manager.source_factory = Mock()
+
+    async def fake_get_daily_data(*_args, **kwargs):
+        if kwargs.get('official_source_only'):
+            manager.source_factory.last_daily_data_diagnostic = {
+                'skipped_sources': [],
+                'probed_sources': [],
+                'stale_source': False,
+                'transport_error': False,
+                'official_source_only': True,
+                'ignore_coverage_breaker': True,
+            }
+            return [{
+                'instrument_id': '000842.SH',
+                'time': datetime(2026, 8, 28),
+                'open': 1,
+                'high': 1,
+                'low': 1,
+                'close': 1,
+                'volume': 1,
+                'amount': 1,
+                'tradestatus': 1,
+                'factor': 1,
+            }]
+        manager.source_factory.last_daily_data_diagnostic = {
+            'skipped_sources': ['csindex_a_stock'],
+            'probed_sources': [],
+            'stale_source': True,
+            'transport_error': False,
+        }
+        return []
+
+    manager.source_factory.get_daily_data = AsyncMock(side_effect=fake_get_daily_data)
+    manager.source_factory.last_daily_data_diagnostic = {}
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SSE'],
+            target_date=date(2026, 8, 28),
+            instrument_types=['index'],
+            run_factor_audit=False,
+        )
+
+    assert manager.source_factory.get_daily_data.await_count == 2
+    retry_call = manager.source_factory.get_daily_data.await_args_list[1]
+    assert retry_call.kwargs['official_source_only'] is True
+    assert retry_call.kwargs['ignore_coverage_breaker'] is True
+    assert result['success_count'] == 1
+    assert result['failure_count'] == 0
+    assert result['integrity_stats']['empty_unresolved'] == 0
+    assert result['integrity_stats']['samples'] == []
+    assert result['total_quotes_added'] == 1
+    assert result['official_retry_stats']['attempted'] == 1
+    assert result['official_retry_stats']['recovered'] == 1
+    assert result['official_retry_stats']['still_unresolved'] == 0
+    assert result['official_retry_stats']['recovered_samples'] == [{
+        'instrument_id': '000842.SH',
+        'symbol': '000842',
+        'exchange': 'SSE',
+        'quotes_added': 1,
+    }]
+    manager.db_ops.save_daily_quotes.assert_awaited_once()
 
 
 @pytest.mark.asyncio

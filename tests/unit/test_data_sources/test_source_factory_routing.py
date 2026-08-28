@@ -531,6 +531,58 @@ class TestSourceFactoryRouting:
         ]
 
     @pytest.mark.asyncio
+    async def test_official_only_retry_ignores_open_http_403_breaker(self):
+        self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 28).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(
+            side_effect=[
+                Exception('HTTP Error 403: Forbidden'),
+                Exception('HTTP Error 403: Forbidden'),
+                Exception('HTTP Error 403: Forbidden'),
+                [self._index_quote('000842.SH', datetime(2026, 8, 28), 3.0)],
+            ]
+        )
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 28), 2.0)
+            ]
+        )
+
+        for symbol in ['000841', '000843', '000844']:
+            rows = await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 28),
+                datetime(2026, 8, 28),
+                instrument_type='index',
+            )
+            assert rows[0]['close'] == 2.0
+
+        baostock_calls = self.baostock.get_daily_data.await_count
+        assert self.csindex.get_daily_data.await_count == 3
+
+        rows = await self.factory.get_daily_data(
+            'SSE',
+            '000842.SH',
+            '000842',
+            datetime(2026, 8, 28),
+            datetime(2026, 8, 28),
+            instrument_type='index',
+            official_source_only=True,
+            ignore_coverage_breaker=True,
+        )
+
+        assert rows[0]['close'] == 3.0
+        assert self.csindex.get_daily_data.await_count == 4
+        assert self.baostock.get_daily_data.await_count == baostock_calls
+        assert self.factory.last_daily_data_diagnostic['official_source_only'] is True
+        assert self.factory.last_daily_data_diagnostic['ignore_coverage_breaker'] is True
+        assert self.factory.last_daily_data_diagnostic['skipped_sources'] == []
+
+    @pytest.mark.asyncio
     async def test_empty_index_result_does_not_open_http_403_breaker(self):
         self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)
         self.factory.db_ops.get_trading_days = AsyncMock(

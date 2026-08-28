@@ -1487,7 +1487,10 @@ class DataSourceFactory:
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
                            instrument_type: str = 'stock',
-                           source_symbol: str = '') -> List[Dict[str, Any]]:
+                           source_symbol: str = '',
+                           *,
+                           official_source_only: bool = False,
+                           ignore_coverage_breaker: bool = False) -> List[Dict[str, Any]]:
         """获取日线数据 - 智能降级策略
 
         Args:
@@ -1498,6 +1501,8 @@ class DataSourceFactory:
             end_date: 结束日期
             instrument_type: 品种类型
             source_symbol: 数据源原始代码（如东财 105.AAPL），可选
+            official_source_only: 只请求路由链第一个官方源，不走 fallback
+            ignore_coverage_breaker: 忽略本轮 stale/403 熔断，强制请求当前源链
         """
         exchange = exchange.upper()
         self.last_daily_data_diagnostic = {
@@ -1509,20 +1514,25 @@ class DataSourceFactory:
             "transport_error": False,
             "skipped_sources": [],
             "probed_sources": [],
+            "official_source_only": bool(official_source_only),
+            "ignore_coverage_breaker": bool(ignore_coverage_breaker),
         }
 
         source_chain = self._get_daily_source_chain(exchange, instrument_type)
         if not source_chain:
             ds_logger.error(f"[DataSourceFactory] No data source configured for exchange: {exchange}")
             return []
-        source_chain = await self._filter_daily_source_chain_for_stale_breaker(
-            source_chain,
-            exchange=exchange,
-            instrument_type=instrument_type,
-            start_date=start_date,
-            end_date=end_date,
-            symbol=symbol,
-        )
+        if official_source_only:
+            source_chain = source_chain[:1]
+        if not ignore_coverage_breaker:
+            source_chain = await self._filter_daily_source_chain_for_stale_breaker(
+                source_chain,
+                exchange=exchange,
+                instrument_type=instrument_type,
+                start_date=start_date,
+                end_date=end_date,
+                symbol=symbol,
+            )
         if not source_chain:
             ds_logger.warning(
                 "[DataSourceFactory] All daily sources are currently blocked by coverage circuit breaker for %s %s",
