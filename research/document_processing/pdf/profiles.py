@@ -153,9 +153,7 @@ def build_router(profile: PdfProfile, *, allow_unapproved_gpu_canary: bool = Fal
     from .native_worker import get_shared_native_worker_pool
 
     if profile.ocr_device.startswith("gpu"):
-        if allow_unapproved_gpu_canary:
-            _require_isolated_gpu_runtime(profile)
-        else:
+        if not allow_unapproved_gpu_canary:
             _require_gpu_canary_approval(profile)
     native_pool = get_shared_native_worker_pool(
         max_workers=profile.native_max_concurrency,
@@ -209,7 +207,6 @@ def _require_gpu_canary_approval(profile: PdfProfile) -> None:
     )
     if not report_valid:
         raise ValueError("GPU PDF canary report has not passed every gate")
-    _require_isolated_gpu_runtime(profile)
 
 
 def _require_visible_cuda_runtime() -> None:
@@ -252,14 +249,14 @@ def _gpu_probe_failure_diagnostic(probe: Mapping[str, Any]) -> str:
     return "; ".join(parts) or "unspecified probe failure"
 
 
-def _require_isolated_gpu_runtime(profile: PdfProfile) -> None:
+def _require_isolated_gpu_runtime(profile: PdfProfile, *, timeout_seconds: float | None = None) -> Mapping[str, Any]:
     from .adapters import PaddleOcrAdapter
 
     key = _gpu_runtime_probe_key(profile)
     with _GPU_PROBE_LOCK:
         cached = _GPU_PROBE_CACHE.get(key)
         if cached is None:
-            probe = PaddleOcrAdapter.probe_runtime(profile)
+            probe = PaddleOcrAdapter.probe_runtime(profile, timeout_seconds=timeout_seconds)
             healthy = (
                 bool(probe.get("healthy"))
                 and bool(probe.get("cuda_available"))
@@ -277,3 +274,4 @@ def _require_isolated_gpu_runtime(profile: PdfProfile) -> None:
         raise ValueError(
             f"GPU PDF profile requires a healthy isolated CUDA OCR worker: {diagnostic}"
         )
+    return probe

@@ -273,7 +273,9 @@ def evaluate_cases(
             except ImportError:
                 pass
             if router_factory is None:
-                from .profiles import build_router
+                from .profiles import _require_isolated_gpu_runtime, build_router
+                if profile.ocr_device.startswith("gpu"):
+                    _require_isolated_gpu_runtime(profile)
                 router = build_router(profile, allow_unapproved_gpu_canary=profile.ocr_device.startswith("gpu"))
             else:
                 router = router_factory(profile)

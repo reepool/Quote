@@ -115,9 +115,11 @@ export QUOTE_PDF_OCR_CACHE_DIR=/var/cache/quote/paddlex
 ```
 
 The approval report is corpus-, renderer-, runtime-, and gate-bound. A
-missing/failed report, CPU-only Paddle installation, unavailable worker, or
-invisible GPU causes profile resolution to fail closed; there is no automatic
-GPU rollout. The known lab Paddle 2.6.2/2.7.3 `inflateReset2`/IR failures are
+missing/failed report or an unapproved profile causes profile resolution to
+fail closed; a currently unavailable worker is checked only when selected OCR
+work is actually executed. Native-only requests therefore remain available
+during GPU outages, while OCR still fails closed or uses the configured CPU
+fallback. There is no automatic GPU rollout. The known lab Paddle 2.6.2/2.7.3 `inflateReset2`/IR failures are
 comparative evidence and are not a production fallback path.
 
 Business-profile extraction forwards `target_page_numbers` to the shared

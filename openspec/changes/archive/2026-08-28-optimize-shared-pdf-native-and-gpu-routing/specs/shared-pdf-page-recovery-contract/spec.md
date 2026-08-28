@@ -64,6 +64,8 @@
 - **WHEN** 隔离 GPU worker 报告 CUDA 不可用、启动失败、模型不健康或进程崩溃
 - **THEN** 探测报告返回 typed GPU unavailable/failed 结果，且仍可运行 native profile 和已配置的 CPU worker 评估
 
+## ADDED Requirements
+
 ### Requirement: Native parser process isolation and parallel execution
 
 共享 PDF 模块 MUST 将生产 `pypdfium2` 文本抽取、PDFium OCR 光栅化和 `pypdf` native fallback 放入共享模块管理的受监管 native worker 池；Quote 主进程不得直接执行这些 native 操作。worker 池 MUST 支持跨文档的有界多进程并行，但单个 worker 内部 PDFium/pypdf MUST 串行执行，不得再创建嵌套 PDFium 线程池。池宽度、队列上限、启动方式、worker 重启上限和页/文档超时 MUST 可配置；worker signal/退出、超时、协议错误和缺页 MUST 转换为 typed diagnostic，并保留已完成页。
@@ -86,8 +88,6 @@
 #### Scenario: GPU runtime version differs from approved baseline
 - **WHEN** worker 报告的 Paddle、PaddleOCR、model 或 inference config 与 profile-bound approval 不一致
 - **THEN** GPU profile fail closed，不能复用旧 approval artifact
-
-## ADDED Requirements
 
 ### Requirement: Version-matched isolated GPU and CPU OCR workers
 

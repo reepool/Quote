@@ -16,12 +16,15 @@ export QUOTE_PDF_GPU_OCR_WORKER='/opt/quote-pdf-gpu/bin/python /opt/quote/resear
 
 The CPU and GPU environments must both use Paddle/PaddleOCR 3.3.1/3.7.0 and
 the same model/inference configuration. The GPU environment uses the CUDA 11.8
-wheel and must pass `--probe` before the `pdfium_paddleocr_gpu` profile can be
-approved. Quote caches a successful in-process probe so later PDFs do not pay
-the cold CUDA import again. A missing worker, failed probe, model-cache
-permission failure, protocol mismatch, crash, or timeout returns a typed OCR
-diagnostic in both the log and the raised error; it never imports CUDA Paddle
-into Quote or silently falls back to unbounded OCR.
+wheel and must pass `--probe` for explicit canary approval. Profile resolution
+and router construction validate the static approval artifact but do not probe
+the worker. Quote lazily probes only when a request has uncached OCR pages;
+native-only requests do not depend on GPU availability. Quote caches a
+successful in-process probe so later PDFs do not pay the cold CUDA import again.
+A missing worker, failed probe, model-cache permission failure, protocol
+mismatch, crash, or timeout returns a typed OCR diagnostic and uses only the
+configured bounded CPU fallback; it never imports CUDA Paddle into Quote or
+silently falls back to unbounded OCR.
 
 The worker must be started by its file path as shown above. Do not use
 `python -m research.document_processing.pdf.ocr_worker` in the isolated

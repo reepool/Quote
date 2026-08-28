@@ -595,6 +595,7 @@ class PdfRouter:
         if ocr_targets and self.ocr and profile.ocr_engine:
             try:
                 ocr_request = replace(request, profile=replace(profile, limits=limits))
+                object.__setattr__(ocr_request, "_document_deadline_monotonic", started + limits.max_document_seconds)
                 ocr_pages = self.ocr.extract_pages(request.content, ocr_targets, request=ocr_request)
             except Exception as exc:
                 ocr_pages = {}
@@ -614,7 +615,9 @@ class PdfRouter:
                 provenance = {"engine": getattr(self.ocr, "name", profile.ocr_engine), "mode": request.ocr_mode, **dict(item.provenance)}
                 diagnostics = previous.diagnostics + tuple(item.diagnostics) + tuple(diags)
                 diagnostic_codes = {item.code for item in item.diagnostics}
-                if "ocr_document_timeout" in diagnostic_codes:
+                if diagnostic_codes & {"ocr_runtime_unavailable", "ocr_unavailable", "ocr_worker_startup_failed", "ocr_model_unhealthy"}:
+                    status = "ocr_unavailable"
+                elif "ocr_document_timeout" in diagnostic_codes:
                     status = "ocr_timeout"
                 elif "ocr_timeout" in diagnostic_codes or item.elapsed_seconds > limits.max_page_seconds:
                     status = "ocr_timeout"

@@ -72,9 +72,9 @@ def _paddle_device() -> str:
         return "unknown"
 
 
-def _probe_timeout_seconds() -> float:
+def _probe_timeout_seconds(override: float | None = None) -> float:
     """Allow a longer first-process CUDA worker import than a warm probe."""
-    raw = os.environ.get("QUOTE_PDF_GPU_PROBE_TIMEOUT_SEC", "60")
+    raw = override if override is not None else os.environ.get("QUOTE_PDF_GPU_PROBE_TIMEOUT_SEC", "60")
     try:
         timeout = float(raw)
     except ValueError:
@@ -114,7 +114,7 @@ class PaddleOcrAdapter:
         return self._ocr is not None or bool(self.worker_command) or importlib.util.find_spec("paddleocr") is not None
 
     @classmethod
-    def probe_runtime(cls, profile) -> Mapping[str, Any]:
+    def probe_runtime(cls, profile, *, timeout_seconds: float | None = None) -> Mapping[str, Any]:
         """Probe an isolated worker without importing Paddle in Quote."""
         command = tuple(profile.ocr_worker_command)
         if not command:
@@ -125,7 +125,7 @@ class PaddleOcrAdapter:
                 input=json.dumps({"protocol": cls.worker_protocol_version, "runtime": profile.ocr_runtime, "model_cache_dir": profile.ocr_model_cache_dir}),
                 capture_output=True,
                 text=True,
-                timeout=_probe_timeout_seconds(),
+                timeout=_probe_timeout_seconds(timeout_seconds),
                 check=False,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
@@ -172,9 +172,15 @@ class PaddleOcrAdapter:
     def extract_pages(self, content: bytes, pages: Sequence[int], *, request: PdfParseRequest) -> Mapping[int, OcrPage]:
         if not pages:
             return {}
-        if self.worker_command:
+        if self.worker_command or (self.device.startswith("gpu") and self.fallback_worker_command):
             return self._extract_pages_with_external_worker(content, pages, request=request)
         if self._ocr is None and request.profile.ocr_runtime.startswith("isolated-"):
+            if self.device.startswith("gpu"):
+                return self._worker_error_pages(
+                    pages,
+                    _OcrWorkerError("ocr_runtime_unavailable", "isolated GPU OCR worker command is not configured"),
+                    request,
+                )
             return self._worker_error_pages(
                 pages,
                 _OcrWorkerError("ocr_worker_startup_failed", "isolated OCR worker command is not configured"),
@@ -224,13 +230,27 @@ class PaddleOcrAdapter:
             diagnostic = PdfDiagnostic("ocr_render_failure", f"{type(exc).__name__}: {exc}", severity="error")
             return {int(page): OcrPage("", None, 0.0, (diagnostic,), {"runtime": request.profile.ocr_runtime}) for page in pages}
         try:
-            output = self._invoke_external_worker(self.worker_command, images, request, timeout=max(0.1, request.profile.limits.max_document_seconds))
+            if self.device.startswith("gpu"):
+                from .profiles import _require_isolated_gpu_runtime
+
+                deadline = getattr(request, "_document_deadline_monotonic", None)
+                remaining = None if deadline is None else max(0.1, deadline - time.monotonic())
+                try:
+                    _require_isolated_gpu_runtime(request.profile, timeout_seconds=remaining)
+                except ValueError as exc:
+                    raise _OcrWorkerError("ocr_runtime_unavailable", str(exc)) from exc
+            deadline = getattr(request, "_document_deadline_monotonic", None)
+            timeout = request.profile.limits.max_document_seconds if deadline is None else max(0.1, deadline - time.monotonic())
+            if not self.worker_command:
+                raise _OcrWorkerError("ocr_runtime_unavailable", "isolated GPU OCR worker command is not configured")
+            output = self._invoke_external_worker(self.worker_command, images, request, timeout=timeout)
         except _OcrWorkerError as exc:
             if self.fallback_worker_command and exc.code in request.profile.ocr_fallback_failure_codes:
-                remaining = request.profile.limits.max_document_seconds - (time.monotonic() - started)
+                deadline = getattr(request, "_document_deadline_monotonic", None)
+                remaining = (request.profile.limits.max_document_seconds - (time.monotonic() - started)) if deadline is None else deadline - time.monotonic()
                 if remaining > 0:
                     try:
-                        output = self._invoke_external_worker(self.fallback_worker_command, images, request, timeout=remaining, runtime=request.profile.ocr_fallback_runtime)
+                        output = self._invoke_external_worker(self.fallback_worker_command, images, request, timeout=remaining, runtime=request.profile.ocr_fallback_runtime, device="cpu")
                         output = {
                             number: OcrPage(
                                 item.text,
@@ -251,11 +271,11 @@ class PaddleOcrAdapter:
                 return self._worker_error_pages(pages, exc, request)
         return output
 
-    def _invoke_external_worker(self, command: Sequence[str], images: Mapping[int, bytes], request: PdfParseRequest, *, timeout: float, runtime: str | None = None) -> Mapping[int, OcrPage]:
+    def _invoke_external_worker(self, command: Sequence[str], images: Mapping[int, bytes], request: PdfParseRequest, *, timeout: float, runtime: str | None = None, device: str | None = None) -> Mapping[int, OcrPage]:
         payload = {
             "protocol": self.worker_protocol_version,
             "runtime": runtime or request.profile.ocr_runtime,
-            "device": self.device,
+            "device": device or self.device,
             "structure": self.structure,
             "model_cache_dir": self.model_cache_dir,
             "inference_config": dict(request.profile.ocr_inference_config),

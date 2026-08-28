@@ -22,6 +22,7 @@ from research.document_processing.pdf import (
     detect_text_quality,
     profile_from_mapping,
     resolve_profile,
+    build_router,
     benchmark_native_parallelism,
 )
 from research.document_processing.pdf.adapters import IsolatedNativeAdapter, PaddleOcrAdapter
@@ -289,24 +290,28 @@ def test_gpu_runtime_probe_is_cached_across_profile_and_router(monkeypatch, tmp_
     _enable_approved_gpu_canary(monkeypatch, tmp_path)
     calls: list[object] = []
 
-    def fake_probe(profile):
+    def fake_probe(profile, **kwargs):
         calls.append(tuple(profile.ocr_worker_command))
         return {"healthy": True, "cuda_available": True, "model_cache_writable": True, "device": "gpu:0"}
 
     monkeypatch.setattr(PaddleOcrAdapter, "probe_runtime", staticmethod(fake_probe))
 
     profile = resolve_profile("pdfium_paddleocr_gpu")
+    build_router(profile)
+    assert calls == []
+    pdf_profiles._require_isolated_gpu_runtime(profile)
     pdf_profiles._require_isolated_gpu_runtime(profile)
     assert calls == [("/opt/fake-gpu/bin/python", "/tmp/ocr_worker.py")]
 
 
 def test_gpu_runtime_probe_failure_includes_and_logs_diagnostic(monkeypatch, tmp_path, caplog) -> None:
+    from research.document_processing.pdf import profiles as pdf_profiles
     from research.document_processing.pdf.adapters import PaddleOcrAdapter
 
     _enable_approved_gpu_canary(monkeypatch, tmp_path)
     calls: list[int] = []
 
-    def fake_probe(profile):
+    def fake_probe(profile, **kwargs):
         calls.append(1)
         return {
             "healthy": False,
@@ -316,13 +321,70 @@ def test_gpu_runtime_probe_failure_includes_and_logs_diagnostic(monkeypatch, tmp
         }
 
     monkeypatch.setattr(PaddleOcrAdapter, "probe_runtime", staticmethod(fake_probe))
+    profile = resolve_profile("pdfium_paddleocr_gpu")
+    build_router(profile)
+    assert calls == []
     with caplog.at_level("ERROR"):
         with pytest.raises(ValueError, match="TimeoutExpired: worker exceeded 60.0 seconds"):
-            resolve_profile("pdfium_paddleocr_gpu")
+            pdf_profiles._require_isolated_gpu_runtime(profile)
         with pytest.raises(ValueError, match="TimeoutExpired: worker exceeded 60.0 seconds"):
-            resolve_profile("pdfium_paddleocr_gpu")
+            pdf_profiles._require_isolated_gpu_runtime(profile)
     assert calls == [1, 1]
     assert any("TimeoutExpired: worker exceeded 60.0 seconds" in message for message in caplog.messages)
+
+
+def test_gpu_probe_is_lazy_until_uncached_ocr_pages_exist(monkeypatch) -> None:
+    from research.document_processing.pdf import profiles as pdf_profiles
+
+    calls: list[str] = []
+
+    def fake_ready(profile, **kwargs):
+        calls.append(profile.name)
+        return {"healthy": True, "cuda_available": True, "model_cache_writable": True}
+
+    monkeypatch.setattr(pdf_profiles, "_require_isolated_gpu_runtime", fake_ready)
+    adapter = PaddleOcrAdapter(worker_command=("worker",), device="gpu:0")
+    profile = PdfProfile(name="lazy-gpu", ocr_engine="paddleocr", ocr_device="gpu:0", ocr_runtime="isolated-gpu-paddle-3.3.1")
+    monkeypatch.setattr("research.document_processing.pdf.adapters._render_pdfium_batch", lambda content, pages, dpi: {page: b"png" for page in pages})
+    monkeypatch.setattr(adapter, "_invoke_external_worker", lambda command, images, request, *, timeout, runtime=None, device=None: {page: OcrPage("中文 OCR", 0.99) for page in images})
+
+    request = PdfParseRequest(content=b"%PDF-1.4", profile=profile)
+    assert adapter.extract_pages(request.content, (), request=request) == {}
+    assert calls == []
+    result = adapter.extract_pages(request.content, (1,), request=request)
+    assert result[1].text == "中文 OCR"
+    assert calls == ["lazy-gpu"]
+
+
+def test_gpu_probe_failure_uses_configured_cpu_fallback(monkeypatch) -> None:
+    from research.document_processing.pdf import profiles as pdf_profiles
+
+    def fail_ready(profile, **kwargs):
+        raise ValueError("GPU worker unavailable")
+
+    monkeypatch.setattr(pdf_profiles, "_require_isolated_gpu_runtime", fail_ready)
+    monkeypatch.setattr("research.document_processing.pdf.adapters._render_pdfium_batch", lambda content, pages, dpi: {page: b"png" for page in pages})
+    calls: list[tuple[str, str]] = []
+
+    def invoke(command, images, request, *, timeout, runtime=None, device=None):
+        calls.append((runtime or "gpu", device or "unknown"))
+        return {page: OcrPage("中文 CPU 恢复", 0.98) for page in images}
+
+    adapter = PaddleOcrAdapter(worker_command=("gpu-worker",), fallback_worker_command=("cpu-worker",), device="gpu:0")
+    monkeypatch.setattr(adapter, "_invoke_external_worker", invoke)
+    profile = PdfProfile(
+        name="gpu-with-cpu-fallback",
+        ocr_engine="paddleocr",
+        ocr_device="gpu:0",
+        ocr_runtime="isolated-gpu-paddle-3.3.1",
+        ocr_fallback_runtime="isolated-cpu-paddle-3.3.1",
+        ocr_fallback_worker_command=("cpu-worker",),
+    )
+    request = PdfParseRequest(content=b"%PDF-1.4", profile=profile)
+    result = adapter.extract_pages(request.content, (1,), request=request)
+    assert result[1].text == "中文 CPU 恢复"
+    assert calls == [("isolated-cpu-paddle-3.3.1", "cpu")]
+    assert result[1].provenance["fallback_from_runtime"] == "isolated-gpu-paddle-3.3.1"
 
 
 def test_gpu_probe_uses_cold_start_timeout_budget(monkeypatch) -> None:

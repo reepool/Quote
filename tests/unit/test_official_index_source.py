@@ -17,6 +17,21 @@ from data_sources.official_index_source import (
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "official_index"
 
 
+def test_official_index_pdf_text_uses_authoritative_shared_router(monkeypatch):
+    from types import SimpleNamespace
+
+    calls = []
+
+    class FakeRouter:
+        def parse(self, request):
+            calls.append(request.profile.name)
+            return SimpleNamespace(pages=(SimpleNamespace(text="公告正文"),))
+
+    monkeypatch.setattr("research.document_processing.pdf.build_router", lambda profile: FakeRouter())
+    assert OfficialIndexLifecycleParser.extract_pdf_text(b"%PDF-1.4") == "公告正文"
+    assert calls == ["pdfium_native"]
+
+
 def test_cnindex_index_list_excel_parses_master_rows():
     frame = pd.DataFrame([
         {

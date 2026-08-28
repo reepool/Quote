@@ -97,6 +97,8 @@ The module SHALL extend the existing `PaddleOcrAdapter` boundary to reuse bounde
 - **THEN** it SHALL invoke the isolated worker's versioned capability probe
 - **AND** the Quote process SHALL NOT import a CUDA Paddle package for liveness detection
 
+## ADDED Requirements
+
 ### Requirement: Supervised native worker isolation and bounded parallelism
 
 The shared module MUST execute production `pypdfium2` extraction, PDFium rasterization, and native `pypdf` fallback inside a supervised worker pool outside the Quote parent process. The pool MUST support bounded multi-process parallelism across documents while each worker processes one document attempt serially and MUST NOT create nested PDFium threads. Pool width, queue size, worker task/restart limit, per-page deadline, per-document deadline, and start method MUST be explicit configuration. The parent MUST convert worker signal exits (including `SIGTRAP`), non-zero exits, timeouts, protocol errors, and missing page results into typed diagnostics and MUST preserve completed pages.
@@ -134,8 +136,6 @@ The shared module MUST execute production `pypdfium2` extraction, PDFium rasteri
 - **WHEN** the evaluator tests native worker widths `1`, `2`, `4`, `6`, `8`, and `10` on the frozen corpus and known crash reports (subject to host capacity)
 - **THEN** it MUST report throughput, P95/tail latency, memory, queue wait, worker crash rate, parent-process exits, and completed-page preservation for each width
 - **AND** production configuration MUST select only the highest tested width with zero parent-process exits and no unexplained page loss
-
-## ADDED Requirements
 
 ### Requirement: PDFium is a first-class native and rendering dependency
 The production dependency manifest SHALL directly pin `pypdfium2==5.13.0` for native extraction and OCR rendering. The PDFium native adapter SHALL return one-based physical pages, deterministic text/hash output, page count, engine version, elapsed time, and typed open/page/extraction failures without performing OCR.

@@ -115,8 +115,9 @@ class OfficialIndexLifecycleParser:
 
     @classmethod
     def extract_pdf_text(cls, pdf_bytes: bytes) -> str:
-        from research.document_processing.pdf import PdfParseRequest, PdfRouter
-        result = PdfRouter().parse(PdfParseRequest(content=pdf_bytes))
+        from research.document_processing.pdf import PdfParseRequest, build_router
+        request = PdfParseRequest(content=pdf_bytes)
+        result = build_router(request.profile).parse(request)
         return "\n".join(page.text for page in result.pages if page.text)
 
     @classmethod

@@ -7,6 +7,26 @@ from research.announcements import AnnouncementQuery, AnnouncementScope
 FIXTURE_DIR = Path(__file__).resolve().parents[2] / "fixtures" / "hkex_instrument_master"
 
 
+def test_hkex_pdf_parser_uses_shared_profile_router(monkeypatch):
+    from types import SimpleNamespace
+
+    from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+
+    calls = []
+
+    class FakeRouter:
+        def parse(self, request):
+            calls.append(request.profile.name)
+            return SimpleNamespace(status="success", page_count=1, pages=(SimpleNamespace(text=""),))
+
+    profile = SimpleNamespace(name="pdfium_native")
+    monkeypatch.setattr("research.document_processing.pdf.resolve_profile", lambda name=None: profile)
+    monkeypatch.setattr("research.document_processing.pdf.build_router", lambda selected: FakeRouter())
+    result = HKEXSuspensionReportProvider(profile_name="pdfium_native").parse_pdf(b"%PDF-1.4")
+    assert result.rows == []
+    assert calls == ["pdfium_native"]
+
+
 class _Response:
     def __init__(self, payload, *, status_code=200, url=""):
         self._payload = payload
