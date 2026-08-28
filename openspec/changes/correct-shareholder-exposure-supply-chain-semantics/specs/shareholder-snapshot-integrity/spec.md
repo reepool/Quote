@@ -37,6 +37,21 @@ The shareholder sync owner MUST select holder count, top holders, and ownership 
 - **WHEN** an authoritative source returns an older report period than the current internally consistent scope
 - **THEN** the current newer scope remains selected and the older occurrence remains diagnostic input only.
 
+#### Scenario: Equivalent date representations arrive
+- **WHEN** two source records express the same report date as `20260331` and `2026-03-31`
+- **THEN** comparison, content hashing, persistence, and readiness use the same canonical date and do not report a false content change.
+
+### Requirement: Selected shareholder values retain coherent provenance
+The shareholder snapshot MUST identify the source and report period selected for every scope, and top-level source/raw provenance MUST NOT continue to claim a displaced first writer as the source of the merged snapshot.
+
+#### Scenario: Official top holders replace aggregate top holders
+- **WHEN** the merged holder count remains from an aggregate source while official top holders replace the aggregate top-holder scope
+- **THEN** per-scope source, period, and raw provenance identify both selections and top-level metadata explicitly represents the composite result or its documented primary scope.
+
+#### Scenario: Repair reads raw source material
+- **WHEN** local repair reconstructs a selected scope
+- **THEN** it uses raw provenance attributable to that scope rather than assuming the top-level source owns every merged value.
+
 ### Requirement: Shareholder readiness is per-instrument complete
 Readiness MUST count instruments for which every required field-backed scope is satisfied and MUST NOT infer readiness from independent aggregate counts that can refer to different instruments.
 
@@ -60,7 +75,7 @@ Any business-profile or company research projection that includes top holders, a
 - **THEN** the query returns an explicit local-data gap and does not perform implicit remote acquisition.
 
 ### Requirement: Shareholder identity and batch failures fail closed locally
-The shareholder owner MUST reject ambiguous security aliases or response-symbol mismatches for the affected instrument and MUST isolate single-instrument provider failures from unrelated instruments in the batch.
+The shareholder owner MUST apply one canonical `instrument_id`, symbol, and exchange acceptance rule to full, force-merge, incremental, and repair paths; it MUST reject ambiguous security aliases or response-identity mismatches for the affected instrument and isolate single-instrument provider failures from unrelated instruments in the batch.
 
 #### Scenario: Ambiguous BSE alias
 - **WHEN** more than one local instrument could match a generated `920` alias
@@ -70,9 +85,21 @@ The shareholder owner MUST reject ambiguous security aliases or response-symbol 
 - **WHEN** the returned security identity does not match the requested canonical instrument
 - **THEN** the response is rejected for that instrument without terminating the remaining batch.
 
+#### Scenario: Incremental response identity mismatch
+- **WHEN** an incremental provider result has the requested `instrument_id` but a different symbol or exchange
+- **THEN** the same identity guard used by full sync rejects it before merge or persistence.
+
+#### Scenario: One provider call fails for one instrument
+- **WHEN** an aggregate provider raises while fetching one instrument in a multi-instrument exchange batch
+- **THEN** that instrument/source attempt is reported as failed or missing and processing continues for the remaining instruments.
+
 #### Scenario: Candidate limit is enabled
 - **WHEN** incremental shareholder discovery exceeds a positive candidate limit
 - **THEN** missing-required-scope candidates remain prioritized and time-based candidates are selected newest first.
+
+#### Scenario: Incremental run is partially complete
+- **WHEN** the shareholder application result is `degraded`
+- **THEN** scheduler and Telegram reporting show a warning/degraded outcome and the scheduler adapter does not return unqualified success.
 
 ### Requirement: Existing incorrect shareholder projections are repairable locally
 The system MUST provide a dry-run-first, idempotent repair mode that recomputes coverage and selected scopes from local snapshots, raw payloads, and control history without remote acquisition.

@@ -1,53 +1,59 @@
-## 1. Shareholder snapshot truth vertical slice
+## Implementation checkpoint (2026-08-28 recheck)
 
-- [ ] 1.1 Add field-backed scope helpers that validate holder count/report date, coherent exchange-appropriate top holders, and actual ownership/control fields without trusting `coverage_scope` labels.
-- [ ] 1.2 Remove first-top-holder controller inference from aggregate providers and preserve their returned top-holder data without populating `control_owner_*`.
-- [ ] 1.3 Replace snapshot first-wins merging with per-scope selection by normalized report period, configured provider authority for equal periods, and deterministic completeness tie-breakers; persist selected scope source and period.
-- [ ] 1.4 Normalize provider report dates before comparison/hash, isolate per-instrument provider exceptions, and reject returned security identities that do not match the requested canonical instrument.
-- [ ] 1.5 Make incremental discovery reject ambiguous BSE aliases, retain missing-scope priority, and order time-based candidates newest first when bounded.
-- [ ] 1.6 Rework shareholder readiness to count the per-instrument intersection of all required field-backed scopes and preserve degraded/failure status in scheduler and Telegram reports.
-- [ ] 1.7 Add shareholder provider, merge, incremental, readiness, and scheduler tests for top-holder-only ownership, newer cross-source data, same-period official precedence, mixed dates, response mismatch, BSE alias collision, isolated failure, and degraded reporting.
+The current code already contains useful corrections that must be preserved: field-backed shareholder scope checks, removal of first-holder controller inference, per-scope authority selection, BSE alias collision rejection, separate purchase/consumption/consumer exposure identities, fact-only publication gaps, company-only executable mappings, cost/revenue cycle direction, and explicit `disclosed_name_only` review.
 
-## 2. Local shareholder read boundary
+The change is not complete. The tasks below are the remaining end-to-end work after the recheck. A checked task means the revised requirement and its focused tests are complete, not merely that an earlier partial implementation exists.
 
-- [ ] 2.1 Identify the existing local shareholder snapshot/control-history query owner used by shareholder and company research APIs, and expose any missing narrow read method without adding a remote or LLM fallback.
-- [ ] 2.2 Ensure any company-profile projection that requests top holders, actual controller, or control method reads only eligible local records at the knowledge cutoff and reports an explicit local-data gap when absent.
-- [ ] 2.3 Add query/API tests that fail if shareholder profile reads instantiate a provider, call CNInfo, call another remote source, or invoke an LLM.
+## 1. Complete the shareholder write path
 
-## 3. Supply-chain relationship vertical slice
+- [ ] 1.1 Use one report-date normalizer for provider payloads, per-scope comparison, content hashing, persisted report dates, and readiness; prove equivalent compact/ISO dates do not produce changes.
+- [ ] 1.2 Reuse the full-sync canonical `instrument_id`/symbol/exchange response guard in incremental and force-merge paths, and validate provider-returned identity fields when the upstream response exposes them.
+- [ ] 1.3 Isolate efinance and other sequential aggregate-provider exceptions per instrument, record the failed instrument/source attempt, and continue the remaining exchange batch.
+- [ ] 1.4 Fix bounded incremental candidate ordering so `max_candidates > 0` cannot fail and deterministically keeps missing-required-scope candidates before newest time-based candidates.
+- [ ] 1.5 Make merged top-level source/source-mode/raw provenance agree with the per-scope selections by explicitly representing a primary or composite snapshot; preserve attributable raw provenance for every selected scope.
+- [ ] 1.6 Preserve application `degraded` semantics through scheduler and Telegram adapters as warning/partial completion, without returning or displaying unqualified success.
+- [ ] 1.7 Add focused provider, merge, incremental, hash, readiness, and scheduler tests for response mismatch, one-instrument failure, equivalent dates, bounded ordering, composite provenance, and degraded reporting.
 
-- [ ] 3.1 Stop generating approved aliases from unique securities short names or ticker history; keep exact governed legal identities and explicitly approved aliases as the only resolved-entity inputs.
-- [ ] 3.2 Add explicit relationship identity status for `resolved_entity` and evidence-backed `disclosed_name_only`, and require review decisions to preserve that distinction without requiring a global enterprise catalog.
-- [ ] 3.3 Separate relationship occurrence ID from stable temporal lineage, exclude evidence ID from lineage, retain contract/source-row occurrence discrimination, and supersede prior eligible annual occurrences.
-- [ ] 3.4 Deterministically classify anonymous customer/supplier concentration from label plus direction, expand real anonymous aggregate labels, and fail closed on contradictory semantics.
-- [ ] 3.5 Normalize named and anonymous disclosed shares from raw numeric value/unit in program code, require a finite fraction, and reject ambiguous or out-of-range values.
-- [ ] 3.6 Include activities and relationships in temporal readiness/current selection and exclude candidates from approved DCF/profile input hashes while retaining explicit diagnostic reads.
-- [ ] 3.7 Add tests for external named counterparties, short-name non-resolution, explicit disclosed-name approval, later entity resolution, consecutive annual reports, same-period multiple contracts, relationship end dates, concentration direction conflicts, and percent conversion.
+## 2. Complete the local shareholder read boundary
 
-## 4. Commodity exposure and DCF vertical slice
+- [ ] 2.1 Identify and document the existing local snapshot/control-history query owner used by shareholder and company-research APIs; add only the narrow missing query projection rather than a second acquisition path.
+- [ ] 2.2 Project top holders, actual controller, and control method at the requested knowledge cutoff from eligible local records with source, report date, and availability date; return an explicit local-data gap when absent.
+- [ ] 2.3 Add API/query tests that fail if company-profile shareholder reads instantiate a provider, access CNInfo/another remote source, or invoke an LLM.
 
-- [ ] 4.1 Extend exposure lineage/predecessor identity with source fact/action class and canonical role so purchase and consumption, or other distinct legs, cannot supersede one another.
-- [ ] 4.2 Canonicalize assumption aliases before lookup and include `consumer_id` in assumption-bearing publication identity; fail closed on conflicting synonymous assumptions.
-- [ ] 4.3 Resolve feedstock versus energy cost through deterministic action/product catalog rules, keep unsupported hedges and unknown roles fact-only, and never default an absent role to revenue.
-- [ ] 4.4 Make fact-only a terminal non-retryable publication gap that remains open and can be locally replayed after mapping/rule approval without another extraction LLM call.
-- [ ] 4.5 Make publication gates derive current/candidate and semantic proof from approved component provenance instead of constants, and route legacy component migration through the same publication classifier/gates.
-- [ ] 4.6 Separate industry-default mappings from executable company mappings in the resolver and make automatic DCF accept only current `approved_company_business_profile` sources with active cutoff-eligible series.
-- [ ] 4.7 Replace first-diagnostic cycle selection with explicit governed role/materiality/spread selection and implement opposite economic normalization for revenue and cost legs; fail closed for mixed ambiguity.
-- [ ] 4.8 Add exposure/resolver/DCF tests for purchase plus consumption, multiple consumers, assumption aliases, energy inputs, unsupported hedges, fact-only replay, industry-only context, candidate exclusion, revenue high-cycle, cost high-cycle, and ambiguous multi-series inputs.
+## 3. Complete relationship identity and current-state semantics
 
-## 5. Local audit and repair
+- [ ] 3.1 Build counterparty entities from governed local company full names and official identifiers at the cutoff; never assign `instruments.name`, ticker history, or short names to `legal_name`; retain only explicitly approved aliases.
+- [ ] 3.2 Reverse the production resolver regression test: a unique securities short name remains unresolved, a governed full legal name resolves, and a clearly disclosed external name remains `disclosed_name_only` without requiring a global enterprise directory.
+- [ ] 3.3 Expand deterministic anonymous aggregate classification for real top-customer/top-supplier labels before production, while keeping generic `关联方` unclassified unless evidence supplies the missing counterparty/direction semantics.
+- [ ] 3.4 Implement two-level temporal identity: stable business lineage excludes evidence/source-row occurrence, latest eligible report cohort wins, and contract/evidence-independent row discriminators preserve multiple occurrences within that cohort.
+- [ ] 3.5 Apply explicit half-open validity and the configured relationship freshness window consistently in repository as-of selection, resolver output, API current/history projection, and readiness.
+- [ ] 3.6 Ensure approved profile and DCF reads exclude candidates by default while separately requested diagnostic APIs can still return them without changing executable fingerprints.
+- [ ] 3.7 Add tests for local full-name resolution, unique short-name non-resolution, explicit disclosed-name approval, aggregate labels with omitted anonymous flag, generic related-party ambiguity, consecutive reports, same-period contracts, evidence-derived row keys, explicit end dates, and stale relationships.
 
-- [ ] 5.1 Add one bounded dry-run-default operator command over the existing domain services with explicit instrument/all scope and apply flag; do not duplicate merge, review, publication, or DCF logic in the adapter.
-- [ ] 5.2 Audit local shareholder snapshots for unsupported controller inference, false scope labels, mixed periods, lower-authority retained scopes, and readiness differences; emit stable IDs and before/after projections.
-- [ ] 5.3 In apply mode, rebuild shareholder scopes from local raw snapshots and control history, clear unsupported inferred fields, and mark unreconstructable scopes incomplete without remote acquisition.
-- [ ] 5.4 Audit and repair short-name relationship resolutions and concurrent cross-year current occurrences from persisted evidence/semantic records, preserving history and using normal review/supersession transitions.
-- [ ] 5.5 Audit and replay collided exposure publications and incorrectly closed fact-only gaps from approved local facts/mappings through the corrected publisher, preserving component evidence lineage.
-- [ ] 5.6 Report industry-only contexts previously labeled governed and verify corrected DCF assembly excludes them; do not persist or delete ephemeral DCF outputs as a substitute for fixing input assembly.
-- [ ] 5.7 Add temporary-database tests proving audit has no writes, apply is transactional per instrument and idempotent, raw evidence is retained, and no repair path performs network or LLM access.
+## 4. Complete exposure publication and DCF isolation
 
-## 6. End-to-end verification and rollout
+- [ ] 4.1 Make DCF assembly request an approved-only business profile (`include_candidates=False`) and prove candidate-only changes leave profile/model/executable/valuation fingerprints unchanged.
+- [ ] 4.2 Enforce recognized `economic_role` at every executable DCF consumer and return an input gap for absent/unknown roles rather than defaulting to revenue; remove or correct any reachable legacy fallback.
+- [ ] 4.3 Verify canonical assumption aliases are resolved before identity/selection and make conflicting synonymous values fail closed without last-write-wins behavior.
+- [ ] 4.4 Route legacy exposure componentization through the current publication classifier and promotion gates; do not allow direct generic system promotion to create an approved executable successor.
+- [ ] 4.5 Retain industry defaults only as non-executable diagnostics and retain fact-only gaps until a local mapping/rule replay succeeds without another extraction LLM call.
+- [ ] 4.6 Add focused exposure/resolver/DCF tests for distinct purchase/consumption legs, multiple consumers, assumption conflicts, unknown roles, candidate fingerprint isolation, legacy gate enforcement, industry-only context, revenue/cost cycles, and ambiguous multi-series inputs.
 
-- [ ] 6.1 Run the focused shareholder, business-profile activity/relationship, exposure publication, resolver, API, and DCF unit/integration suites and resolve only blocking regressions introduced by this change.
-- [ ] 6.2 On a copied local database, run repair audit then apply for representative controller/top-holder, external counterparty, cross-year relationship, purchase/consumption, energy-cost, and industry-only DCF cases; compare before/after API and valuation lineage.
-- [ ] 6.3 Verify existing scheduler job IDs, `/run business_profile_backfill`, shareholder/profile/exposure API routes, and default approved-only behavior remain compatible and no second write owner or implicit remote shareholder path was added.
-- [ ] 6.4 Review the complete change against all three capability specs, document corrected versus intentionally retained historical records, and update operator/current documentation with dry-run, apply, backup, rollback, and result interpretation.
+## 5. Implement one bounded local audit and repair flow
+
+- [ ] 5.1 Add one repair application service with `audit` and `apply`; expose it through a thin operator adapter with dry-run default, explicit instrument/all scope, and no duplicated merge/review/publication logic.
+- [ ] 5.2 Audit shareholder snapshots for inferred controller fields, unsupported scope labels, mixed/noncanonical periods, retained lower-authority scopes, incoherent top-level provenance, and readiness differences; emit stable IDs and before/after projections.
+- [ ] 5.3 In apply mode, delegate shareholder reconstruction to the corrected local merge/query owners, clear unsupported control fields, preserve attributable raw provenance, and mark unreconstructable scopes incomplete without remote acquisition.
+- [ ] 5.4 Audit and repair short-name entity resolutions, evidence-split relationship lineages, stale/concurrently-current report cohorts, and explicit disclosed-name status through normal review/temporal transitions while retaining all evidence history.
+- [ ] 5.5 Audit and replay collided or incorrectly promoted exposure publications from approved local facts/mappings through the corrected publisher, including legacy component successors and fact-only gaps.
+- [ ] 5.6 Report industry-only contexts previously labeled governed and verify subsequent DCF assembly excludes them; do not persist/delete ephemeral DCF outputs as a substitute for correcting input assembly.
+- [ ] 5.7 Make audit provably read-only and apply transactional per instrument, idempotent, reason-coded, and explicit about `changed`, `unchanged`, `held`, `deleted_duplicate`, and `failed`; preserve source evidence/valid history, delete only proven unreferenced machine-derived duplicates, and perform no network or LLM access.
+- [ ] 5.8 Add copied/temporary-database tests covering audit zero writes, repeated apply, partial failure isolation, raw/evidence retention, no remote/LLM calls, and stable repair IDs.
+
+## 6. End-to-end verification, cleanup, and rollout
+
+- [ ] 6.1 Run focused shareholder, local profile query, relationship, temporal, exposure publication, resolver, API, scheduler, and DCF suites; resolve blocking regressions only.
+- [ ] 6.2 On a copied local database, run repair audit then bounded apply for representative controller/top-holder, external counterparty, short-name, cross-year relationship, purchase/consumption, energy-cost, legacy publication, and industry-only DCF cases; compare before/after APIs and valuation lineage.
+- [ ] 6.3 Verify existing scheduler job IDs, `/run business_profile_backfill`, shareholder/profile/exposure API routes, approved-only defaults, database locations, and configured source authority remain compatible and no second write owner or implicit remote shareholder path exists.
+- [ ] 6.4 After repair cohorts show no remaining consumers, remove the superseded one-off legacy migration path or reduce it to the bounded repair service adapter; do not retain a parallel long-term legacy implementation.
+- [ ] 6.5 Update current operator documentation with audit/apply, backup, rollback, warning/degraded interpretation, and result fields; record intentionally retained historical rows and archive this change only after every revised requirement is verified.

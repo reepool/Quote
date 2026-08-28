@@ -30,6 +30,10 @@ The system MUST derive publication role and financial direction from determinist
 - **WHEN** a publication or mapping has no recognized role
 - **THEN** it is excluded from executable mappings and is not defaulted to revenue.
 
+#### Scenario: Legacy or external DCF context omits role
+- **WHEN** an otherwise shaped mapping reaches a DCF consumer without `economic_role` or a recognized exposure role
+- **THEN** the consumer rejects the automatic cycle adjustment and reports an input gap instead of assuming a revenue leg.
+
 ### Requirement: Fact-only is an explicit publication gap
 A fact-only outcome MUST be terminal for the current processing attempt but MUST remain an explicit non-published gap until a valid mapping or deterministic rule becomes available.
 
@@ -56,6 +60,14 @@ The automatic company DCF path MUST accept only current mappings sourced from ap
 - **WHEN** an exposure is candidate, held, stale, superseded, or fact-only
 - **THEN** it cannot enter executable DCF mappings even if its commodity has an industry price series.
 
+#### Scenario: Diagnostic candidates change
+- **WHEN** candidate facts, relationships, or exposures change but approved executable business-profile inputs do not
+- **THEN** DCF model inputs, `profile_version`, executable input hash, and valuation lineage remain unchanged.
+
+#### Scenario: Diagnostic profile is requested explicitly
+- **WHEN** an API caller requests candidate diagnostics
+- **THEN** candidates may appear in diagnostic output but remain excluded from executable mappings and model fingerprints.
+
 ### Requirement: DCF cycle adjustment respects revenue and cost direction
 DCF cycle selection MUST be deterministic by approved mapping role and MUST apply opposite economic direction for revenue and cost price legs; iteration order MUST NOT choose the series.
 
@@ -73,6 +85,10 @@ DCF cycle selection MUST be deterministic by approved mapping role and MUST appl
 
 ### Requirement: Existing exposure and DCF state is auditable and replayable locally
 The system MUST provide a dry-run-first idempotent audit and repair flow for old exposure collisions, false fact-only closure, and industry-only governed DCF context using persisted approved facts, mappings, and local market metadata.
+
+#### Scenario: Legacy componentization proposes an approved successor
+- **WHEN** a locally proven legacy exposure can be decomposed into components
+- **THEN** its successor passes the current publication classifier and promotion gates; a generic system promotion cannot bypass those gates.
 
 #### Scenario: Cost exposure was superseded by a different action
 - **WHEN** audit finds purchase and consumption publications linked by the old predecessor key

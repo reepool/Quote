@@ -7,6 +7,10 @@ The system MUST preserve a clearly disclosed named customer or supplier without 
 - **WHEN** a counterparty matches a local governed legal name, official identifier, or explicitly approved alias at the cutoff
 - **THEN** the relationship may use `resolved_entity` status and the governed entity ID.
 
+#### Scenario: Local security master contains only a short display name
+- **WHEN** `instruments.name` is `中国神华` while the governed local company full name is `中国神华能源股份有限公司`
+- **THEN** only the governed full name is eligible as `legal_name`; the securities display name remains unresolved unless an explicit approved alias supports it.
+
 #### Scenario: Named external counterparty is not in the local entity set
 - **WHEN** official evidence clearly names an external counterparty but no governed local entity is available
 - **THEN** the relationship is retained as `disclosed_name_only` with raw name and evidence and does not claim cross-company entity resolution.
@@ -37,12 +41,28 @@ The system MUST separate evidence occurrence identity from stable relationship l
 - **WHEN** the same report discloses two relationships distinguished by contract reference or source-row occurrence
 - **THEN** both occurrences remain separately queryable and neither overwrites the other.
 
+#### Scenario: Source-row identity embeds report evidence
+- **WHEN** an occurrence key differs across reports only because its source-row key embeds an evidence ID
+- **THEN** that key does not split the stable business lineage or allow both report cohorts to remain current.
+
+#### Scenario: Latest report cohort has multiple occurrences
+- **WHEN** the newest eligible report contains two distinct contracts or rows in one stable business lineage
+- **THEN** current selection returns both newest-cohort occurrences and excludes older report cohorts from current results.
+
 #### Scenario: Relationship ends explicitly
 - **WHEN** evidence or review supplies a valid end date
 - **THEN** the relationship is not current on or after that half-open interval boundary.
 
 ### Requirement: Concentration semantics are deterministic
 Anonymous concentration facts MUST reconcile the disclosed label, relationship direction, raw value, and raw unit in program code before approval.
+
+#### Scenario: Model omits anonymous flag for top-five label
+- **WHEN** the counterparty label is a deterministic aggregate such as `前五大客户` or `前五名供应商` but the LLM does not set `anonymous=true`
+- **THEN** program code classifies it as anonymous concentration before relationship production and applies the direction/share checks.
+
+#### Scenario: Generic related-party label
+- **WHEN** the only label is `关联方` without a disclosed aggregate meaning, counterparty name, or customer/supplier direction
+- **THEN** the system does not automatically classify it as anonymous customer/supplier concentration and holds insufficient semantics for review.
 
 #### Scenario: Customer label conflicts with supplier direction
 - **WHEN** a label denotes top customers but the relationship direction is `buys_from`
@@ -62,6 +82,10 @@ Business-profile readiness MUST report current relationship and activity coverag
 #### Scenario: Only stale relationship evidence exists
 - **WHEN** all approved relationship occurrences fall outside the configured report-aware current window or have been superseded
 - **THEN** relationship temporal coverage is reported as missing or stale rather than current.
+
+#### Scenario: Persistent relationship policy has a freshness window
+- **WHEN** a persistent relationship has no explicit valid end but its latest eligible annual-report occurrence exceeds the configured freshness window
+- **THEN** current/as-of selection and readiness both exclude it as stale.
 
 #### Scenario: Approved profile API omits candidates
 - **WHEN** an approved profile or DCF context is requested without diagnostic candidates
