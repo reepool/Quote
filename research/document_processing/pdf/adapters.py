@@ -72,6 +72,16 @@ def _paddle_device() -> str:
         return "unknown"
 
 
+def _probe_timeout_seconds() -> float:
+    """Allow a longer first-process CUDA worker import than a warm probe."""
+    raw = os.environ.get("QUOTE_PDF_GPU_PROBE_TIMEOUT_SEC", "60")
+    try:
+        timeout = float(raw)
+    except ValueError:
+        timeout = 60.0
+    return max(1.0, timeout)
+
+
 class PaddleOcrAdapter:
     """Page-addressable PaddleOCR adapter with bounded worker sessions.
 
@@ -115,7 +125,7 @@ class PaddleOcrAdapter:
                 input=json.dumps({"protocol": cls.worker_protocol_version, "runtime": profile.ocr_runtime, "model_cache_dir": profile.ocr_model_cache_dir}),
                 capture_output=True,
                 text=True,
-                timeout=20.0,
+                timeout=_probe_timeout_seconds(),
                 check=False,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:

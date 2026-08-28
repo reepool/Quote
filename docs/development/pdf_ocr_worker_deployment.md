@@ -92,11 +92,15 @@ QUOTE_PDF_CPU_OCR_WORKER=...
 QUOTE_PDF_GPU_CANARY_APPROVED=1
 QUOTE_PDF_GPU_CANARY_REPORT=...
 QUOTE_PDF_GPU_CANARY_CORPUS_HASH=...
+QUOTE_PDF_GPU_PROBE_TIMEOUT_SEC=60
 PADDLE_PDX_CACHE_HOME=/var/cache/quote/paddlex
 ```
 
 GPU profile 仍受 approval、worker probe 和 cache 可写性约束。任一条件失败
-都会 fail closed，不会隐式改为全文 OCR。GPU worker 运行失败时，共享 adapter
+都会 fail closed，不会隐式改为全文 OCR。进程内成功的 GPU `--probe` 会复用，
+避免 `resolve_profile` 和 `build_router` 各探一次；失败不缓存，下次 PDF 可重试。
+首次探活默认 60 秒（`QUOTE_PDF_GPU_PROBE_TIMEOUT_SEC`），失败必须把
+`diagnostic` 写进日志和异常。GPU worker 运行失败时，共享 adapter
 只在同一页白名单和原始预算内尝试 CPU fallback。
 
 ## 验证

@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import shlex
+import threading
 from dataclasses import fields, replace
 from pathlib import Path
 from typing import Any, Mapping
 
 from .core import DEFAULT_MODE_BUDGETS, PdfProfile, PdfResourceLimits
+
+logger = logging.getLogger(__name__)
+_GPU_PROBE_LOCK = threading.Lock()
+_GPU_PROBE_CACHE: dict[tuple[Any, ...], Mapping[str, Any]] = {}
 
 
 def profile_from_mapping(name: str, raw: Mapping[str, Any]) -> PdfProfile:
@@ -211,13 +217,63 @@ def _require_visible_cuda_runtime() -> None:
     raise ValueError("GPU PDF runtime must be probed through an isolated OCR worker")
 
 
+def clear_gpu_runtime_probe_cache() -> None:
+    """Drop the in-process GPU worker probe cache."""
+    with _GPU_PROBE_LOCK:
+        _GPU_PROBE_CACHE.clear()
+
+
+def _gpu_runtime_probe_key(profile: PdfProfile) -> tuple[Any, ...]:
+    return (
+        tuple(profile.ocr_worker_command or ()),
+        str(profile.ocr_runtime or ""),
+        str(profile.ocr_model_cache_dir or ""),
+        str(profile.ocr_device or ""),
+    )
+
+
+def _gpu_probe_failure_diagnostic(probe: Mapping[str, Any]) -> str:
+    diagnostic = str(probe.get("diagnostic") or "").strip()
+    if diagnostic:
+        return diagnostic
+    parts: list[str] = []
+    if not probe.get("healthy"):
+        parts.append(f"healthy={probe.get('healthy')}")
+        if probe.get("paddleocr_version") is not None:
+            parts.append(f"paddleocr={probe.get('paddleocr_version')}")
+    if not probe.get("cuda_available"):
+        parts.append(f"cuda_available={probe.get('cuda_available')}")
+        if probe.get("device") is not None:
+            parts.append(f"device={probe.get('device')}")
+        if probe.get("cuda_device_count") is not None:
+            parts.append(f"cuda_device_count={probe.get('cuda_device_count')}")
+    if probe.get("model_cache_writable") is False:
+        parts.append(f"model_cache_writable=false dir={probe.get('model_cache_dir')}")
+    return "; ".join(parts) or "unspecified probe failure"
+
+
 def _require_isolated_gpu_runtime(profile: PdfProfile) -> None:
     from .adapters import PaddleOcrAdapter
 
-    probe = PaddleOcrAdapter.probe_runtime(profile)
-    if (
-        not probe.get("healthy")
-        or not probe.get("cuda_available")
-        or probe.get("model_cache_writable") is False
-    ):
-        raise ValueError("GPU PDF profile requires a healthy isolated CUDA OCR worker")
+    key = _gpu_runtime_probe_key(profile)
+    with _GPU_PROBE_LOCK:
+        cached = _GPU_PROBE_CACHE.get(key)
+        if cached is None:
+            probe = PaddleOcrAdapter.probe_runtime(profile)
+            healthy = (
+                bool(probe.get("healthy"))
+                and bool(probe.get("cuda_available"))
+                and probe.get("model_cache_writable") is not False
+            )
+            if healthy:
+                _GPU_PROBE_CACHE[key] = probe
+        else:
+            probe = cached
+            healthy = True
+
+    if not healthy:
+        diagnostic = _gpu_probe_failure_diagnostic(probe)
+        logger.error("GPU PDF OCR worker probe failed: %s", diagnostic)
+        raise ValueError(
+            f"GPU PDF profile requires a healthy isolated CUDA OCR worker: {diagnostic}"
+        )

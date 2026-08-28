@@ -258,6 +258,103 @@ def test_gpu_canary_profile_rejects_approval_for_other_corpus(monkeypatch, tmp_p
         resolve_profile("pdfium_paddleocr_gpu")
 
 
+def _enable_approved_gpu_canary(monkeypatch, tmp_path) -> None:
+    from research.document_processing.pdf import profiles as pdf_profiles
+
+    corpus = "b" * 64
+    report = tmp_path / "gpu-canary.json"
+    report.write_text(
+        json.dumps(
+            {
+                "schema_version": "pdf-gpu-canary-approval.v1",
+                "profile": "pdfium_paddleocr_gpu",
+                "corpus_hash": corpus,
+                "gpu_canary_approved": True,
+                "checks": {name: True for name in GPU_CANARY_REQUIRED_CHECKS},
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(pdf_profiles, "GPU_CANARY_CORPUS_HASH", corpus)
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_APPROVED", "1")
+    monkeypatch.setenv("QUOTE_PDF_GPU_CANARY_REPORT", str(report))
+    monkeypatch.setenv("QUOTE_PDF_GPU_OCR_WORKER", "/opt/fake-gpu/bin/python /tmp/ocr_worker.py")
+    pdf_profiles.clear_gpu_runtime_probe_cache()
+
+
+def test_gpu_runtime_probe_is_cached_across_profile_and_router(monkeypatch, tmp_path) -> None:
+    from research.document_processing.pdf import profiles as pdf_profiles
+    from research.document_processing.pdf.adapters import PaddleOcrAdapter
+
+    _enable_approved_gpu_canary(monkeypatch, tmp_path)
+    calls: list[object] = []
+
+    def fake_probe(profile):
+        calls.append(tuple(profile.ocr_worker_command))
+        return {"healthy": True, "cuda_available": True, "model_cache_writable": True, "device": "gpu:0"}
+
+    monkeypatch.setattr(PaddleOcrAdapter, "probe_runtime", staticmethod(fake_probe))
+
+    profile = resolve_profile("pdfium_paddleocr_gpu")
+    pdf_profiles._require_isolated_gpu_runtime(profile)
+    assert calls == [("/opt/fake-gpu/bin/python", "/tmp/ocr_worker.py")]
+
+
+def test_gpu_runtime_probe_failure_includes_and_logs_diagnostic(monkeypatch, tmp_path, caplog) -> None:
+    from research.document_processing.pdf.adapters import PaddleOcrAdapter
+
+    _enable_approved_gpu_canary(monkeypatch, tmp_path)
+    calls: list[int] = []
+
+    def fake_probe(profile):
+        calls.append(1)
+        return {
+            "healthy": False,
+            "cuda_available": False,
+            "model_cache_writable": True,
+            "diagnostic": "TimeoutExpired: worker exceeded 60.0 seconds",
+        }
+
+    monkeypatch.setattr(PaddleOcrAdapter, "probe_runtime", staticmethod(fake_probe))
+    with caplog.at_level("ERROR"):
+        with pytest.raises(ValueError, match="TimeoutExpired: worker exceeded 60.0 seconds"):
+            resolve_profile("pdfium_paddleocr_gpu")
+        with pytest.raises(ValueError, match="TimeoutExpired: worker exceeded 60.0 seconds"):
+            resolve_profile("pdfium_paddleocr_gpu")
+    assert calls == [1, 1]
+    assert any("TimeoutExpired: worker exceeded 60.0 seconds" in message for message in caplog.messages)
+
+
+def test_gpu_probe_uses_cold_start_timeout_budget(monkeypatch) -> None:
+    captured: dict[str, float] = {}
+
+    class Completed:
+        returncode = 0
+        stdout = json.dumps(
+            {
+                "protocol": PaddleOcrAdapter.worker_protocol_version,
+                "healthy": True,
+                "cuda_available": True,
+            }
+        )
+        stderr = ""
+
+    def fake_run(*args, **kwargs):
+        captured["timeout"] = kwargs.get("timeout")
+        return Completed()
+
+    monkeypatch.setattr("research.document_processing.pdf.adapters.subprocess.run", fake_run)
+    profile = PdfProfile(
+        name="gpu-probe",
+        ocr_worker_command=("/opt/fake-gpu/bin/python", "/tmp/ocr_worker.py"),
+        ocr_runtime="isolated-gpu-paddle-3.3.1",
+        ocr_model_cache_dir="/var/cache/quote/paddlex",
+    )
+    payload = PaddleOcrAdapter.probe_runtime(profile)
+    assert payload["healthy"] is True
+    assert captured["timeout"] == 60.0
+
+
 def test_ocr_cache_directory_can_be_supplied_by_runtime_config(monkeypatch) -> None:
     monkeypatch.setenv("QUOTE_PDF_OCR_CACHE_DIR", "/tmp/quote-pdf-cache")
     assert resolve_profile("pdfium_paddleocr_cpu").ocr_model_cache_dir == "/tmp/quote-pdf-cache"
