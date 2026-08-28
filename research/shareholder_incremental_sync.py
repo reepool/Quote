@@ -29,6 +29,7 @@ from research.shareholder_announcement_filters import (
     shareholder_announcement_filter,
     shareholder_announcement_stream_specs,
 )
+from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
 from research.source_policy import ResearchSourcePolicyResolver
 from research.storage import ResearchStorageManager
@@ -468,11 +469,22 @@ class ShareholderIncrementalSyncService:
             )
             if instrument is None:
                 continue
+            metadata = (
+                manifest.get("metadata")
+                if isinstance(manifest.get("metadata"), dict)
+                else {}
+            )
+            announcement_ids = [
+                str(item).strip()
+                for item in metadata.get("announcement_ids", []) or []
+                if str(item).strip()
+            ]
             candidates[instrument_id] = ShareholderAnnouncementCandidate(
                 instrument_id=instrument_id,
                 symbol=str(instrument.get("symbol") or "").strip(),
                 exchange=str(instrument.get("exchange") or "").strip(),
                 reasons=["pending_recheck"],
+                announcement_ids=announcement_ids,
                 latest_announcement_time=manifest.get("last_announcement_time"),
             )
 
@@ -640,23 +652,43 @@ class ShareholderIncrementalSyncService:
         failed_ids: List[str] = []
         for instrument_id, candidate in candidates.items():
             snapshot = snapshots.get(instrument_id)
+            existing_snapshot = existing_snapshots.get(instrument_id)
+            existing_hashes = self._existing_snapshot_hashes(existing_snapshot)
+            pending_until = self._active_pending_until(
+                existing_manifests.get(instrument_id),
+                candidate,
+                now,
+                pending_recheck_days,
+            )
             if snapshot is None:
-                failed += 1
-                failed_ids.append(instrument_id)
+                if pending_until is not None:
+                    pending += 1
+                    status = "pending_recheck"
+                else:
+                    failed += 1
+                    failed_ids.append(instrument_id)
+                    status = "failed"
                 if not dry_run:
                     self.storage.upsert_shareholder_change_manifest(
                         instrument_id=instrument_id,
                         symbol=candidate.symbol,
                         exchange=candidate.exchange,
-                        content_hash=None,
-                        top_holders_hash=None,
-                        holder_count_hash=None,
-                        ownership_hash=None,
-                        latest_report_date=None,
-                        coverage_scope=[],
-                        status="failed",
-                        reasons=candidate.reasons,
-                        metadata={"announcement_ids": candidate.announcement_ids},
+                        content_hash=existing_hashes.get("content_hash"),
+                        top_holders_hash=existing_hashes.get("top_holders_hash"),
+                        holder_count_hash=existing_hashes.get("holder_count_hash"),
+                        ownership_hash=existing_hashes.get("ownership_hash"),
+                        latest_report_date=existing_hashes.get("latest_report_date"),
+                        coverage_scope=list(existing_hashes.get("coverage_scope") or []),
+                        status=status,
+                        pending_recheck_until=pending_until,
+                        last_announcement_time=candidate.latest_announcement_time,
+                        reasons=[*candidate.reasons, "provider_empty"],
+                        metadata=self._build_manifest_metadata(
+                            existing_manifests.get(instrument_id),
+                            candidate,
+                            now,
+                            pending_until,
+                        ),
                         ingestion_run_id=run_id,
                     )
                 continue
@@ -667,33 +699,37 @@ class ShareholderIncrementalSyncService:
                 existing_snapshots,
                 existing_manifests,
             )
-            existing_snapshot = existing_snapshots.get(instrument_id)
             existing_complete = self._snapshot_dict_covers_scope(
                 existing_snapshot,
                 required_scope,
             )
+            weaker_incoming = incoming_shareholder_snapshot_is_weaker(
+                existing_snapshot,
+                snapshot,
+                required_scope,
+            )
             content_changed = hashes["content_hash"] != existing_hash
-            should_write = content_changed or not existing_complete
+            should_write = (content_changed or not existing_complete) and not weaker_incoming
             has_announcement = bool(candidate.announcement_ids)
+            reasons = list(candidate.reasons)
+            manifest_hashes = hashes
             status = "changed" if should_write else "unchanged"
-            pending_until = None
-            if not should_write and has_announcement and pending_recheck_days > 0:
-                deadline = self._pending_recheck_deadline(
-                    existing_manifests.get(instrument_id),
-                    candidate,
-                    now,
-                    pending_recheck_days,
-                )
-                if deadline is not None and deadline >= now:
+            if weaker_incoming:
+                reasons.append("rejected_weaker_incoming")
+                manifest_hashes = existing_hashes or hashes
+                if pending_until is not None:
                     status = "pending_recheck"
-                    pending_until = deadline.isoformat()
                     pending += 1
                 else:
                     unchanged += 1
+            elif not should_write and has_announcement and pending_until is not None:
+                status = "pending_recheck"
+                pending += 1
             elif should_write:
                 changed += 1
             else:
                 unchanged += 1
+                pending_until = None
 
             if should_write:
                 would_write += 1
@@ -720,22 +756,22 @@ class ShareholderIncrementalSyncService:
                     instrument_id=instrument_id,
                     symbol=snapshot.symbol,
                     exchange=snapshot.exchange,
-                    content_hash=hashes["content_hash"],
-                    top_holders_hash=hashes["top_holders_hash"],
-                    holder_count_hash=hashes["holder_count_hash"],
-                    ownership_hash=hashes["ownership_hash"],
-                    latest_report_date=hashes.get("latest_report_date"),
-                    coverage_scope=hashes["coverage_scope"],
+                    content_hash=manifest_hashes.get("content_hash"),
+                    top_holders_hash=manifest_hashes.get("top_holders_hash"),
+                    holder_count_hash=manifest_hashes.get("holder_count_hash"),
+                    ownership_hash=manifest_hashes.get("ownership_hash"),
+                    latest_report_date=manifest_hashes.get("latest_report_date"),
+                    coverage_scope=list(manifest_hashes.get("coverage_scope") or []),
                     status=status,
                     last_changed_at=now.isoformat() if should_write else None,
-                    pending_recheck_until=pending_until,
+                    pending_recheck_until=pending_until if status == "pending_recheck" else None,
                     last_announcement_time=candidate.latest_announcement_time,
-                    reasons=candidate.reasons,
+                    reasons=reasons,
                     metadata=self._build_manifest_metadata(
                         existing_manifests.get(instrument_id),
                         candidate,
                         now,
-                        pending_until,
+                        pending_until if status == "pending_recheck" else None,
                     ),
                     ingestion_run_id=run_id,
                 )
@@ -749,6 +785,37 @@ class ShareholderIncrementalSyncService:
             "snapshots_written": written,
             "would_write_snapshots": would_write,
         }
+
+    @staticmethod
+    def _existing_snapshot_hashes(
+        existing_snapshot: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        snapshot_json = (
+            existing_snapshot.get("snapshot") if isinstance(existing_snapshot, dict) else None
+        )
+        if isinstance(snapshot_json, dict):
+            return compute_shareholder_content_hashes(snapshot_json)
+        return {}
+
+    @classmethod
+    def _active_pending_until(
+        cls,
+        existing_manifest: Optional[Dict[str, Any]],
+        candidate: ShareholderAnnouncementCandidate,
+        now: datetime,
+        pending_recheck_days: int,
+    ) -> Optional[str]:
+        if not candidate.announcement_ids or pending_recheck_days <= 0:
+            return None
+        deadline = cls._pending_recheck_deadline(
+            existing_manifest,
+            candidate,
+            now,
+            pending_recheck_days,
+        )
+        if deadline is None or deadline < now:
+            return None
+        return deadline.isoformat()
 
     @staticmethod
     def _existing_content_hash(

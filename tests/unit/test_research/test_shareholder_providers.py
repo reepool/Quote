@@ -740,6 +740,54 @@ def test_akshare_shareholders_provider_records_empty_top_holder_payload_after_re
     }
 
 
+def test_efinance_shareholders_provider_scopes_only_fields_that_exist():
+    provider = EfinanceShareholdersProvider()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "exchange": "SSE",
+    }
+
+    holder_only = provider._build_snapshot(
+        instrument=instrument,
+        exchange="SSE",
+        mode="direct",
+        holder_count_payload=pd.DataFrame(
+            [{"股东户数": 98765, "截止日期": "2026-03-31"}]
+        ),
+        top_holders_payload=pd.DataFrame(),
+    )
+
+    assert holder_only is not None
+    assert holder_only.holder_count == 98765
+    assert holder_only.top_holders_count == 0
+    assert holder_only.snapshot_json["coverage_scope"] == ["holder_count"]
+
+    top_only = provider._build_snapshot(
+        instrument=instrument,
+        exchange="SSE",
+        mode="direct",
+        holder_count_payload=pd.DataFrame(),
+        top_holders_payload=pd.DataFrame(
+            [
+                {
+                    "股东名称": "控股股东A",
+                    "持股比例": 54.07,
+                    "截止日期": "2026-03-31",
+                }
+            ]
+        ),
+    )
+
+    assert top_only is not None
+    assert top_only.holder_count is None
+    assert top_only.top_holders_count == 1
+    assert top_only.snapshot_json["coverage_scope"] == [
+        "top10_holders",
+        "reference_only_ownership_clues",
+    ]
+
+
 def test_efinance_shareholders_provider_json_ready_normalizes_dates():
     payload = EfinanceShareholdersProvider._json_ready(
         {

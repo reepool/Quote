@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Set
 from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
 from research.empty_support import allows_optional_empty_exchange
+from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.source_policy import ResearchSourcePolicyResolver
 from research.storage import ResearchStorageManager
 from utils import dm_logger
@@ -385,13 +386,22 @@ class ShareholderShadowSyncService:
             total_written = 0
             unchanged_instruments = 0
             existing_snapshots: Dict[str, Dict[str, Any]] = {}
-            if write_policy == "changed_only" and merged_snapshots:
+            if merged_snapshots:
                 existing_snapshots = self.storage.get_shareholder_snapshots(
                     list(merged_snapshots.keys())
                 )
+            kept_complete_ids: Set[str] = set()
             for snapshot in merged_snapshots.values():
+                existing_snapshot = existing_snapshots.get(snapshot.instrument_id)
+                if incoming_shareholder_snapshot_is_weaker(
+                    existing_snapshot,
+                    snapshot,
+                    required_scope,
+                ):
+                    unchanged_instruments += 1
+                    kept_complete_ids.add(snapshot.instrument_id)
+                    continue
                 if write_policy == "changed_only":
-                    existing_snapshot = existing_snapshots.get(snapshot.instrument_id)
                     existing_json = (
                         existing_snapshot.get("snapshot")
                         if existing_snapshot
@@ -434,7 +444,8 @@ class ShareholderShadowSyncService:
             missing_ids = [
                 str(instrument["instrument_id"])
                 for instrument in stock_instruments
-                if not self._snapshot_covers_required_scope(
+                if str(instrument["instrument_id"]) not in kept_complete_ids
+                and not self._snapshot_covers_required_scope(
                     merged_snapshots.get(str(instrument["instrument_id"])),
                     required_scope,
                 )

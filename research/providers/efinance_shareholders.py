@@ -215,12 +215,18 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
         if holder_count is None and not top_holders:
             return None
 
+        coverage_scope: List[str] = []
+        if holder_count is not None:
+            coverage_scope.append("holder_count")
+        if top_holders:
+            coverage_scope.append("top10_holders")
+        if control_owner_name or control_owner_ratio is not None:
+            coverage_scope.append("reference_only_ownership_clues")
+        elif top_holders:
+            coverage_scope.append("reference_only_ownership_clues")
+
         snapshot_json = {
-            "coverage_scope": [
-                "holder_count",
-                "top10_holders",
-                "reference_only_ownership_clues",
-            ],
+            "coverage_scope": coverage_scope,
             "holder_count": {
                 "value": holder_count,
                 "report_date": holder_count_report_date,

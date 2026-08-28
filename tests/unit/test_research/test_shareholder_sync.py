@@ -1034,3 +1034,160 @@ async def test_shareholder_sync_serializes_date_like_raw_payloads(tmp_path):
     assert row is not None
     payload = json.loads(row["payload_json"])
     assert payload["report_date"] == "2026-03-31"
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_changed_only_keeps_complete_local_over_partial(
+    tmp_path,
+):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(
+        ShareholderSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            holder_count=200,
+            holder_count_report_date="2026-06-30",
+            top_holders_report_date="2026-06-30",
+            top_holders_count=1,
+            top_holders_total_ratio=50.0,
+            control_owner_name="控股股东A",
+            control_owner_ratio=50.0,
+            source="akshare",
+            snapshot_json={
+                "coverage_scope": [
+                    "holder_count",
+                    "top10_holders",
+                    "reference_only_ownership_clues",
+                ],
+                "holder_count": {"value": 200, "report_date": "2026-06-30"},
+                "top_holders": [
+                    {
+                        "rank": 1,
+                        "holder_name": "控股股东A",
+                        "holding_ratio": 50.0,
+                        "report_date": "2026-06-30",
+                    }
+                ],
+                "ownership_clues": {
+                    "control_owner_name": "控股股东A",
+                    "control_owner_ratio": 50.0,
+                    "report_date": "2026-06-30",
+                },
+            },
+            raw_payload={"seed": True},
+        )
+    )
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=[instrument]),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry(
+            {
+                "akshare": _ShareholderProvider(
+                    "akshare",
+                    coverage_scope=["holder_count"],
+                )
+            }
+        ),
+    )
+
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        write_policy="changed_only",
+    )
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["status"] == "success"
+    assert result["total_snapshots_written"] == 0
+    assert result["exchanges"][0]["unchanged_instruments"] == 1
+    assert result["exchanges"][0]["missing_instruments"] == 0
+    assert stored["holder_count"] == 200
+    assert stored["top_holders_count"] == 1
+    assert stored["snapshot"]["top_holders"]
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_still_reports_missing_when_provider_returns_nothing(
+    tmp_path,
+):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(
+        ShareholderSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            holder_count=200,
+            holder_count_report_date="2026-06-30",
+            top_holders_report_date="2026-06-30",
+            top_holders_count=1,
+            top_holders_total_ratio=50.0,
+            control_owner_name="控股股东A",
+            control_owner_ratio=50.0,
+            source="akshare",
+            snapshot_json={
+                "coverage_scope": [
+                    "holder_count",
+                    "top10_holders",
+                    "reference_only_ownership_clues",
+                ],
+                "holder_count": {"value": 200, "report_date": "2026-06-30"},
+                "top_holders": [
+                    {
+                        "rank": 1,
+                        "holder_name": "控股股东A",
+                        "holding_ratio": 50.0,
+                        "report_date": "2026-06-30",
+                    }
+                ],
+                "ownership_clues": {
+                    "control_owner_name": "控股股东A",
+                    "control_owner_ratio": 50.0,
+                    "report_date": "2026-06-30",
+                },
+            },
+            raw_payload={"seed": True},
+        )
+    )
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=[instrument]),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry({"akshare": _EmptyProvider()}),
+    )
+
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        write_policy="changed_only",
+    )
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["status"] == "degraded"
+    assert result["total_snapshots_written"] == 0
+    assert result["exchanges"][0]["missing_instruments"] == 1
+    assert stored["holder_count"] == 200
+    assert stored["top_holders_count"] == 1

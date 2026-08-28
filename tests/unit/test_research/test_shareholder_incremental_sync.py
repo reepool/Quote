@@ -88,57 +88,146 @@ class _FakeAnnouncementService:
         )
 
 
+class _EmptyShareholderProvider(BaseShareholderProvider):
+    source_name = "cninfo"
+
+    async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
+        return []
+
+
 class _ShareholderProvider(BaseShareholderProvider):
     source_name = "cninfo"
 
-    def __init__(self, holder_count=100):
+    def __init__(
+        self,
+        holder_count=100,
+        report_date="2026-03-31",
+        coverage_scope=None,
+    ):
         self.holder_count = holder_count
+        self.report_date = report_date
+        self.coverage_scope = coverage_scope or [
+            "holder_count",
+            "top10_holders",
+            "reference_only_ownership_clues",
+        ]
         self.calls = []
 
     async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
         self.calls.append({"instruments": list(instruments), "exchange": exchange, "mode": mode})
+        has_top = "top10_holders" in self.coverage_scope
+        has_owner = "reference_only_ownership_clues" in self.coverage_scope
         return [
             ShareholderSnapshot(
                 instrument_id=instrument["instrument_id"],
                 symbol=instrument["symbol"],
                 exchange=exchange,
-                holder_count=self.holder_count,
-                holder_count_report_date="2026-03-31",
-                top_holders_report_date="2026-03-31",
-                top_holders_count=1,
-                top_holders_total_ratio=50.0,
-                control_owner_name="控股股东A",
-                control_owner_ratio=50.0,
+                holder_count=(
+                    self.holder_count if "holder_count" in self.coverage_scope else None
+                ),
+                holder_count_report_date=self.report_date,
+                top_holders_report_date=self.report_date if has_top else None,
+                top_holders_count=1 if has_top else 0,
+                top_holders_total_ratio=50.0 if has_top else None,
+                control_owner_name="控股股东A" if has_owner else None,
+                control_owner_ratio=50.0 if has_owner else None,
                 source="cninfo",
                 source_mode=mode,
                 snapshot_json={
-                    "coverage_scope": [
-                        "holder_count",
-                        "top10_holders",
-                        "reference_only_ownership_clues",
-                    ],
-                    "holder_count": {"value": self.holder_count, "report_date": "2026-03-31"},
-                    "top_holders": [
-                        {
-                            "rank": 1,
-                            "holder_name": "控股股东A",
-                            "holding_shares": 1000000,
-                            "holding_ratio": 50.0,
-                            "holder_type": "流通A股",
-                            "change": "未变",
-                            "report_date": "2026-03-31",
-                        }
-                    ],
+                    "coverage_scope": list(self.coverage_scope),
+                    "holder_count": {
+                        "value": self.holder_count,
+                        "report_date": self.report_date,
+                    },
+                    "top_holders": (
+                        [
+                            {
+                                "rank": 1,
+                                "holder_name": "控股股东A",
+                                "holding_shares": 1000000,
+                                "holding_ratio": 50.0,
+                                "holder_type": "流通A股",
+                                "change": "未变",
+                                "report_date": self.report_date,
+                            }
+                        ]
+                        if has_top
+                        else []
+                    ),
                     "ownership_clues": {
-                        "control_owner_name": "控股股东A",
-                        "control_owner_ratio": 50.0,
-                        "report_date": "2026-03-31",
+                        "control_owner_name": "控股股东A" if has_owner else None,
+                        "control_owner_ratio": 50.0 if has_owner else None,
+                        "report_date": self.report_date,
                     },
                 },
                 raw_payload={"holder_count": self.holder_count},
             )
             for instrument in instruments[:limit]
         ]
+
+
+def _complete_snapshot(
+    instrument,
+    *,
+    holder_count=200,
+    report_date="2026-06-30",
+):
+    return ShareholderSnapshot(
+        instrument_id=instrument["instrument_id"],
+        symbol=instrument["symbol"],
+        exchange=instrument["exchange"],
+        holder_count=holder_count,
+        holder_count_report_date=report_date,
+        top_holders_report_date=report_date,
+        top_holders_count=1,
+        top_holders_total_ratio=50.0,
+        control_owner_name="控股股东A",
+        control_owner_ratio=50.0,
+        source="cninfo",
+        source_mode="direct",
+        snapshot_json={
+            "coverage_scope": [
+                "holder_count",
+                "top10_holders",
+                "reference_only_ownership_clues",
+            ],
+            "holder_count": {"value": holder_count, "report_date": report_date},
+            "top_holders": [
+                {
+                    "rank": 1,
+                    "holder_name": "控股股东A",
+                    "holding_shares": 1000000,
+                    "holding_ratio": 50.0,
+                    "holder_type": "流通A股",
+                    "change": "未变",
+                    "report_date": report_date,
+                }
+            ],
+            "ownership_clues": {
+                "control_owner_name": "控股股东A",
+                "control_owner_ratio": 50.0,
+                "report_date": report_date,
+            },
+        },
+        raw_payload={"holder_count": holder_count},
+    )
+
+
+def _quarter_report_announcement(instrument):
+    return AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id=f"ann-{instrument['symbol']}",
+        announcement_key=build_announcement_key(
+            "cninfo", f"ann-{instrument['symbol']}"
+        ),
+        title=f"{instrument.get('name') or instrument['symbol']}2026年半年度报告",
+        published_at="2026-08-26T16:00:00+08:00",
+        published_at_raw="2026-08-26",
+        exchange=instrument["exchange"],
+        market=instrument["exchange"],
+        symbols=(instrument["symbol"],),
+        raw_payload={"announcementId": f"ann-{instrument['symbol']}"},
+    )
 
 
 def _build_config(tmp_path):
@@ -389,3 +478,181 @@ def test_pending_recheck_deadline_does_not_extend_for_same_announcement():
 
     assert deadline == datetime.fromisoformat("2026-05-06T09:00:00+08:00")
     assert deadline < now
+
+
+@pytest.mark.asyncio
+async def test_incremental_does_not_overwrite_complete_snapshot_with_partial(tmp_path):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(_complete_snapshot(instrument))
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry(
+            {
+                "cninfo": _ShareholderProvider(
+                    holder_count=80,
+                    report_date="2026-06-30",
+                    coverage_scope=["holder_count"],
+                )
+            }
+        ),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=5)
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["snapshots_written"] == 0
+    assert result["pending_rechecks"] == 1
+    assert result["failed_instruments"] == 0
+    assert stored["holder_count"] == 200
+    assert stored["top_holders_count"] == 1
+    assert stored["snapshot"]["top_holders"]
+    pending = storage.list_pending_shareholder_rechecks()
+    assert [item["instrument_id"] for item in pending] == ["600519.SH"]
+
+
+@pytest.mark.asyncio
+async def test_incremental_does_not_overwrite_newer_report_with_older_complete(tmp_path):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(
+        _complete_snapshot(instrument, holder_count=200, report_date="2026-06-30")
+    )
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry(
+            {
+                "cninfo": _ShareholderProvider(
+                    holder_count=80,
+                    report_date="2026-03-31",
+                )
+            }
+        ),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=5)
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["snapshots_written"] == 0
+    assert result["pending_rechecks"] == 1
+    assert stored["holder_count"] == 200
+    assert stored["holder_count_report_date"] == "2026-06-30"
+
+
+@pytest.mark.asyncio
+async def test_incremental_keeps_failed_announcement_names_in_pending_recheck(tmp_path):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(_complete_snapshot(instrument))
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": _EmptyShareholderProvider()}),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=5)
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    pending = storage.list_pending_shareholder_rechecks()
+    assert result["snapshots_written"] == 0
+    assert result["pending_rechecks"] == 1
+    assert result["failed_instruments"] == 0
+    assert stored["holder_count"] == 200
+    assert stored["top_holders_count"] == 1
+    assert [item["instrument_id"] for item in pending] == ["600519.SH"]
+    assert pending[0]["status"] == "pending_recheck"
+    assert pending[0]["content_hash"]
+
+
+@pytest.mark.asyncio
+async def test_incremental_pending_recheck_survives_next_run_without_new_announcement(
+    tmp_path,
+):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(_complete_snapshot(instrument))
+    first_service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": _EmptyShareholderProvider()}),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+    first_result = await first_service.sync(exchanges=["SSE"], pending_recheck_days=5)
+    assert first_result["pending_rechecks"] == 1
+
+    second_service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": _EmptyShareholderProvider()}),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+    second_result = await second_service.sync(exchanges=["SSE"], pending_recheck_days=5)
+
+    pending = storage.list_pending_shareholder_rechecks()
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert second_result["pending_rechecks"] == 1
+    assert second_result["failed_instruments"] == 0
+    assert [item["instrument_id"] for item in pending] == ["600519.SH"]
+    assert pending[0]["status"] == "pending_recheck"
+    assert pending[0]["metadata"]["announcement_ids"]
+    assert pending[0]["metadata"]["first_pending_at"]
+    assert stored["holder_count"] == 200
