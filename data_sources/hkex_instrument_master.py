@@ -1036,12 +1036,17 @@ def _hkex_incoming_lifecycle_wins(
     return incoming_at >= existing_at
 
 
-def _hkex_row_is_untradable(row: Optional[Dict[str, Any]]) -> bool:
+def hkex_official_row_is_untradable(row: Optional[Dict[str, Any]]) -> bool:
+    """True when the merged official row is still an arrangement/cessation window."""
     item = row or {}
     source = str(item.get("source") or item.get("official_lifecycle_source") or "")
     if source not in HKEX_UNTRADABLE_SOURCES:
         return False
     return item.get("trading_status") in (0, "0", False)
+
+
+def _hkex_row_is_untradable(row: Optional[Dict[str, Any]]) -> bool:
+    return hkex_official_row_is_untradable(row)
 
 
 def _hkex_row_makes_tradable(row: Optional[Dict[str, Any]]) -> bool:

@@ -17570,6 +17570,7 @@ class DataManager:
             HKEXLifecyclePolicy,
             HKEXSourceEvidencePolicy,
             build_quote_availability_diagnostics,
+            hkex_official_row_is_untradable,
         )
 
         config = self._get_hkex_instrument_master_sync_config()
@@ -17798,13 +17799,13 @@ class DataManager:
                     hasattr(self.db_ops, 'mark_instrument_untradable')
                     and source_evidence_policy.get('trading_status_scan_complete', True)
                 ):
-                    for row in source_bundle.get('untradable_rows') or []:
+                    for row in official_active_rows:
                         instrument_id = row.get('instrument_id')
                         if instrument_id not in allowed_lifecycle_ids:
                             continue
                         if str(row.get('status') or '').lower() != 'active':
                             continue
-                        if row.get('trading_status') not in (0, '0', False):
+                        if not hkex_official_row_is_untradable(row):
                             continue
                         await self.db_ops.mark_instrument_untradable(
                             instrument_id,

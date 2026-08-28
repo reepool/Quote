@@ -1363,9 +1363,27 @@ async def test_hkex_product_cessation_restored_by_manual_review_active(tmp_path)
     manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
     manager._scan_hkex_trading_status_announcements = AsyncMock(
         return_value={
-            'snapshots': [],
+            'snapshots': [
+                HKEXProviderSnapshot(
+                    source='hkexnews_trading_eligibility',
+                    source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+                    parser_version='test',
+                    raw_snapshot_hash='cessation',
+                    rows=[
+                        {
+                            'instrument_id': '00005.HK',
+                            'symbol': '00005',
+                            'name': 'HSBC HOLDINGS',
+                            'status': 'active',
+                            'trading_status': 0,
+                            'source': 'hkexnews_product_cessation',
+                            'lifecycle_evidence_at': '2026-07-28T04:00:00+00:00',
+                        }
+                    ],
+                )
+            ],
             'scan': {
-                'status': 'success_empty',
+                'status': 'success',
                 'is_complete': True,
                 'errors': [],
                 'stop_reason': 'complete',
@@ -1379,6 +1397,7 @@ async def test_hkex_product_cessation_restored_by_manual_review_active(tmp_path)
     by_id = {row['instrument_id']: row for row in safe_rows}
     assert by_id['00005.HK']['trading_status'] == 1
     assert by_id['00005.HK']['source'] == 'hkex_manual_review'
+    manager.db_ops.mark_instrument_untradable.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -1404,6 +1423,23 @@ async def test_hkex_product_cessation_restored_by_later_official_resumption():
     manager._scan_hkex_trading_status_announcements = AsyncMock(
         return_value={
             'snapshots': [
+                HKEXProviderSnapshot(
+                    source='hkexnews_trading_eligibility',
+                    source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+                    parser_version='test',
+                    raw_snapshot_hash='cessation',
+                    rows=[
+                        {
+                            'instrument_id': '00005.HK',
+                            'symbol': '00005',
+                            'name': 'HSBC HOLDINGS',
+                            'status': 'active',
+                            'trading_status': 0,
+                            'source': 'hkexnews_product_cessation',
+                            'lifecycle_evidence_at': '2026-07-28T04:00:00+00:00',
+                        }
+                    ],
+                ),
                 HKEXProviderSnapshot(
                     source='hkexnews_trading_resumption',
                     source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
@@ -1437,6 +1473,7 @@ async def test_hkex_product_cessation_restored_by_later_official_resumption():
     by_id = {row['instrument_id']: row for row in safe_rows}
     assert by_id['00005.HK']['trading_status'] == 1
     assert by_id['00005.HK']['source'] == 'hkexnews_trading_resumption'
+    manager.db_ops.mark_instrument_untradable.assert_not_awaited()
 
 
 @pytest.mark.asyncio
