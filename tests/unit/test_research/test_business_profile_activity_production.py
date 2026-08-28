@@ -94,6 +94,57 @@ def test_relationship_identity_includes_object_and_source_row():
         data_available_date="2026-03-28",
     )
     assert first["relationship_id"] != second["relationship_id"]
+    assert "source_row_key" not in first
+    assert "contract_reference_raw" not in first
+    assert first["metadata"]["source_row_key"] == "row-a"
+
+
+def test_unresolved_named_relationship_is_retained_for_catalog_review():
+    producer = BusinessProfileActivityProducer(_Repository())
+    _, record = producer.build_relationship_or_concentration_candidate(
+        {
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "relationship_type": "buys_from",
+            "counterparty_name_raw": "目录外供应商",
+            "object_raw": "原料A",
+            "scope_id": "group",
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("目录外供应商"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    assert record["counterparty_entity_id"] is None
+    assert record["metadata"]["resolution_status"] == "unresolved"
+    assert record["metadata"]["counterparty_catalog_pending"] is True
+
+
+def test_unresolved_relationship_identity_includes_raw_counterparty_name():
+    producer = BusinessProfileActivityProducer(_Repository())
+    base = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "buys_from",
+        "object_raw": "原料A",
+        "scope_id": "group",
+    }
+    resolver = GovernedCounterpartyResolver(entities=[])
+    _, first = producer.build_relationship_or_concentration_candidate(
+        {**base, "counterparty_name_raw": "目录外供应商甲"},
+        resolution=resolver.resolve("目录外供应商甲"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    _, second = producer.build_relationship_or_concentration_candidate(
+        {**base, "counterparty_name_raw": "目录外供应商乙"},
+        resolution=resolver.resolve("目录外供应商乙"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    assert first["relationship_id"] != second["relationship_id"]
 
 
 def test_activity_identity_is_not_changed_by_processing_run():

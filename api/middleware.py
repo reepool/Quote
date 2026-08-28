@@ -80,10 +80,15 @@ class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
             .lower()
             in {"1", "true", "yes", "on"}
         )
+        history_diagnostic = (
+            request.method.upper() == "GET"
+            and path.endswith("/business-profile/history")
+        )
         if (
             not self._is_protected(path, request.method)
             and not operator_readiness
             and not candidate_diagnostic
+            and not history_diagnostic
         ):
             return await call_next(request)
         research_config = config_manager.get_research_config()
@@ -195,6 +200,10 @@ class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
                 permissions.get("business_profile_process")
                 or "business_profile:process"
             ).strip(),
+            "business_profile_diagnostic": str(
+                permissions.get("business_profile_diagnostic")
+                or "business_profile:diagnostic"
+            ).strip(),
             "broker_risk_control_process": str(
                 permissions.get("broker_risk_control_process")
                 or "broker_risk_control:process"
@@ -207,6 +216,14 @@ class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
                 "trusted identity permission names are invalid",
             )
         request.state.annual_report_permission_names = permission_names
+        if candidate_diagnostic or history_diagnostic:
+            diagnostic_scope = permission_names["business_profile_diagnostic"]
+            if diagnostic_scope not in scopes:
+                return self._error(
+                    403,
+                    "permission_denied",
+                    "business-profile diagnostic permission is missing",
+                )
         return await call_next(request)
 
 

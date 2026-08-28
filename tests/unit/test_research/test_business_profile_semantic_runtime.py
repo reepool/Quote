@@ -16,6 +16,7 @@ import research.business_profile_semantic_runtime as runtime_module
 from research.business_profile_activity_production import GovernedCounterpartyResolver
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_promotion import FieldFamilyPromotionManifest
+from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_section_selection import (
     SelectedSection,
     SelectedSectionArtifact,
@@ -4504,9 +4505,9 @@ def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path
     assert resolved.status == "resolved"
     assert resolved.entity_id == "600000.SH"
     external = resolver.resolve("腾讯控股有限公司")
-    assert external.status == "resolved"
-    assert external.entity_id.startswith("local-entity:")
-    assert external.basis == "official_filing_exact_name"
+    assert external.status == "unresolved"
+    assert external.entity_id is None
+    assert external.basis is None
 
 
 def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_path):
@@ -4624,10 +4625,66 @@ def test_disclosed_complete_counterparty_is_published_without_master_registratio
     relationships = repository.list_records("relationships", instrument_id="601088.SH")
     assert len(gateway.requests) == 2
     assert len(relationships) == 1
-    assert relationships[0]["counterparty_entity_id"].startswith("local-entity:")
-    assert relationships[0]["resolution_basis"] == "official_filing_exact_name"
-    assert relationships[0]["review_status"] == "approved"
-    assert repository.list_exceptions(instrument_id="601088.SH") == []
+    assert relationships[0]["counterparty_entity_id"] is None
+    assert relationships[0]["metadata"]["resolution_status"] == "unresolved"
+    assert relationships[0]["metadata"]["counterparty_catalog_pending"] is True
+    assert relationships[0]["review_status"] == "candidate"
+    exceptions = repository.list_exceptions(instrument_id="601088.SH")
+    assert any("catalog_proposal" in item["reason_codes"] for item in exceptions)
+
+
+def test_resolved_relationship_closes_prior_catalog_proposal_exceptions(
+    tmp_path, monkeypatch
+):
+    repository, pipeline, scope, _ = _relationship_runtime(
+        tmp_path, monkeypatch, [], promote=True
+    )
+    runtime = pipeline.handlers["promote"].__self__
+
+    assert pipeline.run("verify", scope=scope)["status"] == "success"
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+    unresolved = repository.list_records(
+        "relationships", instrument_id="601088.SH"
+    )[0]
+    assertion_id = unresolved["metadata"]["semantic_assertion_id"]
+    assert repository.list_exceptions(instrument_id="601088.SH", status="open")
+
+    resolved = {
+        **unresolved,
+        "relationship_id": "relationship-resolved",
+        "counterparty_name_normalized": "客户股份有限公司",
+        "counterparty_entity_id": "customer-entity",
+        "resolution_basis": "approved_exact_legal_name",
+        "review_status": "candidate",
+        "metadata": {
+            **unresolved["metadata"],
+            "resolution_status": "resolved",
+            "counterparty_catalog_pending": False,
+            "semantic_assertion_id": assertion_id,
+        },
+    }
+    for generated in ("created_at", "updated_at", "lineage_hash"):
+        resolved.pop(generated, None)
+    repository.upsert("relationships", resolved)
+    current = repository.get_record("relationships", resolved["relationship_id"])
+    BusinessProfileReviewService(repository).system_promote_record(
+        "relationships",
+        resolved["relationship_id"],
+        field_family="named_relationships",
+        policy_version="test_policy.v1",
+        gate_manifest_hash="test-relationship-gates",
+        reviewer_version="v1",
+        expected_updated_at=current["updated_at"],
+        evidence_references=[resolved["evidence_id"]],
+    )
+
+    runtime._resolve_relationship_promotion_exceptions(
+        resolved, field_family="named_relationships"
+    )
+
+    assert repository.list_exceptions(
+        instrument_id="601088.SH", status="open"
+    ) == []
 
 
 def test_network_kill_switch_makes_zero_gateway_calls_without_business_rework(
@@ -4775,10 +4832,7 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     }
     assert all(item["review_status"] == "approved" for item in facts)
     exposures = repository.list_records("exposures", instrument_id="601088.SH")
-    assert len(exposures) == 1
-    assert exposures[0]["commodity_id"] == "COMMODITY.coal.thermal_coal"
-    assert exposures[0]["price_series_id"] is None
-    assert exposures[0]["metadata"]["market_series_status"] == "unresolved"
+    assert exposures == []
 
     promoted_payload = runtime.stage_store.read(
         promoted["artifact"],
@@ -4786,21 +4840,9 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     )
     publication_results = promoted_payload["derived"]["publications"]
     assert len(publication_results) == 1
-    assert {item["status"] for item in publication_results} == {"published"}
-    assert [
-        item["reason"] for item in publication_results if item["status"] == "input_gap"
-    ] == []
-    assert promoted["quality"] == {
-        "stage": "promote",
-        "stage_ready": True,
-        "candidate_records": 2,
-        "verified_records": 2,
-        "promoted_records": 2,
-        "value_chain_roles_published": 1,
-        "commodity_exposure_facts_published": 2,
-        "commodity_exposures_published": 1,
-        "publication_gaps": 0,
-    }
+    assert {item["status"] for item in publication_results} == {"fact_only"}
+    assert promoted["quality"]["commodity_exposures_published"] == 0
+    assert promoted["quality"]["commodity_exposure_facts_published"] == 2
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert exceptions == []
     stale_activity = next(item for item in activities if item["action"] == "produces")
@@ -4825,7 +4867,7 @@ def test_approved_atomic_activities_drive_local_roles_and_fail_closed_exposures(
     assert report["atomic_activities"]["candidates"] == 2
     assert report["derived_value_chain_roles"]["auto_promoted"] == 1
     assert report["commodity_exposure_facts"]["auto_promoted"] == 2
-    assert report["commodity_exposure_publication"]["auto_promoted"] == 1
+    assert report["commodity_exposure_publication"]["auto_promoted"] == 0
 
     checkpoint = pipeline.checkpoint_store.load()
     verified = runtime.stage_store.read(

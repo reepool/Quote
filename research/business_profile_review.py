@@ -14,7 +14,6 @@ from research.business_profile_governance import (
 )
 from research.business_profile_temporal import (
     get_business_profile_supersession_column,
-    get_business_profile_temporal_policy,
 )
 from utils.date_utils import get_shanghai_time
 
@@ -436,7 +435,9 @@ class BusinessProfileReviewService:
                 f"replacement record not found: {record_type}:{replacement_id}"
             )
         current_id = (
-            row.get("record_id")
+            row.get("activity_id")
+            or row.get("relationship_id")
+            or row.get("record_id")
             or row.get("exposure_id")
             or row.get("fact_id")
             or row.get("assumption_id")
@@ -450,11 +451,8 @@ class BusinessProfileReviewService:
             raise ValueError("replacement record instrument mismatch")
         if replacement.get("review_status") != "approved":
             raise ValueError("replacement record must already be approved")
-        policy = get_business_profile_temporal_policy(record_type)
-        if not BusinessProfileRepository._same_stable_identity(
-            policy.stable_identity_fields,
-            row,
-            replacement,
+        if not BusinessProfileRepository._same_temporal_identity(
+            record_type, row, replacement
         ):
             raise ValueError("replacement record stable identity mismatch")
         pointer = replacement.get(get_business_profile_supersession_column(record_type))

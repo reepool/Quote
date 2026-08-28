@@ -116,6 +116,7 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
         (
             "instrument_id",
             "relationship_type",
+            "counterparty_name_raw",
             "counterparty_name_normalized",
             "scope_id",
             "object_raw",

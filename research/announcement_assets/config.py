@@ -509,6 +509,7 @@ class AnnouncementAssetConfig:
     acquire_permission: str = "annual_report_assets:acquire"
     content_permission: str = "annual_report_assets:read_content"
     operator_permission: str = "annual_report_assets:operator"
+    business_profile_diagnostic_permission: str = "business_profile:diagnostic"
 
     def __post_init__(self) -> None:
         root = self.project_root.resolve(strict=False)
@@ -534,6 +535,7 @@ class AnnouncementAssetConfig:
             "acquire_permission",
             "content_permission",
             "operator_permission",
+            "business_profile_diagnostic_permission",
         ):
             _non_empty_text(getattr(self, name), f"permissions.{name}")
         object.__setattr__(self, "project_root", root)
@@ -705,6 +707,9 @@ class AnnouncementAssetConfig:
                 "acquire": self.acquire_permission,
                 "read_content": self.content_permission,
                 "operator": self.operator_permission,
+                "business_profile_diagnostic": (
+                    self.business_profile_diagnostic_permission
+                ),
             },
         }
 
@@ -1015,5 +1020,10 @@ class AnnouncementAssetConfig:
             ),
             operator_permission=str(
                 permissions.get("operator", "annual_report_assets:operator")
+            ),
+            business_profile_diagnostic_permission=str(
+                permissions.get(
+                    "business_profile_diagnostic", "business_profile:diagnostic"
+                )
             ),
         )

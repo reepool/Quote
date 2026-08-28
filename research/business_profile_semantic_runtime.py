@@ -3453,6 +3453,12 @@ class BusinessProfileSemanticRuntime:
                         "insufficient_evidence"
                     ):
                         exception_reasons.append("context_incomplete")
+                    if (
+                        record_type == "relationships"
+                        and (record.get("metadata") or {}).get("resolution_status")
+                        != "resolved"
+                    ):
+                        exception_reasons.append("catalog_proposal")
                     promotion = self._promote_record(
                         record_type,
                         record,
@@ -3464,14 +3470,9 @@ class BusinessProfileSemanticRuntime:
                     )
                     decisions.append(promotion)
                     if record_type == "relationships" and promotion.get("promoted"):
-                        for (
-                            semantic_assertion_id
-                        ) in _semantic_relationship_assertion_ids(record):
-                            self.promotion_service.resolve_open_exceptions_for_target(
-                                target_id=semantic_assertion_id,
-                                target_type="document_field_family",
-                                field_family=family,
-                            )
+                        self._resolve_relationship_promotion_exceptions(
+                            record, field_family=family
+                        )
         derived = self._derive_and_publish(scope)
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
@@ -3593,6 +3594,40 @@ class BusinessProfileSemanticRuntime:
                 "by_field_family": by_field_family,
             },
         }
+
+    def _resolve_relationship_promotion_exceptions(
+        self,
+        record: Mapping[str, Any],
+        *,
+        field_family: str,
+    ) -> None:
+        """Close catalog-pending exceptions represented by an approved relation."""
+
+        assertion_ids = set(_semantic_relationship_assertion_ids(record))
+        if not assertion_ids:
+            return
+        for assertion_id in assertion_ids:
+            self.promotion_service.resolve_open_exceptions_for_target(
+                target_id=assertion_id,
+                target_type="document_field_family",
+                field_family=field_family,
+            )
+        for prior in self.repository.list_records(
+            "relationships",
+            instrument_id=str(record.get("instrument_id") or ""),
+            limit=10_000,
+        ):
+            if not assertion_ids.intersection(
+                _semantic_relationship_assertion_ids(prior)
+            ):
+                continue
+            relationship_id = str(prior.get("relationship_id") or "")
+            if relationship_id:
+                self.promotion_service.resolve_open_exceptions_for_target(
+                    target_id=relationship_id,
+                    target_type="relationships",
+                    field_family=field_family,
+                )
 
     def _revised_scope(
         self,
@@ -4086,7 +4121,8 @@ class BusinessProfileSemanticRuntime:
                             "evidence_reference": evidence["evidence_id"],
                         }
                     )
-                    continue
+                    if exception["tier"] == "quick_review":
+                        continue
             evidence_by_id[evidence["evidence_id"]] = evidence
             record_type, record = (
                 self.activity_producer.build_relationship_or_concentration_candidate(
@@ -4484,9 +4520,20 @@ class BusinessProfileSemanticRuntime:
                     )
                 for fact in publication_facts:
                     try:
+                        publication_manifest = self.promotion_manifests.get(
+                            "commodity_exposure_publication"
+                        )
+                        publication_gates = _publication_promotion_gates(
+                            fact,
+                            scope=scope,
+                            manifest=publication_manifest,
+                            repository=self.repository,
+                        )
                         publication = publisher.publish_basic(
                             fact_id=fact["fact_id"],
                             knowledge_cutoff=scope.knowledge_cutoff,
+                            promotion_manifest=publication_manifest,
+                            promotion_gates=publication_gates,
                         )
                         result["publications"].append(publication)
                         if publication.get("status") in {
@@ -5566,7 +5613,9 @@ def _atomic_activity_fact_type(
     if action == "sells":
         return "sales_revenue" if is_currency else "sales_volume"
     if action == "produces":
-        return "production_volume"
+        return "production_volume" if _atomic_unit_dimension(
+            unit, runtime_unit_rules=runtime_unit_rules
+        ) is not None else "other_measurement"
     if action == "stores":
         return "inventory_volume"
     if action == "purchases":
@@ -6244,6 +6293,77 @@ def _current_catalog_versions() -> dict[str, str]:
         "fact": load_business_fact_catalog().catalog_version,
         "product": load_business_product_catalog().catalog_version,
         "unit": load_unit_conversion_catalog().catalog_version,
+    }
+
+
+def _publication_promotion_gates(
+    fact: Mapping[str, Any],
+    *,
+    scope: Any,
+    manifest: FieldFamilyPromotionManifest | None,
+    repository: Any,
+) -> dict[str, bool]:
+    """Evaluate publication gates before handing a candidate to the publisher."""
+
+    metadata = dict(fact.get("metadata") or {})
+    validation = dict(metadata.get("promotion_validation") or {})
+    evidence = repository.get_record("evidence", str(fact.get("evidence_id") or ""))
+    evidence_metadata = dict((evidence or {}).get("metadata") or {})
+    evidence_validation = dict(evidence_metadata.get("promotion_validation") or {})
+    required_keys = _catalog_version_scope(
+        "exposures", "commodity_exposure_publication"
+    )
+    expected_catalogs = _current_catalog_versions()
+    recorded_catalogs = dict(
+        validation.get("catalog_versions")
+        or evidence_validation.get("catalog_versions")
+        or {}
+    )
+    manifest_matches = bool(
+        manifest is not None
+        and manifest.field_family == "commodity_exposure_publication"
+        and scope.promotion_manifest_hashes.get("commodity_exposure_publication")
+        == manifest.manifest_hash
+    )
+    evidence_approved = bool(evidence and evidence.get("review_status") == "approved")
+    return {
+        "official_identity": bool(
+            evidence
+            and evidence.get("source_tier") == "official_filing"
+            and evidence.get("source_document_id")
+            and evidence.get("document_hash")
+            and evidence_validation.get("official_identity_verified") is True
+        ),
+        "artifact_quality": bool(
+            evidence
+            and evidence.get("ocr_status") not in {"required", "failed"}
+            and evidence_validation.get("artifact_quality_verified") is True
+        ),
+        "exact_evidence": bool(
+            evidence_approved
+            and evidence.get("evidence_text_hash")
+            and evidence.get("page_number")
+            and evidence.get("section_path")
+            and evidence_validation.get("exact_evidence_verified") is True
+        ),
+        "catalogs_current": _catalogs_current(
+            recorded_catalogs, expected_catalogs, required_keys=required_keys
+        ),
+        "temporal_scope": bool(
+            validation.get("temporal_scope_valid") is True
+            and _temporal_scope_is_current(fact, scope.knowledge_cutoff)
+        ),
+        "numeric_reconciliation": bool(
+            validation.get("numeric_reconciliation_executed") is True
+            and validation.get("numeric_reconciliation_valid") is True
+        ),
+        "no_conflicts": validation.get("no_conflicts") is True,
+        "field_family_manifest": manifest_matches,
+        "runtime_identity_match": bool(
+            manifest is not None and dict(scope.identities) == dict(manifest.identities)
+        ),
+        "candidate_current": True,
+        "semantic_proof": True,
     }
 
 

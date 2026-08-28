@@ -1028,6 +1028,8 @@ class BusinessProfileRepository:
                 predecessor = None
                 for row in rows:
                     existing = dict(row)
+                    if not self._same_temporal_identity(record_type, payload, existing):
+                        continue
                     if self._temporal_versions_conflict(record_type, payload, existing):
                         predecessor = existing
                         break
@@ -1082,10 +1084,8 @@ class BusinessProfileRepository:
                     and not allow_reuse_conflicts
                 ):
                     continue
-                if not self._same_stable_identity(
-                    policy.stable_identity_fields,
-                    left["payload"],
-                    right["payload"],
+                if not self._same_temporal_identity(
+                    record_type, left["payload"], right["payload"]
                 ):
                     continue
                 if self._temporal_versions_conflict(
@@ -1139,11 +1139,7 @@ class BusinessProfileRepository:
             )
             if prior is None:
                 raise ValueError(f"superseded business profile record not found: {pointer}")
-            if not self._same_stable_identity(
-                policy.stable_identity_fields,
-                payload,
-                prior,
-            ):
+            if not self._same_temporal_identity(record_type, payload, prior):
                 raise ValueError("superseded business profile stable identity mismatch")
             if int(payload.get("version") or 0) <= int(prior.get("version") or 0):
                 raise ValueError("superseding business profile version must increase")
@@ -1157,6 +1153,8 @@ class BusinessProfileRepository:
         ).fetchall()
         for row in rows:
             existing = dict(row)
+            if not self._same_temporal_identity(record_type, payload, existing):
+                continue
             if pointer and str(existing.get(spec["pk"])) == pointer:
                 continue
             if self._temporal_versions_conflict(record_type, payload, existing):
@@ -1254,6 +1252,43 @@ class BusinessProfileRepository:
     ) -> bool:
         return all(left.get(field) == right.get(field) for field in fields)
 
+    @classmethod
+    def _same_temporal_identity(
+        cls,
+        record_type: str,
+        left: Mapping[str, Any],
+        right: Mapping[str, Any],
+    ) -> bool:
+        """Compare policy identity plus persisted source lineage where needed."""
+
+        policy = get_business_profile_temporal_policy(record_type)
+        if not cls._same_stable_identity(policy.stable_identity_fields, left, right):
+            return False
+        if record_type in {"activities", "relationships"}:
+            for field in ("source_row_key", "contract_reference_raw"):
+                left_value = cls._lineage_value(left, field)
+                right_value = cls._lineage_value(right, field)
+                if (
+                    left_value is not None
+                    and right_value is not None
+                    and left_value != right_value
+                ):
+                    return False
+        return True
+
+    @staticmethod
+    def _lineage_value(record: Mapping[str, Any], field: str) -> Any:
+        if record.get(field) is not None:
+            return record.get(field)
+        metadata = record.get("metadata")
+        if not isinstance(metadata, Mapping):
+            metadata = record.get("metadata_json")
+            if isinstance(metadata, str):
+                metadata = _json_loads(metadata, {})
+        value = metadata.get(field) if isinstance(metadata, Mapping) else None
+        normalized = str(value or "").strip()
+        return normalized or None
+
     @staticmethod
     def _temporal_versions_conflict(
         record_type: str,
@@ -1265,7 +1300,9 @@ class BusinessProfileRepository:
         left_pointer = str(left.get(supersession_column) or "")
         right_pointer = str(right.get(supersession_column) or "")
         left_id = str(
-            left.get("record_id")
+            left.get("activity_id")
+            or left.get("relationship_id")
+            or left.get("record_id")
             or left.get("exposure_id")
             or left.get("fact_id")
             or left.get("assumption_id")
@@ -1273,14 +1310,18 @@ class BusinessProfileRepository:
             or ""
         )
         right_id = str(
-            right.get("record_id")
+            right.get("activity_id")
+            or right.get("relationship_id")
+            or right.get("record_id")
             or right.get("exposure_id")
             or right.get("fact_id")
             or right.get("assumption_id")
             or right.get("regime_id")
             or ""
         )
-        if left_pointer == right_id or right_pointer == left_id:
+        if left_pointer and right_id and left_pointer == right_id:
+            return False
+        if right_pointer and left_id and right_pointer == left_id:
             return False
         if policy.temporal_class == BusinessProfileTemporalClass.REPORT_FLOW:
             field = policy.observation_period_field or "report_period"

@@ -32,6 +32,7 @@ def _trusted_config():
                                 "annual_report_assets:acquire",
                                 "annual_report_assets:read_content",
                                 "annual_report_assets:operator",
+                                "business_profile:diagnostic",
                             ],
                         }
                     ],
@@ -39,6 +40,77 @@ def _trusted_config():
             }
         }
     )
+
+
+@pytest.mark.asyncio
+async def test_business_profile_history_requires_diagnostic_scope(monkeypatch):
+    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "secret-token")
+    monkeypatch.setattr("api.middleware.config_manager.get_research_config", _trusted_config)
+    method = AsyncMock(return_value={"status": "success", "instrument_id": "601088.SH", "history": {}})
+    monkeypatch.setattr(
+        "api.routes.data_manager.get_research_company_business_profile_history",
+        method,
+    )
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        unauthenticated = await client.get(
+            "/api/v1/research/company/601088.SH/business-profile/history"
+        )
+        authenticated = await client.get(
+            "/api/v1/research/company/601088.SH/business-profile/history",
+            headers={"Authorization": "Bearer secret-token"},
+        )
+    assert unauthenticated.status_code == 401
+    assert authenticated.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_business_profile_history_rejects_read_content_only_principal(monkeypatch):
+    config = _trusted_config()
+    config.modules["official_announcement_assets"]["permissions"]["principals"][0][
+        "scopes"
+    ] = ["annual_report_assets:read_content"]
+    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "secret-token")
+    monkeypatch.setattr(
+        "api.middleware.config_manager.get_research_config", lambda: config
+    )
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            "/api/v1/research/company/601088.SH/business-profile/history",
+            headers={"Authorization": "Bearer secret-token"},
+        )
+    assert response.status_code == 403
+    assert response.json()["error_code"] == "permission_denied"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/v1/research/company/601088.SH/business-profile?include_candidates=true",
+        "/api/v1/research/company/601088.SH/commodity-exposures?include_candidates=true",
+    ],
+)
+async def test_business_profile_candidates_reject_read_content_only_principal(
+    monkeypatch, path
+):
+    config = _trusted_config()
+    config.modules["official_announcement_assets"]["permissions"]["principals"][0][
+        "scopes"
+    ] = ["annual_report_assets:read_content"]
+    monkeypatch.setenv("TEST_ANNUAL_REPORT_ASSET_TOKEN", "secret-token")
+    monkeypatch.setattr(
+        "api.middleware.config_manager.get_research_config", lambda: config
+    )
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            path,
+            headers={"Authorization": "Bearer secret-token"},
+        )
+    assert response.status_code == 403
+    assert response.json()["error_code"] == "permission_denied"
 
 
 @pytest.mark.asyncio

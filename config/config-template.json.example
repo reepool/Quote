@@ -1185,7 +1185,8 @@
           "principals": [],
           "acquire": "annual_report_assets:acquire",
           "read_content": "annual_report_assets:read_content",
-          "operator": "annual_report_assets:operator"
+          "operator": "annual_report_assets:operator",
+          "business_profile_diagnostic": "business_profile:diagnostic"
         }
       }
     }

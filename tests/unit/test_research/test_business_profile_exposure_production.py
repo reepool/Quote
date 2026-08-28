@@ -19,6 +19,20 @@ from tests.unit.test_research.test_business_profile_exposure_components import (
     _storage,
 )
 from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_promotion import FieldFamilyPromotionManifest
+
+
+def _publication_context():
+    manifest = FieldFamilyPromotionManifest(
+        field_family="commodity_exposure_publication",
+        enabled=True,
+        benchmark_passed=True,
+        identities={"test": "publication"},
+    )
+    return {
+        "promotion_manifest": manifest,
+        "promotion_gates": {name: True for name in manifest.required_gates},
+    }
 
 
 def _catalog(
@@ -98,7 +112,7 @@ def _approved_sales_activity(
         "valid_to": "2026-12-31",
         "knowledge_from": "2026-03-28",
         "version": 1,
-        "metadata": {},
+        "metadata": {"period_basis": "period_total"},
     }
     repository.upsert("activities", payload)
     _promote(
@@ -128,6 +142,60 @@ def test_approved_activity_maps_to_fact_and_preserves_unknown_materiality(tmp_pa
     assert fact["share"] is None
     assert fact["metadata"]["unknown_value_preserved"] is False
     assert fact["metadata"]["source_activity_action"] == "sells"
+
+
+def test_period_basis_is_preserved_and_unknown_does_not_assume_full_year(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(repository)
+    activity = {**activity, "metadata": {"period_basis": "instant"}}
+    fact = BusinessProfileExposureFactProducer(repository).build_from_activity(activity)
+
+    assert fact["metadata"]["period_basis"] == "instant"
+    assert fact["metadata"]["period_basis_source"] == "activity"
+    assert fact["metadata"]["numeric_reconciliation_valid"] is True
+
+
+def test_publication_requires_external_manifest_and_gate_context(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(repository)
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(repository, "exposure_facts", fact["fact_id"], references=["evidence-2025-ar"])
+
+    with pytest.raises(ValueError, match="promotion manifest is required"):
+        BusinessProfileExposurePublisher(repository).publish_basic(
+            fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        )
+
+
+def test_failed_gate_does_not_reuse_approved_publication_as_success(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(repository)
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(repository, "exposure_facts", fact["fact_id"], references=["evidence-2025-ar"])
+    publisher = BusinessProfileExposurePublisher(
+        repository, mapping_resolver=GovernedCommodityMappingResolver(_catalog())
+    )
+    context = _publication_context()
+    assert publisher.publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **context
+    )["status"] == "published"
+    failed = dict(context["promotion_gates"])
+    failed["no_conflicts"] = False
+    result = publisher.publish_basic(
+        fact_id=fact["fact_id"],
+        knowledge_cutoff="2026-04-30",
+        promotion_manifest=context["promotion_manifest"],
+        promotion_gates=failed,
+    )
+    assert result["status"] == "held"
+    assert result["reason"] == "publication_gates_failed"
 
 
 def test_fact_production_rejects_candidate_activity(tmp_path):
@@ -220,7 +288,7 @@ def test_known_commodity_identity_publishes_without_forcing_market_series(
     )
 
     published = BusinessProfileExposurePublisher(repository).publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )
 
     assert published["status"] == "fact_only"
@@ -248,7 +316,7 @@ def test_composite_process_fact_is_retained_without_false_publication_gap(tmp_pa
     )
 
     result = BusinessProfileExposurePublisher(repository).publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )
 
     persisted = repository.get_record("exposure_facts", fact["fact_id"])
@@ -281,7 +349,7 @@ def test_mapped_production_activity_publishes_positive_output_exposure(tmp_path)
         repository,
         mapping_resolver=GovernedCommodityMappingResolver(_catalog()),
     ).publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )["exposure"]
 
     assert exposure["exposure_role"] == "revenue"
@@ -341,10 +409,10 @@ def test_basic_publication_is_audited_idempotent_and_excludes_optional_assumptio
     )
 
     first = publisher.publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )
     second = publisher.publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )
 
     exposure = first["exposure"]
@@ -403,7 +471,7 @@ def test_purchase_activity_uses_explicit_negative_input_cost_rule(tmp_path):
     )
 
     exposure = publisher.publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )["exposure"]
     assert exposure["exposure_role"] == "feedstock_cost"
     assert exposure["direction"] == "negative"
@@ -428,6 +496,7 @@ def test_consumer_specific_publication_requires_approved_current_assumption(tmp_
         publisher.publish_basic(
             fact_id=fact["fact_id"],
             knowledge_cutoff="2026-04-30",
+            **_publication_context(),
             required_assumption_types=("lag_days",),
             consumer_id="dcf.v1",
         )
@@ -453,6 +522,7 @@ def test_consumer_specific_publication_requires_approved_current_assumption(tmp_
     result = publisher.publish_basic(
         fact_id=fact["fact_id"],
         knowledge_cutoff="2026-04-30",
+        **_publication_context(),
         required_assumption_types=("lag_days",),
         consumer_id="dcf.v1",
     )
@@ -481,10 +551,14 @@ def test_future_fact_and_candidate_publication_do_not_leak_to_resolver(tmp_path)
     )
 
     with pytest.raises(ValueError, match="unavailable at cutoff"):
-        publisher.publish_basic(fact_id=fact["fact_id"], knowledge_cutoff="2026-03-01")
+        publisher.publish_basic(
+            fact_id=fact["fact_id"],
+            knowledge_cutoff="2026-03-01",
+            **_publication_context(),
+        )
 
     published = publisher.publish_basic(
-        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )["exposure"]
     candidate = dict(published)
     candidate.pop("created_at", None)
@@ -522,7 +596,7 @@ def test_new_fact_publication_supersedes_prior_exposure_at_knowledge_cutoff(tmp_
         repository, mapping_resolver=GovernedCommodityMappingResolver(_catalog())
     )
     first_exposure = publisher.publish_basic(
-        fact_id=first_fact["fact_id"], knowledge_cutoff="2026-04-30"
+        fact_id=first_fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
     )["exposure"]
 
     successor = {
@@ -552,7 +626,7 @@ def test_new_fact_publication_supersedes_prior_exposure_at_knowledge_cutoff(tmp_
         references=["evidence-2025-ar"],
     )
     second_exposure = publisher.publish_basic(
-        fact_id=successor["fact_id"], knowledge_cutoff="2026-08-15"
+        fact_id=successor["fact_id"], knowledge_cutoff="2026-08-15", **_publication_context()
     )["exposure"]
 
     assert second_exposure["supersedes_exposure_id"] == first_exposure["exposure_id"]

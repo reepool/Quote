@@ -175,7 +175,16 @@ class BusinessProfileActivityProducer:
         activity_id = _stable_id("activity", stable_payload)
         return {
             "activity_id": activity_id,
-            **stable_payload,
+            "instrument_id": instrument_id,
+            "report_period": report_period,
+            "subject_scope": subject_scope,
+            "action": action,
+            "object_type": stable_payload["object_type"],
+            "object_raw": object_raw,
+            "object_id": stable_payload["object_id"],
+            "segment_id": stable_payload["segment_id"],
+            "evidence_id": evidence_id,
+            "run_id": run_id,
             "geography": assertion.get("geography"),
             "value": assertion.get("value"),
             "unit": assertion.get("unit"),
@@ -295,8 +304,6 @@ class BusinessProfileActivityProducer:
             }
             return "operating_facts", record
         raw_name = _required_text(assertion, "counterparty_name_raw")
-        if resolution.status != "resolved" or not resolution.entity_id:
-            raise ValueError("named relationship counterparty is unresolved")
         valid_from = assertion.get("valid_from") or report_period
         relationship_id = _stable_id(
             "relationship",
@@ -304,6 +311,7 @@ class BusinessProfileActivityProducer:
                 "instrument_id": instrument_id,
                 "relationship_type": relationship_type,
                 "counterparty_entity_id": resolution.entity_id,
+                "counterparty_name_raw": raw_name,
                 "scope_id": assertion.get("scope_id"),
                 "object_raw": assertion.get("object_raw"),
                 "object_id": assertion.get("object_id"),
@@ -327,8 +335,6 @@ class BusinessProfileActivityProducer:
             "scope_id": str(assertion.get("scope_id") or instrument_id),
             "object_raw": assertion.get("object_raw"),
             "object_id": assertion.get("object_id"),
-            "source_row_key": assertion.get("source_row_key"),
-            "contract_reference_raw": assertion.get("contract_reference_raw"),
             "disclosed_value": assertion.get("disclosed_value"),
             "disclosed_unit": assertion.get("disclosed_unit"),
             "disclosed_share": assertion.get("disclosed_share"),
@@ -345,6 +351,12 @@ class BusinessProfileActivityProducer:
             "version": 1,
             "metadata": {
                 "entity_resolution": resolution.to_dict(),
+                "resolution_status": (
+                    "resolved"
+                    if resolution.status == "resolved" and resolution.entity_id
+                    else "unresolved"
+                ),
+                "counterparty_catalog_pending": resolution.status != "resolved",
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
                 "source_row_key": assertion.get("source_row_key"),
                 "contract_reference_raw": assertion.get("contract_reference_raw"),

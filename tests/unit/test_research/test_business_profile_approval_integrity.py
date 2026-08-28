@@ -443,6 +443,220 @@ def test_temporal_validation_rejects_invalid_interval_and_overlapping_state(tmp_
         )
 
 
+def test_activity_temporal_conflict_uses_primary_key_and_source_row(tmp_path):
+    repository, _ = _repository(tmp_path)
+    repository.upsert("evidence", _candidate_evidence())
+    evidence = repository.list_records("evidence")[0]
+    review = BusinessProfileReviewService(repository)
+    review.system_promote_record(
+        "evidence",
+        evidence["evidence_id"],
+        field_family="test:evidence",
+        policy_version="test_policy.v1",
+        gate_manifest_hash="test-evidence-gates",
+        reviewer_version="v1",
+        expected_updated_at=evidence["updated_at"],
+        evidence_references=[],
+    )
+    base = {
+        "activity_id": "activity-row-1-v1",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "subject_scope": "issuer",
+        "action": "purchases",
+        "object_type": "product",
+        "object_raw": "多晶硅料",
+        "value": 4.18,
+        "unit": "亿元",
+        "evidence_id": evidence["evidence_id"],
+        "run_id": "run-1",
+        "data_available_date": "2026-03-28",
+        "extraction_method": "semantic_verified",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": "2025-01-01",
+        "knowledge_from": "2026-03-28",
+        "metadata": {"source_row_key": "contract-row-1"},
+    }
+    repository.upsert("activities", base)
+    current = repository.get_record("activities", base["activity_id"])
+    review.system_promote_record(
+        "activities",
+        base["activity_id"],
+        field_family="test:activities",
+        policy_version="test_policy.v1",
+        gate_manifest_hash="test-activity-gates",
+        reviewer_version="v1",
+        expected_updated_at=current["updated_at"],
+        evidence_references=[evidence["evidence_id"]],
+    )
+
+    with pytest.raises(ValueError, match="business profile temporal conflict"):
+        repository.upsert(
+            "activities",
+            {
+                **base,
+                "activity_id": "activity-row-1-v2",
+                "value": 0,
+                "version": 2,
+            },
+        )
+
+    repository.upsert(
+        "activities",
+        {
+            **base,
+            "activity_id": "activity-row-2",
+            "value": 0,
+            "metadata": {"source_row_key": "contract-row-2"},
+        },
+    )
+    assert repository.get_record("activities", "activity-row-2") is not None
+
+    with pytest.raises(ValueError, match="business profile temporal conflict"):
+        repository.upsert(
+            "activities",
+            {
+                **base,
+                "activity_id": "activity-legacy-lineage",
+                "value": 0,
+                "metadata": {},
+            },
+        )
+
+    relationship = {
+        "relationship_id": "relationship-row-1-v1",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "buys_from",
+        "direction": "inbound",
+        "counterparty_name_raw": "供应商甲",
+        "counterparty_name_normalized": "供应商甲",
+        "counterparty_entity_id": "supplier-a",
+        "resolution_basis": "exact_legal_name",
+        "anonymous": 0,
+        "scope_type": "company",
+        "scope_id": "601088.SH",
+        "object_raw": "多晶硅料",
+        "disclosed_value": 4.18,
+        "disclosed_unit": "亿元",
+        "evidence_id": evidence["evidence_id"],
+        "run_id": "run-1",
+        "data_available_date": "2026-03-28",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": "2025-01-01",
+        "knowledge_from": "2026-03-28",
+        "metadata": {"source_row_key": "supplier-contract-row-1"},
+    }
+    repository.upsert("relationships", relationship)
+    current = repository.get_record("relationships", relationship["relationship_id"])
+    review.system_promote_record(
+        "relationships",
+        relationship["relationship_id"],
+        field_family="test:relationships",
+        policy_version="test_policy.v1",
+        gate_manifest_hash="test-relationship-gates",
+        reviewer_version="v1",
+        expected_updated_at=current["updated_at"],
+        evidence_references=[evidence["evidence_id"]],
+    )
+
+    with pytest.raises(ValueError, match="business profile temporal conflict"):
+        repository.upsert(
+            "relationships",
+            {
+                **relationship,
+                "relationship_id": "relationship-row-1-v2",
+                "disclosed_value": 0,
+                "version": 2,
+            },
+        )
+
+    repository.upsert(
+        "relationships",
+        {
+            **relationship,
+            "relationship_id": "relationship-row-2",
+            "disclosed_value": 0,
+            "metadata": {"source_row_key": "supplier-contract-row-2"},
+        },
+    )
+    assert repository.get_record("relationships", "relationship-row-2") is not None
+
+
+@pytest.mark.parametrize(
+    ("record_type", "primary_key", "supersession_key", "identity"),
+    [
+        (
+            "activities",
+            "activity_id",
+            "supersedes_activity_id",
+            {
+                "instrument_id": "601088.SH",
+                "action": "purchases",
+                "object_type": "product",
+                "object_id": None,
+                "segment_id": None,
+                "object_raw": "多晶硅料",
+                "evidence_id": "evidence-2025-ar",
+            },
+        ),
+        (
+            "relationships",
+            "relationship_id",
+            "supersedes_relationship_id",
+            {
+                "instrument_id": "601088.SH",
+                "relationship_type": "buys_from",
+                "counterparty_name_raw": "供应商甲",
+                "counterparty_name_normalized": "供应商甲",
+                "scope_id": "601088.SH",
+                "object_raw": "多晶硅料",
+                "object_id": None,
+                "evidence_id": "evidence-2025-ar",
+            },
+        ),
+    ],
+)
+def test_replacement_validation_uses_record_primary_key_and_source_lineage(
+    record_type,
+    primary_key,
+    supersession_key,
+    identity,
+):
+    current_id = f"{record_type}-row-1-v1"
+    replacement_id = f"{record_type}-row-1-v2"
+    current = {
+        **identity,
+        primary_key: current_id,
+        "metadata": {"source_row_key": "contract-row-1"},
+    }
+    replacement = {
+        **identity,
+        primary_key: replacement_id,
+        supersession_key: current_id,
+        "review_status": "approved",
+        "metadata_json": '{"source_row_key":"contract-row-1"}',
+    }
+
+    BusinessProfileReviewService._validate_replacement(
+        record_type,
+        current,
+        replacement,
+        replacement_id=replacement_id,
+    )
+
+    replacement["metadata_json"] = '{"source_row_key":"contract-row-2"}'
+    with pytest.raises(ValueError, match="replacement record stable identity mismatch"):
+        BusinessProfileReviewService._validate_replacement(
+            record_type,
+            current,
+            replacement,
+            replacement_id=replacement_id,
+        )
+
+
 def test_promotion_rechecks_temporal_conflicts_and_allows_explicit_successor(tmp_path):
     repository, _ = _repository(tmp_path)
     repository.upsert("evidence", _candidate_evidence())

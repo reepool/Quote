@@ -91,11 +91,18 @@ class BusinessProfileExposureFactProducer:
         )
         normalized_value = None
         normalized_unit = None
-        if value is not None and resolution is not None and resolution.publishable:
+        period_basis = _activity_period_basis(activity)
+        conversion_completed = (
+            value is not None
+            and resolution is not None
+            and resolution.publishable
+            and period_basis in catalog.period_basis_values
+        )
+        if conversion_completed:
             converted = catalog.convert_resolved(
                 value,
                 resolution,
-                period_basis="full_year",
+                period_basis=period_basis,
                 equity_basis="unknown",
             )
             normalized_value = float(converted.normalized_value)
@@ -144,12 +151,20 @@ class BusinessProfileExposureFactProducer:
                 "unknown_value_preserved": value is None,
                 "unknown_unit_preserved": unit is None or not bool(resolution and resolution.publishable),
                 "unit_resolution": resolution.to_dict() if resolution else None,
+                "period_basis": period_basis,
+                "period_basis_source": (
+                    "activity" if period_basis != "unknown" else "unknown"
+                ),
+                "numeric_reconciliation_executed": value is None or conversion_completed,
+                "numeric_reconciliation_valid": value is None or conversion_completed,
                 "unit_normalization_status": (
                     resolution.status if resolution else ("not_applicable" if value is None else "unit_resolution_pending")
                 ),
                 "publication_blocker": (
                     "unit_normalization_failed"
                     if value is not None and not (resolution and resolution.publishable)
+                    else "period_basis_unknown"
+                    if value is not None and period_basis not in catalog.period_basis_values
                     else None
                 ),
                 "llm_assumption_fields_prohibited": True,
@@ -165,6 +180,15 @@ class BusinessProfileExposureFactProducer:
         return _find_record(
             self.repository, "exposure_facts", "fact_id", fact["fact_id"]
         )
+
+
+def _activity_period_basis(activity: Mapping[str, Any]) -> str:
+    """Read the disclosed measurement basis without inventing annual semantics."""
+
+    metadata = activity.get("metadata") or {}
+    value = activity.get("period_basis") or metadata.get("period_basis")
+    normalized = str(value or "").strip().lower()
+    return normalized or "unknown"
 
 
 class GovernedCommodityMappingResolver:
@@ -320,7 +344,15 @@ class BusinessProfileExposurePublisher:
         knowledge_cutoff: str,
         required_assumption_types: Sequence[str] = (),
         consumer_id: str | None = None,
+        promotion_manifest: FieldFamilyPromotionManifest | None = None,
+        promotion_gates: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
+        if promotion_manifest is None:
+            raise ValueError("commodity publication promotion manifest is required")
+        if promotion_manifest.field_family != "commodity_exposure_publication":
+            raise ValueError("commodity publication promotion manifest mismatch")
+        if promotion_gates is None:
+            raise ValueError("commodity publication promotion gates are required")
         fact = _find_approved_as_of(
             self.repository,
             "exposure_facts",
@@ -400,6 +432,15 @@ class BusinessProfileExposurePublisher:
             self.repository, "exposures", "exposure_id", exposure_id
         )
         if existing and existing.get("review_status") == "approved":
+            if not _publication_context_allows_approved_reuse(
+                promotion_manifest, promotion_gates
+            ):
+                return {
+                    "status": "held",
+                    "exposure": existing,
+                    "audit": None,
+                    "reason": "publication_gates_failed",
+                }
             return {"status": "unchanged", "exposure": existing, "audit": None}
         build_policy_hash = _stable_hash(
             {
@@ -490,17 +531,18 @@ class BusinessProfileExposurePublisher:
         )
         self.repository.upsert("exposures", payload)
         current = _find_record(self.repository, "exposures", "exposure_id", exposure_id)
-        identities = {
+        identities = dict(promotion_manifest.identities)
+        required_identities = {
             "catalog_version": mapping.catalog_version,
             "publication_policy": PUBLICATION_POLICY_VERSION,
         }
-        manifest = FieldFamilyPromotionManifest(
-            field_family="commodity_exposure_publication",
-            enabled=True,
-            benchmark_passed=True,
-            identities=identities,
-        )
-        gates = {name: True for name in manifest.required_gates}
+        if any(
+            str(identities.get(key) or "") != value
+            for key, value in required_identities.items()
+            if key in identities
+        ):
+            raise ValueError("commodity publication manifest identity mismatch")
+        gates = dict(promotion_gates)
         promotion = BusinessProfilePromotionService(self.review_service).process(
             PromotionContext(
                 target_type="exposures",
@@ -515,7 +557,7 @@ class BusinessProfileExposurePublisher:
                 ),
                 metadata={"component_lineage_hash": component_lineage_hash},
             ),
-            manifest,
+            promotion_manifest,
         )
         return {
             "status": "published" if promotion.get("promoted") else "held",
@@ -602,7 +644,11 @@ def _fact_type(
     if action == "produces":
         if value is None:
             return "production_activity"
-        return "production_value" if dimension == "currency" else "production_volume"
+        if dimension == "currency":
+            return "production_value"
+        if dimension is None:
+            return "production_activity"
+        return "production_volume"
     if action == "hedges":
         if value is None:
             return "hedge_activity"
@@ -619,6 +665,19 @@ def _fact_type(
     if dimension == "currency" or unit in {"CNY", "HKD", "USD"}:
         return f"{prefix}_value"
     return f"{prefix}_volume"
+
+
+def _publication_context_allows_approved_reuse(
+    manifest: FieldFamilyPromotionManifest,
+    gates: Mapping[str, Any],
+) -> bool:
+    required = set(manifest.required_gates)
+    return bool(
+        manifest.enabled
+        and manifest.benchmark_passed
+        and set(gates) == required
+        and all(gates.get(name) is True for name in required)
+    )
 
 
 def _find_approved_as_of(
