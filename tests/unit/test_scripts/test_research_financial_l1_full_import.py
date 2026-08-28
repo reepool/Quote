@@ -1,8 +1,13 @@
+import json
+from datetime import datetime
+
 from scripts.research_financial_l1_full_import import (
     DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES,
     DEFAULT_ACCEPTED_SOURCE_GAPS,
     accepted_source_gaps_from_manifest_lifecycle,
+    apply_batch_status_to_progress,
     merge_accepted_source_gaps,
+    resolve_full_import_log_dir,
     resolve_report_periods,
     selected_batches,
     split_ready_existing_targets,
@@ -188,3 +193,137 @@ def test_split_ready_existing_targets_skips_only_fully_ready_targets(tmp_path):
 
     assert [target.instrument_id for target in ready] == ["600519.SH"]
     assert [target.instrument_id for target in pending] == ["600355.SH"]
+
+
+def test_needs_review_batch_is_not_marked_completed():
+    progress = {"completed_batches": [1], "failed_batches": [], "review_batches": []}
+
+    outcome = apply_batch_status_to_progress(
+        progress,
+        batch_index=2,
+        status="needs_review",
+        continue_on_needs_review=True,
+        blocking_not_ready_read_count=3,
+        evidence_path="batch_0002.json",
+    )
+
+    assert outcome == "review"
+    assert progress["completed_batches"] == [1]
+    assert progress["failed_batches"] == []
+    assert progress["review_batches"] == [
+        {
+            "batch_index": 2,
+            "status": "needs_review",
+            "blocking_not_ready_read_count": 3,
+            "evidence_path": "batch_0002.json",
+        }
+    ]
+
+
+def test_successful_retry_clears_needs_review_batch():
+    progress = {
+        "completed_batches": [1],
+        "failed_batches": [],
+        "review_batches": [
+            {
+                "batch_index": 2,
+                "status": "needs_review",
+                "blocking_not_ready_read_count": 3,
+                "evidence_path": "batch_0002.json",
+            }
+        ],
+    }
+
+    outcome = apply_batch_status_to_progress(
+        progress,
+        batch_index=2,
+        status="success",
+        continue_on_needs_review=True,
+    )
+
+    assert outcome == "completed"
+    assert progress["completed_batches"] == [1, 2]
+    assert progress["review_batches"] == []
+
+
+def test_resolve_full_import_log_dir_reuses_incomplete_run(tmp_path):
+    incomplete = tmp_path / "20260827_233000"
+    incomplete.mkdir()
+    (incomplete / "progress_state.json").write_text(
+        json.dumps(
+            {
+                "completed_batches": [1],
+                "failed_batches": [2],
+                "batch_results": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (incomplete / "manifest.json").write_text(
+        json.dumps({"batches": [{"batch_index": 1}, {"batch_index": 2}]}),
+        encoding="utf-8",
+    )
+
+    resolved = resolve_full_import_log_dir(None, resume=True, root=tmp_path)
+
+    assert resolved == incomplete
+
+
+def test_resolve_full_import_log_dir_starts_new_after_completed_run(tmp_path):
+    finished = tmp_path / "20260827_233000"
+    finished.mkdir()
+    (finished / "progress_state.json").write_text(
+        json.dumps(
+            {
+                "completed_batches": [1, 2],
+                "failed_batches": [],
+                "review_batches": [],
+                "batch_results": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (finished / "manifest.json").write_text(
+        json.dumps({"batches": [{"batch_index": 1}, {"batch_index": 2}]}),
+        encoding="utf-8",
+    )
+    (finished / "final_summary.json").write_text(
+        json.dumps({"status": "success"}),
+        encoding="utf-8",
+    )
+
+    resolved = resolve_full_import_log_dir(
+        None,
+        resume=True,
+        root=tmp_path,
+        now=datetime(2026, 8, 28, 9, 20, 0),
+    )
+
+    assert resolved == tmp_path / "20260828_092000"
+
+
+def test_resolve_full_import_log_dir_reuses_review_batches_not_completed(tmp_path):
+    review_run = tmp_path / "20260827_233000"
+    review_run.mkdir()
+    (review_run / "progress_state.json").write_text(
+        json.dumps(
+            {
+                "completed_batches": [1],
+                "failed_batches": [],
+                "review_batches": [{"batch_index": 2, "status": "needs_review"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (review_run / "manifest.json").write_text(
+        json.dumps({"batches": [{"batch_index": 1}, {"batch_index": 2}]}),
+        encoding="utf-8",
+    )
+    (review_run / "final_summary.json").write_text(
+        json.dumps({"status": "success_with_review"}),
+        encoding="utf-8",
+    )
+
+    resolved = resolve_full_import_log_dir(None, resume=True, root=tmp_path)
+
+    assert resolved == review_run

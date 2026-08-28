@@ -537,7 +537,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 | `--optional-anchor-period` | 空 | 可选锚定期，例如 `2023Q4` |
 | `--include-optional-anchor` | 关闭 | 是否额外包含 `--optional-anchor-period` |
 | `--db-path` | `data/financials.db` | 写入目标库 |
-| `--log-dir` | `logs/financial_full_import/<timestamp>` | 本次运行日志与 evidence 目录 |
+| `--log-dir` | 未指定时按 `--resume` 解析 | CLI 默认写 `logs/financial_full_import/<timestamp>`；`--resume` 且未指定目录时复用该根下最近一次未完成/待复核运行。Telegram `/run` 使用 `log/financial_l1_full_import/`，`log_dir=null` 且 `resume=true` 时同样复用最近未完成目录 |
 | `--exchanges` | `SSE,SZSE,BSE` | 导入交易所范围 |
 | `--limit-per-exchange` | 空 | 每个交易所最多取多少标的；仅用于 smoke 或抽样 |
 | `--batch-size` | `20` | 每批标的数 |
@@ -551,7 +551,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 | `--no-default-accepted-source-gaps` | 关闭默认缺口清单 | 用于严格复核，不建议生产导入默认使用 |
 | `--stop-on-needs-review` | 关闭 | 默认遇到非 BSE 的 blocking 缺口时记录 review 并继续后续批次；打开后恢复旧行为，遇到首个 `needs_review` 即停止 |
 | `--no-skip-ready-targets` | 关闭 | 默认续跑时会检查 `financials.db`，已经覆盖全部 requested report periods 且必达字段齐全的股票会跳过 |
-| `--resume` | 关闭 | 使用已有 manifest 和 progress 续跑 |
+| `--resume` | 关闭 | 使用已有 manifest 和 progress 续跑；`needs_review` 批次不会记入 `completed_batches`，续跑会重试其中尚未齐的标的 |
 | `--manifest-only` | 关闭 | 只生成计划 |
 | `--start-batch / --end-batch / --max-batches` | 空 | 控制运行批次范围 |
 

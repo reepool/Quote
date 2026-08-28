@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Sequence
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -52,6 +52,10 @@ from scripts.research_cli_support import (  # noqa: E402
 
 LOGGER = logging.getLogger(__name__)
 
+DEFAULT_SCHEDULER_LOG_ROOT = Path("log") / "financial_l1_full_import"
+DEFAULT_CLI_LOG_ROOT = Path("logs") / "financial_full_import"
+COMPLETED_BATCH_STATUSES = {"success", "success_with_accepted_source_gaps"}
+
 DEFAULT_ACCEPTED_SOURCE_GAPS = (
     "920020.BJ:2024-09-30:total_assets,total_liabilities,equity_parent",
     "920027.BJ:2024-09-30:total_assets,total_liabilities,equity_parent",
@@ -77,9 +81,123 @@ DEFAULT_ACCEPTED_SOURCE_GAPS = (
 DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES = ("BSE",)
 
 
-def default_log_dir() -> Path:
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return Path("logs") / "financial_full_import" / stamp
+def _batch_index_set(values: Iterable[Any]) -> set[int]:
+    return {int(item) for item in values or [] if item is not None and str(item) != ""}
+
+
+def _review_batch_indexes(progress: Mapping[str, Any]) -> set[int]:
+    indexes: set[int] = set()
+    for item in progress.get("review_batches") or []:
+        if isinstance(item, Mapping):
+            index = int(item.get("batch_index") or 0)
+        else:
+            index = int(item or 0)
+        if index:
+            indexes.add(index)
+    return indexes
+
+
+def _drop_review_batch(progress: Dict[str, Any], batch_index: int) -> None:
+    progress["review_batches"] = [
+        item
+        for item in progress.get("review_batches") or []
+        if int((item.get("batch_index") if isinstance(item, Mapping) else item) or 0)
+        != batch_index
+    ]
+
+
+def apply_batch_status_to_progress(
+    progress: Dict[str, Any],
+    *,
+    batch_index: int,
+    status: str,
+    continue_on_needs_review: bool,
+    blocking_not_ready_read_count: int = 0,
+    evidence_path: str = "",
+) -> Literal["completed", "review", "failed"]:
+    """Update progress for one batch without treating review as completed."""
+    completed = _batch_index_set(progress.get("completed_batches") or [])
+    failed = [
+        int(item)
+        for item in progress.get("failed_batches") or []
+        if int(item) != batch_index
+    ]
+    if status in COMPLETED_BATCH_STATUSES:
+        completed.add(batch_index)
+        progress["completed_batches"] = sorted(completed)
+        progress["failed_batches"] = failed
+        _drop_review_batch(progress, batch_index)
+        return "completed"
+    if status == "needs_review" and continue_on_needs_review:
+        progress["completed_batches"] = sorted(completed)
+        progress["failed_batches"] = failed
+        _drop_review_batch(progress, batch_index)
+        progress.setdefault("review_batches", []).append(
+            {
+                "batch_index": batch_index,
+                "status": status,
+                "blocking_not_ready_read_count": blocking_not_ready_read_count,
+                "evidence_path": evidence_path,
+            }
+        )
+        return "review"
+    progress["completed_batches"] = sorted(completed)
+    progress["failed_batches"] = failed + [batch_index]
+    return "failed"
+
+
+def full_import_run_is_resumable(log_dir: Path) -> bool:
+    """Return True when a previous run still has unfinished or review batches."""
+    if not progress_path(log_dir).exists():
+        return False
+    progress = load_progress(log_dir)
+    completed = _batch_index_set(progress.get("completed_batches") or [])
+    if progress.get("failed_batches"):
+        return True
+    if any(index not in completed for index in _review_batch_indexes(progress)):
+        return True
+    manifest_path = log_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = read_json(manifest_path)
+        batch_indexes = _batch_index_set(
+            batch.get("batch_index")
+            for batch in manifest.get("batches") or []
+            if isinstance(batch, Mapping)
+        )
+        return bool(batch_indexes) and not batch_indexes.issubset(completed)
+    return not (log_dir / "final_summary.json").exists()
+
+
+def find_resumable_full_import_log_dir(root: Path) -> Optional[Path]:
+    if not root.exists():
+        return None
+    candidates = [
+        child
+        for child in root.iterdir()
+        if child.is_dir() and full_import_run_is_resumable(child)
+    ]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda path: progress_path(path).stat().st_mtime)
+
+
+def resolve_full_import_log_dir(
+    log_dir: Optional[str | Path],
+    *,
+    resume: bool = False,
+    root: Optional[Path] = None,
+    now: Optional[datetime] = None,
+) -> Path:
+    """Reuse the latest incomplete run when resume is on and no log_dir is given."""
+    if log_dir:
+        return Path(log_dir)
+    resolved_root = root or DEFAULT_SCHEDULER_LOG_ROOT
+    if resume:
+        existing = find_resumable_full_import_log_dir(resolved_root)
+        if existing is not None:
+            return existing
+    stamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
+    return resolved_root / stamp
 
 
 def setup_logging(log_dir: Path) -> Path:
@@ -487,13 +605,14 @@ async def run_full_import(
             result["batch_elapsed_seconds"] = 0.0
             write_json(log_dir / f"{batch_name}.json", result)
             write_json(log_dir / f"{batch_name}_summary.json", result)
-            completed.add(batch_index)
-            progress["completed_batches"] = sorted(completed)
-            progress["failed_batches"] = [
-                int(item)
-                for item in progress.get("failed_batches") or []
-                if int(item) != batch_index
-            ]
+            apply_batch_status_to_progress(
+                progress,
+                batch_index=batch_index,
+                status="success",
+                continue_on_needs_review=continue_on_needs_review,
+                evidence_path=str(log_dir / f"{batch_name}.json"),
+            )
+            completed = _batch_index_set(progress.get("completed_batches") or [])
             progress.setdefault("batch_results", []).append(
                 {
                     "batch_index": batch_index,
@@ -557,40 +676,27 @@ async def run_full_import(
                 "evidence_path": str(log_dir / f"{batch_name}.json"),
             }
         )
-        if status in {"success", "success_with_accepted_source_gaps"}:
-            completed.add(batch_index)
-            progress["completed_batches"] = sorted(completed)
-            progress["failed_batches"] = [
-                int(item)
-                for item in progress.get("failed_batches") or []
-                if int(item) != batch_index
-            ]
+        outcome = apply_batch_status_to_progress(
+            progress,
+            batch_index=batch_index,
+            status=status,
+            continue_on_needs_review=continue_on_needs_review,
+            blocking_not_ready_read_count=len(
+                result.get("blocking_not_ready_reads") or []
+            ),
+            evidence_path=str(log_dir / f"{batch_name}.json"),
+        )
+        completed = _batch_index_set(progress.get("completed_batches") or [])
+        if outcome == "completed":
             append_progress_line(log_dir, f"DONE {batch_name} status={status}")
             LOGGER.info("[FinancialL1FullImport] batch done %s status=%s", batch_name, status)
-        elif status == "needs_review" and continue_on_needs_review:
-            completed.add(batch_index)
-            progress["completed_batches"] = sorted(completed)
-            progress["failed_batches"] = [
-                int(item)
-                for item in progress.get("failed_batches") or []
-                if int(item) != batch_index
-            ]
-            review_entry = {
-                "batch_index": batch_index,
-                "status": status,
-                "blocking_not_ready_read_count": len(
-                    result.get("blocking_not_ready_reads") or []
-                ),
-                "evidence_path": str(log_dir / f"{batch_name}.json"),
-            }
-            progress.setdefault("review_batches", []).append(review_entry)
+        elif outcome == "review":
             append_progress_line(log_dir, f"REVIEW {batch_name} status={status}")
             LOGGER.warning(
                 "[FinancialL1FullImport] batch needs review but continuing %s",
                 batch_name,
             )
         else:
-            progress.setdefault("failed_batches", []).append(batch_index)
             append_progress_line(log_dir, f"FAIL {batch_name} status={status}")
             LOGGER.error("[FinancialL1FullImport] batch failed %s status=%s", batch_name, status)
             failed = True
@@ -694,7 +800,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--include-optional-anchor", action="store_true")
     parser.add_argument("--db-path", type=Path, default=Path("data/financials.db"))
-    parser.add_argument("--log-dir", type=Path, default=default_log_dir())
+    parser.add_argument("--log-dir", type=Path, default=None)
     parser.add_argument("--exchanges", default=",".join(DEFAULT_EXCHANGES))
     parser.add_argument("--limit-per-exchange", type=int)
     parser.add_argument("--batch-size", type=int, default=20)
@@ -767,7 +873,11 @@ async def async_main(argv: Optional[List[str]] = None) -> int:
         include_optional_anchor=args.include_optional_anchor,
     )
     summary = await run_full_import(
-        log_dir=args.log_dir,
+        log_dir=resolve_full_import_log_dir(
+            args.log_dir,
+            resume=args.resume,
+            root=DEFAULT_CLI_LOG_ROOT,
+        ),
         db_path=args.db_path,
         report_periods=report_periods,
         exchanges=parse_exchanges(args.exchanges) or list(DEFAULT_EXCHANGES),

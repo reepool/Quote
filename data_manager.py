@@ -7069,7 +7069,9 @@ class DataManager:
             DEFAULT_ACCEPTED_SOURCE_GAPS,
             DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES,
             DEFAULT_EXCHANGES,
+            DEFAULT_SCHEDULER_LOG_ROOT,
             DEFAULT_SOURCE_ORDER,
+            resolve_full_import_log_dir,
             resolve_report_periods,
             run_full_import,
         )
@@ -7090,7 +7092,12 @@ class DataManager:
             optional_anchor_period=None,
             include_optional_anchor=False,
         )
-        target_log_dir = Path(log_dir) if log_dir else Path("log") / "financial_l1_full_import" / get_shanghai_time().strftime("%Y%m%d_%H%M%S")
+        target_log_dir = resolve_full_import_log_dir(
+            log_dir,
+            resume=resume,
+            root=DEFAULT_SCHEDULER_LOG_ROOT,
+            now=get_shanghai_time(),
+        )
         return await run_full_import(
             log_dir=target_log_dir,
             db_path=Path(db_path),

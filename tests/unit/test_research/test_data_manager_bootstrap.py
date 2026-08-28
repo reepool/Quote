@@ -615,6 +615,53 @@ def test_data_manager_run_financial_l1_full_import_delegates_to_python_orchestra
     assert str(kwargs["db_path"]).endswith("financials.db")
 
 
+def test_data_manager_reuses_incomplete_l1_log_dir_when_resume(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    incomplete = tmp_path / "20260827_233000"
+    incomplete.mkdir()
+    (incomplete / "progress_state.json").write_text(
+        '{"completed_batches":[1],"failed_batches":[2],"batch_results":[]}',
+        encoding="utf-8",
+    )
+    (incomplete / "manifest.json").write_text(
+        '{"batches":[{"batch_index":1},{"batch_index":2}]}',
+        encoding="utf-8",
+    )
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch(
+        "scripts.research_financial_l1_full_import.DEFAULT_SCHEDULER_LOG_ROOT",
+        tmp_path,
+    ), patch(
+        "scripts.research_financial_l1_full_import.run_full_import",
+        new_callable=AsyncMock,
+    ) as run_full_import:
+        run_full_import.return_value = {"status": "success"}
+        result = _run(
+            manager.run_financial_l1_full_import(
+                exchanges=["SSE"],
+                period_window="latest",
+                rolling_quarters=1,
+                latest_report_period="2026Q1",
+                db_path=str(tmp_path / "financials.db"),
+                log_dir=None,
+                resume=True,
+            )
+        )
+
+    assert result["status"] == "success"
+    assert run_full_import.await_args.kwargs["log_dir"] == incomplete
+    assert run_full_import.await_args.kwargs["resume"] is True
+
+
 def test_data_manager_run_financial_disclosure_incremental_sync_delegates_to_service(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
