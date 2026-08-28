@@ -668,11 +668,11 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
         coverage_scope = build_shareholder_coverage_scope(
             exchange=exchange,
             holder_count=holder_count,
+            holder_count_report_date=holder_count_report_date,
             top_holders=top_holders,
             has_ownership_clues=bool(
                 control_owner_name
                 or control_owner_ratio is not None
-                or top_holders
             ),
         )
 

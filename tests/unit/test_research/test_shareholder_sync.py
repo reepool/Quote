@@ -113,6 +113,10 @@ class _ShareholderProvider(BaseShareholderProvider):
                 source_mode=mode,
                 snapshot_json={
                     "coverage_scope": self.coverage_scope,
+                    "holder_count": {
+                        "value": 123456 if "holder_count" in self.coverage_scope else None,
+                        "report_date": "2026-03-31" if "holder_count" in self.coverage_scope else None,
+                    },
                     "top_holders": (
                         _ten_top_holders("2026-03-31")
                         if "top10_holders" in self.coverage_scope
@@ -126,6 +130,11 @@ class _ShareholderProvider(BaseShareholderProvider):
                         ),
                         "control_owner_ratio": (
                             self.control_owner_ratio
+                            if "reference_only_ownership_clues" in self.coverage_scope
+                            else None
+                        ),
+                        "report_date": (
+                            "2026-03-31"
                             if "reference_only_ownership_clues" in self.coverage_scope
                             else None
                         ),
@@ -178,6 +187,7 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
                 source_mode=mode,
                 snapshot_json={
                     "coverage_scope": coverage_scope,
+                    "holder_count": {"value": 123456, "report_date": "2026-03-31"},
                     "top_holders": (
                         _ten_top_holders("2026-03-31")
                         if "top10_holders" in coverage_scope
@@ -186,6 +196,7 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
                     "ownership_clues": {
                         "control_owner_name": "中国贵州茅台酒厂（集团）有限责任公司",
                         "control_owner_ratio": 54.0,
+                        "report_date": "2026-03-31",
                     },
                 },
                 raw_payload={
@@ -345,6 +356,7 @@ def _build_research_config(tmp_path) -> ResearchConfig:
                 "same_source_recovery_candidates": ["akshare:direct"],
                 "same_source_recovery_batch_size": 1,
                 "same_source_recovery_max_instruments": 20,
+                "source_authority": ["cninfo", "akshare", "efinance"],
             }
         },
         routing={

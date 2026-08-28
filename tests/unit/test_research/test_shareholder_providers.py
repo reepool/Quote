@@ -127,11 +127,8 @@ def test_akshare_shareholders_provider_builds_normalized_snapshot(monkeypatch):
     assert snapshot.holder_count_report_date == "2026-03-31"
     assert snapshot.top_holders_report_date == "2026-03-31"
     assert snapshot.top_holders_count == 2
-    assert snapshot.control_owner_name == "中国贵州茅台酒厂（集团）有限责任公司"
-    assert snapshot.snapshot_json["coverage_scope"] == [
-        "holder_count",
-        "reference_only_ownership_clues",
-    ]
+    assert snapshot.control_owner_name is None
+    assert snapshot.snapshot_json["coverage_scope"] == ["holder_count"]
     assert snapshot.raw_payload["holder_count"][0]["股东户数统计截止日"] == "2026-03-31"
     assert snapshot.raw_payload["top_holders"][0]["截至日期"] == "2026-03-31"
 
@@ -446,10 +443,7 @@ def test_cninfo_shareholders_provider_builds_top10_snapshot(monkeypatch):
     assert snapshot.top_holders_report_date == "2026-03-31"
     assert snapshot.top_holders_count == 1
     assert snapshot.top_holders_total_ratio == 54.07
-    assert snapshot.snapshot_json["coverage_scope"] == [
-        "holder_count",
-        "reference_only_ownership_clues",
-    ]
+    assert snapshot.snapshot_json["coverage_scope"] == ["holder_count"]
     assert snapshot.snapshot_json["top_holders"][0]["holding_shares"] == 778821955
     assert snapshot.raw_payload["request_symbol"] == "600519"
 
@@ -953,9 +947,7 @@ def test_efinance_shareholders_provider_scopes_only_fields_that_exist():
     assert top_only is not None
     assert top_only.holder_count is None
     assert top_only.top_holders_count == 1
-    assert top_only.snapshot_json["coverage_scope"] == [
-        "reference_only_ownership_clues",
-    ]
+    assert top_only.snapshot_json["coverage_scope"] == []
 
 
 def test_efinance_shareholders_provider_json_ready_normalizes_dates():

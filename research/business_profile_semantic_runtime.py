@@ -623,50 +623,10 @@ def build_business_profile_counterparty_resolver(
         }
         for row in rows
     }
+    # Security short names and historical ticker labels are not legal-entity
+    # aliases.  Resolution deliberately uses only governed legal names here;
+    # explicitly reviewed aliases enter through the resolver's own owner.
     aliases: list[dict[str, Any]] = []
-    with storage.get_connection() as conn:
-        storage._apply_pragmas(conn)
-        profile_table = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type = 'table' "
-            "AND name = 'company_profiles'"
-        ).fetchone()
-        profile_rows = (
-            conn.execute(
-                "SELECT instrument_id, company_name, short_name, listed_date, "
-                "status, data_as_of FROM company_profiles"
-            ).fetchall()
-            if profile_table is not None
-            else ()
-        )
-    alias_owners: dict[str, set[str]] = {}
-    for row in profile_rows:
-        instrument_id = str(row["instrument_id"] or "")
-        entity = entities_by_id.get(instrument_id)
-        if entity is None:
-            continue
-        data_as_of = str(row["data_as_of"] or "")[:10]
-        if knowledge_cutoff and data_as_of and data_as_of > knowledge_cutoff:
-            continue
-        original_legal_name = str(entity["legal_name"] or "").strip()
-        company_name = str(row["company_name"] or "").strip()
-        if company_name:
-            entity["legal_name"] = company_name
-        if original_legal_name and original_legal_name != entity["legal_name"]:
-            alias_owners.setdefault(original_legal_name, set()).add(instrument_id)
-        short_name = str(row["short_name"] or "").strip()
-        if short_name and short_name != entity["legal_name"]:
-            alias_owners.setdefault(short_name, set()).add(instrument_id)
-    aliases.extend(
-        {
-            "entity_id": next(iter(owners)),
-            "alias": alias,
-            "review_status": "approved",
-            "valid_from": entities_by_id[next(iter(owners))].get("valid_from"),
-            "valid_to": entities_by_id[next(iter(owners))].get("valid_to"),
-        }
-        for alias, owners in alias_owners.items()
-        if len(owners) == 1
-    )
     entities = list(entities_by_id.values())
     if not entities:
         raise ValueError(
@@ -4536,11 +4496,7 @@ class BusinessProfileSemanticRuntime:
                             promotion_gates=publication_gates,
                         )
                         result["publications"].append(publication)
-                        if publication.get("status") in {
-                            "published",
-                            "unchanged",
-                            "fact_only",
-                        }:
+                        if publication.get("status") in {"published", "unchanged"}:
                             self.promotion_service.resolve_open_exceptions_for_target(
                                 target_id=str(fact["fact_id"]),
                                 field_family="commodity_exposure_publication",
@@ -6362,8 +6318,15 @@ def _publication_promotion_gates(
         "runtime_identity_match": bool(
             manifest is not None and dict(scope.identities) == dict(manifest.identities)
         ),
-        "candidate_current": True,
-        "semantic_proof": True,
+        "candidate_current": bool(
+            fact.get("review_status") == "approved"
+            and not fact.get("knowledge_to")
+            and _temporal_scope_is_current(fact, scope.knowledge_cutoff)
+        ),
+        "semantic_proof": bool(
+            validation.get("semantic_verification_passed") is True
+            or validation.get("semantic_proof_valid") is True
+        ),
     }
 
 

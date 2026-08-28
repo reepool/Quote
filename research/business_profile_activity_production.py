@@ -226,12 +226,11 @@ class BusinessProfileActivityProducer:
             share = assertion.get("disclosed_share")
             if share is None:
                 raise ValueError("anonymous relationship requires disclosed_share")
-            normalized_share = float(share)
-            if not math.isfinite(normalized_share) or not 0 <= normalized_share <= 1:
-                raise ValueError(
-                    "anonymous relationship disclosed_share must be a finite fraction"
-                )
+            normalized_share, share_rule = _normalize_disclosed_share(
+                share, assertion.get("disclosed_share_unit")
+            )
             anonymous_label = _required_text(assertion, "counterparty_name_raw")
+            _validate_anonymous_direction(anonymous_label, relationship_type)
             object_raw = str(assertion.get("object_raw") or "").strip() or None
             anonymous_label_key = _anonymous_concentration_key(
                 anonymous_label, _ANONYMOUS_CONCENTRATION_LABEL_ALIASES
@@ -292,10 +291,10 @@ class BusinessProfileActivityProducer:
                         "schema_version": "business_profile_ratio_validation.v1",
                         "status": "passed",
                         "source_value": str(share),
-                        "source_unit": "fraction",
+                        "source_unit": assertion.get("disclosed_share_unit") or "fraction",
                         "normalized_value": str(normalized_share),
                         "normalized_unit": "fraction",
-                        "rule": "finite_fraction_inclusive_range_0_1",
+                        "rule": share_rule,
                     },
                     "numeric_reconciliation_status": "passed",
                     "numeric_reconciliation_executed": True,
@@ -305,6 +304,9 @@ class BusinessProfileActivityProducer:
             return "operating_facts", record
         raw_name = _required_text(assertion, "counterparty_name_raw")
         valid_from = assertion.get("valid_from") or report_period
+        normalized_share, share_rule = _normalize_disclosed_share(
+            assertion.get("disclosed_share"), assertion.get("disclosed_share_unit")
+        )
         relationship_id = _stable_id(
             "relationship",
             {
@@ -337,7 +339,7 @@ class BusinessProfileActivityProducer:
             "object_id": assertion.get("object_id"),
             "disclosed_value": assertion.get("disclosed_value"),
             "disclosed_unit": assertion.get("disclosed_unit"),
-            "disclosed_share": assertion.get("disclosed_share"),
+            "disclosed_share": normalized_share,
             "evidence_id": evidence_id,
             "run_id": run_id,
             "data_available_date": data_available_date,
@@ -352,14 +354,28 @@ class BusinessProfileActivityProducer:
             "metadata": {
                 "entity_resolution": resolution.to_dict(),
                 "resolution_status": (
-                    "resolved"
+                    "resolved_entity"
                     if resolution.status == "resolved" and resolution.entity_id
-                    else "unresolved"
+                    else "disclosed_name_only"
                 ),
-                "counterparty_catalog_pending": resolution.status != "resolved",
+                "counterparty_catalog_pending": False,
+                "identity_status": (
+                    "resolved_entity"
+                    if resolution.status == "resolved" and resolution.entity_id
+                    else "disclosed_name_only"
+                ),
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
                 "source_row_key": assertion.get("source_row_key"),
                 "contract_reference_raw": assertion.get("contract_reference_raw"),
+                "numeric_reconciliation": {
+                    "schema_version": "business_profile_ratio_validation.v1",
+                    "status": "passed" if normalized_share is not None else "not_applicable",
+                    "source_value": None if assertion.get("disclosed_share") is None else str(assertion.get("disclosed_share")),
+                    "source_unit": assertion.get("disclosed_share_unit"),
+                    "normalized_value": None if normalized_share is None else str(normalized_share),
+                    "normalized_unit": "fraction" if normalized_share is not None else None,
+                    "rule": share_rule,
+                },
             },
         }
 
@@ -500,11 +516,41 @@ def classify_entity_resolution_exception(
             "reason_code": "counterparty_exact_match_ambiguous",
             "ranked_local_choices": list(resolution.candidate_entity_ids),
         }
-    return {
-        "tier": "machine_rework",
-        "reason_code": "counterparty_not_resolved_exactly",
-        "ranked_local_choices": [],
-    }
+    # A named counterparty disclosed in the filing is useful evidence even
+    # without a local listed-company entity.  It is reviewed as disclosed-name
+    # evidence rather than sent back for an impossible catalog match.
+    return None
+
+
+def _normalize_disclosed_share(value: Any, unit: Any) -> tuple[float | None, str]:
+    if value in (None, ""):
+        return None, "not_applicable"
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("relationship disclosed_share is not numeric") from exc
+    if not math.isfinite(numeric):
+        raise ValueError("relationship disclosed_share must be finite")
+    normalized_unit = str(unit or "").strip().lower()
+    if normalized_unit in {"%", "percent", "percentage", "百分点"}:
+        numeric /= 100.0
+        rule = "percent_to_fraction"
+    elif normalized_unit in {"fraction", "ratio", "", "decimal"}:
+        rule = "finite_fraction_inclusive_range_0_1"
+    else:
+        raise ValueError("relationship disclosed_share unit is ambiguous")
+    if not 0 <= numeric <= 1:
+        raise ValueError("relationship disclosed_share is outside [0, 1]")
+    return numeric, rule
+
+
+def _validate_anonymous_direction(label: str, relationship_type: str) -> None:
+    normalized = _anonymous_concentration_key(label, _ANONYMOUS_CONCENTRATION_LABEL_ALIASES)
+    direction = RELATIONSHIP_DIRECTIONS[relationship_type]
+    if normalized == "top_five_customers" and direction != "outbound":
+        raise ValueError("anonymous concentration direction conflicts with customer label")
+    if normalized == "top_five_suppliers" and direction != "inbound":
+        raise ValueError("anonymous concentration direction conflicts with supplier label")
 
 
 def _resolution(matches: Sequence[Mapping[str, Any]], basis: str) -> EntityResolution:

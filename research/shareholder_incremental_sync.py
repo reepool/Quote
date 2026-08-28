@@ -29,6 +29,7 @@ from research.shareholder_announcement_filters import (
     shareholder_announcement_filter,
     shareholder_announcement_stream_specs,
 )
+from research.shareholder_snapshot_policy import actual_shareholder_coverage_scope
 from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
@@ -509,7 +510,7 @@ class ShareholderIncrementalSyncService:
             candidates.values(),
             key=lambda item: (
                 "missing_required_scope" not in item.reasons,
-                item.latest_announcement_time or "",
+                -(self._time_sort_key(item.latest_announcement_time)),
                 item.instrument_id,
             ),
         )
@@ -909,8 +910,8 @@ class ShareholderIncrementalSyncService:
             return parsed.replace(tzinfo=get_shanghai_time().tzinfo)
         return parsed
 
-    @staticmethod
     def _snapshot_dict_covers_scope(
+        self,
         snapshot: Optional[Dict[str, Any]],
         required_scope: Set[str],
     ) -> bool:
@@ -921,12 +922,17 @@ class ShareholderIncrementalSyncService:
         snapshot_json = snapshot.get("snapshot")
         if not isinstance(snapshot_json, dict):
             return False
-        scope = {
-            str(item).strip()
-            for item in snapshot_json.get("coverage_scope", []) or []
-            if str(item).strip()
-        }
+        scope = actual_shareholder_coverage_scope(
+            exchange=str(snapshot.get("exchange") or ""),
+            snapshot_json=snapshot_json,
+            holder_count=snapshot.get("holder_count"),
+        )
         return required_scope.issubset(scope)
+
+    @staticmethod
+    def _time_sort_key(value: Any) -> float:
+        parsed = ShareholderIncrementalSyncService._parse_manifest_time(value)
+        return parsed.timestamp() if parsed is not None else float("-inf")
 
     @staticmethod
     def _derive_status(

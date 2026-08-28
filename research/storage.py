@@ -7574,7 +7574,7 @@ class ResearchStorageManager:
             ).fetchall()
             snapshot_rows = conn.execute(
                 f"""
-                SELECT snapshot_json
+                SELECT exchange, holder_count, snapshot_json
                 FROM shareholder_snapshots
                 {where_clause}
                 """,
@@ -7597,10 +7597,13 @@ class ResearchStorageManager:
             snapshot = self._deserialize_json(row["snapshot_json"])
             if not isinstance(snapshot, dict):
                 continue
-            for scope in snapshot.get("coverage_scope", []) or []:
-                scope_text = str(scope).strip()
-                if not scope_text:
-                    continue
+            from research.shareholder_snapshot_policy import actual_shareholder_coverage_scope
+
+            for scope_text in actual_shareholder_coverage_scope(
+                exchange=str(row["exchange"] or ""),
+                snapshot_json=snapshot,
+                holder_count=row["holder_count"],
+            ):
                 scope_counts[scope_text] = scope_counts.get(scope_text, 0) + 1
 
         return {

@@ -117,6 +117,22 @@ class BusinessProfileReviewService:
                     expected_updated_at=expected_updated,
                 )
                 if normalized_decision == "approved":
+                    if record_type == "relationships":
+                        relationship_metadata = _json_loads(
+                            row.get("metadata_json"), {}
+                        )
+                        identity_status = str(
+                            relationship_metadata.get("identity_status")
+                            or relationship_metadata.get("resolution_status")
+                            or ""
+                        )
+                        if (
+                            identity_status == "disclosed_name_only"
+                            and not bool((metadata or {}).get("confirm_disclosed_name_only"))
+                        ):
+                            raise ValueError(
+                                "disclosed-name-only relationship approval requires explicit confirmation"
+                            )
                     self._validate_approval_evidence(
                         conn,
                         record_type,

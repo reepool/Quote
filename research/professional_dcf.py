@@ -2896,6 +2896,7 @@ class ProfessionalDcfEngine:
                 cap=cap,
                 cycle_percentile=cycle_percentile,
                 cycle_state=cycle_state,
+                economic_role=str(cycle_context.get("economic_role") or "revenue"),
                 overrides=overrides,
             )
             if cycle_adjusted is not None and cycle_adjusted != normalized_margin:
@@ -2957,6 +2958,7 @@ class ProfessionalDcfEngine:
         cap: float,
         cycle_percentile: Optional[float],
         cycle_state: str,
+        economic_role: str,
         overrides: Dict[str, Any],
     ) -> Optional[float]:
         if cycle_percentile is None:
@@ -2987,16 +2989,22 @@ class ProfessionalDcfEngine:
         )
         midpoint = (floor + cap) / 2.0
         state = cycle_state.lower()
-        high_cycle = cycle_percentile >= high_threshold or state in {"high", "extreme_high"}
-        low_cycle = cycle_percentile <= low_threshold or state in {"low", "extreme_low"}
+        cost_leg = economic_role in {"feedstock_cost", "energy_cost"}
+        effective_percentile = 1.0 - cycle_percentile if cost_leg else cycle_percentile
+        high_cycle = effective_percentile >= high_threshold or (
+            state in {"low", "extreme_low"} if cost_leg else state in {"high", "extreme_high"}
+        )
+        low_cycle = effective_percentile <= low_threshold or (
+            state in {"high", "extreme_high"} if cost_leg else state in {"low", "extreme_low"}
+        )
         if high_cycle and reported_margin > midpoint:
             distance = reported_margin - midpoint
-            cycle_intensity = 1.0 if high_threshold >= 1.0 else (cycle_percentile - high_threshold) / (1.0 - high_threshold)
+            cycle_intensity = 1.0 if high_threshold >= 1.0 else (effective_percentile - high_threshold) / (1.0 - high_threshold)
             cycle_intensity = max(0.0, min(1.0, cycle_intensity))
             return reported_margin - distance * strength * max(cycle_intensity, 0.5)
         if low_cycle and reported_margin < midpoint:
             distance = midpoint - reported_margin
-            cycle_intensity = 1.0 if low_threshold <= 0.0 else (low_threshold - cycle_percentile) / low_threshold
+            cycle_intensity = 1.0 if low_threshold <= 0.0 else (low_threshold - effective_percentile) / low_threshold
             cycle_intensity = max(0.0, min(1.0, cycle_intensity))
             return reported_margin + distance * strength * max(cycle_intensity, 0.5)
         return None

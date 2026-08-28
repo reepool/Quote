@@ -116,8 +116,46 @@ def test_unresolved_named_relationship_is_retained_for_catalog_review():
         data_available_date="2026-03-28",
     )
     assert record["counterparty_entity_id"] is None
-    assert record["metadata"]["resolution_status"] == "unresolved"
-    assert record["metadata"]["counterparty_catalog_pending"] is True
+    assert record["metadata"]["resolution_status"] == "disclosed_name_only"
+    assert record["metadata"]["counterparty_catalog_pending"] is False
+
+
+def test_relationship_share_percentage_is_normalized_and_direction_conflicts_fail_closed():
+    producer = BusinessProfileActivityProducer(_Repository())
+    _, relationship = producer.build_relationship_or_concentration_candidate(
+        {
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "relationship_type": "buys_from",
+            "counterparty_name_raw": "目录外供应商",
+            "object_raw": "原料A",
+            "scope_id": "group",
+            "disclosed_share": 30,
+            "disclosed_share_unit": "%",
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("目录外供应商"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    assert relationship["disclosed_share"] == 0.3
+    assert relationship["metadata"]["numeric_reconciliation"]["rule"] == "percent_to_fraction"
+
+    with pytest.raises(ValueError, match="direction conflicts"):
+        producer.build_relationship_or_concentration_candidate(
+            {
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "relationship_type": "buys_from",
+                "anonymous": True,
+                "counterparty_name_raw": "前五大客户",
+                "disclosed_share": 0.3,
+            },
+            resolution=GovernedCounterpartyResolver(entities=[]).resolve("前五大客户"),
+            evidence_id="evidence-1",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+        )
 
 
 def test_unresolved_relationship_identity_includes_raw_counterparty_name():

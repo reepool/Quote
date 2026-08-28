@@ -107,7 +107,13 @@ def build_shareholder_symbol_index(
                 values.add(alias)
         for value in values:
             if value:
-                index.setdefault(value, instrument)
+                existing = index.get(value)
+                if existing is None:
+                    index[value] = instrument
+                elif str(existing.get("instrument_id")) != instrument_id:
+                    # An alias collision must never associate an announcement
+                    # with an arbitrary BSE security.
+                    index.pop(value, None)
     return index
 
 

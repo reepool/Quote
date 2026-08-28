@@ -1,5 +1,6 @@
 from research.providers.base import ShareholderSnapshot
 from research.shareholder_snapshot_policy import (
+    actual_shareholder_coverage_scope,
     incoming_shareholder_snapshot_is_weaker,
     top_holders_satisfy_required_scope,
 )
@@ -199,7 +200,7 @@ def _ten_holders(report_date: str):
 
 
 def test_sse_and_szse_require_ten_top_holders_but_bse_accepts_partial():
-    one_holder = [{"rank": 1, "holder_name": "周孝伟"}]
+    one_holder = [{"rank": 1, "holder_name": "周孝伟", "report_date": "2026-03-31"}]
     ten_holders = _ten_holders("2026-03-31")
 
     assert not top_holders_satisfy_required_scope("SSE", one_holder)
@@ -207,6 +208,23 @@ def test_sse_and_szse_require_ten_top_holders_but_bse_accepts_partial():
     assert top_holders_satisfy_required_scope("SSE", ten_holders)
     assert top_holders_satisfy_required_scope("BSE", one_holder)
     assert not top_holders_satisfy_required_scope("SSE", [])
+
+
+def test_coverage_requires_actual_control_fields_and_coherent_top_holder_dates():
+    snapshot = _snapshot_json(
+        coverage_scope=REQUIRED_SCOPE,
+        report_date="2026-03-31",
+    )
+    snapshot["ownership_clues"] = {}
+    snapshot["top_holders"][0]["report_date"] = "2025-12-31"
+
+    actual = actual_shareholder_coverage_scope(
+        exchange="SSE",
+        snapshot_json=snapshot,
+        holder_count=100,
+    )
+
+    assert actual == {"holder_count"}
 
 
 def test_weaker_guard_allows_older_complete_top10_to_replace_incomplete_sse():

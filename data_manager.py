@@ -72,6 +72,7 @@ from research.empty_support import (
     allows_optional_empty_exchange,
     get_optional_empty_exchanges,
 )
+from research.shareholder_snapshot_policy import actual_shareholder_coverage_scope
 from research.financial_statement_profile import resolve_financial_statement_profile
 from research.financial_source_field_mapping import MAPPING_VERSION as FINANCIAL_MAPPING_VERSION
 from research.financial_industry_fact_packs import (
@@ -6359,6 +6360,15 @@ class DataManager:
             not required_mode or delivery_mode == required_mode
         )
 
+        target_instrument_ids: List[str] = []
+        for exchange in markets:
+            if str(exchange).strip().upper() in optional_empty_exchanges:
+                continue
+            target_instrument_ids.extend(
+                await self._list_research_target_instrument_ids_by_exchange(exchange)
+            )
+        target_instrument_ids = sorted(set(target_instrument_ids))
+
         snapshot_total = int(target_summary.get("total", 0))
         missing_snapshot_count = max(target_total - snapshot_total, 0)
         scope_counts = {
@@ -6366,6 +6376,9 @@ class DataManager:
             for scope, count in (target_summary.get("scope_counts") or {}).items()
             if str(scope).strip()
         }
+        target_snapshot_rows = self._load_research_storage_state(
+            lambda: storage.get_shareholder_snapshots(target_instrument_ids)
+        ) if target_instrument_ids else {}
 
         exchange_coverage = []
         for exchange in markets:
@@ -6400,6 +6413,18 @@ class DataManager:
                 }
             )
 
+        complete_instrument_ids: List[str] = []
+        for instrument_id, snapshot in target_snapshot_rows.items():
+            actual_scope = actual_shareholder_coverage_scope(
+                exchange=str(snapshot.get("exchange") or ""),
+                snapshot_json=snapshot.get("snapshot"),
+                holder_count=snapshot.get("holder_count"),
+            )
+            if set(required_scope).issubset(actual_scope):
+                complete_instrument_ids.append(instrument_id)
+        complete_instrument_count = len(complete_instrument_ids)
+        missing_required_scope_count = max(target_total - complete_instrument_count, 0)
+
         blockers: List[str] = []
         if not enabled:
             blockers.append("shareholders_module_disabled")
@@ -6409,7 +6434,7 @@ class DataManager:
             blockers.append("no_shareholder_snapshots")
         if target_total > 0 and snapshot_total < target_total:
             blockers.append("shareholder_snapshot_coverage_incomplete")
-        if target_total > 0 and any(item["snapshot_count"] < target_total for item in scope_coverage):
+        if target_total > 0 and missing_required_scope_count > 0:
             blockers.append("required_scope_coverage_incomplete")
         if required_mode and delivery_mode != required_mode:
             blockers.append("delivery_mode_gate_not_satisfied")
@@ -6432,6 +6457,11 @@ class DataManager:
             "source_counts": target_summary.get("source_counts", {}),
             "source_mode_counts": target_summary.get("source_mode_counts", {}),
             "scope_counts": scope_counts,
+            "complete_required_scope_instrument_count": complete_instrument_count,
+            "missing_required_scope_count": missing_required_scope_count,
+            "missing_required_scope_instrument_ids": sorted(
+                set(target_instrument_ids) - set(complete_instrument_ids)
+            )[:100],
             "latest_updated_at": target_summary.get("latest_updated_at"),
             "latest_data_as_of": target_summary.get("latest_data_as_of"),
             "exchange_coverage": exchange_coverage,
@@ -9225,14 +9255,21 @@ class DataManager:
         industry_membership: Optional[Dict[str, Any]],
         governed_exposure_mappings: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
-        if governed_exposure_mappings:
+        if governed_exposure_mappings is not None:
+            mappings = [
+                item
+                for item in governed_exposure_mappings
+                if isinstance(item, dict)
+                and item.get("source") == "approved_company_business_profile"
+                and str(item.get("exposure_role") or "") in {"revenue", "feedstock_cost", "energy_cost"}
+            ]
             return {
-                "status": "success",
+                "status": "success" if mappings else "unavailable",
                 "instrument_id": instrument_id,
                 "mapping_scope": "governed_business_profile",
                 "mapping_scope_id": instrument_id,
-                "mappings": governed_exposure_mappings,
-                "input_gaps": [],
+                "mappings": mappings,
+                "input_gaps": [] if mappings else ["approved_company_exposure_mapping_missing"],
             }
         mappings = storage.get_exposure_mappings(
             scope_type="instrument",
@@ -11189,12 +11226,32 @@ class DataManager:
         if payload.get("status") != "success":
             return None
         diagnostics_by_series = payload.get("diagnostics_by_series") or {}
-        selected_series_id = None
+        eligible_mappings = sorted(
+            payload.get("mappings") or [],
+            key=lambda item: (
+                -float(item.get("transmission_strength") or 0.0),
+                str(item.get("exposure_role") or ""),
+                str(item.get("mapping_id") or ""),
+            ),
+        )
+        if not eligible_mappings:
+            return None
+        selected_mapping = eligible_mappings[0]
+        top_strength = float(selected_mapping.get("transmission_strength") or 0.0)
+        equally_material = [
+            item for item in eligible_mappings
+            if float(item.get("transmission_strength") or 0.0) == top_strength
+        ]
+        if len(equally_material) > 1:
+            return None
+        selected_series_id = selected_mapping.get("revenue_series_id") or next(
+            iter(selected_mapping.get("cost_series_ids") or []), None
+        )
         selected_diagnostic = None
-        for series_id, diagnostics in diagnostics_by_series.items():
+        for series_id in [selected_series_id]:
+            diagnostics = diagnostics_by_series.get(series_id) or []
             if not isinstance(diagnostics, list) or not diagnostics:
                 continue
-            selected_series_id = series_id
             selected_diagnostic = next(
                 (
                     item for item in diagnostics
@@ -11208,13 +11265,6 @@ class DataManager:
             break
         if not selected_diagnostic:
             return None
-        selected_mapping = None
-        for mapping in payload.get("mappings") or []:
-            series_ids = [mapping.get("revenue_series_id")]
-            series_ids.extend(mapping.get("cost_series_ids") or [])
-            if selected_series_id in {item for item in series_ids if item}:
-                selected_mapping = mapping
-                break
         selected_series_diagnostics = diagnostics_by_series.get(selected_series_id) or []
         diagnostics_summary = {
             str(item.get("lookback_years")): {
@@ -11248,6 +11298,7 @@ class DataManager:
             "diagnostics_summary": diagnostics_summary,
             "diagnostic": selected_diagnostic,
             "selected_mapping": selected_mapping,
+            "economic_role": selected_mapping.get("exposure_role"),
             "exposure_mappings": payload.get("mappings") or [],
             "diagnostics_by_series": diagnostics_by_series,
             "input_gaps": payload.get("input_gaps") or [],

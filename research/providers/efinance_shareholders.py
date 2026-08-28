@@ -220,11 +220,11 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
         coverage_scope = build_shareholder_coverage_scope(
             exchange=exchange,
             holder_count=holder_count,
+            holder_count_report_date=holder_count_report_date,
             top_holders=top_holders,
             has_ownership_clues=bool(
                 control_owner_name
                 or control_owner_ratio is not None
-                or top_holders
             ),
         )
 
@@ -307,6 +307,7 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
                 "holding_ratio": ratio,
                 "holding_shares": self._to_float(self._pick_first(row, self._holder_shares_aliases)),
                 "holder_type": self._pick_first(row, self._holder_type_aliases),
+                "report_date": self._normalize_report_date(best_report_date),
             }
             holders.append(holder)
 
@@ -316,13 +317,12 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
         total_ratio = sum(
             ratio for ratio in (item.get("holding_ratio") for item in holders) if ratio is not None
         )
-        control_owner = holders[0]
         return (
             best_report_date,
             holders,
             total_ratio if total_ratio > 0 else None,
-            control_owner.get("holder_name"),
-            control_owner.get("holding_ratio"),
+            None,
+            None,
         )
 
     @staticmethod
@@ -418,6 +418,13 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
     @staticmethod
     def _date_sort_key(value: Optional[str]) -> str:
         return "" if value in (None, "") else str(value)
+
+    @staticmethod
+    def _normalize_report_date(value: Any) -> Optional[str]:
+        if value in (None, ""):
+            return None
+        digits = "".join(character for character in str(value) if character.isdigit())
+        return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}" if len(digits) >= 8 else None
 
     @classmethod
     def _json_ready(cls, payload: Any) -> Any:

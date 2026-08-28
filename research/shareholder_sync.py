@@ -65,6 +65,24 @@ class ShareholderShadowSyncService:
             research_config=self.research_config,
         )
 
+    def _source_authority(self, source: str) -> int:
+        """Return configured route precedence; lower is more authoritative."""
+        try:
+            candidates = self.resolver.resolve("shareholders").candidates
+        except Exception:
+            candidates = []
+        configured = self.research_config.modules.get("shareholders", {}).get(
+            "source_authority", []
+        )
+        ordered = [str(source).strip() for source in configured if str(source).strip()]
+        for candidate in candidates:
+            if candidate.source not in ordered:
+                ordered.append(candidate.source)
+        try:
+            return ordered.index(str(source))
+        except ValueError:
+            return len(ordered) + 1
+
     async def sync(
         self,
         *,
@@ -300,12 +318,23 @@ class ShareholderShadowSyncService:
                     )
                     continue
 
+                expected_instruments = {
+                    str(item["instrument_id"]): item for item in candidate_instruments
+                }
                 accepted_snapshots = []
                 accepted_ids = set()
                 eligible_ids = all_instrument_ids if force_merge_candidate else remaining_ids
                 for snapshot in snapshots:
                     instrument_id = str(snapshot.instrument_id)
                     if instrument_id not in eligible_ids or instrument_id in accepted_ids:
+                        continue
+                    expected = expected_instruments.get(instrument_id)
+                    if expected is None or not self._snapshot_matches_instrument(snapshot, expected):
+                        dm_logger.warning(
+                            "[ShareholderSync] Provider snapshot rejected: source=%s instrument_id=%s reason=response_identity_mismatch",
+                            snapshot.source,
+                            instrument_id,
+                        )
                         continue
                     accepted_ids.add(instrument_id)
                     accepted_snapshots.append(snapshot)
@@ -664,9 +693,20 @@ class ShareholderShadowSyncService:
                 continue
 
             accepted_ids: Set[str] = set()
+            expected_instruments = {
+                str(item["instrument_id"]): item for item in batch
+            }
             for snapshot in snapshots or []:
                 instrument_id = str(snapshot.instrument_id)
                 if instrument_id not in remaining_ids or instrument_id in accepted_ids:
+                    continue
+                expected = expected_instruments.get(instrument_id)
+                if expected is None or not self._snapshot_matches_instrument(snapshot, expected):
+                    dm_logger.warning(
+                        "[ShareholderSync] Recovery snapshot rejected: source=%s instrument_id=%s reason=response_identity_mismatch",
+                        snapshot.source,
+                        instrument_id,
+                    )
                     continue
                 accepted_ids.add(instrument_id)
                 merged_snapshots[instrument_id] = self._merge_snapshots(
@@ -732,11 +772,19 @@ class ShareholderShadowSyncService:
         incoming: ShareholderSnapshot,
     ) -> ShareholderSnapshot:
         if existing is None:
-            incoming_scope = self._extract_scope_set(incoming)
+            incoming_scope = actual_shareholder_coverage_scope(
+                exchange=incoming.exchange,
+                snapshot_json=incoming.snapshot_json,
+                holder_count=incoming.holder_count,
+            )
             incoming_snapshot_json = dict(incoming.snapshot_json)
             incoming_snapshot_json["coverage_scope"] = sorted(incoming_scope)
             incoming_snapshot_json["scope_sources"] = {
                 scope: f"{incoming.source}:{incoming.source_mode}"
+                for scope in sorted(incoming_scope)
+            }
+            incoming_snapshot_json["scope_periods"] = {
+                scope: self._scope_period(incoming, scope)
                 for scope in sorted(incoming_scope)
             }
             return ShareholderSnapshot(
@@ -758,123 +806,103 @@ class ShareholderShadowSyncService:
                 raw_payload=incoming.raw_payload,
             )
 
-        existing_scope = self._extract_scope_set(existing)
-        incoming_scope = self._extract_scope_set(incoming)
-        merged_scope = sorted(existing_scope | incoming_scope)
-        existing_scope_sources = dict(existing.snapshot_json.get("scope_sources", {}) or {})
-        incoming_holder_count_source = f"{incoming.source}:{incoming.source_mode}"
-        should_replace_holder_count = (
-            "holder_count" in incoming_scope
-            and incoming.holder_count is not None
-            and (
-                existing.holder_count is None
-                or existing_scope_sources.get("holder_count") == incoming_holder_count_source
-            )
+        existing_scope = actual_shareholder_coverage_scope(
+            exchange=existing.exchange,
+            snapshot_json=existing.snapshot_json,
+            holder_count=existing.holder_count,
         )
+        incoming_scope = actual_shareholder_coverage_scope(
+            exchange=incoming.exchange,
+            snapshot_json=incoming.snapshot_json,
+            holder_count=incoming.holder_count,
+        )
+        selected: Dict[str, ShareholderSnapshot] = {}
+        for scope in ("holder_count", "top10_holders", "reference_only_ownership_clues"):
+            existing_has = scope in existing_scope
+            incoming_has = scope in incoming_scope
+            if incoming_has and (not existing_has or self._scope_is_preferred(incoming, existing, scope)):
+                selected[scope] = incoming
+            elif existing_has:
+                selected[scope] = existing
 
-        existing_top_holders = list(existing.snapshot_json.get("top_holders", []) or [])
-        incoming_top_holders = list(incoming.snapshot_json.get("top_holders", []) or [])
-        existing_top10_complete = top_holders_satisfy_required_scope(
-            existing.exchange,
-            existing_top_holders,
-        )
-        incoming_top10_complete = top_holders_satisfy_required_scope(
-            incoming.exchange,
-            incoming_top_holders,
-        )
-        use_incoming_top_holders = (
-            incoming_top10_complete and not existing_top10_complete
-        ) or (
-            not existing_top10_complete
-            and len(incoming_top_holders) > len(existing_top_holders)
-        )
-        merged_top_holders = (
-            incoming_top_holders
-            if use_incoming_top_holders
-            else existing_top_holders or incoming_top_holders
-        )
-
-        existing_ownership = dict(existing.snapshot_json.get("ownership_clues", {}) or {})
-        incoming_ownership = dict(incoming.snapshot_json.get("ownership_clues", {}) or {})
-        merged_ownership = dict(existing_ownership)
-        incoming_has_authoritative_control = (
-            incoming.source == "cninfo"
-            and incoming_ownership.get("control_owner_name") not in (None, "")
-        )
-        for key, value in incoming_ownership.items():
-            if incoming_has_authoritative_control or merged_ownership.get(key) in (None, "", []):
-                merged_ownership[key] = value
-
-        scope_sources = dict(existing_scope_sources)
-        for scope in incoming_scope:
-            if incoming_has_authoritative_control and scope == "reference_only_ownership_clues":
-                scope_sources[scope] = f"{incoming.source}:{incoming.source_mode}"
-            elif use_incoming_top_holders and scope == "top10_holders":
-                scope_sources[scope] = f"{incoming.source}:{incoming.source_mode}"
-            else:
-                scope_sources.setdefault(scope, f"{incoming.source}:{incoming.source_mode}")
-
+        holder_source = selected.get("holder_count", existing)
+        top_source = selected.get("top10_holders", existing)
+        ownership_source = selected.get("reference_only_ownership_clues", existing)
         merged_snapshot_json = dict(existing.snapshot_json)
-        merged_snapshot_json["coverage_scope"] = merged_scope
-        merged_snapshot_json["top_holders"] = merged_top_holders
-        merged_snapshot_json["ownership_clues"] = merged_ownership
-        merged_snapshot_json["scope_sources"] = scope_sources
-        if should_replace_holder_count:
-            merged_snapshot_json["holder_count"] = incoming.snapshot_json.get("holder_count")
+        merged_snapshot_json["holder_count"] = holder_source.snapshot_json.get("holder_count")
+        merged_snapshot_json["top_holders"] = list(top_source.snapshot_json.get("top_holders", []) or [])
+        merged_snapshot_json["ownership_clues"] = dict(
+            ownership_source.snapshot_json.get("ownership_clues", {}) or {}
+        )
+        merged_snapshot_json["coverage_scope"] = sorted(selected)
+        merged_snapshot_json["scope_sources"] = {
+            scope: f"{source.source}:{source.source_mode}" for scope, source in selected.items()
+        }
+        merged_snapshot_json["scope_periods"] = {
+            scope: self._scope_period(source, scope) for scope, source in selected.items()
+        }
 
         return ShareholderSnapshot(
             instrument_id=existing.instrument_id,
             symbol=existing.symbol,
             exchange=existing.exchange,
             coverage_status=existing.coverage_status,
-            holder_count=incoming.holder_count
-            if should_replace_holder_count
-            else existing.holder_count if existing.holder_count is not None else incoming.holder_count,
-            holder_count_report_date=(
-                incoming.holder_count_report_date
-                if should_replace_holder_count
-                else existing.holder_count_report_date or incoming.holder_count_report_date
-            ),
-            top_holders_report_date=(
-                incoming.top_holders_report_date
-                if use_incoming_top_holders
-                else existing.top_holders_report_date or incoming.top_holders_report_date
-            ),
-            top_holders_count=(
-                incoming.top_holders_count
-                if use_incoming_top_holders
-                else (
-                    existing.top_holders_count
-                    if existing.top_holders_count not in (None, 0)
-                    else incoming.top_holders_count
-                )
-            ),
-            top_holders_total_ratio=(
-                incoming.top_holders_total_ratio
-                if use_incoming_top_holders
-                else (
-                    existing.top_holders_total_ratio
-                    if existing.top_holders_total_ratio is not None
-                    else incoming.top_holders_total_ratio
-                )
-            ),
-            control_owner_name=(
-                incoming.control_owner_name
-                if incoming_has_authoritative_control
-                else existing.control_owner_name or incoming.control_owner_name
-            ),
-            control_owner_ratio=(
-                incoming.control_owner_ratio
-                if incoming_has_authoritative_control and incoming.control_owner_ratio is not None
-                else (
-                    existing.control_owner_ratio
-                    if existing.control_owner_ratio is not None
-                    else incoming.control_owner_ratio
-                )
-            ),
+            holder_count=holder_source.holder_count,
+            holder_count_report_date=self._scope_period(holder_source, "holder_count"),
+            top_holders_report_date=self._scope_period(top_source, "top10_holders"),
+            top_holders_count=top_source.top_holders_count,
+            top_holders_total_ratio=top_source.top_holders_total_ratio,
+            control_owner_name=ownership_source.control_owner_name,
+            control_owner_ratio=ownership_source.control_owner_ratio,
             schema_version=existing.schema_version,
             source=existing.source,
             source_mode=existing.source_mode,
             snapshot_json=merged_snapshot_json,
             raw_payload=existing.raw_payload,
+        )
+
+    def _scope_is_preferred(
+        self,
+        incoming: ShareholderSnapshot,
+        existing: ShareholderSnapshot,
+        scope: str,
+    ) -> bool:
+        incoming_period = self._scope_period(incoming, scope)
+        existing_period = self._scope_period(existing, scope)
+        if incoming_period != existing_period:
+            return bool(incoming_period and (not existing_period or incoming_period > existing_period))
+        incoming_authority = self._source_authority(incoming.source)
+        existing_authority = self._source_authority(existing.source)
+        if incoming_authority != existing_authority:
+            return incoming_authority < existing_authority
+        return self._scope_completeness(incoming, scope) > self._scope_completeness(existing, scope)
+
+    @staticmethod
+    def _scope_period(snapshot: ShareholderSnapshot, scope: str) -> Optional[str]:
+        payload = snapshot.snapshot_json if isinstance(snapshot.snapshot_json, dict) else {}
+        if scope == "holder_count":
+            raw = (payload.get("holder_count") or {}).get("report_date") if isinstance(payload.get("holder_count"), dict) else snapshot.holder_count_report_date
+        elif scope == "top10_holders":
+            holders = payload.get("top_holders") or []
+            raw = holders[0].get("report_date") if isinstance(holders, list) and holders and isinstance(holders[0], dict) else snapshot.top_holders_report_date
+        else:
+            raw = (payload.get("ownership_clues") or {}).get("report_date") if isinstance(payload.get("ownership_clues"), dict) else None
+            raw = raw or snapshot.top_holders_report_date or snapshot.holder_count_report_date
+        digits = "".join(character for character in str(raw or "") if character.isdigit())
+        return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}" if len(digits) >= 8 else None
+
+    @staticmethod
+    def _scope_completeness(snapshot: ShareholderSnapshot, scope: str) -> int:
+        if scope == "top10_holders":
+            return len(snapshot.snapshot_json.get("top_holders", []) or [])
+        if scope == "reference_only_ownership_clues":
+            return sum(bool(value) for value in (snapshot.control_owner_name, snapshot.control_owner_ratio))
+        return int(snapshot.holder_count is not None)
+
+    @staticmethod
+    def _snapshot_matches_instrument(snapshot: ShareholderSnapshot, instrument: Dict[str, Any]) -> bool:
+        return (
+            str(snapshot.instrument_id) == str(instrument.get("instrument_id") or "")
+            and str(snapshot.symbol) == str(instrument.get("symbol") or "")
+            and str(snapshot.exchange).upper() == str(instrument.get("exchange") or "").upper()
         )

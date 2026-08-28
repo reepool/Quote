@@ -388,11 +388,11 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
         coverage_scope = build_shareholder_coverage_scope(
             exchange=exchange,
             holder_count=holder_count,
+            holder_count_report_date=holder_count_report_date,
             top_holders=top_holders,
             has_ownership_clues=bool(
                 control_owner_name
                 or control_owner_ratio is not None
-                or top_holders
             ),
         )
 
@@ -510,6 +510,7 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
                         self._pick_first(row, self._top_holder_shares_aliases)
                     ),
                     "holder_type": self._pick_first(row, self._top_holder_type_aliases),
+                    "report_date": best_date,
                 }
             )
 
@@ -519,13 +520,12 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
         total_ratio = sum(
             ratio for ratio in (item.get("holding_ratio") for item in holders) if ratio is not None
         )
-        control_owner = holders[0]
         return (
             best_date,
             holders,
             total_ratio if total_ratio > 0 else None,
-            control_owner.get("holder_name"),
-            control_owner.get("holding_ratio"),
+            None,
+            None,
             fallback_holder_count,
         )
 

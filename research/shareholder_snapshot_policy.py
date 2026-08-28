@@ -14,10 +14,19 @@ REQUIRED_MAIN_BOARD_TOP_HOLDERS = 10
 def top_holders_satisfy_required_scope(exchange: str, top_holders: Any) -> bool:
     """Return whether a top-holder list satisfies the exchange coverage rule."""
     holders = top_holders if isinstance(top_holders, list) else []
-    count = len(holders)
+    holders = [item for item in holders if isinstance(item, dict)]
+    if not holders:
+        return False
+    ranks = [item.get("rank") for item in holders]
+    names = [str(item.get("holder_name") or "").strip() for item in holders]
+    dates = {_normalize_report_date(item.get("report_date")) for item in holders}
+    if not all(names) or len(set(names)) != len(names) or None in dates or len(dates) != 1:
+        return False
     if str(exchange or "").strip().upper() in MAIN_BOARD_TOP10_EXCHANGES:
-        return count >= REQUIRED_MAIN_BOARD_TOP_HOLDERS
-    return count > 0
+        return len(holders) == REQUIRED_MAIN_BOARD_TOP_HOLDERS and set(ranks) == set(
+            range(1, REQUIRED_MAIN_BOARD_TOP_HOLDERS + 1)
+        )
+    return all(isinstance(rank, int) and rank > 0 for rank in ranks)
 
 
 def actual_shareholder_coverage_scope(
@@ -28,20 +37,19 @@ def actual_shareholder_coverage_scope(
 ) -> Set[str]:
     """Return coverage actually present, not just claimed coverage_scope values."""
     payload = snapshot_json if isinstance(snapshot_json, dict) else {}
-    claimed = coverage_scope_of(payload)
     actual: Set[str] = set()
 
     holder_value = holder_count
     holder_blob = payload.get("holder_count")
     if holder_value is None and isinstance(holder_blob, dict):
         holder_value = holder_blob.get("value")
-    if holder_value is not None:
+    if _valid_holder_count(holder_value) and _holder_count_report_date(payload):
         actual.add("holder_count")
 
     if top_holders_satisfy_required_scope(exchange, payload.get("top_holders") or []):
         actual.add("top10_holders")
 
-    if "reference_only_ownership_clues" in claimed:
+    if _has_actual_ownership_control(payload):
         actual.add("reference_only_ownership_clues")
     return actual
 
@@ -50,12 +58,13 @@ def build_shareholder_coverage_scope(
     *,
     exchange: str,
     holder_count: Any,
+    holder_count_report_date: Any = None,
     top_holders: Any,
     has_ownership_clues: bool,
 ) -> List[str]:
     """Build coverage_scope using exchange-specific top10 completeness."""
     scope: List[str] = []
-    if holder_count is not None:
+    if _valid_holder_count(holder_count) and _normalize_report_date(holder_count_report_date):
         scope.append("holder_count")
     if top_holders_satisfy_required_scope(exchange, top_holders):
         scope.append("top10_holders")
@@ -172,8 +181,37 @@ def _top_holders_report_date(snapshot_json: Optional[Dict[str, Any]]) -> Optiona
             for item in top_holders
             if isinstance(item, dict)
         )
-    present = [item for item in dates if item]
-    return max(present) if present else None
+    present = {item for item in dates if item}
+    return next(iter(present)) if len(present) == 1 else None
+
+
+def _valid_holder_count(value: Any) -> bool:
+    try:
+        return int(value) >= 0
+    except (TypeError, ValueError):
+        return False
+
+
+def _has_actual_ownership_control(snapshot_json: Dict[str, Any]) -> bool:
+    """Return whether a source provided a dedicated ownership/control field.
+
+    Top-holder rank is not an actual-controller assertion and is deliberately
+    excluded here.
+    """
+    ownership = snapshot_json.get("ownership_clues")
+    if not isinstance(ownership, dict):
+        return False
+    return any(
+        str(ownership.get(key) or "").strip()
+        for key in (
+            "control_owner_name",
+            "actual_controller_name",
+            "controller_name",
+            "controlling_shareholder_name",
+            "control_method",
+            "ownership_control_method",
+        )
+    )
 
 
 def _report_date_regressed(

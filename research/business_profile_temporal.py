@@ -121,12 +121,11 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
             "scope_id",
             "object_raw",
             "object_id",
-            "evidence_id",
         ),
         "report_period",
         "valid_from",
         "valid_to",
-        None,
+        550,
     ),
     BusinessProfileTemporalPolicy(
         "exposure_facts",

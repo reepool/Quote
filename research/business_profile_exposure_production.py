@@ -367,8 +367,10 @@ class BusinessProfileExposurePublisher:
                 "reason": str((fact.get("metadata") or {}).get("publication_blocker")),
             }
         action = str((fact.get("metadata") or {}).get("source_activity_action") or "")
+        if action == "hedges":
+            return {"status": "fact_only", "fact": fact, "reason": "hedge_publication_rule_unsupported"}
         if action not in _ACTION_ROLES:
-            raise ValueError("ambiguous_or_unsupported_exposure_direction")
+            return {"status": "fact_only", "fact": fact, "reason": "unknown_exposure_role"}
         exposure_role, direction, evidence_requirement = _ACTION_ROLES[action]
         product_id = str(fact.get("product_id") or "").strip()
         if not product_id:
@@ -377,6 +379,9 @@ class BusinessProfileExposurePublisher:
                 "fact": fact,
                 "reason": "commodity_identity_unresolved",
             }
+        product = self.mapping_resolver.catalog.require_product(product_id)
+        if action in {"purchases", "consumes"} and product.product_kind == "energy_input":
+            exposure_role = "energy_cost"
         mapping = self.mapping_resolver.resolve(
             product_id=product_id,
             exposure_role=exposure_role,
@@ -416,6 +421,7 @@ class BusinessProfileExposurePublisher:
         )
         component_lineage = {
             "fact_ids": [fact_id],
+            "source_activity_action": action,
             "mapping_ids": [mapping.mapping_id],
             "assumption_ids": assumption_ids,
             "assumption_lineage_hashes": [
@@ -425,6 +431,7 @@ class BusinessProfileExposurePublisher:
             "fact_lineage_hash": fact.get("lineage_hash"),
             "catalog_version": mapping.catalog_version,
             "build_policy_version": PUBLICATION_POLICY_VERSION,
+            "consumer_id": normalized_consumer_id,
         }
         component_lineage_hash = _stable_hash(component_lineage)
         exposure_id = "commodity-exposure-" + component_lineage_hash[:24]
@@ -576,10 +583,14 @@ class BusinessProfileExposurePublisher:
         assumption_types: Sequence[str],
         knowledge_cutoff: str,
     ) -> list[dict[str, Any]]:
-        requested = tuple(dict.fromkeys(str(item).strip() for item in assumption_types))
-        unknown = sorted(set(requested) - set(_ASSUMPTION_TYPES))
+        canonical_by_requested = {
+            str(item).strip(): _ASSUMPTION_TYPES.get(str(item).strip())
+            for item in assumption_types
+        }
+        unknown = sorted(key for key, value in canonical_by_requested.items() if key and value is None and key not in {"spread_parameter"})
         if unknown:
             raise ValueError(f"unsupported required exposure assumptions: {unknown}")
+        requested = tuple(dict.fromkeys(value for value in canonical_by_requested.values() if value))
         if not requested:
             return []
         valid_scopes = {
@@ -595,15 +606,16 @@ class BusinessProfileExposurePublisher:
             matches = [
                 item
                 for item in approved
-                if item.get("assumption_type") == assumption_type
+                if _ASSUMPTION_TYPES.get(str(item.get("assumption_type") or "")) == assumption_type
                 and str(item.get("scope_id") or "") in valid_scopes
             ]
-            if len(matches) != 1:
+            values = {float(item.get("assumption_value")) for item in matches}
+            if len(matches) != 1 and len(values) != 1:
                 raise ValueError(
                     "required approved exposure assumption is missing or ambiguous: "
                     f"{assumption_type}"
                 )
-            selected.append(matches[0])
+            selected.append(sorted(matches, key=lambda item: str(item.get("updated_at") or ""))[-1])
         return selected
 
     def _find_predecessor(self, payload: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -619,6 +631,10 @@ class BusinessProfileExposurePublisher:
             and item.get("scope_id") == payload.get("scope_id")
             and item.get("commodity_id") == payload.get("commodity_id")
             and item.get("exposure_role") == payload.get("exposure_role")
+            and str((item.get("metadata") or {}).get("source_activity_action") or "")
+            == str((payload.get("metadata") or {}).get("source_activity_action") or "")
+            and str((item.get("metadata") or {}).get("consumer_id") or "")
+            == str((payload.get("metadata") or {}).get("consumer_id") or "")
             and item.get("exposure_id") != payload.get("exposure_id")
             and not item.get("knowledge_to")
         ]

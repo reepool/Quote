@@ -1005,6 +1005,15 @@ class ResearchShareholderReadinessResponse(BaseModel):
     )
     snapshot_total: int = Field(..., description="已落库股东快照总量")
     missing_snapshot_count: int = Field(..., description="仍缺失的股东快照数量")
+    complete_required_scope_instrument_count: int = Field(
+        0, description="同时满足全部 required scope 的标的数"
+    )
+    missing_required_scope_count: int = Field(
+        0, description="未同时满足全部 required scope 的标的数"
+    )
+    missing_required_scope_instrument_ids: List[str] = Field(
+        default_factory=list, description="未满足完整 required scope 的标的"
+    )
     required_scope: List[str] = Field(
         default_factory=list,
         description="rollout 期望覆盖的股东摘要字段范围",

@@ -1906,7 +1906,6 @@ class BusinessProfileResolver:
 
         industry_mappings, industry_scope = self._load_industry_mappings(industry_membership, cutoff)
         executable_company, mapping_gaps = self._company_executable_mappings(approved["exposures"])
-        selected_mappings = self._merge_mappings(executable_company, industry_mappings)
         scores = self._model_scores(industry_membership, industry_mappings, approved)
         conflicts = self._detect_conflicts(executable_company, industry_mappings)
         recommendation = self._recommend_model(scores, conflicts, bool(executable_company))
@@ -1943,7 +1942,7 @@ class BusinessProfileResolver:
             "profile_lifecycle": {
                 key: value for key, value in lifecycle.items() if key != "warnings"
             },
-            "executable_exposure_mappings": selected_mappings,
+            "executable_exposure_mappings": executable_company,
             "model_scores": scores,
             "model_recommendation": recommendation,
             "conflicts": conflicts,
@@ -1958,7 +1957,7 @@ class BusinessProfileResolver:
                 "profile_events": [
                     item.get("lineage_hash") for item in lifecycle["approved_events"]
                 ],
-                "mappings": [item.get("mapping_id") for item in selected_mappings],
+                "mappings": [item.get("mapping_id") for item in executable_company],
             }
         )
         approved_company_fact_count = sum(len(values) for values in approved.values())
@@ -1985,7 +1984,7 @@ class BusinessProfileResolver:
             "active_business_regime_id": active_regime_id,
             "approved_profile_event_count": len(lifecycle["approved_events"]),
             "industry_mapping_count": len(industry_mappings),
-            "executable_mapping_count": len(selected_mappings),
+            "executable_mapping_count": len(executable_company),
             "market_link": {
                 "status": market_link_status,
                 "approved_exposure_count": approved_exposure_count,
@@ -2016,6 +2015,8 @@ class BusinessProfileResolver:
         for record_type in (
             "segments",
             "operating_facts",
+            "activities",
+            "relationships",
             "value_chain_roles",
             "exposures",
         ):
@@ -2327,7 +2328,10 @@ class BusinessProfileResolver:
             if not series_id and not spread_id:
                 gaps.append(f"exposure_market_series_missing:{exposure.get('exposure_id')}")
                 continue
-            role = str(exposure.get("exposure_role") or "revenue")
+            role = str(exposure.get("exposure_role") or "").strip()
+            if role not in {"revenue", "feedstock_cost", "energy_cost"}:
+                gaps.append(f"exposure_role_unrecognized:{exposure.get('exposure_id')}")
+                continue
             is_cost = role in {"feedstock_cost", "energy_cost"}
             direction = str(exposure.get("direction") or "").strip() or None
             if direction is None:

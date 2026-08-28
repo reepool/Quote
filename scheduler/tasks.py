@@ -11402,11 +11402,11 @@ class ScheduledTasks:
                 readiness = None
 
             status = result.get('status', 'failed')
-            success = status in {'success', 'degraded'}
+            success = status == 'success'
 
             report_data = {
                 'name': '股东摘要影子同步报告',
-                'status': 'success' if success else 'error',
+                'status': status if status in {'success', 'degraded'} else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
                 'duration': 'N/A',
                 'content': _format_shareholder_shadow_scheduler_report(
@@ -11484,11 +11484,11 @@ class ScheduledTasks:
                 readiness = None
 
             status = result.get('status', 'failed')
-            success = status in {'success', 'degraded'}
+            success = status == 'success'
 
             report_data = {
                 'name': '股东摘要周期复核与补足报告',
-                'status': 'success' if success else 'error',
+                'status': status if status in {'success', 'degraded'} else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
                 'duration': 'N/A',
                 'content': _format_shareholder_shadow_scheduler_report(

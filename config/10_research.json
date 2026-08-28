@@ -405,6 +405,7 @@
       },
       "shareholders": {
         "enabled": true,
+        "source_authority": ["cninfo", "akshare", "efinance"],
         "delivery_mode": "paid_high_availability",
         "optional_empty_exchanges": [
           "BSE"
