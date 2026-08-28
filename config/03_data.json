@@ -39,9 +39,12 @@
       "short_gap_catchup_days": 5,
       "sample_limit": 10
     },
-    "daily_update_official_retry": {
+    "daily_update_unresolved_retry": {
       "enabled": true,
-      "max_instruments": 50
+      "max_instruments": 50,
+      "sources": ["primary"],
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "ignore_coverage_breaker": true
     },
     "repair_universe_governance": {
       "enabled": true,

@@ -297,7 +297,14 @@ class ReportEngine:
             f"未覆盖: {empty_unresolved}，陈旧源: {stale_source}，质量拒绝: {quality_rejected}",
         ]
         if retry_attempted > 0:
-            lines.append(f"官方补拉: 尝试{retry_attempted}，挽回{retry_recovered}")
+            source_label = ','.join(
+                str(item) for item in (official_retry_stats.get('sources') or [])[:4]
+                if str(item).strip()
+            )
+            retry_line = f"补拉: 尝试{retry_attempted}，挽回{retry_recovered}"
+            if source_label:
+                retry_line += f"，源={source_label}"
+            lines.append(retry_line)
             recovered_parts = []
             for sample in (official_retry_stats.get('recovered_samples') or [])[:5]:
                 if not isinstance(sample, dict):

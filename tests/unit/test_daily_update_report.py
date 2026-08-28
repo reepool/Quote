@@ -883,6 +883,7 @@ def test_daily_update_report_renders_official_retry_without_nested_table_noise()
             'recovered': 3,
             'still_unresolved': 1,
             'quotes_added': 3,
+            'sources': ['primary'],
             'recovered_samples': [
                 {'instrument_id': '000842.SH', 'symbol': '000842', 'exchange': 'SSE'},
                 {'instrument_id': '000939.SH', 'symbol': '000939', 'exchange': 'SSE'},
@@ -920,7 +921,8 @@ def test_daily_update_report_renders_official_retry_without_nested_table_noise()
     )
 
     assert '*完整性*' in message
-    assert '官方补拉: 尝试4，挽回3' in message
+    assert '补拉: 尝试4，挽回3' in message
+    assert '源=primary' in message
     assert '挽回样例: 000842.SH；000939.SH' in message
     assert '399691.SZ skipped=cnindex_a_stock retry=empty' in message
     assert "'recovered_samples':" not in message
@@ -1209,7 +1211,7 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
 
     assert manager.source_factory.get_daily_data.await_count == 2
     retry_call = manager.source_factory.get_daily_data.await_args_list[1]
-    assert retry_call.kwargs['official_source_only'] is True
+    assert retry_call.kwargs['source_names'] == ['primary']
     assert retry_call.kwargs['ignore_coverage_breaker'] is True
     assert result['success_count'] == 0
     assert result['failure_count'] == 1
@@ -1217,6 +1219,7 @@ async def test_update_daily_data_does_not_count_empty_quote_as_success():
     assert result['official_retry_stats']['attempted'] == 1
     assert result['official_retry_stats']['recovered'] == 0
     assert result['official_retry_stats']['still_unresolved'] == 1
+    assert result['official_retry_stats']['sources'] == ['primary']
     assert result['integrity_stats']['samples'] == [{
         'instrument_id': '000001.SZ',
         'symbol': '000001',
@@ -1262,13 +1265,13 @@ async def test_update_daily_data_retries_empty_unresolved_from_official_source()
     manager.source_factory = Mock()
 
     async def fake_get_daily_data(*_args, **kwargs):
-        if kwargs.get('official_source_only'):
+        if kwargs.get('source_names') or kwargs.get('official_source_only'):
             manager.source_factory.last_daily_data_diagnostic = {
                 'skipped_sources': [],
                 'probed_sources': [],
                 'stale_source': False,
                 'transport_error': False,
-                'official_source_only': True,
+                'source_names': list(kwargs.get('source_names') or ['primary']),
                 'ignore_coverage_breaker': True,
             }
             return [{
@@ -1304,7 +1307,7 @@ async def test_update_daily_data_retries_empty_unresolved_from_official_source()
 
     assert manager.source_factory.get_daily_data.await_count == 2
     retry_call = manager.source_factory.get_daily_data.await_args_list[1]
-    assert retry_call.kwargs['official_source_only'] is True
+    assert retry_call.kwargs['source_names'] == ['primary']
     assert retry_call.kwargs['ignore_coverage_breaker'] is True
     assert result['success_count'] == 1
     assert result['failure_count'] == 0
@@ -1314,6 +1317,7 @@ async def test_update_daily_data_retries_empty_unresolved_from_official_source()
     assert result['official_retry_stats']['attempted'] == 1
     assert result['official_retry_stats']['recovered'] == 1
     assert result['official_retry_stats']['still_unresolved'] == 0
+    assert result['official_retry_stats']['sources'] == ['primary']
     assert result['official_retry_stats']['recovered_samples'] == [{
         'instrument_id': '000842.SH',
         'symbol': '000842',
@@ -1321,6 +1325,160 @@ async def test_update_daily_data_retries_empty_unresolved_from_official_source()
         'quotes_added': 1,
     }]
     manager.db_ops.save_daily_quotes.assert_awaited_once()
+
+
+def test_unresolved_retry_config_reads_sources_and_legacy_key():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_unresolved_retry'] = {
+        'enabled': False,
+        'max_instruments': 8,
+        'sources': ['csindex', 'cnindex'],
+        'exchanges': ['SSE'],
+        'ignore_coverage_breaker': False,
+    }
+    cfg = manager._get_daily_update_unresolved_retry_config()
+    assert cfg['enabled'] is False
+    assert cfg['max_instruments'] == 8
+    assert cfg['sources'] == ['csindex', 'cnindex']
+    assert cfg['exchanges'] == {'SSE'}
+    assert cfg['ignore_coverage_breaker'] is False
+
+    manager.data_config.pop('daily_update_unresolved_retry')
+    manager.data_config['daily_update_official_retry'] = {
+        'enabled': True,
+        'max_instruments': 3,
+        'sources': 'primary',
+    }
+    legacy = manager._get_daily_update_unresolved_retry_config()
+    assert legacy['enabled'] is True
+    assert legacy['max_instruments'] == 3
+    assert legacy['sources'] == ['primary']
+    assert 'SSE' in legacy['exchanges']
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_skips_unresolved_retry_when_disabled():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_unresolved_retry'] = {'enabled': False}
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'exchange': 'SZSE',
+        'type': 'stock',
+        'listed_date': datetime(2020, 1, 1),
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+    manager.source_factory.last_daily_data_diagnostic = {}
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SZSE'],
+            target_date=date(2026, 8, 26),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    assert manager.source_factory.get_daily_data.await_count == 1
+    assert result['official_retry_stats']['attempted'] == 0
+    assert result['failure_count'] == 1
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_retries_configured_source_names():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_unresolved_retry'] = {
+        'enabled': True,
+        'max_instruments': 50,
+        'sources': ['csindex', 'cnindex'],
+        'ignore_coverage_breaker': True,
+    }
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '000842.SH',
+        'symbol': '000842',
+        'exchange': 'SSE',
+        'type': 'index',
+        'listed_date': datetime(2010, 1, 1),
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+    manager.source_factory.last_daily_data_diagnostic = {}
+
+    with patch('builtins.open', mock_open()):
+        await manager.update_daily_data(
+            exchanges=['SSE'],
+            target_date=date(2026, 8, 28),
+            instrument_types=['index'],
+            run_factor_audit=False,
+        )
+
+    retry_call = manager.source_factory.get_daily_data.await_args_list[1]
+    assert retry_call.kwargs['source_names'] == ['csindex', 'cnindex']
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_caps_unresolved_retry_count():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_unresolved_retry'] = {
+        'enabled': True,
+        'max_instruments': 1,
+        'sources': ['primary'],
+    }
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[
+        {
+            'instrument_id': '000842.SH',
+            'symbol': '000842',
+            'exchange': 'SSE',
+            'type': 'index',
+            'listed_date': datetime(2010, 1, 1),
+        },
+        {
+            'instrument_id': '000939.SH',
+            'symbol': '000939',
+            'exchange': 'SSE',
+            'type': 'index',
+            'listed_date': datetime(2010, 1, 1),
+        },
+    ])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+    manager.source_factory.last_daily_data_diagnostic = {}
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SSE'],
+            target_date=date(2026, 8, 28),
+            instrument_types=['index'],
+            run_factor_audit=False,
+        )
+
+    # 2 main-loop fetches + 1 capped retry
+    assert manager.source_factory.get_daily_data.await_count == 3
+    assert result['official_retry_stats']['attempted'] == 1
+    assert result['official_retry_stats']['capped'] is True
+    assert result['integrity_stats']['empty_unresolved'] == 2
 
 
 @pytest.mark.asyncio

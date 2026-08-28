@@ -82,7 +82,7 @@ SchedulerCore
 
 - 范围为 `SSE`、`SZSE`、`BSE` 的 `stock` 主数据。
 - A 股股票主数据源为 `exchange_official -> BaoStock -> AkShare`：上交所、深交所、北交所官方 current list 是股票生命周期最高证据；BaoStock 是第一备源，AkShare 是第二备源。官方源成功时，备源只补充非生命周期字段和差异诊断，不把官方列表缺失代码并集补入 active universe。
-- 指数日线使用官方源优先：`SSE index = CSIndex -> BaoStock -> AkShare`，`SZSE index = CNIndex -> BaoStock -> AkShare`；官方源返回非空但未覆盖请求区间内最后一个交易日时继续 fallback。主循环结束后，`data_config.daily_update_official_retry` 会对仍为 `empty_unresolved` 的 A 股代码再请求一次官方源。
+- 指数日线使用官方源优先：`SSE index = CSIndex -> BaoStock -> AkShare`，`SZSE index = CNIndex -> BaoStock -> AkShare`；官方源返回非空但未覆盖请求区间内最后一个交易日时继续 fallback。主循环结束后，`data_config.daily_update_unresolved_retry` 会对仍为 `empty_unresolved` 的代码按配置源再请求一次。
 - 日更走共享主数据前置治理，并默认命中 `force_refresh_job_names`；当前日更会跳过 freshness 复用并重新拉取上游主数据。`instrument_types` 包含 `index` 时，还会在读取指数 universe 前执行 A 股指数主数据治理。
 - 同步完成后重新读取 active instruments，再开始行情抓取。
 - 指数治理会把 CNIndex 没有有效 6 位 `深交所行情代码` 的官方指数保存为 metadata-only 主数据身份；本地遗留的错误行情型 key 或非 6 位 `.SZ` key 会被标记为 `status=metadata_only,is_active=0,trading_status=0`，因此不会进入 `tradable_only=True` 的普通日更抓取池。

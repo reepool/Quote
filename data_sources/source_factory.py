@@ -10,7 +10,7 @@ from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshar
 _install_akshare_proxy_patch(required=False)
 
 import asyncio
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Sequence
 from datetime import datetime, date
 
 from utils import ds_logger, config_manager
@@ -319,6 +319,46 @@ class DataSourceFactory:
             if name.endswith(suffix):
                 return name[:-len(suffix)]
         return name
+
+    @classmethod
+    def _normalize_retry_source_token(cls, value: Any) -> str:
+        return str(value or '').strip().lower()
+
+    def _source_matches_retry_token(self, source: BaseDataSource, token: str) -> bool:
+        if not token:
+            return False
+        full = (getattr(source, 'name', '') or '').lower()
+        base = self._source_base_name(source).lower()
+        return token == full or token == base
+
+    def _select_daily_source_chain(
+        self,
+        source_chain: List[BaseDataSource],
+        source_names: Sequence[str],
+    ) -> List[BaseDataSource]:
+        """Keep route members requested for an end-of-run retry, in config order."""
+        if not source_names:
+            return list(source_chain)
+
+        selected: List[BaseDataSource] = []
+        seen = set()
+        for raw_name in source_names:
+            token = self._normalize_retry_source_token(raw_name)
+            if not token:
+                continue
+            if token in {'primary', 'official'}:
+                if source_chain and id(source_chain[0]) not in seen:
+                    selected.append(source_chain[0])
+                    seen.add(id(source_chain[0]))
+                continue
+            for source in source_chain:
+                if id(source) in seen:
+                    continue
+                if self._source_matches_retry_token(source, token):
+                    selected.append(source)
+                    seen.add(id(source))
+                    break
+        return selected
 
     @staticmethod
     def _is_official_instrument_source(source: Optional[BaseDataSource]) -> bool:
@@ -1489,6 +1529,7 @@ class DataSourceFactory:
                            instrument_type: str = 'stock',
                            source_symbol: str = '',
                            *,
+                           source_names: Optional[Sequence[str]] = None,
                            official_source_only: bool = False,
                            ignore_coverage_breaker: bool = False) -> List[Dict[str, Any]]:
         """获取日线数据 - 智能降级策略
@@ -1501,10 +1542,18 @@ class DataSourceFactory:
             end_date: 结束日期
             instrument_type: 品种类型
             source_symbol: 数据源原始代码（如东财 105.AAPL），可选
-            official_source_only: 只请求路由链第一个官方源，不走 fallback
+            source_names: 只使用这些路由名（如 csindex、baostock、primary），按列表顺序
+            official_source_only: 兼容开关，等价于 source_names=["primary"]
             ignore_coverage_breaker: 忽略本轮 stale/403 熔断，强制请求当前源链
         """
         exchange = exchange.upper()
+        requested_names = [
+            str(name).strip()
+            for name in (source_names or [])
+            if str(name).strip()
+        ]
+        if not requested_names and official_source_only:
+            requested_names = ['primary']
         self.last_daily_data_diagnostic = {
             "exchange": exchange,
             "instrument_id": instrument_id,
@@ -1514,7 +1563,8 @@ class DataSourceFactory:
             "transport_error": False,
             "skipped_sources": [],
             "probed_sources": [],
-            "official_source_only": bool(official_source_only),
+            "source_names": list(requested_names),
+            "official_source_only": bool(official_source_only) or requested_names == ['primary'],
             "ignore_coverage_breaker": bool(ignore_coverage_breaker),
         }
 
@@ -1522,8 +1572,16 @@ class DataSourceFactory:
         if not source_chain:
             ds_logger.error(f"[DataSourceFactory] No data source configured for exchange: {exchange}")
             return []
-        if official_source_only:
-            source_chain = source_chain[:1]
+        if requested_names:
+            source_chain = self._select_daily_source_chain(source_chain, requested_names)
+            if not source_chain:
+                ds_logger.warning(
+                    "[DataSourceFactory] No matching daily sources for %s %s requested=%s",
+                    exchange,
+                    symbol,
+                    ",".join(requested_names),
+                )
+                return []
         if not ignore_coverage_breaker:
             source_chain = await self._filter_daily_source_chain_for_stale_breaker(
                 source_chain,

@@ -19273,13 +19273,18 @@ class DataManager:
         cfg['enabled'] = bool(cfg.get('enabled', True))
         return cfg
 
-    def _get_daily_update_official_retry_config(self) -> Dict[str, Any]:
-        """Return end-of-run official-source retry settings for unresolved quotes."""
+    def _get_daily_update_unresolved_retry_config(self) -> Dict[str, Any]:
+        """Return end-of-run unresolved quote retry settings."""
         defaults = {
             'enabled': True,
             'max_instruments': 50,
+            'sources': ['primary'],
+            'exchanges': ['SSE', 'SZSE', 'BSE'],
+            'ignore_coverage_breaker': True,
         }
-        raw = self.data_config.get('daily_update_official_retry', {})
+        raw = self.data_config.get('daily_update_unresolved_retry')
+        if not isinstance(raw, dict):
+            raw = self.data_config.get('daily_update_official_retry', {})
         if not isinstance(raw, dict):
             raw = {}
         cfg = {**defaults, **raw}
@@ -19290,8 +19295,32 @@ class DataManager:
             )
         except (TypeError, ValueError):
             cfg['max_instruments'] = defaults['max_instruments']
+        sources_raw = cfg.get('sources', defaults['sources'])
+        if isinstance(sources_raw, str):
+            sources = [sources_raw.strip()] if sources_raw.strip() else []
+        elif isinstance(sources_raw, (list, tuple)):
+            sources = [
+                str(item).strip()
+                for item in sources_raw
+                if str(item).strip()
+            ]
+        else:
+            sources = list(defaults['sources'])
+        cfg['sources'] = sources
+        cfg['exchanges'] = {
+            str(exchange).strip().upper()
+            for exchange in cfg.get('exchanges', defaults['exchanges'])
+            if str(exchange).strip()
+        }
         cfg['enabled'] = bool(cfg.get('enabled', True))
+        cfg['ignore_coverage_breaker'] = bool(
+            cfg.get('ignore_coverage_breaker', True)
+        )
         return cfg
+
+    def _get_daily_update_official_retry_config(self) -> Dict[str, Any]:
+        """Compatibility alias for unresolved daily retry settings."""
+        return self._get_daily_update_unresolved_retry_config()
 
     @staticmethod
     def _empty_official_retry_stats() -> Dict[str, Any]:
@@ -19301,6 +19330,7 @@ class DataManager:
             'still_unresolved': 0,
             'quotes_added': 0,
             'capped': False,
+            'sources': [],
             'recovered_samples': [],
         }
 
@@ -19343,26 +19373,32 @@ class DataManager:
         per_instrument_timeout_sec: Optional[int],
         catchup_sample_limit: int,
     ) -> Dict[str, Any]:
-        """Retry empty_unresolved A-share codes once from the official daily source."""
+        """Retry empty_unresolved quotes from configured daily sources."""
         stats = self._empty_official_retry_stats()
         if not candidates:
             return stats
 
         max_instruments = int(retry_config.get('max_instruments', 50) or 0)
-        if max_instruments <= 0:
+        source_names = list(retry_config.get('sources') or ['primary'])
+        stats['sources'] = list(source_names)
+        ignore_coverage_breaker = bool(
+            retry_config.get('ignore_coverage_breaker', True)
+        )
+        if max_instruments <= 0 or not source_names:
             return stats
 
         to_retry = candidates[:max_instruments]
         stats['capped'] = len(candidates) > len(to_retry)
         if stats['capped']:
             dm_logger.warning(
-                "[DataManager] Official daily retry capped from %s to %s unresolved instruments",
+                "[DataManager] Unresolved daily retry capped from %s to %s instruments",
                 len(candidates),
                 len(to_retry),
             )
         dm_logger.info(
-            "[DataManager] Retrying %s empty_unresolved instrument(s) from official daily source",
+            "[DataManager] Retrying %s empty_unresolved instrument(s) from sources=%s",
             len(to_retry),
+            ",".join(source_names),
         )
 
         for item in to_retry:
@@ -19387,8 +19423,8 @@ class DataManager:
                     datetime.combine(end_date, datetime.max.time()),
                     instrument_type=instrument.get('type', 'stock'),
                     source_symbol=instrument.get('source_symbol', ''),
-                    official_source_only=True,
-                    ignore_coverage_breaker=True,
+                    source_names=source_names,
+                    ignore_coverage_breaker=ignore_coverage_breaker,
                 )
                 if per_instrument_timeout_sec:
                     data = await asyncio.wait_for(
@@ -19399,7 +19435,7 @@ class DataManager:
                     data = await fetch_coro
             except asyncio.TimeoutError:
                 dm_logger.warning(
-                    "[DataManager] Official daily retry timed out for %s (%s)",
+                    "[DataManager] Unresolved daily retry timed out for %s (%s)",
                     symbol,
                     instrument_id,
                 )
@@ -19417,7 +19453,7 @@ class DataManager:
                 continue
             except Exception as retry_error:
                 dm_logger.warning(
-                    "[DataManager] Official daily retry failed for %s: %s",
+                    "[DataManager] Unresolved daily retry failed for %s: %s",
                     symbol,
                     retry_error,
                 )
@@ -19469,7 +19505,7 @@ class DataManager:
                     retry_patch,
                 )
                 dm_logger.info(
-                    "[DataManager] Official daily retry still empty for %s",
+                    "[DataManager] Unresolved daily retry still empty for %s",
                     symbol,
                 )
                 continue
@@ -19483,7 +19519,7 @@ class DataManager:
             if int(write_stats.get('failed', 0) or 0):
                 stats['still_unresolved'] += 1
                 dm_logger.warning(
-                    "[DataManager] Official daily retry persistence incomplete for %s: failed=%s",
+                    "[DataManager] Unresolved daily retry persistence incomplete for %s: failed=%s",
                     symbol,
                     write_stats.get('failed'),
                 )
@@ -19554,16 +19590,17 @@ class DataManager:
             if catchup_sample_limit > 0 and len(stats['recovered_samples']) < catchup_sample_limit:
                 stats['recovered_samples'].append(recovered_sample)
             dm_logger.info(
-                "[DataManager] Official daily retry recovered %s: %s quotes",
+                "[DataManager] Unresolved daily retry recovered %s: %s quotes",
                 symbol,
                 quotes_added,
             )
 
         dm_logger.info(
-            "[DataManager] Official daily retry finished: attempted=%s recovered=%s still_unresolved=%s",
+            "[DataManager] Unresolved daily retry finished: attempted=%s recovered=%s still_unresolved=%s sources=%s",
             stats['attempted'],
             stats['recovered'],
             stats['still_unresolved'],
+            ",".join(source_names),
         )
         return stats
 
@@ -38123,6 +38160,7 @@ class DataManager:
             update_results['index_master_governance'] = instrument_master_sync.get('index_master_governance')
             catchup_config = self._get_daily_update_catchup_config()
             catchup_sample_limit = int(catchup_config.get('sample_limit', 10))
+            retry_config = self._get_daily_update_unresolved_retry_config()
 
             def _record_catchup_sample(exchange_result: Dict[str, Any], sample: Dict[str, Any]) -> None:
                 if catchup_sample_limit <= 0:
@@ -38319,7 +38357,7 @@ class DataManager:
                                                 ),
                                             },
                                         )
-                                        if exchange in ('SSE', 'SZSE', 'BSE'):
+                                        if exchange in retry_config['exchanges']:
                                             empty_unresolved_retries.append(
                                                 {
                                                     'exchange': exchange,
@@ -38458,7 +38496,6 @@ class DataManager:
                     update_results['exchange_stats'][exchange] = {'error': str(e)}
                     continue
 
-            retry_config = self._get_daily_update_official_retry_config()
             if retry_config.get('enabled') and empty_unresolved_retries:
                 update_results['official_retry_stats'] = (
                     await self._retry_empty_unresolved_official_daily(

@@ -582,6 +582,63 @@ class TestSourceFactoryRouting:
         assert self.factory.last_daily_data_diagnostic['ignore_coverage_breaker'] is True
         assert self.factory.last_daily_data_diagnostic['skipped_sources'] == []
 
+    def test_select_daily_source_chain_keeps_configured_route_members(self):
+        chain = self.factory._get_daily_source_chain('SSE', 'index')
+        selected = self.factory._select_daily_source_chain(
+            chain, ['csindex', 'akshare']
+        )
+        assert [source.name for source in selected] == [
+            'csindex_a_stock',
+            'akshare_a_stock',
+        ]
+        assert self.factory._select_daily_source_chain(chain, ['primary']) == [chain[0]]
+        assert self.factory._select_daily_source_chain(chain, ['cnindex']) == []
+
+    @pytest.mark.asyncio
+    async def test_named_retry_sources_try_selected_route_members_only(self):
+        self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 8, 28).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(
+            side_effect=Exception('HTTP Error 403: Forbidden')
+        )
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                self._index_quote(instrument_id, datetime(2026, 8, 28), 2.0)
+            ]
+        )
+        self.akshare.get_daily_data = AsyncMock(return_value=[])
+
+        for symbol in ['000841', '000843', '000844']:
+            await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 8, 28),
+                datetime(2026, 8, 28),
+                instrument_type='index',
+            )
+
+        akshare_calls = self.akshare.get_daily_data.await_count
+        rows = await self.factory.get_daily_data(
+            'SSE',
+            '000842.SH',
+            '000842',
+            datetime(2026, 8, 28),
+            datetime(2026, 8, 28),
+            instrument_type='index',
+            source_names=['csindex', 'baostock'],
+            ignore_coverage_breaker=True,
+        )
+
+        assert rows[0]['close'] == 2.0
+        assert self.factory.last_daily_data_diagnostic['source_names'] == [
+            'csindex',
+            'baostock',
+        ]
+        assert self.akshare.get_daily_data.await_count == akshare_calls
+
     @pytest.mark.asyncio
     async def test_empty_index_result_does_not_open_http_403_breaker(self):
         self._set_index_breaker_behavior(transport_threshold=3, transport_probe_every=0)

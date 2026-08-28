@@ -442,21 +442,27 @@
 - **`short_gap_catchup_days`**: 对已有行情但最新日期落后普通日更窗口的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。
 - **`sample_limit`**: 日更报告中保留的追补样例数量。追补窗口被截断或缺少 `listed_date` 时会在报告中暴露，超过窗口的大缺口仍交给 `/backfill` 或 `find_gap_and_repair`。
 
-### data_config.daily_update_official_retry
+### data_config.daily_update_unresolved_retry
 
-> 普通 A 股日更在全市场循环结束后，对仍未覆盖目标交易日的失败代码再请求一次官方行情源。用于官方源被 403/stale 熔断跳过、但任务末尾可能已经恢复的指数。
+> 普通日更在全市场循环结束后，对仍未覆盖目标交易日的失败代码再请求一次配置中的行情源。用于官方源被 403/stale 熔断跳过、但任务末尾可能已经恢复的指数；也可改成只补 backup 或同时补几个源。旧键 `daily_update_official_retry` 仍可读取。
 
 ```json
 {
-  "daily_update_official_retry": {
+  "daily_update_unresolved_retry": {
     "enabled": true,
-    "max_instruments": 50
+    "max_instruments": 50,
+    "sources": ["primary"],
+    "exchanges": ["SSE", "SZSE", "BSE"],
+    "ignore_coverage_breaker": true
   }
 }
 ```
 
 - **`enabled`**: 是否在日更主循环结束后补拉 `empty_unresolved` 代码。
-- **`max_instruments`**: 单轮最多补拉数量，避免全市场主源故障时重复打官方接口。补拉只走路由链第一个官方源，并忽略本轮 coverage 熔断，不重试 BaoStock/AkShare。挽回结果计入成功数，并出现在 Telegram「完整性」段的「官方补拉」。
+- **`max_instruments`**: 单轮最多补拉数量，避免全市场主源故障时重复打接口。
+- **`sources`**: 补拉使用的源，按列表顺序尝试，且必须属于该品种当前 `routing.daily` 链路。`primary` / `official` 表示链路第一个源（SSE 指数为 CSIndex，SZSE 指数为 CNIndex）。也可写路由名，例如 `["csindex", "cnindex"]` 或 `["csindex", "baostock"]`。某个市场没有该源时自动跳过。
+- **`exchanges`**: 允许进入补拉名单的市场。
+- **`ignore_coverage_breaker`**: 补拉时是否忽略本轮 stale/403 熔断。官方源补拉应保持 `true`，否则仍会被熔断跳过。挽回结果计入成功数，并出现在 Telegram「完整性」段的「补拉」。
 
 ### data_config.repair_universe_governance
 
